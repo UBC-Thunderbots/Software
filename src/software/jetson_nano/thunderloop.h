@@ -106,6 +106,7 @@ class Thunderloop
     std::optional<TbotsProto::MotorStatus> motor_status_;
     TbotsProto::ThunderloopStatus thunderloop_status_;
     TbotsProto::ChipperKickerStatus chipper_kicker_status_;
+    TbotsProto::PrimitiveExecutorStatus primitive_executor_status_;
     TbotsProto::Timestamp time_sent_;
 
     // Current State

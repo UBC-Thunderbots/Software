@@ -18,6 +18,8 @@ struct PivotKickFSM
         Angle kick_direction;
         // How the robot will chip or kick the ball
         AutoChipOrKick auto_chip_or_kick;
+
+        std::optional<Angle> dribble_into_ball_orientation = std::nullopt;
     };
 
     // this struct defines the only event that the PivotKickFSM responds to

@@ -1,3 +1,5 @@
+import copy
+
 from software.py_constants import *
 from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -104,11 +106,18 @@ class RobotCommunication(object):
         Uses the keyboard estop value
         Unless estop is plugged in, in which case the physical estop value overrides it
         """
+        previous_estop_is_playing = True
         if self.estop_mode != EstopMode.DISABLE_ESTOP:
             while True:
                 if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
                     self.estop_is_playing = self.estop_reader.isEstopPlay()
-                    self.should_send_stop = not self.estop_is_playing
+                    # Send stop primitive once
+                    if previous_estop_is_playing and not self.estop_is_playing:
+                        self.should_send_stop = True
+                    else:
+                        self.should_send_stop = False
+
+                    previous_estop_is_playing = self.estop_is_playing
 
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_is_playing)
@@ -283,9 +292,11 @@ class RobotCommunication(object):
         # Since it is not used by the robots, we will remove all values from its
         # array.
         if primitive.HasField("move"):
-            del primitive.move.motion_control.static_obstacles[:]
-
-        return primitive
+            primitive_copy = copy.copy(primitive)
+            del primitive_copy.move.motion_control.static_obstacles[:]
+            return primitive_copy
+        else:
+            return primitive
 
     def setup_for_fullsystem(self):
         """

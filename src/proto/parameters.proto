@@ -55,13 +55,13 @@ message AttackerTacticConfig
     // The radius of the circle around a friendly robot around which
     // we think an enemy is about to steal the ball
     required double enemy_about_to_steal_ball_radius = 1
-        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 4.0];
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 
     // The minimum open angle to the goal that we require before taking a shot
     required double min_open_angle_for_shot_deg = 2 [
-        default                   = 6.0,
+        default                   = 3.0,
         (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 90.0
+        (bounds).max_double_value = 10.0
     ];
 }
 

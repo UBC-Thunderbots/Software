@@ -19,9 +19,14 @@ NetworkService::NetworkService(const std::string& ip_address,
 }
 
 std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> NetworkService::poll(
-    const TbotsProto::RobotStatus& robot_status)
+    TbotsProto::RobotStatus& robot_status)
 {
     std::scoped_lock lock{primitive_set_mutex, world_mutex};
+    robot_status.mutable_network_status()->set_primitive_packet_loss_percentage(
+        static_cast<unsigned int>(primitive_tracker.getLossRate() * 100));
+    robot_status.mutable_network_status()->set_world_packet_loss_percentage(
+        static_cast<unsigned int>(world_tracker.getLossRate() * 100));
+
     // Rate limit sending of proto based on thunderloop freq
     if ((robot_status.motor_status().front_left().motor_faults_size() > 0 ||
          robot_status.motor_status().front_right().motor_faults_size() > 0 ||
@@ -51,13 +56,14 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
         primitive_set_msg = input;
     }
 
-    float primitive_set_loss_rate = primitive_tracker.getLossRate();
-    if (primitive_set_loss_rate > PROTO_LOSS_WARNING_THRESHOLD)
-    {
-        // Log in 5% increments to allow the logs to be merged
-        LOG(WARNING) << "Primitive set loss rate is "
-                     << static_cast<int>(primitive_set_loss_rate * 20) * 5 << "%";
-    }
+    //    float primitive_set_loss_rate = primitive_tracker.getLossRate();
+    //    if (primitive_set_loss_rate > PROTO_LOSS_WARNING_THRESHOLD)
+    //    {
+    //        // Log in 5% increments to allow the logs to be merged
+    //        LOG(WARNING) << "Primitive set loss rate is " <<
+    //        static_cast<int>(primitive_set_loss_rate * 20) * 5
+    //                     << "%";
+    //    }
 }
 
 void NetworkService::worldCallback(TbotsProto::World input)
@@ -71,11 +77,11 @@ void NetworkService::worldCallback(TbotsProto::World input)
         world_msg = input;
     }
 
-    float world_loss_rate = world_tracker.getLossRate();
-    if (world_loss_rate > PROTO_LOSS_WARNING_THRESHOLD)
-    {
-        // Log in 5% increments to allow the logs to be merged
-        LOG(WARNING) << "World loss rate is "
-                     << static_cast<int>(world_loss_rate * 20) * 5 << "%";
-    }
+    //    float world_loss_rate = world_tracker.getLossRate();
+    //    if (world_loss_rate > PROTO_LOSS_WARNING_THRESHOLD)
+    //    {
+    //        // Log in 5% increments to allow the logs to be merged
+    //        LOG(WARNING) << "World loss rate is " << static_cast<int>(world_loss_rate *
+    //        20) * 5 << "%";
+    //    }
 }

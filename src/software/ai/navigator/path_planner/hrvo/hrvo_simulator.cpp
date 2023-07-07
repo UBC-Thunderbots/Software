@@ -243,7 +243,7 @@ void HRVOSimulator::visualize(unsigned int robot_id, TeamColour friendly_team_co
     auto friendly_robot = robots.find(robot_id);
     if (friendly_robot == robots.end())
     {
-        LOG(WARNING) << "Attempt to visualize untracked robot with id " << robot_id;
+        LOG(INFO) << "Attempt to visualize untracked robot with id " << robot_id;
         return;
     }
 
