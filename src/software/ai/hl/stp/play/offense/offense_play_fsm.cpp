@@ -37,11 +37,6 @@ void OffensePlayFSM::setupOffensiveStrategy(const Update& event)
         num_defenders = 2;
     }
 
-    if (overbalancedFriendlyRobotsInFriendlyHalf(event.common.world) && num_defenders > 0)
-    {
-        num_defenders -= 1;
-    }
-
     if (fewEnemyThreatsInFriendlyHalf(event.common.world) && num_defenders > 1)
     {
         num_defenders = 1;
@@ -87,15 +82,14 @@ void OffensePlayFSM::setupDefensiveStrategy(const Update& event)
         num_defending_robots = num_tactics;
     }
     int num_attacking_robots = num_tactics - num_defending_robots;
-
-    LOG(INFO) << "[OffensivePlayFSM] assigned: " << num_defending_robots << " defending robots, and attacking robots: " << num_attacking_robots;
-
-    setTactics(event, num_tactics-num_defending_robots, num_defending_robots);
+    setTactics(event, num_attacking_robots, num_defending_robots);
 }
 
 void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
                                 int num_defenders, bool is_currently_in_possession)
 {
+
+    LOG(INFO) << "[OffensivePlayFSM] assigned: " << num_defenders << " defending robots, and attacking robots: " << num_shoot_or_pass;
     PriorityTacticVector tactics_to_return;
 
     if (num_shoot_or_pass > 0)

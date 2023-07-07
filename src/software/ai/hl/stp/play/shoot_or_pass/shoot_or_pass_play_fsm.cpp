@@ -82,8 +82,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
                              pass_score_ramp_down_duration,
                          1.0 - abs_min_pass_score);
         updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                          event.common.num_tactics - 2);
-
+                                          event.common.num_tactics - 1);
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
     }
@@ -121,7 +120,7 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
     event.common.set_inter_play_communication_fun(
         InterPlayCommunication{.last_committed_pass = best_pass_and_score_so_far});
 
-    //    LOG(DEBUG) << "best pass speed: " << best_pass_and_score_so_far.pass.speed();
+    LOG(DEBUG) << "best pass speed: " << best_pass_and_score_so_far.pass.speed();
 
     if (!attacker_tactic->done())
     {

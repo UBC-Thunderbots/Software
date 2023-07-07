@@ -43,6 +43,9 @@ struct DefensePlayFSM
      */
     bool shouldDefendAggressively(const Update& event);
 
+
+    void addShadower(EnemyThreat &enemy_threat);
+
     /**
      * Action to identify all immediate enemy threats and assign
      * defenders to block enemy shots and passes
@@ -66,7 +69,7 @@ struct DefensePlayFSM
      * @param event the FSM event
      * @param enemy_threats the enemy threats to defend against
      */
-    void updateCreaseAndPassDefenders(const Update& event, const int num_tactics_to_assign);
+    int updateCreaseAndPassDefenders(const Update& event, const int num_tactics_to_assign);
 
     /**
      * Helper function to update shadowers to shadow specified threats
@@ -74,7 +77,7 @@ struct DefensePlayFSM
      * @param event the FSM event
      * @param threats_to_shadow the enemy threats to shadow
      */
-    void updateShadowers(const Update& event, const std::vector<EnemyThreat> &threats_to_shadow);
+    void updateShadowers(const Update& event, const std::vector<EnemyThreat> &threats_to_shadow, const int num_shadowers);
 
     /**
      * Helper function to set up crease defender tactic vector members

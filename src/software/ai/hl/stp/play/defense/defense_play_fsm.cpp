@@ -15,6 +15,7 @@ void DefensePlayFSM::resetAssignments(const Update& event)
 {
     crease_defender_assignments = std::vector<DefenderAssignment>();
     pass_defender_assignments = std::vector<DefenderAssignment>();
+    shadowers = std::vector<std::shared_ptr<ShadowEnemyTactic>>();
 
     if (event.control_params.defender_assignments.size() > 0)
     {
@@ -22,13 +23,15 @@ void DefensePlayFSM::resetAssignments(const Update& event)
     }
 
     defender_assignments_q = std::queue(event.control_params.defender_assignments);
+
+    LOG(DEBUG) << "We have " << defender_assignments_q.size() << " assignments";
 }
 
 void DefensePlayFSM::blockShots(const Update& event)
 {
     resetAssignments(event);
 
-    unsigned int num_tactics_left_to_assign = event.common.num_tactics;
+    int num_tactics_left_to_assign = static_cast<int>(event.common.num_tactics);
 
     if (event.control_params.defender_assignments.size() > 0)
     {
@@ -37,12 +40,20 @@ void DefensePlayFSM::blockShots(const Update& event)
         num_tactics_left_to_assign -= assignMostThreateningThreat(event, num_tactics_left_to_assign);
     }
 
-    if (num_tactics_left_to_assign != event.common.num_tactics)
+    if (num_tactics_left_to_assign != static_cast<int>(event.common.num_tactics))
     {
         defender_assignments_q.pop();
     }
 
-    updateCreaseAndPassDefenders(event, num_tactics_left_to_assign);
+    num_tactics_left_to_assign -= updateCreaseAndPassDefenders(event, num_tactics_left_to_assign);
+
+    auto enemy_threats = getAllEnemyThreats(event.common.world.field(), event.common.world.friendlyTeam(),
+            event.common.world.enemyTeam(), event.common.world.ball(), false);
+
+    for (int i = 0; (i < static_cast<int>(enemy_threats.size()) && i < num_tactics_left_to_assign); ++i)
+    {
+        addShadower(enemy_threats.at(i+1));
+    }
 
     setTactics(event);
 }
@@ -66,39 +77,60 @@ int DefensePlayFSM::assignMostThreateningThreat(const Update &event, int num_tac
 
 void DefensePlayFSM::shadowAndBlockShots(const Update& event)
 {
-    unsigned int num_tactics_left_to_assign = event.common.num_tactics;
+    int num_tactics_left_to_assign = static_cast<int>(event.common.num_tactics);
     resetAssignments(event);
+    const int total_defenders = static_cast<int>(event.common.num_tactics);
+    bool assigned_shadower_to_most_dangerous = false;
 
     num_tactics_left_to_assign -= assignMostThreateningThreat(event, num_tactics_left_to_assign);
     auto enemy_threats = getAllEnemyThreats(event.common.world.field(), event.common.world.friendlyTeam(),
             event.common.world.enemyTeam(), event.common.world.ball(), false);
 
-    if (num_tactics_left_to_assign >= 1 && enemy_threats.size() > 0)
+    if (num_tactics_left_to_assign >= 1 && enemy_threats.size() > 0 && num_tactics_left_to_assign != total_defenders)
     {
-        updateShadowers(event, {enemy_threats.at(0)});
+        addShadower(enemy_threats.at(0));
         num_tactics_left_to_assign -= 1;
+        assigned_shadower_to_most_dangerous = true;
     }
 
     num_tactics_left_to_assign -= assignMostThreateningThreat(event, num_tactics_left_to_assign); 
 
-    if (num_tactics_left_to_assign != event.common.num_tactics)
+    if (num_tactics_left_to_assign != total_defenders)
     {
         defender_assignments_q.pop();
     }
 
-    updateCreaseAndPassDefenders(event, num_tactics_left_to_assign);
+    num_tactics_left_to_assign -= updateCreaseAndPassDefenders(event, num_tactics_left_to_assign);
+
+    // assign shadowers to left over tactics
+    int num_unaddressed_enemy_threats = static_cast<int>(enemy_threats.size());
+    if (assigned_shadower_to_most_dangerous)
+    {
+        num_unaddressed_enemy_threats -= 1;
+    }
+    for (int i = 0; ((i < num_unaddressed_enemy_threats) && i < num_tactics_left_to_assign); ++i)
+    {
+        if (assigned_shadower_to_most_dangerous)
+        {
+            addShadower(enemy_threats.at(i+1));
+        }
+        else
+        {
+            addShadower(enemy_threats.at(i));
+        }
+    }
 
     setTactics(event);
 }
 
-void DefensePlayFSM::updateCreaseAndPassDefenders(
+int DefensePlayFSM::updateCreaseAndPassDefenders(
     const Update& event, const int num_tactics_to_assign)
 {
-    auto assignments = defender_assignments_q;
+    int num_tactics_assigned = num_tactics_to_assign;
 
-    if (assignments.size() == 0)
+    if (defender_assignments_q.size() == 0)
     {
-        return;
+        return 0;
     }
 
     // Choose which defender assignments to assign defenders to based on number
@@ -106,10 +138,10 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
     for (int i = 0; i < num_tactics_to_assign; i++)
     {
         std::unique_ptr<struct DefenderAssignment> defender_assignment;
-        if (!assignments.empty())
+        if (!defender_assignments_q.empty())
         {
-            defender_assignment = std::make_unique<struct DefenderAssignment>(assignments.front());
-            assignments.pop();
+            defender_assignment = std::make_unique<struct DefenderAssignment>(defender_assignments_q.front());
+            defender_assignments_q.pop();
         }
         else if (highest_cov_rating_assignment.has_value())
         {
@@ -125,13 +157,18 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
         }
 
         if (defender_assignment->type == CREASE_DEFENDER &&
-            crease_defender_assignments.size() < 3)
+                crease_defender_assignments.size() < 3)
         {
             crease_defender_assignments.emplace_back(*defender_assignment);
         }
         else if (defender_assignment->type == PASS_DEFENDER)
         {
             pass_defender_assignments.emplace_back(*defender_assignment);
+        }
+        else if (defender_assignments_q.empty())
+        {
+            num_tactics_assigned = i+1;
+            break;
         }
 
         defender_assignments_q.pop();
@@ -185,17 +222,26 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
     {
         pass_defenders.at(i)->updateControlParams(pass_defender_assignments.at(i).target);
     }
+
+    return num_tactics_assigned;
 }
 
-void DefensePlayFSM::updateShadowers(const Update& event, const std::vector<EnemyThreat> &threats_to_shadow)
+void DefensePlayFSM::updateShadowers(const Update& event, const std::vector<EnemyThreat> &threats_to_shadow, const int num_shadowers_to_assign)
 {
-    setUpShadowers(static_cast<unsigned int>(threats_to_shadow.size()));
+    setUpShadowers(static_cast<unsigned int>(num_shadowers_to_assign));
 
-    for (unsigned int i = 0; i < shadowers.size(); i++)
+    for (int i = 0; i < num_shadowers_to_assign; i++)
     {
         shadowers.at(i)->updateControlParams(threats_to_shadow.at(i),
                                              ROBOT_SHADOWING_DISTANCE_METERS);
     }
+}
+
+void DefensePlayFSM::addShadower(EnemyThreat &enemy_threat)
+{
+    std::shared_ptr<ShadowEnemyTactic> shadower = std::make_shared<ShadowEnemyTactic>();
+    shadower->updateControlParams(enemy_threat, ROBOT_SHADOWING_DISTANCE_METERS);
+    shadowers.push_back(shadower);
 }
 
 void DefensePlayFSM::setUpCreaseDefenders(unsigned int num_crease_defenders)
