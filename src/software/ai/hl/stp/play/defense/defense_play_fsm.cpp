@@ -76,6 +76,15 @@ void DefensePlayFSM::updateCreaseAndPassDefenders(
         if (defender_assignment.type == CREASE_DEFENDER)
         {
             crease_defender_assignments.emplace_back(defender_assignment);
+
+            // If we have at least two available defenders, two defenders should
+            // be assigned to the highest scoring crease defender assignment to better
+            // block the shot cone of the most threatening enemy
+            if (i == 0 && event.common.num_tactics >= 2)
+            {
+                crease_defender_assignments.emplace_back(defender_assignment);
+                i++;
+            }
         }
         else
         {
