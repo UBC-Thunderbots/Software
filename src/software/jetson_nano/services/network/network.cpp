@@ -1,9 +1,12 @@
 #include "software/jetson_nano/services/network/network.h"
 
-NetworkService::NetworkService(const std::string &ip_address, unsigned short world_listener_port,
-                               unsigned short primitive_listener_port, unsigned short robot_status_sender_port,
-                               bool multicast, const unsigned thunderloop_hz)
-    : ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO(ROBOT_STATUS_BROADCAST_RATE_HZ / (thunderloop_hz + 1.0)),
+NetworkService::NetworkService(const std::string& ip_address,
+                               unsigned short world_listener_port,
+                               unsigned short primitive_listener_port,
+                               unsigned short robot_status_sender_port, bool multicast,
+                               const unsigned thunderloop_hz)
+    : ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO(ROBOT_STATUS_BROADCAST_RATE_HZ /
+                                           (thunderloop_hz + 1.0)),
       primitive_tracker(ProtoTracker("primitive set")),
       world_tracker(ProtoTracker("world")),
       control_loop_hz(thunderloop_hz)

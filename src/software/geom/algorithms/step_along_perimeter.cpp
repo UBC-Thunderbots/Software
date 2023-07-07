@@ -2,8 +2,7 @@
 
 #include "software/geom/algorithms/contains.h"
 
-std::optional<Point> stepAlongPerimeter(const Rectangle &rectangle, 
-                                        const Point &start, 
+std::optional<Point> stepAlongPerimeter(const Rectangle &rectangle, const Point &start,
                                         double distance)
 {
     // This function hasn't been properly implemented yet, but it
@@ -18,8 +17,8 @@ std::optional<Point> stepAlongPerimeter(const Rectangle &rectangle,
     // Need to investigate after Robocup
 
     double remaining_distance = std::abs(distance);
-    bool step_clockwise = distance >= 0;
-    Point step_point = start;
+    bool step_clockwise       = distance >= 0;
+    Point step_point          = start;
 
     auto edge = edgeContainingPoint(rectangle, step_point);
     if (!edge)
@@ -41,10 +40,10 @@ std::optional<Point> stepAlongPerimeter(const Rectangle &rectangle,
     {
         step_vector = step_vector.normalize() * remaining_distance;
     }
-    
+
     step_point += step_vector;
     remaining_distance -= step_vector.length();
-    
+
     return std::make_optional(step_point);
 }
 

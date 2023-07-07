@@ -26,9 +26,10 @@ class NetworkService
      * @param multicast  If true, then the provided IP address is a multicast address and
      * we should join the group
      */
-    NetworkService(const std::string &ip_address, unsigned short world_listener_port,
-                   unsigned short primitive_listener_port, unsigned short robot_status_sender_port,
-                   bool multicast, const unsigned thunderloop_hz);
+    NetworkService(const std::string& ip_address, unsigned short world_listener_port,
+                   unsigned short primitive_listener_port,
+                   unsigned short robot_status_sender_port, bool multicast,
+                   const unsigned thunderloop_hz);
 
     /**
      * When the network service is polled, it sends the robot_status and returns

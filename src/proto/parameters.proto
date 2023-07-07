@@ -39,7 +39,7 @@ message AiConfig
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
-    required OffensePlayConfig offense_play_config = 13;
+    required OffensePlayConfig offense_play_config                          = 13;
 }
 
 message AiControlConfig
@@ -67,7 +67,7 @@ message AttackerTacticConfig
 
     // Max robot kicking speed
     required double kick_max_speed = 3
-    [default = 6.0, (bounds).min_double_value = 3.0, (bounds).max_double_value = 6.5];
+        [default = 6.0, (bounds).min_double_value = 3.0, (bounds).max_double_value = 6.5];
 }
 
 message CornerKickPlayConfig
@@ -130,8 +130,8 @@ message PassingConfig
 
     // Number of seconds added to the number of seconds it takes the robot
     // to reach the destination.
-    required double pass_friendly_capability_offset_sec = 11
-    [default = 0.0, (bounds).min_double_value = -2.0, (bounds).max_double_value = 2.0];
+    required double pass_friendly_capability_multiplier = 11
+        [default = 1.0, (bounds).min_double_value = 0.1, (bounds).max_double_value = 2.0];
 }
 
 message GoalieTacticConfig

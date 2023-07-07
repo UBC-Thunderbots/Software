@@ -50,7 +50,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     {
         PriorityTacticVector result = {{}};
 
-        for (auto & defense_position : defense_positions) {
+        for (auto &defense_position : defense_positions)
+        {
             auto move_tactic = std::make_shared<MoveTactic>();
             move_tactic->updateControlParams(defense_position, Angle::zero(), 0);
             result[0].emplace_back(move_tactic);
