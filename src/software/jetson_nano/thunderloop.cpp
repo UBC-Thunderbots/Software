@@ -104,7 +104,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
 
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
-        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true, loop_hz);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
@@ -354,9 +354,9 @@ Thunderloop::~Thunderloop() {}
                                                   NANOSECONDS_PER_MILLISECOND);
 
         //TODO : REMOVE BEFORE PR
-        LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-            {"loop duration", (loop_duration_ns / NANOSECONDS_PER_MILLISECOND)}
-        });
+//        LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+//            {"loop duration", (loop_duration_ns / NANOSECONDS_PER_MILLISECOND)}
+//        });
 
         // Make sure the iteration can fit inside the period of the loop
         loop_duration_seconds =
