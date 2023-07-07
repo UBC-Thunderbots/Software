@@ -5,6 +5,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
 #include "software/ai/passing/pass.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/math/math_functions.h"
 #include "software/util/make_enum/make_enum.h"
 #include "software/world/field.h"
@@ -143,6 +144,9 @@ double getStaticPositionQuality(const Field& field, const Point& position,
  */
 double calculateProximityRisk(const Point& point, const Team& enemy_team,
                               double enemy_proximity_importance);
+
+
+double getPassDistanceQuality(const Pass& pass);
 
 /**
  * Sample passes at different points on the field and rate them, similar to ratePass, to

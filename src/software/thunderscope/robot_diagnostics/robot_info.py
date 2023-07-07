@@ -116,6 +116,19 @@ class RobotInfo(QWidget):
         self.battery_progress_bar.floatValueChanged.connect(
             lambda float_val: self.battery_label.setText("%.2fV" % float_val)
         )
+
+        self.stop_primitive_label = QLabel()
+        self.stop_primitive_label.setText("NA")
+        self.battery_layout.addWidget(self.stop_primitive_label)
+
+        self.primitive_loss_rate_label = QLabel()
+        self.primitive_loss_rate_label.setText("P%NA")
+        self.battery_layout.addWidget(self.primitive_loss_rate_label)
+
+        self.world_loss_rate_label = QLabel()
+        self.world_loss_rate_label.setText("W%NA")
+        self.battery_layout.addWidget(self.world_loss_rate_label)
+
         self.battery_layout.addWidget(self.battery_progress_bar)
         self.battery_layout.addWidget(self.battery_label)
 
@@ -262,7 +275,7 @@ class RobotInfo(QWidget):
 
         return pixmap
 
-    def update(self, motor_status, power_status, error_codes):
+    def update(self, robot_status):
         """
         Receives parts of a RobotStatus message
 
@@ -270,15 +283,13 @@ class RobotInfo(QWidget):
         Sets the robot UI as connected and updates the UI
         Then sets a timer callback to disconnect the robot if needed
 
-        :param motor_status: The motor status message for this robot
-        :param power_status: The power status message for this robot
-        :param error_codes: The error codes of this robot
+        :param robot_status: The robot status message for this robot
         """
         self.time_of_last_robot_status = time.time()
 
         self.robot_model.setPixmap(self.color_vision_pattern)
 
-        self.update_ui(motor_status, power_status, error_codes)
+        self.update_ui(robot_status)
 
         QtCore.QTimer.singleShot(DISCONNECT_DURATION_MS, self.disconnect_robot)
 
@@ -302,7 +313,7 @@ class RobotInfo(QWidget):
 
         self.breakbeam_label.update_breakbeam_status(None)
 
-    def update_ui(self, motor_status, power_status, error_codes):
+    def update_ui(self, robot_status):
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
@@ -310,10 +321,32 @@ class RobotInfo(QWidget):
             - If there are any motor faults
             - If Battery Voltage is too low
             - If this robot has errors
-        :param motor_status: The motor status message for this robot
-        :param power_status: The power status message for this robot
-        :param error_codes: The error codes of this robot
+        :param robot_status: The robot status message for this robot
         """
+        logging.debug(robot_status)
+        motor_status = robot_status.motor_status
+        power_status = robot_status.power_status
+        error_codes = robot_status.error_code
+        network_status = robot_status.network_status
+        primitive_executor_status = robot_status.primitive_executor_status
+
+        if primitive_executor_status.running_primitive:
+            self.stop_primitive_label.setText("RUN")
+            self.stop_primitive_label.setStyleSheet(
+                "background-color: green; border: 1px solid black;"
+            )
+        else:
+            self.stop_primitive_label.setText("STOP")
+            self.stop_primitive_label.setStyleSheet(
+                "background-color: red; border: 1px solid black;"
+            )
+
+        self.primitive_loss_rate_label.setText(
+            f"P%{network_status.primitive_packet_loss_percentage:02d}"
+        )
+        self.world_loss_rate_label.setText(
+            f"W%{network_status.world_packet_loss_percentage:02d}"
+        )
 
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)
 
@@ -335,7 +368,9 @@ class RobotInfo(QWidget):
             #     "Battery Voltage Alert",
             #     f"robot {self.robot_id} voltage is {power_status.battery_voltage}",
             # )
-            logging.warning(f"Battery Voltage Alert\n\nrobot {self.robot_id} voltage is {power_status.battery_voltage}")
+            logging.warning(
+                f"Battery Voltage Alert\n\nrobot {self.robot_id} voltage is {power_status.battery_voltage}"
+            )
             self.battery_warning_disabled = True
         elif power_status.battery_voltage > BATTERY_WARNING_VOLTAGE:
             self.battery_warning_disabled = False
@@ -347,4 +382,6 @@ class RobotInfo(QWidget):
                 #     f"Warning: {ERROR_CODE_MESSAGES[code]}",
                 #     f"{ERROR_CODE_MESSAGES[code]} warning for robot {self.robot_id}",
                 # )
-                logging.warning(f"WARNING ERROR CODE FROM ROBOT {self.robot_id}: {ERROR_CODE_MESSAGES[code]} {ERROR_CODE_MESSAGES[code]}")
+                logging.warning(
+                    f"WARNING ERROR CODE FROM ROBOT {self.robot_id}: {ERROR_CODE_MESSAGES[code]} {ERROR_CODE_MESSAGES[code]}"
+                )

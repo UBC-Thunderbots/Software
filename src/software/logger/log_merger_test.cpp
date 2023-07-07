@@ -141,12 +141,14 @@ TEST(LogMergerTests, log_order)
     std::list<g3::LogMessage> logs;
 
     g3::LogMessage msg1 = createLog("First message");
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
+    {
         logs = merger.log(msg1);
     }
 
     g3::LogMessage msg2 = createLog("Second message");
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         logs = merger.log(msg2);
     }
 
@@ -154,18 +156,20 @@ TEST(LogMergerTests, log_order)
     merger.log(msg3);
 
     // Interleaving msg1 and msg2
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 2; i++)
+    {
         logs = merger.log(msg2);
     }
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
+    {
         logs = merger.log(msg1);
     }
 
     merger.pastime();
 
     g3::LogMessage different_message = createLog("different message");
-    logs = merger.log(different_message);
+    logs                             = merger.log(different_message);
 
     EXPECT_EQ(3, logs.size());
     g3::LogMessage repeat_msg1 = createLog("First message (9 repeats)");
@@ -173,5 +177,4 @@ TEST(LogMergerTests, log_order)
     g3::LogMessage repeat_msg2 = createLog("Second message (4 repeats)");
     logs.pop_front();
     checkLogsEqual(different_message, logs.front());
-
 }

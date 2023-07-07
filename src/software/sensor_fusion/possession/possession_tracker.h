@@ -42,11 +42,22 @@ class PossessionTracker
     // to be considered far away from the ball
     double distance_far_tolerance_meters;
 
+    // Min distance in meters that ball must move between two timestamps
+    // for the ball to be considered moved
+    double ball_moved_threshold_meters;
+
     // Min time that robot must stay close to ball for it to be considered near
     Duration time_near_threshold;
 
     // Min time that robot must stay away from ball for it to be considered far away
     Duration time_far_threshold;
+
+    // Min time that team must hold possession for in order to be considered stagnant
+    Duration time_stagnant_threshold;
+
+    // Min time that the ball must stay still in order for possession to be considered
+    // stagnant
+    Duration time_ball_stagnant_threshold;
 
     // The timestamp of last game snapshot the PossessionTracker was updated with
     Timestamp last_timestamp;
@@ -63,11 +74,18 @@ class PossessionTracker
     // The amount of time that the enemy team has spent far away from the ball
     Duration time_far_enemy;
 
+    // The amount of time since the ball last moved
+    Duration time_since_ball_moved;
+
+    // The position of the ball at the last timestamp
+    Point last_ball_position;
+
     // The team currently with possession of the ball
     TeamPossession possession;
 
     /**
      * Updates the amounts of time that each team has spent near or away from the ball
+     * and the amount of time since the ball last moved
      *
      * @param friendly_team the friendly team
      * @param enemy_team the enemy team

@@ -121,6 +121,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
     event.common.set_inter_play_communication_fun(
         InterPlayCommunication{.last_committed_pass = best_pass_and_score_so_far});
 
+    //    LOG(DEBUG) << "best pass speed: " << best_pass_and_score_so_far.pass.speed();
+
     if (!attacker_tactic->done())
     {
         PriorityTacticVector ret_tactics = {{attacker_tactic, receiver_tactic}, {}};

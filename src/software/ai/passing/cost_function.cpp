@@ -18,6 +18,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
 
+    double pass_distance_quality = getPassDistanceQuality(pass);
+
     double friendly_pass_rating =
         ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
@@ -38,7 +40,15 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
     return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-           shoot_pass_rating * pass_speed_quality * in_region_quality;
+           shoot_pass_rating * pass_speed_quality * in_region_quality *
+           pass_distance_quality;
+}
+
+double getPassDistanceQuality(const Pass& pass)
+{
+    double distance = distanceSquared(pass.passerPoint(), pass.receiverPoint());
+
+    return 1 - sigmoid(distance, 15, 1);
 }
 
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,

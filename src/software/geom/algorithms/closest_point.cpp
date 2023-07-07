@@ -103,4 +103,3 @@ Point closestPoint(const Point &p, const Circle &circle)
 {
     return closestPoint(circle, p);
 }
-
