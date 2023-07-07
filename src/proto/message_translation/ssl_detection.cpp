@@ -101,7 +101,8 @@ std::vector<BallDetection> createBallDetections(
                                   ball.y() * METERS_PER_MILLIMETER),
                 .distance_from_ground = ball.z() * METERS_PER_MILLIMETER,
                 .timestamp            = Timestamp::fromSeconds(detection.t_capture()),
-                .confidence           = ball.confidence()};
+                .confidence           = ball.confidence(),
+                .is_from_break_beam   = false};
 
             bool ignore_ball = ignore_invalid_camera_data &&
                                (min_valid_x > ball_detection.position.x() ||

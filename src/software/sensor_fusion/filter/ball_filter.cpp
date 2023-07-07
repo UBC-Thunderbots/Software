@@ -70,7 +70,9 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
             double maximum_acceptable_velocity_magnitude =
                 BALL_MAX_SPEED_METERS_PER_SECOND + MAX_ACCEPTABLE_BALL_SPEED_BUFFER;
             if (estimated_detection_velocity_magnitude >
-                maximum_acceptable_velocity_magnitude)
+                maximum_acceptable_velocity_magnitude
+                || ((detection.is_from_break_beam || detection_with_smallest_timestamp.is_from_break_beam)
+                && detection_distance > MAX_ACCEPTABLE_BREAK_BEAM_DETECTION_DISTANCE))
             {
                 // If we determine the data to be noise, remove an entry from the buffer.
                 // This way if we have messed up and now the ball is too far away for the
