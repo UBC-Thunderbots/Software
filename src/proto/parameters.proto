@@ -39,6 +39,7 @@ message AiConfig
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
+    required OffensePlayConfig offense_play_config = 13;
 }
 
 message AiControlConfig
@@ -78,16 +79,16 @@ message PassingConfig
     // The offset from the sides of the field to place the rectangular
     // sigmoid we use to determine what areas to pass to
     required double static_field_position_quality_x_offset = 1
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
     // The offset from the sides of the field to place the rectangular
     // sigmoid we use to determine what areas to pass to
     required double static_field_position_quality_y_offset = 2
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
     // The weight that being close to the goal will have on the static
     // position quality. Lower, more negative weights result in the distance
     // to the goal having less of an effect.
     required double static_field_position_quality_friendly_goal_distance_weight = 3
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
     // This controls how heavily we weigh an enemy robot being near the pass
     // receiver when calculating enemy risk to a pass
     required double enemy_proximity_importance = 4 [
@@ -122,6 +123,11 @@ message PassingConfig
         [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
     // Cost visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
+
+    // Number of seconds added to the number of seconds it takes the robot
+    // to reach the destination.
+    required double pass_friendly_capability_offset_sec = 11
+    [default = 0.0, (bounds).min_double_value = -2.0, (bounds).max_double_value = 2.0];
 }
 
 message GoalieTacticConfig
@@ -177,7 +183,7 @@ message DribbleTacticConfig
     // Threshold to determine if the robot has the expected orientation when
     // completing the dribble (in degrees)
     required double final_destination_close_threshold = 3 [
-        default                   = 1.0,
+        default                   = 2.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
@@ -200,6 +206,11 @@ message EnemyCapabilityConfig
     // This value should be set based on whether or not the team we are playing against
     // can pass the ball. This will affect how we defend against the team.
     required bool enemy_team_can_pass = 1 [default = true];
+}
+
+message OffensePlayConfig
+{
+    required bool allow_single_defender = 1 [default = true];
 }
 
 message ShootOrPassPlayConfig
