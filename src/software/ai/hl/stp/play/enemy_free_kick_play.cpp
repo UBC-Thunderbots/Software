@@ -46,7 +46,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // Block free kicker
         Vector block_direction = Vector::createFromAngle(enemy_threats[0].robot.orientation());
-        Point block_kick_point = world.ball().position() + block_direction.normalize((0.5 + 2 * ROBOT_MAX_RADIUS_METERS));
+        Point block_kick_point = world.ball().position() + block_direction.normalize(0.5 + 2 * ROBOT_MAX_RADIUS_METERS);
         block_free_kicker->updateControlParams(block_kick_point);
         tactics_to_run[0].emplace_back(block_free_kicker);
 
