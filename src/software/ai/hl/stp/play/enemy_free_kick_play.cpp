@@ -79,7 +79,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
              i < std::min(num_unassigned_robots, (int)enemy_threats.size() - 1); i++)
         {
             auto block_potential_receiver = std::make_shared<PassDefenderTactic>();
-            Point enemy_position = enemy_threats[i + 1].robot.position();
+            Point enemy_position = enemy_threats[i + 1].robot.position(); // i + 1 to skip the kicker, which is already being blocked
             Vector enemy_to_ball_vector = world.ball().position() - enemy_position;
             Point block_pass_point = enemy_position + enemy_to_ball_vector.normalize(ROBOT_MAX_RADIUS_METERS * 3);
 
