@@ -106,11 +106,18 @@ class RobotCommunication(object):
         Uses the keyboard estop value
         Unless estop is plugged in, in which case the physical estop value overrides it
         """
+        previous_estop_is_playing = True
         if self.estop_mode != EstopMode.DISABLE_ESTOP:
             while True:
                 if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
                     self.estop_is_playing = self.estop_reader.isEstopPlay()
-                    self.should_send_stop = not self.estop_is_playing
+                    # Send stop primitive once
+                    if previous_estop_is_playing and not self.estop_is_playing:
+                        self.should_send_stop = True
+                    else:
+                        self.should_send_stop = False
+
+                    previous_estop_is_playing = self.estop_is_playing
 
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_is_playing)
