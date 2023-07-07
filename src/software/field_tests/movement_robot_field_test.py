@@ -154,7 +154,7 @@ import math
 
 
 def test_one_robots_foward_back(field_test_runner):
-    id1 =5
+    id1 = 5
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     print("Here are the robots:")

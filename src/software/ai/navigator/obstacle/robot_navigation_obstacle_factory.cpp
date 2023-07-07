@@ -146,7 +146,7 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
                     goal_obstacle_radius + goal_vertical_obstacle_offset,
                     goal_obstacle_radius +
                         goal_horizontal_obstacle_offset)));  // TODO: Shift this closer to
-                                                             // the edge so path cant go
+                                                             // the edge so path can't go
                                                              // behind net
             break;
         }
