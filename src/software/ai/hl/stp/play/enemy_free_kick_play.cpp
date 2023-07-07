@@ -74,18 +74,31 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         }
 
         // Block potential receivers
-        auto num_unassigned_robots = 4 - num_crease_defenders;
-        for (int i = 0;
-             i < std::min(num_unassigned_robots, (int)enemy_threats.size() - 1); i++)
+        auto num_unassigned_robots = world.friendlyTeam().numRobots() - 2 - num_crease_defenders;
+        int target_enemy_counter = 1;
+        LOG(INFO) << enemy_threats.size();
+        while (num_unassigned_robots > 0)
         {
+            if (target_enemy_counter >= (int)enemy_threats.size()) {
+                break;
+            }
+            // Do not try to block enemies that are too far back
+            if (enemy_threats[target_enemy_counter].robot.position().x() >= world.ball().position().x() + 1) {
+//                LOG(INFO) << "Defender too far. Not shadowing";
+                target_enemy_counter++;
+                continue;
+            }
             auto block_potential_receiver = std::make_shared<PassDefenderTactic>();
-            Point enemy_position = enemy_threats[i + 1].robot.position(); // i + 1 to skip the kicker, which is already being blocked
+            Point enemy_position = enemy_threats[target_enemy_counter].robot.position();
+            LOG(INFO) << enemy_position.x();
             Vector enemy_to_ball_vector = world.ball().position() - enemy_position;
             Point block_pass_point = enemy_position + enemy_to_ball_vector.normalize(ROBOT_MAX_RADIUS_METERS * 3);
 
             block_potential_receiver->updateControlParams(block_pass_point);
 
             tactics_to_run[0].emplace_back(block_potential_receiver);
+            num_unassigned_robots--;
+            target_enemy_counter++;
         }
 
         // yield the Tactics this Play wants to run, in order of priority
