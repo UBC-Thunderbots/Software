@@ -64,6 +64,10 @@ message AttackerTacticConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
+
+    // Max robot kicking speed
+    required double kick_max_speed = 3
+    [default = 6.0, (bounds).min_double_value = 3.0, (bounds).max_double_value = 6.5];
 }
 
 message CornerKickPlayConfig

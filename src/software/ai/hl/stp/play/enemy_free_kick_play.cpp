@@ -76,7 +76,6 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // Block potential receivers
         auto num_unassigned_robots = world.friendlyTeam().numRobots() - 2 - num_crease_defenders;
         int target_enemy_counter = 1;
-        LOG(INFO) << enemy_threats.size();
         while (num_unassigned_robots > 0)
         {
             if (target_enemy_counter >= (int)enemy_threats.size()) {
@@ -90,7 +89,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             }
             auto block_potential_receiver = std::make_shared<PassDefenderTactic>();
             Point enemy_position = enemy_threats[target_enemy_counter].robot.position();
-            LOG(INFO) << enemy_position.x();
+
             Vector enemy_to_ball_vector = world.ball().position() - enemy_position;
             Point block_pass_point = enemy_position + enemy_to_ball_vector.normalize(ROBOT_MAX_RADIUS_METERS * 3);
 
