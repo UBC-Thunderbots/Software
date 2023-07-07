@@ -27,6 +27,7 @@ struct CreaseDefenderFSM
         TbotsProto::CreaseDefenderAlignment crease_defender_alignment;
         // The maximum allowed speed mode
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+        bool is_currently_in_possession;
     };
 
     // this struct defines the only event that the CreaseDefenderFSM responds to

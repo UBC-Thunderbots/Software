@@ -37,6 +37,9 @@ struct OffensePlayFSM
      */
     bool enemyHasPossession(const Update& event);
 
+
+    bool fewEnemyThreatsInFriendlyHalf(const World& world);
+
     /**
      * Action to configure the play for offensive gameplay
      *
@@ -59,7 +62,8 @@ struct OffensePlayFSM
      * @param num_shoot_or_pass the number of attackers (ShootOrPassPlay)
      * @param num_defenders the number of defenders (DefensePlay)
      */
-    void setTactics(const Update& event, int num_shoot_or_pass, int num_defenders);
+    void setTactics(const Update& event, int num_shoot_or_pass, int num_defenders,
+                    bool is_currently_in_possession = false);
 
     auto operator()()
     {
