@@ -162,6 +162,7 @@ int DefensePlayFSM::updateCreaseAndPassDefenders(
         else
         {
             LOG(WARNING) << "[DefensePlayFSM] Trying to assign too many robots to defend, and too few enemy threats to work with";
+            num_tactics_assigned = i;
             break;
         }
 
@@ -176,7 +177,7 @@ int DefensePlayFSM::updateCreaseAndPassDefenders(
         }
         else if (defender_assignments_q.empty())
         {
-            num_tactics_assigned = i+1;
+            num_tactics_assigned = i;
             break;
         }
 
