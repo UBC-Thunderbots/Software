@@ -27,6 +27,7 @@ struct CreaseDefenderFSM
         TbotsProto::CreaseDefenderAlignment crease_defender_alignment;
         // The maximum allowed speed mode
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+        bool is_currently_in_possession;
     };
 
     // this struct defines the only event that the CreaseDefenderFSM responds to
@@ -66,7 +67,7 @@ struct CreaseDefenderFSM
     void blockThreat(const Update& event,
                      boost::sml::back::process<MoveFSM::Update> processEvent);
 
-    bool shouldChipAway(const Update &event);
+    bool shouldChipAway(const Update& event);
 
     bool shouldControl(const Update& event);
 
@@ -94,15 +95,15 @@ struct CreaseDefenderFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E [shouldChipAway_G] / chipAway_A = ChipAway_S,
-            MoveFSM_S + Update_E [shouldControl_G] / control_A = Control_S,
+            *MoveFSM_S + Update_E[shouldChipAway_G] / chipAway_A = ChipAway_S,
+            MoveFSM_S + Update_E[shouldControl_G] / control_A    = Control_S,
             MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
-            ChipAway_S + Update_E [shouldChipAway_G] / chipAway_A = ChipAway_S,
-            ChipAway_S + Update_E / blockThreat_A = MoveFSM_S,
-            Control_S + Update_E [shouldChipAway_G] / chipAway_A = ChipAway_S,
-            Control_S + Update_E [shouldControl_G] / control_A = Control_S,
-            Control_S + Update_E / blockThreat_A = MoveFSM_S,
-            X + Update_E / blockThreat_A = MoveFSM_S);
+            ChipAway_S + Update_E[shouldChipAway_G] / chipAway_A = ChipAway_S,
+            ChipAway_S + Update_E / blockThreat_A                = MoveFSM_S,
+            Control_S + Update_E[shouldChipAway_G] / chipAway_A  = ChipAway_S,
+            Control_S + Update_E[shouldControl_G] / control_A    = Control_S,
+            Control_S + Update_E / blockThreat_A                 = MoveFSM_S,
+            X + Update_E / blockThreat_A                         = MoveFSM_S);
     }
 
    private:
@@ -122,10 +123,12 @@ struct CreaseDefenderFSM
         const Field& field, const Ray& ray, const Rectangle &inflated_defense_area);
 
    private:
-    bool enemyCloseToBall(const Update &event);
+    bool enemyCloseToBall(const Update& event);
 
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 
-    static constexpr double ENEMY_THREATS_CLOSE_THRESHOLD_M = 0.015;
-    static constexpr double BALL_CLOSE_THRESHOLD_M = 0.05;
+    static constexpr double ENEMY_THREATS_CLOSE_THRESHOLD_M = 0.15;
+    static constexpr double BALL_CLOSE_THRESHOLD_M          = 0.05;
+
+    bool isSafeToChipForward(const Update& event);
 };

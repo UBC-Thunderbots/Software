@@ -28,8 +28,10 @@
 uint8_t incomingByte;
 size_t read_buffer_size;
 std::vector<uint8_t> buffer;
+bool start_found;
 
-uint32_t sequence_num;
+uint32_t time_since_last_msg_ms;
+uint32_t last_packet_received_time;
 
 std::shared_ptr<Charger> charger;
 std::shared_ptr<Chicker> chicker;
@@ -42,12 +44,14 @@ void setup()
     Serial.begin(460800, SERIAL_8N1);
     read_buffer_size = getMarshalledSize(
         TbotsProto_PowerPulseControl TbotsProto_PowerPulseControl_init_default);
-    sequence_num = 0;
-    charger      = std::make_shared<Charger>();
-    chicker      = std::make_shared<Chicker>();
-    monitor      = std::make_shared<PowerMonitor>();
-    geneva       = std::make_shared<Geneva>();
-    executor     = std::make_shared<ControlExecutor>(charger, chicker, geneva);
+    bool start_found          = false;
+    time_since_last_msg_ms    = 0;
+    last_packet_received_time = 0;
+    charger                   = std::make_shared<Charger>();
+    chicker                   = std::make_shared<Chicker>();
+    monitor                   = std::make_shared<PowerMonitor>();
+    geneva                    = std::make_shared<Geneva>();
+    executor = std::make_shared<ControlExecutor>(charger, chicker, geneva);
     charger->chargeCapacitors();
 }
 
@@ -57,7 +61,33 @@ void loop()
     while (Serial.available() > 0 && buffer.size() < read_buffer_size)
     {
         incomingByte = Serial.read();
-        buffer.emplace_back(static_cast<uint8_t>(incomingByte));
+
+        // Check for end of message found
+        if (start_found && incomingByte == START_END_FLAG_BYTE)
+        {
+            // Handle case where end of packet was read first
+            if (buffer.size() != read_buffer_size - 1)
+            {
+                buffer.clear();
+                // End of message correctly found adding to buffer and resetting
+            }
+            else
+            {
+                start_found = false;
+            }
+            buffer.emplace_back(incomingByte);
+            // continue adding bytes to buffer
+        }
+        else if (start_found)
+        {
+            buffer.emplace_back(incomingByte);
+            // Start of message found start adding bytes to buffer
+        }
+        else if (incomingByte == START_END_FLAG_BYTE)
+        {
+            buffer.emplace_back(incomingByte);
+            start_found = true;
+        }
     }
     // Once there is enough data attempt to decode
     if (buffer.size() == read_buffer_size)
@@ -67,14 +97,16 @@ void loop()
         {
             // On successful decoding execute the given command
             TbotsProto_PowerPulseControl control = frame.power_msg.power_control;
+            last_packet_received_time            = millis();
             executor->execute(control);
         }
         buffer.clear();
     }
     // Read sensor values. These are all instantaneous
-    auto status = createNanoPbPowerStatus(
+    time_since_last_msg_ms = static_cast<int>(millis() - last_packet_received_time);
+    auto status            = createNanoPbPowerStatus(
         monitor->getBatteryVoltage(), charger->getCapacitorVoltage(),
-        monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), sequence_num++,
+        monitor->getCurrentDrawAmp(), geneva->getCurrentSlot(), time_since_last_msg_ms,
         chicker->getBreakBeamTripped());
     auto status_frame = createUartFrame(status);
     auto packet       = marshallUartPacket(status_frame);

@@ -54,7 +54,9 @@ class ThreadedUnixSender:
                 try:
                     send = proto.SerializeToString()
                 except Exception:
-                    logging.warning("Failed to serialize proto to send over unix socket")
+                    logging.warning(
+                        "Failed to serialize proto to send over unix socket"
+                    )
                     continue
 
                 try:

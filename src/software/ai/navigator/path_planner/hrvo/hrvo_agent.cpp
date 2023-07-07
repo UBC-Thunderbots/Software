@@ -280,8 +280,8 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
 
     // Clamp acceleration
     double delta_angular_velocity = (pid_angular_velocity - angular_velocity).toRadians();
-    double max_accel        = max_angular_accel * time_step.toSeconds();
-    max_accel *= std::clamp(1.0 - (2 * velocity.length() / max_speed), 0.0, 1.0);
+    double max_accel              = max_angular_accel * time_step.toSeconds();
+    max_accel *= std::clamp(1.0 - (1 * velocity.length() / max_speed), 0.0, 1.0);
     const double clamped_delta_angular_velocity =
         std::clamp(delta_angular_velocity, -max_accel, max_accel);
 
@@ -663,7 +663,7 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
         // was 0.25m. More detail about the tests can be found on Notion from Apr 28,
         // 2023.
         double distance_for_kp      = std::max(0.25, local_error.length());
-        kp                          = 2.0 / (distance_for_kp + 0.2) + 0.9;
+        kp                          = 2.3 / (distance_for_kp + 0.4) + 1.5;
         prev_dynamic_kp_destination = destination;
     }
 
@@ -674,7 +674,8 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     // Scale down the PID velocity from being excessively high as it causes the
     // robot to swing around the destination. This causes the velocity to point
     // towards the destination as fast as possible.
-//    double increase = LINEAR_VELOCITY_MAX_PID_OFFSET * (1 - angular_velocity.toRadians() / max_angular_speed);
+    //    double increase = LINEAR_VELOCITY_MAX_PID_OFFSET * (1 -
+    //    angular_velocity.toRadians() / max_angular_speed);
     Vector realistic_pid_vel = pid_vel.normalize(
         std::min(pid_vel.length(), velocity.length() + LINEAR_VELOCITY_MAX_PID_OFFSET));
     Vector curr_local_velocity = globalToLocalVelocity(velocity, orientation);
@@ -705,6 +706,15 @@ Vector HRVOAgent::computePreferredVelocity(Duration time_step)
     // in the opposite direction
     output = output.rotate(-angular_velocity * time_step.toSeconds() *
                            ANGULAR_VELOCITY_COMPENSATION_MULTIPLIER);
+
+
+    //    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+    //            {std::to_string(robot_id) + "_x", position.x()},
+    //            {std::to_string(robot_id) + "_y", position.y()},
+    //            {std::to_string(robot_id) + "_t", orientation.toRadians()},
+    //            {std::to_string(robot_id) + "_vx_pref", output.x()},
+    //            {std::to_string(robot_id) + "_vy_pref", output.y()},
+    //    });
 
     return localToGlobalVelocity(output, orientation);
 }
@@ -755,12 +765,13 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
     // TODO (#2838): For HRVOVisualization logs to be sent properly from the robot, no
     // path should be passed as a second argument to LOG
     //    i.e. LOG(VISUALIZE) << hrvo_visualization;
-    if (friendly_team_colour == TeamColour::YELLOW)
-    {
-        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
-    }
-    else
-    {
-        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
-    }
+    //    LOG(VISUALIZE) << hrvo_visualization;
+    //    if (friendly_team_colour == TeamColour::YELLOW)
+    //    {
+    //        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
+    //    }
+    //    else
+    //    {
+    //        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
+    //    }
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
@@ -7,8 +9,6 @@
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play.h"
 #include "software/logger/logger.h"
-
-#include <algorithm>
 
 struct OffensePlayFSM
 {
@@ -37,6 +37,9 @@ struct OffensePlayFSM
      */
     bool enemyHasPossession(const Update& event);
 
+
+    bool fewEnemyThreatsInFriendlyHalf(const World& world);
+
     /**
      * Action to configure the play for offensive gameplay
      *
@@ -59,7 +62,8 @@ struct OffensePlayFSM
      * @param num_shoot_or_pass the number of attackers (ShootOrPassPlay)
      * @param num_defenders the number of defenders (DefensePlay)
      */
-    void setTactics(const Update& event, int num_shoot_or_pass, int num_defenders);
+    void setTactics(const Update& event, int num_shoot_or_pass, int num_defenders,
+                    bool is_currently_in_possession = false);
 
     auto operator()()
     {
@@ -87,12 +91,12 @@ struct OffensePlayFSM
     }
 
    private:
-    bool overbalancedFriendlyRobotsInFriendlyHalf(const World &world);
+    bool overbalancedFriendlyRobotsInFriendlyHalf(const World& world);
 
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<ShootOrPassPlay> shoot_or_pass_play;
     std::shared_ptr<DefensePlay> defense_play;
 
-    static constexpr int ROBOT_MIN_X_THRESHOLD = -2;
+    static constexpr int ROBOT_MIN_X_THRESHOLD                   = -2;
     static constexpr int TOO_MANY_FRIENDLY_HALF_ROBOTS_THRESHOLD = 4;
 };

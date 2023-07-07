@@ -6,7 +6,7 @@
 #include "shared/constants.h"
 
 PlotJugglerSink::PlotJugglerSink()
-    : udp_sender(PLOTJUGGLER_GUI_DEFAULT_HOST, PLOTJUGGLER_GUI_DEFAULT_PORT, false)
+    : udp_sender("192.168.0.104", PLOTJUGGLER_GUI_DEFAULT_PORT, false)
 {
 }
 

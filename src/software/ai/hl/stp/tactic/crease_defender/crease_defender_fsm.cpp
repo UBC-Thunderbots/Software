@@ -3,8 +3,8 @@
 #include "software/geom/algorithms/step_along_perimeter.h"
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
-    const Field& field, const Point& enemy_threat_origin,
-    const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
+    const Field &field, const Point &enemy_threat_origin,
+    const TbotsProto::CreaseDefenderAlignment &crease_defender_alignment,
     double robot_obstacle_inflation_factor)
 {
     // Get the inflated defense area
@@ -85,7 +85,7 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 }
 
 void CreaseDefenderFSM::blockThreat(
-    const Update& event, boost::sml::back::process<MoveFSM::Update> processEvent)
+    const Update &event, boost::sml::back::process<MoveFSM::Update> processEvent)
 {
     Point destination       = event.common.robot.position();
     auto block_threat_point = findBlockThreatPoint(
@@ -98,7 +98,7 @@ void CreaseDefenderFSM::blockThreat(
     }
     else
     {
-        LOG(WARNING)
+        LOG(INFO)
             << "Could not find a point on the defense area to block a potential shot";
     }
     Angle face_threat_orientation =
@@ -112,14 +112,35 @@ void CreaseDefenderFSM::blockThreat(
     {
         ball_collision_type = TbotsProto::BallCollisionType::AVOID;
     }
+    if (event.control_params.is_currently_in_possession &&
+        std::any_of(event.common.world.friendlyTeam().getAllRobots().begin(),
+                    event.common.world.friendlyTeam().getAllRobots().end(),
+                    [&event](const Robot &robot) {
+                        return robot.isNearDribbler(event.common.world.ball().position());
+                    }) &&
+        event.common.robot.isNearDribbler(event.common.world.ball().position(),
+                                          ROBOT_MAX_RADIUS_METERS))
+    {
+        if (event.control_params.crease_defender_alignment ==
+                TbotsProto::CreaseDefenderAlignment::LEFT ||
+            (event.common.robot.position() - event.common.world.ball().position()).x() <
+                0)
+        {
+            destination = destination + Vector(0, ROBOT_MAX_RADIUS_METERS);
+        }
+        else
+        {
+            destination = destination + Vector(0, -ROBOT_MAX_RADIUS_METERS);
+        }
+    }
 
     MoveFSM::ControlParams control_params{
-        .destination         = destination,
-        .final_orientation   = face_threat_orientation,
-        .final_speed         = 0.0,
-        .dribbler_mode       = TbotsProto::DribblerMode::OFF,
-        .ball_collision_type = ball_collision_type,
-        .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        .destination            = destination,
+        .final_orientation      = face_threat_orientation,
+        .final_speed            = 0.0,
+        .dribbler_mode          = TbotsProto::DribblerMode::OFF,
+        .ball_collision_type    = ball_collision_type,
+        .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         .max_allowed_speed_mode = event.control_params.max_allowed_speed_mode,
         .target_spin_rev_per_s  = 0.0};
 
@@ -165,55 +186,85 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
     return std::nullopt;
 }
 
-bool CreaseDefenderFSM::shouldChipAway(const Update &event)
+bool CreaseDefenderFSM::shouldChipAway(const Update& event)
 {
-    return event.common.robot.isNearDribbler(event.common.world.ball().position(), BALL_CLOSE_THRESHOLD_M) && enemyCloseToBall(event);
+    return event.common.robot.isNearDribbler(event.common.world.ball().position(),
+                                             BALL_CLOSE_THRESHOLD_M) &&
+           enemyCloseToBall(event) && isSafeToChipForward(event);
 }
 
-bool CreaseDefenderFSM::enemyCloseToBall(const Update &event)
+bool CreaseDefenderFSM::enemyCloseToBall(const Update& event)
 {
     return std::any_of(event.common.world.enemyTeam().getAllRobots().begin(),
-            event.common.world.enemyTeam().getAllRobots().end(),
-            [&event](const Robot &robot)
-            {
-                return distance(event.common.robot.position(), event.common.world.ball().position()) <= ENEMY_THREATS_CLOSE_THRESHOLD_M;
-            });
+                       event.common.world.enemyTeam().getAllRobots().end(),
+                       [&event](const Robot& robot) {
+                           return distance(event.common.robot.position(),
+                                           event.common.world.ball().position()) <=
+                                  ENEMY_THREATS_CLOSE_THRESHOLD_M;
+                       });
 }
 
-bool CreaseDefenderFSM::shouldControl(const Update &event)
+bool CreaseDefenderFSM::shouldControl(const Update& event)
 {
-    return event.common.robot.isNearDribbler(event.common.world.ball().position(), BALL_CLOSE_THRESHOLD_M)
-        && !enemyCloseToBall(event);
+    return event.common.robot.isNearDribbler(event.common.world.ball().position(),
+                                             BALL_CLOSE_THRESHOLD_M) &&
+           !enemyCloseToBall(event);
 }
 
-void CreaseDefenderFSM::control(const Update &event)
-{
-    Point enemy_goal_centre = event.common.world.field().enemyGoalCenter();
-    Vector robot_position_to_enemy_goal = (enemy_goal_centre - event.common.world.ball().position());
-
-    event.common.set_primitive(createMovePrimitive(
-                CREATE_MOTION_CONTROL(event.common.world.ball().position()),
-                robot_position_to_enemy_goal.orientation(), 
-                0.0, false,
-                TbotsProto::DribblerMode::MAX_FORCE,
-                TbotsProto::BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-                event.common.robot.robotConstants(), 0.0));
-}
-
-void CreaseDefenderFSM::chipAway(const Update &event)
+void CreaseDefenderFSM::control(const Update& event)
 {
     Point enemy_goal_centre = event.common.world.field().enemyGoalCenter();
-    Vector robot_position_to_enemy_goal = (enemy_goal_centre - event.common.world.ball().position());
+    Vector robot_position_to_enemy_goal =
+        (enemy_goal_centre - event.common.world.ball().position());
 
     event.common.set_primitive(createMovePrimitive(
-                CREATE_MOTION_CONTROL(event.common.world.ball().position()),
-                robot_position_to_enemy_goal.orientation(), 
-                0.0, false,
-                TbotsProto::DribblerMode::MAX_FORCE,
-                TbotsProto::BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-                event.common.robot.robotConstants(), 0.0));
+        CREATE_MOTION_CONTROL(event.common.world.ball().position()),
+        robot_position_to_enemy_goal.orientation(), 0.0, false,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants(), 0.0));
+}
+
+void CreaseDefenderFSM::chipAway(const Update& event)
+{
+    Point enemy_goal_centre = event.common.world.field().enemyGoalCenter();
+    Vector robot_position_to_enemy_goal =
+        (enemy_goal_centre - event.common.world.ball().position());
+
+    event.common.set_primitive(createMovePrimitive(
+        CREATE_MOTION_CONTROL(event.common.world.ball().position()),
+        robot_position_to_enemy_goal.orientation(), 0.0, false,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants(), 0.0));
+}
+
+bool CreaseDefenderFSM::isSafeToChipForward(const CreaseDefenderFSM::Update& event)
+{
+    Point ball_position             = event.common.world.ball().position();
+    Angle robot_orientation         = event.common.robot.orientation();
+    Vector direction_of_orientation = Vector::createFromAngle(robot_orientation);
+    const double threshold_constant = 0.3;  // TODO: Add to parameters
+    Segment chip_block_segment(
+        ball_position,
+        ball_position + direction_of_orientation.normalize(threshold_constant));
+    const auto& enemy_robots = event.common.world.enemyTeam().getAllRobots();
+
+    // Don't chip towards the friendly side
+    bool is_facing_away = Angle::zero().minDiff(robot_orientation).toDegrees() < 90.0;
+
+    // Check that none of the enemy robots block our chip
+    bool safe_to_chip = std::none_of(
+        enemy_robots.begin(), enemy_robots.end(),
+        [chip_block_segment, ball_position,
+         threshold_constant](const Robot& enemy_robot) {
+            Point enemy_position = enemy_robot.position();
+            return distance(enemy_robot.position(), ball_position) < threshold_constant &&
+                   intersects(chip_block_segment,
+                              Circle(enemy_position, ROBOT_MAX_RADIUS_METERS));
+        });
+
+    return is_facing_away && safe_to_chip;
 }

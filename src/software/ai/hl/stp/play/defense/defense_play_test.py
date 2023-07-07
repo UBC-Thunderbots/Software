@@ -10,7 +10,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
 
-#@pytest.mark.parametrize(
+# @pytest.mark.parametrize(
 #    "blue_bots,yellow_bots",
 #    [
 #        (
@@ -31,8 +31,8 @@ from proto.ssl_gc_common_pb2 import Team
 #            ],
 #        )
 #    ],
-#)
-#def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
+# )
+# def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
 #    def setup(*args):
 #        # Starting point must be Point
 #        ball_initial_pos = tbots.Point(0.9, 2.85)
@@ -86,6 +86,7 @@ from proto.ssl_gc_common_pb2 import Team
 #        test_timeout_s=30,
 #    )
 
+
 def test_defense_kick_out_of_play(simulated_test_runner):
     # Game Controller Setup
     simulated_test_runner.gamecontroller.send_ci_input(
@@ -98,20 +99,20 @@ def test_defense_kick_out_of_play(simulated_test_runner):
     ball_initial_pos = tbots.Point(-4, 1.5)
 
     blue_bots = [
-                    tbots.Point(-3, 1.5),
-                    tbots.Point(-3, 0.5),
-                    tbots.Point(-3, -0.5),
-                    tbots.Point(-3, -1.5),
-                    tbots.Point(-3, 1),
-                    tbots.Point(-3, 0.75),
+        tbots.Point(-3, 1.5),
+        tbots.Point(-3, 0.5),
+        tbots.Point(-3, -0.5),
+        tbots.Point(-3, -1.5),
+        tbots.Point(-3, 1),
+        tbots.Point(-3, 0.75),
     ]
 
-    yellow_bots =  [
-                tbots.Point(1, -0.25),
-                tbots.Point(1, -1.25),
-                tbots.Point(2, -0.25),
-                tbots.Point(2, -1.25),
-                tbots.Point(2, -1),
+    yellow_bots = [
+        tbots.Point(1, -0.25),
+        tbots.Point(1, -1.25),
+        tbots.Point(2, -0.25),
+        tbots.Point(2, -1.25),
+        tbots.Point(2, -1),
     ]
 
     # Create world state
@@ -133,9 +134,7 @@ def test_defense_kick_out_of_play(simulated_test_runner):
     yellow_play.name = PlayName.ShootOrPassPlay
 
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        Play, yellow_play
-    )
+    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
 
     simulated_test_runner.run_test(
         inv_always_validation_sequence_set=[[]],
@@ -150,6 +149,7 @@ def test_defense_kick_out_of_play(simulated_test_runner):
         ag_eventually_validation_sequence_set=[[]],
         test_timeout_s=60,
     )
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity

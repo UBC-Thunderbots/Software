@@ -42,22 +42,33 @@ void OffensePlayFSM::setupOffensiveStrategy(const Update& event)
         num_defenders -= 1;
     }
 
+    if (fewEnemyThreatsInFriendlyHalf(event.common.world) && num_defenders > 1)
+    {
+        num_defenders = 1;
+    }
+
     num_shoot_or_pass = event.common.num_tactics - num_defenders;
 
-    setTactics(event, num_shoot_or_pass, num_defenders);
+    setTactics(event, num_shoot_or_pass, num_defenders, true);
 }
 
-bool OffensePlayFSM::overbalancedFriendlyRobotsInFriendlyHalf(const World &world)
+bool OffensePlayFSM::overbalancedFriendlyRobotsInFriendlyHalf(const World& world)
 {
     const std::vector<Robot> friendly_robots = world.friendlyTeam().getAllRobots();
 
-    return (world.getTeamWithPossession() == TeamPossession::FRIENDLY_TEAM
-            && std::count_if(world.friendlyTeam().getAllRobots().begin(),
-                world.friendlyTeam().getAllRobots().end(),
-                [&](const Robot &robot)
-                {
-                    return robot.position().x() < ROBOT_MIN_X_THRESHOLD;
-                }) >= TOO_MANY_FRIENDLY_HALF_ROBOTS_THRESHOLD);
+    return (world.getTeamWithPossession() == TeamPossession::FRIENDLY_TEAM &&
+            std::count_if(world.friendlyTeam().getAllRobots().begin(),
+                          world.friendlyTeam().getAllRobots().end(),
+                          [&](const Robot& robot) {
+                              return robot.position().x() < ROBOT_MIN_X_THRESHOLD;
+                          }) >= TOO_MANY_FRIENDLY_HALF_ROBOTS_THRESHOLD);
+}
+
+bool OffensePlayFSM::fewEnemyThreatsInFriendlyHalf(const World& world)
+{
+    return std::none_of(world.enemyTeam().getAllRobots().begin(),
+                        world.enemyTeam().getAllRobots().end(),
+                        [](const Robot& robot) { return robot.position().x() < 0; });
 }
 
 void OffensePlayFSM::setupDefensiveStrategy(const Update& event)
@@ -66,7 +77,7 @@ void OffensePlayFSM::setupDefensiveStrategy(const Update& event)
 }
 
 void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
-                                int num_defenders)
+                                int num_defenders, bool is_currently_in_possession)
 {
     PriorityTacticVector tactics_to_return;
 

@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 
 #include "software/ai/evaluation/find_open_areas.h"
-#include "software/math/math_functions.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/math/math_functions.h"
 
 Point GoalieFSM::getGoaliePositionToBlock(
     const Ball &ball, const Field &field,
@@ -203,7 +203,7 @@ void GoalieFSM::updatePivotKick(
         std::max(clear_origin_x, event.common.world.ball().position().x());
     Point chip_origin = Point(chip_origin_x, event.common.world.ball().position().y());
 
-    Point chip_target  = findGoodChipTarget(event.common.world, goalie_tactic_config);
+    Point chip_target = findGoodChipTarget(event.common.world, goalie_tactic_config);
 
     // check if goalie is outside defense area, inside inflated defense area
     Rectangle friendly_defense_area = event.common.world.field().friendlyDefenseArea();
@@ -211,21 +211,26 @@ void GoalieFSM::updatePivotKick(
 
     // calculate inflated crease obstacle
     double robot_radius_expansion_amount =
-            ROBOT_MAX_RADIUS_METERS *
-            robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
+        ROBOT_MAX_RADIUS_METERS *
+        robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
     Rectangle inflated_defense_area =
-            friendly_defense_area.expand(robot_radius_expansion_amount);
+        friendly_defense_area.expand(robot_radius_expansion_amount);
 
     bool ball_in_dead_zone =
-            !contains(friendly_defense_area, ball.position()) &&
-            contains(friendly_defense_area.expand(robot_radius_expansion_amount),
-                     ball.position());
+        !contains(friendly_defense_area, ball.position()) &&
+        contains(friendly_defense_area.expand(robot_radius_expansion_amount),
+                 ball.position());
 
     // if goalie is in dead zone, retreat back into defense area
-    if (ball_in_dead_zone) {
-        Point defense_area_center = event.common.world.field().friendlyDefenseArea().centre();
-        Vector retreat_direction = (defense_area_center - event.common.world.ball().position()).normalize();
-        Point closest_point = closestPoint(event.common.world.field().friendlyDefenseArea(), event.common.world.friendlyTeam().goalie()->position());
+    if (ball_in_dead_zone)
+    {
+        Point defense_area_center =
+            event.common.world.field().friendlyDefenseArea().centre();
+        Vector retreat_direction =
+            (defense_area_center - event.common.world.ball().position()).normalize();
+        Point closest_point =
+            closestPoint(event.common.world.field().friendlyDefenseArea(),
+                         event.common.world.friendlyTeam().goalie()->position());
         chip_origin = closest_point + retreat_direction * 2 * ROBOT_MAX_RADIUS_METERS;
     }
 
