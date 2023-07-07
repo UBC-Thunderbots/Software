@@ -59,6 +59,8 @@ enum CreaseDefenderAlignment
     LEFT   = 0;
     RIGHT  = 1;
     CENTRE = 2;
+    FAR_LEFT = 3;
+    FAR_RIGHT = 4;
 }
 
 message CreaseDefenderTactic
