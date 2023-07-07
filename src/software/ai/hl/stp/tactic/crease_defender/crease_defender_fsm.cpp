@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
-    const Field &field, const Point &enemy_threat_origin,
-    const TbotsProto::CreaseDefenderAlignment &crease_defender_alignment,
+    const Field& field, const Point& enemy_threat_origin,
+    const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
     double robot_obstacle_inflation_factor)
 {
     // We increment the angle to positive goalpost by 1/6, 3/6, or 5/6 of the shot
@@ -29,7 +29,7 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 }
 
 void CreaseDefenderFSM::blockThreat(
-    const Update &event, boost::sml::back::process<MoveFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<MoveFSM::Update> processEvent)
 {
     Point destination       = event.common.robot.position();
     auto block_threat_point = findBlockThreatPoint(
@@ -59,7 +59,7 @@ void CreaseDefenderFSM::blockThreat(
     if (event.control_params.is_currently_in_possession &&
         std::any_of(event.common.world.friendlyTeam().getAllRobots().begin(),
                     event.common.world.friendlyTeam().getAllRobots().end(),
-                    [&event](const Robot &robot) {
+                    [&event](const Robot& robot) {
                         return robot.isNearDribbler(event.common.world.ball().position());
                     }) &&
         event.common.robot.isNearDribbler(event.common.world.ball().position(),
@@ -93,7 +93,7 @@ void CreaseDefenderFSM::blockThreat(
 }
 
 std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
-    const Field &field, const Ray &ray, double robot_obstacle_inflation_factor)
+    const Field& field, const Ray& ray, double robot_obstacle_inflation_factor)
 {
     // Return the segments that form the path around the crease that the
     // defenders must follow. It's basically the crease inflated by one robot radius
