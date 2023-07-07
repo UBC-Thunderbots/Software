@@ -47,7 +47,7 @@ class RobotCommunication(object):
         self.estop_path = (
             estop_path
             if estop_path
-            else ("/dev/ttyACM0" if os.path.isfile("/dev/ttyACM0") else "/dev/ttyUSB0")
+            else ("/dev/ttyACM0" if os.path.exists("/dev/ttyACM0") else "/dev/ttyUSB0")
         )
         self.estop_buadrate = estop_buadrate
 
