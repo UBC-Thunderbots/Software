@@ -57,10 +57,12 @@ cc_library(
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
+        "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
         "//software/util/generic_factory",
         "//software/world:game_state",
+        "//software/geom:vector"
     ],
     alwayslink = True,
 )
