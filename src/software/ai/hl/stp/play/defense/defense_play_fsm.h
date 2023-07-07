@@ -7,6 +7,7 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/logger/logger.h"
+#include "software/ai/evaluation/defender_assignment.h"
 
 struct DefensePlayFSM
 {
@@ -17,6 +18,8 @@ struct DefensePlayFSM
     {
         // The maximum allowed speed mode
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+
+        std::queue<DefenderAssignment> defender_assignments;
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -63,8 +66,7 @@ struct DefensePlayFSM
      * @param event the FSM event
      * @param enemy_threats the enemy threats to defend against
      */
-    void updateCreaseAndPassDefenders(const Update& event,
-                                      const std::vector<EnemyThreat>& enemy_threats);
+    void updateCreaseAndPassDefenders(const Update& event, const int num_tactics_to_assign);
 
     /**
      * Helper function to update shadowers to shadow specified threats
@@ -72,8 +74,7 @@ struct DefensePlayFSM
      * @param event the FSM event
      * @param threats_to_shadow the enemy threats to shadow
      */
-    void updateShadowers(const Update& event,
-                         const std::vector<EnemyThreat>& threats_to_shadow);
+    void updateShadowers(const Update& event, const std::vector<DefenderAssignment> &threats_to_shadow);
 
     /**
      * Helper function to set up crease defender tactic vector members
@@ -103,6 +104,8 @@ struct DefensePlayFSM
      */
     void setTactics(const Update& event);
 
+    int assignMostThreateningThreat(const Update &event, int num_tactics_left_to_assign);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -130,8 +133,17 @@ struct DefensePlayFSM
     }
 
    private:
+
+    void resetAssignments(const Update& event);
+
     TbotsProto::AiConfig ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
     std::vector<std::shared_ptr<PassDefenderTactic>> pass_defenders;
+
+    std::vector<DefenderAssignment> crease_defender_assignments;
+    std::vector<DefenderAssignment> pass_defender_assignments;
+
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadowers;
+
+    std::optional<DefenderAssignment> highest_cov_rating_assignment;
 };

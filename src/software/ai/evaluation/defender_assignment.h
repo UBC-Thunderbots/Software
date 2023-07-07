@@ -6,6 +6,8 @@
 #include "software/geom/segment.h"
 #include "software/world/field.h"
 
+#include <queue>
+
 // Indicates the type of defender for a DefenderAssignment
 enum DefenderAssignmentType
 {
@@ -27,6 +29,8 @@ struct DefenderAssignment
     // The coverage rating of the assignment, which scores the defender's ability
     // to block high-danger enemy scoring chances or passes
     double coverage_rating;
+
+    EnemyThreat enemy_threat;
 
     // Equality operator for unit testing.
     bool operator==(const DefenderAssignment &other) const
@@ -50,6 +54,8 @@ struct ShootingLane
     // of the lane relative to other lanes (i.e. how likely a pass or shot
     // along the lane will eventually result in the enemy team scoring)
     double threat_rating;
+
+    EnemyThreat enemy_threat;
 
     // Equality operator for unit testing.
     bool operator==(const ShootingLane &other) const
@@ -85,9 +91,10 @@ struct GoalLane : ShootingLane
  * @return a list of all possible defender assignments in order of decreasing
  * coverage rating
  */
-std::vector<DefenderAssignment> getAllDefenderAssignments(
+std::queue<DefenderAssignment> getAllDefenderAssignments(
     const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball,
-    const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig &config);
+    const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig &config,
+    const int max_num_crease_defender_assignments=3);
 
 /**
  * Filters out enemy threats with similar positioning/angle to the primary threat

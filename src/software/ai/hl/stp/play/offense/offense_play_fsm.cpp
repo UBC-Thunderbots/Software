@@ -73,7 +73,21 @@ bool OffensePlayFSM::fewEnemyThreatsInFriendlyHalf(const World& world)
 
 void OffensePlayFSM::setupDefensiveStrategy(const Update& event)
 {
-    setTactics(event, 0, event.common.num_tactics);
+    defender_assignments = getAllDefenderAssignments(
+            getAllEnemyThreats(event.common.world.field(), event.common.world.friendlyTeam(),
+                event.common.world.enemyTeam(), event.common.world.ball(),
+                false),
+            event.common.world.field(), event.common.world.ball(),
+            ai_config.defense_play_config().defender_assignment_config());
+
+    int num_defending_robots = static_cast<int>(defender_assignments.size() + 1);
+    int num_tactics = static_cast<int>(event.common.num_tactics);
+    if (num_defending_robots > num_tactics)
+    {
+        num_defending_robots = num_tactics;
+    }
+
+    setTactics(event, num_tactics-num_defending_robots, num_defending_robots);
 }
 
 void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
@@ -95,7 +109,7 @@ void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
             event.common.set_inter_play_communication_fun));
     }
 
-    defense_play->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    defense_play->updateControlParams(defender_assignments, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     if (num_defenders > 0)
     {

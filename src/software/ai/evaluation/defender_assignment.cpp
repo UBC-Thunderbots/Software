@@ -5,13 +5,14 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/math/math_functions.h"
 
-std::vector<DefenderAssignment> getAllDefenderAssignments(
+std::queue<DefenderAssignment> getAllDefenderAssignments(
     const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball,
-    const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig &config)
+    const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig &config,
+    const int max_num_crease_defender_assignments)
 {
     if (threats.size() == 0)
     {
-        return {};
+        return std::queue<DefenderAssignment>();
     }
 
     std::vector<GoalLane> goal_lanes;
@@ -44,9 +45,9 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
         auto lane =
             Segment(primary_threat_position, filtered_threats.at(i).robot.position());
         double threat_rating = static_cast<double>(filtered_threats.size()) - i;
-        passing_lanes.emplace_back(ShootingLane{lane, threat_rating});
+        passing_lanes.emplace_back(ShootingLane{lane, threat_rating, filtered_threats.at(i)});
         assignments.emplace_back(
-            DefenderAssignment{PASS_DEFENDER, lane.midPoint(), threat_rating});
+            DefenderAssignment{PASS_DEFENDER, lane.midPoint(), threat_rating, filtered_threats.at(i)});
     }
 
     // Construct goal lanes.
@@ -70,7 +71,7 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
         double threat_rating = (static_cast<double>(relevant_threats.size()) - i) *
                                config.goal_lane_threat_multiplier();
         auto angle_to_goal = lane.reverse().toVector().orientation();
-        goal_lanes.emplace_back(GoalLane{{lane, threat_rating}, angle_to_goal});
+        goal_lanes.emplace_back(GoalLane{{lane, threat_rating, relevant_threats.at(i)}, angle_to_goal});
     }
 
     auto grouped_goal_lanes =
@@ -89,14 +90,16 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
 
         for (const auto &goal_lane : goal_lanes_group)
         {
-            auto threat_position   = goal_lane.lane.getStart();
+            EnemyThreat enemy_threat = goal_lane.enemy_threat;
+
+            const Point threat_position = goal_lane.lane.getStart();
             double coverage_rating = goal_lane.threat_rating + nondense_bonus;
 
             // We let the target of the defender assignment be the location
             // of the originating enemy threat to cooperate with control
             // params for CreaseDefenderTactic
             assignments.emplace_back(
-                DefenderAssignment{CREASE_DEFENDER, threat_position, coverage_rating});
+                DefenderAssignment{CREASE_DEFENDER, threat_position, coverage_rating, enemy_threat});
         }
     }
 
@@ -114,7 +117,28 @@ std::vector<DefenderAssignment> getAllDefenderAssignments(
         return a.coverage_rating > b.coverage_rating;
     });
 
-    return assignments;
+    std::vector<DefenderAssignment> reduced_defender_assignments;
+    int num_crease_defenders = 0;
+    std::copy_if(assignments.begin(), assignments.end(), std::back_inserter(reduced_defender_assignments),
+                [&num_crease_defenders, max_num_crease_defender_assignments](const DefenderAssignment defender_assignment)
+                {
+                    if (defender_assignment.type != CREASE_DEFENDER)
+                    {
+                        return true;
+                    }
+
+                    if (num_crease_defenders < max_num_crease_defender_assignments)
+                    {
+                        num_crease_defenders++;
+                        return true;
+                    }
+
+                    return false;
+    });
+
+    std::queue defender_assignment_q = std::queue<DefenderAssignment>(std::deque<DefenderAssignment>(reduced_defender_assignments.begin(), reduced_defender_assignments.end()));
+
+    return defender_assignment_q;
 }
 
 std::vector<EnemyThreat> filterOutSimilarThreats(const std::vector<EnemyThreat> &threats,
