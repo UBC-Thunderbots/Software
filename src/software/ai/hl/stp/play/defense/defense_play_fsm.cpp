@@ -17,6 +17,7 @@ void DefensePlayFSM::resetAssignments(const Update& event)
     pass_defender_assignments = std::vector<DefenderAssignment>();
     shadowers = std::vector<std::shared_ptr<ShadowEnemyTactic>>();
 
+    highest_cov_rating_assignment = std::nullopt;
     if (event.control_params.defender_assignments.size() > 0)
     {
         highest_cov_rating_assignment = std::make_optional<DefenderAssignment>(event.control_params.defender_assignments.front());
@@ -50,9 +51,20 @@ void DefensePlayFSM::blockShots(const Update& event)
     auto enemy_threats = getAllEnemyThreats(event.common.world.field(), event.common.world.friendlyTeam(),
             event.common.world.enemyTeam(), event.common.world.ball(), false);
 
-    for (int i = 0; (i < static_cast<int>(enemy_threats.size()) && i < num_tactics_left_to_assign); ++i)
+    LOG(DEBUG) << "[DefensePlayFSM] Recorded " << enemy_threats.size() << " enemy threats";
+    TeamPossession possession = event.common.world.getTeamWithPossession();
+    if (possession != TeamPossession::FRIENDLY_TEAM)
     {
-        addShadower(enemy_threats.at(i+1));
+        for (int i = 0; (enemy_threats.size() > 0 && num_tactics_left_to_assign > 0); ++i)
+        {
+            addShadower(enemy_threats.at(i % static_cast<int>(enemy_threats.size())));
+            --num_tactics_left_to_assign;
+        }
+    }
+
+    if (num_tactics_left_to_assign > 0)
+    {
+        LOG(WARNING) << "[DefensePlayFSM] Unable to assign " << num_tactics_left_to_assign << ". Consider assigning fewer defensive robots"; 
     }
 
     setTactics(event);
@@ -77,6 +89,8 @@ int DefensePlayFSM::assignMostThreateningThreat(const Update &event, int num_tac
 
 void DefensePlayFSM::shadowAndBlockShots(const Update& event)
 {
+    LOG(DEBUG) << "[DefensePlayFSM] Aggressive defensive on";
+
     int num_tactics_left_to_assign = static_cast<int>(event.common.num_tactics);
     resetAssignments(event);
     const int total_defenders = static_cast<int>(event.common.num_tactics);
@@ -103,21 +117,21 @@ void DefensePlayFSM::shadowAndBlockShots(const Update& event)
     num_tactics_left_to_assign -= updateCreaseAndPassDefenders(event, num_tactics_left_to_assign);
 
     // assign shadowers to left over tactics
-    int num_unaddressed_enemy_threats = static_cast<int>(enemy_threats.size());
+    int starting_index = 0;
     if (assigned_shadower_to_most_dangerous)
     {
-        num_unaddressed_enemy_threats -= 1;
+        starting_index = 1;
     }
-    for (int i = 0; ((i < num_unaddressed_enemy_threats) && i < num_tactics_left_to_assign); ++i)
+    for (int i = starting_index; ((enemy_threats.size() > 0) && (num_tactics_left_to_assign > 0)); ++i)
     {
-        if (assigned_shadower_to_most_dangerous)
-        {
-            addShadower(enemy_threats.at(i+1));
-        }
-        else
-        {
-            addShadower(enemy_threats.at(i));
-        }
+        int index = i % static_cast<int>(enemy_threats.size());
+        addShadower(enemy_threats.at(index));
+        num_tactics_left_to_assign--;
+    }
+
+    if (num_tactics_left_to_assign > 0)
+    {
+        LOG(WARNING) << "[DefensePlayFSM] is unable to assign " << num_tactics_left_to_assign << ". Consider reducing the number of robots assigned to defense";
     }
 
     setTactics(event);
@@ -127,11 +141,6 @@ int DefensePlayFSM::updateCreaseAndPassDefenders(
     const Update& event, const int num_tactics_to_assign)
 {
     int num_tactics_assigned = num_tactics_to_assign;
-
-    if (defender_assignments_q.size() == 0)
-    {
-        return 0;
-    }
 
     // Choose which defender assignments to assign defenders to based on number
     // of tactics available to set

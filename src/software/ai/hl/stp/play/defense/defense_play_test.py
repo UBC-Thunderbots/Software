@@ -128,7 +128,7 @@ def test_defense_kick_out_of_play(simulated_test_runner):
 
     # Force play override here
     blue_play = Play()
-    blue_play.name = PlayName.DefensePlay
+    blue_play.name = PlayName.OffensePlay
 
     yellow_play = Play()
     yellow_play.name = PlayName.ShootOrPassPlay
