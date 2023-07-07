@@ -136,32 +136,32 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
     return std::nullopt;
 }
 
-bool CreaseDefenderFSM::shouldChipAway(const Update &event)
+bool CreaseDefenderFSM::shouldChipAway(const Update& event)
 {
     return event.common.robot.isNearDribbler(event.common.world.ball().position(),
                                              BALL_CLOSE_THRESHOLD_M) &&
            enemyCloseToBall(event);
 }
 
-bool CreaseDefenderFSM::enemyCloseToBall(const Update &event)
+bool CreaseDefenderFSM::enemyCloseToBall(const Update& event)
 {
     return std::any_of(event.common.world.enemyTeam().getAllRobots().begin(),
                        event.common.world.enemyTeam().getAllRobots().end(),
-                       [&event](const Robot &robot) {
+                       [&event](const Robot& robot) {
                            return distance(event.common.robot.position(),
                                            event.common.world.ball().position()) <=
                                   ENEMY_THREATS_CLOSE_THRESHOLD_M;
                        });
 }
 
-bool CreaseDefenderFSM::shouldControl(const Update &event)
+bool CreaseDefenderFSM::shouldControl(const Update& event)
 {
     return event.common.robot.isNearDribbler(event.common.world.ball().position(),
                                              BALL_CLOSE_THRESHOLD_M) &&
            !enemyCloseToBall(event);
 }
 
-void CreaseDefenderFSM::control(const Update &event)
+void CreaseDefenderFSM::control(const Update& event)
 {
     Point enemy_goal_centre = event.common.world.field().enemyGoalCenter();
     Vector robot_position_to_enemy_goal =
@@ -176,7 +176,7 @@ void CreaseDefenderFSM::control(const Update &event)
         event.common.robot.robotConstants(), 0.0));
 }
 
-void CreaseDefenderFSM::chipAway(const Update &event)
+void CreaseDefenderFSM::chipAway(const Update& event)
 {
     Point enemy_goal_centre = event.common.world.field().enemyGoalCenter();
     Vector robot_position_to_enemy_goal =
