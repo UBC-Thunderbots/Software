@@ -96,7 +96,7 @@ void FreeKickPlayFSM::shootBall(const Update &event)
 
     shoot_tactic->updateControlParams(
         ball_pos, (shot->getPointToShootAt() - ball_pos).orientation(),
-        BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
+        ai_config.attacker_tactic_config().kick_max_speed());
     tactics_to_run[0].emplace_back(shoot_tactic);
 
     event.common.set_tactics(tactics_to_run);

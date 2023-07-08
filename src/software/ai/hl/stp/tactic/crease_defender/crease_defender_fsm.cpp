@@ -3,8 +3,8 @@
 #include "software/geom/algorithms/step_along_perimeter.h"
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
-    const Field &field, const Point &enemy_threat_origin,
-    const TbotsProto::CreaseDefenderAlignment &crease_defender_alignment,
+    const Field& field, const Point& enemy_threat_origin,
+    const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
     double robot_obstacle_inflation_factor)
 {
     // Get the inflated defense area
@@ -85,7 +85,7 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 }
 
 void CreaseDefenderFSM::blockThreat(
-    const Update &event, boost::sml::back::process<MoveFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<MoveFSM::Update> processEvent)
 {
     Point destination       = event.common.robot.position();
     auto block_threat_point = findBlockThreatPoint(
@@ -115,7 +115,7 @@ void CreaseDefenderFSM::blockThreat(
     if (event.control_params.is_currently_in_possession &&
         std::any_of(event.common.world.friendlyTeam().getAllRobots().begin(),
                     event.common.world.friendlyTeam().getAllRobots().end(),
-                    [&event](const Robot &robot) {
+                    [&event](const Robot& robot) {
                         return robot.isNearDribbler(event.common.world.ball().position());
                     }) &&
         event.common.robot.isNearDribbler(event.common.world.ball().position(),

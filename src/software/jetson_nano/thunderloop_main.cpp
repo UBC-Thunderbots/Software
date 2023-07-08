@@ -84,6 +84,8 @@ static void reserveProcessMemory(int size)
     free(buffer);
 }
 
+static const unsigned CONTROL_LOOP_HZ = 300u;
+
 int main(int argc, char** argv)
 {
     std::cout << BANNER << std::endl;
