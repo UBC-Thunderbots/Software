@@ -47,7 +47,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             {
                 num_shooters--;
             }
-            else
+            else if (num_defenders > 0)
             {
                 num_defenders--;
             }
