@@ -268,8 +268,8 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
 
     // Figure out how long it would take our robot to get there
     Duration min_robot_travel_time =
-        best_receiver.getTimeToPosition(pass.receiverPoint()) *
-        Duration::fromSeconds(passing_config.pass_friendly_capability_multiplier());
+            Duration::fromSeconds(best_receiver.getTimeToPosition(pass.receiverPoint()).toSeconds() * passing_config.pass_friendly_capability_multiplier());
+
     Timestamp earliest_time_to_receive_point =
         best_receiver.timestamp() + min_robot_travel_time;
 
