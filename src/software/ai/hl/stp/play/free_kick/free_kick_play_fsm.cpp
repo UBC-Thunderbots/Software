@@ -26,8 +26,7 @@ void FreeKickPlayFSM::setupPosition(const Update &event)
     {
         ranked_zones =
             pass_generator.generatePassEvaluation(event.common.world)
-                .rankZonesForReceiving(event.common.world,
-                                       best_pass_and_score_so_far.pass.receiverPoint());
+                .rankZonesForReceiving(event.common.world, event.common.world.ball().position());
     }
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -54,6 +53,10 @@ bool FreeKickPlayFSM::setupDone(const Update &event)
 void FreeKickPlayFSM::updateOffensivePositioningTactics(const World &world)
 {
     using Zones = std::unordered_set<EighteenZoneId>;
+
+//    ranked_zones =
+//            pass_generator.generatePassEvaluation(world)
+//                    .rankZonesForReceiving(world, world.ball().position());
 
     auto pass_eval = pass_generator.generatePassEvaluation(world);
 
@@ -110,7 +113,7 @@ void FreeKickPlayFSM::startLookingForPass(const FreeKickPlayFSM::Update &event)
     ranked_zones =
         pass_generator.generatePassEvaluation(event.common.world)
             .rankZonesForReceiving(event.common.world,
-                                   best_pass_and_score_so_far.pass.receiverPoint());
+                                   event.common.world.ball().position());
 }
 
 bool FreeKickPlayFSM::timeExpired(const FreeKickPlayFSM::Update &event)
@@ -140,6 +143,7 @@ void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
     PriorityTacticVector tactics_to_run = {{}};
 
     // Keep the kicker aligned to the ball
+
     updateAlignToBallTactic(event.common.world);
     tactics_to_run[0].emplace_back(align_to_ball_tactic);
 

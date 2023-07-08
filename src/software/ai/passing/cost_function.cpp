@@ -60,7 +60,7 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
         getStaticPositionQuality(field, zone.centre(), passing_config);
 
     // Rate zones that are up the field higher to encourage progress up the field
-    double pass_up_field_rating = zone.centre().x() / field.xLength();
+//    double pass_up_field_rating = zone.centre().x() / field.xLength();
 
     auto enemy_reaction_time =
         Duration::fromSeconds(passing_config.enemy_reaction_time());
@@ -89,7 +89,8 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
              enemy_reaction_time, enemy_proximity_importance)) /
         5.0;
 
-    return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
+    return static_pass_quality * enemy_risk_rating;
+//    return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
 }
 
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
