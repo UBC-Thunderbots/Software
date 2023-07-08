@@ -62,7 +62,7 @@ void DefensePlayFSM::shadowAndBlockShots(const Update& event)
     num_tactics_left_to_assign -= assignPrimaryCreaseDefender(event, num_tactics_left_to_assign);
 
 
-    if (num_tactics_left_to_assign != static_cast<int>(event.common.num_tactics) && num_tactics_to_assign > 0 && enemy_threats.size() > 0)
+    if (num_tactics_left_to_assign != static_cast<int>(event.common.num_tactics) && num_tactics_left_to_assign > 0 && enemy_threats.size() > 0)
     {
         // Try to add a shadower targeting the most threatening enemy threat
         addShadower(enemy_threats.front());
