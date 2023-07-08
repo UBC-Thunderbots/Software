@@ -11,7 +11,7 @@ struct ShadowEnemyFSM
 {
    public:
     class BlockPassState;
-    class StealAndChipState;
+    class StealAndMaybeChipState;
 
     // this struct defines the unique control parameters that the ShadowEnemyFSM requires
     // in its update
@@ -87,6 +87,15 @@ struct ShadowEnemyFSM
                    boost::sml::back::process<MoveFSM::Update> processEvent);
 
     /**
+     * Action to steal
+     *
+     * Steal the ball if enemy threat is close enough
+     *
+     * @param event ShadowEnemyFSM::Update
+     */
+    void steal(const Update &event);
+
+    /**
      * Action to steal and chip the ball
      *
      * Steal the ball if enemy threat is close enough and chip the ball away
@@ -95,29 +104,34 @@ struct ShadowEnemyFSM
      */
     void stealAndChip(const Update &event);
 
+    bool isGoodToChip(const Update &event);
+
     auto operator()()
     {
         using namespace boost::sml;
 
         DEFINE_SML_STATE(MoveFSM)
         DEFINE_SML_STATE(BlockPassState)
-        DEFINE_SML_STATE(StealAndChipState)
+        DEFINE_SML_STATE(StealAndMaybeChipState)
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(enemyThreatHasBall)
+        DEFINE_SML_GUARD(isGoodToChip)
         DEFINE_SML_ACTION(blockPass)
+        DEFINE_SML_ACTION(steal)
         DEFINE_SML_ACTION(stealAndChip)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockShot, MoveFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E[!enemyThreatHasBall_G] / stealAndChip_A =
-                StealAndChipState_S,
-            MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = StealAndChipState_S,
+            *MoveFSM_S + Update_E[!enemyThreatHasBall_G] / steal_A =
+                StealAndMaybeChipState_S,
+            MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = StealAndMaybeChipState_S,
             BlockPassState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A,
             BlockPassState_S + Update_E[enemyThreatHasBall_G] / blockShot_A = MoveFSM_S,
-            StealAndChipState_S + Update_E[!enemyThreatHasBall_G] / stealAndChip_A,
-            StealAndChipState_S + Update_E[enemyThreatHasBall_G] / blockPass_A = X,
+            StealAndMaybeChipState_S + Update_E[!enemyThreatHasBall_G && isGoodToChip_G] / stealAndChip_A,
+            StealAndMaybeChipState_S + Update_E[!enemyThreatHasBall_G && !isGoodToChip_G] / steal_A,
+            StealAndMaybeChipState_S + Update_E[enemyThreatHasBall_G] / blockPass_A = X,
             X + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
             X + Update_E[enemyThreatHasBall_G] / blockShot_A  = MoveFSM_S,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION          = X);
