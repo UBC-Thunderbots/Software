@@ -41,6 +41,8 @@ struct BallDetection
     Timestamp timestamp;
     double confidence;
 
+    bool is_from_break_beam;
+
     bool operator<(const BallDetection &b) const
     {
         return timestamp < b.timestamp;

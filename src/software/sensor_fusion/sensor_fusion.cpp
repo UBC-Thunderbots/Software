@@ -248,7 +248,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                                    BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
                 .distance_from_ground = 0,
                 .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-                .confidence = 1}};
+                .confidence = 1,
+                .is_from_break_beam = true}};
 
             std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
 

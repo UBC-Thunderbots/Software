@@ -43,6 +43,8 @@ class BallFilter
     static constexpr double MAX_BUFFER_SIZE_VELOCITY_MAGNITUDE = 4.0;
     // The extra amount beyond the ball's max speed that we treat ball detections as valid
     static constexpr double MAX_ACCEPTABLE_BALL_SPEED_BUFFER = 2.0;
+    // The max allowable distance between a break beam detection and vision detection
+    static constexpr double MAX_ACCEPTABLE_BREAK_BEAM_DETECTION_DISTANCE = 0.4;
     // The maximum error threshold to considering using the generated linear regression
     // TODO (#2752): Investigate different values of error threshold
     static constexpr double LINEAR_REGRESSION_ERROR_THRESHOLD = 1000.0;
