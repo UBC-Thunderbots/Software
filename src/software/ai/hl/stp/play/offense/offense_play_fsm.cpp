@@ -66,7 +66,8 @@ bool OffensePlayFSM::overbalancedFriendlyRobotsInFriendlyHalf(const World& world
 
 bool OffensePlayFSM::fewEnemyThreatsInFriendlyHalf(const World& world)
 {
-    return std::none_of(world.enemyTeam().getAllRobots().begin(),
+    return ai_config.offense_play_config().allow_single_defender() &&
+           std::none_of(world.enemyTeam().getAllRobots().begin(),
                         world.enemyTeam().getAllRobots().end(),
                         [](const Robot& robot) { return robot.position().x() < 0; });
 }

@@ -17,7 +17,8 @@ Angle ReceiverFSM::getOneTouchShotDirection(const Ray& shot, const Ball& ball)
 
     // This kick speed is based off of the value used in the firmware `MovePrimitive`
     // when autokick is enabled
-    double kick_speed = BALL_MAX_SPEED_METERS_PER_SECOND - 1;
+    double kick_speed =
+        BALL_MAX_SPEED_METERS_PER_SECOND - 1;  // TODO Update to use config
     Angle shot_offset = Angle::asin(lateral_speed / kick_speed);
 
     // check which direction the ball is going in so we can decide which direction to
@@ -122,7 +123,7 @@ void ReceiverFSM::updateOnetouch(const Update& event)
             one_touch.getOpenAngle(), 0, false, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                           BALL_MAX_SPEED_METERS_PER_SECOND},
+                           BALL_MAX_SPEED_METERS_PER_SECOND - 1},
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
             event.common.robot.robotConstants()));
     }

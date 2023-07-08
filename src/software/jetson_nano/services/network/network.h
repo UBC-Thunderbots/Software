@@ -28,7 +28,8 @@ class NetworkService
      */
     NetworkService(const std::string& ip_address, unsigned short world_listener_port,
                    unsigned short primitive_listener_port,
-                   unsigned short robot_status_sender_port, bool multicast);
+                   unsigned short robot_status_sender_port, bool multicast,
+                   const unsigned thunderloop_hz);
 
     /**
      * When the network service is polled, it sends the robot_status and returns
@@ -43,8 +44,7 @@ class NetworkService
     // Constants
     static constexpr float PROTO_LOSS_WARNING_THRESHOLD          = 0.1f;
     static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
-    static constexpr double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
-        ROBOT_STATUS_BROADCAST_RATE_HZ / (CONTROL_LOOP_HZ + 1.0);
+    const double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO;
 
     // Variables
     TbotsProto::PrimitiveSet primitive_set_msg;
@@ -71,4 +71,6 @@ class NetworkService
 
     // track last breakbeam state for sending RobotStatus outside of specified rate
     bool last_breakbeam_state_sent = false;
+
+    const unsigned control_loop_hz;
 };
