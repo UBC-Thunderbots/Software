@@ -37,7 +37,7 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
      */
     auto shadow_enemy = std::make_shared<ShadowEnemyTactic>();
 
-    bool enemy_at_ball = false;
+//    bool enemy_at_ball = false;
 
     do
     {

@@ -112,7 +112,8 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     {
         if (ip_address == "224.5.23.2" || ip_address == "224.5.23.1") {
             // Join the multicast group.
-            boost::asio::ip::address_v4 listenInterface = boost::asio::ip::address_v4::from_string("10.193.15.92");
+            // TODO Field network (vision)
+            boost::asio::ip::address_v4 listenInterface = boost::asio::ip::address_v4::from_string("10.191.12.196");
             socket_.set_option(boost::asio::ip::multicast::join_group(
                     boost::asio::ip::address::from_string(ip_address).to_v4(), listenInterface));
         }

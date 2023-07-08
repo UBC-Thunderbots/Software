@@ -179,7 +179,7 @@ if __name__ == "__main__":
     if args.flash_robots:
         bazel_arguments += ["-pb deploy_nano.yml"]
         bazel_arguments += ["--hosts"]
-        bazel_arguments += [f"192.168.0.20{id}" for id in args.flash_robots]
+        bazel_arguments += [f"172.16.1.20{id}" for id in args.flash_robots]
         bazel_arguments += ["-pwd", args.pwd]
 
     if args.action in "test":
