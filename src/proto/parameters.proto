@@ -128,10 +128,10 @@ message PassingConfig
     // Cost visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
 
-    // Number of seconds added to the number of seconds it takes the robot
-    // to reach the destination.
-    required double pass_friendly_capability_multiplier = 11
-        [default = 1.0, (bounds).min_double_value = 0.1, (bounds).max_double_value = 2.0];
+    // Multiplier for how long it will take the robot to reach positional and rotational
+    // destination for receiving the ball
+    required double friendly_time_destination_multiplier = 11
+        [default = 1.25, (bounds).min_double_value = 0.1, (bounds).max_double_value = 2.0];
 }
 
 message GoalieTacticConfig
@@ -214,7 +214,7 @@ message EnemyCapabilityConfig
 
 message OffensePlayConfig
 {
-    required bool allow_single_defender = 1 [default = true];
+    required bool allow_single_defender = 1 [default = false];
 }
 
 message ShootOrPassPlayConfig
@@ -307,11 +307,11 @@ message SensorFusionConfig
 
     // Overrides the friendly goalie id provided by the game controller,
     // with FriendlyGoalieId parameter
-    required bool override_game_controller_friendly_goalie_id = 10 [default = true];
+    required bool override_game_controller_friendly_goalie_id = 10 [default = false];
 
     // Overrides the enemy goalie id provided by the game controller,
     // with EnemyGoalieId parameter
-    required bool override_game_controller_enemy_goalie_id = 11 [default = true];
+    required bool override_game_controller_enemy_goalie_id = 11 [default = false];
 
     // Number of dropped detections before we consider the ball not to be in the dribbler
     required int32 num_dropped_detections_before_ball_not_in_dribbler = 12

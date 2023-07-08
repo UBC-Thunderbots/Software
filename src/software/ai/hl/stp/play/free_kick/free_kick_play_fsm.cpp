@@ -133,7 +133,11 @@ void FreeKickPlayFSM::chipBall(const Update &event)
         chip_tactic->updateControlParams(event.common.world.ball().position(),
                                          robot->position());
         // Create a fake pass to assign to the receiver to receiver the chip
-        Pass pass(event.common.world.ball().position(), robot->position(), ai_config.passing_config().max_pass_speed_m_per_s() - 1.0); // TODO: Not sure how fast chip moves.
+        double chip_distance = ai_config.robot_capabilities_config().chip_in_air_distance();
+        Point ball_position = event.common.world.ball().position();
+        Vector ball_to_robot = robot->position() - ball_position;
+        Point receiver_position = event.common.world.ball().position() + ball_to_robot.normalize(chip_distance + 1.5);
+        Pass pass(event.common.world.ball().position(), receiver_position, ai_config.passing_config().max_pass_speed_m_per_s() - 1.0); // TODO: Not sure how fast chip moves.
         receiver_tactic->updateControlParams(pass);
         tactics_to_run[0].emplace_back(chip_tactic);
         tactics_to_run[0].emplace_back(receiver_tactic);

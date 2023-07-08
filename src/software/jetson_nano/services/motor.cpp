@@ -94,7 +94,8 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       motor_fault_detector_(0),
       dribbler_ramp_rpm_(0),
       tracked_motor_fault_start_time_(std::nullopt),
-      num_tracked_motor_resets_(0)
+      num_tracked_motor_resets_(0),
+      num_ticks_motor_stopped(NUM_DRIVE_MOTORS, 0) // ignore dribbler
 {
     int ret = 0;
 
@@ -507,6 +508,29 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     {
         driver_control_enable_gpio_.setValue(GpioState::LOW);
         LOG(FATAL) << "Back right motor runaway";
+    }
+
+    // Check that all encoders are still reading value, if not for a long time, reset!
+    for (uint8_t motor = 0; motor < num_ticks_motor_stopped.size(); ++motor)
+    {
+        if (current_wheel_velocities[motor] != 0.0)
+        {
+            num_ticks_motor_stopped[motor] = 0;
+        }
+        else if (prev_wheel_velocities_[motor] > 0.5)
+        {
+            num_ticks_motor_stopped[motor]++;
+        }
+
+        const unsigned int MAX_NUM_TICKS_MOTOR_STOPPED = 150;
+        if (num_ticks_motor_stopped[motor] > MAX_NUM_TICKS_MOTOR_STOPPED)
+        {
+            LOG(WARNING) << "Encode on motor " << motor << " has not moved for " << MAX_NUM_TICKS_MOTOR_STOPPED << " ticks " << ". RESTARTING!";
+            is_initialized_ = false;
+            num_ticks_motor_stopped[motor] = 0;
+            cached_motor_faults_[motor].motor_faults.insert(TbotsProto::MotorFault::NOT_RUNNING_UNKNOWN_ERROR);
+//            MotorFaultIndicator(false, {TbotsProto::MotorFault::NOT_RUNNING_UNKNOWN_ERROR});
+        }
     }
 
     // Convert to Euclidean velocity_delta

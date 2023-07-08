@@ -154,4 +154,5 @@ struct ShootOrPassPlayFSM
     EighteenZoneId best_pass_zone;
     Duration time_since_commit_stage_start;
     double min_pass_score_threshold;
+    std::vector<EighteenZoneId> assigned_zones;
 };

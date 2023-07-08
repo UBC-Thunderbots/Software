@@ -103,7 +103,7 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
     std::optional<Path> path = convertEnlsvgPathToPath(enlsvgPath);
     if (path == std::nullopt)
     {
-        LOG(WARNING) << "The path planner was unable to find a path between " << start
+        LOG(INFO) << "The path planner was unable to find a path between " << start
                      << " and " << end << std::endl;
         return std::nullopt;
     }

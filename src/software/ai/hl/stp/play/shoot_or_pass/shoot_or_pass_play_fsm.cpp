@@ -34,17 +34,31 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
                       []() { return std::make_shared<MoveTactic>(); });
     }
 
-    for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
+    LOG(DEBUG) << "ranked zones size " << ranked_zones.size();
+    unsigned int offensive_robot_index = 0;
+    for (unsigned int i = 0; offensive_robot_index < offensive_positioning_tactics.size(); i++)
     {
+        // TODO Dont select a zone that is already occupied by another robot
+        if (std::find(assigned_zones.begin(), assigned_zones.end(), ranked_zones[i]) != assigned_zones.end())
+        {
+            // Zone already assigned to another robot
+            continue;
+        }
+        assigned_zones.push_back(ranked_zones[i]);
+
+//        LOG(DEBUG) << "offensive_positioning_tactics " << offensive_positioning_tactics.size();
+
         auto pass1 = pass_eval.getBestPassInZones({ranked_zones[i]}).pass;
-        offensive_positioning_tactics[i]->updateControlParams(
+        offensive_positioning_tactics[offensive_robot_index]->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        offensive_robot_index++;
     }
 }
 
 void ShootOrPassPlayFSM::lookForPass(const Update& event)
 {
+    assigned_zones.clear();
     PriorityTacticVector ret_tactics = {{attacker_tactic}, {}};
 
     // only look for pass if there are more than 1 robots
@@ -120,7 +134,7 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
     event.common.set_inter_play_communication_fun(
         InterPlayCommunication{.last_committed_pass = best_pass_and_score_so_far});
 
-    LOG(DEBUG) << "best pass speed: " << best_pass_and_score_so_far.pass.speed();
+//    LOG(DEBUG) << "best pass speed: " << best_pass_and_score_so_far.pass.speed();
 
     if (!attacker_tactic->done())
     {

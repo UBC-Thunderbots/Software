@@ -87,9 +87,9 @@ void OffensePlayFSM::setupDefensiveStrategy(const Update& event)
 void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
                                 int num_defenders, bool is_currently_in_possession)
 {
-    LOG(INFO) << "[OffensivePlayFSM] assigned: " << 
-        num_shoot_or_pass << " attackers, " << 
-        num_defenders << " defenders";
+//    LOG(INFO) << "[OffensivePlayFSM] assigned: " <<
+//        num_shoot_or_pass << " attackers, " <<
+//        num_defenders << " defenders";
     
     PriorityTacticVector tactics_to_return;
 

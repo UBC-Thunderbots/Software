@@ -357,4 +357,6 @@ class MotorService
     // Motor names (indexed with chip select above)
     static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right",
                                                   "front_right", "dribbler"};
+
+    std::vector<unsigned int> num_ticks_motor_stopped;
 };
