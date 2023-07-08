@@ -300,7 +300,7 @@ message SensorFusionConfig
 
     // The id of the enemy goalie
     required int32 enemy_goalie_id = 6
-        [default = 0, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
+        [default = 1, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
 
     // Yellow if selected, Blue if unselected
     required bool friendly_color_yellow = 9 [default = true];

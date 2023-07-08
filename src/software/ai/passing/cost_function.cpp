@@ -60,7 +60,7 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
         getStaticPositionQuality(field, zone.centre(), passing_config);
 
     // Rate zones that are up the field higher to encourage progress up the field
-    double pass_up_field_rating = zone.centre().x() / field.xLength();
+    double pass_up_field_rating = pow(zone.centre().x() / field.xLength(), 1.0 / 4);
 
     auto enemy_reaction_time =
         Duration::fromSeconds(passing_config.enemy_reaction_time());

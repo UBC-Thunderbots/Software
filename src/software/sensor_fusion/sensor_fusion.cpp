@@ -16,8 +16,8 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       possession(TeamPossession::FRIENDLY_TEAM),
       possession_tracker(std::make_shared<PossessionTracker>(
           sensor_fusion_config.possession_tracker_config())),
-      friendly_goalie_id(0),
-      enemy_goalie_id(0),
+      friendly_goalie_id(1),
+      enemy_goalie_id(1),
       defending_positive_side(false),
       ball_in_dribbler_timeout(0),
       reset_time_vision_packets_detected(0),
