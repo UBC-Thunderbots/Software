@@ -15,7 +15,7 @@ EnemyBallPlacementPlay::EnemyBallPlacementPlay(TbotsProto::AiConfig config)
 
 void EnemyBallPlacementPlay::ballPlacementWithShadow(
     TacticCoroutine::push_type &yield, const World &world,
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 5> crease_defenders,
     std::array<std::shared_ptr<MoveTactic>, 2> move_tactics, Point placement_point)
 {
     /*
