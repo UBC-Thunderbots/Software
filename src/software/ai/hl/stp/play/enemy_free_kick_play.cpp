@@ -9,7 +9,7 @@
 
 EnemyFreekickPlay::EnemyFreekickPlay(TbotsProto::AiConfig config) : Play(config, true),
   defense_play(std::make_shared<DefensePlay>(ai_config)),
-  shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config))
+  crease_defense(std::make_shared<CreaseDefensePlay>(ai_config))
 {
 }
 
@@ -91,7 +91,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             }
         }
 
-        shoot_or_pass_play->updateTactics(PlayUpdate(
+        crease_defense->updateTactics(PlayUpdate(
                     world, num_friendly_robots-num_defenders, 
                     [&tactics_to_return](PriorityTacticVector new_tactics)
                     {

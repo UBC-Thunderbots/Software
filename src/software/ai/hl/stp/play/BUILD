@@ -54,6 +54,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
         "//software/ai/hl/stp/play/defense:defense_play",
+        "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
         "//software/ai/evaluation:defender_assignment",
         "//software/logger",
         "//software/util/generic_factory",
