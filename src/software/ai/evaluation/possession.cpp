@@ -13,6 +13,14 @@ std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
         return std::nullopt;
     }
 
+    for (const Robot &robot : team.getAllRobots())
+    {
+        if (robot.isNearDribbler(ball.position()))
+        {
+            return robot;
+        }
+    }
+
     auto best_intercept =
         findBestInterceptForBall(ball, field, team.getAllRobots().at(0));
     auto baller_robot = team.getAllRobots().at(0);
