@@ -41,6 +41,8 @@ void DefensePlayFSM::blockShots(const Update& event)
         num_tactics_left_to_assign -= updateShadowers(event, num_tactics_left_to_assign);
     }
 
+    num_tactics_left_to_assign -= assignDefaultCreaseDefenders(event, num_tactics_left_to_assign);
+
     if (num_tactics_left_to_assign > 0)
     {
         LOG(WARNING) << "[DefensePlayFSM] Unable to assign " << num_tactics_left_to_assign << 
@@ -88,6 +90,9 @@ void DefensePlayFSM::shadowAndBlockShots(const Update& event)
     // Assign shadowers to left over tactics
     num_tactics_left_to_assign -= updateShadowers(event, num_tactics_left_to_assign);
 
+    // If we still have robots left over, assign CreaseDefenders
+    num_tactics_left_to_assign -= assignDefaultCreaseDefenders(event, num_tactics_left_to_assign);
+
     if (num_tactics_left_to_assign > 0)
     {
         LOG(WARNING) << "[DefensePlayFSM] Unable to assign " << num_tactics_left_to_assign << 
@@ -95,6 +100,17 @@ void DefensePlayFSM::shadowAndBlockShots(const Update& event)
     }
 
     setTactics(event);
+}
+
+int DefensePlayFSM::assignDefaultCreaseDefenders(const Update &event, const int num_tactics_to_assign)
+{
+    if (num_tactics_to_assign > 0 && crease_defenders.size() > 0 && !highest_cov_rating_assignment.has_value())
+    {
+        highest_cov_rating_assignment = std::make_optional<DefenderAssignment>(CREASE_DEFENDER, event.common.world.ball().position(), 0.0);
+        return updateCreaseAndPassDefenders(event, num_tactics_to_assign);
+    }
+
+    return 0;
 }
 
 void DefensePlayFSM::resetAssignmentsAndEnemyThreats(const Update& event)
