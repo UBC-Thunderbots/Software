@@ -90,7 +90,7 @@ class FullSystem(object):
             # be debugged from clion or somewhere other than gdb
             if not is_cmd_running(
                 [
-                    "unix_full_system",
+                    "software/unix_full_system",
                     "--runtime_dir={}".format(self.full_system_runtime_dir),
                 ]
             ):
@@ -105,7 +105,7 @@ Debugging Fullsystem ==============
 
 2. Run the following binaries from src to debug full system:
 
-gdb --args bazel-bin/{full_system}
+gdb --args bazel-bin/{self.full_system}
 
 3. Rerun this binary once the gdb instance is setup
 """

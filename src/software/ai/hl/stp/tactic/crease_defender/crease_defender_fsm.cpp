@@ -29,7 +29,7 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 
     // Find where the shot ray intersects the defense area boundary
     Point block_threat_point;
-    auto defense_area_intersection =
+    auto defense_area_intersection = 
         findDefenseAreaIntersection(field, ray, inflated_defense_area);
     if (defense_area_intersection)
     {
@@ -42,8 +42,7 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 
     // Make sure that the crease defender will not end up past the field lines
     // if it has an alignment other than centre
-    double min_block_threat_point_x =
-        (field.fieldLines().xMin() + ROBOT_MAX_RADIUS_METERS * 3);
+    double min_block_threat_point_x = (field.fieldLines().xMin() + ROBOT_MAX_RADIUS_METERS * 3);
     if (crease_defender_alignment != TbotsProto::CreaseDefenderAlignment::CENTRE &&
         block_threat_point.x() < min_block_threat_point_x)
     {
@@ -55,22 +54,26 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
     {
         stepped_block_threat_point = stepAlongPerimeter(
-            inflated_defense_area, block_threat_point, -ROBOT_MAX_RADIUS_METERS * 2);
+            inflated_defense_area, block_threat_point, 
+            -ROBOT_MAX_RADIUS_METERS * 2);
     }
     else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::RIGHT)
     {
         stepped_block_threat_point = stepAlongPerimeter(
-            inflated_defense_area, block_threat_point, ROBOT_MAX_RADIUS_METERS * 2);
+            inflated_defense_area, block_threat_point, 
+            ROBOT_MAX_RADIUS_METERS * 2);
     }
     else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::FAR_LEFT)
     {
         stepped_block_threat_point = stepAlongPerimeter(
-            inflated_defense_area, block_threat_point, -ROBOT_MAX_RADIUS_METERS * 4);
+            inflated_defense_area, block_threat_point, 
+            -ROBOT_MAX_RADIUS_METERS * 4);
     }
     else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::FAR_RIGHT)
     {
         stepped_block_threat_point = stepAlongPerimeter(
-            inflated_defense_area, block_threat_point, ROBOT_MAX_RADIUS_METERS * 4);
+            inflated_defense_area, block_threat_point, 
+            ROBOT_MAX_RADIUS_METERS * 4);
     }
 
     if (stepped_block_threat_point)
@@ -146,7 +149,7 @@ void CreaseDefenderFSM::blockThreat(
 }
 
 std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
-    const Field& field, const Ray& ray, const Rectangle& inflated_defense_area)
+    const Field& field, const Ray& ray, const Rectangle &inflated_defense_area)
 {
     // Return the segments that form the path around the crease that the
     // defenders must follow
