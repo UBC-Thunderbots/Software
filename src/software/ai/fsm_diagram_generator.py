@@ -59,7 +59,7 @@ def generate_diagram(fsm):
         # Remove suffixes from states, guard, action
         src_state = remove_suffix(src_state, "_S")
         dest_state = remove_suffix(dest_state, "_S")
-        guard = "&&".join([remove_suffix(g, "_G") for g in guard.split("&&")])
+        guard = " && ".join([remove_suffix(g, "_G") for g in guard.split("&&")])
         action = remove_suffix(action, "_A")
 
         # Terminate state is marked with X in transition table.
