@@ -258,6 +258,14 @@ message RobotCapabilitiesConfig
     required string broken_chippers = 2;
     // Comma-separated list of numbers of robots with broken kickers
     required string broken_kickers = 3;
+    // The distance in meters that a robot can chip the ball away. This
+    // is the distance which the ball travels before its first contact to ground
+    // since we're assuming that the second bound will be low enough for the robot to interfere with it.
+    required double chip_in_air_distance = 4 [
+        default                   = 2.5,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 5.0
+    ];
 }
 
 message SensorFusionConfig

@@ -161,6 +161,8 @@ struct FreeKickPlayFSM
      */
     bool chipDone(const Update& event);
 
+    std::optional<Robot> findRobotToChipTo(const Update &event);
+
     auto operator()()
     {
         using namespace boost::sml;
