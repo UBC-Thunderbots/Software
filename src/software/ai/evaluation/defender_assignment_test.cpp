@@ -55,7 +55,7 @@ TEST_F(GetAllDefenderAssignmentsTest, single_threat)
     EXPECT_EQ(assignments.size(), 1);
 
     // Crease defenders should target ball, not the primary threat
-    auto assignment = assignments[0];
+    auto assignment = assignments.front();
     EXPECT_EQ(assignment.type, DefenderAssignmentType::CREASE_DEFENDER);
     EXPECT_EQ(assignment.target, ball_position);
 }

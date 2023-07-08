@@ -7,6 +7,7 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/logger/logger.h"
+#include "software/ai/evaluation/defender_assignment.h"
 
 struct DefensePlayFSM
 {
@@ -17,6 +18,10 @@ struct DefensePlayFSM
     {
         // The maximum allowed speed mode
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+
+        // The defender assignments, ordered such that the assignments with the 
+        // highest coverage ratings at the front of the queue
+        std::queue<DefenderAssignment> defender_assignments;
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -50,58 +55,11 @@ struct DefensePlayFSM
 
     /**
      * Action to shadow the primary enemy threat and assign
-     * extra defenders to block enemy shots and passes
+     * defenders to block enemy shots and passes
      *
      * @param event the FSM event
      */
     void shadowAndBlockShots(const Update& event);
-
-    /**
-     * Helper function to update crease and pass defenders to defend
-     * against specified threats
-     *
-     * @param event the FSM event
-     * @param enemy_threats the enemy threats to defend against
-     */
-    void updateCreaseAndPassDefenders(const Update& event,
-                                      const std::vector<EnemyThreat>& enemy_threats);
-
-    /**
-     * Helper function to update shadowers to shadow specified threats
-     *
-     * @param event the FSM event
-     * @param threats_to_shadow the enemy threats to shadow
-     */
-    void updateShadowers(const Update& event,
-                         const std::vector<EnemyThreat>& threats_to_shadow);
-
-    /**
-     * Helper function to set up crease defender tactic vector members
-     *
-     * @param num_crease_defenders the number of crease defender tactics to set
-     */
-    void setUpCreaseDefenders(unsigned int num_crease_defenders);
-
-    /**
-     * Helper function to set up pass defender tactic vector members
-     *
-     * @param num_pass_defenders the number of pass defender tactics to set
-     */
-    void setUpPassDefenders(unsigned int num_pass_defenders);
-
-    /**
-     * Helper function to set up shadow enemy tactic vector members
-     *
-     * @param num_shadowers the number of shadow enemy tactics to set
-     */
-    void setUpShadowers(unsigned int num_shadowers);
-
-    /**
-     * Helper function to return the next tactics
-     *
-     * @param event the FSM event
-     */
-    void setTactics(const Update& event);
 
     auto operator()()
     {
@@ -130,8 +88,89 @@ struct DefensePlayFSM
     }
 
    private:
+
+    /**
+     * Helper function to reset the crease and pass defender assignment vectors
+     * and recompute all enemy threats
+     *
+     * @param event the FSM event
+     */    
+    void resetAssignmentsAndEnemyThreats(const Update& event);
+
+    /**
+     * Helper function to assign one crease defender using the defender assignment
+     * with the highest coverage rating
+     *
+     * @param event the FSM event
+     * @param num_tactics_available the number of tactics left available to assign
+     *
+     * @return the number of crease defenders assigned
+     */
+    int assignPrimaryCreaseDefender(const Update &event, int num_tactics_available);
+
+    /**
+     * Helper function to assign crease and pass defenders based on
+     * the number of remaining tactics left to assign
+     *
+     * @param event the FSM event
+     * @param num_tactics_to_assign the number of tactics to try to assign
+     *
+     * @return the number of tactics assigned
+     */
+    int updateCreaseAndPassDefenders(const Update& event, const int num_tactics_to_assign);
+
+    /**
+     * Helper function to assign shadowers based on the number of remaining 
+     * tactics left to assign
+     *
+     * @param event the FSM event
+     * @param num_shadowers_to_assign the number of shadowers to try to assign
+     *
+     * @return the number of shadowers assigned
+     */
+    int updateShadowers(const Update& event, const int num_shadowers_to_assign);
+
+    /**
+     * Helper function to add a shadow enemy tactic that will shadow the 
+     * given enemy threat
+     *
+     * @param enemy_threat the enemy threat to shadow
+     */
+    void addShadower(EnemyThreat &enemy_threat);
+
+    /**
+     * Helper function to set up crease defender tactic vector members
+     *
+     * @param num_crease_defenders the number of crease defender tactics to set
+     */
+    void setUpCreaseDefenders(unsigned int num_crease_defenders);
+
+    /**
+     * Helper function to set up pass defender tactic vector members
+     *
+     * @param num_pass_defenders the number of pass defender tactics to set
+     */
+    void setUpPassDefenders(unsigned int num_pass_defenders);
+
+    /**
+     * Helper function to return the next tactics
+     *
+     * @param event the FSM event
+     */
+    void setTactics(const Update& event);
+
     TbotsProto::AiConfig ai_config;
+
+    std::vector<EnemyThreat> enemy_threats;
+    
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
     std::vector<std::shared_ptr<PassDefenderTactic>> pass_defenders;
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadowers;
+
+    std::vector<DefenderAssignment> crease_defender_assignments;
+    std::vector<DefenderAssignment> pass_defender_assignments;
+
+    std::queue<DefenderAssignment> defender_assignments_queue;
+
+    std::optional<DefenderAssignment> highest_cov_rating_assignment;
 };

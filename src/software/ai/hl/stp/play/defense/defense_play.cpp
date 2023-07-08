@@ -9,7 +9,8 @@ DefensePlay::DefensePlay(const TbotsProto::AiConfig &config)
     : Play(config, true),
       fsm{DefensePlayFSM{config}},
       control_params{.max_allowed_speed_mode =
-                         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
+                         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                     .defender_assignments = std::queue<DefenderAssignment>()}
 {
 }
 
@@ -22,10 +23,10 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     }
 }
 
-void DefensePlay::updateControlParams(
-    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
+void DefensePlay::updateControlParams(std::queue<DefenderAssignment> &defender_assignments, TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
+    control_params.defender_assignments = defender_assignments;
 }
 
 void DefensePlay::updateTactics(const PlayUpdate &play_update)
