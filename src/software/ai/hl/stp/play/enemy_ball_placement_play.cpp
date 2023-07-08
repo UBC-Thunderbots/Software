@@ -69,7 +69,7 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         // behaviour
         for (const auto &enemy_robot : world.enemyTeam().getAllRobotsExceptGoalie())
         {
-            if ((enemy_robot.position() - world.ball().position()).length() < 0.25)
+            if (((enemy_robot.position() - world.ball().position()).length() < 0.05))
             {
                 enemy_at_ball = true;
             }
@@ -87,6 +87,21 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
                 world.ball().position() + ball_to_net -
                     ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
                 ball_to_net.orientation() + Angle::half(), 0);
+            tactics_to_run[0].emplace_back(move_tactics[0]);
+            tactics_to_run[0].emplace_back(move_tactics[1]);
+        }
+        else if (enemy_threats.size() == 1)
+        {
+            move_tactics[0]->updateControlParams(
+                placement_point + placement_to_net +
+                    placement_to_net.perpendicular().normalize(1.25 *
+                                                               ROBOT_MAX_RADIUS_METERS),
+                placement_to_net.orientation() + Angle::half(), 0);
+            move_tactics[1]->updateControlParams(
+                placement_point + placement_to_net -
+                    placement_to_net.perpendicular().normalize(1.25 *
+                                                               ROBOT_MAX_RADIUS_METERS),
+                placement_to_net.orientation() + Angle::half(), 0);
             tactics_to_run[0].emplace_back(move_tactics[0]);
             tactics_to_run[0].emplace_back(move_tactics[1]);
         }
