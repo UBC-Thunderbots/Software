@@ -61,6 +61,9 @@ struct DefensePlayFSM
      */
     void shadowAndBlockShots(const Update& event);
 
+
+    int assignDefaultCreaseDefenders(const Update &event, const int num_tactics_to_assign);
+
     auto operator()()
     {
         using namespace boost::sml;
