@@ -160,8 +160,7 @@ int DefensePlayFSM::updateCreaseAndPassDefenders(
             break;
         }
 
-        if (defender_assignment->type == CREASE_DEFENDER &&
-            crease_defender_assignments.size() < 3)
+        if (defender_assignment->type == CREASE_DEFENDER)
         {
             crease_defender_assignments.emplace_back(*defender_assignment);
         }
