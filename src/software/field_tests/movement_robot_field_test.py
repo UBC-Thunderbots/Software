@@ -213,7 +213,7 @@ def test_one_robots_square(field_test_runner):
     print([robot.current_state.global_position for robot in world.friendly_team.team_robots])
 
     tactic_0 = MoveTactic(
-        destination=Point(x_meters=-2.3, y_meters=2.0),
+        destination=Point(x_meters=2.3, y_meters=2.0),
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
         final_orientation=Angle(radians=math.pi/2),
@@ -223,7 +223,7 @@ def test_one_robots_square(field_test_runner):
         target_spin_rev_per_s=0.0
     )
     tactic_1 = MoveTactic(
-        destination=Point(x_meters=-2.3, y_meters=-2.0),
+        destination=Point(x_meters=2.3, y_meters=-2.0),
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
         final_orientation=Angle(radians=-math.pi/2),
@@ -233,7 +233,7 @@ def test_one_robots_square(field_test_runner):
         target_spin_rev_per_s=0.0
     )
     tactic_2 = MoveTactic(
-        destination=Point(x_meters=-3.3, y_meters=-2.0),
+        destination=Point(x_meters=3.3, y_meters=-2.0),
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
         final_orientation=Angle(radians=math.pi/2),
@@ -243,7 +243,7 @@ def test_one_robots_square(field_test_runner):
         target_spin_rev_per_s=0.0
     )
     tactic_3 = MoveTactic(
-        destination=Point(x_meters=-3.3, y_meters=2.0),
+        destination=Point(x_meters=3.3, y_meters=2.0),
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
         final_orientation=Angle(radians=-math.pi/2),
