@@ -1,5 +1,7 @@
 #include "hrvo_simulator.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
+
 HRVOSimulator::HRVOSimulator(RobotId robot_id)
     : robot_id(robot_id), robots(), world(std::nullopt), primitive_set()
 {
@@ -224,6 +226,10 @@ void HRVOSimulator::doStep(Duration time_step)
     for (auto &robot : robots)
     {
         robot.second->computeNewVelocity(robots, time_step);
+        //        LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+        //            {"x", robot.second->getPosition().x()},
+        //            {"y", robot.second->getPosition().y()}
+        //        });
     }
 
     // Update the positions of all agents given their velocity

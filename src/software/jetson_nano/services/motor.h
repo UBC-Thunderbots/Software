@@ -187,6 +187,34 @@ class MotorService
                      uint32_t spi_speed);
 
     /**
+     * Performs two back to back SPI transactions, first a read and then a write.
+     * NOTE: read_tx and write_tx must both be in BIG ENDIAN, as required by the
+     * Trinamic controller
+     *
+     * @param fd the SPI file descriptor to transfer data over
+     * @param read_tx pointer to the buffer containing the address for reading
+     * @param write_tx pointer to the buffer containing the address + data for write
+     * @param read_rx the buffer our read response will be placed in
+     * @param spi_speed the speed to run spi at
+     */
+    void readThenWriteSpiTransfer(int fd, const uint8_t* read_tx, uint8_t const* write_tx,
+                                  uint8_t const* read_rx, uint32_t spi_speed);
+
+    /**
+     * A function which is written in the same style as the rest of the Trinamic API.
+     * This will trigger two SPI transactions back to back, reading a value and then
+     * writing a value for a specific motor
+     *
+     * @param motor The motor we want to read & write from
+     * @param read_addr the address of the register to read
+     * @param write_addr the address of the register to write
+     * @param write_data the data to write
+     * @return the value read from the trinamic controller
+     */
+    int32_t tmc4671ReadThenWriteValue(uint8_t motor, uint8_t read_addr,
+                                      uint8_t write_addr, int32_t write_data);
+
+    /**
      * Trinamic API Binding function
      *
      * @param motor Which motor to talk to (in our case, the chip select)
@@ -263,9 +291,14 @@ class MotorService
     Gpio driver_control_enable_gpio_;
     Gpio reset_gpio_;
 
-    // Transfer Buffers
+    // Transfer Buffers for spiTransfer
     uint8_t tx_[5] = {0};
     uint8_t rx_[5] = {0};
+
+    // Transfer Buffers for readThenWriteSpiTransfer
+    uint8_t write_tx_[5] = {0};
+    uint8_t read_tx_[5]  = {0};
+    uint8_t read_rx_[5]  = {0};
 
     // Transfer State
     bool transfer_started_  = false;
@@ -285,6 +318,11 @@ class MotorService
 
     // Previous wheel velocities
     WheelSpace_t prev_wheel_velocities_;
+
+    int front_left_target_velocity  = 0;
+    int front_right_target_velocity = 0;
+    int back_left_target_velocity   = 0;
+    int back_right_target_velocity  = 0;
 
     // the motor cs id to check for motor faults
     uint8_t motor_fault_detector_;

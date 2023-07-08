@@ -250,8 +250,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
             }
             else
             {
-                LOG(WARNING) << "No path found for robot " << robot.id() << " to "
-                             << destination << std::endl;
+                LOG(INFO) << "No path found for robot " << robot.id() << " to "
+                          << destination << std::endl;
                 motion_control.set_normalized_path_length(1.0);
             }
 
