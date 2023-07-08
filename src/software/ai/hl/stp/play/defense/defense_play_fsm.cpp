@@ -52,7 +52,7 @@ void DefensePlayFSM::blockShots(const Update& event)
 
 void DefensePlayFSM::shadowAndBlockShots(const Update& event)
 {
-    LOG(DEBUG) << "[DefensePlayFSM] Aggressive defensive on";
+//    LOG(DEBUG) << "[DefensePlayFSM] Aggressive defensive on";
 
     resetAssignmentsAndEnemyThreats(event);
 
@@ -112,13 +112,13 @@ void DefensePlayFSM::resetAssignmentsAndEnemyThreats(const Update& event)
 
     defender_assignments_queue = std::queue(event.control_params.defender_assignments);
 
-    LOG(DEBUG) << "[DefensePlayFSM] Found " << defender_assignments_queue.size() << " defender assignments";
+//    LOG(DEBUG) << "[DefensePlayFSM] Found " << defender_assignments_queue.size() << " defender assignments";
 
     enemy_threats = getAllEnemyThreats(
         event.common.world.field(), event.common.world.friendlyTeam(),
         event.common.world.enemyTeam(), event.common.world.ball(), false);
 
-    LOG(DEBUG) << "[DefensePlayFSM] Found " << enemy_threats.size() << " enemy threats";
+//    LOG(DEBUG) << "[DefensePlayFSM] Found " << enemy_threats.size() << " enemy threats";
 }
 
 int DefensePlayFSM::assignPrimaryCreaseDefender(const Update &event, int num_tactics_available)
