@@ -21,7 +21,9 @@ class DefensePlay : public Play
      *
      * @param max_allowed_speed_mode the mode of maximum speed allowed
      */
-    void updateControlParams(std::queue<DefenderAssignment> &defender_assignments, TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode=TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    void updateControlParams(std::queue<DefenderAssignment> &defender_assignments,
+                             TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+                                 TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
    private:
     FSM<DefensePlayFSM> fsm;

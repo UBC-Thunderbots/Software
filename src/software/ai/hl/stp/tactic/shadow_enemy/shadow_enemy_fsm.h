@@ -129,8 +129,10 @@ struct ShadowEnemyFSM
             MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = StealAndMaybeChipState_S,
             BlockPassState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A,
             BlockPassState_S + Update_E[enemyThreatHasBall_G] / blockShot_A = MoveFSM_S,
-            StealAndMaybeChipState_S + Update_E[!enemyThreatHasBall_G && isGoodToChip_G] / stealAndChip_A,
-            StealAndMaybeChipState_S + Update_E[!enemyThreatHasBall_G && !isGoodToChip_G] / steal_A,
+            StealAndMaybeChipState_S +
+                Update_E[!enemyThreatHasBall_G && isGoodToChip_G] / stealAndChip_A,
+            StealAndMaybeChipState_S +
+                Update_E[!enemyThreatHasBall_G && !isGoodToChip_G] / steal_A,
             StealAndMaybeChipState_S + Update_E[enemyThreatHasBall_G] / blockPass_A = X,
             X + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
             X + Update_E[enemyThreatHasBall_G] / blockShot_A  = MoveFSM_S,

@@ -122,8 +122,9 @@ void ReceiverFSM::updateOnetouch(const Update& event)
             CREATE_MOTION_CONTROL(one_touch.getPointToShootAt()),
             one_touch.getOpenAngle(), 0, false, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                           BALL_MAX_SPEED_METERS_PER_SECOND - 1},  // TODO Update to use config
+            AutoChipOrKick{
+                AutoChipOrKickMode::AUTOKICK,
+                BALL_MAX_SPEED_METERS_PER_SECOND - 1},  // TODO Update to use config
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
             event.common.robot.robotConstants()));
     }

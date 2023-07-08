@@ -18,12 +18,12 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
+        "//software/ai/evaluation:defender_assignment",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
         "//software/logger",
         "//software/util/generic_factory",
-        "//software/ai/evaluation:defender_assignment",
         "@sml",
     ],
     alwayslink = True,

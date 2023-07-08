@@ -1,12 +1,12 @@
 #pragma once
 
+#include <queue>
+
 #include "proto/parameters.pb.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
 #include "software/world/field.h"
-
-#include <queue>
 
 // Indicates the type of defender for a DefenderAssignment
 enum DefenderAssignmentType
@@ -37,17 +37,15 @@ struct DefenderAssignment
                this->coverage_rating == other.coverage_rating;
     }
 
-    DefenderAssignment(const DefenderAssignment& defender_assignment)
+    DefenderAssignment(const DefenderAssignment &defender_assignment)
         : type(defender_assignment.type),
-        target(defender_assignment.target),
-        coverage_rating(defender_assignment.coverage_rating)
+          target(defender_assignment.target),
+          coverage_rating(defender_assignment.coverage_rating)
     {
     }
 
     DefenderAssignment(DefenderAssignmentType type, Point target, double coverage_rating)
-        : type(type),
-        target(target),
-        coverage_rating(coverage_rating)
+        : type(type), target(target), coverage_rating(coverage_rating)
     {
     }
 };
@@ -104,7 +102,7 @@ struct GoalLane : ShootingLane
 std::queue<DefenderAssignment> getAllDefenderAssignments(
     const std::vector<EnemyThreat> &threats, const Field &field, const Ball &ball,
     const TbotsProto::DefensePlayConfig::DefenderAssignmentConfig &config,
-    const int max_num_crease_defender_assignments=3);
+    const int max_num_crease_defender_assignments = 3);
 
 /**
  * Filters out enemy threats with similar positioning/angle to the primary threat

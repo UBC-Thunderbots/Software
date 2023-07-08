@@ -1,10 +1,10 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
+#include "software/ai/evaluation/defender_assignment.h"
+#include "software/ai/hl/stp/play/defense/defense_play.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play.h"
-#include "software/ai/hl/stp/play/defense/defense_play.h"
-#include "software/ai/evaluation/defender_assignment.h"
 
 /**
  * Play for defending against enemy free kicks

@@ -95,7 +95,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       dribbler_ramp_rpm_(0),
       tracked_motor_fault_start_time_(std::nullopt),
       num_tracked_motor_resets_(0),
-      num_ticks_motor_stopped(NUM_DRIVE_MOTORS, 0) // ignore dribbler
+      num_ticks_motor_stopped(NUM_DRIVE_MOTORS, 0)  // ignore dribbler
 {
     int ret = 0;
 
@@ -525,11 +525,15 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         const unsigned int MAX_NUM_TICKS_MOTOR_STOPPED = 150;
         if (num_ticks_motor_stopped[motor] > MAX_NUM_TICKS_MOTOR_STOPPED)
         {
-            LOG(WARNING) << "Encode on motor " << motor << " has not moved for " << MAX_NUM_TICKS_MOTOR_STOPPED << " ticks " << ". RESTARTING!";
-            is_initialized_ = false;
+            LOG(WARNING) << "Encode on motor " << motor << " has not moved for "
+                         << MAX_NUM_TICKS_MOTOR_STOPPED << " ticks "
+                         << ". RESTARTING!";
+            is_initialized_                = false;
             num_ticks_motor_stopped[motor] = 0;
-            cached_motor_faults_[motor].motor_faults.insert(TbotsProto::MotorFault::NOT_RUNNING_UNKNOWN_ERROR);
-//            MotorFaultIndicator(false, {TbotsProto::MotorFault::NOT_RUNNING_UNKNOWN_ERROR});
+            cached_motor_faults_[motor].motor_faults.insert(
+                TbotsProto::MotorFault::NOT_RUNNING_UNKNOWN_ERROR);
+            //            MotorFaultIndicator(false,
+            //            {TbotsProto::MotorFault::NOT_RUNNING_UNKNOWN_ERROR});
         }
     }
 

@@ -104,7 +104,7 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
     if (path == std::nullopt)
     {
         LOG(INFO) << "The path planner was unable to find a path between " << start
-                     << " and " << end << std::endl;
+                  << " and " << end << std::endl;
         return std::nullopt;
     }
 

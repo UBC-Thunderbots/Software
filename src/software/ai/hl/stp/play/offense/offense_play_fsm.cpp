@@ -70,27 +70,27 @@ bool OffensePlayFSM::fewEnemyThreatsInFriendlyHalf(const World& world)
 void OffensePlayFSM::setupDefensiveStrategy(const Update& event)
 {
     defender_assignments = getAllDefenderAssignments(
-        getAllEnemyThreats(
-            event.common.world.field(), event.common.world.friendlyTeam(),
-            event.common.world.enemyTeam(), event.common.world.ball(),
-            false),
+        getAllEnemyThreats(event.common.world.field(), event.common.world.friendlyTeam(),
+                           event.common.world.enemyTeam(), event.common.world.ball(),
+                           false),
         event.common.world.field(), event.common.world.ball(),
         ai_config.defense_play_config().defender_assignment_config());
 
     int num_tactics = static_cast<int>(event.common.num_tactics);
-    int num_defending_robots = std::min(static_cast<int>(defender_assignments.size() + 3), num_tactics);
+    int num_defending_robots =
+        std::min(static_cast<int>(defender_assignments.size() + 3), num_tactics);
     int num_attacking_robots = num_tactics - num_defending_robots;
-    
+
     setTactics(event, num_attacking_robots, num_defending_robots);
 }
 
 void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
                                 int num_defenders, bool is_currently_in_possession)
 {
-//    LOG(INFO) << "[OffensivePlayFSM] assigned: " <<
-//        num_shoot_or_pass << " attackers, " <<
-//        num_defenders << " defenders";
-    
+    //    LOG(INFO) << "[OffensivePlayFSM] assigned: " <<
+    //        num_shoot_or_pass << " attackers, " <<
+    //        num_defenders << " defenders";
+
     PriorityTacticVector tactics_to_return;
 
     if (num_shoot_or_pass > 0)
@@ -107,7 +107,8 @@ void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
             event.common.set_inter_play_communication_fun));
     }
 
-    defense_play->updateControlParams(defender_assignments, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    defense_play->updateControlParams(defender_assignments,
+                                      TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     if (num_defenders > 0)
     {

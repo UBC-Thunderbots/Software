@@ -63,15 +63,17 @@ void ShadowEnemyFSM::blockPass(const Update &event)
         position_to_block =
             findBlockPassPoint(ball_position, enemy_threat_opt.value().robot,
                                event.control_params.shadow_distance);
-        orientation_to_face = (enemy_threat_opt.value().robot.position() - event.common.robot.position()).orientation();
+        orientation_to_face =
+            (enemy_threat_opt.value().robot.position() - event.common.robot.position())
+                .orientation();
     };
 
     event.common.set_primitive(createMovePrimitive(
-            CREATE_MOTION_CONTROL(position_to_block), orientation_to_face, 0, false,
-            TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-            event.common.robot.robotConstants()));
+        CREATE_MOTION_CONTROL(position_to_block), orientation_to_face, 0, false,
+        TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants()));
 }
 
 void ShadowEnemyFSM::blockShot(const Update &event,
@@ -95,7 +97,9 @@ void ShadowEnemyFSM::blockShot(const Update &event,
             event.common.world.friendlyTeam(), event.common.world.enemyTeam(),
             enemy_threat_opt.value().robot, event.control_params.shadow_distance);
 
-        orientation_to_face = (enemy_threat_opt.value().robot.position() - event.common.robot.position()).orientation();
+        orientation_to_face =
+            (enemy_threat_opt.value().robot.position() - event.common.robot.position())
+                .orientation();
     };
 
     MoveFSM::ControlParams control_params{
@@ -115,14 +119,14 @@ void ShadowEnemyFSM::steal(const Update &event)
 {
     auto ball_position = event.common.world.ball().position();
     auto face_ball_orientation =
-            (ball_position - event.common.robot.position()).orientation();
+        (ball_position - event.common.robot.position()).orientation();
 
     event.common.set_primitive(createMovePrimitive(
-            CREATE_MOTION_CONTROL(ball_position), face_ball_orientation, 0, false,
-            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-            event.common.robot.robotConstants(), std::optional<double>()));
+        CREATE_MOTION_CONTROL(ball_position), face_ball_orientation, 0, false,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants(), std::optional<double>()));
 }
 
 void ShadowEnemyFSM::stealAndChip(const Update &event)
@@ -147,8 +151,10 @@ bool ShadowEnemyFSM::isGoodToChip(const Update &event)
     // Don't chip towards the friendly side
     bool is_facing_away = Angle::zero().minDiff(robot_orientation).toDegrees() < 90.0;
 
-    bool is_chip_out_of_bounds = contains(event.common.world.field().fieldBoundary(),
-        event.common.robot.position() + direction_of_orientation.normalize(YEET_CHIP_DISTANCE_METERS));
+    bool is_chip_out_of_bounds =
+        contains(event.common.world.field().fieldBoundary(),
+                 event.common.robot.position() +
+                     direction_of_orientation.normalize(YEET_CHIP_DISTANCE_METERS));
 
     return is_facing_away && !is_chip_out_of_bounds;
 }

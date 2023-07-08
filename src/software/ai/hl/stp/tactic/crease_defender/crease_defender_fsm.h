@@ -120,7 +120,7 @@ struct CreaseDefenderFSM
      * or behind the defense area
      */
     static std::optional<Point> findDefenseAreaIntersection(
-        const Field& field, const Ray& ray, const Rectangle &inflated_defense_area);
+        const Field& field, const Ray& ray, const Rectangle& inflated_defense_area);
 
    private:
     bool enemyCloseToBall(const Update& event);

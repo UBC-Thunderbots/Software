@@ -24,9 +24,9 @@ void FreeKickPlayFSM::setupPosition(const Update &event)
 {
     if (ranked_zones.empty())
     {
-        ranked_zones =
-            pass_generator.generatePassEvaluation(event.common.world)
-                .rankZonesForReceiving(event.common.world, event.common.world.ball().position());
+        ranked_zones = pass_generator.generatePassEvaluation(event.common.world)
+                           .rankZonesForReceiving(event.common.world,
+                                                  event.common.world.ball().position());
     }
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -54,9 +54,9 @@ void FreeKickPlayFSM::updateOffensivePositioningTactics(const World &world)
 {
     using Zones = std::unordered_set<EighteenZoneId>;
 
-//    ranked_zones =
-//            pass_generator.generatePassEvaluation(world)
-//                    .rankZonesForReceiving(world, world.ball().position());
+    //    ranked_zones =
+    //            pass_generator.generatePassEvaluation(world)
+    //                    .rankZonesForReceiving(world, world.ball().position());
 
     auto pass_eval = pass_generator.generatePassEvaluation(world);
 
@@ -110,10 +110,9 @@ void FreeKickPlayFSM::startLookingForPass(const FreeKickPlayFSM::Update &event)
     pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
     // Generate the best zones for receiving a pass
     // Only generate the zones once to avoid oscillatory behaviour
-    ranked_zones =
-        pass_generator.generatePassEvaluation(event.common.world)
-            .rankZonesForReceiving(event.common.world,
-                                   event.common.world.ball().position());
+    ranked_zones = pass_generator.generatePassEvaluation(event.common.world)
+                       .rankZonesForReceiving(event.common.world,
+                                              event.common.world.ball().position());
 }
 
 bool FreeKickPlayFSM::timeExpired(const FreeKickPlayFSM::Update &event)
@@ -136,56 +135,66 @@ void FreeKickPlayFSM::chipBall(const Update &event)
         chip_tactic->updateControlParams(event.common.world.ball().position(),
                                          robot->position());
         // Create a fake pass to assign to the receiver to receiver the chip
-        double chip_distance = ai_config.robot_capabilities_config().chip_in_air_distance();
-        Point ball_position = event.common.world.ball().position();
-        Vector ball_to_robot = robot->position() - ball_position;
-        Point receiver_position = event.common.world.ball().position() + ball_to_robot.normalize(chip_distance + 1.5);
-        Pass pass(event.common.world.ball().position(), receiver_position, ai_config.passing_config().max_pass_speed_m_per_s() - 1.0); // TODO: Not sure how fast chip moves.
+        double chip_distance =
+            ai_config.robot_capabilities_config().chip_in_air_distance();
+        Point ball_position     = event.common.world.ball().position();
+        Vector ball_to_robot    = robot->position() - ball_position;
+        Point receiver_position = event.common.world.ball().position() +
+                                  ball_to_robot.normalize(chip_distance + 1.5);
+        Pass pass(event.common.world.ball().position(), receiver_position,
+                  ai_config.passing_config().max_pass_speed_m_per_s() -
+                      1.0);  // TODO: Not sure how fast chip moves.
         receiver_tactic->updateControlParams(pass);
         tactics_to_run[0].emplace_back(chip_tactic);
         tactics_to_run[0].emplace_back(receiver_tactic);
-
     }
     else
     {
         // Chip towards the goal since we can't find any pass
         double fallback_chip_target_x_offset = 1.5;
-        Point chip_target                    = event.common.world.field().enemyGoalCenter() -
-                                               Vector(fallback_chip_target_x_offset, 0);
-        chip_tactic->updateControlParams(event.common.world.ball().position(), chip_target);
+        Point chip_target = event.common.world.field().enemyGoalCenter() -
+                            Vector(fallback_chip_target_x_offset, 0);
+        chip_tactic->updateControlParams(event.common.world.ball().position(),
+                                         chip_target);
         tactics_to_run[0].emplace_back(chip_tactic);
     }
 
     event.common.set_tactics(tactics_to_run);
 }
 
-std::optional<Robot> FreeKickPlayFSM::findRobotToChipTo(const Update &event) {
-    const auto& friendlies = event.common.world.friendlyTeam().getAllRobots();
-    const auto& enemies = event.common.world.enemyTeam().getAllRobots();
-    Point ball_position = event.common.world.ball().position();
-    double chip_distance = ai_config.robot_capabilities_config().chip_in_air_distance();
-    auto robot_iter = std::find_if(friendlies.begin(), friendlies.end(), [&](const Robot& robot)
-    {
-        // Robot needs to be infront of ball or in the enemy half
-        // Additionally, it has to be atleast our chip distance away.
-        if ((robot.position().x() > ball_position.x() || robot.position().x() > 0.0) &&
-            distance(robot.position(), ball_position) > chip_distance)
-        {
-            // TODO: Could add more logic for checking where enemies are placed
-            Vector ball_to_robot = robot.position() - ball_position;
-            Segment ball_near_ground_segment(ball_position + ball_to_robot.normalize(chip_distance), robot.position());
-
-            // Check that no enemies are fully blocking the chip
-            return std::none_of(enemies.begin(), enemies.end(), [&](const Robot& enemy)
+std::optional<Robot> FreeKickPlayFSM::findRobotToChipTo(const Update &event)
+{
+    const auto &friendlies = event.common.world.friendlyTeam().getAllRobots();
+    const auto &enemies    = event.common.world.enemyTeam().getAllRobots();
+    Point ball_position    = event.common.world.ball().position();
+    double chip_distance   = ai_config.robot_capabilities_config().chip_in_air_distance();
+    auto robot_iter =
+        std::find_if(friendlies.begin(), friendlies.end(), [&](const Robot &robot) {
+            // Robot needs to be infront of ball or in the enemy half
+            // Additionally, it has to be atleast our chip distance away.
+            if ((robot.position().x() > ball_position.x() ||
+                 robot.position().x() > 0.0) &&
+                distance(robot.position(), ball_position) > chip_distance)
             {
-                return intersects(ball_near_ground_segment, Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS));
-            });
-        }
-        else
-        {
-            return false;
-        }
-    });
+                // TODO: Could add more logic for checking where enemies are placed
+                Vector ball_to_robot = robot.position() - ball_position;
+                Segment ball_near_ground_segment(
+                    ball_position + ball_to_robot.normalize(chip_distance),
+                    robot.position());
+
+                // Check that no enemies are fully blocking the chip
+                return std::none_of(
+                    enemies.begin(), enemies.end(), [&](const Robot &enemy) {
+                        return intersects(
+                            ball_near_ground_segment,
+                            Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS));
+                    });
+            }
+            else
+            {
+                return false;
+            }
+        });
 
     if (robot_iter != friendlies.end())
     {

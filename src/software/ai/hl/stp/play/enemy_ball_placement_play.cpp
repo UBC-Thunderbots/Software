@@ -37,7 +37,7 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
      */
     auto shadow_enemy = std::make_shared<ShadowEnemyTactic>();
 
-//    bool enemy_at_ball = false;
+    //    bool enemy_at_ball = false;
 
     do
     {
@@ -54,9 +54,9 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         crease_defenders[2]->updateControlParams(
             placement_point, TbotsProto::CreaseDefenderAlignment::CENTRE);
         crease_defenders[3]->updateControlParams(
-                placement_point, TbotsProto::CreaseDefenderAlignment::FAR_LEFT);
+            placement_point, TbotsProto::CreaseDefenderAlignment::FAR_LEFT);
         crease_defenders[4]->updateControlParams(
-                placement_point, TbotsProto::CreaseDefenderAlignment::FAR_RIGHT);
+            placement_point, TbotsProto::CreaseDefenderAlignment::FAR_RIGHT);
 
         tactics_to_run[0].emplace_back(crease_defenders[0]);
         tactics_to_run[0].emplace_back(crease_defenders[1]);
@@ -162,9 +162,9 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::make_shared<CreaseDefenderTactic>(
             ai_config.robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-                ai_config.robot_navigation_obstacle_config()),
+            ai_config.robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-                ai_config.robot_navigation_obstacle_config())};
+            ai_config.robot_navigation_obstacle_config())};
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_tactics = {
         std::make_shared<MoveTactic>(),

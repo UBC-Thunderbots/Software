@@ -130,8 +130,11 @@ message PassingConfig
 
     // Multiplier for how long it will take the robot to reach positional and rotational
     // destination for receiving the ball
-    required double friendly_time_destination_multiplier = 11
-        [default = 1.25, (bounds).min_double_value = 0.1, (bounds).max_double_value = 2.0];
+    required double friendly_time_destination_multiplier = 11 [
+        default                   = 1.25,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 2.0
+    ];
 }
 
 message GoalieTacticConfig
@@ -260,12 +263,10 @@ message RobotCapabilitiesConfig
     required string broken_kickers = 3;
     // The distance in meters that a robot can chip the ball away. This
     // is the distance which the ball travels before its first contact to ground
-    // since we're assuming that the second bound will be low enough for the robot to interfere with it.
-    required double chip_in_air_distance = 4 [
-        default                   = 2.5,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 5.0
-    ];
+    // since we're assuming that the second bound will be low enough for the robot to
+    // interfere with it.
+    required double chip_in_air_distance = 4
+        [default = 2.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 message SensorFusionConfig

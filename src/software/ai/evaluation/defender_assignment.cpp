@@ -91,7 +91,7 @@ std::queue<DefenderAssignment> getAllDefenderAssignments(
         for (const auto &goal_lane : goal_lanes_group)
         {
             const Point threat_position = goal_lane.lane.getStart();
-            double coverage_rating = goal_lane.threat_rating + nondense_bonus;
+            double coverage_rating      = goal_lane.threat_rating + nondense_bonus;
 
             // We let the target of the defender assignment be the location
             // of the originating enemy threat to cooperate with control
@@ -117,24 +117,27 @@ std::queue<DefenderAssignment> getAllDefenderAssignments(
 
     std::vector<DefenderAssignment> reduced_defender_assignments;
     int num_crease_defenders = 0;
-    std::copy_if(assignments.begin(), assignments.end(), std::back_inserter(reduced_defender_assignments),
-                [&num_crease_defenders, max_num_crease_defender_assignments](const DefenderAssignment defender_assignment)
-                {
-                    if (defender_assignment.type != CREASE_DEFENDER)
-                    {
-                        return true;
-                    }
+    std::copy_if(assignments.begin(), assignments.end(),
+                 std::back_inserter(reduced_defender_assignments),
+                 [&num_crease_defenders, max_num_crease_defender_assignments](
+                     const DefenderAssignment defender_assignment) {
+                     if (defender_assignment.type != CREASE_DEFENDER)
+                     {
+                         return true;
+                     }
 
-                    if (num_crease_defenders < max_num_crease_defender_assignments)
-                    {
-                        num_crease_defenders++;
-                        return true;
-                    }
+                     if (num_crease_defenders < max_num_crease_defender_assignments)
+                     {
+                         num_crease_defenders++;
+                         return true;
+                     }
 
-                    return false;
-    });
+                     return false;
+                 });
 
-    std::queue defender_assignment_q = std::queue<DefenderAssignment>(std::deque<DefenderAssignment>(reduced_defender_assignments.begin(), reduced_defender_assignments.end()));
+    std::queue defender_assignment_q =
+        std::queue<DefenderAssignment>(std::deque<DefenderAssignment>(
+            reduced_defender_assignments.begin(), reduced_defender_assignments.end()));
 
     return defender_assignment_q;
 }

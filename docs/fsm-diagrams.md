@@ -395,13 +395,14 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> MoveFSM
-MoveFSM --> StealAndChipState : [!enemyThreatHasBall]\n<i>stealAndChip</i>
+MoveFSM --> StealAndMaybeChipState : [!enemyThreatHasBall]\n<i>steal</i>
 MoveFSM --> MoveFSM : <i>blockShot</i>
-MoveFSM --> StealAndChipState
+MoveFSM --> StealAndMaybeChipState
 BlockPassState --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
 BlockPassState --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
-StealAndChipState --> StealAndChipState : [!enemyThreatHasBall]\n<i>stealAndChip</i>
-StealAndChipState --> Terminate:::terminate : [enemyThreatHasBall]\n<i>blockPass</i>
+StealAndMaybeChipState --> StealAndMaybeChipState : [!enemyThreatHasBall_G&&isGoodToChip]\n<i>stealAndChip</i>
+StealAndMaybeChipState --> StealAndMaybeChipState : [!enemyThreatHasBall_G&&!isGoodToChip]\n<i>steal</i>
+StealAndMaybeChipState --> Terminate:::terminate : [enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>

@@ -90,18 +90,20 @@ void DribbleFSM::getPossession(const Update &event)
                               event.common.world.field()) +
         Vector::createFromAngle(face_ball_orientation).normalize(0.05);
 
-    TbotsProto::MaxAllowedSpeedMode speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
-//    if (event.common.world.gameState().isOurFreeKick() || event.common.world.gameState().isOurKickoff())
-//    {
-//        speed_mode = TbotsProto::MaxAllowedSpeedMode::CLOSE_CONTROL;
-//    }
-//    LOG(DEBUG) << "speed_mode=" << speed_mode;
+    TbotsProto::MaxAllowedSpeedMode speed_mode =
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
+    //    if (event.common.world.gameState().isOurFreeKick() ||
+    //    event.common.world.gameState().isOurKickoff())
+    //    {
+    //        speed_mode = TbotsProto::MaxAllowedSpeedMode::CLOSE_CONTROL;
+    //    }
+    //    LOG(DEBUG) << "speed_mode=" << speed_mode;
 
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation, 0, false,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        speed_mode, 0.0, // TODOOOOOOOOO: RESET!!!!!
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, speed_mode,
+        0.0,  // TODOOOOOOOOO: RESET!!!!!
         event.common.robot.robotConstants()));
 }
 

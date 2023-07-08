@@ -131,7 +131,8 @@ struct PenaltyKickFSM
     // the fraction of the enemy side of the field that we define to be the lower limit of
     // where we choose to shoot in other words, it helps define the minimum distance at
     // which we decide to potentially shoot
-    static constexpr double PENALTY_KICK_MIN_SHOT_X_DISTANCE_FACTOR = 1.0 / 3.0; // TODO Make it 3 degrees instead
+    static constexpr double PENALTY_KICK_MIN_SHOT_X_DISTANCE_FACTOR =
+        1.0 / 3.0;  // TODO Make it 3 degrees instead
 
     // timeout that forces a shot after the robot approaches the ball and advances
     // towards the keeper
