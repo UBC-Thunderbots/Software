@@ -9,77 +9,45 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyFreekickPlay::EnemyFreekickPlay(TbotsProto::AiConfig config) : Play(config, true) {}
+EnemyFreekickPlay::EnemyFreekickPlay(TbotsProto::AiConfig config) : Play(config, true),
+  defense_play(std::make_shared<DefensePlay>()),
+  shoot_or_pass_play(std::make_shared<ShootOrPassPlay>())
+{
+}
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
-    // Free kicks are usually taken near the edge of the field. We assign one robot to
-    // shadow the enemy robot taking the free kick
-    auto shadow_free_kicker = std::make_shared<ShadowEnemyTactic>();
-
-    // Assign up to two crease defenders
-    std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders = {
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config())};
-
-    // Try to shadow as many enemy robots as possible
-    std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_potential_receivers;
-
     do
     {
-        // Create tactic vector
         PriorityTacticVector tactics_to_run = {{}};
 
-        // Get all enemy threats
-        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                                world.enemyTeam(), world.ball(), false);
+        std::queue defense_assignments = getAllDefenderAssignments(getAllEnemyThreats(world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false), world.field(), world.ball(),
+                config.defense_play_config);
 
-        if (enemy_threats.empty())
+        int num_defenders = defense_play_assignments.size() + 2;
+        if (num_defenders > world.friendlyTeam().numRobots())
         {
-            return;
+            num_defenders = world.friendlyTeam().numRobots();
         }
 
-        // Assign crease defenders
-        auto num_crease_defenders = world.friendlyTeam().numRobots() > 3 ? 2 : 1;
-        if (num_crease_defenders == 2)
-        {
-            crease_defenders[0]->updateControlParams(
-                world.ball().position(), TbotsProto::CreaseDefenderAlignment::LEFT);
-            crease_defenders[1]->updateControlParams(
-                world.ball().position(), TbotsProto::CreaseDefenderAlignment::RIGHT);
+        defense_play->updateControlParams(defense_play_assignments, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-            tactics_to_run[0].emplace_back(crease_defenders[0]);
-            tactics_to_run[0].emplace_back(crease_defenders[1]);
-        }
-        else
-        {
-            crease_defenders[0]->updateControlParams(
-                world.ball().position(), TbotsProto::CreaseDefenderAlignment::CENTRE);
+        defense_play->updateTactics(PlayUpdate(
+                    world, numRobots,
+                    [&tactics_to_return](PriorityTacticVector new_tactics)
+                    {
+                        for (const auto& tactic_vector : new_tactics)
+                        {
+                            tactics_to_return.push_back(tactic_vector);
+                        }
+                    },
+                    {},
+                    [](InterPlayCommunication comm){}));
 
-            tactics_to_run[0].emplace_back(crease_defenders[0]);
-        }
 
-        auto num_unassigned_robots = 5 - num_crease_defenders;
-        for (int i = 0;
-             i < std::min(num_unassigned_robots, (int)enemy_threats.size() - 1); i++)
-        {
-            shadow_potential_receivers.emplace_back(
-                std::make_shared<ShadowEnemyTactic>());
-            shadow_potential_receivers[i]->updateControlParams(
-                enemy_threats[i + 1], ROBOT_MAX_RADIUS_METERS * 3);
+        shoot_or_pass_play->updateControlParams(
 
-            tactics_to_run[0].emplace_back(shadow_potential_receivers[i]);
-        }
-
-        // Shadow free kicker should shadow the enemy robot with the ball
-        shadow_free_kicker->updateControlParams(enemy_threats[0],
-                                                ROBOT_MAX_RADIUS_METERS * 3);
-        tactics_to_run[0].emplace_back(shadow_free_kicker);
-
-        // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);
     } while (true);
 }
