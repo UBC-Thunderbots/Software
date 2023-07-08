@@ -58,8 +58,22 @@ void DefensePlayFSM::shadowAndBlockShots(const Update& event)
 
     int num_tactics_left_to_assign = static_cast<int>(event.common.num_tactics);
 
-    // Assign two robots to defend the most dangerous enemy threat
+    // Assign a robot to defend the most dangerous enemy threat
     num_tactics_left_to_assign -= assignPrimaryCreaseDefender(event, num_tactics_left_to_assign);
+
+
+    if (num_tactics_left_to_assign != static_cast<int>(event.common.num_tactics) && num_tactics_to_assign > 0 && enemy_threats.size() > 0)
+    {
+        // Try to add a shadower targeting the most threatening enemy threat
+        addShadower(enemy_threats.front());
+        num_tactics_left_to_assign--;
+
+        // Remove the most threatening enemy threat from the list so
+        // that we don't assign more shadowers to defend against it
+        enemy_threats.erase(enemy_threats.begin());
+    }
+
+    // Assign another robot to defend the most dangerous enemy threat
     num_tactics_left_to_assign -= assignPrimaryCreaseDefender(event, num_tactics_left_to_assign); 
 
     if (num_tactics_left_to_assign != static_cast<int>(event.common.num_tactics))
@@ -67,17 +81,6 @@ void DefensePlayFSM::shadowAndBlockShots(const Update& event)
         // Defenders were assigned to the assignment with the highest coverage rating,
         // so we no longer need to assign defenders to that assignment
         defender_assignments_queue.pop();
-
-        // Try to add a shadower targeting the most threatening enemy threat
-        if (num_tactics_left_to_assign > 0 && enemy_threats.size() > 0)
-        {
-            addShadower(enemy_threats.front());
-            num_tactics_left_to_assign--;
-
-            // Remove the most threatening enemy threat from the list so
-            // that we don't assign more shadowers to defend against it
-            enemy_threats.erase(enemy_threats.begin());
-        }
     }
 
     num_tactics_left_to_assign -= updateCreaseAndPassDefenders(event, num_tactics_left_to_assign);
