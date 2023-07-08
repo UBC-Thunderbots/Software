@@ -215,6 +215,14 @@ int DefensePlayFSM::updateCreaseAndPassDefenders(
                 alignment = TbotsProto::CreaseDefenderAlignment::LEFT;
             }
         }
+        else if (defenders_with_target_count == 3)
+        {
+            alignment = TbotsProto::CreaseDefenderAlignment::FAR_LEFT;
+        }
+        else if (defenders_with_target_count == 4)
+        {
+            alignment = TbotsProto::CreaseDefenderAlignment::FAR_RIGHT;
+        }
 
         crease_defenders.at(i)->updateControlParams(
             target, alignment, event.control_params.max_allowed_speed_mode);

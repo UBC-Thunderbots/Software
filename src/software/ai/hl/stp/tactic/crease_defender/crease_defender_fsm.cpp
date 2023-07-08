@@ -1,31 +1,87 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 
+#include "software/geom/algorithms/step_along_perimeter.h"
+
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field &field, const Point &enemy_threat_origin,
     const TbotsProto::CreaseDefenderAlignment &crease_defender_alignment,
     double robot_obstacle_inflation_factor)
 {
-    // We increment the angle to positive goalpost by 1/6, 3/6, or 5/6 of the shot
-    // cone
-    Angle shot_angle_sixth = convexAngle(field.friendlyGoalpostPos(), enemy_threat_origin,
-                                         field.friendlyGoalpostNeg()) /
-                             6.0;
-    Angle angle_to_positive_goalpost =
-        (field.friendlyGoalpostPos() - enemy_threat_origin).orientation();
-    Angle angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 3.0;
+    // Get the inflated defense area
+    double robot_radius_expansion_amount =
+        ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
+    Rectangle inflated_defense_area =
+        field.friendlyDefenseArea().expand(robot_radius_expansion_amount);
+
+    // Early return if the enemy threat is somewhere such that we cannot block it
+    // (past our goal line or inside our defense area)
+    if (enemy_threat_origin.x() < field.fieldLines().xMin() ||
+        contains(inflated_defense_area, enemy_threat_origin))
+    {
+        return std::nullopt;
+    }
+
+    // Get a ray representing a shot from the enemy threat directed towards
+    // our friendly goal
+    Angle angle_to_block =
+        (field.friendlyGoalCenter() - enemy_threat_origin).orientation();
+    Ray ray(enemy_threat_origin, angle_to_block);
+
+    // Find where the shot ray intersects the defense area boundary
+    Point block_threat_point;
+    auto defense_area_intersection = 
+        findDefenseAreaIntersection(field, ray, inflated_defense_area);
+    if (defense_area_intersection)
+    {
+        block_threat_point = defense_area_intersection.value();
+    }
+    else
+    {
+        return std::nullopt;
+    }
+
+    // Make sure that the crease defender will not end up past the field lines
+    // if it has an alignment other than centre
+    double min_block_threat_point_x = (field.fieldLines().xMin() + ROBOT_MAX_RADIUS_METERS * 3);
+    if (crease_defender_alignment != TbotsProto::CreaseDefenderAlignment::CENTRE &&
+        block_threat_point.x() < min_block_threat_point_x)
+    {
+        block_threat_point.setX(min_block_threat_point_x);
+    }
+
+    // Step along the defense area perimeter if the alignment is not centre
+    std::optional<Point> stepped_block_threat_point = std::nullopt;
     if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
     {
-        angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 1.0;
+        stepped_block_threat_point = stepAlongPerimeter(
+            inflated_defense_area, block_threat_point, 
+            -ROBOT_MAX_RADIUS_METERS * 2);
     }
     else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::RIGHT)
     {
-        angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 5.0;
+        stepped_block_threat_point = stepAlongPerimeter(
+            inflated_defense_area, block_threat_point, 
+            ROBOT_MAX_RADIUS_METERS * 2);
+    }
+    else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::FAR_LEFT)
+    {
+        stepped_block_threat_point = stepAlongPerimeter(
+            inflated_defense_area, block_threat_point, 
+            -ROBOT_MAX_RADIUS_METERS * 4);
+    }
+    else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::FAR_RIGHT)
+    {
+        stepped_block_threat_point = stepAlongPerimeter(
+            inflated_defense_area, block_threat_point, 
+            ROBOT_MAX_RADIUS_METERS * 4);
     }
 
-    // Shot ray to block
-    Ray ray(enemy_threat_origin, angle_to_block);
+    if (stepped_block_threat_point)
+    {
+        block_threat_point = stepped_block_threat_point.value();
+    }
 
-    return findDefenseAreaIntersection(field, ray, robot_obstacle_inflation_factor);
+    return block_threat_point;
 }
 
 void CreaseDefenderFSM::blockThreat(
@@ -93,16 +149,10 @@ void CreaseDefenderFSM::blockThreat(
 }
 
 std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
-    const Field &field, const Ray &ray, double robot_obstacle_inflation_factor)
+    const Field& field, const Ray& ray, const Rectangle &inflated_defense_area)
 {
     // Return the segments that form the path around the crease that the
-    // defenders must follow. It's basically the crease inflated by one robot radius
-    // multiplied by a factor
-    double robot_radius_expansion_amount =
-        ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
-    Rectangle inflated_defense_area =
-        field.friendlyDefenseArea().expand(robot_radius_expansion_amount);
-
+    // defenders must follow
     auto front_segment = Segment(inflated_defense_area.posXPosYCorner(),
                                  inflated_defense_area.posXNegYCorner());
     auto left_segment  = Segment(inflated_defense_area.posXPosYCorner(),
