@@ -65,7 +65,7 @@ static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 static const double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The distance from the center of the robot to the front face (the flat part), in meters
 static const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.07;
-// The approximate radius of the ball according to the SSL rulebook
+// The approximate radius of the ball according to the SSL rulebookSSL+VO
 static const double BALL_MAX_RADIUS_METERS = 0.0215;
 // According to the rules, 80% of the ball must be seen at all times. Robots may not
 // cover more than 20% of the ball

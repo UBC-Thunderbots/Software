@@ -9,7 +9,7 @@ DefensePlayFSM::DefensePlayFSM(TbotsProto::AiConfig ai_config)
 bool DefensePlayFSM::shouldDefendAggressively(const Update& event)
 {
     TeamPossession possession = event.common.world.getTeamWithPossession();
-    return (possession == TeamPossession::STAGNANT_ENEMY_TEAM);
+    return (possession == TeamPossession::STAGNANT_ENEMY_TEAM) || (possession == TeamPossession::ENEMY_TEAM);
 }
 
 void DefensePlayFSM::blockShots(const Update& event)

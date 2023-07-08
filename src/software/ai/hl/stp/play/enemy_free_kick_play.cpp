@@ -91,17 +91,17 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             }
         }
 
-        shoot_or_pass_play->updateTactics(PlayUpdate(
-                    world, num_friendly_robots-num_defenders, 
-                    [&tactics_to_return](PriorityTacticVector new_tactics)
-                    {
-                        for (const auto& tactic_vector : new_tactics)
-                        {
-                            tactics_to_return.push_back(tactic_vector);
-                        }
-                    },
-                    InterPlayCommunication(),
-                    [](InterPlayCommunication comm){}));
+//        shoot_or_pass_play->updateTactics(PlayUpdate(
+//                    world, num_friendly_robots-num_defenders,
+//                    [&tactics_to_return](PriorityTacticVector new_tactics)
+//                    {
+//                        for (const auto& tactic_vector : new_tactics)
+//                        {
+//                            tactics_to_return.push_back(tactic_vector);
+//                        }
+//                    },
+//                    InterPlayCommunication(),
+//                    [](InterPlayCommunication comm){}));
 
         yield(tactics_to_return);
     } while (true);

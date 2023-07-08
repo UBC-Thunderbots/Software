@@ -110,9 +110,17 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
 
     if (multicast)
     {
-        // Join the multicast group.
-        socket_.set_option(boost::asio::ip::multicast::join_group(
-            boost::asio::ip::address::from_string(ip_address)));
+        if (ip_address == "224.5.23.2" || ip_address == "224.5.23.1") {
+            // Join the multicast group.
+            boost::asio::ip::address_v4 listenInterface = boost::asio::ip::address_v4::from_string("10.193.15.92");
+            socket_.set_option(boost::asio::ip::multicast::join_group(
+                    boost::asio::ip::address::from_string(ip_address).to_v4(), listenInterface));
+        }
+        else
+        {
+            socket_.set_option(boost::asio::ip::multicast::join_group(
+                    boost::asio::ip::address::from_string(ip_address)));
+        }
     }
 
     startListen();
