@@ -53,12 +53,18 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
             placement_point, TbotsProto::CreaseDefenderAlignment::RIGHT);
         crease_defenders[2]->updateControlParams(
             placement_point, TbotsProto::CreaseDefenderAlignment::CENTRE);
+        crease_defenders[3]->updateControlParams(
+                placement_point, TbotsProto::CreaseDefenderAlignment::FAR_LEFT);
+        crease_defenders[4]->updateControlParams(
+                placement_point, TbotsProto::CreaseDefenderAlignment::FAR_RIGHT);
 
         tactics_to_run[0].emplace_back(crease_defenders[0]);
         tactics_to_run[0].emplace_back(crease_defenders[1]);
         tactics_to_run[0].emplace_back(crease_defenders[2]);
+        tactics_to_run[0].emplace_back(crease_defenders[3]);
+        tactics_to_run[0].emplace_back(crease_defenders[4]);
 
-        Vector ball_to_net =
+        /**Vector ball_to_net =
             (world.ball().position() - world.field().friendlyGoalCenter())
                 .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
 
@@ -135,7 +141,7 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
 
             tactics_to_run[0].emplace_back(move_tactics[0]);
             tactics_to_run[0].emplace_back(shadow_enemy);
-        }
+        }**/
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);
@@ -147,14 +153,18 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     std::optional<Point> placement_point = world.gameState().getBallPlacementPoint();
 
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders = {
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 5> crease_defenders = {
         // TODO-AKHIL: Remove this hard-coded value
         std::make_shared<CreaseDefenderTactic>(
             ai_config.robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
             ai_config.robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config())};
+            ai_config.robot_navigation_obstacle_config()),
+        std::make_shared<CreaseDefenderTactic>(
+                ai_config.robot_navigation_obstacle_config()),
+        std::make_shared<CreaseDefenderTactic>(
+                ai_config.robot_navigation_obstacle_config())};
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_tactics = {
         std::make_shared<MoveTactic>(),
