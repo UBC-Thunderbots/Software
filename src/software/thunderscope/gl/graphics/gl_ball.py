@@ -5,8 +5,13 @@ from software.py_constants import BALL_MAX_RADIUS_METERS
 from software.thunderscope.constants import Colors
 
 class GLBall(GLMeshItem):
+    """Displays a 3D sphere representing the ball"""
 
     def __init__(self):
+        
+        self.x = 0
+        self.y = 0
+        self.z = 0
 
         GLMeshItem.__init__(
             self,
@@ -14,20 +19,13 @@ class GLBall(GLMeshItem):
             color=Colors.BALL_COLOR
         )
 
-        self.x = 0
-        self.y = 0
-        self.z = 0
-
     def setPosition(self, x, y, z):
 
         if self.x == x and self.y == y and self.z == z:
             return
 
-        self.translate(-self.x, -self.y, -self.z)
-
+        self.translate(x - self.x, y - self.y, z - self.z)
         self.x = x 
         self.y = y
         self.z = z
-        self.translate(self.x, self.y, self.z)
-
         

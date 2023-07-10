@@ -128,6 +128,9 @@ class GLWorldLayer(GLLayer):
                 robot.current_state.global_position.x_meters,
                 robot.current_state.global_position.y_meters 
             )
+            gl_robot.setOrientation(
+                robot.current_state.global_orientation.radians
+            )
 
             robot_id_text_item = robot_id_text_items[robot.id]
             if self.display_robot_id:

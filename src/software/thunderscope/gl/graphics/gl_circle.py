@@ -5,17 +5,17 @@ import math
 import numpy as np
 
 class GLCircle(GLLinePlotItem):
+    """Displays a circle on the x-y plane"""
 
     def __init__(self, radius=0, num_points=24, color=(1.0, 1.0, 1.0, 0.5)):
-        GLLinePlotItem.__init__(self)
 
         self.x = 0
         self.y = 0
         self.radius = 0
         self.num_points = num_points
         
+        GLLinePlotItem.__init__(self, color=color)
         self.setRadius(radius)
-        self.setColor(color)
 
     def setRadius(self, radius):
         if (self.radius == radius):
@@ -33,6 +33,7 @@ class GLCircle(GLLinePlotItem):
             ] 
             for x in range(0, self.num_points + 1)
         ])
+
         self.setData(pos=points)
 
     def setColor(self, color):
@@ -43,8 +44,7 @@ class GLCircle(GLLinePlotItem):
         if self.x == x and self.y == y:
             return
 
-        self.translate(-self.x, -self.y, 0)
-
+        self.translate(x - self.x, y - self.y, 0)
         self.x = x
         self.y = y
-        self.translate(self.x, self.y, 0)
+        

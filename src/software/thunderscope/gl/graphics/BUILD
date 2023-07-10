@@ -19,9 +19,18 @@ py_library(
 )
 
 py_library(
+    name = "gl_robot_outline",
+    srcs = ["gl_robot_outline.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "gl_robot",
     srcs = ["gl_robot.py"],
     deps = [
+        ":gl_robot_outline",
         requirement("pyqtgraph"),
     ],
 )

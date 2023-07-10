@@ -25,6 +25,7 @@ py_library(
     srcs = ["gl_path_layer.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_robot_outline",
         requirement("pyqtgraph"),
     ],
 )

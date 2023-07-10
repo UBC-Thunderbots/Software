@@ -2,16 +2,16 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.opengl import *
 
 class GLRect(GLGridItem):
+    """Displays a rectangle on the x-y plane"""
 
     def __init__(self, color=(255, 255, 255, 127.5)):
-        GLGridItem.__init__(self)
 
         self.x = 0
         self.y = 0
         self.x_length = 0
         self.y_length = 0
 
-        self.setColor(color)
+        GLGridItem.__init__(self, color=color)
 
     def setDimensions(self, x_length=0, y_length=0):
         
@@ -32,8 +32,6 @@ class GLRect(GLGridItem):
         if self.x == x and self.y == y:
             return
 
-        self.translate(-self.x, -self.y, 0)
-
+        self.translate(x - self.x, y - self.y, 0)
         self.x = x
         self.y = y
-        self.translate(self.x, self.y, 0)

@@ -10,6 +10,7 @@ from software.py_constants import *
 from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.gl_layer import GLLayer
+from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 
 class GLPathLayer(GLLayer):
 
@@ -19,6 +20,7 @@ class GLPathLayer(GLLayer):
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
         self.path_lines = []
+        self.desired_position_outlines = []
 
     def updateGraphics(self):
 
@@ -26,8 +28,13 @@ class GLPathLayer(GLLayer):
         removed_graphics = []
 
         if not self.isVisible():
-            for index in range(len(self.path_lines)):
-                removed_graphics.append(self.path_lines.pop())
+
+            for index in range(len(self.desired_position_outlines)):
+                removed_graphics.append(self.desired_position_outlines.pop())
+
+            for index in range(len(self.desired_position_outlines)):
+                removed_graphics.append(self.desired_position_outlines.pop())
+
             return added_graphics, removed_graphics
 
         primitive_set = self.primitive_set_buffer.get(
@@ -70,6 +77,26 @@ class GLPathLayer(GLLayer):
                 pos=np.array([[point.x_meters, point.y_meters, 0] for point in path.points]),
                 color=Colors.NAVIGATOR_PATH_COLOR
             )
+
+        if len(self.desired_position_outlines) < len(requested_destinations):
+            num_lines_to_add = len(requested_destinations) - len(self.desired_position_outlines)
+
+            for i in range(num_lines_to_add):
+                gl_line_plot_item = GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE)
+                self.desired_position_outlines.append(gl_line_plot_item)
+                added_graphics.append(gl_line_plot_item)
+
+        elif len(self.desired_position_outlines) > len(requested_destinations):
+            num_lines_to_remove = len(self.desired_position_outlines) - len(requested_destinations)
+
+            for i in range(num_lines_to_remove):
+                removed_graphics.append(self.desired_position_outlines.pop())
+
+        for (dest, final_angle), outline in zip(
+            requested_destinations, self.desired_position_outlines
+        ):
+            outline.setPosition(dest.x_meters, dest.y_meters)
+            outline.setOrientation(final_angle.radians)
 
         return added_graphics, removed_graphics
 
