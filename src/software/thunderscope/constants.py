@@ -50,6 +50,13 @@ class IndividualRobotMode(IntEnum):
     MANUAL = 1
     AI = 2
 
+class CameraView(Enum):
+
+    LANDSCAPE_TOP_DOWN = 1
+    LANDSCAPE_HIGH_ANGLE = 2
+    LEFT_HALF_HIGH_ANGLE = 3
+    RIGHT_HALF_HIGH_ANGLE = 4
+
 
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
@@ -121,8 +128,7 @@ def rgb_to_bw(r, g, b):
 
 class Colors(object):
 
-    FIELD_COLOR = "w"
-    FIELD_LINE_COLOR = "w"
+    FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 100)
 
     BLUE_ROBOT = QtGui.QColor(255, 100, 0, 255)
     BALL_COLOR = QtGui.QColor(255, 100, 0, 255)
@@ -138,6 +144,7 @@ class Colors(object):
     ROBOT_SPEED_SLOW_COLOR = "black"
     NAVIGATOR_PATH_COLOR = "green"
     NAVIGATOR_OBSTACLE_COLOR = "orange"
+    PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
 
     VALIDATION_PASSED_COLOR = "g"
     VALIDATION_FAILED_COLOR = "r"

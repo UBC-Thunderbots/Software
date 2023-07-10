@@ -8,6 +8,14 @@ from software.thunderscope.dock_label_style import *
 
 
 # Import Widgets
+from software.thunderscope.gl.gl_widget import GLWidget
+from software.thunderscope.gl import (
+    gl_obstacle_layer,
+    gl_path_layer,
+    gl_passing_layer,
+    gl_world_layer,
+)
+
 from software.thunderscope.field import (
     obstacle_layer,
     path_layer,
@@ -41,6 +49,56 @@ from software.thunderscope.replay.proto_player import ProtoPlayer
 ################################
 #  FULLSYSTEM RELATED WIDGETS  #
 ################################
+
+def setup_gl_widget(
+    sim_proto_unix_io,
+    full_system_proto_unix_io,
+    friendly_colour_yellow,
+    visualization_buffer_size,
+    replay=False,
+    replay_log=None,
+):
+    player = None
+    if replay:
+        player = ProtoPlayer(replay_log, full_system_proto_unix_io)
+
+    # Create widget
+    gl_widget = GLWidget(player=player)
+
+    # Create layers
+    path_layer = gl_path_layer.GLPathLayer(visualization_buffer_size)
+    obstacle_layer = gl_obstacle_layer.GLObstacleLayer(visualization_buffer_size)
+    passing_layer = gl_passing_layer.GLPassingLayer(visualization_buffer_size)
+    world_layer = gl_world_layer.GLWorldLayer(
+        sim_proto_unix_io, friendly_colour_yellow, visualization_buffer_size
+    )
+
+    gl_widget.addLayer("Paths", path_layer)
+    gl_widget.addLayer("Obstacles", obstacle_layer)
+    gl_widget.addLayer("Passing", passing_layer)
+    gl_widget.addLayer("Vision", world_layer)
+
+    # Register observers
+    # sim_proto_unix_io.register_observer(
+    #     SimulatorState, sim_state.simulator_state_buffer
+    # )
+
+    for arg in [
+        (World, world_layer.world_buffer),
+        (RobotStatus, world_layer.robot_status_buffer),
+        (Referee, world_layer.referee_buffer),
+        (PrimitiveSet, obstacle_layer.primitive_set_buffer),
+        (PrimitiveSet, path_layer.primitive_set_buffer),
+        (PassVisualization, passing_layer.pass_visualization_buffer),
+        # (ValidationProtoSet, validation.validation_set_buffer),
+        # (SimulatorState, sim_state.simulator_state_buffer),
+    ]: #+ [
+    #     (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
+    #     for hrvo_sim_state in hrvo_sim_states
+    # ]:
+        full_system_proto_unix_io.register_observer(*arg)
+
+    return gl_widget;
 
 
 def setup_field_widget(

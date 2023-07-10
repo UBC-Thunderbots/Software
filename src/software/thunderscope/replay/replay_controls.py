@@ -97,6 +97,8 @@ class ReplayControls(QGroupBox):
         self.replay_slider.sliderReleased.connect(self.__on_replay_slider_released)
         self.replay_slider.sliderPressed.connect(self.__on_replay_slider_pressed)
 
+        self.setMaximumHeight(180)
+
         self.controls_layout.addLayout(self.replay_layout)
         self.controls_layout.addLayout(self.buttons_layout)
         self.setLayout(self.controls_layout)
