@@ -40,7 +40,11 @@ class GLObstacleLayer(GLLayer):
         
         """
         if not self.isVisible():
-            return [], self.clearGraphicsList(self.line_graphics)
+            return (
+                [], 
+                self.clearGraphicsList(self.line_graphics) 
+                + self.clearGraphicsList(self.circle_graphics)
+            )
 
         primitive_set = self.primitive_set_buffer.get(
             block=False
