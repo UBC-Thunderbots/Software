@@ -139,7 +139,7 @@ def configure_base_fullsystem(
     return [
         TScopeWidget(
             name="Field",
-            widget=setup_gl_widget(                
+            widget=setup_gl_widget(
                 **{
                     "replay": replay,
                     "replay_log": replay_log,
@@ -153,14 +153,14 @@ def configure_base_fullsystem(
         # TScopeWidget(
         #     name="Field",
         #     widget=setup_field_widget(
-                # **{
-                #     "replay": replay,
-                #     "replay_log": replay_log,
-                #     "full_system_proto_unix_io": full_system_proto_unix_io,
-                #     "sim_proto_unix_io": sim_proto_unix_io,
-                #     "friendly_colour_yellow": friendly_colour_yellow,
-                #     "visualization_buffer_size": visualization_buffer_size,
-                # }
+        # **{
+        #     "replay": replay,
+        #     "replay_log": replay_log,
+        #     "full_system_proto_unix_io": full_system_proto_unix_io,
+        #     "sim_proto_unix_io": sim_proto_unix_io,
+        #     "friendly_colour_yellow": friendly_colour_yellow,
+        #     "visualization_buffer_size": visualization_buffer_size,
+        # }
         #     ),
         # ),
         TScopeWidget(

@@ -53,10 +53,10 @@ py_library(
     srcs = ["gl_world_layer.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_ball",
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_rect",
         "//software/thunderscope/gl/graphics:gl_robot",
-        "//software/thunderscope/gl/graphics:gl_ball",
         requirement("pyqtgraph"),
     ],
 )

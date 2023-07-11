@@ -50,6 +50,7 @@ from software.thunderscope.replay.proto_player import ProtoPlayer
 #  FULLSYSTEM RELATED WIDGETS  #
 ################################
 
+
 def setup_gl_widget(
     sim_proto_unix_io,
     full_system_proto_unix_io,
@@ -92,13 +93,13 @@ def setup_gl_widget(
         (PassVisualization, passing_layer.pass_visualization_buffer),
         # (ValidationProtoSet, validation.validation_set_buffer),
         # (SimulatorState, sim_state.simulator_state_buffer),
-    ]: #+ [
-    #     (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
-    #     for hrvo_sim_state in hrvo_sim_states
-    # ]:
+    ]:  # + [
+        #     (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
+        #     for hrvo_sim_state in hrvo_sim_states
+        # ]:
         full_system_proto_unix_io.register_observer(*arg)
 
-    return gl_widget;
+    return gl_widget
 
 
 def setup_field_widget(

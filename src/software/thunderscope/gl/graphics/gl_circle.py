@@ -4,6 +4,7 @@ from pyqtgraph.opengl import *
 import math
 import numpy as np
 
+
 class GLCircle(GLLinePlotItem):
     """Displays a circle on the x-y plane"""
 
@@ -13,26 +14,28 @@ class GLCircle(GLLinePlotItem):
         self.y = 0
         self.radius = 0
         self.num_points = num_points
-        
+
         GLLinePlotItem.__init__(self, color=color)
         self.setRadius(radius)
 
     def setRadius(self, radius):
-        if (self.radius == radius):
+        if self.radius == radius:
             return
-        
+
         self.radius = radius
 
-        # Generate points on the circumference of a circle centered at (0,0) 
+        # Generate points on the circumference of a circle centered at (0,0)
         pi = math.pi
-        points = np.array([
+        points = np.array(
             [
-                math.cos(2 * pi / self.num_points * x) * self.radius, 
-                math.sin(2 * pi / self.num_points * x) * self.radius,
-                0
-            ] 
-            for x in range(0, self.num_points + 1)
-        ])
+                [
+                    math.cos(2 * pi / self.num_points * x) * self.radius,
+                    math.sin(2 * pi / self.num_points * x) * self.radius,
+                    0,
+                ]
+                for x in range(0, self.num_points + 1)
+            ]
+        )
 
         self.setData(pos=points)
 
@@ -47,4 +50,3 @@ class GLCircle(GLLinePlotItem):
         self.translate(x - self.x, y - self.y, 0)
         self.x = x
         self.y = y
-        

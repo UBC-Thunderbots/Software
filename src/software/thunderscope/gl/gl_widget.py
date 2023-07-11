@@ -8,6 +8,7 @@ from software.thunderscope.constants import CameraView
 from software.thunderscope.gl.gl_layer import GLLayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 
+
 class GLWidget(QWidget):
     """Widget that handles GLLayers to produce a 3D visualization of the field/world 
     and our AI. GLWidget can also provide replay controls.
@@ -21,7 +22,7 @@ class GLWidget(QWidget):
         """
         QVBoxLayout.__init__(self)
 
-        # Setup the GraphicsView containing the GLViewWidget 
+        # Setup the GraphicsView containing the GLViewWidget
         self.graphics_view = GraphicsView()
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
@@ -55,7 +56,7 @@ class GLWidget(QWidget):
         self.camera_view_button.setText("View ")
         self.camera_view_button.setStyleSheet(
             "QToolButton {"
-            "   background-color: transparent;" 
+            "   background-color: transparent;"
             "   border-color: transparent;"
             "   border-width: 0px;"
             "   height: 8px;"
@@ -65,17 +66,16 @@ class GLWidget(QWidget):
 
         self.camera_view_menu = QtGui.QMenu()
         self.camera_view_button.setMenu(self.camera_view_menu)
-        self.camera_view_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
-        
+        self.camera_view_button.setPopupMode(
+            QToolButton.ToolButtonPopupMode.InstantPopup
+        )
+
         for camera_view_action in self.camera_view_actions:
             self.camera_view_menu.addAction(camera_view_action)
-        
+
         self.toolbar = QWidget()
         self.toolbar.setMaximumHeight(40)
-        self.toolbar.setStyleSheet(
-            "background-color: black;"
-            "padding: 0px;"
-        )
+        self.toolbar.setStyleSheet("background-color: black;" "padding: 0px;")
         self.toolbar.setLayout(QHBoxLayout())
         self.toolbar.layout().addStretch()
         self.toolbar.layout().addWidget(self.camera_view_button)
@@ -85,7 +85,7 @@ class GLWidget(QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.toolbar)
         self.layout.addWidget(self.graphics_view.gl_view_widget)
-        
+
         # Setup replay controls if player is provided and the log has some size
         self.player = player
         if self.player and self.player.end_time != 0.0:
@@ -149,32 +149,21 @@ class GLWidget(QWidget):
     def setCameraView(self, camera_view):
         if camera_view == CameraView.LANDSCAPE_TOP_DOWN:
             self.graphics_view.gl_view_widget.setCameraPosition(
-                pos=pg.Vector(0, 0, 0),
-                distance=15,
-                elevation=90,
-                azimuth=-90
+                pos=pg.Vector(0, 0, 0), distance=15, elevation=90, azimuth=-90
             )
         elif camera_view == CameraView.LANDSCAPE_HIGH_ANGLE:
             self.graphics_view.gl_view_widget.setCameraPosition(
-                pos=pg.Vector(0, -0.5, 0),
-                distance=13,
-                elevation=45,
-                azimuth=-90
+                pos=pg.Vector(0, -0.5, 0), distance=13, elevation=45, azimuth=-90
             )
         elif camera_view == CameraView.LEFT_HALF_HIGH_ANGLE:
             self.graphics_view.gl_view_widget.setCameraPosition(
-                pos=pg.Vector(-2.5, 0, 0),
-                distance=10,
-                elevation=45,
-                azimuth=180
+                pos=pg.Vector(-2.5, 0, 0), distance=10, elevation=45, azimuth=180
             )
         elif camera_view == CameraView.RIGHT_HALF_HIGH_ANGLE:
             self.graphics_view.gl_view_widget.setCameraPosition(
-                pos=pg.Vector(2.5, 0, 0),
-                distance=10,
-                elevation=45,
-                azimuth=0
+                pos=pg.Vector(2.5, 0, 0), distance=10, elevation=45, azimuth=0
             )
+
 
 class GraphicsView(pg.GraphicsView):
     """GraphicsView subclass that uses GLViewWidget as its canvas. 
@@ -186,7 +175,7 @@ class GraphicsView(pg.GraphicsView):
         pg.GraphicsView.__init__(self, background=None)
         self.setStyleSheet("background: transparent")
         self.setViewport(self.gl_view_widget)
-        
+
     def paintEvent(self, event):
         """Propagate paint events to both widgets
 
@@ -204,7 +193,7 @@ class GraphicsView(pg.GraphicsView):
         """
         pg.GraphicsView.mousePressEvent(self, event)
         self.gl_view_widget.mousePressEvent(event)
-        
+
     def mouseMoveEvent(self, event):
         """Propagate mouse events to both widgets
         
@@ -213,7 +202,7 @@ class GraphicsView(pg.GraphicsView):
         """
         pg.GraphicsView.mouseMoveEvent(self, event)
         self.gl_view_widget.mouseMoveEvent(event)
-        
+
     def mouseReleaseEvent(self, event):
         """Propagate mouse events to both widgets
         

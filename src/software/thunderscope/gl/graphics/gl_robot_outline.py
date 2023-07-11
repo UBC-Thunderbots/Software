@@ -6,6 +6,7 @@ from software.py_constants import *
 import math
 import numpy as np
 
+
 class GLRobotOutline(GLLinePlotItem):
     """Displays an outline of a robot on the x-y plane"""
 
@@ -17,9 +18,7 @@ class GLRobotOutline(GLLinePlotItem):
         self.color = color
 
         GLLinePlotItem.__init__(
-            self, 
-            pos=np.array(GLRobotOutline.getRobotOutline()), 
-            color=color
+            self, pos=np.array(GLRobotOutline.getRobotOutline()), color=color
         )
 
     @staticmethod
@@ -32,15 +31,15 @@ class GLRobotOutline(GLLinePlotItem):
         :returns: A list of points representing the outline of a robot
 
         """
-        # We compute points along 3/4 the circumference of a circle. 
+        # We compute points along 3/4 the circumference of a circle.
         # This is so that when we connect the points, there will be a chord
         # that slices the circle and produces a flat side (i.e the front of the bot)
         points = [
             [
-                math.cos(1.5 * math.pi / num_points * x) * ROBOT_MAX_RADIUS_METERS, 
+                math.cos(1.5 * math.pi / num_points * x) * ROBOT_MAX_RADIUS_METERS,
                 math.sin(1.5 * math.pi / num_points * x) * ROBOT_MAX_RADIUS_METERS,
-                z_coordinate
-            ] 
+                z_coordinate,
+            ]
             for x in range(0, num_points + 1)
         ]
 
@@ -55,13 +54,13 @@ class GLRobotOutline(GLLinePlotItem):
             return
 
         self.translate(x - self.x, y - self.y, 0)
-        self.x = x 
+        self.x = x
         self.y = y
 
     def setOrientation(self, radians):
 
         # We need to add 45 degrees to our desired orientation in order
-        # to get the flat side of the robot (i.e. its front) to face 
+        # to get the flat side of the robot (i.e. its front) to face
         # the right way
         degrees = math.degrees(radians) + 45
 
@@ -71,4 +70,3 @@ class GLRobotOutline(GLLinePlotItem):
         # Rotate locally about the z axis (0, 0, 1)
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
-        

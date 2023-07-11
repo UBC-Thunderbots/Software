@@ -7,6 +7,7 @@ from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 import math
 import numpy as np
 
+
 class GLRobot(GLMeshItem):
     """Displays a 3D mesh representing a robot"""
 
@@ -18,14 +19,12 @@ class GLRobot(GLMeshItem):
         self.color = color
 
         GLMeshItem.__init__(
-            self,
-            meshdata=self.getMeshData(),
-            color=self.color,
+            self, meshdata=self.getMeshData(), color=self.color,
         )
 
     def getMeshData(self):
         """
-        Return a MeshData instance with vertexes and faces computed
+        Return a MeshData instance with vertices and faces computed
         for the surface of a cylinder that has been sliced by a chord.
         This represents the geometry of a robot.
 
@@ -33,7 +32,9 @@ class GLRobot(GLMeshItem):
 
         """
 
-        top_face_points = GLRobotOutline.getRobotOutline(z_coordinate=ROBOT_MAX_HEIGHT_METERS)
+        top_face_points = GLRobotOutline.getRobotOutline(
+            z_coordinate=ROBOT_MAX_HEIGHT_METERS
+        )
         bottom_face_points = GLRobotOutline.getRobotOutline(z_coordinate=0)
         circle_points = top_face_points + bottom_face_points
 
@@ -52,10 +53,7 @@ class GLRobot(GLMeshItem):
         for index in range(len(top_face_points) - 1):
             faces.append([index, index + 1, len(circle_points)])
 
-        return MeshData(
-            vertexes=np.array(points),
-            faces=np.array(faces),
-        )
+        return MeshData(vertices=np.array(points), faces=np.array(faces),)
 
     def setPosition(self, x, y):
 
@@ -63,13 +61,13 @@ class GLRobot(GLMeshItem):
             return
 
         self.translate(x - self.x, y - self.y, 0)
-        self.x = x 
+        self.x = x
         self.y = y
 
     def setOrientation(self, radians):
 
         # We need to add 45 degrees to our desired orientation in order
-        # to get the flat side of the robot (i.e. its front) to face 
+        # to get the flat side of the robot (i.e. its front) to face
         # the right way
         degrees = math.degrees(radians) + 45
 
@@ -79,4 +77,3 @@ class GLRobot(GLMeshItem):
         # Rotate locally about the z axis (0, 0, 1)
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
-        

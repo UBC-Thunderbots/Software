@@ -50,6 +50,7 @@ class IndividualRobotMode(IntEnum):
     MANUAL = 1
     AI = 2
 
+
 class CameraView(Enum):
 
     LANDSCAPE_TOP_DOWN = 1
