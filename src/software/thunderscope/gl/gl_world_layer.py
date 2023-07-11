@@ -148,7 +148,10 @@ class GLWorldLayer(GLLayer):
                 robot_id_map[robot.id] = gl_robot
                 added_robot_graphics.append(gl_robot)
 
-                robot_id_text_item = GLTextItem(text=str(robot.id))
+                robot_id_text_item = GLTextItem(
+                    text=str(robot.id),
+                    color=Colors.PRIMARY_TEXT_COLOR
+                )
                 robot_id_text_items[robot.id] = robot_id_text_item
                 added_robot_graphics.append(robot_id_text_item)
 

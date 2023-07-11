@@ -70,3 +70,12 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_tactic_layer",
+    srcs = ["gl_tactic_layer.py"],
+    deps = [
+        ":gl_layer",
+        requirement("pyqtgraph"),
+    ],
+)

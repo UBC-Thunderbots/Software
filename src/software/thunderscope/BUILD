@@ -68,6 +68,7 @@ py_library(
         "//software/thunderscope/gl:gl_widget",
         "//software/thunderscope/gl:gl_world_layer",
         "//software/thunderscope/gl:gl_hrvo_layer",
+        "//software/thunderscope/gl:gl_tactic_layer",
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/play:playinfo_widget",

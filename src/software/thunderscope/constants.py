@@ -150,6 +150,9 @@ class Colors(object):
     VALIDATION_PASSED_COLOR = "g"
     VALIDATION_FAILED_COLOR = "r"
 
+    PRIMARY_TEXT_COLOR = QtGui.QColor(255, 255, 255, 255)
+    SECONDARY_TEXT_COLOR = QtGui.QColor(255, 255, 255, 160)
+
     # Colors for vision pattern
     PINK = QtGui.QColor(255, 0, 255)
     GREEN = QtGui.QColor(0, 255, 0)
