@@ -1,7 +1,10 @@
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
+
+import textwrap
 
 from software.thunderscope.constants import CameraView
 
@@ -32,6 +35,23 @@ class GLWidget(QWidget):
         self.legend = pg.LegendItem((80, 60))
         self.graphics_view.addItem(self.legend)
 
+        tool_button_stylesheet = textwrap.dedent(
+            """
+            QToolButton {
+                color: #969696;
+                background-color: transparent;
+                border-color: transparent;
+                border-width: 4px;
+                border-radius: 4px;
+                height: 16px;
+            }
+            QToolButton:hover {
+                background-color: #363636;
+                border-color: #363636;
+            }
+            """
+        )
+
         # Set up menu button for setting the camera position to standard views
         self.camera_view_actions = [
             QtGui.QAction("Landscape Top Down"),
@@ -53,16 +73,8 @@ class GLWidget(QWidget):
         )
 
         self.camera_view_button = QToolButton()
-        self.camera_view_button.setText("View ")
-        self.camera_view_button.setStyleSheet(
-            "QToolButton {"
-            "   background-color: transparent;"
-            "   border-color: transparent;"
-            "   border-width: 0px;"
-            "   height: 8px;"
-            "   padding-right: 8px;"
-            "}"
-        )
+        self.camera_view_button.setText("View")
+        self.camera_view_button.setStyleSheet(tool_button_stylesheet)
 
         self.camera_view_menu = QtGui.QMenu()
         self.camera_view_button.setMenu(self.camera_view_menu)
@@ -73,11 +85,38 @@ class GLWidget(QWidget):
         for camera_view_action in self.camera_view_actions:
             self.camera_view_menu.addAction(camera_view_action)
 
+        # Setup help button
+        self.help_button = QToolButton()
+        self.help_button.setText("Help")
+        self.help_button.setStyleSheet(tool_button_stylesheet)
+        self.help_button.clicked.connect(
+            lambda: QMessageBox.information(
+                self,
+                "Help",
+                textwrap.dedent(
+                    f"""
+                    <h3>Keyboard Shortcuts</h3><br>
+                    
+                    <b><code>I:</code></b> Identify robots, toggle robot ID visibility<br>
+                    <b><code>Ctrl+Space:</code></b> Stop AI vs AI simulation<br>
+                    <b><code>Number Keys:</code></b> Position camera to preset view<br>
+
+                    <h3>Camera Controls</h3><br>
+
+                    <b><code>Orbit:</code></b> Left click and drag mouse<br>
+                    <b><code>Pan:</code></b> Hold Ctrl while dragging OR drag with middle mouse button<br>
+                    <b><code>Zoom:</code></b> Scrollwheel<br>
+                    """
+                ),
+            )
+        )
+
         self.toolbar = QWidget()
         self.toolbar.setMaximumHeight(40)
         self.toolbar.setStyleSheet("background-color: black;" "padding: 0px;")
         self.toolbar.setLayout(QHBoxLayout())
         self.toolbar.layout().addStretch()
+        self.toolbar.layout().addWidget(self.help_button)
         self.toolbar.layout().addWidget(self.camera_view_button)
 
         self.layout = QVBoxLayout()
@@ -95,25 +134,46 @@ class GLWidget(QWidget):
         else:
             self.player = None
 
+        self.key_pressed = {}
+        self.accepted_keys = [Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3, Qt.Key.Key_4]
+        for key in self.accepted_keys:
+            self.key_pressed[key] = False
+
         self.layers = []
 
         self.setCameraView(CameraView.LANDSCAPE_HIGH_ANGLE)
 
     def keyPressEvent(self, event):
-        """Propagate keypress event to all field layers
+        """Detect when a key has been pressed
         
         :param event: The event
         
         """
+        self.key_pressed[event.key()] = True
+        
+        # Camera view shortcuts
+        if self.key_pressed[Qt.Key.Key_1]:
+            self.setCameraView(CameraView.LANDSCAPE_TOP_DOWN)
+        elif self.key_pressed[Qt.Key.Key_2]:
+            self.setCameraView(CameraView.LANDSCAPE_HIGH_ANGLE)
+        elif self.key_pressed[Qt.Key.Key_3]:
+            self.setCameraView(CameraView.LEFT_HALF_HIGH_ANGLE)
+        elif self.key_pressed[Qt.Key.Key_4]:
+            self.setCameraView(CameraView.RIGHT_HALF_HIGH_ANGLE)
+        
+        # Propagate keypress event to all field layers
         for layer in self.layers:
             layer.keyPressEvent(event)
 
     def keyReleaseEvent(self, event):
-        """Propagate keyrelease event to all field layers
+        """Detect when a key has been released
         
         :param event: The event
         
         """
+        self.key_pressed[event.key()] = False
+
+        # Propagate keypress event to all field layers
         for layer in self.layers:
             layer.keyReleaseEvent(event)
 
