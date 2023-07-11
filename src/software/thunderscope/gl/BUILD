@@ -35,6 +35,7 @@ py_library(
     srcs = ["gl_obstacle_layer.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_circle",
         requirement("pyqtgraph"),
     ],
 )

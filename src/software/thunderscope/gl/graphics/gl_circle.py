@@ -41,7 +41,7 @@ class GLCircle(GLLinePlotItem):
     def setColor(self, color):
         self.setData(color=color)
 
-    def setTranslation(self, x, y):
+    def setPosition(self, x, y):
 
         if self.x == x and self.y == y:
             return

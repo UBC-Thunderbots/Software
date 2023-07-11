@@ -35,6 +35,7 @@ class GLWidget(QWidget):
         self.legend = pg.LegendItem((80, 60))
         self.graphics_view.addItem(self.legend)
 
+        # Stylesheet for toolbar buttons
         tool_button_stylesheet = textwrap.dedent(
             """
             QToolButton {
@@ -52,7 +53,15 @@ class GLWidget(QWidget):
             """
         )
 
-        # Set up menu button for setting the camera position to standard views
+        # Set up View button for setting the camera position to standard views
+        self.camera_view_button = QToolButton()
+        self.camera_view_button.setText("View")
+        self.camera_view_button.setStyleSheet(tool_button_stylesheet)
+        self.camera_view_menu = QtGui.QMenu()
+        self.camera_view_button.setMenu(self.camera_view_menu)
+        self.camera_view_button.setPopupMode(
+            QToolButton.ToolButtonPopupMode.InstantPopup
+        )
         self.camera_view_actions = [
             QtGui.QAction("Landscape Top Down"),
             QtGui.QAction("Landscape High Angle"),
@@ -71,21 +80,10 @@ class GLWidget(QWidget):
         self.camera_view_actions[3].triggered.connect(
             lambda: self.setCameraView(CameraView.RIGHT_HALF_HIGH_ANGLE)
         )
-
-        self.camera_view_button = QToolButton()
-        self.camera_view_button.setText("View")
-        self.camera_view_button.setStyleSheet(tool_button_stylesheet)
-
-        self.camera_view_menu = QtGui.QMenu()
-        self.camera_view_button.setMenu(self.camera_view_menu)
-        self.camera_view_button.setPopupMode(
-            QToolButton.ToolButtonPopupMode.InstantPopup
-        )
-
         for camera_view_action in self.camera_view_actions:
             self.camera_view_menu.addAction(camera_view_action)
 
-        # Setup help button
+        # Setup Help button
         self.help_button = QToolButton()
         self.help_button.setText("Help")
         self.help_button.setStyleSheet(tool_button_stylesheet)
@@ -111,6 +109,7 @@ class GLWidget(QWidget):
             )
         )
 
+        # Setup toolbar
         self.toolbar = QWidget()
         self.toolbar.setMaximumHeight(40)
         self.toolbar.setStyleSheet("background-color: black;" "padding: 0px;")
@@ -119,6 +118,7 @@ class GLWidget(QWidget):
         self.toolbar.layout().addWidget(self.help_button)
         self.toolbar.layout().addWidget(self.camera_view_button)
 
+        # Setup layout
         self.layout = QVBoxLayout()
         self.layout.setSpacing(0)
         self.setLayout(self.layout)
@@ -134,6 +134,7 @@ class GLWidget(QWidget):
         else:
             self.player = None
 
+        # Variables for keeping track of keys pressed
         self.key_pressed = {}
         self.accepted_keys = [Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3, Qt.Key.Key_4]
         for key in self.accepted_keys:

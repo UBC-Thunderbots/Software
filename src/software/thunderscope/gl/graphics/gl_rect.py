@@ -28,7 +28,7 @@ class GLRect(GLGridItem):
         self.x_length = x_length
         self.y_length = y_length
 
-    def setTranslation(self, x, y):
+    def setPosition(self, x, y):
 
         if self.x == x and self.y == y:
             return

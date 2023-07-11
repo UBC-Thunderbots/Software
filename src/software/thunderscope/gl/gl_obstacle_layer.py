@@ -11,6 +11,7 @@ from software.py_constants import *
 from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.gl_layer import GLLayer
+from software.thunderscope.gl.graphics.gl_circle import GLCircle
 
 
 class GLObstacleLayer(GLLayer):
@@ -27,7 +28,8 @@ class GLObstacleLayer(GLLayer):
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
-        self.obstacle_lines = []
+        self.line_graphics = []
+        self.circle_graphics = []
 
     def updateGraphics(self):
         """Update the GLGraphicsItems in this layer
@@ -38,7 +40,7 @@ class GLObstacleLayer(GLLayer):
         
         """
         if not self.isVisible():
-            return [], self.clearGraphicsList(self.obstacle_lines)
+            return [], self.clearGraphicsList(self.line_graphics)
 
         primitive_set = self.primitive_set_buffer.get(
             block=False
@@ -62,24 +64,39 @@ class GLObstacleLayer(GLLayer):
             for circle_obstacle in obstacle.circle
         ]
 
-        added_graphics, removed_graphics = self.setupGraphicsList(
-            graphics_list=self.obstacle_lines,
+        added_line_graphics, removed_line_graphics = self.setupGraphicsList(
+            graphics_list=self.line_graphics,
             num_graphics=len(poly_obstacles),
-            graphic_init_func=lambda: GLLinePlotItem(),
+            graphic_init_func=lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
 
-        for index, poly_obstacle in enumerate(poly_obstacles):
+        added_circle_graphics, removed_circle_graphics = self.setupGraphicsList(
+            graphics_list=self.circle_graphics,
+            num_graphics=len(circle_obstacles),
+            graphic_init_func=lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
+        )
+
+        added_graphics = added_line_graphics + added_circle_graphics
+        removed_graphics = removed_line_graphics + removed_circle_graphics
+
+        for obstacle_line, poly_obstacle in zip(self.line_graphics, poly_obstacles):
 
             # In order to close the polygon, we need to include the first point at the end of
             # the list of points in the polygon
             polygon_points = list(poly_obstacle.points) + poly_obstacle.points[:1]
 
-            obstacle_line = self.obstacle_lines[index]
             obstacle_line.setData(
                 pos=np.array(
                     [[point.x_meters, point.y_meters, 0] for point in polygon_points]
                 ),
-                color=Colors.NAVIGATOR_OBSTACLE_COLOR,
+            )
+
+        for circle_graphic, circle_obstacle in zip(self.circle_graphics, circle_obstacles):
+
+            circle_graphic.setRadius(circle_obstacle.radius)
+            circle_graphic.setPosition(
+                circle_obstacle.origin.x_meters,
+                circle_obstacle.origin.y_meters,
             )
 
         return added_graphics, removed_graphics

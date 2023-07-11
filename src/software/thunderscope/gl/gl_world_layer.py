@@ -102,14 +102,14 @@ class GLWorldLayer(GLLayer):
         self.friendly_defense_area_rect.setDimensions(
             field.defense_x_length, field.defense_y_length
         )
-        self.friendly_defense_area_rect.setTranslation(
+        self.friendly_defense_area_rect.setPosition(
             -(field.field_x_length / 2) + (field.defense_x_length / 2), 0
         )
 
         self.enemy_defense_area_rect.setDimensions(
             field.defense_x_length, field.defense_y_length
         )
-        self.enemy_defense_area_rect.setTranslation(
+        self.enemy_defense_area_rect.setPosition(
             (field.field_x_length / 2) - (field.defense_x_length / 2), 0
         )
 
