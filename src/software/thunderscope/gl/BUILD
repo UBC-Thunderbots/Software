@@ -61,3 +61,12 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_hrvo_layer",
+    srcs = ["gl_hrvo_layer.py"],
+    deps = [
+        ":gl_layer",
+        requirement("pyqtgraph"),
+    ],
+)

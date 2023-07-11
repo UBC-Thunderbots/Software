@@ -79,13 +79,13 @@ class GLObstacleLayer(GLLayer):
         added_graphics = added_line_graphics + added_circle_graphics
         removed_graphics = removed_line_graphics + removed_circle_graphics
 
-        for obstacle_line, poly_obstacle in zip(self.line_graphics, poly_obstacles):
+        for line_graphic, poly_obstacle in zip(self.line_graphics, poly_obstacles):
 
             # In order to close the polygon, we need to include the first point at the end of
             # the list of points in the polygon
             polygon_points = list(poly_obstacle.points) + poly_obstacle.points[:1]
 
-            obstacle_line.setData(
+            line_graphic.setData(
                 pos=np.array(
                     [[point.x_meters, point.y_meters, 0] for point in polygon_points]
                 ),

@@ -14,6 +14,7 @@ from software.thunderscope.gl import (
     gl_path_layer,
     gl_passing_layer,
     gl_world_layer,
+    gl_hrvo_layer
 )
 
 from software.thunderscope.field import (
@@ -79,6 +80,14 @@ def setup_gl_widget(
     gl_widget.addLayer("Passing", passing_layer)
     gl_widget.addLayer("Vision", world_layer)
 
+    # Add HRVO layers to field widget and have them hidden on startup
+    # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+    hrvo_sim_states = []
+    for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
+        hrvo_sim_state = gl_hrvo_layer.GLHrvoLayer(robot_id, visualization_buffer_size)
+        hrvo_sim_states.append(hrvo_sim_state)
+        gl_widget.addLayer(f"HRVO {robot_id}", hrvo_sim_state, False)
+
     # Register observers
     for arg in [
         (World, world_layer.world_buffer),
@@ -88,10 +97,10 @@ def setup_gl_widget(
         (PrimitiveSet, path_layer.primitive_set_buffer),
         (PassVisualization, passing_layer.pass_visualization_buffer),
         # (ValidationProtoSet, validation.validation_set_buffer),
-    ]:  # + [
-        #     (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
-        #     for hrvo_sim_state in hrvo_sim_states
-        # ]:
+    ] + [
+        (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
+        for hrvo_sim_state in hrvo_sim_states
+    ]:
         full_system_proto_unix_io.register_observer(*arg)
 
     return gl_widget
