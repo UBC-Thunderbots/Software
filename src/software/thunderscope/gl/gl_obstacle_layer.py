@@ -14,7 +14,15 @@ from software.thunderscope.gl.gl_layer import GLLayer
 
 
 class GLObstacleLayer(GLLayer):
+    """GLLayer that visualizes obstacles"""
+
     def __init__(self, buffer_size=5):
+        """Initialize the GLObstacleLayer
+
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+
+        """
         GLLayer.__init__(self)
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
@@ -22,7 +30,13 @@ class GLObstacleLayer(GLLayer):
         self.obstacle_lines = []
 
     def updateGraphics(self):
+        """Update the GLGraphicsItems in this layer
 
+        :returns: tuple (added_graphics, removed_graphics)
+            - added_graphics - List of the added GLGraphicsItems
+            - removed_graphics - List of the removed GLGraphicsItems
+        
+        """
         if not self.isVisible():
             return [], self.clearGraphicsList(self.obstacle_lines)
 

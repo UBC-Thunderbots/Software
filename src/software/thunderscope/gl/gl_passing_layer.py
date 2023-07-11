@@ -17,6 +17,7 @@ from software.thunderscope.gl.gl_layer import GLLayer
 
 
 class GLPassingLayer(GLLayer):
+    """GLLayer that visualizes passes"""
 
     # The pass generator is created and destroyed as we move in and out of offensive plays.
     # If we no longer receive new passes, we need to remove the old one.
@@ -26,6 +27,12 @@ class GLPassingLayer(GLLayer):
     NUM_PASSES_TO_SHOW = 1
 
     def __init__(self, buffer_size=5):
+        """Initialize the GLPassingLayer
+
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+                            
+        """
         GLLayer.__init__(self)
 
         self.pass_visualization_buffer = ThreadSafeBuffer(
@@ -37,7 +44,13 @@ class GLPassingLayer(GLLayer):
         self.pass_lines = []
 
     def updateGraphics(self):
+        """Update the GLGraphicsItems in this layer
 
+        :returns: tuple (added_graphics, removed_graphics)
+            - added_graphics - List of the added GLGraphicsItems
+            - removed_graphics - List of the removed GLGraphicsItems
+        
+        """
         if not self.isVisible():
             return [], self.clearGraphicsList(self.pass_lines)
 

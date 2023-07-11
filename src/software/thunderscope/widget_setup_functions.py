@@ -80,10 +80,6 @@ def setup_gl_widget(
     gl_widget.addLayer("Vision", world_layer)
 
     # Register observers
-    # sim_proto_unix_io.register_observer(
-    #     SimulatorState, sim_state.simulator_state_buffer
-    # )
-
     for arg in [
         (World, world_layer.world_buffer),
         (RobotStatus, world_layer.robot_status_buffer),
@@ -92,7 +88,6 @@ def setup_gl_widget(
         (PrimitiveSet, path_layer.primitive_set_buffer),
         (PassVisualization, passing_layer.pass_visualization_buffer),
         # (ValidationProtoSet, validation.validation_set_buffer),
-        # (SimulatorState, sim_state.simulator_state_buffer),
     ]:  # + [
         #     (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
         #     for hrvo_sim_state in hrvo_sim_states

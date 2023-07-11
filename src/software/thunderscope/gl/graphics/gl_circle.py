@@ -36,7 +36,6 @@ class GLCircle(GLLinePlotItem):
                 for x in range(0, self.num_points + 1)
             ]
         )
-
         self.setData(pos=points)
 
     def setColor(self, color):

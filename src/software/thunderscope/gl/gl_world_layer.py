@@ -19,7 +19,17 @@ from software.thunderscope.gl.gl_layer import GLLayer
 
 
 class GLWorldLayer(GLLayer):
+    """GLLayer that visualizes the world and vision data"""
+
     def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=5):
+        """Initialize the GLWorldLayer
+
+        :param simulator_io: The simulator io communicate with the simulator
+        :param friendly_colour_yellow: Is the friendly_colour_yellow?
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+
+        """
         GLLayer.__init__(self)
 
         self.simulator_io = simulator_io
@@ -81,7 +91,11 @@ class GLWorldLayer(GLLayer):
         self.key_pressed[event.key()] = False
 
     def updateFieldGraphics(self, field: Field):
+        """Update the GLGraphicsItems that display the field lines and markings
+        
+        :param field: The field proto
 
+        """
         self.field_lines_rect.setDimensions(field.field_x_length, field.field_y_length)
         self.field_centre_circle.setRadius(field.center_circle_radius)
 
@@ -100,7 +114,11 @@ class GLWorldLayer(GLLayer):
         )
 
     def updateBallGraphics(self, ball_state: BallState):
+        """Update the GLGraphicsItems that display the ball
+        
+        :param ball_state: The ball state proto
 
+        """
         self.ball.setPosition(
             ball_state.global_position.x_meters,
             ball_state.global_position.y_meters,
@@ -108,7 +126,18 @@ class GLWorldLayer(GLLayer):
         )
 
     def updateRobotGraphics(self, team: Team, robot_id_map, robot_id_text_items, color):
+        """Update the GLGraphicsItems that display the robots
+        
+        :param team: The team proto
+        :param robot_id_map: The robot graphics dictionary
+        :param robot_id_text_items: The robot id text item graphics list
+        :param color: The color of the robots
 
+        :returns: tuple (added_graphics, removed_graphics)
+            - added_graphics - List of the added GLGraphicsItems
+            - removed_graphics - List of the removed GLGraphicsItems
+
+        """
         added_robot_graphics = []
         removed_robot_graphics = []
 
@@ -156,7 +185,13 @@ class GLWorldLayer(GLLayer):
         return added_robot_graphics, removed_robot_graphics
 
     def updateGraphics(self):
+        """Update the GLGraphicsItems in this layer
 
+        :returns: tuple (added_graphics, removed_graphics)
+            - added_graphics - List of the added GLGraphicsItems
+            - removed_graphics - List of the removed GLGraphicsItems
+        
+        """
         if not self.isVisible():
 
             removed_graphics = []

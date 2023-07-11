@@ -14,7 +14,15 @@ from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 
 
 class GLPathLayer(GLLayer):
+    """GLLayer that visualizes paths from the navigator"""
+
     def __init__(self, buffer_size=5):
+        """Initialize the GLPathLayer
+
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+                            
+        """
         GLLayer.__init__(self)
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
@@ -23,7 +31,13 @@ class GLPathLayer(GLLayer):
         self.desired_position_outlines = []
 
     def updateGraphics(self):
+        """Update the GLGraphicsItems in this layer
 
+        :returns: tuple (added_graphics, removed_graphics)
+            - added_graphics - List of the added GLGraphicsItems
+            - removed_graphics - List of the removed GLGraphicsItems
+        
+        """
         if not self.isVisible():
             return (
                 [],

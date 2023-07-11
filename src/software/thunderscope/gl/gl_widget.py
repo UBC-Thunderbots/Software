@@ -131,7 +131,7 @@ class GLWidget(QWidget):
             layer.hide()
 
     def refresh(self):
-        """Triggers an update on all the layers, adding/removing GLGraphicsItem 
+        """Trigger an update on all the layers, adding/removing GLGraphicsItem 
         returned by the layers to/from the GLViewWidget scene
         """
         if self.player:
@@ -147,6 +147,11 @@ class GLWidget(QWidget):
                 self.graphics_view.gl_view_widget.removeItem(removed_graphic)
 
     def setCameraView(self, camera_view):
+        """Set the camera position to a preset camera view
+
+        :param camera_view: the preset camera view
+
+        """
         if camera_view == CameraView.LANDSCAPE_TOP_DOWN:
             self.graphics_view.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(0, 0, 0), distance=15, elevation=90, azimuth=-90
