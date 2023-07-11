@@ -8,7 +8,7 @@ import numpy as np
 
 
 class GLRobotOutline(GLLinePlotItem):
-    """Displays an outline of a robot on the x-y plane"""
+    """Displays an outline of a robot parallel to the x-y plane"""
 
     def __init__(self, color):
 

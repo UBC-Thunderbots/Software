@@ -41,7 +41,7 @@ class GLPassingLayer(GLLayer):
         self.cached_pass_vis = PassVisualization()
         self.timeout = time.time() + GLPassingLayer.PASS_VISUALIZATION_TIMEOUT_S
 
-        self.pass_lines = []
+        self.line_graphics = []
 
     def updateGraphics(self):
         """Update the GLGraphicsItems in this layer
@@ -52,7 +52,7 @@ class GLPassingLayer(GLLayer):
         
         """
         if not self.isVisible():
-            return [], self.clearGraphicsList(self.pass_lines)
+            return [], self.clearGraphicsList(self.line_graphics)
 
         try:
             pass_vis = self.pass_visualization_buffer.queue.get_nowait()
@@ -64,7 +64,7 @@ class GLPassingLayer(GLLayer):
 
             # If we haven't received pass visualizations for a bit, clear the layer's graphics
             if time.time() > self.timeout:
-                return [], self.clearGraphicsList(self.pass_lines)
+                return [], self.clearGraphicsList(self.line_graphics)
         else:
             # We received new pass data, so lets update our timeout
             self.timeout = time.time() + GLPassingLayer.PASS_VISUALIZATION_TIMEOUT_S
@@ -76,14 +76,13 @@ class GLPassingLayer(GLLayer):
         passes_to_show = sorted_pass_with_rating[0 : GLPassingLayer.NUM_PASSES_TO_SHOW]
 
         added_graphics, removed_graphics = self.setupGraphicsList(
-            graphics_list=self.pass_lines,
+            graphics_list=self.line_graphics,
             num_graphics=len(passes_to_show),
-            graphic_init_func=lambda: GLLinePlotItem(),
+            graphic_init_func=lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR),
         )
 
-        for index, pass_with_rating in enumerate(passes_to_show):
-            pass_line = self.pass_lines[index]
-            pass_line.setData(
+        for line_graphic, pass_with_rating in zip(self.line_graphics, passes_to_show):
+            line_graphic.setData(
                 pos=np.array(
                     [
                         [
@@ -96,7 +95,6 @@ class GLPassingLayer(GLLayer):
                         ],
                     ]
                 ),
-                color=Colors.PASS_VISUALIZATION_COLOR,
             )
 
         return added_graphics, removed_graphics

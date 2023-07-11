@@ -3,7 +3,7 @@ from pyqtgraph.opengl import *
 
 
 class GLRect(GLGridItem):
-    """Displays a rectangle on the x-y plane"""
+    """Displays a rectangle parallel to the x-y plane"""
 
     def __init__(self, color=(255, 255, 255, 127.5)):
 

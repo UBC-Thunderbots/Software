@@ -27,8 +27,8 @@ class GLPathLayer(GLLayer):
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
-        self.path_lines = []
-        self.desired_position_outlines = []
+        self.path_line_graphics = []
+        self.dest_outline_graphics = []
 
     def updateGraphics(self):
         """Update the GLGraphicsItems in this layer
@@ -41,8 +41,8 @@ class GLPathLayer(GLLayer):
         if not self.isVisible():
             return (
                 [],
-                self.clearGraphicsList(self.path_lines)
-                + self.clearGraphicsList(self.desired_position_outlines),
+                self.clearGraphicsList(self.path_line_graphics)
+                + self.clearGraphicsList(self.dest_outline_graphics),
             )
 
         primitive_set = self.primitive_set_buffer.get(
@@ -65,13 +65,13 @@ class GLPathLayer(GLLayer):
         ]
 
         added_path_line_graphics, removed_path_line_graphics = self.setupGraphicsList(
-            graphics_list=self.path_lines,
+            graphics_list=self.path_line_graphics,
             num_graphics=len(paths),
             graphic_init_func=lambda: GLLinePlotItem(),
         )
 
         added_outline_graphics, removed_outline_graphics = self.setupGraphicsList(
-            graphics_list=self.desired_position_outlines,
+            graphics_list=self.dest_outline_graphics,
             num_graphics=len(requested_destinations),
             graphic_init_func=lambda: GLRobotOutline(
                 color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE
@@ -81,19 +81,18 @@ class GLPathLayer(GLLayer):
         added_graphics = added_path_line_graphics + added_outline_graphics
         removed_graphics = removed_path_line_graphics + removed_outline_graphics
 
-        for index, path in enumerate(paths):
-            path_line = self.path_lines[index]
-            path_line.setData(
+        for path_line_graphic, path in zip(self.path_line_graphics, paths):
+            path_line_graphic.setData(
                 pos=np.array(
                     [[point.x_meters, point.y_meters, 0] for point in path.points]
                 ),
                 color=Colors.NAVIGATOR_PATH_COLOR,
             )
 
-        for (dest, final_angle), outline in zip(
-            requested_destinations, self.desired_position_outlines
+        for outline_graphic, (dest, final_angle) in zip(
+            self.dest_outline_graphics, requested_destinations
         ):
-            outline.setPosition(dest.x_meters, dest.y_meters)
-            outline.setOrientation(final_angle.radians)
+            outline_graphic.setPosition(dest.x_meters, dest.y_meters)
+            outline_graphic.setOrientation(final_angle.radians)
 
         return added_graphics, removed_graphics

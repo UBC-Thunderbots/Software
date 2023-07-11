@@ -53,13 +53,13 @@ class GLWorldLayer(GLLayer):
         self.field_centre_circle = None
         self.friendly_defense_area_rect = None
         self.enemy_defense_area_rect = None
-        self.ball = None
+        self.ball_graphic = None
 
-        self.friendly_robots_by_id = {}
-        self.enemy_robots_by_id = {}
+        self.friendly_robot_graphics = {}
+        self.enemy_robot_graphics = {}
 
-        self.friendly_robot_id_text_items = {}
-        self.enemy_robot_id_text_items = {}
+        self.friendly_robot_id_text_graphics = {}
+        self.enemy_robot_id_text_graphics = {}
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed
@@ -119,7 +119,7 @@ class GLWorldLayer(GLLayer):
         :param ball_state: The ball state proto
 
         """
-        self.ball.setPosition(
+        self.ball_graphic.setPosition(
             ball_state.global_position.x_meters,
             ball_state.global_position.y_meters,
             ball_state.distance_from_ground,
@@ -212,17 +212,17 @@ class GLWorldLayer(GLLayer):
                 removed_graphics.append(self.enemy_defense_area_rect)
                 self.enemy_defense_area_rect = None
 
-            if self.ball is not None:
-                removed_graphics.append(self.ball)
-                self.ball = None
+            if self.ball_graphic is not None:
+                removed_graphics.append(self.ball_graphic)
+                self.ball_graphic = None
 
             return (
                 [],
                 removed_graphics
-                + self.clearGraphicsDict(self.friendly_robots_by_id)
-                + self.clearGraphicsDict(self.enemy_robots_by_id)
-                + self.clearGraphicsDict(self.friendly_robot_id_text_items)
-                + self.clearGraphicsDict(self.enemy_robot_id_text_items),
+                + self.clearGraphicsDict(self.friendly_robot_graphics)
+                + self.clearGraphicsDict(self.enemy_robot_graphics)
+                + self.clearGraphicsDict(self.friendly_robot_id_text_graphics)
+                + self.clearGraphicsDict(self.enemy_robot_id_text_graphics),
             )
 
         added_graphics = []
@@ -246,9 +246,9 @@ class GLWorldLayer(GLLayer):
             self.enemy_defense_area_rect = GLRect(color=Colors.FIELD_LINE_COLOR)
             added_graphics.append(self.enemy_defense_area_rect)
 
-        if self.ball is None:
-            self.ball = GLBall()
-            added_graphics.append(self.ball)
+        if self.ball_graphic is None:
+            self.ball_graphic = GLBall()
+            added_graphics.append(self.ball_graphic)
 
         self.updateFieldGraphics(self.cached_world.field)
         self.updateBallGraphics(self.cached_world.ball.current_state)
@@ -266,8 +266,8 @@ class GLWorldLayer(GLLayer):
 
         added_robot_graphics, removed_robot_graphics = self.updateRobotGraphics(
             self.cached_world.friendly_team,
-            self.friendly_robots_by_id,
-            self.friendly_robot_id_text_items,
+            self.friendly_robot_graphics,
+            self.friendly_robot_id_text_graphics,
             friendly_colour,
         )
 
@@ -276,8 +276,8 @@ class GLWorldLayer(GLLayer):
 
         added_robot_graphics, removed_robot_graphics = self.updateRobotGraphics(
             self.cached_world.enemy_team,
-            self.enemy_robots_by_id,
-            self.enemy_robot_id_text_items,
+            self.enemy_robot_graphics,
+            self.enemy_robot_id_text_graphics,
             enemy_colour,
         )
 

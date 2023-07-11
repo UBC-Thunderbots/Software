@@ -6,7 +6,7 @@ import numpy as np
 
 
 class GLCircle(GLLinePlotItem):
-    """Displays a circle on the x-y plane"""
+    """Displays a circle parallel to the x-y plane"""
 
     def __init__(self, radius=0, num_points=24, color=(1.0, 1.0, 1.0, 0.5)):
 
