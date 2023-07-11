@@ -63,13 +63,13 @@ class GLWidget(QWidget):
             QToolButton.ToolButtonPopupMode.InstantPopup
         )
         self.camera_view_actions = [
-            QtGui.QAction("Landscape Top Down"),
-            QtGui.QAction("Landscape High Angle"),
-            QtGui.QAction("Left Half High Angle"),
-            QtGui.QAction("Right Half High Angle"),
+            QtGui.QAction("[1] Orthographic Top Down"),
+            QtGui.QAction("[2] Landscape High Angle"),
+            QtGui.QAction("[3] Left Half High Angle"),
+            QtGui.QAction("[4] Right Half High Angle"),
         ]
         self.camera_view_actions[0].triggered.connect(
-            lambda: self.setCameraView(CameraView.LANDSCAPE_TOP_DOWN)
+            lambda: self.setCameraView(CameraView.ORTHOGRAPHIC)
         )
         self.camera_view_actions[1].triggered.connect(
             lambda: self.setCameraView(CameraView.LANDSCAPE_HIGH_ANGLE)
@@ -154,7 +154,7 @@ class GLWidget(QWidget):
         
         # Camera view shortcuts
         if self.key_pressed[Qt.Key.Key_1]:
-            self.setCameraView(CameraView.LANDSCAPE_TOP_DOWN)
+            self.setCameraView(CameraView.ORTHOGRAPHIC)
         elif self.key_pressed[Qt.Key.Key_2]:
             self.setCameraView(CameraView.LANDSCAPE_HIGH_ANGLE)
         elif self.key_pressed[Qt.Key.Key_3]:
@@ -213,9 +213,13 @@ class GLWidget(QWidget):
         :param camera_view: the preset camera view
 
         """
-        if camera_view == CameraView.LANDSCAPE_TOP_DOWN:
+        self.graphics_view.gl_view_widget.reset()
+        if camera_view == CameraView.ORTHOGRAPHIC:
             self.graphics_view.gl_view_widget.setCameraPosition(
-                pos=pg.Vector(0, 0, 0), distance=15, elevation=90, azimuth=-90
+                pos=pg.Vector(0, 0, 0), distance=1000, elevation=90, azimuth=-90
+            )
+            self.graphics_view.gl_view_widget.setCameraParams(
+                fov=1.0
             )
         elif camera_view == CameraView.LANDSCAPE_HIGH_ANGLE:
             self.graphics_view.gl_view_widget.setCameraPosition(

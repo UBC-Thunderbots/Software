@@ -53,7 +53,7 @@ class IndividualRobotMode(IntEnum):
 
 class CameraView(Enum):
 
-    LANDSCAPE_TOP_DOWN = 1
+    ORTHOGRAPHIC = 1
     LANDSCAPE_HIGH_ANGLE = 2
     LEFT_HALF_HIGH_ANGLE = 3
     RIGHT_HALF_HIGH_ANGLE = 4
