@@ -41,7 +41,12 @@ class GLPassingLayer(GLLayer):
         self.cached_pass_vis = PassVisualization()
         self.timeout = time.time() + GLPassingLayer.PASS_VISUALIZATION_TIMEOUT_S
 
-        self.line_graphics = []
+        self.graphics_list.registerGraphicsGroup(
+            "passes", 
+            lambda: GLLinePlotItem(
+                color=Colors.PASS_VISUALIZATION_COLOR
+            )
+        )
 
     def updateGraphics(self):
         """Update the GLGraphicsItems in this layer
@@ -51,8 +56,9 @@ class GLPassingLayer(GLLayer):
             - removed_graphics - List of the removed GLGraphicsItems
         
         """
+        # Clear all graphics in this layer if not visible
         if not self.isVisible():
-            return [], self.clearGraphicsList(self.line_graphics)
+            return self.graphics_list.getChanges()
 
         try:
             pass_vis = self.pass_visualization_buffer.queue.get_nowait()
@@ -64,7 +70,7 @@ class GLPassingLayer(GLLayer):
 
             # If we haven't received pass visualizations for a bit, clear the layer's graphics
             if time.time() > self.timeout:
-                return [], self.clearGraphicsList(self.line_graphics)
+                return self.graphics_list.getChanges()
         else:
             # We received new pass data, so lets update our timeout
             self.timeout = time.time() + GLPassingLayer.PASS_VISUALIZATION_TIMEOUT_S
@@ -75,16 +81,11 @@ class GLPassingLayer(GLLayer):
         )
         passes_to_show = sorted_pass_with_rating[0 : GLPassingLayer.NUM_PASSES_TO_SHOW]
 
-        added_graphics, removed_graphics = self.setupGraphicsList(
-            graphics_list=self.line_graphics,
-            num_graphics=len(passes_to_show),
-            graphic_init_func=lambda: GLLinePlotItem(
-                color=Colors.PASS_VISUALIZATION_COLOR
-            ),
-        )
-
-        for line_graphic, pass_with_rating in zip(self.line_graphics, passes_to_show):
-            line_graphic.setData(
+        for pass_graphic, pass_with_rating in zip(
+            self.graphics_list.getGraphics("passes", len(passes_to_show)), 
+            passes_to_show
+        ):
+            pass_graphic.setData(
                 pos=np.array(
                     [
                         [
@@ -99,4 +100,4 @@ class GLPassingLayer(GLLayer):
                 ),
             )
 
-        return added_graphics, removed_graphics
+        return self.graphics_list.getChanges()

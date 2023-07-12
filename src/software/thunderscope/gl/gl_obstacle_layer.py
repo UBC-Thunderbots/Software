@@ -28,8 +28,14 @@ class GLObstacleLayer(GLLayer):
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
-        self.line_graphics = []
-        self.circle_graphics = []
+        self.graphics_list.registerGraphicsGroup(
+            "poly_obstacles",
+            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
+        )
+        self.graphics_list.registerGraphicsGroup(
+            "circle_obstacles",
+            lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
+        )
 
     def updateGraphics(self):
         """Update the GLGraphicsItems in this layer
@@ -39,12 +45,9 @@ class GLObstacleLayer(GLLayer):
             - removed_graphics - List of the removed GLGraphicsItems
         
         """
+        # Clear all graphics in this layer if not visible
         if not self.isVisible():
-            return (
-                [],
-                self.clearGraphicsList(self.line_graphics)
-                + self.clearGraphicsList(self.circle_graphics),
-            )
+            return self.graphics_list.getChanges()
 
         primitive_set = self.primitive_set_buffer.get(
             block=False
@@ -55,55 +58,31 @@ class GLObstacleLayer(GLLayer):
             for primitive in primitive_set
             if primitive.HasField("move")
         ]
-        poly_obstacles = [
-            poly_obstacle
-            for obstacles in obstacles_ptrs
-            for obstacle in obstacles
-            for poly_obstacle in obstacle.polygon
-        ]
-        circle_obstacles = [
-            circle_obstacle
-            for obstacles in obstacles_ptrs
-            for obstacle in obstacles
-            for circle_obstacle in obstacle.circle
-        ]
 
-        added_line_graphics, removed_line_graphics = self.setupGraphicsList(
-            graphics_list=self.line_graphics,
-            num_graphics=len(poly_obstacles),
-            graphic_init_func=lambda: GLLinePlotItem(
-                color=Colors.NAVIGATOR_OBSTACLE_COLOR
-            ),
-        )
+        for obstacles in obstacles_ptrs:
+            for obstacle in obstacles:
+                
+                for poly_obstacle_graphic, poly_obstacle in zip(
+                    self.graphics_list.getGraphics("poly_obstacles", len(obstacle.polygon)), 
+                    obstacle.polygon
+                ):
+                    # In order to close the polygon, we need to include the first point at the end of
+                    # the list of points in the polygon
+                    polygon_points = list(poly_obstacle.points) + poly_obstacle.points[:1]
 
-        added_circle_graphics, removed_circle_graphics = self.setupGraphicsList(
-            graphics_list=self.circle_graphics,
-            num_graphics=len(circle_obstacles),
-            graphic_init_func=lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
-        )
+                    poly_obstacle_graphic.setData(
+                        pos=np.array(
+                            [[point.x_meters, point.y_meters, 0] for point in polygon_points]
+                        ),
+                    )
 
-        added_graphics = added_line_graphics + added_circle_graphics
-        removed_graphics = removed_line_graphics + removed_circle_graphics
+                for circle_obstacle_graphic, circle_obstacle in zip(
+                    self.graphics_list.getGraphics("circle_obstacles", len(obstacle.circle)), 
+                    obstacle.circle
+                ):
+                    circle_obstacle_graphic.setRadius(circle_obstacle.radius)
+                    circle_obstacle_graphic.setPosition(
+                        circle_obstacle.origin.x_meters, circle_obstacle.origin.y_meters,
+                    )
 
-        for line_graphic, poly_obstacle in zip(self.line_graphics, poly_obstacles):
-
-            # In order to close the polygon, we need to include the first point at the end of
-            # the list of points in the polygon
-            polygon_points = list(poly_obstacle.points) + poly_obstacle.points[:1]
-
-            line_graphic.setData(
-                pos=np.array(
-                    [[point.x_meters, point.y_meters, 0] for point in polygon_points]
-                ),
-            )
-
-        for circle_graphic, circle_obstacle in zip(
-            self.circle_graphics, circle_obstacles
-        ):
-
-            circle_graphic.setRadius(circle_obstacle.radius)
-            circle_graphic.setPosition(
-                circle_obstacle.origin.x_meters, circle_obstacle.origin.y_meters,
-            )
-
-        return added_graphics, removed_graphics
+        return self.graphics_list.getChanges()

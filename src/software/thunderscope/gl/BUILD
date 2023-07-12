@@ -17,6 +17,7 @@ py_library(
     srcs = ["gl_layer.py"],
     deps = [
         "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope/gl/helpers:graphics_list",
         requirement("pyqtgraph"),
     ],
 )

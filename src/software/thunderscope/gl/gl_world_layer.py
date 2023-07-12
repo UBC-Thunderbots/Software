@@ -54,17 +54,20 @@ class GLWorldLayer(GLLayer):
         self.display_robot_id = False
         self.is_playing = True
 
-        self.field_lines_rect = None
-        self.field_centre_circle = None
-        self.friendly_defense_area_rect = None
-        self.enemy_defense_area_rect = None
-        self.ball_graphic = None
-
-        self.friendly_robot_graphics = {}
-        self.enemy_robot_graphics = {}
-
-        self.friendly_robot_id_text_graphics = {}
-        self.enemy_robot_id_text_graphics = {}
+        self.graphics_list.registerGraphicsGroup(
+            "field_lines",
+            lambda: GLRect(color=Colors.FIELD_LINE_COLOR)
+        )
+        self.graphics_list.registerGraphicsGroup(
+            "field_center_circle",
+            lambda: GLCircle(color=Colors.FIELD_LINE_COLOR)
+        )
+        self.graphics_list.registerGraphicsGroup("ball", GLBall)
+        self.graphics_list.registerGraphicsGroup("robots", GLRobot)
+        self.graphics_list.registerGraphicsGroup(
+            "robot_ids", 
+            lambda: GLTextItem(color=Colors.PRIMARY_TEXT_COLOR)
+        )
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed
@@ -121,20 +124,28 @@ class GLWorldLayer(GLLayer):
         :param field: The field proto
 
         """
-        self.field_lines_rect.setDimensions(field.field_x_length, field.field_y_length)
-        self.field_centre_circle.setRadius(field.center_circle_radius)
+        field_line_graphics = self.graphics_list.getGraphics("field_lines", 3)
+        field_center_circle_graphic = self.graphics_list.getGraphics("field_center_circle", 1)[0]
 
-        self.friendly_defense_area_rect.setDimensions(
+        # Outer field lines
+        field_line_graphics[0].setDimensions(field.field_x_length, field.field_y_length)
+        
+        # Center circle
+        field_center_circle_graphic.setRadius(field.center_circle_radius)
+
+        # Friendly defense area
+        field_line_graphics[1].setDimensions(
             field.defense_x_length, field.defense_y_length
         )
-        self.friendly_defense_area_rect.setPosition(
+        field_line_graphics[1].setPosition(
             -(field.field_x_length / 2) + (field.defense_x_length / 2), 0
         )
 
-        self.enemy_defense_area_rect.setDimensions(
+        # Enemy defense area
+        field_line_graphics[2].setDimensions(
             field.defense_x_length, field.defense_y_length
         )
-        self.enemy_defense_area_rect.setPosition(
+        field_line_graphics[2].setPosition(
             (field.field_x_length / 2) - (field.defense_x_length / 2), 0
         )
 
@@ -144,52 +155,36 @@ class GLWorldLayer(GLLayer):
         :param ball_state: The ball state proto
 
         """
-        self.ball_graphic.setPosition(
+        ball_graphic = self.graphics_list.getGraphics("ball", 1)[0]
+        ball_graphic.setPosition(
             ball_state.global_position.x_meters,
             ball_state.global_position.y_meters,
             ball_state.distance_from_ground,
         )
 
-    def updateRobotGraphics(self, team: Team, robot_id_map, robot_id_text_items, color):
+    def updateRobotGraphics(self, team: Team, color):
         """Update the GLGraphicsItems that display the robots
         
         :param team: The team proto
-        :param robot_id_map: The robot graphics dictionary
-        :param robot_id_text_items: The robot id text item graphics list
         :param color: The color of the robots
 
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
-
         """
-        added_robot_graphics = []
-        removed_robot_graphics = []
-
-        for robot in team.team_robots:
-
-            if robot.id not in robot_id_map:
-                gl_robot = GLRobot(color)
-                robot_id_map[robot.id] = gl_robot
-                added_robot_graphics.append(gl_robot)
-
-                robot_id_text_item = GLTextItem(
-                    text=str(robot.id), color=Colors.PRIMARY_TEXT_COLOR
-                )
-                robot_id_text_items[robot.id] = robot_id_text_item
-                added_robot_graphics.append(robot_id_text_item)
-
-            gl_robot = robot_id_map[robot.id]
-            gl_robot.setPosition(
+        for robot_graphic, robot_id_graphic, robot in zip(
+            self.graphics_list.getGraphics("robots", len(team.team_robots)), 
+            self.graphics_list.getGraphics("robot_ids", len(team.team_robots)), 
+            team.team_robots
+        ):
+            robot_graphic.setPosition(
                 robot.current_state.global_position.x_meters,
                 robot.current_state.global_position.y_meters,
             )
-            gl_robot.setOrientation(robot.current_state.global_orientation.radians)
+            robot_graphic.setOrientation(robot.current_state.global_orientation.radians)
+            robot_graphic.setColor(color)
 
-            robot_id_text_item = robot_id_text_items[robot.id]
             if self.display_robot_id:
-                robot_id_text_item.show()
-                robot_id_text_item.setData(
+                robot_id_graphic.show()
+                robot_id_graphic.setData(
+                    text=str(robot.id),
                     pos=[
                         robot.current_state.global_position.x_meters
                         + (ROBOT_MAX_RADIUS_METERS / 2),
@@ -198,18 +193,7 @@ class GLWorldLayer(GLLayer):
                     ]
                 )
             else:
-                robot_id_text_item.hide()
-
-        removed_robot_ids = [
-            id
-            for id in robot_id_map
-            if id not in [robot.id for robot in team.team_robots]
-        ]
-        for robot_id in removed_robot_ids:
-            removed_robot_graphics.append(robot_id_map.pop(robot_id))
-            removed_robot_graphics.append(robot_id_text_items.pop(robot_id))
-
-        return added_robot_graphics, removed_robot_graphics
+                robot_id_graphic.hide()
 
     def updateGraphics(self):
         """Update the GLGraphicsItems in this layer
@@ -219,63 +203,11 @@ class GLWorldLayer(GLLayer):
             - removed_graphics - List of the removed GLGraphicsItems
         
         """
+        # Clear all graphics in this layer if not visible
         if not self.isVisible():
-
-            removed_graphics = []
-
-            if self.field_lines_rect is not None:
-                removed_graphics.append(self.field_lines_rect)
-                self.field_lines_rect = None
-
-            if self.field_centre_circle is not None:
-                removed_graphics.append(self.field_centre_circle)
-                self.field_centre_circle = None
-
-            if self.friendly_defense_area_rect is not None:
-                removed_graphics.append(self.friendly_defense_area_rect)
-                self.friendly_defense_area_rect = None
-
-            if self.enemy_defense_area_rect is not None:
-                removed_graphics.append(self.enemy_defense_area_rect)
-                self.enemy_defense_area_rect = None
-
-            if self.ball_graphic is not None:
-                removed_graphics.append(self.ball_graphic)
-                self.ball_graphic = None
-
-            return (
-                [],
-                removed_graphics
-                + self.clearGraphicsDict(self.friendly_robot_graphics)
-                + self.clearGraphicsDict(self.enemy_robot_graphics)
-                + self.clearGraphicsDict(self.friendly_robot_id_text_graphics)
-                + self.clearGraphicsDict(self.enemy_robot_id_text_graphics),
-            )
-
-        added_graphics = []
-        removed_graphics = []
+            return self.graphics_list.getChanges()
 
         self.cached_world = self.world_buffer.get(block=False)
-
-        if self.field_lines_rect is None:
-            self.field_lines_rect = GLRect(color=Colors.FIELD_LINE_COLOR)
-            added_graphics.append(self.field_lines_rect)
-
-        if self.field_centre_circle is None:
-            self.field_centre_circle = GLCircle(color=Colors.FIELD_LINE_COLOR)
-            added_graphics.append(self.field_centre_circle)
-
-        if self.friendly_defense_area_rect is None:
-            self.friendly_defense_area_rect = GLRect(color=Colors.FIELD_LINE_COLOR)
-            added_graphics.append(self.friendly_defense_area_rect)
-
-        if self.enemy_defense_area_rect is None:
-            self.enemy_defense_area_rect = GLRect(color=Colors.FIELD_LINE_COLOR)
-            added_graphics.append(self.enemy_defense_area_rect)
-
-        if self.ball_graphic is None:
-            self.ball_graphic = GLBall()
-            added_graphics.append(self.ball_graphic)
 
         self.updateFieldGraphics(self.cached_world.field)
         self.updateBallGraphics(self.cached_world.ball.current_state)
@@ -291,24 +223,7 @@ class GLWorldLayer(GLLayer):
             else Colors.YELLOW_ROBOT_COLOR
         )
 
-        added_robot_graphics, removed_robot_graphics = self.updateRobotGraphics(
-            self.cached_world.friendly_team,
-            self.friendly_robot_graphics,
-            self.friendly_robot_id_text_graphics,
-            friendly_colour,
-        )
+        self.updateRobotGraphics(self.cached_world.friendly_team, friendly_colour)
+        self.updateRobotGraphics(self.cached_world.enemy_team, enemy_colour)
 
-        added_graphics += added_robot_graphics
-        removed_graphics += removed_robot_graphics
-
-        added_robot_graphics, removed_robot_graphics = self.updateRobotGraphics(
-            self.cached_world.enemy_team,
-            self.enemy_robot_graphics,
-            self.enemy_robot_id_text_graphics,
-            enemy_colour,
-        )
-
-        added_graphics += added_robot_graphics
-        removed_graphics += removed_robot_graphics
-
-        return added_graphics, removed_graphics
+        return self.graphics_list.getChanges()

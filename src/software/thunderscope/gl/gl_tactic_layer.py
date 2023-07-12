@@ -38,7 +38,12 @@ class GLTacticLayer(GLLayer):
         self.play_info_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.cached_world = World()
 
-        self.tactic_text_graphics = []
+        self.graphics_list.registerGraphicsGroup(
+            "tactic_fsm_info",
+            lambda: GLTextItem(
+                font=QtGui.QFont("Helvetica", 6), color=Colors.SECONDARY_TEXT_COLOR
+            )
+        )
 
     def updateTacticNameGraphics(self, team: Team, play_info_dict):
         """Update the GLGraphicsItems that display tactic data
@@ -46,25 +51,14 @@ class GLTacticLayer(GLLayer):
         :param team: The team proto
         :param play_info_dict: The dictionary containing play/tactic info
 
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
-
         """
-        added_graphics, removed_graphics = self.setupGraphicsList(
-            self.tactic_text_graphics,
-            len(team.team_robots),
-            lambda: GLTextItem(
-                font=QtGui.QFont("Helvetica", 6), color=Colors.SECONDARY_TEXT_COLOR
-            ),
-        )
-
         tactic_assignments = play_info_dict["robotTacticAssignment"]
 
-        for tactic_text_graphic, robot in zip(
-            self.tactic_text_graphics, team.team_robots
+        for tactic_fsm_info_graphic, robot in zip(
+            self.graphics_list.getGraphics("tactic_fsm_info", len(team.team_robots)), 
+            team.team_robots
         ):
-            tactic_text_graphic.setData(
+            tactic_fsm_info_graphic.setData(
                 text=textwrap.dedent(
                     f"""
                     {tactic_assignments[str(robot.id)]["tacticName"]} - 
@@ -78,8 +72,6 @@ class GLTacticLayer(GLLayer):
                 ],
             )
 
-        return added_graphics, removed_graphics
-
     def updateGraphics(self):
         """Update the GLGraphicsItems in this layer
 
@@ -88,24 +80,14 @@ class GLTacticLayer(GLLayer):
             - removed_graphics - List of the removed GLGraphicsItems
         
         """
+        # Clear all graphics in this layer if not visible
         if not self.isVisible():
-            return ([], self.clearGraphicsList(self.tactic_text_graphics))
-
-        added_graphics = []
-        removed_graphics = []
+            return self.graphics_list.getChanges()
 
         self.cached_world = self.world_buffer.get(block=False)
         play_info = self.play_info_buffer.get(block=False)
         play_info_dict = MessageToDict(play_info)
 
-        (
-            added_tactic_name_graphics,
-            removed_tactic_name_graphics,
-        ) = self.updateTacticNameGraphics(
-            self.cached_world.friendly_team, play_info_dict,
-        )
+        self.updateTacticNameGraphics(self.cached_world.friendly_team, play_info_dict)
 
-        added_graphics += added_tactic_name_graphics
-        removed_graphics += removed_tactic_name_graphics
-
-        return added_graphics, removed_graphics
+        return self.graphics_list.getChanges()

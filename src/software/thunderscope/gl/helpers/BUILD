@@ -3,6 +3,12 @@ package(default_visibility = ["//visibility:public"])
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 py_library(
+    name = "graphics_list",
+    srcs = ["graphics_list.py"],
+    deps = [],
+)
+
+py_library(
     name = "graphics_view",
     srcs = ["graphics_view.py"],
     deps = [

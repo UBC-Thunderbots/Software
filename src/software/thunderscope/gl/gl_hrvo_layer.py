@@ -31,7 +31,10 @@ class GLHrvoLayer(GLLayer):
         self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HRVOVisualization)
         self.prev_message = HRVOVisualization(robot_id=self.robot_id)
 
-        self.line_graphics = []
+        self.graphics_list.registerGraphicsGroup(
+            "velocity_obstacles",
+            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
+        )
 
     def updateGraphics(self):
         """Update the GLGraphicsItems in this layer
@@ -41,8 +44,9 @@ class GLHrvoLayer(GLLayer):
             - removed_graphics - List of the removed GLGraphicsItems
         
         """
+        # Clear all graphics in this layer if not visible
         if not self.isVisible():
-            return [], self.clearGraphicsList(self.line_graphics)
+            return self.graphics_list.getChanges()
 
         velocity_obstacle_msg = self.prev_message
         while not self.hrvo_buffer.queue.empty():
@@ -52,16 +56,12 @@ class GLHrvoLayer(GLLayer):
 
         self.prev_message = velocity_obstacle_msg
 
-        added_graphics, removed_graphics = self.setupGraphicsList(
-            graphics_list=self.line_graphics,
-            num_graphics=len(velocity_obstacle_msg.velocity_obstacles),
-            graphic_init_func=lambda: GLLinePlotItem(
-                color=Colors.NAVIGATOR_OBSTACLE_COLOR
+        for velocity_obstacle_graphic, velocity_obstacle in zip(
+            self.graphics_list.getGraphics(
+                "velocity_obstacles", 
+                len(velocity_obstacle_msg.velocity_obstacles)
             ),
-        )
-
-        for line_graphic, velocity_obstacle in zip(
-            self.line_graphics, velocity_obstacle_msg.velocity_obstacles
+            velocity_obstacle_msg.velocity_obstacles 
         ):
             polygon_points = [
                 [
@@ -86,8 +86,8 @@ class GLHrvoLayer(GLLayer):
             # the list of points in the polygon
             polygon_points = polygon_points + polygon_points[:1]
 
-            line_graphic.setData(
+            velocity_obstacle_graphic.setData(
                 pos=np.array([[point[0], point[1], 0] for point in polygon_points]),
             )
 
-        return added_graphics, removed_graphics
+        return self.graphics_list.getChanges()

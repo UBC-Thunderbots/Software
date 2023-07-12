@@ -11,7 +11,7 @@ import numpy as np
 class GLRobot(GLMeshItem):
     """Displays a 3D mesh representing a robot"""
 
-    def __init__(self, color):
+    def __init__(self, color=(1.0, 1.0, 1.0, 0.5)):
 
         self.x = 0
         self.y = 0
@@ -77,3 +77,4 @@ class GLRobot(GLMeshItem):
         # Rotate locally about the z axis (0, 0, 1)
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
+        
