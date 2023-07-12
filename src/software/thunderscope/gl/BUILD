@@ -81,3 +81,13 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_validation_layer",
+    srcs = ["gl_validation_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_circle",
+        requirement("pyqtgraph"),
+    ],
+)

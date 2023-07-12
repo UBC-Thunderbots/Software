@@ -12,6 +12,7 @@ from software.thunderscope.gl.gl_widget import GLWidget
 from software.thunderscope.gl import (
     gl_obstacle_layer,
     gl_path_layer,
+    gl_validation_layer,
     gl_passing_layer,
     gl_world_layer,
     gl_hrvo_layer,
@@ -79,6 +80,7 @@ def setup_gl_widget(
     gl_widget = GLWidget(player=player)
 
     # Create layers
+    validation_layer = gl_validation_layer.GLValidationLayer(visualization_buffer_size)
     path_layer = gl_path_layer.GLPathLayer(visualization_buffer_size)
     obstacle_layer = gl_obstacle_layer.GLObstacleLayer(visualization_buffer_size)
     passing_layer = gl_passing_layer.GLPassingLayer(visualization_buffer_size)
@@ -87,6 +89,7 @@ def setup_gl_widget(
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer(visualization_buffer_size)
 
+    gl_widget.addLayer("Validation", validation_layer)
     gl_widget.addLayer("Paths", path_layer)
     gl_widget.addLayer("Obstacles", obstacle_layer)
     gl_widget.addLayer("Passing", passing_layer)
@@ -110,8 +113,8 @@ def setup_gl_widget(
         (PrimitiveSet, path_layer.primitive_set_buffer),
         (PassVisualization, passing_layer.pass_visualization_buffer),
         (World, tactic_layer.world_buffer),
-        (PlayInfo, tactic_layer.play_info_buffer)
-        # (ValidationProtoSet, validation.validation_set_buffer),
+        (PlayInfo, tactic_layer.play_info_buffer),
+        (ValidationProtoSet, validation_layer.validation_set_buffer),
     ] + [
         (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
         for hrvo_sim_state in hrvo_sim_states
