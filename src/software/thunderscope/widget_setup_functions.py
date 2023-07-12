@@ -61,9 +61,19 @@ def setup_gl_widget(
     replay=False,
     replay_log=None,
 ):
-    player = None
-    if replay:
-        player = ProtoPlayer(replay_log, full_system_proto_unix_io)
+    """Setup the GLWidget with its constituent layers
+
+    :param sim_proto_unix_io: The proto unix io object for the simulator
+    :param full_system_proto_unix_io: The proto unix io object for the full system
+    :param friendly_colour_yellow: Whether the friendly colour is yellow
+    :param visualization_buffer_size: How many packets to buffer while rendering
+    :param replay: Whether replay mode is currently enabled
+    :param replay_log: The file path of the replay log
+    :returns: The GLWidget
+
+    """
+    # Create ProtoPlayer if replay is enabled
+    player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
 
     # Create widget
     gl_widget = GLWidget(player=player)
