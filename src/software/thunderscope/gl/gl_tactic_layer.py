@@ -52,17 +52,18 @@ class GLTacticLayer(GLLayer):
 
         """
         added_graphics, removed_graphics = self.setupGraphicsList(
-            self.tactic_text_graphics, 
-            len(team.team_robots), 
+            self.tactic_text_graphics,
+            len(team.team_robots),
             lambda: GLTextItem(
-                font=QtGui.QFont('Helvetica', 6), 
-                color=Colors.SECONDARY_TEXT_COLOR
-            )
+                font=QtGui.QFont("Helvetica", 6), color=Colors.SECONDARY_TEXT_COLOR
+            ),
         )
 
         tactic_assignments = play_info_dict["robotTacticAssignment"]
 
-        for tactic_text_graphic, robot in zip(self.tactic_text_graphics, team.team_robots):
+        for tactic_text_graphic, robot in zip(
+            self.tactic_text_graphics, team.team_robots
+        ):
             tactic_text_graphic.setData(
                 text=textwrap.dedent(
                     f"""
@@ -74,7 +75,7 @@ class GLTacticLayer(GLLayer):
                     robot.current_state.global_position.x_meters,
                     robot.current_state.global_position.y_meters,
                     ROBOT_MAX_HEIGHT_METERS + 0.1,
-                ]
+                ],
             )
 
         return added_graphics, removed_graphics
@@ -88,10 +89,7 @@ class GLTacticLayer(GLLayer):
         
         """
         if not self.isVisible():
-            return (
-                [],
-                self.clearGraphicsList(self.tactic_text_graphics)
-            )
+            return ([], self.clearGraphicsList(self.tactic_text_graphics))
 
         added_graphics = []
         removed_graphics = []
@@ -100,9 +98,11 @@ class GLTacticLayer(GLLayer):
         play_info = self.play_info_buffer.get(block=False)
         play_info_dict = MessageToDict(play_info)
 
-        added_tactic_name_graphics, removed_tactic_name_graphics = self.updateTacticNameGraphics(
-            self.cached_world.friendly_team,
-            play_info_dict,
+        (
+            added_tactic_name_graphics,
+            removed_tactic_name_graphics,
+        ) = self.updateTacticNameGraphics(
+            self.cached_world.friendly_team, play_info_dict,
         )
 
         added_graphics += added_tactic_name_graphics

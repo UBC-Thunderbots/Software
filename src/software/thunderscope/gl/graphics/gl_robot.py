@@ -53,7 +53,7 @@ class GLRobot(GLMeshItem):
         for index in range(len(top_face_points) - 1):
             faces.append([index, index + 1, len(circle_points)])
 
-        return MeshData(vertexes=np.array(points), faces=np.array(faces),)
+        return MeshData(vertices=np.array(points), faces=np.array(faces),)
 
     def setPosition(self, x, y):
 

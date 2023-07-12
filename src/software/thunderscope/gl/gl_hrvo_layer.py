@@ -55,30 +55,31 @@ class GLHrvoLayer(GLLayer):
         added_graphics, removed_graphics = self.setupGraphicsList(
             graphics_list=self.line_graphics,
             num_graphics=len(velocity_obstacle_msg.velocity_obstacles),
-            graphic_init_func=lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
+            graphic_init_func=lambda: GLLinePlotItem(
+                color=Colors.NAVIGATOR_OBSTACLE_COLOR
+            ),
         )
 
         for line_graphic, velocity_obstacle in zip(
-            self.line_graphics, 
-            velocity_obstacle_msg.velocity_obstacles
+            self.line_graphics, velocity_obstacle_msg.velocity_obstacles
         ):
             polygon_points = [
                 [
                     velocity_obstacle.apex.x_component_meters,
-                    velocity_obstacle.apex.y_component_meters
+                    velocity_obstacle.apex.y_component_meters,
                 ],
                 [
                     velocity_obstacle.apex.x_component_meters
                     + velocity_obstacle.left_side.x_component_meters,
                     velocity_obstacle.apex.y_component_meters
-                    + velocity_obstacle.left_side.y_component_meters
+                    + velocity_obstacle.left_side.y_component_meters,
                 ],
                 [
                     velocity_obstacle.apex.x_component_meters
                     + velocity_obstacle.right_side.x_component_meters,
                     velocity_obstacle.apex.y_component_meters
-                    + velocity_obstacle.right_side.y_component_meters
-                ]
+                    + velocity_obstacle.right_side.y_component_meters,
+                ],
             ]
 
             # In order to close the polygon, we need to include the first point at the end of
@@ -86,9 +87,7 @@ class GLHrvoLayer(GLLayer):
             polygon_points = polygon_points + polygon_points[:1]
 
             line_graphic.setData(
-                pos=np.array(
-                    [[point[0], point[1], 0] for point in polygon_points]
-                ),
+                pos=np.array([[point[0], point[1], 0] for point in polygon_points]),
             )
 
         return added_graphics, removed_graphics

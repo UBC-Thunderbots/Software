@@ -7,6 +7,7 @@ py_library(
     srcs = ["gl_widget.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope/gl/helpers:graphics_view",
         requirement("pyqtgraph"),
     ],
 )

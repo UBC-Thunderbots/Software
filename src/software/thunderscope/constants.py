@@ -2,6 +2,8 @@ from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
 from enum import Enum, IntEnum
 
+import textwrap
+
 
 class ProtoUnixIOTypes(Enum):
     """
@@ -80,6 +82,39 @@ ERROR_CODE_MESSAGES = {
     ErrorCode.HIGH_BOARD_TEMP: "High Board Temp",
     ErrorCode.DRIBBLER_MOTOR_HOT: "Dribbler Motor Hot",
 }
+
+SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
+LAYOUT_FILE_EXTENSION = "tscopelayout"
+LAST_OPENED_LAYOUT_PATH = (
+    f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
+)
+
+THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
+    f"""
+    <h3>General Controls</h3><br>
+    
+    <b><code>I:</code></b> Identify robots, toggle robot ID visibility<br>
+    <b><code>Ctrl + Space:</code></b> Stop AI vs AI simulation<br>
+    <b><code>Number Keys:</code></b> Position camera to preset view<br>
+    <b><code>Shift + Left Click:</code></b> Place the ball at the cursor<br>
+
+    <h3>Camera Controls</h3><br>
+
+    <b>Orbit:</b> Left click and drag mouse<br>
+    <b>Pan:</b> Hold Ctrl while dragging OR drag with middle mouse button<br>
+    <b>Zoom:</b> Scrollwheel<br>
+
+    <h3>Layout Controls</h3><br>
+
+    <b>Pop widget out as window:</b> Double click the widgets' blue bar<br>
+    <b>Rearrange/dock widgets:</b> Drag the widgets' blue bar<br><br>
+    <b><code>Ctrl + S:</code></b> Save layout<br>
+    <b><code>Ctrl + O:</code></b> Open layout<br>
+    <b><code>Ctrl + R:</code></b> Remove the current layout file and reset the layout<br><br>
+    Layout file (on save) is located at {SAVED_LAYOUT_PATH}<br>
+
+    """
+)
 
 
 def create_vision_pattern_lookup(color1, color2):

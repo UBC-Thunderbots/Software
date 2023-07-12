@@ -5,11 +5,13 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 
 import textwrap
+import numpy as np
 
-from software.thunderscope.constants import CameraView
+from software.thunderscope.constants import *
 
 from software.thunderscope.gl.gl_layer import GLLayer
 from software.thunderscope.replay.replay_controls import ReplayControls
+from software.thunderscope.gl.helpers.graphics_view import GraphicsView
 
 
 class GLWidget(QWidget):
@@ -27,6 +29,9 @@ class GLWidget(QWidget):
 
         # Setup the GraphicsView containing the GLViewWidget
         self.graphics_view = GraphicsView()
+        self.graphics_view.gl_view_widget.point_in_scene_picked_signal.connect(
+            self.pointInScenePickedEvent
+        )
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.graphics_view.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
@@ -88,25 +93,7 @@ class GLWidget(QWidget):
         self.help_button.setText("Help")
         self.help_button.setStyleSheet(tool_button_stylesheet)
         self.help_button.clicked.connect(
-            lambda: QMessageBox.information(
-                self,
-                "Help",
-                textwrap.dedent(
-                    f"""
-                    <h3>Keyboard Shortcuts</h3><br>
-                    
-                    <b><code>I:</code></b> Identify robots, toggle robot ID visibility<br>
-                    <b><code>Ctrl+Space:</code></b> Stop AI vs AI simulation<br>
-                    <b><code>Number Keys:</code></b> Position camera to preset view<br>
-
-                    <h3>Camera Controls</h3><br>
-
-                    <b><code>Orbit:</code></b> Left click and drag mouse<br>
-                    <b><code>Pan:</code></b> Hold Ctrl while dragging OR drag with middle mouse button<br>
-                    <b><code>Zoom:</code></b> Scrollwheel<br>
-                    """
-                ),
-            )
+            lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
         )
 
         # Setup toolbar
@@ -151,7 +138,7 @@ class GLWidget(QWidget):
         
         """
         self.key_pressed[event.key()] = True
-        
+
         # Camera view shortcuts
         if self.key_pressed[Qt.Key.Key_1]:
             self.setCameraView(CameraView.ORTHOGRAPHIC)
@@ -161,8 +148,8 @@ class GLWidget(QWidget):
             self.setCameraView(CameraView.LEFT_HALF_HIGH_ANGLE)
         elif self.key_pressed[Qt.Key.Key_4]:
             self.setCameraView(CameraView.RIGHT_HALF_HIGH_ANGLE)
-        
-        # Propagate keypress event to all field layers
+
+        # Propagate keypress event to all layers
         for layer in self.layers:
             layer.keyPressEvent(event)
 
@@ -174,9 +161,18 @@ class GLWidget(QWidget):
         """
         self.key_pressed[event.key()] = False
 
-        # Propagate keypress event to all field layers
+        # Propagate keypress event to all layers
         for layer in self.layers:
             layer.keyReleaseEvent(event)
+
+    def pointInScenePickedEvent(self, event):
+        """Propagate PointInScenePickedEvent to all layers
+        
+        :param event: The event
+        
+        """
+        for layer in self.layers:
+            layer.pointInScenePickedEvent(event)
 
     def addLayer(self, name: str, layer: GLLayer, visible: bool = True):
         """Add a layer to this GLWidget and to the legend
@@ -218,9 +214,7 @@ class GLWidget(QWidget):
             self.graphics_view.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(0, 0, 0), distance=1000, elevation=90, azimuth=-90
             )
-            self.graphics_view.gl_view_widget.setCameraParams(
-                fov=1.0
-            )
+            self.graphics_view.gl_view_widget.setCameraParams(fov=1.0)
         elif camera_view == CameraView.LANDSCAPE_HIGH_ANGLE:
             self.graphics_view.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(0, -0.5, 0), distance=13, elevation=45, azimuth=-90
@@ -233,60 +227,3 @@ class GLWidget(QWidget):
             self.graphics_view.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(2.5, 0, 0), distance=10, elevation=45, azimuth=0
             )
-
-
-class GraphicsView(pg.GraphicsView):
-    """GraphicsView subclass that uses GLViewWidget as its canvas. 
-    This allows 2D graphics to be overlaid on a 3D background.
-    """
-
-    def __init__(self):
-        self.gl_view_widget = GLViewWidget()
-        pg.GraphicsView.__init__(self, background=None)
-        self.setStyleSheet("background: transparent")
-        self.setViewport(self.gl_view_widget)
-
-    def paintEvent(self, event):
-        """Propagate paint events to both widgets
-
-        :param event: The event
-
-        """
-        self.gl_view_widget.paintEvent(event)
-        return pg.GraphicsView.paintEvent(self, event)
-
-    def mousePressEvent(self, event):
-        """Propagate mouse events to both widgets
-        
-        :param event: The event
-        
-        """
-        pg.GraphicsView.mousePressEvent(self, event)
-        self.gl_view_widget.mousePressEvent(event)
-
-    def mouseMoveEvent(self, event):
-        """Propagate mouse events to both widgets
-        
-        :param event: The event
-        
-        """
-        pg.GraphicsView.mouseMoveEvent(self, event)
-        self.gl_view_widget.mouseMoveEvent(event)
-
-    def mouseReleaseEvent(self, event):
-        """Propagate mouse events to both widgets
-        
-        :param event: The event
-        
-        """
-        pg.GraphicsView.mouseReleaseEvent(self, event)
-        self.gl_view_widget.mouseReleaseEvent(event)
-
-    def wheelEvent(self, event):
-        """Propagate mouse wheel events to both widgets
-        
-        :param event: The event
-        
-        """
-        pg.GraphicsView.wheelEvent(self, event)
-        self.gl_view_widget.wheelEvent(event)

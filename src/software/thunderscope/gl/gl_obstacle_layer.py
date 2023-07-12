@@ -41,9 +41,9 @@ class GLObstacleLayer(GLLayer):
         """
         if not self.isVisible():
             return (
-                [], 
-                self.clearGraphicsList(self.line_graphics) 
-                + self.clearGraphicsList(self.circle_graphics)
+                [],
+                self.clearGraphicsList(self.line_graphics)
+                + self.clearGraphicsList(self.circle_graphics),
             )
 
         primitive_set = self.primitive_set_buffer.get(
@@ -71,7 +71,9 @@ class GLObstacleLayer(GLLayer):
         added_line_graphics, removed_line_graphics = self.setupGraphicsList(
             graphics_list=self.line_graphics,
             num_graphics=len(poly_obstacles),
-            graphic_init_func=lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
+            graphic_init_func=lambda: GLLinePlotItem(
+                color=Colors.NAVIGATOR_OBSTACLE_COLOR
+            ),
         )
 
         added_circle_graphics, removed_circle_graphics = self.setupGraphicsList(
@@ -95,12 +97,13 @@ class GLObstacleLayer(GLLayer):
                 ),
             )
 
-        for circle_graphic, circle_obstacle in zip(self.circle_graphics, circle_obstacles):
+        for circle_graphic, circle_obstacle in zip(
+            self.circle_graphics, circle_obstacles
+        ):
 
             circle_graphic.setRadius(circle_obstacle.radius)
             circle_graphic.setPosition(
-                circle_obstacle.origin.x_meters,
-                circle_obstacle.origin.y_meters,
+                circle_obstacle.origin.x_meters, circle_obstacle.origin.y_meters,
             )
 
         return added_graphics, removed_graphics

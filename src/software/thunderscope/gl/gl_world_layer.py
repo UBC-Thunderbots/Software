@@ -42,7 +42,12 @@ class GLWorldLayer(GLLayer):
         self.cached_status = {}
 
         self.key_pressed = {}
-        self.accepted_keys = [Qt.Key.Key_Control, Qt.Key.Key_I, QtCore.Qt.Key.Key_Space]
+        self.accepted_keys = [
+            Qt.Key.Key_Control,
+            Qt.Key.Key_I,
+            Qt.Key.Key_Space,
+            Qt.Key.Key_Shift,
+        ]
         for key in self.accepted_keys:
             self.key_pressed[key] = False
 
@@ -89,6 +94,26 @@ class GLWorldLayer(GLLayer):
 
         """
         self.key_pressed[event.key()] = False
+
+    def pointInScenePickedEvent(self, event):
+        """Event handler for the PointInScenePickedEvent
+        
+        :param event: The event
+        
+        """
+        # If the user was holding shift, send a command to the simulator to move
+        # the ball to the point picked.
+        if self.key_pressed[Qt.Key.Key_Shift]:
+            world_state = WorldState()
+            world_state.ball_state.CopyFrom(
+                BallState(
+                    global_position=Point(
+                        x_meters=event.point_in_scene[0],
+                        y_meters=event.point_in_scene[1],
+                    )
+                )
+            )
+            self.simulator_io.send_proto(WorldState, world_state)
 
     def updateFieldGraphics(self, field: Field):
         """Update the GLGraphicsItems that display the field lines and markings
@@ -149,8 +174,7 @@ class GLWorldLayer(GLLayer):
                 added_robot_graphics.append(gl_robot)
 
                 robot_id_text_item = GLTextItem(
-                    text=str(robot.id),
-                    color=Colors.PRIMARY_TEXT_COLOR
+                    text=str(robot.id), color=Colors.PRIMARY_TEXT_COLOR
                 )
                 robot_id_text_items[robot.id] = robot_id_text_item
                 added_robot_graphics.append(robot_id_text_item)

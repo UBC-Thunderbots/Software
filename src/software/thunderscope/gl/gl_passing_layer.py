@@ -78,7 +78,9 @@ class GLPassingLayer(GLLayer):
         added_graphics, removed_graphics = self.setupGraphicsList(
             graphics_list=self.line_graphics,
             num_graphics=len(passes_to_show),
-            graphic_init_func=lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR),
+            graphic_init_func=lambda: GLLinePlotItem(
+                color=Colors.PASS_VISUALIZATION_COLOR
+            ),
         )
 
         for line_graphic, pass_with_rating in zip(self.line_graphics, passes_to_show):

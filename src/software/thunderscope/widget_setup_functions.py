@@ -15,7 +15,7 @@ from software.thunderscope.gl import (
     gl_passing_layer,
     gl_world_layer,
     gl_hrvo_layer,
-    gl_tactic_layer
+    gl_tactic_layer,
 )
 
 from software.thunderscope.field import (
@@ -90,7 +90,7 @@ def setup_gl_widget(
         hrvo_sim_state = gl_hrvo_layer.GLHrvoLayer(robot_id, visualization_buffer_size)
         hrvo_sim_states.append(hrvo_sim_state)
         gl_widget.addLayer(f"HRVO {robot_id}", hrvo_sim_state, False)
-        
+
     # Register observers
     for arg in [
         (World, world_layer.world_buffer),

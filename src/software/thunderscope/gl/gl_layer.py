@@ -33,6 +33,13 @@ class GLLayer(pg.GraphicsObject):
         """
         raise NotImplementedError("Abstract class method called: updateGraphics")
 
+    def pointInScenePickedEvent(self, event):
+        """Event handler for the PointInScenePickedEvent
+        
+        :param event: The event
+        
+        """
+
     def setupGraphicsList(self, graphics_list, num_graphics, graphic_init_func):
         """Add or remove graphics from the given graphics list so that its
         length is equal to the specified number of graphics.
