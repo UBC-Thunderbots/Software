@@ -43,7 +43,7 @@ class GLWorldLayer(GLLayer):
         self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
         self.cached_world = World()
-        self.cached_status = {}
+        self.cached_robot_status = {}
 
         self.key_pressed = {}
         self.accepted_keys = [
@@ -72,6 +72,9 @@ class GLWorldLayer(GLLayer):
         self.graphics_list.registerGraphicsGroup("robots", GLRobot)
         self.graphics_list.registerGraphicsGroup(
             "robot_ids", lambda: GLTextItem(color=Colors.PRIMARY_TEXT_COLOR)
+        )
+        self.graphics_list.registerGraphicsGroup(
+            "robot_status", lambda: GLCircle(color=Colors.BREAKBEAM_TRIPPED_COLOR)
         )
         self.graphics_list.registerGraphicsGroup(
             "speed_lines", lambda: GLCircle(color=Colors.SPEED_VECTOR_COLOR)
@@ -137,6 +140,9 @@ class GLWorldLayer(GLLayer):
         :param event: The event
         
         """
+        if not self.point_in_scene_picked:
+            return
+
         # User picked a point in the 3D scene and is now dragging it across the scene
         # to apply a velocity on the ball (i.e. kick it).
         # We create a velocity vector that is proportional to the distance the
@@ -167,30 +173,31 @@ class GLWorldLayer(GLLayer):
         :param event: The event
         
         """
-        if self.ball_velocity_vector:
+        if not self.point_in_scene_picked or not self.ball_velocity_vector:
+            return
 
-            if self.__should_invert_coordinate_frame():
-                self.ball_velocity_vector = -self.ball_velocity_vector
+        if self.__should_invert_coordinate_frame():
+            self.ball_velocity_vector = -self.ball_velocity_vector
 
-            # Send a command to the simulator to give the ball the specified
-            # velocity (i.e. kick it)
+        # Send a command to the simulator to give the ball the specified
+        # velocity (i.e. kick it)
 
-            world_state = WorldState()
-            world_state.ball_state.CopyFrom(
-                BallState(
-                    global_position=Point(
-                        x_meters=self.point_in_scene_picked[0],
-                        y_meters=self.point_in_scene_picked[1],
-                    ),
-                    global_velocity=Vector(
-                        x_component_meters=self.ball_velocity_vector.x(),
-                        y_component_meters=self.ball_velocity_vector.y(),
-                    ),
-                )
+        world_state = WorldState()
+        world_state.ball_state.CopyFrom(
+            BallState(
+                global_position=Point(
+                    x_meters=self.point_in_scene_picked[0],
+                    y_meters=self.point_in_scene_picked[1],
+                ),
+                global_velocity=Vector(
+                    x_component_meters=self.ball_velocity_vector.x(),
+                    y_component_meters=self.ball_velocity_vector.y(),
+                ),
             )
+        )
 
-            self.ball_velocity_vector = None
-            self.simulator_io.send_proto(WorldState, world_state)
+        self.ball_velocity_vector = None
+        self.simulator_io.send_proto(WorldState, world_state)
 
     def updateFieldGraphics(self, field: Field):
         """Update the GLGraphicsItems that display the field lines and markings
@@ -271,6 +278,22 @@ class GLWorldLayer(GLLayer):
                 )
             else:
                 robot_id_graphic.hide()
+
+    def updateRobotStatusGraphics(self):
+        """Update the robot status graphics"""
+        self.cached_status = self.robot_status_buffer.get(block=False)
+
+        for robot in self.cached_world.friendly_team.team_robots:
+            if (
+                self.cached_status.power_status.breakbeam_tripped is True
+                and robot.id == self.cached_status.robot_id
+            ):
+                robot_status_graphic = self.graphics_list.getGraphics("robot_status", 1)[0]
+                robot_status_graphic.setRadius(ROBOT_MAX_RADIUS_METERS / 2)
+                robot_status_graphic.setPosition(
+                    robot.current_state.global_position.x_meters,
+                    robot.current_state.global_position.y_meters
+                )
 
     def updateSpeedLineGraphics(self):
         """Update the speed lines visualizing the robot and ball speeds"""
@@ -356,6 +379,7 @@ class GLWorldLayer(GLLayer):
         self.updateRobotGraphics(self.cached_world.friendly_team, friendly_colour)
         self.updateRobotGraphics(self.cached_world.enemy_team, enemy_colour)
 
+        self.updateRobotStatusGraphics()
         self.updateSpeedLineGraphics()
 
         return self.graphics_list.getChanges()
@@ -381,15 +405,15 @@ class GLWorldLayer(GLLayer):
             return True
         return False
 
-    def __invert_position_if_defending_negative_half(self, mouse_click):
+    def __invert_position_if_defending_negative_half(self, point):
         """If we are defending the negative half of the field, we invert the coordinate frame
         for the mouse click/3D point picked to match up with the visualization.
 
-        :param mouse_click: The point location in the 3D scene [x, y]
+        :param point: The point location in the 3D scene [x, y]
         :return: The inverted point location [x, y] (if needed to be inverted)
 
         """
         if self.__should_invert_coordinate_frame():
-            return [-mouse_click[0], -mouse_click[1]]
+            return [-point[0], -point[1]]
 
-        return mouse_click
+        return point

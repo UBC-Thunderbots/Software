@@ -166,22 +166,20 @@ def rgb_to_bw(r, g, b):
 class Colors(object):
 
     FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 100)
-
-    BLUE_ROBOT = QtGui.QColor(255, 100, 0, 255)
     BALL_COLOR = QtGui.QColor(255, 100, 0, 255)
     SIM_BALL_COLOR = QtGui.QColor(255, 100, 0, 150)
     YELLOW_ROBOT_COLOR = QtGui.QColor(255, 255, 0, 255)
     BLUE_ROBOT_COLOR = QtGui.QColor(0, 75, 255, 255)
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
-    DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 150)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
     ROBOT_MIDDLE_BLUE = "blue"
     BW_ROBOT_MIDDLE_BLUE = QtGui.QColor(*rgb_to_bw(0, 0, 255))
-    ROBOT_SPEED_SLOW_COLOR = "black"
+    DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 150)
     NAVIGATOR_PATH_COLOR = "green"
     NAVIGATOR_OBSTACLE_COLOR = "orange"
     PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
+    BREAKBEAM_TRIPPED_COLOR = "r"
 
     VALIDATION_PASSED_COLOR = "g"
     VALIDATION_FAILED_COLOR = "r"
