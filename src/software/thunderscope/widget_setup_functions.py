@@ -15,6 +15,7 @@ from software.thunderscope.gl import (
     gl_validation_layer,
     gl_passing_layer,
     gl_world_layer,
+    gl_simulator_layer,
     gl_hrvo_layer,
     gl_tactic_layer,
 )
@@ -87,6 +88,9 @@ def setup_gl_widget(
     world_layer = gl_world_layer.GLWorldLayer(
         sim_proto_unix_io, friendly_colour_yellow, visualization_buffer_size
     )
+    simulator_layer = gl_simulator_layer.GLSimulatorLayer(
+        friendly_colour_yellow, visualization_buffer_size
+    )
     tactic_layer = gl_tactic_layer.GLTacticLayer(visualization_buffer_size)
 
     gl_widget.add_layer("Validation", validation_layer)
@@ -94,6 +98,7 @@ def setup_gl_widget(
     gl_widget.add_layer("Obstacles", obstacle_layer)
     gl_widget.add_layer("Passing", passing_layer)
     gl_widget.add_layer("Vision", world_layer)
+    gl_widget.add_layer("Simulator", simulator_layer, False)
     gl_widget.add_layer("Tactics", tactic_layer, False)
 
     # Add HRVO layers to field widget and have them hidden on startup
@@ -115,6 +120,7 @@ def setup_gl_widget(
         (World, tactic_layer.world_buffer),
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
+        (SimulatorState, simulator_layer.simulator_state_buffer),
     ] + [
         (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
         for hrvo_sim_state in hrvo_sim_states

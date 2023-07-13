@@ -8,16 +8,18 @@ from software.thunderscope.constants import Colors
 class GLBall(GLMeshItem):
     """Displays a 3D sphere representing the ball"""
 
-    def __init__(self):
-        """Initialize the GLBall"""
+    def __init__(self, color=Colors.BALL_COLOR):
+        """Initialize the GLBall
+        
+        :param color: The color of the ball
+
+        """
         self.x = 0
         self.y = 0
         self.z = 0
 
         GLMeshItem.__init__(
-            self,
-            meshdata=MeshData.sphere(3, 3, BALL_MAX_RADIUS_METERS),
-            color=Colors.BALL_COLOR,
+            self, meshdata=MeshData.sphere(3, 3, BALL_MAX_RADIUS_METERS), color=color,
         )
 
     def set_position(self, x, y, z):

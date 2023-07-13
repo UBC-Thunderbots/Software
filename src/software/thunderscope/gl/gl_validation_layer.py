@@ -39,7 +39,9 @@ class GLValidationLayer(GLLayer):
 
         self.passed_validation_timeout_pairs = []
 
-        self.graphics_list.register_graphics_group("validation_polygons", GLLinePlotItem)
+        self.graphics_list.register_graphics_group(
+            "validation_polygons", GLLinePlotItem
+        )
         self.graphics_list.register_graphics_group("validation_circles", GLCircle)
 
     def update_validation_graphics(self, validations):

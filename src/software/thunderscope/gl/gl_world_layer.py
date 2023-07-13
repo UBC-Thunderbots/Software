@@ -212,7 +212,9 @@ class GLWorldLayer(GLLayer):
         )[0]
 
         # Outer field lines
-        field_line_graphics[0].set_dimensions(field.field_x_length, field.field_y_length)
+        field_line_graphics[0].set_dimensions(
+            field.field_x_length, field.field_y_length
+        )
 
         # Center circle
         field_center_circle_graphic.set_radius(field.center_circle_radius)
@@ -263,7 +265,9 @@ class GLWorldLayer(GLLayer):
                 robot.current_state.global_position.x_meters,
                 robot.current_state.global_position.y_meters,
             )
-            robot_graphic.set_orientation(robot.current_state.global_orientation.radians)
+            robot_graphic.set_orientation(
+                robot.current_state.global_orientation.radians
+            )
             robot_graphic.setColor(color)
 
             if self.display_robot_id:

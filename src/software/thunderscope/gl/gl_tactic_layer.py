@@ -88,6 +88,8 @@ class GLTacticLayer(GLLayer):
         play_info = self.play_info_buffer.get(block=False)
         play_info_dict = MessageToDict(play_info)
 
-        self.update_tactic_name_graphics(self.cached_world.friendly_team, play_info_dict)
+        self.update_tactic_name_graphics(
+            self.cached_world.friendly_team, play_info_dict
+        )
 
         return self.graphics_list.get_changes()

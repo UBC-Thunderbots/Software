@@ -65,6 +65,16 @@ py_library(
 )
 
 py_library(
+    name = "gl_simulator_layer",
+    srcs = ["gl_simulator_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_ball",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "gl_hrvo_layer",
     srcs = ["gl_hrvo_layer.py"],
     deps = [

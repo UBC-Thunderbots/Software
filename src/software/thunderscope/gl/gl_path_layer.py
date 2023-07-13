@@ -75,7 +75,9 @@ class GLPathLayer(GLLayer):
             )
 
         for dest_graphic, (dest, final_angle) in zip(
-            self.graphics_list.get_graphics("destinations", len(requested_destinations)),
+            self.graphics_list.get_graphics(
+                "destinations", len(requested_destinations)
+            ),
             requested_destinations,
         ):
             dest_graphic.set_position(dest.x_meters, dest.y_meters)
