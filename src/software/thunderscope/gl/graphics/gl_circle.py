@@ -9,7 +9,13 @@ class GLCircle(GLLinePlotItem):
     """Displays a circle parallel to the x-y plane"""
 
     def __init__(self, radius=0, num_points=24, color=(1.0, 1.0, 1.0, 0.5)):
+        """Initialize the GLCircle
+        
+        :param radius: The radius of the circle
+        :param num_points: The number of points to generate when creating the circle
+        :param color: The color of the graphic
 
+        """
         self.x = 0
         self.y = 0
         self.radius = 0
@@ -39,10 +45,20 @@ class GLCircle(GLLinePlotItem):
         self.setData(pos=points)
 
     def setColor(self, color):
+        """Set the color of the graphic
+        
+        :param color: The color of the graphic
+        
+        """
         self.setData(color=color)
 
     def setPosition(self, x, y):
-
+        """Set the position of the graphic in the scene
+        
+        :param x: The x coordinate to position the graphic at
+        :param y: The y coordinate to position the graphic at
+        
+        """
         if self.x == x and self.y == y:
             return
 

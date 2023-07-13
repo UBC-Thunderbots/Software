@@ -12,7 +12,11 @@ class GLRobot(GLMeshItem):
     """Displays a 3D mesh representing a robot"""
 
     def __init__(self, color=(1.0, 1.0, 1.0, 0.5)):
+        """Initialize the GLRobot
+        
+        :param color: The color of the graphic
 
+        """
         self.x = 0
         self.y = 0
         self.orientation = 0
@@ -31,7 +35,6 @@ class GLRobot(GLMeshItem):
         :returns: the computed MeshData instance 
 
         """
-
         top_face_points = GLRobotOutline.getRobotOutline(
             z_coordinate=ROBOT_MAX_HEIGHT_METERS
         )
@@ -56,7 +59,12 @@ class GLRobot(GLMeshItem):
         return MeshData(vertexes=np.array(points), faces=np.array(faces),)
 
     def setPosition(self, x, y):
-
+        """Set the position of the graphic in the scene
+        
+        :param x: The x coordinate to position the graphic at
+        :param y: The y coordinate to position the graphic at
+        
+        """
         if self.x == x and self.y == y:
             return
 
@@ -65,7 +73,11 @@ class GLRobot(GLMeshItem):
         self.y = y
 
     def setOrientation(self, radians):
+        """Set the orientation of the graphic in the scene
+        
+        :param radians: The orientation of the graphic in radians
 
+        """
         # We need to add 45 degrees to our desired orientation in order
         # to get the flat side of the robot (i.e. its front) to face
         # the right way

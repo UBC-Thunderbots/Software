@@ -9,7 +9,7 @@ class GLBall(GLMeshItem):
     """Displays a 3D sphere representing the ball"""
 
     def __init__(self):
-
+        """Initialize the GLBall"""
         self.x = 0
         self.y = 0
         self.z = 0
@@ -21,7 +21,13 @@ class GLBall(GLMeshItem):
         )
 
     def setPosition(self, x, y, z):
-
+        """Set the position of the graphic in the scene
+        
+        :param x: The x coordinate to position the graphic at
+        :param y: The y coordinate to position the graphic at
+        :param z: The z coordinate to position the graphic at
+        
+        """
         if self.x == x and self.y == y and self.z == z:
             return
 

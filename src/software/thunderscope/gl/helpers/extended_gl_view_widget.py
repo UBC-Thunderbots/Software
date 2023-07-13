@@ -37,6 +37,7 @@ class ExtendedGLViewWidget(GLViewWidget):
     point_in_scene_released_signal = QtCore.pyqtSignal(PointInSceneEvent)
 
     def __init__(self):
+        """Initialize the ExtendedGLViewWidget"""
         super().__init__()
 
         # Keep track of whether the mouse picked a point in the 3D scene
