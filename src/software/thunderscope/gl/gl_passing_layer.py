@@ -42,10 +42,7 @@ class GLPassingLayer(GLLayer):
         self.timeout = time.time() + GLPassingLayer.PASS_VISUALIZATION_TIMEOUT_S
 
         self.graphics_list.registerGraphicsGroup(
-            "passes", 
-            lambda: GLLinePlotItem(
-                color=Colors.PASS_VISUALIZATION_COLOR
-            )
+            "passes", lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR)
         )
 
     def updateGraphics(self):
@@ -82,8 +79,8 @@ class GLPassingLayer(GLLayer):
         passes_to_show = sorted_pass_with_rating[0 : GLPassingLayer.NUM_PASSES_TO_SHOW]
 
         for pass_graphic, pass_with_rating in zip(
-            self.graphics_list.getGraphics("passes", len(passes_to_show)), 
-            passes_to_show
+            self.graphics_list.getGraphics("passes", len(passes_to_show)),
+            passes_to_show,
         ):
             pass_graphic.setData(
                 pos=np.array(

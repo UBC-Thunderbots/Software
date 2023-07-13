@@ -58,10 +58,9 @@ class GLValidationLayer(GLLayer):
 
             for polygon_graphic, polygon in zip(
                 self.graphics_list.getGraphics(
-                    "validation_polygons", 
-                    len(validation.geometry.polygons)
+                    "validation_polygons", len(validation.geometry.polygons)
                 ),
-                validation.geometry.polygons
+                validation.geometry.polygons,
             ):
                 # In order to close the polygon, we need to include the first point at the end of
                 # the list of points in the polygon
@@ -69,35 +68,40 @@ class GLValidationLayer(GLLayer):
 
                 polygon_graphic.setData(
                     pos=np.array(
-                        [[point.x_meters, point.y_meters, 0] for point in polygon_points]
+                        [
+                            [point.x_meters, point.y_meters, 0]
+                            for point in polygon_points
+                        ]
                     ),
                     color=validation_color,
                 )
-            
+
             for segment_graphic, segment in zip(
                 self.graphics_list.getGraphics(
-                    "validation_polygons", 
-                    len(validation.geometry.segments)
+                    "validation_polygons", len(validation.geometry.segments)
                 ),
-                validation.geometry.segments
+                validation.geometry.segments,
             ):
                 segment_graphic.setData(
-                    pos=np.array([
-                        [segment.start.x_meters, segment.start.y_meters],
-                        [segment.end.x_meters, segment.end.y_meters]
-                    ]),
+                    pos=np.array(
+                        [
+                            [segment.start.x_meters, segment.start.y_meters],
+                            [segment.end.x_meters, segment.end.y_meters],
+                        ]
+                    ),
                     color=validation_color,
                 )
 
             for circle_graphic, circle in zip(
                 self.graphics_list.getGraphics(
-                    "validation_circles", 
-                    len(validation.geometry.circles)
+                    "validation_circles", len(validation.geometry.circles)
                 ),
-                validation.geometry.circles
+                validation.geometry.circles,
             ):
                 circle_graphic.setRadius(circle.radius)
-                circle_graphic.setPosition(circle.origin.x_meters, circle.origin.y_meters)
+                circle_graphic.setPosition(
+                    circle.origin.x_meters, circle.origin.y_meters
+                )
                 circle_graphic.setColor(validation_color)
 
     def updateGraphics(self):
@@ -140,7 +144,7 @@ class GLValidationLayer(GLLayer):
                 )
 
         self.updateValidationGraphics(
-            list(self.cached_always_validation_set.validations) 
+            list(self.cached_always_validation_set.validations)
             + list(self.cached_eventually_validation_set.validations)
             + list(self.passed_validation_timeout_pairs)
         )

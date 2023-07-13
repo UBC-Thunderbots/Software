@@ -1,6 +1,7 @@
 from typing import Callable
 
-class GraphicsList():
+
+class GraphicsList:
     """Grouped collection of GLGraphicsItems with support for added/removed item tracking"""
 
     def __init__(self):
@@ -39,7 +40,7 @@ class GraphicsList():
         graphics_list = self.graphics[key]
 
         num_fetched = self.num_fetched[key]
-        num_added = self.num_added[key]
+        self.num_added[key]
 
         num_graphics_to_add = max(num_graphics - (len(graphics_list) - num_fetched), 0)
         if num_graphics_to_add > 0:
@@ -48,7 +49,7 @@ class GraphicsList():
                 graphics_list.append(graphics_factory())
             self.num_added[key] += num_graphics_to_add
 
-        fetched_graphics = graphics_list[num_fetched:num_fetched + num_graphics]
+        fetched_graphics = graphics_list[num_fetched : num_fetched + num_graphics]
         self.num_fetched[key] += num_graphics
 
         return fetched_graphics

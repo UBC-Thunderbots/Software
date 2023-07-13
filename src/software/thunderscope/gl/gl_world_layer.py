@@ -63,22 +63,18 @@ class GLWorldLayer(GLLayer):
         self.point_in_scene_picked = None
 
         self.graphics_list.registerGraphicsGroup(
-            "field_lines",
-            lambda: GLRect(color=Colors.FIELD_LINE_COLOR)
+            "field_lines", lambda: GLRect(color=Colors.FIELD_LINE_COLOR)
         )
         self.graphics_list.registerGraphicsGroup(
-            "field_center_circle",
-            lambda: GLCircle(color=Colors.FIELD_LINE_COLOR)
+            "field_center_circle", lambda: GLCircle(color=Colors.FIELD_LINE_COLOR)
         )
         self.graphics_list.registerGraphicsGroup("ball", GLBall)
         self.graphics_list.registerGraphicsGroup("robots", GLRobot)
         self.graphics_list.registerGraphicsGroup(
-            "robot_ids", 
-            lambda: GLTextItem(color=Colors.PRIMARY_TEXT_COLOR)
+            "robot_ids", lambda: GLTextItem(color=Colors.PRIMARY_TEXT_COLOR)
         )
         self.graphics_list.registerGraphicsGroup(
-            "speed_lines",
-            lambda: GLCircle(color=Colors.SPEED_VECTOR_COLOR)
+            "speed_lines", lambda: GLCircle(color=Colors.SPEED_VECTOR_COLOR)
         )
 
     def keyPressEvent(self, event):
@@ -145,8 +141,7 @@ class GLWorldLayer(GLLayer):
         # mouse has moved away from the ball.
 
         ball_position = geom.Vector(
-            self.point_in_scene_picked[0],
-            self.point_in_scene_picked[1]
+            self.point_in_scene_picked[0], self.point_in_scene_picked[1]
         )
 
         self.ball_velocity_vector = ball_position - geom.Vector(
@@ -154,7 +149,10 @@ class GLWorldLayer(GLLayer):
         )
 
         # Cap the maximum kick speed
-        if self.ball_velocity_vector.length() > GLWorldLayer.MAX_ALLOWED_KICK_SPEED_M_PER_S:
+        if (
+            self.ball_velocity_vector.length()
+            > GLWorldLayer.MAX_ALLOWED_KICK_SPEED_M_PER_S
+        ):
             self.ball_velocity_vector = self.ball_velocity_vector.normalize(
                 GLWorldLayer.MAX_ALLOWED_KICK_SPEED_M_PER_S
             )
@@ -167,7 +165,7 @@ class GLWorldLayer(GLLayer):
         """
         if self.ball_velocity_vector:
 
-            # Send a command to the simulator to give the ball the specified 
+            # Send a command to the simulator to give the ball the specified
             # velocity (i.e. kick it)
 
             world_state = WorldState()
@@ -179,7 +177,7 @@ class GLWorldLayer(GLLayer):
                     ),
                     global_velocity=Vector(
                         x_component_meters=self.ball_velocity_vector.x(),
-                        y_component_meters=self.ball_velocity_vector.y()
+                        y_component_meters=self.ball_velocity_vector.y(),
                     ),
                 )
             )
@@ -194,11 +192,13 @@ class GLWorldLayer(GLLayer):
 
         """
         field_line_graphics = self.graphics_list.getGraphics("field_lines", 3)
-        field_center_circle_graphic = self.graphics_list.getGraphics("field_center_circle", 1)[0]
+        field_center_circle_graphic = self.graphics_list.getGraphics(
+            "field_center_circle", 1
+        )[0]
 
         # Outer field lines
         field_line_graphics[0].setDimensions(field.field_x_length, field.field_y_length)
-        
+
         # Center circle
         field_center_circle_graphic.setRadius(field.center_circle_radius)
 
@@ -240,9 +240,9 @@ class GLWorldLayer(GLLayer):
 
         """
         for robot_graphic, robot_id_graphic, robot in zip(
-            self.graphics_list.getGraphics("robots", len(team.team_robots)), 
-            self.graphics_list.getGraphics("robot_ids", len(team.team_robots)), 
-            team.team_robots
+            self.graphics_list.getGraphics("robots", len(team.team_robots)),
+            self.graphics_list.getGraphics("robot_ids", len(team.team_robots)),
+            team.team_robots,
         ):
             robot_graphic.setPosition(
                 robot.current_state.global_position.x_meters,
@@ -260,7 +260,7 @@ class GLWorldLayer(GLLayer):
                         + (ROBOT_MAX_RADIUS_METERS / 2),
                         robot.current_state.global_position.y_meters,
                         ROBOT_MAX_HEIGHT_METERS + 0.1,
-                    ]
+                    ],
                 )
             else:
                 robot_id_graphic.hide()
@@ -271,22 +271,24 @@ class GLWorldLayer(GLLayer):
         # If user if trying to apply a velocity on the ball (i.e. kick it), visualize
         # the velocity vector
         if self.ball_velocity_vector:
-            
+
             ball_state = self.cached_world.ball.current_state
             velocity = self.ball_velocity_vector * SPEED_SEGMENT_SCALE
 
             speed_line_graphic = self.graphics_list.getGraphics("speed_lines", 1)[0]
             speed_line_graphic.setData(
-                pos=np.array([
+                pos=np.array(
                     [
-                        ball_state.global_position.x_meters, 
-                        ball_state.global_position.y_meters
-                    ],
-                    [
-                        ball_state.global_position.x_meters + velocity.x(), 
-                        ball_state.global_position.y_meters + velocity.y()
-                    ],
-                ]),
+                        [
+                            ball_state.global_position.x_meters,
+                            ball_state.global_position.y_meters,
+                        ],
+                        [
+                            ball_state.global_position.x_meters + velocity.x(),
+                            ball_state.global_position.y_meters + velocity.y(),
+                        ],
+                    ]
+                ),
             )
 
         if self.display_speed_lines:
@@ -295,22 +297,25 @@ class GLWorldLayer(GLLayer):
             # multiple calls to GraphicsList.getGraphics
             objects = list(self.cached_world.friendly_team.team_robots)
             objects.append(self.cached_world.ball)
-            
+
             for speed_line_graphic, object in zip(
-                self.graphics_list.getGraphics("speed_lines", len(objects)),
-                objects
+                self.graphics_list.getGraphics("speed_lines", len(objects)), objects
             ):
                 pos_x = object.current_state.global_position.x_meters
                 pos_y = object.current_state.global_position.y_meters
                 velocity = object.current_state.global_velocity
                 speed_line_graphic.setData(
-                    pos=np.array([
-                        [pos_x, pos_y],
+                    pos=np.array(
                         [
-                            pos_x + velocity.x_component_meters * SPEED_SEGMENT_SCALE, 
-                            pos_y + velocity.y_component_meters * SPEED_SEGMENT_SCALE
-                        ],
-                    ]),
+                            [pos_x, pos_y],
+                            [
+                                pos_x
+                                + velocity.x_component_meters * SPEED_SEGMENT_SCALE,
+                                pos_y
+                                + velocity.y_component_meters * SPEED_SEGMENT_SCALE,
+                            ],
+                        ]
+                    ),
                 )
 
     def updateGraphics(self):

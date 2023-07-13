@@ -2,6 +2,7 @@ import pyqtgraph as pg
 
 from software.thunderscope.gl.helpers.graphics_list import GraphicsList
 
+
 class GLLayer(pg.GraphicsObject):
     """Represents a layer in the 3D visualization. A layer manages and returns GLGraphicsItem 
     graphics to be displayed in the 3D scene.
@@ -42,7 +43,6 @@ class GLLayer(pg.GraphicsObject):
         :param event: The event
         
         """
-        pass
 
     def pointInSceneDragged(self, event):
         """Event handler for the pointInSceneDragged event
@@ -50,7 +50,6 @@ class GLLayer(pg.GraphicsObject):
         :param event: The event
         
         """
-        pass
 
     def pointInSceneReleased(self, event):
         """Event handler for the pointInSceneReleased event
@@ -58,4 +57,3 @@ class GLLayer(pg.GraphicsObject):
         :param event: The event
         
         """
-        pass

@@ -42,7 +42,7 @@ class GLTacticLayer(GLLayer):
             "tactic_fsm_info",
             lambda: GLTextItem(
                 font=QtGui.QFont("Helvetica", 6), color=Colors.SECONDARY_TEXT_COLOR
-            )
+            ),
         )
 
     def updateTacticNameGraphics(self, team: Team, play_info_dict):
@@ -55,8 +55,8 @@ class GLTacticLayer(GLLayer):
         tactic_assignments = play_info_dict["robotTacticAssignment"]
 
         for tactic_fsm_info_graphic, robot in zip(
-            self.graphics_list.getGraphics("tactic_fsm_info", len(team.team_robots)), 
-            team.team_robots
+            self.graphics_list.getGraphics("tactic_fsm_info", len(team.team_robots)),
+            team.team_robots,
         ):
             tactic_fsm_info_graphic.setData(
                 text=textwrap.dedent(

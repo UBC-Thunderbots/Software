@@ -33,7 +33,7 @@ class GLHrvoLayer(GLLayer):
 
         self.graphics_list.registerGraphicsGroup(
             "velocity_obstacles",
-            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
+            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
 
     def updateGraphics(self):
@@ -58,10 +58,9 @@ class GLHrvoLayer(GLLayer):
 
         for velocity_obstacle_graphic, velocity_obstacle in zip(
             self.graphics_list.getGraphics(
-                "velocity_obstacles", 
-                len(velocity_obstacle_msg.velocity_obstacles)
+                "velocity_obstacles", len(velocity_obstacle_msg.velocity_obstacles)
             ),
-            velocity_obstacle_msg.velocity_obstacles 
+            velocity_obstacle_msg.velocity_obstacles,
         ):
             polygon_points = [
                 [

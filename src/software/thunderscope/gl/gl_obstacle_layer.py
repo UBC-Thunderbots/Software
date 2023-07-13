@@ -30,11 +30,10 @@ class GLObstacleLayer(GLLayer):
 
         self.graphics_list.registerGraphicsGroup(
             "poly_obstacles",
-            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
+            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
         self.graphics_list.registerGraphicsGroup(
-            "circle_obstacles",
-            lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
+            "circle_obstacles", lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
         )
 
     def updateGraphics(self):
@@ -61,28 +60,38 @@ class GLObstacleLayer(GLLayer):
 
         for obstacles in obstacles_ptrs:
             for obstacle in obstacles:
-                
+
                 for poly_obstacle_graphic, poly_obstacle in zip(
-                    self.graphics_list.getGraphics("poly_obstacles", len(obstacle.polygon)), 
-                    obstacle.polygon
+                    self.graphics_list.getGraphics(
+                        "poly_obstacles", len(obstacle.polygon)
+                    ),
+                    obstacle.polygon,
                 ):
                     # In order to close the polygon, we need to include the first point at the end of
                     # the list of points in the polygon
-                    polygon_points = list(poly_obstacle.points) + poly_obstacle.points[:1]
+                    polygon_points = (
+                        list(poly_obstacle.points) + poly_obstacle.points[:1]
+                    )
 
                     poly_obstacle_graphic.setData(
                         pos=np.array(
-                            [[point.x_meters, point.y_meters, 0] for point in polygon_points]
+                            [
+                                [point.x_meters, point.y_meters, 0]
+                                for point in polygon_points
+                            ]
                         ),
                     )
 
                 for circle_obstacle_graphic, circle_obstacle in zip(
-                    self.graphics_list.getGraphics("circle_obstacles", len(obstacle.circle)), 
-                    obstacle.circle
+                    self.graphics_list.getGraphics(
+                        "circle_obstacles", len(obstacle.circle)
+                    ),
+                    obstacle.circle,
                 ):
                     circle_obstacle_graphic.setRadius(circle_obstacle.radius)
                     circle_obstacle_graphic.setPosition(
-                        circle_obstacle.origin.x_meters, circle_obstacle.origin.y_meters,
+                        circle_obstacle.origin.x_meters,
+                        circle_obstacle.origin.y_meters,
                     )
 
         return self.graphics_list.getChanges()

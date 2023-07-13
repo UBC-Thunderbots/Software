@@ -30,9 +30,7 @@ class GLPathLayer(GLLayer):
         self.graphics_list.registerGraphicsGroup("paths", GLLinePlotItem)
         self.graphics_list.registerGraphicsGroup(
             "destinations",
-            lambda: GLRobotOutline(
-                color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE
-            )
+            lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
         )
 
     def updateGraphics(self):
@@ -67,8 +65,7 @@ class GLPathLayer(GLLayer):
         ]
 
         for path_graphic, path in zip(
-            self.graphics_list.getGraphics("paths", len(paths)), 
-            paths
+            self.graphics_list.getGraphics("paths", len(paths)), paths
         ):
             path_graphic.setData(
                 pos=np.array(
@@ -78,8 +75,8 @@ class GLPathLayer(GLLayer):
             )
 
         for dest_graphic, (dest, final_angle) in zip(
-            self.graphics_list.getGraphics("destinations", len(requested_destinations)), 
-            requested_destinations
+            self.graphics_list.getGraphics("destinations", len(requested_destinations)),
+            requested_destinations,
         ):
             dest_graphic.setPosition(dest.x_meters, dest.y_meters)
             dest_graphic.setOrientation(final_angle.radians)

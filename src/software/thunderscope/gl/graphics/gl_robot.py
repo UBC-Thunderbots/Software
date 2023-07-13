@@ -77,4 +77,3 @@ class GLRobot(GLMeshItem):
         # Rotate locally about the z axis (0, 0, 1)
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
-        
