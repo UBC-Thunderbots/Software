@@ -213,6 +213,21 @@ class GLWidget(QWidget):
         if not visible:
             layer.hide()
 
+    def remove_layer(self, layer: GLLayer):
+        """Remove a layer from this GLWidget and its legend
+        
+        :param layer: The GLLayer to remove
+
+        """
+        # Remove all graphics provided by this layer from the scene
+        graphics = layer.graphics_list.graphics.values()
+        for graphic in graphics:
+            self.graphics_view.gl_view_widget.removeItem(graphic)
+        
+        # Remove the layer
+        self.layers.remove(layer)
+        self.legend.removeItem(layer)
+
     def refresh(self):
         """Trigger an update on all the layers, adding/removing GLGraphicsItem 
         returned by the layers to/from the GLViewWidget scene

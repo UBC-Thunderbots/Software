@@ -169,6 +169,7 @@ def rgb_to_bw(r, g, b):
 class Colors(object):
 
     FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 100)
+    FIELD_LINE_LIGHTER_COLOR = QtGui.QColor(255, 255, 255, 50)
     BALL_COLOR = QtGui.QColor(255, 100, 0, 255)
     SIM_BALL_COLOR = QtGui.QColor(255, 100, 0, 150)
     YELLOW_ROBOT_COLOR = QtGui.QColor(255, 255, 0, 255)
