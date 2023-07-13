@@ -121,7 +121,7 @@ class GLWorldLayer(GLLayer):
         self.point_in_scene_picked = self.__invert_position_if_defending_negative_half(
             event.point_in_scene
         )
-        
+
         # Send a command to the simulator to move the ball to the picked point
         world_state = WorldState()
         world_state.ball_state.CopyFrom(
@@ -153,7 +153,8 @@ class GLWorldLayer(GLLayer):
         )
 
         self.ball_velocity_vector = (
-            ball_position - self.__invert_position_if_defending_negative_half(
+            ball_position
+            - self.__invert_position_if_defending_negative_half(
                 geom.Vector(event.point_in_scene[0], event.point_in_scene[1])
             )
         )
@@ -288,11 +289,13 @@ class GLWorldLayer(GLLayer):
                 self.cached_status.power_status.breakbeam_tripped is True
                 and robot.id == self.cached_status.robot_id
             ):
-                robot_status_graphic = self.graphics_list.getGraphics("robot_status", 1)[0]
+                robot_status_graphic = self.graphics_list.getGraphics(
+                    "robot_status", 1
+                )[0]
                 robot_status_graphic.setRadius(ROBOT_MAX_RADIUS_METERS / 2)
                 robot_status_graphic.setPosition(
                     robot.current_state.global_position.x_meters,
-                    robot.current_state.global_position.y_meters
+                    robot.current_state.global_position.y_meters,
                 )
 
     def updateSpeedLineGraphics(self):
