@@ -29,8 +29,16 @@ class GLWidget(QWidget):
 
         # Setup the GraphicsView containing the GLViewWidget
         self.graphics_view = GraphicsView()
-        self.graphics_view.gl_view_widget.point_in_scene_picked_signal.connect(
-            self.pointInScenePickedEvent
+
+        # Connect event handlers
+        self.graphics_view.gl_view_widget.point_in_scene_pressed_signal.connect(
+            self.pointInScenePressed
+        )
+        self.graphics_view.gl_view_widget.point_in_scene_dragged_signal.connect(
+            self.pointInSceneDragged
+        )
+        self.graphics_view.gl_view_widget.point_in_scene_released_signal.connect(
+            self.pointInSceneReleased
         )
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
@@ -165,14 +173,32 @@ class GLWidget(QWidget):
         for layer in self.layers:
             layer.keyReleaseEvent(event)
 
-    def pointInScenePickedEvent(self, event):
-        """Propagate PointInScenePickedEvent to all layers
+    def pointInScenePressed(self, event):
+        """Propagate pointInScenePressed event to all layers
         
         :param event: The event
         
         """
         for layer in self.layers:
-            layer.pointInScenePickedEvent(event)
+            layer.pointInScenePressed(event)
+
+    def pointInSceneDragged(self, event):
+        """Propagate pointInSceneDragged event to all layers
+        
+        :param event: The event
+        
+        """
+        for layer in self.layers:
+            layer.pointInSceneDragged(event)
+
+    def pointInSceneReleased(self, event):
+        """Propagate pointInSceneReleased event to all layers
+        
+        :param event: The event
+        
+        """
+        for layer in self.layers:
+            layer.pointInSceneReleased(event)
 
     def addLayer(self, name: str, layer: GLLayer, visible: bool = True):
         """Add a layer to this GLWidget and to the legend

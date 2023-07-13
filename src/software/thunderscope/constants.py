@@ -94,6 +94,7 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <h3>General Controls</h3><br>
     
     <b><code>I:</code></b> Identify robots, toggle robot ID visibility<br>
+    <b><code>S:</code></b> Toggle visibility of robot/ball speed visualization<br>
     <b><code>Ctrl + Space:</code></b> Stop AI vs AI simulation<br>
     <b><code>Number Keys:</code></b> Position camera to preset view<br>
     <b><code>Shift + Left Click:</code></b> Place the ball at the cursor<br>

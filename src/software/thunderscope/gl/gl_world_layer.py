@@ -4,8 +4,9 @@ from pyqtgraph.opengl import *
 
 from proto.import_all_protos import *
 from software.py_constants import *
+import software.python_bindings as geom
 import software.thunderscope.constants as constants
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, SPEED_SEGMENT_SCALE
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
@@ -20,6 +21,9 @@ from software.thunderscope.gl.gl_layer import GLLayer
 
 class GLWorldLayer(GLLayer):
     """GLLayer that visualizes the world and vision data"""
+
+    # The maximum allowed velocity that the user can give the ball
+    MAX_ALLOWED_KICK_SPEED_M_PER_S = 6.5
 
     def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=5):
         """Initialize the GLWorldLayer
@@ -52,7 +56,11 @@ class GLWorldLayer(GLLayer):
             self.key_pressed[key] = False
 
         self.display_robot_id = False
+        self.display_speed_lines = True
         self.is_playing = True
+
+        self.ball_velocity_vector = None
+        self.point_in_scene_picked = None
 
         self.graphics_list.registerGraphicsGroup(
             "field_lines",
@@ -68,6 +76,10 @@ class GLWorldLayer(GLLayer):
             "robot_ids", 
             lambda: GLTextItem(color=Colors.PRIMARY_TEXT_COLOR)
         )
+        self.graphics_list.registerGraphicsGroup(
+            "speed_lines",
+            lambda: GLCircle(color=Colors.SPEED_VECTOR_COLOR)
+        )
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed
@@ -76,8 +88,11 @@ class GLWorldLayer(GLLayer):
 
         """
         self.key_pressed[event.key()] = True
+
         if event.key() == QtCore.Qt.Key.Key_I:
             self.display_robot_id = not self.display_robot_id
+        elif event.key() == QtCore.Qt.Key.Key_S:
+            self.display_speed_lines = not self.display_speed_lines
 
         # If user is holding ctrl + space, send a command to simulator to pause the gameplay
         if (
@@ -98,24 +113,78 @@ class GLWorldLayer(GLLayer):
         """
         self.key_pressed[event.key()] = False
 
-    def pointInScenePickedEvent(self, event):
-        """Event handler for the PointInScenePickedEvent
+    def pointInScenePressed(self, event):
+        """Event handler for the pointInScenePressed event
         
         :param event: The event
         
         """
-        # If the user was holding shift, send a command to the simulator to move
-        # the ball to the point picked.
-        if self.key_pressed[Qt.Key.Key_Shift]:
+        self.point_in_scene_picked = event.point_in_scene
+
+        # Send a command to the simulator to move the ball to the picked point
+        world_state = WorldState()
+        world_state.ball_state.CopyFrom(
+            BallState(
+                global_position=Point(
+                    x_meters=self.point_in_scene_picked[0],
+                    y_meters=self.point_in_scene_picked[1],
+                )
+            )
+        )
+        self.simulator_io.send_proto(WorldState, world_state)
+
+    def pointInSceneDragged(self, event):
+        """Event handler for the pointInSceneDragged event
+        
+        :param event: The event
+        
+        """
+        # User picked a point in the 3D scene and is now dragging it across the scene
+        # to apply a velocity on the ball (i.e. kick it).
+        # We create a velocity vector that is proportional to the distance the
+        # mouse has moved away from the ball.
+
+        ball_position = geom.Vector(
+            self.point_in_scene_picked[0],
+            self.point_in_scene_picked[1]
+        )
+
+        self.ball_velocity_vector = ball_position - geom.Vector(
+            event.point_in_scene[0], event.point_in_scene[1]
+        )
+
+        # Cap the maximum kick speed
+        if self.ball_velocity_vector.length() > GLWorldLayer.MAX_ALLOWED_KICK_SPEED_M_PER_S:
+            self.ball_velocity_vector = self.ball_velocity_vector.normalize(
+                GLWorldLayer.MAX_ALLOWED_KICK_SPEED_M_PER_S
+            )
+
+    def pointInSceneReleased(self, event):
+        """Event handler for the pointInSceneReleased event
+        
+        :param event: The event
+        
+        """
+        if self.ball_velocity_vector:
+
+            # Send a command to the simulator to give the ball the specified 
+            # velocity (i.e. kick it)
+
             world_state = WorldState()
             world_state.ball_state.CopyFrom(
                 BallState(
                     global_position=Point(
-                        x_meters=event.point_in_scene[0],
-                        y_meters=event.point_in_scene[1],
-                    )
+                        x_meters=self.point_in_scene_picked[0],
+                        y_meters=self.point_in_scene_picked[1],
+                    ),
+                    global_velocity=Vector(
+                        x_component_meters=self.ball_velocity_vector.x(),
+                        y_component_meters=self.ball_velocity_vector.y()
+                    ),
                 )
             )
+
+            self.ball_velocity_vector = None
             self.simulator_io.send_proto(WorldState, world_state)
 
     def updateFieldGraphics(self, field: Field):
@@ -155,6 +224,7 @@ class GLWorldLayer(GLLayer):
         :param ball_state: The ball state proto
 
         """
+        # Update the ball graphic
         ball_graphic = self.graphics_list.getGraphics("ball", 1)[0]
         ball_graphic.setPosition(
             ball_state.global_position.x_meters,
@@ -195,6 +265,54 @@ class GLWorldLayer(GLLayer):
             else:
                 robot_id_graphic.hide()
 
+    def updateSpeedLineGraphics(self):
+        """Update the speed lines visualizing the robot and ball speeds"""
+
+        # If user if trying to apply a velocity on the ball (i.e. kick it), visualize
+        # the velocity vector
+        if self.ball_velocity_vector:
+            
+            ball_state = self.cached_world.ball.current_state
+            velocity = self.ball_velocity_vector * SPEED_SEGMENT_SCALE
+
+            speed_line_graphic = self.graphics_list.getGraphics("speed_lines", 1)[0]
+            speed_line_graphic.setData(
+                pos=np.array([
+                    [
+                        ball_state.global_position.x_meters, 
+                        ball_state.global_position.y_meters
+                    ],
+                    [
+                        ball_state.global_position.x_meters + velocity.x(), 
+                        ball_state.global_position.y_meters + velocity.y()
+                    ],
+                ]),
+            )
+
+        if self.display_speed_lines:
+
+            # Combining robots and ball into one list so we can avoid
+            # multiple calls to GraphicsList.getGraphics
+            objects = list(self.cached_world.friendly_team.team_robots)
+            objects.append(self.cached_world.ball)
+            
+            for speed_line_graphic, object in zip(
+                self.graphics_list.getGraphics("speed_lines", len(objects)),
+                objects
+            ):
+                pos_x = object.current_state.global_position.x_meters
+                pos_y = object.current_state.global_position.y_meters
+                velocity = object.current_state.global_velocity
+                speed_line_graphic.setData(
+                    pos=np.array([
+                        [pos_x, pos_y],
+                        [
+                            pos_x + velocity.x_component_meters * SPEED_SEGMENT_SCALE, 
+                            pos_y + velocity.y_component_meters * SPEED_SEGMENT_SCALE
+                        ],
+                    ]),
+                )
+
     def updateGraphics(self):
         """Update the GLGraphicsItems in this layer
 
@@ -225,5 +343,7 @@ class GLWorldLayer(GLLayer):
 
         self.updateRobotGraphics(self.cached_world.friendly_team, friendly_colour)
         self.updateRobotGraphics(self.cached_world.enemy_team, enemy_colour)
+
+        self.updateSpeedLineGraphics()
 
         return self.graphics_list.getChanges()

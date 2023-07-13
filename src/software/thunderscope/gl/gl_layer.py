@@ -36,8 +36,24 @@ class GLLayer(pg.GraphicsObject):
         """
         raise NotImplementedError("Abstract class method called: updateGraphics")
 
-    def pointInScenePickedEvent(self, event):
-        """Event handler for the PointInScenePickedEvent
+    def pointInScenePressed(self, event):
+        """Event handler for the pointInScenePressed event
+        
+        :param event: The event
+        
+        """
+        pass
+
+    def pointInSceneDragged(self, event):
+        """Event handler for the pointInSceneDragged event
+        
+        :param event: The event
+        
+        """
+        pass
+
+    def pointInSceneReleased(self, event):
+        """Event handler for the pointInSceneReleased event
         
         :param event: The event
         

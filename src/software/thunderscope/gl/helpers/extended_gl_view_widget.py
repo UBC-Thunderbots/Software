@@ -7,13 +7,13 @@ from pyqtgraph.opengl import *
 import numpy as np
 
 
-class PointInScenePickedEvent(object):
+class PointInSceneEvent(object):
     """Wraps QMouseEvent and includes additional data about the point in the 3D scene
     that was picked by the mouse cursor
     """
 
     def __init__(self, mouse_event: QtGui.QMouseEvent, point_in_scene):
-        """Initialize the PointInScenePickedEvent
+        """Initialize the PointInSceneEvent
         
         :param mouse_event: The QMouseEvent to wrap
         :param point_in_scene: The point in the 3D scene that was picked
@@ -27,8 +27,20 @@ class ExtendedGLViewWidget(GLViewWidget):
     """Extends GLViewWidget with ability to determine coordinates of the
     mouse cursor position in the 3D scene"""
 
-    # Signal emitted when the mouse has picked a point in the 3D scene
-    point_in_scene_picked_signal = QtCore.pyqtSignal(PointInScenePickedEvent)
+    # Signal emitted when mouse has picked a point in the 3D scene (shift + click)
+    point_in_scene_pressed_signal = QtCore.pyqtSignal(PointInSceneEvent)
+
+    # Signal emitted when mouse is dragging within the 3D scene (shift + drag)
+    point_in_scene_dragged_signal = QtCore.pyqtSignal(PointInSceneEvent)
+
+    # Signal emitted when mouse is released having picked a point in the 3D scene (shift + release)
+    point_in_scene_released_signal = QtCore.pyqtSignal(PointInSceneEvent)
+
+    def __init__(self):
+        super().__init__()
+
+        # Keep track of whether the mouse picked a point in the 3D scene
+        self.point_picked = False
 
     def mousePressEvent(self, event):
         """Detect that the mouse was pressed
@@ -36,12 +48,49 @@ class ExtendedGLViewWidget(GLViewWidget):
         :param event: The event
         
         """
-        super().mousePressEvent(event)
+        if (
+            event.buttons() == QtCore.Qt.MouseButton.LeftButton
+            and event.modifiers() == QtCore.Qt.KeyboardModifier.ShiftModifier 
+        ):
+            self.point_picked = True
+            point_in_scene_event = PointInSceneEvent(
+                event, self.getPointInScene(event.position())
+            )
+            self.point_in_scene_pressed_signal.emit(point_in_scene_event)
+        else:
+            # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
+            super().mousePressEvent(event)
 
-        point_picked_event = PointInScenePickedEvent(
-            event, self.getPointInScene(event.position())
-        )
-        self.point_in_scene_picked_signal.emit(point_picked_event)
+    def mouseMoveEvent(self, event):
+        """Detect that the mouse was moved
+        
+        :param event: The event
+
+        """
+        if self.point_picked:
+            point_in_scene_event = PointInSceneEvent(
+                event, self.getPointInScene(event.position())
+            )
+            self.point_in_scene_dragged_signal.emit(point_in_scene_event)
+        else:
+            # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
+            super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        """Detect that the mouse was released
+        
+        :param event: The event
+
+        """
+        if self.point_picked:
+            self.point_picked = False
+            point_in_scene_event = PointInSceneEvent(
+                event, self.getPointInScene(event.position())
+            )
+            self.point_in_scene_released_signal.emit(point_in_scene_event)
+        else:
+            # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
+            super().mouseReleaseEvent(event)
 
     def getPointInScene(self, mouse_pos):
         """Determine the coordinates of the point on the x-y plane in the 3D scene that 
