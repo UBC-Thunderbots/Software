@@ -115,8 +115,10 @@ class GLWorldLayer(GLLayer):
         :param event: The event
         
         """
-        self.point_in_scene_picked = event.point_in_scene
-
+        self.point_in_scene_picked = self.__invert_position_if_defending_negative_half(
+            event.point_in_scene
+        )
+        
         # Send a command to the simulator to move the ball to the picked point
         world_state = WorldState()
         world_state.ball_state.CopyFrom(
@@ -144,8 +146,10 @@ class GLWorldLayer(GLLayer):
             self.point_in_scene_picked[0], self.point_in_scene_picked[1]
         )
 
-        self.ball_velocity_vector = ball_position - geom.Vector(
-            event.point_in_scene[0], event.point_in_scene[1]
+        self.ball_velocity_vector = (
+            ball_position - self.__invert_position_if_defending_negative_half(
+                geom.Vector(event.point_in_scene[0], event.point_in_scene[1])
+            )
         )
 
         # Cap the maximum kick speed
@@ -164,6 +168,9 @@ class GLWorldLayer(GLLayer):
         
         """
         if self.ball_velocity_vector:
+
+            if self.__should_invert_coordinate_frame():
+                self.ball_velocity_vector = -self.ball_velocity_vector
 
             # Send a command to the simulator to give the ball the specified
             # velocity (i.e. kick it)
@@ -352,3 +359,37 @@ class GLWorldLayer(GLLayer):
         self.updateSpeedLineGraphics()
 
         return self.graphics_list.getChanges()
+
+    def __should_invert_coordinate_frame(self):
+        """Our coordinate system always assumes that the friendly team is defending
+        the negative half of the field.
+
+        If we are defending the positive half, we invert the coordinate frame
+        and render the inverted proto. 
+
+        We can use the referee msg to determine if we are defending the positive
+        or negative half of the field.
+
+        :return: True if we should invert the coordinate frame, False otherwise
+
+        """
+        referee = self.referee_buffer.get(block=False)
+
+        if (self.friendly_colour_yellow and not referee.blue_team_on_positive_half) or (
+            not self.friendly_colour_yellow and referee.blue_team_on_positive_half
+        ):
+            return True
+        return False
+
+    def __invert_position_if_defending_negative_half(self, mouse_click):
+        """If we are defending the negative half of the field, we invert the coordinate frame
+        for the mouse click/3D point picked to match up with the visualization.
+
+        :param mouse_click: The point location in the 3D scene [x, y]
+        :return: The inverted point location [x, y] (if needed to be inverted)
+
+        """
+        if self.__should_invert_coordinate_frame():
+            return [-mouse_click[0], -mouse_click[1]]
+
+        return mouse_click
