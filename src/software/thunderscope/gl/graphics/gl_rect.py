@@ -18,7 +18,7 @@ class GLRect(GLGridItem):
 
         GLGridItem.__init__(self, color=color)
 
-    def setDimensions(self, x_length=0, y_length=0):
+    def set_dimensions(self, x_length=0, y_length=0):
         """Set the dimensions of the rectangle
         
         :param x_length: The length of the rectangle in the x direction
@@ -37,7 +37,7 @@ class GLRect(GLGridItem):
         self.x_length = x_length
         self.y_length = y_length
 
-    def setPosition(self, x, y):
+    def set_position(self, x, y):
         """Set the position of the graphic in the scene
         
         :param x: The x coordinate to position the graphic at

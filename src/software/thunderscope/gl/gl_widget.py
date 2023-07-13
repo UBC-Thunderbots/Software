@@ -32,13 +32,13 @@ class GLWidget(QWidget):
 
         # Connect event handlers
         self.graphics_view.gl_view_widget.point_in_scene_pressed_signal.connect(
-            self.pointInScenePressed
+            self.point_in_scene_pressed
         )
         self.graphics_view.gl_view_widget.point_in_scene_dragged_signal.connect(
-            self.pointInSceneDragged
+            self.point_in_scene_dragged
         )
         self.graphics_view.gl_view_widget.point_in_scene_released_signal.connect(
-            self.pointInSceneReleased
+            self.point_in_scene_released
         )
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
@@ -82,16 +82,16 @@ class GLWidget(QWidget):
             QtGui.QAction("[4] Right Half High Angle"),
         ]
         self.camera_view_actions[0].triggered.connect(
-            lambda: self.setCameraView(CameraView.ORTHOGRAPHIC)
+            lambda: self.set_camera_view(CameraView.ORTHOGRAPHIC)
         )
         self.camera_view_actions[1].triggered.connect(
-            lambda: self.setCameraView(CameraView.LANDSCAPE_HIGH_ANGLE)
+            lambda: self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
         )
         self.camera_view_actions[2].triggered.connect(
-            lambda: self.setCameraView(CameraView.LEFT_HALF_HIGH_ANGLE)
+            lambda: self.set_camera_view(CameraView.LEFT_HALF_HIGH_ANGLE)
         )
         self.camera_view_actions[3].triggered.connect(
-            lambda: self.setCameraView(CameraView.RIGHT_HALF_HIGH_ANGLE)
+            lambda: self.set_camera_view(CameraView.RIGHT_HALF_HIGH_ANGLE)
         )
         for camera_view_action in self.camera_view_actions:
             self.camera_view_menu.addAction(camera_view_action)
@@ -137,7 +137,7 @@ class GLWidget(QWidget):
 
         self.layers = []
 
-        self.setCameraView(CameraView.LANDSCAPE_HIGH_ANGLE)
+        self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed
@@ -149,13 +149,13 @@ class GLWidget(QWidget):
 
         # Camera view shortcuts
         if self.key_pressed[Qt.Key.Key_1]:
-            self.setCameraView(CameraView.ORTHOGRAPHIC)
+            self.set_camera_view(CameraView.ORTHOGRAPHIC)
         elif self.key_pressed[Qt.Key.Key_2]:
-            self.setCameraView(CameraView.LANDSCAPE_HIGH_ANGLE)
+            self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
         elif self.key_pressed[Qt.Key.Key_3]:
-            self.setCameraView(CameraView.LEFT_HALF_HIGH_ANGLE)
+            self.set_camera_view(CameraView.LEFT_HALF_HIGH_ANGLE)
         elif self.key_pressed[Qt.Key.Key_4]:
-            self.setCameraView(CameraView.RIGHT_HALF_HIGH_ANGLE)
+            self.set_camera_view(CameraView.RIGHT_HALF_HIGH_ANGLE)
 
         # Propagate keypress event to all layers
         for layer in self.layers:
@@ -173,34 +173,34 @@ class GLWidget(QWidget):
         for layer in self.layers:
             layer.keyReleaseEvent(event)
 
-    def pointInScenePressed(self, event):
-        """Propagate pointInScenePressed event to all layers
+    def point_in_scene_pressed(self, event):
+        """Propagate point_in_scene_pressed event to all layers
         
         :param event: The event
         
         """
         for layer in self.layers:
-            layer.pointInScenePressed(event)
+            layer.point_in_scene_pressed(event)
 
-    def pointInSceneDragged(self, event):
-        """Propagate pointInSceneDragged event to all layers
+    def point_in_scene_dragged(self, event):
+        """Propagate point_in_scene_dragged event to all layers
         
         :param event: The event
         
         """
         for layer in self.layers:
-            layer.pointInSceneDragged(event)
+            layer.point_in_scene_dragged(event)
 
-    def pointInSceneReleased(self, event):
-        """Propagate pointInSceneReleased event to all layers
+    def point_in_scene_released(self, event):
+        """Propagate point_in_scene_released event to all layers
         
         :param event: The event
         
         """
         for layer in self.layers:
-            layer.pointInSceneReleased(event)
+            layer.point_in_scene_released(event)
 
-    def addLayer(self, name: str, layer: GLLayer, visible: bool = True):
+    def add_layer(self, name: str, layer: GLLayer, visible: bool = True):
         """Add a layer to this GLWidget and to the legend
         
         :param name: The name of the layer
@@ -221,7 +221,7 @@ class GLWidget(QWidget):
             self.replay_controls.refresh()
 
         for layer in self.layers:
-            added_graphics, removed_graphics = layer.updateGraphics()
+            added_graphics, removed_graphics = layer.update_graphics()
 
             for added_graphic in added_graphics:
                 self.graphics_view.gl_view_widget.addItem(added_graphic)
@@ -229,7 +229,7 @@ class GLWidget(QWidget):
             for removed_graphic in removed_graphics:
                 self.graphics_view.gl_view_widget.removeItem(removed_graphic)
 
-    def setCameraView(self, camera_view):
+    def set_camera_view(self, camera_view):
         """Set the camera position to a preset camera view
 
         :param camera_view: the preset camera view

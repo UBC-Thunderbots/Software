@@ -22,9 +22,9 @@ class GLCircle(GLLinePlotItem):
         self.num_points = num_points
 
         GLLinePlotItem.__init__(self, color=color)
-        self.setRadius(radius)
+        self.set_radius(radius)
 
-    def setRadius(self, radius):
+    def set_radius(self, radius):
         if self.radius == radius:
             return
 
@@ -44,7 +44,7 @@ class GLCircle(GLLinePlotItem):
         )
         self.setData(pos=points)
 
-    def setColor(self, color):
+    def set_color(self, color):
         """Set the color of the graphic
         
         :param color: The color of the graphic
@@ -52,7 +52,7 @@ class GLCircle(GLLinePlotItem):
         """
         self.setData(color=color)
 
-    def setPosition(self, x, y):
+    def set_position(self, x, y):
         """Set the position of the graphic in the scene
         
         :param x: The x coordinate to position the graphic at

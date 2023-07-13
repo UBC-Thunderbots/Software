@@ -27,7 +27,7 @@ class GLLayer(pg.GraphicsObject):
 
         self.graphics_list = GraphicsList()
 
-    def updateGraphics(self):
+    def update_graphics(self):
         """Update the GLGraphicsItems in this layer
 
         :returns: tuple (added_graphics, removed_graphics)
@@ -35,24 +35,24 @@ class GLLayer(pg.GraphicsObject):
             - removed_graphics - List of the removed GLGraphicsItems
         
         """
-        raise NotImplementedError("Abstract class method called: updateGraphics")
+        raise NotImplementedError("Abstract class method called: update_graphics")
 
-    def pointInScenePressed(self, event):
-        """Event handler for the pointInScenePressed event
+    def point_in_scene_pressed(self, event):
+        """Event handler for the point_in_scene_pressed event
         
         :param event: The event
         
         """
 
-    def pointInSceneDragged(self, event):
-        """Event handler for the pointInSceneDragged event
+    def point_in_scene_dragged(self, event):
+        """Event handler for the point_in_scene_dragged event
         
         :param event: The event
         
         """
 
-    def pointInSceneReleased(self, event):
-        """Event handler for the pointInSceneReleased event
+    def point_in_scene_released(self, event):
+        """Event handler for the point_in_scene_released event
         
         :param event: The event
         

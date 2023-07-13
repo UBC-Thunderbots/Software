@@ -20,7 +20,7 @@ class GLBall(GLMeshItem):
             color=Colors.BALL_COLOR,
         )
 
-    def setPosition(self, x, y, z):
+    def set_position(self, x, y, z):
         """Set the position of the graphic in the scene
         
         :param x: The x coordinate to position the graphic at

@@ -89,12 +89,12 @@ def setup_gl_widget(
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer(visualization_buffer_size)
 
-    gl_widget.addLayer("Validation", validation_layer)
-    gl_widget.addLayer("Paths", path_layer)
-    gl_widget.addLayer("Obstacles", obstacle_layer)
-    gl_widget.addLayer("Passing", passing_layer)
-    gl_widget.addLayer("Vision", world_layer)
-    gl_widget.addLayer("Tactics", tactic_layer, False)
+    gl_widget.add_layer("Validation", validation_layer)
+    gl_widget.add_layer("Paths", path_layer)
+    gl_widget.add_layer("Obstacles", obstacle_layer)
+    gl_widget.add_layer("Passing", passing_layer)
+    gl_widget.add_layer("Vision", world_layer)
+    gl_widget.add_layer("Tactics", tactic_layer, False)
 
     # Add HRVO layers to field widget and have them hidden on startup
     # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
@@ -102,7 +102,7 @@ def setup_gl_widget(
     for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
         hrvo_sim_state = gl_hrvo_layer.GLHrvoLayer(robot_id, visualization_buffer_size)
         hrvo_sim_states.append(hrvo_sim_state)
-        gl_widget.addLayer(f"HRVO {robot_id}", hrvo_sim_state, False)
+        gl_widget.add_layer(f"HRVO {robot_id}", hrvo_sim_state, False)
 
     # Register observers
     for arg in [

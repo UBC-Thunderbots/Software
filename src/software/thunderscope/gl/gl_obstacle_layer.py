@@ -28,15 +28,15 @@ class GLObstacleLayer(GLLayer):
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
-        self.graphics_list.registerGraphicsGroup(
+        self.graphics_list.register_graphics_group(
             "poly_obstacles",
             lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
-        self.graphics_list.registerGraphicsGroup(
+        self.graphics_list.register_graphics_group(
             "circle_obstacles", lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
         )
 
-    def updateGraphics(self):
+    def update_graphics(self):
         """Update the GLGraphicsItems in this layer
 
         :returns: tuple (added_graphics, removed_graphics)
@@ -46,7 +46,7 @@ class GLObstacleLayer(GLLayer):
         """
         # Clear all graphics in this layer if not visible
         if not self.isVisible():
-            return self.graphics_list.getChanges()
+            return self.graphics_list.get_changes()
 
         primitive_set = self.primitive_set_buffer.get(
             block=False
@@ -62,7 +62,7 @@ class GLObstacleLayer(GLLayer):
             for obstacle in obstacles:
 
                 for poly_obstacle_graphic, poly_obstacle in zip(
-                    self.graphics_list.getGraphics(
+                    self.graphics_list.get_graphics(
                         "poly_obstacles", len(obstacle.polygon)
                     ),
                     obstacle.polygon,
@@ -83,15 +83,15 @@ class GLObstacleLayer(GLLayer):
                     )
 
                 for circle_obstacle_graphic, circle_obstacle in zip(
-                    self.graphics_list.getGraphics(
+                    self.graphics_list.get_graphics(
                         "circle_obstacles", len(obstacle.circle)
                     ),
                     obstacle.circle,
                 ):
-                    circle_obstacle_graphic.setRadius(circle_obstacle.radius)
-                    circle_obstacle_graphic.setPosition(
+                    circle_obstacle_graphic.set_radius(circle_obstacle.radius)
+                    circle_obstacle_graphic.set_position(
                         circle_obstacle.origin.x_meters,
                         circle_obstacle.origin.y_meters,
                     )
 
-        return self.graphics_list.getChanges()
+        return self.graphics_list.get_changes()

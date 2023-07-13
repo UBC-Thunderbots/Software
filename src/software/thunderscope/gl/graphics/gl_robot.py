@@ -35,10 +35,10 @@ class GLRobot(GLMeshItem):
         :returns: the computed MeshData instance 
 
         """
-        top_face_points = GLRobotOutline.getRobotOutline(
+        top_face_points = GLRobotOutline.get_robot_outline(
             z_coordinate=ROBOT_MAX_HEIGHT_METERS
         )
-        bottom_face_points = GLRobotOutline.getRobotOutline(z_coordinate=0)
+        bottom_face_points = GLRobotOutline.get_robot_outline(z_coordinate=0)
         circle_points = top_face_points + bottom_face_points
 
         # Add an extra point at the center of the top face. This is so that we
@@ -58,7 +58,7 @@ class GLRobot(GLMeshItem):
 
         return MeshData(vertexes=np.array(points), faces=np.array(faces),)
 
-    def setPosition(self, x, y):
+    def set_position(self, x, y):
         """Set the position of the graphic in the scene
         
         :param x: The x coordinate to position the graphic at
@@ -72,7 +72,7 @@ class GLRobot(GLMeshItem):
         self.x = x
         self.y = y
 
-    def setOrientation(self, radians):
+    def set_orientation(self, radians):
         """Set the orientation of the graphic in the scene
         
         :param radians: The orientation of the graphic in radians

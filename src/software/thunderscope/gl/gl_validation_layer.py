@@ -39,10 +39,10 @@ class GLValidationLayer(GLLayer):
 
         self.passed_validation_timeout_pairs = []
 
-        self.graphics_list.registerGraphicsGroup("validation_polygons", GLLinePlotItem)
-        self.graphics_list.registerGraphicsGroup("validation_circles", GLCircle)
+        self.graphics_list.register_graphics_group("validation_polygons", GLLinePlotItem)
+        self.graphics_list.register_graphics_group("validation_circles", GLCircle)
 
-    def updateValidationGraphics(self, validations):
+    def update_validation_graphics(self, validations):
         """Update the GLGraphicsItems that display the validations
         
         :param validations: The list of validation protos
@@ -57,7 +57,7 @@ class GLValidationLayer(GLLayer):
             )
 
             for polygon_graphic, polygon in zip(
-                self.graphics_list.getGraphics(
+                self.graphics_list.get_graphics(
                     "validation_polygons", len(validation.geometry.polygons)
                 ),
                 validation.geometry.polygons,
@@ -77,7 +77,7 @@ class GLValidationLayer(GLLayer):
                 )
 
             for segment_graphic, segment in zip(
-                self.graphics_list.getGraphics(
+                self.graphics_list.get_graphics(
                     "validation_polygons", len(validation.geometry.segments)
                 ),
                 validation.geometry.segments,
@@ -93,18 +93,18 @@ class GLValidationLayer(GLLayer):
                 )
 
             for circle_graphic, circle in zip(
-                self.graphics_list.getGraphics(
+                self.graphics_list.get_graphics(
                     "validation_circles", len(validation.geometry.circles)
                 ),
                 validation.geometry.circles,
             ):
-                circle_graphic.setRadius(circle.radius)
-                circle_graphic.setPosition(
+                circle_graphic.set_radius(circle.radius)
+                circle_graphic.set_position(
                     circle.origin.x_meters, circle.origin.y_meters
                 )
-                circle_graphic.setColor(validation_color)
+                circle_graphic.set_color(validation_color)
 
-    def updateGraphics(self):
+    def update_graphics(self):
         """Update the GLGraphicsItems in this layer
 
         :returns: tuple (added_graphics, removed_graphics)
@@ -114,7 +114,7 @@ class GLValidationLayer(GLLayer):
         """
         # Clear all graphics in this layer if not visible
         if not self.isVisible():
-            return self.graphics_list.getChanges()
+            return self.graphics_list.get_changes()
 
         # Consume the validation set buffer
         for _ in range(self.validation_set_buffer.queue.qsize()):
@@ -143,10 +143,10 @@ class GLValidationLayer(GLLayer):
                     (validation, stop_drawing_time)
                 )
 
-        self.updateValidationGraphics(
+        self.update_validation_graphics(
             list(self.cached_always_validation_set.validations)
             + list(self.cached_eventually_validation_set.validations)
             + list(self.passed_validation_timeout_pairs)
         )
 
-        return self.graphics_list.getChanges()
+        return self.graphics_list.get_changes()

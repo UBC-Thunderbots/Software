@@ -54,6 +54,9 @@ class IndividualRobotMode(IntEnum):
 
 
 class CameraView(Enum):
+    """
+    Enum for preset camera views in the 3D visualizer
+    """
 
     ORTHOGRAPHIC = 1
     LANDSCAPE_HIGH_ANGLE = 2

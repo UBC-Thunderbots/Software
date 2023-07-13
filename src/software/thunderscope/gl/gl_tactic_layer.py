@@ -38,14 +38,14 @@ class GLTacticLayer(GLLayer):
         self.play_info_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.cached_world = World()
 
-        self.graphics_list.registerGraphicsGroup(
+        self.graphics_list.register_graphics_group(
             "tactic_fsm_info",
             lambda: GLTextItem(
                 font=QtGui.QFont("Helvetica", 6), color=Colors.SECONDARY_TEXT_COLOR
             ),
         )
 
-    def updateTacticNameGraphics(self, team: Team, play_info_dict):
+    def update_tactic_name_graphics(self, team: Team, play_info_dict):
         """Update the GLGraphicsItems that display tactic data
         
         :param team: The team proto
@@ -55,7 +55,7 @@ class GLTacticLayer(GLLayer):
         tactic_assignments = play_info_dict["robotTacticAssignment"]
 
         for tactic_fsm_info_graphic, robot in zip(
-            self.graphics_list.getGraphics("tactic_fsm_info", len(team.team_robots)),
+            self.graphics_list.get_graphics("tactic_fsm_info", len(team.team_robots)),
             team.team_robots,
         ):
             tactic_fsm_info_graphic.setData(
@@ -72,7 +72,7 @@ class GLTacticLayer(GLLayer):
                 ],
             )
 
-    def updateGraphics(self):
+    def update_graphics(self):
         """Update the GLGraphicsItems in this layer
 
         :returns: tuple (added_graphics, removed_graphics)
@@ -82,12 +82,12 @@ class GLTacticLayer(GLLayer):
         """
         # Clear all graphics in this layer if not visible
         if not self.isVisible():
-            return self.graphics_list.getChanges()
+            return self.graphics_list.get_changes()
 
         self.cached_world = self.world_buffer.get(block=False)
         play_info = self.play_info_buffer.get(block=False)
         play_info_dict = MessageToDict(play_info)
 
-        self.updateTacticNameGraphics(self.cached_world.friendly_team, play_info_dict)
+        self.update_tactic_name_graphics(self.cached_world.friendly_team, play_info_dict)
 
-        return self.graphics_list.getChanges()
+        return self.graphics_list.get_changes()

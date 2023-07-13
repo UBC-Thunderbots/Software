@@ -15,7 +15,7 @@ class GraphicsList:
         self.num_fetched = {}
         self.num_added = {}
 
-    def registerGraphicsGroup(self, key: str, graphics_factory: Callable):
+    def register_graphics_group(self, key: str, graphics_factory: Callable):
         """Register a new group of GLGraphicsItems in the collection.
 
         :param key: The key used to identify the group
@@ -27,7 +27,7 @@ class GraphicsList:
         self.num_fetched[key] = 0
         self.num_added[key] = 0
 
-    def getGraphics(self, key: str, num_graphics: int):
+    def get_graphics(self, key: str, num_graphics: int):
         """Get a specified number of GLGraphicsItems from the specified group.
         The collection will automatically add more GLGraphicsItems to the group and return
         them if necessary.
@@ -54,14 +54,14 @@ class GraphicsList:
 
         return fetched_graphics
 
-    def getChanges(self):
+    def get_changes(self):
         """Return all graphics added or removed from the list since the last
-        time getChanges was called.
+        time get_changes was called.
         
-        Graphics that haven't been fetched with getGraphics since the last
-        time getChanges was called will be purged from the collection.
+        Graphics that haven't been fetched with get_graphics since the last
+        time get_changes was called will be purged from the collection.
 
-        Thus, calling getChanges without calling getGraphics beforehand 
+        Thus, calling get_changes without calling get_graphics beforehand 
         effectively clears all graphics from the collection.
 
         :returns: tuple (added_graphics, removed_graphics)

@@ -22,11 +22,11 @@ class GLRobotOutline(GLLinePlotItem):
         self.color = color
 
         GLLinePlotItem.__init__(
-            self, pos=np.array(GLRobotOutline.getRobotOutline()), color=color
+            self, pos=np.array(GLRobotOutline.get_robot_outline()), color=color
         )
 
     @staticmethod
-    def getRobotOutline(z_coordinate=0, num_points=10):
+    def get_robot_outline(z_coordinate=0, num_points=10):
         """Returns a list of points that represent the outline of a robot.
         The points will be on a plane parallel to the x-y plane.
 
@@ -52,7 +52,7 @@ class GLRobotOutline(GLLinePlotItem):
 
         return points
 
-    def setPosition(self, x, y):
+    def set_position(self, x, y):
         """Set the position of the graphic in the scene
         
         :param x: The x coordinate to position the graphic at
@@ -66,7 +66,7 @@ class GLRobotOutline(GLLinePlotItem):
         self.x = x
         self.y = y
 
-    def setOrientation(self, radians):
+    def set_orientation(self, radians):
         """Set the orientation of the graphic in the scene
         
         :param radians: The orientation of the graphic in radians

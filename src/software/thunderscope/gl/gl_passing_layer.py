@@ -41,11 +41,11 @@ class GLPassingLayer(GLLayer):
         self.cached_pass_vis = PassVisualization()
         self.timeout = time.time() + GLPassingLayer.PASS_VISUALIZATION_TIMEOUT_S
 
-        self.graphics_list.registerGraphicsGroup(
+        self.graphics_list.register_graphics_group(
             "passes", lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR)
         )
 
-    def updateGraphics(self):
+    def update_graphics(self):
         """Update the GLGraphicsItems in this layer
 
         :returns: tuple (added_graphics, removed_graphics)
@@ -55,7 +55,7 @@ class GLPassingLayer(GLLayer):
         """
         # Clear all graphics in this layer if not visible
         if not self.isVisible():
-            return self.graphics_list.getChanges()
+            return self.graphics_list.get_changes()
 
         try:
             pass_vis = self.pass_visualization_buffer.queue.get_nowait()
@@ -67,7 +67,7 @@ class GLPassingLayer(GLLayer):
 
             # If we haven't received pass visualizations for a bit, clear the layer's graphics
             if time.time() > self.timeout:
-                return self.graphics_list.getChanges()
+                return self.graphics_list.get_changes()
         else:
             # We received new pass data, so lets update our timeout
             self.timeout = time.time() + GLPassingLayer.PASS_VISUALIZATION_TIMEOUT_S
@@ -79,7 +79,7 @@ class GLPassingLayer(GLLayer):
         passes_to_show = sorted_pass_with_rating[0 : GLPassingLayer.NUM_PASSES_TO_SHOW]
 
         for pass_graphic, pass_with_rating in zip(
-            self.graphics_list.getGraphics("passes", len(passes_to_show)),
+            self.graphics_list.get_graphics("passes", len(passes_to_show)),
             passes_to_show,
         ):
             pass_graphic.setData(
@@ -97,4 +97,4 @@ class GLPassingLayer(GLLayer):
                 ),
             )
 
-        return self.graphics_list.getChanges()
+        return self.graphics_list.get_changes()

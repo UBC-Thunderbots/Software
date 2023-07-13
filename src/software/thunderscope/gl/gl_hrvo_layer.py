@@ -31,12 +31,12 @@ class GLHrvoLayer(GLLayer):
         self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HRVOVisualization)
         self.prev_message = HRVOVisualization(robot_id=self.robot_id)
 
-        self.graphics_list.registerGraphicsGroup(
+        self.graphics_list.register_graphics_group(
             "velocity_obstacles",
             lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
 
-    def updateGraphics(self):
+    def update_graphics(self):
         """Update the GLGraphicsItems in this layer
 
         :returns: tuple (added_graphics, removed_graphics)
@@ -46,7 +46,7 @@ class GLHrvoLayer(GLLayer):
         """
         # Clear all graphics in this layer if not visible
         if not self.isVisible():
-            return self.graphics_list.getChanges()
+            return self.graphics_list.get_changes()
 
         velocity_obstacle_msg = self.prev_message
         while not self.hrvo_buffer.queue.empty():
@@ -57,7 +57,7 @@ class GLHrvoLayer(GLLayer):
         self.prev_message = velocity_obstacle_msg
 
         for velocity_obstacle_graphic, velocity_obstacle in zip(
-            self.graphics_list.getGraphics(
+            self.graphics_list.get_graphics(
                 "velocity_obstacles", len(velocity_obstacle_msg.velocity_obstacles)
             ),
             velocity_obstacle_msg.velocity_obstacles,
@@ -89,4 +89,4 @@ class GLHrvoLayer(GLLayer):
                 pos=np.array([[point[0], point[1], 0] for point in polygon_points]),
             )
 
-        return self.graphics_list.getChanges()
+        return self.graphics_list.get_changes()

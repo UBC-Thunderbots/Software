@@ -27,13 +27,13 @@ class GLPathLayer(GLLayer):
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
-        self.graphics_list.registerGraphicsGroup("paths", GLLinePlotItem)
-        self.graphics_list.registerGraphicsGroup(
+        self.graphics_list.register_graphics_group("paths", GLLinePlotItem)
+        self.graphics_list.register_graphics_group(
             "destinations",
             lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
         )
 
-    def updateGraphics(self):
+    def update_graphics(self):
         """Update the GLGraphicsItems in this layer
 
         :returns: tuple (added_graphics, removed_graphics)
@@ -43,7 +43,7 @@ class GLPathLayer(GLLayer):
         """
         # Clear all graphics in this layer if not visible
         if not self.isVisible():
-            return self.graphics_list.getChanges()
+            return self.graphics_list.get_changes()
 
         primitive_set = self.primitive_set_buffer.get(
             block=False
@@ -65,7 +65,7 @@ class GLPathLayer(GLLayer):
         ]
 
         for path_graphic, path in zip(
-            self.graphics_list.getGraphics("paths", len(paths)), paths
+            self.graphics_list.get_graphics("paths", len(paths)), paths
         ):
             path_graphic.setData(
                 pos=np.array(
@@ -75,10 +75,10 @@ class GLPathLayer(GLLayer):
             )
 
         for dest_graphic, (dest, final_angle) in zip(
-            self.graphics_list.getGraphics("destinations", len(requested_destinations)),
+            self.graphics_list.get_graphics("destinations", len(requested_destinations)),
             requested_destinations,
         ):
-            dest_graphic.setPosition(dest.x_meters, dest.y_meters)
-            dest_graphic.setOrientation(final_angle.radians)
+            dest_graphic.set_position(dest.x_meters, dest.y_meters)
+            dest_graphic.set_orientation(final_angle.radians)
 
-        return self.graphics_list.getChanges()
+        return self.graphics_list.get_changes()

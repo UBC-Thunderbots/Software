@@ -55,7 +55,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         ):
             self.point_picked = True
             point_in_scene_event = PointInSceneEvent(
-                event, self.getPointInScene(event.position())
+                event, self.get_point_in_scene(event.position())
             )
             self.point_in_scene_pressed_signal.emit(point_in_scene_event)
         else:
@@ -70,7 +70,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         """
         if self.point_picked:
             point_in_scene_event = PointInSceneEvent(
-                event, self.getPointInScene(event.position())
+                event, self.get_point_in_scene(event.position())
             )
             self.point_in_scene_dragged_signal.emit(point_in_scene_event)
         else:
@@ -86,14 +86,14 @@ class ExtendedGLViewWidget(GLViewWidget):
         if self.point_picked:
             self.point_picked = False
             point_in_scene_event = PointInSceneEvent(
-                event, self.getPointInScene(event.position())
+                event, self.get_point_in_scene(event.position())
             )
             self.point_in_scene_released_signal.emit(point_in_scene_event)
         else:
             # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
             super().mouseReleaseEvent(event)
 
-    def getPointInScene(self, mouse_pos):
+    def get_point_in_scene(self, mouse_pos):
         """Determine the coordinates of the point on the x-y plane in the 3D scene that 
         the mouse is pointing at.
 
