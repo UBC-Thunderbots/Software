@@ -9,6 +9,7 @@ py_library(
         ":gl_layer",
         ":gl_measure_layer",
         "//software/thunderscope/gl/helpers:graphics_view",
+        "//software/thunderscope/replay:replay_controls",
         requirement("pyqtgraph"),
     ],
 )

@@ -459,7 +459,7 @@ def configure_replay_view(
     """
     Constructs the Thunderscope Config for a replay view
     Can have 1 or 2 FullSystem tabs but no GameController tab
-    Field widget will now have Player controls
+    GLWidget will now have Player controls
 
     :param blue_replay_log: the file path for the blue replay log
     :param yellow_replay_log: the file path for the yellow replay log

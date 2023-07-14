@@ -20,21 +20,10 @@ from software.thunderscope.gl import (
     gl_tactic_layer,
 )
 
-from software.thunderscope.field import (
-    obstacle_layer,
-    path_layer,
-    validation_layer,
-    simulator_layer,
-    world_layer,
-    passing_layer,
-    hrvo_layer,
-)
-
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
 )
 from software.thunderscope.cost_vis.cost_vis import CostVisualizationWidget
-from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
@@ -101,7 +90,7 @@ def setup_gl_widget(
     gl_widget.add_layer("Simulator", simulator_layer, False)
     gl_widget.add_layer("Tactics", tactic_layer, False)
 
-    # Add HRVO layers to field widget and have them hidden on startup
+    # Add HRVO layers and have them hidden on startup
     # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
     hrvo_sim_states = []
     for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
@@ -128,82 +117,6 @@ def setup_gl_widget(
         full_system_proto_unix_io.register_observer(*arg)
 
     return gl_widget
-
-
-def setup_field_widget(
-    sim_proto_unix_io,
-    full_system_proto_unix_io,
-    friendly_colour_yellow,
-    visualization_buffer_size,
-    replay=False,
-    replay_log=None,
-):
-    """setup the field widget with the constituent layers
-
-    :param sim_proto_unix_io: The proto unix io object for the simulator
-    :param full_system_proto_unix_io: The proto unix io object for the full system
-    :param friendly_colour_yellow: Whether the friendly colour is yellow
-    :param replay: whether replay mode is currently enabled
-    :param replay_log: the file path of the replay log
-    :param visualization_buffer_size: How many packets to buffer while rendering
-    :returns: the field widget
-
-    """
-    player = None
-
-    if replay:
-        player = ProtoPlayer(replay_log, full_system_proto_unix_io,)
-    field = Field(player=player)
-
-    # Create layers
-    paths = path_layer.PathLayer(visualization_buffer_size)
-    obstacles = obstacle_layer.ObstacleLayer(visualization_buffer_size)
-    validation = validation_layer.ValidationLayer(visualization_buffer_size)
-    world = world_layer.WorldLayer(
-        sim_proto_unix_io, friendly_colour_yellow, visualization_buffer_size
-    )
-    sim_state = simulator_layer.SimulatorLayer(
-        friendly_colour_yellow, visualization_buffer_size
-    )
-    passing = passing_layer.PassingLayer(visualization_buffer_size)
-
-    # Add field layers to field
-    field.add_layer("Vision", world)
-    field.add_layer("Obstacles", obstacles)
-    field.add_layer("Paths", paths)
-    field.add_layer("Validation", validation)
-    field.add_layer("Passing", passing)
-    field.add_layer("Simulator", sim_state)
-    hrvo_sim_states = []
-    # Add HRVO layers to field widget and have them hidden on startup
-    # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-    for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
-        hrvo_sim_state = hrvo_layer.HRVOLayer(robot_id, visualization_buffer_size)
-        hrvo_sim_states.append(hrvo_sim_state)
-        field.add_layer(f"HRVO {robot_id}", hrvo_sim_state, False)
-
-    # Register observers
-    sim_proto_unix_io.register_observer(
-        SimulatorState, sim_state.simulator_state_buffer
-    )
-
-    for arg in [
-        (World, world.world_buffer),
-        (RobotStatus, world.robot_status_buffer),
-        (Referee, world.referee_buffer),
-        (PrimitiveSet, obstacles.primitive_set_buffer),
-        (PrimitiveSet, paths.primitive_set_buffer),
-        (PassVisualization, passing.pass_visualization_buffer),
-        (ValidationProtoSet, validation.validation_set_buffer),
-        (SimulatorState, sim_state.simulator_state_buffer),
-    ] + [
-        (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
-        for hrvo_sim_state in hrvo_sim_states
-    ]:
-        full_system_proto_unix_io.register_observer(*arg)
-
-    return field
-
 
 def setup_parameter_widget(proto_unix_io, friendly_colour_yellow):
     """Setup the parameter widget

@@ -4,7 +4,6 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
 from functools import partial
 
-from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.common import common_widgets
 from software.py_constants import *
 
