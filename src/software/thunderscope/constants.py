@@ -97,6 +97,7 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <h3>General Controls</h3><br>
     
     <b><code>I:</code></b> Identify robots, toggle robot ID visibility<br>
+    <b><code>M:</code></b> Toggle measure mode<br>
     <b><code>S:</code></b> Toggle visibility of robot/ball speed visualization<br>
     <b><code>Ctrl + Space:</code></b> Stop AI vs AI simulation<br>
     <b><code>Number Keys:</code></b> Position camera to preset view<br>
@@ -107,6 +108,14 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b>Orbit:</b> Left click and drag mouse<br>
     <b>Pan:</b> Hold Ctrl while dragging OR drag with middle mouse button<br>
     <b>Zoom:</b> Scrollwheel<br>
+
+    <h3>Measure Mode</h3><br>
+
+    <b><code>M:</code></b> Toggle measure mode<br>
+    <b>Shift + Left Click:</b> Place a point<br>
+    Placing 2 points will create a distance measurement.<br> 
+    Placing 3 points will create an angle measurement.<br> 
+    All measurements will be cleared when measure mode is toggled off.
 
     <h3>Layout Controls</h3><br>
 

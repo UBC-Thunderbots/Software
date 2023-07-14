@@ -7,6 +7,7 @@ py_library(
     srcs = ["gl_widget.py"],
     deps = [
         ":gl_layer",
+        ":gl_measure_layer",
         "//software/thunderscope/gl/helpers:graphics_view",
         requirement("pyqtgraph"),
     ],
@@ -98,6 +99,16 @@ py_library(
     deps = [
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_circle",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_measure_layer",
+    srcs = ["gl_measure_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_ball",
         requirement("pyqtgraph"),
     ],
 )

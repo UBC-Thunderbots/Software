@@ -10,6 +10,7 @@ import numpy as np
 from software.thunderscope.constants import *
 
 from software.thunderscope.gl.gl_layer import GLLayer
+from software.thunderscope.gl.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.graphics_view import GraphicsView
 
@@ -31,14 +32,17 @@ class GLWidget(QWidget):
         self.graphics_view = GraphicsView()
 
         # Connect event handlers
-        self.graphics_view.gl_view_widget.point_in_scene_pressed_signal.connect(
-            self.point_in_scene_pressed
+        self.graphics_view.gl_view_widget.mouse_in_scene_pressed_signal.connect(
+            self.mouse_in_scene_pressed
         )
-        self.graphics_view.gl_view_widget.point_in_scene_dragged_signal.connect(
-            self.point_in_scene_dragged
+        self.graphics_view.gl_view_widget.mouse_in_scene_dragged_signal.connect(
+            self.mouse_in_scene_dragged
         )
-        self.graphics_view.gl_view_widget.point_in_scene_released_signal.connect(
-            self.point_in_scene_released
+        self.graphics_view.gl_view_widget.mouse_in_scene_released_signal.connect(
+            self.mouse_in_scene_released
+        )
+        self.graphics_view.gl_view_widget.mouse_in_scene_moved_signal.connect(
+            self.mouse_in_scene_moved
         )
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
@@ -96,6 +100,17 @@ class GLWidget(QWidget):
         for camera_view_action in self.camera_view_actions:
             self.camera_view_menu.addAction(camera_view_action)
 
+        # Setup Measure button for enabling/disabling measure mode
+        self.measure_mode_enabled = False
+        self.measure_layer = None
+        self.measure_button = QToolButton()
+        self.measure_button.setText("Measure")
+        self.measure_button.setStyleSheet(tool_button_stylesheet)
+        self.measure_button.setShortcut("m")
+        self.measure_button.clicked.connect(
+            lambda: self.toggle_measure_mode()
+        )
+
         # Setup Help button
         self.help_button = QToolButton()
         self.help_button.setText("Help")
@@ -111,6 +126,7 @@ class GLWidget(QWidget):
         self.toolbar.setLayout(QHBoxLayout())
         self.toolbar.layout().addStretch()
         self.toolbar.layout().addWidget(self.help_button)
+        self.toolbar.layout().addWidget(self.measure_button)
         self.toolbar.layout().addWidget(self.camera_view_button)
 
         # Setup layout
@@ -173,32 +189,61 @@ class GLWidget(QWidget):
         for layer in self.layers:
             layer.keyReleaseEvent(event)
 
-    def point_in_scene_pressed(self, event):
-        """Propagate point_in_scene_pressed event to all layers
+    def mouse_in_scene_pressed(self, event):
+        """Propagate mouse_in_scene_pressed event to all layers
         
         :param event: The event
         
         """
-        for layer in self.layers:
-            layer.point_in_scene_pressed(event)
+        if self.measure_mode_enabled:
+            # Only GLMeasureLayer should receive event to avoid layer
+            # functionality conflicts
+            self.measure_layer.mouse_in_scene_pressed(event)
+        else:
+            for layer in self.layers:
+                layer.mouse_in_scene_pressed(event)
 
-    def point_in_scene_dragged(self, event):
-        """Propagate point_in_scene_dragged event to all layers
+    def mouse_in_scene_dragged(self, event):
+        """Propagate mouse_in_scene_dragged event to all layers
         
         :param event: The event
         
         """
-        for layer in self.layers:
-            layer.point_in_scene_dragged(event)
+        if self.measure_mode_enabled:
+            # Only GLMeasureLayer should receive event to avoid layer
+            # functionality conflicts
+            self.measure_layer.mouse_in_scene_dragged(event)
+        else:
+            for layer in self.layers:
+                layer.mouse_in_scene_dragged(event)
 
-    def point_in_scene_released(self, event):
-        """Propagate point_in_scene_released event to all layers
+    def mouse_in_scene_released(self, event):
+        """Propagate mouse_in_scene_released event to all layers
         
         :param event: The event
         
         """
-        for layer in self.layers:
-            layer.point_in_scene_released(event)
+        if self.measure_mode_enabled:
+            # Only GLMeasureLayer should receive event to avoid layer
+            # functionality conflicts
+            self.measure_layer.mouse_in_scene_released(event)
+        else:
+            for layer in self.layers:
+                layer.mouse_in_scene_released(event)
+
+    def mouse_in_scene_moved(self, event):
+        """Propagate mouse_in_scene_moved event to all layers
+        
+        :param event: The event
+        
+        """
+        if self.measure_mode_enabled:
+            # Only GLMeasureLayer should receive event to avoid layer
+            # functionality conflicts
+            self.measure_layer.mouse_in_scene_moved(event)
+        else:
+            for layer in self.layers:
+                ayer.mouse_in_scene_moved(event)
 
     def add_layer(self, name: str, layer: GLLayer, visible: bool = True):
         """Add a layer to this GLWidget and to the legend
@@ -220,7 +265,11 @@ class GLWidget(QWidget):
 
         """
         # Remove all graphics provided by this layer from the scene
-        graphics = layer.graphics_list.graphics.values()
+        graphics = [
+            graphic 
+            for graphics_list in layer.graphics_list.graphics.values()
+            for graphic in graphics_list
+        ]
         for graphic in graphics:
             self.graphics_view.gl_view_widget.removeItem(graphic)
         
@@ -268,3 +317,21 @@ class GLWidget(QWidget):
             self.graphics_view.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(2.5, 0, 0), distance=10, elevation=45, azimuth=0
             )
+
+    def toggle_measure_mode(self):
+        """Toggles measure mode in the 3D visualizer"""
+        self.measure_mode_enabled = not self.measure_mode_enabled
+
+        # Enable/disable detect_mouse_movement_in_scene in ExtendedGLViewWidget
+        # so that the mouse_in_scene_moved_signal is emitted if measure mode is on.
+        #
+        # Normally we want to disable detect_mouse_movement_in_scene so that we
+        # don't do unnecessary calculations every tick to find the point in the scene
+        # that the mouse is pointing at.
+        self.graphics_view.gl_view_widget.detect_mouse_movement_in_scene = self.measure_mode_enabled
+
+        if self.measure_mode_enabled:
+            self.measure_layer = GLMeasureLayer()
+            self.add_layer("Measure", self.measure_layer)
+        else:
+            self.remove_layer(self.measure_layer)

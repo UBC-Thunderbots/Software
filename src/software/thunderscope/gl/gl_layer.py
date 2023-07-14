@@ -37,22 +37,30 @@ class GLLayer(pg.GraphicsObject):
         """
         raise NotImplementedError("Abstract class method called: update_graphics")
 
-    def point_in_scene_pressed(self, event):
-        """Event handler for the point_in_scene_pressed event
+    def mouse_in_scene_pressed(self, event):
+        """Event handler for the mouse_in_scene_pressed event
+        
+        :param event: The event
+        
+        """
+        pass
+
+    def mouse_in_scene_dragged(self, event):
+        """Event handler for the mouse_in_scene_dragged event
         
         :param event: The event
         
         """
 
-    def point_in_scene_dragged(self, event):
-        """Event handler for the point_in_scene_dragged event
+    def mouse_in_scene_released(self, event):
+        """Event handler for the mouse_in_scene_released event
         
         :param event: The event
         
         """
 
-    def point_in_scene_released(self, event):
-        """Event handler for the point_in_scene_released event
+    def mouse_in_scene_moved(self, event):
+        """Event handler for the mouse_in_scene_moved event
         
         :param event: The event
         

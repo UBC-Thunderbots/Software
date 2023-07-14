@@ -28,13 +28,17 @@ class ExtendedGLViewWidget(GLViewWidget):
     mouse cursor position in the 3D scene"""
 
     # Signal emitted when mouse has picked a point in the 3D scene (shift + click)
-    point_in_scene_pressed_signal = QtCore.pyqtSignal(PointInSceneEvent)
+    mouse_in_scene_pressed_signal = QtCore.pyqtSignal(PointInSceneEvent)
 
     # Signal emitted when mouse is dragging within the 3D scene (shift + drag)
-    point_in_scene_dragged_signal = QtCore.pyqtSignal(PointInSceneEvent)
+    mouse_in_scene_dragged_signal = QtCore.pyqtSignal(PointInSceneEvent)
 
     # Signal emitted when mouse is released having picked a point in the 3D scene (shift + release)
-    point_in_scene_released_signal = QtCore.pyqtSignal(PointInSceneEvent)
+    mouse_in_scene_released_signal = QtCore.pyqtSignal(PointInSceneEvent)
+
+    # Signal emitted when mouse is moving within the 3D scene
+    # (mouse_moved_in_scene_signal must be enabled for this signal to be emitted)
+    mouse_in_scene_moved_signal = QtCore.pyqtSignal(PointInSceneEvent)
 
     def __init__(self):
         """Initialize the ExtendedGLViewWidget"""
@@ -42,6 +46,9 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         # Keep track of whether the mouse picked a point in the 3D scene
         self.point_picked = False
+
+        # This must be enabled for the mouse_moved_in_scene_signal to be emitted
+        self.detect_mouse_movement_in_scene = False
 
     def mousePressEvent(self, event):
         """Detect that the mouse was pressed
@@ -57,7 +64,7 @@ class ExtendedGLViewWidget(GLViewWidget):
             point_in_scene_event = PointInSceneEvent(
                 event, self.get_point_in_scene(event.position())
             )
-            self.point_in_scene_pressed_signal.emit(point_in_scene_event)
+            self.mouse_in_scene_pressed_signal.emit(point_in_scene_event)
         else:
             # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
             super().mousePressEvent(event)
@@ -68,14 +75,22 @@ class ExtendedGLViewWidget(GLViewWidget):
         :param event: The event
 
         """
-        if self.point_picked:
+        if self.point_picked or self.detect_mouse_movement_in_scene:
+            
             point_in_scene_event = PointInSceneEvent(
                 event, self.get_point_in_scene(event.position())
             )
-            self.point_in_scene_dragged_signal.emit(point_in_scene_event)
-        else:
-            # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
-            super().mouseMoveEvent(event)
+
+            if self.detect_mouse_movement_in_scene:
+                self.mouse_in_scene_moved_signal.emit(point_in_scene_event)
+            
+            if self.point_picked:
+                self.mouse_in_scene_dragged_signal.emit(point_in_scene_event)
+                # We don't want to handle GLViewWidget orbit/pan if we're picking a 
+                # point in 3D, so early return
+                return
+        
+        super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
         """Detect that the mouse was released
@@ -88,7 +103,7 @@ class ExtendedGLViewWidget(GLViewWidget):
             point_in_scene_event = PointInSceneEvent(
                 event, self.get_point_in_scene(event.position())
             )
-            self.point_in_scene_released_signal.emit(point_in_scene_event)
+            self.mouse_in_scene_released_signal.emit(point_in_scene_event)
         else:
             # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
             super().mouseReleaseEvent(event)

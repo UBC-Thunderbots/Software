@@ -115,8 +115,8 @@ class GLWorldLayer(GLLayer):
         """
         self.key_pressed[event.key()] = False
 
-    def point_in_scene_pressed(self, event):
-        """Event handler for the point_in_scene_pressed event
+    def mouse_in_scene_pressed(self, event):
+        """Event handler for the mouse_in_scene_pressed event
         
         :param event: The event
         
@@ -137,8 +137,8 @@ class GLWorldLayer(GLLayer):
         )
         self.simulator_io.send_proto(WorldState, world_state)
 
-    def point_in_scene_dragged(self, event):
-        """Event handler for the point_in_scene_dragged event
+    def mouse_in_scene_dragged(self, event):
+        """Event handler for the mouse_in_scene_dragged event
         
         :param event: The event
         
@@ -171,8 +171,8 @@ class GLWorldLayer(GLLayer):
                 GLWorldLayer.MAX_ALLOWED_KICK_SPEED_M_PER_S
             )
 
-    def point_in_scene_released(self, event):
-        """Event handler for the point_in_scene_released event
+    def mouse_in_scene_released(self, event):
+        """Event handler for the mouse_in_scene_released event
         
         :param event: The event
         
