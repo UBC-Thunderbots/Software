@@ -41,7 +41,7 @@ class GLTacticLayer(GLLayer):
         self.graphics_list.register_graphics_group(
             "tactic_fsm_info",
             lambda: GLTextItem(
-                font=QtGui.QFont("Helvetica", 6), color=Colors.SECONDARY_TEXT_COLOR
+                font=QtGui.QFont("Roboto", 6), color=Colors.SECONDARY_TEXT_COLOR
             ),
         )
 

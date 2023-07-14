@@ -49,7 +49,7 @@ class GLWidget(QWidget):
         # Stylesheet for toolbar buttons
         tool_button_stylesheet = textwrap.dedent(
             """
-            QToolButton {
+            QPushButton {
                 color: #969696;
                 background-color: transparent;
                 border-color: transparent;
@@ -57,7 +57,7 @@ class GLWidget(QWidget):
                 border-radius: 4px;
                 height: 16px;
             }
-            QToolButton:hover {
+            QPushButton:hover {
                 background-color: #363636;
                 border-color: #363636;
             }
@@ -65,25 +65,19 @@ class GLWidget(QWidget):
         )
 
         # Setup Layers button for toggling visibility of layers
-        self.layers_button = QToolButton()
+        self.layers_button = QPushButton()
         self.layers_button.setText("Layers")
         self.layers_button.setStyleSheet(tool_button_stylesheet)
         self.layers_menu = QtGui.QMenu()
         self.layers_menu_actions = {}
         self.layers_button.setMenu(self.layers_menu)
-        self.layers_button.setPopupMode(
-            QToolButton.ToolButtonPopupMode.InstantPopup
-        )
 
         # Set up View button for setting the camera position to standard views
-        self.camera_view_button = QToolButton()
+        self.camera_view_button = QPushButton()
         self.camera_view_button.setText("View")
         self.camera_view_button.setStyleSheet(tool_button_stylesheet)
         self.camera_view_menu = QtGui.QMenu()
         self.camera_view_button.setMenu(self.camera_view_menu)
-        self.camera_view_button.setPopupMode(
-            QToolButton.ToolButtonPopupMode.InstantPopup
-        )
         self.camera_view_actions = [
             QtGui.QAction("[1] Orthographic Top Down"),
             QtGui.QAction("[2] Landscape High Angle"),
@@ -108,7 +102,7 @@ class GLWidget(QWidget):
         # Setup Measure button for enabling/disabling measure mode
         self.measure_mode_enabled = False
         self.measure_layer = None
-        self.measure_button = QToolButton()
+        self.measure_button = QPushButton()
         self.measure_button.setText("Measure")
         self.measure_button.setStyleSheet(tool_button_stylesheet)
         self.measure_button.setShortcut("m")
@@ -117,7 +111,7 @@ class GLWidget(QWidget):
         )
 
         # Setup Help button
-        self.help_button = QToolButton()
+        self.help_button = QPushButton()
         self.help_button.setText("Help")
         self.help_button.setStyleSheet(tool_button_stylesheet)
         self.help_button.clicked.connect(

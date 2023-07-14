@@ -33,13 +33,13 @@ class GLMeasureLayer(GLLayer):
         self.graphics_list.register_graphics_group(
             "cursor_text", 
             lambda: GLTextItem(
-                font=QtGui.QFont("Helvetica", 10), color=Colors.PRIMARY_TEXT_COLOR
+                font=QtGui.QFont("Roboto", 10), color=Colors.PRIMARY_TEXT_COLOR
             )
         )
         self.graphics_list.register_graphics_group(
             "measurement_text", 
             lambda: GLTextItem(
-                font=QtGui.QFont("Helvetica", 8), color=Colors.FIELD_LINE_COLOR
+                font=QtGui.QFont("Roboto", 8), color=Colors.FIELD_LINE_COLOR
             )
         )
         self.graphics_list.register_graphics_group(
