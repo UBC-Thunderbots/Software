@@ -8,7 +8,7 @@ py_library(
     deps = [
         ":gl_layer",
         ":gl_measure_layer",
-        "//software/thunderscope/gl/helpers:graphics_view",
+        "//software/thunderscope/gl/helpers:extended_gl_view_widget",
         "//software/thunderscope/replay:replay_controls",
         requirement("pyqtgraph"),
     ],

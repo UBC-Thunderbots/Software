@@ -12,7 +12,7 @@ from software.thunderscope.constants import *
 from software.thunderscope.gl.gl_layer import GLLayer
 from software.thunderscope.gl.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.replay.replay_controls import ReplayControls
-from software.thunderscope.gl.helpers.graphics_view import GraphicsView
+from software.thunderscope.gl.helpers.extended_gl_view_widget import ExtendedGLViewWidget
 
 
 class GLWidget(QWidget):
@@ -28,29 +28,23 @@ class GLWidget(QWidget):
         """
         QVBoxLayout.__init__(self)
 
-        # Setup the GraphicsView containing the GLViewWidget
-        self.graphics_view = GraphicsView()
+        self.gl_view_widget = ExtendedGLViewWidget()
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
+        self.gl_view_widget.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         # Connect event handlers
-        self.graphics_view.gl_view_widget.mouse_in_scene_pressed_signal.connect(
+        self.gl_view_widget.mouse_in_scene_pressed_signal.connect(
             self.mouse_in_scene_pressed
         )
-        self.graphics_view.gl_view_widget.mouse_in_scene_dragged_signal.connect(
+        self.gl_view_widget.mouse_in_scene_dragged_signal.connect(
             self.mouse_in_scene_dragged
         )
-        self.graphics_view.gl_view_widget.mouse_in_scene_released_signal.connect(
+        self.gl_view_widget.mouse_in_scene_released_signal.connect(
             self.mouse_in_scene_released
         )
-        self.graphics_view.gl_view_widget.mouse_in_scene_moved_signal.connect(
+        self.gl_view_widget.mouse_in_scene_moved_signal.connect(
             self.mouse_in_scene_moved
         )
-
-        self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
-        self.graphics_view.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-
-        # Setup legend
-        self.legend = pg.LegendItem((80, 60))
-        self.graphics_view.addItem(self.legend)
 
         # Stylesheet for toolbar buttons
         tool_button_stylesheet = textwrap.dedent(
@@ -68,6 +62,17 @@ class GLWidget(QWidget):
                 border-color: #363636;
             }
             """
+        )
+
+        # Setup Layers button for toggling visibility of layers
+        self.layers_button = QToolButton()
+        self.layers_button.setText("Layers")
+        self.layers_button.setStyleSheet(tool_button_stylesheet)
+        self.layers_menu = QtGui.QMenu()
+        self.layers_menu_actions = {}
+        self.layers_button.setMenu(self.layers_menu)
+        self.layers_button.setPopupMode(
+            QToolButton.ToolButtonPopupMode.InstantPopup
         )
 
         # Set up View button for setting the camera position to standard views
@@ -124,6 +129,7 @@ class GLWidget(QWidget):
         self.toolbar.setMaximumHeight(40)
         self.toolbar.setStyleSheet("background-color: black;" "padding: 0px;")
         self.toolbar.setLayout(QHBoxLayout())
+        self.toolbar.layout().addWidget(self.layers_button)
         self.toolbar.layout().addStretch()
         self.toolbar.layout().addWidget(self.help_button)
         self.toolbar.layout().addWidget(self.measure_button)
@@ -134,7 +140,7 @@ class GLWidget(QWidget):
         self.layout.setSpacing(0)
         self.setLayout(self.layout)
         self.layout.addWidget(self.toolbar)
-        self.layout.addWidget(self.graphics_view.gl_view_widget)
+        self.layout.addWidget(self.gl_view_widget)
 
         # Setup replay controls if player is provided and the log has some size
         self.player = player
@@ -243,23 +249,29 @@ class GLWidget(QWidget):
             self.measure_layer.mouse_in_scene_moved(event)
         else:
             for layer in self.layers:
-                ayer.mouse_in_scene_moved(event)
+                layer.mouse_in_scene_moved(event)
 
-    def add_layer(self, name: str, layer: GLLayer, visible: bool = True):
-        """Add a layer to this GLWidget and to the legend
+    def add_layer(self, layer: GLLayer, visible: bool = True):
+        """Add a layer to this GLWidget
         
-        :param name: The name of the layer
         :param layer: The GLLayer 
         :param visible: Whether the layer is visible on startup
 
         """
         self.layers.append(layer)
-        self.legend.addItem(layer, name)
+
         if not visible:
             layer.hide()
 
+        # Add the layer to the Layer menu
+        layer_action = QtGui.QAction(layer.name, self.layers_menu, checkable=True)
+        layer_action.setChecked(layer.isVisible())
+        layer_action.triggered.connect(lambda: layer.setVisible(not layer.isVisible()))
+        self.layers_menu_actions[layer.name] = layer_action
+        self.layers_menu.addAction(layer_action)
+
     def remove_layer(self, layer: GLLayer):
-        """Remove a layer from this GLWidget and its legend
+        """Remove a layer from this GLWidget
         
         :param layer: The GLLayer to remove
 
@@ -271,11 +283,14 @@ class GLWidget(QWidget):
             for graphic in graphics_list
         ]
         for graphic in graphics:
-            self.graphics_view.gl_view_widget.removeItem(graphic)
+            self.gl_view_widget.removeItem(graphic)
         
         # Remove the layer
         self.layers.remove(layer)
-        self.legend.removeItem(layer)
+
+        # Remove the layer from the Layer menu
+        layer_action = self.layers_menu_actions[layer.name]
+        self.layers_menu.removeAction(layer_action)
 
     def refresh(self):
         """Trigger an update on all the layers, adding/removing GLGraphicsItem 
@@ -288,10 +303,10 @@ class GLWidget(QWidget):
             added_graphics, removed_graphics = layer.update_graphics()
 
             for added_graphic in added_graphics:
-                self.graphics_view.gl_view_widget.addItem(added_graphic)
+                self.gl_view_widget.addItem(added_graphic)
 
             for removed_graphic in removed_graphics:
-                self.graphics_view.gl_view_widget.removeItem(removed_graphic)
+                self.gl_view_widget.removeItem(removed_graphic)
 
     def set_camera_view(self, camera_view):
         """Set the camera position to a preset camera view
@@ -299,22 +314,22 @@ class GLWidget(QWidget):
         :param camera_view: the preset camera view
 
         """
-        self.graphics_view.gl_view_widget.reset()
+        self.gl_view_widget.reset()
         if camera_view == CameraView.ORTHOGRAPHIC:
-            self.graphics_view.gl_view_widget.setCameraPosition(
+            self.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(0, 0, 0), distance=1000, elevation=90, azimuth=-90
             )
-            self.graphics_view.gl_view_widget.setCameraParams(fov=1.0)
+            self.gl_view_widget.setCameraParams(fov=1.0)
         elif camera_view == CameraView.LANDSCAPE_HIGH_ANGLE:
-            self.graphics_view.gl_view_widget.setCameraPosition(
+            self.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(0, -0.5, 0), distance=13, elevation=45, azimuth=-90
             )
         elif camera_view == CameraView.LEFT_HALF_HIGH_ANGLE:
-            self.graphics_view.gl_view_widget.setCameraPosition(
+            self.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(-2.5, 0, 0), distance=10, elevation=45, azimuth=180
             )
         elif camera_view == CameraView.RIGHT_HALF_HIGH_ANGLE:
-            self.graphics_view.gl_view_widget.setCameraPosition(
+            self.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(2.5, 0, 0), distance=10, elevation=45, azimuth=0
             )
 
@@ -328,10 +343,11 @@ class GLWidget(QWidget):
         # Normally we want to disable detect_mouse_movement_in_scene so that we
         # don't do unnecessary calculations every tick to find the point in the scene
         # that the mouse is pointing at.
-        self.graphics_view.gl_view_widget.detect_mouse_movement_in_scene = self.measure_mode_enabled
+        self.gl_view_widget.detect_mouse_movement_in_scene = self.measure_mode_enabled
 
         if self.measure_mode_enabled:
             self.measure_layer = GLMeasureLayer()
-            self.add_layer("Measure", self.measure_layer)
+            self.measure_layer.set_name("Measure")
+            self.add_layer(self.measure_layer)
         else:
             self.remove_layer(self.measure_layer)

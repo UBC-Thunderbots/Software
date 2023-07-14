@@ -9,15 +9,6 @@ py_library(
 )
 
 py_library(
-    name = "graphics_view",
-    srcs = ["graphics_view.py"],
-    deps = [
-        ":extended_gl_view_widget",
-        requirement("pyqtgraph"),
-    ],
-)
-
-py_library(
     name = "extended_gl_view_widget",
     srcs = ["extended_gl_view_widget.py"],
     deps = [

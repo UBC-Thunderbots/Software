@@ -44,6 +44,12 @@ class ExtendedGLViewWidget(GLViewWidget):
         """Initialize the ExtendedGLViewWidget"""
         super().__init__()
 
+        # Fixes strange bug where mousePos is not initialized
+        self.mousePos = QtCore.QPointF(0, 0)
+
+        # Always track mouse so that mouseMoveEvent is always received
+        self.setMouseTracking(True)
+
         # Keep track of whether the mouse picked a point in the 3D scene
         self.point_picked = False
 

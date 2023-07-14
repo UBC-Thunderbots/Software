@@ -12,21 +12,17 @@ class GLLayer(pg.GraphicsObject):
         """Initialize the GLLayer"""
         pg.GraphicsObject.__init__(self)
 
-        # Options for the layer, used to configure the legend
-        self.opts = {
-            "pxMode": True,
-            "useCache": True,
-            "antialias": True,
-            "name": None,
-            "symbol": "o",
-            "size": 7,
-            "pen": pg.mkPen("w"),
-            "brush": pg.mkBrush("w"),
-            "tip": "x: {x:.3g}\ny: {y:.3g}\ndata={data}".format,
-        }
-
+        self.name = ""
         self.graphics_list = GraphicsList()
 
+    def set_name(self, name: str):
+        """Sets the displayed name of the layer
+        
+        :param name: The name of the layer
+
+        """
+        self.name = name
+        
     def update_graphics(self):
         """Update the GLGraphicsItems in this layer
 
