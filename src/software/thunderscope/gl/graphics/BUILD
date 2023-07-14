@@ -42,3 +42,11 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_goal",
+    srcs = ["gl_goal.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
+)

@@ -62,6 +62,7 @@ py_library(
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_rect",
         "//software/thunderscope/gl/graphics:gl_robot",
+        "//software/thunderscope/gl/graphics:gl_goal",
         requirement("pyqtgraph"),
     ],
 )

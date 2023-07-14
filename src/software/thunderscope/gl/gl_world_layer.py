@@ -12,6 +12,7 @@ from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
 from software.thunderscope.gl.graphics.gl_robot import GLRobot
 from software.thunderscope.gl.graphics.gl_ball import GLBall
+from software.thunderscope.gl.graphics.gl_goal import GLGoal
 
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -70,6 +71,9 @@ class GLWorldLayer(GLLayer):
         )
         self.graphics_list.register_graphics_group(
             "field_center_circle", lambda: GLCircle(color=Colors.FIELD_LINE_COLOR)
+        )
+        self.graphics_list.register_graphics_group(
+            "goals", lambda: GLGoal(color=Colors.GOAL_COLOR)
         )
         self.graphics_list.register_graphics_group("ball", GLBall)
         self.graphics_list.register_graphics_group("robots", GLRobot)
@@ -258,6 +262,32 @@ class GLWorldLayer(GLLayer):
                 ]
             ),
         )
+    
+    def update_goal_graphics(self, field: Field):
+        """Update the GLGraphicsItems that display the goals
+        
+        :param field: The field proto
+
+        """
+        goal_graphics = self.graphics_list.get_graphics("goals", 2)
+
+        # Friendly goal
+        goal_graphics[0].set_dimensions(
+            field.goal_x_length, field.goal_y_length
+        )
+        goal_graphics[0].set_position(
+            -field.field_x_length / 2, 0
+        )
+        goal_graphics[0].set_orientation(0)
+
+        # Enemy goal
+        goal_graphics[1].set_dimensions(
+            field.goal_x_length, field.goal_y_length
+        )
+        goal_graphics[1].set_position(
+            field.field_x_length / 2, 0
+        )
+        goal_graphics[1].set_orientation(180)
 
     def update_ball_graphics(self, ball_state: BallState):
         """Update the GLGraphicsItems that display the ball
@@ -394,6 +424,7 @@ class GLWorldLayer(GLLayer):
         self.cached_world = self.world_buffer.get(block=False)
 
         self.update_field_graphics(self.cached_world.field)
+        self.update_goal_graphics(self.cached_world.field)
         self.update_ball_graphics(self.cached_world.ball.current_state)
 
         friendly_colour = (

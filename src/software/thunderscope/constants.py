@@ -180,6 +180,7 @@ class Colors(object):
 
     FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 100)
     FIELD_LINE_LIGHTER_COLOR = QtGui.QColor(255, 255, 255, 50)
+    GOAL_COLOR = QtGui.QColor(200, 200, 200, 255)
     BALL_COLOR = QtGui.QColor(255, 100, 0, 255)
     SIM_BALL_COLOR = QtGui.QColor(255, 100, 0, 150)
     YELLOW_ROBOT_COLOR = QtGui.QColor(255, 255, 0, 255)
