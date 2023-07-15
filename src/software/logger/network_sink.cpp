@@ -7,8 +7,9 @@
 #include "shared/constants.h"
 #include "software/logger/custom_logging_levels.h"
 
-NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int robot_id)
-    : robot_id(robot_id)
+NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int robot_id,
+                         bool enable_log_merging)
+    : robot_id(robot_id), log_merger(LogMerger(enable_log_merging))
 {
     log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel)) + "%" + interface,
@@ -21,12 +22,22 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
 
 void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
 {
-    auto level = log_entry.get()._level;
+    g3::LogMessage new_log = log_entry.get();
+    for (const g3::LogMessage& log : log_merger.log(new_log))
+    {
+        sendOneLogToNetwork(log);
+    }
+}
 
-    if (level.value == VISUALIZE.value)
+void NetworkSink::sendOneLogToNetwork(const g3::LogMessage& log)
+{
+    auto log_msg_proto = std::make_unique<TbotsProto::RobotLog>();
+    TbotsProto::LogLevel log_level_proto;
+
+    if (log._level.value == VISUALIZE.value)
     {
         TbotsProto::HRVOVisualization log_msg_proto;
-        std::string msg       = log_entry.get().message();
+        std::string msg       = log.message();
         size_t file_name_pos  = msg.find(PROTO_MSG_TYPE_DELIMITER);
         std::string file_name = msg.substr(0, file_name_pos);
 
@@ -53,16 +64,13 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
         }
     }
 
-    TbotsProto::LogLevel log_level_proto;
-    if (TbotsProto::LogLevel_Parse(log_entry.get().level(), &log_level_proto))
+    if (TbotsProto::LogLevel_Parse(log.level(), &log_level_proto))
     {
-        TbotsProto::RobotLog log_msg_proto;
-        log_msg_proto.set_log_msg(log_entry.get().message());
-        log_msg_proto.set_robot_id(robot_id);
-        log_msg_proto.set_log_level(log_level_proto);
-        log_msg_proto.set_file_name(log_entry.get().file());
-        log_msg_proto.set_line_number(
-            static_cast<uint32_t>(std::stoul(log_entry.get().line())));
+        log_msg_proto->set_log_msg(log.message());
+        log_msg_proto->set_robot_id(robot_id);
+        log_msg_proto->set_log_level(log_level_proto);
+        log_msg_proto->set_file_name(log.file());
+        log_msg_proto->set_line_number(static_cast<uint32_t>(std::stoul(log.line())));
 
         TbotsProto::Timestamp timestamp;
         const auto current_time_ms =
@@ -71,8 +79,8 @@ void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
         timestamp.set_epoch_timestamp_seconds(
             static_cast<double>(current_time_ms.time_since_epoch().count()) /
             MILLISECONDS_PER_SECOND);
-        *(log_msg_proto.mutable_created_timestamp()) = timestamp;
+        *(log_msg_proto->mutable_created_timestamp()) = timestamp;
 
-        log_output->sendProto(log_msg_proto);
+        log_output->sendProto(*log_msg_proto);
     }
 }

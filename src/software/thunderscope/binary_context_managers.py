@@ -125,7 +125,6 @@ gdb --args bazel-bin/{full_system}
 
     def __restart__(self):
         "Restarts full system."
-
         while True:
             if not is_cmd_running(
                 [

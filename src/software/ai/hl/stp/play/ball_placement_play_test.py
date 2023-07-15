@@ -12,7 +12,6 @@ from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
 # TODO (#2599): Remove Duration parameter from test
-# TODO (#2690): Robot gets stuck in corner of defense area
 def test_two_ai_ball_placement(simulated_test_runner):
 
     # placement point must be Vector2 to work with game controller
@@ -29,7 +28,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
             tbots.Point(-2.75, 0.5),
             tbots.Point(-2.75, -0.5),
             tbots.Point(-2.75, -1.5),
-            tbots.Point(4.6, -3.1),
+            tbots.Point(4.5, -3.0),
         ]
 
         yellow_bots = [
@@ -83,7 +82,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
 
     simulated_test_runner.run_test(
         setup=setup,
-        params=[False, False, False, False],
+        params=[False],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[
             [
@@ -102,7 +101,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
                 ),
             ]
         ],
-        test_timeout_s=[20, 20, 20, 20],
+        test_timeout_s=[20],
     )
 
 

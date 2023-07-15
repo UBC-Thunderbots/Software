@@ -2,7 +2,10 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <condition_variable>
+#include <mutex>
 #include <string>
+#include <thread>
 
 #include "software/logger/logger.h"
 #include "software/networking/proto_udp_listener.hpp"
@@ -45,8 +48,13 @@ class ProtoUdpListener
      */
     ProtoUdpListener(boost::asio::io_service& io_service, unsigned short port,
                      std::function<void(ReceiveProtoT&)> receive_callback);
+    /**
+     * Closes the socket associated to the UDP listener
+     */
+    virtual void close();
 
     virtual ~ProtoUdpListener();
+
 
    private:
     /**
@@ -57,6 +65,16 @@ class ProtoUdpListener
      */
     void handleDataReception(const boost::system::error_code& error,
                              size_t num_bytes_received);
+
+    /**
+     * This function is setup as the callback to handle packets received over the network.
+     * If the callback takes longer than 1s, a warning is logged and the packet is dropped
+     *
+     * @param error The error code obtained when receiving the incoming data
+     * @param num_bytes_received How many bytes of data were received
+     */
+    void receiveData(const boost::system::error_code& error, size_t num_bytes_received);
+
 
     /**
      * Start listening for data
@@ -154,13 +172,49 @@ template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
+    // Mutex and C.V. are required to create two threads, one which runs recieveData and
+    // one which counts down for 1s This effecitvely creates a "timeout" in case we end up
+    // in an infinite blocking loop.
+    std::mutex m;
+    std::condition_variable cv;
+
+    // Spawns a new thread. When receiveData finishes, it will signal the condition
+    // variable.
+    std::thread recv_thread([this, &cv, &error, &num_bytes_received]() {
+        receiveData(error, num_bytes_received);
+        cv.notify_one();
+    });
+
+    // Run thread
+    recv_thread.detach();
+
+    // This scoped block will wait for the condition variable to get signalled. If not
+    // signalled within 1s, log an error and try startListen again
+    {
+        using namespace std::chrono_literals;
+        std::unique_lock<std::mutex> lock(m);
+        // Sometimes we hang during the receive callback because the callback function is
+        // defined in python, and passed to the pybinded UDP listener. Timeout of 1s is
+        // set to avoid infinite hanging during robot communication teardown. We are
+        // unsure why this happens
+        if (cv.wait_for(lock, 1s) == std::cv_status::timeout)
+        {
+            LOG(WARNING) << "Timed out, starting listen again" << std::endl;
+            startListen();
+        }
+    }
+}
+
+template <class ReceiveProtoT>
+void ProtoUdpListener<ReceiveProtoT>::receiveData(const boost::system::error_code& error,
+                                                  size_t num_bytes_received)
+{
     if (!error)
     {
         auto packet_data = ReceiveProtoT();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
         receive_callback(packet_data);
-
         // Once we've handled the data, start listening again
         startListen();
     }
@@ -185,6 +239,12 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
 
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::~ProtoUdpListener()
+{
+    socket_.close();
+}
+
+template <class ReceiveProtoT>
+void ProtoUdpListener<ReceiveProtoT>::close()
 {
     socket_.close();
 }
