@@ -171,6 +171,12 @@ class SimulatedTestRunner(TbotsTestRunner):
                     world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
+
+                    # We need this blocking get call to synchronize the running speed of world and primitives
+                    # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
+                    self.primitive_set_buffer.get(
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
+                    )
                     break
                 except queue.Empty as empty:
                     # If we timeout, that means full_system missed the last
@@ -185,11 +191,6 @@ class SimulatedTestRunner(TbotsTestRunner):
                     )
                     self.blue_full_system_proto_unix_io.send_proto(
                         RobotStatus, robot_status
-                    )
-                    # We need this blocking get call to synchronize the running speed of world and primitives
-                    # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
-                    self.primitive_set_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
 
             # Validate
