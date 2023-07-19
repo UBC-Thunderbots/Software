@@ -112,7 +112,7 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
 
     <h3>Measure Mode</h3><br>
 
-    <b><code>M:</code></b> Toggle measure mode<br>
+    <b><code>M:</code></b> Toggle measure mode / show coordinates<br>
     <b>Shift + Left Click:</b> Place a point<br>
     Placing 2 points will create a distance measurement.<br> 
     Placing 3 points will create an angle measurement.<br> 

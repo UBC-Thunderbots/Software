@@ -33,7 +33,7 @@ py_library(
         "//software/networking:threaded_unix_sender_py",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:constants",
-        "//software/thunderscope:dock_label_style",
+        "//software/thunderscope:dock_style",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
         requirement("pyqtgraph"),
@@ -107,8 +107,8 @@ py_library(
 )
 
 py_library(
-    name = "dock_label_style",
-    srcs = ["dock_label_style.py"],
+    name = "dock_style",
+    srcs = ["dock_style.py"],
 )
 
 py_library(

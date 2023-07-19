@@ -132,6 +132,7 @@ class GLWidget(QWidget):
         # Setup layout
         self.layout = QVBoxLayout()
         self.layout.setSpacing(0)
+        self.layout.setContentsMargins(2, 2, 2, 2)
         self.setLayout(self.layout)
         self.layout.addWidget(self.toolbar)
         self.layout.addWidget(self.gl_view_widget)
