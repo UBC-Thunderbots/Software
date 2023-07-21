@@ -134,7 +134,7 @@ sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.5_linux-x64_bi
 sudo apt install /tmp/./jdk-17.0.5.deb
 
 print_status_msg "Compiling TIGERS AutoRef"
-sudo wget -N https://gitlab.tigers-mannheim.de/open-source/AutoReferee/-/archive/autoref-ci/AutoReferee-autoref-ci.zip -O /tmp/autoref-ci.zip
+sudo wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/refs/heads/autoref-ci.zip -O /tmp/autoref-ci.zip
 unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
 touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
 /tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/

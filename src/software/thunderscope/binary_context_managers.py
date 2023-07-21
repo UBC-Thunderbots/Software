@@ -671,6 +671,7 @@ class TigersAutoref(object):
 
     AUTOREF_COMM_PORT = 10013
     AUTOREF_NUM_RETRIES = 10
+    NEXT_PACKET_DELAY = 1.0 / 30 # 30 Hz
 
     def __init__(
         self,
@@ -687,6 +688,7 @@ class TigersAutoref(object):
         self.ci_mode = ci_mode
         self.autoref_runtime_dir = autoref_runtime_dir
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
+        self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
         self.gamecontroller = gc
         self.supress_logs = supress_logs
         self.tick_rate_ms = tick_rate_ms
@@ -769,9 +771,15 @@ class TigersAutoref(object):
 
         while True:
             try:
-                ssl_wrapper = self.wrapper_buffer.get(block=True)
+                ssl_wrapper = self.wrapper_buffer.get(block=False, return_cached=True)
+                referee_packet = self.referee_buffer.get(block=False, return_cached=True)
+
+                if not ssl_wrapper.IsInitialized() or not referee_packet.IsInitialized():
+                    time.sleep(self.NEXT_PACKET_DELAY)
+
                 ci_input = AutoRefCiInput()
                 ci_input.detection.append(ssl_wrapper.detection)
+                ci_input.referee_message.CopyFrom(referee_packet)
 
                 self.ci_socket.send(ci_input)
                 response_data = self.ci_socket.receive(AutoRefCiOutput)
@@ -830,9 +838,9 @@ class TigersAutoref(object):
         :param yellow_full_system_proto_unix_io:    the proto unix io for the yellow full system
         """
         autoref_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
-        self.gamecontroller.register_ci_referee_command_observer(
-            blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
-        )
+        #self.gamecontroller.register_ci_referee_command_observer(
+        #    blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
+        #)
 
     def __exit__(self, type, value, traceback):
         if self.tigers_autoref_proc:
