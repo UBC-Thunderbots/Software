@@ -295,7 +295,7 @@ gdb --args bazel-bin/{simulator_command}
         simulator_proto_unix_io,
         blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io,
-        autoref_proto_unix_io,
+        autoref_proto_unix_io
     ):
 
         """Setup the proto unix io for the simulator
@@ -457,31 +457,15 @@ class Gamecontroller(object):
         raise IOError("no free ports")
 
     def setup_proto_unix_io(
-        self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
+        self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io, autoref_proto_unix_io=None
     ):
         """Setup gamecontroller io. Registers to receive RefereeCommands from the Gamecontroller UI.
 
         :param blue_full_system_proto_unix_io: The proto unix io of the blue full system.
         :param yellow_full_system_proto_unix_io: The proto unix io of the yellow full system.
+        :param autoref_proto_unix_io: The proto unix io for the autoref
 
         """
-
-        self.register_referee_command_observer(
-            blue_full_system_proto_unix_io,
-            yellow_full_system_proto_unix_io,
-            self.referee_port,
-        )
-
-    def register_referee_command_observer(
-        self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io, port
-    ):
-        """Register as an observer of RefereeCommands on the specified port.
-
-        :param blue_full_system_proto_unix_io:      the proto unix io of the blue full system
-        :param yellow_full_system_proto_unix_io:    the proto unix io of the yellow full system
-        :param port:                                the port to listen for RefereeCommands
-        """
-
         def __send_referee_command(data):
             """Send a referee command from the gamecontroller to both full
             systems.
@@ -491,23 +475,11 @@ class Gamecontroller(object):
             """
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
+            if autoref_proto_unix_io is not None:
+                autoref_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP, port, __send_referee_command, True,
-        )
-
-    def register_ci_referee_command_observer(
-        self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
-    ):
-        """Register the CI port for RefereeCommands. Requires ci_mode=True
-
-        :param blue_full_system_proto_unix_io:      the proto unix io of the blue full system
-        :param yellow_full_system_proto_unix_io:    the proto unix io of the yellow full system
-        """
-        self.register_referee_command_observer(
-            blue_full_system_proto_unix_io,
-            yellow_full_system_proto_unix_io,
-            self.ci_port,
+            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
         )
 
     def send_gc_command(
@@ -771,20 +743,18 @@ class TigersAutoref(object):
 
         while True:
             try:
-                ssl_wrapper = self.wrapper_buffer.get(block=False, return_cached=True)
+                ssl_wrapper = self.wrapper_buffer.get(block=True)
                 referee_packet = self.referee_buffer.get(
-                    block=False, return_cached=True
+                    block=False
                 )
-
-                if (
-                    not ssl_wrapper.IsInitialized()
-                    or not referee_packet.IsInitialized()
-                ):
-                    time.sleep(self.NEXT_PACKET_DELAY)
+                print("referee_packet")
+                print(referee_packet)
 
                 ci_input = AutoRefCiInput()
                 ci_input.detection.append(ssl_wrapper.detection)
-                ci_input.referee_message.CopyFrom(referee_packet)
+                if referee_packet.IsInitialized() :
+                    print("added on a referee message packet", flush=True)
+                    ci_input.referee_message.CopyFrom(referee_packet)
 
                 self.ci_socket.send(ci_input)
                 response_data = self.ci_socket.receive(AutoRefCiOutput)
@@ -831,21 +801,15 @@ class TigersAutoref(object):
 
     def setup_ssl_wrapper_packets(
         self,
-        autoref_proto_unix_io,
-        blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io,
+        autoref_proto_unix_io
     ):
         """
         Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the Gamecontroller in CI mode.
 
         :param autoref_proto_unix_io:               the proto unix io for the Autoref to receive SSLWrapperPackets
-        :param blue_full_system_proto_unix_io:      the proto unix io for the blue full system
-        :param yellow_full_system_proto_unix_io:    the proto unix io for the yellow full system
         """
         autoref_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
-        # self.gamecontroller.register_ci_referee_command_observer(
-        #    blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
-        # )
+        autoref_proto_unix_io.register_observer(Referee, self.referee_buffer)
 
     def __exit__(self, type, value, traceback):
         if self.tigers_autoref_proc:
