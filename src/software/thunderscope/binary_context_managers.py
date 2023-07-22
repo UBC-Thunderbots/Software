@@ -295,7 +295,7 @@ gdb --args bazel-bin/{simulator_command}
         simulator_proto_unix_io,
         blue_full_system_proto_unix_io,
         yellow_full_system_proto_unix_io,
-        autoref_proto_unix_io
+        autoref_proto_unix_io,
     ):
 
         """Setup the proto unix io for the simulator
@@ -457,7 +457,10 @@ class Gamecontroller(object):
         raise IOError("no free ports")
 
     def setup_proto_unix_io(
-        self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io, autoref_proto_unix_io=None
+        self,
+        blue_full_system_proto_unix_io,
+        yellow_full_system_proto_unix_io,
+        autoref_proto_unix_io=None,
     ):
         """Setup gamecontroller io. Registers to receive RefereeCommands from the Gamecontroller UI.
 
@@ -466,6 +469,7 @@ class Gamecontroller(object):
         :param autoref_proto_unix_io: The proto unix io for the autoref
 
         """
+
         def __send_referee_command(data):
             """Send a referee command from the gamecontroller to both full
             systems.
@@ -744,15 +748,13 @@ class TigersAutoref(object):
         while True:
             try:
                 ssl_wrapper = self.wrapper_buffer.get(block=True)
-                referee_packet = self.referee_buffer.get(
-                    block=False
-                )
+                referee_packet = self.referee_buffer.get(block=False)
                 print("referee_packet")
                 print(referee_packet)
 
                 ci_input = AutoRefCiInput()
                 ci_input.detection.append(ssl_wrapper.detection)
-                if referee_packet.IsInitialized() :
+                if referee_packet.IsInitialized():
                     print("added on a referee message packet", flush=True)
                     ci_input.referee_message.CopyFrom(referee_packet)
 
@@ -799,10 +801,7 @@ class TigersAutoref(object):
         else:
             self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
 
-    def setup_ssl_wrapper_packets(
-        self,
-        autoref_proto_unix_io
-    ):
+    def setup_ssl_wrapper_packets(self, autoref_proto_unix_io):
         """
         Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the Gamecontroller in CI mode.
 

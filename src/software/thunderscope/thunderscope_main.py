@@ -450,12 +450,10 @@ if __name__ == "__main__":
             gamecontroller.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
-                autoref_proto_unix_io
+                autoref_proto_unix_io,
             )
             if args.enable_autoref:
-                autoref.setup_ssl_wrapper_packets(
-                    autoref_proto_unix_io,
-                )
+                autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io,)
 
             # Start the simulator
             thread = threading.Thread(
