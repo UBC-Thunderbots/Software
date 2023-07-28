@@ -40,7 +40,6 @@ class GraphicsList:
         graphics_list = self.graphics[key]
 
         num_fetched = self.num_fetched[key]
-        self.num_added[key]
 
         num_graphics_to_add = max(num_graphics - (len(graphics_list) - num_fetched), 0)
         if num_graphics_to_add > 0:

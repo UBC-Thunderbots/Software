@@ -31,29 +31,23 @@ class GLMeasureLayer(GLLayer):
         self.measurement_points_cache = []
 
         self.graphics_list.register_graphics_group(
-            "cursor_text", 
+            "cursor_text",
             lambda: GLTextItem(
                 font=QtGui.QFont("Roboto", 10), color=Colors.PRIMARY_TEXT_COLOR
-            )
+            ),
         )
         self.graphics_list.register_graphics_group(
-            "measurement_text", 
+            "measurement_text",
             lambda: GLTextItem(
                 font=QtGui.QFont("Roboto", 8), color=Colors.FIELD_LINE_COLOR
-            )
+            ),
         )
         self.graphics_list.register_graphics_group(
-            "measurement_lines", 
-            lambda: GLLinePlotItem(
-                color=Colors.FIELD_LINE_COLOR
-            )
+            "measurement_lines", lambda: GLLinePlotItem(color=Colors.FIELD_LINE_COLOR)
         )
         self.graphics_list.register_graphics_group(
-            "measurement_points", 
-            lambda: GLSphere(
-                radius=0.02,
-                color=Colors.FIELD_LINE_COLOR,
-            )
+            "measurement_points",
+            lambda: GLSphere(radius=0.02, color=Colors.FIELD_LINE_COLOR,),
         )
 
     def mouse_in_scene_pressed(self, event):
@@ -68,12 +62,14 @@ class GLMeasureLayer(GLLayer):
         # If we have at least one previous measurement point, then adding a new point
         # will create a line between the last point and the new point
         if len(self.measurement_points_cache) > 1:
-            self.measurement_lines.append([self.measurement_points_cache[-2], self.measurement_points_cache[-1]])
+            self.measurement_lines.append(
+                [self.measurement_points_cache[-2], self.measurement_points_cache[-1]]
+            )
 
         # If two points are already in the cache, adding a new point will form an angle
         # between the three points
         if len(self.measurement_points_cache) == 3:
-            
+
             # Calculate the angle
             a = self.measurement_points_cache[0]
             b = self.measurement_points_cache[1]
@@ -82,7 +78,9 @@ class GLMeasureLayer(GLLayer):
             ba = a - b
             bc = c - b
 
-            cosine_angle = QtGui.QVector3D.dotProduct(ba, bc) / (ba.length() * bc.length())
+            cosine_angle = QtGui.QVector3D.dotProduct(ba, bc) / (
+                ba.length() * bc.length()
+            )
             angle = math.degrees(math.acos(cosine_angle))
 
             # Calculate the point where the angle text should be placed.
@@ -92,10 +90,7 @@ class GLMeasureLayer(GLLayer):
             placement_point = b + 0.5 * bisector.normalized()
 
             self.measurement_angles.append(
-                [
-                    angle, 
-                    [placement_point[0], placement_point[1], 0]
-                ]
+                [angle, [placement_point[0], placement_point[1], 0]]
             )
 
             # Clear the cache
@@ -120,23 +115,31 @@ class GLMeasureLayer(GLLayer):
         """Update the graphics that display the measurements"""
 
         for measurement_point_graphic, measurement_point in zip(
-            self.graphics_list.get_graphics("measurement_points", len(self.measurement_points)),
-            self.measurement_points
+            self.graphics_list.get_graphics(
+                "measurement_points", len(self.measurement_points)
+            ),
+            self.measurement_points,
         ):
-            measurement_point_graphic.set_position(measurement_point[0], measurement_point[1], 0)
+            measurement_point_graphic.set_position(
+                measurement_point[0], measurement_point[1], 0
+            )
 
         for measurement_text_graphic, measurement_line_graphic, measurement_line in zip(
-            self.graphics_list.get_graphics("measurement_text", len(self.measurement_lines)),
-            self.graphics_list.get_graphics("measurement_lines", len(self.measurement_lines)),
-            self.measurement_lines
+            self.graphics_list.get_graphics(
+                "measurement_text", len(self.measurement_lines)
+            ),
+            self.graphics_list.get_graphics(
+                "measurement_lines", len(self.measurement_lines)
+            ),
+            self.measurement_lines,
         ):
             first_point = measurement_line[0]
             second_point = measurement_line[1]
 
             # Pythagorean theorem
             distance = math.sqrt(
-                (second_point[0] - first_point[0])**2 
-                + (second_point[1] - first_point[1])**2
+                (second_point[0] - first_point[0]) ** 2
+                + (second_point[1] - first_point[1]) ** 2
             )
 
             midpoint = [
@@ -145,8 +148,7 @@ class GLMeasureLayer(GLLayer):
             ]
 
             measurement_text_graphic.setData(
-                text=f"{distance:.2f} m",
-                pos=np.array([midpoint[0], midpoint[1], 0]),
+                text=f"{distance:.2f} m", pos=np.array([midpoint[0], midpoint[1], 0]),
             )
 
             measurement_line_graphic.setData(
@@ -159,15 +161,16 @@ class GLMeasureLayer(GLLayer):
             )
 
         for measurement_angle_graphic, measurement_angle in zip(
-            self.graphics_list.get_graphics("measurement_text", len(self.measurement_angles)),
-            self.measurement_angles
+            self.graphics_list.get_graphics(
+                "measurement_text", len(self.measurement_angles)
+            ),
+            self.measurement_angles,
         ):
             angle = measurement_angle[0]
             placement_point = measurement_angle[1]
 
             measurement_angle_graphic.setData(
-                text=f"{angle:.1f}°",
-                pos=np.array(placement_point),
+                text=f"{angle:.1f}°", pos=np.array(placement_point),
             )
 
     def update_graphics(self):
@@ -182,18 +185,13 @@ class GLMeasureLayer(GLLayer):
         if not self.isVisible():
             return self.graphics_list.get_changes()
 
-
         # Display coordinates of point at mouse cursor
         cursor_text_graphic = self.graphics_list.get_graphics("cursor_text", 1)[0]
         mouse_point_in_scene_x = self.mouse_point_in_scene[0]
         mouse_point_in_scene_y = self.mouse_point_in_scene[1]
         cursor_text_graphic.setData(
             text=f"({mouse_point_in_scene_x:.2f} m, {mouse_point_in_scene_y:.2f} m)",
-            pos=[
-                mouse_point_in_scene_x,
-                mouse_point_in_scene_y,
-                0
-            ],
+            pos=[mouse_point_in_scene_x, mouse_point_in_scene_y, 0],
         )
 
         self.update_measurement_graphics()

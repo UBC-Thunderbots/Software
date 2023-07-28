@@ -82,20 +82,20 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         """
         if self.point_picked or self.detect_mouse_movement_in_scene:
-            
+
             point_in_scene_event = PointInSceneEvent(
                 event, self.get_point_in_scene(event.position())
             )
 
             if self.detect_mouse_movement_in_scene:
                 self.mouse_in_scene_moved_signal.emit(point_in_scene_event)
-            
+
             if self.point_picked:
                 self.mouse_in_scene_dragged_signal.emit(point_in_scene_event)
-                # We don't want to handle GLViewWidget orbit/pan if we're picking a 
+                # We don't want to handle GLViewWidget orbit/pan if we're picking a
                 # point in 3D, so early return
                 return
-        
+
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):

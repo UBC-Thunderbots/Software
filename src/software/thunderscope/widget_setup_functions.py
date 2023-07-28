@@ -119,13 +119,11 @@ def setup_gl_widget(
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
         (SimulatorState, simulator_layer.simulator_state_buffer),
-    ] + [
-        (HRVOVisualization, hrvo_layer.hrvo_buffer)
-        for hrvo_layer in hrvo_layers
-    ]:
+    ] + [(HRVOVisualization, hrvo_layer.hrvo_buffer) for hrvo_layer in hrvo_layers]:
         full_system_proto_unix_io.register_observer(*arg)
 
     return gl_widget
+
 
 def setup_parameter_widget(proto_unix_io, friendly_colour_yellow):
     """Setup the parameter widget

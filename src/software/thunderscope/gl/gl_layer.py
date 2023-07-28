@@ -22,7 +22,7 @@ class GLLayer(pg.GraphicsObject):
 
         """
         self.name = name
-        
+
     def update_graphics(self):
         """Update the GLGraphicsItems in this layer
 
@@ -39,7 +39,6 @@ class GLLayer(pg.GraphicsObject):
         :param event: The event
         
         """
-        pass
 
     def mouse_in_scene_dragged(self, event):
         """Event handler for the mouse_in_scene_dragged event

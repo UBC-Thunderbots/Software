@@ -32,7 +32,10 @@ class GLSimulatorLayer(GLLayer):
         self.simulator_state_buffer = ThreadSafeBuffer(buffer_size, SimulatorState)
 
         self.graphics_list.register_graphics_group(
-            "ball", lambda: GLSphere(radius=BALL_MAX_RADIUS_METERS, color=Colors.SIM_BALL_COLOR)
+            "ball",
+            lambda: GLSphere(
+                radius=BALL_MAX_RADIUS_METERS, color=Colors.SIM_BALL_COLOR
+            ),
         )
 
     def update_graphics(self):

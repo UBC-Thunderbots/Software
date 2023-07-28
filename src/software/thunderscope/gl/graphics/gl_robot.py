@@ -29,7 +29,7 @@ class GLRobot(GLMeshItem):
     def getMeshData(self):
         """
         Return a MeshData instance with vertices and faces computed
-        for the surface of a cylinder that has been sliced by a chord.
+        for the surface of a cylinder with a flat side wall.
         This represents the geometry of a robot.
 
         :returns: the computed MeshData instance 

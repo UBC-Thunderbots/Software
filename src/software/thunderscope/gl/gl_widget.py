@@ -12,7 +12,9 @@ from software.thunderscope.constants import *
 from software.thunderscope.gl.gl_layer import GLLayer
 from software.thunderscope.gl.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.replay.replay_controls import ReplayControls
-from software.thunderscope.gl.helpers.extended_gl_view_widget import ExtendedGLViewWidget
+from software.thunderscope.gl.helpers.extended_gl_view_widget import (
+    ExtendedGLViewWidget,
+)
 
 
 class GLWidget(QWidget):
@@ -106,9 +108,7 @@ class GLWidget(QWidget):
         self.measure_button.setText("Measure")
         self.measure_button.setStyleSheet(tool_button_stylesheet)
         self.measure_button.setShortcut("m")
-        self.measure_button.clicked.connect(
-            lambda: self.toggle_measure_mode()
-        )
+        self.measure_button.clicked.connect(lambda: self.toggle_measure_mode())
 
         # Setup Help button
         self.help_button = QPushButton()
@@ -273,13 +273,13 @@ class GLWidget(QWidget):
         """
         # Remove all graphics provided by this layer from the scene
         graphics = [
-            graphic 
+            graphic
             for graphics_list in layer.graphics_list.graphics.values()
             for graphic in graphics_list
         ]
         for graphic in graphics:
             self.gl_view_widget.removeItem(graphic)
-        
+
         # Remove the layer
         self.layers.remove(layer)
 

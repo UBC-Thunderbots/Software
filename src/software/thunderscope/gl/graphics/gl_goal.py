@@ -3,7 +3,6 @@ from pyqtgraph.opengl import *
 
 from software.py_constants import *
 
-import math
 import numpy as np
 
 
@@ -82,7 +81,7 @@ class GLGoal(GLMeshItem):
             [5, 6, 7],
             # Right plate faces
             [8, 9, 10],
-            [9, 10, 11]
+            [9, 10, 11],
         ]
 
         return MeshData(vertexes=np.array(points), faces=np.array(faces),)

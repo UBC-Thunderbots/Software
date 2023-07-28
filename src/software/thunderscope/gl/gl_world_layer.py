@@ -67,7 +67,8 @@ class GLWorldLayer(GLLayer):
             "field_marking_rects", lambda: GLRect(color=Colors.FIELD_LINE_COLOR)
         )
         self.graphics_list.register_graphics_group(
-            "field_marking_lines", lambda: GLLinePlotItem(color=Colors.FIELD_LINE_LIGHTER_COLOR)
+            "field_marking_lines",
+            lambda: GLLinePlotItem(color=Colors.FIELD_LINE_LIGHTER_COLOR),
         )
         self.graphics_list.register_graphics_group(
             "field_center_circle", lambda: GLCircle(color=Colors.FIELD_LINE_COLOR)
@@ -76,7 +77,8 @@ class GLWorldLayer(GLLayer):
             "goals", lambda: GLGoal(color=Colors.GOAL_COLOR)
         )
         self.graphics_list.register_graphics_group(
-            "ball", lambda: GLSphere(radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR) 
+            "ball",
+            lambda: GLSphere(radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR),
         )
         self.graphics_list.register_graphics_group(
             "robot_ids", lambda: GLTextItem(color=Colors.PRIMARY_TEXT_COLOR)
@@ -215,8 +217,12 @@ class GLWorldLayer(GLLayer):
         :param field: The field proto
 
         """
-        field_marking_rect_graphics = self.graphics_list.get_graphics("field_marking_rects", 3)
-        field_marking_line_graphics = self.graphics_list.get_graphics("field_marking_lines", 2)
+        field_marking_rect_graphics = self.graphics_list.get_graphics(
+            "field_marking_rects", 3
+        )
+        field_marking_line_graphics = self.graphics_list.get_graphics(
+            "field_marking_lines", 2
+        )
         field_center_circle_graphic = self.graphics_list.get_graphics(
             "field_center_circle", 1
         )[0]
@@ -248,23 +254,17 @@ class GLWorldLayer(GLLayer):
         # Halfway line
         field_marking_line_graphics[0].setData(
             pos=np.array(
-                [
-                    [0, -(field.field_y_length / 2)],
-                    [0, (field.field_y_length / 2)]
-                ]
+                [[0, -(field.field_y_length / 2)], [0, (field.field_y_length / 2)]]
             ),
         )
 
         # Goal-to-goal line
         field_marking_line_graphics[1].setData(
             pos=np.array(
-                [
-                    [-(field.field_x_length / 2), 0],
-                    [(field.field_x_length / 2), 0]
-                ]
+                [[-(field.field_x_length / 2), 0], [(field.field_x_length / 2), 0]]
             ),
         )
-    
+
     def update_goal_graphics(self, field: Field):
         """Update the GLGraphicsItems that display the goals
         
@@ -274,21 +274,13 @@ class GLWorldLayer(GLLayer):
         goal_graphics = self.graphics_list.get_graphics("goals", 2)
 
         # Friendly goal
-        goal_graphics[0].set_dimensions(
-            field.goal_x_length, field.goal_y_length
-        )
-        goal_graphics[0].set_position(
-            -field.field_x_length / 2, 0
-        )
+        goal_graphics[0].set_dimensions(field.goal_x_length, field.goal_y_length)
+        goal_graphics[0].set_position(-field.field_x_length / 2, 0)
         goal_graphics[0].set_orientation(0)
 
         # Enemy goal
-        goal_graphics[1].set_dimensions(
-            field.goal_x_length, field.goal_y_length
-        )
-        goal_graphics[1].set_position(
-            field.field_x_length / 2, 0
-        )
+        goal_graphics[1].set_dimensions(field.goal_x_length, field.goal_y_length)
+        goal_graphics[1].set_position(field.field_x_length / 2, 0)
         goal_graphics[1].set_orientation(180)
 
     def update_ball_graphics(self, ball_state: BallState):

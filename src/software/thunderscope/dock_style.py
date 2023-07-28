@@ -1,5 +1,6 @@
 from pyqtgraph.dockarea.Dock import Dock, DockLabel
 
+
 def updateDockStylePatched(self):
     """
     Overrides the style of the dock.
@@ -7,7 +8,7 @@ def updateDockStylePatched(self):
     border = "#4f5b62"
     border_width = "2px"
     border_radius = "5px"
-    
+
     if self.labelHidden:
         self.nStyle = """
         Dock > QWidget {
@@ -16,12 +17,12 @@ def updateDockStylePatched(self):
         }""" % (
             border_width,
             border,
-            border_radius
+            border_radius,
         )
         self.widgetArea.setStyleSheet(self.nStyle)
 
-    elif self.orientation == 'vertical':
-        self.label.setOrientation('vertical')
+    elif self.orientation == "vertical":
+        self.label.setOrientation("vertical")
         if self.moveLabel:
             self.topLayout.addWidget(self.label, 1, 0)
         self.vStyle = """
@@ -33,12 +34,12 @@ def updateDockStylePatched(self):
         }""" % (
             border_width,
             border,
-            border_radius
+            border_radius,
         )
         self.widgetArea.setStyleSheet(self.vStyle)
 
     else:
-        self.label.setOrientation('horizontal')
+        self.label.setOrientation("horizontal")
         if self.moveLabel:
             self.topLayout.addWidget(self.label, 0, 1)
         self.hStyle = """
@@ -50,9 +51,10 @@ def updateDockStylePatched(self):
         }""" % (
             border_width,
             border,
-            border_radius
+            border_radius,
         )
         self.widgetArea.setStyleSheet(self.hStyle)
+
 
 def updateDockLabelStylePatched(self):
     """
@@ -114,6 +116,7 @@ def updateDockLabelStylePatched(self):
             border,
         )
         self.setStyleSheet(self.hStyle)
+
 
 Dock.updateStyle = updateDockStylePatched
 DockLabel.updateStyle = updateDockLabelStylePatched
