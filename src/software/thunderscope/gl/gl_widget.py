@@ -259,9 +259,17 @@ class GLWidget(QWidget):
             layer.hide()
 
         # Add the layer to the Layer menu
-        layer_action = QtGui.QAction(layer.name, self.layers_menu, checkable=True)
-        layer_action.setChecked(layer.isVisible())
-        layer_action.triggered.connect(lambda: layer.setVisible(not layer.isVisible()))
+        
+        # Not using a checkable QAction in order to prevent menu from closing
+        # when an action is pressed
+        layer_checkbox = QCheckBox(layer.name, self.layers_menu)
+        layer_checkbox.setStyleSheet("QCheckBox { padding: 0px 8px; }")
+        layer_checkbox.setChecked(layer.isVisible())
+        layer_checkbox.stateChanged.connect(lambda: layer.setVisible(layer_checkbox.isChecked()))
+
+        layer_action = QWidgetAction(self.layers_menu)
+        layer_action.setDefaultWidget(layer_checkbox)
+        
         self.layers_menu_actions[layer.name] = layer_action
         self.layers_menu.addAction(layer_action)
 
