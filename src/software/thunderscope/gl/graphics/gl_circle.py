@@ -25,6 +25,11 @@ class GLCircle(GLLinePlotItem):
         self.set_radius(radius)
 
     def set_radius(self, radius):
+        """Set the radius of the circle
+
+        :param radius: The radius of the circle
+        
+        """
         if self.radius == radius:
             return
 

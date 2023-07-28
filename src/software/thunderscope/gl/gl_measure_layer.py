@@ -12,7 +12,7 @@ from software.py_constants import *
 from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.gl_layer import GLLayer
-from software.thunderscope.gl.graphics.gl_ball import GLBall
+from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 
 
 class GLMeasureLayer(GLLayer):
@@ -50,7 +50,8 @@ class GLMeasureLayer(GLLayer):
         )
         self.graphics_list.register_graphics_group(
             "measurement_points", 
-            lambda: GLBall(
+            lambda: GLSphere(
+                radius=0.02,
                 color=Colors.FIELD_LINE_COLOR,
             )
         )

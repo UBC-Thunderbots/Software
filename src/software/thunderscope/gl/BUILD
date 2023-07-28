@@ -58,7 +58,7 @@ py_library(
     srcs = ["gl_world_layer.py"],
     deps = [
         ":gl_layer",
-        "//software/thunderscope/gl/graphics:gl_ball",
+        "//software/thunderscope/gl/graphics:gl_sphere",
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_rect",
         "//software/thunderscope/gl/graphics:gl_robot",
@@ -72,7 +72,7 @@ py_library(
     srcs = ["gl_simulator_layer.py"],
     deps = [
         ":gl_layer",
-        "//software/thunderscope/gl/graphics:gl_ball",
+        "//software/thunderscope/gl/graphics:gl_sphere",
         requirement("pyqtgraph"),
     ],
 )
@@ -110,7 +110,7 @@ py_library(
     srcs = ["gl_measure_layer.py"],
     deps = [
         ":gl_layer",
-        "//software/thunderscope/gl/graphics:gl_ball",
+        "//software/thunderscope/gl/graphics:gl_sphere",
         requirement("pyqtgraph"),
     ],
 )

@@ -3,7 +3,8 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.opengl import *
 
 from software.thunderscope.gl.gl_layer import GLLayer
-from software.thunderscope.gl.graphics.gl_ball import GLBall
+from software.thunderscope.gl.graphics.gl_sphere import GLSphere
+from software.py_constants import BALL_MAX_RADIUS_METERS
 from software.thunderscope.constants import Colors
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -31,7 +32,7 @@ class GLSimulatorLayer(GLLayer):
         self.simulator_state_buffer = ThreadSafeBuffer(buffer_size, SimulatorState)
 
         self.graphics_list.register_graphics_group(
-            "ball", lambda: GLBall(color=Colors.SIM_BALL_COLOR)
+            "ball", lambda: GLSphere(radius=BALL_MAX_RADIUS_METERS, color=Colors.SIM_BALL_COLOR)
         )
 
     def update_graphics(self):

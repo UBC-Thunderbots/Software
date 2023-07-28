@@ -36,8 +36,8 @@ py_library(
 )
 
 py_library(
-    name = "gl_ball",
-    srcs = ["gl_ball.py"],
+    name = "gl_sphere",
+    srcs = ["gl_sphere.py"],
     deps = [
         requirement("pyqtgraph"),
     ],

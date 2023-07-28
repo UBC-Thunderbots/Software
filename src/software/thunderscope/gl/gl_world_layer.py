@@ -11,7 +11,7 @@ from software.thunderscope.constants import Colors, SPEED_SEGMENT_SCALE
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
 from software.thunderscope.gl.graphics.gl_robot import GLRobot
-from software.thunderscope.gl.graphics.gl_ball import GLBall
+from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.thunderscope.gl.graphics.gl_goal import GLGoal
 
 from software.networking.threaded_unix_listener import ThreadedUnixListener
@@ -75,8 +75,9 @@ class GLWorldLayer(GLLayer):
         self.graphics_list.register_graphics_group(
             "goals", lambda: GLGoal(color=Colors.GOAL_COLOR)
         )
-        self.graphics_list.register_graphics_group("ball", GLBall)
-        self.graphics_list.register_graphics_group("robots", GLRobot)
+        self.graphics_list.register_graphics_group(
+            "ball", lambda: GLSphere(radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR) 
+        )
         self.graphics_list.register_graphics_group(
             "robot_ids", lambda: GLTextItem(color=Colors.PRIMARY_TEXT_COLOR)
         )
@@ -86,6 +87,7 @@ class GLWorldLayer(GLLayer):
         self.graphics_list.register_graphics_group(
             "speed_lines", lambda: GLCircle(color=Colors.SPEED_VECTOR_COLOR)
         )
+        self.graphics_list.register_graphics_group("robots", GLRobot)
 
     def keyPressEvent(self, event):
         """Detect when a key has been pressed
