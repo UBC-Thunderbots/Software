@@ -29,6 +29,14 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "itrajectory",
+    hdrs = ["ITrajectory.h"],
+    deps = [
+        "//software/time:duration",
+    ],
+)
+
 cc_test(
     name = "enlsvg_path_planner_test",
     srcs = ["enlsvg_path_planner_test.cpp"],

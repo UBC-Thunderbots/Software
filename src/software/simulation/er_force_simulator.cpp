@@ -345,9 +345,39 @@ void ErForceSimulator::setRobotPrimitive(
     if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
     {
         auto primitive_executor = robot_primitive_executor_iter->second;
+        // Time the following code with chrono
+        std::chrono::steady_clock::time_point begin =
+                std::chrono::steady_clock::now();
         primitive_executor->updatePrimitiveSet(primitive_set_msg);
+        std::chrono::steady_clock::time_point end =
+                std::chrono::steady_clock::now();
+        std::cout << "updatePrimitiveSet: Time difference = "
+                  << std::chrono::duration_cast<std::chrono::microseconds>(end -
+                                                                           begin)
+                          .count()
+                  << "[µs]" << std::endl;
+
+        begin =
+                std::chrono::steady_clock::now();
         primitive_executor->updateWorld(world_msg);
+        end =
+                std::chrono::steady_clock::now();
+        std::cout << "updateWorld: Time difference = "
+                  << std::chrono::duration_cast<std::chrono::microseconds>(end -
+                                                                           begin)
+                          .count()
+                  << "[µs]" << std::endl;
+
+        begin =
+                std::chrono::steady_clock::now();
         primitive_executor->updateVelocity(local_velocity, angular_velocity);
+        end =
+                std::chrono::steady_clock::now();
+        std::cout << "updateVelocity: Time difference = "
+                  << std::chrono::duration_cast<std::chrono::microseconds>(end -
+                                                                           begin)
+                          .count()
+                  << "[µs]" << std::endl;
     }
     else
     {
@@ -392,7 +422,17 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         }
         else
         {
+            // Time the following code with chrono
+            std::chrono::steady_clock::time_point begin =
+                std::chrono::steady_clock::now();
             direct_control = primitive_executor->stepPrimitive();
+            std::chrono::steady_clock::time_point end =
+                std::chrono::steady_clock::now();
+            std::cout << "stepPrimitive: Time difference = "
+                      << std::chrono::duration_cast<std::chrono::microseconds>(end -
+                                                                              begin)
+                             .count()
+                      << "[µs]" << std::endl;
         }
 
         auto command = *getRobotCommandFromDirectControl(
