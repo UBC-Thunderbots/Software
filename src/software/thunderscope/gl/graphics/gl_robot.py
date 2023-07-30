@@ -23,10 +23,42 @@ class GLRobot(GLMeshItem):
         self.color = color
 
         GLMeshItem.__init__(
-            self, meshdata=self.getMeshData(), color=self.color,
+            self, meshdata=self.__get_mesh_data(), color=self.color,
         )
 
-    def getMeshData(self):
+    def set_position(self, x: float, y: float):
+        """Set the position of the graphic in the scene
+        
+        :param x: The x coordinate to position the graphic at
+        :param y: The y coordinate to position the graphic at
+        
+        """
+        if self.x == x and self.y == y:
+            return
+
+        self.translate(x - self.x, y - self.y, 0)
+        self.x = x
+        self.y = y
+
+    def set_orientation(self, degrees: float):
+        """Set the orientation of the graphic in the scene
+        
+        :param degrees: The orientation of the graphic in degrees
+
+        """
+        # We need to add 45 degrees to our desired orientation in order
+        # to get the flat side of the robot (i.e. its front) to face
+        # the right way
+        degrees += 45
+
+        if self.orientation == degrees:
+            return
+
+        # Rotate locally about the z axis (0, 0, 1)
+        self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
+        self.orientation = degrees
+    
+    def __get_mesh_data(self):
         """
         Return a MeshData instance with vertices and faces computed
         for the surface of a cylinder with a flat side wall.
@@ -57,35 +89,3 @@ class GLRobot(GLMeshItem):
             faces.append([index, index + 1, len(circle_points)])
 
         return MeshData(vertexes=np.array(points), faces=np.array(faces),)
-
-    def set_position(self, x, y):
-        """Set the position of the graphic in the scene
-        
-        :param x: The x coordinate to position the graphic at
-        :param y: The y coordinate to position the graphic at
-        
-        """
-        if self.x == x and self.y == y:
-            return
-
-        self.translate(x - self.x, y - self.y, 0)
-        self.x = x
-        self.y = y
-
-    def set_orientation(self, radians):
-        """Set the orientation of the graphic in the scene
-        
-        :param radians: The orientation of the graphic in radians
-
-        """
-        # We need to add 45 degrees to our desired orientation in order
-        # to get the flat side of the robot (i.e. its front) to face
-        # the right way
-        degrees = math.degrees(radians) + 45
-
-        if self.orientation == degrees:
-            return
-
-        # Rotate locally about the z axis (0, 0, 1)
-        self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
-        self.orientation = degrees

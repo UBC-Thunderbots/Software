@@ -17,15 +17,16 @@ from software.thunderscope.gl.graphics.gl_circle import GLCircle
 class GLHrvoLayer(GLLayer):
     """GLHrvoLayer that visualizes the state of the HRVO Simulator"""
 
-    def __init__(self, robot_id, buffer_size=5):
+    def __init__(self, name: str, robot_id: int, buffer_size: int = 5):
         """Initialize the GLHrvoLayer
 
+        :param name: The displayed name of the layer
         :param robot_id: The id of the robot which this layer will visualize
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 
         """
-        GLLayer.__init__(self)
+        GLLayer.__init__(self, name)
 
         self.robot_id = robot_id
         self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HRVOVisualization)
@@ -36,17 +37,8 @@ class GLHrvoLayer(GLLayer):
             lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
 
-    def update_graphics(self):
-        """Update the GLGraphicsItems in this layer
-
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
-        
-        """
-        # Clear all graphics in this layer if not visible
-        if not self.isVisible():
-            return self.graphics_list.get_changes()
+    def _update_graphics(self):
+        """Fetch and update graphics for the layer"""
 
         velocity_obstacle_msg = self.prev_message
         while not self.hrvo_buffer.queue.empty():
@@ -88,5 +80,3 @@ class GLHrvoLayer(GLLayer):
             velocity_obstacle_graphic.setData(
                 pos=np.array([[point[0], point[1], 0] for point in polygon_points]),
             )
-
-        return self.graphics_list.get_changes()

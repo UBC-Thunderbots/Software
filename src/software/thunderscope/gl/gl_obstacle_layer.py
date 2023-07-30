@@ -17,14 +17,15 @@ from software.thunderscope.gl.graphics.gl_circle import GLCircle
 class GLObstacleLayer(GLLayer):
     """GLLayer that visualizes obstacles"""
 
-    def __init__(self, buffer_size=5):
+    def __init__(self, name: str, buffer_size: int = 5):
         """Initialize the GLObstacleLayer
 
+        :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 
         """
-        GLLayer.__init__(self)
+        GLLayer.__init__(self, name)
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
@@ -36,18 +37,9 @@ class GLObstacleLayer(GLLayer):
             "circle_obstacles", lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
         )
 
-    def update_graphics(self):
-        """Update the GLGraphicsItems in this layer
-
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
+    def _update_graphics(self):
+        """Fetch and update graphics for the layer"""
         
-        """
-        # Clear all graphics in this layer if not visible
-        if not self.isVisible():
-            return self.graphics_list.get_changes()
-
         primitive_set = self.primitive_set_buffer.get(
             block=False
         ).robot_primitives.values()
@@ -93,5 +85,3 @@ class GLObstacleLayer(GLLayer):
                         circle_obstacle.origin.x_meters,
                         circle_obstacle.origin.y_meters,
                     )
-
-        return self.graphics_list.get_changes()

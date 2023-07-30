@@ -8,7 +8,7 @@ import numpy as np
 class GLCircle(GLLinePlotItem):
     """Displays a circle parallel to the x-y plane"""
 
-    def __init__(self, radius=0, num_points=24, color=(1.0, 1.0, 1.0, 0.5)):
+    def __init__(self, radius: float = 0, num_points: int = 24, color=(1.0, 1.0, 1.0, 0.5)):
         """Initialize the GLCircle
         
         :param radius: The radius of the circle
@@ -24,16 +24,18 @@ class GLCircle(GLLinePlotItem):
         GLLinePlotItem.__init__(self, color=color)
         self.set_radius(radius)
 
-    def set_radius(self, radius):
+    def set_radius(self, radius: float, num_points: int = 24):
         """Set the radius of the circle
 
         :param radius: The radius of the circle
+        :param num_points: The number of points to generate when creating the circle
         
         """
         if self.radius == radius:
             return
 
         self.radius = radius
+        self.num_points = num_points
 
         # Generate points on the circumference of a circle centered at (0,0)
         pi = math.pi
@@ -57,7 +59,7 @@ class GLCircle(GLLinePlotItem):
         """
         self.setData(color=color)
 
-    def set_position(self, x, y):
+    def set_position(self, x: float, y: float):
         """Set the position of the graphic in the scene
         
         :param x: The x coordinate to position the graphic at

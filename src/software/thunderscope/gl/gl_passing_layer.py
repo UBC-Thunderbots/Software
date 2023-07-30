@@ -26,14 +26,15 @@ class GLPassingLayer(GLLayer):
     # The number of passes to show in the visualization
     NUM_PASSES_TO_SHOW = 1
 
-    def __init__(self, buffer_size=5):
+    def __init__(self, name: str, buffer_size: int = 5):
         """Initialize the GLPassingLayer
 
+        :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
                             
         """
-        GLLayer.__init__(self)
+        GLLayer.__init__(self, name)
 
         self.pass_visualization_buffer = ThreadSafeBuffer(
             buffer_size, PassVisualization
@@ -45,18 +46,9 @@ class GLPassingLayer(GLLayer):
             "passes", lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR)
         )
 
-    def update_graphics(self):
-        """Update the GLGraphicsItems in this layer
-
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
+    def _update_graphics(self):
+        """Fetch and update graphics for the layer"""
         
-        """
-        # Clear all graphics in this layer if not visible
-        if not self.isVisible():
-            return self.graphics_list.get_changes()
-
         try:
             pass_vis = self.pass_visualization_buffer.queue.get_nowait()
         except queue.Empty as empty:
@@ -96,5 +88,3 @@ class GLPassingLayer(GLLayer):
                     ]
                 ),
             )
-
-        return self.graphics_list.get_changes()

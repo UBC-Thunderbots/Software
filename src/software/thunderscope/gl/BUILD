@@ -20,6 +20,7 @@ py_library(
     deps = [
         "//software/thunderscope:thread_safe_buffer",
         "//software/thunderscope/gl/helpers:graphics_list",
+        "//software/thunderscope/gl/helpers:extended_gl_view_widget",
         requirement("pyqtgraph"),
     ],
 )

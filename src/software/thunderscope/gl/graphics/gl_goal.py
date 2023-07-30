@@ -24,7 +24,7 @@ class GLGoal(GLMeshItem):
 
         GLMeshItem.__init__(self, color=self.color)
 
-    def set_dimensions(self, x_length, y_length):
+    def set_dimensions(self, x_length: float, y_length: float):
         """Set the dimensions of the goal
         
         :param x_length: The length of the goal in the x direction
@@ -37,9 +37,36 @@ class GLGoal(GLMeshItem):
         self.x_length = x_length
         self.y_length = y_length
 
-        self.setMeshData(meshdata=self.getMeshData(self.x_length, self.y_length))
+        self.setMeshData(meshdata=self.__get_mesh_data(self.x_length, self.y_length))
 
-    def getMeshData(self, x_length, y_length):
+    def set_position(self, x: float, y: float):
+        """Set the position of the graphic in the scene
+        
+        :param x: The x coordinate to position the graphic at
+        :param y: The y coordinate to position the graphic at
+        
+        """
+        if self.x == x and self.y == y:
+            return
+
+        self.translate(x - self.x, y - self.y, 0)
+        self.x = x
+        self.y = y
+
+    def set_orientation(self, degrees: float):
+        """Set the orientation of the graphic in the scene
+        
+        :param degrees: The orientation of the graphic in degrees
+
+        """
+        if self.orientation == degrees:
+            return
+
+        # Rotate locally about the z axis (0, 0, 1)
+        self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
+        self.orientation = degrees
+    
+    def __get_mesh_data(self, x_length: float, y_length: float):
         """
         Return a MeshData instance with vertices and faces computed
         for a mesh representing the goal
@@ -85,30 +112,3 @@ class GLGoal(GLMeshItem):
         ]
 
         return MeshData(vertexes=np.array(points), faces=np.array(faces),)
-
-    def set_position(self, x, y):
-        """Set the position of the graphic in the scene
-        
-        :param x: The x coordinate to position the graphic at
-        :param y: The y coordinate to position the graphic at
-        
-        """
-        if self.x == x and self.y == y:
-            return
-
-        self.translate(x - self.x, y - self.y, 0)
-        self.x = x
-        self.y = y
-
-    def set_orientation(self, degrees):
-        """Set the orientation of the graphic in the scene
-        
-        :param degrees: The orientation of the graphic in degrees
-
-        """
-        if self.orientation == degrees:
-            return
-
-        # Rotate locally about the z axis (0, 0, 1)
-        self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
-        self.orientation = degrees

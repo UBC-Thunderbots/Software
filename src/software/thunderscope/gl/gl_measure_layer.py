@@ -13,14 +13,19 @@ from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
+from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInSceneEvent
 
 
 class GLMeasureLayer(GLLayer):
     """GLLayer that displays UI graphics for measuring coordinates, distances, and angles"""
 
-    def __init__(self):
-        """Initialize the GLMeasureLayer"""
-        GLLayer.__init__(self)
+    def __init__(self, name: str):
+        """Initialize the GLMeasureLayer
+        
+        :param name: The displayed name of the layer
+
+        """
+        GLLayer.__init__(self, name)
 
         self.mouse_point_in_scene = [0, 0]
 
@@ -50,7 +55,7 @@ class GLMeasureLayer(GLLayer):
             lambda: GLSphere(radius=0.02, color=Colors.FIELD_LINE_COLOR,),
         )
 
-    def mouse_in_scene_pressed(self, event):
+    def mouse_in_scene_pressed(self, event: PointInSceneEvent):
         """Event handler for the mouse_in_scene_pressed event
         
         :param event: The event
@@ -96,7 +101,7 @@ class GLMeasureLayer(GLLayer):
             # Clear the cache
             self.measurement_points_cache.clear()
 
-    def mouse_in_scene_moved(self, event):
+    def mouse_in_scene_moved(self, event: PointInSceneEvent):
         """Event handler for the mouse_in_scene_moved event
         
         :param event: The event
@@ -111,7 +116,21 @@ class GLMeasureLayer(GLLayer):
         self.measurement_angles.clear()
         self.measurement_points_cache.clear()
 
-    def update_measurement_graphics(self):
+    def _update_graphics(self):
+        """Fetch and update graphics for the layer"""
+        
+        # Display coordinates of point at mouse cursor
+        cursor_text_graphic = self.graphics_list.get_graphics("cursor_text", 1)[0]
+        mouse_point_in_scene_x = self.mouse_point_in_scene[0]
+        mouse_point_in_scene_y = self.mouse_point_in_scene[1]
+        cursor_text_graphic.setData(
+            text=f"({mouse_point_in_scene_x:.2f} m, {mouse_point_in_scene_y:.2f} m)",
+            pos=[mouse_point_in_scene_x, mouse_point_in_scene_y, 0],
+        )
+
+        self.__update_measurement_graphics()
+
+    def __update_measurement_graphics(self):
         """Update the graphics that display the measurements"""
 
         for measurement_point_graphic, measurement_point in zip(
@@ -172,28 +191,3 @@ class GLMeasureLayer(GLLayer):
             measurement_angle_graphic.setData(
                 text=f"{angle:.1f}°", pos=np.array(placement_point),
             )
-
-    def update_graphics(self):
-        """Update the GLGraphicsItems in this layer
-
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
-        
-        """
-        # Clear all graphics in this layer if not visible
-        if not self.isVisible():
-            return self.graphics_list.get_changes()
-
-        # Display coordinates of point at mouse cursor
-        cursor_text_graphic = self.graphics_list.get_graphics("cursor_text", 1)[0]
-        mouse_point_in_scene_x = self.mouse_point_in_scene[0]
-        mouse_point_in_scene_y = self.mouse_point_in_scene[1]
-        cursor_text_graphic.setData(
-            text=f"({mouse_point_in_scene_x:.2f} m, {mouse_point_in_scene_y:.2f} m)",
-            pos=[mouse_point_in_scene_x, mouse_point_in_scene_y, 0],
-        )
-
-        self.update_measurement_graphics()
-
-        return self.graphics_list.get_changes()

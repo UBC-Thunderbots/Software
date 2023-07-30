@@ -70,25 +70,23 @@ def setup_gl_widget(
     gl_widget = GLWidget(player=player)
 
     # Create layers
-    validation_layer = gl_validation_layer.GLValidationLayer(visualization_buffer_size)
-    path_layer = gl_path_layer.GLPathLayer(visualization_buffer_size)
-    obstacle_layer = gl_obstacle_layer.GLObstacleLayer(visualization_buffer_size)
-    passing_layer = gl_passing_layer.GLPassingLayer(visualization_buffer_size)
+    validation_layer = gl_validation_layer.GLValidationLayer(
+        "Validation", visualization_buffer_size
+    )
+    path_layer = gl_path_layer.GLPathLayer("Paths", visualization_buffer_size)
+    obstacle_layer = gl_obstacle_layer.GLObstacleLayer(
+        "Obstacles", visualization_buffer_size
+    )
+    passing_layer = gl_passing_layer.GLPassingLayer(
+        "Passing", visualization_buffer_size
+    )
     world_layer = gl_world_layer.GLWorldLayer(
-        sim_proto_unix_io, friendly_colour_yellow, visualization_buffer_size
+        "Vision", sim_proto_unix_io, friendly_colour_yellow, visualization_buffer_size
     )
     simulator_layer = gl_simulator_layer.GLSimulatorLayer(
-        friendly_colour_yellow, visualization_buffer_size
+        "Simulator", friendly_colour_yellow, visualization_buffer_size
     )
-    tactic_layer = gl_tactic_layer.GLTacticLayer(visualization_buffer_size)
-
-    validation_layer.set_name("Validation")
-    path_layer.set_name("Paths")
-    obstacle_layer.set_name("Obstacles")
-    passing_layer.set_name("Passing")
-    world_layer.set_name("Vision")
-    simulator_layer.set_name("Simulator")
-    tactic_layer.set_name("Tactics")
+    tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
 
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(path_layer)
@@ -102,8 +100,9 @@ def setup_gl_widget(
     # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
     hrvo_layers = []
     for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
-        hrvo_layer = gl_hrvo_layer.GLHrvoLayer(robot_id, visualization_buffer_size)
-        hrvo_layer.set_name(f"HRVO {robot_id}")
+        hrvo_layer = gl_hrvo_layer.GLHrvoLayer(
+            f"HRVO {robot_id}", robot_id, visualization_buffer_size
+        )
         hrvo_layers.append(hrvo_layer)
         gl_widget.add_layer(hrvo_layer, False)
 

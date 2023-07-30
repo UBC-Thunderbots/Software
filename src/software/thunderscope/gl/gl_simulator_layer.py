@@ -18,15 +18,16 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
 class GLSimulatorLayer(GLLayer):
     """GLLayer that visualizes the simulator"""
 
-    def __init__(self, friendly_colour_yellow, buffer_size=5):
+    def __init__(self, name: str, friendly_colour_yellow: bool, buffer_size: int = 5):
         """Initialize the GLSimulatorLayer
 
+        :param name: The displayed name of the layer
         :param friendly_colour_yellow: Is the friendly_colour_yellow?
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 
         """
-        GLLayer.__init__(self)
+        GLLayer.__init__(self, name)
 
         self.friendly_colour_yellow = friendly_colour_yellow
         self.simulator_state_buffer = ThreadSafeBuffer(buffer_size, SimulatorState)
@@ -38,17 +39,8 @@ class GLSimulatorLayer(GLLayer):
             ),
         )
 
-    def update_graphics(self):
-        """Update the GLGraphicsItems in this layer
-
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
-        
-        """
-        # Clear all graphics in this layer if not visible
-        if not self.isVisible():
-            return self.graphics_list.get_changes()
+    def _update_graphics(self):
+        """Fetch and update graphics for the layer"""
 
         sim_world_state = self.simulator_state_buffer.get(block=False)
 
@@ -60,5 +52,3 @@ class GLSimulatorLayer(GLLayer):
             -sim_world_state.ball.p_x,
             sim_world_state.ball.p_z,
         )
-
-        return self.graphics_list.get_changes()

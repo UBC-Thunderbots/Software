@@ -12,7 +12,7 @@ class PointInSceneEvent(object):
     that was picked by the mouse cursor
     """
 
-    def __init__(self, mouse_event: QtGui.QMouseEvent, point_in_scene):
+    def __init__(self, mouse_event: QtGui.QMouseEvent, point_in_scene: QtGui.QVector3D):
         """Initialize the PointInSceneEvent
         
         :param mouse_event: The QMouseEvent to wrap
@@ -56,7 +56,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         # This must be enabled for the mouse_moved_in_scene_signal to be emitted
         self.detect_mouse_movement_in_scene = False
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QtGui.QMouseEvent):
         """Detect that the mouse was pressed
         
         :param event: The event
@@ -75,7 +75,7 @@ class ExtendedGLViewWidget(GLViewWidget):
             # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
             super().mousePressEvent(event)
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event: QtGui.QMouseEvent):
         """Detect that the mouse was moved
         
         :param event: The event
@@ -98,7 +98,7 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         super().mouseMoveEvent(event)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event: QtGui.QMouseEvent):
         """Detect that the mouse was released
         
         :param event: The event
@@ -114,7 +114,7 @@ class ExtendedGLViewWidget(GLViewWidget):
             # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
             super().mouseReleaseEvent(event)
 
-    def get_point_in_scene(self, mouse_pos):
+    def get_point_in_scene(self, mouse_pos: QtCore.QPoint) -> QtGui.QVector3D:
         """Determine the coordinates of the point on the x-y plane in the 3D scene that 
         the mouse is pointing at.
 

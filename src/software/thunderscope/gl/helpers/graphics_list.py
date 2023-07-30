@@ -1,4 +1,5 @@
-from typing import Callable
+from typing import Callable, List, Tuple
+from pyqtgraph.opengl import *
 
 
 class GraphicsList:

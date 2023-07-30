@@ -12,10 +12,7 @@ from software.thunderscope.constants import *
 from software.thunderscope.gl.gl_layer import GLLayer
 from software.thunderscope.gl.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.replay.replay_controls import ReplayControls
-from software.thunderscope.gl.helpers.extended_gl_view_widget import (
-    ExtendedGLViewWidget,
-)
-
+from software.thunderscope.gl.helpers.extended_gl_view_widget import *
 
 class GLWidget(QWidget):
     """Widget that handles GLLayers to produce a 3D visualization of the field/world 
@@ -146,51 +143,43 @@ class GLWidget(QWidget):
         else:
             self.player = None
 
-        # Variables for keeping track of keys pressed
-        self.key_pressed = {}
-        self.accepted_keys = [Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3, Qt.Key.Key_4]
-        for key in self.accepted_keys:
-            self.key_pressed[key] = False
-
         self.layers = []
 
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QtGui.QKeyEvent):
         """Detect when a key has been pressed
         
         :param event: The event
         
         """
-        self.key_pressed[event.key()] = True
+        key_pressed = event.key()
 
         # Camera view shortcuts
-        if self.key_pressed[Qt.Key.Key_1]:
+        if key_pressed == Qt.Key.Key_1:
             self.set_camera_view(CameraView.ORTHOGRAPHIC)
-        elif self.key_pressed[Qt.Key.Key_2]:
+        elif key_pressed == Qt.Key.Key_2:
             self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
-        elif self.key_pressed[Qt.Key.Key_3]:
+        elif key_pressed == Qt.Key.Key_3:
             self.set_camera_view(CameraView.LEFT_HALF_HIGH_ANGLE)
-        elif self.key_pressed[Qt.Key.Key_4]:
+        elif key_pressed == Qt.Key.Key_4:
             self.set_camera_view(CameraView.RIGHT_HALF_HIGH_ANGLE)
 
         # Propagate keypress event to all layers
         for layer in self.layers:
             layer.keyPressEvent(event)
 
-    def keyReleaseEvent(self, event):
+    def keyReleaseEvent(self, event: QtGui.QKeyEvent):
         """Detect when a key has been released
         
         :param event: The event
         
         """
-        self.key_pressed[event.key()] = False
-
         # Propagate keypress event to all layers
         for layer in self.layers:
             layer.keyReleaseEvent(event)
 
-    def mouse_in_scene_pressed(self, event):
+    def mouse_in_scene_pressed(self, event: PointInSceneEvent):
         """Propagate mouse_in_scene_pressed event to all layers
         
         :param event: The event
@@ -204,7 +193,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_pressed(event)
 
-    def mouse_in_scene_dragged(self, event):
+    def mouse_in_scene_dragged(self, event: PointInSceneEvent):
         """Propagate mouse_in_scene_dragged event to all layers
         
         :param event: The event
@@ -218,7 +207,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_dragged(event)
 
-    def mouse_in_scene_released(self, event):
+    def mouse_in_scene_released(self, event: PointInSceneEvent):
         """Propagate mouse_in_scene_released event to all layers
         
         :param event: The event
@@ -232,7 +221,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_released(event)
 
-    def mouse_in_scene_moved(self, event):
+    def mouse_in_scene_moved(self, event: PointInSceneEvent):
         """Propagate mouse_in_scene_moved event to all layers
         
         :param event: The event
@@ -259,17 +248,19 @@ class GLWidget(QWidget):
             layer.hide()
 
         # Add the layer to the Layer menu
-        
+
         # Not using a checkable QAction in order to prevent menu from closing
         # when an action is pressed
         layer_checkbox = QCheckBox(layer.name, self.layers_menu)
         layer_checkbox.setStyleSheet("QCheckBox { padding: 0px 8px; }")
         layer_checkbox.setChecked(layer.isVisible())
-        layer_checkbox.stateChanged.connect(lambda: layer.setVisible(layer_checkbox.isChecked()))
+        layer_checkbox.stateChanged.connect(
+            lambda: layer.setVisible(layer_checkbox.isChecked())
+        )
 
         layer_action = QWidgetAction(self.layers_menu)
         layer_action.setDefaultWidget(layer_checkbox)
-        
+
         self.layers_menu_actions[layer.name] = layer_action
         self.layers_menu.addAction(layer_action)
 
@@ -311,7 +302,7 @@ class GLWidget(QWidget):
             for removed_graphic in removed_graphics:
                 self.gl_view_widget.removeItem(removed_graphic)
 
-    def set_camera_view(self, camera_view):
+    def set_camera_view(self, camera_view: CameraView):
         """Set the camera position to a preset camera view
 
         :param camera_view: the preset camera view
@@ -338,6 +329,7 @@ class GLWidget(QWidget):
 
     def toggle_measure_mode(self):
         """Toggles measure mode in the 3D visualizer"""
+
         self.measure_mode_enabled = not self.measure_mode_enabled
 
         # Enable/disable detect_mouse_movement_in_scene in ExtendedGLViewWidget
@@ -349,8 +341,7 @@ class GLWidget(QWidget):
         self.gl_view_widget.detect_mouse_movement_in_scene = self.measure_mode_enabled
 
         if self.measure_mode_enabled:
-            self.measure_layer = GLMeasureLayer()
-            self.measure_layer.set_name("Measure")
+            self.measure_layer = GLMeasureLayer("Measure")
             self.add_layer(self.measure_layer)
         else:
             self.remove_layer(self.measure_layer)

@@ -26,7 +26,7 @@ class GLRobotOutline(GLLinePlotItem):
         )
 
     @staticmethod
-    def get_robot_outline(z_coordinate=0, num_points=10):
+    def get_robot_outline(z_coordinate: float = 0, num_points: int = 10):
         """Returns a list of points that represent the outline of a robot.
         The points will be on a plane parallel to the x-y plane.
 
@@ -52,7 +52,7 @@ class GLRobotOutline(GLLinePlotItem):
 
         return points
 
-    def set_position(self, x, y):
+    def set_position(self, x: float, y: float):
         """Set the position of the graphic in the scene
         
         :param x: The x coordinate to position the graphic at
@@ -66,16 +66,16 @@ class GLRobotOutline(GLLinePlotItem):
         self.x = x
         self.y = y
 
-    def set_orientation(self, radians):
+    def set_orientation(self, degrees: float):
         """Set the orientation of the graphic in the scene
         
-        :param radians: The orientation of the graphic in radians
+        :param degrees: The orientation of the graphic in degrees
 
         """
         # We need to add 45 degrees to our desired orientation in order
         # to get the flat side of the robot (i.e. its front) to face
         # the right way
-        degrees = math.degrees(radians) + 45
+        degrees += 45
 
         if self.orientation == degrees:
             return

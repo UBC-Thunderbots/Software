@@ -25,14 +25,15 @@ from software.thunderscope.gl.gl_layer import GLLayer
 class GLTacticLayer(GLLayer):
     """GLLayer that visualizes tactics"""
 
-    def __init__(self, buffer_size=5):
+    def __init__(self, name: str, buffer_size: int = 5):
         """Initialize the GLTacticLayer
 
+        :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 
         """
-        GLLayer.__init__(self)
+        GLLayer.__init__(self, name)
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.play_info_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
@@ -45,7 +46,18 @@ class GLTacticLayer(GLLayer):
             ),
         )
 
-    def update_tactic_name_graphics(self, team: Team, play_info_dict):
+    def _update_graphics(self):
+        """Fetch and update graphics for the layer"""
+
+        self.cached_world = self.world_buffer.get(block=False)
+        play_info = self.play_info_buffer.get(block=False)
+        play_info_dict = MessageToDict(play_info)
+
+        self.__update_tactic_name_graphics(
+            self.cached_world.friendly_team, play_info_dict
+        )
+
+    def __update_tactic_name_graphics(self, team: Team, play_info_dict):
         """Update the GLGraphicsItems that display tactic data
         
         :param team: The team proto
@@ -71,25 +83,3 @@ class GLTacticLayer(GLLayer):
                     ROBOT_MAX_HEIGHT_METERS + 0.1,
                 ],
             )
-
-    def update_graphics(self):
-        """Update the GLGraphicsItems in this layer
-
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
-        
-        """
-        # Clear all graphics in this layer if not visible
-        if not self.isVisible():
-            return self.graphics_list.get_changes()
-
-        self.cached_world = self.world_buffer.get(block=False)
-        play_info = self.play_info_buffer.get(block=False)
-        play_info_dict = MessageToDict(play_info)
-
-        self.update_tactic_name_graphics(
-            self.cached_world.friendly_team, play_info_dict
-        )
-
-        return self.graphics_list.get_changes()

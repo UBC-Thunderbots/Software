@@ -1,6 +1,7 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.opengl import *
 
+import math
 import numpy as np
 
 from proto.tbots_software_msgs_pb2 import PrimitiveSet
@@ -16,14 +17,15 @@ from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 class GLPathLayer(GLLayer):
     """GLLayer that visualizes paths from the navigator"""
 
-    def __init__(self, buffer_size=5):
+    def __init__(self, name: str, buffer_size: int = 5):
         """Initialize the GLPathLayer
 
+        :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
                             
         """
-        GLLayer.__init__(self)
+        GLLayer.__init__(self, name)
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
@@ -33,17 +35,8 @@ class GLPathLayer(GLLayer):
             lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
         )
 
-    def update_graphics(self):
-        """Update the GLGraphicsItems in this layer
-
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
-        
-        """
-        # Clear all graphics in this layer if not visible
-        if not self.isVisible():
-            return self.graphics_list.get_changes()
+    def _update_graphics(self):
+        """Fetch and update graphics for the layer"""
 
         primitive_set = self.primitive_set_buffer.get(
             block=False
@@ -81,6 +74,4 @@ class GLPathLayer(GLLayer):
             requested_destinations,
         ):
             dest_graphic.set_position(dest.x_meters, dest.y_meters)
-            dest_graphic.set_orientation(final_angle.radians)
-
-        return self.graphics_list.get_changes()
+            dest_graphic.set_orientation(math.degrees(final_angle.radians))

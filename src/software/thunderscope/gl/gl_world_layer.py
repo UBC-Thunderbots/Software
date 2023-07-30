@@ -2,6 +2,8 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.opengl import *
 
+import math
+
 from proto.import_all_protos import *
 from software.py_constants import *
 import software.python_bindings as geom
@@ -18,6 +20,7 @@ from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 from software.thunderscope.gl.gl_layer import GLLayer
+from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInSceneEvent
 
 
 class GLWorldLayer(GLLayer):
@@ -26,16 +29,17 @@ class GLWorldLayer(GLLayer):
     # The maximum allowed velocity that the user can give the ball
     MAX_ALLOWED_KICK_SPEED_M_PER_S = 6.5
 
-    def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=5):
+    def __init__(self, name: str, simulator_io, friendly_colour_yellow: bool, buffer_size: int = 5):
         """Initialize the GLWorldLayer
 
+        :param name: The displayed name of the layer
         :param simulator_io: The simulator io communicate with the simulator
         :param friendly_colour_yellow: Is the friendly_colour_yellow?
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 
         """
-        GLLayer.__init__(self)
+        GLLayer.__init__(self, name)
 
         self.simulator_io = simulator_io
         self.friendly_colour_yellow = friendly_colour_yellow
@@ -81,7 +85,11 @@ class GLWorldLayer(GLLayer):
             lambda: GLSphere(radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR),
         )
         self.graphics_list.register_graphics_group(
-            "robot_ids", lambda: GLTextItem(color=Colors.PRIMARY_TEXT_COLOR)
+            "robot_ids", 
+            lambda: GLTextItem(
+                font=QtGui.QFont("Roboto", 10, weight=700), 
+                color=Colors.PRIMARY_TEXT_COLOR
+            )
         )
         self.graphics_list.register_graphics_group(
             "robot_status", lambda: GLCircle(color=Colors.BREAKBEAM_TRIPPED_COLOR)
@@ -91,7 +99,7 @@ class GLWorldLayer(GLLayer):
         )
         self.graphics_list.register_graphics_group("robots", GLRobot)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QtGui.QKeyEvent):
         """Detect when a key has been pressed
 
         :param event: The event
@@ -115,7 +123,7 @@ class GLWorldLayer(GLLayer):
 
             self.simulator_io.send_proto(SimulationState, simulator_state)
 
-    def keyReleaseEvent(self, event):
+    def keyReleaseEvent(self, event: QtGui.QKeyEvent):
         """Detect when a key has been released
 
         :param event: The event
@@ -123,7 +131,7 @@ class GLWorldLayer(GLLayer):
         """
         self.key_pressed[event.key()] = False
 
-    def mouse_in_scene_pressed(self, event):
+    def mouse_in_scene_pressed(self, event: PointInSceneEvent):
         """Event handler for the mouse_in_scene_pressed event
         
         :param event: The event
@@ -145,7 +153,7 @@ class GLWorldLayer(GLLayer):
         )
         self.simulator_io.send_proto(WorldState, world_state)
 
-    def mouse_in_scene_dragged(self, event):
+    def mouse_in_scene_dragged(self, event: PointInSceneEvent):
         """Event handler for the mouse_in_scene_dragged event
         
         :param event: The event
@@ -179,7 +187,7 @@ class GLWorldLayer(GLLayer):
                 GLWorldLayer.MAX_ALLOWED_KICK_SPEED_M_PER_S
             )
 
-    def mouse_in_scene_released(self, event):
+    def mouse_in_scene_released(self, event: PointInSceneEvent):
         """Event handler for the mouse_in_scene_released event
         
         :param event: The event
@@ -211,7 +219,33 @@ class GLWorldLayer(GLLayer):
         self.ball_velocity_vector = None
         self.simulator_io.send_proto(WorldState, world_state)
 
-    def update_field_graphics(self, field: Field):
+    def _update_graphics(self):
+        """Fetch and update graphics for the layer"""
+
+        self.cached_world = self.world_buffer.get(block=False)
+
+        self.__update_field_graphics(self.cached_world.field)
+        self.__update_goal_graphics(self.cached_world.field)
+        self.__update_ball_graphics(self.cached_world.ball.current_state)
+
+        friendly_colour = (
+            Colors.YELLOW_ROBOT_COLOR
+            if self.friendly_colour_yellow
+            else Colors.BLUE_ROBOT_COLOR
+        )
+        enemy_colour = (
+            Colors.BLUE_ROBOT_COLOR
+            if self.friendly_colour_yellow
+            else Colors.YELLOW_ROBOT_COLOR
+        )
+
+        self.__update_robot_graphics(self.cached_world.friendly_team, friendly_colour)
+        self.__update_robot_graphics(self.cached_world.enemy_team, enemy_colour)
+
+        self.__update_robot_status_graphics()
+        self.__update_speed_line_graphics()
+
+    def __update_field_graphics(self, field: Field):
         """Update the GLGraphicsItems that display the field lines and markings
         
         :param field: The field proto
@@ -265,7 +299,7 @@ class GLWorldLayer(GLLayer):
             ),
         )
 
-    def update_goal_graphics(self, field: Field):
+    def __update_goal_graphics(self, field: Field):
         """Update the GLGraphicsItems that display the goals
         
         :param field: The field proto
@@ -283,7 +317,7 @@ class GLWorldLayer(GLLayer):
         goal_graphics[1].set_position(field.field_x_length / 2, 0)
         goal_graphics[1].set_orientation(180)
 
-    def update_ball_graphics(self, ball_state: BallState):
+    def __update_ball_graphics(self, ball_state: BallState):
         """Update the GLGraphicsItems that display the ball
         
         :param ball_state: The ball state proto
@@ -297,7 +331,7 @@ class GLWorldLayer(GLLayer):
             ball_state.distance_from_ground,
         )
 
-    def update_robot_graphics(self, team: Team, color):
+    def __update_robot_graphics(self, team: Team, color):
         """Update the GLGraphicsItems that display the robots
         
         :param team: The team proto
@@ -314,7 +348,7 @@ class GLWorldLayer(GLLayer):
                 robot.current_state.global_position.y_meters,
             )
             robot_graphic.set_orientation(
-                robot.current_state.global_orientation.radians
+                math.degrees(robot.current_state.global_orientation.radians)
             )
             robot_graphic.setColor(color)
 
@@ -332,7 +366,7 @@ class GLWorldLayer(GLLayer):
             else:
                 robot_id_graphic.hide()
 
-    def update_robot_status_graphics(self):
+    def __update_robot_status_graphics(self):
         """Update the robot status graphics"""
         self.cached_status = self.robot_status_buffer.get(block=False)
 
@@ -350,7 +384,7 @@ class GLWorldLayer(GLLayer):
                     robot.current_state.global_position.y_meters,
                 )
 
-    def update_speed_line_graphics(self):
+    def __update_speed_line_graphics(self):
         """Update the speed lines visualizing the robot and ball speeds"""
 
         # If user if trying to apply a velocity on the ball (i.e. kick it), visualize
@@ -402,43 +436,6 @@ class GLWorldLayer(GLLayer):
                         ]
                     ),
                 )
-
-    def update_graphics(self):
-        """Update the GLGraphicsItems in this layer
-
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
-        
-        """
-        # Clear all graphics in this layer if not visible
-        if not self.isVisible():
-            return self.graphics_list.get_changes()
-
-        self.cached_world = self.world_buffer.get(block=False)
-
-        self.update_field_graphics(self.cached_world.field)
-        self.update_goal_graphics(self.cached_world.field)
-        self.update_ball_graphics(self.cached_world.ball.current_state)
-
-        friendly_colour = (
-            Colors.YELLOW_ROBOT_COLOR
-            if self.friendly_colour_yellow
-            else Colors.BLUE_ROBOT_COLOR
-        )
-        enemy_colour = (
-            Colors.BLUE_ROBOT_COLOR
-            if self.friendly_colour_yellow
-            else Colors.YELLOW_ROBOT_COLOR
-        )
-
-        self.update_robot_graphics(self.cached_world.friendly_team, friendly_colour)
-        self.update_robot_graphics(self.cached_world.enemy_team, enemy_colour)
-
-        self.update_robot_status_graphics()
-        self.update_speed_line_graphics()
-
-        return self.graphics_list.get_changes()
 
     def __should_invert_coordinate_frame(self):
         """Our coordinate system always assumes that the friendly team is defending
