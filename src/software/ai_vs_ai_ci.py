@@ -22,24 +22,30 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
         :param tick_rate_ms: The tick rate of the simulation
 
         """
-        world_state = tbots_protobuf.create_world_state(
-            blue_robot_locations=[
-                cpp_bindings.Point(-3, y)
-                for y in numpy.linspace(-2, 2, DIV_B_NUM_ROBOTS)
-            ],
-            yellow_robot_locations=[
-                cpp_bindings.Point(3, y)
-                for y in numpy.linspace(-2, 2, DIV_B_NUM_ROBOTS)
-            ],
-            ball_location=cpp_bindings.Point(0, 0),
-            ball_velocity=cpp_bindings.Vector(0, 0),
+        world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
+        simulator_proto_unix_io.register_observer(
+            WorldStateReceivedTrigger, world_state_received_buffer
         )
-        simulator_proto_unix_io.send_proto(WorldState, world_state)
+
+        while True:
+            world_state_received = world_state_received_buffer.get(
+                block=False, return_cached=False
+            )
+            if not world_state_received:
+                world_state = tbots_protobuf.create_default_world_state(
+                    DIV_B_NUM_ROBOTS
+                )
+                simulator_proto_unix_io.send_proto(WorldState, world_state)
+            else:
+                break
+
+            time.sleep(0.01)
 
         # Tick Simulation
-        while True:
-            tick = SimulatorTick(milliseconds=SIXTY_HERTZ_MILLISECONDS_PER_TICK)
-            simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+        tick = SimulatorTick(
+            milliseconds=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK
+        )
+        simulator_proto_unix_io.send_proto(SimulatorTick, tick)
 
     blue_fs_proto_unix_io = ProtoUnixIO()
     yellow_fs_proto_unix_io = ProtoUnixIO()
@@ -59,7 +65,7 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
         autoref_runtime_dir="/tmp/tbots/autoref",
         ci_mode=True,
         gc=gamecontroller,
-        tick_rate_ms=SIXTY_HERTZ_MILLISECONDS_PER_TICK,
+        tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
     ) as autoref:
         autoref_proto_unix_io = ProtoUnixIO()
 
@@ -75,12 +81,10 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
             autoref_proto_unix_io,
         )
         gamecontroller.setup_proto_unix_io(
-            blue_fs_proto_unix_io, yellow_fs_proto_unix_io
+            blue_fs_proto_unix_io, yellow_fs_proto_unix_io, autoref_proto_unix_io
         )
 
-        autoref.setup_ssl_wrapper_packets(
-            autoref_proto_unix_io, blue_fs_proto_unix_io, yellow_fs_proto_unix_io
-        )
+        autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io)
 
         thread = threading.Thread(
             target=__async_sim_ticker, args=(simulator_proto_unix_io,), daemon=True,

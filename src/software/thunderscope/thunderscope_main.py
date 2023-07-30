@@ -2,7 +2,6 @@ import os
 import time
 import threading
 import argparse
-import numpy
 import contextlib
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -16,8 +15,6 @@ from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
 from software.thunderscope.constants import ProtoUnixIOTypes
-
-NUM_ROBOTS = 6
 
 ###########################################################################
 #                         Thunderscope Main                               #
@@ -163,6 +160,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--enable_autoref", action="store_true", default=False, help="Enable autoref"
+    )
+    parser.add_argument(
+        "--show_autoref_gui",
+        action="store_true",
+        default=False,
+        help="Show TigersAutoref GUI",
     )
     parser.add_argument(
         "--cost_visualization",
@@ -360,17 +363,8 @@ if __name__ == "__main__":
                     block=False, return_cached=False
                 )
                 if not world_state_received:
-                    world_state = tbots_protobuf.create_world_state(
-                        blue_robot_locations=[
-                            cpp_bindings.Point(-3, y)
-                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                        ],
-                        yellow_robot_locations=[
-                            cpp_bindings.Point(3, y)
-                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                        ],
-                        ball_location=cpp_bindings.Point(0, 0),
-                        ball_velocity=cpp_bindings.Vector(0, 0),
+                    world_state = tbots_protobuf.create_default_world_state(
+                        DIV_B_NUM_ROBOTS
                     )
                     tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].send_proto(
                         WorldState, world_state
@@ -420,10 +414,11 @@ if __name__ == "__main__":
             # All calls to autoref should be guarded with args.enable_autoref
             TigersAutoref(
                 autoref_runtime_dir="/tmp/tbots/autoref",
-                ci_mode=args.enable_autoref,
+                ci_mode=True,
                 gc=gamecontroller,
                 supress_logs=(not args.verbose),
                 tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
+                show_gui=args.show_autoref_gui,
             )
             if args.enable_autoref
             else contextlib.nullcontext()

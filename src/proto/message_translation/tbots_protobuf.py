@@ -1,4 +1,6 @@
 from proto.import_all_protos import *
+import software.python_bindings as cpp_bindings
+import numpy
 
 
 def create_world_state(
@@ -47,3 +49,16 @@ def create_world_state(
     )
 
     return world_state
+
+
+def create_default_world_state(num_robots):
+    return create_world_state(
+        blue_robot_locations=[
+            cpp_bindings.Point(-3, y) for y in numpy.linspace(-2, 2, num_robots)
+        ],
+        yellow_robot_locations=[
+            cpp_bindings.Point(3, y) for y in numpy.linspace(-2, 2, num_robots)
+        ],
+        ball_location=cpp_bindings.Point(0, 0),
+        ball_velocity=cpp_bindings.Vector(0, 0),
+    )

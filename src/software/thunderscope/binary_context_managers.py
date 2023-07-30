@@ -501,6 +501,7 @@ class Gamecontroller(object):
 
         :param gc_command: The gc command to send
         :param team: The team to send the command to
+        :param final_ball_placement_point: ball placement point for BallPlacement messages
         :return: The response CiOutput containing 1 or more refree msgs
 
         """
@@ -646,7 +647,7 @@ class TigersAutoref(object):
     """
 
     AUTOREF_COMM_PORT = 10013
-    AUTOREF_NUM_RETRIES = 10
+    AUTOREF_NUM_RETRIES = 20
     NEXT_PACKET_DELAY = 1.0 / 30  # 30 Hz
 
     def __init__(
@@ -657,6 +658,7 @@ class TigersAutoref(object):
         buffer_size=5,
         gc=Gamecontroller(),
         supress_logs=True,
+        show_gui=False,
     ):
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
@@ -669,6 +671,7 @@ class TigersAutoref(object):
         self.supress_logs = supress_logs
         self.tick_rate_ms = tick_rate_ms
         self.current_timestamp = int(time.time_ns())
+        self.show_gui = show_gui
 
     def __enter__(self):
         if not os.path.exists("/opt/tbotspython/autoReferee/bin/autoReferee"):
@@ -749,13 +752,10 @@ class TigersAutoref(object):
             try:
                 ssl_wrapper = self.wrapper_buffer.get(block=True)
                 referee_packet = self.referee_buffer.get(block=False)
-                print("referee_packet")
-                print(referee_packet)
 
                 ci_input = AutoRefCiInput()
                 ci_input.detection.append(ssl_wrapper.detection)
                 if referee_packet.IsInitialized():
-                    print("added on a referee message packet", flush=True)
                     ci_input.referee_message.CopyFrom(referee_packet)
 
                 self.ci_socket.send(ci_input)
@@ -789,6 +789,9 @@ class TigersAutoref(object):
         Starts the TigersAutoref binary.
         """
         autoref_cmd = "software/autoref/run_autoref"
+
+        if not self.show_gui:
+            autoref_cmd += " -hl"
 
         if self.ci_mode:
             autoref_cmd += " --ci"
