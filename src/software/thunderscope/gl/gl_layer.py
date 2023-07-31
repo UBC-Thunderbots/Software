@@ -21,8 +21,8 @@ class GLLayer(pg.GraphicsObject):
         self.name = name
         self.graphics_list = GraphicsList()
 
-    def update_graphics(self):
-        """Update the GLGraphicsItems in this layer
+    def refresh_graphics(self):
+        """Updates the GLGraphicsItems in this layer
 
         :returns: tuple (added_graphics, removed_graphics)
             - added_graphics - List of the added GLGraphicsItems

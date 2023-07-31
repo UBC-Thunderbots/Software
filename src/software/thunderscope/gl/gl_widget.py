@@ -294,7 +294,7 @@ class GLWidget(QWidget):
             self.replay_controls.refresh()
 
         for layer in self.layers:
-            added_graphics, removed_graphics = layer.update_graphics()
+            added_graphics, removed_graphics = layer.refresh_graphics()
 
             for added_graphic in added_graphics:
                 self.gl_view_widget.addItem(added_graphic)
