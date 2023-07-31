@@ -84,7 +84,7 @@ class GLRobot(GLMeshItem):
         for index in range(len(top_face_points) - 1):
             faces.append([index, index + 1, index + len(top_face_points)])
         for index in range(len(top_face_points), len(circle_points) - 1):
-            faces.append([index, index + 1, index + 1 - len(top_face_points)])
+            faces.append([index + 1 - len(top_face_points), index + 1, index])
         for index in range(len(top_face_points) - 1):
             faces.append([index, index + 1, len(circle_points)])
 

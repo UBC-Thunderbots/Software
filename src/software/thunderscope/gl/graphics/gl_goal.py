@@ -76,39 +76,30 @@ class GLGoal(GLMeshItem):
         :returns: the computed MeshData instance 
 
         """
-        # Construct points that make up the mesh.
-        back_plate_points = [
+        # Construct vertices that make up the mesh.
+        vertices = [
             [-x_length, y_length / 2, 0],
             [-x_length, -y_length / 2, 0],
             [-x_length, y_length / 2, ROBOT_MAX_HEIGHT_METERS],
             [-x_length, -y_length / 2, ROBOT_MAX_HEIGHT_METERS],
-        ]
-        left_plate_points = [
-            [-x_length, y_length / 2, 0],
             [0, y_length / 2, 0],
-            [-x_length, y_length / 2, ROBOT_MAX_HEIGHT_METERS],
             [0, y_length / 2, ROBOT_MAX_HEIGHT_METERS],
-        ]
-        right_plate_points = [
-            [-x_length, -y_length / 2, 0],
             [0, -y_length / 2, 0],
-            [-x_length, -y_length / 2, ROBOT_MAX_HEIGHT_METERS],
             [0, -y_length / 2, ROBOT_MAX_HEIGHT_METERS],
         ]
-        points = back_plate_points + left_plate_points + right_plate_points
 
         # Construct triangular faces that make up the mesh.
         # Each face is an array of 3 indices in the points array.
         faces = [
             # Back plate faces
             [0, 1, 2],
-            [1, 2, 3],
+            [3, 2, 1],
             # Left plate faces
-            [4, 5, 6],
-            [5, 6, 7],
+            [0, 4, 5],
+            [5, 2, 0],
             # Right plate faces
-            [8, 9, 10],
-            [9, 10, 11],
+            [1, 6, 7],
+            [7, 3, 1],
         ]
 
-        return MeshData(vertexes=np.array(points), faces=np.array(faces),)
+        return MeshData(vertexes=np.array(vertices), faces=np.array(faces),)
