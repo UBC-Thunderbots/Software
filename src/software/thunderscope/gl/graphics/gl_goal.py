@@ -24,6 +24,11 @@ class GLGoal(GLMeshItem):
 
         GLMeshItem.__init__(self, color=self.color)
 
+        # The 3D mesh isn't visible from the orthographic view, so
+        # we need to draw an outline of the goal on the ground 
+        self.goal_outline = GLLinePlotItem(color=self.color)
+        self.goal_outline.setParentItem(self)
+
     def set_dimensions(self, x_length: float, y_length: float):
         """Set the dimensions of the goal
         
@@ -38,6 +43,16 @@ class GLGoal(GLMeshItem):
         self.y_length = y_length
 
         self.setMeshData(meshdata=self.__get_mesh_data(self.x_length, self.y_length))
+        self.goal_outline.setData(
+            pos=np.array(
+                [
+                    [0, self.y_length / 2, 0],
+                    [-self.x_length, self.y_length / 2, 0],
+                    [-self.x_length, -self.y_length / 2, 0],
+                    [0, -self.y_length / 2, 0],
+                ]
+            ),
+        )
 
     def set_position(self, x: float, y: float):
         """Set the position of the graphic in the scene
