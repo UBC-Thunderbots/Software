@@ -539,7 +539,7 @@ A [DrawFunction](#draw_functions) is essentially a function that tells the [Visu
 
 The latest iteration of our visualizer uses [PyQtGraph's 3D graphics system](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/index.html). Below lists the key components of the visualizer in the codebase:
 
-- `software/thunderscope/gl`: Main folder for the 3D visualizer. The "GL" prefix lets us identify 3D graphics related code + keeps namings consistent with `pyqtgraph.opengl` class names.
+- `software/thunderscope/gl`: Main folder for the 3D visualizer. The "GL" prefix lets us identify 3D graphics related code and keeps namings consistent with `pyqtgraph.opengl` class names.
   - `/graphics`: Folder for custom graphics items. Graphics should inherit from `GLGraphicsItem` and represent 3D objects that can be visualized in the scene (e.g. a robot, a sphere, a circle, etc.)
   - [`GLWidget`](../src/software/thunderscope/gl/gl_widget.py) is the widget that displays our 3D visualizer. It wraps a PyQtGraph `GLViewWidget` that renders all the `GLGraphicsItem`s that have been added to its scene. 
   - [Layers](#layers) are contained under the `gl` directory.
@@ -547,7 +547,7 @@ The latest iteration of our visualizer uses [PyQtGraph's 3D graphics system](htt
 ### Layers
 We organize our graphics into "layers" so that we can toggle the visibility of different parts of our visualization. Each layer is responsible for visualizing a specific portion of our AI (e.g. vision data, path planning, passing, etc.). The base class for a layer is [`GLLayer`](../src/software/thunderscope/gl/gl_layer.py).
 
-In order to manage the adding and removing of graphics to the `GLViewWidget` scene from each layer, `GLLayer` has a `GraphicsList` that caches and tracks which graphics items are currently in use by the layer. A subclass of `GLLayer` should:
+In order to manage the adding and removing of graphics to the `GLViewWidget` scene from each layer, `GLLayer` has a [`GraphicsList`](../src/software/thunderscope/gl/helpers/graphics_list.py) that caches and tracks which graphics items are currently in use by the layer. A subclass of `GLLayer` should:
 
 - Register the types of graphics to be displayed with `self.graphics_list.register_graphics_group` in the layer's constructor.
 - Override the layer's `_update_graphics` function. This is where the layer should fetch graphics from the `GraphicsList` with `get_graphics` and update those graphics' transformations/properties. The `GraphicsList` will automatically create and add graphics to the cache as necessary, depending on the number of graphics requested.
