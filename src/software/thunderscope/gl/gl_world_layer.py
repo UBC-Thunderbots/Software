@@ -71,6 +71,9 @@ class GLWorldLayer(GLLayer):
             "field_marking_rects", lambda: GLRect(color=Colors.FIELD_LINE_COLOR)
         )
         self.graphics_list.register_graphics_group(
+            "field_outer_boundary_rect", lambda: GLRect(color=Colors.FIELD_LINE_LIGHTER_COLOR)
+        )
+        self.graphics_list.register_graphics_group(
             "field_marking_lines",
             lambda: GLLinePlotItem(color=Colors.FIELD_LINE_LIGHTER_COLOR),
         )
@@ -254,6 +257,9 @@ class GLWorldLayer(GLLayer):
         field_marking_rect_graphics = self.graphics_list.get_graphics(
             "field_marking_rects", 3
         )
+        field_outer_boundary_rect = self.graphics_list.get_graphics(
+            "field_outer_boundary_rect", 1
+        )[0]
         field_marking_line_graphics = self.graphics_list.get_graphics(
             "field_marking_lines", 2
         )
@@ -262,12 +268,13 @@ class GLWorldLayer(GLLayer):
         )[0]
 
         # Outer field lines
+        boundary_buffer = (2 * field.boundary_buffer_size)
+        field_outer_boundary_rect.set_dimensions(
+            field.field_x_length + boundary_buffer, field.field_y_length + boundary_buffer
+        )
         field_marking_rect_graphics[0].set_dimensions(
             field.field_x_length, field.field_y_length
         )
-
-        # Center circle
-        field_center_circle_graphic.set_radius(field.center_circle_radius)
 
         # Friendly defense area
         field_marking_rect_graphics[1].set_dimensions(
@@ -298,6 +305,9 @@ class GLWorldLayer(GLLayer):
                 [[-(field.field_x_length / 2), 0], [(field.field_x_length / 2), 0]]
             ),
         )
+
+        # Center circle
+        field_center_circle_graphic.set_radius(field.center_circle_radius)
 
     def __update_goal_graphics(self, field: Field):
         """Update the GLGraphicsItems that display the goals
