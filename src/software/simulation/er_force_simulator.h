@@ -27,10 +27,12 @@ class ErForceSimulator
      * @param robot_constants The robot constants
      * @param realism_config realism configuration
      */
-    explicit ErForceSimulator(
-        const TbotsProto::FieldType& field_type, const RobotConstants_t& robot_constants,
-        std::unique_ptr<RealismConfigErForce>& realism_config, const bool ramping = false,
-        double primitive_executor_time_step_s = DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK);
+    explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
+                              const RobotConstants_t& robot_constants,
+                              std::unique_ptr<RealismConfigErForce>& realism_config,
+                              const bool ramping = false,
+                              double primitive_executor_time_step_s =
+                                  DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
