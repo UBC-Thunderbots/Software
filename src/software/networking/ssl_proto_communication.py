@@ -32,6 +32,7 @@ class SslSocket(object):
 
         :param port the port to bind to
         """
+        # bind to all local interfaces, TCP
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect(("", port))
 
