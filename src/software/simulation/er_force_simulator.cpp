@@ -21,7 +21,8 @@
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
                                    std::unique_ptr<RealismConfigErForce>& realism_config,
-                                   const bool ramping, double primitive_executor_time_step)
+                                   const bool ramping,
+                                   double primitive_executor_time_step)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       primitive_executor_time_step_s(primitive_executor_time_step),
