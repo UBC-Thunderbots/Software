@@ -11,7 +11,11 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
     """
     Start AI vs AI silently, ticking as fast as possible without visualization.
 
-    :param simulator_runtime_dir the runtime directory to set up ProtoUnixIO for the Simulator
+    Note: This module is different from Thunderscope as it does not run any Qt elements at all. It runs two
+    FullSystems, a Gamecontroller and TigersAutoref. Qt does not work with display-less devices, so it won't work
+    properly in a CI setting, which is why this AI vs AI setup is required.
+
+    :param simulator_runtime_dir    the runtime directory to set up ProtoUnixIO for the Simulator
     :param blue_fs_dir              the runtime directory to set up ProtoUnixIO for the blue FullSystem
     :param yellow_fs_dir            the runtime directory to set up ProtoUnixIO for the yellow FullSystem
     """

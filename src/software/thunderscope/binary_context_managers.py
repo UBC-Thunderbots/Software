@@ -505,16 +505,16 @@ class Gamecontroller(object):
         :return: The response CiOutput containing 1 or more refree msgs
 
         """
-        ci_ci_input = CiInput(timestamp=int(time.time_ns()))
-        ci_input = Input()
-        ci_change = Change()
-        ci_new_command = NewCommand()
-        ci_command = Command(type=gc_command, for_team=team)
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        api_input = Input()
+        change = Change()
+        new_command = NewCommand()
+        command = Command(type=gc_command, for_team=team)
 
-        ci_new_command.command.CopyFrom(ci_command)
-        ci_change.new_command.CopyFrom(ci_new_command)
-        ci_input.change.CopyFrom(ci_change)
-        ci_ci_input.api_inputs.append(ci_input)
+        new_command.command.CopyFrom(command)
+        change.new_command.CopyFrom(new_command)
+        api_input.change.CopyFrom(change)
+        ci_input.api_inputs.append(api_input)
 
         # Do this only if ball placement pos is specified
         if final_ball_placement_point:
@@ -526,21 +526,21 @@ class Gamecontroller(object):
                     y=float(final_ball_placement_point.y()),
                 )
             )
-            ci_change = Change()
-            ci_input = Input()
-            ci_change.set_ball_placement_pos.CopyFrom(ball_placement_pos)
-            ci_input.change.CopyFrom(ci_change)
-            ci_ci_input.api_inputs.append(ci_input)
+            change = Change()
+            api_input = Input()
+            change.set_ball_placement_pos.CopyFrom(ball_placement_pos)
+            api_input.change.CopyFrom(change)
+            ci_input.api_inputs.append(api_input)
 
             # Start Placement
-            ci_change = Change()
-            ci_input = Input()
+            change = Change()
+            api_input = Input()
             start_placement = StartBallPlacement()
-            ci_change.start_ball_placement.CopyFrom(start_placement)
-            ci_input.change.CopyFrom(ci_change)
-            ci_ci_input.api_inputs.append(ci_input)
+            change.start_ball_placement.CopyFrom(start_placement)
+            api_input.change.CopyFrom(change)
+            ci_input.api_inputs.append(api_input)
 
-        ci_output_list = self.send_ci_input(ci_ci_input)
+        ci_output_list = self.send_ci_input(ci_input)
 
         return ci_output_list
 
@@ -609,33 +609,34 @@ class Gamecontroller(object):
 
         :return: a list of CiOutput protos from the Gamecontroller
         """
-        ci_ci_input = CiInput(timestamp=int(time.time_ns()))
-        ci_input_blue_update = Input()
-        ci_input_blue_update.reset_match = True
-        ci_input_blue_update.change.update_team_state.CopyFrom(
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        input_blue_update = Input()
+        input_blue_update.reset_match = True
+        input_blue_update.change.update_team_state.CopyFrom(
             self.reset_team("BLUE", Team.BLUE)
         )
 
-        ci_input_yellow_update = Input()
-        ci_input_yellow_update.reset_match = True
-        ci_input_yellow_update.change.update_team_state.CopyFrom(
+        input_yellow_update = Input()
+        input_yellow_update.reset_match = True
+        input_yellow_update.change.update_team_state.CopyFrom(
             self.reset_team("YELLOW", Team.YELLOW)
         )
 
-        ci_input_game_update = Input()
-        ci_input_game_update.reset_match = True
-        ci_input_game_update.change.update_config.CopyFrom(self.reset_game(division))
+        input_game_update = Input()
+        input_game_update.reset_match = True
+        input_game_update.change.update_config.CopyFrom(self.reset_game(division))
 
-        ci_ci_input.api_inputs.append(ci_input_blue_update)
-        ci_ci_input.api_inputs.append(ci_input_yellow_update)
-        ci_ci_input.api_inputs.append(ci_input_game_update)
+        ci_input.api_inputs.append(input_blue_update)
+        ci_input.api_inputs.append(input_yellow_update)
+        ci_input.api_inputs.append(input_game_update)
 
-        return self.send_ci_input(ci_ci_input)
+        return self.send_ci_input(ci_input)
 
 
 class TigersAutoref(object):
     """
-    A wrapper over the TigersAutoref binary. It coordinates communication between the Simulator, TigersAutoref and Gamecontroller. 
+    A wrapper over the TigersAutoref binary. It coordinates communication between the Simulator, TigersAutoref and
+    Gamecontroller. 
 
     In CI mode, the flow of data corresponds to:
 
@@ -717,14 +718,16 @@ class TigersAutoref(object):
 
     def persistently_connect_to_autoref(self):
         """
-        Connect to the TigersAutoref binary. Retry connection a few times if the connection doesn't go through in case the binary hasn't started yet.
+        Connect to the TigersAutoref binary. Retry connection a few times if the connection doesn't go through in case
+        the binary hasn't started yet.
 
         :return: True if the action was successful, False otherwise
         """
         tries = 0
         while tries < TigersAutoref.AUTOREF_NUM_RETRIES:
             try:
-                # We cannot start the Autoref binary immediately, so we must wait until the binary has started before we try to connect to it
+                # We cannot start the Autoref binary immediately, so we must wait until the binary has started before
+                # we try to connect to it
                 time.sleep(0.5)
                 self.ci_socket = SslSocket(TigersAutoref.AUTOREF_COMM_PORT)
                 return True
@@ -735,7 +738,8 @@ class TigersAutoref(object):
 
     def send_to_autoref_and_forward_to_gamecontroller(self):
         """
-        Main communication loop that sets up the TigersAutoref and coordinates communication between Simulator, TigersAutoref and Gamecontroller. Returns early if connection to the TigersAutoref binary was unsuccessful.
+        Main communication loop that sets up the TigersAutoref and coordinates communication between Simulator,
+        TigersAutoref and Gamecontroller. Returns early if connection to the TigersAutoref binary was unsuccessful.
         """
         if not self.persistently_connect_to_autoref():
             logging.info("Failed to connect to autoref binary. Is it running?")
@@ -770,7 +774,8 @@ class TigersAutoref(object):
 
     def forward_to_gamecontroller(self, tracker_wrapper):
         """
-        Uses the given tracker_wrapper to create a CiInput for the Gamecontroller to track. Uses the timestamp from the given tracker_wrapper to support asynchronous ticking.
+        Uses the given tracker_wrapper to create a CiInput for the Gamecontroller to track. Uses the timestamp from the
+        given tracker_wrapper to support asynchronous ticking.
 
         :param tracker_wrapper TrackerWrapperPacket for the Gamecontroller to track
 
@@ -806,7 +811,8 @@ class TigersAutoref(object):
 
     def setup_ssl_wrapper_packets(self, autoref_proto_unix_io):
         """
-        Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the Gamecontroller in CI mode.
+        Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the
+        Gamecontroller in CI mode.
 
         :param autoref_proto_unix_io:               the proto unix io for the Autoref to receive SSLWrapperPackets
         """

@@ -1,3 +1,5 @@
+// This file should be kept up to data with Robocup SSL's version
+// https://github.com/RoboCup-SSL/ssl-game-controller/blob/master/proto/ssl_autoref_ci.proto
 syntax = "proto2";
 
 package SSLProto;

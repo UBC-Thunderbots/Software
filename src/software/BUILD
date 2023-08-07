@@ -109,6 +109,7 @@ py_binary(
     srcs = ["ai_vs_ai_ci.py"],
     data = [
         "//software:python_bindings.so",
+        "//software:er_force_simulator_main",
     ],
     deps = [
         "//proto/message_translation:py_tbots_protobuf",

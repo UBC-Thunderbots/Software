@@ -332,13 +332,11 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");
     declareThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>(m, "SSLWrapperPacket");
-    declareThreadedProtoUdpListener<SSLProto::AutoRefCiOutput>(m, "SSL_AutoRefCiOutput");
 
     // Senders
     declareThreadedProtoUdpSender<TbotsProto::World>(m, "World");
     declareThreadedProtoUdpSender<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
-    declareThreadedProtoUdpSender<SSLProto::AutoRefCiInput>(m, "SSL_AutoRefCiInput");
 
     // Estop Reader
     py::class_<ThreadedEstopReader, std::unique_ptr<ThreadedEstopReader>>(

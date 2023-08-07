@@ -12,18 +12,23 @@ class SslSocketProtoParseException(Exception):
 
 class SslSocket(object):
     """
-    The SSL Socket class is responsible for communication with SSL protos from SSL binaries. The encoding that SSL uses is slightly different from our encoding when we send protobufs between different processes (and robots).
+    The SSL Socket class is responsible for communication with SSL protos from SSL binaries. The encoding that SSL uses
+    is slightly different from our encoding when we send protobufs between different processes (and robots).
 
-    Each SSL Proto message is preceded by an uvarint containing the message size in bytes, so we must read a certain buffered amount, and then read the rest of the message as necessary.
+    Each SSL Proto message is preceded by an uvarint containing the message size in bytes, so we must read a certain
+    buffered amount, and then read the rest of the message as necessary.
 
-    Encoding details can be seen here: https://github.com/RoboCup-SSL/ssl-game-controller/blob/master/cmd/ssl-auto-ref-client/README.md
+    Encoding details can be seen here:
+    https://github.com/RoboCup-SSL/ssl-game-controller/blob/master/cmd/ssl-auto-ref-client/README.md
     """
 
     RECEIVE_BUFFER_SIZE = 9000
 
     def __init__(self, port):
         """
-        Open a socket with the given port, to communicate with other processes. It binds the socket to INADDR_ANY which binds the socket to all local interfaces, meaning that it will listen to traffic on the specified port on ethernet, wifi,...
+        Open a TCP socket with the given port, to communicate with other processes. It binds the socket to INADDR_ANY
+        which binds the socket to all local interfaces, meaning that it will listen to traffic on the specified port on
+        ethernet, wifi,...
 
         :param port the port to bind to
         """
@@ -36,6 +41,9 @@ class SslSocket(object):
 
         :param proto proto to send
         """
+        # When streaming multiple Protobuf messages, we need to delimit distinct messages.  Protobufs are not
+        # self-delimiting, so the common practice for sending delimited Protobuf messages is to write the size of the
+        # packet in var-int form followed by the serialized message bytes.
         # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
         size = proto.ByteSize()
 
@@ -81,7 +89,7 @@ class SslSocket(object):
 
             if not ci_output.IsInitialized():
                 raise SslSocketProtoParseException(
-                    "Improper proto of type '{proto_type}' parsed"
+                    f"Improper proto of type '{proto_type}' parsed"
                 )
 
             offset += msg_len
