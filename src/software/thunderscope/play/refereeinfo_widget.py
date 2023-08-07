@@ -83,7 +83,6 @@ class RefereeInfoWidget(QWidget):
             else:
                 team_info.append(team_info_name)
 
-
         for info in team_info:
             if info == "yellowCardTimes":
                 blue.append(self.parse_yellow_card_times(referee_msg_dict["blue"]))
@@ -117,14 +116,13 @@ class RefereeInfoWidget(QWidget):
         text = ""
         if "yellowCardTimes" in team_info:
             yellow_card_times = team_info["yellowCardTimes"]
-            for i in range(0, len(yellow_card_times)-1):
+            for i in range(0, len(yellow_card_times) - 1):
                 formatted_time = int(yellow_card_times[i] * SECONDS_PER_MICROSECOND)
                 text = text + str(formatted_time) + ", "
 
-            formatted_time = int(yellow_card_times[len(yellow_card_times)-1] * SECONDS_PER_MICROSECOND)
+            formatted_time = int(
+                yellow_card_times[len(yellow_card_times) - 1] * SECONDS_PER_MICROSECOND
+            )
             text = text + str(formatted_time)
 
         return text
-
-
-
