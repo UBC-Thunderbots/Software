@@ -36,6 +36,10 @@ class GLHrvoLayer(GLLayer):
             "velocity_obstacles",
             lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
+        self.graphics_list.register_graphics_group(
+            "robot_circles",
+            lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR, num_points=10)
+        )
 
     def _update_graphics(self):
         """Fetch and update graphics for the layer"""
@@ -79,4 +83,14 @@ class GLHrvoLayer(GLLayer):
 
             velocity_obstacle_graphic.setData(
                 pos=np.array([[point[0], point[1], 0] for point in polygon_points]),
+            )
+
+        for robot_circle_graphic, robot_circle in zip(
+            self.graphics_list.get_graphics("robot_circles", len(velocity_obstacle_msg.robots)),
+            velocity_obstacle_msg.robots
+        ):
+            robot_circle_graphic.set_radius(robot_circle.radius)
+            robot_circle_graphic.set_position(
+                robot_circle.origin.x_meters, 
+                robot_circle.origin.y_meters
             )
