@@ -293,6 +293,11 @@ class GLWidget(QWidget):
         if self.player:
             self.replay_controls.refresh()
 
+        # Prevents RuntimeError: wrapped C/C++ object of type ___ has been deleted
+        # See: https://stackoverflow.com/a/60700622/20199855
+        if self.isVisible() == False:
+            return
+
         for layer in self.layers:
             added_graphics, removed_graphics = layer.refresh_graphics()
 
