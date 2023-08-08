@@ -23,12 +23,20 @@ class GLValidationLayer(GLLayer):
 
     PASSED_VALIDATION_PERSISTANCE_TIMEOUT_S = 1.0
 
-    def __init__(self, name: str, buffer_size: int = 10):
+    def __init__(
+        self, 
+        name: str, 
+        buffer_size: int = 10, 
+        test_name_pos_x: float = -4.5, 
+        test_name_pos_y: float = 3.2
+    ):
         """Initialize the GLValidationLayer
 
         :param name: The displayed name of the layer
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
+        :param test_name_pos_x: The x position of the test name
+        :param test_name_pos_y: The y position of the test name
 
         """
         GLLayer.__init__(self, name)
@@ -40,6 +48,14 @@ class GLValidationLayer(GLLayer):
 
         self.passed_validation_timeout_pairs = []
 
+        self.graphics_list.register_graphics_group(
+            "test_name", 
+            lambda: GLTextItem(
+                pos=(test_name_pos_x, test_name_pos_y, 0), 
+                font=QtGui.QFont("Roboto", 8), 
+                color=Colors.PRIMARY_TEXT_COLOR
+            )
+        )
         self.graphics_list.register_graphics_group(
             "validation_polygons", GLLinePlotItem
         )
@@ -80,6 +96,9 @@ class GLValidationLayer(GLLayer):
             + list(self.cached_eventually_validation_set.validations)
             + list(self.passed_validation_timeout_pairs)
         )
+
+        test_name_graphic = self.graphics_list.get_graphics("test_name", 1)[0]
+        test_name_graphic.setData(text=self.cached_eventually_validation_set.test_name)
 
     def __update_validation_graphics(self, validations: List[ValidationProto]):
         """Update the GLGraphicsItems that display the validations

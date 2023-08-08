@@ -316,7 +316,7 @@ class GLWidget(QWidget):
         self.gl_view_widget.reset()
         if camera_view == CameraView.ORTHOGRAPHIC:
             self.gl_view_widget.setCameraPosition(
-                pos=pg.Vector(0, 0, 0), distance=1000, elevation=90, azimuth=-90
+                pos=pg.Vector(0, 0, 0), distance=1100, elevation=90, azimuth=-90
             )
             self.gl_view_widget.setCameraParams(fov=1.0)
         elif camera_view == CameraView.LANDSCAPE_HIGH_ANGLE:
