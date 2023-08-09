@@ -57,9 +57,9 @@ class GLPassingLayer(GLLayer):
         if not pass_vis:
             pass_vis = self.cached_pass_vis
 
-            # If we haven't received pass visualizations for a bit, clear the layer's graphics
+            # If we haven't received pass visualizations for a bit, skip updating graphics
             if time.time() > self.timeout:
-                return self.graphics_list.get_changes()
+                return
         else:
             # We received new pass data, so lets update our timeout
             self.timeout = time.time() + GLPassingLayer.PASS_VISUALIZATION_TIMEOUT_S
