@@ -115,6 +115,7 @@ py_binary(
         "//proto/message_translation:py_tbots_protobuf",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:proto_unix_io",
+        "//software/thunderscope:thread_safe_buffer",
         "//software/thunderscope/replay:proto_logger",
         requirement("numpy"),
     ],

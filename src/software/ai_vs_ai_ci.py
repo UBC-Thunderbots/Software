@@ -1,4 +1,5 @@
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.binary_context_managers import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from proto.message_translation import tbots_protobuf
@@ -20,12 +21,22 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
     :param yellow_fs_dir            the runtime directory to set up ProtoUnixIO for the yellow FullSystem
     """
 
-    def __async_sim_ticker(simulator_proto_unix_io):
+    blue_fs_proto_unix_io = ProtoUnixIO()
+    yellow_fs_proto_unix_io = ProtoUnixIO()
+    simulator_proto_unix_io = ProtoUnixIO()
+
+    def __async_sim_ticker():
         """Setup the world and tick simulation forever, as fast as possible
 
         :param tick_rate_ms: The tick rate of the simulation
 
         """
+        yellow_world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
+        blue_world_buffer = ThreadSafeBuffer(buffer_size=1, protobuf_type=World)
+
+        yellow_fs_proto_unix_io.register_observer(World, yellow_world_buffer)
+        blue_fs_proto_unix_io.register_observer(World, blue_world_buffer)
+
         world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
         simulator_proto_unix_io.register_observer(
             WorldStateReceivedTrigger, world_state_received_buffer
@@ -45,18 +56,23 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
 
             time.sleep(0.01)
 
-        # Tick Simulation
-        tick = SimulatorTick(
-            milliseconds=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK
-        )
-        simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+            while True:
+                # Tick Simulation
+                tick = SimulatorTick(
+                    milliseconds=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK
+                )
+                simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+
+                # Wait for full systems to process worlds before continuing
+                yellow_world_buffer.get(block=True)
+                blue_world_buffer.get(block=True)
 
     blue_fs_proto_unix_io = ProtoUnixIO()
     yellow_fs_proto_unix_io = ProtoUnixIO()
     simulator_proto_unix_io = ProtoUnixIO()
 
     with Simulator(simulator_runtime_dir) as simulator, FullSystem(
-        blue_fs_dir, friendly_colour_yellow=False
+        blue_fs_dir, friendly_colour_yellow=False,
     ) as blue_fs, FullSystem(
         yellow_fs_dir, friendly_colour_yellow=True
     ) as yellow_fs, ProtoLogger(
@@ -64,7 +80,7 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
     ) as blue_logger, ProtoLogger(
         f"{yellow_fs_dir}/logs/",
     ) as yellow_logger, Gamecontroller(
-        ci_mode=True
+        ci_mode=True, supress_logs=True,
     ) as gamecontroller, TigersAutoref(
         autoref_runtime_dir="/tmp/tbots/autoref",
         ci_mode=True,
@@ -90,9 +106,7 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
 
         autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io)
 
-        thread = threading.Thread(
-            target=__async_sim_ticker, args=(simulator_proto_unix_io,), daemon=True,
-        )
+        thread = threading.Thread(target=__async_sim_ticker, daemon=True,)
         thread.start()
         thread.join()
 
