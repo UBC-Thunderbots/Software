@@ -212,12 +212,14 @@ def create_slider_abs(slider, text, min_val, max_val, tick_spacing):
     slider.setMaximum(max_val)
     slider.setTickPosition(QSlider.TickPosition.NoTicks)
     slider.setTickInterval(tick_spacing)
+    
+    vbox = QVBoxLayout()
+
+    if text:
+        slider_label = QLabel(str(text))
+        vbox.addWidget(slider_label)
 
     value_label = QLabel(str(slider.value()))
-    slider_label = QLabel(str(text))
-
-    vbox = QVBoxLayout()
-    vbox.addWidget(slider_label)
     vbox.addWidget(value_label)
     vbox.addWidget(slider)
 

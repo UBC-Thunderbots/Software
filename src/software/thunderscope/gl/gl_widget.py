@@ -117,7 +117,7 @@ class GLWidget(QWidget):
 
         # Setup toolbar
         self.toolbar = QWidget()
-        self.toolbar.setMaximumHeight(40)
+        self.toolbar.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self.toolbar.setStyleSheet("background-color: black;" "padding: 0px;")
         self.toolbar.setLayout(QHBoxLayout())
         self.toolbar.layout().addWidget(self.layers_button)
@@ -139,6 +139,7 @@ class GLWidget(QWidget):
         if self.player and self.player.end_time != 0.0:
             self.replay_controls = ReplayControls(player=player)
             self.replay_controls.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+            self.replay_controls.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
             self.layout.addWidget(self.replay_controls)
         else:
             self.player = None

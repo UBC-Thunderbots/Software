@@ -315,6 +315,9 @@ class GLWorldLayer(GLLayer):
         :param field: The field proto
 
         """
+        if not field.goal_x_length or not field.goal_y_length:
+            return
+
         goal_graphics = self.graphics_list.get_graphics("goals", 2)
 
         # Friendly goal
