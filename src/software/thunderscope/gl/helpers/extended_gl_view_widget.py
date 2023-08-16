@@ -5,7 +5,8 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 
 import numpy as np
-
+import time
+import collections
 
 class PointInSceneEvent(object):
     """Wraps QMouseEvent and includes additional data about the point in the 3D scene
@@ -55,6 +56,10 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         # This must be enabled for the mouse_moved_in_scene_signal to be emitted
         self.detect_mouse_movement_in_scene = False
+
+        self.execution_times = collections.deque()
+        self.execution_times_sum = 0
+        self.execution_times_count = 0
 
     def mousePressEvent(self, event: QtGui.QMouseEvent):
         """Detect that the mouse was pressed
@@ -158,3 +163,20 @@ class ExtendedGLViewWidget(GLViewWidget):
         intersection = ray_origin + (distance_from_ray_origin * ray_dir)
 
         return intersection
+
+    def paintEvent(self, e):
+
+        start = time.perf_counter()
+        super().paintEvent(e)
+        end = time.perf_counter()
+
+        execution_time = end - start
+        self.execution_times.append(execution_time)
+        self.execution_times_sum += execution_time
+        self.execution_times_count += 1
+
+        if self.execution_times_count > 100:
+            self.execution_times_sum -= self.execution_times.popleft()
+            self.execution_times_count -= 1
+
+        print(self.execution_times_sum / self.execution_times_count)
