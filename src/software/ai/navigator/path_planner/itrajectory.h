@@ -14,7 +14,7 @@ class ITrajectory
      * @param t Duration elapsed since start of trajectory
      * @return position
      */
-    virtual P getPosition(const Duration t) const = 0;
+    virtual P getPosition(Duration t) const = 0;
 
 
     /**
@@ -23,7 +23,7 @@ class ITrajectory
      * @param t Duration elapsed since start of trajectory
      * @return velocity
      */
-    virtual V getVelocity(const Duration t) const = 0;
+    virtual V getVelocity(Duration t) const = 0;
 
 
     /**
@@ -32,7 +32,7 @@ class ITrajectory
      * @param t Duration elapsed since start of trajectory
      * @return acceleration
      */
-    virtual A getAcceleration(const Duration t) const = 0;
+    virtual A getAcceleration(Duration t) const = 0;
 
 
     /**

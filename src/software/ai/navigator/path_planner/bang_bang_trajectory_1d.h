@@ -27,7 +27,7 @@ public:
      * @param t Duration elapsed since start of trajectory
      * @return position
      */
-    double getPosition(const Duration t) const override;
+    double getPosition(Duration t) const override;
 
     /**
      * Get velocity at time t
@@ -35,7 +35,7 @@ public:
      * @param t Duration elapsed since start of trajectory
      * @return velocity
      */
-    double getVelocity(const Duration t) const override;
+    double getVelocity(Duration t) const override;
 
     /**
      * Get acceleration at time t
@@ -43,7 +43,7 @@ public:
      * @param t Duration elapsed since start of trajectory
      * @return acceleration
      */
-    double getAcceleration(const Duration t) const override;
+    double getAcceleration(Duration t) const override;
 
     /**
      * Get total runtime of trajectory
@@ -84,6 +84,10 @@ private:
     generateTriangularTrajectory(double initial_pos, double final_pos, double initial_vel, double max_vel,
                                  double max_accel,
                                  double max_decel);
+
+    size_t getTrajectoryIndexAtTime(Duration t) const;
+
+    void getTrajPartAndDeltaTime(Duration t, TrajectoryPart &out_traj_part, Duration &out_t_delta) const;
 
     std::vector<TrajectoryPart> trajectory_parts;
 };
