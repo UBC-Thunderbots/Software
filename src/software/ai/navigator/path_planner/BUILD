@@ -31,9 +31,29 @@ cc_library(
 
 cc_library(
     name = "itrajectory",
-    hdrs = ["ITrajectory.h"],
+    hdrs = ["itrajectory.h"],
     deps = [
         "//software/time:duration",
+    ],
+)
+
+cc_library(
+    name = "bang_bang_trajectory_1d",
+    srcs = ["bang_bang_trajectory_1d.cpp"],
+    hdrs = ["bang_bang_trajectory_1d.h"],
+    deps = [
+        ":itrajectory",
+        "//software/geom/algorithms:is_in_range",
+    ],
+)
+
+cc_test(
+    name = "bang_bang_trajectory_1d_test",
+    srcs = ["bang_bang_trajectory_1d_test.cpp"],
+    deps = [
+        ":bang_bang_trajectory_1d",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
 

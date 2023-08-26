@@ -2,16 +2,19 @@
 
 #include "software/time/duration.h"
 
-class ITrajectory<P, V, A>
+template <class P, class V, class A>
+class ITrajectory
 {
    public:
+    virtual ~ITrajectory() = default;
+
     /**
      * Get position at time t
      *
      * @param t Duration elapsed since start of trajectory
      * @return position
      */
-    virtual P getPosition(const Duration t) = 0;
+    virtual P getPosition(const Duration t) const = 0;
 
 
     /**
@@ -20,7 +23,7 @@ class ITrajectory<P, V, A>
      * @param t Duration elapsed since start of trajectory
      * @return velocity
      */
-    virtual V getVelocity(const Duration t) = 0;
+    virtual V getVelocity(const Duration t) const = 0;
 
 
     /**
@@ -29,7 +32,7 @@ class ITrajectory<P, V, A>
      * @param t Duration elapsed since start of trajectory
      * @return acceleration
      */
-    virtual A getAcceleration(const Duration t) = 0;
+    virtual A getAcceleration(const Duration t) const = 0;
 
 
     /**
@@ -37,15 +40,14 @@ class ITrajectory<P, V, A>
      *
      * @return total time for trajectory in seconds
      */
-    virtual Duration getTotalTime() = 0;
+    virtual Duration getTotalTime() const = 0;
 
 
     /**
      * Get the final desired destination
-     * @param t Duration elapsed since start of trajectory
-     * @return the next destination, if this trajectory is divided into multiple subtract-pathes
+     * @return the next destination, if this trajectory is divided into multiple subtract-paths
      */
-    P getDestination(const Duration t)
+    P getDestination() const
     {
         return getPosition(getTotalTime());
     }
