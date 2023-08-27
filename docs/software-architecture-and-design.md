@@ -54,9 +54,8 @@
       * [Path Objective](#path-objective)
       * [Path Planner](#path-planner)
     * [Diagram](#ai-diagram)
-  * [Visualizer](#visualizer)
-    * [Diagram](#visualizer-diagram)
-    * [Draw Functions](#draw-functions)
+  * [Thunderscope](#thunderscope)
+    * [Inter-process Communication](#inter-process-communication)
   * [Estop](#estop)
 * [Simulator](#simulator)
   * [Standalone Simulator](#standalone-simulator)
@@ -65,15 +64,6 @@
       * [Validation Functions](#validation-functions)
     * [Component Connections and Determinism](#component-connections-and-determinism)
     * [Diagram](#simulated-tests-diagram)
-* [GUI](#gui)
-  * [Naming](#naming)
-  * [Editing the GUIs](#editing-the-guis)
-    * [Editing ui files](#editing-ui-files)
-    * [Promoting Widgets](#promoting-widgets)'
-  * [Qt Best Practices](#qt-best-practices)
-    * [Build A Hierarchy](#build-a-hierarchy)
-    * [Create Reusable Widgets](#create-reusable-widgets)
-    * [Miscellaneous Qt Tips](#miscellaneous-qt-tips)
 
 
 # Tools
@@ -87,7 +77,7 @@ A few commonly-used terms and tools to be familiar with:
 
 
 # Important Classes
-These are classes that are either heavily used in our code, or are very important for understanding how the AI works, but are _not_ core components of the AI or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [Sensor Fusion](#sensor-fusion), [AI](#ai), and [Visualizer](#visualizer).
+These are classes that are either heavily used in our code, or are very important for understanding how the AI works, but are _not_ core components of the AI or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [Sensor Fusion](#sensor-fusion), [AI](#ai), and [Thunderscope](#thunderscope).
 
 ## World
 The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current referee commands. Altogether, it's the information we have at any given time that we can use to make decisions.
@@ -118,7 +108,7 @@ There are two types of `Intent`s: `DirectPrimitiveIntent`s and `NavigatingIntent
 ## Dynamic Parameters
 `Dynamic Parameters` are the system we use to change values in our code at runtime. The reason we want to change values at runtime is primarily because we may want to tweak our strategy or aspects of our gameplay very quickly. During games we are only allowed to touch our computers and make changes during halftime or a timeout, so every second counts! Using `Dynamic Parameters` saves us from having to stop the [AI](#ai), change a constant, recompile the code, and restart the [AI](#ai).
 
-Additionally, we can use `Dynamic Parameters` to communicate between the [Visualizer](#visualizer) and the rest of our system. The [Visualizer](#visualizer) can change the values of `DynamicParameters` when buttons or menu items are clicked, and these new values will be picked up by the rest of the code. For example, we can define a `Dynamic Parameter` called `run_ai` that is a boolean value. Then when the `Start [AI](#ai)` button is clicked in the [Visualizer](#visualizer), it sets the value of `run_ai` to `true`. In the "main loop" for the [AI](#ai), it will check if the value of `run_ai` is true before running its logic.
+Additionally, we can use `Dynamic Parameters` to communicate between [Thunderscope](#thunderscope) and the rest of our system. [Thunderscope](#thunderscope) can change the values of `DynamicParameters` when buttons or menu items are clicked, and these new values will be picked up by the rest of the code. For example, we can define a `Dynamic Parameter` called `run_ai` that is a boolean value. Then when the `Start [AI](#ai)` button is clicked in [Thunderscope](#thunderscope), it sets the value of `run_ai` to `true`. In the "main loop" for the [AI](#ai), it will check if the value of `run_ai` is true before running its logic.
 
 Here's a slightly more relevant example of how we used `Dynamic Parameters` during a game in RoboCup 2019. We had a parameter called `enemy_team_can_pass`, which indicates whether or not we think the enemy team can pass. This parameter was used in several places in our defensive logic, and specifically affected how we would shadow enemy robots when we were defending them. If we assumed the enemy team could pass, we would shadow between the robots and the ball to block any passes, otherwise we would shadow between the enemy robot and our net to block shots. During the start of a game, we had `enemy_team_can_pass` set to `false` but the enemy did start to attempt some passes during the game. However, we didn't want to use one of our timeouts to change the value. Luckily later during the half, the enemy team took a time out. Because `Dynamic Parameters` can be changed quick without stopping [AI](#ai), we were quickly able to change `enemy_team_can_pass` to `true` while the enemy team took their timeout. This made our defence much better against that team and didn't take so much time that we had to burn our own timeout. Altogether this is an example of how we use `Dynamic Parameters` to control our [AI](#ai) and other parts of the code.
 
@@ -126,7 +116,7 @@ It is worth noting that constants are still useful, and should still be used whe
 
 
 # Protobuf
-Protobuf or protocol buffers are used to pass messages between components in our system.
+[Protobuf or protocol buffers](https://protobuf.dev/) are used to pass messages between components in our system.
 After building using Bazel, the `.proto` files are generated into `.pb.h` and `.pb.cc` files, which are found in `bazel-out/k8-fastbuild/bin/proto`.
 To include these files in our code, we simply include `proto/<protobuf_filename>.pb.h`
 
@@ -148,7 +138,7 @@ The `TbotsProto::RobotStatus` protobuf message contains information about the st
 * The capacitor charge on the robot
 * The temperature of the dribbler motor
 
-Information about the robot status is communicated and stored as `RobotStatus` protobuf messages. The [Visualizer](#visualizer) displays warnings from incoming `RobotStatus`es so we can take appropriate action. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
+Information about the robot status is communicated and stored as `RobotStatus` protobuf messages. [Thunderscope](#thunderscope) displays warnings from incoming `RobotStatus`es so we can take appropriate action. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
 
 # Design Patterns
 Below are the main design patterns we use in our code, and what they are used for.
@@ -396,9 +386,9 @@ Because of our [Coordinate Conventions](#coordinates), this means that an angle 
 
 
 # Architecture Overview
-At a high-level our system is made of 4 main components: The [Backend](#backend), the [Sensor Fusion](#sensor-fusion), the [AI](#ai), and the [Visualizer](#visualizer). These 4 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern).
+At a high-level our system is made of 4 main components: The [Backend](#backend), the [Sensor Fusion](#sensor-fusion), the [AI](#ai), and [Thunderscope](#thunderscope). These 4 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern).
 
-The [Backend](#backend) is responsible for communicating with the outside world (network and radio), [Sensor Fusion](#sensor-fusion) is responsible for processing and filtering raw data, the [AI](#ai) makes the actual gameplay decisions, and the [Visualizer](#visualizer) shows us what's happening and lets us control the [AI](#ai).
+The [Backend](#backend) is responsible for communicating with the outside world (network and radio), [Sensor Fusion](#sensor-fusion) is responsible for processing and filtering raw data, the [AI](#ai) makes the actual gameplay decisions, and [Thunderscope](#thunderscope) shows us what's happening and lets us control the [AI](#ai).
 
 Each component is described in more detail in their own sections.
 
@@ -500,38 +490,30 @@ The `Path Planner` is an interface for the responsibility of path planning a sin
 ![AI Diagram](images/ai_diagram.svg)
 
 
-# Visualizer
-The [Visualizer](#visualizer) is exactly what it sounds like: A visualizion of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
+# Thunderscope
+[Thunderscope](#thunderscope) is our main visualizer of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
 
-The [Visualizer](#visualizer) also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through the [Visualizer](#visualizer), we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
+Thunderscope also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through Thunderscope, we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
 
-The [Visualizer](#visualizer) is connected to the rest of the system using the [Observer Design Pattern](#observer-design-pattern). It observes Subjects that contain information it wants to display, such as the [World](#world) or [DrawFunctions](#draw-functions).
+Thunderscope is implemented using [PyQtGraph](https://www.pyqtgraph.org/), a Python graphics and GUI library. PyQtGraph is built upon [PyQt](https://riverbankcomputing.com/software/pyqt/intro), which provides Python bindings for [Qt](https://www.qt.io/), a C++ library for creating cross-platform GUIs. The general documentation for [Qt](https://www.qt.io/) can be found [here](https://doc.qt.io/qt-5/index.html). The most important parts of Qt to understand are:
 
-The [Visualizer](#visualizer) is implemented using [Qt](https://www.qt.io/), a C++ library for creating cross-platform GUIs. The general documentation for [Qt](https://www.qt.io/) can be found [here](https://doc.qt.io/qt-5/index.html). The most important parts for the Visualizer are:
-* [Signals and Slots](https://doc.qt.io/qt-5/signalsandslots.html)
-* [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) (specifically for Widget-based applications)
 * [Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html)
+* [Layouts](https://doc.qt.io/qt-6/layout.html)
+* [Signals and Slots](https://doc.qt.io/qt-5/signalsandslots.html)
 
-The [Visualizer](#visualizer) is made up of the following components:
-* Qt Components
-  * The [QApplication](https://doc.qt.io/qt-5/qapplication.html). This is the Qt component that manages the event loop and all the widgets in the GUI.
-  * The `Visualizer Widget`. This contains all of the graphical components used in the [Visualizer](#visualizer).
-* Non-Qt Components
-  * The `VisualizerWrapper`. The `VisualizerWrapper` contains the [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget`. It runs the [QApplication](https://doc.qt.io/qt-5/qapplication.html) in a separate thread, so that Qt can run its event loop and handle events and rendering without blocking our main thread.
- 
+## Inter-process Communication
+Since [Thunderscope](#thunderscope) runs in a separate process from our [AI](#ai), we use [Unix domain sockets](https://en.wikipedia.org/wiki/Unix_domain_socket) to facilitate communication between our AI and Thunderscope. Unix sockets [have high throughput and are very performant](https://stackoverflow.com/a/29436429/20199855); we simply bind the unix socket to a file path and pass data between processes, instead of having to deal with TCP/IP overhead just to send and receive data on the same computer.
 
-## Visualizer Diagram
-![Visualizer Diagram](images/visualizer_diagram.svg)
+The data sent between the AI and Thunderscope is serialized using [protobufs](#protobuf). In order to get protobufs from anywhere in our C++ full system (backend, pass generator, navigator, FSMs, sensor fusion, etc.) sent to Thunderscope, we convert the protobufs to strings and log them using the [`g3log`](https://kjellkod.github.io/g3log/) logger used throughout our codebase. `g3log` is a fast and thread-safe way to log strings with custom handlers called “sinks". We don’t want to dependency inject a "communication" object everywhere we have visualizable data to send to the visualizer, so we use `g3log` to have a static singleton that can be called anywhere. 
 
-## Inter-thread Communication
-The `VisualizerWrapper` needs to communicate with the [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget` running in its separate thread in order to trigger events like drawing when new data is received. In order to do this, the `VisualizerWrapper` and `Visualizer Widget` use our `ThreadsafeBuffer` class to communicate. The `VisualizerWrapper` pushes data into the buffers, and the `Visualizer Widget` pops the data in a `Producer -> Consumer` pattern. This means the `Visualizer Widget` can handle data at its own rate, independent from the `VisualizerWrapper`.
+<details>
+<summary><b>Aside: calling <code>g3log</code> to log protobuf data</b></summary>
+Logging protobufs is done at the <code>VISUALIZE</code> level (e.g. <code>LOG(VISUALIZE) << some_random_proto;</code>). We've overloaded the stream (<code><<</code>) operator to automatically pack protobufs into a <code>google::protobuf::Any</code> and serialize them to a string, so you don't need to do the conversion yourself.
+</details><br>
 
-In some rare cases, we use the [Qt MetaObject](https://doc.qt.io/qt-5/moc.html) system to send signals to trigger functions in the Qt thread in a thread-safe way. This is further documented in the code.
+Logging a protobuf will send it to our custom protobuf `g3log` sink, which lazily initializes unix senders based on the type of protobuf that is logged. The sink then sends the protobuf over the socket to listeners.
 
-## Draw Functions
-Although we want to display information about the [AI](#ai) in the [Visualizer](#visualizer), we cannot send copies of an [AI](#ai) object to the [Visualizer](#visualizer) over the [Observer](#observer-design-pattern) system because the [AI](#ai) is non-copyable. [Draw Functions](#draw_functions) are our solution that allow us to draw information in the [Visualizer](#visualizer) for non-copyable types.
-
-A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
+On the Python (Thunderscope) side, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. Through `ProtoUnixIO`, classes can register as an [observer](#observer-design-pattern) by providing a protobuf type to observe and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming data. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and send data to all observers of that proto type. Classes can also send out protobufs via `ProtoUnixIO`, which will relay the data to any registered observers.
 
 # Estop
 `Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:
@@ -596,80 +578,6 @@ Now we have a nice loop from the `Simulator -> Sensor Fusion -> Validation Funct
 ### Simulated Tests Diagram
 Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the [Backend](#backend) replaced by the [Simulator](#simulator) and with [Validation Functions](#validation-functions) in the loop between [Sensor Fusion](#sensor-fusion) and [AI](#ai).
 
-The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and are not run during the tests unless we are debugging.
+[Thunderscope](#thunderscope) and connections to it are marked with dashed lines, since they are optional and are not run during the tests unless we are debugging.
 
 ![Simulated Testing High-level Architecture Diagram](images/simulated_test_high_level_architecture.svg)
-
-
-# GUI
-
-## Naming
-
-### Variables
-When creating widgets in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), all widgets should be given a descriptive name. This is because the `.ui` file will eventually be generated into code that we interact with, so we want the variable names to be descriptive and consistent with our naming conventions.
-
-Names should follow our [reglar naming conventions for variables](code-style-guide.md#names-and-variables). Furthermore, they should be named in the form `<purpose>_<widget>`. The purpose is essentially the "normal" variable name that should describe what the variable is. The widget component should be the name of the widget.
-
-For example, a `QLabel` for team colour should be named `team_colour_label`. Similarly, the button that starts the [AI](#ai) should be named `start_ai_button`.
-
-![Good Qt Widget Naming](images/qt_widget_naming_example.png)
-
-### Classes
-Only the top-level class for a given GUI should be suffixed with `GUI`. These top-level classes should just aggregate top-level widgets (typically generated from a `.ui` file) and connect callbacks. They should not define additional widgets or features themselves. For example, `FullSystemGUI` connects incoming buffers of data to the `main_widget` generated by a `.ui` file.
-
-## Editing the GUIs
-Qt provides [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), an IDE used for visually creating GUIs and laying out widgets. We use this editor as much as possible since it is easy to learn and use, and saves us having to define the entire GUI in code (which is more complex and makes things generally harder to understand and modify).
-
-Our rule of thumb is that [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) should be used to define all the widgets in the [Visualizer](#visualizer), and define the layout for everything. All logic (including connecting signals and slots, receiving data from buffers, etc.) should be implemented in the code ourselves.
-
-For a very quick tutorial on how to use QtCreator, see [this video](https://www.youtube.com/watch?v=R6zWLfHIYJw)
-
-To summarize, [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) creates and modifies a `.ui` file, which is more-or-less an `XML` describing the GUI application (what components exist, how they are positioned relative to one another, and their attributes). During compilation, this `.ui` file gets generated into code which handles all the setup and layout of the GUI components that have been defined in the `.ui` file. We include the autogenerated code in our [Visualizer](#visualizer) code where we are then able to connect the autogenerated widgets to various functions, and implement the logic we need to.
-
-### Editing `.ui` files
-1. Open QtCreator
-2. Click `File -> Open File or Project`
-3. Select the `.ui` file.
-4. Make your changes (*Don't forget to save. You must save the file for changes to be picked up in compilation*)
-
-### Promoting Widgets
-The most important thing to know about editing the [Visualizer](#visualizer) in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), is how to promote generic widgets to custom widgets. If we want to extend a QtWidget with custom behavior, we need to create our own class that extends the Widget we want to customize. However, we would still prefer to use [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) to declare this widget and how it fits in the GUI layout.
-
-"Promoting" a widget in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) allows us to place a "generic" widget in the layout, and then tell [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) we actually want that widget to be our custom class. To promote a widget:
-1. Right-click the widget you want to promote
-2. Click `Promote To` or `Promoted Widgets`
-3. Choose the custom widget this widget should be promoted to. Create a new promoted class if necessary.
-    1. When creating new promoted classes, make sure to provide the path to the header file relative to the bazel `WORKSPACE` file. This will make the `#include` statements in the generated code use the full path, which is required by `bazel`.
-
-More information about defining custom widgets in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) can be found [here](https://doc.qt.io/qt-5/designer-using-custom-widgets.html).
-
-## Qt Best Practices
-Although this will focus on Qt-specific examples, these principles generally apply to all GUI design and implementation. They are really just Software Engineering principles applied to GUIs.
-
-### Build A Hierarchy
-Qt is designed to handle hierarchy. It has [an extensive and robust system for maintaining Object Trees and parent/child relationships between components](https://doc.qt.io/qt-5/objecttrees.html). Much like regular code, GUIs should be created in a logical hierarchy to make organization and re-use easier.
-
-Make sure to use layouts, and group widgets in a logical way. For example, several widgets that work together to collect a user's mailing address should be grouped. This group may then be part of a larger group of widgets in a popup dialog asking for billing information.
-
-Here is a good example of laying out widgets in a hierarchy:
-
-![Good Qt Widget Layout](images/qt_layout_good_example.png)
-
-Do **not** lay out all your widgets in a single layer like this:
-
-![Bad Qt Widget Layout](images/qt_layout_bad_example.png)
-
-The main point to remember is to use [layouts](https://doc.qt.io/qt-5/layout.html) to group and manage widgets, and to create these groups in a logical way that can be built into a hierarchy. This will make it significantly easier to replace parts of the GUI later, or move components around.
-
-### Create Reusable Widgets
-Much like how we create functions in order to reuse code, [widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) should be created so that they are reusable.
-
-For example, if you create a few widgets that work together to gather user input with a slider and display the current value next to it, you should combine all of this into its own `SliderWithValue` widget. This will make it very easy to make several copies of this widget, or use it somewhere else in a completely different application. Similarly, if you need specialized functionality from any widget (for example, our `ZoomableQGraphicsView`), this should also be implemented as a custom reusable widget.
-
-![Reusable Widget Example](images/qt_reusable_widget_example.png)
-
-Creating widgets that are slightly more generic and reusable are very useful and allow code and graphical modules to be shared and reused between multiple applications.
-
-### Miscellaneous Qt Tips
-* Define minimum and maximum sizes (if it makes sense) to help enforce the correct sizing of elements
-    * Eg. define a minimum width for a textbox based on what it's expected to contain
