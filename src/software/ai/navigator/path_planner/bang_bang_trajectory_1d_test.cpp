@@ -21,7 +21,7 @@ class BangBangTrajectory1DTest : public testing::Test
             double accel_limit;
             // if velocity and acceleration have opposite signs, then the velocity is
             // going towards 0, so use max_decel.
-            if (std::signbit(part.velocity * part.acceleration))
+            if (part.velocity * part.acceleration < 0)
             {
                 // Velocity is going towards 0, so use max_decel
                 accel_limit = max_decel;
@@ -289,5 +289,37 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_triangular_profile_wit
     verifyPartState(traj, 0, 2.0, initial_pos, initial_vel, max_decel);
     verifyPartState(traj, 1, 4.0, 3.0, 0, max_accel);
     verifyPartState(traj, 2, 8.0, 7.0, 4.0, max_decel);
+    verifyFinalState(traj, destination, max_decel);
+}
+
+TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_triangular_profile_overshooting_destination)
+{
+    // We're near the destination, but our initial velocity is too high, resulting
+    // in us overshooting the destination.
+    double initial_pos = 0;
+    double destination = 5;
+    double initial_vel = 4;
+    // Pick a high max velocity to ensure that the profile is triangular
+    double max_vel     = 20;
+    double max_accel   = -2;
+    double max_decel   = 1;
+
+    BangBangTrajectory1D traj(initial_pos, destination, initial_vel, max_vel, max_accel,
+                              max_decel);
+    const auto& parts = traj.getTrajectoryParts();
+    EXPECT_EQ(parts.size(), 3);
+    verifyVelocityAndAccelerationLimits(traj, max_vel, max_accel, max_decel);
+    verifyChronologicalTime(traj);
+
+    // 4.0 sec to decelerate from 4  to  0 m/s (travels 8m -> overshooting destination by 3m)
+    // 1.0 sec to accelerate from 0  to -2 m/s (travels -1m)
+    // 2.0 sec to decelerate from -2 to 0 m/s (travels -2m)
+    // Total time = 7 sec
+    EXPECT_TRUE(
+            TestUtil::equalWithinTolerance(7.0, traj.getTotalTime().toSeconds(), 0.001));
+
+    verifyPartState(traj, 0, 4.0, initial_pos, initial_vel, -max_decel);
+    verifyPartState(traj, 1, 5.0, 8.0, 0, max_accel);
+    verifyPartState(traj, 2, 7.0, 7.0, -2.0, max_decel);
     verifyFinalState(traj, destination, max_decel);
 }
