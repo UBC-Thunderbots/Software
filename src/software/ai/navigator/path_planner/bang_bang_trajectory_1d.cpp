@@ -54,23 +54,21 @@ BangBangTrajectory1D::BangBangTrajectory1D(double initial_pos, double final_pos,
         {
             // We have time to reach max velocity, so we can use a trapezoidal profile
             generateTrapezoidalTrajectory(stop_pos, final_pos, 0, max_vel, max_accel,
-                                          max_decel);
+                                          max_decel, time_to_stop);
         }
         else
         {
             // We can't reach max velocity and cruise at it, so we have to use
             // a triangular profile
             generateTriangularTrajectory(stop_pos, final_pos, 0, max_accel,
-                                         max_decel);
+                                         max_decel, time_to_stop);
         }
     }
 }
 
-void BangBangTrajectory1D::generateTrapezoidalTrajectory(double initial_pos,
-                                                         double final_pos,
-                                                         double initial_vel,
-                                                         double max_vel, double max_accel,
-                                                         double max_decel)
+void BangBangTrajectory1D::generateTrapezoidalTrajectory(double initial_pos, double final_pos, double initial_vel,
+                                                         double max_vel, double max_accel, double max_decel,
+                                                         Duration time_offset)
 {
     if (final_pos < initial_pos)
     {
@@ -93,22 +91,22 @@ void BangBangTrajectory1D::generateTrapezoidalTrajectory(double initial_pos,
 
     // Add the trajectory parts
     trajectory_parts.insert(trajectory_parts.end(),
-                            {{.end_time     = Duration::fromSeconds(t1),
+                            {{.end_time     = time_offset + Duration::fromSeconds(t1),
                               .position     = initial_pos,
                               .velocity     = initial_vel,
                               .acceleration = max_accel},
-                             {.end_time     = Duration::fromSeconds(t1 + t2),
+                             {.end_time     = time_offset + Duration::fromSeconds(t1 + t2),
                               .position     = initial_pos + d1,
                               .velocity     = max_vel,
                               .acceleration = 0},
-                             {.end_time     = Duration::fromSeconds(t1 + t2 + t3),
+                             {.end_time     = time_offset + Duration::fromSeconds(t1 + t2 + t3),
                               .position     = initial_pos + d1 + d2,
                               .velocity     = max_vel,
                               .acceleration = -max_decel}});
 }
 
 void BangBangTrajectory1D::generateTriangularTrajectory(double initial_pos, double final_pos, double initial_vel,
-                                                        double max_accel, double max_decel)
+                                                        double max_accel, double max_decel, Duration time_offset)
 {
     double direction = std::copysign(1.0, final_pos - initial_pos);
     double dist = std::abs(final_pos - initial_pos);
@@ -131,11 +129,11 @@ void BangBangTrajectory1D::generateTriangularTrajectory(double initial_pos, doub
 
     // Add the trajectory parts
     trajectory_parts.insert(trajectory_parts.end(),
-                            {{.end_time     = Duration::fromSeconds(t_accel),
+                            {{.end_time     = time_offset + Duration::fromSeconds(t_accel),
                               .position     = initial_pos,
                               .velocity     = initial_vel,
                               .acceleration = signed_accel},
-                             {.end_time     = Duration::fromSeconds(t_accel + t_decel),
+                             {.end_time     = time_offset + Duration::fromSeconds(t_accel + t_decel),
                               .position     = initial_pos + d_accel,
                               .velocity     = v_max_reached,
                               .acceleration = signed_decel}});

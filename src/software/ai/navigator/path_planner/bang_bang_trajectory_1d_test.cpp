@@ -143,34 +143,38 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_trapezoidal_profile)
     verifyFinalState(traj, destination, max_decel);
 }
 
-//TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_trapezoidal_profile_with_negative_initial_velocity)
-//{
-//    double initial_pos = 2;
-//    double destination = 8.5;
-//    double initial_vel = 1;
-//    double max_vel     = 2;
-//    double max_accel   = 1;
-//    double max_decel   = -2;
-//
-//    BangBangTrajectory1D traj(initial_pos, destination, initial_vel, max_vel, max_accel,
-//                              max_decel);
-//    const auto& parts = traj.getTrajectoryParts();
-//    EXPECT_EQ(parts.size(), 3);
-//    verifyVelocityAndAccelerationLimits(traj, max_vel, max_accel, max_decel);
-//    verifyChronologicalTime(traj);
-//
-//    // 1.0 sec to accelerate from 1 to 2 m/s (travels 1.5m)
-//    // 1.0 sec to decelerate from 2 to 0 m/s (travels 1m)
-//    // Remaining 4m travelled at 2 m/s takes 2 sec
-//    // Total time = 4 sec
-//    EXPECT_TRUE(
-//            TestUtil::equalWithinTolerance(4.0, traj.getTotalTime().toSeconds(), 0.001));
-//
-//    verifyPartState(traj, 0, 1.0, initial_pos, initial_vel, max_accel);
-//    verifyPartState(traj, 1, 3.0, 3.5, max_vel, 0.0);
-//    verifyPartState(traj, 2, 4.0, 7.5, max_vel, max_decel);
-//    verifyFinalState(traj, destination, max_decel);
-//}
+TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_trapezoidal_profile_with_negative_initial_velocity)
+{
+    double initial_pos = 5;
+    double destination = 27;
+    // Initially moving away from the destination. So we must stop, and then accelerate
+    // towards the destination.
+    double initial_vel = -2;
+    double max_vel     = 4;
+    double max_accel   = 2;
+    double max_decel   = -1;
+
+    BangBangTrajectory1D traj(initial_pos, destination, initial_vel, max_vel, max_accel,
+                              max_decel);
+    const auto& parts = traj.getTrajectoryParts();
+    EXPECT_EQ(parts.size(), 4);
+    verifyVelocityAndAccelerationLimits(traj, max_vel, max_accel, max_decel);
+    verifyChronologicalTime(traj);
+
+    // 2.0 sec to decelerate from -2 to 0 m/s (travels -2m)
+    // 2.0 sec to accelerate from 0  to 4 m/s (travels 8m)
+    // 4.0 sec to decelerate from 4  to 0 m/s (travels 8m)
+    // Remaining 8m travelled at 4 m/s takes 2 sec
+    // Total time = 10 sec
+    EXPECT_TRUE(
+            TestUtil::equalWithinTolerance(10.0, traj.getTotalTime().toSeconds(), 0.001));
+
+    verifyPartState(traj, 0, 2.0, initial_pos, initial_vel, max_decel);
+    verifyPartState(traj, 0, 4.0, 3.0, 0, max_accel);
+    verifyPartState(traj, 1, 8.0, 11.0, max_vel, 0.0);
+    verifyPartState(traj, 2, 10.0, 19.0, max_vel, max_decel);
+    verifyFinalState(traj, destination, max_decel);
+}
 
 TEST_F(BangBangTrajectory1DTest, negative_non_symmetrical_trapezoidal_profile)
 {

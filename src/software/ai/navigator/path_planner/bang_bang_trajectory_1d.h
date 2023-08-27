@@ -78,13 +78,14 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
      * @param max_vel Assuming value is positive
      * @param max_accel Assuming value is positive
      * @param max_decel Assuming value is positive
+     * @param time_offset
      */
-    void generateTrapezoidalTrajectory(double initial_pos, double final_pos,
-                                       double initial_vel, double max_vel,
-                                       double max_accel, double max_decel);
+    void generateTrapezoidalTrajectory(double initial_pos, double final_pos, double initial_vel,
+                                       double max_vel, double max_accel, double max_decel,
+                                       Duration time_offset = Duration::fromSeconds(0));
 
     void generateTriangularTrajectory(double initial_pos, double final_pos, double initial_vel,
-                                      double max_accel, double max_decel);
+                                      double max_accel, double max_decel, Duration time_offset = Duration::fromSeconds(0));
 
     size_t getTrajectoryIndexAtTime(Duration t) const;
 
