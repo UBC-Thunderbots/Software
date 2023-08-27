@@ -47,11 +47,31 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "bang_bang_trajectory_2d",
+    srcs = ["bang_bang_trajectory_2d.cpp"],
+    hdrs = ["bang_bang_trajectory_2d.h"],
+    deps = [
+        ":bang_bang_trajectory_1d",
+        "//software/geom:point",
+    ],
+)
+
 cc_test(
     name = "bang_bang_trajectory_1d_test",
     srcs = ["bang_bang_trajectory_1d_test.cpp"],
     deps = [
         ":bang_bang_trajectory_1d",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_test(
+    name = "bang_bang_trajectory_2d_test",
+    srcs = ["bang_bang_trajectory_2d_test.cpp"],
+    deps = [
+        ":bang_bang_trajectory_2d",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],

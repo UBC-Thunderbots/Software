@@ -83,6 +83,8 @@ class BangBangTrajectory1DTest : public testing::Test
             << part.acceleration << " instead of the expected acceleration of "
             << acceleration;
     }
+
+    BangBangTrajectory1D traj;
 };
 
 TEST_F(BangBangTrajectory1DTest, positive_symmetrical_trapezoidal_profile)
@@ -94,8 +96,7 @@ TEST_F(BangBangTrajectory1DTest, positive_symmetrical_trapezoidal_profile)
     double max_accel   = 1;
     double max_decel   = -1;
 
-    BangBangTrajectory1D traj(initial_pos, destination, initial_vel, max_vel, max_accel,
-                              max_decel);
+    traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
     const auto& parts = traj.getTrajectoryParts();
     EXPECT_EQ(parts.size(), 3);
     verifyVelocityAndAccelerationLimits(traj, max_vel, max_accel, max_decel);
@@ -123,8 +124,7 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_trapezoidal_profile)
     double max_accel   = 1;
     double max_decel   = -2;
 
-    BangBangTrajectory1D traj(initial_pos, destination, initial_vel, max_vel, max_accel,
-                              max_decel);
+    traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
     const auto& parts = traj.getTrajectoryParts();
     EXPECT_EQ(parts.size(), 3);
     verifyVelocityAndAccelerationLimits(traj, max_vel, max_accel, max_decel);
@@ -143,7 +143,8 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_trapezoidal_profile)
     verifyFinalState(traj, destination, max_decel);
 }
 
-TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_trapezoidal_profile_with_negative_initial_velocity)
+TEST_F(BangBangTrajectory1DTest,
+       positive_non_symmetrical_trapezoidal_profile_with_negative_initial_velocity)
 {
     double initial_pos = 5;
     double destination = 27;
@@ -154,8 +155,7 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_trapezoidal_profile_wi
     double max_accel   = 2;
     double max_decel   = -1;
 
-    BangBangTrajectory1D traj(initial_pos, destination, initial_vel, max_vel, max_accel,
-                              max_decel);
+    traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
     const auto& parts = traj.getTrajectoryParts();
     EXPECT_EQ(parts.size(), 4);
     verifyVelocityAndAccelerationLimits(traj, max_vel, max_accel, max_decel);
@@ -167,7 +167,7 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_trapezoidal_profile_wi
     // Remaining 12m travelled at 4 m/s takes 3 sec
     // Total time = 11 sec
     EXPECT_TRUE(
-            TestUtil::equalWithinTolerance(11.0, traj.getTotalTime().toSeconds(), 0.001));
+        TestUtil::equalWithinTolerance(11.0, traj.getTotalTime().toSeconds(), 0.001));
 
     verifyPartState(traj, 0, 2.0, initial_pos, initial_vel, max_decel);
     verifyPartState(traj, 1, 4.0, 3.0, 0, max_accel);
@@ -185,8 +185,7 @@ TEST_F(BangBangTrajectory1DTest, negative_non_symmetrical_trapezoidal_profile)
     double max_accel   = 1;
     double max_decel   = -2;
 
-    BangBangTrajectory1D traj(initial_pos, destination, initial_vel, max_vel, max_accel,
-                              max_decel);
+    traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
     const auto& parts = traj.getTrajectoryParts();
     EXPECT_EQ(parts.size(), 3);
     verifyVelocityAndAccelerationLimits(traj, max_vel, max_accel, max_decel);
@@ -211,13 +210,11 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_triangular_profile)
     double destination = 10.5;
     double initial_vel = 1;
     // Pick a high max velocity to ensure that the profile is triangular
-    double max_vel =
-        10;
+    double max_vel   = 10;
     double max_accel = 1;
     double max_decel = -2;
 
-    BangBangTrajectory1D traj(initial_pos, destination, initial_vel, max_vel, max_accel,
-                              max_decel);
+    traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
     const auto& parts = traj.getTrajectoryParts();
     EXPECT_EQ(parts.size(), 2);
     verifyVelocityAndAccelerationLimits(traj, max_vel, max_accel, max_decel);
@@ -239,12 +236,11 @@ TEST_F(BangBangTrajectory1DTest, negative_non_symmetrical_triangular_profile)
     double destination = -10.5;
     double initial_vel = -1;
     // Pick a high max velocity to ensure that the profile is triangular
-    double max_vel = 10;
+    double max_vel   = 10;
     double max_accel = 1;
     double max_decel = -2;
 
-    BangBangTrajectory1D traj(initial_pos, destination, initial_vel, max_vel, max_accel,
-                              max_decel);
+    traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
     const auto& parts = traj.getTrajectoryParts();
     EXPECT_EQ(parts.size(), 2);
     verifyVelocityAndAccelerationLimits(traj, max_vel, max_accel, max_decel);
@@ -260,7 +256,8 @@ TEST_F(BangBangTrajectory1DTest, negative_non_symmetrical_triangular_profile)
     verifyFinalState(traj, destination, -max_decel);
 }
 
-TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_triangular_profile_with_negative_initial_velocity)
+TEST_F(BangBangTrajectory1DTest,
+       positive_non_symmetrical_triangular_profile_with_negative_initial_velocity)
 {
     double initial_pos = 5;
     double destination = 15;
@@ -268,12 +265,11 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_triangular_profile_wit
     // towards the destination.
     double initial_vel = -2;
     // Pick a high max velocity to ensure that the profile is triangular
-    double max_vel     = 20;
-    double max_accel   = 2;
-    double max_decel   = -1;
+    double max_vel   = 20;
+    double max_accel = 2;
+    double max_decel = -1;
 
-    BangBangTrajectory1D traj(initial_pos, destination, initial_vel, max_vel, max_accel,
-                              max_decel);
+    traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
     const auto& parts = traj.getTrajectoryParts();
     EXPECT_EQ(parts.size(), 3);
     verifyVelocityAndAccelerationLimits(traj, max_vel, max_accel, max_decel);
@@ -284,7 +280,7 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_triangular_profile_wit
     // 4.0 sec to decelerate from 4  to 0 m/s (travels 8m)
     // Total time = 8 sec
     EXPECT_TRUE(
-            TestUtil::equalWithinTolerance(8.0, traj.getTotalTime().toSeconds(), 0.001));
+        TestUtil::equalWithinTolerance(8.0, traj.getTotalTime().toSeconds(), 0.001));
 
     verifyPartState(traj, 0, 2.0, initial_pos, initial_vel, max_decel);
     verifyPartState(traj, 1, 4.0, 3.0, 0, max_accel);
@@ -292,7 +288,8 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_triangular_profile_wit
     verifyFinalState(traj, destination, max_decel);
 }
 
-TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_triangular_profile_overshooting_destination)
+TEST_F(BangBangTrajectory1DTest,
+       positive_non_symmetrical_triangular_profile_overshooting_destination)
 {
     // We're near the destination, but our initial velocity is too high, resulting
     // in us overshooting the destination.
@@ -300,23 +297,21 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_triangular_profile_ove
     double destination = 5;
     double initial_vel = 4;
     // Pick a high max velocity to ensure that the profile is triangular
-    double max_vel     = 20;
-    double max_accel   = -2;
-    double max_decel   = 1;
+    double max_vel   = 20;
+    double max_accel = -2;
+    double max_decel = 1;
 
-    BangBangTrajectory1D traj(initial_pos, destination, initial_vel, max_vel, max_accel,
-                              max_decel);
+    traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
     const auto& parts = traj.getTrajectoryParts();
     EXPECT_EQ(parts.size(), 3);
     verifyVelocityAndAccelerationLimits(traj, max_vel, max_accel, max_decel);
     verifyChronologicalTime(traj);
 
-    // 4.0 sec to decelerate from 4  to  0 m/s (travels 8m -> overshooting destination by 3m)
-    // 1.0 sec to accelerate from 0  to -2 m/s (travels -1m)
-    // 2.0 sec to decelerate from -2 to 0 m/s (travels -2m)
-    // Total time = 7 sec
+    // 4.0 sec to decelerate from 4  to  0 m/s (travels 8m -> overshooting destination by
+    // 3m) 1.0 sec to accelerate from 0  to -2 m/s (travels -1m) 2.0 sec to decelerate
+    // from -2 to 0 m/s (travels -2m) Total time = 7 sec
     EXPECT_TRUE(
-            TestUtil::equalWithinTolerance(7.0, traj.getTotalTime().toSeconds(), 0.001));
+        TestUtil::equalWithinTolerance(7.0, traj.getTotalTime().toSeconds(), 0.001));
 
     verifyPartState(traj, 0, 4.0, initial_pos, initial_vel, -max_decel);
     verifyPartState(traj, 1, 5.0, 8.0, 0, max_accel);

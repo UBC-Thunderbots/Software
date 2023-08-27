@@ -15,11 +15,20 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
         double acceleration;
     };
 
+    BangBangTrajectory1D() = default;
+
     /**
-     * Constructor
+     * Overwrites any existing trajectory with the newly generated trajectory
+     *
+     * @param initial_pos
+     * @param final_pos
+     * @param initial_vel
+     * @param max_vel
+     * @param max_accel
+     * @param max_decel
      */
-    BangBangTrajectory1D(double initial_pos, double final_pos, double initial_vel,
-                         double max_vel, double max_accel, double max_decel);
+    void generate(double initial_pos, double final_pos, double initial_vel,
+                  double max_vel, double max_accel, double max_decel);
 
     /**
      * Get position at time t
@@ -80,12 +89,15 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
      * @param max_decel Assuming value is positive
      * @param time_offset
      */
-    void generateTrapezoidalTrajectory(double initial_pos, double final_pos, double initial_vel,
-                                       double max_vel, double max_accel, double max_decel,
+    void generateTrapezoidalTrajectory(double initial_pos, double final_pos,
+                                       double initial_vel, double max_vel,
+                                       double max_accel, double max_decel,
                                        Duration time_offset = Duration::fromSeconds(0));
 
-    void generateTriangularTrajectory(double initial_pos, double final_pos, double initial_vel,
-                                      double max_accel, double max_decel, Duration time_offset = Duration::fromSeconds(0));
+    void generateTriangularTrajectory(double initial_pos, double final_pos,
+                                      double initial_vel, double max_accel,
+                                      double max_decel,
+                                      Duration time_offset = Duration::fromSeconds(0));
 
     size_t getTrajectoryIndexAtTime(Duration t) const;
 

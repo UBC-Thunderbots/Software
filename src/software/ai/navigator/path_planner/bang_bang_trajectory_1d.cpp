@@ -1,13 +1,15 @@
-#include "bang_bang_trajectory_1d.h"
+#include "software/ai/navigator/path_planner/bang_bang_trajectory_1d.h"
 
 #include <cmath>
 
 #include "software/geom/algorithms/is_in_range.h"
 
-BangBangTrajectory1D::BangBangTrajectory1D(double initial_pos, double final_pos,
-                                           double initial_vel, double max_vel,
-                                           double max_accel, double max_decel)
+void BangBangTrajectory1D::generate(double initial_pos, double final_pos,
+                                    double initial_vel, double max_vel, double max_accel,
+                                    double max_decel)
 {
+    trajectory_parts.clear();
+
     // Unify the signs of the parameters
     max_accel = std::abs(max_accel);
     max_decel = std::abs(max_decel);
@@ -33,8 +35,8 @@ BangBangTrajectory1D::BangBangTrajectory1D(double initial_pos, double final_pos,
         {
             // We can't reach max velocity and cruise at it, so we have to use
             // a triangular profile
-            generateTriangularTrajectory(initial_pos, final_pos, initial_vel,
-                                         max_accel, max_decel);
+            generateTriangularTrajectory(initial_pos, final_pos, initial_vel, max_accel,
+                                         max_decel);
         }
     }
     else
@@ -60,15 +62,15 @@ BangBangTrajectory1D::BangBangTrajectory1D(double initial_pos, double final_pos,
         {
             // We can't reach max velocity and cruise at it, so we have to use
             // a triangular profile
-            generateTriangularTrajectory(stop_pos, final_pos, 0, max_accel,
-                                         max_decel, time_to_stop);
+            generateTriangularTrajectory(stop_pos, final_pos, 0, max_accel, max_decel,
+                                         time_to_stop);
         }
     }
 }
 
-void BangBangTrajectory1D::generateTrapezoidalTrajectory(double initial_pos, double final_pos, double initial_vel,
-                                                         double max_vel, double max_accel, double max_decel,
-                                                         Duration time_offset)
+void BangBangTrajectory1D::generateTrapezoidalTrajectory(
+    double initial_pos, double final_pos, double initial_vel, double max_vel,
+    double max_accel, double max_decel, Duration time_offset)
 {
     if (final_pos < initial_pos)
     {
@@ -90,26 +92,28 @@ void BangBangTrajectory1D::generateTrapezoidalTrajectory(double initial_pos, dou
     double t2 = d2 / max_vel;
 
     // Add the trajectory parts
-    trajectory_parts.insert(trajectory_parts.end(),
-                            {{.end_time     = time_offset + Duration::fromSeconds(t1),
-                              .position     = initial_pos,
-                              .velocity     = initial_vel,
-                              .acceleration = max_accel},
-                             {.end_time     = time_offset + Duration::fromSeconds(t1 + t2),
-                              .position     = initial_pos + d1,
-                              .velocity     = max_vel,
-                              .acceleration = 0},
-                             {.end_time     = time_offset + Duration::fromSeconds(t1 + t2 + t3),
-                              .position     = initial_pos + d1 + d2,
-                              .velocity     = max_vel,
-                              .acceleration = -max_decel}});
+    trajectory_parts.insert(
+        trajectory_parts.end(),
+        {{.end_time     = time_offset + Duration::fromSeconds(t1),
+          .position     = initial_pos,
+          .velocity     = initial_vel,
+          .acceleration = max_accel},
+         {.end_time     = time_offset + Duration::fromSeconds(t1 + t2),
+          .position     = initial_pos + d1,
+          .velocity     = max_vel,
+          .acceleration = 0},
+         {.end_time     = time_offset + Duration::fromSeconds(t1 + t2 + t3),
+          .position     = initial_pos + d1 + d2,
+          .velocity     = max_vel,
+          .acceleration = -max_decel}});
 }
 
-void BangBangTrajectory1D::generateTriangularTrajectory(double initial_pos, double final_pos, double initial_vel,
-                                                        double max_accel, double max_decel, Duration time_offset)
+void BangBangTrajectory1D::generateTriangularTrajectory(
+    double initial_pos, double final_pos, double initial_vel, double max_accel,
+    double max_decel, Duration time_offset)
 {
     double direction = std::copysign(1.0, final_pos - initial_pos);
-    double dist = std::abs(final_pos - initial_pos);
+    double dist      = std::abs(final_pos - initial_pos);
 
     // Calculate the time to decelerate to 0
     // Note that the max velocity reached is not known, but this formula still works
@@ -128,15 +132,16 @@ void BangBangTrajectory1D::generateTriangularTrajectory(double initial_pos, doub
     double d_accel = initial_vel * t_accel + 0.5 * signed_accel * std::pow(t_accel, 2.0);
 
     // Add the trajectory parts
-    trajectory_parts.insert(trajectory_parts.end(),
-                            {{.end_time     = time_offset + Duration::fromSeconds(t_accel),
-                              .position     = initial_pos,
-                              .velocity     = initial_vel,
-                              .acceleration = signed_accel},
-                             {.end_time     = time_offset + Duration::fromSeconds(t_accel + t_decel),
-                              .position     = initial_pos + d_accel,
-                              .velocity     = v_max_reached,
-                              .acceleration = signed_decel}});
+    trajectory_parts.insert(
+        trajectory_parts.end(),
+        {{.end_time     = time_offset + Duration::fromSeconds(t_accel),
+          .position     = initial_pos,
+          .velocity     = initial_vel,
+          .acceleration = signed_accel},
+         {.end_time     = time_offset + Duration::fromSeconds(t_accel + t_decel),
+          .position     = initial_pos + d_accel,
+          .velocity     = v_max_reached,
+          .acceleration = signed_decel}});
 }
 
 double BangBangTrajectory1D::getPosition(Duration t) const
