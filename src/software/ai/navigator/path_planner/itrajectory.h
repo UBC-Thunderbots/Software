@@ -45,7 +45,8 @@ class ITrajectory
 
     /**
      * Get the final desired destination
-     * @return the next destination, if this trajectory is divided into multiple subtract-paths
+     * @return the next destination, if this trajectory is divided into multiple
+     * subtract-paths
      */
     P getDestination() const
     {

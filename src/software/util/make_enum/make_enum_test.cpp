@@ -40,8 +40,8 @@ TEST(EnumMacroTest, separate_enum_strings_without_trailing_comma)
 
 TEST(EnumMacroTest, separate_enum_strings_with_extra_spaces_tabs_and_newlines)
 {
-    std::string enum_string                  = "getTrajPartAndDeltaTime   \n, \tbar, \nbaz \t ";
-    auto result                              = separateEnumStrings(enum_string);
+    std::string enum_string = "getTrajPartAndDeltaTime   \n, \tbar, \nbaz \t ";
+    auto result             = separateEnumStrings(enum_string);
     std::vector<std::string> expected_result = {"getTrajPartAndDeltaTime", "bar", "baz"};
     EXPECT_EQ(expected_result, result);
 }

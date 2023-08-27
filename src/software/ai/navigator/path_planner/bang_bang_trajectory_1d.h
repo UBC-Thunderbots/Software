@@ -1,16 +1,16 @@
 #pragma once
 
 #include <vector>
+
 #include "software/ai/navigator/path_planner/itrajectory.h"
 
 class BangBangTrajectory1D : public ITrajectory<double, double, double>
 {
-
-public:
-    struct TrajectoryPart // TODO: Make private
+   public:
+    struct TrajectoryPart  // TODO: Make private
     {
         Duration end_time;
-        double position; // TODO: Consider adding initial/final prefix
+        double position;  // TODO: Consider adding initial/final prefix
         double velocity;
         double acceleration;
     };
@@ -18,8 +18,8 @@ public:
     /**
      * Constructor
      */
-    BangBangTrajectory1D(double initial_pos, double final_pos, double initial_vel, double max_vel,
-                         double max_accel, double max_decel);
+    BangBangTrajectory1D(double initial_pos, double final_pos, double initial_vel,
+                         double max_vel, double max_accel, double max_decel);
 
     /**
      * Get position at time t
@@ -55,7 +55,7 @@ public:
     // TODO: Added for testing purposes, remove later
     const std::vector<TrajectoryPart> &getTrajectoryParts() const;
 
-private:
+   private:
     /**
      * Calculate the minimum distance required to stop (0 velocity) from a
      * given initial velocity.
@@ -63,10 +63,12 @@ private:
      * @param max_decel Max achievable deceleration
      * @return Minimum distance required to stop
      */
-    inline double closestPositionToStop(double initial_pos, double initial_vel, double max_decel) const;
+    inline double closestPositionToStop(double initial_pos, double initial_vel,
+                                        double max_decel) const;
 
-    inline double triangularProfileStopPosition(double initial_pos, double initial_vel, double max_vel,
-                                                double max_accel, double max_decel) const;
+    inline double triangularProfileStopPosition(double initial_pos, double initial_vel,
+                                                double max_vel, double max_accel,
+                                                double max_decel) const;
 
     /**
      *
@@ -77,17 +79,17 @@ private:
      * @param max_accel Assuming value is positive
      * @param max_decel Assuming value is positive
      */
-    void generateTrapezoidalTrajectory(double initial_pos, double final_pos, double initial_vel, double max_vel,
+    void generateTrapezoidalTrajectory(double initial_pos, double final_pos,
+                                       double initial_vel, double max_vel,
                                        double max_accel, double max_decel);
 
-    void
-    generateTriangularTrajectory(double initial_pos, double final_pos, double initial_vel, double max_vel,
-                                 double max_accel,
-                                 double max_decel);
+    void generateTriangularTrajectory(double initial_pos, double final_pos, double initial_vel,
+                                      double max_accel, double max_decel);
 
     size_t getTrajectoryIndexAtTime(Duration t) const;
 
-    void getTrajPartAndDeltaTime(Duration t, TrajectoryPart &out_traj_part, Duration &out_t_delta) const;
+    void getTrajPartAndDeltaTime(Duration t, TrajectoryPart &out_traj_part,
+                                 Duration &out_t_delta) const;
 
     std::vector<TrajectoryPart> trajectory_parts;
 };
