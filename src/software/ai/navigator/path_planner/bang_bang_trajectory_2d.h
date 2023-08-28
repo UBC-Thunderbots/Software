@@ -7,16 +7,19 @@ class BangBangTrajectory2D : public ITrajectory<Point, Vector, Vector>
     BangBangTrajectory2D() = default;
 
     /**
-     * Generate a 2D trajectory from the initial position to the final position with the given initial
-     * velocity and kinematic constraints.
+     * Generate a 2D trajectory from the initial position to the final position with the
+     * given initial velocity and kinematic constraints.
      * @note that calling generate will overwrite the existing trajectory.
      *
      * @param initial_pos Starting position of the trajectory
      * @param final_pos Destination. Where the trajectory should end at
      * @param initial_vel The initial velocity of the trajectory
-     * @param max_vel The max velocity (in 2D) that the trajectory can reach at any given point
-     * @param max_accel The max acceleration (in 2D) that the trajectory can reach at any given point
-     * @param max_decel The max deceleration (in 2D) that the trajectory can reach at any given point
+     * @param max_vel The max velocity (in 2D) that the trajectory can reach at any given
+     * point
+     * @param max_accel The max acceleration (in 2D) that the trajectory can reach at any
+     * given point
+     * @param max_decel The max deceleration (in 2D) that the trajectory can reach at any
+     * given point
      */
     void generate(const Point& initial_pos, const Point& final_pos,
                   const Vector& initial_vel, double max_vel, double max_accel,
@@ -58,6 +61,7 @@ class BangBangTrajectory2D : public ITrajectory<Point, Vector, Vector>
     BangBangTrajectory1D x_trajectory;
     BangBangTrajectory1D y_trajectory;
 
-    // The maximum difference the x and y trajectory runtimes could have from each other in seconds
+    // The maximum difference the x and y trajectory runtimes could have from each other
+    // in seconds
     const double TRAJ_ACCURACY_TOLERANCE_SEC = 0.01;
 };

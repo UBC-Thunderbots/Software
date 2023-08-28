@@ -24,8 +24,8 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
     BangBangTrajectory1D() = default;
 
     /**
-     * Generate a 1D trajectory from the initial position to the final position with the given initial
-     * velocity and kinematic constraints.
+     * Generate a 1D trajectory from the initial position to the final position with the
+     * given initial velocity and kinematic constraints.
      * @note This method will overwrite the existing trajectory.
      * @note The generated trajectory will always have a final velocity of 0
      *
@@ -80,17 +80,21 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
    private:
     /**
      * Generate a trapezoidal trajectory and fill in `trajectory_parts`.
-     * Trapezoidal trajectory gets its name from the shape of the generated velocity vs time
-     * graph. The velocity will accelerate to max velocity, cruise at max velocity, then decelerate to 0
-     * @assumes that there is enough distance to accelerate from initial velocity to max velocity, and
-     * decelerate from max velocity to 0 velocity.
+     * Trapezoidal trajectory gets its name from the shape of the generated velocity vs
+     * time graph. The velocity will accelerate to max velocity, cruise at max velocity,
+     * then decelerate to 0
+     * @assumes that there is enough distance to accelerate from initial velocity to max
+     * velocity, and decelerate from max velocity to 0 velocity.
      *
      * @param initial_pos Starting position of the trajectory
      * @param final_pos Destination. Where the trajectory should end at
      * @param initial_vel The velocity at the start of the trajectory
-     * @param max_vel The maximum velocity (magnitude) the trajectory could have. Assumes value is positive
-     * @param max_accel The maximum acceleration the trajectory could have. Assumes value is positive
-     * @param max_decel The maximum deceleration the trajectory could have. Assumes value is positive
+     * @param max_vel The maximum velocity (magnitude) the trajectory could have. Assumes
+     * value is positive
+     * @param max_accel The maximum acceleration the trajectory could have. Assumes value
+     * is positive
+     * @param max_decel The maximum deceleration the trajectory could have. Assumes value
+     * is positive
      * @param time_offset The time offset to start the trajectory at
      */
     void generateTrapezoidalTrajectory(double initial_pos, double final_pos,
@@ -100,16 +104,19 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
 
     /**
      * Generate a triangular trajectory and fill in `trajectory_parts`.
-     * Triangular trajectory has the velocity vs time graph look like a triangle. The velocity will
-     * accelerate to a value less than or equal to the max velocity, then decelerate to 0.
-     * @assumes that there is not enough time for the trajectory to cruise at max velocity, given the
-     * distance that needs to be travelled.
+     * Triangular trajectory has the velocity vs time graph look like a triangle. The
+     * velocity will accelerate to a value less than or equal to the max velocity, then
+     * decelerate to 0.
+     * @assumes that there is not enough time for the trajectory to cruise at max
+     * velocity, given the distance that needs to be travelled.
      *
      * @param initial_pos Starting position of the trajectory
      * @param final_pos Destination. Where the trajectory should end at
      * @param initial_vel The velocity at the start of the trajectory
-     * @param max_accel The maximum acceleration the trajectory could have. Assumes value is positive
-     * @param max_decel The maximum deceleration the trajectory could have. Assumes value is positive
+     * @param max_accel The maximum acceleration the trajectory could have. Assumes value
+     * is positive
+     * @param max_decel The maximum deceleration the trajectory could have. Assumes value
+     * is positive
      * @param time_offset The time offset to start the trajectory at
      */
     void generateTriangularTrajectory(double initial_pos, double final_pos,
@@ -118,8 +125,8 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
                                       Duration time_offset = Duration::fromSeconds(0));
 
     /**
-     * Calculates the closest position at which the trajectory could stop at (velocity = 0)
-     * given the initial velocity.
+     * Calculates the closest position at which the trajectory could stop at (velocity =
+     * 0) given the initial velocity.
      *
      * @param initial_vel Initial velocity
      * @param max_decel Max achievable deceleration
@@ -129,15 +136,19 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
                                         double max_decel) const;
 
     /**
-     * Calculates the position at which the robot will be at if it accelerates from the initial
-     * velocity to the max velocity, then decelerates to 0 velocity.
+     * Calculates the position at which the robot will be at if it accelerates from the
+     * initial velocity to the max velocity, then decelerates to 0 velocity.
      *
      * @param initial_pos Starting position of the trajectory
      * @param initial_vel The velocity at the start of the trajectory
-     * @param max_vel The maximum velocity (magnitude) the trajectory could have. Assumes value is positive
-     * @param max_accel The maximum acceleration the trajectory could have. Assumes value is positive
-     * @param max_decel The maximum deceleration the trajectory could have. Assumes value is positive
-     * @return The final position of the robot after a triangular profile trajectory to the max velocity
+     * @param max_vel The maximum velocity (magnitude) the trajectory could have. Assumes
+     * value is positive
+     * @param max_accel The maximum acceleration the trajectory could have. Assumes value
+     * is positive
+     * @param max_decel The maximum deceleration the trajectory could have. Assumes value
+     * is positive
+     * @return The final position of the robot after a triangular profile trajectory to
+     * the max velocity
      */
     inline double triangularProfileStopPosition(double initial_pos, double initial_vel,
                                                 double max_vel, double max_accel,
@@ -157,7 +168,8 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
      *
      * @param t Duration elapsed since start of trajectory
      * @param out_traj_part Out parameter for the trajectory part at time t
-     * @param out_t_delta Out parameter for the time delta between the start of the trajectory part and time t
+     * @param out_t_delta Out parameter for the time delta between the start of the
+     * trajectory part and time t
      */
     void getTrajPartAndDeltaTime(Duration t, TrajectoryPart &out_traj_part,
                                  Duration &out_t_delta) const;

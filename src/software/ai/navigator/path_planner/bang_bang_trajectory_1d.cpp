@@ -14,7 +14,6 @@ void BangBangTrajectory1D::generate(double initial_pos, double final_pos,
     max_accel = std::abs(max_accel);
     max_decel = std::abs(max_decel);
     max_vel   = std::abs(max_vel);
-    // TODO: Should we clamp initial vel to max vel?
 
     // From initial position, where the closest position is where we can stop.
     // If it is not between initial and final position, then we must break right away.
@@ -44,6 +43,7 @@ void BangBangTrajectory1D::generate(double initial_pos, double final_pos,
         // Either there is no way for us not to overshoot the destination, or the initial
         // velocity is moving away from the destination. In either case, we have to
         // decelerate to stop first, then we can generate a profile to our destination.
+        // vf = vi + at  =>  t = -vi / t  (vf = 0)
         Duration time_to_stop = Duration::fromSeconds(std::abs(initial_vel) / max_decel);
         trajectory_parts.push_back({.end_time     = time_to_stop,
                                     .position     = initial_pos,
@@ -115,8 +115,15 @@ void BangBangTrajectory1D::generateTriangularTrajectory(
     double direction = std::copysign(1.0, final_pos - initial_pos);
     double dist      = std::abs(final_pos - initial_pos);
 
-    // Calculate the time to decelerate to 0
-    // Note that the max velocity reached is not known, but this formula still works
+    // Given the following constraints:
+    // - Travel exactly a distance of dist
+    // - Have a final velocity of 0
+    // - Take the least amount of time possible (i.e. accelerate until we have to
+    // decelerate) Calculate the time it takes for us to decelerate from the highest
+    // velocity we can reach to a full stop. The full derivation of the formula can be
+    // found here: https://www.desmos.com/calculator/qvrvtplgk7 Note that the full
+    // derivation also supports a non-zero final velocity, but we currently don't support
+    // that here.
     double t_decel = std::sqrt((std::pow(initial_vel, 2) + 2 * dist * max_accel) /
                                (max_decel * (max_accel + max_decel)));
 
@@ -125,7 +132,7 @@ void BangBangTrajectory1D::generateTriangularTrajectory(
 
     // Calculate the max velocity we will reach
     // vf = vi + at  =>  vi = -at  (vf = 0)
-    double v_max_reached = -t_decel * signed_decel;
+    double v_max_reached = -signed_decel * t_decel;
 
     // Calculate the time to accelerate to the max reached velocity
     double t_accel = (v_max_reached - initial_vel) / signed_accel;

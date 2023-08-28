@@ -4,13 +4,14 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
                                     const Vector& initial_vel, double max_vel,
                                     double max_accel, double max_decel)
 {
-    // Take the x and y components of the max velocity, acceleration, and deceleration based
-    // on the angle alpha so the overall 2D trajectory abides by the kinematic constraints.
+    // Take the x and y components of the max velocity, acceleration, and deceleration
+    // based on the angle alpha so the overall 2D trajectory abides by the kinematic
+    // constraints.
 
     // Alpha starts at PI/4 (45 deg) which will have the x and y components equivalent to
-    // each other. We then increment alpha by PI/(8*2^i) where i is the iteration of binary
-    // search we're at. This will result in alpha being in the range of 0 rad (no y-component)
-    // to PI/2 rad (no x-component).
+    // each other. We then increment alpha by PI/(8*2^i) where i is the iteration of
+    // binary search we're at. This will result in alpha being in the range of 0 rad (no
+    // y-component) to PI/2 rad (no x-component).
     double alpha     = M_PI / 4.0;
     double increment = M_PI / 8.0;
 
@@ -26,9 +27,12 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
         y_trajectory.generate(initial_pos.y(), final_pos.y(), initial_vel.y(),
                               max_vel * sin, max_accel * sin, max_decel * sin);
 
-        std::cout << "max_accel mag: " << Vector(max_accel * cos, max_accel * sin).length() << std::endl;
-        std::cout << "max_decel mag: " << Vector(max_decel * cos, max_decel * sin).length() << std::endl;
-        std::cout << "max_decel + max_accel mag: " << Vector(max_accel * cos, max_decel * sin).length() << std::endl;
+        std::cout << "max_accel mag: "
+                  << Vector(max_accel * cos, max_accel * sin).length() << std::endl;
+        std::cout << "max_decel mag: "
+                  << Vector(max_decel * cos, max_decel * sin).length() << std::endl;
+        std::cout << "max_decel + max_accel mag: "
+                  << Vector(max_accel * cos, max_decel * sin).length() << std::endl;
 
         const Duration x_time = x_trajectory.getTotalTime();
         const Duration y_time = y_trajectory.getTotalTime();
@@ -73,8 +77,6 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
     }
     std::cout << Point(time, 0.0) << ",";
     std::cout << std::endl;
-
-
 }
 
 Point BangBangTrajectory2D::getPosition(Duration t) const
