@@ -12,7 +12,7 @@ class BangBangTrajectory2DTest : public testing::Test
 
 TEST_F(BangBangTrajectory2DTest, test1)
 {
-    traj.generate(Point(0, 0), Point(3, 3), Vector(5.0, 0.0), 3, 3, 3);
+    traj.generate(Point(0, 0), Point(0, 0), Vector(0.0, 0.0), 1, 1, 1);
 
     std::cout << "Positions " << std::endl;
     const int num_points = 20;

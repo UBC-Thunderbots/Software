@@ -3,12 +3,17 @@
 #include <cmath>
 
 #include "software/geom/algorithms/is_in_range.h"
+#include "software/logger/logger.h"
 
 void BangBangTrajectory1D::generate(double initial_pos, double final_pos,
                                     double initial_vel, double max_vel, double max_accel,
                                     double max_decel)
 {
     trajectory_parts.clear();
+
+    CHECK(max_vel != 0) << "Max velocity cannot be 0";
+    CHECK(max_accel != 0) << "Max acceleration cannot be 0";
+    CHECK(max_decel != 0) << "Max deceleration cannot be 0";
 
     // Unify the signs of the parameters
     max_accel = std::abs(max_accel);

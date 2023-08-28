@@ -44,6 +44,7 @@ cc_library(
     deps = [
         ":itrajectory",
         "//software/geom/algorithms:is_in_range",
+        "//software/logger",
     ],
 )
 
