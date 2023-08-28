@@ -12,8 +12,9 @@ class BangBangTrajectory2DTest : public testing::Test
 
 TEST_F(BangBangTrajectory2DTest, test1)
 {
-    traj.generate(Point(0, 0), Point(1, 3), Vector(3.0, 0.0), 3, 3, 6);
+    traj.generate(Point(0, 0), Point(3, 3), Vector(0.0, 0.0), 3, 3, 3);
 
+    std::cout << "Positions " << std::endl;
     const int num_points = 20;
     for (int i = 0; i <= num_points; ++i)
     {
@@ -21,4 +22,25 @@ TEST_F(BangBangTrajectory2DTest, test1)
         std::cout << pos << ",";
     }
     std::cout << std::endl;
+
+
+    std::cout << "XY vel" << std::endl;
+    for (int i = 0; i <= num_points; ++i)
+    {
+        double time = i * traj.getTotalTime().toSeconds() / num_points;
+        Vector vel = traj.getVelocity(Duration::fromSeconds(time));
+        std::cout << Point(time, vel.length()) << ",";
+    }
+    std::cout << std::endl;
+
+    std::cout << "XY accel" << std::endl;
+    for (int i = 0; i <= num_points; ++i)
+    {
+        double time = i * traj.getTotalTime().toSeconds() / num_points;
+        Vector acc = traj.getAcceleration(Duration::fromSeconds(time));
+        std::cout << Point(time, acc.length()) << ",";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Total time: " << traj.getTotalTime().toSeconds() << std::endl;
 }

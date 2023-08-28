@@ -2,6 +2,14 @@
 
 #include "software/time/duration.h"
 
+/**
+ * A trajectory is a path that is parameterized by time. It is a function that
+ * takes in a time and returns a position, velocity, and acceleration.
+ *
+ * @tparam P The type of position
+ * @tparam V The type of velocity
+ * @tparam A The type of acceleration
+ */
 template <class P, class V, class A>
 class ITrajectory
 {
@@ -45,8 +53,7 @@ class ITrajectory
 
     /**
      * Get the final desired destination
-     * @return the next destination, if this trajectory is divided into multiple
-     * subtract-paths
+     * @return The position which the trajectory ends at
      */
     P getDestination() const
     {
