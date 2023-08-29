@@ -27,12 +27,15 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
         y_trajectory.generate(initial_pos.y(), final_pos.y(), initial_vel.y(),
                               max_vel * sin, max_accel * sin, max_decel * sin);
 
-        std::cout << "max_accel mag: "
-                  << Vector(max_accel * cos, max_accel * sin).length() << std::endl;
-        std::cout << "max_decel mag: "
-                  << Vector(max_decel * cos, max_decel * sin).length() << std::endl;
-        std::cout << "max_decel + max_accel mag: "
-                  << Vector(max_accel * cos, max_decel * sin).length() << std::endl;
+        //        std::cout << "max_accel mag: "
+        //                  << Vector(max_accel * cos, max_accel * sin).length() <<
+        //                  std::endl;
+        //        std::cout << "max_decel mag: "
+        //                  << Vector(max_decel * cos, max_decel * sin).length() <<
+        //                  std::endl;
+        //        std::cout << "max_decel + max_accel mag: "
+        //                  << Vector(max_accel * cos, max_decel * sin).length() <<
+        //                  std::endl;
 
         const Duration x_time = x_trajectory.getTotalTime();
         const Duration y_time = y_trajectory.getTotalTime();
@@ -62,7 +65,7 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
     for (const auto& part : x_trajectory.getTrajectoryParts())
     {
         std::cout << Point(time, part.velocity) << ",";
-        time += part.end_time.toSeconds();
+        time = part.end_time.toSeconds();
     }
     std::cout << Point(time, 0.0) << ",";
     std::cout << std::endl;
@@ -73,7 +76,7 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
     for (const auto& part : y_trajectory.getTrajectoryParts())
     {
         std::cout << Point(time, part.velocity) << ",";
-        time += part.end_time.toSeconds();
+        time = part.end_time.toSeconds();
     }
     std::cout << Point(time, 0.0) << ",";
     std::cout << std::endl;
