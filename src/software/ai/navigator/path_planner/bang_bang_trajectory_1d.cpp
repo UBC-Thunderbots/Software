@@ -53,7 +53,7 @@ void BangBangTrajectory1D::generate(double initial_pos, double final_pos,
         trajectory_parts.push_back({.end_time     = time_to_stop,
                                     .position     = initial_pos,
                                     .velocity     = initial_vel,
-                                    .acceleration = -max_decel});
+                                    .acceleration = -std::copysign(max_decel, initial_vel)});
 
         double triangular_pos =
             triangularProfileStopPosition(stop_pos, 0, max_vel, max_accel, max_decel);
