@@ -166,7 +166,9 @@ TEST_F(BangBangTrajectory1DTest,
     EXPECT_TRUE(
         TestUtil::equalWithinTolerance(11.0, traj.getTotalTime().toSeconds(), 0.001));
 
-    verifyPartState(0, 2.0, initial_pos, initial_vel, max_decel);
+    // We're decelerating in the positive direction (i.e. velocity is increasing,
+    // from -2 to 0).
+    verifyPartState(0, 2.0, initial_pos, initial_vel, -max_decel);
     verifyPartState(1, 4.0, 3.0, 0, max_accel);
     verifyPartState(2, 7.0, 7.0, max_vel, 0.0);
     verifyPartState(3, 11.0, 19.0, max_vel, max_decel);
@@ -279,7 +281,9 @@ TEST_F(BangBangTrajectory1DTest,
     EXPECT_TRUE(
         TestUtil::equalWithinTolerance(8.0, traj.getTotalTime().toSeconds(), 0.001));
 
-    verifyPartState(0, 2.0, initial_pos, initial_vel, max_decel);
+    // We're decelerating in the positive direction (i.e. velocity is increasing,
+    // from -2 to 0).
+    verifyPartState(0, 2.0, initial_pos, initial_vel, -max_decel);
     verifyPartState(1, 4.0, 3.0, 0, max_accel);
     verifyPartState(2, 8.0, 7.0, 4.0, max_decel);
     verifyFinalState(destination, max_decel);
@@ -316,7 +320,7 @@ TEST_F(BangBangTrajectory1DTest,
     verifyFinalState(destination, max_decel);
 }
 
-TEST_F(BangBangTrajectory1DTest, test_already_at_destination)
+TEST_F(BangBangTrajectory1DTest, already_at_destination)
 {
     double initial_pos = 0;
     double destination = 0;

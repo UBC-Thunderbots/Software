@@ -27,21 +27,10 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
         y_trajectory.generate(initial_pos.y(), final_pos.y(), initial_vel.y(),
                               max_vel * sin, max_accel * sin, max_decel * sin);
 
-        //        std::cout << "max_accel mag: "
-        //                  << Vector(max_accel * cos, max_accel * sin).length() <<
-        //                  std::endl;
-        //        std::cout << "max_decel mag: "
-        //                  << Vector(max_decel * cos, max_decel * sin).length() <<
-        //                  std::endl;
-        //        std::cout << "max_decel + max_accel mag: "
-        //                  << Vector(max_accel * cos, max_decel * sin).length() <<
-        //                  std::endl;
-
         const Duration x_time = x_trajectory.getTotalTime();
         const Duration y_time = y_trajectory.getTotalTime();
         if (std::abs((x_time - y_time).toSeconds()) < TRAJ_ACCURACY_TOLERANCE_SEC)
         {
-            std::cout << "time diff: " << (x_time - y_time).toSeconds() << std::endl;
             break;
         }
 

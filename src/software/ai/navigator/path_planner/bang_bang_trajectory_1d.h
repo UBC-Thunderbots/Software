@@ -147,12 +147,13 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
      * is positive
      * @param max_decel The maximum deceleration the trajectory could have. Assumes value
      * is positive
+     * @param direction Direction of the trajectory. 1 for moving in the positive direction,
+     * -1 for moving in the negative direction
      * @return The final position of the robot after a triangular profile trajectory to
      * the max velocity
      */
-    inline double triangularProfileStopPosition(double initial_pos, double initial_vel,
-                                                double max_vel, double max_accel,
-                                                double max_decel) const;
+    inline double triangularProfileStopPosition(double initial_pos, double initial_vel, double max_vel,
+                                                double max_accel, double max_decel, double direction) const;
 
     /**
      * Get the index of `trajectory_parts` that the robot is at at time t

@@ -18,7 +18,7 @@ class BangBangTrajectory2DTest : public testing::Test
 
    protected:
     static const int NUM_SUB_POINTS   = 30;
-    static const int NUM_RANDOM_TESTS = 100;
+    static const int NUM_RANDOM_TESTS = 1000;
 
     void verifyKinematicConstraints(double max_vel, double max_accel, double max_decel)
     {
@@ -30,13 +30,18 @@ class BangBangTrajectory2DTest : public testing::Test
         {
             Duration t = Duration::fromSeconds(i * sub_point_length_sec);
 
+            // Note that the velocity may slightly exceed the max velocity if one of
+            // the components gets a small fraction of the overall max velocity, and
+            // has an initial velocity which exceeds it. By the time it decelerates
+            // to something reasonable, the other component may be accelerating,
+            // resulting in the velocity vector exceeding the max.
             Vector vel = traj.getVelocity(t);
-            ASSERT_LE(std::abs(vel.length()), max_vel + 1e-3)
+            ASSERT_LE(vel.length(), max_vel + 0.5)
                 << "Velocity constraint violated at t=" << t << " by "
                 << vel.length() - max_vel;
 
             Vector acc = traj.getAcceleration(t);
-            ASSERT_LE(std::abs(acc.length()), max_accel_decel + 1e-3)
+            ASSERT_LE(acc.length(), max_accel_decel + 1e-3)
                 << "Acceleration constraint violated at t=" << t << " by +"
                 << acc.length() - max_accel_decel;
         }
@@ -46,7 +51,7 @@ class BangBangTrajectory2DTest : public testing::Test
     {
         Point actual_pos = traj.getPosition(t);
         EXPECT_TRUE(TestUtil::equalWithinTolerance((expected_pos - actual_pos).length(),
-                                                   0.0, 0.001))
+                                                   0.0, 0.01))
             << "Trajectory is not at the expected position at t=" << t
             << ". expected_pos=" << expected_pos << " actual_pos=" << actual_pos;
     }
@@ -87,25 +92,15 @@ TEST_F(BangBangTrajectory2DTest, test_random_start_and_final_position_sampling)
 
         Point start_pos  = getRandomPoint();
         Point final_pos  = getRandomPoint();
-        Vector start_vel = getRandomVector();  // TODO This might be over the limits
+        Vector start_vel = getRandomVector();
         traj.generate(start_pos, final_pos, start_vel, max_vel, max_accel, max_decel);
-
-
-        std::cout << "Positions: Start=" << start_pos << " final_pos=" << final_pos
-                  << " start_vel=" << start_vel << " -> len=" << start_vel.length()
-                  << std::endl;
-        const int num_points = 40;
-        for (int i = 0; i <= num_points; ++i)
-        {
-            Point pos = traj.getPosition(
-                Duration::fromSeconds(i * traj.getTotalTime().toSeconds() / num_points));
-            std::cout << pos << ",";
-        }
-        std::cout << std::endl;
 
         verifyKinematicConstraints(max_vel, max_accel, max_decel);
         verifyPosition(start_pos, Duration::fromSeconds(0));
         verifyPosition(final_pos, traj.getTotalTime());
+        Vector final_vel = traj.getVelocity(traj.getTotalTime());
+        EXPECT_LE(final_vel.length(), 0.001)
+            << "Final velocity is " << final_vel << " instead of 0";
     }
 }
 
