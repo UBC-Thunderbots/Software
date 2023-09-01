@@ -1,16 +1,21 @@
 #pragma once
 
 #include "software/ai/navigator/path_planner/trajectory_path_node.h"
+#include "software/ai/navigator/path_planner/kinematic_constraints.h"
 
 /**
  * TrajectoryPath represents a list of 2D trajectories that are connected end-to-end
  * to form a path. A TrajectoryNode is a 2D trajectory and the time at which it ends
  * and the next TrajectoryNode begins.
  */
-class TrajectoryPath : public ITrajectory<Point, Vector, Vector>
+class TrajectoryPath : public Trajectory<Point, Vector, Vector>
 {
 public:
-    TrajectoryPath() = default;
+    TrajectoryPath() = delete;
+
+    TrajectoryPath(const BangBangTrajectory2D& initial_trajectory);
+
+    void append(const KinematicConstraints& constraints, Duration connection_time, const Point& destination);
 
     /**
      * Get the position at time t of this trajectory path

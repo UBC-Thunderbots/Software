@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "software/ai/navigator/path_planner/itrajectory.h"
+#include "software/ai/navigator/path_planner/trajectory.h"
 
-class BangBangTrajectory1D : public ITrajectory<double, double, double>
+class BangBangTrajectory1D : public Trajectory<double, double, double>
 {
    public:
     /**

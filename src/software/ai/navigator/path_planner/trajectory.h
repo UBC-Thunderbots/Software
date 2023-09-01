@@ -11,10 +11,10 @@
  * @tparam A The type of acceleration
  */
 template <class P, class V, class A>
-class ITrajectory
+class Trajectory
 {
    public:
-    virtual ~ITrajectory() = default;
+    virtual ~Trajectory() = default;
 
     /**
      * Get position at time t

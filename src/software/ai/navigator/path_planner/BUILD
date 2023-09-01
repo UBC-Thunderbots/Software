@@ -30,8 +30,14 @@ cc_library(
 )
 
 cc_library(
-    name = "itrajectory",
-    hdrs = ["itrajectory.h"],
+    name = "kinematic_constraints",
+    srcs = ["kinematic_constraints.cpp"],
+    hdrs = ["kinematic_constraints.h"],
+)
+
+cc_library(
+    name = "trajectory",
+    hdrs = ["trajectory.h"],
     deps = [
         "//software/time:duration",
     ],
@@ -42,7 +48,7 @@ cc_library(
     srcs = ["bang_bang_trajectory_1d.cpp"],
     hdrs = ["bang_bang_trajectory_1d.h"],
     deps = [
-        ":itrajectory",
+        ":trajectory",
         "//software/geom/algorithms:is_in_range",
         "//software/logger",
     ],
@@ -85,6 +91,26 @@ cc_library(
     hdrs = ["trajectory_path.h"],
     deps = [
         ":trajectory_path_node",
+        "//software/logger",
+    ],
+)
+
+cc_library(
+    name = "trajectory_path_with_cost",
+    srcs = ["trajectory_path_with_cost.cpp"],
+    hdrs = ["trajectory_path_with_cost.h"],
+    deps = [
+        ":trajectory_path",
+    ],
+)
+
+cc_library(
+    name = "trajectory_planner",
+    srcs = ["trajectory_planner.cpp"],
+    hdrs = ["trajectory_planner.h"],
+    deps = [
+        ":kinematic_constraints",
+        ":trajectory_path",
     ],
 )
 

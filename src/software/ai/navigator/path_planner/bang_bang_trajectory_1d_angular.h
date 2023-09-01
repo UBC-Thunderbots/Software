@@ -5,7 +5,7 @@
 #include "software/geom/angular_velocity.h"
 #include "software/geom/angular_acceleration.h"
 
-class BangBangTrajectory1DAngular : public ITrajectory<Angle, AngularVelocity, AngularAcceleration>
+class BangBangTrajectory1DAngular : public Trajectory<Angle, AngularVelocity, AngularAcceleration>
 {
    public:
     BangBangTrajectory1DAngular() = default;

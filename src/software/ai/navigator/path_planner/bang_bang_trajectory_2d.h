@@ -3,10 +3,14 @@
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d.h"
 #include "software/geom/point.h"
 
-class BangBangTrajectory2D : public ITrajectory<Point, Vector, Vector>
+class BangBangTrajectory2D : public Trajectory<Point, Vector, Vector>
 {
    public:
     BangBangTrajectory2D() = default;
+
+    BangBangTrajectory2D(const Point& initial_pos, const Point& final_pos,
+                         const Vector& initial_vel, double max_vel, double max_accel,
+                         double max_decel);
 
     /**
      * Generate a 2D trajectory from the initial position to the final position with the
@@ -65,5 +69,5 @@ class BangBangTrajectory2D : public ITrajectory<Point, Vector, Vector>
 
     // The maximum difference the x and y trajectory runtimes could have from each other
     // in seconds
-    const double TRAJ_ACCURACY_TOLERANCE_SEC = 0.01;
+    static constexpr double TRAJ_ACCURACY_TOLERANCE_SEC = 0.01;
 };
