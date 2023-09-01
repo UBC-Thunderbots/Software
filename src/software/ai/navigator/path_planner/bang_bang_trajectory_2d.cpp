@@ -48,27 +48,6 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
 
         increment /= 2.0;
     }
-
-    std::cout << "X vel" << std::endl;
-    double time = 0;
-    for (const auto& part : x_trajectory.getTrajectoryParts())
-    {
-        std::cout << Point(time, part.velocity) << ",";
-        time = part.end_time.toSeconds();
-    }
-    std::cout << Point(time, 0.0) << ",";
-    std::cout << std::endl;
-
-
-    std::cout << "Y vel" << std::endl;
-    time = 0;
-    for (const auto& part : y_trajectory.getTrajectoryParts())
-    {
-        std::cout << Point(time, part.velocity) << ",";
-        time = part.end_time.toSeconds();
-    }
-    std::cout << Point(time, 0.0) << ",";
-    std::cout << std::endl;
 }
 
 Point BangBangTrajectory2D::getPosition(Duration t) const
