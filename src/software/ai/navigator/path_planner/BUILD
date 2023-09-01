@@ -70,6 +70,24 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "trajectory_path_node",
+    hdrs = ["trajectory_path_node.h"],
+    deps = [
+        ":bang_bang_trajectory_2d",
+        "//software/geom:point",
+    ],
+)
+
+cc_library(
+    name = "trajectory_path",
+    srcs = ["trajectory_path.cpp"],
+    hdrs = ["trajectory_path.h"],
+    deps = [
+        ":trajectory_path_node",
+    ],
+)
+
 cc_test(
     name = "bang_bang_trajectory_1d_test",
     srcs = ["bang_bang_trajectory_1d_test.cpp"],

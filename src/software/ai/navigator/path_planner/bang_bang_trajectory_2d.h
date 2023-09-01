@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d.h"
 #include "software/geom/point.h"
 
