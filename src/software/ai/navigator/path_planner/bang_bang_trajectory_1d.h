@@ -15,13 +15,16 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
      */
     struct TrajectoryPart
     {
-        Duration end_time;
-        double position;
-        double velocity;
-        double acceleration;
+        Duration end_time = Duration::fromSeconds(0);
+        double position = 0;
+        double velocity = 0;
+        double acceleration = 0;
     };
 
-    BangBangTrajectory1D() = default;
+    /**
+     * Constructor
+     */
+    BangBangTrajectory1D();
 
     /**
      * Generate a 1D trajectory from the initial position to the final position with the

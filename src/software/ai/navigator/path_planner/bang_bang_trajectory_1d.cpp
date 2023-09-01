@@ -5,6 +5,13 @@
 #include "software/geom/algorithms/is_in_range.h"
 #include "software/logger/logger.h"
 
+BangBangTrajectory1D::BangBangTrajectory1D()
+{
+    // Add a default trajectory part to avoid segfaults
+    // when the getters are called before generate
+    trajectory_parts.push_back(TrajectoryPart());
+}
+
 void BangBangTrajectory1D::generate(double initial_pos, double final_pos,
                                     double initial_vel, double max_vel, double max_accel,
                                     double max_decel)
