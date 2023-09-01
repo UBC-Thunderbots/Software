@@ -12,7 +12,7 @@ class BangBangTrajectory2DTest : public testing::Test
     // Use a fixed seed for the random number generator so that the tests are
     // deterministic
     BangBangTrajectory2DTest()
-        : rng(0), pos_uniform_dist(-10, 10), vel_uniform_dist(-2, 2)
+        : rng(1010), pos_uniform_dist(-10, 10), vel_uniform_dist(-2, 2)
     {
     }
 
@@ -106,7 +106,7 @@ TEST_F(BangBangTrajectory2DTest, test_random_start_and_final_position_sampling)
 
 TEST_F(BangBangTrajectory2DTest, test1)
 {
-    traj.generate(Point(0, 0), Point(0, 0), Vector(0.0, 0.0), 1, 1, 1);
+    traj.generate(Point(0, 0), Point(3, 3), Vector(5.0, 0.0), 3, 3, 6);
 
     std::cout << "Positions " << std::endl;
     const int num_points = 20;

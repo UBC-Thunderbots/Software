@@ -66,7 +66,7 @@ class BangBangTrajectory1D : public ITrajectory<double, double, double>
     /**
      * Get total runtime of trajectory
      *
-     * @return total time for trajectory in seconds
+     * @return total time for trajectory
      */
     Duration getTotalTime() const override;
 

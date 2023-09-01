@@ -46,7 +46,7 @@ class ITrajectory
     /**
      * Get total runtime of trajectory
      *
-     * @return total time for trajectory in seconds
+     * @return total time for trajectory
      */
     virtual Duration getTotalTime() const = 0;
 
