@@ -23,6 +23,9 @@ Agent::Agent(RobotId robot_id, const RobotState &robot_state, const RobotPath &p
 
 void Agent::update(Duration time_step)
 {
+    // TODO: Could comment this out and trust the trajectory planner...
+//    setVelocity(new_velocity);
+//
     if (new_velocity.length() >= max_speed)
     {
         // New velocity can not be greater than max speed
@@ -52,7 +55,7 @@ void Agent::update(Duration time_step)
         // acceleration constraint
         setVelocity(velocity + dv.normalize(acceleration_limit * time_step.toSeconds()));
     }
-    position = position + (velocity * time_step.toSeconds());
+//    position = position + (velocity * time_step.toSeconds());
 
     const std::optional<PathPoint> &path_point = path.getCurrentPathPoint();
 

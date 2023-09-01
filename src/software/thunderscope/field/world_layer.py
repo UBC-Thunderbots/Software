@@ -24,7 +24,7 @@ MAX_ALLOWED_KICK_SPEED_M_PER_S = 6.5
 
 
 class WorldLayer(FieldLayer):
-    def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=5):
+    def __init__(self, simulator_io, friendly_colour_yellow, buffer_size=1):
         """The WorldLayer
 
         :param simulator_io: The simulator io communicate with the simulator

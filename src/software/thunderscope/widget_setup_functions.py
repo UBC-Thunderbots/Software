@@ -93,7 +93,7 @@ def setup_field_widget(
     for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
         hrvo_sim_state = hrvo_layer.HRVOLayer(robot_id, visualization_buffer_size)
         hrvo_sim_states.append(hrvo_sim_state)
-        field.add_layer(f"HRVO {robot_id}", hrvo_sim_state, False)
+        field.add_layer(f"HRVO {robot_id}", hrvo_sim_state, True)
 
     # Register observers
     sim_proto_unix_io.register_observer(

@@ -105,6 +105,13 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         }
     }
     this->path = path;
+
+    auto path_point_opt = path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
+    Point destination  = path_point_opt.getPosition();
+    position_traj.generate(position, destination, velocity, max_speed, max_accel, max_decel);
+    angular_traj.generate(orientation, path_point_opt.getOrientation(), angular_velocity,
+                          AngularVelocity::fromRadians(max_angular_speed), AngularAcceleration::fromRadians(max_angular_accel), AngularAcceleration::fromRadians(max_angular_accel));
+    last_traj_update_time = std::chrono::steady_clock::now();
 }
 
 std::vector<RobotId> HRVOAgent::computeNeighbors(
@@ -263,45 +270,52 @@ VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
 
 void HRVOAgent::computeNewAngularVelocity(Duration time_step)
 {
-    auto path_point_opt = path.getCurrentPathPoint();
-    if (!path_point_opt.has_value())
-    {
-        angular_velocity = AngularVelocity::fromRadians(0);
-        return;
-    }
-
-    const Angle dest_orientation = path_point_opt.value().getOrientation();
-    const double signed_delta_orientation =
-        (dest_orientation - orientation).clamp().toRadians();
-
-    // PID controller
-    const double pid_output              = signed_delta_orientation * ANGULAR_VELOCITY_KP;
-    AngularVelocity pid_angular_velocity = AngularVelocity::fromRadians(pid_output);
-
-    // Clamp acceleration
-    double delta_angular_velocity = (pid_angular_velocity - angular_velocity).toRadians();
-    const double max_accel        = max_angular_accel * time_step.toSeconds();
-    const double clamped_delta_angular_velocity =
-        std::clamp(delta_angular_velocity, -max_accel, max_accel);
-
-    // Clamp velocity
-    const double desired_output =
-        angular_velocity.toRadians() + clamped_delta_angular_velocity;
-    const double max_angular_vel = static_cast<double>(max_angular_speed);
-    AngularVelocity desired      = AngularVelocity::fromRadians(
-        std::clamp(desired_output, -max_angular_vel, max_angular_vel));
-
-    // Update orientation, assuming constant acceleration between
-    // current and desired angular velocity
-    orientation += ((angular_velocity + desired) / 2) * time_step.toSeconds();
-
-    angular_velocity = desired;
+//    auto path_point_opt = path.getCurrentPathPoint();
+//    if (!path_point_opt.has_value())
+//    {
+//        angular_velocity = AngularVelocity::fromRadians(0);
+//        return;
+//    }
+//
+//    const Angle dest_orientation = path_point_opt.value().getOrientation();
+//    const double signed_delta_orientation =
+//        (dest_orientation - orientation).clamp().toRadians();
+//
+//    // PID controller
+//    const double pid_output              = signed_delta_orientation * ANGULAR_VELOCITY_KP;
+//    AngularVelocity pid_angular_velocity = AngularVelocity::fromRadians(pid_output);
+//
+//    // Clamp acceleration
+//    double delta_angular_velocity = (pid_angular_velocity - angular_velocity).toRadians();
+//    const double max_accel        = max_angular_accel * time_step.toSeconds();
+//    const double clamped_delta_angular_velocity =
+//        std::clamp(delta_angular_velocity, -max_accel, max_accel);
+//
+//    // Clamp velocity
+//    const double desired_output =
+//        angular_velocity.toRadians() + clamped_delta_angular_velocity;
+//    const double max_angular_vel = static_cast<double>(max_angular_speed);
+//    AngularVelocity desired      = AngularVelocity::fromRadians(
+//        std::clamp(desired_output, -max_angular_vel, max_angular_vel));
+//
+//    // Update orientation, assuming constant acceleration between
+//    // current and desired angular velocity
+//    orientation += ((angular_velocity + desired) / 2) * time_step.toSeconds();
+//
+//    angular_velocity = desired;
 }
 
 
 void HRVOAgent::computeNewVelocity(
     const std::map<unsigned int, std::shared_ptr<Agent>> &agents, Duration time_step)
 {
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    long time_since_traj_start_us = std::chrono::duration_cast<std::chrono::microseconds>(now - last_traj_update_time).count();
+    new_velocity = position_traj.getVelocity(time_step + Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) * MILLISECONDS_PER_MICROSECOND));
+    angular_velocity = angular_traj.getVelocity(time_step + Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) * MILLISECONDS_PER_MICROSECOND));
+
+    return;
+
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
 
@@ -720,35 +734,45 @@ std::vector<VelocityObstacle> HRVOAgent::getVelocityObstacles()
 void HRVOAgent::visualize(TeamColour friendly_team_colour)
 {
     TbotsProto::HRVOVisualization hrvo_visualization;
-
-    // Visualize this agent
+//
+//    // Visualize this agent
     *(hrvo_visualization.add_robots()) = *createCircleProto(Circle(position, radius));
-
-    // Visualize all neighbours
-    for (const auto &robot : neighbours)
-    {
-        *(hrvo_visualization.add_robots()) =
-            *createCircleProto(Circle(robot->getPosition(), robot->getRadius()));
-    }
-
-    std::vector<TbotsProto::VelocityObstacle> vo_protos;
-    for (const VelocityObstacle &vo : getVelocityObstacles())
-    {
-        vo_protos.emplace_back(
-            *createVelocityObstacleProto(vo, getPosition().toVector()));
-    }
+//
+//    // Visualize all neighbours
+//    for (const auto &robot : neighbours)
+//    {
+//        *(hrvo_visualization.add_robots()) =
+//            *createCircleProto(Circle(robot->getPosition(), robot->getRadius()));
+//    }
+//
+//    std::vector<TbotsProto::VelocityObstacle> vo_protos;
+//    for (const VelocityObstacle &vo : getVelocityObstacles())
+//    {
+//        vo_protos.emplace_back(
+//            *createVelocityObstacleProto(vo, getPosition().toVector()));
+//    }
     hrvo_visualization.set_robot_id(robot_id);
+//
+//    *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
+//                                                          vo_protos.end()};
+//
+//    // Visualize the ball obstacle
+//    if (ball_obstacle.has_value())
+//    {
+//        TbotsProto::Circle ball_circle =
+//            ball_obstacle.value()->createObstacleProto().circle()[0];
+//        *(hrvo_visualization.add_robots()) = ball_circle;
+//    }
 
-    *(hrvo_visualization.mutable_velocity_obstacles()) = {vo_protos.begin(),
-                                                          vo_protos.end()};
-
-    // Visualize the ball obstacle
-    if (ball_obstacle.has_value())
+    TbotsProto::Path path_proto;
+    const int num_points = 18;
+    for (int j = 0; j <= num_points; ++j)
     {
-        TbotsProto::Circle ball_circle =
-            ball_obstacle.value()->createObstacleProto().circle()[0];
-        *(hrvo_visualization.add_robots()) = ball_circle;
+        Point pos = position_traj.getPosition(
+                Duration::fromSeconds(j * position_traj.getTotalTime().toSeconds() / num_points));
+        *(path_proto.add_points()) = *createPointProto(pos);
     }
+    *(hrvo_visualization.mutable_trajectory()) = path_proto;
 
     // TODO (#2838): For HRVOVisualization logs to be sent properly from the robot, no
     // path should be passed as a second argument to LOG

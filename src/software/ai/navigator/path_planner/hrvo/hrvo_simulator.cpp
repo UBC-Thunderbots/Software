@@ -38,6 +38,7 @@ void HRVOSimulator::updateWorld(const World &world,
                 // We do not want velocity feedback for the robot which is running
                 // this HRVO simulator as it prevents it from being able to accelerate
                 // at its maximum acceleration.
+//                hrvo_agent->second->setVelocity(friendly_robot.velocity());
                 hrvo_agent->second->setPosition(friendly_robot.position());
                 hrvo_agent->second->setOrientation(friendly_robot.orientation());
             }

@@ -301,7 +301,6 @@ TEST_F(BangBangTrajectory1DTest,
     double max_vel   = 20;
     double max_accel = -2;
     double max_decel = 1;
-
     traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
     const auto& parts = traj.getTrajectoryParts();
     EXPECT_EQ(parts.size(), 3);

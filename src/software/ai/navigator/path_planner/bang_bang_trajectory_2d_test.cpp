@@ -103,39 +103,3 @@ TEST_F(BangBangTrajectory2DTest, test_random_start_and_final_position_sampling)
             << "Final velocity is " << final_vel << " instead of 0";
     }
 }
-
-TEST_F(BangBangTrajectory2DTest, test1)
-{
-    traj.generate(Point(0, 0), Point(3, 3), Vector(5.0, 0.0), 3, 3, 6);
-
-    std::cout << "Positions " << std::endl;
-    const int num_points = 20;
-    for (int i = 0; i <= num_points; ++i)
-    {
-        Point pos = traj.getPosition(
-            Duration::fromSeconds(i * traj.getTotalTime().toSeconds() / num_points));
-        std::cout << pos << ",";
-    }
-    std::cout << std::endl;
-
-
-    std::cout << "XY vel" << std::endl;
-    for (int i = 0; i <= num_points; ++i)
-    {
-        double time = i * traj.getTotalTime().toSeconds() / num_points;
-        Vector vel  = traj.getVelocity(Duration::fromSeconds(time));
-        std::cout << Point(time, vel.length()) << ",";
-    }
-    std::cout << std::endl;
-
-    std::cout << "XY accel" << std::endl;
-    for (int i = 0; i <= num_points; ++i)
-    {
-        double time = i * traj.getTotalTime().toSeconds() / num_points;
-        Vector acc  = traj.getAcceleration(Duration::fromSeconds(time));
-        std::cout << Point(time, acc.length()) << ",";
-    }
-    std::cout << std::endl;
-
-    std::cout << "Total time: " << traj.getTotalTime().toSeconds() << std::endl;
-}

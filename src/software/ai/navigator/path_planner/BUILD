@@ -49,6 +49,18 @@ cc_library(
 )
 
 cc_library(
+    name = "bang_bang_trajectory_1d_angular",
+    srcs = ["bang_bang_trajectory_1d_angular.cpp"],
+    hdrs = ["bang_bang_trajectory_1d_angular.h"],
+    deps = [
+        ":bang_bang_trajectory_1d",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software/geom:angular_acceleration",
+    ],
+)
+
+cc_library(
     name = "bang_bang_trajectory_2d",
     srcs = ["bang_bang_trajectory_2d.cpp"],
     hdrs = ["bang_bang_trajectory_2d.h"],
