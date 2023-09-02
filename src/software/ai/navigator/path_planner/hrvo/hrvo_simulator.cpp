@@ -292,6 +292,7 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
     auto hrvo_agent = robots.find(robot_id);
     if (hrvo_agent != robots.end())
     {
+//        std::cout << "Robot id " << robot_id << " returned velocity: " << hrvo_agent->second->getVelocity() << std::endl;
         return hrvo_agent->second->getVelocity();
     }
     LOG(WARNING) << "Velocity for robot " << robot_id

@@ -50,13 +50,23 @@ TrajectoryPlanner::findTrajectory(const Point &start, const Point &destination, 
         }
     }
 
+    // TODO: This can probably be shared between all findTrajectory calls in the same tick.
+    //       Should create a wrapper which automatically creates this (and hides it) and stores the obstacles
+    aabb::Tree tree(2, 0.0, {false, false}, {navigable_area.xLength(), navigable_area.yLength()}, static_cast<unsigned int>(obstacles.size()), false);
+    for (unsigned int i = 0; i < obstacles.size(); i++)
+    {
+        Rectangle aabb = obstacles[i]->axisAlignedBoundingBox();
+        std::vector aabb_lower = {aabb.negXNegYCorner().x(), aabb.negXNegYCorner().y()};
+        std::vector aabb_upper = {aabb.posXPosYCorner().x(), aabb.posXPosYCorner().y()};
+        tree.insertParticle(i, aabb_lower, aabb_upper);
+    }
 
     // Find the trajectory with the lowest cost
     double lowest_cost = std::numeric_limits<double>::infinity();
     size_t lowest_cost_index = 0;
     for (size_t i = 0; i < possible_paths.size(); ++i)
     {
-        double cost = calculateCost(possible_paths[i], obstacles);
+        double cost = calculateCost(possible_paths[i], tree, obstacles);
         if (cost < lowest_cost)
         {
             lowest_cost = cost;
@@ -79,7 +89,7 @@ TrajectoryPlanner::findTrajectory(const Point &start, const Point &destination, 
 }
 
 double
-TrajectoryPlanner::calculateCost(const TrajectoryPath &trajectory_path, const std::vector<ObstaclePtr> &obstacles)
+TrajectoryPlanner::calculateCost(const TrajectoryPath &trajectory_path, aabb::Tree& obstacle_tree, const std::vector<ObstaclePtr> &obstacles)
 {
     double cost = trajectory_path.getTotalTime().toSeconds();
 
@@ -89,51 +99,44 @@ TrajectoryPlanner::calculateCost(const TrajectoryPath &trajectory_path, const st
     Duration earliest_collision_time = trajectory_path.getTotalTime() + Duration::fromSeconds(1);
     for (Duration time = Duration(); time < trajectory_path.getTotalTime(); time += COLLISION_CHECK_STEP_INTERVAL)
     {
-        bool collision_at_current_time = false;
-        for (const ObstaclePtr& obstacle : obstacles)
-        {
-            static long int collision_check_time = 0;
-            static int num_collision_checks = 0;
-            auto start_check_time = std::chrono::high_resolution_clock::now();
-            bool is_colliding = obstacle->contains(trajectory_path.getPosition(time));
-            auto end_check_time = std::chrono::high_resolution_clock::now();
-            collision_check_time += std::chrono::duration_cast<std::chrono::nanoseconds>(end_check_time - start_check_time).count();
-            num_collision_checks++;
-            if (num_collision_checks % 1000000 == 0)
-            {
-                std::cout << "Average collision check time: " << collision_check_time / num_collision_checks / 1000 << "us -> total: " << collision_check_time / 1000 << ", num checks: " << num_collision_checks << std::endl;
-            }
+        Point position = trajectory_path.getPosition(time);
+        std::vector aabb_lower = {position.x() - TRAJ_POSITION_AABB_RADIUS_METERS, position.y() - TRAJ_POSITION_AABB_RADIUS_METERS};
+        std::vector aabb_upper = {position.x() + TRAJ_POSITION_AABB_RADIUS_METERS, position.y() + TRAJ_POSITION_AABB_RADIUS_METERS};
+        aabb::AABB aabb(aabb_lower, aabb_upper);
+        std::vector<unsigned int> colliding_obstacle_indices = obstacle_tree.query(aabb);
 
-            if (is_colliding)
+        for (unsigned int obstacle_index : colliding_obstacle_indices)
+        {
+            // Do actual more expensive collision check
+            if (obstacles[obstacle_index]->contains(position))
             {
-                collision_at_current_time = true;
                 collision_found = true;
-                earliest_collision_time = time;
-                break;
+                if (time < earliest_collision_time)
+                {
+                    earliest_collision_time = time;
+                }
+
+                if (first_iteration)
+                {
+                    starts_in_collision = true;
+                }
             }
         }
 
-        if (first_iteration)
-        {
-            first_iteration = false;
-            if (collision_at_current_time)
-            {
-                starts_in_collision = true;
-            }
-        }
-        else if (starts_in_collision && !collision_at_current_time)
-        {
-            // We have exited the collision
-            starts_in_collision = false;
-            // TODO: Add cost depending on length of collision?!
-//            cost += time.toSeconds();
-        }
+        first_iteration = false;
+        // TODO: Add cost depending on length of collision?!
     }
 
     if (collision_found)
     {
         cost += PATH_WITH_COLLISION_COST;
         cost += (trajectory_path.getTotalTime() - earliest_collision_time).toSeconds();
+    }
+
+    if (starts_in_collision)
+    {
+        // TODO;
+        cost += 0.0;
     }
 
     return cost;

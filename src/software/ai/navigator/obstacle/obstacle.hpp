@@ -15,6 +15,7 @@
 #include "software/geom/algorithms/rasterize.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
+#include "software/geom/algorithms/axis_aligned_bounding_box.h"
 
 /**
  * An obstacle is an area to avoid for navigation
@@ -65,6 +66,11 @@ class Obstacle
                                                       const Vector&) const = 0;
 
     /**
+     * Create the axis aligned bounding box for this obstacle
+     */
+    virtual Rectangle axisAlignedBoundingBox(const double = 0) const = 0;
+
+    /**
      * Output string to describe the obstacle
      *
      * @return string that describes the obstacle
@@ -106,6 +112,7 @@ class GeomObstacle : public Obstacle
     double distance(const Point& p) const override;
     bool intersects(const Segment& segment) const override;
     TbotsProto::Obstacles createObstacleProto() const override;
+    Rectangle axisAlignedBoundingBox(double inflation_radius = 0) const override;
     std::string toString(void) const override;
     void accept(ObstacleVisitor& visitor) const override;
     std::vector<Point> rasterize(const double resolution_size) const override;
@@ -122,7 +129,6 @@ class GeomObstacle : public Obstacle
    private:
     GEOM_TYPE geom_;
 };
-
 
 /**
  * We use a pointer to Obstacle to support inheritance
@@ -184,6 +190,12 @@ VelocityObstacle GeomObstacle<GEOM_TYPE>::generateVelocityObstacle(
     const Circle& robot, const Vector& obstacle_velocity) const
 {
     return ::generateVelocityObstacle(geom_, robot, obstacle_velocity);
+}
+
+template<typename GEOM_TYPE>
+Rectangle GeomObstacle<GEOM_TYPE>::axisAlignedBoundingBox(const double inflation_radius) const
+{
+    return ::axisAlignedBoundingBox(geom_, inflation_radius);
 }
 
 template <typename GEOM_TYPE>

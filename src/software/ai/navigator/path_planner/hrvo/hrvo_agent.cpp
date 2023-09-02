@@ -17,8 +17,8 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
 {
     // Reinitialize obstacle factory with a custom inflation factor
     auto obstacle_config = TbotsProto::RobotNavigationObstacleConfig();
-    obstacle_config.set_robot_obstacle_inflation_factor(
-        HRVO_STATIC_OBSTACLE_INFLATION_FACTOR);
+//    obstacle_config.set_robot_obstacle_inflation_factor(
+//        HRVO_STATIC_OBSTACLE_INFLATION_FACTOR); // Removed for now
     obstacle_factory = RobotNavigationObstacleFactory(obstacle_config);
 }
 
@@ -107,7 +107,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 
         auto path_point_opt = path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
         Point destination  = path_point_opt.getPosition();
-//    position_traj.generate(position, destination, velocity, max_speed, max_accel, max_decel);
+        position_traj.generate(position, destination, velocity, max_speed, max_accel, max_decel);
         angular_traj.generate(orientation, path_point_opt.getOrientation(), angular_velocity,
                               AngularVelocity::fromRadians(max_angular_speed), AngularAcceleration::fromRadians(max_angular_accel), AngularAcceleration::fromRadians(max_angular_accel));
 
@@ -326,9 +326,10 @@ void HRVOAgent::computeNewVelocity(
 {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     long time_since_traj_start_us = std::chrono::duration_cast<std::chrono::microseconds>(now - last_traj_update_time).count();
-    new_velocity = trajectory_path.getVelocity(time_step + Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) * MILLISECONDS_PER_MICROSECOND));
+    new_velocity = position_traj.getVelocity(time_step + Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) * MILLISECONDS_PER_MICROSECOND));
     angular_velocity = angular_traj.getVelocity(time_step + Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) * MILLISECONDS_PER_MICROSECOND));
 
+//    std::cout << "Robot id " << robot_id << " new velocity: " << new_velocity << std::endl;
     return;
 
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:

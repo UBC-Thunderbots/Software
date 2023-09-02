@@ -240,7 +240,7 @@ class HRVOAgent : public Agent
     Point prev_dynamic_kp_destination;
     double kp;
 
-//    BangBangTrajectory2D position_traj;
+    BangBangTrajectory2D position_traj;
     BangBangTrajectory1DAngular angular_traj;
     std::chrono::steady_clock::time_point last_traj_update_time;
 
