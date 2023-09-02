@@ -26,6 +26,7 @@
 #include "software/world/world.h"
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
+#include "software/ai/navigator/path_planner/trajectory_planner.h"
 
 
 class HRVOAgent : public Agent
@@ -239,9 +240,13 @@ class HRVOAgent : public Agent
     Point prev_dynamic_kp_destination;
     double kp;
 
-    BangBangTrajectory2D position_traj;
+//    BangBangTrajectory2D position_traj;
     BangBangTrajectory1DAngular angular_traj;
     std::chrono::steady_clock::time_point last_traj_update_time;
+
+
+    TrajectoryPlanner planner;
+    TrajectoryPath trajectory_path;
 
     // The maximum amount that the destination can be moved (in meters) before
     // we recalculate the dynamic kp value

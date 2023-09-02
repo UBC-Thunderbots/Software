@@ -92,6 +92,7 @@ cc_library(
     deps = [
         ":trajectory_path_node",
         "//software/logger",
+        "//software/ai/navigator/path_planner:kinematic_constraints",
     ],
 )
 
@@ -111,6 +112,7 @@ cc_library(
     deps = [
         ":kinematic_constraints",
         ":trajectory_path",
+        "//software/ai/navigator/obstacle:obstacle",
     ],
 )
 

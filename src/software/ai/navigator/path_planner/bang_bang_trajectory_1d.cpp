@@ -16,6 +16,11 @@ void BangBangTrajectory1D::generate(double initial_pos, double final_pos,
                                     double initial_vel, double max_vel, double max_accel,
                                     double max_decel)
 {
+//    static unsigned long int run = 0;
+//    if (run++ % 10000 == 0)
+//    {
+//        std::cout << run << std::endl;
+//    }
     trajectory_parts.clear();
 
     CHECK(max_vel != 0) << "Max velocity cannot be 0";

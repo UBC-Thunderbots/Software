@@ -41,7 +41,7 @@ cc_library(
         "//software/networking:threaded_proto_unix_sender",
         "//software/physics:velocity_conversion_util",
         "//software/world",
-        "//software/ai/navigator/path_planner:bang_bang_trajectory_2d",
+        "//software/ai/navigator/path_planner:trajectory_planner",
         "//software/ai/navigator/path_planner:bang_bang_trajectory_1d_angular",
     ],
 )

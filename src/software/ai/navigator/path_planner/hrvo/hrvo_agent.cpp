@@ -12,7 +12,8 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()),
       neighbours(),
       prev_dynamic_kp_destination(robot_state.position()),
-      kp(2.0)
+      kp(2.0),
+      trajectory_path(BangBangTrajectory2D())
 {
     // Reinitialize obstacle factory with a custom inflation factor
     auto obstacle_config = TbotsProto::RobotNavigationObstacleConfig();
@@ -103,15 +104,29 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             static_obstacles.push_back(
                 obstacle_factory.createFromBallPosition(world.ball().position()));
         }
+
+        auto path_point_opt = path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
+        Point destination  = path_point_opt.getPosition();
+//    position_traj.generate(position, destination, velocity, max_speed, max_accel, max_decel);
+        angular_traj.generate(orientation, path_point_opt.getOrientation(), angular_velocity,
+                              AngularVelocity::fromRadians(max_angular_speed), AngularAcceleration::fromRadians(max_angular_accel), AngularAcceleration::fromRadians(max_angular_accel));
+
+        std::vector<ObstaclePtr> obstacles = obstacle_factory.createStaticObstaclesFromMotionConstraints(motion_constraints, world.field());
+        for (const Robot& enemy : world.enemyTeam().getAllRobots())
+        {
+            obstacles.push_back(obstacle_factory.createFromRobotPosition(enemy.position()));
+        }
+        for (const Robot& friendly : world.friendlyTeam().getAllRobots())
+        {
+            if (friendly.id() != robot_id)
+            {
+                obstacles.push_back(obstacle_factory.createFromRobotPosition(friendly.position()));
+            }
+        }
+        trajectory_path = planner.findTrajectory(position, destination, velocity, KinematicConstraints(max_speed, max_accel, max_decel), obstacles, world.field().fieldLines());
+        last_traj_update_time = std::chrono::steady_clock::now();
     }
     this->path = path;
-
-    auto path_point_opt = path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
-    Point destination  = path_point_opt.getPosition();
-    position_traj.generate(position, destination, velocity, max_speed, max_accel, max_decel);
-    angular_traj.generate(orientation, path_point_opt.getOrientation(), angular_velocity,
-                          AngularVelocity::fromRadians(max_angular_speed), AngularAcceleration::fromRadians(max_angular_accel), AngularAcceleration::fromRadians(max_angular_accel));
-    last_traj_update_time = std::chrono::steady_clock::now();
 }
 
 std::vector<RobotId> HRVOAgent::computeNeighbors(
@@ -311,7 +326,7 @@ void HRVOAgent::computeNewVelocity(
 {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     long time_since_traj_start_us = std::chrono::duration_cast<std::chrono::microseconds>(now - last_traj_update_time).count();
-    new_velocity = position_traj.getVelocity(time_step + Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) * MILLISECONDS_PER_MICROSECOND));
+    new_velocity = trajectory_path.getVelocity(time_step + Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) * MILLISECONDS_PER_MICROSECOND));
     angular_velocity = angular_traj.getVelocity(time_step + Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) * MILLISECONDS_PER_MICROSECOND));
 
     return;
@@ -768,8 +783,8 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
     const int num_points = 18;
     for (int j = 0; j <= num_points; ++j)
     {
-        Point pos = position_traj.getPosition(
-                Duration::fromSeconds(j * position_traj.getTotalTime().toSeconds() / num_points));
+        Point pos = trajectory_path.getPosition(
+                Duration::fromSeconds(j * trajectory_path.getTotalTime().toSeconds() / num_points));
         *(path_proto.add_points()) = *createPointProto(pos);
     }
     *(hrvo_visualization.mutable_trajectory()) = path_proto;

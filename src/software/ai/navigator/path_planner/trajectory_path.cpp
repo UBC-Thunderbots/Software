@@ -7,7 +7,7 @@ TrajectoryPath::TrajectoryPath(const BangBangTrajectory2D &initial_trajectory)
 
 void TrajectoryPath::append(const KinematicConstraints &constraints, Duration connection_time, const Point& destination)
 {
-    for (int i = 0; i < traj_path.size(); i++)
+    for (size_t i = 0; i < traj_path.size(); i++)
     {
         if (connection_time <= traj_path[i].getTrajectoryEndTime())
         {
