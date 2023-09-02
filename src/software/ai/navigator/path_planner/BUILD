@@ -113,6 +113,7 @@ cc_library(
         ":kinematic_constraints",
         ":trajectory_path",
         "//software/ai/navigator/obstacle:obstacle",
+        "//extlibs/AABB:aabb_tree",
     ],
 )
 
