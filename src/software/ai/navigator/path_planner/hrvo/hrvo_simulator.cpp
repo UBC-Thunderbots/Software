@@ -217,33 +217,36 @@ void HRVOSimulator::doStep(Duration time_step)
     // loops are separated so that all robot fields that need to updated,
     // are updated separately. Otherwise, some robots would already be updated with new
     // velocity, while others aren't.
-    for (auto &robot : robots)
-    {
-        if (robot.first != robot_id)
-        {
-            return;
-        }
-        robot.second->computeNewAngularVelocity(time_step);
-    }
+    robots[robot_id]->computeNewAngularVelocity(time_step);
+//    for (auto &robot : robots)
+//    {
+////        if (robot.first != robot_id)
+////        {
+////            return;
+////        }
+//        robot.second->computeNewAngularVelocity(time_step);
+//    }
 
-    for (auto &robot : robots)
-    {
-        if (robot.first != robot_id)
-        {
-            return;
-        }
-        robot.second->computeNewVelocity(robots, time_step);
-    }
+    robots[robot_id]->computeNewVelocity(robots, time_step);
+//    for (auto &robot : robots)
+//    {
+////        if (robot.first != robot_id)
+////        {
+////            return;
+////        }
+//        robot.second->computeNewVelocity(robots, time_step);
+//    }
 
     // Update the positions of all agents given their velocity
-    for (auto &robot : robots)
-    {
-        if (robot.first != robot_id)
-        {
-            return;
-        }
-        robot.second->update(time_step);
-    }
+    robots[robot_id]->update(time_step);
+//    for (auto &robot : robots)
+//    {
+////        if (robot.first != robot_id)
+////        {
+////            return;
+////        }
+//        robot.second->update(time_step);
+//    }
 }
 
 void HRVOSimulator::visualize(unsigned int robot_id, TeamColour friendly_team_colour)
