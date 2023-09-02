@@ -2,6 +2,7 @@
 
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d.h"
 #include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 
 class BangBangTrajectory2D : public Trajectory<Point, Vector, Vector>
 {
@@ -62,6 +63,12 @@ class BangBangTrajectory2D : public Trajectory<Point, Vector, Vector>
      */
     Duration getTotalTime() const override;
 
+    // TODO: Test
+    /**
+     * Get the bounding box of the trajectory
+     * @return Rectangle which bounds the trajectory
+     */
+    Rectangle getBoundingBox() const;
 
    private:
     BangBangTrajectory1D x_trajectory;

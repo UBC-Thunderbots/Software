@@ -62,17 +62,17 @@ class PathLayer(FieldLayer):
         ]
 
         # Draw lines representing all paths
-        painter.setPen(self.path_pen)
-        for path in paths:
-            polygon_points = [
-                QtCore.QPoint(
-                    int(MILLIMETERS_PER_METER * point.x_meters),
-                    int(MILLIMETERS_PER_METER * point.y_meters),
-                )
-                for point in path.points
-            ]
-            poly = QtGui.QPolygon(polygon_points)
-            painter.drawPolyline(poly)
+        # painter.setPen(self.path_pen)
+        # for path in paths:
+        #     polygon_points = [
+        #         QtCore.QPoint(
+        #             int(MILLIMETERS_PER_METER * point.x_meters),
+        #             int(MILLIMETERS_PER_METER * point.y_meters),
+        #         )
+        #         for point in path.points
+        #     ]
+        #     poly = QtGui.QPolygon(polygon_points)
+        #     painter.drawPolyline(poly)
 
         # Draw outlines of robots representing the desired final position and orientation
         painter.setBrush(self.transparent_brush)

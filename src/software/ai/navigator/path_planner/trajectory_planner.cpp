@@ -93,6 +93,22 @@ TrajectoryPlanner::calculateCost(const TrajectoryPath &trajectory_path, aabb::Tr
 {
     double cost = trajectory_path.getTotalTime().toSeconds();
 
+    std::set<unsigned int> possible_collisions_indices;
+    for (const Rectangle& bounding_box : trajectory_path.getBoundingBoxes())
+    {
+        std::vector<unsigned int> bb_collisions = obstacle_tree.query(
+                aabb::AABB({bounding_box.negXNegYCorner().x(),
+                            bounding_box.negXNegYCorner().y()},
+                           {bounding_box.posXPosYCorner().x(),
+                            bounding_box.posXPosYCorner().y()}));
+        possible_collisions_indices.insert(bb_collisions.begin(), bb_collisions.end());
+    }
+
+    if (possible_collisions_indices.empty())
+    {
+        return cost;
+    }
+
     bool starts_in_collision = false;
     bool first_iteration = true;
     bool collision_found = false;
@@ -100,13 +116,10 @@ TrajectoryPlanner::calculateCost(const TrajectoryPath &trajectory_path, aabb::Tr
     for (Duration time = Duration(); time < trajectory_path.getTotalTime(); time += COLLISION_CHECK_STEP_INTERVAL)
     {
         Point position = trajectory_path.getPosition(time);
-        std::vector aabb_lower = {position.x() - TRAJ_POSITION_AABB_RADIUS_METERS, position.y() - TRAJ_POSITION_AABB_RADIUS_METERS};
-        std::vector aabb_upper = {position.x() + TRAJ_POSITION_AABB_RADIUS_METERS, position.y() + TRAJ_POSITION_AABB_RADIUS_METERS};
-        aabb::AABB aabb(aabb_lower, aabb_upper);
-        std::vector<unsigned int> colliding_obstacle_indices = obstacle_tree.query(aabb);
-
-        for (unsigned int obstacle_index : colliding_obstacle_indices)
+        for (unsigned int obstacle_index : possible_collisions_indices)
         {
+            // TODO: Consider updating the contains implementation (for polygon specifically if it's used)
+            //       to check AABB contains first...
             // Do actual more expensive collision check
             if (obstacles[obstacle_index]->contains(position))
             {
@@ -121,10 +134,10 @@ TrajectoryPlanner::calculateCost(const TrajectoryPath &trajectory_path, aabb::Tr
                     starts_in_collision = true;
                 }
             }
-        }
 
-        first_iteration = false;
-        // TODO: Add cost depending on length of collision?!
+            first_iteration = false;
+            // TODO: Add cost depending on length of collision?!
+        }
     }
 
     if (collision_found)

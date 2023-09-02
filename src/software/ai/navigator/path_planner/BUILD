@@ -73,6 +73,7 @@ cc_library(
     deps = [
         ":bang_bang_trajectory_1d",
         "//software/geom:point",
+        "//software/geom:rectangle",
     ],
 )
 

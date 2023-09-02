@@ -71,8 +71,20 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      *
      * @return total time for trajectory
      */
-    Duration getTotalTime() const override;
+    inline Duration getTotalTime() const override
+    {
+        return trajectory_parts.back().end_time;
+    }
 
+    /**
+     * Get the minimum and maximum positions that the trajectory will reach
+     *
+     * @return A pair where the first value is the minimum and the second
+     * value is the maximum positions
+     */
+    std::pair<double, double> getMinMaxPositions() const;
+
+    // TODO: Test
     /**
      * Get the trajectory parts that make up the generated trajectory
      *
@@ -164,7 +176,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      * @param t Duration elapsed since start of trajectory
      * @return Index of `trajectory_parts` that the robot is at at time t
      */
-    size_t getTrajectoryIndexAtTime(Duration t) const;
+    inline size_t getTrajectoryIndexAtTime(Duration t) const;
 
     /**
      * Helper for getting the trajectory part at time t, and the time delta

@@ -83,7 +83,7 @@ def setup_field_widget(
     # Add field layers to field
     field.add_layer("Vision", world)
     field.add_layer("Obstacles", obstacles)
-    field.add_layer("Paths", paths, False)
+    field.add_layer("Paths", paths)
     field.add_layer("Validation", validation)
     field.add_layer("Passing", passing, False)
     field.add_layer("Simulator", sim_state)

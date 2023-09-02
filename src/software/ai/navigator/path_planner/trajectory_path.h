@@ -48,6 +48,8 @@ public:
      */
     Duration getTotalTime() const override;
 
+    std::vector<Rectangle> getBoundingBoxes() const;
+
 private:
     std::vector<TrajectoryPathNode> traj_path;
 };
