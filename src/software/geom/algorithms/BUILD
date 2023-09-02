@@ -4,6 +4,7 @@ cc_library(
     name = "algorithms",
     srcs = [
         "almost_equal.cpp",
+        "axis_aligned_bounding_box.cpp",
         "calculate_block_cone.cpp",
         "closest_point.cpp",
         "collinear.cpp",
@@ -20,6 +21,7 @@ cc_library(
     ],
     hdrs = [
         "almost_equal.h",
+        "axis_aligned_bounding_box.h",
         "calculate_block_cone.h",
         "closest_point.h",
         "collinear.h",
