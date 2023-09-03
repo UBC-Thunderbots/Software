@@ -326,6 +326,7 @@ void HRVOAgent::computeNewVelocity(
 {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     long time_since_traj_start_us = std::chrono::duration_cast<std::chrono::microseconds>(now - last_traj_update_time).count();
+    // TODO: Need to increment timestep for next iteration, but in sim we regenerate every tick anyways
     new_velocity = position_traj.getVelocity(time_step + Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) * MILLISECONDS_PER_MICROSECOND));
     angular_velocity = angular_traj.getVelocity(time_step + Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) * MILLISECONDS_PER_MICROSECOND));
 

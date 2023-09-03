@@ -80,14 +80,14 @@ Rectangle BangBangTrajectory2D::getBoundingBox() const
 {
     std::pair<double, double> x_min_max = x_trajectory.getMinMaxPositions();
     std::pair<double, double> y_min_max = y_trajectory.getMinMaxPositions();
-    // If min max are the same, shift them slightly so a rectangle can
+    // If min max are the same, shift them slightly so a valid rectangle can
     // be created
-    if (x_min_max.first == x_min_max.second)
+    if (std::abs(x_min_max.first - x_min_max.second) <= FIXED_EPSILON)
     {
         x_min_max.first -= 0.01;
         x_min_max.second += 0.01;
     }
-    if (y_min_max.first == y_min_max.second)
+    if (std::abs(y_min_max.first - y_min_max.second) <= FIXED_EPSILON)
     {
         y_min_max.first -= 0.01;
         y_min_max.second += 0.01;
