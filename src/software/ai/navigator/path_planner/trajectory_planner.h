@@ -23,12 +23,12 @@ class TrajectoryPlanner
 
     std::vector<Vector> relative_sub_destinations;
 
-    const Duration SUB_DESTINATION_STEP_INTERVAL = Duration::fromSeconds(0.4);  // 0.2
-    const Duration COLLISION_CHECK_STEP_INTERVAL = Duration::fromSeconds(0.2);  // 0.1
-    const Duration MAX_FUTURE_COLLISION_CHECK = Duration::fromSeconds(3.0);  // 0.1
+    const Duration SUB_DESTINATION_STEP_INTERVAL = Duration::fromSeconds(0.2);
+    const Duration COLLISION_CHECK_STEP_INTERVAL = Duration::fromSeconds(0.1);
+    const Duration MAX_FUTURE_COLLISION_CHECK = Duration::fromSeconds(3.0);
 
     static constexpr std::array<double, 4> SUB_DESTINATION_DISTANCES_METERS = {
-        0.1, 1 /*, 2, 3*/};
-    static constexpr unsigned int NUM_SUB_DESTINATION_ANGLES = 3;
+        0.1, 1, 2, 3};
+    static constexpr unsigned int NUM_SUB_DESTINATION_ANGLES = 15;
     static constexpr double PATH_WITH_COLLISION_COST         = 5.0;
 };

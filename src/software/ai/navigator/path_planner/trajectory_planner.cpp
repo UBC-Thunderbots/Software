@@ -1,5 +1,7 @@
 #include "software/ai/navigator/path_planner/trajectory_planner.h"
 
+#include "external/tracy/public/tracy/Tracy.hpp"
+
 TrajectoryPlanner::TrajectoryPlanner()
 {
     // Initialize the relative sub-destinations array
@@ -20,6 +22,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles,
     const Rectangle &navigable_area)
 {
+    ZoneScopedN("findTrajectory");
     static long int total_time = 0;
     static int num_calls       = 0;
     auto start_time            = std::chrono::high_resolution_clock::now();
@@ -36,24 +39,26 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
 
     std::vector<TrajectoryPath> possible_paths;
     possible_paths.reserve(sub_destinations.size() + 1);
-
-    // Add a default trajectory from start to destination
-    possible_paths.emplace_back(BangBangTrajectory2D(
-        start, destination, initial_velocity, constraints.getMaxVelocity(),
-        constraints.getMaxAcceleration(), constraints.getMaxDeceleration()));
-
-    // Add trajectories that go through sub-destinations
-    for (const Point &sub_dest : sub_destinations)
     {
-        TrajectoryPath trajectory_path(BangBangTrajectory2D(
-            start, sub_dest, initial_velocity, constraints.getMaxVelocity(),
-            constraints.getMaxAcceleration(), constraints.getMaxDeceleration()));
-        for (Duration connection_time = SUB_DESTINATION_STEP_INTERVAL;
-             connection_time < trajectory_path.getTotalTime();
-             connection_time += SUB_DESTINATION_STEP_INTERVAL)
+        ZoneScopedN("generateTrajectories");
+        // Add a default trajectory from start to destination
+        possible_paths.emplace_back(BangBangTrajectory2D(
+                start, destination, initial_velocity, constraints.getMaxVelocity(),
+                constraints.getMaxAcceleration(), constraints.getMaxDeceleration()));
+
+        // Add trajectories that go through sub-destinations
+        for (const Point &sub_dest : sub_destinations)
         {
-            possible_paths.push_back(trajectory_path);
-            possible_paths.back().append(constraints, connection_time, destination);
+            TrajectoryPath trajectory_path(BangBangTrajectory2D(
+                    start, sub_dest, initial_velocity, constraints.getMaxVelocity(),
+                    constraints.getMaxAcceleration(), constraints.getMaxDeceleration()));
+            for (Duration connection_time = SUB_DESTINATION_STEP_INTERVAL;
+                 connection_time < trajectory_path.getTotalTime();
+                 connection_time += SUB_DESTINATION_STEP_INTERVAL)
+            {
+                possible_paths.push_back(trajectory_path);
+                possible_paths.back().append(constraints, connection_time, destination);
+            }
         }
     }
 
@@ -64,24 +69,30 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     aabb::Tree tree(2, 0.0, {false, false},
                     {navigable_area.xLength(), navigable_area.yLength()},
                     static_cast<unsigned int>(obstacles.size()), false);
-    for (unsigned int i = 0; i < obstacles.size(); i++)
     {
-        Rectangle aabb         = obstacles[i]->axisAlignedBoundingBox();
-        std::vector aabb_lower = {aabb.negXNegYCorner().x(), aabb.negXNegYCorner().y()};
-        std::vector aabb_upper = {aabb.posXPosYCorner().x(), aabb.posXPosYCorner().y()};
-        tree.insertParticle(i, aabb_lower, aabb_upper);
+        ZoneScopedN("fillObstacleTree");
+        for (unsigned int i = 0; i < obstacles.size(); i++)
+        {
+            Rectangle aabb         = obstacles[i]->axisAlignedBoundingBox();
+            std::vector aabb_lower = {aabb.negXNegYCorner().x(), aabb.negXNegYCorner().y()};
+            std::vector aabb_upper = {aabb.posXPosYCorner().x(), aabb.posXPosYCorner().y()};
+            tree.insertParticle(i, aabb_lower, aabb_upper);
+        }
     }
 
     // Find the trajectory with the lowest cost
     double lowest_cost       = std::numeric_limits<double>::infinity();
     size_t lowest_cost_index = 0;
-    for (size_t i = 0; i < possible_paths.size(); ++i)
     {
-        double cost = calculateCost(possible_paths[i], tree, obstacles);
-        if (cost < lowest_cost)
+        ZoneScopedN("findBestTrajectory");
+        for (size_t i = 0; i < possible_paths.size(); ++i)
         {
-            lowest_cost       = cost;
-            lowest_cost_index = i;
+            double cost = calculateCost(possible_paths[i], tree, obstacles);
+            if (cost < lowest_cost)
+            {
+                lowest_cost       = cost;
+                lowest_cost_index = i;
+            }
         }
     }
 

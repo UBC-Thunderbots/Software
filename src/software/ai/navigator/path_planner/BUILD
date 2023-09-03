@@ -113,6 +113,7 @@ cc_library(
     deps = [
         ":kinematic_constraints",
         ":trajectory_path",
+        "@tracy",
         "//extlibs/AABB:aabb_tree",
         "//software/ai/navigator/obstacle",
     ],

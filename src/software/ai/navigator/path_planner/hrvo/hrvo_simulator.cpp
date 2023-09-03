@@ -1,5 +1,8 @@
 #include "hrvo_simulator.h"
 
+
+#include "external/tracy/public/tracy/Tracy.hpp"
+
 HRVOSimulator::HRVOSimulator(RobotId robot_id)
     : robot_id(robot_id), robots(), world(std::nullopt), primitive_set()
 {
@@ -9,6 +12,7 @@ void HRVOSimulator::updateWorld(const World &world,
                                 const RobotConstants_t &robot_constants,
                                 Duration time_step)
 {
+    ZoneScopedN("HRVOSimulator::updateWorld");
     this->world = world;
 
     const Team &friendly_team = world.friendlyTeam();
@@ -104,16 +108,30 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
     if (world.has_value())
     {
         primitive_set = new_primitive_set;
-        for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
-        {
-            auto friendly_robot = robots.find(robot_id);
-            if (friendly_robot == robots.end())
-            {
-                continue;
-            }
 
-            friendly_robot->second->updatePrimitive(primitive, world.value(), time_step);
+        auto friendly_robot = robots.find(robot_id);
+        if (friendly_robot == robots.end())
+        {
+            return;
         }
+        auto primitive_iter = primitive_set.robot_primitives().find(robot_id);
+        if (primitive_iter == primitive_set.robot_primitives().end())
+        {
+            return;
+        }
+        friendly_robot->second->updatePrimitive(primitive_iter->second, world.value(), time_step);
+
+
+//        for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
+//        {
+//            auto friendly_robot = robots.find(robot_id);
+//            if (friendly_robot == robots.end())
+//            {
+//                continue;
+//            }
+//
+//            friendly_robot->second->updatePrimitive(primitive, world.value(), time_step);
+//        }
     }
 }
 
@@ -194,6 +212,7 @@ void HRVOSimulator::configureLVRobot(const Robot &robot,
 
 void HRVOSimulator::doStep(Duration time_step)
 {
+    ZoneScopedN("HRVOSimulator::doStep");
     if (time_step.toSeconds() == 0.0)
     {
         LOG(WARNING) << "Simulator time step is zero";

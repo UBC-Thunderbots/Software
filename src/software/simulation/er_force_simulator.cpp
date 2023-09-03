@@ -18,6 +18,8 @@
 #include "software/physics/velocity_conversion_util.h"
 #include "software/world/robot_state.h"
 
+#include "external/tracy/public/tracy/Tracy.hpp"
+
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
                                    std::unique_ptr<RealismConfigErForce>& realism_config,
@@ -299,6 +301,7 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
+    ZoneScopedN("setYellowPrimitives");
     // Use chrono to time this function
     static long int total_time_us    = 0;
     static long int num_calls        = 0;
@@ -313,12 +316,12 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     std::vector<std::thread> threads;
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        //        threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
-        //                                          &robot_to_vel_pair_map]() {
+                threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
+                                                  &robot_to_vel_pair_map]() {
         auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
         setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
                           world_proto, local_vel, angular_vel);
-        //        });
+                });
     }
 
     for (auto& thread : threads)
@@ -343,6 +346,7 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
+    ZoneScopedN("setBluePrimitives");
     // Use chrono to time this function
     static long int total_time_us    = 0;
     static long int num_calls        = 0;
@@ -357,12 +361,12 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     std::vector<std::thread> threads;
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        //        threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
-        //                                          &robot_to_vel_pair_map]() {
+        threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
+                                          &robot_to_vel_pair_map]() {
         auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
         setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
                           world_proto, local_vel, angular_vel);
-        //        });
+        });
     }
 
     for (auto& thread : threads)
@@ -390,6 +394,7 @@ void ErForceSimulator::setRobotPrimitive(
     const TbotsProto::World& world_msg, const Vector& local_velocity,
     const AngularVelocity angular_velocity)
 {
+    ZoneScopedN("setRobotPrimitive");
     // Set to NEG_X because the world msg in this simulator is normalized
     // correctly
     auto robot_primitive_executor_iter = robot_primitive_executor_map.find(id);

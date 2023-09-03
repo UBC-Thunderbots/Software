@@ -3,6 +3,9 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/physics/velocity_conversion_util.h"
 
+
+#include "external/tracy/public/tracy/Tracy.hpp"
+
 HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
                      const RobotPath &path, double radius, double max_speed,
                      double max_accel, double max_decel, double max_angular_speed,
@@ -25,6 +28,7 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                                 const World &world, Duration time_step)
 {
+    ZoneScopedN("HRVOAgent::updatePrimitive");
     RobotPath path;
     static_obstacles.clear();
     ball_obstacle = std::nullopt;

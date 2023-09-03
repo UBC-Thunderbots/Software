@@ -132,6 +132,13 @@ new_git_repository(
     shallow_since = "1642460459 -0600",
 )
 
+new_git_repository(
+    name = "tracy",
+    build_file = "@//extlibs:tracy.BUILD",
+    commit = "5d7cf137cf71ddb977a7497aed6d0c3d0398e350",
+    remote = "https://github.com/wolfpld/tracy.git",
+)
+
 # nanopb: lightweight protobuf library used on the STM32. The build file in the
 # repo does not build the proto compiler (protoc) as a target, and is really complicated
 # to set it up as a protobuf plugin due to lack of bazel support. So we use the archive
