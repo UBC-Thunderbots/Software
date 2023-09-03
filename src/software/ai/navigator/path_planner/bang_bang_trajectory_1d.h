@@ -1,8 +1,10 @@
 #pragma once
 
-#include <vector>
+#include <array>
 
 #include "software/ai/navigator/path_planner/trajectory.h"
+
+static const unsigned int MAX_TRAJECTORY_PARTS = 4;
 
 class BangBangTrajectory1D : public Trajectory<double, double, double>
 {
@@ -15,9 +17,9 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      */
     struct TrajectoryPart
     {
-        Duration end_time = Duration::fromSeconds(0);
-        double position = 0;
-        double velocity = 0;
+        Duration end_time   = Duration::fromSeconds(0);
+        double position     = 0;
+        double velocity     = 0;
         double acceleration = 0;
     };
 
@@ -73,7 +75,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      */
     inline Duration getTotalTime() const override
     {
-        return trajectory_parts.back().end_time;
+        return trajectory_parts[num_trajectory_parts - 1].end_time;
     }
 
     /**
@@ -86,11 +88,15 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
 
     // TODO: Test
     /**
-     * Get the trajectory parts that make up the generated trajectory
+     * Get the trajectory part at index that makes up the generated trajectory
+     * @note Index is not checked to be within the bound of the array.
+     * `getNumTrajectoryParts` should be called first!
      *
      * @return Trajectory parts
      */
-    const std::vector<TrajectoryPart> &getTrajectoryParts() const;
+    const TrajectoryPart &getTrajectoryPart(size_t index) const;
+
+    size_t getNumTrajectoryParts() const;
 
    private:
     /**
@@ -162,13 +168,14 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      * is positive
      * @param max_decel The maximum deceleration the trajectory could have. Assumes value
      * is positive
-     * @param direction Direction of the trajectory. 1 for moving in the positive direction,
-     * -1 for moving in the negative direction
+     * @param direction Direction of the trajectory. 1 for moving in the positive
+     * direction, -1 for moving in the negative direction
      * @return The final position of the robot after a triangular profile trajectory to
      * the max velocity
      */
-    inline double triangularProfileStopPosition(double initial_pos, double initial_vel, double max_vel,
-                                                double max_accel, double max_decel, double direction) const;
+    inline double triangularProfileStopPosition(double initial_pos, double initial_vel,
+                                                double max_vel, double max_accel,
+                                                double max_decel, double direction) const;
 
     /**
      * Get the index of `trajectory_parts` that the robot is at at time t
@@ -190,5 +197,11 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
     void getTrajPartAndDeltaTime(Duration t, TrajectoryPart &out_traj_part,
                                  Duration &out_t_delta) const;
 
-    std::vector<TrajectoryPart> trajectory_parts;
+    inline void addTrajectoryPart(const TrajectoryPart &part);
+
+    // We use a fixed size array over a vector to avoid the overhead
+    // of dynamic memory allocation + emplace_back, push_back, etc.
+    size_t num_trajectory_parts                                       = 0;
+    std::array<TrajectoryPart, MAX_TRAJECTORY_PARTS> trajectory_parts = {
+        TrajectoryPart(), TrajectoryPart(), TrajectoryPart(), TrajectoryPart()};
 };

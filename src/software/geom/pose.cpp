@@ -2,7 +2,10 @@
 
 Pose::Pose() : position_(Point()), orientation_(Angle::zero()) {}
 
-Pose::Pose(const Point &position, const Angle orientation) : position_(position), orientation_(orientation) {}
+Pose::Pose(const Point &position, const Angle orientation)
+    : position_(position), orientation_(orientation)
+{
+}
 
 const Point &Pose::position() const
 {
@@ -16,8 +19,7 @@ const Angle &Pose::orientation() const
 
 bool Pose::operator==(const Pose &rhs) const
 {
-    return position_ == rhs.position_ &&
-           orientation_ == rhs.orientation_;
+    return position_ == rhs.position_ && orientation_ == rhs.orientation_;
 }
 
 bool Pose::operator!=(const Pose &rhs) const

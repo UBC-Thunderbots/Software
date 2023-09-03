@@ -299,17 +299,43 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
+    // Use chrono to time this function
+    static long int total_time_us    = 0;
+    static long int num_calls        = 0;
+    auto start                       = std::chrono::high_resolution_clock::now();
     auto sim_state                   = getSimulatorState();
     const auto& sim_robots           = sim_state.yellow_robots();
     const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots);
 
     yellow_team_world_msg               = std::move(world_msg);
     const TbotsProto::World world_proto = *yellow_team_world_msg;
+
+    std::vector<std::thread> threads;
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
+        //        threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
+        //                                          &robot_to_vel_pair_map]() {
         auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
         setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
                           world_proto, local_vel, angular_vel);
+        //        });
+    }
+
+    for (auto& thread : threads)
+    {
+        thread.join();
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    num_calls++;
+    total_time_us +=
+        std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    if (num_calls % 200 == 0)
+    {
+        std::cout << "Average time per setYellowRobotPrimitiveSet call: "
+                  << total_time_us / num_calls << " us" << std::endl;
+        total_time_us = 0;
+        num_calls     = 0;
     }
 }
 
@@ -317,17 +343,43 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
+    // Use chrono to time this function
+    static long int total_time_us    = 0;
+    static long int num_calls        = 0;
+    auto start                       = std::chrono::high_resolution_clock::now();
     auto sim_state                   = getSimulatorState();
     const auto& sim_robots           = sim_state.blue_robots();
     const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots);
 
     blue_team_world_msg                 = std::move(world_msg);
     const TbotsProto::World world_proto = *blue_team_world_msg;
+
+    std::vector<std::thread> threads;
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
+        //        threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
+        //                                          &robot_to_vel_pair_map]() {
         auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
         setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
                           world_proto, local_vel, angular_vel);
+        //        });
+    }
+
+    for (auto& thread : threads)
+    {
+        thread.join();
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    num_calls++;
+    total_time_us +=
+        std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    if (num_calls % 200 == 0)
+    {
+        std::cout << "Average time per setYellowRobotPrimitiveSet call: "
+                  << total_time_us / num_calls << " us" << std::endl;
+        total_time_us = 0;
+        num_calls     = 0;
     }
 }
 

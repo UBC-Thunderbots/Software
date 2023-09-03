@@ -47,7 +47,7 @@ class Pose final
      */
     bool operator!=(const Pose &rhs) const;
 
-private:
+   private:
     /**
      * The position of the Pose. The variable name starts with an underscore to prevent
      * name conflicts with its accessor function.

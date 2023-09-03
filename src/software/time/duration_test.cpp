@@ -134,7 +134,7 @@ TEST(DurationTest, test_subtraction_operator_with_negative_result)
 
 TEST(DurationTest, test_addition_assignment_operator)
 {
-    Duration d              = Duration::fromSeconds(0.12);
+    Duration d = Duration::fromSeconds(0.12);
     d += Duration::fromMilliseconds(350);
     Duration expected_result = Duration::fromMilliseconds(470);
     EXPECT_EQ(d, expected_result);
@@ -142,7 +142,7 @@ TEST(DurationTest, test_addition_assignment_operator)
 
 TEST(DurationTest, test_subtraction_assignment_operator_with_positive_result)
 {
-    Duration d              = Duration::fromMilliseconds(1234);
+    Duration d = Duration::fromMilliseconds(1234);
     d -= Duration::fromMilliseconds(600);
     Duration expected_result = Duration::fromMilliseconds(634);
     EXPECT_EQ(d, expected_result);
@@ -150,7 +150,7 @@ TEST(DurationTest, test_subtraction_assignment_operator_with_positive_result)
 
 TEST(DurationTest, test_subtraction_assignment_operator_with_negative_result)
 {
-    Duration d              = Duration::fromMilliseconds(1234);
+    Duration d = Duration::fromMilliseconds(1234);
     d -= Duration::fromMilliseconds(1235);
     Duration expected_result = Duration::fromMilliseconds(-1);
     EXPECT_EQ(d, expected_result);

@@ -9,7 +9,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class HRVOLayer(FieldLayer):
-    def __init__(self, robot_id, buffer_size=10):
+    def __init__(self, robot_id, buffer_size=20):
         """Visualize the state of the HRVO Simulator
 
         :param robot_id: The id of the robot which this layer will visualize

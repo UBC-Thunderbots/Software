@@ -53,7 +53,7 @@ namespace aabb
      */
     class AABB
     {
-    public:
+       public:
         /// Constructor.
         AABB();
 
@@ -188,7 +188,7 @@ namespace aabb
      */
     class Tree
     {
-    public:
+       public:
         //! Constructor (non-periodic).
         /*! \param dimension_
                 The dimensionality of the system.
@@ -203,8 +203,8 @@ namespace aabb
             \param touchIsOverlap
                 Does touching count as overlapping in query operations?
          */
-        Tree(unsigned int dimension_= 3, double skinThickness_ = 0.05,
-             unsigned int nParticles = 16, bool touchIsOverlap=true);
+        Tree(unsigned int dimension_ = 3, double skinThickness_ = 0.05,
+             unsigned int nParticles = 16, bool touchIsOverlap = true);
 
         //! Constructor (custom periodicity).
         /*! \param dimension_
@@ -227,7 +227,7 @@ namespace aabb
                 Does touching count as overlapping in query operations?
          */
         Tree(unsigned int, double, const std::vector<bool>&, const std::vector<double>&,
-             unsigned int nParticles = 16, bool touchIsOverlap=true);
+             unsigned int nParticles = 16, bool touchIsOverlap = true);
 
         //! Set the periodicity of the simulation box.
         /*! \param periodicity_
@@ -288,12 +288,14 @@ namespace aabb
                 The radius of the particle.
 
             \param alwaysReinsert
-                Always reinsert the particle, even if it's within its old AABB (default:false)
+                Always reinsert the particle, even if it's within its old AABB
+           (default:false)
 
             \return
                 Whether the particle was reinserted.
          */
-        bool updateParticle(unsigned int, std::vector<double>&, double, bool alwaysReinsert=false);
+        bool updateParticle(unsigned int, std::vector<double>&, double,
+                            bool alwaysReinsert = false);
 
         //! Update the tree if a particle moves outside its fattened AABB.
         /*! \param particle
@@ -306,9 +308,11 @@ namespace aabb
                 The upper bound in each dimension.
 
             \param alwaysReinsert
-                Always reinsert the particle, even if it's within its old AABB (default: false)
+                Always reinsert the particle, even if it's within its old AABB (default:
+           false)
          */
-        bool updateParticle(unsigned int, std::vector<double>&, std::vector<double>&, bool alwaysReinsert=false);
+        bool updateParticle(unsigned int, std::vector<double>&, std::vector<double>&,
+                            bool alwaysReinsert = false);
 
         //! Query the tree to find candidate interactions for a particle.
         /*! \param particle
@@ -378,7 +382,7 @@ namespace aabb
         /// Rebuild an optimal tree.
         void rebuild();
 
-    private:
+       private:
         /// The index of the root node.
         unsigned int root;
 
@@ -400,7 +404,8 @@ namespace aabb
         /// Whether the system is periodic along at least one axis.
         bool isPeriodic;
 
-        /// The skin thickness of the fattened AABBs, as a fraction of the AABB base length.
+        /// The skin thickness of the fattened AABBs, as a fraction of the AABB base
+        /// length.
         double skinThickness;
 
         /// Whether the system is periodic along each axis.
@@ -496,6 +501,6 @@ namespace aabb
          */
         bool minimumImage(std::vector<double>&, std::vector<double>&);
     };
-}
+}  // namespace aabb
 
 #endif /* _AABB_H */

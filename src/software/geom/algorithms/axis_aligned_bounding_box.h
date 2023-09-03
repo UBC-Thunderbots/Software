@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/geom/circle.h"
-#include "software/geom/rectangle.h"
 #include "software/geom/polygon.h"
+#include "software/geom/rectangle.h"
 
 // TODO: Add tests
 
@@ -14,5 +14,7 @@
  * @return A rectangle which represents the AABB of the shape
  */
 Rectangle axisAlignedBoundingBox(const Circle& circle, const double inflation_radius = 0);
-Rectangle axisAlignedBoundingBox(const Rectangle& rectangle, const double inflation_radius = 0);
-Rectangle axisAlignedBoundingBox(const Polygon& polygon, const double inflation_radius = 0);
+Rectangle axisAlignedBoundingBox(const Rectangle& rectangle,
+                                 const double inflation_radius = 0);
+Rectangle axisAlignedBoundingBox(const Polygon& polygon,
+                                 const double inflation_radius = 0);

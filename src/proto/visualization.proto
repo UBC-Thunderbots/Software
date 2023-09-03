@@ -35,12 +35,12 @@ message PassVisualization
 
 message HRVOVisualization
 {
-    uint32 robot_id                              = 1;
+    uint32 robot_id = 1;
     reserved 2;
-//    reserved 3;
+    //    reserved 3;
     //    repeated VelocityObstacle velocity_obstacles = 2;
-    repeated Circle robots                       = 3;
-    Path trajectory                              = 4;
+    repeated Circle robots = 3;
+    Path trajectory        = 4;
 }
 
 message CostVisualization

@@ -2,12 +2,15 @@
 
 Rectangle axisAlignedBoundingBox(const Circle& circle, const double inflation_radius)
 {
-    Point bottom_left(circle.origin().x() - circle.radius() - inflation_radius, circle.origin().y() - circle.radius() - inflation_radius);
-    Point top_right(circle.origin().x() + circle.radius() + inflation_radius, circle.origin().y() + circle.radius() + inflation_radius);
+    Point bottom_left(circle.origin().x() - circle.radius() - inflation_radius,
+                      circle.origin().y() - circle.radius() - inflation_radius);
+    Point top_right(circle.origin().x() + circle.radius() + inflation_radius,
+                    circle.origin().y() + circle.radius() + inflation_radius);
     return Rectangle(bottom_left, top_right);
 }
 
-Rectangle axisAlignedBoundingBox(const Rectangle& rectangle, const double inflation_radius)
+Rectangle axisAlignedBoundingBox(const Rectangle& rectangle,
+                                 const double inflation_radius)
 {
     return rectangle;
 }

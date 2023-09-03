@@ -3,11 +3,13 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "aabb_tree",
     srcs = [
-        "AABB.cc"
+        "AABB.cc",
     ],
     hdrs = [
-        "AABB.h"
+        "AABB.h",
     ],
     linkstatic = True,
-    deps = [],
+    deps = [
+        "//software/geom:rectangle",
+    ],
 )

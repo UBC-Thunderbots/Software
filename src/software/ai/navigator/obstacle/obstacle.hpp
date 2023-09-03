@@ -8,6 +8,7 @@
 #include "proto/primitive.pb.h"
 #include "shared/constants.h"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
+#include "software/geom/algorithms/axis_aligned_bounding_box.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/generate_velocity_obstacle.h"
@@ -15,7 +16,6 @@
 #include "software/geom/algorithms/rasterize.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
-#include "software/geom/algorithms/axis_aligned_bounding_box.h"
 
 /**
  * An obstacle is an area to avoid for navigation
@@ -192,8 +192,9 @@ VelocityObstacle GeomObstacle<GEOM_TYPE>::generateVelocityObstacle(
     return ::generateVelocityObstacle(geom_, robot, obstacle_velocity);
 }
 
-template<typename GEOM_TYPE>
-Rectangle GeomObstacle<GEOM_TYPE>::axisAlignedBoundingBox(const double inflation_radius) const
+template <typename GEOM_TYPE>
+Rectangle GeomObstacle<GEOM_TYPE>::axisAlignedBoundingBox(
+    const double inflation_radius) const
 {
     return ::axisAlignedBoundingBox(geom_, inflation_radius);
 }

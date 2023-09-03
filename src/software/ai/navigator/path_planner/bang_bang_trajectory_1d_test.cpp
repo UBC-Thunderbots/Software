@@ -10,9 +10,9 @@ class BangBangTrajectory1DTest : public testing::Test
     void verifyVelocityAndAccelerationLimits(double max_vel, double max_accel,
                                              double max_decel)
     {
-        for (unsigned int i = 0; i < traj.getTrajectoryParts().size(); i++)
+        for (unsigned int i = 0; i < traj.getNumTrajectoryParts(); i++)
         {
-            const auto& part = traj.getTrajectoryParts()[i];
+            const auto& part = traj.getTrajectoryPart(i);
             EXPECT_LE(std::abs(part.velocity), max_vel)
                 << "Trajectory part " << i << " has a velocity of " << part.velocity
                 << " which has a greater magnitude than the limit of " << max_vel;
@@ -39,9 +39,9 @@ class BangBangTrajectory1DTest : public testing::Test
     void verifyChronologicalTime()
     {
         Duration prev_time = Duration::fromSeconds(0);
-        for (unsigned int i = 0; i < traj.getTrajectoryParts().size(); i++)
+        for (unsigned int i = 0; i < traj.getNumTrajectoryParts(); i++)
         {
-            const auto& part = traj.getTrajectoryParts()[i];
+            const auto& part = traj.getTrajectoryPart(i);
             EXPECT_GE(part.end_time, prev_time)
                 << "Trajectory part " << i << " ends at " << part.end_time
                 << " which is greater than the end time of previous part: " << prev_time;
@@ -63,7 +63,7 @@ class BangBangTrajectory1DTest : public testing::Test
     void verifyPartState(size_t part_index, double end_time, double position,
                          double velocity, double acceleration)
     {
-        const auto& part = traj.getTrajectoryParts()[part_index];
+        const auto& part = traj.getTrajectoryPart(part_index);
         EXPECT_TRUE(
             TestUtil::equalWithinTolerance(end_time, part.end_time.toSeconds(), 0.001))
             << "Trajectory part " << part_index << " ends at " << part.end_time
@@ -94,8 +94,7 @@ TEST_F(BangBangTrajectory1DTest, positive_symmetrical_trapezoidal_profile)
     double max_decel   = -1;
 
     traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
-    const auto& parts = traj.getTrajectoryParts();
-    EXPECT_EQ(parts.size(), 3);
+    EXPECT_EQ(traj.getNumTrajectoryParts(), 3);
     verifyVelocityAndAccelerationLimits(max_vel, max_accel, max_decel);
     verifyChronologicalTime();
 
@@ -122,8 +121,7 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_trapezoidal_profile)
     double max_decel   = -2;
 
     traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
-    const auto& parts = traj.getTrajectoryParts();
-    EXPECT_EQ(parts.size(), 3);
+    EXPECT_EQ(traj.getNumTrajectoryParts(), 3);
     verifyVelocityAndAccelerationLimits(max_vel, max_accel, max_decel);
     verifyChronologicalTime();
 
@@ -153,8 +151,7 @@ TEST_F(BangBangTrajectory1DTest,
     double max_decel   = -1;
 
     traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
-    const auto& parts = traj.getTrajectoryParts();
-    EXPECT_EQ(parts.size(), 4);
+    EXPECT_EQ(traj.getNumTrajectoryParts(), 4);
     verifyVelocityAndAccelerationLimits(max_vel, max_accel, max_decel);
     verifyChronologicalTime();
 
@@ -185,8 +182,7 @@ TEST_F(BangBangTrajectory1DTest, negative_non_symmetrical_trapezoidal_profile)
     double max_decel   = -2;
 
     traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
-    const auto& parts = traj.getTrajectoryParts();
-    EXPECT_EQ(parts.size(), 3);
+    EXPECT_EQ(traj.getNumTrajectoryParts(), 3);
     verifyVelocityAndAccelerationLimits(max_vel, max_accel, max_decel);
     verifyChronologicalTime();
 
@@ -214,8 +210,7 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_triangular_profile)
     double max_decel = -2;
 
     traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
-    const auto& parts = traj.getTrajectoryParts();
-    EXPECT_EQ(parts.size(), 2);
+    EXPECT_EQ(traj.getNumTrajectoryParts(), 2);
     verifyVelocityAndAccelerationLimits(max_vel, max_accel, max_decel);
     verifyChronologicalTime();
 
@@ -240,8 +235,7 @@ TEST_F(BangBangTrajectory1DTest, negative_non_symmetrical_triangular_profile)
     double max_decel = -2;
 
     traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
-    const auto& parts = traj.getTrajectoryParts();
-    EXPECT_EQ(parts.size(), 2);
+    EXPECT_EQ(traj.getNumTrajectoryParts(), 2);
     verifyVelocityAndAccelerationLimits(max_vel, max_accel, max_decel);
     verifyChronologicalTime();
 
@@ -269,8 +263,7 @@ TEST_F(BangBangTrajectory1DTest,
     double max_decel = -1;
 
     traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
-    const auto& parts = traj.getTrajectoryParts();
-    EXPECT_EQ(parts.size(), 3);
+    EXPECT_EQ(traj.getNumTrajectoryParts(), 3);
     verifyVelocityAndAccelerationLimits(max_vel, max_accel, max_decel);
     verifyChronologicalTime();
 
@@ -302,8 +295,7 @@ TEST_F(BangBangTrajectory1DTest,
     double max_accel = -2;
     double max_decel = 1;
     traj.generate(initial_pos, destination, initial_vel, max_vel, max_accel, max_decel);
-    const auto& parts = traj.getTrajectoryParts();
-    EXPECT_EQ(parts.size(), 3);
+    EXPECT_EQ(traj.getNumTrajectoryParts(), 3);
     verifyVelocityAndAccelerationLimits(max_vel, max_accel, max_decel);
     verifyChronologicalTime();
 

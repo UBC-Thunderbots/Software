@@ -1,7 +1,9 @@
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
 
-BangBangTrajectory2D::BangBangTrajectory2D(const Point &initial_pos, const Point &final_pos, const Vector &initial_vel,
-                                           double max_vel, double max_accel, double max_decel)
+BangBangTrajectory2D::BangBangTrajectory2D(const Point& initial_pos,
+                                           const Point& final_pos,
+                                           const Vector& initial_vel, double max_vel,
+                                           double max_accel, double max_decel)
 {
     generate(initial_pos, final_pos, initial_vel, max_vel, max_accel, max_decel);
 }
