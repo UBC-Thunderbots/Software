@@ -5,17 +5,13 @@
 // TODO: Consider making this a private class in trajectory path
 class TrajectoryPathNode
 {
-public:
-    TrajectoryPathNode(const BangBangTrajectory2D& trajectory,
-                       Duration trajectory_end_time) : trajectory(trajectory),
-                                                       trajectory_end_time(trajectory_end_time)
-    {
-    };
+   public:
+    TrajectoryPathNode(const BangBangTrajectory2D &trajectory,
+                       Duration trajectory_end_time)
+        : trajectory(trajectory), trajectory_end_time(trajectory_end_time){};
 
-    TrajectoryPathNode(const BangBangTrajectory2D& trajectory) : trajectory(trajectory),
-                                                                  trajectory_end_time(trajectory.getTotalTime())
-    {
-    };
+    TrajectoryPathNode(const BangBangTrajectory2D &trajectory)
+        : trajectory(trajectory), trajectory_end_time(trajectory.getTotalTime()){};
 
     const BangBangTrajectory2D &getTrajectory() const
     {
@@ -32,8 +28,9 @@ public:
         trajectory_end_time = new_end_time;
     }
 
-private:
-    // TODO: Consider making this a pointer of 2D trajectories so the traj planner can be replaced
+   private:
+    // TODO: Consider making this a pointer of 2D trajectories so the traj planner can be
+    // replaced
     BangBangTrajectory2D trajectory;
     Duration trajectory_end_time;
 };

@@ -4,12 +4,12 @@
 
 class TrajectoryPathWithCost
 {
-public:
+   public:
     TrajectoryPathWithCost() = delete;
 
     TrajectoryPathWithCost(const TrajectoryPath& traj_path, double cost);
 
-private:
+   private:
     TrajectoryPath traj_path;
     double cost;
 };

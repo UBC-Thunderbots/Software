@@ -38,7 +38,7 @@ void HRVOSimulator::updateWorld(const World &world,
                 // We do not want velocity feedback for the robot which is running
                 // this HRVO simulator as it prevents it from being able to accelerate
                 // at its maximum acceleration.
-//                hrvo_agent->second->setVelocity(friendly_robot.velocity());
+                //                hrvo_agent->second->setVelocity(friendly_robot.velocity());
                 hrvo_agent->second->setPosition(friendly_robot.position());
                 hrvo_agent->second->setOrientation(friendly_robot.orientation());
             }
@@ -295,7 +295,6 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
     auto hrvo_agent = robots.find(robot_id);
     if (hrvo_agent != robots.end())
     {
-//        std::cout << "Robot id " << robot_id << " returned velocity: " << hrvo_agent->second->getVelocity() << std::endl;
         return hrvo_agent->second->getVelocity();
     }
     LOG(WARNING) << "Velocity for robot " << robot_id

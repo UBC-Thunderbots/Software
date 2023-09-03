@@ -2,7 +2,7 @@
 
 class KinematicConstraints
 {
-public:
+   public:
     KinematicConstraints() = delete;
 
     KinematicConstraints(double max_velocity, double max_acceleration,
@@ -17,7 +17,7 @@ public:
     void setMaxDeceleration(double max_deceleration);
 
 
-private:
+   private:
     double max_velocity;
     double max_acceleration;
     double max_deceleration;

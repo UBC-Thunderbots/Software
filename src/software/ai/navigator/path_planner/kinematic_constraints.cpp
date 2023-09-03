@@ -1,7 +1,10 @@
 #include "software/ai/navigator/path_planner/kinematic_constraints.h"
 
-KinematicConstraints::KinematicConstraints(double max_velocity, double max_acceleration, double max_deceleration) :
-    max_velocity(max_velocity), max_acceleration(max_acceleration), max_deceleration(max_deceleration)
+KinematicConstraints::KinematicConstraints(double max_velocity, double max_acceleration,
+                                           double max_deceleration)
+    : max_velocity(max_velocity),
+      max_acceleration(max_acceleration),
+      max_deceleration(max_deceleration)
 {
 }
 

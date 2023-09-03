@@ -35,14 +35,14 @@ cc_library(
         "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/ai/navigator/path_planner:bang_bang_trajectory_1d_angular",
+        "//software/ai/navigator/path_planner:trajectory_planner",
         "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:vector",
         "//software/geom/algorithms:nearest_neighbor_search",
         "//software/networking:threaded_proto_unix_sender",
         "//software/physics:velocity_conversion_util",
         "//software/world",
-        "//software/ai/navigator/path_planner:trajectory_planner",
-        "//software/ai/navigator/path_planner:bang_bang_trajectory_1d_angular",
     ],
 )
 

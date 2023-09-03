@@ -14,9 +14,12 @@
 #include "proto/visualization.pb.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
+#include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
 #include "software/ai/navigator/path_planner/hrvo/lv_agent.h"
 #include "software/ai/navigator/path_planner/hrvo/robot_path.h"
 #include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
+#include "software/ai/navigator/path_planner/trajectory_planner.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/nearest_neighbor_search.hpp"
 #include "software/geom/vector.h"
@@ -24,9 +27,6 @@
 #include "software/world/robot_state.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
-#include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
-#include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
-#include "software/ai/navigator/path_planner/trajectory_planner.h"
 
 
 class HRVOAgent : public Agent

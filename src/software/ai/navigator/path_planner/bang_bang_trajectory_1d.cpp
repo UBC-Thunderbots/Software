@@ -107,11 +107,11 @@ void BangBangTrajectory1D::generateTrapezoidalTrajectory(
         initial_accel = -max_decel;
     }
     double t1 = std::abs((max_vel - initial_vel) / initial_accel);
-    double d1 = initial_vel * t1 + 0.5 * initial_accel * std::pow(t1, 2.0);
+    double d1 = initial_vel * t1 + 0.5 * initial_accel * t1 * t1;
 
     // Calculate time and distance to decelerate from max velocity to 0
     double t3 = max_vel / max_decel;
-    double d3 = max_vel * t3 + 0.5 * -max_decel * std::pow(t3, 2.0);
+    double d3 = max_vel * t3 + 0.5 * -max_decel * t3 * t3;
 
     // Calculate distance and time we can travel at max velocity
     double d2 = (final_pos - initial_pos) - (d1 + d3);
@@ -148,7 +148,7 @@ void BangBangTrajectory1D::generateTriangularTrajectory(
     // found here: https://www.desmos.com/calculator/qvrvtplgk7 Note that the full
     // derivation also supports a non-zero final velocity, but we currently don't support
     // that here.
-    double t_decel = std::sqrt((std::pow(initial_vel, 2) + 2 * dist * max_accel) /
+    double t_decel = std::sqrt((initial_vel * initial_vel + 2 * dist * max_accel) /
                                (max_decel * (max_accel + max_decel)));
 
     double signed_accel = std::copysign(max_accel, direction);
@@ -160,7 +160,7 @@ void BangBangTrajectory1D::generateTriangularTrajectory(
 
     // Calculate the time to accelerate to the max reached velocity
     double t_accel = (v_max_reached - initial_vel) / signed_accel;
-    double d_accel = initial_vel * t_accel + 0.5 * signed_accel * std::pow(t_accel, 2.0);
+    double d_accel = initial_vel * t_accel + 0.5 * signed_accel * t_accel * t_accel;
 
     // Add the trajectory parts
     addTrajectoryPart({.end_time     = time_offset + Duration::fromSeconds(t_accel),
@@ -179,8 +179,9 @@ double BangBangTrajectory1D::getPosition(Duration t) const
     Duration t_delta;
     getTrajPartAndDeltaTime(t, traj_part, t_delta);
 
-    return traj_part.position + traj_part.velocity * t_delta.toSeconds() +
-           0.5 * traj_part.acceleration * std::pow(t_delta.toSeconds(), 2.0);
+    double t_delta_sec = t_delta.toSeconds();
+    return traj_part.position + traj_part.velocity * t_delta_sec +
+           0.5 * traj_part.acceleration * t_delta_sec * t_delta_sec;
 }
 
 double BangBangTrajectory1D::getVelocity(Duration t) const
@@ -234,17 +235,17 @@ inline double BangBangTrajectory1D::triangularProfileStopPosition(
     {
         // Distance to accelerate to max velocity
         double d_accel =
-            (std::pow(max_vel, 2.0) - std::pow(initial_vel, 2.0)) / (2 * max_accel);
+            (max_vel * max_vel - initial_vel * initial_vel) / (2 * max_accel);
 
         // Distance to decelerate from max velocity to 0
-        double d_decel = std::pow(max_vel, 2.0) / (2 * max_decel);
+        double d_decel = (max_vel * max_vel) / (2 * max_decel);
 
         return initial_pos + std::copysign(d_accel + d_decel, direction);
     }
     else
     {
         // Initial velocity is higher than max velocity, so we will just decelerate to 0
-        double d_decel = std::pow(initial_vel, 2.0) / (2 * max_decel);
+        double d_decel = (initial_vel * initial_vel) / (2 * max_decel);
         return initial_pos + std::copysign(d_decel, direction);
     }
 }

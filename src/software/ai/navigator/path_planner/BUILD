@@ -61,8 +61,8 @@ cc_library(
     deps = [
         ":bang_bang_trajectory_1d",
         "//software/geom:angle",
-        "//software/geom:angular_velocity",
         "//software/geom:angular_acceleration",
+        "//software/geom:angular_velocity",
     ],
 )
 
@@ -92,8 +92,8 @@ cc_library(
     hdrs = ["trajectory_path.h"],
     deps = [
         ":trajectory_path_node",
-        "//software/logger",
         "//software/ai/navigator/path_planner:kinematic_constraints",
+        "//software/logger",
     ],
 )
 
@@ -113,8 +113,8 @@ cc_library(
     deps = [
         ":kinematic_constraints",
         ":trajectory_path",
-        "//software/ai/navigator/obstacle:obstacle",
         "//extlibs/AABB:aabb_tree",
+        "//software/ai/navigator/obstacle",
     ],
 )
 

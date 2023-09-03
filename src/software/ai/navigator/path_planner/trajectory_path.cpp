@@ -1,11 +1,14 @@
 #include "software/ai/navigator/path_planner/trajectory_path.h"
+
 #include "software/logger/logger.h"
 
-TrajectoryPath::TrajectoryPath(const BangBangTrajectory2D &initial_trajectory)
-        : traj_path({TrajectoryPathNode(initial_trajectory)})
-{}
+TrajectoryPath::TrajectoryPath(const BangBangTrajectory2D& initial_trajectory)
+    : traj_path({TrajectoryPathNode(initial_trajectory)})
+{
+}
 
-void TrajectoryPath::append(const KinematicConstraints &constraints, Duration connection_time, const Point& destination)
+void TrajectoryPath::append(const KinematicConstraints& constraints,
+                            Duration connection_time, const Point& destination)
 {
     for (size_t i = 0; i < traj_path.size(); i++)
     {
@@ -16,10 +19,12 @@ void TrajectoryPath::append(const KinematicConstraints &constraints, Duration co
             // Delete all trajectory nodes after the on that is being connected to
             traj_path.erase(traj_path.begin() + i + 1, traj_path.end());
 
-            Point connection_pos = getPosition(connection_time);
+            Point connection_pos  = getPosition(connection_time);
             Vector connection_vel = getVelocity(connection_time);
             BangBangTrajectory2D child_traj;
-            child_traj.generate(connection_pos, destination, connection_vel, constraints.getMaxVelocity(), constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
+            child_traj.generate(
+                connection_pos, destination, connection_vel, constraints.getMaxVelocity(),
+                constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
             traj_path.emplace_back(child_traj);
             return;
         }
@@ -29,7 +34,9 @@ void TrajectoryPath::append(const KinematicConstraints &constraints, Duration co
         }
     }
 
-    LOG(FATAL) << "TrajectoryPath::append called with connection_time > getTotalTime() = " << getTotalTime() << " (Num trajectories already in path: " << traj_path.size() << ")";
+    LOG(FATAL) << "TrajectoryPath::append called with connection_time > getTotalTime() = "
+               << getTotalTime()
+               << " (Num trajectories already in path: " << traj_path.size() << ")";
 }
 
 Point TrajectoryPath::getPosition(Duration t) const
@@ -102,4 +109,3 @@ std::vector<Rectangle> TrajectoryPath::getBoundingBoxes() const
     }
     return bounding_boxes;
 }
-

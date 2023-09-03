@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/navigator/path_planner/trajectory_path_node.h"
 #include "software/ai/navigator/path_planner/kinematic_constraints.h"
+#include "software/ai/navigator/path_planner/trajectory_path_node.h"
 
 /**
  * TrajectoryPath represents a list of 2D trajectories that are connected end-to-end
@@ -10,12 +10,13 @@
  */
 class TrajectoryPath : public Trajectory<Point, Vector, Vector>
 {
-public:
+   public:
     TrajectoryPath() = delete;
 
     TrajectoryPath(const BangBangTrajectory2D& initial_trajectory);
 
-    void append(const KinematicConstraints& constraints, Duration connection_time, const Point& destination);
+    void append(const KinematicConstraints& constraints, Duration connection_time,
+                const Point& destination);
 
     /**
      * Get the position at time t of this trajectory path
@@ -50,6 +51,6 @@ public:
 
     std::vector<Rectangle> getBoundingBoxes() const;
 
-private:
+   private:
     std::vector<TrajectoryPathNode> traj_path;
 };
