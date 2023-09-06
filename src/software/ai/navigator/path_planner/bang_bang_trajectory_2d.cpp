@@ -12,6 +12,9 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
                                     const Vector& initial_vel, double max_vel,
                                     double max_accel, double max_decel)
 {
+    // The following implementation is based on section IV of the paper
+    // "Trajectory generation for four wheeled omnidirectional vehicles"
+
     // Take the x and y components of the max velocity, acceleration, and deceleration
     // based on the angle alpha so the overall 2D trajectory abides by the kinematic
     // constraints.

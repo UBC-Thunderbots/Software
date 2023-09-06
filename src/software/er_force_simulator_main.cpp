@@ -11,6 +11,9 @@
 #include "software/networking/threaded_proto_unix_sender.hpp"
 #include "software/simulation/er_force_simulator.h"
 
+
+#include "external/tracy/public/tracy/Tracy.hpp"
+
 int main(int argc, char **argv)
 {
     struct CommandLineArgs
@@ -181,6 +184,7 @@ int main(int argc, char **argv)
         // Simulator Tick Input
         auto simulator_tick = ThreadedProtoUnixListener<TbotsProto::SimulatorTick>(
             runtime_dir + SIMULATION_TICK_PATH, [&](TbotsProto::SimulatorTick input) {
+                FrameMarkNamed("TickSim");
                 std::scoped_lock lock(simulator_mutex);
 
                 // Step the simulation and send back the wrapper packets and

@@ -88,8 +88,7 @@ TEST_F(BangBangTrajectory2DTest, test_random_start_and_final_position_sampling)
     const double max_decel = 5;
     for (int i = 0; i < NUM_RANDOM_TESTS; ++i)
     {
-        std::cout << "Random test " << i << std::endl;
-
+        LOG(DEBUG) << "Random test " << i;
         Point start_pos  = getRandomPoint();
         Point final_pos  = getRandomPoint();
         Vector start_vel = getRandomVector();

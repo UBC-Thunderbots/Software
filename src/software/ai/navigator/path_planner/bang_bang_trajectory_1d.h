@@ -96,6 +96,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      */
     const TrajectoryPart &getTrajectoryPart(size_t index) const;
 
+    // TODO: Add tests for getters with time being over limit?!
     size_t getNumTrajectoryParts() const;
 
    private:

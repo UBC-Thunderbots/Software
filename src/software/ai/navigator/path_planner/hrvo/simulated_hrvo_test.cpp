@@ -115,12 +115,13 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_friendly_robot_infront)
 {
-    Point destination      = Point(2.8, 0);
-    Point initial_position = Point(-2.5, 0);
+    Point destination      = Point(2.5, 0);
+    Point initial_position = Point(-2.5, 0.0);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
-        TestUtil::createStationaryRobotStatesWithId({Point(2, 0), initial_position});
-    std::vector<RobotStateWithId> enemy_robots = {};
+        TestUtil::createStationaryRobotStatesWithId({Point(3.0, -3.0), initial_position});
+    std::vector<RobotStateWithId> enemy_robots =
+            TestUtil::createStationaryRobotStatesWithId({/*Point(2, 0), Point(2, 0.1)*/});;
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);

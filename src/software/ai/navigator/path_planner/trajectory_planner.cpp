@@ -56,6 +56,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
                  connection_time < trajectory_path.getTotalTime();
                  connection_time += SUB_DESTINATION_STEP_INTERVAL)
             {
+                ZoneScopedN("pushBackAndAppendTrajectoy");
                 possible_paths.push_back(trajectory_path);
                 possible_paths.back().append(constraints, connection_time, destination);
             }
@@ -138,8 +139,9 @@ double TrajectoryPlanner::calculateCost(const TrajectoryPath &trajectory_path,
     bool collision_found     = false;
     Duration earliest_collision_time =
         trajectory_path.getTotalTime() + Duration::fromSeconds(1);
-    for (Duration time = Duration(); time < trajectory_path.getTotalTime() && time < MAX_FUTURE_COLLISION_CHECK;
-         time += COLLISION_CHECK_STEP_INTERVAL)
+
+    Duration time;
+    while (time < MAX_FUTURE_COLLISION_CHECK)
     {
         Point position = trajectory_path.getPosition(time);
         for (unsigned int obstacle_index : possible_collisions_indices)
@@ -165,6 +167,8 @@ double TrajectoryPlanner::calculateCost(const TrajectoryPath &trajectory_path,
             first_iteration = false;
             // TODO: Add cost depending on length of collision?!
         }
+        Vector vel = trajectory_path.getVelocity(time);
+        time += std::max(Duration::fromSeconds(0.1), Duration::fromSeconds(ROBOT_MAX_RADIUS_METERS / vel.length()));
     }
 
     if (collision_found)

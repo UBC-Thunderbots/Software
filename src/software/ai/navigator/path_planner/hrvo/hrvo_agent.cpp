@@ -20,8 +20,8 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
 {
     // Reinitialize obstacle factory with a custom inflation factor
     auto obstacle_config = TbotsProto::RobotNavigationObstacleConfig();
-    //    obstacle_config.set_robot_obstacle_inflation_factor(
-    //        HRVO_STATIC_OBSTACLE_INFLATION_FACTOR); // Removed for now
+        //        obstacle_config.set_robot_obstacle_inflation_factor(
+        //            0.0); // TODO: Updated for now
     obstacle_factory = RobotNavigationObstacleFactory(obstacle_config);
 }
 
@@ -112,8 +112,8 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         auto path_point_opt =
             path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
         Point destination = path_point_opt.getPosition();
-        position_traj.generate(position, destination, velocity, max_speed, max_accel,
-                               max_decel);
+//        position_traj.generate(position, destination, velocity, max_speed, max_accel,
+//                               max_decel);
         angular_traj.generate(orientation, path_point_opt.getOrientation(),
                               angular_velocity,
                               AngularVelocity::fromRadians(max_angular_speed),
@@ -141,6 +141,9 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                                    KinematicConstraints(max_speed, max_accel, max_decel),
                                    obstacles, world.field().fieldLines());
         last_traj_update_time = std::chrono::steady_clock::now();
+        // TODO: This time offset works for the current kinematic constants
+        //       it doesn't work if those constants are changed.
+        time_since_traj_update = Duration::fromSeconds(0.016);
     }
     this->path = path;
 }
@@ -341,20 +344,37 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
 void HRVOAgent::computeNewVelocity(
     const std::map<unsigned int, std::shared_ptr<Agent>> &agents, Duration time_step)
 {
-    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    long time_since_traj_start_us =
-        std::chrono::duration_cast<std::chrono::microseconds>(now - last_traj_update_time)
-            .count();
+//    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+//    long time_since_traj_start_us =
+//        std::chrono::duration_cast<std::chrono::microseconds>(now - last_traj_update_time)
+//            .count();
     // TODO: Need to increment timestep for next iteration, but in sim we regenerate every
     // tick anyways
-    new_velocity = position_traj.getVelocity(
-        time_step +
+    time_since_traj_update += time_step;
+    new_velocity = trajectory_path.getVelocity(
+            time_since_traj_update /*+
         Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) *
-                                   MILLISECONDS_PER_MICROSECOND));
+                                   MILLISECONDS_PER_MICROSECOND)*/);
+//    std::cout << "time_since_traj_start: " << Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) *
+//                                                                            MILLISECONDS_PER_MICROSECOND) << std::endl;
+
+    auto path_point_opt =
+            path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
+    Point destination = path_point_opt.getPosition();
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+                            {"vx", velocity.x()},
+                            {"vy", velocity.y()},
+                            {"v", velocity.length()},
+                            {"d", (position - destination).length()},
+                            {"px", position.x()},
+                            {"py", position.y()},
+                            {"dx", (position - destination).x()},
+                            {"dy", (position - destination).y()}
+                        });
     angular_velocity = angular_traj.getVelocity(
-        time_step +
+            time_since_traj_update /*+
         Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) *
-                                   MILLISECONDS_PER_MICROSECOND));
+                                   MILLISECONDS_PER_MICROSECOND)*/);
 
     //    std::cout << "Robot id " << robot_id << " new velocity: " << new_velocity <<
     //    std::endl;

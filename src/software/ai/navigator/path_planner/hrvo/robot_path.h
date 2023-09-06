@@ -43,6 +43,9 @@ class RobotPath
      */
     std::optional<PathPoint> getCurrentPathPoint() const;
 
+    // TODO: Added for hacky integration. Remove!
+    std::optional<PathPoint> getFinalPathPoint() const;
+
     /**
      * Gets the path radius for this agent
      * @returns path radius for this agent

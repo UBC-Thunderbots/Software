@@ -39,6 +39,18 @@ std::optional<PathPoint> RobotPath::getCurrentPathPoint() const
     }
 }
 
+std::optional<PathPoint> RobotPath::getFinalPathPoint() const
+{
+    if (!path.empty())
+    {
+        return path[path.size() - 1];
+    }
+    else
+    {
+        return std::nullopt;
+    }
+}
+
 bool RobotPath::isGoingToFinalPathPoint()
 {
     return curr_path_index >= path.size() - 1;

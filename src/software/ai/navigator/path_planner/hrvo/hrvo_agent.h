@@ -243,6 +243,7 @@ class HRVOAgent : public Agent
     BangBangTrajectory2D position_traj;
     BangBangTrajectory1DAngular angular_traj;
     std::chrono::steady_clock::time_point last_traj_update_time;
+    Duration time_since_traj_update;
 
 
     TrajectoryPlanner planner;
