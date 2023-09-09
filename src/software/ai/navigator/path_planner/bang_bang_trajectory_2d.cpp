@@ -38,14 +38,14 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
         y_trajectory.generate(initial_pos.y(), final_pos.y(), initial_vel.y(),
                               max_vel * sin, max_accel * sin, max_decel * sin);
 
-        const Duration x_time = x_trajectory.getTotalTime();
-        const Duration y_time = y_trajectory.getTotalTime();
-        if (std::abs((x_time - y_time).toSeconds()) < TRAJ_ACCURACY_TOLERANCE_SEC)
+        const double x_time_sec = x_trajectory.getTotalTime();
+        const double y_time_sec = y_trajectory.getTotalTime();
+        if (std::abs(x_time_sec - y_time_sec) < TRAJ_ACCURACY_TOLERANCE_SEC)
         {
             break;
         }
 
-        if (x_time > y_time)
+        if (x_time_sec > y_time_sec)
         {
             // x trajectory takes longer, so decrease the alpha resulting in it getting
             // a larger component of the kinematic constraints relative to y and reaching
@@ -61,22 +61,22 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
     }
 }
 
-Point BangBangTrajectory2D::getPosition(Duration t) const
+Point BangBangTrajectory2D::getPosition(double t_sec) const
 {
-    return Point(x_trajectory.getPosition(t), y_trajectory.getPosition(t));
+    return Point(x_trajectory.getPosition(t_sec), y_trajectory.getPosition(t_sec));
 }
 
-Vector BangBangTrajectory2D::getVelocity(Duration t) const
+Vector BangBangTrajectory2D::getVelocity(double t_sec) const
 {
-    return Vector(x_trajectory.getVelocity(t), y_trajectory.getVelocity(t));
+    return Vector(x_trajectory.getVelocity(t_sec), y_trajectory.getVelocity(t_sec));
 }
 
-Vector BangBangTrajectory2D::getAcceleration(Duration t) const
+Vector BangBangTrajectory2D::getAcceleration(double t_sec) const
 {
-    return Vector(x_trajectory.getAcceleration(t), y_trajectory.getAcceleration(t));
+    return Vector(x_trajectory.getAcceleration(t_sec), y_trajectory.getAcceleration(t_sec));
 }
 
-Duration BangBangTrajectory2D::getTotalTime() const
+double BangBangTrajectory2D::getTotalTime() const
 {
     return std::max(x_trajectory.getTotalTime(), y_trajectory.getTotalTime());
 }

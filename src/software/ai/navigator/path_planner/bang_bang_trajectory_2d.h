@@ -37,33 +37,33 @@ class BangBangTrajectory2D : public Trajectory2D
     /**
      * Get the position at time t
      *
-     * @param t The time elapsed since the start of the trajectory
+     * @param t The time elapsed since the start of the trajectory in seconds
      * @return The position at time t
      */
-    Point getPosition(Duration t) const override;
+    Point getPosition(double t_sec) const override;
 
     /**
      * Get the velocity at time t
      *
-     * @param t The time elapsed since the start of the trajectory
+     * @param t The time elapsed since the start of the trajectory in seconds
      * @return The velocity at time t
      */
-    Vector getVelocity(Duration t) const override;
+    Vector getVelocity(double t_sec) const override;
 
     /**
      * Get the acceleration at time t
      *
-     * @param t The time elapsed since the start of the trajectory
+     * @param t The time elapsed since the start of the trajectory in seconds
      * @return The acceleration at time t
      */
-    Vector getAcceleration(Duration t) const override;
+    Vector getAcceleration(double t_sec) const override;
 
     /**
      * Get the total duration of the trajectory until it reaches the destination
      *
-     * @return The total duration for the trajectory
+     * @return The total duration for the trajectory in seconds
      */
-    Duration getTotalTime() const override;
+    double getTotalTime() const override;
 
     // TODO: Test
     /**

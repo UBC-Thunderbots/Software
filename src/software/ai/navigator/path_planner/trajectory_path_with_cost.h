@@ -14,14 +14,14 @@ class TrajectoryPathWithCost
 
 
     TrajectoryPath traj_path;
-    double cost;
+    double cost = 0.0;
     // The duration before the trajectory leaves an obstacle that it starts
     // within. 0 if the trajectory does not start within an obstacle.
-    Duration collision_duration_front;
+    double collision_duration_front = 0.0;
     // The duration we're within an obstacle before the trajectory end.
     // Equals duration of trajectory if it does not end in an obstacle.
-    Duration collision_duration_back;
-    Duration first_collision_time;
-    Duration collision_lookahead;
-    ObstaclePtr colliding_obstacle;
+    double collision_duration_back = 0.0;
+    double first_collision_time = 0.0;
+    double collision_lookahead = 0.0;
+    ObstaclePtr colliding_obstacle = nullptr;
 };

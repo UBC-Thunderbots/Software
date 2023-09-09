@@ -58,8 +58,8 @@ void BangBangTrajectory1D::generate(double initial_pos, double final_pos,
         // velocity is moving away from the destination. In either case, we have to
         // decelerate to stop first, then we can generate a profile to our destination.
         // vf = vi + at  =>  t = -vi / t  (vf = 0)
-        Duration time_to_stop = Duration::fromSeconds(std::abs(initial_vel) / max_decel);
-        addTrajectoryPart({.end_time     = time_to_stop,
+        double time_to_stop_sec = std::abs(initial_vel) / max_decel;
+        addTrajectoryPart({.end_time_sec     = time_to_stop_sec,
                            .position     = initial_pos,
                            .velocity     = initial_vel,
                            .acceleration = -std::copysign(max_decel, initial_vel)});
@@ -71,21 +71,21 @@ void BangBangTrajectory1D::generate(double initial_pos, double final_pos,
         {
             // We have time to reach max velocity, so we can use a trapezoidal profile
             generateTrapezoidalTrajectory(stop_pos, final_pos, 0, max_vel, max_accel,
-                                          max_decel, time_to_stop);
+                                          max_decel, time_to_stop_sec);
         }
         else
         {
             // We can't reach max velocity and cruise at it, so we have to use
             // a triangular profile
             generateTriangularTrajectory(stop_pos, final_pos, 0, max_accel, max_decel,
-                                         time_to_stop);
+                                         time_to_stop_sec);
         }
     }
 }
 
 void BangBangTrajectory1D::generateTrapezoidalTrajectory(
-    double initial_pos, double final_pos, double initial_vel, double max_vel,
-    double max_accel, double max_decel, Duration time_offset)
+        double initial_pos, double final_pos, double initial_vel, double max_vel,
+        double max_accel, double max_decel, double time_offset_sec)
 {
     if (final_pos < initial_pos)
     {
@@ -118,23 +118,23 @@ void BangBangTrajectory1D::generateTrapezoidalTrajectory(
     double t2 = d2 / max_vel;
 
     // Add the trajectory parts
-    addTrajectoryPart({.end_time     = time_offset + Duration::fromSeconds(t1),
+    addTrajectoryPart({.end_time_sec     = time_offset_sec + t1,
                        .position     = initial_pos,
                        .velocity     = initial_vel,
                        .acceleration = initial_accel});
-    addTrajectoryPart({.end_time     = time_offset + Duration::fromSeconds(t1 + t2),
+    addTrajectoryPart({.end_time_sec     = time_offset_sec + t1 + t2,
                        .position     = initial_pos + d1,
                        .velocity     = max_vel,
                        .acceleration = 0});
-    addTrajectoryPart({.end_time     = time_offset + Duration::fromSeconds(t1 + t2 + t3),
+    addTrajectoryPart({.end_time_sec     = time_offset_sec + t1 + t2 + t3,
                        .position     = initial_pos + d1 + d2,
                        .velocity     = max_vel,
                        .acceleration = -max_decel});
 }
 
 void BangBangTrajectory1D::generateTriangularTrajectory(
-    double initial_pos, double final_pos, double initial_vel, double max_accel,
-    double max_decel, Duration time_offset)
+        double initial_pos, double final_pos, double initial_vel, double max_accel,
+        double max_decel, double time_offset_sec)
 {
     double direction = std::copysign(1.0, final_pos - initial_pos);
     double dist      = std::abs(final_pos - initial_pos);
@@ -163,57 +163,56 @@ void BangBangTrajectory1D::generateTriangularTrajectory(
     double d_accel = initial_vel * t_accel + 0.5 * signed_accel * t_accel * t_accel;
 
     // Add the trajectory parts
-    addTrajectoryPart({.end_time     = time_offset + Duration::fromSeconds(t_accel),
+    addTrajectoryPart({.end_time_sec     = time_offset_sec + t_accel,
                        .position     = initial_pos,
                        .velocity     = initial_vel,
                        .acceleration = signed_accel});
-    addTrajectoryPart({.end_time = time_offset + Duration::fromSeconds(t_accel + t_decel),
+    addTrajectoryPart({.end_time_sec = time_offset_sec + t_accel + t_decel,
                        .position = initial_pos + d_accel,
                        .velocity = v_max_reached,
                        .acceleration = signed_decel});
 }
 
-double BangBangTrajectory1D::getPosition(Duration t) const
+double BangBangTrajectory1D::getPosition(double t_sec) const
 {
     TrajectoryPart traj_part;
-    Duration t_delta;
-    getTrajPartAndDeltaTime(t, traj_part, t_delta);
+    double t_delta_sec;
+    getTrajPartAndDeltaTime(t_sec, traj_part, t_delta_sec);
 
-    double t_delta_sec = t_delta.toSeconds();
     return traj_part.position + traj_part.velocity * t_delta_sec +
            0.5 * traj_part.acceleration * t_delta_sec * t_delta_sec;
 }
 
-double BangBangTrajectory1D::getVelocity(Duration t) const
+double BangBangTrajectory1D::getVelocity(double t_sec) const
 {
     TrajectoryPart traj_part;
-    Duration t_delta;
-    getTrajPartAndDeltaTime(t, traj_part, t_delta);
+    double t_delta_sec;
+    getTrajPartAndDeltaTime(t_sec, traj_part, t_delta_sec);
 
-    return traj_part.velocity + traj_part.acceleration * t_delta.toSeconds();
+    return traj_part.velocity + traj_part.acceleration * t_delta_sec;
 }
 
-double BangBangTrajectory1D::getAcceleration(Duration t) const
+double BangBangTrajectory1D::getAcceleration(double t_sec) const
 {
-    t                       = std::clamp(t, Duration::fromSeconds(0), getTotalTime());
-    size_t trajectory_index = getTrajectoryIndexAtTime(t);
+    t_sec                       = std::clamp(t_sec, 0.0, getTotalTime());
+    size_t trajectory_index = getTrajectoryIndexAtTime(t_sec);
     return trajectory_parts[trajectory_index].acceleration;
 }
 
 void BangBangTrajectory1D::getTrajPartAndDeltaTime(
-    Duration t, BangBangTrajectory1D::TrajectoryPart &out_traj_part,
-    Duration &out_t_delta) const
+        double t_sec, BangBangTrajectory1D::TrajectoryPart &out_traj_part,
+        double &out_t_delta_sec) const
 {
-    t                       = std::clamp(t, Duration::fromSeconds(0), getTotalTime());
-    size_t trajectory_index = getTrajectoryIndexAtTime(t);
+    t_sec                       = std::clamp(t_sec, 0.0, getTotalTime());
+    size_t trajectory_index = getTrajectoryIndexAtTime(t_sec);
     out_traj_part           = trajectory_parts[trajectory_index];
 
-    Duration last_part_start_time;
+    double last_part_start_time = 0.0;
     if (trajectory_index > 0)
     {
-        last_part_start_time = trajectory_parts[trajectory_index - 1].end_time;
+        last_part_start_time = trajectory_parts[trajectory_index - 1].end_time_sec;
     }
-    out_t_delta = t - last_part_start_time;
+    out_t_delta_sec = t_sec - last_part_start_time;
 }
 
 inline double BangBangTrajectory1D::closestPositionToStop(double initial_pos,
@@ -250,11 +249,11 @@ inline double BangBangTrajectory1D::triangularProfileStopPosition(
     }
 }
 
-size_t BangBangTrajectory1D::getTrajectoryIndexAtTime(Duration t) const
+size_t BangBangTrajectory1D::getTrajectoryIndexAtTime(double t_sec) const
 {
     for (unsigned int i = 0; i < num_trajectory_parts; i++)
     {
-        if (t <= trajectory_parts[i].end_time)
+        if (t_sec <= trajectory_parts[i].end_time_sec)
         {
             return i;
         }

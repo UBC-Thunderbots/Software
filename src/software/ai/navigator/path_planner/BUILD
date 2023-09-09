@@ -37,9 +37,8 @@ cc_library(
 
 cc_library(
     name = "trajectory",
-    hdrs = ["trajectory.h"],
+    hdrs = ["trajectory.hpp"],
     deps = [
-        "//software/time:duration",
     ],
 )
 

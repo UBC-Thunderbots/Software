@@ -1,7 +1,5 @@
 #pragma once
 
-#include "software/time/duration.h"
-
 /**
  * A trajectory is a path that is parameterized by time. It is a function that
  * takes in a time and returns a position, velocity, and acceleration.
@@ -19,36 +17,36 @@ class Trajectory
     /**
      * Get position at time t
      *
-     * @param t Duration elapsed since start of trajectory
+     * @param t_sec Duration elapsed since start of trajectory in seconds
      * @return position
      */
-    virtual P getPosition(Duration t) const = 0;
+    virtual P getPosition(double t_sec) const = 0;
 
 
     /**
      * Get velocity at time t
      *
-     * @param t Duration elapsed since start of trajectory
+     * @param t_sec Duration elapsed since start of trajectory in seconds
      * @return velocity
      */
-    virtual V getVelocity(Duration t) const = 0;
+    virtual V getVelocity(double t_sec) const = 0;
 
 
     /**
      * Get acceleration at time t
      *
-     * @param t Duration elapsed since start of trajectory
+     * @param t_sec Duration elapsed since start of trajectory in seconds
      * @return acceleration
      */
-    virtual A getAcceleration(Duration t) const = 0;
+    virtual A getAcceleration(double t_sec) const = 0;
 
 
     /**
      * Get total runtime of trajectory
      *
-     * @return total time for trajectory
+     * @return total time for trajectory in seconds
      */
-    virtual Duration getTotalTime() const = 0;
+    virtual double getTotalTime() const = 0;
 
 
     /**

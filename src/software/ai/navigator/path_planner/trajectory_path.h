@@ -15,7 +15,7 @@ class TrajectoryPath : public Trajectory2D
 
     TrajectoryPath(const BangBangTrajectory2D& initial_trajectory);
 
-    void append(const KinematicConstraints& constraints, Duration connection_time,
+    void append(const KinematicConstraints& constraints, double connection_time_sec,
                 const Point& destination);
 
     /**
@@ -24,7 +24,7 @@ class TrajectoryPath : public Trajectory2D
      * @param t The time elapsed since the start of the trajectory path
      * @return The position at time t
      */
-    Point getPosition(Duration t) const override;
+    Point getPosition(double t_sec) const override;
 
     /**
      * Get the velocity at time t of this trajectory path
@@ -32,7 +32,7 @@ class TrajectoryPath : public Trajectory2D
      * @param t The time elapsed since the start of the trajectory path
      * @return The velocity at time t
      */
-    Vector getVelocity(Duration t) const override;
+    Vector getVelocity(double t_sec) const override;
 
     /**
      * Get the acceleration at time t of this trajectory path
@@ -40,14 +40,14 @@ class TrajectoryPath : public Trajectory2D
      * @param t The time elapsed since the start of the trajectory path
      * @return The acceleration at time t
      */
-    Vector getAcceleration(Duration t) const override;
+    Vector getAcceleration(double t_sec) const override;
 
     /**
      * Get the total duration of the trajectory until it reaches the destination
      *
      * @return The total duration for this trajectory path
      */
-    Duration getTotalTime() const override;
+    double getTotalTime() const override;
 
     std::vector<Rectangle> getBoundingBoxes() const;
 

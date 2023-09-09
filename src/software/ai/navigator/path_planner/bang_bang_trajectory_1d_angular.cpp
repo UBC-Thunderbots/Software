@@ -13,22 +13,22 @@ void BangBangTrajectory1DAngular::generate(Angle initial_orient, Angle final_ori
                         max_angular_accel.toRadians(), max_angular_decel.toRadians());
 }
 
-Angle BangBangTrajectory1DAngular::getPosition(Duration t) const
+Angle BangBangTrajectory1DAngular::getPosition(double t_sec) const
 {
-    return Angle::fromRadians(trajectory.getPosition(t));
+    return Angle::fromRadians(trajectory.getPosition(t_sec));
 }
 
-AngularVelocity BangBangTrajectory1DAngular::getVelocity(Duration t) const
+AngularVelocity BangBangTrajectory1DAngular::getVelocity(double t_sec) const
 {
-    return AngularVelocity::fromRadians(trajectory.getVelocity(t));
+    return AngularVelocity::fromRadians(trajectory.getVelocity(t_sec));
 }
 
-AngularAcceleration BangBangTrajectory1DAngular::getAcceleration(Duration t) const
+AngularAcceleration BangBangTrajectory1DAngular::getAcceleration(double t_sec) const
 {
-    return AngularAcceleration::fromRadians(trajectory.getAcceleration(t));
+    return AngularAcceleration::fromRadians(trajectory.getAcceleration(t_sec));
 }
 
-Duration BangBangTrajectory1DAngular::getTotalTime() const
+double BangBangTrajectory1DAngular::getTotalTime() const
 {
     return trajectory.getTotalTime();
 }

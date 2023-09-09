@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include "software/ai/navigator/path_planner/trajectory.h"
+#include "software/ai/navigator/path_planner/trajectory.hpp"
 
 static const unsigned int MAX_TRAJECTORY_PARTS = 4;
 
@@ -17,7 +17,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      */
     struct TrajectoryPart
     {
-        Duration end_time   = Duration::fromSeconds(0);
+        double end_time_sec   = 0;
         double position     = 0;
         double velocity     = 0;
         double acceleration = 0;
@@ -47,35 +47,35 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
     /**
      * Get position at time t
      *
-     * @param t Duration elapsed since start of trajectory
+     * @param t_sec Duration elapsed since start of trajectory in seconds
      * @return The position at time t
      */
-    double getPosition(Duration t) const override;
+    double getPosition(double t_sec) const override;
 
     /**
      * Get velocity at time t
      *
-     * @param t Duration elapsed since start of trajectory
+     * @param t_sec Duration elapsed since start of trajectory in seconds
      * @return The velocity at time t
      */
-    double getVelocity(Duration t) const override;
+    double getVelocity(double t_sec) const override;
 
     /**
      * Get acceleration at time t
      *
-     * @param t Duration elapsed since start of trajectory
+     * @param t_sec Duration elapsed since start of trajectory in seconds
      * @return The acceleration at time t
      */
-    double getAcceleration(Duration t) const override;
+    double getAcceleration(double t_sec) const override;
 
     /**
      * Get total runtime of trajectory
      *
      * @return total time for trajectory
      */
-    inline Duration getTotalTime() const override
+    inline double getTotalTime() const override
     {
-        return trajectory_parts[num_trajectory_parts - 1].end_time;
+        return trajectory_parts[num_trajectory_parts - 1].end_time_sec;
     }
 
     /**
@@ -117,12 +117,12 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      * is positive
      * @param max_decel The maximum deceleration the trajectory could have. Assumes value
      * is positive
-     * @param time_offset The time offset to start the trajectory at
+     * @param time_offset_sec The time offset to start the trajectory at
      */
     void generateTrapezoidalTrajectory(double initial_pos, double final_pos,
                                        double initial_vel, double max_vel,
                                        double max_accel, double max_decel,
-                                       Duration time_offset = Duration::fromSeconds(0));
+                                       double time_offset_sec = 0.0);
 
     /**
      * Generate a triangular trajectory and fill in `trajectory_parts`.
@@ -139,12 +139,12 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      * is positive
      * @param max_decel The maximum deceleration the trajectory could have. Assumes value
      * is positive
-     * @param time_offset The time offset to start the trajectory at
+     * @param time_offset_sec The time offset to start the trajectory at
      */
     void generateTriangularTrajectory(double initial_pos, double final_pos,
                                       double initial_vel, double max_accel,
                                       double max_decel,
-                                      Duration time_offset = Duration::fromSeconds(0));
+                                      double time_offset_sec = 0.0);
 
     /**
      * Calculates the closest position at which the trajectory could stop at (velocity =
@@ -181,22 +181,22 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
     /**
      * Get the index of `trajectory_parts` that the robot is at at time t
      *
-     * @param t Duration elapsed since start of trajectory
+     * @param t_sec Duration elapsed since start of trajectory
      * @return Index of `trajectory_parts` that the robot is at at time t
      */
-    inline size_t getTrajectoryIndexAtTime(Duration t) const;
+    inline size_t getTrajectoryIndexAtTime(double t_sec) const;
 
     /**
      * Helper for getting the trajectory part at time t, and the time delta
      * between the start of the trajectory part and time t.
      *
-     * @param t Duration elapsed since start of trajectory
+     * @param t_sec Duration elapsed since start of trajectory
      * @param out_traj_part Out parameter for the trajectory part at time t
-     * @param out_t_delta Out parameter for the time delta between the start of the
+     * @param out_t_delta_sec Out parameter for the time delta between the start of the
      * trajectory part and time t
      */
-    void getTrajPartAndDeltaTime(Duration t, TrajectoryPart &out_traj_part,
-                                 Duration &out_t_delta) const;
+    void getTrajPartAndDeltaTime(double t_sec, BangBangTrajectory1D::TrajectoryPart &out_traj_part,
+                                 double &out_t_delta_sec) const;
 
     inline void addTrajectoryPart(const TrajectoryPart &part);
 

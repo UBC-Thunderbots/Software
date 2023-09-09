@@ -35,33 +35,33 @@ class BangBangTrajectory1DAngular
     /**
      * Get orientation at time t
      *
-     * @param t Duration elapsed since start of trajectory
+     * @param t_sec Duration elapsed since start of trajectory in seconds
      * @return The orientation at time t
      */
-    Angle getPosition(Duration t) const override;
+    Angle getPosition(double t_sec) const override;
 
     /**
      * Get angular velocity at time t
      *
-     * @param t Duration elapsed since start of trajectory
+     * @param t_sec Duration elapsed since start of trajectory in seconds
      * @return The angular velocity at time t
      */
-    AngularVelocity getVelocity(Duration t) const override;
+    AngularVelocity getVelocity(double t_sec) const override;
 
     /**
      * Get angular acceleration at time t
      *
-     * @param t Duration elapsed since start of trajectory
+     * @param t_sec Duration elapsed since start of trajectory in seconds
      * @return The angular acceleration at time t
      */
-    AngularAcceleration getAcceleration(Duration t) const override;
+    AngularAcceleration getAcceleration(double t_sec) const override;
 
     /**
      * Get total runtime of trajectory
      *
      * @return total time for trajectory
      */
-    Duration getTotalTime() const override;
+    double getTotalTime() const override;
 
    private:
     BangBangTrajectory1D trajectory;

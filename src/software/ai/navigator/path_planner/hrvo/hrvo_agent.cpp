@@ -352,7 +352,7 @@ void HRVOAgent::computeNewVelocity(
     // tick anyways
     time_since_traj_update += time_step;
     new_velocity = trajectory_path.getVelocity(
-            time_since_traj_update /*+
+            time_since_traj_update.toSeconds() /*+
         Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) *
                                    MILLISECONDS_PER_MICROSECOND)*/);
 //    std::cout << "time_since_traj_start: " << Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) *
@@ -372,7 +372,7 @@ void HRVOAgent::computeNewVelocity(
                             {"dy", (position - destination).y()}
                         });
     angular_velocity = angular_traj.getVelocity(
-            time_since_traj_update /*+
+            time_since_traj_update.toSeconds() /*+
         Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) *
                                    MILLISECONDS_PER_MICROSECOND)*/);
 
@@ -832,8 +832,8 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
     const int num_points = 18;
     for (int j = 0; j <= num_points; ++j)
     {
-        Point pos                  = trajectory_path.getPosition(Duration::fromSeconds(
-            j * trajectory_path.getTotalTime().toSeconds() / num_points));
+        Point pos                  = trajectory_path.getPosition(
+            j * trajectory_path.getTotalTime() / num_points);
         *(path_proto.add_points()) = *createPointProto(pos);
     }
     *(hrvo_visualization.mutable_trajectory()) = path_proto;

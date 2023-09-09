@@ -23,12 +23,12 @@ class BangBangTrajectory2DTest : public testing::Test
     void verifyKinematicConstraints(double max_vel, double max_accel, double max_decel)
     {
         const double sub_point_length_sec =
-            traj.getTotalTime().toSeconds() / NUM_SUB_POINTS;
+            traj.getTotalTime() / NUM_SUB_POINTS;
         const double max_accel_decel = std::max(max_accel, std::abs(max_decel));
 
         for (int i = 0; i <= NUM_SUB_POINTS; i++)
         {
-            Duration t = Duration::fromSeconds(i * sub_point_length_sec);
+            double t = i * sub_point_length_sec;
 
             // Note that the velocity may slightly exceed the max velocity if one of
             // the components gets a small fraction of the overall max velocity, and
@@ -47,7 +47,7 @@ class BangBangTrajectory2DTest : public testing::Test
         }
     }
 
-    void verifyPosition(const Point& expected_pos, Duration t)
+    void verifyPosition(const Point& expected_pos, double t)
     {
         Point actual_pos = traj.getPosition(t);
         EXPECT_TRUE(TestUtil::equalWithinTolerance((expected_pos - actual_pos).length(),
@@ -75,7 +75,7 @@ class BangBangTrajectory2DTest : public testing::Test
 TEST_F(BangBangTrajectory2DTest, test_already_at_destination)
 {
     traj.generate(Point(0, 0), Point(0, 0), Vector(0.0, 0.0), 1, 1, 1);
-    verifyPosition(Point(0, 0), Duration::fromSeconds(0));
+    verifyPosition(Point(0, 0), 0.0);
 }
 
 TEST_F(BangBangTrajectory2DTest, test_random_start_and_final_position_sampling)
@@ -95,7 +95,7 @@ TEST_F(BangBangTrajectory2DTest, test_random_start_and_final_position_sampling)
         traj.generate(start_pos, final_pos, start_vel, max_vel, max_accel, max_decel);
 
         verifyKinematicConstraints(max_vel, max_accel, max_decel);
-        verifyPosition(start_pos, Duration::fromSeconds(0));
+        verifyPosition(start_pos, 0.0);
         verifyPosition(final_pos, traj.getTotalTime());
         Vector final_vel = traj.getVelocity(traj.getTotalTime());
         EXPECT_LE(final_vel.length(), 0.001)
