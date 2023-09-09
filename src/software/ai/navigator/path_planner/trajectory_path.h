@@ -8,7 +8,7 @@
  * to form a path. A TrajectoryNode is a 2D trajectory and the time at which it ends
  * and the next TrajectoryNode begins.
  */
-class TrajectoryPath : public Trajectory<Point, Vector, Vector>
+class TrajectoryPath : public Trajectory2D
 {
    public:
     TrajectoryPath() = delete;

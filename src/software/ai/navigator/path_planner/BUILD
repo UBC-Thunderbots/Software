@@ -103,6 +103,7 @@ cc_library(
     hdrs = ["trajectory_path_with_cost.h"],
     deps = [
         ":trajectory_path",
+        "//software/ai/navigator/obstacle:obstacle",
     ],
 )
 
@@ -116,6 +117,7 @@ cc_library(
         "@tracy",
         "//extlibs/AABB:aabb_tree",
         "//software/ai/navigator/obstacle",
+        "//software/ai/navigator/path_planner:trajectory_path_with_cost",
     ],
 )
 

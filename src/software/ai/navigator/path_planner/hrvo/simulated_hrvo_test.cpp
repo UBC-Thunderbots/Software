@@ -121,7 +121,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_friendly_robot_infron
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(3.0, -3.0), initial_position});
     std::vector<RobotStateWithId> enemy_robots =
-            TestUtil::createStationaryRobotStatesWithId({/*Point(2, 0), Point(2, 0.1)*/});;
+            TestUtil::createStationaryRobotStatesWithId({Point(2, 0), Point(2, 0.1)});;
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);

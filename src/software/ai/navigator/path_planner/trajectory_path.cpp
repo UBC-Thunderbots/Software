@@ -53,7 +53,7 @@ Point TrajectoryPath::getPosition(Duration t) const
         }
     }
 
-    return Point();
+    return traj_path.back().getTrajectory().getDestination();
 }
 
 Vector TrajectoryPath::getVelocity(Duration t) const

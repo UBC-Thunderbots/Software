@@ -4,7 +4,9 @@
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 
-class BangBangTrajectory2D : public Trajectory<Point, Vector, Vector>
+using Trajectory2D = Trajectory<Point, Vector, Vector>;
+
+class BangBangTrajectory2D : public Trajectory2D
 {
    public:
     BangBangTrajectory2D() = default;
