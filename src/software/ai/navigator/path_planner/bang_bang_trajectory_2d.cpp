@@ -81,22 +81,22 @@ double BangBangTrajectory2D::getTotalTime() const
     return std::max(x_trajectory.getTotalTime(), y_trajectory.getTotalTime());
 }
 
-Rectangle BangBangTrajectory2D::getBoundingBox() const
+BoundingBox BangBangTrajectory2D::getBoundingBox() const
 {
     std::pair<double, double> x_min_max = x_trajectory.getMinMaxPositions();
     std::pair<double, double> y_min_max = y_trajectory.getMinMaxPositions();
-    // If min max are the same, shift them slightly so a valid rectangle can
+    // If min max are the same, shift them slightly so a valid bounding box can
     // be created
     if (std::abs(x_min_max.first - x_min_max.second) <= FIXED_EPSILON)
     {
-        x_min_max.first -= 0.01;
-        x_min_max.second += 0.01;
+        x_min_max.first -= 0.001;
+        x_min_max.second += 0.001;
     }
     if (std::abs(y_min_max.first - y_min_max.second) <= FIXED_EPSILON)
     {
-        y_min_max.first -= 0.01;
-        y_min_max.second += 0.01;
+        y_min_max.first -= 0.001;
+        y_min_max.second += 0.001;
     }
-    return Rectangle({x_min_max.first, y_min_max.first},
-                     {x_min_max.second, y_min_max.second});
+    return BoundingBox({x_min_max.first, y_min_max.first},
+                       {x_min_max.second, y_min_max.second});
 }

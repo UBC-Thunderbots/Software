@@ -31,7 +31,7 @@ class TrajectoryPlanner
                                                  const std::vector<ObstaclePtr> &obstacles,
                                                  const std::optional<TrajectoryPathWithCost>& sub_traj_with_cost,
                                                  const std::optional<double> sub_traj_duration_sec);
-    double calculateCost(const TrajectoryPathWithCost &traj_with_cost);
+    double calculateCost(const TrajectoryPathWithCost &traj_with_cost) const;
 
     std::vector<Vector> relative_sub_destinations;
 

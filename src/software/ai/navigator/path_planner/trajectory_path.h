@@ -49,7 +49,11 @@ class TrajectoryPath : public Trajectory2D
      */
     double getTotalTime() const override;
 
-    std::vector<Rectangle> getBoundingBoxes() const;
+    /**
+     * Get the bounding boxes of the trajectory path
+     * @return A list of bounding boxes which wrap this trajectory path
+     */
+    std::vector<BoundingBox> getBoundingBoxes() const;
 
    private:
     std::vector<TrajectoryPathNode> traj_path;

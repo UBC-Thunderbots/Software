@@ -2,7 +2,7 @@
 
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d.h"
 #include "software/geom/point.h"
-#include "software/geom/rectangle.h"
+#include "software/geom/bounding_box.h"
 
 using Trajectory2D = Trajectory<Point, Vector, Vector>;
 
@@ -68,9 +68,9 @@ class BangBangTrajectory2D : public Trajectory2D
     // TODO: Test
     /**
      * Get the bounding box of the trajectory
-     * @return Rectangle which bounds the trajectory
+     * @return bounding box which bounds the trajectory
      */
-    Rectangle getBoundingBox() const;
+    BoundingBox getBoundingBox() const;
 
    private:
     BangBangTrajectory1D x_trajectory;

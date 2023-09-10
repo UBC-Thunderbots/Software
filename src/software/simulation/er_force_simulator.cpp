@@ -318,6 +318,7 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     {
                 threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
                                                   &robot_to_vel_pair_map]() {
+        tracy::SetThreadName(("Yellow Robot " + std::to_string(robot_id)).c_str());
         auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
         setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
                           world_proto, local_vel, angular_vel);
@@ -363,6 +364,7 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     {
         threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
                                           &robot_to_vel_pair_map]() {
+        tracy::SetThreadName(("Blue Robot " + std::to_string(robot_id)).c_str());
         auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
         setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
                           world_proto, local_vel, angular_vel);

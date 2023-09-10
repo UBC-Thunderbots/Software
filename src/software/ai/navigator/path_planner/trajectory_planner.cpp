@@ -33,7 +33,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     //       stores the obstacles
     aabb::Tree tree(2, 0.0, {false, false},
                     {navigable_area.xLength(), navigable_area.yLength()},
-                    static_cast<unsigned int>(obstacles.size()), false);
+                    std::max(static_cast<unsigned int>(obstacles.size()), 1u), false);
     {
         ZoneScopedN("fillObstacleTree");
         for (unsigned int i = 0; i < obstacles.size(); i++)
@@ -118,11 +118,11 @@ double TrajectoryPlanner::calculateCost(const TrajectoryPath &trajectory_path,
 
     // TODO: Only get AABB up to MAX_FUTURE_COLLISION_CHECK into the future
     std::set<unsigned int> possible_collisions_indices;
-    for (const Rectangle &bounding_box : trajectory_path.getBoundingBoxes())
+    for (const BoundingBox &bounding_box : trajectory_path.getBoundingBoxes())
     {
         std::vector<unsigned int> bb_collisions = obstacle_tree.query(aabb::AABB(
-            {bounding_box.negXNegYCorner().x(), bounding_box.negXNegYCorner().y()},
-            {bounding_box.posXPosYCorner().x(), bounding_box.posXPosYCorner().y()}));
+            {bounding_box.xMin(), bounding_box.yMin()},
+            {bounding_box.xMax(), bounding_box.yMax()}));
         possible_collisions_indices.insert(bb_collisions.begin(), bb_collisions.end());
     }
 
@@ -198,14 +198,16 @@ TrajectoryPlanner::getTrajectoryWithCost(const TrajectoryPath &trajectory, aabb:
                                          const std::optional<TrajectoryPathWithCost>& sub_traj_with_cost,
                                          const std::optional<double> sub_traj_duration_sec)
 {
+    ZoneScopedN("getTrajectoryWithCost");
+
     TrajectoryPathWithCost traj_with_cost(trajectory);
 
     std::set<unsigned int> possible_collisions_indices;
-    for (const Rectangle &bounding_box : trajectory.getBoundingBoxes())
+    for (const BoundingBox &bounding_box : trajectory.getBoundingBoxes())
     {
         std::vector<unsigned int> bb_collisions = obstacle_tree.query(aabb::AABB(
-                {bounding_box.negXNegYCorner().x(), bounding_box.negXNegYCorner().y()},
-                {bounding_box.posXPosYCorner().x(), bounding_box.posXPosYCorner().y()}));
+                {bounding_box.xMin(), bounding_box.yMin()},
+                {bounding_box.xMax(), bounding_box.yMax()}));
         possible_collisions_indices.insert(bb_collisions.begin(), bb_collisions.end());
     }
 
@@ -246,8 +248,9 @@ TrajectoryPlanner::getTrajectoryWithCost(const TrajectoryPath &trajectory, aabb:
     return traj_with_cost;
 }
 
-double TrajectoryPlanner::calculateCost(const TrajectoryPathWithCost &traj_with_cost)
+double TrajectoryPlanner::calculateCost(const TrajectoryPathWithCost &traj_with_cost) const
 {
+    ZoneScopedN("calculateCost");
     double total_cost = traj_with_cost.traj_path.getTotalTime();
 
     // TODO: Tiger's does this dynamically?! collisionPenalty. Mainly for penalty area
@@ -278,6 +281,7 @@ double TrajectoryPlanner::getFirstNonCollisionTime(const TrajectoryPath &traj_pa
                                                      const std::set<unsigned int>& obstacle_indices,
                                                      const std::vector<ObstaclePtr> &obstacles) const
 {
+    ZoneScopedN("getFirstNonCollisionTime");
     double path_length = traj_path.getTotalTime();
     for (double time = 0.0;
          time <= std::min(path_length, MAX_FUTURE_COLLISION_CHECK_SEC);
@@ -307,6 +311,7 @@ TrajectoryPlanner::getFirstCollisionTime(const TrajectoryPath &traj_path, const 
                                          const std::vector<ObstaclePtr> &obstacles, const double start_time_sec,
                                          const double stop_time_sec) const
 {
+    ZoneScopedN("getFirstCollisionTime");
     for (double time = start_time_sec;
          time <= std::min(stop_time_sec, MAX_FUTURE_COLLISION_CHECK_SEC);
          time += COLLISION_CHECK_STEP_INTERVAL_SEC)
@@ -327,6 +332,7 @@ TrajectoryPlanner::getFirstCollisionTime(const TrajectoryPath &traj_path, const 
 double TrajectoryPlanner::getLastNonCollisionTime(const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
                                                     const std::vector<ObstaclePtr> &obstacles) const
 {
+    ZoneScopedN("getLastNonCollisionTime");
     double path_length = traj_path.getTotalTime();
     for (double time = std::min(path_length, MAX_FUTURE_COLLISION_CHECK_SEC);
          time >= 0.0;
