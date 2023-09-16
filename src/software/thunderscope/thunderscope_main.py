@@ -264,7 +264,7 @@ if __name__ == "__main__":
 
         with RobotCommunication(
             current_proto_unix_io,
-            getRobotMulticastChannel(0),
+            getRobotMulticastChannel(args.channel),
             args.interface,
             args.disable_estop,
             estop_path,
