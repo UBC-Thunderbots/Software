@@ -25,7 +25,7 @@ class GLGoal(GLMeshItem):
         GLMeshItem.__init__(self, color=self.color)
 
         # The 3D mesh isn't visible from the orthographic view, so
-        # we need to draw an outline of the goal on the ground 
+        # we need to draw an outline of the goal on the ground
         self.goal_outline = GLLinePlotItem(color=self.color)
         self.goal_outline.setParentItem(self)
 
@@ -80,7 +80,7 @@ class GLGoal(GLMeshItem):
         # Rotate locally about the z axis (0, 0, 1)
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
-    
+
     def __get_mesh_data(self, x_length: float, y_length: float):
         """
         Return a MeshData instance with vertices and faces computed

@@ -7,7 +7,9 @@ from software.thunderscope.constants import Colors
 class GLSphere(GLMeshItem):
     """Displays a 3D sphere"""
 
-    def __init__(self, radius: float, color=Colors.BALL_COLOR, rows: int = 6, cols: int = 6):
+    def __init__(
+        self, radius: float, color=Colors.BALL_COLOR, rows: int = 6, cols: int = 6
+    ):
         """Initialize the GLSphere
         
         :param radius: The radius of the sphere

@@ -118,7 +118,7 @@ class GLMeasureLayer(GLLayer):
 
     def _update_graphics(self):
         """Fetch and update graphics for the layer"""
-        
+
         # Display coordinates of point at mouse cursor
         cursor_text_graphic = self.graphics_list.get_graphics("cursor_text", 1)[0]
         mouse_point_in_scene_x = self.mouse_point_in_scene[0]

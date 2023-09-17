@@ -29,7 +29,13 @@ class GLWorldLayer(GLLayer):
     # The maximum allowed velocity that the user can give the ball
     MAX_ALLOWED_KICK_SPEED_M_PER_S = 6.5
 
-    def __init__(self, name: str, simulator_io, friendly_colour_yellow: bool, buffer_size: int = 5):
+    def __init__(
+        self,
+        name: str,
+        simulator_io,
+        friendly_colour_yellow: bool,
+        buffer_size: int = 5,
+    ):
         """Initialize the GLWorldLayer
 
         :param name: The displayed name of the layer
@@ -71,7 +77,8 @@ class GLWorldLayer(GLLayer):
             "field_marking_rects", lambda: GLRect(color=Colors.FIELD_LINE_COLOR)
         )
         self.graphics_list.register_graphics_group(
-            "field_outer_boundary_rect", lambda: GLRect(color=Colors.FIELD_LINE_LIGHTER_COLOR)
+            "field_outer_boundary_rect",
+            lambda: GLRect(color=Colors.FIELD_LINE_LIGHTER_COLOR),
         )
         self.graphics_list.register_graphics_group(
             "field_marking_lines",
@@ -88,11 +95,11 @@ class GLWorldLayer(GLLayer):
             lambda: GLSphere(radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR),
         )
         self.graphics_list.register_graphics_group(
-            "robot_ids", 
+            "robot_ids",
             lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 10, weight=700), 
-                color=Colors.PRIMARY_TEXT_COLOR
-            )
+                font=QtGui.QFont("Roboto", 10, weight=700),
+                color=Colors.PRIMARY_TEXT_COLOR,
+            ),
         )
         self.graphics_list.register_graphics_group(
             "robot_status", lambda: GLCircle(color=Colors.BREAKBEAM_TRIPPED_COLOR)
@@ -268,9 +275,10 @@ class GLWorldLayer(GLLayer):
         )[0]
 
         # Outer field lines
-        boundary_buffer = (2 * field.boundary_buffer_size)
+        boundary_buffer = 2 * field.boundary_buffer_size
         field_outer_boundary_rect.set_dimensions(
-            field.field_x_length + boundary_buffer, field.field_y_length + boundary_buffer
+            field.field_x_length + boundary_buffer,
+            field.field_y_length + boundary_buffer,
         )
         field_marking_rect_graphics[0].set_dimensions(
             field.field_x_length, field.field_y_length

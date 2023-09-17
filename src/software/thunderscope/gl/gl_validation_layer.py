@@ -24,11 +24,11 @@ class GLValidationLayer(GLLayer):
     PASSED_VALIDATION_PERSISTANCE_TIMEOUT_S = 1.0
 
     def __init__(
-        self, 
-        name: str, 
-        buffer_size: int = 10, 
-        test_name_pos_x: float = -4.5, 
-        test_name_pos_y: float = 3.2
+        self,
+        name: str,
+        buffer_size: int = 10,
+        test_name_pos_x: float = -4.5,
+        test_name_pos_y: float = 3.2,
     ):
         """Initialize the GLValidationLayer
 
@@ -49,12 +49,12 @@ class GLValidationLayer(GLLayer):
         self.passed_validation_timeout_pairs = []
 
         self.graphics_list.register_graphics_group(
-            "test_name", 
+            "test_name",
             lambda: GLTextItem(
-                pos=(test_name_pos_x, test_name_pos_y, 0), 
-                font=QtGui.QFont("Roboto", 8), 
-                color=Colors.PRIMARY_TEXT_COLOR
-            )
+                pos=(test_name_pos_x, test_name_pos_y, 0),
+                font=QtGui.QFont("Roboto", 8),
+                color=Colors.PRIMARY_TEXT_COLOR,
+            ),
         )
         self.graphics_list.register_graphics_group(
             "validation_polygons", GLLinePlotItem

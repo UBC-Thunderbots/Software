@@ -1,4 +1,4 @@
-from typing import Callable, List, Tuple
+from typing import Callable
 from pyqtgraph.opengl import *
 
 
