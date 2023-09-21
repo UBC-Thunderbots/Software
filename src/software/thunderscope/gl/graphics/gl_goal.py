@@ -1,7 +1,6 @@
-from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.opengl import *
 
-from software.py_constants import *
+from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 
 import numpy as np
 

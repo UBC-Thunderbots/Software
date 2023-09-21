@@ -6,9 +6,8 @@ import math
 
 from proto.import_all_protos import *
 from software.py_constants import *
-import software.python_bindings as geom
-import software.thunderscope.constants as constants
 from software.thunderscope.constants import Colors, SPEED_SEGMENT_SCALE
+import software.python_bindings as geom
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
@@ -25,9 +24,6 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInScen
 
 class GLWorldLayer(GLLayer):
     """GLLayer that visualizes the world and vision data"""
-
-    # The maximum allowed velocity that the user can give the ball
-    MAX_ALLOWED_KICK_SPEED_M_PER_S = 6.5
 
     def __init__(self, name: str, simulator_io, friendly_colour_yellow: bool, buffer_size: int = 5):
         """Initialize the GLWorldLayer
@@ -60,7 +56,7 @@ class GLWorldLayer(GLLayer):
         for key in self.accepted_keys:
             self.key_pressed[key] = False
 
-        self.display_robot_id = False
+        self.display_robot_ids = True
         self.display_speed_lines = True
         self.is_playing = True
 
@@ -111,7 +107,7 @@ class GLWorldLayer(GLLayer):
         self.key_pressed[event.key()] = True
 
         if event.key() == QtCore.Qt.Key.Key_I:
-            self.display_robot_id = not self.display_robot_id
+            self.display_robot_ids = not self.display_robot_ids
         elif event.key() == QtCore.Qt.Key.Key_S:
             self.display_speed_lines = not self.display_speed_lines
 
@@ -183,11 +179,10 @@ class GLWorldLayer(GLLayer):
 
         # Cap the maximum kick speed
         if (
-            self.ball_velocity_vector.length()
-            > GLWorldLayer.MAX_ALLOWED_KICK_SPEED_M_PER_S
+            self.ball_velocity_vector.length() > BALL_MAX_SPEED_METERS_PER_SECOND
         ):
             self.ball_velocity_vector = self.ball_velocity_vector.normalize(
-                GLWorldLayer.MAX_ALLOWED_KICK_SPEED_M_PER_S
+                BALL_MAX_SPEED_METERS_PER_SECOND 
             )
 
     def mouse_in_scene_released(self, event: PointInSceneEvent):
@@ -365,7 +360,7 @@ class GLWorldLayer(GLLayer):
             )
             robot_graphic.setColor(color)
 
-            if self.display_robot_id:
+            if self.display_robot_ids:
                 robot_id_graphic.show()
                 robot_id_graphic.setData(
                     text=str(robot.id),

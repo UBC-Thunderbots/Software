@@ -1,5 +1,3 @@
-from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.opengl import *
 
 from software.thunderscope.gl.gl_layer import GLLayer

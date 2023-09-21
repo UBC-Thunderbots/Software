@@ -143,7 +143,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         projection_matrix = self.projectionMatrix()
         view_matrix = self.viewMatrix()
 
-        # Unproject point on far plane to get get ray direction vector
+        # Unproject point on far plane to get the ray direction vector
         ray_dir = window_space_coords.unproject(
             view_matrix, projection_matrix, viewport
         )

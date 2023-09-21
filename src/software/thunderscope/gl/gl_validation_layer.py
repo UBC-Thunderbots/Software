@@ -1,16 +1,13 @@
 from typing import List
 
-from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 
 import time
 import numpy as np
 
 from proto.import_all_protos import *
-from proto.geometry_pb2 import Circle, Polygon
-from proto.tbots_software_msgs_pb2 import PrimitiveSet
 
-import software.thunderscope.constants as constants
 from software.py_constants import *
 from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer

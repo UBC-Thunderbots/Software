@@ -1,5 +1,4 @@
-from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt.QtCore import Qt
+from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 
 import textwrap
@@ -8,7 +7,6 @@ from google.protobuf.json_format import MessageToDict
 
 from proto.import_all_protos import *
 from software.py_constants import *
-import software.thunderscope.constants as constants
 from software.thunderscope.constants import Colors
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle

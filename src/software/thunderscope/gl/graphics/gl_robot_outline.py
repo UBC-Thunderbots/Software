@@ -1,7 +1,6 @@
-from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.opengl import *
 
-from software.py_constants import *
+from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
 import math
 import numpy as np

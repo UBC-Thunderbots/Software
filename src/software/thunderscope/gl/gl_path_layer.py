@@ -1,4 +1,3 @@
-from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.opengl import *
 
 import math
@@ -6,8 +5,6 @@ import numpy as np
 
 from proto.tbots_software_msgs_pb2 import PrimitiveSet
 
-import software.thunderscope.constants as constants
-from software.py_constants import *
 from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.gl_layer import GLLayer
