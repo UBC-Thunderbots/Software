@@ -8,6 +8,7 @@ import numpy as np
 import time
 import collections
 
+
 class PointInSceneEvent(object):
     """Wraps QMouseEvent and includes additional data about the point in the 3D scene
     that was picked by the mouse cursor

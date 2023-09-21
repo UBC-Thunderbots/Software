@@ -25,7 +25,13 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInScen
 class GLWorldLayer(GLLayer):
     """GLLayer that visualizes the world and vision data"""
 
-    def __init__(self, name: str, simulator_io, friendly_colour_yellow: bool, buffer_size: int = 5):
+    def __init__(
+        self,
+        name: str,
+        simulator_io,
+        friendly_colour_yellow: bool,
+        buffer_size: int = 5,
+    ):
         """Initialize the GLWorldLayer
 
         :param name: The displayed name of the layer
@@ -179,11 +185,9 @@ class GLWorldLayer(GLLayer):
         )
 
         # Cap the maximum kick speed
-        if (
-            self.ball_velocity_vector.length() > BALL_MAX_SPEED_METERS_PER_SECOND
-        ):
+        if self.ball_velocity_vector.length() > BALL_MAX_SPEED_METERS_PER_SECOND:
             self.ball_velocity_vector = self.ball_velocity_vector.normalize(
-                BALL_MAX_SPEED_METERS_PER_SECOND 
+                BALL_MAX_SPEED_METERS_PER_SECOND
             )
 
     def mouse_in_scene_released(self, event: PointInSceneEvent):
