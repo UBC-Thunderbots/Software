@@ -14,6 +14,7 @@ from software.thunderscope.gl.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
 
+
 class GLWidget(QWidget):
     """Widget that handles GLLayers to produce a 3D visualization of the field/world 
     and our AI. GLWidget can also provide replay controls.

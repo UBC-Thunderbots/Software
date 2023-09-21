@@ -35,7 +35,7 @@ class GLObstacleLayer(GLLayer):
 
     def _update_graphics(self):
         """Fetch and update graphics for the layer"""
-        
+
         primitive_set = self.primitive_set_buffer.get(
             block=False
         ).robot_primitives.values()

@@ -3,7 +3,6 @@ from pyqtgraph.opengl import *
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 
-import math
 import numpy as np
 
 
@@ -56,7 +55,7 @@ class GLRobot(GLMeshItem):
         # Rotate locally about the z axis (0, 0, 1)
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
-    
+
     def __get_mesh_data(self):
         """
         Return a MeshData instance with vertices and faces computed

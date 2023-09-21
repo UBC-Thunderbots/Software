@@ -44,7 +44,7 @@ class GLPassingLayer(GLLayer):
 
     def _update_graphics(self):
         """Fetch and update graphics for the layer"""
-        
+
         try:
             pass_vis = self.pass_visualization_buffer.queue.get_nowait()
         except queue.Empty as empty:
