@@ -1,21 +1,23 @@
+from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 
 
-class GLRect(GLGridItem):
+class GLRect(GLLinePlotItem):
     """Displays a rectangle parallel to the x-y plane"""
 
-    def __init__(self, color=(255, 255, 255, 127.5)):
+    def __init__(self, color=(255, 255, 255, 127.5), line_width: float = 1.0):
         """Initialize the GLRect
         
         :param color: The color of the graphic
+        :param line_width: The line width of the graphic
 
         """
+        GLLinePlotItem.__init__(self, color=color, width=line_width)
+        
         self.x = 0
         self.y = 0
         self.x_length = 0
         self.y_length = 0
-
-        GLGridItem.__init__(self, color=color)
 
     def set_dimensions(self, x_length: float = 0, y_length: float = 0):
         """Set the dimensions of the rectangle
@@ -30,11 +32,20 @@ class GLRect(GLGridItem):
         if self.x_length == x_length and self.y_length == y_length:
             return
 
-        self.setSize(x_length, y_length, 0)
-        self.setSpacing(x_length, y_length, 0)
-
         self.x_length = x_length
         self.y_length = y_length
+
+        self.setData(
+            pos=np.array(
+                [
+                    [-x_length / 2, y_length / 2, 0],
+                    [x_length / 2, y_length / 2, 0],
+                    [x_length / 2, -y_length / 2, 0],
+                    [-x_length / 2, -y_length / 2, 0],
+                    [-x_length / 2, y_length / 2, 0],
+                ]
+            )
+        )
 
     def set_position(self, x: float, y: float):
         """Set the position of the graphic in the scene

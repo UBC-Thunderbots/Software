@@ -6,6 +6,7 @@ import numpy as np
 
 from software.py_constants import *
 from software.thunderscope.constants import Colors
+
 from software.thunderscope.gl.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInSceneEvent

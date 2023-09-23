@@ -1,3 +1,4 @@
+from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 
 import math
@@ -8,7 +9,7 @@ class GLCircle(GLLinePlotItem):
     """Displays a circle parallel to the x-y plane"""
 
     def __init__(
-        self, radius: float = 1, num_points: int = 24, color=(1.0, 1.0, 1.0, 0.5)
+        self, radius: float = 1, num_points: int = 24, color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5)
     ):
         """Initialize the GLCircle
         
@@ -17,12 +18,12 @@ class GLCircle(GLLinePlotItem):
         :param color: The color of the graphic
 
         """
+        GLLinePlotItem.__init__(self, color=color)
+
         self.x = 0
         self.y = 0
         self.radius = 0
-        self.num_points = num_points
-
-        GLLinePlotItem.__init__(self, color=color)
+        self.num_points = 0
         self.set_radius(radius)
 
     def set_radius(self, radius: float, num_points: int = 24):
@@ -52,7 +53,7 @@ class GLCircle(GLLinePlotItem):
         )
         self.setData(pos=points)
 
-    def set_color(self, color):
+    def set_color(self, color: QtGui.QColor):
         """Set the color of the graphic
         
         :param color: The color of the graphic

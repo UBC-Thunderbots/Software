@@ -1,3 +1,4 @@
+from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
@@ -8,24 +9,23 @@ import numpy as np
 class GLGoal(GLMeshItem):
     """Displays a 3D mesh representing the goal"""
 
-    def __init__(self, color=(1.0, 1.0, 1.0, 0.5)):
+    def __init__(self, color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5)):
         """Initialize the GLGoal
         
         :param color: The color of the graphic
 
         """
+        GLMeshItem.__init__(self, color=color)
+        
         self.x = 0
         self.y = 0
         self.x_length = 0
         self.y_length = 0
         self.orientation = 0
-        self.color = color
-
-        GLMeshItem.__init__(self, color=self.color)
 
         # The 3D mesh isn't visible from the orthographic view, so
         # we need to draw an outline of the goal on the ground
-        self.goal_outline = GLLinePlotItem(color=self.color)
+        self.goal_outline = GLLinePlotItem(color=color)
         self.goal_outline.setParentItem(self)
 
     def set_dimensions(self, x_length: float, y_length: float):
