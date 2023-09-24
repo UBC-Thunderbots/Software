@@ -76,8 +76,11 @@ class GLTacticLayer(GLLayer):
                     """
                 ),
                 pos=[
-                    robot.current_state.global_position.x_meters,
+                    robot.current_state.global_position.x_meters + ROBOT_MAX_RADIUS_METERS,
                     robot.current_state.global_position.y_meters,
                     ROBOT_MAX_HEIGHT_METERS + 0.1,
                 ],
             )
+
+            # Depth value of 1 ensures text is rendered over top other graphics 
+            tactic_fsm_info_graphic.setDepthValue(1)

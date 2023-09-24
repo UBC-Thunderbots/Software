@@ -201,6 +201,7 @@ class Colors(object):
 
     PRIMARY_TEXT_COLOR = QtGui.QColor(255, 255, 255, 255)
     SECONDARY_TEXT_COLOR = QtGui.QColor(255, 255, 255, 160)
+    BLACK_TEXT_COLOR = QtGui.QColor(0, 0, 0, 255) 
 
     # Colors for vision pattern
     PINK = QtGui.QColor(255, 0, 255)

@@ -369,15 +369,20 @@ class GLWorldLayer(GLLayer):
 
             if self.display_robot_ids:
                 robot_id_graphic.show()
+
+                # Depth value of 1 ensures text is rendered over top other graphics
+                robot_id_graphic.setDepthValue(1)
+
                 robot_id_graphic.setData(
                     text=str(robot.id),
                     pos=[
                         robot.current_state.global_position.x_meters
-                        + (ROBOT_MAX_RADIUS_METERS / 2),
+                        - (ROBOT_MAX_RADIUS_METERS / 2),
                         robot.current_state.global_position.y_meters,
                         ROBOT_MAX_HEIGHT_METERS + 0.1,
                     ],
                 )
+
             else:
                 robot_id_graphic.hide()
 
