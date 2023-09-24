@@ -16,7 +16,7 @@ class GLGoal(GLMeshItem):
 
         """
         GLMeshItem.__init__(self, color=color)
-        
+
         self.x = 0
         self.y = 0
         self.x_length = 0

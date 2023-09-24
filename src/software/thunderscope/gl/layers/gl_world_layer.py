@@ -70,8 +70,8 @@ class GLWorldLayer(GLLayer):
         self.point_in_scene_picked = None
 
         self.graphics_list.register_graphics_group(
-            "field_marking_rects", 
-            lambda: GLRect(color=Colors.FIELD_LINE_COLOR, line_width=3)
+            "field_marking_rects",
+            lambda: GLRect(color=Colors.FIELD_LINE_COLOR, line_width=3),
         )
         self.graphics_list.register_graphics_group(
             "field_outer_boundary_rect",

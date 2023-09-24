@@ -8,7 +8,11 @@ class GLSphere(GLMeshItem):
     """Displays a 3D sphere"""
 
     def __init__(
-        self, radius: float, color: QtGui.QColor = Colors.BALL_COLOR, rows: int = 6, cols: int = 6
+        self,
+        radius: float,
+        color: QtGui.QColor = Colors.BALL_COLOR,
+        rows: int = 6,
+        cols: int = 6,
     ):
         """Initialize the GLSphere
         

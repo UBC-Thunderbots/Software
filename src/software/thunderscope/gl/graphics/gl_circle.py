@@ -9,7 +9,10 @@ class GLCircle(GLLinePlotItem):
     """Displays a circle parallel to the x-y plane"""
 
     def __init__(
-        self, radius: float = 1, num_points: int = 24, color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5)
+        self,
+        radius: float = 1,
+        num_points: int = 24,
+        color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
     ):
         """Initialize the GLCircle
         
