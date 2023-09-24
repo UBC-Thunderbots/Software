@@ -40,7 +40,7 @@ class GLTacticLayer(GLLayer):
         self.graphics_list.register_graphics_group(
             "tactic_fsm_info",
             lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 6), color=Colors.SECONDARY_TEXT_COLOR
+                font=QtGui.QFont("Roboto", 8), color=Colors.SECONDARY_TEXT_COLOR
             ),
         )
 
@@ -76,7 +76,7 @@ class GLTacticLayer(GLLayer):
                     """
                 ),
                 pos=[
-                    robot.current_state.global_position.x_meters + ROBOT_MAX_RADIUS_METERS,
+                    robot.current_state.global_position.x_meters + ROBOT_MAX_RADIUS_METERS + 0.05,
                     robot.current_state.global_position.y_meters,
                     ROBOT_MAX_HEIGHT_METERS + 0.1,
                 ],
