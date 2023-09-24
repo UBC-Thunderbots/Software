@@ -9,8 +9,8 @@ import numpy as np
 
 from software.thunderscope.constants import *
 
-from software.thunderscope.gl.gl_layer import GLLayer
-from software.thunderscope.gl.gl_measure_layer import GLMeasureLayer
+from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
 

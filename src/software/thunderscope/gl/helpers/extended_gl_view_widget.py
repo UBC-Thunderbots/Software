@@ -93,7 +93,7 @@ class ExtendedGLViewWidget(GLViewWidget):
             if self.point_picked:
                 self.mouse_in_scene_dragged_signal.emit(point_in_scene_event)
                 # We don't want to handle GLViewWidget orbit/pan if we're picking a
-                # point in 3D, so early return
+                # point in 3D, so return early
                 return
 
         super().mouseMoveEvent(event)

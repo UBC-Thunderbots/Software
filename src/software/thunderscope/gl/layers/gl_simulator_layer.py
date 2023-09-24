@@ -1,6 +1,6 @@
 from pyqtgraph.opengl import *
 
-from software.thunderscope.gl.gl_layer import GLLayer
+from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.py_constants import BALL_MAX_RADIUS_METERS
 from software.thunderscope.constants import Colors

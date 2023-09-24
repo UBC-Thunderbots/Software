@@ -17,7 +17,7 @@ from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
-from software.thunderscope.gl.gl_layer import GLLayer
+from software.thunderscope.gl.layers.gl_layer import GLLayer
 
 
 class GLTacticLayer(GLLayer):

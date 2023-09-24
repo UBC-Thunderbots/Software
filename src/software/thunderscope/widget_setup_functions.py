@@ -9,7 +9,7 @@ from software.thunderscope.dock_style import *
 
 # Import Widgets
 from software.thunderscope.gl.gl_widget import GLWidget
-from software.thunderscope.gl import (
+from software.thunderscope.gl.layers import (
     gl_obstacle_layer,
     gl_path_layer,
     gl_validation_layer,

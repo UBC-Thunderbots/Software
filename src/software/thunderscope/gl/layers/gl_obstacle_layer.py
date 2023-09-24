@@ -6,7 +6,7 @@ from proto.tbots_software_msgs_pb2 import PrimitiveSet
 
 from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.gl.gl_layer import GLLayer
+from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 
 
