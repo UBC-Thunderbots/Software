@@ -13,7 +13,7 @@ class GLRect(GLLinePlotItem):
 
         """
         GLLinePlotItem.__init__(self, color=color, width=line_width)
-        
+
         self.x = 0
         self.y = 0
         self.x_length = 0
