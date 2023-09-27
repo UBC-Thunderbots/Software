@@ -37,6 +37,7 @@ sudo apt-get update
 # (sorted alphabetically)
 host_software_packages=(
     cmake # Needed to build some of our dependencies
+	clang
     codespell # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
@@ -60,7 +61,6 @@ host_software_packages=(
                     # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
     python3-yaml # Load dynamic parameter configuration files
-    qt5-default # A GUI library used by er-force sim
     tmux        # Used by AI vs AI script
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
@@ -80,12 +80,17 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(llvm-6.0)
     host_software_packages+=(libclang-6.0-dev)
     host_software_packages+=(libncurses5)
+    host_software_packages+=(qt5-default)
     sudo apt-get -y install gcc-7 g++-7
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
     
     # This fixes missing headers by notifying the linker
     ldconfig
+fi
+
+if [[ $(lsb_release -rs) == "22.04" ]]; then
+    host_software_packages+=(qt6-base-dev)
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
@@ -99,7 +104,7 @@ print_status_msg "Setting Up Virtual Python Environment"
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
-if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
+if ! sudo /usr/bin/python3 -m venv /opt/tbotspython ; then
     print_status_msg "Error: Setting up virtual environment failed"
     exit 1
 fi
@@ -111,6 +116,15 @@ fi
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
+
+	sudo ln -s /usr/include/x86_64-linux-gnu/qt5 /opt/tbotspython/qt
+fi
+
+if [[ $(lsb_release -rs) == "22.04" ]]; then
+	sudo /opt/tbotspython/bin/pip3 install git+https://github.com/mcfletch/pyopengl.git@227f9c66976d9f5dadf62b9a97e6beaec84831ca#subdirectory=accelerate
+    sudo /opt/tbotspython/bin/pip3 install -r ubuntu22_requirements.txt
+
+	sudo ln -s /usr/include/x86_64-linux-gnu/qt6 /opt/tbotspython/qt
 fi
 
 if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
@@ -142,7 +156,7 @@ print_status_msg "Setting Up PlatformIO"
 # **need to reboot for changes to come into effect**
 
 # downloading platformio udev rules
-if ! curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules; then
+if ! curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/system/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules; then
     print_status_msg "Error: Downloading PlatformIO udev rules failed"
     exit 1
 fi
@@ -153,7 +167,7 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # installs PlatformIO to global environment
-if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.0.2; then
+if ! sudo /usr/bin/python3 -m pip install --prefix /usr/local platformio==6.0.2; then
     print_status_msg "Error: Installing PlatformIO failed"
     exit 1
 fi
