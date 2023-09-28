@@ -53,15 +53,10 @@ host_software_packages=(
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
-    python3       # Python 3
-    python3-dev # Python 3 headers
-    python3-venv # Virtual Environment
-    python3-pip   # Required for bazel to install python dependencies for build targets
     python3-protobuf # This is required for the "NanoPb" library, which does not
                     # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
-    python3-yaml # Load dynamic parameter configuration files
-    tmux        # Used by AI vs AI script
+    python3-yaml 	# Load dynamic parameter configuration files
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
     libffi-dev # needed to use _ctypes in Python3
@@ -98,16 +93,18 @@ if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     exit 1
 fi
 
-# Upgrade python3 pip, which some pip packages require
-print_status_msg "Setting Up Virtual Python Environment"
+print_status_msg "Setting Up Python 3.11 Env"
 
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
-if ! sudo /usr/bin/python3 -m venv /opt/tbotspython ; then
-    print_status_msg "Error: Setting up virtual environment failed"
-    exit 1
-fi
+# Install python3.11 from source
+wget -nc https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz -o /tmp/python3.11.tgz
+tar -xf /tmp/python3.11.tgz
+cd /tmp/Python-3.11.0
+./configure --prefix=/opt/tbotspython
+make
+cd "$CURR_DIR"
 
 if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     print_status_msg "Error: Upgrading pip version in venv failed"

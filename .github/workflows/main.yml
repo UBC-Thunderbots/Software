@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  software-tests:
+  ubuntu22-tests:
     name: Ubuntu 22.04 Build
     runs-on: ubuntu-22.04
     steps:
@@ -35,7 +35,6 @@ jobs:
       - name: Jetson Nano Build Test
         run: |
           bazel build --cpu=jetson_nano //software/jetson_nano:thunderloop_main
-
 
   software-tests:
     name: Software Tests
