@@ -89,17 +89,25 @@ if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     exit 1
 fi
 
-print_status_msg "Setting Up Python 3.11 Env"
+print_status_msg "Setting Up Python 3.11 (may take up to 10 minutes)"
 
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
 # Install python3.11 from source
+
+print_status_msg "Downloading Python"
 wget -nc -q https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz -O /tmp/python3.11.tgz
 tar -xf /tmp/python3.11.tgz -C /tmp/
 cd /tmp/Python-3.11.0
-./configure --prefix=/opt/tbotspython --enable-optimizations > /dev/null
+
+print_status_msg "Configuring Python"
+./configure --enable-optimizations --with-lto --prefix=/opt/tbotspython > /dev/null
+
+print_status_msg "Building Python"
 make -j 6 > /dev/null
+
+print_status_msg "Installing Python"
 sudo make altinstall > /dev/null
 cd "$CURR_DIR"
 
