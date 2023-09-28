@@ -111,7 +111,7 @@ print_status_msg "Installing Python"
 sudo make altinstall > /dev/null
 cd "$CURR_DIR"
 
-if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
+if ! sudo /opt/tbotspython/bin/python3.11 -m pip install --upgrade pip ; then
     print_status_msg "Error: Upgrading pip version in venv failed"
     exit 1
 fi
