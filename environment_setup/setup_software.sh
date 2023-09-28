@@ -37,7 +37,6 @@ sudo apt-get update
 # (sorted alphabetically)
 host_software_packages=(
     cmake # Needed to build some of our dependencies
-	clang
     codespell # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
