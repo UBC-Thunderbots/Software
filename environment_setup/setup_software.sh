@@ -4,10 +4,7 @@
 # UBC Thunderbots Ubuntu Software Setup
 #
 # This script must be run with sudo! root permissions are required to install
-# packages and copy files to the /etc/udev/rules.d directory. The reason that the script
-# must be run with sudo rather than the individual commands using sudo, is that
-# when running CI within Docker, the sudo command does not exist since
-# everything is automatically run as root.
+# packages and copy files to the /etc/udev/rules.d directory.
 #
 # This script will install all the required libraries and dependencies to build
 # and run the Thunderbots codebase. This includes being able to run the ai and
@@ -98,11 +95,12 @@ print_status_msg "Setting Up Python 3.11 Env"
 sudo rm -rf /opt/tbotspython
 
 # Install python3.11 from source
-wget -nc https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz -o /tmp/python3.11.tgz
-tar -xf /tmp/python3.11.tgz
+wget -nc -q https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz -O /tmp/python3.11.tgz
+tar -xf /tmp/python3.11.tgz -C /tmp/
 cd /tmp/Python-3.11.0
-./configure --prefix=/opt/tbotspython
-make
+./configure --prefix=/opt/tbotspython --enable-optimizations > /dev/null
+make -j 6 > /dev/null
+sudo make altinstall > /dev/null
 cd "$CURR_DIR"
 
 if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
