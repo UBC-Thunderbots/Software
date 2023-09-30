@@ -87,7 +87,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
 fi
 
 if [[ $(lsb_release -rs) == "22.04" ]]; then
-    host_software_packages+=(qt6-base-dev)
+    host_software_packages+=(qtbase5-dev)
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
@@ -120,15 +120,11 @@ print_status_msg "Done Setting Up Virtual Python Environment"
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
-
-	sudo ln -s /usr/include/x86_64-linux-gnu/qt5 /opt/tbotspython/qt
 fi
 
 if [[ $(lsb_release -rs) == "22.04" ]]; then
 	sudo /opt/tbotspython/bin/pip3 install git+https://github.com/mcfletch/pyopengl.git@227f9c66976d9f5dadf62b9a97e6beaec84831ca#subdirectory=accelerate
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu22_requirements.txt
-
-	sudo ln -s /usr/include/x86_64-linux-gnu/qt6 /opt/tbotspython/qt
 fi
 
 print_status_msg "Fetching game controller"
