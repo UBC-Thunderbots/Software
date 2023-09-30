@@ -29,6 +29,7 @@ print_status_msg "Installing Utilities and Dependencies"
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update
 
 # (sorted alphabetically)
@@ -46,9 +47,14 @@ host_software_packages=(
     libprotobuf-dev
     libudev-dev
     libusb-1.0-0-dev
+
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
+    python3.8       # Python 3
+    python3.8-dev # Python 3 headers
+    python3.8-venv # Virtual Environment
+    python3-pip   # Required for bazel to install python dependencies for build targets
     python3-protobuf # This is required for the "NanoPb" library, which does not
                     # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
@@ -89,32 +95,28 @@ if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     exit 1
 fi
 
-print_status_msg "Setting Up Python 3.11 (may take up to 10 minutes)"
+# Upgrade python3 pip, which some pip packages require
+print_status_msg "Setting Up Virtual Python Environment"
 
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
-# Install python3.11 from source
+if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
+    print_status_msg "Error: Setting up virtual environment failed"
+    exit 1
+fi
 
-print_status_msg "Downloading Python"
-wget -nc -q https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz -O /tmp/python3.11.tgz
-tar -xf /tmp/python3.11.tgz -C /tmp/
-cd /tmp/Python-3.11.0
-
-print_status_msg "Configuring Python"
-./configure --enable-optimizations --with-lto --prefix=/opt/tbotspython > /dev/null
-
-print_status_msg "Building Python"
-make -j 6 > /dev/null
-
-print_status_msg "Installing Python"
-sudo make altinstall > /dev/null
-cd "$CURR_DIR"
-
-if ! sudo /opt/tbotspython/bin/python3.11 -m pip install --upgrade pip ; then
+if ! sudo /opt/tbotspython/bin/python3.8 -m pip install --upgrade pip ; then
     print_status_msg "Error: Upgrading pip version in venv failed"
     exit 1
 fi
+
+if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
+    print_status_msg "Error: Installing protobuf failed"
+    exit 1;
+fi
+
+print_status_msg "Done Setting Up Virtual Python Environment"
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
@@ -129,12 +131,6 @@ if [[ $(lsb_release -rs) == "22.04" ]]; then
 	sudo ln -s /usr/include/x86_64-linux-gnu/qt6 /opt/tbotspython/qt
 fi
 
-if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
-    print_status_msg "Error: Installing protobuf failed"
-    exit 1;
-fi
-
-print_status_msg "Done Setting Up Virtual Python Environment"
 print_status_msg "Fetching game controller"
 
 sudo chown -R $USER:$USER /opt/tbotspython
@@ -169,7 +165,7 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # installs PlatformIO to global environment
-if ! sudo /usr/bin/python3 -m pip install --prefix /usr/local platformio==6.0.2; then
+if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.0.2; then
     print_status_msg "Error: Installing PlatformIO failed"
     exit 1
 fi
