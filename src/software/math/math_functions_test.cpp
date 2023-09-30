@@ -230,3 +230,57 @@ TEST(NormalizeToRangeTest, test_floating_point_type_initial_value_out_of_range)
     double result = normalizeValueToRange<double>(300, 0, 255, 0, 6);
     EXPECT_DOUBLE_EQ(6.0, result);
 }
+
+TEST(PercentDifferenceTest, test_both_numbers_zero)
+{
+    double result = percent_difference(0, 0);
+    EXPECT_EQ(result, 0);
+}
+
+TEST(PercentDifferenceTest, test_a_is_zero)
+{
+    double result = percent_difference(0, 3);
+    EXPECT_EQ(result, 2);
+}
+
+TEST(PercentDifferenceTest, test_b_is_zero)
+{
+    double result = percent_difference(3, 0);
+    EXPECT_EQ(result, 2);
+}
+
+TEST(PercentDifferenceTest, test_a_is_negative)
+{
+    double result = percent_difference(-1, 2);
+    EXPECT_EQ(result, 2);
+}
+
+TEST(PercentDifferenceTest, test_b_is_negative)
+{
+    double result = percent_difference(1, -2);
+    EXPECT_EQ(result, 2);
+}
+
+TEST(PercentDifferenceTest, test_both_numbers_negative)
+{
+    double result = percent_difference(-3, -2);
+    EXPECT_EQ(result, 0.4);
+}
+
+TEST(PercentDifferenceTest, test_both_numbers_positive)
+{
+    double result = percent_difference(3, 2);
+    EXPECT_EQ(result, 0.4);
+}
+
+TEST(PercentDifferenceTest, test_same_positive_numbers)
+{
+    double result = percent_difference(3, 3);
+    EXPECT_EQ(result, 0);
+}
+
+TEST(PercentDifferenceTest, test_same_negative_numbers)
+{
+    double result = percent_difference(-3, -3);
+    EXPECT_EQ(result, 0);
+}

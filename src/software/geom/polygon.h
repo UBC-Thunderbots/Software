@@ -62,9 +62,12 @@ class Polygon : public virtual Shape
      * both points as "focal" points similar to an ellipse. see definition for details and
      * diagram
      * @param segment segment along which to construct the rectangular polygon
-     * @param radius the radius of the rectangle.
+     * @param length_radius How much each end of the segment should be elongated by
+     * @param width_radius How wide should the polygon be, measured from the segment
      * @return an oriented polygon along the 2 points that contains both points.
      */
+    static Polygon fromSegment(const Segment& segment, double length_radius,
+                               double width_radius);
     static Polygon fromSegment(const Segment& segment, double radius);
 
    protected:

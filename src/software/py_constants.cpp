@@ -61,6 +61,7 @@ PYBIND11_MODULE(py_constants, m)
         DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH;
     m.attr("DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH") =
         DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH;
+    m.attr("WORLD_STATE_RECEIVED_TRIGGER_PATH") = WORLD_STATE_RECEIVED_TRIGGER_PATH;
 
     // Multicast Channels
     m.def("getRobotMulticastChannel", [](py::args& args) {
@@ -73,10 +74,15 @@ PYBIND11_MODULE(py_constants, m)
     });
 
     // Ports
-    m.attr("VISION_PORT")       = VISION_PORT;
-    m.attr("PRIMITIVE_PORT")    = PRIMITIVE_PORT;
-    m.attr("ROBOT_STATUS_PORT") = ROBOT_STATUS_PORT;
-    m.attr("ROBOT_LOGS_PORT")   = ROBOT_LOGS_PORT;
+    m.attr("VISION_PORT")             = VISION_PORT;
+    m.attr("PRIMITIVE_PORT")          = PRIMITIVE_PORT;
+    m.attr("ROBOT_STATUS_PORT")       = ROBOT_STATUS_PORT;
+    m.attr("ROBOT_LOGS_PORT")         = ROBOT_LOGS_PORT;
+    m.attr("HRVO_VISUALIZATION_PORT") = HRVO_VISUALIZATION_PORT;
+
+    // PlotJuggler
+    m.attr("PLOTJUGGLER_GUI_DEFAULT_HOST") = PLOTJUGGLER_GUI_DEFAULT_HOST;
+    m.attr("PLOTJUGGLER_GUI_DEFAULT_PORT") = PLOTJUGGLER_GUI_DEFAULT_PORT;
 
     // SSL
     m.attr("SSL_VISION_ADDRESS") = SSL_VISION_ADDRESS;
@@ -127,5 +133,6 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("BATTERY_WARNING_VOLTAGE") = BATTERY_WARNING_VOLTAGE;
 
     // Robot Communication
-    m.attr("NUM_TIMES_SEND_STOP") = NUM_TIMES_SEND_STOP;
+    m.attr("NUM_TIMES_SEND_STOP")    = NUM_TIMES_SEND_STOP;
+    m.attr("DISCONNECT_DURATION_MS") = DISCONNECT_DURATION_MS;
 }

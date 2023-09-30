@@ -15,7 +15,7 @@ void ChipFSM::updateChip(const Update &event)
 {
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(event.control_params.chip_origin),
-        event.control_params.chip_direction, 0.1, TbotsProto::DribblerMode::OFF,
+        event.control_params.chip_direction, 0.1, false, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
                        event.control_params.chip_distance_meters},

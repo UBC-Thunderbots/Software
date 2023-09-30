@@ -1,17 +1,7 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
-from enum import IntEnum
-
-
-class IndividualRobotMode(IntEnum):
-    """
-    Enum for the mode of input for an individual robot
-    """
-
-    NONE = 0
-    MANUAL = 1
-    AI = 3
+from software.py_constants import *
 
 
 class FloatSlider(QSlider):
@@ -89,7 +79,7 @@ class ColorProgressBar(QProgressBar):
         self.decimals = 10 ** decimals
 
         super(ColorProgressBar, self).setRange(
-            min_val * self.decimals, max_val * self.decimals
+            int(min_val * self.decimals), int(max_val * self.decimals)
         )
 
         super(ColorProgressBar, self).setStyleSheet(
@@ -115,7 +105,11 @@ class ColorProgressBar(QProgressBar):
         """
         super(ColorProgressBar, self).setValue(value * self.decimals)
 
-        percent = (self.value() - self.minimum()) / (self.maximum() - self.minimum())
+        # clamp percent to make sure it's between 0% and 100%
+        percent = min(
+            1,
+            max(0, (self.value() - self.minimum()) / (self.maximum() - self.minimum())),
+        )
 
         if percent < 0.5:
             super(ColorProgressBar, self).setStyleSheet(
@@ -389,3 +383,21 @@ def draw_robot(painter, rect, start_angle_degree, span_angle_degree):
     painter.drawChord(
         rect, start_angle_degree * convert_degree, span_angle_degree * convert_degree,
     )
+
+
+def display_tooltip(event, tooltip_text):
+    """
+    Checks given event to see if it is an Enter or Leave event
+    Upon Enter, displays a tooltip with the given text
+    Upon Leave, hides the tooltip
+    :param event: event to check
+    :param tooltip_text: the text to display in the tooltip
+    """
+    if str(event.type()) == "Type.Enter":
+        QToolTip.showText(
+            QPoint(int(event.globalPosition().x()), int(event.globalPosition().y()),),
+            tooltip_text,
+            msecShowTime=20 * MILLISECONDS_PER_SECOND,
+        )
+    elif str(event.type()) == "Type.Leave":
+        QToolTip.hideText()

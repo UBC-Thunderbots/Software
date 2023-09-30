@@ -47,7 +47,6 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard)
             world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
             [](InterPlayCommunication comm) {})));
 
-    world.setTeamWithPossession(TeamSide::FRIENDLY);
     Robot friendly_robot_1(1, Point(3, -1), Vector(0, 0), Angle::zero(),
                            AngularVelocity::zero(), Timestamp::fromSeconds(2));
     Robot friendly_robot_2(2, Point(0, 0), Vector(0, 0), Angle::half(),
@@ -107,7 +106,6 @@ TEST(ShootOrPassPlayFSMTest, test_took_shot_guard)
     std::vector<Robot> friendlies = {friendly_robot_1};
     world.updateFriendlyTeamState(Team(friendlies));
     world.updateBall(Ball(Point(2.0, 0), Vector(10, 0), Timestamp::fromSeconds(1)));
-    world.setTeamWithPossession(TeamSide::FRIENDLY);
 
     // have the fsm process an event with updated world
     fsm.process_event(ShootOrPassPlayFSM::Update(

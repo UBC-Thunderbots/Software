@@ -29,9 +29,9 @@ class DribbleTacticTest : public SimulatedErForceSimPlayTestFixture
         robotReceivedBall(world_ptr, yield);
         auto received_ball_time = world_ptr->getMostRecentTimestamp();
         while (world_ptr->getMostRecentTimestamp() <
-               received_ball_time + Duration::fromSeconds(1))
+               received_ball_time + Duration::fromSeconds(2))
         {
-            yield("Waiting 1 second to see if possession is maintained");
+            yield("Waiting 2 second to see if possession is maintained");
         }
         robotReceivedBall(world_ptr, yield);
     }
@@ -247,15 +247,13 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
             Duration::fromSeconds(25));
 }
 
-// TODO (#2496): robot gets stuck in place
-TEST_F(
-    DribbleTacticTest,
-    DISABLED_test_dribble_dest_and_orientation_around_rectangle_with_excessive_dribbling)
+TEST_F(DribbleTacticTest,
+       test_dribble_dest_and_orientation_around_rectangle_with_excessive_dribbling)
 {
-    Point initial_position    = Point(3, -3);
-    Point dribble_destination = Point(4, 2.5);
+    Point dribble_destination = Point(3, 2);
+    Point initial_position    = Point(4.5, -3.0);
     Angle dribble_orientation = Angle::half();
-    BallState ball_state(Point(4, -2.5), Vector(0, 0));
+    BallState ball_state(Point(4.2, -2.5), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
     auto tactic = std::make_shared<DribbleTactic>(ai_config);
