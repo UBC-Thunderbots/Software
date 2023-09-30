@@ -76,11 +76,7 @@ class WorldLayer(FieldLayer):
             self.key_pressed[QtCore.Qt.Key.Key_Control]
             and self.key_pressed[QtCore.Qt.Key.Key_Space]
         ):
-
-            simulator_state = SimulationState(is_playing=not self.is_playing)
-            self.is_playing = not self.is_playing
-
-            self.simulator_io.send_proto(SimulationState, simulator_state)
+            self.toggle_sim_playing()
 
     def keyReleaseEvent(self, event):
         """Detect when a key has been released (override)
@@ -186,9 +182,6 @@ class WorldLayer(FieldLayer):
             self.mouse_click_pos
         )
 
-        # determine whether a robot was clicked
-        friendly_robot, enemy_robot = self.identify_robots(*self.mouse_click_pos)
-
         # If the user was holding ctrl, send a command to the simulator to move
         # the ball to the mouse click location.
         if self.key_pressed[Qt.Key.Key_Control]:
@@ -264,6 +257,13 @@ class WorldLayer(FieldLayer):
 
         return friendly_robot, enemy_robot
 
+    def toggle_sim_playing(self):
+        simulator_state = SimulationState(is_playing=not self.is_playing)
+        self.is_playing = not self.is_playing
+
+        self.simulator_io.send_proto(SimulationState, simulator_state)
+        return self.is_playing
+
     def identify_robot(self, mouse_x, mouse_y, team):
         """Identify which robot was clicked on the team
 
@@ -282,6 +282,7 @@ class WorldLayer(FieldLayer):
                 )
                 <= ROBOT_MAX_RADIUS_MILLIMETERS / MILLIMETERS_PER_METER
             ):
+                print(robot_.id)
                 return robot_
         return None
 

@@ -112,11 +112,11 @@ def configure_robot_view_diagnostics(diagnostics_proto_unix_io):
         position="above",
     )
 
-
 def configure_base_fullsystem(
     full_system_proto_unix_io,
     sim_proto_unix_io,
     friendly_colour_yellow,
+    sandbox_mode=False,
     replay=False,
     replay_log=None,
     visualization_buffer_size=5,
@@ -129,6 +129,7 @@ def configure_base_fullsystem(
     :param full_system_proto_unix_io: the proto unix io to configure widgets with
     :param sim_proto_unix_io: the proto unix io for the simulator
     :param friendly_colour_yellow: if this is Yellow FullSystem (True) or Blue (False)
+    :param sandbox_mode: if the field widget should be in sandbox mode
     :param replay: True if in replay mode, False if not
     :param replay_log: the file path of the replay protos
     :param visualization_buffer_size: The size of the visualization buffer.
@@ -141,6 +142,7 @@ def configure_base_fullsystem(
             name="Field",
             widget=setup_field_widget(
                 **{
+                    "sandbox_mode": sandbox_mode,
                     "replay": replay,
                     "replay_log": replay_log,
                     "full_system_proto_unix_io": full_system_proto_unix_io,
@@ -149,51 +151,52 @@ def configure_base_fullsystem(
                     "visualization_buffer_size": visualization_buffer_size,
                 }
             ),
+            stretch=WidgetStretchData(y=5) if sandbox_mode else None,
         ),
-        TScopeWidget(
-            name="Parameters",
-            widget=setup_parameter_widget(
-                **{
-                    "proto_unix_io": full_system_proto_unix_io,
-                    "friendly_colour_yellow": friendly_colour_yellow,
-                }
-            ),
-            anchor="Field",
-            position="left",
-            has_refresh_func=False,
-        ),
-        TScopeWidget(
-            name="Logs",
-            widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
-            anchor="Parameters",
-            position="above",
-        ),
-        TScopeWidget(
-            name="Referee Info",
-            widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
-            anchor="Field",
-            position="bottom",
-        ),
-        TScopeWidget(
-            name="Play Info",
-            widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
-            anchor="Referee Info",
-            position="above",
-        ),
-        TScopeWidget(
-            name="Performance",
-            widget=setup_performance_plot(
-                **{"proto_unix_io": full_system_proto_unix_io}
-            ),
-            # this is because this widget specifically has to be added like so:
-            # dock.addWidget(widget.win) instead of dock.addWidget(widget)
-            # otherwise, it opens in a new window
-            # the setup functions returns the widget.win and the refresh function separately
-            in_window=True,
-            anchor="Play Info",
-            position="right",
-        ),
-    ] + extra_widgets
+       TScopeWidget(
+           name="Parameters",
+           widget=setup_parameter_widget(
+               **{
+                   "proto_unix_io": full_system_proto_unix_io,
+                   "friendly_colour_yellow": friendly_colour_yellow,
+               }
+           ),
+           anchor="Field",
+           position="left",
+           has_refresh_func=False,
+       ),
+       TScopeWidget(
+           name="Logs",
+           widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
+           anchor="Parameters",
+           position="above",
+       ),
+       TScopeWidget(
+           name="Referee Info",
+           widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
+           anchor="Field",
+           position="bottom",
+       ),
+       TScopeWidget(
+           name="Play Info",
+           widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
+           anchor="Referee Info",
+           position="above",
+       ),
+       TScopeWidget(
+           name="Performance",
+           widget=setup_performance_plot(
+               **{"proto_unix_io": full_system_proto_unix_io}
+           ),
+           # this is because this widget specifically has to be added like so:
+           # dock.addWidget(widget.win) instead of dock.addWidget(widget)
+           # otherwise, it opens in a new window
+           # the setup functions returns the widget.win and the refresh function separately
+           in_window=True,
+           anchor="Play Info",
+           position="right",
+       ),
+   ] + extra_widgets
 
 
 def configure_base_diagnostics(diagnostics_proto_unix_io, extra_widgets=[]):
@@ -241,7 +244,7 @@ def configure_base_diagnostics(diagnostics_proto_unix_io, extra_widgets=[]):
 
 
 def configure_two_ai_gamecontroller_view(
-    visualization_buffer_size=5, cost_visualization=False
+    visualization_buffer_size=5, cost_visualization=False, sandbox_mode=False
 ):
     """
     Constructs the Thunderscope Config for a view with 2 FullSystem tabs (Blue and Yellow)
@@ -251,6 +254,8 @@ def configure_two_ai_gamecontroller_view(
             Increasing this will increase smoothness but will be less realtime.
     :param cost_visualization: True if cost visualization widget should be enabled
                                 False if not
+    :param sandbox_mode: True if the field should be in sandbox mode
+                         False if not
     :return: the Thunderscope Config for this view
     """
     proto_unix_io_map = {
@@ -272,6 +277,7 @@ def configure_two_ai_gamecontroller_view(
                     full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
+                    sandbox_mode=sandbox_mode,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[
                         configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
@@ -289,6 +295,7 @@ def configure_two_ai_gamecontroller_view(
                     ],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
+                    sandbox_mode=sandbox_mode,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[
                         configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])

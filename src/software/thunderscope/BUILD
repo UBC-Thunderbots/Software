@@ -62,6 +62,8 @@ py_library(
         "//software/thunderscope/field:simulator_layer",
         "//software/thunderscope/field:validation_layer",
         "//software/thunderscope/field:world_layer",
+        "//software/thunderscope/field:sandbox_world_layer",
+        "//software/thunderscope/field:sandbox_controls",
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/play:playinfo_widget",

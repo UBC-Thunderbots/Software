@@ -18,7 +18,7 @@ class Field(QWidget):
     # last 2 are self.max_x_range and self.max_y_range
     field_resized = QtCore.pyqtSignal([float, float, float, float, float, float])
 
-    def __init__(self, player=None, max_x_range=10000, max_y_range=6000):
+    def __init__(self, player=None, sandbox_controller=None, max_x_range=10000, max_y_range=6000):
         """Initialize the field
 
         :param player: The replay player to optionally display media controls for
@@ -75,6 +75,12 @@ class Field(QWidget):
         else:
             self.player = None
 
+        if sandbox_controller:
+            self.sandbox_controls = sandbox_controller
+            self.layout.addWidget(self.sandbox_controls)
+        else:
+            self.sandbox_controls = None
+
         self.setLayout(self.layout)
 
     def keyPressEvent(self, event):
@@ -116,6 +122,9 @@ class Field(QWidget):
         """
         if self.player:
             self.replay_controls.refresh()
+
+        if self.sandbox_controls:
+            self.sandbox_controls.refresh()
 
         for layer in self.layers:
             layer.update()

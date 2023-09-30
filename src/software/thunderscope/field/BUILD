@@ -71,6 +71,24 @@ py_library(
 )
 
 py_library(
+    name = "sandbox_world_layer",
+    srcs = ["sandbox_world_layer.py"],
+    deps = [
+        ":world_layer",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "sandbox_controls",
+    srcs = ["sandbox_controls.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "simulator_layer",
     srcs = ["simulator_layer.py"],
     deps = [

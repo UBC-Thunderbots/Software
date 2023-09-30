@@ -14,8 +14,10 @@ from software.thunderscope.field import (
     validation_layer,
     simulator_layer,
     world_layer,
+    sandbox_world_layer,
     passing_layer,
     hrvo_layer,
+    sandbox_controls
 )
 
 from software.thunderscope.common.proto_configuration_widget import (
@@ -48,6 +50,7 @@ def setup_field_widget(
     full_system_proto_unix_io,
     friendly_colour_yellow,
     visualization_buffer_size,
+    sandbox_mode=False,
     replay=False,
     replay_log=None,
 ):
@@ -56,6 +59,7 @@ def setup_field_widget(
     :param sim_proto_unix_io: The proto unix io object for the simulator
     :param full_system_proto_unix_io: The proto unix io object for the full system
     :param friendly_colour_yellow: Whether the friendly colour is yellow
+    :param sandbox_mode: if the field widget should be in sandbox mode
     :param replay: whether replay mode is currently enabled
     :param replay_log: the file path of the replay log
     :param visualization_buffer_size: How many packets to buffer while rendering
@@ -63,18 +67,27 @@ def setup_field_widget(
 
     """
     player = None
+    sandbox_controller = None
 
     if replay:
         player = ProtoPlayer(replay_log, full_system_proto_unix_io,)
-    field = Field(player=player)
+    if sandbox_mode:
+        sandbox_controller = sandbox_controls.SandboxControls()
+    field = Field(player=player, sandbox_controller=sandbox_controller)
 
     # Create layers
     paths = path_layer.PathLayer(visualization_buffer_size)
     obstacles = obstacle_layer.ObstacleLayer(visualization_buffer_size)
     validation = validation_layer.ValidationLayer(visualization_buffer_size)
-    world = world_layer.WorldLayer(
-        sim_proto_unix_io, friendly_colour_yellow, visualization_buffer_size
+    world = sandbox_world_layer.SandboxWorldLayer(
+        sim_proto_unix_io, friendly_colour_yellow
+    ) if sandbox_mode else world_layer.WorldLayer(
+        sim_proto_unix_io, friendly_colour_yellow
     )
+
+    if sandbox_controller:
+        sandbox_controller.toggle_play_state = world.toggle_sim_playing
+
     sim_state = simulator_layer.SimulatorLayer(
         friendly_colour_yellow, visualization_buffer_size
     )
@@ -116,6 +129,10 @@ def setup_field_widget(
         full_system_proto_unix_io.register_observer(*arg)
 
     return field
+
+
+def setup_sandbox_controls(proto_unix_io):
+    return sandbox_controls.SandboxControls()
 
 
 def setup_parameter_widget(proto_unix_io, friendly_colour_yellow):

@@ -15,7 +15,6 @@ def create_world_state(
 
     """
     world_state = WorldState()
-
     for robot_id, robot_location in enumerate(yellow_robot_locations):
         world_state.yellow_robots[robot_id].CopyFrom(
             RobotState(
@@ -24,7 +23,6 @@ def create_world_state(
                 ),
             )
         )
-
     for robot_id, robot_location in enumerate(blue_robot_locations):
         world_state.blue_robots[robot_id].CopyFrom(
             RobotState(
@@ -33,7 +31,6 @@ def create_world_state(
                 ),
             )
         )
-
     world_state.ball_state.CopyFrom(
         BallState(
             global_position=Point(
