@@ -27,7 +27,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
 
     def setup(run_enemy_ai):
         # starting point must be Point
-        ball_initial_pos = tbots.Point(2, 2)
+        tbots.Point(2, 2)
 
         # Setup Bots
         blue_bots = [
