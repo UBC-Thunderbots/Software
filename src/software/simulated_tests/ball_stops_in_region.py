@@ -1,4 +1,4 @@
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -22,10 +22,10 @@ class BallStopsInRegion(Validation):
                   PASSING when a ball stops in a region
         """
         for region in self.regions:
-            if tbots.contains(
-                region, tbots.createPoint(world.ball.current_state.global_position)
+            if tbots_cpp.contains(
+                region, tbots_cpp.createPoint(world.ball.current_state.global_position)
             ) and (
-                tbots.createVector(world.ball.current_state.global_velocity).length()
+                tbots_cpp.createVector(world.ball.current_state.global_velocity).length()
                 <= 0.01
             ):
                 return ValidationStatus.PASSING

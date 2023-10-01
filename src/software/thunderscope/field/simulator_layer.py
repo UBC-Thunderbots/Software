@@ -1,4 +1,4 @@
-import software.python_bindings as geom
+import software.python_bindings as geom_cpp
 import pyqtgraph as pg
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore, QtGui
