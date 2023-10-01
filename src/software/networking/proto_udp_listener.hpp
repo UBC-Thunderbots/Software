@@ -197,7 +197,7 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
         // defined in python, and passed to the pybinded UDP listener. Timeout of 1s is
         // set to avoid infinite hanging during robot communication teardown. We are
         // unsure why this happens
-        if (cv.wait_for(lock, 1s) == std::cv_status::timeout)
+        if (cv.wait_for(lock, 0.1s) == std::cv_status::timeout)
         {
             LOG(WARNING) << "Timed out, starting listen again" << std::endl;
             startListen();

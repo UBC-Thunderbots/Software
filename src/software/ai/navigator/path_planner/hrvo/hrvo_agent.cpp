@@ -369,7 +369,13 @@ void HRVOAgent::computeNewVelocity(
                             {"px", position.x()},
                             {"py", position.y()},
                             {"dx", (position - destination).x()},
-                            {"dy", (position - destination).y()}
+                            {"dy", (position - destination).y()},
+                            {"destx", (destination).x()},
+                            {"desty", (destination).y()},
+                            {"maxv", max_speed},
+                            {"maxa", max_accel},
+                            {"vt", angular_velocity.toRadians()},
+                            {"t", orientation.toRadians()}
                         });
     angular_velocity = angular_traj.getVelocity(
             time_since_traj_update.toSeconds() /*+
@@ -841,12 +847,13 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
     // TODO (#2838): For HRVOVisualization logs to be sent properly from the robot, no
     // path should be passed as a second argument to LOG
     //    i.e. LOG(VISUALIZE) << hrvo_visualization;
-    if (friendly_team_colour == TeamColour::YELLOW)
-    {
-        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
-    }
-    else
-    {
-        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
-    }
+//    LOG(VISUALIZE) << hrvo_visualization;
+//    if (friendly_team_colour == TeamColour::YELLOW)
+//    {
+//        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
+//    }
+//    else
+//    {
+//        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
+//    }
 }
