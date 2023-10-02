@@ -88,6 +88,9 @@ py_library(
 py_library(
     name = "config",
     srcs = ["thunderscope_config.py"],
+    data = [
+        ":resources",
+    ],
     deps = [
         ":constants",
         ":proto_unix_io",
@@ -130,4 +133,9 @@ py_library(
     deps = [
         "//software/thunderscope:constants",
     ],
+)
+
+filegroup(
+    name = "resources",
+    srcs = glob(["resources/**/*"]),
 )
