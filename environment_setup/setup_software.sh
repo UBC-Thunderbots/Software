@@ -47,7 +47,6 @@ host_software_packages=(
     libprotobuf-dev
     libudev-dev
     libusb-1.0-0-dev
-
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
