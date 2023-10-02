@@ -59,7 +59,11 @@ def free_kick_play_setup(
 # We want to test friendly half, enemy half, and at the border of the field
 @pytest.mark.parametrize(
     "ball_initial_pos",
-    [tbots_cpp.Point(1.5, -2.75), tbots_cpp.Point(-1.5, -2.75), tbots_cpp.Point(1.5, -3)],
+    [
+        tbots_cpp.Point(1.5, -2.75),
+        tbots_cpp.Point(-1.5, -2.75),
+        tbots_cpp.Point(1.5, -3),
+    ],
 )
 def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
     # TODO- #2753 Validation
@@ -183,7 +187,11 @@ def test_free_kick_play_enemy(simulated_test_runner, ball_initial_pos, yellow_bo
 
 @pytest.mark.parametrize(
     "ball_initial_pos",
-    [tbots_cpp.Point(1.5, -2.75), tbots_cpp.Point(-1.5, -2.75), tbots_cpp.Point(1.5, -3)],
+    [
+        tbots_cpp.Point(1.5, -2.75),
+        tbots_cpp.Point(-1.5, -2.75),
+        tbots_cpp.Point(1.5, -3),
+    ],
 )
 def test_free_kick_play_both(simulated_test_runner, ball_initial_pos):
     # TODO- #2753 Validation

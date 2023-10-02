@@ -38,8 +38,12 @@ def test_two_ai_ball_placement(simulated_test_runner):
             tbots_cpp.Point(1, 2.5),
             tbots_cpp.Point(1, -2.5),
             tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-            tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-            tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXNegYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXPosYCorner(),
         ]
 
         # Game Controller Setup
