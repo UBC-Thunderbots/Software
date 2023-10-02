@@ -7,6 +7,7 @@
 #include <QtCore/QString>
 #include <iostream>
 
+#include "external/tracy/public/tracy/Tracy.hpp"
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
@@ -17,8 +18,6 @@
 #include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 #include "software/world/robot_state.h"
-
-#include "external/tracy/public/tracy/Tracy.hpp"
 
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
@@ -316,13 +315,13 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     std::vector<std::thread> threads;
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-                threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
-                                                  &robot_to_vel_pair_map]() {
-        tracy::SetThreadName(("Yellow Robot " + std::to_string(robot_id)).c_str());
-        auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
-        setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                          world_proto, local_vel, angular_vel);
-                });
+        threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
+                              &robot_to_vel_pair_map]() {
+            tracy::SetThreadName(("Yellow Robot " + std::to_string(robot_id)).c_str());
+            auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
+            setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
+                              world_proto, local_vel, angular_vel);
+        });
     }
 
     for (auto& thread : threads)
@@ -363,11 +362,11 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
         threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
-                                          &robot_to_vel_pair_map]() {
-        tracy::SetThreadName(("Blue Robot " + std::to_string(robot_id)).c_str());
-        auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
-        setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                          world_proto, local_vel, angular_vel);
+                              &robot_to_vel_pair_map]() {
+            tracy::SetThreadName(("Blue Robot " + std::to_string(robot_id)).c_str());
+            auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
+            setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
+                              world_proto, local_vel, angular_vel);
         });
     }
 
@@ -617,8 +616,8 @@ void ErForceSimulator::resetCurrentTime()
 }
 
 std::map<RobotId, std::pair<Vector, AngularVelocity>>
-ErForceSimulator::getRobotIdToLocalVelocityMap(const google::protobuf::RepeatedPtrField<world::SimRobot> &sim_robots,
-                                               bool plot)
+ErForceSimulator::getRobotIdToLocalVelocityMap(
+    const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots, bool plot)
 {
     std::map<std::string, double> plot_juggler_values;
     std::map<RobotId, std::pair<Vector, AngularVelocity>> robot_to_local_velocity;

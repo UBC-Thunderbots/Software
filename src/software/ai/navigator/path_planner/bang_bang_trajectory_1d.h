@@ -17,7 +17,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      */
     struct TrajectoryPart
     {
-        double end_time_sec   = 0;
+        double end_time_sec = 0;
         double position     = 0;
         double velocity     = 0;
         double acceleration = 0;
@@ -143,8 +143,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      */
     void generateTriangularTrajectory(double initial_pos, double final_pos,
                                       double initial_vel, double max_accel,
-                                      double max_decel,
-                                      double time_offset_sec = 0.0);
+                                      double max_decel, double time_offset_sec = 0.0);
 
     /**
      * Calculates the closest position at which the trajectory could stop at (velocity =
@@ -195,7 +194,8 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      * @param out_t_delta_sec Out parameter for the time delta between the start of the
      * trajectory part and time t
      */
-    void getTrajPartAndDeltaTime(double t_sec, BangBangTrajectory1D::TrajectoryPart &out_traj_part,
+    void getTrajPartAndDeltaTime(double t_sec,
+                                 BangBangTrajectory1D::TrajectoryPart &out_traj_part,
                                  double &out_t_delta_sec) const;
 
     inline void addTrajectoryPart(const TrajectoryPart &part);

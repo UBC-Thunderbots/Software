@@ -6,8 +6,7 @@
 class TrajectoryPathNode
 {
    public:
-    TrajectoryPathNode(const BangBangTrajectory2D &trajectory,
-                       double trajectory_end_time)
+    TrajectoryPathNode(const BangBangTrajectory2D &trajectory, double trajectory_end_time)
         : trajectory(trajectory), trajectory_end_time_sec(trajectory_end_time){};
 
     TrajectoryPathNode(const BangBangTrajectory2D &trajectory)

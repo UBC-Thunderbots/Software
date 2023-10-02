@@ -7,9 +7,9 @@
  * This is used as a light weight alternative to the Rectangle class as
  * it does not extend the ConvexPolygon class.
  */
-class BoundingBox // TODO: Add tests for this class
+class BoundingBox  // TODO: Add tests for this class
 {
-    public:
+   public:
     BoundingBox() = delete;
 
     /**
@@ -68,7 +68,7 @@ class BoundingBox // TODO: Add tests for this class
      */
     double yMin() const;
 
-private:
+   private:
     Point pos_x_pos_y_corner;
     Point neg_x_neg_y_corner;
 };

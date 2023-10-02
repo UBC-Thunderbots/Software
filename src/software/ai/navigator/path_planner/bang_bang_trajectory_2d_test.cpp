@@ -22,9 +22,8 @@ class BangBangTrajectory2DTest : public testing::Test
 
     void verifyKinematicConstraints(double max_vel, double max_accel, double max_decel)
     {
-        const double sub_point_length_sec =
-            traj.getTotalTime() / NUM_SUB_POINTS;
-        const double max_accel_decel = std::max(max_accel, std::abs(max_decel));
+        const double sub_point_length_sec = traj.getTotalTime() / NUM_SUB_POINTS;
+        const double max_accel_decel      = std::max(max_accel, std::abs(max_decel));
 
         for (int i = 0; i <= NUM_SUB_POINTS; i++)
         {

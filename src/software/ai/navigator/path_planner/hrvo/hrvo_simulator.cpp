@@ -1,6 +1,5 @@
 #include "hrvo_simulator.h"
 
-
 #include "external/tracy/public/tracy/Tracy.hpp"
 
 HRVOSimulator::HRVOSimulator(RobotId robot_id)
@@ -119,19 +118,21 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
         {
             return;
         }
-        friendly_robot->second->updatePrimitive(primitive_iter->second, world.value(), time_step);
+        friendly_robot->second->updatePrimitive(primitive_iter->second, world.value(),
+                                                time_step);
 
 
-//        for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
-//        {
-//            auto friendly_robot = robots.find(robot_id);
-//            if (friendly_robot == robots.end())
-//            {
-//                continue;
-//            }
-//
-//            friendly_robot->second->updatePrimitive(primitive, world.value(), time_step);
-//        }
+        //        for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
+        //        {
+        //            auto friendly_robot = robots.find(robot_id);
+        //            if (friendly_robot == robots.end())
+        //            {
+        //                continue;
+        //            }
+        //
+        //            friendly_robot->second->updatePrimitive(primitive, world.value(),
+        //            time_step);
+        //        }
     }
 }
 
@@ -226,46 +227,46 @@ void HRVOSimulator::doStep(Duration time_step)
     }
 
     // Update all the hrvo robots velocities radii based on their current velocity
-//    for (auto &robot : robots)
-//    {
-//        // Linearly increase radius based on the current agent velocity
-//        robot.second->updateRadiusFromVelocity();
-//    }
+    //    for (auto &robot : robots)
+    //    {
+    //        // Linearly increase radius based on the current agent velocity
+    //        robot.second->updateRadiusFromVelocity();
+    //    }
 
     // Compute what velocity each agent will take next
     // loops are separated so that all robot fields that need to updated,
     // are updated separately. Otherwise, some robots would already be updated with new
     // velocity, while others aren't.
     robots[robot_id]->computeNewAngularVelocity(time_step);
-//    for (auto &robot : robots)
-//    {
-////        if (robot.first != robot_id)
-////        {
-////            return;
-////        }
-//        robot.second->computeNewAngularVelocity(time_step);
-//    }
+    //    for (auto &robot : robots)
+    //    {
+    ////        if (robot.first != robot_id)
+    ////        {
+    ////            return;
+    ////        }
+    //        robot.second->computeNewAngularVelocity(time_step);
+    //    }
 
     robots[robot_id]->computeNewVelocity(robots, time_step);
-//    for (auto &robot : robots)
-//    {
-////        if (robot.first != robot_id)
-////        {
-////            return;
-////        }
-//        robot.second->computeNewVelocity(robots, time_step);
-//    }
+    //    for (auto &robot : robots)
+    //    {
+    ////        if (robot.first != robot_id)
+    ////        {
+    ////            return;
+    ////        }
+    //        robot.second->computeNewVelocity(robots, time_step);
+    //    }
 
     // Update the positions of all agents given their velocity
     robots[robot_id]->update(time_step);
-//    for (auto &robot : robots)
-//    {
-////        if (robot.first != robot_id)
-////        {
-////            return;
-////        }
-//        robot.second->update(time_step);
-//    }
+    //    for (auto &robot : robots)
+    //    {
+    ////        if (robot.first != robot_id)
+    ////        {
+    ////            return;
+    ////        }
+    //        robot.second->update(time_step);
+    //    }
 }
 
 void HRVOSimulator::visualize(unsigned int robot_id, TeamColour friendly_team_colour)

@@ -73,7 +73,8 @@ Vector BangBangTrajectory2D::getVelocity(double t_sec) const
 
 Vector BangBangTrajectory2D::getAcceleration(double t_sec) const
 {
-    return Vector(x_trajectory.getAcceleration(t_sec), y_trajectory.getAcceleration(t_sec));
+    return Vector(x_trajectory.getAcceleration(t_sec),
+                  y_trajectory.getAcceleration(t_sec));
 }
 
 double BangBangTrajectory2D::getTotalTime() const
