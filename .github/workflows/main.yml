@@ -34,6 +34,7 @@ jobs:
 
       - name: Jetson Nano Build Test
         run: |
+          cd src
           bazel build --cpu=jetson_nano //software/jetson_nano:thunderloop_main
 
   software-tests:
