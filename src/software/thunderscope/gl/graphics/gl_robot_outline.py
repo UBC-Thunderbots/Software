@@ -91,3 +91,11 @@ class GLRobotOutline(GLLinePlotItem):
         # Rotate locally about the z axis (0, 0, 1)
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
+
+    def set_color(self, color: QtGui.QColor):
+        """Set the color of the graphic
+        
+        :param color: The color of the graphic
+        
+        """
+        self.setData(color=color)
