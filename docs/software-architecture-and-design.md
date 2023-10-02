@@ -57,8 +57,7 @@
   * [Visualizer](#visualizer)
     * [Diagram](#visualizer-diagram)
     * [Draw Functions](#draw-functions)
-    * [3D Field Visualizer](#3d-field-visualizer)
-      * [Components](#components)
+    * [3D Visualizer](#3d-visualizer)
       * [Layers](#layers)
   * [Estop](#estop)
 * [Simulator](#simulator)
@@ -536,7 +535,7 @@ Although we want to display information about the [AI](#ai) in the [Visualizer](
 
 A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
 
-## 3D Field Visualizer
+## 3D Visualizer
 
 Our field visualizer uses [PyQtGraph's 3D graphics system](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/index.html) to render 3D graphics with OpenGL. PyQtGraph handles all the necessary calls to OpenGL for us, and as an abstraction, provides a [scenegraph](https://en.wikipedia.org/wiki/Scene_graph) to organize and manipulate entities/objects within the 3D environment (the scene).
 
