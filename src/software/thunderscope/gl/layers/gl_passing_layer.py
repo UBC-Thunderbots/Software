@@ -13,6 +13,7 @@ from software.thunderscope.gl.layers.gl_layer import GLLayer
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
+
 class GLPassingLayer(GLLayer):
     """GLLayer that visualizes passes"""
 
@@ -67,15 +68,12 @@ class GLPassingLayer(GLLayer):
 
         # Ensure we have the same number of graphics as protos
         self._bring_list_to_length(
-            self.pass_graphics, 
+            self.pass_graphics,
             len(passes_to_show),
-            lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR)
+            lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR),
         )
 
-        for pass_graphic, pass_with_rating in zip(
-            self.pass_graphics,
-            passes_to_show,
-        ):
+        for pass_graphic, pass_with_rating in zip(self.pass_graphics, passes_to_show,):
             pass_graphic.setData(
                 pos=np.array(
                     [

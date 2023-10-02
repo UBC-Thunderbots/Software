@@ -31,9 +31,7 @@ class GLSimulatorLayer(GLLayer):
         self.simulator_state_buffer = ThreadSafeBuffer(buffer_size, SimulatorState)
 
         self.ball_graphic = GLSphere(
-            parentItem=self, 
-            radius=BALL_MAX_RADIUS_METERS, 
-            color=Colors.SIM_BALL_COLOR
+            parentItem=self, radius=BALL_MAX_RADIUS_METERS, color=Colors.SIM_BALL_COLOR
         )
 
     def refresh_graphics(self):

@@ -11,6 +11,7 @@ from software.thunderscope.gl.graphics.gl_circle import GLCircle
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
+
 class GLHrvoLayer(GLLayer):
     """GLHrvoLayer that visualizes the state of the HRVO Simulator"""
 
@@ -45,22 +46,18 @@ class GLHrvoLayer(GLLayer):
 
         # Ensure we have the same number of graphics as protos
         self._bring_list_to_length(
-            self.velocity_obstacle_graphics, 
+            self.velocity_obstacle_graphics,
             len(velocity_obstacle_msg.velocity_obstacles),
-            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
+            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
         self._bring_list_to_length(
-            self.robot_circle_graphics, 
+            self.robot_circle_graphics,
             len(velocity_obstacle_msg.robots),
-            lambda: GLCircle(
-                color=Colors.NAVIGATOR_OBSTACLE_COLOR, 
-                num_points=10
-            )
+            lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR, num_points=10),
         )
 
         for velocity_obstacle_graphic, velocity_obstacle in zip(
-            self.velocity_obstacle_graphics,
-            velocity_obstacle_msg.velocity_obstacles,
+            self.velocity_obstacle_graphics, velocity_obstacle_msg.velocity_obstacles,
         ):
             polygon_points = [
                 [
@@ -90,8 +87,7 @@ class GLHrvoLayer(GLLayer):
             )
 
         for robot_circle_graphic, robot_circle in zip(
-            self.robot_circle_graphics,
-            velocity_obstacle_msg.robots,
+            self.robot_circle_graphics, velocity_obstacle_msg.robots,
         ):
             robot_circle_graphic.set_radius(robot_circle.radius)
             robot_circle_graphic.set_position(

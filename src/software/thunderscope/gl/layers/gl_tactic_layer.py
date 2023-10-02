@@ -66,17 +66,15 @@ class GLTacticLayer(GLLayer):
 
         # Ensure we have the same number of graphics as robots
         self._bring_list_to_length(
-            self.tactic_fsm_info_graphics, 
+            self.tactic_fsm_info_graphics,
             len(team.team_robots),
             lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 8), 
-                color=Colors.SECONDARY_TEXT_COLOR
-            )
+                font=QtGui.QFont("Roboto", 8), color=Colors.SECONDARY_TEXT_COLOR
+            ),
         )
 
         for tactic_fsm_info_graphic, robot in zip(
-            self.tactic_fsm_info_graphics,
-            team.team_robots,
+            self.tactic_fsm_info_graphics, team.team_robots,
         ):
             tactic_fsm_info_graphic.setData(
                 text=textwrap.dedent(

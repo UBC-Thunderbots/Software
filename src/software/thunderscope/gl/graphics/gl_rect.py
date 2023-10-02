@@ -4,10 +4,16 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 import numpy as np
 
+
 class GLRect(GLLinePlotItem):
     """Displays a rectangle parallel to the x-y plane"""
 
-    def __init__(self, parentItem: GLGraphicsItem = None, color=(255, 255, 255, 127.5), line_width: float = 1.0):
+    def __init__(
+        self,
+        parentItem: GLGraphicsItem = None,
+        color=(255, 255, 255, 127.5),
+        line_width: float = 1.0,
+    ):
         """Initialize the GLRect
         
         :param parentItem: The parent item of the graphic
@@ -15,7 +21,9 @@ class GLRect(GLLinePlotItem):
         :param line_width: The line width of the graphic
 
         """
-        GLLinePlotItem.__init__(self, parentItem=parentItem, color=color, width=line_width)
+        GLLinePlotItem.__init__(
+            self, parentItem=parentItem, color=color, width=line_width
+        )
 
         self.x = 0
         self.y = 0

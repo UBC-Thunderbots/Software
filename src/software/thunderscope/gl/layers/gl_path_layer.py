@@ -12,6 +12,7 @@ from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
+
 class GLPathLayer(GLLayer):
     """GLLayer that visualizes paths from the navigator"""
 
@@ -26,7 +27,7 @@ class GLPathLayer(GLLayer):
         GLLayer.__init__(self, name)
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
-        
+
         self.path_graphics = ObservableList(self._graphics_changed)
         self.destination_graphics = ObservableList(self._graphics_changed)
 
@@ -54,19 +55,15 @@ class GLPathLayer(GLLayer):
 
         # Ensure we have the same number of graphics as protos
         self._bring_list_to_length(
-            self.path_graphics, 
-            len(paths),
-            lambda: GLLinePlotItem()
+            self.path_graphics, len(paths), lambda: GLLinePlotItem()
         )
         self._bring_list_to_length(
-            self.destination_graphics, 
+            self.destination_graphics,
             len(requested_destinations),
-            lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE)
+            lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
         )
 
-        for path_graphic, path in zip(
-            self.path_graphics, paths
-        ):
+        for path_graphic, path in zip(self.path_graphics, paths):
             path_graphic.setData(
                 pos=np.array(
                     [[point.x_meters, point.y_meters, 0] for point in path.points]

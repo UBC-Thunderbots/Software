@@ -10,7 +10,11 @@ import numpy as np
 class GLGoal(GLMeshItem):
     """Displays a 3D mesh representing the goal"""
 
-    def __init__(self, parentItem: GLGraphicsItem = None, color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5)):
+    def __init__(
+        self,
+        parentItem: GLGraphicsItem = None,
+        color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
+    ):
         """Initialize the GLGoal
         
         :param parentItem: The parent item of the graphic
@@ -31,7 +35,7 @@ class GLGoal(GLMeshItem):
         self.goal_outline.setParentItem(self)
 
         # Need to give goal some default meshdata; otherwise, pyqtgraph
-        # tries calculating some stuff using invalid vertices/faces and 
+        # tries calculating some stuff using invalid vertices/faces and
         # runs into "NoneType object is not subscriptable" errors
         self.setMeshData(meshdata=MeshData.sphere(1, 1))
 

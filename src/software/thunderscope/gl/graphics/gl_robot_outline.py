@@ -11,7 +11,11 @@ import numpy as np
 class GLRobotOutline(GLLinePlotItem):
     """Displays an outline of a robot parallel to the x-y plane"""
 
-    def __init__(self, parentItem: GLGraphicsItem = None, color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5)):
+    def __init__(
+        self,
+        parentItem: GLGraphicsItem = None,
+        color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
+    ):
         """Initialize the GLRobotOutline
         
         :param parentItem: The parent item of the graphic
@@ -19,7 +23,10 @@ class GLRobotOutline(GLLinePlotItem):
 
         """
         GLLinePlotItem.__init__(
-            self, parentItem=parentItem, pos=np.array(GLRobotOutline.get_robot_outline()), color=color
+            self,
+            parentItem=parentItem,
+            pos=np.array(GLRobotOutline.get_robot_outline()),
+            color=color,
         )
 
         self.x = 0

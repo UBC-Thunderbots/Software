@@ -24,6 +24,7 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInScen
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
+
 class GLWorldLayer(GLLayer):
     """GLLayer that visualizes the world and vision data"""
 
@@ -71,18 +72,38 @@ class GLWorldLayer(GLLayer):
         self.ball_velocity_vector = None
         self.point_in_scene_picked = None
 
-        self.friendly_defense_area_graphic = GLRect(parentItem=self, color=Colors.FIELD_LINE_COLOR, line_width=3)
-        self.enemy_defense_area_graphic = GLRect(parentItem=self, color=Colors.FIELD_LINE_COLOR, line_width=3)
-        self.field_lines_graphic = GLRect(parentItem=self, color=Colors.FIELD_LINE_COLOR, line_width=3)
-        self.field_outer_boundary_graphic = GLRect(parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, line_width=3)
-        self.halfway_line_graphic = GLLinePlotItem(parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR)
-        self.goal_to_goal_line_graphic = GLLinePlotItem(parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR)
-        self.field_center_circle_graphic = GLCircle(parentItem=self, color=Colors.FIELD_LINE_COLOR)
+        self.friendly_defense_area_graphic = GLRect(
+            parentItem=self, color=Colors.FIELD_LINE_COLOR, line_width=3
+        )
+        self.enemy_defense_area_graphic = GLRect(
+            parentItem=self, color=Colors.FIELD_LINE_COLOR, line_width=3
+        )
+        self.field_lines_graphic = GLRect(
+            parentItem=self, color=Colors.FIELD_LINE_COLOR, line_width=3
+        )
+        self.field_outer_boundary_graphic = GLRect(
+            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, line_width=3
+        )
+        self.halfway_line_graphic = GLLinePlotItem(
+            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR
+        )
+        self.goal_to_goal_line_graphic = GLLinePlotItem(
+            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR
+        )
+        self.field_center_circle_graphic = GLCircle(
+            parentItem=self, color=Colors.FIELD_LINE_COLOR
+        )
         self.friendly_goal_graphic = GLGoal(parentItem=self, color=Colors.GOAL_COLOR)
         self.enemy_goal_graphic = GLGoal(parentItem=self, color=Colors.GOAL_COLOR)
-        self.ball_graphic = GLSphere(parentItem=self, radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR)
-        self.robot_status_graphic = GLCircle(parentItem=self, color=Colors.BREAKBEAM_TRIPPED_COLOR)
-        self.ball_kick_velocity_graphic = GLLinePlotItem(parentItem=self, color=Colors.SPEED_VECTOR_COLOR)
+        self.ball_graphic = GLSphere(
+            parentItem=self, radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR
+        )
+        self.robot_status_graphic = GLCircle(
+            parentItem=self, color=Colors.BREAKBEAM_TRIPPED_COLOR
+        )
+        self.ball_kick_velocity_graphic = GLLinePlotItem(
+            parentItem=self, color=Colors.SPEED_VECTOR_COLOR
+        )
 
         self.friendly_robot_graphics = ObservableList(self._graphics_changed)
         self.enemy_robot_graphics = ObservableList(self._graphics_changed)
@@ -229,16 +250,16 @@ class GLWorldLayer(GLLayer):
         )
 
         self.__update_robot_graphics(
-            self.cached_world.friendly_team, 
+            self.cached_world.friendly_team,
             friendly_colour,
             self.friendly_robot_graphics,
-            self.friendly_robot_id_graphics
+            self.friendly_robot_id_graphics,
         )
         self.__update_robot_graphics(
-            self.cached_world.enemy_team, 
+            self.cached_world.enemy_team,
             enemy_colour,
             self.enemy_robot_graphics,
-            self.enemy_robot_id_graphics
+            self.enemy_robot_id_graphics,
         )
 
         self.__update_robot_status_graphics()
@@ -297,7 +318,9 @@ class GLWorldLayer(GLLayer):
         if not field.goal_x_length or not field.goal_y_length:
             return
 
-        self.friendly_goal_graphic.set_dimensions(field.goal_x_length, field.goal_y_length)
+        self.friendly_goal_graphic.set_dimensions(
+            field.goal_x_length, field.goal_y_length
+        )
         self.friendly_goal_graphic.set_position(-field.field_x_length / 2, 0)
         self.friendly_goal_graphic.set_orientation(0)
 
@@ -318,11 +341,11 @@ class GLWorldLayer(GLLayer):
         )
 
     def __update_robot_graphics(
-        self, 
-        team: Team, 
-        color: QtGui.QColor, 
+        self,
+        team: Team,
+        color: QtGui.QColor,
         robot_graphics: ObservableList,
-        robot_id_graphics: ObservableList 
+        robot_id_graphics: ObservableList,
     ):
         """Update the GLGraphicsItems that display the robots
         
@@ -334,23 +357,19 @@ class GLWorldLayer(GLLayer):
         """
         # Ensure we have the same number of graphics as robots
         self._bring_list_to_length(
-            robot_graphics, 
-            len(team.team_robots),
-            lambda: GLRobot()
+            robot_graphics, len(team.team_robots), lambda: GLRobot()
         )
         self._bring_list_to_length(
-            robot_id_graphics, 
+            robot_id_graphics,
             len(team.team_robots),
             lambda: GLTextItem(
                 font=QtGui.QFont("Roboto", 10, weight=700),
                 color=Colors.PRIMARY_TEXT_COLOR,
-            )
+            ),
         )
 
         for robot_graphic, robot_id_graphic, robot in zip(
-            robot_graphics,
-            robot_id_graphics,
-            team.team_robots,
+            robot_graphics, robot_id_graphics, team.team_robots,
         ):
             robot_graphic.set_position(
                 robot.current_state.global_position.x_meters,
@@ -383,10 +402,10 @@ class GLWorldLayer(GLLayer):
     def __update_robot_status_graphics(self):
         """Update the robot status graphics"""
         self.cached_status = self.robot_status_buffer.get(block=False)
-        
+
         if self.cached_status.power_status.breakbeam_tripped:
             self.robot_status_graphic.show()
-            
+
             for robot in self.cached_world.friendly_team.team_robots:
                 if robot.id == self.cached_status.robot_id:
                     self.robot_status_graphic.set_radius(ROBOT_MAX_RADIUS_METERS / 2)
@@ -433,9 +452,9 @@ class GLWorldLayer(GLLayer):
 
         # Ensure we have the same number of graphics as robots/balls
         self._bring_list_to_length(
-            self.speed_line_graphics, 
+            self.speed_line_graphics,
             len(self.speed_line_graphics),
-            lambda: GLLinePlotItem(color=Colors.SPEED_VECTOR_COLOR)
+            lambda: GLLinePlotItem(color=Colors.SPEED_VECTOR_COLOR),
         )
 
         for speed_line_graphic, object in zip(self.speed_line_graphics, objects):
@@ -447,10 +466,8 @@ class GLWorldLayer(GLLayer):
                     [
                         [pos_x, pos_y],
                         [
-                            pos_x
-                            + velocity.x_component_meters * SPEED_SEGMENT_SCALE,
-                            pos_y
-                            + velocity.y_component_meters * SPEED_SEGMENT_SCALE,
+                            pos_x + velocity.x_component_meters * SPEED_SEGMENT_SCALE,
+                            pos_y + velocity.y_component_meters * SPEED_SEGMENT_SCALE,
                         ],
                     ]
                 ),

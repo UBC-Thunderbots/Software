@@ -13,6 +13,7 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInScen
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
+
 class GLMeasureLayer(GLLayer):
     """GLLayer that displays UI graphics for measuring coordinates, distances, and angles"""
 
@@ -29,12 +30,12 @@ class GLMeasureLayer(GLLayer):
 
         # GLTextItem must be initialized later, outside of this constructor
         # Otherwise we run into some strange bugs: 'NoneType' object has no attribute 'width'
-        self.cursor_coords_graphic: GLTextItem = None;
+        self.cursor_coords_graphic: GLTextItem = None
 
         self.measurement_text_graphics = ObservableList(self._graphics_changed)
         self.measurement_line_graphics = ObservableList(self._graphics_changed)
         self.measurement_point_graphics = ObservableList(self._graphics_changed)
-        
+
     def mouse_in_scene_pressed(self, event: PointInSceneEvent):
         """Event handler for the mouse_in_scene_pressed event
         
@@ -43,7 +44,9 @@ class GLMeasureLayer(GLLayer):
         """
         self.measurement_points_cache.append(event.point_in_scene)
 
-        measurement_point_graphic = GLSphere(radius=0.02, color=Colors.PRIMARY_TEXT_COLOR)
+        measurement_point_graphic = GLSphere(
+            radius=0.02, color=Colors.PRIMARY_TEXT_COLOR
+        )
         measurement_point_graphic.set_position(
             event.point_in_scene[0], event.point_in_scene[1], 0
         )
@@ -71,7 +74,7 @@ class GLMeasureLayer(GLLayer):
             # Create and add text graphic labelling the line with the measurement
 
             # Pythagorean theorem
-            distance = math.sqrt( 
+            distance = math.sqrt(
                 (second_point[0] - first_point[0]) ** 2
                 + (second_point[1] - first_point[1]) ** 2
             )
@@ -81,12 +84,14 @@ class GLMeasureLayer(GLLayer):
                 (first_point[1] + second_point[1]) / 2,
             ]
 
-            self.measurement_text_graphics.append(GLTextItem(
-                font=QtGui.QFont("Roboto", 8), 
-                color=Colors.PRIMARY_TEXT_COLOR,
-                text=f"{distance:.2f} m", 
-                pos=np.array([*midpoint, 0])
-            ))
+            self.measurement_text_graphics.append(
+                GLTextItem(
+                    font=QtGui.QFont("Roboto", 8),
+                    color=Colors.PRIMARY_TEXT_COLOR,
+                    text=f"{distance:.2f} m",
+                    pos=np.array([*midpoint, 0]),
+                )
+            )
 
         # If two points are already in the cache, adding a new point will form an angle
         # between the three points
@@ -111,12 +116,14 @@ class GLMeasureLayer(GLLayer):
             bisector = ba.normalized() + bc.normalized()
             placement_point = b + 0.5 * bisector.normalized()
 
-            self.measurement_text_graphics.append(GLTextItem(
-                font=QtGui.QFont("Roboto", 8), 
-                color=Colors.PRIMARY_TEXT_COLOR,
-                text=f"{angle:.1f}°", 
-                pos=np.array([*placement_point, 0]),
-            ))
+            self.measurement_text_graphics.append(
+                GLTextItem(
+                    font=QtGui.QFont("Roboto", 8),
+                    color=Colors.PRIMARY_TEXT_COLOR,
+                    text=f"{angle:.1f}°",
+                    pos=np.array([*placement_point, 0]),
+                )
+            )
 
             # Clear the point cache
             self.measurement_points_cache.clear()
@@ -138,20 +145,19 @@ class GLMeasureLayer(GLLayer):
 
     def refresh_graphics(self):
         """Update graphics in this layer"""
-        
+
         # Display coordinates of point at mouse cursor
 
         if not self.cursor_coords_graphic:
             self.cursor_coords_graphic = GLTextItem(
                 parentItem=self,
-                font=QtGui.QFont("Roboto", 10), 
+                font=QtGui.QFont("Roboto", 10),
                 color=Colors.PRIMARY_TEXT_COLOR,
             )
-        
+
         mouse_point_in_scene_x = self.mouse_point_in_scene[0]
         mouse_point_in_scene_y = self.mouse_point_in_scene[1]
         self.cursor_coords_graphic.setData(
             text=f"({mouse_point_in_scene_x:.2f} m, {mouse_point_in_scene_y:.2f} m)",
             pos=[mouse_point_in_scene_x, mouse_point_in_scene_y, 0],
         )
-

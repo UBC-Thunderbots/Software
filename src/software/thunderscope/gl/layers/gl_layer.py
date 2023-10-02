@@ -2,7 +2,7 @@ from pyqtgraph.Qt import QtGui
 import pyqtgraph as pg
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
-from typing import List, Iterable, Callable
+from typing import Callable, List
 
 from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
 from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInSceneEvent
@@ -87,7 +87,9 @@ class GLLayer(GLGraphicsItem):
             for graphic in change.elements:
                 graphic.setParentItem(None)
 
-    def _bring_list_to_length(self, list_: List, target_len: int, element_factory: Callable):
+    def _bring_list_to_length(
+        self, list_: List, target_len: int, element_factory: Callable
+    ):
         """Bring a list to a desired target length by either creating new elements
         using the provided `element_factory` and adding them to the list, or by 
         popping elements from the end of the list.
@@ -104,4 +106,3 @@ class GLLayer(GLGraphicsItem):
             list_.pop()
         while len(list_) < target_len:
             list_.append(element_factory())
-            

@@ -11,7 +11,11 @@ import numpy as np
 class GLRobot(GLMeshItem):
     """Displays a 3D mesh representing a robot"""
 
-    def __init__(self, parentItem: GLGraphicsItem = None, color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5)):
+    def __init__(
+        self,
+        parentItem: GLGraphicsItem = None,
+        color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
+    ):
         """Initialize the GLRobot
         
         :param parentItem: The parent item of the graphic

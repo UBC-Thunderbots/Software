@@ -16,6 +16,7 @@ from software.thunderscope.gl.graphics.gl_circle import GLCircle
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
+
 class GLValidationLayer(GLLayer):
     """GLLayer that visualizes validation"""
 
@@ -100,7 +101,9 @@ class GLValidationLayer(GLLayer):
             + list(self.passed_validation_timeout_pairs)
         )
 
-        self.test_name_graphic.setData(text=self.cached_eventually_validation_set.test_name)
+        self.test_name_graphic.setData(
+            text=self.cached_eventually_validation_set.test_name
+        )
 
     def __update_validation_graphics(self, validations: List[ValidationProto]):
         """Update the GLGraphicsItems that display the validations
@@ -108,9 +111,9 @@ class GLValidationLayer(GLLayer):
         :param validations: The list of validation protos
 
         """
-        polygon_graphics_index = 0; 
-        circle_graphics_index = 0; 
-        
+        polygon_graphics_index = 0
+        circle_graphics_index = 0
+
         for validation in validations:
 
             validation_color = (
@@ -120,7 +123,7 @@ class GLValidationLayer(GLLayer):
             )
 
             for polygon in validation.geometry.polygons:
-                
+
                 # Get a previously cached graphic or create a new one
                 if polygon_graphics_index >= len(self.polygon_graphics):
                     polygon_graphic = GLLinePlotItem()
@@ -144,7 +147,7 @@ class GLValidationLayer(GLLayer):
                 )
 
             for segment in validation.geometry.segments:
-                
+
                 # Get a previously cached graphic or create a new one
                 if polygon_graphics_index >= len(self.polygon_graphics):
                     polygon_graphic = GLLinePlotItem()

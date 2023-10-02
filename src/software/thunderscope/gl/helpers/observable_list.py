@@ -1,13 +1,14 @@
-from enum import Enum
 from typing import TypeVar, List, Iterable, Union, Callable
 
-T = TypeVar('T')
+T = TypeVar("T")
 
-class ChangeAction():
+
+class ChangeAction:
     ADD = 1
     REMOVE = 2
 
-class Change():
+
+class Change:
     """Represents a change in a list"""
 
     def __init__(self, changed_list: List, changed_slice: slice, action: ChangeAction):
@@ -40,13 +41,12 @@ class Change():
         """
         return self._action
 
+
 class ObservableList(list):
     """List that notifies observers when elements are added or removed"""
 
     def __init__(
-        self, 
-        observer: Callable[[Change], None] = None, 
-        iterable: Iterable[T] = ()
+        self, observer: Callable[[Change], None] = None, iterable: Iterable[T] = ()
     ):
         """Initialize the ObservableList
         
@@ -142,7 +142,9 @@ class ObservableList(list):
         for observer in self.observers:
             observer(change)
 
-    def __notify_elements_removed_index_or_slice(self, index_or_slice: Union[int, slice]) -> Callable:
+    def __notify_elements_removed_index_or_slice(
+        self, index_or_slice: Union[int, slice]
+    ) -> Callable:
         """Notify observers about elements removed at an index or slice
 
         :return: a function that notifies about an add at the same place
