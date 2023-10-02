@@ -37,6 +37,10 @@ class g3logWidget(QWidget):
         self.console_widget.exceptionBtn.hide()
         self.console_widget.historyBtn.hide()
 
+        # _lastCommandRow is initialized to None, which causes errors
+        # when writing to ReplWidget 
+        self.console_widget.repl._lastCommandRow = 0;
+
         # Creates checkbox widget
         self.checkbox_widget = g3logCheckboxes()
         self.log_buffer = ThreadSafeBuffer(buffer_size, RobotLog)
@@ -82,6 +86,6 @@ class g3logWidget(QWidget):
             )
         ):
             log_str = f"R{log.robot_id} {log.created_timestamp.epoch_timestamp_seconds} {self.log_level_str_map[log.log_level]} [{log.file_name}->{log.line_number}] {log.log_msg}\n"
-            # self.console_widget.write(log_str)
+            self.console_widget.repl.write(log_str, style="output")
         else:
             return
