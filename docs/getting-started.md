@@ -97,6 +97,7 @@ We have several setup scripts to help you easily install the necessary dependenc
 * Run `./setup_software.sh`
   * You will be prompted for your admin password
   * This script will install everything necessary in order to build and run our main `AI` software 
+  * **If you are on WSL, run the script with the `--wsl` flag** (i.e. run `./setup_software.sh --wsl`)
 
 ### Installing an IDE
 

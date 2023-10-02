@@ -57,7 +57,8 @@
   * [Visualizer](#visualizer)
     * [Diagram](#visualizer-diagram)
     * [Draw Functions](#draw-functions)
-    * [3D Visualizer](#3d-visualizer)
+    * [3D Field Visualizer](#3d-field-visualizer)
+      * [Components](#components)
       * [Layers](#layers)
   * [Estop](#estop)
 * [Simulator](#simulator)
@@ -535,28 +536,20 @@ Although we want to display information about the [AI](#ai) in the [Visualizer](
 
 A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
 
-## 3D Visualizer
+## 3D Field Visualizer
 
-The latest iteration of our visualizer uses [PyQtGraph's 3D graphics system](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/index.html). Below lists the key components of the visualizer in the codebase:
+Our field visualizer uses [PyQtGraph's 3D graphics system](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/index.html) to render 3D graphics with OpenGL. PyQtGraph handles all the necessary calls to OpenGL for us, and as an abstraction, provides a [scenegraph](https://en.wikipedia.org/wiki/Scene_graph) to organize and manipulate entities/objects within the 3D environment (the scene).
 
-- `software/thunderscope/gl`: Main folder for the 3D visualizer. The "GL" prefix lets us identify 3D graphics related code and keeps namings consistent with `pyqtgraph.opengl` class names.
-  - `/graphics`: Folder for custom graphics items. Graphics should inherit from `GLGraphicsItem` and represent 3D objects that can be visualized in the scene (e.g. a robot, a sphere, a circle, etc.)
-  - [`GLWidget`](../src/software/thunderscope/gl/gl_widget.py) is the widget that displays our 3D visualizer. It wraps a PyQtGraph `GLViewWidget` that renders all the `GLGraphicsItem`s that have been added to its scene. 
-  - [Layers](#layers) are contained under the `gl` directory.
+`software/thunderscope/gl` is the main directory for the 3D visualizer. The "GL" prefix lets us identify 3D graphics related code and keeps namings consistent with `pyqtgraph.opengl` class names. Inside this directory:
+
+- [`GLWidget`](../src/software/thunderscope/gl/gl_widget.py) is the widget that displays our 3D visualization. It wraps a PyQtGraph `GLViewWidget` that renders all the `GLGraphicsItem`s that have been added to its [scenegraph](https://en.wikipedia.org/wiki/Scene_graph). 
+- `/graphics` contains custom "graphics items". Graphics items (or just "graphics" for short) are objects that can be added to the [3D scenegraph](https://en.wikipedia.org/wiki/Scene_graph). Graphics should inherit from [`GLGraphicsItem`](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/glgraphicsitem.html) and represent 3D objects that can be visualized in the scene (e.g. a robot, a sphere, a circle, etc.).
+- `/layers` contains all the [layers](#layers) we use to organize and group together graphics.
 
 ### Layers
-We organize our graphics into "layers" so that we can toggle the visibility of different parts of our visualization. Each layer is responsible for visualizing a specific portion of our AI (e.g. vision data, path planning, passing, etc.). The base class for a layer is [`GLLayer`](../src/software/thunderscope/gl/gl_layer.py).
+We organize our graphics into "layers" so that we can toggle the visibility of different parts of our visualization. Each layer is responsible for visualizing a specific portion of our AI (e.g. vision data, path planning, passing, etc.). A layer can also handle layer-specific functionality; for instance, `GLWorldLayer` lets the user place or kick the ball using the mouse. The base class for a layer is [`GLLayer`](../src/software/thunderscope/gl/gl_layer.py).
 
-In order to manage the adding and removing of graphics to the `GLViewWidget` scene from each layer, `GLLayer` has a [`GraphicsList`](../src/software/thunderscope/gl/helpers/graphics_list.py) that caches and tracks which graphics items are currently in use by the layer. A subclass of `GLLayer` should:
-
-- Register the types of graphics to be displayed with `self.graphics_list.register_graphics_group` in the layer's constructor.
-- Override the layer's `_update_graphics` function. This is where the layer should fetch graphics from the `GraphicsList` with `get_graphics` and update those graphics' transformations/properties. The `GraphicsList` will automatically create and add graphics to the cache as necessary, depending on the number of graphics requested.
-
-When the layer's `refresh_graphics` function is called, the `GLLayer` will call `_update_graphics` and then `get_changes` on the `GraphicsList`. The `get_changes` function will:
-  - purge all cached graphics that haven't been fetched since the last time `get_changes` was called
-  - return all graphics added to and removed from the cache since the last time `get_changes` was called
-
-The added/removed graphics are relayed to the `GLWidget`, which then adds or removes those graphics from the `GLViewWidget` scene.
+A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a tree-like structure. In theory, `GLLayers` could also be nested within one another. 
 
 # Estop
 `Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:
