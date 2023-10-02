@@ -34,7 +34,7 @@ sudo apt-get install -y software-properties-common # required for add-apt-reposi
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo apt-get update
 
-if ["$1" == "--wsl"] then
+if [ "$1" == "--wsl" ]; then
     print_status_msg "WSL Setup"
 
     sudo apt install unzip
