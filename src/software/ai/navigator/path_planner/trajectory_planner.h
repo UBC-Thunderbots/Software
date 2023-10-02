@@ -33,6 +33,17 @@ class TrajectoryPlanner
                                                  const std::optional<double> sub_traj_duration_sec);
     double calculateCost(const TrajectoryPathWithCost &traj_with_cost) const;
 
+    double getFirstNonCollisionTime(const TrajectoryPath &traj_path, const std::set<unsigned int>& obstacle_indices,
+                                    const std::vector<ObstaclePtr> &obstacles) const;
+
+    std::pair<double, ObstaclePtr>
+    getFirstCollisionTime(const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
+                          const std::vector<ObstaclePtr> &obstacles, const double start_time_sec,
+                          const double stop_time_sec) const;
+
+    double getLastNonCollisionTime(const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
+                                   const std::vector<ObstaclePtr> &obstacles) const;
+
     std::vector<Vector> relative_sub_destinations;
 
     const double SUB_DESTINATION_STEP_INTERVAL_SEC = 0.2;
@@ -44,15 +55,4 @@ class TrajectoryPlanner
         0.1, 1, 2, 3};
     static constexpr unsigned int NUM_SUB_DESTINATION_ANGLES = 15;
     static constexpr double PATH_WITH_COLLISION_COST         = 5.0;
-
-    double getFirstNonCollisionTime(const TrajectoryPath &traj_path, const std::set<unsigned int>& obstacle_indices,
-                                      const std::vector<ObstaclePtr> &obstacles) const;
-
-    std::pair<double, ObstaclePtr>
-    getFirstCollisionTime(const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
-                          const std::vector<ObstaclePtr> &obstacles, const double start_time_sec,
-                          const double stop_time_sec) const;
-
-    double getLastNonCollisionTime(const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
-                                     const std::vector<ObstaclePtr> &obstacles) const;
 };
