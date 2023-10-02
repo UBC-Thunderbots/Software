@@ -9,8 +9,12 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInScen
 
 
 class GLLayer(GLGraphicsItem):
-    """Represents a layer in the 3D visualization. A layer manages and returns GLGraphicsItem 
-    graphics to be displayed in the 3D scene.
+    """Represents a layer in the 3D visualization. 
+    
+    A layer is added to the 3D scenegraph and represents a collection of
+    GLGraphicsItems that we wish to display together. GLGraphicsItems should
+    be added as children of a GLLayer (using GLGraphicsItem.setParentItem)
+    
     """
 
     def __init__(self, name: str):
