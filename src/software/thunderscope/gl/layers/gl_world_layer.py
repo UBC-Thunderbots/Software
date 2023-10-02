@@ -180,9 +180,7 @@ class GLWorldLayer(GLLayer):
         # mouse has moved away from the ball.
         self.ball_velocity_vector = (
             self.point_in_scene_picked
-            - self.__invert_position_if_defending_negative_half(
-                event.point_in_scene
-            )
+            - self.__invert_position_if_defending_negative_half(event.point_in_scene)
         )
 
         # Cap the maximum kick speed
@@ -488,7 +486,9 @@ class GLWorldLayer(GLLayer):
             return True
         return False
 
-    def __invert_position_if_defending_negative_half(self, point: QtGui.QVector3D) -> QtGui.QVector3D:
+    def __invert_position_if_defending_negative_half(
+        self, point: QtGui.QVector3D
+    ) -> QtGui.QVector3D:
         """If we are defending the negative half of the field, we invert the coordinate frame
         for the mouse click/3D point picked to match up with the visualization.
 

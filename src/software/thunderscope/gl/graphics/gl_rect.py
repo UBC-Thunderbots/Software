@@ -11,7 +11,7 @@ class GLRect(GLLinePlotItem):
     def __init__(
         self,
         parentItem: GLGraphicsItem = None,
-        color: QtGui.QColor =(255, 255, 255, 127.5),
+        color: QtGui.QColor = (255, 255, 255, 127.5),
         line_width: float = 1.0,
     ):
         """Initialize the GLRect

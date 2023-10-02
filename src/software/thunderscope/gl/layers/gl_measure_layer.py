@@ -60,15 +60,17 @@ class GLMeasureLayer(GLLayer):
             second_point = self.measurement_points_cache[-1]
 
             # Create and add line graphic
-            self.measurement_line_graphics.append(GLLinePlotItem(
-                color=(Colors.PRIMARY_TEXT_COLOR),
-                pos=np.array(
-                    [
-                        [first_point.x(), first_point.y(), 0],
-                        [second_point.x(), second_point.y(), 0],
-                    ]
-                ),
-            ))
+            self.measurement_line_graphics.append(
+                GLLinePlotItem(
+                    color=(Colors.PRIMARY_TEXT_COLOR),
+                    pos=np.array(
+                        [
+                            [first_point.x(), first_point.y(), 0],
+                            [second_point.x(), second_point.y(), 0],
+                        ]
+                    ),
+                )
+            )
 
             # Create and add text graphic labelling the line with the measurement
 
