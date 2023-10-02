@@ -38,8 +38,8 @@ class g3logWidget(QWidget):
         self.console_widget.historyBtn.hide()
 
         # _lastCommandRow is initialized to None, which causes errors
-        # when writing to ReplWidget 
-        self.console_widget.repl._lastCommandRow = 0;
+        # when writing to ReplWidget
+        self.console_widget.repl._lastCommandRow = 0
 
         # Creates checkbox widget
         self.checkbox_widget = g3logCheckboxes()
