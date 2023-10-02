@@ -111,22 +111,15 @@ if ! sudo /opt/tbotspython/bin/python3.8 -m pip install --upgrade pip ; then
     exit 1
 fi
 
-if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
-    print_status_msg "Error: Installing protobuf failed"
-    exit 1;
-fi
-
-print_status_msg "Done Setting Up Virtual Python Environment"
-
 if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
 fi
 
 if [[ $(lsb_release -rs) == "22.04" ]]; then
-	sudo /opt/tbotspython/bin/pip3 install git+https://github.com/mcfletch/pyopengl.git@227f9c66976d9f5dadf62b9a97e6beaec84831ca#subdirectory=accelerate
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu22_requirements.txt
 fi
 
+print_status_msg "Done Setting Up Virtual Python Environment"
 print_status_msg "Fetching game controller"
 
 sudo chown -R $USER:$USER /opt/tbotspython
