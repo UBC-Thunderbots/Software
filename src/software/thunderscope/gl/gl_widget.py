@@ -185,7 +185,7 @@ class GLWidget(QWidget):
         for layer in self.layers:
             layer.keyReleaseEvent(event)
 
-    def mouse_in_scene_pressed(self, event: PointInSceneEvent):
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
         """Propagate mouse_in_scene_pressed event to all layers
         
         :param event: The event
@@ -199,7 +199,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_pressed(event)
 
-    def mouse_in_scene_dragged(self, event: PointInSceneEvent):
+    def mouse_in_scene_dragged(self, event: MouseInSceneEvent):
         """Propagate mouse_in_scene_dragged event to all layers
         
         :param event: The event
@@ -213,7 +213,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_dragged(event)
 
-    def mouse_in_scene_released(self, event: PointInSceneEvent):
+    def mouse_in_scene_released(self, event: MouseInSceneEvent):
         """Propagate mouse_in_scene_released event to all layers
         
         :param event: The event
@@ -227,7 +227,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_released(event)
 
-    def mouse_in_scene_moved(self, event: PointInSceneEvent):
+    def mouse_in_scene_moved(self, event: MouseInSceneEvent):
         """Propagate mouse_in_scene_moved event to all layers
         
         :param event: The event

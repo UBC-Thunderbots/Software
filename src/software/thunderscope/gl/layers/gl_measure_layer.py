@@ -9,7 +9,7 @@ from software.thunderscope.constants import Colors
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
-from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInSceneEvent
+from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -25,7 +25,7 @@ class GLMeasureLayer(GLLayer):
         """
         GLLayer.__init__(self, name)
 
-        self.mouse_point_in_scene = [0, 0]
+        self.mouse_point_in_scene = QtGui.QVector3D()
         self.measurement_points_cache = []
 
         # GLTextItem must be initialized later, outside of this constructor
@@ -36,8 +36,8 @@ class GLMeasureLayer(GLLayer):
         self.measurement_line_graphics = ObservableList(self._graphics_changed)
         self.measurement_point_graphics = ObservableList(self._graphics_changed)
 
-    def mouse_in_scene_pressed(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_pressed event
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
+        """Detect that the mouse was pressed and picked a point in the 3D scene
         
         :param event: The event
 
@@ -48,7 +48,7 @@ class GLMeasureLayer(GLLayer):
             radius=0.02, color=Colors.PRIMARY_TEXT_COLOR
         )
         measurement_point_graphic.set_position(
-            event.point_in_scene[0], event.point_in_scene[1], 0
+            event.point_in_scene.x(), event.point_in_scene.y(), 0
         )
         self.measurement_point_graphics.append(measurement_point_graphic)
 
@@ -60,36 +60,31 @@ class GLMeasureLayer(GLLayer):
             second_point = self.measurement_points_cache[-1]
 
             # Create and add line graphic
-            measurement_line_graphic = GLLinePlotItem(
+            self.measurement_line_graphics.append(GLLinePlotItem(
                 color=(Colors.PRIMARY_TEXT_COLOR),
                 pos=np.array(
                     [
-                        [first_point[0], first_point[1], 0],
-                        [second_point[0], second_point[1], 0],
+                        [first_point.x(), first_point.y(), 0],
+                        [second_point.x(), second_point.y(), 0],
                     ]
                 ),
-            )
-            self.measurement_line_graphics.append(measurement_line_graphic)
+            ))
 
             # Create and add text graphic labelling the line with the measurement
 
             # Pythagorean theorem
             distance = math.sqrt(
-                (second_point[0] - first_point[0]) ** 2
-                + (second_point[1] - first_point[1]) ** 2
+                (second_point.x() - first_point.x()) ** 2
+                + (second_point.y() - first_point.y()) ** 2
             )
-
-            midpoint = [
-                (first_point[0] + second_point[0]) / 2,
-                (first_point[1] + second_point[1]) / 2,
-            ]
+            midpoint = (first_point + second_point) / 2
 
             self.measurement_text_graphics.append(
                 GLTextItem(
                     font=QtGui.QFont("Roboto", 8),
                     color=Colors.PRIMARY_TEXT_COLOR,
                     text=f"{distance:.2f} m",
-                    pos=np.array([*midpoint, 0]),
+                    pos=np.array([midpoint.x(), midpoint.y(), 0]),
                 )
             )
 
@@ -121,15 +116,15 @@ class GLMeasureLayer(GLLayer):
                     font=QtGui.QFont("Roboto", 8),
                     color=Colors.PRIMARY_TEXT_COLOR,
                     text=f"{angle:.1f}°",
-                    pos=np.array([*placement_point, 0]),
+                    pos=np.array([placement_point.x(), placement_point.y(), 0]),
                 )
             )
 
             # Clear the point cache
             self.measurement_points_cache.clear()
 
-    def mouse_in_scene_moved(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_moved event
+    def mouse_in_scene_moved(self, event: MouseInSceneEvent):
+        """Detect that the mouse was moved within the 3D scene
         
         :param event: The event
         
@@ -155,9 +150,7 @@ class GLMeasureLayer(GLLayer):
                 color=Colors.PRIMARY_TEXT_COLOR,
             )
 
-        mouse_point_in_scene_x = self.mouse_point_in_scene[0]
-        mouse_point_in_scene_y = self.mouse_point_in_scene[1]
         self.cursor_coords_graphic.setData(
-            text=f"({mouse_point_in_scene_x:.2f} m, {mouse_point_in_scene_y:.2f} m)",
-            pos=[mouse_point_in_scene_x, mouse_point_in_scene_y, 0],
+            text=f"({self.mouse_point_in_scene.x():.2f} m, {self.mouse_point_in_scene.y():.2f} m)",
+            pos=[self.mouse_point_in_scene.x(), self.mouse_point_in_scene.y(), 0],
         )

@@ -5,7 +5,7 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from typing import Callable, List
 
 from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
-from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInSceneEvent
+from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 
 
 class GLLayer(GLGraphicsItem):
@@ -25,34 +25,6 @@ class GLLayer(GLGraphicsItem):
     def refresh_graphics(self):
         """Updates the GLGraphicsItems in this layer"""
 
-    def mouse_in_scene_pressed(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_pressed event
-        
-        :param event: The event
-        
-        """
-
-    def mouse_in_scene_dragged(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_dragged event
-        
-        :param event: The event
-        
-        """
-
-    def mouse_in_scene_released(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_released event
-        
-        :param event: The event
-        
-        """
-
-    def mouse_in_scene_moved(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_moved event
-        
-        :param event: The event
-        
-        """
-
     def keyPressEvent(self, event: QtGui.QKeyEvent):
         """Detect when a key has been pressed
 
@@ -65,6 +37,34 @@ class GLLayer(GLGraphicsItem):
 
         :param event: The event
 
+        """
+
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
+        """Detect that the mouse was pressed and picked a point in the 3D scene
+        
+        :param event: The event
+        
+        """
+
+    def mouse_in_scene_dragged(self, event: MouseInSceneEvent):
+        """Detect that the mouse was dragged within the 3D scene
+        
+        :param event: The event
+        
+        """
+
+    def mouse_in_scene_released(self, event: MouseInSceneEvent):
+        """Detect that the mouse was released after picking a point in the 3D scene
+        
+        :param event: The event
+        
+        """
+
+    def mouse_in_scene_moved(self, event: MouseInSceneEvent):
+        """Detect that the mouse was moved within the 3D scene
+        
+        :param event: The event
+        
         """
 
     def _graphics_changed(self, change: Change):

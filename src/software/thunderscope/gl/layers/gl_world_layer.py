@@ -8,7 +8,6 @@ import numpy as np
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import Colors, SPEED_SEGMENT_SCALE
-import software.python_bindings as geom
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
@@ -20,7 +19,7 @@ from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
-from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInSceneEvent
+from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -144,8 +143,8 @@ class GLWorldLayer(GLLayer):
         """
         self.key_pressed[event.key()] = False
 
-    def mouse_in_scene_pressed(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_pressed event
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
+        """Detect that the mouse was pressed and picked a point in the 3D scene
         
         :param event: The event
         
@@ -159,15 +158,15 @@ class GLWorldLayer(GLLayer):
         world_state.ball_state.CopyFrom(
             BallState(
                 global_position=Point(
-                    x_meters=self.point_in_scene_picked[0],
-                    y_meters=self.point_in_scene_picked[1],
+                    x_meters=self.point_in_scene_picked.x(),
+                    y_meters=self.point_in_scene_picked.y(),
                 )
             )
         )
         self.simulator_io.send_proto(WorldState, world_state)
 
-    def mouse_in_scene_dragged(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_dragged event
+    def mouse_in_scene_dragged(self, event: MouseInSceneEvent):
+        """Detect that the mouse was dragged within the 3D scene
         
         :param event: The event
         
@@ -179,15 +178,10 @@ class GLWorldLayer(GLLayer):
         # to apply a velocity on the ball (i.e. kick it).
         # We create a velocity vector that is proportional to the distance the
         # mouse has moved away from the ball.
-
-        ball_position = geom.Vector(
-            self.point_in_scene_picked[0], self.point_in_scene_picked[1]
-        )
-
         self.ball_velocity_vector = (
-            ball_position
+            self.point_in_scene_picked
             - self.__invert_position_if_defending_negative_half(
-                geom.Vector(event.point_in_scene[0], event.point_in_scene[1])
+                event.point_in_scene
             )
         )
 
@@ -197,8 +191,8 @@ class GLWorldLayer(GLLayer):
                 BALL_MAX_SPEED_METERS_PER_SECOND
             )
 
-    def mouse_in_scene_released(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_released event
+    def mouse_in_scene_released(self, event: MouseInSceneEvent):
+        """Detect that the mouse was released after picking a point in the 3D scene
         
         :param event: The event
         
@@ -216,8 +210,8 @@ class GLWorldLayer(GLLayer):
         world_state.ball_state.CopyFrom(
             BallState(
                 global_position=Point(
-                    x_meters=self.point_in_scene_picked[0],
-                    y_meters=self.point_in_scene_picked[1],
+                    x_meters=self.point_in_scene_picked.x(),
+                    y_meters=self.point_in_scene_picked.y(),
                 ),
                 global_velocity=Vector(
                     x_component_meters=self.ball_velocity_vector.x(),
@@ -473,7 +467,7 @@ class GLWorldLayer(GLLayer):
                 ),
             )
 
-    def __should_invert_coordinate_frame(self):
+    def __should_invert_coordinate_frame(self) -> bool:
         """Our coordinate system always assumes that the friendly team is defending
         the negative half of the field.
 
@@ -494,7 +488,7 @@ class GLWorldLayer(GLLayer):
             return True
         return False
 
-    def __invert_position_if_defending_negative_half(self, point):
+    def __invert_position_if_defending_negative_half(self, point: QtGui.QVector3D) -> QtGui.QVector3D:
         """If we are defending the negative half of the field, we invert the coordinate frame
         for the mouse click/3D point picked to match up with the visualization.
 
@@ -503,6 +497,5 @@ class GLWorldLayer(GLLayer):
 
         """
         if self.__should_invert_coordinate_frame():
-            return [-point[0], -point[1]]
-
+            return QtGui.QVector3D(-point[0], -point[1], point[2])
         return point
