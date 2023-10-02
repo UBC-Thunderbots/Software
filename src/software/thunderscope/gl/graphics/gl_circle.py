@@ -1,5 +1,6 @@
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 import math
 import numpy as np
@@ -10,18 +11,20 @@ class GLCircle(GLLinePlotItem):
 
     def __init__(
         self,
+        parentItem: GLGraphicsItem = None,
         radius: float = 1,
         num_points: int = 24,
         color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
     ):
         """Initialize the GLCircle
         
+        :param parentItem: The parent item of the graphic
         :param radius: The radius of the circle
         :param num_points: The number of points to generate when creating the circle
         :param color: The color of the graphic
 
         """
-        GLLinePlotItem.__init__(self, color=color)
+        GLLinePlotItem.__init__(self, parentItem=parentItem, color=color)
 
         self.x = 0
         self.y = 0

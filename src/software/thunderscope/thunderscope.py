@@ -70,7 +70,7 @@ class Thunderscope(object):
             self.tabs.addTab(tab.dock_area, tab.name)
             self.register_refresh_function(tab.refresh)
 
-        self.window = QtGui.QMainWindow()
+        self.window = QMainWindow()
         self.window.setCentralWidget(self.tabs)
         self.window.setWindowIcon(
             QtGui.QIcon("software/thunderscope/thunderscope-logo.png")

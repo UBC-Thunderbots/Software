@@ -1,5 +1,6 @@
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.constants import Colors
 
@@ -9,20 +10,22 @@ class GLSphere(GLMeshItem):
 
     def __init__(
         self,
-        radius: float,
+        parentItem: GLGraphicsItem = None,
+        radius: float = 1,
         color: QtGui.QColor = Colors.BALL_COLOR,
         rows: int = 6,
         cols: int = 6,
     ):
         """Initialize the GLSphere
         
+        :param parentItem: The parent item of the graphic
         :param radius: The radius of the sphere
         :param color: The color of the sphere
         :param rows: The number of rows in the mesh
         :param cols: The number of columns in the mesh
 
         """
-        GLMeshItem.__init__(self, color=color)
+        GLMeshItem.__init__(self, parentItem=parentItem, color=color)
 
         self.x = 0
         self.y = 0

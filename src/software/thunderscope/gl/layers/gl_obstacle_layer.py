@@ -9,6 +9,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 
+from software.thunderscope.gl.helpers.observable_list import ObservableList
 
 class GLObstacleLayer(GLLayer):
     """GLLayer that visualizes obstacles"""
@@ -25,16 +26,11 @@ class GLObstacleLayer(GLLayer):
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
-        self.graphics_list.register_graphics_group(
-            "poly_obstacles",
-            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
-        )
-        self.graphics_list.register_graphics_group(
-            "circle_obstacles", lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
-        )
+        self.poly_obstacle_graphics = ObservableList(self._graphics_changed)
+        self.circle_obstacle_graphics = ObservableList(self._graphics_changed)
 
-    def _update_graphics(self):
-        """Fetch and update graphics for the layer"""
+    def refresh_graphics(self):
+        """Update graphics in this layer"""
 
         primitive_set = self.primitive_set_buffer.get(
             block=False
@@ -46,15 +42,23 @@ class GLObstacleLayer(GLLayer):
             if primitive.HasField("move")
         ]
 
+        poly_obstacle_graphics_index = 0; 
+        circle_obstacle_graphics_index = 0; 
+
         for obstacles in obstacles_ptrs:
             for obstacle in obstacles:
+                
 
-                for poly_obstacle_graphic, poly_obstacle in zip(
-                    self.graphics_list.get_graphics(
-                        "poly_obstacles", len(obstacle.polygon)
-                    ),
-                    obstacle.polygon,
-                ):
+                for poly_obstacle in obstacle.polygon:
+
+                    # Get a previously cached graphic or create a new one
+                    if poly_obstacle_graphics_index >= len(self.poly_obstacle_graphics):
+                        poly_obstacle_graphic = GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
+                        self.poly_obstacle_graphics.append(poly_obstacle_graphic)
+                    else:
+                        poly_obstacle_graphic = self.poly_obstacle_graphics[poly_obstacle_graphics_index]
+                    poly_obstacle_graphics_index += 1
+
                     # In order to close the polygon, we need to include the first point at the end of
                     # the list of points in the polygon
                     polygon_points = (
@@ -70,14 +74,24 @@ class GLObstacleLayer(GLLayer):
                         ),
                     )
 
-                for circle_obstacle_graphic, circle_obstacle in zip(
-                    self.graphics_list.get_graphics(
-                        "circle_obstacles", len(obstacle.circle)
-                    ),
-                    obstacle.circle,
-                ):
+                for circle_obstacle in obstacle.circle:
+
+                    # Get a previously cached graphic or create a new one
+                    if circle_obstacle_graphics_index >= len(self.circle_obstacle_graphics):
+                        circle_obstacle_graphic = GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
+                        self.circle_obstacle_graphics.append(circle_obstacle_graphic)
+                    else:
+                        circle_obstacle_graphic = self.circle_obstacle_graphics[circle_obstacle_graphics_index]
+                    circle_obstacle_graphics_index += 1
+
                     circle_obstacle_graphic.set_radius(circle_obstacle.radius)
                     circle_obstacle_graphic.set_position(
                         circle_obstacle.origin.x_meters,
                         circle_obstacle.origin.y_meters,
                     )
+
+        # Remove graphics we don't need anymore
+        while poly_obstacle_graphics_index < len(self.poly_obstacle_graphics):
+            self.poly_obstacle_graphics.pop()
+        while circle_obstacle_graphics_index < len(self.circle_obstacle_graphics):
+            self.circle_obstacle_graphics.pop()

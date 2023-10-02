@@ -19,6 +19,8 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 
+from software.thunderscope.gl.helpers.observable_list import ObservableList
+
 
 class GLTacticLayer(GLLayer):
     """GLLayer that visualizes tactics"""
@@ -33,19 +35,17 @@ class GLTacticLayer(GLLayer):
         """
         GLLayer.__init__(self, name)
 
+        # Depth value of 1 ensures this layer is rendered over top other layers
+        self.setDepthValue(1)
+
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.play_info_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.cached_world = World()
 
-        self.graphics_list.register_graphics_group(
-            "tactic_fsm_info",
-            lambda: GLTextItem(
-                font=QtGui.QFont("Roboto", 8), color=Colors.SECONDARY_TEXT_COLOR
-            ),
-        )
+        self.tactic_fsm_info_graphics = ObservableList(self._graphics_changed)
 
-    def _update_graphics(self):
-        """Fetch and update graphics for the layer"""
+    def refresh_graphics(self):
+        """Update graphics in this layer"""
 
         self.cached_world = self.world_buffer.get(block=False)
         play_info = self.play_info_buffer.get(block=False)
@@ -64,8 +64,18 @@ class GLTacticLayer(GLLayer):
         """
         tactic_assignments = play_info_dict["robotTacticAssignment"]
 
+        # Ensure we have the same number of graphics as robots
+        self._bring_list_to_length(
+            self.tactic_fsm_info_graphics, 
+            len(team.team_robots),
+            lambda: GLTextItem(
+                font=QtGui.QFont("Roboto", 8), 
+                color=Colors.SECONDARY_TEXT_COLOR
+            )
+        )
+
         for tactic_fsm_info_graphic, robot in zip(
-            self.graphics_list.get_graphics("tactic_fsm_info", len(team.team_robots)),
+            self.tactic_fsm_info_graphics,
             team.team_robots,
         ):
             tactic_fsm_info_graphic.setData(
@@ -83,6 +93,3 @@ class GLTacticLayer(GLLayer):
                     ROBOT_MAX_HEIGHT_METERS + 0.1,
                 ],
             )
-
-            # Depth value of 1 ensures text is rendered over top other graphics
-            tactic_fsm_info_graphic.setDepthValue(1)

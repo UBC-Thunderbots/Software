@@ -9,6 +9,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 
+from software.thunderscope.gl.helpers.observable_list import ObservableList
 
 class GLHrvoLayer(GLLayer):
     """GLHrvoLayer that visualizes the state of the HRVO Simulator"""
@@ -28,17 +29,11 @@ class GLHrvoLayer(GLLayer):
         self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HRVOVisualization)
         self.prev_message = HRVOVisualization(robot_id=self.robot_id)
 
-        self.graphics_list.register_graphics_group(
-            "velocity_obstacles",
-            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
-        )
-        self.graphics_list.register_graphics_group(
-            "robot_circles",
-            lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR, num_points=10),
-        )
+        self.velocity_obstacle_graphics = ObservableList(self._graphics_changed)
+        self.robot_circle_graphics = ObservableList(self._graphics_changed)
 
-    def _update_graphics(self):
-        """Fetch and update graphics for the layer"""
+    def refresh_graphics(self):
+        """Update graphics in this layer"""
 
         velocity_obstacle_msg = self.prev_message
         while not self.hrvo_buffer.queue.empty():
@@ -48,10 +43,23 @@ class GLHrvoLayer(GLLayer):
 
         self.prev_message = velocity_obstacle_msg
 
+        # Ensure we have the same number of graphics as protos
+        self._bring_list_to_length(
+            self.velocity_obstacle_graphics, 
+            len(velocity_obstacle_msg.velocity_obstacles),
+            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR)
+        )
+        self._bring_list_to_length(
+            self.robot_circle_graphics, 
+            len(velocity_obstacle_msg.robots),
+            lambda: GLCircle(
+                color=Colors.NAVIGATOR_OBSTACLE_COLOR, 
+                num_points=10
+            )
+        )
+
         for velocity_obstacle_graphic, velocity_obstacle in zip(
-            self.graphics_list.get_graphics(
-                "velocity_obstacles", len(velocity_obstacle_msg.velocity_obstacles)
-            ),
+            self.velocity_obstacle_graphics,
             velocity_obstacle_msg.velocity_obstacles,
         ):
             polygon_points = [
@@ -82,9 +90,7 @@ class GLHrvoLayer(GLLayer):
             )
 
         for robot_circle_graphic, robot_circle in zip(
-            self.graphics_list.get_graphics(
-                "robot_circles", len(velocity_obstacle_msg.robots)
-            ),
+            self.robot_circle_graphics,
             velocity_obstacle_msg.robots,
         ):
             robot_circle_graphic.set_radius(robot_circle.radius)

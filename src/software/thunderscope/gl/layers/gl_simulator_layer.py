@@ -30,22 +30,19 @@ class GLSimulatorLayer(GLLayer):
         self.friendly_colour_yellow = friendly_colour_yellow
         self.simulator_state_buffer = ThreadSafeBuffer(buffer_size, SimulatorState)
 
-        self.graphics_list.register_graphics_group(
-            "ball",
-            lambda: GLSphere(
-                radius=BALL_MAX_RADIUS_METERS, color=Colors.SIM_BALL_COLOR
-            ),
+        self.ball_graphic = GLSphere(
+            parentItem=self, 
+            radius=BALL_MAX_RADIUS_METERS, 
+            color=Colors.SIM_BALL_COLOR
         )
 
-    def _update_graphics(self):
-        """Fetch and update graphics for the layer"""
+    def refresh_graphics(self):
+        """Update graphics in this layer"""
 
         sim_world_state = self.simulator_state_buffer.get(block=False)
 
-        ball_graphic = self.graphics_list.get_graphics("ball", 1)[0]
-
         # For some reason x and y are reversed?
-        ball_graphic.set_position(
+        self.ball_graphic.set_position(
             sim_world_state.ball.p_y,
             -sim_world_state.ball.p_x,
             sim_world_state.ball.p_z,

@@ -10,6 +10,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 
+from software.thunderscope.gl.helpers.observable_list import ObservableList
 
 class GLPathLayer(GLLayer):
     """GLLayer that visualizes paths from the navigator"""
@@ -25,15 +26,12 @@ class GLPathLayer(GLLayer):
         GLLayer.__init__(self, name)
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
+        
+        self.path_graphics = ObservableList(self._graphics_changed)
+        self.destination_graphics = ObservableList(self._graphics_changed)
 
-        self.graphics_list.register_graphics_group("paths", GLLinePlotItem)
-        self.graphics_list.register_graphics_group(
-            "destinations",
-            lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
-        )
-
-    def _update_graphics(self):
-        """Fetch and update graphics for the layer"""
+    def refresh_graphics(self):
+        """Update graphics in this layer"""
 
         primitive_set = self.primitive_set_buffer.get(
             block=False
@@ -54,8 +52,20 @@ class GLPathLayer(GLLayer):
             if primitive.HasField("move")
         ]
 
+        # Ensure we have the same number of graphics as protos
+        self._bring_list_to_length(
+            self.path_graphics, 
+            len(paths),
+            lambda: GLLinePlotItem()
+        )
+        self._bring_list_to_length(
+            self.destination_graphics, 
+            len(requested_destinations),
+            lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE)
+        )
+
         for path_graphic, path in zip(
-            self.graphics_list.get_graphics("paths", len(paths)), paths
+            self.path_graphics, paths
         ):
             path_graphic.setData(
                 pos=np.array(
@@ -65,10 +75,7 @@ class GLPathLayer(GLLayer):
             )
 
         for dest_graphic, (dest, final_angle) in zip(
-            self.graphics_list.get_graphics(
-                "destinations", len(requested_destinations)
-            ),
-            requested_destinations,
+            self.destination_graphics, requested_destinations
         ):
             dest_graphic.set_position(dest.x_meters, dest.y_meters)
             dest_graphic.set_orientation(math.degrees(final_angle.radians))

@@ -14,6 +14,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 
+from software.thunderscope.gl.helpers.observable_list import ObservableList
 
 class GLValidationLayer(GLLayer):
     """GLLayer that visualizes validation"""
@@ -45,21 +46,26 @@ class GLValidationLayer(GLLayer):
 
         self.passed_validation_timeout_pairs = []
 
-        self.graphics_list.register_graphics_group(
-            "test_name",
-            lambda: GLTextItem(
-                pos=(test_name_pos_x, test_name_pos_y, 0),
+        self.test_name_pos_x = test_name_pos_x
+        self.test_name_pos_y = test_name_pos_y
+
+        # GLTextItem must be initialized later, outside of this constructor
+        # Otherwise we run into some strange bugs: 'NoneType' object has no attribute 'width'
+        self.test_name_graphic: GLTextItem = None
+
+        self.polygon_graphics = ObservableList(self._graphics_changed)
+        self.circle_graphics = ObservableList(self._graphics_changed)
+
+    def refresh_graphics(self):
+        """Update graphics in this layer"""
+
+        if not self.test_name_graphic:
+            self.test_name_graphic = GLTextItem(
+                parentItem=self,
+                pos=(self.test_name_pos_x, self.test_name_pos_y, 0),
                 font=QtGui.QFont("Roboto", 8),
                 color=Colors.PRIMARY_TEXT_COLOR,
-            ),
-        )
-        self.graphics_list.register_graphics_group(
-            "validation_polygons", GLLinePlotItem
-        )
-        self.graphics_list.register_graphics_group("validation_circles", GLCircle)
-
-    def _update_graphics(self):
-        """Fetch and update graphics for the layer"""
+            )
 
         # Consume the validation set buffer
         for _ in range(self.validation_set_buffer.queue.qsize()):
@@ -94,8 +100,7 @@ class GLValidationLayer(GLLayer):
             + list(self.passed_validation_timeout_pairs)
         )
 
-        test_name_graphic = self.graphics_list.get_graphics("test_name", 1)[0]
-        test_name_graphic.setData(text=self.cached_eventually_validation_set.test_name)
+        self.test_name_graphic.setData(text=self.cached_eventually_validation_set.test_name)
 
     def __update_validation_graphics(self, validations: List[ValidationProto]):
         """Update the GLGraphicsItems that display the validations
@@ -103,6 +108,9 @@ class GLValidationLayer(GLLayer):
         :param validations: The list of validation protos
 
         """
+        polygon_graphics_index = 0; 
+        circle_graphics_index = 0; 
+        
         for validation in validations:
 
             validation_color = (
@@ -111,12 +119,16 @@ class GLValidationLayer(GLLayer):
                 else Colors.VALIDATION_FAILED_COLOR
             )
 
-            for polygon_graphic, polygon in zip(
-                self.graphics_list.get_graphics(
-                    "validation_polygons", len(validation.geometry.polygons)
-                ),
-                validation.geometry.polygons,
-            ):
+            for polygon in validation.geometry.polygons:
+                
+                # Get a previously cached graphic or create a new one
+                if polygon_graphics_index >= len(self.polygon_graphics):
+                    polygon_graphic = GLLinePlotItem()
+                    self.polygon_graphics.append(polygon_graphic)
+                else:
+                    polygon_graphic = self.polygon_graphics[polygon_graphics_index]
+                polygon_graphics_index += 1
+
                 # In order to close the polygon, we need to include the first point at the end of
                 # the list of points in the polygon
                 polygon_points = list(polygon.points) + polygon.points[:1]
@@ -131,12 +143,16 @@ class GLValidationLayer(GLLayer):
                     color=validation_color,
                 )
 
-            for segment_graphic, segment in zip(
-                self.graphics_list.get_graphics(
-                    "validation_polygons", len(validation.geometry.segments)
-                ),
-                validation.geometry.segments,
-            ):
+            for segment in validation.geometry.segments:
+                
+                # Get a previously cached graphic or create a new one
+                if polygon_graphics_index >= len(self.polygon_graphics):
+                    polygon_graphic = GLLinePlotItem()
+                    self.polygon_graphics.append(polygon_graphic)
+                else:
+                    polygon_graphic = self.polygon_graphics[polygon_graphics_index]
+                polygon_graphics_index += 1
+
                 segment_graphic.setData(
                     pos=np.array(
                         [
@@ -147,14 +163,24 @@ class GLValidationLayer(GLLayer):
                     color=validation_color,
                 )
 
-            for circle_graphic, circle in zip(
-                self.graphics_list.get_graphics(
-                    "validation_circles", len(validation.geometry.circles)
-                ),
-                validation.geometry.circles,
-            ):
+            for circle in validation.geometry.circles:
+
+                # Get a previously cached graphic or create a new one
+                if circle_graphics_index >= len(self.circle_graphics):
+                    circle_graphic = GLCircle()
+                    self.circle_graphics.append(circle_graphic)
+                else:
+                    circle_graphic = self.circle_graphics[circle_graphics_index]
+                circle_graphics_index += 1
+
                 circle_graphic.set_radius(circle.radius)
                 circle_graphic.set_position(
                     circle.origin.x_meters, circle.origin.y_meters
                 )
                 circle_graphic.set_color(validation_color)
+
+        # Remove graphics we don't need anymore
+        while polygon_graphics_index < len(self.polygon_graphics):
+            self.polygon_graphics.pop()
+        while circle_graphics_index < len(self.circle_graphics):
+            self.circle_graphics.pop()

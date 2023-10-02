@@ -1,11 +1,14 @@
+from pyqtgraph.Qt import QtGui
 import pyqtgraph as pg
-from pyqtgraph.opengl import *
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
-from software.thunderscope.gl.helpers.graphics_list import GraphicsList
+from typing import List, Iterable, Callable
+
+from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
 from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInSceneEvent
 
 
-class GLLayer(pg.GraphicsObject):
+class GLLayer(GLGraphicsItem):
     """Represents a layer in the 3D visualization. A layer manages and returns GLGraphicsItem 
     graphics to be displayed in the 3D scene.
     """
@@ -16,23 +19,11 @@ class GLLayer(pg.GraphicsObject):
         :param name: The displayed name of the layer
 
         """
-        pg.GraphicsObject.__init__(self)
-
+        GLGraphicsItem.__init__(self)
         self.name = name
-        self.graphics_list = GraphicsList()
 
     def refresh_graphics(self):
-        """Updates the GLGraphicsItems in this layer
-
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
-        
-        """
-        if self.isVisible():
-            self._update_graphics()
-
-        return self.graphics_list.get_changes()
+        """Updates the GLGraphicsItems in this layer"""
 
     def mouse_in_scene_pressed(self, event: PointInSceneEvent):
         """Event handler for the mouse_in_scene_pressed event
@@ -62,14 +53,55 @@ class GLLayer(pg.GraphicsObject):
         
         """
 
-    def _update_graphics(self):
-        """Protected method that should overridden to fetch and update
-        graphics for the layer. 
-        
-        Subclasses of GLLayer should fetch graphics from self.graphics_list
-        and only update the returned graphics from GraphicsList collection.
-        
-        self.graphics_list.get_changes() should NOT be called in this function.
+    def keyPressEvent(self, event: QtGui.QKeyEvent):
+        """Detect when a key has been pressed
+
+        :param event: The event
 
         """
-        raise NotImplementedError("Abstract class method called: _update_graphics")
+
+    def keyReleaseEvent(self, event: QtGui.QKeyEvent):
+        """Detect when a key has been released
+
+        :param event: The event
+
+        """
+
+    def _graphics_changed(self, change: Change):
+        """Called by an ObservableList of GLGraphicsItems to notify 
+        this observer that GLGraphicsItems were added or removed from
+        the ObservableList.
+
+        Subclasses of GLLayer should use ObservableLists to store collections of
+        GLGraphicsItems. Each ObservableList should register this function as an observer 
+        so that GLGraphicsItems are automatically added/removed to the 3D scenegraph
+        when they are added/removed from the ObservableList.
+
+        :param change: Change representing the GLGraphicsItems added or removed
+
+        """
+        if change.action == ChangeAction.ADD:
+            for graphic in change.elements:
+                graphic.setParentItem(self)
+        elif change.action == ChangeAction.REMOVE:
+            for graphic in change.elements:
+                graphic.setParentItem(None)
+
+    def _bring_list_to_length(self, list_: List, target_len: int, element_factory: Callable):
+        """Bring a list to a desired target length by either creating new elements
+        using the provided `element_factory` and adding them to the list, or by 
+        popping elements from the end of the list.
+
+        Subclasses of GLLayer using ObservableLists for storing GLGraphicsItems may
+        find this helper function useful.
+
+        :param list_: The list
+        :param target_len: The target length to bring the list to
+        :param element_factory: Callable that returns an element to add to the list
+
+        """
+        while len(list_) > target_len:
+            list_.pop()
+        while len(list_) < target_len:
+            list_.append(element_factory())
+            

@@ -1,5 +1,6 @@
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 
@@ -9,13 +10,14 @@ import numpy as np
 class GLGoal(GLMeshItem):
     """Displays a 3D mesh representing the goal"""
 
-    def __init__(self, color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5)):
+    def __init__(self, parentItem: GLGraphicsItem = None, color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5)):
         """Initialize the GLGoal
         
+        :param parentItem: The parent item of the graphic
         :param color: The color of the graphic
 
         """
-        GLMeshItem.__init__(self, color=color)
+        GLMeshItem.__init__(self, parentItem=parentItem, color=color)
 
         self.x = 0
         self.y = 0
@@ -27,6 +29,11 @@ class GLGoal(GLMeshItem):
         # we need to draw an outline of the goal on the ground
         self.goal_outline = GLLinePlotItem(color=color)
         self.goal_outline.setParentItem(self)
+
+        # Need to give goal some default meshdata; otherwise, pyqtgraph
+        # tries calculating some stuff using invalid vertices/faces and 
+        # runs into "NoneType object is not subscriptable" errors
+        self.setMeshData(meshdata=MeshData.sphere(1, 1))
 
     def set_dimensions(self, x_length: float, y_length: float):
         """Set the dimensions of the goal

@@ -1,5 +1,6 @@
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
@@ -10,14 +11,15 @@ import numpy as np
 class GLRobot(GLMeshItem):
     """Displays a 3D mesh representing a robot"""
 
-    def __init__(self, color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5)):
+    def __init__(self, parentItem: GLGraphicsItem = None, color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5)):
         """Initialize the GLRobot
         
+        :param parentItem: The parent item of the graphic
         :param color: The color of the graphic
 
         """
         GLMeshItem.__init__(
-            self, meshdata=self.__get_mesh_data(), color=color,
+            self, parentItem=parentItem, meshdata=self.__get_mesh_data(), color=color,
         )
 
         self.x = 0
