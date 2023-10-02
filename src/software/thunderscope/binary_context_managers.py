@@ -18,7 +18,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
 )
 
 
-def is_cmd_running(command):
+def is_cmd_running(command: list[str]) -> bool:
     """Check if there is any running process that was launched
     with the given command.
 
@@ -45,10 +45,10 @@ class FullSystem(object):
     def __init__(
         self,
         full_system_runtime_dir=None,
-        debug_full_system=False,
-        friendly_colour_yellow=False,
-        should_restart_on_crash=True,
-    ):
+        debug_full_system: bool=False,
+        friendly_colour_yellow: bool=False,
+        should_restart_on_crash: bool=True,
+    ) -> None:
         """Run FullSystem
 
         :param full_system_runtime_dir: The directory to run the blue full_system in
