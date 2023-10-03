@@ -82,7 +82,6 @@ class BangBangTrajectory2D : public Trajectory2D
      */
     double getTotalTime() const override;
 
-    // TODO: Test
     /**
      * Get the bounding box of the trajectory
      * @return bounding box which bounds the trajectory
