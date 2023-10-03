@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d.h"
+#include "software/geom/bounding_box.h"
 #include "software/geom/point.h"
-#include "software/geom/rectangle.h"
 
 using Trajectory2D = Trajectory<Point, Vector, Vector>;
 

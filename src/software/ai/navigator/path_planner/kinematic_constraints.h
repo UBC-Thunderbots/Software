@@ -14,8 +14,13 @@ class KinematicConstraints
      * @param max_acceleration The max acceleration a robot can have
      * @param max_deceleration The max deceleration a robot can have
      */
-    KinematicConstraints(double max_velocity, double max_acceleration,
-                         double max_deceleration);
+    inline KinematicConstraints(double max_velocity, double max_acceleration,
+                                double max_deceleration)
+        : max_velocity(max_velocity),
+          max_acceleration(max_acceleration),
+          max_deceleration(max_deceleration)
+    {
+    }
 
     /**
      * Get the max velocity

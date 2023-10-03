@@ -31,15 +31,12 @@ cc_library(
 
 cc_library(
     name = "kinematic_constraints",
-    srcs = ["kinematic_constraints.cpp"],
     hdrs = ["kinematic_constraints.h"],
 )
 
 cc_library(
     name = "trajectory",
     hdrs = ["trajectory.hpp"],
-    deps = [
-    ],
 )
 
 cc_library(
