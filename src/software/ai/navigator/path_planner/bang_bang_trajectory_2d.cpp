@@ -12,22 +12,31 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
                                     const Vector& initial_vel, double max_vel,
                                     double max_accel, double max_decel)
 {
-    // The following implementation is based on section IV of the paper
-    // "Trajectory generation for four wheeled omnidirectional vehicles"
+    /**
+     * The following implementation is based on section IV of the paper
+     * "Trajectory generation for four wheeled omnidirectional vehicles"
+     *
+     * A 2D trajectories is represented as 2x 1D trajectories (one for x and one for y)
+     * which take the same amount of time to reach the destination.
+     *
+     * The max velocity, acceleration, and deceleration are assumed to be the kinematic
+     * constraints in 2D space, as opposed to the constraints for individual x and y
+     * components. To find the components of these constraints for each axis which will
+     * give us two trajectories with (almost) equal durations, we will use binary search
+     * over the components of the given kinematic constraints.
+     *
+     * We will start with alpha = PI/4 (45 deg) which will have the x and y components
+     * equivalent to each other. Depending on which 1D trajectory takes longer to reach
+     * the destination, we will either increase or decrease alpha by increment
+     * (= PI/(8*2^i) where i is the iteration of binary search we're at). This will
+     * result in the component which is taking longer to reach the destination to get a
+     * larger component of the kinematic constraints relative to the other component which
+     * reaches the destination faster.
+     */
 
-    // Take the x and y components of the max velocity, acceleration, and deceleration
-    // based on the angle alpha so the overall 2D trajectory abides by the kinematic
-    // constraints.
-
-    // Alpha starts at PI/4 (45 deg) which will have the x and y components equivalent to
-    // each other. We then increment alpha by PI/(8*2^i) where i is the iteration of
-    // binary search we're at. This will result in alpha being in the range of 0 rad (no
-    // y-component) to PI/2 rad (no x-component).
     double alpha     = M_PI / 4.0;
     double increment = M_PI / 8.0;
 
-    // Use binary search to find the ideal alpha which results in the x and y trajectories
-    // to take basically the same amount of time to reach the destination
     while (increment > 1e-7)
     {
         const double cos = std::cos(alpha);
@@ -42,14 +51,16 @@ void BangBangTrajectory2D::generate(const Point& initial_pos, const Point& final
         const double y_time_sec = y_trajectory.getTotalTime();
         if (std::abs(x_time_sec - y_time_sec) < TRAJ_ACCURACY_TOLERANCE_SEC)
         {
+            // The duration of the trajectories are close enough, so we can stop the
+            // binary search.
             break;
         }
 
         if (x_time_sec > y_time_sec)
         {
-            // x trajectory takes longer, so decrease the alpha resulting in it getting
-            // a larger component of the kinematic constraints relative to y and reaching
-            // the destination faster
+            // x trajectory takes longer, so decrease the alpha resulting in the x
+            // trajectory getting a larger component of the kinematic constraints relative
+            // to y and reaching the destination faster
             alpha -= increment;
         }
         else

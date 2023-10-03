@@ -86,17 +86,19 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      */
     std::pair<double, double> getMinMaxPositions() const;
 
-    // TODO: Test
     /**
      * Get the trajectory part at index that makes up the generated trajectory
-     * @note Index is not checked to be within the bound of the array.
-     * `getNumTrajectoryParts` should be called first!
+     * @note Crashes if index is out of bound
      *
      * @return Trajectory parts
      */
     const TrajectoryPart &getTrajectoryPart(size_t index) const;
 
-    // TODO: Add tests for getters with time being over limit?!
+    /**
+     * Get the number of trajectory parts that make up the generated trajectory.
+     *
+     * @return The number of trajectory parts
+     */
     size_t getNumTrajectoryParts() const;
 
    private:
@@ -187,7 +189,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
 
     /**
      * Helper for getting the trajectory part at time t, and the time delta
-     * between the start of the trajectory part and time t.
+     * between the start of the found trajectory part and time t.
      *
      * @param t_sec Duration elapsed since start of trajectory
      * @param out_traj_part Out parameter for the trajectory part at time t
@@ -198,9 +200,17 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
                                  BangBangTrajectory1D::TrajectoryPart &out_traj_part,
                                  double &out_t_delta_sec) const;
 
+    /**
+     * Helper for adding a trajectory part to the end of the trajectory_parts
+     * array.
+     *
+     * @note Crashes if trajectory_parts array is full
+     *
+     * @param part The trajectory part to add
+     */
     inline void addTrajectoryPart(const TrajectoryPart &part);
 
-    // We use a fixed size array over a vector to avoid the overhead
+    // We use a fixed size array instead of a vector to avoid the overhead
     // of dynamic memory allocation + emplace_back, push_back, etc.
     size_t num_trajectory_parts                                       = 0;
     std::array<TrajectoryPart, MAX_TRAJECTORY_PARTS> trajectory_parts = {

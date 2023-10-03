@@ -13,8 +13,21 @@ class TrajectoryPath : public Trajectory2D
    public:
     TrajectoryPath() = delete;
 
+    /**
+     * Constructor
+     *
+     * @param initial_trajectory The initial trajectory of this trajectory path
+     */
     TrajectoryPath(const BangBangTrajectory2D& initial_trajectory);
 
+    /**
+     * Generate and append a new trajectory to the end of this trajectory path
+     *
+     * @param constraints Constraints of the new generated trajectory
+     * @param connection_time_sec The time where the last existing trajectory should
+     * connect to the newly generated trajectory
+     * @param destination Destination of the newly generated trajectory
+     */
     void append(const KinematicConstraints& constraints, double connection_time_sec,
                 const Point& destination);
 

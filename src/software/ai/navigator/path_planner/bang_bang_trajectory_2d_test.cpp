@@ -101,3 +101,12 @@ TEST_F(BangBangTrajectory2DTest, test_random_start_and_final_position_sampling)
             << "Final velocity is " << final_vel << " instead of 0";
     }
 }
+
+TEST_F(BangBangTrajectory2DTest, test_trajectory_bounding_box)
+{
+    Point start_pos(0, 0);
+    Point destination(1, 1);
+    traj.generate(start_pos, destination, Vector(0, 0), 1.0, 1.0, 1.0);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(traj.getBoundingBox(),
+                                               Rectangle(start_pos, destination), 1e-3));
+}

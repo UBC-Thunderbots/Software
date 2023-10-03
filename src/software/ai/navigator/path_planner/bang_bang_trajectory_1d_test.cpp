@@ -313,3 +313,12 @@ TEST_F(BangBangTrajectory1DTest, already_at_destination)
     EXPECT_TRUE(
         TestUtil::equalWithinTolerance(initial_pos, traj.getDestination(), 0.001));
 }
+
+TEST_F(BangBangTrajectory1DTest, test_trajectory_min_max_range)
+{
+    // Trajectory from 0 to 1
+    traj.generate(0.0, 1.0, 0.0, 1.0, 1.0, 1.0);
+    auto min_max = traj.getMinMaxPositions();
+    EXPECT_DOUBLE_EQ(min_max.first, 0.0);
+    EXPECT_DOUBLE_EQ(min_max.second, 1.0);
+}
