@@ -1,21 +1,25 @@
 package(default_visibility = ["//visibility:public"])
 
-load(":cc_toolchain_config.bzl", "cc_toolchain_config_jetson_nano", "cc_toolchain_config_k8")
+load(":cc_toolchain_config.bzl", "cc_toolchain_config_jetson_nano", "cc_toolchain_config_k8", "cc_toolchain_config_arm")
 
 # Create environments for each CPU this toolchain supports
 environment(name = "k8")
 
 environment(name = "jetson_nano")
 
+environment(name = "aarch64")
+
 environment_group(
     name = "cpus",
     defaults = [
         ":k8",
         ":jetson_nano",
+        ":aarch64",
     ],
     environments = [
         ":k8",
         ":jetson_nano",
+        ":aarch64",
     ],
 )
 
@@ -27,6 +31,11 @@ config_setting(
 config_setting(
     name = "cpu_jetson_nano",
     values = {"cpu": "jetson_nano"},
+)
+
+config_setting(
+    name = "cpu_aarch64",
+    values = {"cpu": "aarch64"},
 )
 
 # This represents a mapping of CPU -> Compiler To Use
@@ -41,6 +50,8 @@ cc_toolchain_suite(
         # jetson nano 4GB system
         "jetson_nano": "cc_toolchain_jetson_nano",
         "jetson_nano|compiler": "cc_toolchain_jetson_nano",
+        "aarch64": "cc_toolchain_linux_gcc_arm",
+        "aarch64|compiler": "cc_toolchain_linux_gcc_arm"
     },
 )
 
@@ -136,6 +147,53 @@ cc_toolchain(
     tags = ["no-ide"],
     toolchain_config = ":gcc-jetson_nano",
     toolchain_identifier = "gcc-jetson_nano",
+)
+
+cc_toolchain(
+    name = "cc_toolchain_linux_gcc_arm",
+    all_files = ":linux_gcc_all",
+    ar_files = ":linux_gcc_all",
+    as_files = ":linux_gcc_all",
+    compiler_files = ":linux_gcc_all",
+    dwp_files = ":linux_gcc_all",
+    dynamic_runtime_lib = "@linux_gcc//:runtime_libs",
+    linker_files = ":linux_gcc_all",
+    objcopy_files = ":linux_gcc_all",
+    static_runtime_lib = "@linux_gcc//:static_libs",
+    strip_files = ":linux_gcc_all",
+    supports_param_files = True,
+    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
+    # when possible
+    # https://github.com/bazelbuild/intellij/issues/486
+    tags = ["no-ide"],
+    toolchain_config = ":linux_gcc_arm",
+    toolchain_identifier = "aarch64_gcc-arm",
+)
+
+cc_toolchain_config_arm(
+    name = "linux_gcc",
+    builtin_include_directories = [
+        "/usr/lib/gcc/aarch64-linux-gnu/",
+        "/usr/include/",
+        "/usr/local/include/",
+        "/usr/lib/gcc/c++/*/include/",
+    ],
+    cpu = "aarch64",
+    target_cpu = "aarch64",
+    target_system_name = "aarch64",
+    tool_paths = {
+        "ar": "/usr/bin/ar",
+        "cpp": "/usr/bin/cpp",
+        "dwp": "/usr/bin/dwp",
+        "gcc": "wrapper/linux_gcc",
+        "gcov": "/usr/bin/gcov",
+        "ld": "/usr/bin/ld",
+        "nm": "/usr/bin/nm",
+        "objcopy": "/usr/bin/objcopy",
+        "objdump": "/usr/bin/objdump",
+        "strip": "/usr/bin/strip",
+    },
+    toolchain_identifier = "linux_gcc-arm",
 )
 
 cc_toolchain_config_jetson_nano(
