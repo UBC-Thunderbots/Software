@@ -171,7 +171,7 @@ cc_toolchain(
 )
 
 cc_toolchain_config_arm(
-    name = "linux_gcc",
+    name = "linux_gcc_arm",
     builtin_include_directories = [
         "/usr/lib/gcc/aarch64-linux-gnu/",
         "/usr/include/",

@@ -577,11 +577,206 @@ def _linux_gcc_impl(ctx):
         ),
     ]
 
+def _linux_gcc_impl_arm(ctx):
+    host_system_name = "aarch64"
+
+    action_configs = []
+
+    tool_paths = [
+        tool_path(name = name, path = path)
+        for name, path in ctx.attr.tool_paths.items()
+    ]
+
+    common = _make_common_features(ctx)
+
+    runtime_library_search_directories = feature(
+        name = "runtime_library_search_directories",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            "-Wl,-rpath,$ORIGIN/%{runtime_library_search_directories}",
+                        ],
+                        iterate_over = "runtime_library_search_directories",
+                        expand_if_available = "runtime_library_search_directories",
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    supports_pic_feature = feature(name = "supports_pic", enabled = True)
+
+    stdlib_feature = feature(
+        name = "stdlib",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-lm",
+                    "-lpthread",
+                    "-ldl",
+                    "-lrt",
+                    "-lstdc++fs",
+                ])],
+            ),
+        ],
+    )
+
+    opt_feature = feature(
+        name = "opt",
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            "-ggdb",
+                            "-O3",
+                            "-ffunction-sections",
+                            "-fdata-sections",
+                        ],
+                    ),
+                ],
+            ),
+            flag_set(
+                actions = [
+                    ACTION_NAMES.cpp_link_dynamic_library,
+                    ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+                    ACTION_NAMES.cpp_link_executable,
+                ],
+                flag_groups = [flag_group(flags = ["-Wl,--gc-sections"])],
+            ),
+        ],
+        implies = ["common"],
+    )
+
+    coverage_feature = feature(
+        name = "coverage",
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = ["--coverage"],
+                    ),
+                ],
+            ),
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = ["--coverage"],
+                    ),
+                ],
+            ),
+        ],
+        provides = ["profile"],
+    )
+
+    # This feature is not required for the code to build, but it is required
+    # in order for the bazel plugin we use for CLion to function correctly. This was
+    # prompted by the following comment in the plugin itself:
+    # https://github.com/bazelbuild/intellij/blob/e76fdadb0bdabbe2be913cba03d9014eb2366374/cpp/src/com/google/idea/blaze/cpp/SysrootFlagsProcessor.java#L70
+    # An issue has been filed (https://github.com/bazelbuild/intellij/issues/1368) to
+    # hopefully correct this so we don't need this feature in the future, or confirm
+    # if this is expected behavior.
+    builtin_include_directories_feature = feature(
+        name = "builtin_include_directories",
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [flag_group(
+                    flags = [
+                        "-I{}".format(dir)
+                        for dir in ctx.attr.builtin_include_directories
+                    ],
+                )],
+            ),
+        ],
+    )
+
+    common_feature = feature(
+        name = "common",
+        implies = [
+            "build-id",
+            "c++2a",
+            "colour",
+            "determinism",
+            "frame-pointer",
+            "hardening",
+            "lld",
+            "no-canonical-prefixes",
+            "pic",
+            "static_link_cpp_runtimes",
+            "stdlib",
+        ],
+    )
+
+    features = common.values() + [
+        supports_pic_feature,
+        builtin_include_directories_feature,
+        common_feature,
+        stdlib_feature,
+        coverage_feature,
+        opt_feature,
+        runtime_library_search_directories,
+    ]
+
+    out = ctx.actions.declare_file(ctx.label.name)
+    ctx.actions.write(out, "Fake executable")
+
+    return [
+        cc_common.create_cc_toolchain_config_info(
+            ctx = ctx,
+            features = features,
+            action_configs = action_configs,
+            artifact_name_patterns = [],
+            cxx_builtin_include_directories = ctx.attr.builtin_include_directories,
+            toolchain_identifier = ctx.attr.toolchain_identifier,
+            host_system_name = host_system_name,
+            target_system_name = ctx.attr.target_system_name,
+            target_cpu = ctx.attr.target_cpu,
+            target_libc = "libc",
+            compiler = "gcc",
+            abi_version = "local",
+            abi_libc_version = "local",
+            tool_paths = tool_paths,
+            make_variables = [],
+            builtin_sysroot = None,
+            cc_target_os = None,
+        ),
+        DefaultInfo(
+            executable = out,
+        ),
+    ]
+
 cc_toolchain_config_k8 = rule(
     implementation = _linux_gcc_impl,
     attrs = {
         "builtin_include_directories": attr.string_list(),
         "cpu": attr.string(mandatory = True, values = ["k8"]),
+        "extra_features": attr.string_list(),
+        "extra_no_canonical_prefixes_flags": attr.string_list(),
+        "host_compiler_warnings": attr.string_list(),
+        "host_unfiltered_compile_flags": attr.string_list(),
+        "target_cpu": attr.string(),
+        "target_system_name": attr.string(),
+        "tool_paths": attr.string_dict(),
+        "toolchain_identifier": attr.string(),
+    },
+    provides = [CcToolchainConfigInfo],
+    executable = True,
+)
+
+cc_toolchain_config_arm = rule(
+    implementation = _linux_gcc_impl_arm,
+    attrs = {
+        "builtin_include_directories": attr.string_list(),
+        "cpu": attr.string(mandatory = True, values = ["aarch64"]),
         "extra_features": attr.string_list(),
         "extra_no_canonical_prefixes_flags": attr.string_list(),
         "host_compiler_warnings": attr.string_list(),
