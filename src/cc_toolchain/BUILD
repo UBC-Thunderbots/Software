@@ -83,6 +83,17 @@ filegroup(
     ],
 )
 
+filegroup(
+    name = "linux_gcc_arm_all",
+    srcs = [
+        ":linux_gcc_wrapper",
+        "@linux_gcc_arm//:includes",
+        "@linux_gcc_arm//:libs",
+        "@linux_gcc_arm//:runtime_libs",
+        "@linux_gcc_arm//:static_libs",
+    ],
+)
+
 cc_toolchain_config_k8(
     name = "linux_gcc",
     builtin_include_directories = [
@@ -151,16 +162,16 @@ cc_toolchain(
 
 cc_toolchain(
     name = "cc_toolchain_linux_gcc_arm",
-    all_files = ":linux_gcc_all",
-    ar_files = ":linux_gcc_all",
-    as_files = ":linux_gcc_all",
-    compiler_files = ":linux_gcc_all",
-    dwp_files = ":linux_gcc_all",
-    dynamic_runtime_lib = "@linux_gcc//:runtime_libs",
-    linker_files = ":linux_gcc_all",
-    objcopy_files = ":linux_gcc_all",
-    static_runtime_lib = "@linux_gcc//:static_libs",
-    strip_files = ":linux_gcc_all",
+    all_files = ":linux_gcc_arm_all",
+    ar_files = ":linux_gcc_arm_all",
+    as_files = ":linux_gcc_arm_all",
+    compiler_files = ":linux_gcc_arm_all",
+    dwp_files = ":linux_gcc_arm_all",
+    dynamic_runtime_lib = "@linux_gcc_arm//:runtime_libs",
+    linker_files = ":linux_gcc_arm_all",
+    objcopy_files = ":linux_gcc_arm_all",
+    static_runtime_lib = "@linux_gcc_arm//:static_libs",
+    strip_files = ":linux_gcc_arm_all",
     supports_param_files = True,
     # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
     # when possible

@@ -193,6 +193,12 @@ new_local_repository(
     path = "/",
 )
 
+new_local_repository(
+    name = "linux_gcc_arm",
+    build_file = "@//extlibs:linux_gcc_arm.BUILD",
+    path = "/",
+)
+
 # libclang-dev is installed into the system through setup_software.sh
 new_local_repository(
     name = "libclang",
