@@ -124,9 +124,13 @@ class ProtoLogger(object):
                         current_time = self.time_provider() - self.start_time
 
                         try:
-                            log_entry = ProtoLogger.create_log_entry(proto, current_time)
+                            log_entry = ProtoLogger.create_log_entry(
+                                proto, current_time
+                            )
                         except Exception:
-                            logging.warning(f"Failed to create log entry from {proto.DESCRIPTOR.full_name}. Likely due to a corrupt message.")
+                            logging.warning(
+                                f"Failed to create log entry from {proto.DESCRIPTOR.full_name}. Likely due to a corrupt message."
+                            )
                             continue
 
                         self.log_file.write(bytes(log_entry, encoding="utf-8"))
@@ -143,9 +147,9 @@ class ProtoLogger(object):
     def create_log_entry(proto, current_time):
         serialized_proto = base64.b64encode(proto.SerializeToString())
         log_entry = (
-                f"{current_time}{REPLAY_METADATA_DELIMETER}"
-                + f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMETER}"
-                + f"{serialized_proto}\n"
+            f"{current_time}{REPLAY_METADATA_DELIMETER}"
+            + f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMETER}"
+            + f"{serialized_proto}\n"
         )
 
         return log_entry

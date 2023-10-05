@@ -46,7 +46,7 @@ PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
 PlaceBallState --> WaitState : [ballPlaced]\n<i>startWait</i>
 WaitState --> WaitState : [!waitDone]
 WaitState --> RetreatState : [waitDone]
-RetreatState --> Terminate:::terminate : [retreatDone_G&&ballPlaced]
+RetreatState --> Terminate:::terminate : [retreatDone && ballPlaced]
 RetreatState --> RetreatState : [!ballPlaced]\n<i>placeBall</i>
 RetreatState --> RetreatState : [ballPlaced]\n<i>retreat</i>
 Terminate:::terminate --> StartState : [!ballPlaced]

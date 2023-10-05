@@ -25,10 +25,10 @@ RobotConstants_t create2021RobotConstants(void)
         .motor_max_acceleration_m_per_s_2 = 4.5f,
 
         // Robot's linear movement constants
-        .robot_max_speed_m_per_s          = 5.000f,
+        .robot_max_speed_m_per_s                 = 5.000f,
         .robot_max_speed_while_dribbling_m_per_s = 1.000f,
-        .robot_max_acceleration_m_per_s_2 = 2.8f,
-        .robot_max_deceleration_m_per_s_2 = 6.0f,
+        .robot_max_acceleration_m_per_s_2        = 2.8f,
+        .robot_max_deceleration_m_per_s_2        = 6.0f,
 
         // Robot's angular movement constants
         .robot_max_ang_speed_rad_per_s          = 10.0f,

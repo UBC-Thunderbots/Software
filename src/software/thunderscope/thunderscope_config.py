@@ -641,11 +641,16 @@ def configure_ai_or_diagnostics(
                         configure_estop(
                             proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
                         ),
-                    ] + ([
-                        configure_robot_view_diagnostics(
-                            proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
-                        ),
-                    ] if (not load_blue and not load_yellow) else []),
+                    ]
+                    + (
+                        [
+                            configure_robot_view_diagnostics(
+                                proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
+                            ),
+                        ]
+                        if (not load_blue and not load_yellow)
+                        else []
+                    ),
                 ),
             )
         )
