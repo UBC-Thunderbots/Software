@@ -2,8 +2,7 @@
 
 #include <unordered_set>
 
-Polygon::Polygon(const std::vector<Point>& points)
-    : points_(points)
+Polygon::Polygon(const std::vector<Point>& points) : points_(points)
 {
     // we pre-compute the segments_ in the constructor to improve performance
     initSegments();

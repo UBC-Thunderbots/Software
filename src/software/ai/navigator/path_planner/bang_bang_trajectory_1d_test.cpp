@@ -64,8 +64,7 @@ class BangBangTrajectory1DTest : public testing::Test
                          double velocity, double acceleration)
     {
         const auto& part = traj.getTrajectoryPart(part_index);
-        EXPECT_TRUE(
-            TestUtil::equalWithinTolerance(end_time, part.end_time_sec, 0.001))
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(end_time, part.end_time_sec, 0.001))
             << "Trajectory part " << part_index << " ends at " << part.end_time_sec
             << " instead of the expected end time of " << end_time;
         EXPECT_TRUE(TestUtil::equalWithinTolerance(position, part.position, 0.001))
@@ -102,8 +101,7 @@ TEST_F(BangBangTrajectory1DTest, positive_symmetrical_trapezoidal_profile)
     // 1.0 sec to decelerate from 1 to 0 m/s (travels 0.5m)
     // Remaining 2m travelled at 1 m/s takes 2 sec
     // Total time = 4 sec
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(4.0, traj.getTotalTime(), 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(4.0, traj.getTotalTime(), 0.001));
 
     verifyPartState(0, 1.0, initial_pos, initial_vel, max_accel);
     verifyPartState(1, 3.0, 0.5, max_vel, 0.0);
@@ -129,8 +127,7 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_trapezoidal_profile)
     // 1.0 sec to decelerate from 2 to 0 m/s (travels 1m)
     // Remaining 4m travelled at 2 m/s takes 2 sec
     // Total time = 4 sec
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(4.0, traj.getTotalTime(), 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(4.0, traj.getTotalTime(), 0.001));
 
     verifyPartState(0, 1.0, initial_pos, initial_vel, max_accel);
     verifyPartState(1, 3.0, 3.5, max_vel, 0.0);
@@ -160,8 +157,7 @@ TEST_F(BangBangTrajectory1DTest,
     // 4.0 sec to decelerate from 4  to 0 m/s (travels 8m)
     // Remaining 12m travelled at 4 m/s takes 3 sec
     // Total time = 11 sec
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(11.0, traj.getTotalTime(), 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(11.0, traj.getTotalTime(), 0.001));
 
     // We're decelerating in the positive direction (i.e. velocity is increasing,
     // from -2 to 0).
@@ -190,8 +186,7 @@ TEST_F(BangBangTrajectory1DTest, negative_non_symmetrical_trapezoidal_profile)
     // 1.0 sec to decelerate from 2 to 0 m/s (travels 1m)
     // Remaining 4m travelled at 2 m/s takes 2 sec
     // Total time = 4 sec
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(4.0, traj.getTotalTime(), 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(4.0, traj.getTotalTime(), 0.001));
 
     verifyPartState(0, 1.0, initial_pos, initial_vel, -max_accel);
     verifyPartState(1, 3.0, -3.5, -max_vel, 0.0);
@@ -216,8 +211,7 @@ TEST_F(BangBangTrajectory1DTest, positive_non_symmetrical_triangular_profile)
 
     // Expected values are determined through Desmos
     // https://www.desmos.com/calculator/lgpc5g8ewr
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(4.19615, traj.getTotalTime(), 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(4.19615, traj.getTotalTime(), 0.001));
 
     verifyPartState(0, 2.46410, initial_pos, initial_vel, max_accel);
     verifyPartState(1, 4.19615, 7.5, 3.46410, max_decel);
@@ -241,8 +235,7 @@ TEST_F(BangBangTrajectory1DTest, negative_non_symmetrical_triangular_profile)
 
     // Expected values are determined through Desmos
     // https://www.desmos.com/calculator/lgpc5g8ewr
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(4.19615, traj.getTotalTime(), 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(4.19615, traj.getTotalTime(), 0.001));
 
     verifyPartState(0, 2.46410, initial_pos, initial_vel, -max_accel);
     verifyPartState(1, 4.19615, -7.5, -3.46410, -max_decel);
@@ -271,8 +264,7 @@ TEST_F(BangBangTrajectory1DTest,
     // 2.0 sec to accelerate from 0  to 4 m/s (travels 4m)
     // 4.0 sec to decelerate from 4  to 0 m/s (travels 8m)
     // Total time = 8 sec
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(8.0, traj.getTotalTime(), 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(8.0, traj.getTotalTime(), 0.001));
 
     // We're decelerating in the positive direction (i.e. velocity is increasing,
     // from -2 to 0).
@@ -302,8 +294,7 @@ TEST_F(BangBangTrajectory1DTest,
     // 4.0 sec to decelerate from 4  to  0 m/s (travels 8m -> overshooting destination by
     // 3m) 1.0 sec to accelerate from 0  to -2 m/s (travels -1m) 2.0 sec to decelerate
     // from -2 to 0 m/s (travels -2m) Total time = 7 sec
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(7.0, traj.getTotalTime(), 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(7.0, traj.getTotalTime(), 0.001));
 
     verifyPartState(0, 4.0, initial_pos, initial_vel, -max_decel);
     verifyPartState(1, 5.0, 8.0, 0, max_accel);
@@ -318,8 +309,16 @@ TEST_F(BangBangTrajectory1DTest, already_at_destination)
     double initial_vel = 0;
 
     traj.generate(initial_pos, destination, initial_vel, 1, 1, 1);
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(0.0, traj.getTotalTime(), 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(0.0, traj.getTotalTime(), 0.001));
     EXPECT_TRUE(
         TestUtil::equalWithinTolerance(initial_pos, traj.getDestination(), 0.001));
+}
+
+TEST_F(BangBangTrajectory1DTest, test_trajectory_min_max_range)
+{
+    // Trajectory from 0 to 1
+    traj.generate(0.0, 1.0, 0.0, 1.0, 1.0, 1.0);
+    auto min_max = traj.getMinMaxPositions();
+    EXPECT_DOUBLE_EQ(min_max.first, 0.0);
+    EXPECT_DOUBLE_EQ(min_max.second, 1.0);
 }

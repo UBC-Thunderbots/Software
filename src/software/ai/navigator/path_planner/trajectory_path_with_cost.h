@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/navigator/path_planner/trajectory_path.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/ai/navigator/path_planner/trajectory_path.h"
 
 class TrajectoryPathWithCost
 {
@@ -21,7 +21,7 @@ class TrajectoryPathWithCost
     // The duration we're within an obstacle before the trajectory end.
     // Equals duration of trajectory if it does not end in an obstacle.
     double collision_duration_back = 0.0;
-    double first_collision_time = 0.0;
-    double collision_lookahead = 0.0;
+    double first_collision_time    = 0.0;
+    double collision_lookahead     = 0.0;
     ObstaclePtr colliding_obstacle = nullptr;
 };

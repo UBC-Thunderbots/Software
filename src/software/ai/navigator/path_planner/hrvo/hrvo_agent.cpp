@@ -1,10 +1,8 @@
 #include "software/ai/navigator/path_planner/hrvo/hrvo_agent.h"
 
+#include "external/tracy/public/tracy/Tracy.hpp"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/physics/velocity_conversion_util.h"
-
-
-#include "external/tracy/public/tracy/Tracy.hpp"
 
 HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
                      const RobotPath &path, double radius, double max_speed,
@@ -20,8 +18,8 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
 {
     // Reinitialize obstacle factory with a custom inflation factor
     auto obstacle_config = TbotsProto::RobotNavigationObstacleConfig();
-        //        obstacle_config.set_robot_obstacle_inflation_factor(
-        //            0.0); // TODO: Updated for now
+    //        obstacle_config.set_robot_obstacle_inflation_factor(
+    //            0.0); // TODO: Updated for now
     obstacle_factory = RobotNavigationObstacleFactory(obstacle_config);
 }
 
@@ -112,8 +110,9 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         auto path_point_opt =
             path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
         Point destination = path_point_opt.getPosition();
-//        position_traj.generate(position, destination, velocity, max_speed, max_accel,
-//                               max_decel);
+        //        position_traj.generate(position, destination, velocity, max_speed,
+        //        max_accel,
+        //                               max_decel);
         angular_traj.generate(orientation, path_point_opt.getOrientation(),
                               angular_velocity,
                               AngularVelocity::fromRadians(max_angular_speed),
@@ -344,10 +343,11 @@ void HRVOAgent::computeNewAngularVelocity(Duration time_step)
 void HRVOAgent::computeNewVelocity(
     const std::map<unsigned int, std::shared_ptr<Agent>> &agents, Duration time_step)
 {
-//    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-//    long time_since_traj_start_us =
-//        std::chrono::duration_cast<std::chrono::microseconds>(now - last_traj_update_time)
-//            .count();
+    //    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    //    long time_since_traj_start_us =
+    //        std::chrono::duration_cast<std::chrono::microseconds>(now -
+    //        last_traj_update_time)
+    //            .count();
     // TODO: Need to increment timestep for next iteration, but in sim we regenerate every
     // tick anyways
     time_since_traj_update += time_step;
@@ -355,28 +355,29 @@ void HRVOAgent::computeNewVelocity(
             time_since_traj_update.toSeconds() /*+
         Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) *
                                    MILLISECONDS_PER_MICROSECOND)*/);
-//    std::cout << "time_since_traj_start: " << Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) *
-//                                                                            MILLISECONDS_PER_MICROSECOND) << std::endl;
+    //    std::cout << "time_since_traj_start: " <<
+    //    Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) *
+    //                                                                            MILLISECONDS_PER_MICROSECOND)
+    //                                                                            <<
+    //                                                                            std::endl;
 
     auto path_point_opt =
-            path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
+        path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
     Point destination = path_point_opt.getPosition();
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                            {"vx", velocity.x()},
-                            {"vy", velocity.y()},
-                            {"v", velocity.length()},
-                            {"d", (position - destination).length()},
-                            {"px", position.x()},
-                            {"py", position.y()},
-                            {"dx", (position - destination).x()},
-                            {"dy", (position - destination).y()},
-                            {"destx", (destination).x()},
-                            {"desty", (destination).y()},
-                            {"maxv", max_speed},
-                            {"maxa", max_accel},
-                            {"vt", angular_velocity.toRadians()},
-                            {"t", orientation.toRadians()}
-                        });
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"vx", velocity.x()},
+                                                 {"vy", velocity.y()},
+                                                 {"v", velocity.length()},
+                                                 {"d", (position - destination).length()},
+                                                 {"px", position.x()},
+                                                 {"py", position.y()},
+                                                 {"dx", (position - destination).x()},
+                                                 {"dy", (position - destination).y()},
+                                                 {"destx", (destination).x()},
+                                                 {"desty", (destination).y()},
+                                                 {"maxv", max_speed},
+                                                 {"maxa", max_accel},
+                                                 {"vt", angular_velocity.toRadians()},
+                                                 {"t", orientation.toRadians()}});
     angular_velocity = angular_traj.getVelocity(
             time_since_traj_update.toSeconds() /*+
         Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) *
@@ -838,8 +839,8 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
     const int num_points = 18;
     for (int j = 0; j <= num_points; ++j)
     {
-        Point pos                  = trajectory_path.getPosition(
-            j * trajectory_path.getTotalTime() / num_points);
+        Point pos =
+            trajectory_path.getPosition(j * trajectory_path.getTotalTime() / num_points);
         *(path_proto.add_points()) = *createPointProto(pos);
     }
     *(hrvo_visualization.mutable_trajectory()) = path_proto;
@@ -847,13 +848,13 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
     // TODO (#2838): For HRVOVisualization logs to be sent properly from the robot, no
     // path should be passed as a second argument to LOG
     //    i.e. LOG(VISUALIZE) << hrvo_visualization;
-//    LOG(VISUALIZE) << hrvo_visualization;
-//    if (friendly_team_colour == TeamColour::YELLOW)
-//    {
-//        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
-//    }
-//    else
-//    {
-//        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
-//    }
+    //    LOG(VISUALIZE) << hrvo_visualization;
+    //    if (friendly_team_colour == TeamColour::YELLOW)
+    //    {
+    //        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
+    //    }
+    //    else
+    //    {
+    //        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
+    //    }
 }

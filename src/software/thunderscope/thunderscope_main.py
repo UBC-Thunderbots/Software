@@ -16,7 +16,7 @@ import software.thunderscope.thunderscope_config as config
 from software.thunderscope.constants import ProtoUnixIOTypes
 
 NUM_ROBOTS = 6
-SIM_TICK_RATE_MS = 16 # TODO: Updated for now
+SIM_TICK_RATE_MS = 16  # TODO: Updated for now
 
 ###########################################################################
 #                         Thunderscope Main                               #
@@ -392,14 +392,22 @@ if __name__ == "__main__":
                     blue_world_buffer.get(block=True)
                     yellow_world_buffer.get(block=True)
                 else:
-                    blue_fullsystem_message = blue_world_buffer.get(block=False, return_cached=False)
-                    yellow_fullsystem_message = yellow_world_buffer.get(block=False, return_cached=False)
-                    if blue_fullsystem_message is not None and yellow_fullsystem_message is not None:
+                    blue_fullsystem_message = blue_world_buffer.get(
+                        block=False, return_cached=False
+                    )
+                    yellow_fullsystem_message = yellow_world_buffer.get(
+                        block=False, return_cached=False
+                    )
+                    if (
+                        blue_fullsystem_message is not None
+                        and yellow_fullsystem_message is not None
+                    ):
                         received_first_primitive = True
 
-
                 if simulation_state_message.is_playing:
-                    tick = SimulatorTick(milliseconds=tick_rate_ms) # TODO: Added for more stable sim. Considering blocking until fullsystems are ready
+                    tick = SimulatorTick(
+                        milliseconds=tick_rate_ms
+                    )  # TODO: Added for more stable sim. Considering blocking until fullsystems are ready
                     tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].send_proto(
                         SimulatorTick, tick
                     )

@@ -1,16 +1,33 @@
 #pragma once
 
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d.h"
-#include "software/geom/point.h"
 #include "software/geom/bounding_box.h"
+#include "software/geom/point.h"
 
 using Trajectory2D = Trajectory<Point, Vector, Vector>;
 
 class BangBangTrajectory2D : public Trajectory2D
 {
    public:
+    /**
+     * Default constructor. Creates an empty trajectory.
+     */
     BangBangTrajectory2D() = default;
 
+    /**
+     * Generate a 2D trajectory from the initial position to the final position with the
+     * given initial velocity and kinematic constraints.
+     *
+     * @param initial_pos Starting position of the trajectory
+     * @param final_pos Destination. Where the trajectory should end at
+     * @param initial_vel The initial velocity of the trajectory
+     * @param max_vel The max velocity (in 2D) that the trajectory can reach at any given
+     * point
+     * @param max_accel The max acceleration (in 2D) that the trajectory can reach at any
+     * given point
+     * @param max_decel The max deceleration (in 2D) that the trajectory can reach at any
+     * given point
+     */
     BangBangTrajectory2D(const Point& initial_pos, const Point& final_pos,
                          const Vector& initial_vel, double max_vel, double max_accel,
                          double max_decel);
@@ -65,7 +82,6 @@ class BangBangTrajectory2D : public Trajectory2D
      */
     double getTotalTime() const override;
 
-    // TODO: Test
     /**
      * Get the bounding box of the trajectory
      * @return bounding box which bounds the trajectory

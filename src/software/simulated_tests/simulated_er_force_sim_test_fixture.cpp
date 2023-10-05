@@ -529,10 +529,11 @@ bool SimulatedErForceSimTestFixture::tickTest(
         // TODO (#2419): remove this to re-enable sigfpe checks
         feenableexcept(FE_INVALID | FE_OVERFLOW);
         updateSensorFusion(simulator);
-//        if (run_simulation_in_realtime)
-//        {
-//            sleep(wall_start_time, Duration::fromMilliseconds(ai_time_step.toMilliseconds() / 2.0));
-//        }
+        //        if (run_simulation_in_realtime)
+        //        {
+        //            sleep(wall_start_time,
+        //            Duration::fromMilliseconds(ai_time_step.toMilliseconds() / 2.0));
+        //        }
     }
 
     if (friendly_sensor_fusion.getWorld().has_value() &&
@@ -554,7 +555,8 @@ bool SimulatedErForceSimTestFixture::tickTest(
 
         if (run_simulation_in_realtime)
         {
-            sleep(wall_start_time, Duration::fromMilliseconds(ai_time_step.toMilliseconds()/* / 2.0*/));
+            sleep(wall_start_time,
+                  Duration::fromMilliseconds(ai_time_step.toMilliseconds() /* / 2.0*/));
         }
     }
     else

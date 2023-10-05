@@ -6,6 +6,8 @@ void BangBangTrajectory1DAngular::generate(Angle initial_orient, Angle final_ori
                                            AngularAcceleration max_angular_accel,
                                            AngularAcceleration max_angular_decel)
 {
+    // We use the relative final orientation as the destination of the trajectory
+    // to avoid issues with the discontinuity at 2PI == 0 or -PI == PI.
     Angle relative_final_orient =
         initial_orient + (final_orient - initial_orient).clamp();
     trajectory.generate(initial_orient.toRadians(), relative_final_orient.toRadians(),

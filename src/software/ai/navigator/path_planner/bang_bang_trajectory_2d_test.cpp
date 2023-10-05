@@ -22,9 +22,8 @@ class BangBangTrajectory2DTest : public testing::Test
 
     void verifyKinematicConstraints(double max_vel, double max_accel, double max_decel)
     {
-        const double sub_point_length_sec =
-            traj.getTotalTime() / NUM_SUB_POINTS;
-        const double max_accel_decel = std::max(max_accel, std::abs(max_decel));
+        const double sub_point_length_sec = traj.getTotalTime() / NUM_SUB_POINTS;
+        const double max_accel_decel      = std::max(max_accel, std::abs(max_decel));
 
         for (int i = 0; i <= NUM_SUB_POINTS; i++)
         {
@@ -101,4 +100,13 @@ TEST_F(BangBangTrajectory2DTest, test_random_start_and_final_position_sampling)
         EXPECT_LE(final_vel.length(), 0.001)
             << "Final velocity is " << final_vel << " instead of 0";
     }
+}
+
+TEST_F(BangBangTrajectory2DTest, test_trajectory_bounding_box)
+{
+    Point start_pos(0, 0);
+    Point destination(1, 1);
+    traj.generate(start_pos, destination, Vector(0, 0), 1.0, 1.0, 1.0);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(traj.getBoundingBox(),
+                                               Rectangle(start_pos, destination), 1e-3));
 }

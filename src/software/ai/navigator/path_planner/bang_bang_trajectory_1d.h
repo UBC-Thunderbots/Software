@@ -17,7 +17,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      */
     struct TrajectoryPart
     {
-        double end_time_sec   = 0;
+        double end_time_sec = 0;
         double position     = 0;
         double velocity     = 0;
         double acceleration = 0;
@@ -86,17 +86,19 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      */
     std::pair<double, double> getMinMaxPositions() const;
 
-    // TODO: Test
     /**
      * Get the trajectory part at index that makes up the generated trajectory
-     * @note Index is not checked to be within the bound of the array.
-     * `getNumTrajectoryParts` should be called first!
+     * @note Crashes if index is out of bound
      *
      * @return Trajectory parts
      */
     const TrajectoryPart &getTrajectoryPart(size_t index) const;
 
-    // TODO: Add tests for getters with time being over limit?!
+    /**
+     * Get the number of trajectory parts that make up the generated trajectory.
+     *
+     * @return The number of trajectory parts
+     */
     size_t getNumTrajectoryParts() const;
 
    private:
@@ -143,8 +145,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      */
     void generateTriangularTrajectory(double initial_pos, double final_pos,
                                       double initial_vel, double max_accel,
-                                      double max_decel,
-                                      double time_offset_sec = 0.0);
+                                      double max_decel, double time_offset_sec = 0.0);
 
     /**
      * Calculates the closest position at which the trajectory could stop at (velocity =
@@ -188,19 +189,28 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
 
     /**
      * Helper for getting the trajectory part at time t, and the time delta
-     * between the start of the trajectory part and time t.
+     * between the start of the found trajectory part and time t.
      *
      * @param t_sec Duration elapsed since start of trajectory
      * @param out_traj_part Out parameter for the trajectory part at time t
      * @param out_t_delta_sec Out parameter for the time delta between the start of the
      * trajectory part and time t
      */
-    void getTrajPartAndDeltaTime(double t_sec, BangBangTrajectory1D::TrajectoryPart &out_traj_part,
+    void getTrajPartAndDeltaTime(double t_sec,
+                                 BangBangTrajectory1D::TrajectoryPart &out_traj_part,
                                  double &out_t_delta_sec) const;
 
+    /**
+     * Helper for adding a trajectory part to the end of the trajectory_parts
+     * array.
+     *
+     * @note Crashes if trajectory_parts array is full
+     *
+     * @param part The trajectory part to add
+     */
     inline void addTrajectoryPart(const TrajectoryPart &part);
 
-    // We use a fixed size array over a vector to avoid the overhead
+    // We use a fixed size array instead of a vector to avoid the overhead
     // of dynamic memory allocation + emplace_back, push_back, etc.
     size_t num_trajectory_parts                                       = 0;
     std::array<TrajectoryPart, MAX_TRAJECTORY_PARTS> trajectory_parts = {

@@ -8,5 +8,6 @@ TrajectoryPathWithCost::TrajectoryPathWithCost(const TrajectoryPath &traj_path,
 
 bool TrajectoryPathWithCost::collides() const
 {
-    return colliding_obstacle != nullptr || first_collision_time < traj_path.getTotalTime();
+    return colliding_obstacle != nullptr ||
+           first_collision_time < traj_path.getTotalTime();
 }

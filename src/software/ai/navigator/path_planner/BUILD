@@ -31,15 +31,12 @@ cc_library(
 
 cc_library(
     name = "kinematic_constraints",
-    srcs = ["kinematic_constraints.cpp"],
     hdrs = ["kinematic_constraints.h"],
 )
 
 cc_library(
     name = "trajectory",
     hdrs = ["trajectory.hpp"],
-    deps = [
-    ],
 )
 
 cc_library(
@@ -71,8 +68,8 @@ cc_library(
     hdrs = ["bang_bang_trajectory_2d.h"],
     deps = [
         ":bang_bang_trajectory_1d",
-        "//software/geom:point",
         "//software/geom:bounding_box",
+        "//software/geom:point",
     ],
 )
 
@@ -102,7 +99,7 @@ cc_library(
     hdrs = ["trajectory_path_with_cost.h"],
     deps = [
         ":trajectory_path",
-        "//software/ai/navigator/obstacle:obstacle",
+        "//software/ai/navigator/obstacle",
     ],
 )
 
@@ -113,10 +110,10 @@ cc_library(
     deps = [
         ":kinematic_constraints",
         ":trajectory_path",
-        "@tracy",
         "//extlibs/AABB:aabb_tree",
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/path_planner:trajectory_path_with_cost",
+        "@tracy",
     ],
 )
 
