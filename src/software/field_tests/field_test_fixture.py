@@ -17,7 +17,6 @@ from software.simulated_tests.robot_enters_region import (
 )
 
 from software.simulated_tests import validation
-from software.thunderscope.constants import EstopMode
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
@@ -36,6 +35,7 @@ from software.thunderscope.thunderscope_config import configure_field_test_view
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.robot_communication import RobotCommunication
 from software.py_constants import *
+from software.simulated_tests.ball_stops_in_region import BallEventuallyStopsInRegion
 
 logger = createLogger(__name__)
 
@@ -314,7 +314,11 @@ def load_command_line_arguments():
     )
 
     parser.add_argument(
-        "--estop_path", action="store", type=str, help="Path to the Estop",
+        "--estop_path",
+        action="store",
+        type=str,
+        default="/dev/ttyACM0",
+        help="Path to the Estop",
     )
 
     parser.add_argument(
@@ -330,20 +334,6 @@ def load_command_line_arguments():
         action="store_true",
         default=False,
         help="Run the test with friendly robots in yellow mode",
-    )
-
-    estop_group = parser.add_mutually_exclusive_group()
-    estop_group.add_argument(
-        "--keyboard_estop",
-        action="store_true",
-        default=False,
-        help="Allows the use of the spacebar as an estop instead of a physical one",
-    )
-    estop_group.add_argument(
-        "--disable_estop",
-        action="store_true",
-        default=False,
-        help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
     )
 
     return parser.parse_args()
@@ -376,12 +366,6 @@ def field_test_runner():
         runtime_dir = f"{args.yellow_full_system_runtime_dir}/test/{test_name}"
         friendly_proto_unix_io = yellow_full_system_proto_unix_io
 
-    estop_mode = EstopMode.PHYSICAL_ESTOP
-    if args.keyboard_estop:
-        estop_mode = EstopMode.KEYBOARD_ESTOP
-    if args.disable_estop:
-        estop_mode = EstopMode.DISABLE_ESTOP
-
     # Launch all binaries
     with FullSystem(
         runtime_dir,
@@ -392,8 +376,7 @@ def field_test_runner():
         current_proto_unix_io=friendly_proto_unix_io,
         multicast_channel=getRobotMulticastChannel(args.channel),
         interface=args.interface,
-        estop_mode=estop_mode,
-        estop_path=args.estop_path,
+        disable_estop=False,
     ) as rc_friendly:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True

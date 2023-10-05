@@ -12,7 +12,6 @@ import software.python_bindings as cpp_bindings
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.thunderscope.constants import EstopMode
 import software.thunderscope.thunderscope_config as config
 from software.thunderscope.constants import ProtoUnixIOTypes
 
@@ -140,7 +139,11 @@ if __name__ == "__main__":
         help="set realism flag to use realistic config",
     )
     parser.add_argument(
-        "--estop_path", action="store", type=str, help="Path to the Estop",
+        "--estop_path",
+        action="store",
+        type=str,
+        default="/dev/ttyACM0",
+        help="Path to the Estop",
     )
     parser.add_argument(
         "--estop_baudrate",
@@ -154,14 +157,7 @@ if __name__ == "__main__":
         action="store_true",
         help="show pass cost visualization layer",
     )
-    estop_group = parser.add_mutually_exclusive_group()
-    estop_group.add_argument(
-        "--keyboard_estop",
-        action="store_true",
-        default=False,
-        help="Allows the use of the spacebar as an estop instead of a physical one",
-    )
-    estop_group.add_argument(
+    parser.add_argument(
         "--disable_estop",
         action="store_true",
         default=False,
@@ -261,25 +257,18 @@ if __name__ == "__main__":
         # else, it will be the diagnostics proto
         current_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.CURRENT]
 
-        estop_mode = EstopMode.PHYSICAL_ESTOP
-        if args.keyboard_estop:
-            estop_mode = EstopMode.KEYBOARD_ESTOP
-        if args.disable_estop:
-            estop_mode = EstopMode.DISABLE_ESTOP
+        # different estops use different ports this detects which one to use based on what is plugged in
+        estop_path = (
+            "/dev/ttyACM0" if os.path.isfile("/dev/ttyACM0") else "/dev/ttyUSB0"
+        )
 
         with RobotCommunication(
-            current_proto_unix_io=current_proto_unix_io,
-            multicast_channel=getRobotMulticastChannel(args.channel),
-            interface=args.interface,
-            estop_mode=estop_mode,
-            estop_path=args.estop_path,
+            current_proto_unix_io,
+            getRobotMulticastChannel(args.channel),
+            args.interface,
+            args.disable_estop,
+            estop_path,
         ) as robot_communication:
-
-            if estop_mode == EstopMode.KEYBOARD_ESTOP:
-                tscope.keyboard_estop_shortcut.activated.connect(
-                    robot_communication.toggle_keyboard_estop
-                )
-
             if args.run_diagnostics:
                 for tab in tscope_config.tabs:
                     if hasattr(tab, "widgets"):
