@@ -99,9 +99,9 @@ protobuf_deps()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
-    commit = "4ab574f9a84b42b1809978114a4664184716f4bf",
+    commit = "d7dd80f381f101d834927076e75e5ebe44e44121",
     remote = "https://github.com/nelhage/rules_boost",
-    shallow_since = "1694566326 +0000",
+    shallow_since = "1650036359 -0400",
 )
 
 git_repository(
