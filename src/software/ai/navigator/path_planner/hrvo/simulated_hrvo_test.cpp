@@ -20,7 +20,7 @@ class SimulatedHRVOTest : public SimulatedErForceSimPlayTestFixture
 
 TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_behind)
 {
-    Point destination      = Point(2.8, 0);
+    Point destination      = Point(3.5, 0);
     Point initial_position = Point(-2.3, 0);
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
@@ -29,7 +29,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
         TestUtil::createMovingRobotStatesWithId({Point(-4.2, 0)}, {Vector(5, 0)});
 
     auto tactic = std::make_shared<MoveTactic>();
-    tactic->updateControlParams(destination, Angle::zero(), 0);
+    tactic->updateControlParams(destination, Angle::half(), 0);
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
