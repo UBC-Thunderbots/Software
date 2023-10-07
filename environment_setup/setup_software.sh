@@ -4,10 +4,7 @@
 # UBC Thunderbots Ubuntu Software Setup
 #
 # This script must be run with sudo! root permissions are required to install
-# packages and copy files to the /etc/udev/rules.d directory. The reason that the script
-# must be run with sudo rather than the individual commands using sudo, is that
-# when running CI within Docker, the sudo command does not exist since
-# everything is automatically run as root.
+# packages and copy files to the /etc/udev/rules.d directory.
 #
 # This script will install all the required libraries and dependencies to build
 # and run the Thunderbots codebase. This includes being able to run the ai and
@@ -32,6 +29,7 @@ print_status_msg "Installing Utilities and Dependencies"
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update
 
 # (sorted alphabetically)
@@ -52,16 +50,14 @@ host_software_packages=(
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
-    python3       # Python 3
-    python3-dev # Python 3 headers
-    python3-venv # Virtual Environment
+    python3.8       # Python 3
+    python3.8-dev # Python 3 headers
+    python3.8-venv # Virtual Environment
     python3-pip   # Required for bazel to install python dependencies for build targets
     python3-protobuf # This is required for the "NanoPb" library, which does not
                     # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
-    python3-yaml # Load dynamic parameter configuration files
-    qt5-default # A GUI library used by er-force sim
-    tmux        # Used by AI vs AI script
+    python3-yaml 	# Load dynamic parameter configuration files
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
     libffi-dev # needed to use _ctypes in Python3
@@ -80,12 +76,17 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(llvm-6.0)
     host_software_packages+=(libclang-6.0-dev)
     host_software_packages+=(libncurses5)
+    host_software_packages+=(qt5-default)
     sudo apt-get -y install gcc-7 g++-7
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
     
     # This fixes missing headers by notifying the linker
     ldconfig
+fi
+
+if [[ $(lsb_release -rs) == "22.04" ]]; then
+    host_software_packages+=(qtbase5-dev)
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
@@ -113,9 +114,8 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
 fi
 
-if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
-    print_status_msg "Error: Installing protobuf failed"
-    exit 1;
+if [[ $(lsb_release -rs) == "22.04" ]]; then
+    sudo /opt/tbotspython/bin/pip3 install -r ubuntu22_requirements.txt
 fi
 
 print_status_msg "Done Setting Up Virtual Python Environment"
@@ -142,7 +142,7 @@ print_status_msg "Setting Up PlatformIO"
 # **need to reboot for changes to come into effect**
 
 # downloading platformio udev rules
-if ! curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules; then
+if ! curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/system/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules; then
     print_status_msg "Error: Downloading PlatformIO udev rules failed"
     exit 1
 fi
