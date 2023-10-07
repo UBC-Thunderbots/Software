@@ -72,16 +72,16 @@ class GLWorldLayer(GLLayer):
         self.point_in_scene_picked = None
 
         self.friendly_defense_area_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_COLOR, line_width=3
+            parentItem=self, color=Colors.FIELD_LINE_COLOR
         )
         self.enemy_defense_area_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_COLOR, line_width=3
+            parentItem=self, color=Colors.FIELD_LINE_COLOR
         )
         self.field_lines_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_COLOR, line_width=3
+            parentItem=self, color=Colors.FIELD_LINE_COLOR
         )
         self.field_outer_boundary_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, line_width=3
+            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR
         )
         self.halfway_line_graphic = GLLinePlotItem(
             parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR
@@ -96,9 +96,6 @@ class GLWorldLayer(GLLayer):
         self.enemy_goal_graphic = GLGoal(parentItem=self, color=Colors.GOAL_COLOR)
         self.ball_graphic = GLSphere(
             parentItem=self, radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR
-        )
-        self.robot_status_graphic = GLCircle(
-            parentItem=self, color=Colors.BREAKBEAM_TRIPPED_COLOR
         )
         self.ball_kick_velocity_graphic = GLLinePlotItem(
             parentItem=self, color=Colors.SPEED_VECTOR_COLOR
@@ -394,6 +391,12 @@ class GLWorldLayer(GLLayer):
     def __update_robot_status_graphics(self):
         """Update the robot status graphics"""
         self.cached_status = self.robot_status_buffer.get(block=False)
+
+        self.__bring_list_to_length(
+            self.robot_status_graphics,
+            len(cached_world.friendly_team.team_robots),
+            GLCircle(parentItem=self, color=Colors.BREAKBEAM_TRIPPED_COLOR)
+        )
 
         if self.cached_status.power_status.breakbeam_tripped:
             self.robot_status_graphic.show()

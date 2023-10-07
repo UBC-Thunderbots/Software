@@ -27,7 +27,7 @@ class GLValidationLayer(GLLayer):
         name: str,
         buffer_size: int = 10,
         test_name_pos_x: float = -4.5,
-        test_name_pos_y: float = 3.2,
+        test_name_pos_y: float = 3.6,
     ):
         """Initialize the GLValidationLayer
 
