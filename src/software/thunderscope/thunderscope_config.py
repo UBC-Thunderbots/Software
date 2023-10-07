@@ -15,7 +15,8 @@ from software.thunderscope.thunderscope_types import (
 )
 import pyqtgraph
 import signal
-from pyqtgraph.Qt.QtCore import QDir
+import qdarktheme
+from qt_material import apply_stylesheet, list_themes
 
 
 class TScopeConfig:
@@ -50,11 +51,7 @@ def initialize_application():
     app = pyqtgraph.mkQApp("Thunderscope")
 
     # Setup stylesheet
-    with open("software/thunderscope/resources/dark_theme.qss", "r") as file:
-        app.setStyleSheet(file.read())
-
-    # Load icons
-    QDir.addSearchPath("icon", "software/thunderscope/resources/theme")
+    apply_stylesheet(app, theme="dark_blue.xml")
 
 
 def configure_cost_vis(proto_unix_io):
