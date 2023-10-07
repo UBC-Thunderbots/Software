@@ -445,7 +445,7 @@ class GLWorldLayer(GLLayer):
         # Ensure we have the same number of graphics as robots/balls
         self._bring_list_to_length(
             self.speed_line_graphics,
-            len(self.speed_line_graphics),
+            len(objects),
             lambda: GLLinePlotItem(color=Colors.SPEED_VECTOR_COLOR),
         )
 

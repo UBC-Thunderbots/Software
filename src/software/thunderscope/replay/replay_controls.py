@@ -44,7 +44,7 @@ class ReplayControls(QWidget):
         self.buttons_layout.addWidget(self.play_pause)
 
         # Setup playback speed combo box
-        self.playback_speed_combo_box = QtGui.QComboBox(self)
+        self.playback_speed_combo_box = QComboBox(self)
 
         for item in ["3", "2", "1", "0.5", "0.2", "0.1", "0.05", "0.01"]:
             self.playback_speed_combo_box.addItem(item)

@@ -13,8 +13,8 @@ class GLSphere(GLMeshItem):
         parentItem: GLGraphicsItem = None,
         radius: float = 1,
         color: QtGui.QColor = Colors.BALL_COLOR,
-        rows: int = 6,
-        cols: int = 6,
+        rows: int = 10,
+        cols: int = 10,
     ):
         """Initialize the GLSphere
         

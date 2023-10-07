@@ -39,7 +39,6 @@ class GLSimulatorLayer(GLLayer):
 
         sim_world_state = self.simulator_state_buffer.get(block=False)
 
-        # For some reason x and y are reversed?
         self.ball_graphic.set_position(
             sim_world_state.ball.p_y,
             -sim_world_state.ball.p_x,

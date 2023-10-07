@@ -89,6 +89,7 @@ class GLLayer(GLGraphicsItem):
                 graphic.setParentItem(self)
         elif change.action == ChangeAction.REMOVE:
             for graphic in change.elements:
+                # Setting parent item to None will remove it as a child of the layer 
                 graphic.setParentItem(None)
 
     def _bring_list_to_length(
