@@ -110,15 +110,6 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
         auto path_point_opt =
             path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
         Point destination = path_point_opt.getPosition();
-        //        position_traj.generate(position, destination, velocity, max_speed,
-        //        max_accel,
-        //                               max_decel);
-        angular_traj.generate(orientation, path_point_opt.getOrientation(),
-                              angular_velocity,
-                              AngularVelocity::fromRadians(max_angular_speed),
-                              AngularAcceleration::fromRadians(max_angular_accel),
-                              AngularAcceleration::fromRadians(max_angular_accel));
-
         std::vector<ObstaclePtr> obstacles =
             obstacle_factory.createStaticObstaclesFromMotionConstraints(
                 motion_constraints, world.field());
@@ -139,6 +130,42 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             planner.findTrajectory(position, destination, velocity,
                                    KinematicConstraints(max_speed, max_accel, max_decel),
                                    obstacles, world.field().fieldLines());
+
+        angular_traj.generate(orientation, path_point_opt.getOrientation(),
+                              angular_velocity,
+                              AngularVelocity::fromRadians(max_angular_speed),
+                              AngularAcceleration::fromRadians(max_angular_accel),
+                              AngularAcceleration::fromRadians(max_angular_accel));
+
+        double MAX_TIME_OFFSET_BETWEEN_LINEAR_TRAJ_AND_ANGULAR_TRAJ_SEC = 0.5;
+        if (angular_traj.getTotalTime() < trajectory_path.getTotalTime() - MAX_TIME_OFFSET_BETWEEN_LINEAR_TRAJ_AND_ANGULAR_TRAJ_SEC)
+        {
+            // Binary search over coefficients for the kinematic constraints
+            // of the angular trajectory that make the times basically equal
+            double coefficient = 0.5;
+            double increment = 0.25;
+            while (increment > 0.0001)
+            {
+                angular_traj.generate(orientation, path_point_opt.getOrientation(),
+                                      angular_velocity,
+                                      AngularVelocity::fromRadians(max_angular_speed * coefficient),
+                                      AngularAcceleration::fromRadians(max_angular_accel * coefficient),
+                                      AngularAcceleration::fromRadians(max_angular_accel * coefficient));
+                if (angular_traj.getTotalTime() > trajectory_path.getTotalTime() -
+                                                  MAX_TIME_OFFSET_BETWEEN_LINEAR_TRAJ_AND_ANGULAR_TRAJ_SEC)
+                {
+                    coefficient += increment;
+                }
+                else
+                {
+                    coefficient -= increment;
+                }
+                increment /= 2;
+            }
+        }
+
+
+
         last_traj_update_time = std::chrono::steady_clock::now();
         // TODO: This time offset works for the current kinematic constants
         //       it doesn't work if those constants are changed.
