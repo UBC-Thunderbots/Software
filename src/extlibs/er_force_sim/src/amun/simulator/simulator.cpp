@@ -262,8 +262,8 @@ void Simulator::sendSSLSimErrorInternal(ErrorSource source)
 }
 
 static void createProtobufRobot(Simulator::RobotMap &list, float x, float y, uint32_t id,
-                        const ErrorAggregator *agg, SimulatorData *data,
-                        const QMap<uint32_t, robot::Specs> &teamSpecs)
+                                const ErrorAggregator *agg, SimulatorData *data,
+                                const QMap<uint32_t, robot::Specs> &teamSpecs)
 {
     SimRobot *robot = new SimRobot(&data->rng, teamSpecs[id], data->dynamicsWorld,
                                    btVector3(x, y, 0), 0.f);
@@ -727,8 +727,8 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
                 ErForceVector targetPos;
                 coordinates::fromVision(robot, targetPos);
                 // TODO: check if the given position is fine
-                createProtobufRobot(list, targetPos.x, targetPos.y, robot.id().id(), m_aggregator,
-                            m_data, teamSpecs);
+                createProtobufRobot(list, targetPos.x, targetPos.y, robot.id().id(),
+                                    m_aggregator, m_data, teamSpecs);
             }
         }
         else if (!robot.present() && isPresent)
