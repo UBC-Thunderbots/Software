@@ -395,7 +395,7 @@ class GLWorldLayer(GLLayer):
         self.__bring_list_to_length(
             self.robot_status_graphics,
             len(cached_world.friendly_team.team_robots),
-            GLCircle(parentItem=self, color=Colors.BREAKBEAM_TRIPPED_COLOR)
+            GLCircle(parentItem=self, color=Colors.BREAKBEAM_TRIPPED_COLOR),
         )
 
         if self.cached_status.power_status.breakbeam_tripped:
