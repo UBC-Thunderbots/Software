@@ -70,7 +70,7 @@ py_library(
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests:validation",
         "//software/thunderscope",
-        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/binary_context_managers:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
     ],
 )
@@ -90,7 +90,7 @@ py_library(
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests:validation",
         "//software/thunderscope",
-        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/binary_context_managers:binary_context_managers",
         "//software/thunderscope:config",
         "//software/thunderscope:constants",
         "//software/thunderscope/replay:proto_logger",

@@ -9,7 +9,7 @@ py_binary(
         ":config",
         ":constants",
         ":thunderscope",
-        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/binary_context_managers:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
     ],
 )
@@ -31,7 +31,7 @@ py_library(
         "//proto/message_translation:py_tbots_protobuf",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
-        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/binary_context_managers:binary_context_managers",
         "//software/thunderscope:constants",
         "//software/thunderscope:dock_label_style",
         "//software/thunderscope:proto_unix_io",
@@ -116,10 +116,6 @@ py_library(
     srcs = ["thread_safe_buffer.py"],
 )
 
-py_library(
-    name = "binary_context_managers",
-    srcs = ["binary_context_managers.py"],
-)
 
 py_library(
     name = "robot_communication",

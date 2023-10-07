@@ -15,6 +15,11 @@ from software.thunderscope.replay.proto_logger import ProtoLogger
 import software.thunderscope.thunderscope_config as config
 from software.thunderscope.constants import ProtoUnixIOTypes
 
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+
+
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
 
