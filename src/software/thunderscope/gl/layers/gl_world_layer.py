@@ -101,6 +101,16 @@ class GLWorldLayer(GLLayer):
             parentItem=self, color=Colors.SPEED_VECTOR_COLOR
         )
 
+        # Set depth value of field line graphics to -1 so that they are
+        # rendered beneath robots and other graphics
+        self.friendly_defense_area_graphic.setDepthValue(-1)
+        self.enemy_defense_area_graphic.setDepthValue(-1)
+        self.field_lines_graphic.setDepthValue(-1)
+        self.field_outer_boundary_graphic.setDepthValue(-1)
+        self.halfway_line_graphic.setDepthValue(-1)
+        self.goal_to_goal_line_graphic.setDepthValue(-1)
+        self.field_center_circle_graphic.setDepthValue(-1)
+
         self.friendly_robot_graphics = ObservableList(self._graphics_changed)
         self.enemy_robot_graphics = ObservableList(self._graphics_changed)
         self.friendly_robot_id_graphics = ObservableList(self._graphics_changed)
