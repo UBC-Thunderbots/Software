@@ -9,12 +9,6 @@ from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import Colors
 
-from software.thunderscope.gl.graphics.gl_circle import GLCircle
-from software.thunderscope.gl.graphics.gl_rect import GLRect
-from software.thunderscope.gl.graphics.gl_robot import GLRobot
-from software.thunderscope.gl.graphics.gl_sphere import GLSphere
-
-from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer

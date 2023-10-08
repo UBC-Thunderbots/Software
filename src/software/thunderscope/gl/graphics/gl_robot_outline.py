@@ -15,11 +15,13 @@ class GLRobotOutline(GLLinePlotItem):
         self,
         parentItem: GLGraphicsItem = None,
         color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
+        line_width: float = 3.0,
     ):
         """Initialize the GLRobotOutline
         
         :param parentItem: The parent item of the graphic
         :param color: The color of the graphic
+        :param line_width: The line width of the graphic
 
         """
         GLLinePlotItem.__init__(
@@ -27,6 +29,7 @@ class GLRobotOutline(GLLinePlotItem):
             parentItem=parentItem,
             pos=np.array(GLRobotOutline.get_robot_outline()),
             color=color,
+            width=line_width
         )
 
         self.x = 0

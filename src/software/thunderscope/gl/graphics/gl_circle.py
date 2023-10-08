@@ -15,6 +15,7 @@ class GLCircle(GLLinePlotItem):
         radius: float = 1,
         num_points: int = 24,
         color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
+        line_width: float = 3.0,
     ):
         """Initialize the GLCircle
         
@@ -22,9 +23,10 @@ class GLCircle(GLLinePlotItem):
         :param radius: The radius of the circle
         :param num_points: The number of points to generate when creating the circle
         :param color: The color of the graphic
+        :param line_width: The line width of the graphic
 
         """
-        GLLinePlotItem.__init__(self, parentItem=parentItem, color=color)
+        GLLinePlotItem.__init__(self, parentItem=parentItem, color=color, width=line_width)
 
         self.x = 0
         self.y = 0

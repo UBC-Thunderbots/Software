@@ -84,10 +84,10 @@ class GLWorldLayer(GLLayer):
             parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR
         )
         self.halfway_line_graphic = GLLinePlotItem(
-            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR
+            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=3.0
         )
         self.goal_to_goal_line_graphic = GLLinePlotItem(
-            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR
+            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=3.0
         )
         self.field_center_circle_graphic = GLCircle(
             parentItem=self, color=Colors.FIELD_LINE_COLOR
@@ -105,7 +105,7 @@ class GLWorldLayer(GLLayer):
         self.enemy_robot_graphics = ObservableList(self._graphics_changed)
         self.friendly_robot_id_graphics = ObservableList(self._graphics_changed)
         self.enemy_robot_id_graphics = ObservableList(self._graphics_changed)
-        self.robot_status_graphics = ObservableList(self._graphics_changed)
+        self.breakbeam_graphics = ObservableList(self._graphics_changed)
         self.speed_line_graphics = ObservableList(self._graphics_changed)
 
     def keyPressEvent(self, event: QtGui.QKeyEvent):
@@ -372,8 +372,8 @@ class GLWorldLayer(GLLayer):
             if self.display_robot_ids:
                 robot_id_graphic.show()
 
-                # Depth value of 1 ensures text is rendered over top other graphics
-                robot_id_graphic.setDepthValue(1)
+                # Depth value of 2 ensures text is rendered over top other graphics
+                robot_id_graphic.setDepthValue(2)
 
                 robot_id_graphic.setData(
                     text=str(robot.id),
@@ -390,32 +390,52 @@ class GLWorldLayer(GLLayer):
 
     def __update_robot_status_graphics(self):
         """Update the robot status graphics"""
-        self.cached_status = self.robot_status_buffer.get(block=False)
+        
+        # Get the robot status messages
+        robot_statuses = {}
+        while True:
+            robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
+            if robot_status: 
+                robot_statuses[robot_status.robot_id] = robot_status
+            else: 
+                break;
 
-        self.__bring_list_to_length(
-            self.robot_status_graphics,
-            len(cached_world.friendly_team.team_robots),
-            GLCircle(parentItem=self, color=Colors.BREAKBEAM_TRIPPED_COLOR)
+        # Ensure we have the same number of graphics as robots
+        self._bring_list_to_length(
+            self.breakbeam_graphics,
+            len(self.cached_world.friendly_team.team_robots),
+            lambda: GLCircle(
+                parentItem=self, 
+                radius=ROBOT_MAX_RADIUS_METERS / 2, 
+                color=Colors.BREAKBEAM_TRIPPED_COLOR,
+            )
         )
 
-        if self.cached_status.power_status.breakbeam_tripped:
-            self.robot_status_graphic.show()
+        for breakbeam_graphic, robot in zip(
+            self.breakbeam_graphics,
+            self.cached_world.friendly_team.team_robots
+        ):
+            if (
+                robot.id in robot_statuses and 
+                robot_statuses[robot.id].power_status.breakbeam_tripped
+            ):
+                breakbeam_graphic.show()
 
-            for robot in self.cached_world.friendly_team.team_robots:
-                if robot.id == self.cached_status.robot_id:
-                    self.robot_status_graphic.set_radius(ROBOT_MAX_RADIUS_METERS / 2)
-                    self.robot_status_graphic.set_position(
-                        robot.current_state.global_position.x_meters,
-                        robot.current_state.global_position.y_meters,
-                    )
-        else:
-            self.robot_status_graphic.hide()
+                # Depth value of 1 ensures text is rendered over top robots
+                breakbeam_graphic.setDepthValue(1)
+
+                breakbeam_graphic.set_position(
+                    robot.current_state.global_position.x_meters,
+                    robot.current_state.global_position.y_meters,
+                )
+            else:
+                breakbeam_graphic.hide()
 
     def __update_speed_line_graphics(self):
         """Update the speed lines visualizing the robot and ball speeds"""
 
-        # If user if trying to apply a velocity on the ball (i.e. kick it), visualize
-        # the velocity vector
+        # When the user is kicking the ball, show the kick velocity vector
+        # as a speed line
         if self.ball_velocity_vector:
 
             ball_state = self.cached_world.ball.current_state
@@ -436,6 +456,7 @@ class GLWorldLayer(GLLayer):
                     ]
                 ),
             )
+
         else:
             self.ball_kick_velocity_graphic.hide()
 

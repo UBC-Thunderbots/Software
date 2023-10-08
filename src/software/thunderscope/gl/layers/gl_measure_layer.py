@@ -63,6 +63,7 @@ class GLMeasureLayer(GLLayer):
             self.measurement_line_graphics.append(
                 GLLinePlotItem(
                     color=(Colors.PRIMARY_TEXT_COLOR),
+                    width=3.0,
                     pos=np.array(
                         [
                             [first_point.x(), first_point.y(), 0],

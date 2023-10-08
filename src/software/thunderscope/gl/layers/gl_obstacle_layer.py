@@ -54,7 +54,8 @@ class GLObstacleLayer(GLLayer):
                     # Get a previously cached graphic or create a new one
                     if poly_obstacle_graphics_index >= len(self.poly_obstacle_graphics):
                         poly_obstacle_graphic = GLLinePlotItem(
-                            color=Colors.NAVIGATOR_OBSTACLE_COLOR
+                            color=Colors.NAVIGATOR_OBSTACLE_COLOR,
+                            width=3.0,
                         )
                         self.poly_obstacle_graphics.append(poly_obstacle_graphic)
                     else:

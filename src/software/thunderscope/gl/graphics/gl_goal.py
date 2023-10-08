@@ -31,7 +31,7 @@ class GLGoal(GLMeshItem):
 
         # The 3D mesh isn't visible from the orthographic view, so
         # we need to draw an outline of the goal on the ground
-        self.goal_outline = GLLinePlotItem(color=color)
+        self.goal_outline = GLLinePlotItem(color=color, width=3.0)
         self.goal_outline.setParentItem(self)
 
         # Need to give goal some default meshdata; otherwise, pyqtgraph

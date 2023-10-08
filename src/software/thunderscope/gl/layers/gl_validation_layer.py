@@ -126,7 +126,7 @@ class GLValidationLayer(GLLayer):
 
                 # Get a previously cached graphic or create a new one
                 if polygon_graphics_index >= len(self.polygon_graphics):
-                    polygon_graphic = GLLinePlotItem()
+                    polygon_graphic = GLLinePlotItem(width=3.0)
                     self.polygon_graphics.append(polygon_graphic)
                 else:
                     polygon_graphic = self.polygon_graphics[polygon_graphics_index]

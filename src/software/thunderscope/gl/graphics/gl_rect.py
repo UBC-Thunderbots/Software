@@ -12,7 +12,7 @@ class GLRect(GLLinePlotItem):
         self,
         parentItem: GLGraphicsItem = None,
         color: QtGui.QColor = (255, 255, 255, 127.5),
-        line_width: float = 1.0,
+        line_width: float = 3.0,
     ):
         """Initialize the GLRect
         

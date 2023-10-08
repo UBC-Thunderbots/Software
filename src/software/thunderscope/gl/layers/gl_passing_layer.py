@@ -70,7 +70,7 @@ class GLPassingLayer(GLLayer):
         self._bring_list_to_length(
             self.pass_graphics,
             len(passes_to_show),
-            lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR),
+            lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR, width=3.0),
         )
 
         for pass_graphic, pass_with_rating in zip(self.pass_graphics, passes_to_show,):

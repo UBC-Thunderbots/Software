@@ -35,8 +35,8 @@ sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo apt-get update
 
 # Detect if running under WSL
-# See https://github.com/microsoft/WSL/issues/4071#issuecomment-496737093
-if [[ $(grep Microsoft /proc/version) ]]; then
+# See https://github.com/microsoft/WSL/issues/4071#issuecomment-1221588337
+if [[ $(grep -i Microsoft /proc/version) ]]; then
     print_status_msg "WSL Setup"
 
     sudo apt install unzip

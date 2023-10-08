@@ -8,7 +8,7 @@ from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
-
+from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
 
@@ -41,14 +41,14 @@ class GLHrvoLayer(GLLayer):
             msg = self.hrvo_buffer.get(block=False)
             if msg.robot_id == self.robot_id:
                 velocity_obstacle_msg = msg
-
+                break;
         self.prev_message = velocity_obstacle_msg
 
         # Ensure we have the same number of graphics as protos
         self._bring_list_to_length(
             self.velocity_obstacle_graphics,
             len(velocity_obstacle_msg.velocity_obstacles),
-            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
+            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR, width=3.0),
         )
         self._bring_list_to_length(
             self.robot_circle_graphics,
@@ -63,18 +63,21 @@ class GLHrvoLayer(GLLayer):
                 [
                     velocity_obstacle.apex.x_component_meters,
                     velocity_obstacle.apex.y_component_meters,
+                    0,
                 ],
                 [
                     velocity_obstacle.apex.x_component_meters
                     + velocity_obstacle.left_side.x_component_meters,
                     velocity_obstacle.apex.y_component_meters
                     + velocity_obstacle.left_side.y_component_meters,
+                    0,
                 ],
                 [
                     velocity_obstacle.apex.x_component_meters
                     + velocity_obstacle.right_side.x_component_meters,
                     velocity_obstacle.apex.y_component_meters
                     + velocity_obstacle.right_side.y_component_meters,
+                    0,
                 ],
             ]
 
@@ -83,7 +86,7 @@ class GLHrvoLayer(GLLayer):
             polygon_points = polygon_points + polygon_points[:1]
 
             velocity_obstacle_graphic.setData(
-                pos=np.array([[point[0], point[1], 0] for point in polygon_points]),
+                pos=np.array(polygon_points),
             )
 
         for robot_circle_graphic, robot_circle in zip(
