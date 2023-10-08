@@ -390,34 +390,35 @@ class GLWorldLayer(GLLayer):
 
     def __update_robot_status_graphics(self):
         """Update the robot status graphics"""
-        
+
         # Get the robot status messages
         robot_statuses = {}
         while True:
-            robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
-            if robot_status: 
+            robot_status = self.robot_status_buffer.get(
+                block=False, return_cached=False
+            )
+            if robot_status:
                 robot_statuses[robot_status.robot_id] = robot_status
-            else: 
-                break;
+            else:
+                break
 
         # Ensure we have the same number of graphics as robots
         self._bring_list_to_length(
             self.breakbeam_graphics,
             len(self.cached_world.friendly_team.team_robots),
             lambda: GLCircle(
-                parentItem=self, 
-                radius=ROBOT_MAX_RADIUS_METERS / 2, 
+                parentItem=self,
+                radius=ROBOT_MAX_RADIUS_METERS / 2,
                 color=Colors.BREAKBEAM_TRIPPED_COLOR,
-            )
+            ),
         )
 
         for breakbeam_graphic, robot in zip(
-            self.breakbeam_graphics,
-            self.cached_world.friendly_team.team_robots
+            self.breakbeam_graphics, self.cached_world.friendly_team.team_robots
         ):
             if (
-                robot.id in robot_statuses and 
-                robot_statuses[robot.id].power_status.breakbeam_tripped
+                robot.id in robot_statuses
+                and robot_statuses[robot.id].power_status.breakbeam_tripped
             ):
                 breakbeam_graphic.show()
 

@@ -29,7 +29,7 @@ class GLRobotOutline(GLLinePlotItem):
             parentItem=parentItem,
             pos=np.array(GLRobotOutline.get_robot_outline()),
             color=color,
-            width=line_width
+            width=line_width,
         )
 
         self.x = 0

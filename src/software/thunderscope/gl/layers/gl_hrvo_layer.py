@@ -41,7 +41,7 @@ class GLHrvoLayer(GLLayer):
             msg = self.hrvo_buffer.get(block=False)
             if msg.robot_id == self.robot_id:
                 velocity_obstacle_msg = msg
-                break;
+                break
         self.prev_message = velocity_obstacle_msg
 
         # Ensure we have the same number of graphics as protos
@@ -85,9 +85,7 @@ class GLHrvoLayer(GLLayer):
             # the list of points in the polygon
             polygon_points = polygon_points + polygon_points[:1]
 
-            velocity_obstacle_graphic.setData(
-                pos=np.array(polygon_points),
-            )
+            velocity_obstacle_graphic.setData(pos=np.array(polygon_points),)
 
         for robot_circle_graphic, robot_circle in zip(
             self.robot_circle_graphics, velocity_obstacle_msg.robots,
