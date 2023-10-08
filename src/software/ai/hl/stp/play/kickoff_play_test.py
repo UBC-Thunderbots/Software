@@ -31,8 +31,12 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             tbots_cpp.Point(1, 2.5),
             tbots_cpp.Point(1, -2.5),
             tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-            tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-            tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXNegYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXPosYCorner(),
         ]
 
         blue_play = Play()

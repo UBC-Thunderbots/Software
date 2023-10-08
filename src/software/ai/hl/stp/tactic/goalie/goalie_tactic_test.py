@@ -161,7 +161,9 @@ def test_goalie_blocks_shot(
         [
             # Goalie should be in the defense area
             RobotEventuallyEntersRegion(
-                regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()]
+                regions=[
+                    tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
+                ]
             ),
         ]
     ]

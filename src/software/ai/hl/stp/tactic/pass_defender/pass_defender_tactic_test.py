@@ -24,7 +24,11 @@ from proto.ssl_gc_common_pb2 import Team
         # Intercept pass angled away from defender
         (tbots_cpp.Point(2, 0), tbots_cpp.Vector(-3, 0), tbots_cpp.Point(-2, 0.5)),
         # Intercept diagonal pass
-        (tbots_cpp.Point(-1, -3), tbots_cpp.Vector(-2, 1.5), tbots_cpp.Point(-3, -0.75)),
+        (
+            tbots_cpp.Point(-1, -3),
+            tbots_cpp.Vector(-2, 1.5),
+            tbots_cpp.Point(-3, -0.75),
+        ),
     ],
 )
 def test_ball_chipped_on_intercept(
@@ -65,7 +69,9 @@ def test_ball_chipped_on_intercept(
     always_validation_sequence_set = [
         [
             RobotNeverEntersRegion(
-                regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()]
+                regions=[
+                    tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
+                ]
             ),
             # Defender should intercept ball and prevent it from entering the goal
             BallNeverEntersRegion(
