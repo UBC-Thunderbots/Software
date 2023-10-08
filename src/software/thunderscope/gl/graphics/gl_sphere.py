@@ -31,9 +31,9 @@ class GLSphere(GLMeshItem):
         self.y = 0
         self.z = 0
         self.radius = 0
-        self.set_radius(radius)
+        self.set_radius(radius, rows, cols)
 
-    def set_radius(self, radius: float, rows: int = 3, cols: int = 3):
+    def set_radius(self, radius: float, rows: int = 10, cols: int = 10):
         """Set the radius of the sphere
 
         :param radius: The radius of the sphere
