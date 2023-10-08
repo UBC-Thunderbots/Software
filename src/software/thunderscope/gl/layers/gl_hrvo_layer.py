@@ -24,7 +24,7 @@ class GLHrvoLayer(GLLayer):
                             Set lower for more realtime plots. Default is arbitrary
 
         """
-        GLLayer.__init__(self, name)
+        super().__init__(name)
 
         self.robot_id = robot_id
         self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HRVOVisualization)

@@ -43,7 +43,7 @@ class GLWorldLayer(GLLayer):
                             Set lower for more realtime plots. Default is arbitrary
 
         """
-        GLLayer.__init__(self, name)
+        super().__init__(name)
 
         self.simulator_io = simulator_io
         self.friendly_colour_yellow = friendly_colour_yellow

@@ -27,7 +27,7 @@ class GLTacticLayer(GLLayer):
                             Set lower for more realtime plots. Default is arbitrary
 
         """
-        GLLayer.__init__(self, name)
+        super().__init__(name)
 
         # Depth value of 1 ensures this layer is rendered over top other layers
         self.setDepthValue(1)

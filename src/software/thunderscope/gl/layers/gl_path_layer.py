@@ -24,7 +24,7 @@ class GLPathLayer(GLLayer):
                             Set lower for more realtime plots. Default is arbitrary
                             
         """
-        GLLayer.__init__(self, name)
+        super().__init__(name)
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 

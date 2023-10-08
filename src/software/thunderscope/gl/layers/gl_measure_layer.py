@@ -23,7 +23,7 @@ class GLMeasureLayer(GLLayer):
         :param name: The displayed name of the layer
 
         """
-        GLLayer.__init__(self, name)
+        super().__init__(name)
 
         self.mouse_point_in_scene = QtGui.QVector3D()
         self.measurement_points_cache = []

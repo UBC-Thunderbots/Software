@@ -12,8 +12,8 @@ class GLLayer(GLGraphicsItem):
     """Represents a layer in the 3D visualization. 
     
     A layer is added to the 3D scenegraph and represents a collection of
-    GLGraphicsItems that we wish to display together. GLGraphicsItems should
-    be added as children of a GLLayer (using GLGraphicsItem.setParentItem)
+    GLGraphicsItems to be displayed together. GLGraphicsItems should be 
+    added as children of a GLLayer.
     
     """
 
@@ -23,7 +23,7 @@ class GLLayer(GLGraphicsItem):
         :param name: The displayed name of the layer
 
         """
-        GLGraphicsItem.__init__(self)
+        super().__init__()
         self.name = name
 
     def refresh_graphics(self):
@@ -78,19 +78,30 @@ class GLLayer(GLGraphicsItem):
 
         Subclasses of GLLayer should use ObservableLists to store collections of
         GLGraphicsItems. Each ObservableList should register this function as an observer 
-        so that GLGraphicsItems are automatically added/removed to the 3D scenegraph
-        when they are added/removed from the ObservableList.
+        so that GLGraphicsItems are automatically added/removed as children of this layer
+        (and thus added/removed to the 3D scenegraph) when they are added/removed from 
+        the ObservableList.
 
         :param change: Change representing the GLGraphicsItems added or removed
 
         """
         if change.action == ChangeAction.ADD:
             for graphic in change.elements:
-                graphic.setParentItem(self)
+                # Manually setting the parent of the GLGraphicsItem to this
+                # layer since GLGraphicsItem.setParentItem does not work 
+                # correctly
+                self._GLGraphicsItem__children.add(graphic)
+                graphic._GLGraphicsItem__parent = self
+                self.view().addItem(graphic)
+
         elif change.action == ChangeAction.REMOVE:
             for graphic in change.elements:
-                # Setting parent item to None will remove it as a child of the layer
-                graphic.setParentItem(None)
+                # Manually removing the GLGraphicsItem as a child of this
+                # layer since GLGraphicsItem.setParentItem does not work 
+                # correctly
+                self._GLGraphicsItem__children.remove(graphic)
+                graphic._GLGraphicsItem__parent = None
+                self.view().removeItem(graphic)
 
     def _bring_list_to_length(
         self, list_: List, target_len: int, element_factory: Callable

@@ -32,7 +32,7 @@ class GLPassingLayer(GLLayer):
                             Set lower for more realtime plots. Default is arbitrary
                             
         """
-        GLLayer.__init__(self, name)
+        super().__init__(name)
 
         self.pass_visualization_buffer = ThreadSafeBuffer(
             buffer_size, PassVisualization
