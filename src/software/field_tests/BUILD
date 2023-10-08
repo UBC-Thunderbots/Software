@@ -18,7 +18,7 @@ py_library(
         "//software/simulated_tests:tbots_test_runner",
         "//software/simulated_tests:validation",
         "//software/thunderscope",
-        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/binary_context_managers:binary_context_managers",
         "//software/thunderscope:robot_communication",
         "//software/thunderscope/replay:proto_logger",
     ],
