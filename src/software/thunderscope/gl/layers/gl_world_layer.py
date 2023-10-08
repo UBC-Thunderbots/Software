@@ -17,6 +17,7 @@ from software.thunderscope.gl.graphics.gl_goal import GLGoal
 
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
@@ -30,7 +31,7 @@ class GLWorldLayer(GLLayer):
     def __init__(
         self,
         name: str,
-        simulator_io,
+        simulator_io: ProtoUnixIO,
         friendly_colour_yellow: bool,
         buffer_size: int = 5,
     ):
