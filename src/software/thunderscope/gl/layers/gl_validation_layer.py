@@ -55,6 +55,7 @@ class GLValidationLayer(GLLayer):
         self.test_name_graphic: GLTextItem = None
 
         self.polygon_graphics = ObservableList(self._graphics_changed)
+        self.segment_graphics = ObservableList(self._graphics_changed)
         self.circle_graphics = ObservableList(self._graphics_changed)
 
     def refresh_graphics(self):
@@ -111,79 +112,86 @@ class GLValidationLayer(GLLayer):
         :param validations: The list of validation protos
 
         """
-        polygon_graphics_index = 0
-        circle_graphics_index = 0
+        polygons = [
+            (polygon, validation.status)
+            for validation in validations
+            for polygon in validation.geometry.polygons
+        ]
+        segments = [
+            (segment, validation.status)
+            for validation in validations
+            for segment in validation.geometry.segments
+        ]
+        circles = [
+            (circle, validation.status)
+            for validation in validations
+            for circle in validation.geometry.circles
+        ]
 
-        for validation in validations:
+        # Ensure we have the same number of graphics as validations
+        self._bring_list_to_length(
+            self.polygon_graphics,
+            len(polygons),
+            lambda: GLLinePlotItem(width=3.0),
+        )
+        self._bring_list_to_length(
+            self.segment_graphics,
+            len(segments),
+            lambda: GLLinePlotItem(width=3.0),
+        )
+        self._bring_list_to_length(
+            self.circle_graphics,
+            len(circles),
+            lambda: GLCircle(),
+        )
 
-            validation_color = (
-                Colors.VALIDATION_PASSED_COLOR
-                if validation.status == ValidationStatus.PASSING
-                else Colors.VALIDATION_FAILED_COLOR
+        for polygon_graphic, (polygon, validation_status) in zip(
+            self.polygon_graphics, polygons
+        ):
+            # In order to close the polygon, we need to include the first point at the end of
+            # the list of points in the polygon
+            polygon_points = list(polygon.points) + polygon.points[:1]
+
+            polygon_graphic.setData(
+                pos=np.array(
+                    [
+                        [point.x_meters, point.y_meters, 0]
+                        for point in polygon_points
+                    ]
+                ),
+                color=self.__get_validation_color(validation_status),
             )
 
-            for polygon in validation.geometry.polygons:
+        for segment_graphic, (segment, validation_status) in zip(
+            self.segment_graphics, segments
+        ):
+            segment_graphic.setData(
+                pos=np.array(
+                    [
+                        [segment.start.x_meters, segment.start.y_meters],
+                        [segment.end.x_meters, segment.end.y_meters],
+                    ]
+                ),
+                color=self.__get_validation_color(validation_status),
+            )
 
-                # Get a previously cached graphic or create a new one
-                if polygon_graphics_index >= len(self.polygon_graphics):
-                    polygon_graphic = GLLinePlotItem(width=3.0)
-                    self.polygon_graphics.append(polygon_graphic)
-                else:
-                    polygon_graphic = self.polygon_graphics[polygon_graphics_index]
-                polygon_graphics_index += 1
+        for circle_graphic, (circle, validation_status) in zip(
+            self.circle_graphics, circles
+        ):
+            circle_graphic.set_radius(circle.radius)
+            circle_graphic.set_position(
+                circle.origin.x_meters, circle.origin.y_meters
+            )
+            circle_graphic.set_color(self.__get_validation_color(validation_status))
 
-                # In order to close the polygon, we need to include the first point at the end of
-                # the list of points in the polygon
-                polygon_points = list(polygon.points) + polygon.points[:1]
+    def __get_validation_color(self, validation_status: ValidationStatus):
+        """Get the color representing the given validation status
+        
+        :param validation_status: the validation status
 
-                polygon_graphic.setData(
-                    pos=np.array(
-                        [
-                            [point.x_meters, point.y_meters, 0]
-                            for point in polygon_points
-                        ]
-                    ),
-                    color=validation_color,
-                )
-
-            for segment in validation.geometry.segments:
-
-                # Get a previously cached graphic or create a new one
-                if polygon_graphics_index >= len(self.polygon_graphics):
-                    polygon_graphic = GLLinePlotItem()
-                    self.polygon_graphics.append(polygon_graphic)
-                else:
-                    polygon_graphic = self.polygon_graphics[polygon_graphics_index]
-                polygon_graphics_index += 1
-
-                segment_graphic.setData(
-                    pos=np.array(
-                        [
-                            [segment.start.x_meters, segment.start.y_meters],
-                            [segment.end.x_meters, segment.end.y_meters],
-                        ]
-                    ),
-                    color=validation_color,
-                )
-
-            for circle in validation.geometry.circles:
-
-                # Get a previously cached graphic or create a new one
-                if circle_graphics_index >= len(self.circle_graphics):
-                    circle_graphic = GLCircle()
-                    self.circle_graphics.append(circle_graphic)
-                else:
-                    circle_graphic = self.circle_graphics[circle_graphics_index]
-                circle_graphics_index += 1
-
-                circle_graphic.set_radius(circle.radius)
-                circle_graphic.set_position(
-                    circle.origin.x_meters, circle.origin.y_meters
-                )
-                circle_graphic.set_color(validation_color)
-
-        # Remove graphics we don't need anymore
-        while polygon_graphics_index < len(self.polygon_graphics):
-            self.polygon_graphics.pop()
-        while circle_graphics_index < len(self.circle_graphics):
-            self.circle_graphics.pop()
+        """ 
+        return (
+            Colors.VALIDATION_PASSED_COLOR
+            if validation_status == ValidationStatus.PASSING
+            else Colors.VALIDATION_FAILED_COLOR
+        )

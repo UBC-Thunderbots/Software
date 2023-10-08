@@ -37,71 +37,59 @@ class GLObstacleLayer(GLLayer):
             block=False
         ).robot_primitives.values()
 
-        obstacles_ptrs = [
-            primitive.move.motion_control.static_obstacles
+        obstacles = [
+            obstacle
             for primitive in primitive_set
             if primitive.HasField("move")
+            for obstacle in primitive.move.motion_control.static_obstacles
+        ]
+        poly_obstacles = [
+            poly_obstacle
+            for obstacle in obstacles
+            for poly_obstacle in obstacle.polygon
+        ]
+        circle_obstacles = [
+            circle_obstacle
+            for obstacle in obstacles
+            for circle_obstacle in obstacle.circle
         ]
 
-        poly_obstacle_graphics_index = 0
-        circle_obstacle_graphics_index = 0
+        # Ensure we have the same number of graphics as obstacles
+        self._bring_list_to_length(
+            self.poly_obstacle_graphics,
+            len(poly_obstacles),
+            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR, width=3.0),
+        )
+        self._bring_list_to_length(
+            self.circle_obstacle_graphics,
+            len(circle_obstacles),
+            lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
+        )
 
-        for obstacles in obstacles_ptrs:
-            for obstacle in obstacles:
+        for poly_obstacle_graphic, poly_obstacle in zip(
+            self.poly_obstacle_graphics, poly_obstacles
+        ):
+            # In order to close the polygon, we need to include the first point at the end of
+            # the list of points in the polygon
+            polygon_points = (
+                list(poly_obstacle.points) + poly_obstacle.points[:1]
+            )
 
-                for poly_obstacle in obstacle.polygon:
+            poly_obstacle_graphic.setData(
+                pos=np.array(
+                    [
+                        [point.x_meters, point.y_meters, 0]
+                        for point in polygon_points
+                    ]
+                ),
+            )
 
-                    # Get a previously cached graphic or create a new one
-                    if poly_obstacle_graphics_index >= len(self.poly_obstacle_graphics):
-                        poly_obstacle_graphic = GLLinePlotItem(
-                            color=Colors.NAVIGATOR_OBSTACLE_COLOR, width=3.0,
-                        )
-                        self.poly_obstacle_graphics.append(poly_obstacle_graphic)
-                    else:
-                        poly_obstacle_graphic = self.poly_obstacle_graphics[
-                            poly_obstacle_graphics_index
-                        ]
-                    poly_obstacle_graphics_index += 1
-
-                    # In order to close the polygon, we need to include the first point at the end of
-                    # the list of points in the polygon
-                    polygon_points = (
-                        list(poly_obstacle.points) + poly_obstacle.points[:1]
-                    )
-
-                    poly_obstacle_graphic.setData(
-                        pos=np.array(
-                            [
-                                [point.x_meters, point.y_meters, 0]
-                                for point in polygon_points
-                            ]
-                        ),
-                    )
-
-                for circle_obstacle in obstacle.circle:
-
-                    # Get a previously cached graphic or create a new one
-                    if circle_obstacle_graphics_index >= len(
-                        self.circle_obstacle_graphics
-                    ):
-                        circle_obstacle_graphic = GLCircle(
-                            color=Colors.NAVIGATOR_OBSTACLE_COLOR
-                        )
-                        self.circle_obstacle_graphics.append(circle_obstacle_graphic)
-                    else:
-                        circle_obstacle_graphic = self.circle_obstacle_graphics[
-                            circle_obstacle_graphics_index
-                        ]
-                    circle_obstacle_graphics_index += 1
-
-                    circle_obstacle_graphic.set_radius(circle_obstacle.radius)
-                    circle_obstacle_graphic.set_position(
-                        circle_obstacle.origin.x_meters,
-                        circle_obstacle.origin.y_meters,
-                    )
-
-        # Remove graphics we don't need anymore
-        while poly_obstacle_graphics_index < len(self.poly_obstacle_graphics):
-            self.poly_obstacle_graphics.pop()
-        while circle_obstacle_graphics_index < len(self.circle_obstacle_graphics):
-            self.circle_obstacle_graphics.pop()
+        for circle_obstacle_graphic, circle_obstacle in zip(
+            self.circle_obstacle_graphics, circle_obstacles
+        ):
+            circle_obstacle_graphic.set_radius(circle_obstacle.radius)
+            circle_obstacle_graphic.set_position(
+                circle_obstacle.origin.x_meters,
+                circle_obstacle.origin.y_meters,
+            )
+            
