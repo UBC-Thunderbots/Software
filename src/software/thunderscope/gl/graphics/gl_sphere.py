@@ -25,7 +25,7 @@ class GLSphere(GLMeshItem):
         :param cols: The number of columns in the mesh
 
         """
-        GLMeshItem.__init__(self, parentItem=parentItem, color=color)
+        super().__init__(parentItem=parentItem, color=color)
 
         self.x = 0
         self.y = 0

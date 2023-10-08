@@ -129,20 +129,14 @@ class GLValidationLayer(GLLayer):
         ]
 
         # Ensure we have the same number of graphics as validations
-        self._bring_list_to_length(
-            self.polygon_graphics,
-            len(polygons),
-            lambda: GLLinePlotItem(width=3.0),
+        self.polygon_graphics.resize(
+            len(polygons), lambda: GLLinePlotItem(width=3.0),
         )
-        self._bring_list_to_length(
-            self.segment_graphics,
-            len(segments),
-            lambda: GLLinePlotItem(width=3.0),
+        self.segment_graphics.resize(
+            len(segments), lambda: GLLinePlotItem(width=3.0),
         )
-        self._bring_list_to_length(
-            self.circle_graphics,
-            len(circles),
-            lambda: GLCircle(),
+        self.circle_graphics.resize(
+            len(circles), lambda: GLCircle(),
         )
 
         for polygon_graphic, (polygon, validation_status) in zip(
@@ -154,10 +148,7 @@ class GLValidationLayer(GLLayer):
 
             polygon_graphic.setData(
                 pos=np.array(
-                    [
-                        [point.x_meters, point.y_meters, 0]
-                        for point in polygon_points
-                    ]
+                    [[point.x_meters, point.y_meters, 0] for point in polygon_points]
                 ),
                 color=self.__get_validation_color(validation_status),
             )
@@ -179,9 +170,7 @@ class GLValidationLayer(GLLayer):
             self.circle_graphics, circles
         ):
             circle_graphic.set_radius(circle.radius)
-            circle_graphic.set_position(
-                circle.origin.x_meters, circle.origin.y_meters
-            )
+            circle_graphic.set_position(circle.origin.x_meters, circle.origin.y_meters)
             circle_graphic.set_color(self.__get_validation_color(validation_status))
 
     def __get_validation_color(self, validation_status: ValidationStatus):
@@ -189,7 +178,7 @@ class GLValidationLayer(GLLayer):
         
         :param validation_status: the validation status
 
-        """ 
+        """
         return (
             Colors.VALIDATION_PASSED_COLOR
             if validation_status == ValidationStatus.PASSING

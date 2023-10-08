@@ -2,7 +2,6 @@ from pyqtgraph.Qt import QtGui
 import pyqtgraph as pg
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
-from typing import Callable, List
 
 from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
@@ -88,7 +87,7 @@ class GLLayer(GLGraphicsItem):
         if change.action == ChangeAction.ADD:
             for graphic in change.elements:
                 # Manually setting the parent of the GLGraphicsItem to this
-                # layer since GLGraphicsItem.setParentItem does not work 
+                # layer since GLGraphicsItem.setParentItem does not work
                 # correctly
                 self._GLGraphicsItem__children.add(graphic)
                 graphic._GLGraphicsItem__parent = self
@@ -97,28 +96,8 @@ class GLLayer(GLGraphicsItem):
         elif change.action == ChangeAction.REMOVE:
             for graphic in change.elements:
                 # Manually removing the GLGraphicsItem as a child of this
-                # layer since GLGraphicsItem.setParentItem does not work 
+                # layer since GLGraphicsItem.setParentItem does not work
                 # correctly
                 self._GLGraphicsItem__children.remove(graphic)
                 graphic._GLGraphicsItem__parent = None
                 self.view().removeItem(graphic)
-
-    def _bring_list_to_length(
-        self, list_: List, target_len: int, element_factory: Callable
-    ):
-        """Bring a list to a desired target length by either creating new elements
-        using the provided `element_factory` and adding them to the list, or by 
-        popping elements from the end of the list.
-
-        Subclasses of GLLayer using ObservableLists for storing GLGraphicsItems may
-        find this helper function useful.
-
-        :param list_: The list
-        :param target_len: The target length to bring the list to
-        :param element_factory: Callable that returns an element to add to the list
-
-        """
-        while len(list_) > target_len:
-            list_.pop()
-        while len(list_) < target_len:
-            list_.append(element_factory())

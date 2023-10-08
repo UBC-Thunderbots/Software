@@ -26,7 +26,7 @@ class GLWidget(QWidget):
         :param player: The replay player to optionally display media controls for
 
         """
-        QVBoxLayout.__init__(self)
+        super().__init__()
 
         self.gl_view_widget = ExtendedGLViewWidget()
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)

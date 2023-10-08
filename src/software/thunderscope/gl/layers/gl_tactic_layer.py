@@ -59,8 +59,7 @@ class GLTacticLayer(GLLayer):
         tactic_assignments = play_info_dict["robotTacticAssignment"]
 
         # Ensure we have the same number of graphics as robots
-        self._bring_list_to_length(
-            self.tactic_fsm_info_graphics,
+        self.tactic_fsm_info_graphics.resize(
             len(team.team_robots),
             lambda: GLTextItem(
                 font=QtGui.QFont("Roboto", 8), color=Colors.SECONDARY_TEXT_COLOR

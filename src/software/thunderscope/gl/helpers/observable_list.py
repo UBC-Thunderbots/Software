@@ -55,6 +55,7 @@ class ObservableList(list):
                          the initialized ObservableList
         
         """
+        super().__init__()
         self.observers = []
         self.extend(iterable)
         self.register_observer(observer)
@@ -68,6 +69,20 @@ class ObservableList(list):
         """
         if observer:
             self.observers.append(observer)
+
+    def resize(self, length: int, element_generator: Callable):
+        """Resize the list to a desired target length by either creating new elements
+        using the provided `element_generator` and adding them to the list, or by 
+        popping elements from the end of the list.
+
+        :param length: The target length to resize the list to
+        :param element_generator: Callable that returns an element to add to the list
+
+        """
+        if len(self) > length:
+            del self[length : len(self)]
+        elif len(self) < length:
+            self.extend([element_generator() for _ in range(length - len(self))])
 
     def append(self, element: T):
         """See list.append"""

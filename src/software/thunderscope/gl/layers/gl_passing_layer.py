@@ -67,8 +67,7 @@ class GLPassingLayer(GLLayer):
         passes_to_show = sorted_pass_with_rating[0 : GLPassingLayer.NUM_PASSES_TO_SHOW]
 
         # Ensure we have the same number of graphics as protos
-        self._bring_list_to_length(
-            self.pass_graphics,
+        self.pass_graphics.resize(
             len(passes_to_show),
             lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR, width=3.0),
         )

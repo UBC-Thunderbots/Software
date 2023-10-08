@@ -345,11 +345,8 @@ class GLWorldLayer(GLLayer):
 
         """
         # Ensure we have the same number of graphics as robots
-        self._bring_list_to_length(
-            robot_graphics, len(team.team_robots), lambda: GLRobot()
-        )
-        self._bring_list_to_length(
-            robot_id_graphics,
+        robot_graphics.resize(len(team.team_robots), lambda: GLRobot())
+        robot_id_graphics.resize(
             len(team.team_robots),
             lambda: GLTextItem(
                 font=QtGui.QFont("Roboto", 10, weight=700),
@@ -403,8 +400,7 @@ class GLWorldLayer(GLLayer):
                 break
 
         # Ensure we have the same number of graphics as robots
-        self._bring_list_to_length(
-            self.breakbeam_graphics,
+        self.breakbeam_graphics.resize(
             len(self.cached_world.friendly_team.team_robots),
             lambda: GLCircle(
                 parentItem=self,
@@ -468,10 +464,8 @@ class GLWorldLayer(GLLayer):
             objects.append(self.cached_world.ball)
 
         # Ensure we have the same number of graphics as robots/balls
-        self._bring_list_to_length(
-            self.speed_line_graphics,
-            len(objects),
-            lambda: GLLinePlotItem(color=Colors.SPEED_VECTOR_COLOR),
+        self.speed_line_graphics.resize(
+            len(objects), lambda: GLLinePlotItem(color=Colors.SPEED_VECTOR_COLOR),
         )
 
         for speed_line_graphic, object in zip(self.speed_line_graphics, objects):

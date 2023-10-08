@@ -24,8 +24,7 @@ class GLRobotOutline(GLLinePlotItem):
         :param line_width: The line width of the graphic
 
         """
-        GLLinePlotItem.__init__(
-            self,
+        super().__init__(
             parentItem=parentItem,
             pos=np.array(GLRobotOutline.get_robot_outline()),
             color=color,

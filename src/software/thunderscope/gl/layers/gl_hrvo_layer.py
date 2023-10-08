@@ -45,13 +45,11 @@ class GLHrvoLayer(GLLayer):
         self.prev_message = velocity_obstacle_msg
 
         # Ensure we have the same number of graphics as protos
-        self._bring_list_to_length(
-            self.velocity_obstacle_graphics,
+        self.velocity_obstacle_graphics.resize(
             len(velocity_obstacle_msg.velocity_obstacles),
             lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR, width=3.0),
         )
-        self._bring_list_to_length(
-            self.robot_circle_graphics,
+        self.robot_circle_graphics.resize(
             len(velocity_obstacle_msg.robots),
             lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR, num_points=10),
         )

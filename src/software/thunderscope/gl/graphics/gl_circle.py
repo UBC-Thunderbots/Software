@@ -26,9 +26,7 @@ class GLCircle(GLLinePlotItem):
         :param line_width: The line width of the graphic
 
         """
-        GLLinePlotItem.__init__(
-            self, parentItem=parentItem, color=color, width=line_width
-        )
+        super().__init__(parentItem=parentItem, color=color, width=line_width)
 
         self.x = 0
         self.y = 0

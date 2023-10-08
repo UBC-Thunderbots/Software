@@ -22,8 +22,8 @@ class GLRobot(GLMeshItem):
         :param color: The color of the graphic
 
         """
-        GLMeshItem.__init__(
-            self, parentItem=parentItem, meshdata=self.__get_mesh_data(), color=color,
+        super().__init__(
+            parentItem=parentItem, meshdata=self.__get_mesh_data(), color=color,
         )
 
         self.x = 0

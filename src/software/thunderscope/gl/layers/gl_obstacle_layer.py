@@ -55,13 +55,11 @@ class GLObstacleLayer(GLLayer):
         ]
 
         # Ensure we have the same number of graphics as obstacles
-        self._bring_list_to_length(
-            self.poly_obstacle_graphics,
+        self.poly_obstacle_graphics.resize(
             len(poly_obstacles),
             lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR, width=3.0),
         )
-        self._bring_list_to_length(
-            self.circle_obstacle_graphics,
+        self.circle_obstacle_graphics.resize(
             len(circle_obstacles),
             lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
@@ -71,16 +69,11 @@ class GLObstacleLayer(GLLayer):
         ):
             # In order to close the polygon, we need to include the first point at the end of
             # the list of points in the polygon
-            polygon_points = (
-                list(poly_obstacle.points) + poly_obstacle.points[:1]
-            )
+            polygon_points = list(poly_obstacle.points) + poly_obstacle.points[:1]
 
             poly_obstacle_graphic.setData(
                 pos=np.array(
-                    [
-                        [point.x_meters, point.y_meters, 0]
-                        for point in polygon_points
-                    ]
+                    [[point.x_meters, point.y_meters, 0] for point in polygon_points]
                 ),
             )
 
@@ -89,7 +82,5 @@ class GLObstacleLayer(GLLayer):
         ):
             circle_obstacle_graphic.set_radius(circle_obstacle.radius)
             circle_obstacle_graphic.set_position(
-                circle_obstacle.origin.x_meters,
-                circle_obstacle.origin.y_meters,
+                circle_obstacle.origin.x_meters, circle_obstacle.origin.y_meters,
             )
-            

@@ -21,7 +21,7 @@ class GLGoal(GLMeshItem):
         :param color: The color of the graphic
 
         """
-        GLMeshItem.__init__(self, parentItem=parentItem, color=color)
+        super().__init__(parentItem=parentItem, color=color)
 
         self.x = 0
         self.y = 0

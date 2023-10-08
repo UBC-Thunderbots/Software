@@ -54,11 +54,8 @@ class GLPathLayer(GLLayer):
         ]
 
         # Ensure we have the same number of graphics as protos
-        self._bring_list_to_length(
-            self.path_graphics, len(paths), lambda: GLLinePlotItem(width=3.0)
-        )
-        self._bring_list_to_length(
-            self.destination_graphics,
+        self.path_graphics.resize(len(paths), lambda: GLLinePlotItem(width=3.0))
+        self.destination_graphics.resize(
             len(requested_destinations),
             lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
         )
