@@ -23,12 +23,6 @@ from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-
-# from software.thunderscope.binary_context_managers import (
-#     FullSystem,
-#     Simulator,
-#     Gamecontroller,
-# )
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from proto.message_translation.tbots_protobuf import create_world_state
 
