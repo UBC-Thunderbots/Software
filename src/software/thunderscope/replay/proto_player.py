@@ -15,7 +15,6 @@ from google.protobuf.message import Message
 from typing import Callable
 
 
-
 class ProtoPlayer(object):
 
     """Plays back a proto log folder. All the playback is handled by a worker
@@ -44,7 +43,9 @@ class ProtoPlayer(object):
 
     """
 
-    def __init__(self: 'ProtoPlayer', log_folder_path: str, proto_unix_io: ProtoUnixIO) -> None:
+    def __init__(
+        self: "ProtoPlayer", log_folder_path: str, proto_unix_io: ProtoUnixIO
+    ) -> None:
         """Creates a proto player that plays back all protos
 
         :param log_folder_path: The path to the log file.
@@ -152,7 +153,9 @@ class ProtoPlayer(object):
 
         return float(timestamp), proto_class, proto
 
-    def save_clip(self: 'ProtoPlayer', filename: str, start_time: float, end_time: float) -> None:
+    def save_clip(
+        self: "ProtoPlayer", filename: str, start_time: float, end_time: float
+    ) -> None:
         """Saves clip
 
         :param filename: The file to save to
@@ -215,7 +218,7 @@ class ProtoPlayer(object):
                     )
                     self.current_entry_index = 0
 
-    def play(self: 'ProtoPlayer') -> None:
+    def play(self: "ProtoPlayer") -> None:
         """Plays back the log file."""
 
         # Protection from spamming the play button
@@ -226,14 +229,14 @@ class ProtoPlayer(object):
             self.start_playback_time = time.time()
             self.is_playing = True
 
-    def pause(self: 'ProtoPlayer') -> None:
+    def pause(self: "ProtoPlayer") -> None:
         """Pauses the player."""
 
         with self.replay_controls_mutex:
             self.is_playing = False
             self.seek_offset_time = self.current_packet_time
 
-    def toggle_play_pause(self: 'ProtoPlayer') -> None:
+    def toggle_play_pause(self: "ProtoPlayer") -> None:
         """Toggles the play/pause state."""
 
         with self.replay_controls_mutex:
@@ -242,7 +245,7 @@ class ProtoPlayer(object):
             else:
                 self.pause()
 
-    def set_playback_speed(self: 'ProtoPlayer', speed: float) -> None:
+    def set_playback_speed(self: "ProtoPlayer", speed: float) -> None:
         """Sets the playback speed.
 
         :param speed: The speed to set the playback to.
@@ -253,7 +256,7 @@ class ProtoPlayer(object):
             self.playback_speed = 1.0 / float(speed)
             self.play()
 
-    def single_step_forward(self: 'ProtoPlayer') -> None:
+    def single_step_forward(self: "ProtoPlayer") -> None:
         """Steps the player forward by one log entry
         """
         self.pause()
@@ -281,7 +284,7 @@ class ProtoPlayer(object):
             )
         )
 
-    def seek(self: 'ProtoPlayer', seek_time: float) -> None:
+    def seek(self: "ProtoPlayer", seek_time: float) -> None:
         """Seeks to a specific time. We binary search through the chunks
         to find the chunk that would contain the data at the given time.
 
@@ -375,7 +378,7 @@ class ProtoPlayer(object):
 
         return min(abs(low), abs(high))
 
-    def __play_protobufs(self: 'ProtoPlayer') -> None:
+    def __play_protobufs(self: "ProtoPlayer") -> None:
         """Plays all protos in the file in chronologoical order. 
 
         Playback controls:

@@ -38,7 +38,12 @@ class ProtoLogger(object):
 
     BLOCK_TIMEOUT = 0.1
 
-    def __init__(self: 'ProtoLogger', log_path: str, log_prefix: str = "proto_", time_provider: Callable[[], float] = None ) -> None:
+    def __init__(
+        self: "ProtoLogger",
+        log_path: str,
+        log_prefix: str = "proto_",
+        time_provider: Callable[[], float] = None,
+    ) -> None:
         """Creates a proto logger that logs all protos registered on the queue.
 
         Stores the files to
@@ -67,7 +72,7 @@ class ProtoLogger(object):
         self.start_time = self.time_provider()
         self.stop_logging = False
 
-    def __enter__(self: 'ProtoLogger') -> 'ProtoLogger':
+    def __enter__(self: "ProtoLogger") -> "ProtoLogger":
         """Starts the logger.
 
         We use gzip to save the data with compression enabled to
@@ -80,7 +85,7 @@ class ProtoLogger(object):
 
         return self
 
-    def __exit__(self: 'ProtoLogger', type, value, traceback) -> None:
+    def __exit__(self: "ProtoLogger", type, value, traceback) -> None:
         """Closes the log file.
 
         :param type: The type of the exception.
@@ -91,7 +96,7 @@ class ProtoLogger(object):
         self.stop_logging = True
         self.thread.join()
 
-    def __log_protobufs(self: 'ProtoLogger') -> None:
+    def __log_protobufs(self: "ProtoLogger") -> None:
         """Logs all protos in the queue. 
 
         Stores it in the format: where !#! is the delimiter.

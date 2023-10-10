@@ -31,6 +31,6 @@ py_library(
     ],
     deps = [
         requirement("pyqtgraph"),
-        ":proto_player"
+        ":proto_player",
     ],
 )
