@@ -8,7 +8,7 @@ import gzip
 from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.replay.replay_constants import *
-
+from typing import Callable
 
 
 class ProtoLogger(object):
@@ -38,7 +38,7 @@ class ProtoLogger(object):
 
     BLOCK_TIMEOUT = 0.1
 
-    def __init__(self: 'ProtoLogger', log_path: str, log_prefix: str = "proto_", time_provider: 'function' = None ) -> None:
+    def __init__(self: 'ProtoLogger', log_path: str, log_prefix: str = "proto_", time_provider: Callable[[], float] = None ) -> None:
         """Creates a proto logger that logs all protos registered on the queue.
 
         Stores the files to

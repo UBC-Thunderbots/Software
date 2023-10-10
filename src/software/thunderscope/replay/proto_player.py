@@ -12,6 +12,7 @@ from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from google.protobuf.message import Message
+from typing import Callable
 
 
 
@@ -342,7 +343,7 @@ class ProtoPlayer(object):
             )
 
     @staticmethod
-    def binary_search(arr: list, x: ..., key: 'function' = lambda x: x) -> int:
+    def binary_search(arr: list, x: ..., key: Callable = lambda x: x) -> int:
         """Binary search for an element in an array.
 
         Stolen from: https://www.geeksforgeeks.org/python-program-for-binary-search/
