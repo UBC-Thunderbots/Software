@@ -1,5 +1,5 @@
 from pyqtgraph.Qt.QtWidgets import *
-from pyqtgraph.Qt.QtCore import Qt, QPoint, QByteArray, QBuffer, QIODeviceBase
+from pyqtgraph.Qt.QtCore import Qt, QPoint, QByteArray, QBuffer, QIODeviceBase, QEvent
 from pyqtgraph.Qt import QtGui
 from software.thunderscope.robot_diagnostics.motor_fault_icons.motor_fault_icon_loader import (
     get_no_fault_icon,
@@ -8,7 +8,7 @@ from software.thunderscope.robot_diagnostics.motor_fault_icons.motor_fault_icon_
 )
 from software.thunderscope.common.proto_parameter_tree_util import get_string_val
 from software.thunderscope.common.common_widgets import display_tooltip
-
+from Typing import Any
 
 class MotorFaultView(QWidget):
     """
@@ -18,7 +18,7 @@ class MotorFaultView(QWidget):
     Displays specific faults for each motor in a tooltip
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initializes the motor fault view widget
 
@@ -60,7 +60,7 @@ class MotorFaultView(QWidget):
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
-    def event(self, event):
+    def event(self, event: QEvent) -> bool:
         """
         Overridden event function which intercepts all events
         On hover, displays a tooltip with all the current motor faults if any
@@ -74,7 +74,7 @@ class MotorFaultView(QWidget):
 
         return super().event(event)
 
-    def add_faults_to_tooltip(self, enum_descriptor):
+    def add_faults_to_tooltip(self, enum_descriptor: Any) -> None:
         """
         Adds detailed information about faults for each motor to the tooltip text
         Adds an icon for each motor to indicate if it has stopped, has a warning, or is fine
@@ -123,7 +123,7 @@ class MotorFaultView(QWidget):
             else:
                 self.motor_fault_tooltip += f"<ul><li>No Motor Faults :)</li></ul>"
 
-    def update_ui(self):
+    def update_ui(self) -> None:
         """
         Updates the main UI according to the current motor states
 
@@ -156,7 +156,7 @@ class MotorFaultView(QWidget):
 
                 self.fault_count_label.hide()
 
-    def refresh(self, motor_status, enum_descriptor):
+    def refresh(self, motor_status: MotorStatus, enum_descriptor: Any) -> None:
         """
         Converts the given message into a map of motor name to its fault info
         And calls functions to update the main UI and the tooltip

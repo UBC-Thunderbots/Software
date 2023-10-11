@@ -3,7 +3,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 import software.thunderscope.common.common_widgets as common_widgets
 from enum import IntEnum
-
+from typing import List
 
 class ControlMode(IntEnum):
     """
@@ -25,7 +25,7 @@ class FullSystemConnectWidget(QWidget):
     # Signal to indicate if manual controls should be disabled based on boolean parameter
     toggle_controls_signal = pyqtSignal(bool)
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control
         """
@@ -58,7 +58,7 @@ class FullSystemConnectWidget(QWidget):
 
         self.setLayout(vbox_layout)
 
-    def switch_control_mode(self, mode):
+    def switch_control_mode(self, mode: ControlMode) -> None:
         """
         Switches the control mode to the given mode
 
@@ -71,5 +71,5 @@ class FullSystemConnectWidget(QWidget):
 
         self.toggle_controls_signal.emit(self.control_mode == ControlMode.DIAGNOSTICS)
 
-    def refresh(self):
+    def refresh(self) -> None:
         pass
