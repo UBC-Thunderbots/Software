@@ -30,8 +30,8 @@ RobotConstants_t create2021RobotConstants(void)
         .robot_max_deceleration_m_per_s_2 = 2.5f,
 
         // Robot's angular movement constants
-        .robot_max_ang_speed_rad_per_s          = 2.0f,
-        .robot_max_ang_acceleration_rad_per_s_2 = 6.0f,
+        .robot_max_ang_speed_rad_per_s          = 4.0f,
+        .robot_max_ang_acceleration_rad_per_s_2 = 12.0f,
 
         .wheel_radius_meters                = 0.03f,
         .wheel_rotations_per_motor_rotation = 17.0f / 60.0f};

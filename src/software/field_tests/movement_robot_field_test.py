@@ -76,8 +76,8 @@ logger = createLogger(__name__)
 
 # this test can only be run on the field
 def test_basic_rotation(field_test_runner):
-    test_angles = [0, 45, 90, 180, 270, 0]
-    id = 5
+    test_angles = [0, 180, 0, 180, 0, 180, 0]
+    id = 3
 
     # current position
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)

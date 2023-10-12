@@ -339,6 +339,10 @@ class RobotInfo(QWidget):
 
         for code in error_codes:
             if code != ErrorCode.NO_ERROR:
+                print(f"Received error code {code}")
+                if code not in ERROR_CODE_MESSAGES:
+                    print(f"{motor_status=}\n {power_status=}\n {error_codes=}")
+
                 QMessageBox.warning(
                     self,
                     f"Warning: {ERROR_CODE_MESSAGES[code]}",
