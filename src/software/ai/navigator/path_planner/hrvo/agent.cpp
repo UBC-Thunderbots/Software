@@ -77,9 +77,11 @@ void Agent::updateRadiusFromVelocity()
     // is equal to min_radius, and at max_speed is equal to min_radius +
     // max_radius_inflation. A 4th degree polynomial was chosen because we want the radius
     // to increase quickly for smaller velocities.
-    double a = -max_radius_inflation / std::pow(max_speed, 4.0);
-    radius   = min_radius + max_radius_inflation +
-             a * std::pow(velocity.length() - max_speed, 4.0);
+    // Clamp velocity to avoid the possibility of negative radius
+    double clamped_velocity = std::min(velocity.length(), max_speed);
+    double a                = -max_radius_inflation / std::pow(max_speed, 4.0);
+    radius                  = min_radius + max_radius_inflation +
+             a * std::pow(clamped_velocity - max_speed, 4.0);
 }
 
 double Agent::getMaxAccel() const

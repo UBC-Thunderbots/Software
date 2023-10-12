@@ -15,7 +15,7 @@ void GetBehindBallFSM::updateMove(const Update& event)
 
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(point_behind_ball), event.control_params.chick_direction,
-        0.0, TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
+        0.0, false, TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
         event.common.robot.robotConstants()));
