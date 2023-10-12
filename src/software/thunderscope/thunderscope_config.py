@@ -33,12 +33,12 @@ class TScopeConfig:
         self,
         proto_unix_io_map: Dict[ProtoUnixIOTypes, ProtoUnixIO],
         tabs: Sequence[TScopeTab],
-    ):
+    ) -> None:
         self.proto_unix_io_map = proto_unix_io_map
         self.tabs = tabs
 
 
-def initialize_application():
+def initialize_application() -> None:
     """
     Initializes a QApplication
 
@@ -54,7 +54,7 @@ def initialize_application():
     apply_stylesheet(app, theme="dark_blue.xml")
 
 
-def configure_cost_vis(proto_unix_io):
+def configure_cost_vis(proto_unix_io: ) -> TScopeWidget:
     """
     Returns Widget Data for the Cost Visualization Widget
     :param proto_unix_io: the proto unix io key to configure the widget with

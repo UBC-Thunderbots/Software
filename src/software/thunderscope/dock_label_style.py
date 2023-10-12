@@ -1,7 +1,7 @@
 from pyqtgraph.dockarea.Dock import DockLabel
 
 
-def updateStylePatched(self):
+def updateStylePatched(self) -> None:
     """
     Overrides the style of the label.
     """

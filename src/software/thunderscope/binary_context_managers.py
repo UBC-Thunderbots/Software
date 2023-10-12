@@ -46,7 +46,7 @@ class FullSystem(object):
 
     def __init__(
         self,
-        full_system_runtime_dir: Optional[Union[str, os.PathLike]]=None,
+        full_system_runtime_dir: os.PathLike = None,
         debug_full_system: bool = False,
         friendly_colour_yellow: bool = False,
         should_restart_on_crash: bool = True,
@@ -208,7 +208,7 @@ class Simulator(object):
 
     def __init__(
         self, 
-        simulator_runtime_dir: Optional[Union[str, os.PathLike]] = None, 
+        simulator_runtime_dir: os.PathLike = None, 
         debug_simulator: bool = False, 
         enable_realism: bool = False
     ) -> None:

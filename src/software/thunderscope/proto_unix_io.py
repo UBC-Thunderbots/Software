@@ -50,7 +50,7 @@ class ProtoUnixIO:
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Mapping from ProtoType.DESCRIPTOR.full_name -> buffer
         self.proto_observers = {}
         self.all_proto_observers = []
@@ -59,7 +59,7 @@ class ProtoUnixIO:
         self.send_proto_to_observer_threads = {}
         self.running = True
 
-    def __send_proto_to_observers(self, receive_buffer: ThreadSafeBuffer):
+    def __send_proto_to_observers(self, receive_buffer: ThreadSafeBuffer) -> None:
         """Given a ThreadSafeBuffer (receive_buffer) consume it and
         send place it in the other buffers.
 
@@ -82,7 +82,7 @@ class ProtoUnixIO:
                 except queue.Full:
                     print("Buffer registered to receive everything dropped data")
 
-    def register_observer(self, proto_class, buffer):
+    def register_observer(self, proto_class: Any, buffer: ThreadSafeBuffer) -> None:
         """Register a widget to consume from a given protobuf class
 
         :param proto_class: Class of protobuf to consume
@@ -94,7 +94,7 @@ class ProtoUnixIO:
         else:
             self.proto_observers[proto_class.DESCRIPTOR.full_name] = [buffer]
 
-    def register_to_observe_everything(self, buffer):
+    def register_to_observe_everything(self, buffer: ThreadSafeBuffer) -> None:
         """Register a buffer to observe all incoming protobufs
 
         :param buffer: buffer to push protos onto
@@ -102,7 +102,7 @@ class ProtoUnixIO:
         """
         self.all_proto_observers.append(buffer)
 
-    def send_proto(self, proto_class, data, block=False, timeout=None):
+    def send_proto(self, proto_class: Any, data: enum, block=False: bool, timeout=None: int) -> None:
         """Send the data to all register_observers
 
         :param proto_class: The class to send
@@ -121,7 +121,7 @@ class ProtoUnixIO:
             except queue.Full:
                 print("Buffer registered to receive everything dropped data")
 
-    def attach_unix_sender(self, runtime_dir, unix_path, proto_class):
+    def attach_unix_sender(self, runtime_dir: os.PathLike, unix_path: os.PathLike, proto_class: Any) -> None:
         """Creates a unix sender and registers an observer
         of the proto_class to send the data over the unix_path socket.
         
@@ -137,8 +137,8 @@ class ProtoUnixIO:
         self.register_observer(proto_class, sender.proto_buffer)
 
     def attach_unix_receiver(
-        self, runtime_dir, unix_path="", proto_class=None, from_log_visualize=False
-    ):
+        self, runtime_dir: os.PathLike, unix_path="": os.PathLike, proto_class=None, from_log_visualize=False: bool
+    ) -> None:
         """Creates a unix listener of that protobuf type and provides
         incoming data to registered observers.
         
@@ -168,7 +168,7 @@ class ProtoUnixIO:
         )
         self.send_proto_to_observer_threads[key].start()
 
-    def force_close(self):
+    def force_close(self) -> None:
         """
         Closes all unix senders and receivers
         """
