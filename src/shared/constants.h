@@ -23,7 +23,7 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
 // PlotJuggler's default host and port
 // Should be updated to your local machine's IP address if
 // you want to plot from the robot
-static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "192.168.0.101";
+static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1"; //"192.168.0.101";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
 #endif  // PLATFORMIO_BUILD

@@ -110,6 +110,7 @@ cc_library(
     deps = [
         ":kinematic_constraints",
         ":trajectory_path",
+        "//proto/message_translation:tbots_protobuf",
         "//extlibs/AABB:aabb_tree",
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/path_planner:trajectory_path_with_cost",

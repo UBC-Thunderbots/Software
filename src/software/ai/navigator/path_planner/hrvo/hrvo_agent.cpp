@@ -388,23 +388,23 @@ void HRVOAgent::computeNewVelocity(
     //                                                                            <<
     //                                                                            std::endl;
 
-    auto path_point_opt =
-        path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
-    Point destination = path_point_opt.getPosition();
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"vx", velocity.x()},
-                                                 {"vy", velocity.y()},
-                                                 {"v", velocity.length()},
-                                                 {"d", (position - destination).length()},
-                                                 {"px", position.x()},
-                                                 {"py", position.y()},
-                                                 {"dx", (position - destination).x()},
-                                                 {"dy", (position - destination).y()},
-                                                 {"destx", (destination).x()},
-                                                 {"desty", (destination).y()},
-                                                 {"maxv", max_speed},
-                                                 {"maxa", max_accel},
-                                                 {"vt", angular_velocity.toRadians()},
-                                                 {"t", orientation.toRadians()}});
+//    auto path_point_opt =
+//        path.getCurrentPathPoint().value_or(PathPoint(Point(0, 0), 0, Angle::zero()));
+//    Point destination = path_point_opt.getPosition();
+//    LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"vx", velocity.x()},
+//                                                 {"vy", velocity.y()},
+//                                                 {"v", velocity.length()},
+//                                                 {"d", (position - destination).length()},
+//                                                 {"px", position.x()},
+//                                                 {"py", position.y()},
+//                                                 {"dx", (position - destination).x()},
+//                                                 {"dy", (position - destination).y()},
+//                                                 {"destx", (destination).x()},
+//                                                 {"desty", (destination).y()},
+//                                                 {"maxv", max_speed},
+//                                                 {"maxa", max_accel},
+//                                                 {"vt", angular_velocity.toRadians()},
+//                                                 {"t", orientation.toRadians()}});
     angular_velocity = angular_traj.getVelocity(
             time_since_traj_update.toSeconds() /*+
         Duration::fromMilliseconds(static_cast<double>(time_since_traj_start_us) *

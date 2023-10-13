@@ -619,7 +619,7 @@ std::map<RobotId, std::pair<Vector, AngularVelocity>>
 ErForceSimulator::getRobotIdToLocalVelocityMap(
     const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots, bool plot)
 {
-    std::map<std::string, double> plot_juggler_values;
+//    std::map<std::string, double> plot_juggler_values;
     std::map<RobotId, std::pair<Vector, AngularVelocity>> robot_to_local_velocity;
     for (const auto& sim_robot : sim_robots)
     {
@@ -629,14 +629,14 @@ ErForceSimulator::getRobotIdToLocalVelocityMap(
         const AngularVelocity angular_vel       = Angle::fromRadians(sim_robot.r_z());
         robot_to_local_velocity[sim_robot.id()] = {local_vel, angular_vel};
 
-        plot_juggler_values[std::to_string(sim_robot.id()) + "_sim_vx"] = sim_robot.v_x();
-        plot_juggler_values[std::to_string(sim_robot.id()) + "_sim_vy"] = sim_robot.v_y();
-        plot_juggler_values[std::to_string(sim_robot.id()) + "_sim_px"] = sim_robot.p_x();
-        plot_juggler_values[std::to_string(sim_robot.id()) + "_sim_py"] = sim_robot.p_y();
+//        plot_juggler_values[std::to_string(sim_robot.id()) + "_sim_vx"] = sim_robot.v_x();
+//        plot_juggler_values[std::to_string(sim_robot.id()) + "_sim_vy"] = sim_robot.v_y();
+//        plot_juggler_values[std::to_string(sim_robot.id()) + "_sim_px"] = sim_robot.p_x();
+//        plot_juggler_values[std::to_string(sim_robot.id()) + "_sim_py"] = sim_robot.p_y();
     }
     if (plot)
     {
-        LOG(PLOTJUGGLER) << *createPlotJugglerValue(plot_juggler_values);
+//        LOG(PLOTJUGGLER) << *createPlotJugglerValue(plot_juggler_values);
     }
     return robot_to_local_velocity;
 }

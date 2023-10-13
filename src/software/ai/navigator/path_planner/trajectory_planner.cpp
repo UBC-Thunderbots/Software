@@ -1,6 +1,7 @@
 #include "software/ai/navigator/path_planner/trajectory_planner.h"
 
 #include "external/tracy/public/tracy/Tracy.hpp"
+#include "proto/message_translation/tbots_protobuf.h"
 
 TrajectoryPlanner::TrajectoryPlanner()
 {
@@ -67,7 +68,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
             sub_destinations.emplace_back(sub_dest);
         }
     }
-
+    int num_traj = 1;
     {
         ZoneScopedN("generateTrajectories");
 
@@ -88,6 +89,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
                 traj_path_to_dest.append(constraints, connection_time, destination);
                 TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
                     traj_path_to_dest, tree, obstacles, sub_trajectory, connection_time);
+                num_traj++;
                 // TODO: If full_traj_with_cost doesn't have any collisions, should we
                 // continue to next iter?
                 //       i.e. is it possible that with a later connection_time we get an
@@ -99,6 +101,9 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
             }
         }
     }
+//    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+//          {"num_traj", num_traj}
+//    });
 
     // TODO: Added for debugging
     auto end_time = std::chrono::high_resolution_clock::now();
@@ -116,75 +121,6 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     }
 
     return best_traj_with_cost.traj_path;
-}
-
-double TrajectoryPlanner::calculateCost(const TrajectoryPath &trajectory_path,
-                                        aabb::Tree &obstacle_tree,
-                                        const std::vector<ObstaclePtr> &obstacles)
-{
-    double cost = trajectory_path.getTotalTime();
-
-    // TODO: Only get AABB up to MAX_FUTURE_COLLISION_CHECK into the future
-    std::set<unsigned int> possible_collisions_indices;
-    for (const BoundingBox &bounding_box : trajectory_path.getBoundingBoxes())
-    {
-        std::vector<unsigned int> bb_collisions =
-            obstacle_tree.query(aabb::AABB({bounding_box.xMin(), bounding_box.yMin()},
-                                           {bounding_box.xMax(), bounding_box.yMax()}));
-        possible_collisions_indices.insert(bb_collisions.begin(), bb_collisions.end());
-    }
-
-    if (possible_collisions_indices.empty())
-    {
-        return cost;
-    }
-
-    bool starts_in_collision       = false;
-    bool first_iteration           = true;
-    bool collision_found           = false;
-    double earliest_collision_time = trajectory_path.getTotalTime() + 10.0;
-
-    for (double time = 0.0; time < MAX_FUTURE_COLLISION_CHECK_SEC; time += 0.1)
-    {
-        Point position = trajectory_path.getPosition(time);
-        for (unsigned int obstacle_index : possible_collisions_indices)
-        {
-            // TODO: Consider updating the contains implementation (for polygon
-            // specifically if it's used)
-            //       to check AABB contains first...
-            // Do actual more expensive collision check
-            if (obstacles[obstacle_index]->contains(position))
-            {
-                collision_found = true;
-                if (time < earliest_collision_time)
-                {
-                    earliest_collision_time = time;
-                }
-
-                if (first_iteration)
-                {
-                    starts_in_collision = true;
-                }
-            }
-
-            first_iteration = false;
-            // TODO: Add cost depending on length of collision?!
-        }
-    }
-
-    if (collision_found)
-    {
-        cost += PATH_WITH_COLLISION_COST;
-        cost += (trajectory_path.getTotalTime() - earliest_collision_time);
-    }
-
-    if (starts_in_collision)
-    {
-        // TODO;
-        cost += 0.0;
-    }
-
-    return cost;
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
