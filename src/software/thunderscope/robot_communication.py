@@ -21,7 +21,7 @@ class RobotCommunication(object):
         interface: str,
         disable_estop: bool,
         estop_path: os.PathLike,
-        estop_buadrate=115200: int,
+        estop_buadrate: int = 115200,
     ) -> None:
         """Initialize the communication with the robots
 

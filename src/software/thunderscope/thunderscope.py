@@ -36,8 +36,8 @@ class Thunderscope(object):
     """
 
     def __init__(
-        self, config: TScopeConfig, layout_path=None, refresh_interval_ms=10,
-    ):
+        self, config: TScopeConfig, layout_path: os.PathLike = None, refresh_interval_ms: int = 10,
+    ) -> None:
         """Initialize Thunderscope
 
         :param config: The current Thunderscope UI configuration
@@ -138,7 +138,7 @@ class Thunderscope(object):
             )
         )
 
-    def reset_layout(self):
+    def reset_layout(self) -> None:
         """Reset the layout to the default layout"""
         saved_layout_path = pathlib.Path(LAST_OPENED_LAYOUT_PATH)
         saved_layout_path.unlink(missing_ok=True)
@@ -148,7 +148,7 @@ class Thunderscope(object):
             "Restart thunderscope to reset the layout.",
         )
 
-    def save_layout(self):
+    def save_layout(self) -> None:
         """Open a file dialog to save the layout and any other
         registered state to a file
 
@@ -180,7 +180,7 @@ class Thunderscope(object):
             for key, val in self.tab_dock_map.items():
                 shelf[key] = val.saveState()
 
-    def load_layout(self, filename=None):
+    def load_layout(self, filename: str = None) -> None:
         """Open a file dialog to load the layout and state to all widgets
 
         :param filename: The filename to load the layout from. If None, then
@@ -215,7 +215,7 @@ class Thunderscope(object):
                         default_shelf[key] = val
                     default_shelf.sync()
 
-    def register_refresh_function(self, refresh_func):
+    def register_refresh_function(self, refresh_func: Any) -> None:
         """Register the refresh functions to run at the refresh_interval_ms
         passed into thunderscope.
 
@@ -229,18 +229,18 @@ class Thunderscope(object):
 
         self.refresh_timers.append(refresh_timer)
 
-    def show(self):
+    def show(self) -> None:
         """Show the main window"""
 
         self.window.show()
         self.window.showMaximized()
         pyqtgraph.exec()
 
-    def is_open(self):
+    def is_open(self) -> bool:
         """Returns true if the window is open"""
         return self.window.isVisible()
 
-    def close(self):
+    def close(self) -> None:
         """Close the main window"""
 
         QtCore.QTimer.singleShot(0, self.window.close)

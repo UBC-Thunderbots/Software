@@ -19,7 +19,7 @@ class ThreadSafeBuffer(object):
 
     """
 
-    def __init__(self, buffer_size: int, protobuf_type: Any, log_overrun=False: bool) -> None:
+    def __init__(self, buffer_size: int, protobuf_type: Any, log_overrun: bool = False) -> None:
 
         """A buffer to hold data to be consumed.
 
@@ -36,7 +36,7 @@ class ThreadSafeBuffer(object):
         self.protos_dropped = 0
         self.last_logged_protos_dropped = 0
 
-    def get(self, block=False: bool, timeout=None: int, return_cached=True: bool) -> Any:
+    def get(self, block: bool = False, timeout: int = None, return_cached: bool = True) -> Any:
         """Get data from the buffer.
 
         If the buffer is empty:
@@ -89,7 +89,7 @@ class ThreadSafeBuffer(object):
 
         return self.cached_msg
 
-    def put(self, proto: Any, block=False: bool, timeout=None: int) -> None:
+    def put(self, proto: Any, block: bool = False, timeout: int = None) -> None:
         """Put data into the buffer. If the buffer is full, then
         the proto will be logged.
 
