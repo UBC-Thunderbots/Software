@@ -208,7 +208,9 @@ class RobotInfo(QWidget):
 
         return control_mode_menu
 
-    def create_vision_pattern(self, team_colour: QtGui.QColor, radius: int, connected: bool) -> QtGui.QPixmap:
+    def create_vision_pattern(
+        self, team_colour: QtGui.QColor, radius: int, connected: bool
+    ) -> QtGui.QPixmap:
         """Given a robot id, team color and radius, draw the vision
         pattern on a pixmap and return it.
 
@@ -262,7 +264,12 @@ class RobotInfo(QWidget):
 
         return pixmap
 
-    def update(self, motor_status: MotorStatus, power_status: PowerStatus, error_codes: List[ErrorCode]) -> None:
+    def update(
+        self,
+        motor_status: MotorStatus,
+        power_status: PowerStatus,
+        error_codes: List[ErrorCode],
+    ) -> None:
         """
         Receives parts of a RobotStatus message
 
@@ -302,7 +309,12 @@ class RobotInfo(QWidget):
 
         self.breakbeam_label.update_breakbeam_status(None)
 
-    def update_ui(self, motor_status: MotorStatus, power_status: PowerStatus, error_codes: List[ErrorCode]) -> None:
+    def update_ui(
+        self,
+        motor_status: MotorStatus,
+        power_status: PowerStatus,
+        error_codes: List[ErrorCode],
+    ) -> None:
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for

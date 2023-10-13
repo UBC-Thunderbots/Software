@@ -11,6 +11,7 @@ from software.thunderscope.common.common_widgets import display_tooltip
 from typing import Any
 from proto.import_all_protos import *
 
+
 class MotorFaultView(QWidget):
     """
     Class to visualise information about motor faults from robot status

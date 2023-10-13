@@ -12,6 +12,7 @@ from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from typing import Type
 
+
 class RobotCrashDialog(QDialog):
     """Dialog to show information about a robot before it crashed,
 
@@ -19,7 +20,9 @@ class RobotCrashDialog(QDialog):
 
     """
 
-    def __init__(self, message: str, robot_status: RobotStatusView, parent: QWidget=None) -> None:
+    def __init__(
+        self, message: str, robot_status: RobotStatusView, parent: QWidget = None
+    ) -> None:
         super().__init__(parent)
 
         self.setWindowTitle("Robot Crash")

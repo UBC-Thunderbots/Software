@@ -3,7 +3,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 import software.thunderscope.common.common_widgets as common_widgets
 from enum import IntEnum
-from typing import List
+
 
 class ControlMode(IntEnum):
     """
