@@ -1,13 +1,19 @@
+from pyqtgraph.Qt import QtGui
 import pyqtgraph as pg
-from pyqtgraph.opengl import *
-
-from software.thunderscope.gl.helpers.graphics_list import GraphicsList
-from software.thunderscope.gl.helpers.extended_gl_view_widget import PointInSceneEvent
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 
-class GLLayer(pg.GraphicsObject):
-    """Represents a layer in the 3D visualization. A layer manages and returns GLGraphicsItem 
-    graphics to be displayed in the 3D scene.
+from software.thunderscope.gl.helpers.observable_list import Change, ChangeAction
+from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
+
+
+class GLLayer(GLGraphicsItem):
+    """Represents a layer in the 3D visualization. 
+    
+    A layer is added to the 3D scenegraph and represents a collection of
+    GLGraphicsItems to be displayed together. GLGraphicsItems should be 
+    added as children of a GLLayer.
+    
     """
 
     def __init__(self, name: str):
@@ -16,60 +22,82 @@ class GLLayer(pg.GraphicsObject):
         :param name: The displayed name of the layer
 
         """
-        pg.GraphicsObject.__init__(self)
-
+        super().__init__()
         self.name = name
-        self.graphics_list = GraphicsList()
 
     def refresh_graphics(self):
-        """Updates the GLGraphicsItems in this layer
+        """Updates the GLGraphicsItems in this layer"""
 
-        :returns: tuple (added_graphics, removed_graphics)
-            - added_graphics - List of the added GLGraphicsItems
-            - removed_graphics - List of the removed GLGraphicsItems
-        
+    def keyPressEvent(self, event: QtGui.QKeyEvent):
+        """Detect when a key has been pressed
+
+        :param event: The event
+
         """
-        if self.isVisible():
-            self._update_graphics()
 
-        return self.graphics_list.get_changes()
+    def keyReleaseEvent(self, event: QtGui.QKeyEvent):
+        """Detect when a key has been released
 
-    def mouse_in_scene_pressed(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_pressed event
+        :param event: The event
+
+        """
+
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
+        """Detect that the mouse was pressed and picked a point in the 3D scene
         
         :param event: The event
         
         """
 
-    def mouse_in_scene_dragged(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_dragged event
+    def mouse_in_scene_dragged(self, event: MouseInSceneEvent):
+        """Detect that the mouse was dragged within the 3D scene
         
         :param event: The event
         
         """
 
-    def mouse_in_scene_released(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_released event
+    def mouse_in_scene_released(self, event: MouseInSceneEvent):
+        """Detect that the mouse was released after picking a point in the 3D scene
         
         :param event: The event
         
         """
 
-    def mouse_in_scene_moved(self, event: PointInSceneEvent):
-        """Event handler for the mouse_in_scene_moved event
+    def mouse_in_scene_moved(self, event: MouseInSceneEvent):
+        """Detect that the mouse was moved within the 3D scene
         
         :param event: The event
         
         """
 
-    def _update_graphics(self):
-        """Protected method that should overridden to fetch and update
-        graphics for the layer. 
-        
-        Subclasses of GLLayer should fetch graphics from self.graphics_list
-        and only update the returned graphics from GraphicsList collection.
-        
-        self.graphics_list.get_changes() should NOT be called in this function.
+    def _graphics_changed(self, change: Change):
+        """Called by an ObservableList of GLGraphicsItems to notify 
+        this observer that GLGraphicsItems were added or removed from
+        the ObservableList.
+
+        Subclasses of GLLayer should use ObservableLists to store collections of
+        GLGraphicsItems. Each ObservableList should register this function as an observer 
+        so that GLGraphicsItems are automatically added/removed as children of this layer
+        (and thus added/removed to the 3D scenegraph) when they are added/removed from 
+        the ObservableList.
+
+        :param change: Change representing the GLGraphicsItems added or removed
 
         """
-        raise NotImplementedError("Abstract class method called: _update_graphics")
+        if change.action == ChangeAction.ADD:
+            for graphic in change.elements:
+                # Manually setting the parent of the GLGraphicsItem to this
+                # layer since GLGraphicsItem.setParentItem does not work
+                # correctly
+                self._GLGraphicsItem__children.add(graphic)
+                graphic._GLGraphicsItem__parent = self
+                self.view().addItem(graphic)
+
+        elif change.action == ChangeAction.REMOVE:
+            for graphic in change.elements:
+                # Manually removing the GLGraphicsItem as a child of this
+                # layer since GLGraphicsItem.setParentItem does not work
+                # correctly
+                self._GLGraphicsItem__children.remove(graphic)
+                graphic._GLGraphicsItem__parent = None
+                self.view().removeItem(graphic)

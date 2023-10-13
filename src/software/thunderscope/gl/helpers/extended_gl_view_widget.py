@@ -10,8 +10,8 @@ import numpy as np
 from typing import List
 
 
-class PointInSceneEvent(object):
-    """Wraps QMouseEvent and includes additional data about the main point in the 3D scene
+class MouseInSceneEvent:
+    """Wraps QMouseEvent and includes additional data about the point in the 3D scene
     that was picked by the mouse cursor
     as well as points in other planes that correspond to the mouse cursor
     """
@@ -22,8 +22,8 @@ class PointInSceneEvent(object):
         point_in_scene: QtGui.QVector3D,
         multi_plane_points: List[QtGui.QVector3D],
     ):
-        """Initialize the PointInSceneEvent
-        
+        """Initialize the MouseInSceneEvent
+
         :param mouse_event: The QMouseEvent to wrap
         :param point_in_scene: The main point in the 3D scene that was picked
         :param multi_plane_points: Points on multiple planes that correspond to the mouse event
@@ -38,17 +38,17 @@ class ExtendedGLViewWidget(GLViewWidget):
     mouse cursor position in the 3D scene"""
 
     # Signal emitted when mouse has picked a point in the 3D scene (shift + click)
-    mouse_in_scene_pressed_signal = QtCore.pyqtSignal(PointInSceneEvent)
+    mouse_in_scene_pressed_signal = QtCore.pyqtSignal(MouseInSceneEvent)
 
     # Signal emitted when mouse is dragging within the 3D scene (shift + drag)
-    mouse_in_scene_dragged_signal = QtCore.pyqtSignal(PointInSceneEvent)
+    mouse_in_scene_dragged_signal = QtCore.pyqtSignal(MouseInSceneEvent)
 
-    # Signal emitted when mouse is released having picked a point in the 3D scene (shift + release)
-    mouse_in_scene_released_signal = QtCore.pyqtSignal(PointInSceneEvent)
+    # Signal emitted when mouse is released after picked a point in the 3D scene (shift + release)
+    mouse_in_scene_released_signal = QtCore.pyqtSignal(MouseInSceneEvent)
 
     # Signal emitted when mouse is moving within the 3D scene
-    # (mouse_moved_in_scene_signal must be enabled for this signal to be emitted)
-    mouse_in_scene_moved_signal = QtCore.pyqtSignal(PointInSceneEvent)
+    # (detect_mouse_movement_in_scene must be enabled for this signal to be emitted)
+    mouse_in_scene_moved_signal = QtCore.pyqtSignal(MouseInSceneEvent)
 
     def __init__(self):
         """Initialize the ExtendedGLViewWidget"""
@@ -73,7 +73,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         Forward this point using the mouse pressed signal
 
         If Shift is not pressed, let super method handle it
-        
+
         :param event: The event
         """
         if (
@@ -81,7 +81,7 @@ class ExtendedGLViewWidget(GLViewWidget):
             and event.modifiers() & QtCore.Qt.KeyboardModifier.ShiftModifier
         ):
             self.point_picked = True
-            point_in_scene_event = PointInSceneEvent(
+            point_in_scene_event = MouseInSceneEvent(
                 event,
                 self.get_point_in_scene(event.position()),
                 self.get_multi_plane_points_in_scene(event.position()),
@@ -99,7 +99,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         """
         if self.point_picked or self.detect_mouse_movement_in_scene:
 
-            point_in_scene_event = PointInSceneEvent(
+            point_in_scene_event = MouseInSceneEvent(
                 event,
                 self.get_point_in_scene(event.position()),
                 self.get_multi_plane_points_in_scene(event.position()),
@@ -124,7 +124,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         """
         if self.point_picked:
             self.point_picked = False
-            point_in_scene_event = PointInSceneEvent(
+            point_in_scene_event = MouseInSceneEvent(
                 event,
                 self.get_point_in_scene(event.position()),
                 self.get_multi_plane_points_in_scene(event.position()),

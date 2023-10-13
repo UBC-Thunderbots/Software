@@ -26,7 +26,7 @@ class GLWidget(QWidget):
         :param player: The replay player to optionally display media controls for
         :param sandbox_controller: The sandbox controls to optionally display
         """
-        QVBoxLayout.__init__(self)
+        super().__init__()
 
         self.gl_view_widget = ExtendedGLViewWidget()
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
@@ -68,7 +68,7 @@ class GLWidget(QWidget):
         self.layers_button = QPushButton()
         self.layers_button.setText("Layers")
         self.layers_button.setStyleSheet(tool_button_stylesheet)
-        self.layers_menu = QtGui.QMenu()
+        self.layers_menu = QMenu()
         self.layers_menu_actions = {}
         self.layers_button.setMenu(self.layers_menu)
 
@@ -76,7 +76,7 @@ class GLWidget(QWidget):
         self.camera_view_button = QPushButton()
         self.camera_view_button.setText("View")
         self.camera_view_button.setStyleSheet(tool_button_stylesheet)
-        self.camera_view_menu = QtGui.QMenu()
+        self.camera_view_menu = QMenu()
         self.camera_view_button.setMenu(self.camera_view_menu)
         self.camera_view_actions = [
             QtGui.QAction("[1] Orthographic Top Down"),
@@ -190,7 +190,7 @@ class GLWidget(QWidget):
         for layer in self.layers:
             layer.keyReleaseEvent(event)
 
-    def mouse_in_scene_pressed(self, event: PointInSceneEvent):
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
         """Propagate mouse_in_scene_pressed event to all layers
         
         :param event: The event
@@ -204,7 +204,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_pressed(event)
 
-    def mouse_in_scene_dragged(self, event: PointInSceneEvent):
+    def mouse_in_scene_dragged(self, event: MouseInSceneEvent):
         """Propagate mouse_in_scene_dragged event to all layers
         
         :param event: The event
@@ -218,7 +218,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_dragged(event)
 
-    def mouse_in_scene_released(self, event: PointInSceneEvent):
+    def mouse_in_scene_released(self, event: MouseInSceneEvent):
         """Propagate mouse_in_scene_released event to all layers
         
         :param event: The event
@@ -232,7 +232,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_released(event)
 
-    def mouse_in_scene_moved(self, event: PointInSceneEvent):
+    def mouse_in_scene_moved(self, event: MouseInSceneEvent):
         """Propagate mouse_in_scene_moved event to all layers
         
         :param event: The event
@@ -264,7 +264,7 @@ class GLWidget(QWidget):
         # when an action is pressed
         layer_checkbox = QCheckBox(layer.name, self.layers_menu)
         layer_checkbox.setStyleSheet("QCheckBox { padding: 0px 8px; }")
-        layer_checkbox.setChecked(layer.isVisible())
+        layer_checkbox.setChecked(layer.visible())
         layer_checkbox.stateChanged.connect(
             lambda: layer.setVisible(layer_checkbox.isChecked())
         )
@@ -275,31 +275,23 @@ class GLWidget(QWidget):
         self.layers_menu_actions[layer.name] = layer_action
         self.layers_menu.addAction(layer_action)
 
+        self.gl_view_widget.addItem(layer)
+
     def remove_layer(self, layer: GLLayer):
         """Remove a layer from this GLWidget
         
         :param layer: The GLLayer to remove
 
         """
-        # Remove all graphics provided by this layer from the scene
-        graphics = [
-            graphic
-            for graphics_list in layer.graphics_list.graphics.values()
-            for graphic in graphics_list
-        ]
-        for graphic in graphics:
-            self.gl_view_widget.removeItem(graphic)
-
-        # Remove the layer
         self.layers.remove(layer)
+        self.gl_view_widget.removeItem(layer)
 
         # Remove the layer from the Layer menu
         layer_action = self.layers_menu_actions[layer.name]
         self.layers_menu.removeAction(layer_action)
 
     def refresh(self):
-        """Trigger an update on all the layers, adding/removing GLGraphicsItem 
-        returned by the layers to/from the GLViewWidget scene
+        """Trigger an update on all the layers
         """
         if self.player:
             self.replay_controls.refresh()
@@ -313,13 +305,8 @@ class GLWidget(QWidget):
             return
 
         for layer in self.layers:
-            added_graphics, removed_graphics = layer.refresh_graphics()
-
-            for added_graphic in added_graphics:
-                self.gl_view_widget.addItem(added_graphic)
-
-            for removed_graphic in removed_graphics:
-                self.gl_view_widget.removeItem(removed_graphic)
+            if layer.visible():
+                layer.refresh_graphics()
 
     def set_camera_view(self, camera_view: CameraView):
         """Set the camera position to a preset camera view

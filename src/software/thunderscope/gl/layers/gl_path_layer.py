@@ -10,6 +10,8 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 
+from software.thunderscope.gl.helpers.observable_list import ObservableList
+
 
 class GLPathLayer(GLLayer):
     """GLLayer that visualizes paths from the navigator"""
@@ -22,18 +24,15 @@ class GLPathLayer(GLLayer):
                             Set lower for more realtime plots. Default is arbitrary
                             
         """
-        GLLayer.__init__(self, name)
+        super().__init__(name)
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
-        self.graphics_list.register_graphics_group("paths", GLLinePlotItem)
-        self.graphics_list.register_graphics_group(
-            "destinations",
-            lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
-        )
+        self.path_graphics = ObservableList(self._graphics_changed)
+        self.destination_graphics = ObservableList(self._graphics_changed)
 
-    def _update_graphics(self):
-        """Fetch and update graphics for the layer"""
+    def refresh_graphics(self):
+        """Update graphics in this layer"""
 
         primitive_set = self.primitive_set_buffer.get(
             block=False
@@ -54,9 +53,14 @@ class GLPathLayer(GLLayer):
             if primitive.HasField("move")
         ]
 
-        for path_graphic, path in zip(
-            self.graphics_list.get_graphics("paths", len(paths)), paths
-        ):
+        # Ensure we have the same number of graphics as protos
+        self.path_graphics.resize(len(paths), lambda: GLLinePlotItem(width=3.0))
+        self.destination_graphics.resize(
+            len(requested_destinations),
+            lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
+        )
+
+        for path_graphic, path in zip(self.path_graphics, paths):
             path_graphic.setData(
                 pos=np.array(
                     [[point.x_meters, point.y_meters, 0] for point in path.points]
@@ -65,10 +69,7 @@ class GLPathLayer(GLLayer):
             )
 
         for dest_graphic, (dest, final_angle) in zip(
-            self.graphics_list.get_graphics(
-                "destinations", len(requested_destinations)
-            ),
-            requested_destinations,
+            self.destination_graphics, requested_destinations
         ):
             dest_graphic.set_position(dest.x_meters, dest.y_meters)
             dest_graphic.set_orientation(math.degrees(final_angle.radians))

@@ -1,5 +1,6 @@
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
 
@@ -10,14 +11,24 @@ import numpy as np
 class GLRobotOutline(GLLinePlotItem):
     """Displays an outline of a robot parallel to the x-y plane"""
 
-    def __init__(self, color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5)):
+    def __init__(
+        self,
+        parentItem: GLGraphicsItem = None,
+        color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
+        line_width: float = 3.0,
+    ):
         """Initialize the GLRobotOutline
         
+        :param parentItem: The parent item of the graphic
         :param color: The color of the graphic
+        :param line_width: The line width of the graphic
 
         """
-        GLLinePlotItem.__init__(
-            self, pos=np.array(GLRobotOutline.get_robot_outline()), color=color
+        super().__init__(
+            parentItem=parentItem,
+            pos=np.array(GLRobotOutline.get_robot_outline()),
+            color=color,
+            width=line_width,
         )
 
         self.x = 0
@@ -82,3 +93,11 @@ class GLRobotOutline(GLLinePlotItem):
         # Rotate locally about the z axis (0, 0, 1)
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
+
+    def set_color(self, color: QtGui.QColor):
+        """Set the color of the graphic
+        
+        :param color: The color of the graphic
+        
+        """
+        self.setData(color=color)

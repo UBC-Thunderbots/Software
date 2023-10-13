@@ -11,6 +11,8 @@ from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 
+from software.thunderscope.gl.helpers.observable_list import ObservableList
+
 
 class GLPassingLayer(GLLayer):
     """GLLayer that visualizes passes"""
@@ -30,7 +32,7 @@ class GLPassingLayer(GLLayer):
                             Set lower for more realtime plots. Default is arbitrary
                             
         """
-        GLLayer.__init__(self, name)
+        super().__init__(name)
 
         self.pass_visualization_buffer = ThreadSafeBuffer(
             buffer_size, PassVisualization
@@ -38,12 +40,10 @@ class GLPassingLayer(GLLayer):
         self.cached_pass_vis = PassVisualization()
         self.timeout = time.time() + GLPassingLayer.PASS_VISUALIZATION_TIMEOUT_S
 
-        self.graphics_list.register_graphics_group(
-            "passes", lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR)
-        )
+        self.pass_graphics = ObservableList(self._graphics_changed)
 
-    def _update_graphics(self):
-        """Fetch and update graphics for the layer"""
+    def refresh_graphics(self):
+        """Update graphics in this layer"""
 
         try:
             pass_vis = self.pass_visualization_buffer.queue.get_nowait()
@@ -66,10 +66,13 @@ class GLPassingLayer(GLLayer):
         )
         passes_to_show = sorted_pass_with_rating[0 : GLPassingLayer.NUM_PASSES_TO_SHOW]
 
-        for pass_graphic, pass_with_rating in zip(
-            self.graphics_list.get_graphics("passes", len(passes_to_show)),
-            passes_to_show,
-        ):
+        # Ensure we have the same number of graphics as protos
+        self.pass_graphics.resize(
+            len(passes_to_show),
+            lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR, width=3.0),
+        )
+
+        for pass_graphic, pass_with_rating in zip(self.pass_graphics, passes_to_show,):
             pass_graphic.setData(
                 pos=np.array(
                     [
