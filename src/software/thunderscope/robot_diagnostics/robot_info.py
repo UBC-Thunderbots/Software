@@ -1,5 +1,6 @@
+from __future__ import annotations
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui, QEvent
+from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 from typing import List
@@ -46,7 +47,7 @@ class BreakbeamLabel(QLabel):
                 "border-color: green"
             )
 
-    def event(self, event: QEvent) -> bool:
+    def event(self, event: QtCore.QEvent) -> bool:
         """
         Overridden event function which intercepts all events
         On hover, displays a tooltip with the current breakbeam status
@@ -76,7 +77,7 @@ class RobotInfo(QWidget):
         self,
         robot_id: int,
         available_control_modes: List[IndividualRobotMode],
-        control_mode_signal: Type[pyqtSignal],
+        control_mode_signal: Type[QtCore.pyqtSignal],
     ) -> None:
         """
         Initialize a single robot's info widget

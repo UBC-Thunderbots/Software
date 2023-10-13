@@ -24,7 +24,7 @@ class RobotViewComponent(QWidget):
         self,
         robot_id: int,
         available_control_modes: List[IndividualRobotMode],
-        control_mode_signal: Type[pyqtSignal],
+        control_mode_signal: Type[QtCore.pyqtSignal],
     ):
         """
         Sets up a Robot Info Widget and a Robot Status Widget for each robot
