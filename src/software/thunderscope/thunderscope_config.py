@@ -112,6 +112,7 @@ def configure_robot_view_diagnostics(diagnostics_proto_unix_io):
         position="above",
     )
 
+
 def configure_base_fullsystem(
     full_system_proto_unix_io,
     sim_proto_unix_io,
@@ -140,7 +141,7 @@ def configure_base_fullsystem(
     return [
         TScopeWidget(
             name="Field",
-            widget=setup_field_widget(
+            widget=setup_gl_widget(
                 **{
                     "sandbox_mode": sandbox_mode,
                     "replay": replay,
@@ -153,50 +154,50 @@ def configure_base_fullsystem(
             ),
             stretch=WidgetStretchData(y=5) if sandbox_mode else None,
         ),
-       TScopeWidget(
-           name="Parameters",
-           widget=setup_parameter_widget(
-               **{
-                   "proto_unix_io": full_system_proto_unix_io,
-                   "friendly_colour_yellow": friendly_colour_yellow,
-               }
-           ),
-           anchor="Field",
-           position="left",
-           has_refresh_func=False,
-       ),
-       TScopeWidget(
-           name="Logs",
-           widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
-           anchor="Parameters",
-           position="above",
-       ),
-       TScopeWidget(
-           name="Referee Info",
-           widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
-           anchor="Field",
-           position="bottom",
-       ),
-       TScopeWidget(
-           name="Play Info",
-           widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
-           anchor="Referee Info",
-           position="above",
-       ),
-       TScopeWidget(
-           name="Performance",
-           widget=setup_performance_plot(
-               **{"proto_unix_io": full_system_proto_unix_io}
-           ),
-           # this is because this widget specifically has to be added like so:
-           # dock.addWidget(widget.win) instead of dock.addWidget(widget)
-           # otherwise, it opens in a new window
-           # the setup functions returns the widget.win and the refresh function separately
-           in_window=True,
-           anchor="Play Info",
-           position="right",
-       ),
-   ] + extra_widgets
+        TScopeWidget(
+            name="Parameters",
+            widget=setup_parameter_widget(
+                **{
+                    "proto_unix_io": full_system_proto_unix_io,
+                    "friendly_colour_yellow": friendly_colour_yellow,
+                }
+            ),
+            anchor="Field",
+            position="left",
+            has_refresh_func=False,
+        ),
+        TScopeWidget(
+            name="Logs",
+            widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
+            anchor="Parameters",
+            position="above",
+        ),
+        TScopeWidget(
+            name="Referee Info",
+            widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
+            anchor="Field",
+            position="bottom",
+        ),
+        TScopeWidget(
+            name="Play Info",
+            widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
+            anchor="Referee Info",
+            position="above",
+        ),
+        TScopeWidget(
+            name="Performance",
+            widget=setup_performance_plot(
+                **{"proto_unix_io": full_system_proto_unix_io}
+            ),
+            # this is because this widget specifically has to be added like so:
+            # dock.addWidget(widget.win) instead of dock.addWidget(widget)
+            # otherwise, it opens in a new window
+            # the setup functions returns the widget.win and the refresh function separately
+            in_window=True,
+            anchor="Play Info",
+            position="right",
+        ),
+    ] + extra_widgets
 
 
 def configure_base_diagnostics(diagnostics_proto_unix_io, extra_widgets=[]):
@@ -466,7 +467,7 @@ def configure_replay_view(
     """
     Constructs the Thunderscope Config for a replay view
     Can have 1 or 2 FullSystem tabs but no GameController tab
-    Field widget will now have Player controls
+    GLWidget will now have Player controls
 
     :param blue_replay_log: the file path for the blue replay log
     :param yellow_replay_log: the file path for the yellow replay log

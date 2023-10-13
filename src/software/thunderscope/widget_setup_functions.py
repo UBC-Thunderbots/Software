@@ -4,27 +4,27 @@ from software.py_constants import *
 from proto.import_all_protos import *
 from software.thunderscope.common.proto_plotter import ProtoPlotter
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
-from software.thunderscope.dock_label_style import *
+from software.thunderscope.dock_style import *
 
 
 # Import Widgets
-from software.thunderscope.field import (
-    obstacle_layer,
-    path_layer,
-    validation_layer,
-    simulator_layer,
-    world_layer,
-    sandbox_world_layer,
-    passing_layer,
-    hrvo_layer,
-    sandbox_controls
+from software.thunderscope.gl.gl_widget import GLWidget
+from software.thunderscope.gl.layers import (
+    gl_obstacle_layer,
+    gl_path_layer,
+    gl_validation_layer,
+    gl_passing_layer,
+    gl_world_layer,
+    gl_sandbox_world_layer,
+    gl_simulator_layer,
+    gl_hrvo_layer,
+    gl_tactic_layer,
 )
 
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
 )
 from software.thunderscope.cost_vis.cost_vis import CostVisualizationWidget
-from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
@@ -39,13 +39,14 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
+from software.thunderscope.sandbox.sandbox_controls import SandboxControls
 
 ################################
 #  FULLSYSTEM RELATED WIDGETS  #
 ################################
 
 
-def setup_field_widget(
+def setup_gl_widget(
     sim_proto_unix_io,
     full_system_proto_unix_io,
     friendly_colour_yellow,
@@ -54,85 +55,96 @@ def setup_field_widget(
     replay=False,
     replay_log=None,
 ):
-    """setup the field widget with the constituent layers
+    """Setup the GLWidget with its constituent layers
 
     :param sim_proto_unix_io: The proto unix io object for the simulator
     :param full_system_proto_unix_io: The proto unix io object for the full system
     :param friendly_colour_yellow: Whether the friendly colour is yellow
-    :param sandbox_mode: if the field widget should be in sandbox mode
-    :param replay: whether replay mode is currently enabled
-    :param replay_log: the file path of the replay log
     :param visualization_buffer_size: How many packets to buffer while rendering
-    :returns: the field widget
+    :param sandbox_mode: if the field widget should be in sandbox mode
+    :param replay: Whether replay mode is currently enabled
+    :param replay_log: The file path of the replay log
+    :returns: The GLWidget
 
     """
-    player = None
-    sandbox_controller = None
+    # Create ProtoPlayer if replay is enabled
+    player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
+    # Create Sandbox Controls if sandbox mode is enabled
+    sandbox_controller = SandboxControls() if sandbox_mode else None
 
-    if replay:
-        player = ProtoPlayer(replay_log, full_system_proto_unix_io,)
-    if sandbox_mode:
-        sandbox_controller = sandbox_controls.SandboxControls()
-    field = Field(player=player, sandbox_controller=sandbox_controller)
+    # Create widget
+    gl_widget = GLWidget(player=player, sandbox_controller=sandbox_controller)
 
     # Create layers
-    paths = path_layer.PathLayer(visualization_buffer_size)
-    obstacles = obstacle_layer.ObstacleLayer(visualization_buffer_size)
-    validation = validation_layer.ValidationLayer(visualization_buffer_size)
-    world = sandbox_world_layer.SandboxWorldLayer(
-        sim_proto_unix_io, friendly_colour_yellow
-    ) if sandbox_mode else world_layer.WorldLayer(
-        sim_proto_unix_io, friendly_colour_yellow
+    validation_layer = gl_validation_layer.GLValidationLayer(
+        "Validation", visualization_buffer_size
     )
-
-    if sandbox_controller:
-        sandbox_controller.toggle_play_state = world.toggle_sim_playing
-
-    sim_state = simulator_layer.SimulatorLayer(
-        friendly_colour_yellow, visualization_buffer_size
+    path_layer = gl_path_layer.GLPathLayer("Paths", visualization_buffer_size)
+    obstacle_layer = gl_obstacle_layer.GLObstacleLayer(
+        "Obstacles", visualization_buffer_size
     )
-    passing = passing_layer.PassingLayer(visualization_buffer_size)
+    passing_layer = gl_passing_layer.GLPassingLayer(
+        "Passing", visualization_buffer_size
+    )
+    world_layer = (
+        gl_sandbox_world_layer.GLSandboxWorldLayer(
+            "Vision",
+            sim_proto_unix_io,
+            friendly_colour_yellow,
+            visualization_buffer_size,
+        )
+        if sandbox_mode
+        else gl_world_layer.GLWorldLayer(
+            "Vision",
+            sim_proto_unix_io,
+            friendly_colour_yellow,
+            visualization_buffer_size,
+        )
+    )
+    simulator_layer = gl_simulator_layer.GLSimulatorLayer(
+        "Simulator", friendly_colour_yellow, visualization_buffer_size
+    )
+    tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
 
-    # Add field layers to field
-    field.add_layer("Vision", world)
-    field.add_layer("Obstacles", obstacles)
-    field.add_layer("Paths", paths)
-    field.add_layer("Validation", validation)
-    field.add_layer("Passing", passing)
-    field.add_layer("Simulator", sim_state)
-    hrvo_sim_states = []
-    # Add HRVO layers to field widget and have them hidden on startup
+    gl_widget.add_layer(validation_layer)
+    gl_widget.add_layer(path_layer)
+    gl_widget.add_layer(obstacle_layer)
+    gl_widget.add_layer(passing_layer)
+    gl_widget.add_layer(world_layer)
+    gl_widget.add_layer(simulator_layer, False)
+    gl_widget.add_layer(tactic_layer, False)
+
+    if sandbox_mode:
+        sandbox_controller.toggle_play_state = world_layer.toggle_play_state
+        sandbox_controller.undo_button.clicked.connect(world_layer.undo)
+        sandbox_controller.redo_button.clicked.connect(world_layer.redo)
+
+    # Add HRVO layers and have them hidden on startup
     # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
+    hrvo_layers = []
     for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
-        hrvo_sim_state = hrvo_layer.HRVOLayer(robot_id, visualization_buffer_size)
-        hrvo_sim_states.append(hrvo_sim_state)
-        field.add_layer(f"HRVO {robot_id}", hrvo_sim_state, False)
+        hrvo_layer = gl_hrvo_layer.GLHrvoLayer(
+            f"HRVO {robot_id}", robot_id, visualization_buffer_size
+        )
+        hrvo_layers.append(hrvo_layer)
+        gl_widget.add_layer(hrvo_layer, False)
 
     # Register observers
-    sim_proto_unix_io.register_observer(
-        SimulatorState, sim_state.simulator_state_buffer
-    )
-
     for arg in [
-        (World, world.world_buffer),
-        (RobotStatus, world.robot_status_buffer),
-        (Referee, world.referee_buffer),
-        (PrimitiveSet, obstacles.primitive_set_buffer),
-        (PrimitiveSet, paths.primitive_set_buffer),
-        (PassVisualization, passing.pass_visualization_buffer),
-        (ValidationProtoSet, validation.validation_set_buffer),
-        (SimulatorState, sim_state.simulator_state_buffer),
-    ] + [
-        (HRVOVisualization, hrvo_sim_state.hrvo_buffer)
-        for hrvo_sim_state in hrvo_sim_states
-    ]:
+        (World, world_layer.world_buffer),
+        (RobotStatus, world_layer.robot_status_buffer),
+        (Referee, world_layer.referee_buffer),
+        (PrimitiveSet, obstacle_layer.primitive_set_buffer),
+        (PrimitiveSet, path_layer.primitive_set_buffer),
+        (PassVisualization, passing_layer.pass_visualization_buffer),
+        (World, tactic_layer.world_buffer),
+        (PlayInfo, tactic_layer.play_info_buffer),
+        (ValidationProtoSet, validation_layer.validation_set_buffer),
+        (SimulatorState, simulator_layer.simulator_state_buffer),
+    ] + [(HRVOVisualization, hrvo_layer.hrvo_buffer) for hrvo_layer in hrvo_layers]:
         full_system_proto_unix_io.register_observer(*arg)
 
-    return field
-
-
-def setup_sandbox_controls(proto_unix_io):
-    return sandbox_controls.SandboxControls()
+    return gl_widget
 
 
 def setup_parameter_widget(proto_unix_io, friendly_colour_yellow):

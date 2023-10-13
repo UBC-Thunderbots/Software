@@ -4,12 +4,11 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtCore, QtGui
 from functools import partial
 
-from software.thunderscope.field.field_layer import FieldLayer
 from software.thunderscope.common import common_widgets
 from software.py_constants import *
 
 
-class ReplayControls(QGroupBox):
+class ReplayControls(QWidget):
     def __init__(self, player):
         """Setup the replay controls. 
 
@@ -21,9 +20,10 @@ class ReplayControls(QGroupBox):
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.setFocus()
 
-        self.controls_layout = QVBoxLayout()
         self.player = player
 
+        self.controls_layout = QVBoxLayout()
+        self.controls_layout.setContentsMargins(12, 12, 12, 12)
         self.buttons_layout = QHBoxLayout()
 
         for button in [
@@ -86,7 +86,7 @@ class ReplayControls(QGroupBox):
             self.replay_slider,
             self.replay_label,
         ) = common_widgets.create_slider(
-            "Replay",
+            text="",
             min_val=0,
             max_val=self.player.end_time * MILLISECONDS_PER_SECOND,
             tick_spacing=1,
@@ -134,7 +134,11 @@ class ReplayControls(QGroupBox):
             "%H:%M:%S",
             time.gmtime(self.replay_slider.value() / MILLISECONDS_PER_SECOND),
         )
-        self.replay_label.setText("Current time: {}".format(current_time))
+        total_time = time.strftime(
+            "%H:%M:%S",
+            time.gmtime(self.replay_slider.maximum() / MILLISECONDS_PER_SECOND),
+        )
+        self.replay_label.setText(f"{current_time} / {total_time}")
 
     def refresh(self):
         """Refresh the slider to match the current time.
