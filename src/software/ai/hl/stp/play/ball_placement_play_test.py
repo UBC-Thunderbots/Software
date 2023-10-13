@@ -16,11 +16,7 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 # test duration global constant
 TEST_DURATION = 20
 
-
-@pytest.mark.parametrize(
-    "run_enemy_ai", [False, True]
-)  # TODO (#2690): Robot gets stuck in corner of defense area
-def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
+def test_two_ai_ball_placement(simulated_test_runner):
 
     # placement point must be Vector2 to work with game controller
     ball_final_pos = tbots.Point(-3, -2)
@@ -62,6 +58,21 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
             final_ball_placement_point=ball_final_pos,
         )
 
+        # Force play override here
+        blue_play = Play()
+        blue_play.name = PlayName.BallPlacementPlay
+
+        simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
+
+        # We can parametrize running in ai_vs_ai mode
+        if run_enemy_ai:
+            yellow_play = Play()
+            yellow_play.name = PlayName.EnemyBallPlacementPlay
+
+            simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+                Play, yellow_play
+            )
+
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
@@ -73,22 +84,26 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
         ),
     )
 
-    # Placement Always Validation
-    placement_always_validation_sequence_set = [[]]
-
-    # Placement Eventually Validation
-    placement_eventually_validation_sequence_set = [
-        [
-            # Ball should arrive within 0.15 m of placement point
-            BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
-            RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
-        ]
-    ]
-
     simulated_test_runner.run_test(
-        eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
-        always_validation_sequence_set=placement_always_validation_sequence_set,
-        test_timeout_s=TEST_DURATION,
+        setup=setup,
+        params=[False, True],
+        inv_always_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=[
+            [
+                # Ball should arrive within 0.15 m of placement point
+                BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+                RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+            ]
+        ],
+        ag_always_validation_sequence_set=[[]],
+        ag_eventually_validation_sequence_set=[
+            [
+                # Ball should arrive within 0.15 m of placement point
+                BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+                RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+            ]
+        ],
+        test_timeout_s=[20],
     )
 
     # TODO (#2797): uncomment tests below to verify robots actually drop ball and exit region
@@ -126,8 +141,7 @@ def test_two_ai_ball_placement(simulated_test_runner, run_enemy_ai):
     # )
 
 
-@pytest.mark.parametrize("run_enemy_ai", [False, True])
-def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
+def test_force_start_ball_placement(simulated_test_runner):
 
     # starting point must be Point
     ball_initial_pos = tbots.Point(2, 2)
@@ -192,22 +206,26 @@ def test_force_start_ball_placement(simulated_test_runner, run_enemy_ai):
         ),
     )
 
-    # Placement Always Validation
-    placement_always_validation_sequence_set = [[]]
-
-    # Placement Eventually Validation
-    placement_eventually_validation_sequence_set = [
-        [
-            # Ball should arrive within 0.15m of placement point
-            BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
-            RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
-        ]
-    ]
-
     simulated_test_runner.run_test(
-        eventually_validation_sequence_set=placement_eventually_validation_sequence_set,
-        always_validation_sequence_set=placement_always_validation_sequence_set,
-        test_timeout_s=TEST_DURATION,
+        setup=setup,
+        params=[False, True],
+        inv_always_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=[
+            [
+                # Ball should arrive within 0.15 m of placement point
+                BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+                RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+            ]
+        ],
+        ag_always_validation_sequence_set=[[]],
+        ag_eventually_validation_sequence_set=[
+            [
+                # Ball should arrive within 0.15 m of placement point
+                BallEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+                RobotEventuallyEntersRegion(regions=[tbots.Circle(ball_final_pos, 0.15)]),
+            ]
+        ],
+        test_timeout_s=[20],
     )
 
     # TODO (#2797): uncomment tests below to verify robots actually drop ball and exit region
