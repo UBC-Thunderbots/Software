@@ -281,6 +281,13 @@ class RobotCommunication(object):
             True,
         )
 
+        self.receive_robot_crash = RobotCrashProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            ROBOT_CRASH_PORT,
+            lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),
+            True,
+        )
+
         # Create multicast senders
         self.send_primitive_set = PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
