@@ -1,5 +1,6 @@
 import queue
 from software.logger.logger import createLogger
+from typing import Any, Optional, Union
 
 
 class ThreadSafeBuffer(object):

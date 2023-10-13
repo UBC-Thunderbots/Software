@@ -1,9 +1,13 @@
 from threading import Thread
 import queue
 
+import os
+
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.networking.threaded_unix_sender import ThreadedUnixSender
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from typing import Any, Optional, Union
+from enum import Enum
 
 
 class ProtoUnixIO:
@@ -102,7 +106,7 @@ class ProtoUnixIO:
         """
         self.all_proto_observers.append(buffer)
 
-    def send_proto(self, proto_class: Any, data: enum, block: bool = False, timeout: int = None) -> None:
+    def send_proto(self, proto_class: Any, data: Enum, block: bool = False, timeout: int = None) -> None:
         """Send the data to all register_observers
 
         :param proto_class: The class to send

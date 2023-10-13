@@ -25,7 +25,7 @@ class TabNames(str, Enum):
     DIAGNOSTICS = "DIAGNOSTICS"
     GAMECONTROLLER = "GAMECONTROLLER"
 
-    def __str__(self): -> str:
+    def __str__(self) -> str:
         return str.__str__(self)
 
 

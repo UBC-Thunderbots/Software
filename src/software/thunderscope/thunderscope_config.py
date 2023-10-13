@@ -16,6 +16,7 @@ from software.thunderscope.thunderscope_types import (
 import pyqtgraph
 import signal
 import qdarktheme
+import os
 from qt_material import apply_stylesheet, list_themes
 
 

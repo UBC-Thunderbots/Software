@@ -6,8 +6,12 @@ from software.python_bindings import *
 from queue import Empty
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 import threading
 import time
+import os
+from typing import Any, Optional, Union
+from enum import Enum, IntEnum
 
 
 class RobotCommunication(object):
@@ -216,7 +220,7 @@ class RobotCommunication(object):
         elif mode == IndividualRobotMode.AI:
             self.robots_connected_to_fullsystem.add(robot_id)
 
-    def __forward_to_proto_unix_io(self, type: Any, data: enum) -> None:
+    def __forward_to_proto_unix_io(self, type: Any, data: Enum) -> None:
         """
         Forwards to proto unix IO iff running is true
         :param data: the data to be passed through
@@ -254,7 +258,7 @@ class RobotCommunication(object):
 
         self.run_world_thread.start()
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> 'self':
         """Enter RobotCommunication context manager. Setup multicast listener
         for RobotStatus and multicast senders for World and PrimitiveSet
 

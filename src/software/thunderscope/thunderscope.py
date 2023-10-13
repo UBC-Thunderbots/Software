@@ -3,6 +3,7 @@ import textwrap
 import shelve
 import logging
 import pathlib
+import os
 
 import pyqtgraph
 from pyqtgraph.Qt import QtCore, QtGui
@@ -11,6 +12,8 @@ from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 
 from software.thunderscope.thunderscope_config import TScopeConfig
+
+from typing import Any, Optional, Union
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
 LAYOUT_FILE_EXTENSION = "tscopelayout"
