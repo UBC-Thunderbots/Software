@@ -7,7 +7,7 @@ import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
-from typing import Any, Optional, Union
+from typing import Any
 from subprocess import Popen
 from software.python_bindings import *
 from proto.import_all_protos import *
@@ -65,7 +65,7 @@ class FullSystem(object):
 
         self.thread = threading.Thread(target=self.__restart__)
 
-    def __enter__(self) -> 'self':
+    def __enter__(self) -> "self":
         """Enter the full_system context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
@@ -207,10 +207,10 @@ class Simulator(object):
     """ Simulator Context Manager """
 
     def __init__(
-        self, 
-        simulator_runtime_dir: os.PathLike = None, 
-        debug_simulator: bool = False, 
-        enable_realism: bool = False
+        self,
+        simulator_runtime_dir: os.PathLike = None,
+        debug_simulator: bool = False,
+        enable_realism: bool = False,
     ) -> None:
         """Run Simulator
 
@@ -226,7 +226,7 @@ class Simulator(object):
         self.er_force_simulator_proc = None
         self.enable_realism = enable_realism
 
-    def __enter__(self) -> 'self':
+    def __enter__(self) -> "self":
         """Enter the simulator context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
@@ -390,7 +390,7 @@ class Gamecontroller(object):
         self.referee_port = self.next_free_port()
         self.ci_port = self.next_free_port()
 
-    def __enter__(self) -> 'self':
+    def __enter__(self) -> "self":
         """Enter the gamecontroller context manager. 
 
         :return: gamecontroller context managed instance
@@ -457,7 +457,9 @@ class Gamecontroller(object):
         raise IOError("no free ports")
 
     def setup_proto_unix_io(
-        self, blue_full_system_proto_unix_io: ProtoUnixIO, yellow_full_system_proto_unix_io: ProtoUnixIO
+        self,
+        blue_full_system_proto_unix_io: ProtoUnixIO,
+        yellow_full_system_proto_unix_io: ProtoUnixIO,
     ) -> None:
         """Setup gamecontroller io
 

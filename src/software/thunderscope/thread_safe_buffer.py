@@ -1,6 +1,6 @@
 import queue
 from software.logger.logger import createLogger
-from typing import Any, Optional, Union
+from typing import Any
 
 
 class ThreadSafeBuffer(object):
@@ -20,7 +20,9 @@ class ThreadSafeBuffer(object):
 
     """
 
-    def __init__(self, buffer_size: int, protobuf_type: Any, log_overrun: bool = False) -> None:
+    def __init__(
+        self, buffer_size: int, protobuf_type: Any, log_overrun: bool = False
+    ) -> None:
 
         """A buffer to hold data to be consumed.
 
@@ -37,7 +39,9 @@ class ThreadSafeBuffer(object):
         self.protos_dropped = 0
         self.last_logged_protos_dropped = 0
 
-    def get(self, block: bool = False, timeout: int = None, return_cached: bool = True) -> Any:
+    def get(
+        self, block: bool = False, timeout: int = None, return_cached: bool = True
+    ) -> Any:
         """Get data from the buffer.
 
         If the buffer is empty:

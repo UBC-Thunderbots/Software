@@ -10,7 +10,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 import threading
 import time
 import os
-from typing import Any, Optional, Union
+from typing import Any
 from enum import Enum, IntEnum
 
 
@@ -258,7 +258,7 @@ class RobotCommunication(object):
 
         self.run_world_thread.start()
 
-    def __enter__(self) -> 'self':
+    def __enter__(self) -> "self":
         """Enter RobotCommunication context manager. Setup multicast listener
         for RobotStatus and multicast senders for World and PrimitiveSet
 

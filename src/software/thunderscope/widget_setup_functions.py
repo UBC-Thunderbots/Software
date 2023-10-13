@@ -121,7 +121,9 @@ def setup_field_widget(
     return field
 
 
-def setup_parameter_widget(proto_unix_io: ProtoUnixIO, friendly_colour_yellow: bool) -> ProtoConfigurationWidget:
+def setup_parameter_widget(
+    proto_unix_io: ProtoUnixIO, friendly_colour_yellow: bool
+) -> ProtoConfigurationWidget:
     """Setup the parameter widget
 
     :param proto_unix_io: The proto unix io object
@@ -206,7 +208,9 @@ def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
     return referee_info
 
 
-def setup_cost_visualization_widget(proto_unix_io: ProtoUnixIO) -> CostVisualizationWidget:
+def setup_cost_visualization_widget(
+    proto_unix_io: ProtoUnixIO,
+) -> CostVisualizationWidget:
     """Setup the cost visualization widget
 
     :param proto_unix_io: The proto unix io object
@@ -225,7 +229,9 @@ def setup_cost_visualization_widget(proto_unix_io: ProtoUnixIO) -> CostVisualiza
 #################################
 
 
-def setup_robot_view(proto_unix_io: ProtoUnixIO, available_control_modes: List[IndividualRobotMode]) -> RobotView:
+def setup_robot_view(
+    proto_unix_io: ProtoUnixIO, available_control_modes: List[IndividualRobotMode]
+) -> RobotView:
     """Setup the robot view widget
     :param proto_unix_io: The proto unix io object for the full system
     :param available_control_modes: the currently available input modes for the robots
@@ -274,7 +280,9 @@ def setup_diagnostics_input_widget() -> FullSystemConnectWidget:
     return diagnostics_input_widget
 
 
-def setup_drive_and_dribbler_widget(proto_unix_io: ProtoUnixIO) -> DriveAndDribblerWidget:
+def setup_drive_and_dribbler_widget(
+    proto_unix_io: ProtoUnixIO,
+) -> DriveAndDribblerWidget:
     """Setup the drive and dribbler widget
 
     :param proto_unix_io: The proto unix io object

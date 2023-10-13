@@ -82,7 +82,9 @@ class TScopeQTTab(TScopeTab):
         str, Callable[[], None]
     ]  # Mapping of widget names to refresh functions
 
-    def __init__(self, name: str, key: TabNames, widgets: Sequence[TScopeWidget]) -> None:
+    def __init__(
+        self, name: str, key: TabNames, widgets: Sequence[TScopeWidget]
+    ) -> None:
         super().__init__(name, key)
         self.widgets = widgets
         self.refresh_functions = {}

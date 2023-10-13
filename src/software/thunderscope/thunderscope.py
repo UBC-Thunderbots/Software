@@ -13,7 +13,7 @@ from software.py_constants import *
 
 from software.thunderscope.thunderscope_config import TScopeConfig
 
-from typing import Any, Optional, Union
+from typing import Any
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
 LAYOUT_FILE_EXTENSION = "tscopelayout"
@@ -39,7 +39,10 @@ class Thunderscope(object):
     """
 
     def __init__(
-        self, config: TScopeConfig, layout_path: os.PathLike = None, refresh_interval_ms: int = 10,
+        self,
+        config: TScopeConfig,
+        layout_path: os.PathLike = None,
+        refresh_interval_ms: int = 10,
     ) -> None:
         """Initialize Thunderscope
 

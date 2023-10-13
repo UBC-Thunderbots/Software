@@ -69,7 +69,9 @@ def configure_cost_vis(proto_unix_io: ProtoUnixIO) -> TScopeWidget:
     )
 
 
-def configure_robot_view_fullsystem(fullsystem_proto_unix_io: ProtoUnixIO) -> TScopeWidget:
+def configure_robot_view_fullsystem(
+    fullsystem_proto_unix_io: ProtoUnixIO,
+) -> TScopeWidget:
     """
     Returns Widget Data for the Robot View Widget for FullSystem
     :param fullsystem_proto_unix_io: the proto unix io key to configure the widget with
@@ -92,7 +94,9 @@ def configure_robot_view_fullsystem(fullsystem_proto_unix_io: ProtoUnixIO) -> TS
     )
 
 
-def configure_robot_view_diagnostics(diagnostics_proto_unix_io: ProtoUnixIO) -> TScopeWidget:
+def configure_robot_view_diagnostics(
+    diagnostics_proto_unix_io: ProtoUnixIO,
+) -> TScopeWidget:
     """
     Returns Widget Data for the Robot View Widget for Diagnostics
     :return: the widget data
@@ -197,7 +201,9 @@ def configure_base_fullsystem(
     ] + extra_widgets
 
 
-def configure_base_diagnostics(diagnostics_proto_unix_io: ProtoUnixIO, extra_widgets: list = []) -> list:
+def configure_base_diagnostics(
+    diagnostics_proto_unix_io: ProtoUnixIO, extra_widgets: list = []
+) -> list:
     """
     Returns a list of widget data for a Diagnostics tab
     along with any extra widgets passed in
