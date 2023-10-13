@@ -50,6 +50,29 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [FreeKickPlayFSM](/src/software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> SetupPositionState
+SetupPositionState --> SetupPositionState : [!setupDone]\n<i>setupPosition</i>
+SetupPositionState --> ShootState : [shotFound]
+ShootState --> ShootState : [!shotDone]\n<i>shootBall</i>
+ShootState --> Terminate:::terminate : [shotDone]
+SetupPositionState --> AttemptPassState : <i>startLookingForPass</i>
+AttemptPassState --> ChipState : [timeExpired]
+AttemptPassState --> AttemptPassState : [!passFound]\n<i>lookForPass</i>
+AttemptPassState --> PassState : [passFound]
+PassState --> PassState : [!passDone]\n<i>passBall</i>
+PassState --> Terminate:::terminate : [passDone]
+ChipState --> ChipState : [!chipDone]\n<i>chipBall</i>
+ChipState --> Terminate:::terminate : [chipDone]
+
+```
+
 ## [OffensePlayFSM](/src/software/ai/hl/stp/play/offense/offense_play_fsm.h)
 
 ```mermaid
