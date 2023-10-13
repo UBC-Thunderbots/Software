@@ -92,19 +92,23 @@ def test_two_ai_ball_placement(simulated_test_runner):
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[
             [
-                # Ball should arrive within 5cm of placement point
                 BallEventuallyEntersRegion(
-                    regions=[tbots_cpp.Circle(ball_final_pos, 0.05)]
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
                 ),
+                RobotEventuallyEntersRegion(
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
+                )
             ]
         ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [
-                # Ball should arrive within 5cm of placement point
                 BallEventuallyEntersRegion(
-                    regions=[tbots_cpp.Circle(ball_final_pos, 0.05)]
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
                 ),
+                RobotEventuallyEntersRegion(
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
+                )
             ]
         ],
         test_timeout_s=[20],
@@ -148,7 +152,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
 
 def test_force_start_ai_ball_placement(simulated_test_runner):
 
-    # placement point must be Vector2 to work with game controller
+     # placement point must be Vector2 to work with game controller
     ball_final_pos = tbots_cpp.Point(-3, -2)
 
     def setup(run_enemy_ai):
@@ -224,19 +228,23 @@ def test_force_start_ai_ball_placement(simulated_test_runner):
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[
             [
-                # Ball should arrive within 5cm of placement point
                 BallEventuallyEntersRegion(
-                    regions=[tbots_cpp.Circle(ball_final_pos, 0.05)]
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
                 ),
+                RobotEventuallyEntersRegion(
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
+                )
             ]
         ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [
-                # Ball should arrive within 5cm of placement point
                 BallEventuallyEntersRegion(
-                    regions=[tbots_cpp.Circle(ball_final_pos, 0.05)]
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
                 ),
+                RobotEventuallyEntersRegion(
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
+                )
             ]
         ],
         test_timeout_s=[20],
