@@ -19,7 +19,7 @@ class RobotCrashDialog(QDialog):
 
     """
 
-    def __init__(self, message, robot_status, parent=None):
+    def __init__(self, message: str, robot_status: RobotStatusView, parent: QWidget=None) -> None:
         super().__init__(parent)
 
         self.setWindowTitle("Robot Crash")
