@@ -6,6 +6,7 @@
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/message_translation/tbots_geometry.h"
+#include "software/logger/network_logger.h"
 #include <chrono>
 #include <thread>
 
@@ -23,20 +24,16 @@ RobotConstants_t robot_constants_;
 int read_value;
 
 // SPI Chip Selects
-static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = motor_service_->FRONT_LEFT_MOTOR_CHIP_SELECT;
-static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = motor_service_->FRONT_RIGHT_MOTOR_CHIP_SELECT;
-static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = motor_service_->BACK_LEFT_MOTOR_CHIP_SELECT;
-static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = motor_service_->BACK_RIGHT_MOTOR_CHIP_SELECT;
 
-static const uint8_t CHIP_SELECT[] = {FRONT_LEFT_MOTOR_CHIP_SELECT, FRONT_RIGHT_MOTOR_CHIP_SELECT, BACK_LEFT_MOTOR_CHIP_SELECT, BACK_RIGHT_MOTOR_CHIP_SELECT};
+static const uint8_t CHIP_SELECT[] = {motor_service_->FRONT_LEFT_MOTOR_CHIP_SELECT, motor_service_->FRONT_RIGHT_MOTOR_CHIP_SELECT, motor_service_->BACK_LEFT_MOTOR_CHIP_SELECT, motor_service_->BACK_RIGHT_MOTOR_CHIP_SELECT};
 
 constexpr int ASCII_4671_IN_HEXADECIMAL = 0x34363731;
 constexpr double THRESHOLD = 0.0001;
-constexpr int DELAY = 10000;
+constexpr int DELAY_NS = 10000;
 std::string runtime_dir  = "/tmp/tbots/yellow_test";
 
 int main(int argc, char **argv) {
-    LoggerSingleton::initializeLogger(runtime_dir);
+    NetworkLoggerSingleton::initializeLogger(0, "interface", 0, true);
     LOG(INFO) << "Running on the Jetson Nano!";
 
     motor_service_ = std::make_unique<MotorService>(
@@ -65,7 +62,7 @@ int main(int argc, char **argv) {
     try {
         power_service_ = std::make_unique<PowerService>();
 
-        usleep(DELAY);
+        usleep(DELAY_NS);
 
         TbotsProto::PowerStatus power_status = power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0);
         power_status = power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0);

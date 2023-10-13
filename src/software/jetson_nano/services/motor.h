@@ -140,6 +140,13 @@ class MotorService
     struct MotorFaultIndicator checkDriverFault(uint8_t motor);
 
     /**
+    * Sets up motor as drive motor controllers
+    *
+    * @param motor drive motor number
+    */
+    void setUpDriveMotor(uint8_t motor);
+
+    /**
      * Used for testing purposes:
      *
      * Wrapper function that writes int to the TMC4671
@@ -168,35 +175,6 @@ class MotorService
      */
     void motorServiceInit(const RobotConstants_t& robot_constants,
                           int control_loop_frequency_hz);
-
-    /**
-     * Holds motor fault information for a particular motor and whether any fault has
-     * caused the motor to be disabled.
-     */
-    void setUpMotors();
-
-    /**
-     * Sets the target velocity for the motor
-     *
-     * @param chip_select motor chip select
-     * @param target int target wheel velocity
-     */
-    void setTargetVelocity(uint8_t chip_select, int target);
-
-    /**
-     * Sets up motor as drive motor controllers
-     *
-     * @param motor drive motor number
-     */
-    void setUpDriveMotor(uint8_t motor);
-
-    /**
-     * Reads the velocity from the TMC4671
-     *
-     * @param motor drive motor number
-     * @return double velocity value
-     */
-    double readVelocityFromTMC4671(uint8_t motor);
 
     /**
      * Calls the configuration functions below in the right sequence

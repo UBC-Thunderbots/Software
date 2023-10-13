@@ -595,11 +595,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     return motor_status;
 }
 
-void MotorService::setTargetVelocity(uint8_t chip_select, int target)
-{
-    tmc4671_setTargetVelocity(chip_select, target);
-}
-
 bool MotorService::requiresMotorReinit(uint8_t motor)
 {
     auto reset_search =
@@ -780,12 +775,6 @@ void MotorService::writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t val
 int MotorService::readIntFromTMC4671(uint8_t motor, uint8_t address)
 {
     return tmc4671_readInt(motor, address);
-}
-
-double MotorService::readVelocityFromTMC4671(uint8_t motor)
-{
-    return static_cast<double>(tmc4671_getActualVelocity(motor)) *
-           MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 }
 
 void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
