@@ -13,7 +13,6 @@
 class MotorService
 {
    public:
-
     // SPI Chip Selects
     static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
     static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
@@ -298,7 +297,8 @@ class MotorService
     // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
     // pairs of the drive motor.
     //
-    // TODO (#2720): compute from robot constants (this was computed by hand and is accurate)
+    // TODO (#2720): compute from robot constants (this was computed by hand and is
+    // accurate)
     static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
     static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS =
         1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
