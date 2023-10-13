@@ -109,40 +109,42 @@ def test_two_ai_ball_placement(simulated_test_runner):
         ],
         test_timeout_s=[20],
     )
-    
+
+
 # TODO (#2797): uncomment tests below to verify robots actually drop ball and exit region
-    # send a free kick command
-    # simulated_test_runner.gamecontroller.send_ci_input(
-    #     gc_command=Command.Type.DIRECT_FREE_BLUE, team=Team.BLUE
-    # )
+# send a free kick command
+# simulated_test_runner.gamecontroller.send_ci_input(
+#     gc_command=Command.Type.DIRECT_FREE_BLUE, team=Team.BLUE
+# )
 
-    # # Drop Ball Always Validation
-    # drop_ball_always_validation_sequence_set = [
-    #     [
-    #         BallAlwaysStaysInRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.15)]),
-    #     ]
-    # ]
+# # Drop Ball Always Validation
+# drop_ball_always_validation_sequence_set = [
+#     [
+#         BallAlwaysStaysInRegion(
+#             regions=[tbots.Circle(ball_final_pos, 0.15)]),
+#     ]
+# ]
 
-    # # Drop Ball Eventually Validation
-    # # Direct free kick after ball placement, the robot must be 0.05 away from the ball after the placement
-    # # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
-    # drop_ball_eventually_validation_sequence_set = [
-    #     [
-    #         # Ball should arrive within 0.15m of placement point
-    #         BallEventuallyStopsInRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.15)]),
-    #           #Robot should exit from ball at least 0.05m
-    #         RobotEventuallyExitsRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.2)]),
-    #     ]
-    # ]
+# # Drop Ball Eventually Validation
+# # Direct free kick after ball placement, the robot must be 0.05 away from the ball after the placement
+# # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
+# drop_ball_eventually_validation_sequence_set = [
+#     [
+#         # Ball should arrive within 0.15m of placement point
+#         BallEventuallyStopsInRegion(
+#             regions=[tbots.Circle(ball_final_pos, 0.15)]),
+#           #Robot should exit from ball at least 0.05m
+#         RobotEventuallyExitsRegion(
+#             regions=[tbots.Circle(ball_final_pos, 0.2)]),
+#     ]
+# ]
 
-    # simulated_test_runner.run_test(
-    #     eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
-    #     always_validation_sequence_set=drop_ball_always_validation_sequence_set,
-    #     test_timeout_s=TEST_DURATION,
-    # )
+# simulated_test_runner.run_test(
+#     eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
+#     always_validation_sequence_set=drop_ball_always_validation_sequence_set,
+#     test_timeout_s=TEST_DURATION,
+# )
+
 
 def test_force_start_ai_ball_placement(simulated_test_runner):
 
@@ -239,7 +241,6 @@ def test_force_start_ai_ball_placement(simulated_test_runner):
         ],
         test_timeout_s=[20],
     )
-
 
     # TODO (#2797): uncomment tests below to verify robots actually drop ball and exit region
     # send a non free kick command after the ball ball placement command
