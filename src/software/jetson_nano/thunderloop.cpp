@@ -1,6 +1,7 @@
 #include "software/jetson_nano/thunderloop.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/robot_crash_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
@@ -22,7 +23,11 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 // signal handling is done by csignal which requires a function pointer with C linkage
 extern "C"
 {
-    static MotorService* g_motor_service = NULL;
+    static MotorService* g_motor_service         = NULL;
+    static TbotsProto::RobotStatus* robot_status = NULL;
+    static int channel_id;
+    static std::string network_interface;
+    static int robot_id;
 
     /**
      * Handles process signals
@@ -40,11 +45,26 @@ extern "C"
         std::cerr << "Thunderloop shutting down and motor board reset\n!!!\n"
                   << std::endl;
 
+        TbotsProto::RobotCrash crash_msg;
+        auto dump = g3::internal::stackdump();
+        crash_msg.set_robot_id(robot_id);
+        crash_msg.set_stack_dump(dump);
+        crash_msg.set_exit_signal(g3::signalToStr(signal_num));
+        *(crash_msg.mutable_status()) = *robot_status;
+
+        auto sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotCrash>>(
+            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)) + "%" +
+                network_interface,
+            ROBOT_CRASH_PORT, true);
+        sender->sendProto(crash_msg);
+        std::cerr << "Broadcasting robot crash msg";
+
         exit(signal_num);
     }
 }
 
-Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop_hz)
+Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
+                         const int loop_hz)
     // TODO (#2495): Set the friendly team colour once we receive World proto
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
@@ -62,7 +82,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
                           TeamColour::YELLOW, robot_id_)
 {
     g3::overrideSetupSignals({});
-    NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_);
+    NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_,
+                                             enable_log_merging);
 
     // catch all catch-able signals
     std::signal(SIGSEGV, tbotsExit);
@@ -72,6 +93,12 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
     std::signal(SIGINT, tbotsExit);
     std::signal(SIGILL, tbotsExit);
 
+    // Initialize values for udp sender in signal handler
+    robot_status      = &robot_status_;
+    channel_id        = channel_id_;
+    network_interface = network_interface_;
+    robot_id          = robot_id_;
+
     LOG(INFO)
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
@@ -79,16 +106,16 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, const int loop
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
         VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
     LOG(INFO)
-        << "THUNDERLOOP: Network Service initialized! Next initializing Motor Service";
+        << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
+
+    power_service_ = std::make_unique<PowerService>();
+    LOG(INFO)
+        << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
     motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
-    LOG(INFO)
-        << "THUNDERLOOP: Motor Service initialized! Next initializing Power Service";
-
-    power_service_ = std::make_unique<PowerService>();
-    LOG(INFO) << "THUNDERLOOP: Power Service initialized!";
+    LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_

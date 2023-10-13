@@ -1,4 +1,4 @@
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import SPEED_SEGMENT_SCALE

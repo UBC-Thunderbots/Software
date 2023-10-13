@@ -2,7 +2,7 @@ import sys
 
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
@@ -15,19 +15,19 @@ from proto.ssl_gc_common_pb2 import Team
     [
         (
             [
-                tbots.Point(-3, 1.5),
-                tbots.Point(-3, 0.5),
-                tbots.Point(-3, -0.5),
-                tbots.Point(-3, -1.5),
-                tbots.Point(-3, 1),
-                tbots.Point(-3, 0.75),
+                tbots_cpp.Point(-3, 1.5),
+                tbots_cpp.Point(-3, 0.5),
+                tbots_cpp.Point(-3, -0.5),
+                tbots_cpp.Point(-3, -1.5),
+                tbots_cpp.Point(-3, 1),
+                tbots_cpp.Point(-3, 0.75),
             ],
             [
-                tbots.Point(1, -0.25),
-                tbots.Point(1, -1.25),
-                tbots.Point(2, -0.25),
-                tbots.Point(2, -1.25),
-                tbots.Point(2, -1),
+                tbots_cpp.Point(1, -0.25),
+                tbots_cpp.Point(1, -1.25),
+                tbots_cpp.Point(2, -0.25),
+                tbots_cpp.Point(2, -1.25),
+                tbots_cpp.Point(2, -1),
             ],
         )
     ],
@@ -35,9 +35,9 @@ from proto.ssl_gc_common_pb2 import Team
 def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
     def setup(*args):
         # Starting point must be Point
-        ball_initial_pos = tbots.Point(0.9, 2.85)
+        ball_initial_pos = tbots_cpp.Point(0.9, 2.85)
         # Placement point must be Vector2 to work with game controller
-        tbots.Point(-3, -2)
+        tbots_cpp.Point(-3, -2)
 
         # Game Controller Setup
         simulated_test_runner.gamecontroller.send_ci_input(
@@ -66,7 +66,7 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
                 ball_location=ball_initial_pos,
-                ball_velocity=tbots.Vector(0, 0),
+                ball_velocity=tbots_cpp.Vector(0, 0),
             ),
         )
 
@@ -78,7 +78,7 @@ def test_defense_play(simulated_test_runner, blue_bots, yellow_bots):
         ag_always_validation_sequence_set=[
             [
                 BallNeverEntersRegion(
-                    regions=[tbots.Field.createSSLDivisionBField().friendlyGoal()]
+                    regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
                 )
             ]
         ],
