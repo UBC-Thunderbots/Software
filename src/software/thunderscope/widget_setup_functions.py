@@ -238,6 +238,7 @@ def setup_robot_view(proto_unix_io, available_control_modes: List[IndividualRobo
     """
     robot_view = RobotView(available_control_modes)
     proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
+    proto_unix_io.register_observer(RobotCrash, robot_view.robot_crash_buffer)
     return robot_view
 
 
