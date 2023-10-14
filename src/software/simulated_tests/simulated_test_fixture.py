@@ -6,7 +6,7 @@ import sys
 import os
 
 import pytest
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
 from pyqtgraph.Qt import QtCore, QtGui
