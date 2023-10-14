@@ -11,6 +11,7 @@ from software.thunderscope.constants import *
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
+from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
 
@@ -20,7 +21,7 @@ class GLWidget(QWidget):
     and our AI. GLWidget can also provide replay controls.
     """
 
-    def __init__(self, player=None):
+    def __init__(self, player: ProtoPlayer = None):
         """Initialize the GLWidget
 
         :param player: The replay player to optionally display media controls for
