@@ -9,7 +9,8 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double dist
     }
 
     std::vector<Segment> polygonSegments = polygon.getSegments();
-    int startSegmentIdx = 0;
+    std::size_t startSegmentIdx = 0;
+
     int i = 0;
 
     // find initial segment which contains start point
@@ -25,7 +26,7 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double dist
         i++;
     }
 
-    int segmentIdx = startSegmentIdx;
+    std::size_t segmentIdx = startSegmentIdx;
 
     bool isClockwise = distance > 0;
 
