@@ -15,7 +15,6 @@ from google.protobuf.message import Message
 from typing import Callable
 
 
-
 class ProtoPlayer:
 
     """Plays back a proto log folder. All the playback is handled by a worker

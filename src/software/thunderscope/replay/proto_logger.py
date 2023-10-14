@@ -38,7 +38,12 @@ class ProtoLogger:
 
     BLOCK_TIMEOUT = 0.1
 
-    def __init__(self, log_path: str, log_prefix: str = "proto_", time_provider: Callable[[], float] = None ) -> None:
+    def __init__(
+        self,
+        log_path: str,
+        log_prefix: str = "proto_",
+        time_provider: Callable[[], float] = None,
+    ) -> None:
         """Creates a proto logger that logs all protos registered on the queue.
 
         Stores the files to
@@ -67,7 +72,7 @@ class ProtoLogger:
         self.start_time = self.time_provider()
         self.stop_logging = False
 
-    def __enter__(self) -> 'ProtoLogger':
+    def __enter__(self) -> "ProtoLogger":
         """Starts the logger.
 
         We use gzip to save the data with compression enabled to

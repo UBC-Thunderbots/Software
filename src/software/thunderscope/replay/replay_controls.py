@@ -10,7 +10,6 @@ from software.py_constants import *
 
 
 class ReplayControls(QGroupBox):
-
     def __init__(self, player: ProtoPlayer) -> None:
         """Setup the replay controls. 
 
