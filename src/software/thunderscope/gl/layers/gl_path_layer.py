@@ -57,7 +57,7 @@ class GLPathLayer(GLLayer):
         self.path_graphics.resize(len(paths), lambda: GLLinePlotItem(width=LINE_WIDTH))
         self.destination_graphics.resize(
             len(requested_destinations),
-            lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
+            lambda: GLRobotOutline(outline_color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
         )
 
         for path_graphic, path in zip(self.path_graphics, paths):

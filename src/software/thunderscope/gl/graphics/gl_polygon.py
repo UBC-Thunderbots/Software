@@ -3,14 +3,15 @@ from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.constants import Colors, LINE_WIDTH
-
 from typing import Optional, List, Tuple
 
-import numpy as np
 import software.thunderscope.gl.helpers.triangulate as triangulate
+from software.thunderscope.gl.graphics.gl_shape import GLShape
+
+import numpy as np
 
 
-class GLPolygon(GLLinePlotItem):
+class GLPolygon(GLShape):
     """Displays a polygon on the cartesian plane (i.e. x-y plane)"""
 
     def __init__(
@@ -21,25 +22,24 @@ class GLPolygon(GLLinePlotItem):
         fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
     ):
-        """Initialize the GLRect
+        """Initialize the GLPolygon
         
         :param parentItem: The parent item of the graphic
+        :param points: A list of 2-tuples representing the polygon points 
+                       on the cartesian plane
         :param outline_color: The color of the polygon's outline
         :param fill_color: The color used to fill the polygon, or None if no fill
         :param line_width: The line width of the polygon's outline
 
         """
-        super().__init__(parentItem=parentItem, width=line_width)
-
-        self.x = 0
-        self.y = 0
-
-        self.points = None
-        self.fill_graphic = None
+        super().__init__(
+            parentItem=parentItem, 
+            outline_color=outline_color,
+            fill_color=fill_color,
+            line_width=line_width, 
+        )
 
         self.set_points(points)
-        self.set_outline_color(outline_color)
-        self.set_fill_color(fill_color)
 
     def set_points(self, points: List[Tuple[float, float]]):
         """Update the point data representing the polygon to display.
@@ -52,7 +52,12 @@ class GLPolygon(GLLinePlotItem):
 
         """
         self.points = points
+        self._update_shape_data()
 
+    def _update_shape_data(self):
+        """Update the underlying GLLinePlotItem and GLMeshItem representing
+        the outline and fill of this shape
+        """
         vertices = [(point[0], point[1], 0) for point in self.points]
         self.setData(pos=vertices)
 
@@ -60,41 +65,4 @@ class GLPolygon(GLLinePlotItem):
             faces = triangulate.earclip(self.points)
             meshdata = MeshData(vertexes=vertices, faces=np.array(faces))
             self.fill_graphic.setMeshData(meshdata=meshdata)
-
-    def set_position(self, x: float, y: float):
-        """Set the position of the graphic in the scene
         
-        :param x: The x coordinate to position the graphic at
-        :param y: The y coordinate to position the graphic at
-        
-        """
-        if self.x == x and self.y == y:
-            return
-
-        self.translate(x - self.x, y - self.y, 0)
-        self.x = x
-        self.y = y
-
-    def set_outline_color(self, outline_color: QtGui.QColor):
-        """Set the color of the polygon's outline
-        
-        :param outline_color: The color of the polygon's outline 
-        
-        """
-        self.setData(color=outline_color)
-
-    def set_fill_color(self, fill_color: Optional[QtGui.QColor]):
-        """Set the color used to fill the polygon
-        
-        :param fill_color: The color used to fill the polygon, or None if no fill 
-        
-        """
-        if fill_color:
-            if not self.fill_graphic:
-                self.fill_graphic = GLMeshItem(parentItem=self)
-                self.set_points(self.points)
-            self.fill_graphic.setColor(fill_color)
-        else:
-            if self.fill_graphic:
-                self.fill_graphic.setParentItem(None)
-                self.fill_graphic = None

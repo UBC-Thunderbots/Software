@@ -5,19 +5,23 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
 from software.thunderscope.constants import Colors, LINE_WIDTH
 
+from software.thunderscope.gl.graphics.gl_shape import GLShape
+import software.thunderscope.gl.helpers.triangulate as triangulate
+
 from typing import Optional
 
 import math
 import numpy as np
 
 
-class GLRobotOutline(GLLinePlotItem):
-    """Displays an outline of a robot parallel to the x-y plane"""
+class GLRobotOutline(GLShape):
+    """Displays an outline of a robot on the cartesian plane (i.e. x-y plane)"""
 
     def __init__(
         self,
         parentItem: Optional[GLGraphicsItem] = None,
-        color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
+        outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
+        fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
     ):
         """Initialize the GLRobotOutline
@@ -28,15 +32,11 @@ class GLRobotOutline(GLLinePlotItem):
 
         """
         super().__init__(
-            parentItem=parentItem,
-            pos=np.array(GLRobotOutline.get_robot_outline()),
-            color=color,
-            width=line_width,
+            parentItem=parentItem, 
+            outline_color=outline_color,
+            fill_color=fill_color,
+            line_width=line_width, 
         )
-
-        self.x = 0
-        self.y = 0
-        self.orientation = 0
 
     @staticmethod
     def get_robot_outline(z_coordinate: float = 0, num_points: int = 10):
@@ -65,20 +65,6 @@ class GLRobotOutline(GLLinePlotItem):
 
         return points
 
-    def set_position(self, x: float, y: float):
-        """Set the position of the graphic in the scene
-        
-        :param x: The x coordinate to position the graphic at
-        :param y: The y coordinate to position the graphic at
-        
-        """
-        if self.x == x and self.y == y:
-            return
-
-        self.translate(x - self.x, y - self.y, 0)
-        self.x = x
-        self.y = y
-
     def set_orientation(self, degrees: float):
         """Set the orientation of the graphic in the scene
         
@@ -88,19 +74,16 @@ class GLRobotOutline(GLLinePlotItem):
         # We need to add 45 degrees to our desired orientation in order
         # to get the flat side of the robot (i.e. its front) to face
         # the right way
-        degrees += 45
+        super().set_orientation(degrees + 45)
 
-        if self.orientation == degrees:
-            return
-
-        # Rotate locally about the z axis (0, 0, 1)
-        self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
-        self.orientation = degrees
-
-    def set_color(self, color: QtGui.QColor):
-        """Set the color of the graphic
-        
-        :param color: The color of the graphic
-        
+    def _update_shape_data(self):
+        """Update the underlying GLLinePlotItem and GLMeshItem representing
+        the outline and fill of this shape
         """
-        self.setData(color=color)
+        self.points = GLRobotOutline.get_robot_outline()
+        self.setData(pos=self.points)
+
+        if self.fill_graphic:
+            faces = triangulate.earclip(self.points)
+            meshdata = MeshData(vertexes=vertices, faces=np.array(faces))
+            self.fill_graphic.setMeshData(meshdata=meshdata)

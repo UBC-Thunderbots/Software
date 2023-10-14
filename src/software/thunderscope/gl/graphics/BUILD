@@ -7,6 +7,7 @@ py_library(
     srcs = ["gl_circle.py"],
     deps = [
         requirement("pyqtgraph"),
+        ":gl_shape",
     ],
 )
 
@@ -15,6 +16,7 @@ py_library(
     srcs = ["gl_rect.py"],
     deps = [
         requirement("pyqtgraph"),
+        ":gl_shape",
     ],
 )
 
@@ -23,6 +25,8 @@ py_library(
     srcs = ["gl_robot_outline.py"],
     deps = [
         requirement("pyqtgraph"),
+        ":gl_shape",
+        "//software/thunderscope/gl/helpers:triangulate",
     ],
 )
 
@@ -56,6 +60,15 @@ py_library(
     srcs = ["gl_polygon.py"],
     deps = [
         requirement("pyqtgraph"),
+        ":gl_shape",
         "//software/thunderscope/gl/helpers:triangulate",
+    ],
+)
+
+py_library(
+    name = "gl_shape",
+    srcs = ["gl_shape.py"],
+    deps = [
+        requirement("pyqtgraph"),
     ],
 )
