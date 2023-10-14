@@ -218,6 +218,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.next_id = operation.next_id
         self.__update_world_state(operation.id, operation.pos)
 
+    # # # # # # # # # # # # # # # # # # # # # # # # #
+    #       ADD / REMOVE / MOVE ROBOT METHODS       #
+    # # # # # # # # # # # # # # # # # # # # # # # # #
+
     def __handle_existing_robot_event(
         self, event: MouseInSceneEvent, robot_id: int, index: int
     ):

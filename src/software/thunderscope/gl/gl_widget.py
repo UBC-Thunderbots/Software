@@ -64,70 +64,7 @@ class GLWidget(QWidget):
             """
         )
 
-        # Setup Layers button for toggling visibility of layers
-        self.layers_button = QPushButton()
-        self.layers_button.setText("Layers")
-        self.layers_button.setStyleSheet(tool_button_stylesheet)
-        self.layers_menu = QMenu()
-        self.layers_menu_actions = {}
-        self.layers_button.setMenu(self.layers_menu)
-
-        # Set up View button for setting the camera position to standard views
-        self.camera_view_button = QPushButton()
-        self.camera_view_button.setText("View")
-        self.camera_view_button.setStyleSheet(tool_button_stylesheet)
-        self.camera_view_menu = QMenu()
-        self.camera_view_button.setMenu(self.camera_view_menu)
-        self.camera_view_actions = [
-            QtGui.QAction("[1] Orthographic Top Down"),
-            QtGui.QAction("[2] Landscape High Angle"),
-            QtGui.QAction("[3] Left Half High Angle"),
-            QtGui.QAction("[4] Right Half High Angle"),
-        ]
-        self.camera_view_actions[0].triggered.connect(
-            lambda: self.set_camera_view(CameraView.ORTHOGRAPHIC)
-        )
-        self.camera_view_actions[1].triggered.connect(
-            lambda: self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
-        )
-        self.camera_view_actions[2].triggered.connect(
-            lambda: self.set_camera_view(CameraView.LEFT_HALF_HIGH_ANGLE)
-        )
-        self.camera_view_actions[3].triggered.connect(
-            lambda: self.set_camera_view(CameraView.RIGHT_HALF_HIGH_ANGLE)
-        )
-        for camera_view_action in self.camera_view_actions:
-            self.camera_view_menu.addAction(camera_view_action)
-
-        # Setup Measure button for enabling/disabling measure mode
-        self.measure_mode_enabled = False
-        self.measure_layer = None
-        self.measure_button = QPushButton()
-        self.measure_button.setText("Measure")
-        self.measure_button.setStyleSheet(tool_button_stylesheet)
-        self.measure_button.setShortcut("m")
-        self.measure_button.clicked.connect(lambda: self.toggle_measure_mode())
-
-        # Setup Help button
-        self.help_button = QPushButton()
-        self.help_button.setText("Help")
-        self.help_button.setStyleSheet(tool_button_stylesheet)
-        self.help_button.clicked.connect(
-            lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
-        )
-
-        # Setup toolbar
-        self.toolbar = QWidget()
-        self.toolbar.setSizePolicy(
-            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed
-        )
-        self.toolbar.setStyleSheet("background-color: black;" "padding: 0px;")
-        self.toolbar.setLayout(QHBoxLayout())
-        self.toolbar.layout().addWidget(self.layers_button)
-        self.toolbar.layout().addStretch()
-        self.toolbar.layout().addWidget(self.help_button)
-        self.toolbar.layout().addWidget(self.measure_button)
-        self.toolbar.layout().addWidget(self.camera_view_button)
+        self.toolbar = GLFieldToolbar()
 
         # Setup layout
         self.layout = QVBoxLayout()

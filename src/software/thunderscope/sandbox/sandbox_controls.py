@@ -26,7 +26,7 @@ class SandboxControls(QWidget):
         self.redo_button = self.controls[1]
 
         self.play_button = self.controls[2]
-        self.play_button.clicked.connect(self.toggle_play)
+        self.play_button.clicked.connect(self.__toggle_play)
 
         self.export_button = self.controls[3]
 
@@ -34,7 +34,7 @@ class SandboxControls(QWidget):
 
         self.setLayout(self.controls_layout)
 
-    def toggle_play(self):
+    def __toggle_play(self):
         """
         Calls the function to toggle the play state
         """
