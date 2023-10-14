@@ -4,15 +4,13 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 
-import textwrap
-import numpy as np
-
 from software.thunderscope.constants import *
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
+from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
 
 
 class GLWidget(QWidget):
@@ -46,25 +44,13 @@ class GLWidget(QWidget):
             self.mouse_in_scene_moved
         )
 
-        # Stylesheet for toolbar buttons
-        tool_button_stylesheet = textwrap.dedent(
-            """
-            QPushButton {
-                color: #969696;
-                background-color: transparent;
-                border-color: transparent;
-                border-width: 4px;
-                border-radius: 4px;
-                height: 16px;
-            }
-            QPushButton:hover {
-                background-color: #363636;
-                border-color: #363636;
-            }
-            """
-        )
-
+        # Setup toolbar
         self.toolbar = GLFieldToolbar()
+        self.toolbar.set_camera_view = self.set_camera_view
+        self.toolbar.measure_button.clicked.connect(lambda: self.toggle_measure_mode())
+        self.layers_menu = QMenu()
+        self.layers_menu_actions = {}
+        self.toolbar.layers_button.setMenu(self.layers_menu)
 
         # Setup layout
         self.layout = QVBoxLayout()
