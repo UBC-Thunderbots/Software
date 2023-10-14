@@ -35,7 +35,7 @@ class GLShape(GLLinePlotItem):
         self.x = 0
         self.y = 0
         self.orientation = 0
-        
+
         self.points = []
         self.fill_graphic = None
 
@@ -97,4 +97,6 @@ class GLShape(GLLinePlotItem):
         """Update the underlying GLLinePlotItem and GLMeshItem representing
         the outline and fill of this shape
         """
-        raise NotImplementedError("Derived class of GLShape must implement _update_shape_data")
+        raise NotImplementedError(
+            "Derived class of GLShape must implement _update_shape_data"
+        )

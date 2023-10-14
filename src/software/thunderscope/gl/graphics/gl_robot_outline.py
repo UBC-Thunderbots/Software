@@ -32,10 +32,10 @@ class GLRobotOutline(GLShape):
 
         """
         super().__init__(
-            parentItem=parentItem, 
+            parentItem=parentItem,
             outline_color=outline_color,
             fill_color=fill_color,
-            line_width=line_width, 
+            line_width=line_width,
         )
 
     @staticmethod
