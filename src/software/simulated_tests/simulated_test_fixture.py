@@ -161,7 +161,6 @@ class SimulatedTestRunner(TbotsTestRunner):
 
             tick = SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
             self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
-            time_elapsed_s += tick_duration_s
 
             if self.thunderscope:
                 time.sleep(tick_duration_s)
@@ -171,6 +170,13 @@ class SimulatedTestRunner(TbotsTestRunner):
                     world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
+                    # We need this blocking get call to synchronize the running speed of world and primitives
+                    # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
+                    primitive_set = self.primitive_set_buffer.get(
+                        block=False, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
+                    )
+                    if primitive_set:
+                        time_elapsed_s += tick_duration_s
                     break
                 except queue.Empty as empty:
                     # If we timeout, that means full_system missed the last
