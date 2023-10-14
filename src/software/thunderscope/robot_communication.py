@@ -10,7 +10,6 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 import threading
 import time
 import os
-from typing import Any
 from enum import Enum
 from google.protobuf.message import Message
 

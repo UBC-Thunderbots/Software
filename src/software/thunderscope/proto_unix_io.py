@@ -6,9 +6,8 @@ import os
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.networking.threaded_unix_sender import ThreadedUnixSender
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from typing import Any, Type
+from typing import Type
 from google.protobuf.message import Message
-from enum import Enum
 
 
 class ProtoUnixIO:
@@ -87,7 +86,9 @@ class ProtoUnixIO:
                 except queue.Full:
                     print("Buffer registered to receive everything dropped data")
 
-    def register_observer(self, proto_class: Type[Message], buffer: ThreadSafeBuffer) -> None:
+    def register_observer(
+        self, proto_class: Type[Message], buffer: ThreadSafeBuffer
+    ) -> None:
         """Register a widget to consume from a given protobuf class
 
         :param proto_class: Class of protobuf to consume
@@ -108,7 +109,11 @@ class ProtoUnixIO:
         self.all_proto_observers.append(buffer)
 
     def send_proto(
-        self, proto_class: Type[Message], data: Message, block: bool = False, timeout: int = None
+        self,
+        proto_class: Type[Message],
+        data: Message,
+        block: bool = False,
+        timeout: int = None,
     ) -> None:
         """Send the data to all register_observers
 
@@ -129,7 +134,10 @@ class ProtoUnixIO:
                 print("Buffer registered to receive everything dropped data")
 
     def attach_unix_sender(
-        self, runtime_dir: os.PathLike, unix_path: os.PathLike, proto_class: Type[Message]
+        self,
+        runtime_dir: os.PathLike,
+        unix_path: os.PathLike,
+        proto_class: Type[Message],
     ) -> None:
         """Creates a unix sender and registers an observer
         of the proto_class to send the data over the unix_path socket.
