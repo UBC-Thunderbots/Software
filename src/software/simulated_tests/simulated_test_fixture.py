@@ -171,7 +171,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
                     # AI is usually slower than getting worlds, so that's the limiting factor
-                    # We get a new primitive set and only update the time if one exists to make time dependant on AI
+                    # We get a new primitive set and only update the time if one exists to make time dependent on AI
                     # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
                     primitive_set = self.primitive_set_buffer.get(
                         block=False, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
