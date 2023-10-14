@@ -4,7 +4,7 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.constants import Colors, LINE_WIDTH
 
-from typing import Optional, List, Tuple
+from typing import Optional
 
 import numpy as np
 import software.thunderscope.gl.helpers.triangulate as triangulate
