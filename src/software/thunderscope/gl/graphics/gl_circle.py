@@ -4,7 +4,7 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.constants import Colors, LINE_WIDTH
 
-from typing import Optional, List
+from typing import Optional
 
 import math
 import numpy as np
