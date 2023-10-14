@@ -12,13 +12,14 @@ class SandboxControls(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.is_playing = False
+        self.is_playing = True
         # this will be set outside the class
         self.toggle_play_state = None
 
         self.controls_layout = QHBoxLayout()
+        self.controls_layout.setContentsMargins(0, 0, 0, 0)
         self.controls_box, self.controls = common_widgets.create_buttons(
-            ["↩", "↪", "⏸"]
+            ["↩", "↪", "⏸", "Export"]
         )
 
         self.undo_button = self.controls[0]
@@ -26,6 +27,8 @@ class SandboxControls(QWidget):
 
         self.play_button = self.controls[2]
         self.play_button.clicked.connect(self.toggle_play)
+
+        self.export_button = self.controls[3]
 
         self.controls_layout.addWidget(self.controls_box)
 

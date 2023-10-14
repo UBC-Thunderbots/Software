@@ -588,7 +588,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param robot_id_graphics: The ObservableList containing the robot ID graphics for this team
         """
 
-        # get the robot and robot id graphics for the filtered robots
+        # update the robot and robot id graphics for the filtered robots
         for robot_graphic, robot_id_graphic, robot_id in zip(
             robot_graphics, robot_id_graphics, robots,
         ):

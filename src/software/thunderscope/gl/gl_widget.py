@@ -152,6 +152,7 @@ class GLWidget(QWidget):
         # Setup sandbox mode controls if controls are provided
         self.sandbox_controller = sandbox_controller
         if self.sandbox_controller:
+            self.sandbox_controller.setMaximumSize(self.width() * 2.5, self.height() * 0.2)
             self.layout.addWidget(self.sandbox_controller)
 
         self.layers = []
