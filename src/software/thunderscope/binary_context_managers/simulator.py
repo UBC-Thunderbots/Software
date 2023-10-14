@@ -3,7 +3,6 @@ import socket
 import logging
 import psutil
 import time
-import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
@@ -17,6 +16,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
     SimRobot,
 )
 from software.thunderscope.binary_context_managers.util import *
+
 
 class Simulator(object):
 

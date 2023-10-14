@@ -1,13 +1,7 @@
-import os
-import socket
-import logging
 import psutil
-import time
-import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
-from subprocess import Popen
 from software.python_bindings import *
 from proto.import_all_protos import *
 from software.py_constants import *
@@ -36,7 +30,3 @@ def is_cmd_running(command):
             pass
 
     return False
-
-
-
-

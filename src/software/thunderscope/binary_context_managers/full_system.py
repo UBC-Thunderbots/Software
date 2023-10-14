@@ -1,5 +1,4 @@
 import os
-import socket
 import logging
 import psutil
 import time
@@ -17,6 +16,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
     SimRobot,
 )
 from software.thunderscope.binary_context_managers.util import *
+
 
 class FullSystem(object):
 
@@ -178,5 +178,3 @@ gdb --args bazel-bin/{full_system}
             (DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH, ThunderbotsConfig,),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)
-
-

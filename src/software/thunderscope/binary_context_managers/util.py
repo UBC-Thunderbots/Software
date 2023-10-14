@@ -38,8 +38,6 @@ def is_cmd_running(command):
     return False
 
 
-
-
 class Gamecontroller(object):
 
     """ Gamecontroller Context Manager """
@@ -222,6 +220,8 @@ class Gamecontroller(object):
         ci_output = CiOutput()
         ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
         return ci_output
+
+
 class FullSystem(object):
 
     """ Full System Binary Context Manager """
@@ -382,4 +382,3 @@ gdb --args bazel-bin/{full_system}
             (DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH, ThunderbotsConfig,),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)
-
