@@ -18,7 +18,7 @@ class RefereeInfoWidget(QWidget):
     HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
     ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
 
-    def __init__(self: 'RefereeInfoWidget', buffer_size: int = 5) -> None:
+    def __init__(self, buffer_size: int = 5) -> None:
         """Shows the referee information 
 
         :param minimum_column_width: minimum width of columns
@@ -40,7 +40,7 @@ class RefereeInfoWidget(QWidget):
         self.vertical_layout.addWidget(self.referee_info)
         self.setLayout(self.vertical_layout)
 
-    def refresh(self: 'RefereeInfoWidget') -> None:
+    def refresh(self) -> None:
         """Update the referee info widget with new referee information
         """
         referee = self.referee_buffer.get(block=False)

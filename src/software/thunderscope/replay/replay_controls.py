@@ -11,7 +11,7 @@ from software.py_constants import *
 
 class ReplayControls(QGroupBox):
 
-    def __init__(self: 'ReplayControls', player: ProtoPlayer) -> None:
+    def __init__(self, player: ProtoPlayer) -> None:
         """Setup the replay controls. 
 
         :param player: The player to control.
@@ -102,12 +102,12 @@ class ReplayControls(QGroupBox):
         self.controls_layout.addLayout(self.buttons_layout)
         self.setLayout(self.controls_layout)
 
-    def __on_play_pause_clicked(self: 'ReplayControls') -> None:
+    def __on_play_pause_clicked(self) -> None:
         """When the play/pause button is clicked, toggle play/pause and set the text
         """
         self.player.toggle_play_pause()
 
-    def __on_replay_slider_released(self: 'ReplayControls') -> None:
+    def __on_replay_slider_released(self) -> None:
         """When the slider is released, seek to the sliders location and
         start playing.
 
@@ -117,7 +117,7 @@ class ReplayControls(QGroupBox):
             self.player.play()
         self.slider_pressed = False
 
-    def __on_replay_slider_pressed(self: 'ReplayControls') -> None:
+    def __on_replay_slider_pressed(self) -> None:
         """When the slider is pressed, pause the player so the slider
         doesn't move away.
 
@@ -126,7 +126,7 @@ class ReplayControls(QGroupBox):
         self.player.pause()
         self.slider_pressed = True
 
-    def __on_replay_slider_value_changed(self: 'ReplayControls', event) -> None:
+    def __on_replay_slider_value_changed(self, value: int) -> None:
         """When the slider value is changed, update the label to show the
         current time.
 
@@ -137,7 +137,7 @@ class ReplayControls(QGroupBox):
         )
         self.replay_label.setText("Current time: {}".format(current_time))
 
-    def refresh(self: 'ReplayControls') -> None:
+    def refresh(self) -> None:
         """Refresh the slider to match the current time.
 
         """
@@ -153,14 +153,14 @@ class ReplayControls(QGroupBox):
             else "Start\nClip"
         )
 
-    def keyPressEvent(self: 'ReplayControls', event) -> None:
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """When a key is pressed, pause the player.
         
         """
         if event.key() == QtCore.Qt.Key.Key_P:
             self.__on_play_pause_clicked()
 
-    def seek_relative(self: 'ReplayControls', relative_time: float) -> None:
+    def seek_relative(self, relative_time: float) -> None:
         """Seeks time relative to current time
 
         :param relative_time The time relative to the current time to seek to
@@ -172,7 +172,7 @@ class ReplayControls(QGroupBox):
         if self.was_playing:
             self.player.play()
 
-    def seek_absolute(self: 'ReplayControls', absolute_time: float) -> None:
+    def seek_absolute(self, absolute_time: float) -> None:
         """Seeks to an absolute time
 
         :param absolute_time The absolute time to seek to
@@ -184,7 +184,7 @@ class ReplayControls(QGroupBox):
         if self.was_playing:
             self.player.play()
 
-    def __on_save_clip_clicked(self: 'ReplayControls') -> None:
+    def __on_save_clip_clicked(self) -> None:
         """When the button is clicked, save clip if current time is after the clip start time
         """
         if self.clipping and self.player.current_packet_time > self.clip_start:
