@@ -178,7 +178,7 @@ def rgb_to_bw(r, g, b):
 
 class Colors(object):
 
-    DEFAULT_GRAPHICS_COLOR = QtGui.QColor(255, 255, 255, 128) 
+    DEFAULT_GRAPHICS_COLOR = QtGui.QColor(255, 255, 255, 128)
     FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 200)
     FIELD_LINE_LIGHTER_COLOR = QtGui.QColor(255, 255, 255, 100)
     GOAL_COLOR = QtGui.QColor(200, 200, 200, 255)
@@ -195,8 +195,8 @@ class Colors(object):
     PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
     BREAKBEAM_TRIPPED_COLOR = QtGui.QColor(255, 0, 0, 255)
 
-    VALIDATION_PASSED_COLOR = QtGui.QColor(0, 255, 0, 255)
-    VALIDATION_FAILED_COLOR = QtGui.QColor(255, 0, 0, 255)
+    VALIDATION_PASSED_COLOR = QtGui.QColor(0, 200, 0, 255)
+    VALIDATION_FAILED_COLOR = QtGui.QColor(200, 0, 0, 255)
 
     PRIMARY_TEXT_COLOR = QtGui.QColor(255, 255, 255, 255)
     SECONDARY_TEXT_COLOR = QtGui.QColor(255, 255, 255, 160)
@@ -218,6 +218,7 @@ class Colors(object):
     # Creates a black and white vision pattern to indicate a disconnected robot
     BW_VISION_PATTERN_LOOKUP = create_vision_pattern_lookup(BW_PINK, BW_GREEN)
 
+
 class DepthValues:
     """Constants for depth values controlling the order in which 
     graphics are drawn in the 3D visualizer.
@@ -225,7 +226,7 @@ class DepthValues:
     Graphics with greater depth values are drawn later.
     Graphics with negative depth values are drawn before their parent.
     """
-    
+
     BACKGROUND_DEPTH = -1
     FOREGROUND_DEPTH = 0
 

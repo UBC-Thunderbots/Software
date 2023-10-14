@@ -5,6 +5,8 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.constants import Colors, LINE_WIDTH
 
+from typing import Optional
+
 import numpy as np
 
 
@@ -13,7 +15,7 @@ class GLGoal(GLMeshItem):
 
     def __init__(
         self,
-        parentItem: GLGraphicsItem = None,
+        parentItem: Optional[GLGraphicsItem] = None,
         color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
     ):
         """Initialize the GLGoal

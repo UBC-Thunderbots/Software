@@ -50,3 +50,12 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_polygon",
+    srcs = ["gl_polygon.py"],
+    deps = [
+        requirement("pyqtgraph"),
+        "//software/thunderscope/gl/helpers:triangulate",
+    ],
+)

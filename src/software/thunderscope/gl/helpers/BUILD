@@ -15,3 +15,9 @@ py_library(
     srcs = ["observable_list.py"],
     deps = [],
 )
+
+py_library(
+    name = "triangulate",
+    srcs = ["triangulate.py"],
+    deps = [],
+)

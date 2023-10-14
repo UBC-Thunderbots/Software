@@ -7,7 +7,12 @@ import numpy as np
 
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.constants import Colors, DepthValues, LINE_WIDTH, SPEED_SEGMENT_SCALE
+from software.thunderscope.constants import (
+    Colors,
+    DepthValues,
+    LINE_WIDTH,
+    SPEED_SEGMENT_SCALE,
+)
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
@@ -73,16 +78,16 @@ class GLWorldLayer(GLLayer):
         self.point_in_scene_picked = None
 
         self.friendly_defense_area_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_COLOR
+            parentItem=self, outline_color=Colors.FIELD_LINE_COLOR
         )
         self.enemy_defense_area_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_COLOR
+            parentItem=self, outline_color=Colors.FIELD_LINE_COLOR
         )
         self.field_lines_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_COLOR
+            parentItem=self, outline_color=Colors.FIELD_LINE_COLOR
         )
         self.field_outer_boundary_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR
+            parentItem=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR
         )
         self.halfway_line_graphic = GLLinePlotItem(
             parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=LINE_WIDTH
@@ -91,7 +96,7 @@ class GLWorldLayer(GLLayer):
             parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=LINE_WIDTH
         )
         self.field_center_circle_graphic = GLCircle(
-            parentItem=self, color=Colors.FIELD_LINE_COLOR
+            parentItem=self, outline_color=Colors.FIELD_LINE_COLOR
         )
         self.friendly_goal_graphic = GLGoal(parentItem=self, color=Colors.GOAL_COLOR)
         self.enemy_goal_graphic = GLGoal(parentItem=self, color=Colors.GOAL_COLOR)
@@ -413,7 +418,7 @@ class GLWorldLayer(GLLayer):
             lambda: GLCircle(
                 parentItem=self,
                 radius=ROBOT_MAX_RADIUS_METERS / 2,
-                color=Colors.BREAKBEAM_TRIPPED_COLOR,
+                outline_color=Colors.BREAKBEAM_TRIPPED_COLOR,
             ),
         )
 

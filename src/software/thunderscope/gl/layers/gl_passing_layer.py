@@ -69,7 +69,9 @@ class GLPassingLayer(GLLayer):
         # Ensure we have the same number of graphics as protos
         self.pass_graphics.resize(
             len(passes_to_show),
-            lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR, width=LINE_WIDTH),
+            lambda: GLLinePlotItem(
+                color=Colors.PASS_VISUALIZATION_COLOR, width=LINE_WIDTH
+            ),
         )
 
         for pass_graphic, pass_with_rating in zip(self.pass_graphics, passes_to_show,):

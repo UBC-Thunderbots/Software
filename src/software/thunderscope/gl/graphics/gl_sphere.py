@@ -2,6 +2,8 @@ from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
+from typing import Optional
+
 from software.thunderscope.constants import Colors
 
 
@@ -10,7 +12,7 @@ class GLSphere(GLMeshItem):
 
     def __init__(
         self,
-        parentItem: GLGraphicsItem = None,
+        parentItem: Optional[GLGraphicsItem] = None,
         radius: float = 1,
         rows: int = 10,
         cols: int = 10,

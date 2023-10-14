@@ -4,6 +4,8 @@ from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.thunderscope.constants import Colors, LINE_WIDTH
 
+from typing import Optional
+
 import numpy as np
 
 
@@ -12,23 +14,35 @@ class GLRect(GLLinePlotItem):
 
     def __init__(
         self,
-        parentItem: GLGraphicsItem = None,
-        color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
+        parentItem: Optional[GLGraphicsItem] = None,
+        x_length: float = 0,
+        y_length: float = 0,
+        outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
+        fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
     ):
         """Initialize the GLRect
         
         :param parentItem: The parent item of the graphic
-        :param color: The color of the graphic
-        :param line_width: The line width of the graphic
+        :param x_length: The length of the rectangle in the x direction
+        :param y_length: The length of the rectangle in the y direction
+        :param outline_color: The color of the rectangle's outline
+        :param fill_color: The color used to fill the rectangle, or None if no fill
+        :param line_width: The line width of the rectangle's outline
 
         """
-        super().__init__(parentItem=parentItem, color=color, width=line_width)
+        super().__init__(parentItem=parentItem, width=line_width)
 
         self.x = 0
         self.y = 0
         self.x_length = 0
         self.y_length = 0
+
+        self.fill_graphic = None
+
+        self.set_dimensions(x_length, y_length)
+        self.set_outline_color(outline_color)
+        self.set_fill_color(fill_color)
 
     def set_dimensions(self, x_length: float = 0, y_length: float = 0):
         """Set the dimensions of the rectangle
@@ -46,17 +60,7 @@ class GLRect(GLLinePlotItem):
         self.x_length = x_length
         self.y_length = y_length
 
-        self.setData(
-            pos=np.array(
-                [
-                    [-x_length / 2, y_length / 2, 0],
-                    [x_length / 2, y_length / 2, 0],
-                    [x_length / 2, -y_length / 2, 0],
-                    [-x_length / 2, -y_length / 2, 0],
-                    [-x_length / 2, y_length / 2, 0],
-                ]
-            )
-        )
+        self.__update_data()
 
     def set_position(self, x: float, y: float):
         """Set the position of the graphic in the scene
@@ -72,10 +76,45 @@ class GLRect(GLLinePlotItem):
         self.x = x
         self.y = y
 
-    def set_color(self, color: QtGui.QColor):
-        """Set the color of the graphic
+    def set_outline_color(self, outline_color: QtGui.QColor):
+        """Set the color of the rectangle's outline
         
-        :param color: The color of the graphic
+        :param outline_color: The color of the rectangle's outline 
         
         """
-        self.setData(color=color)
+        self.setData(color=outline_color)
+
+    def set_fill_color(self, fill_color: Optional[QtGui.QColor]):
+        """Set the color used to fill the rectangle
+        
+        :param fill_color: The color used to fill the rectangle, or None if no fill 
+        
+        """
+        if fill_color:
+            if not self.fill_graphic:
+                self.fill_graphic = GLMeshItem(parentItem=self)
+                self.__update_data()
+            self.fill_graphic.setColor(fill_color)
+        else:
+            if self.fill_graphic:
+                self.fill_graphic.setParentItem(None)
+                self.fill_graphic = None
+
+    def __update_data(self):
+        """Update the vertex and mesh data of the underlying GLLinePlotItem and 
+        GLMeshData graphics that make up the circle graphic
+        """
+        points = [
+            [-self.x_length / 2, self.y_length / 2, 0],
+            [self.x_length / 2, self.y_length / 2, 0],
+            [self.x_length / 2, -self.y_length / 2, 0],
+            [-self.x_length / 2, -self.y_length / 2, 0],
+            [-self.x_length / 2, self.y_length / 2, 0],
+        ]
+
+        self.setData(pos=points)
+
+        if self.fill_graphic:
+            faces = [[0, 1, 2], [2, 3, 4]]
+            meshdata = MeshData(vertexes=points, faces=np.array(faces))
+            self.fill_graphic.setMeshData(meshdata=meshdata)

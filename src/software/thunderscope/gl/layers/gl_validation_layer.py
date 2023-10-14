@@ -13,6 +13,7 @@ from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -130,7 +131,7 @@ class GLValidationLayer(GLLayer):
 
         # Ensure we have the same number of graphics as validations
         self.polygon_graphics.resize(
-            len(polygons), lambda: GLLinePlotItem(width=LINE_WIDTH),
+            len(polygons), lambda: GLPolygon(line_width=LINE_WIDTH),
         )
         self.segment_graphics.resize(
             len(segments), lambda: GLLinePlotItem(width=LINE_WIDTH),
@@ -144,13 +145,16 @@ class GLValidationLayer(GLLayer):
         ):
             # In order to close the polygon, we need to include the first point at the end of
             # the list of points in the polygon
-            polygon_points = list(polygon.points) + polygon.points[:1]
+            polygon_points = list(polygon.points)
 
-            polygon_graphic.setData(
-                pos=np.array(
-                    [[point.x_meters, point.y_meters, 0] for point in polygon_points]
-                ),
-                color=self.__get_validation_color(validation_status),
+            polygon_graphic.set_points(
+                [(point.x_meters, point.y_meters) for point in polygon_points]
+            )
+            polygon_graphic.set_outline_color(
+                self.__get_validation_color(validation_status)
+            )
+            polygon_graphic.set_fill_color(
+                self.__get_validation_color(validation_status)
             )
 
         for segment_graphic, (segment, validation_status) in zip(
@@ -171,7 +175,12 @@ class GLValidationLayer(GLLayer):
         ):
             circle_graphic.set_radius(circle.radius)
             circle_graphic.set_position(circle.origin.x_meters, circle.origin.y_meters)
-            circle_graphic.set_color(self.__get_validation_color(validation_status))
+            circle_graphic.set_outline_color(
+                self.__get_validation_color(validation_status)
+            )
+            circle_graphic.set_fill_color(
+                self.__get_validation_color(validation_status)
+            )
 
     def __get_validation_color(self, validation_status: ValidationStatus):
         """Get the color representing the given validation status
