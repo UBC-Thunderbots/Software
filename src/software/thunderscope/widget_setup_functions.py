@@ -8,6 +8,7 @@ from software.thunderscope.common.proto_plotter import ProtoPlotter
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_label_style import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from google.protobuf.message import Message
 
 
 # Import Widgets
@@ -135,7 +136,7 @@ def setup_parameter_widget(
     config = ThunderbotsConfig()
     config.sensor_fusion_config.friendly_color_yellow = friendly_colour_yellow
 
-    def on_change_callback(attr: Any, value: Any, updated_proto: Any) -> None:
+    def on_change_callback(attr: Any, value: Any, updated_proto: Message) -> None:
         proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
 
     return ProtoConfigurationWidget(config, on_change_callback)

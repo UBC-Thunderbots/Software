@@ -11,7 +11,8 @@ import threading
 import time
 import os
 from typing import Any
-from enum import Enum, IntEnum
+from enum import Enum
+from google.protobuf.message import Message
 
 
 class RobotCommunication(object):
@@ -202,7 +203,7 @@ class RobotCommunication(object):
             if not self.robots_connected_to_fullsystem:
                 time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
-    def toggle_robot_connection(self, mode: IntEnum, robot_id: int) -> None:
+    def toggle_robot_connection(self, mode: IndividualRobotMode, robot_id: int) -> None:
         """
         Connects a robot to or disconnects a robot from diagnostics
 
@@ -220,7 +221,7 @@ class RobotCommunication(object):
         elif mode == IndividualRobotMode.AI:
             self.robots_connected_to_fullsystem.add(robot_id)
 
-    def __forward_to_proto_unix_io(self, type: Any, data: Enum) -> None:
+    def __forward_to_proto_unix_io(self, type: Message, data: Enum) -> None:
         """
         Forwards to proto unix IO iff running is true
         :param data: the data to be passed through
@@ -304,7 +305,7 @@ class RobotCommunication(object):
 
         return self
 
-    def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
+    def __exit__(self, type, value, traceback) -> None:
         """Exit RobotCommunication context manager
 
         Ends all currently running loops and joins all currently active threads

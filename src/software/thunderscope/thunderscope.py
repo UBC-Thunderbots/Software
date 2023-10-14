@@ -186,7 +186,7 @@ class Thunderscope(object):
             for key, val in self.tab_dock_map.items():
                 shelf[key] = val.saveState()
 
-    def load_layout(self, filename: str = None) -> None:
+    def load_layout(self, filename: os.PathLike = None) -> None:
         """Open a file dialog to load the layout and state to all widgets
 
         :param filename: The filename to load the layout from. If None, then

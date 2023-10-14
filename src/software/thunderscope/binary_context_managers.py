@@ -13,6 +13,7 @@ from software.python_bindings import *
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from google.protobuf.message import Message
 from extlibs.er_force_sim.src.protobuf.world_pb2 import (
     SimulatorState,
     SimBall,
@@ -139,7 +140,7 @@ gdb --args bazel-bin/{full_system}
 
             time.sleep(1)
 
-    def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
+    def __exit__(self, type, value, traceback) -> None:
         """Exit the full_system context manager.
 
         :param type: The type of exception that was raised
@@ -283,7 +284,7 @@ gdb --args bazel-bin/{simulator_command}
 
         return self
 
-    def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
+    def __exit__(self, type, value, traceback) -> None:
         """Exit the full_system context manager.
 
         :param type: The type of exception that was raised
@@ -421,7 +422,7 @@ class Gamecontroller(object):
 
         return self
 
-    def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
+    def __exit__(self, type, value, traceback) -> None:
         """Exit the gamecontroller context manager.
 
         :param type: The type of exception that was raised
@@ -468,7 +469,7 @@ class Gamecontroller(object):
 
         """
 
-        def __send_referee_command(data: Any) -> None:
+        def __send_referee_command(data: Message) -> None:
             """Send a referee command from the gamecontroller to both full
             systems.
 

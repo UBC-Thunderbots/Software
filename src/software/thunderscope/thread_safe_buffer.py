@@ -1,6 +1,7 @@
 import queue
 from software.logger.logger import createLogger
 from typing import Any
+from google.protobuf import Message
 
 
 class ThreadSafeBuffer(object):
@@ -94,7 +95,7 @@ class ThreadSafeBuffer(object):
 
         return self.cached_msg
 
-    def put(self, proto: Any, block: bool = False, timeout: int = None) -> None:
+    def put(self, proto: Message, block: bool = False, timeout: int = None) -> None:
         """Put data into the buffer. If the buffer is full, then
         the proto will be logged.
 
