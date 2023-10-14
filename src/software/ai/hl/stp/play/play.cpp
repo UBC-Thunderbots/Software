@@ -3,21 +3,21 @@
 #include <munkres/munkres.h>
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/halt_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 
 Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
     : ai_config(ai_config),
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
-      stop_tactics(),
+      halt_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
       world_(std::nullopt)
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
-        stop_tactics.push_back(std::make_shared<StopTactic>());
+        halt_tactics.push_back(std::make_shared<HaltTactic>());
     }
 }
 
@@ -161,10 +161,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         else if (i == (priority_tactics.size() - 1))
         {
             // If assigning the last tactic vector, then assign rest of robots with
-            // StopTactics
+            // HaltTactics
             for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
             {
-                tactic_vector.push_back(stop_tactics[ii]);
+                tactic_vector.push_back(halt_tactics[ii]);
             }
         }
 

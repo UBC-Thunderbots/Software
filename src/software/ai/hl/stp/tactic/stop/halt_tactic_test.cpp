@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/halt_tactic.h"
 
 #include <gtest/gtest.h>
 
@@ -8,14 +8,14 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 
-class StopTacticTest : public SimulatedErForceSimPlayTestFixture
+class HaltTacticTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
 };
 
-TEST_F(StopTacticTest, robot_already_stopped)
+TEST_F(HaltTacticTest, robot_already_stopped)
 {
     BallState ball_state(Point(0, 0.5), Vector(0, 0));
 
@@ -23,7 +23,7 @@ TEST_F(StopTacticTest, robot_already_stopped)
         {Point(-3, 2.5), Point()}, {Vector(), Vector()});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<StopTactic>();
+    auto tactic = std::make_shared<HaltTactic>();
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -41,7 +41,7 @@ TEST_F(StopTacticTest, robot_already_stopped)
             Duration::fromSeconds(5));
 }
 
-TEST_F(StopTacticTest, robot_start_moving)
+TEST_F(HaltTacticTest, robot_start_moving)
 {
     BallState ball_state(Point(0, 0.5), Vector(0, 0));
 
@@ -49,7 +49,7 @@ TEST_F(StopTacticTest, robot_start_moving)
         {Point(-3, 2.5), Point()}, {Vector(), Vector(4, 4)});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<StopTactic>();
+    auto tactic = std::make_shared<HaltTactic>();
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

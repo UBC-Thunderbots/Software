@@ -3,7 +3,7 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/halt_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 BallPlacementPlay::BallPlacementPlay(TbotsProto::AiConfig config) : Play(config, true) {}
