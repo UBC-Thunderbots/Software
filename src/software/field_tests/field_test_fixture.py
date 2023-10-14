@@ -4,7 +4,7 @@ import os
 import threading
 
 import pytest
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 import argparse
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
@@ -306,6 +306,22 @@ def load_command_line_arguments():
     )
 
     parser.add_argument(
+        "--channel",
+        action="store",
+        type=int,
+        default=0,
+        help="Which channel to communicate over",
+    )
+
+    parser.add_argument(
+        "--estop_path",
+        action="store",
+        type=str,
+        default="/dev/ttyACM0",
+        help="Path to the Estop",
+    )
+
+    parser.add_argument(
         "--estop_baudrate",
         action="store",
         type=int,
@@ -361,7 +377,7 @@ def field_test_runner():
         should_restart_on_crash=False,
     ) as friendly_fs, RobotCommunication(
         current_proto_unix_io=friendly_proto_unix_io,
-        multicast_channel=getRobotMulticastChannel(0),
+        multicast_channel=getRobotMulticastChannel(args.channel),
         interface=args.interface,
         disable_estop=False,
         estop_path=estop_path,
