@@ -14,7 +14,7 @@ class GLRobot(GLMeshItem):
     def __init__(
         self,
         parentItem: GLGraphicsItem = None,
-        color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
+        color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
     ):
         """Initialize the GLRobot
         

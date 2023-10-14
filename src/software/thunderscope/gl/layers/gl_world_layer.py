@@ -7,7 +7,7 @@ import numpy as np
 
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.constants import Colors, SPEED_SEGMENT_SCALE
+from software.thunderscope.constants import Colors, DepthValues, LINE_WIDTH, SPEED_SEGMENT_SCALE
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
@@ -85,10 +85,10 @@ class GLWorldLayer(GLLayer):
             parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR
         )
         self.halfway_line_graphic = GLLinePlotItem(
-            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=3.0
+            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=LINE_WIDTH
         )
         self.goal_to_goal_line_graphic = GLLinePlotItem(
-            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=3.0
+            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=LINE_WIDTH
         )
         self.field_center_circle_graphic = GLCircle(
             parentItem=self, color=Colors.FIELD_LINE_COLOR
@@ -102,15 +102,13 @@ class GLWorldLayer(GLLayer):
             parentItem=self, color=Colors.SPEED_VECTOR_COLOR
         )
 
-        # Set depth value of field line graphics to -1 so that they are
-        # rendered beneath robots and other graphics
-        self.friendly_defense_area_graphic.setDepthValue(-1)
-        self.enemy_defense_area_graphic.setDepthValue(-1)
-        self.field_lines_graphic.setDepthValue(-1)
-        self.field_outer_boundary_graphic.setDepthValue(-1)
-        self.halfway_line_graphic.setDepthValue(-1)
-        self.goal_to_goal_line_graphic.setDepthValue(-1)
-        self.field_center_circle_graphic.setDepthValue(-1)
+        self.friendly_defense_area_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.enemy_defense_area_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.field_lines_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.field_outer_boundary_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.halfway_line_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.goal_to_goal_line_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.field_center_circle_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
         self.friendly_robot_graphics = ObservableList(self._graphics_changed)
         self.enemy_robot_graphics = ObservableList(self._graphics_changed)
@@ -380,8 +378,7 @@ class GLWorldLayer(GLLayer):
             if self.display_robot_ids:
                 robot_id_graphic.show()
 
-                # Depth value of 2 ensures text is rendered over top other graphics
-                robot_id_graphic.setDepthValue(2)
+                robot_id_graphic.setDepthValue(DepthValues.PRIMARY_TEXT_DEPTH)
 
                 robot_id_graphic.setData(
                     text=str(robot.id),
@@ -429,8 +426,7 @@ class GLWorldLayer(GLLayer):
             ):
                 breakbeam_graphic.show()
 
-                # Depth value of 1 ensures text is rendered over top robots
-                breakbeam_graphic.setDepthValue(1)
+                breakbeam_graphic.setDepthValue(DepthValues.SECONDARY_TEXT_DEPTH)
 
                 breakbeam_graphic.set_position(
                     robot.current_state.global_position.x_meters,

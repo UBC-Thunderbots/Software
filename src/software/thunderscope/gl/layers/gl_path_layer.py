@@ -5,7 +5,7 @@ import numpy as np
 
 from proto.tbots_software_msgs_pb2 import PrimitiveSet
 
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
@@ -54,7 +54,7 @@ class GLPathLayer(GLLayer):
         ]
 
         # Ensure we have the same number of graphics as protos
-        self.path_graphics.resize(len(paths), lambda: GLLinePlotItem(width=3.0))
+        self.path_graphics.resize(len(paths), lambda: GLLinePlotItem(width=LINE_WIDTH))
         self.destination_graphics.resize(
             len(requested_destinations),
             lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),

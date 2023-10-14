@@ -3,6 +3,7 @@ from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.py_constants import ROBOT_MAX_RADIUS_METERS
+from software.thunderscope.constants import Colors, LINE_WIDTH
 
 import math
 import numpy as np
@@ -14,8 +15,8 @@ class GLRobotOutline(GLLinePlotItem):
     def __init__(
         self,
         parentItem: GLGraphicsItem = None,
-        color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
-        line_width: float = 3.0,
+        color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
+        line_width: float = LINE_WIDTH,
     ):
         """Initialize the GLRobotOutline
         

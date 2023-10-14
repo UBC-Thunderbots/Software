@@ -2,6 +2,8 @@ from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
+from software.thunderscope.constants import Colors, LINE_WIDTH
+
 import math
 import numpy as np
 
@@ -14,8 +16,8 @@ class GLCircle(GLLinePlotItem):
         parentItem: GLGraphicsItem = None,
         radius: float = 1,
         num_points: int = 24,
-        color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
-        line_width: float = 3.0,
+        color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
+        line_width: float = LINE_WIDTH,
     ):
         """Initialize the GLCircle
         
@@ -32,7 +34,7 @@ class GLCircle(GLLinePlotItem):
         self.y = 0
         self.radius = 0
         self.num_points = 0
-        self.set_radius(radius)
+        self.set_radius(radius, num_points)
 
     def set_radius(self, radius: float, num_points: int = 24):
         """Set the radius of the circle

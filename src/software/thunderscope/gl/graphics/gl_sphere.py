@@ -12,17 +12,17 @@ class GLSphere(GLMeshItem):
         self,
         parentItem: GLGraphicsItem = None,
         radius: float = 1,
-        color: QtGui.QColor = Colors.BALL_COLOR,
         rows: int = 10,
         cols: int = 10,
+        color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
     ):
         """Initialize the GLSphere
         
         :param parentItem: The parent item of the graphic
         :param radius: The radius of the sphere
-        :param color: The color of the sphere
         :param rows: The number of rows in the mesh
         :param cols: The number of columns in the mesh
+        :param color: The color of the sphere
 
         """
         super().__init__(parentItem=parentItem, color=color)

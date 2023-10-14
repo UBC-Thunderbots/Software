@@ -2,6 +2,8 @@ from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
+from software.thunderscope.constants import Colors, LINE_WIDTH
+
 import numpy as np
 
 
@@ -11,8 +13,8 @@ class GLRect(GLLinePlotItem):
     def __init__(
         self,
         parentItem: GLGraphicsItem = None,
-        color: QtGui.QColor = (255, 255, 255, 127.5),
-        line_width: float = 3.0,
+        color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
+        line_width: float = LINE_WIDTH,
     ):
         """Initialize the GLRect
         

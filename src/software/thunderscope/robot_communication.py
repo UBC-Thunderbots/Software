@@ -281,7 +281,7 @@ class RobotCommunication(object):
             True,
         )
 
-        self.receive_robot_crash = RobotCrashProtoListener(
+        self.receive_robot_crash = tbots_cpp.RobotCrashProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_CRASH_PORT,
             lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),

@@ -7,7 +7,7 @@ from google.protobuf.json_format import MessageToDict
 
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, DepthValues
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
@@ -30,7 +30,7 @@ class GLTacticLayer(GLLayer):
         super().__init__(name)
 
         # Depth value of 1 ensures this layer is rendered over top other layers
-        self.setDepthValue(1)
+        self.setDepthValue(DepthValues.SECONDARY_TEXT_DEPTH)
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.play_info_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)

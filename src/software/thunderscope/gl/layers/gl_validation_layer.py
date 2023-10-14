@@ -9,7 +9,7 @@ import numpy as np
 from proto.import_all_protos import *
 
 from software.py_constants import *
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -130,10 +130,10 @@ class GLValidationLayer(GLLayer):
 
         # Ensure we have the same number of graphics as validations
         self.polygon_graphics.resize(
-            len(polygons), lambda: GLLinePlotItem(width=3.0),
+            len(polygons), lambda: GLLinePlotItem(width=LINE_WIDTH),
         )
         self.segment_graphics.resize(
-            len(segments), lambda: GLLinePlotItem(width=3.0),
+            len(segments), lambda: GLLinePlotItem(width=LINE_WIDTH),
         )
         self.circle_graphics.resize(
             len(circles), lambda: GLCircle(),

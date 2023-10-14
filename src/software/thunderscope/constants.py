@@ -178,6 +178,7 @@ def rgb_to_bw(r, g, b):
 
 class Colors(object):
 
+    DEFAULT_GRAPHICS_COLOR = QtGui.QColor(255, 255, 255, 128) 
     FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 200)
     FIELD_LINE_LIGHTER_COLOR = QtGui.QColor(255, 255, 255, 100)
     GOAL_COLOR = QtGui.QColor(200, 200, 200, 255)
@@ -188,22 +189,21 @@ class Colors(object):
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
-    ROBOT_MIDDLE_BLUE = "blue"
-    BW_ROBOT_MIDDLE_BLUE = QtGui.QColor(*rgb_to_bw(0, 0, 255))
     DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 150)
-    NAVIGATOR_PATH_COLOR = "green"
-    NAVIGATOR_OBSTACLE_COLOR = "orange"
+    NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
+    NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 165, 0, 255)
     PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
-    BREAKBEAM_TRIPPED_COLOR = "r"
+    BREAKBEAM_TRIPPED_COLOR = QtGui.QColor(255, 0, 0, 255)
 
-    VALIDATION_PASSED_COLOR = "g"
-    VALIDATION_FAILED_COLOR = "r"
+    VALIDATION_PASSED_COLOR = QtGui.QColor(0, 255, 0, 255)
+    VALIDATION_FAILED_COLOR = QtGui.QColor(255, 0, 0, 255)
 
     PRIMARY_TEXT_COLOR = QtGui.QColor(255, 255, 255, 255)
     SECONDARY_TEXT_COLOR = QtGui.QColor(255, 255, 255, 160)
     BLACK_TEXT_COLOR = QtGui.QColor(0, 0, 0, 255)
 
     # Colors for vision pattern
+    ROBOT_MIDDLE_BLUE = QtGui.QColor(0, 0, 255, 255)
     PINK = QtGui.QColor(255, 0, 255)
     GREEN = QtGui.QColor(0, 255, 0)
 
@@ -211,8 +211,23 @@ class Colors(object):
     VISION_PATTERN_LOOKUP = create_vision_pattern_lookup(PINK, GREEN)
 
     # Colors for black and white vision pattern
+    BW_ROBOT_MIDDLE_BLUE = QtGui.QColor(*rgb_to_bw(0, 0, 255))
     BW_PINK = QtGui.QColor(*rgb_to_bw(255, 0, 255))
     BW_GREEN = QtGui.QColor(*rgb_to_bw(0, 255, 0))
 
     # Creates a black and white vision pattern to indicate a disconnected robot
     BW_VISION_PATTERN_LOOKUP = create_vision_pattern_lookup(BW_PINK, BW_GREEN)
+
+class DepthValues:
+    """Constants for depth values controlling the order in which 
+    graphics are drawn in the 3D visualizer.
+
+    Graphics with greater depth values are drawn later.
+    Graphics with negative depth values are drawn before their parent.
+    """
+    
+    BACKGROUND_DEPTH = -1
+    FOREGROUND_DEPTH = 0
+
+    SECONDARY_TEXT_DEPTH = 1
+    PRIMARY_TEXT_DEPTH = 2
