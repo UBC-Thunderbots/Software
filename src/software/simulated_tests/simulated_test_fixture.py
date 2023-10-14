@@ -170,7 +170,9 @@ class SimulatedTestRunner(TbotsTestRunner):
                     world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
-                    # We need this blocking get call to synchronize the running speed of world and primitives
+                    # Get the primitive set if the buffer has one. Only elapse the time if a primitive set is gotten
+                    # We do this to synchronize the running speed of world and primitives
+                    # Since AI is usually slower than getting worlds, so that's the limiting factor
                     # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
                     primitive_set = self.primitive_set_buffer.get(
                         block=False, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
