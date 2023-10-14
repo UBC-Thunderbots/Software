@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/halt_tactic.h"
 #include "software/test_util/test_util.h"
 
 /**
@@ -160,12 +160,12 @@ TEST_F(STPTacticAssignmentTest,
     world.updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
-    auto stop_tactic_1 = std::make_shared<StopTactic>();
+    auto halt_tactic_1 = std::make_shared<HaltTactic>();
 
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
                                        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-    ConstTacticVector tactics = {move_tactic_1, stop_tactic_1};
+    ConstTacticVector tactics = {move_tactic_1, halt_tactic_1};
 
     // Both robots are now closest to move_tactic_1's destination. We do NOT want
     // robot_0 to be assigned to move_tactic_1, because then robot_1 has to move all the
@@ -175,11 +175,11 @@ TEST_F(STPTacticAssignmentTest,
     auto asst = stp.assignRobotsToTactics({tactics}, world, false);
 
 
-    // move_tactic_1 should be the only Tactic assigned a robot, since stop_tactic_1 is a
+    // move_tactic_1 should be the only Tactic assigned a robot, since halt_tactic_1 is a
     // lower priority than move_tactic_1 so it should be dropped since there's only 1
     // robot
     EXPECT_TRUE(asst.find(move_tactic_1) != asst.end());
-    EXPECT_FALSE(asst.find(stop_tactic_1) != asst.end());
+    EXPECT_FALSE(asst.find(halt_tactic_1) != asst.end());
 }
 
 
@@ -329,21 +329,21 @@ TEST_F(STPTacticAssignmentTest,
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
     world.updateFriendlyTeamState(friendly_team);
 
-    auto stop_tactic_1 = std::make_shared<StopTactic>();
-    auto stop_tactic_2 = std::make_shared<StopTactic>();
-    auto stop_tactic_3 = std::make_shared<StopTactic>();
+    auto halt_tactic_1 = std::make_shared<HaltTactic>();
+    auto halt_tactic_2 = std::make_shared<HaltTactic>();
+    auto halt_tactic_4 = std::make_shared<HaltTactic>();
 
-    ConstTacticVector tactics = {stop_tactic_1, stop_tactic_2, stop_tactic_3};
+    ConstTacticVector tactics = {halt_tactic_1, halt_tactic_2, halt_tactic_4};
 
     // If all costs are equal, the robots and tactics are simply paired in order
     auto asst = stp.assignRobotsToTactics({tactics}, world, false);
 
-    ASSERT_TRUE(asst.find(stop_tactic_1) != asst.end());
-    ASSERT_TRUE(asst.find(stop_tactic_2) != asst.end());
-    ASSERT_TRUE(asst.find(stop_tactic_3) != asst.end());
-    EXPECT_EQ(asst.find(stop_tactic_1)->second, robot_0);
-    EXPECT_EQ(asst.find(stop_tactic_2)->second, robot_1);
-    EXPECT_EQ(asst.find(stop_tactic_3)->second, robot_2);
+    ASSERT_TRUE(asst.find(halt_tactic_1) != asst.end());
+    ASSERT_TRUE(asst.find(halt_tactic_2) != asst.end());
+    ASSERT_TRUE(asst.find(halt_tactic_4) != asst.end());
+    EXPECT_EQ(asst.find(halt_tactic_1)->second, robot_0);
+    EXPECT_EQ(asst.find(halt_tactic_2)->second, robot_1);
+    EXPECT_EQ(asst.find(halt_tactic_4)->second, robot_2);
 }
 
 TEST_F(STPTacticAssignmentTest,
@@ -359,26 +359,26 @@ TEST_F(STPTacticAssignmentTest,
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
     world.updateFriendlyTeamState(friendly_team);
 
-    auto stop_tactic_1 = std::make_shared<StopTactic>();
+    auto halt_tactic_1 = std::make_shared<HaltTactic>();
     auto move_tactic_1 = std::make_shared<MoveTactic>();
-    auto stop_tactic_2 = std::make_shared<StopTactic>();
+    auto halt_tactic_2 = std::make_shared<HaltTactic>();
 
     // The destination of the move_tactic is relatively close to the robot positions, so
     // the cost of assigning any robot to the move_tactic should be less than the
-    // stop_tactics
+    // halt_tactics
     move_tactic_1->updateControlParams(Point(0, 0), Angle::zero(), 0,
                                        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-    ConstTacticVector tactics = {stop_tactic_1, move_tactic_1, stop_tactic_2};
+    ConstTacticVector tactics = {halt_tactic_1, move_tactic_1, halt_tactic_2};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world, false);
 
-    ASSERT_TRUE(asst.find(stop_tactic_1) != asst.end());
+    ASSERT_TRUE(asst.find(halt_tactic_1) != asst.end());
     ASSERT_TRUE(asst.find(move_tactic_1) != asst.end());
-    ASSERT_TRUE(asst.find(stop_tactic_2) != asst.end());
-    EXPECT_EQ(asst.find(stop_tactic_1)->second, robot_2);
+    ASSERT_TRUE(asst.find(halt_tactic_2) != asst.end());
+    EXPECT_EQ(asst.find(halt_tactic_1)->second, robot_2);
     EXPECT_EQ(asst.find(move_tactic_1)->second, robot_0);
-    EXPECT_EQ(asst.find(stop_tactic_2)->second, robot_1);
+    EXPECT_EQ(asst.find(halt_tactic_2)->second, robot_1);
 }
 
 TEST_F(STPTacticAssignmentTest,
@@ -450,9 +450,9 @@ TEST_F(STPTacticAssignmentTest,
 }
 
 TEST_F(STPTacticAssignmentTest,
-       test_assigning_stop_tactics_to_unassigned_non_goalie_robots)
+       test_assigning_halt_tactics_to_unassigned_non_goalie_robots)
 {
-    // Test that StopTactic is assigned to remaining robots without tactics
+    // Test that HaltTactic is assigned to remaining robots without tactics
 
     Team friendly_team(Duration::fromSeconds(0));
     Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),

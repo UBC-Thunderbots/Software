@@ -1,24 +1,24 @@
 #include "software/ai/hl/stp/play/halt_play.h"
 
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/halt_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 HaltPlay::HaltPlay(TbotsProto::AiConfig config) : Play(config, false) {}
 
 void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    auto stop_tactic_1 = std::make_shared<StopTactic>();
-    auto stop_tactic_2 = std::make_shared<StopTactic>();
-    auto stop_tactic_3 = std::make_shared<StopTactic>();
-    auto stop_tactic_4 = std::make_shared<StopTactic>();
-    auto stop_tactic_5 = std::make_shared<StopTactic>();
-    auto stop_tactic_6 = std::make_shared<StopTactic>();
+    auto halt_tactic_1 = std::make_shared<HaltTactic>();
+    auto halt_tactic_2 = std::make_shared<HaltTactic>();
+    auto halt_tactic_3 = std::make_shared<HaltTactic>();
+    auto halt_tactic_4 = std::make_shared<HaltTactic>();
+    auto halt_tactic_5 = std::make_shared<HaltTactic>();
+    auto halt_tactic_6 = std::make_shared<HaltTactic>();
 
     do
     {
         // yield the Tactics this Play wants to run, in order of priority
-        yield({{stop_tactic_1, stop_tactic_2, stop_tactic_3, stop_tactic_4, stop_tactic_5,
-                stop_tactic_6}});
+        yield({{halt_tactic_1, halt_tactic_2, halt_tactic_3, halt_tactic_4, halt_tactic_5,
+             halt_tactic_6}});
     } while (true);
 }
 

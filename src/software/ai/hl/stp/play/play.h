@@ -182,8 +182,8 @@ class Play
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
 
-    // Stop tactic common to all plays for robots that don't have tactics assigned
-    TacticVector stop_tactics;
+    // Halt tactic common to all plays for robots that don't have tactics assigned
+    TacticVector halt_tactics;
 
     // Whether this plays requires a goalie
     const bool requires_goalie;

@@ -202,10 +202,10 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ShadowEnemyTactic &tactic
     return tactic;
 }
 
-std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
+std::shared_ptr<Tactic> createTactic(const TbotsProto::HaltTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    auto tactic = std::make_shared<StopTactic>();
+    auto tactic = std::make_shared<HaltTactic>();
     return tactic;
 }
 

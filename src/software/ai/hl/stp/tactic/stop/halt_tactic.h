@@ -4,16 +4,16 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
- * The StopTactic will stop the robot from moving. The robot will actively try and brake
+ * The HaltTactic will stop the robot from moving. The robot will actively try and brake
  * to come to a halt.
  */
-class StopTactic : public Tactic
+class HaltTactic : public Tactic
 {
    public:
     /**
-     * Creates a new StopTactic
+     * Creates a new HALTTactic
      */
-    explicit StopTactic();
+    explicit HaltTactic();
 
     void accept(TacticVisitor& visitor) const override;
 

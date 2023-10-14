@@ -110,11 +110,11 @@ def test_basic_rotation(field_test_runner):
             eventually_validation_sequence_set=[[]],
             test_timeout_s=5,
         )
-        # Send a stop tactic after the test finishes
-        stop_tactic = StopTactic()
+        # Send a halt tactic after the test finishes
+        halt_tactic = HaltTactic()
         params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
-        # send the stop tactic
+        params.assigned_tactics[id].stop.CopyFrom(halt_tactic)
+        # send the halt tactic
         field_test_runner.set_tactics(params, True)
 
         # validate by eye

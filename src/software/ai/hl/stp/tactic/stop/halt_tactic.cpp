@@ -1,8 +1,8 @@
-#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/halt_tactic.h"
 
 #include <algorithm>
 
-StopTactic::StopTactic() : Tactic(std::set<RobotCapability>()), fsm_map()
+HaltTactic::HaltTactic() : Tactic(std::set<RobotCapability>()), fsm_map()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
@@ -10,12 +10,12 @@ StopTactic::StopTactic() : Tactic(std::set<RobotCapability>()), fsm_map()
     }
 }
 
-void StopTactic::accept(TacticVisitor &visitor) const
+void HaltTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
 
-void StopTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+void HaltTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
 {
     if (reset_fsm)
     {
