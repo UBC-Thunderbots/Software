@@ -139,10 +139,10 @@ class MotorService
     struct MotorFaultIndicator checkDriverFault(uint8_t motor);
 
     /**
-    * Sets up motor as drive motor controllers
-    *
-    * @param motor drive motor number
-    */
+     * Sets up motor as drive motor controllers
+     *
+     * @param motor drive motor number
+     */
     void setUpDriveMotor(uint8_t motor);
 
     /**
