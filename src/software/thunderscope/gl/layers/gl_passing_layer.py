@@ -71,8 +71,7 @@ class GLPassingLayer(GLLayer):
         self.pass_graphics.resize(
             len(passes_to_show),
             lambda: GLPolygon(
-                outline_color=Colors.PASS_VISUALIZATION_COLOR, 
-                line_width=LINE_WIDTH
+                outline_color=Colors.PASS_VISUALIZATION_COLOR, line_width=LINE_WIDTH
             ),
         )
 

@@ -54,7 +54,9 @@ class GLHrvoLayer(GLLayer):
         )
         self.robot_circle_graphics.resize(
             len(velocity_obstacle_msg.robots),
-            lambda: GLCircle(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR, num_points=10),
+            lambda: GLCircle(
+                outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR, num_points=10
+            ),
         )
 
         for velocity_obstacle_graphic, velocity_obstacle in zip(

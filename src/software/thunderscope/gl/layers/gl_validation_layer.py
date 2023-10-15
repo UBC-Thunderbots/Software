@@ -160,10 +160,12 @@ class GLValidationLayer(GLLayer):
         for segment_graphic, (segment, validation_status) in zip(
             self.segment_graphics, segments
         ):
-            segment_graphic.set_points([
-                [segment.start.x_meters, segment.start.y_meters],
-                [segment.end.x_meters, segment.end.y_meters],
-            ])
+            segment_graphic.set_points(
+                [
+                    [segment.start.x_meters, segment.start.y_meters],
+                    [segment.end.x_meters, segment.end.y_meters],
+                ]
+            )
             segment_graphic.set_outline_color(
                 self.__get_validation_color(validation_status)
             )
