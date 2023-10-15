@@ -1,5 +1,5 @@
 import math
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Optional, Dict, Callable
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtGui import *
@@ -9,6 +9,7 @@ from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.gl.graphics.gl_robot import GLRobot
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from software.thunderscope.gl.helpers.observable_list import ObservableList
+from software.thunderscope.gl.helpers.export_to_pytest import PytestBuilder
 from software.thunderscope.constants import Colors
 
 
@@ -67,9 +68,19 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # (easier to keep track of robots rather than removing the entry entirely)
         self.local_robot_positions = {}
 
+        # the state of robots before running the simulator
+        # the robot state if only manual moves are considered
+        self.pre_sim_robot_positions = {}
+
         # stacks for undo and redo operations
         self.undo_operations = []
         self.redo_operations = []
+
+        # callback functions to call when the play state changes
+        self.play_callbacks = []
+
+        # the pytest builder for exporting as a test
+        self.pytest_builder = PytestBuilder()
 
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
         """
@@ -142,7 +153,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 self.move_in_progress = True
 
             # update selected robot position
-            self.__update_world_state(self.selected_robot_id, point_on_current_plane)
+            self.__update_world_state({self.selected_robot_id: point_on_current_plane})
 
     def mouse_in_scene_released(self, event: MouseInSceneEvent):
         """
@@ -207,7 +218,28 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         # reset the local state
         self.local_robot_positions = {}
+
+        # calls each of the callback function with the new play state
+        for callback in self.play_callbacks:
+            callback(curr_play_state)
+
         return curr_play_state
+
+    def add_play_callback(self, callback: Callable[[bool], None]):
+        """
+        Adds a callback function to the list of play state callbacks
+        :param callback: the callback function to add
+        """
+        self.play_callbacks.append(callback)
+
+    def export(self):
+        self.pytest_builder.build(self.pre_sim_robot_positions)
+
+    def reset_to_pre_sim(self):
+        """
+        Resets all robot positions to what they were before the simulator ran
+        """
+        self.__update_world_state(self.pre_sim_robot_positions)
 
     def __undo_redo_internal(self, operation: RobotOperation):
         """
@@ -216,7 +248,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param operation: the operation to apply
         """
         self.next_id = operation.next_id
-        self.__update_world_state(operation.id, operation.pos)
+        self.__update_world_state({operation.id: operation.pos})
 
     # # # # # # # # # # # # # # # # # # # # # # # # #
     #       ADD / REMOVE / MOVE ROBOT METHODS       #
@@ -252,7 +284,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 )
             )
             # remove the robot
-            self.__update_world_state(robot_id)
+            self.__update_world_state({robot_id: None})
             # set next id to the lowest free id
             self.next_id = min(self.next_id, robot_id)
             self.__toggle_robot_remove_double_click()
@@ -279,7 +311,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             )
 
             # add the robot
-            self.__update_world_state(self.next_id, event.point_in_scene)
+            self.__update_world_state({self.next_id: event.point_in_scene})
             self.next_id = self.__get_next_robot_id(self.next_id)
             self.__toggle_robot_add_double_click()
         else:
@@ -407,13 +439,13 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 return index
         return None
 
-    def __update_world_state(self, id: int, new_pos: Optional[QVector3D] = None):
+    def __update_world_state(self, robots_to_add: Dict[int, Optional[QVector3D]]):
         """
         Send out a WorldState proto with the existing robots
         If new position is provided, adds a robot with the given id at the given position
         Else, removes the robot with the given id from the robot state
-        :param id: the id of the robot to add / remove
-        :param new_pos: the position of the new robot [x, y] or None
+        :param robots_to_add: map of ids to positions of the robot to add / remove
+                              position is defined if adding / moving and None if removing
         """
         world_state = WorldState()
 
@@ -430,6 +462,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
                         x_meters=robot_.current_state.global_position.x_meters,
                         y_meters=robot_.current_state.global_position.y_meters,
                     ),
+                    global_orientation=Angle(
+                        radians=robot_.current_state.global_orientation.radians
+                    )
                 ),
             )
 
@@ -445,63 +480,65 @@ class GLSandboxWorldLayer(GLWorldLayer):
                     robot_id,
                     RobotState(
                         global_position=Point(x_meters=pos[0], y_meters=pos[1],),
+                        global_orientation=Angle(
+                            radians=0
+                        )
                     ),
                 )
 
             # if sim is paused, initialize the local state robot to the default value, overwritten later
             self.local_robot_positions[id] = None
 
-        # update world state with new robot position
-        if new_pos:
-            # constructs and adds a new robot state
-            self.curr_robot_ids.add(id)
-            converted_pos = self._invert_position_if_defending_negative_half(new_pos)
-            robot_state = RobotState(
-                global_position=Point(
-                    x_meters=converted_pos.x(), y_meters=converted_pos.y()
-                ),
-            )
-            world_state = self.__add_robot_to_state(world_state, id, robot_state)
-            if not self.is_playing:
-                # update the local state to the converted position
-                self.local_robot_positions[id] = (
-                    converted_pos.x(),
-                    converted_pos.y(),
-                    0,
-                )
-        else:
-            # remove an existing robot
-            self.curr_robot_ids.remove(id)
-            world_state = self.__remove_robot_from_state(world_state, id)
+        # update the world state with each of the new robot positions
+        for robot_id, new_pos in robots_to_add.items():
+            world_state = self.__update_with_new_positions(world_state, robot_id, new_pos)
 
         # send out world state
         self.simulator_io.send_proto(WorldState, world_state)
 
+    def __update_with_new_positions(self, world_state: WorldState, robot_id: int, new_pos: Optional[QVector3D]) -> WorldState:
+        """
+        Updates the world state with the new robot position for the given id
+        New position is defined if adding / moving a robot and None if removing one
+        :param world_state: the world state to change
+        :param robot_id: the id of thr robot to add / move / remove
+        :param new_pos: the new position of the robot, or None if removing
+        :return: the updated world state
+        """
+        if new_pos:
+            # constructs and adds a new robot state
+            self.curr_robot_ids.add(robot_id)
+            robot_state = RobotState(
+                global_position=Point(
+                    x_meters=new_pos.x(), y_meters=new_pos.y()
+                ),
+            )
+            world_state = self.__add_robot_to_state(world_state, robot_id, robot_state)
+            self.pre_sim_robot_positions[robot_id] = new_pos
+            if not self.is_playing:
+                # update the local state to the converted position
+                self.local_robot_positions[robot_id] = (
+                    new_pos.x(),
+                    new_pos.y(),
+                    0,
+                )
+        else:
+            # remove an existing robot
+            self.curr_robot_ids.remove(robot_id)
+            del self.pre_sim_robot_positions[robot_id]
+            world_state = self.__remove_robot_from_state(world_state, robot_id)
+
+        return world_state
+
     def __get_friendly_and_enemy_team(self) -> Tuple[List[Robot], List[Robot]]:
         """
-        Gets the friendly and enemy team robots based on friendly_colour_yellow
+        Gets the friendly and enemy team robots
         :return: A Tuple of [list of friendly robots, list of enemy robots]
         """
-        if self.friendly_colour_yellow:
-            return (
-                self.cached_world.enemy_team.team_robots,
-                self.cached_world.friendly_team.team_robots,
-            )
-        else:
-            return (
-                self.cached_world.friendly_team.team_robots,
-                self.cached_world.enemy_team.team_robots,
-            )
-
-    def __get_friendly_and_enemy_color(self) -> Tuple[QColor, QColor]:
-        """
-        Gets the friendly and enemy colors based on friendly_colour_yellow
-        :return: A Tuple of [friendly color, enemy color]
-        """
-        if self.friendly_colour_yellow:
-            return Colors.YELLOW_ROBOT_COLOR, Colors.BLUE_ROBOT_COLOR
-        else:
-            return Colors.BLUE_ROBOT_COLOR, Colors.YELLOW_ROBOT_COLOR
+        return (
+            self.cached_world.friendly_team.team_robots,
+            self.cached_world.enemy_team.team_robots,
+        )
 
     # # # # # # # # # # # # # # # # # # # #
     #       GRAPHICS UPDATE METHODS       #
@@ -514,11 +551,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         # get the friendly / enemy teams and colors for this layer
         friendly_team, enemy_team = self.__get_friendly_and_enemy_team()
-        friendly_color, enemy_color = self.__get_friendly_and_enemy_color()
 
-        self.__update_robots_graphics(friendly_team, friendly_color, True)
+        self.__update_robots_graphics(friendly_team, Colors.BLUE_ROBOT_COLOR, True)
 
-        self.__update_robots_graphics(enemy_team, enemy_color, False)
+        self.__update_robots_graphics(enemy_team, Colors.YELLOW_ROBOT_COLOR, False)
 
     def __update_robots_graphics(
         self, team_robots: List[Robot], color: QColor, is_friendly: bool

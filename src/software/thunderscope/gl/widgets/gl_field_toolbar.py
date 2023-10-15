@@ -13,24 +13,6 @@ class GLFieldToolbar(QWidget):
     And for undoing / redoing robot state changes
     """
 
-    # the style for each toolbar button
-    TOOL_BUTTON_STYLESHEET = textwrap.dedent(
-        """
-        QPushButton {
-            color: #969696;
-            background-color: transparent;
-            border-color: transparent;
-            border-width: 4px;
-            border-radius: 4px;
-            height: 16px;
-        }
-        QPushButton:hover {
-            background-color: #363636;
-            border-color: #363636;
-        }
-        """
-    )
-
     def __init__(self, on_camera_view_change: Callable[[CameraView], None], on_measure_mode: Callable[[], None], layers_menu: QMenu):
         """
         Set up the toolbar with these buttons:
@@ -52,13 +34,13 @@ class GLFieldToolbar(QWidget):
         # Setup Layers button for toggling visibility of layers
         self.layers_button = QPushButton()
         self.layers_button.setText("Layers")
-        self.layers_button.setStyleSheet(self.TOOL_BUTTON_STYLESHEET)
+        self.layers_button.setStyleSheet(self.get_button_style())
         self.layers_button.setMenu(layers_menu)
 
         # Set up View button for setting the camera position to standard views
         self.camera_view_button = QPushButton()
         self.camera_view_button.setText("View")
-        self.camera_view_button.setStyleSheet(self.TOOL_BUTTON_STYLESHEET)
+        self.camera_view_button.setStyleSheet(self.get_button_style())
         self.camera_view_menu = QMenu()
         self.camera_view_button.setMenu(self.camera_view_menu)
         self.camera_view_actions = [
@@ -85,35 +67,37 @@ class GLFieldToolbar(QWidget):
         # Setup Measure button for enabling/disabling measure mode
         self.measure_button = QPushButton()
         self.measure_button.setText("Measure")
-        self.measure_button.setStyleSheet(self.TOOL_BUTTON_STYLESHEET)
+        self.measure_button.setStyleSheet(self.get_button_style())
         self.measure_button.setShortcut("m")
         self.measure_button.clicked.connect(lambda: on_measure_mode())
 
         # Setup Help button
         self.help_button = QPushButton()
         self.help_button.setText("Help")
-        self.help_button.setStyleSheet(self.TOOL_BUTTON_STYLESHEET)
+        self.help_button.setStyleSheet(self.get_button_style())
         self.help_button.clicked.connect(
             lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
         )
 
+        # Setup Export button
+        self.export_button = QPushButton()
+        self.export_button.setText("Export")
+        self.export_button.setStyleSheet(self.get_button_style())
+
         # Setup play button
         self.play_button = QPushButton()
         self.play_button.setText("Pause")
-        self.play_button.setStyleSheet(self.TOOL_BUTTON_STYLESHEET)
-        self.play_button.clicked.connect(
-            lambda: self.play_button.setText("Pause" if self.toggle_play_state() else "Play")
-        )
+        self.play_button.setStyleSheet(self.get_button_style())
 
         # Setup Undo button
         self.undo_button = QPushButton()
         self.undo_button.setText("Undo")
-        self.undo_button.setStyleSheet(self.TOOL_BUTTON_STYLESHEET)
+        self.undo_button.setStyleSheet(self.get_button_style())
 
         # Setup Redo button
         self.redo_button = QPushButton()
         self.redo_button.setText("Redo")
-        self.redo_button.setStyleSheet(self.TOOL_BUTTON_STYLESHEET)
+        self.redo_button.setStyleSheet(self.get_button_style())
 
         # Setup toolbar
         self.setSizePolicy(
@@ -123,9 +107,32 @@ class GLFieldToolbar(QWidget):
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(self.layers_button)
         self.layout().addStretch()
+        self.layout().addWidget(self.export_button)
         self.layout().addWidget(self.undo_button)
         self.layout().addWidget(self.play_button)
         self.layout().addWidget(self.redo_button)
         self.layout().addWidget(self.help_button)
         self.layout().addWidget(self.measure_button)
         self.layout().addWidget(self.camera_view_button)
+
+    def toggle_play_button_text(self, is_playing: bool):
+        self.play_button.setText("Pause" if is_playing else "Play")
+
+    def get_button_style(self, is_enabled: bool = True):
+        # the style for each toolbar button
+        return textwrap.dedent(
+            f"""
+            QPushButton {{
+                color: {"#969696" if is_enabled else "#474747"};
+                background-color: transparent;
+                border-color: transparent;
+                border-width: 4px;
+                border-radius: 4px;
+                height: 16px;
+            }}
+            QPushButton:hover {{
+                background-color: #363636;
+                border-color: #363636;
+            }}
+            """
+        )

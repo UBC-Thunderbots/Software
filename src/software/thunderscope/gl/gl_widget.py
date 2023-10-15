@@ -18,11 +18,10 @@ class GLWidget(QWidget):
     and our AI. GLWidget can also provide replay controls.
     """
 
-    def __init__(self, player=None, sandbox_controller=None):
+    def __init__(self, player=None):
         """Initialize the GLWidget
 
         :param player: The replay player to optionally display media controls for
-        :param sandbox_controller: The sandbox controls to optionally display
         """
         super().__init__()
 
@@ -74,12 +73,6 @@ class GLWidget(QWidget):
             self.layout.addWidget(self.replay_controls)
         else:
             self.player = None
-
-        # Setup sandbox mode controls if controls are provided
-        self.sandbox_controller = sandbox_controller
-        if self.sandbox_controller:
-            self.sandbox_controller.setMaximumSize(self.width() * 2.5, self.height() * 0.2)
-            self.layout.addWidget(self.sandbox_controller)
 
         self.layers = []
 
@@ -222,9 +215,6 @@ class GLWidget(QWidget):
         """
         if self.player:
             self.replay_controls.refresh()
-
-        if self.sandbox_controller:
-            self.sandbox_controller.refresh()
 
         # Prevents RuntimeError: wrapped C/C++ object of type ___ has been deleted
         # See: https://stackoverflow.com/a/60700622/20199855

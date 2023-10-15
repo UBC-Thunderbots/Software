@@ -10,7 +10,6 @@ py_library(
         "//software/thunderscope/gl/layers:gl_layer",
         "//software/thunderscope/gl/layers:gl_measure_layer",
         "//software/thunderscope/replay:replay_controls",
-        "//software/thunderscope/sandbox:sandbox_controls",
         "//software/thunderscope/gl/widgets:gl_field_toolbar",
         requirement("pyqtgraph"),
     ],

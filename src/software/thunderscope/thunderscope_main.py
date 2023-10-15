@@ -163,10 +163,10 @@ if __name__ == "__main__":
         help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
     )
     parser.add_argument(
-        "--sandbox_mode",
+        "--empty",
         action="store_true",
         default=False,
-        help="Enables sandbox mode for the field widget",
+        help="Whether to populate with default robot (False) or start with an empty field (True) for AI vs AI",
     )
 
     # Sanity check that an interface was provided
@@ -337,7 +337,6 @@ if __name__ == "__main__":
             config=config.configure_two_ai_gamecontroller_view(
                 args.visualization_buffer_size,
                 args.cost_visualization,
-                args.sandbox_mode,
             ),
             layout_path=args.layout,
         )
@@ -360,12 +359,12 @@ if __name__ == "__main__":
                 if not world_state_received:
                     world_state = tbots_protobuf.create_world_state(
                         blue_robot_locations=[]
-                        if args.sandbox_mode
+                        if args.empty
                         else [
                             cpp_bindings.Point(-3, y)
                             for y in numpy.linspace(-2, 2, NUM_ROBOTS)
                         ],
-                        yellow_robot_locations=[
+                        yellow_robot_locations=[] if args.empty else [
                             cpp_bindings.Point(3, y)
                             for y in numpy.linspace(-2, 2, NUM_ROBOTS)
                         ],

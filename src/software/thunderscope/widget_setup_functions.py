@@ -39,7 +39,6 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
-from software.thunderscope.sandbox.sandbox_controls import SandboxControls
 
 ################################
 #  FULLSYSTEM RELATED WIDGETS  #
@@ -51,7 +50,6 @@ def setup_gl_widget(
     full_system_proto_unix_io,
     friendly_colour_yellow,
     visualization_buffer_size,
-    sandbox_mode=False,
     replay=False,
     replay_log=None,
 ):
@@ -61,7 +59,6 @@ def setup_gl_widget(
     :param full_system_proto_unix_io: The proto unix io object for the full system
     :param friendly_colour_yellow: Whether the friendly colour is yellow
     :param visualization_buffer_size: How many packets to buffer while rendering
-    :param sandbox_mode: if the field widget should be in sandbox mode
     :param replay: Whether replay mode is currently enabled
     :param replay_log: The file path of the replay log
     :returns: The GLWidget
@@ -69,11 +66,8 @@ def setup_gl_widget(
     """
     # Create ProtoPlayer if replay is enabled
     player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
-    # Create Sandbox Controls if sandbox mode is enabled
-    sandbox_controller = SandboxControls() if sandbox_mode else None
-
     # Create widget
-    gl_widget = GLWidget(player=player, sandbox_controller=sandbox_controller)
+    gl_widget = GLWidget(player=player)
 
     # Create layers
     validation_layer = gl_validation_layer.GLValidationLayer(
@@ -86,20 +80,11 @@ def setup_gl_widget(
     passing_layer = gl_passing_layer.GLPassingLayer(
         "Passing", visualization_buffer_size
     )
-    world_layer = (
-        gl_sandbox_world_layer.GLSandboxWorldLayer(
-            "Vision",
-            sim_proto_unix_io,
-            friendly_colour_yellow,
-            visualization_buffer_size,
-        )
-        if sandbox_mode
-        else gl_world_layer.GLWorldLayer(
-            "Vision",
-            sim_proto_unix_io,
-            friendly_colour_yellow,
-            visualization_buffer_size,
-        )
+    world_layer = gl_sandbox_world_layer.GLSandboxWorldLayer(
+        "Vision",
+        sim_proto_unix_io,
+        friendly_colour_yellow,
+        visualization_buffer_size,
     )
     simulator_layer = gl_simulator_layer.GLSimulatorLayer(
         "Simulator", friendly_colour_yellow, visualization_buffer_size
@@ -114,10 +99,11 @@ def setup_gl_widget(
     gl_widget.add_layer(simulator_layer, False)
     gl_widget.add_layer(tactic_layer, False)
 
-    if sandbox_mode:
-        sandbox_controller.toggle_play_state = world_layer.toggle_play_state
-        sandbox_controller.undo_button.clicked.connect(world_layer.undo)
-        sandbox_controller.redo_button.clicked.connect(world_layer.redo)
+    gl_widget.toolbar.play_button.clicked.connect(world_layer.toggle_play_state)
+    world_layer.add_play_callback(lambda is_playing: gl_widget.toolbar.toggle_play_button_text(is_playing))
+    gl_widget.toolbar.undo_button.clicked.connect(world_layer.undo)
+    gl_widget.toolbar.redo_button.clicked.connect(world_layer.redo)
+    gl_widget.toolbar.export_button.clicked.connect(world_layer.export)
 
     # Add HRVO layers and have them hidden on startup
     # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
