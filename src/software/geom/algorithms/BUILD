@@ -214,3 +214,13 @@ cc_test(
         "//software/test_util",
     ],
 )
+
+cc_test(
+    name = "step_along_perimeter_test",
+    srcs = ["step_along_perimeter_test.cpp"],
+    deps = [
+        ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util"
+    ]
+)

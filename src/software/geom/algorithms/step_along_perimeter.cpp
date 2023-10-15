@@ -3,6 +3,7 @@
 #include "software/geom/algorithms/collinear.h"
 #include "software/geom/segment.h"
 
+
 Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double distance) {
     if (distance == 0.0) {
         return start;

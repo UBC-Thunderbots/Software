@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/geom/polygon.h"
 #include "software/geom/point.h"
 
@@ -16,5 +18,6 @@
  * @param distance The distance to traverse along the polygon's perimeter. Can be negative.
  * @return Point object representing the final position after traveling the specified distance from the start.
  */
-Point stepAlongPerimeter(const Polygon polygon, const Point start, double distance);  
+Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double distance);
+
 
