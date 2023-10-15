@@ -33,16 +33,9 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double trav
 
     bool isClockwise = travelDistance > 0;
 
-    // perimeter, can add this to the polygon class
-    double perimeter = std::accumulate(polygonSegments.begin(), polygonSegments.end(), 0.0,
-                                      [](double acc, const Segment& seg) {
-                                          return acc + seg.length();
-                                      }
-    );
-
     // if travel distance is negative, it can be equal to perimeter - |travelDistance|.
     // the fmod function is to support wrapping around and negative distance
-    travelDistance = isClockwise ? travelDistance : perimeter - std::fmod(std::abs(travelDistance), perimeter);
+    travelDistance = isClockwise ? travelDistance : polygon.perimeter() - std::fmod(std::abs(travelDistance), polygon.perimeter());
     while (travelDistance > 0) {
         Segment currSegment = polygonSegments[segmentIdx];
 
