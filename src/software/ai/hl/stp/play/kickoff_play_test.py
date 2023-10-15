@@ -74,27 +74,35 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         ),
     )
 
+
+
     # Always Validation
+    # add always validation: ball is always within bounds
+    # req_robot_cnt returns pass if it is not equal to 2 -
+    # need to create new validation sequence that works on "at least" logic
     # TODO- #2809 Validation
     always_validation_sequence_set = [[]]
 
     if is_friendly_test:
         always_validation_sequence_set[0].append(
             NumberOfRobotsNeverEntersRegion(
-                region=[tbots.Field.enemyHalf(), tbots.Field.centerCircle()],
+                region=[tbots.Field.createSSLDivisionBField.enemyHalf(),
+                        tbots.Field.createSSLDivisionBField.centerCircle()],
                 req_robot_cnt=2,
             )
         )
     else:
         always_validation_sequence_set[0].append(
             NumberOfRobotsNeverEntersRegion(
-                region=[tbots.Field.friendlyHalf(), tbots.Field.centerCircle()],
+                region=[tbots.Field.createSSLDivisionBField().friendlyHalf(),
+                        tbots.Field.createSSLDivisionBField.centerCircle()],
                 req_robot_cnt=2,
             )
         )
 
     # Eventually Validation
     # TODO- #2809 Validation
+    # make only for friendly
     eventually_validation_sequence_set = [
         [BallEventuallyExitsRegion(region=[tbots.Circle(ball_initial_pos, 0.05)])]
     ]
