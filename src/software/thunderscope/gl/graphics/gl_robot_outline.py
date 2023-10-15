@@ -35,7 +35,7 @@ class GLRobotOutline(GLShape):
             parent_item=parent_item, 
             outline_color=outline_color,
             fill_color=fill_color,
-            line_width=line_width, 
+            line_width=line_width,
         )
 
     @staticmethod

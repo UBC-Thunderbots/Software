@@ -37,14 +37,14 @@ class GLCircle(GLShape):
             parent_item=parent_item, 
             outline_color=outline_color,
             fill_color=fill_color,
-            line_width=line_width, 
+            line_width=line_width,
         )
-        
+
         self.radius = 0
         self.num_points = 0
 
         self.set_radius(radius, num_points)
-        
+
     def set_radius(self, radius: float, num_points: int = 24):
         """Set the radius of the circle
 

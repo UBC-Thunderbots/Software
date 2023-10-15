@@ -36,7 +36,7 @@ class GLPolygon(GLShape):
             parent_item=parent_item, 
             outline_color=outline_color,
             fill_color=fill_color,
-            line_width=line_width, 
+            line_width=line_width,
         )
 
         self.set_points(points)
@@ -70,4 +70,3 @@ class GLPolygon(GLShape):
             faces = triangulate.earclip(self.points)
             meshdata = MeshData(vertexes=vertices, faces=np.array(faces))
             self.fill_graphic.setMeshData(meshdata=meshdata)
-        
