@@ -134,7 +134,7 @@ class GLValidationLayer(GLLayer):
             len(polygons), lambda: GLPolygon(line_width=LINE_WIDTH),
         )
         self.segment_graphics.resize(
-            len(segments), lambda: GLLinePlotItem(width=LINE_WIDTH),
+            len(segments), lambda: GLPolygon(line_width=LINE_WIDTH),
         )
         self.circle_graphics.resize(
             len(circles), lambda: GLCircle(),
@@ -160,14 +160,12 @@ class GLValidationLayer(GLLayer):
         for segment_graphic, (segment, validation_status) in zip(
             self.segment_graphics, segments
         ):
-            segment_graphic.setData(
-                pos=np.array(
-                    [
-                        [segment.start.x_meters, segment.start.y_meters],
-                        [segment.end.x_meters, segment.end.y_meters],
-                    ]
-                ),
-                color=self.__get_validation_color(validation_status),
+            segment_graphic.set_points([
+                [segment.start.x_meters, segment.start.y_meters],
+                [segment.end.x_meters, segment.end.y_meters],
+            ])
+            segment_graphic.set_outline_color(
+                self.__get_validation_color(validation_status)
             )
 
         for circle_graphic, (circle, validation_status) in zip(

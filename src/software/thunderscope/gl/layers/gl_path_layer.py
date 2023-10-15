@@ -9,6 +9,7 @@ from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -54,18 +55,16 @@ class GLPathLayer(GLLayer):
         ]
 
         # Ensure we have the same number of graphics as protos
-        self.path_graphics.resize(len(paths), lambda: GLLinePlotItem(width=LINE_WIDTH))
+        self.path_graphics.resize(len(paths), lambda: GLPolygon(
+            outline_color=Colors.NAVIGATOR_PATH_COLOR, line_width=LINE_WIDTH))
         self.destination_graphics.resize(
             len(requested_destinations),
             lambda: GLRobotOutline(outline_color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
         )
 
         for path_graphic, path in zip(self.path_graphics, paths):
-            path_graphic.setData(
-                pos=np.array(
-                    [[point.x_meters, point.y_meters, 0] for point in path.points]
-                ),
-                color=Colors.NAVIGATOR_PATH_COLOR,
+            path_graphic.set_points(
+                [[point.x_meters, point.y_meters] for point in path.points]
             )
 
         for dest_graphic, (dest, final_angle) in zip(

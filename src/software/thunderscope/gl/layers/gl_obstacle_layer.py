@@ -8,6 +8,7 @@ from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -57,13 +58,13 @@ class GLObstacleLayer(GLLayer):
         # Ensure we have the same number of graphics as obstacles
         self.poly_obstacle_graphics.resize(
             len(poly_obstacles),
-            lambda: GLLinePlotItem(
-                color=Colors.NAVIGATOR_OBSTACLE_COLOR, width=LINE_WIDTH
+            lambda: GLPolygon(
+                outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR, line_width=LINE_WIDTH
             ),
         )
         self.circle_obstacle_graphics.resize(
             len(circle_obstacles),
-            lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
+            lambda: GLCircle(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
 
         for poly_obstacle_graphic, poly_obstacle in zip(
@@ -73,10 +74,8 @@ class GLObstacleLayer(GLLayer):
             # the list of points in the polygon
             polygon_points = list(poly_obstacle.points) + poly_obstacle.points[:1]
 
-            poly_obstacle_graphic.setData(
-                pos=np.array(
-                    [[point.x_meters, point.y_meters, 0] for point in polygon_points]
-                ),
+            poly_obstacle_graphic.set_points(
+                [[point.x_meters, point.y_meters] for point in polygon_points]
             )
 
         for circle_obstacle_graphic, circle_obstacle in zip(

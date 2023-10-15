@@ -15,7 +15,7 @@ class GLRect(GLShape):
 
     def __init__(
         self,
-        parentItem: Optional[GLGraphicsItem] = None,
+        parent_item: Optional[GLGraphicsItem] = None,
         x_length: float = 0,
         y_length: float = 0,
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
@@ -24,7 +24,7 @@ class GLRect(GLShape):
     ):
         """Initialize the GLRect
         
-        :param parentItem: The parent item of the graphic
+        :param parent_item: The parent item of the graphic
         :param x_length: The length of the rectangle in the x direction
         :param y_length: The length of the rectangle in the y direction
         :param outline_color: The color of the rectangle's outline
@@ -33,7 +33,7 @@ class GLRect(GLShape):
 
         """
         super().__init__(
-            parentItem=parentItem, 
+            parent_item=parent_item, 
             outline_color=outline_color,
             fill_color=fill_color,
             line_width=line_width, 

@@ -16,7 +16,7 @@ class GLPolygon(GLShape):
 
     def __init__(
         self,
-        parentItem: Optional[GLGraphicsItem] = None,
+        parent_item: Optional[GLGraphicsItem] = None,
         points: List[Tuple[float, float]] = [],
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
@@ -24,16 +24,16 @@ class GLPolygon(GLShape):
     ):
         """Initialize the GLPolygon
         
-        :param parentItem: The parent item of the graphic
+        :param parent_item: The parent item of the graphic
         :param points: A list of 2-tuples representing the polygon points 
-                       on the cartesian plane
+                       on the cartesian plane. Must be non-empty
         :param outline_color: The color of the polygon's outline
         :param fill_color: The color used to fill the polygon, or None if no fill
         :param line_width: The line width of the polygon's outline
 
         """
         super().__init__(
-            parentItem=parentItem, 
+            parent_item=parent_item, 
             outline_color=outline_color,
             fill_color=fill_color,
             line_width=line_width, 
@@ -48,7 +48,7 @@ class GLPolygon(GLShape):
         and last points.
 
         :param points: A list of 2-tuples representing the polygon points
-                       on the cartesian plane
+                       on the cartesian plane. Must be non-empty
 
         """
         self.points = points
@@ -58,6 +58,11 @@ class GLPolygon(GLShape):
         """Update the underlying GLLinePlotItem and GLMeshItem representing
         the outline and fill of this shape
         """
+        # We get OpenGL errors if we try passing in an empty list of
+        # vertices, so return early
+        if not self.points:
+            return
+
         vertices = [(point[0], point[1], 0) for point in self.points]
         self.setData(pos=vertices)
 

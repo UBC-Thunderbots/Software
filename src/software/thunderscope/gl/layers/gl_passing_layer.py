@@ -10,6 +10,7 @@ from proto.visualization_pb2 import PassVisualization
 from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -69,23 +70,22 @@ class GLPassingLayer(GLLayer):
         # Ensure we have the same number of graphics as protos
         self.pass_graphics.resize(
             len(passes_to_show),
-            lambda: GLLinePlotItem(
-                color=Colors.PASS_VISUALIZATION_COLOR, width=LINE_WIDTH
+            lambda: GLPolygon(
+                outline_color=Colors.PASS_VISUALIZATION_COLOR, 
+                line_width=LINE_WIDTH
             ),
         )
 
         for pass_graphic, pass_with_rating in zip(self.pass_graphics, passes_to_show,):
-            pass_graphic.setData(
-                pos=np.array(
+            pass_graphic.set_points(
+                [
                     [
-                        [
-                            pass_with_rating.pass_.passer_point.x_meters,
-                            pass_with_rating.pass_.passer_point.y_meters,
-                        ],
-                        [
-                            pass_with_rating.pass_.receiver_point.x_meters,
-                            pass_with_rating.pass_.receiver_point.y_meters,
-                        ],
-                    ]
-                ),
+                        pass_with_rating.pass_.passer_point.x_meters,
+                        pass_with_rating.pass_.passer_point.y_meters,
+                    ],
+                    [
+                        pass_with_rating.pass_.receiver_point.x_meters,
+                        pass_with_rating.pass_.receiver_point.y_meters,
+                    ],
+                ]
             )

@@ -19,20 +19,20 @@ class GLRobotOutline(GLShape):
 
     def __init__(
         self,
-        parentItem: Optional[GLGraphicsItem] = None,
+        parent_item: Optional[GLGraphicsItem] = None,
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
     ):
         """Initialize the GLRobotOutline
         
-        :param parentItem: The parent item of the graphic
+        :param parent_item: The parent item of the graphic
         :param color: The color of the graphic
         :param line_width: The line width of the graphic
 
         """
         super().__init__(
-            parentItem=parentItem, 
+            parent_item=parent_item, 
             outline_color=outline_color,
             fill_color=fill_color,
             line_width=line_width, 

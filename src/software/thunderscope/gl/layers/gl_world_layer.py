@@ -16,6 +16,7 @@ from software.thunderscope.constants import (
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.graphics.gl_robot import GLRobot
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.thunderscope.gl.graphics.gl_goal import GLGoal
@@ -78,33 +79,33 @@ class GLWorldLayer(GLLayer):
         self.point_in_scene_picked = None
 
         self.friendly_defense_area_graphic = GLRect(
-            parentItem=self, outline_color=Colors.FIELD_LINE_COLOR
+            parent_item=self, outline_color=Colors.FIELD_LINE_COLOR
         )
         self.enemy_defense_area_graphic = GLRect(
-            parentItem=self, outline_color=Colors.FIELD_LINE_COLOR
+            parent_item=self, outline_color=Colors.FIELD_LINE_COLOR
         )
         self.field_lines_graphic = GLRect(
-            parentItem=self, outline_color=Colors.FIELD_LINE_COLOR
+            parent_item=self, outline_color=Colors.FIELD_LINE_COLOR
         )
         self.field_outer_boundary_graphic = GLRect(
-            parentItem=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR
+            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR
         )
-        self.halfway_line_graphic = GLLinePlotItem(
-            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=LINE_WIDTH
+        self.halfway_line_graphic = GLPolygon(
+            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR, line_width=LINE_WIDTH
         )
-        self.goal_to_goal_line_graphic = GLLinePlotItem(
-            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=LINE_WIDTH
+        self.goal_to_goal_line_graphic = GLPolygon(
+            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR, line_width=LINE_WIDTH
         )
         self.field_center_circle_graphic = GLCircle(
-            parentItem=self, outline_color=Colors.FIELD_LINE_COLOR
+            parent_item=self, outline_color=Colors.FIELD_LINE_COLOR
         )
-        self.friendly_goal_graphic = GLGoal(parentItem=self, color=Colors.GOAL_COLOR)
-        self.enemy_goal_graphic = GLGoal(parentItem=self, color=Colors.GOAL_COLOR)
+        self.friendly_goal_graphic = GLGoal(parent_item=self, color=Colors.GOAL_COLOR)
+        self.enemy_goal_graphic = GLGoal(parent_item=self, color=Colors.GOAL_COLOR)
         self.ball_graphic = GLSphere(
-            parentItem=self, radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR
+            parent_item=self, radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR
         )
-        self.ball_kick_velocity_graphic = GLLinePlotItem(
-            parentItem=self, color=Colors.SPEED_VECTOR_COLOR
+        self.ball_kick_velocity_graphic = GLPolygon(
+            parent_item=self, outline_color=Colors.SPEED_VECTOR_COLOR
         )
 
         self.friendly_defense_area_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
@@ -298,16 +299,12 @@ class GLWorldLayer(GLLayer):
             (field.field_x_length / 2) - (field.defense_x_length / 2), 0
         )
 
-        self.halfway_line_graphic.setData(
-            pos=np.array(
-                [[0, -(field.field_y_length / 2)], [0, (field.field_y_length / 2)]]
-            ),
+        self.halfway_line_graphic.set_points(
+            [(0, -(field.field_y_length / 2)), (0, (field.field_y_length / 2))]
         )
 
-        self.goal_to_goal_line_graphic.setData(
-            pos=np.array(
-                [[-(field.field_x_length / 2), 0], [(field.field_x_length / 2), 0]]
-            ),
+        self.goal_to_goal_line_graphic.set_points(
+            [(-(field.field_x_length / 2), 0), ((field.field_x_length / 2), 0)]
         )
 
         self.field_center_circle_graphic.set_radius(field.center_circle_radius)
@@ -416,7 +413,7 @@ class GLWorldLayer(GLLayer):
         self.breakbeam_graphics.resize(
             len(self.cached_world.friendly_team.team_robots),
             lambda: GLCircle(
-                parentItem=self,
+                parent_item=self,
                 radius=ROBOT_MAX_RADIUS_METERS / 2,
                 outline_color=Colors.BREAKBEAM_TRIPPED_COLOR,
             ),
@@ -451,19 +448,17 @@ class GLWorldLayer(GLLayer):
             velocity = self.ball_velocity_vector * SPEED_SEGMENT_SCALE
 
             self.ball_kick_velocity_graphic.show()
-            self.ball_kick_velocity_graphic.setData(
-                pos=np.array(
+            self.ball_kick_velocity_graphic.set_points(
+                [
                     [
-                        [
-                            ball_state.global_position.x_meters,
-                            ball_state.global_position.y_meters,
-                        ],
-                        [
-                            ball_state.global_position.x_meters + velocity.x(),
-                            ball_state.global_position.y_meters + velocity.y(),
-                        ],
-                    ]
-                ),
+                        ball_state.global_position.x_meters,
+                        ball_state.global_position.y_meters,
+                    ],
+                    [
+                        ball_state.global_position.x_meters + velocity.x(),
+                        ball_state.global_position.y_meters + velocity.y(),
+                    ],
+                ]
             )
 
         else:
@@ -477,23 +472,21 @@ class GLWorldLayer(GLLayer):
 
         # Ensure we have the same number of graphics as robots/balls
         self.speed_line_graphics.resize(
-            len(objects), lambda: GLLinePlotItem(color=Colors.SPEED_VECTOR_COLOR),
+            len(objects), lambda: GLPolygon(outline_color=Colors.SPEED_VECTOR_COLOR),
         )
 
         for speed_line_graphic, object in zip(self.speed_line_graphics, objects):
             pos_x = object.current_state.global_position.x_meters
             pos_y = object.current_state.global_position.y_meters
             velocity = object.current_state.global_velocity
-            speed_line_graphic.setData(
-                pos=np.array(
+            speed_line_graphic.set_points(
+                [
+                    [pos_x, pos_y],
                     [
-                        [pos_x, pos_y],
-                        [
-                            pos_x + velocity.x_component_meters * SPEED_SEGMENT_SCALE,
-                            pos_y + velocity.y_component_meters * SPEED_SEGMENT_SCALE,
-                        ],
-                    ]
-                ),
+                        pos_x + velocity.x_component_meters * SPEED_SEGMENT_SCALE,
+                        pos_y + velocity.y_component_meters * SPEED_SEGMENT_SCALE,
+                    ],
+                ]
             )
 
     def __should_invert_coordinate_frame(self) -> bool:

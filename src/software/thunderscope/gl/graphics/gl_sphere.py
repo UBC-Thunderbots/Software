@@ -12,7 +12,7 @@ class GLSphere(GLMeshItem):
 
     def __init__(
         self,
-        parentItem: Optional[GLGraphicsItem] = None,
+        parent_item: Optional[GLGraphicsItem] = None,
         radius: float = 1,
         rows: int = 10,
         cols: int = 10,
@@ -20,14 +20,14 @@ class GLSphere(GLMeshItem):
     ):
         """Initialize the GLSphere
         
-        :param parentItem: The parent item of the graphic
+        :param parent_item: The parent item of the graphic
         :param radius: The radius of the sphere
         :param rows: The number of rows in the mesh
         :param cols: The number of columns in the mesh
         :param color: The color of the sphere
 
         """
-        super().__init__(parentItem=parentItem, color=color)
+        super().__init__(parentItem=parent_item, color=color)
 
         self.x = 0
         self.y = 0

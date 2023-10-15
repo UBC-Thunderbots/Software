@@ -9,6 +9,7 @@ from software.thunderscope.constants import Colors, LINE_WIDTH
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
@@ -61,15 +62,13 @@ class GLMeasureLayer(GLLayer):
 
             # Create and add line graphic
             self.measurement_line_graphics.append(
-                GLLinePlotItem(
-                    color=(Colors.PRIMARY_TEXT_COLOR),
-                    width=LINE_WIDTH,
-                    pos=np.array(
-                        [
-                            [first_point.x(), first_point.y(), 0],
-                            [second_point.x(), second_point.y(), 0],
-                        ]
-                    ),
+                GLPolygon(
+                    outline_color=(Colors.PRIMARY_TEXT_COLOR),
+                    line_width=LINE_WIDTH,
+                    points=[
+                        [first_point.x(), first_point.y(), 0],
+                        [second_point.x(), second_point.y(), 0],
+                    ],
                 )
             )
 

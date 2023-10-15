@@ -16,17 +16,17 @@ class GLRobot(GLMeshItem):
 
     def __init__(
         self,
-        parentItem: Optional[GLGraphicsItem] = None,
+        parent_item: Optional[GLGraphicsItem] = None,
         color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
     ):
         """Initialize the GLRobot
         
-        :param parentItem: The parent item of the graphic
+        :param parent_item: The parent item of the graphic
         :param color: The color of the graphic
 
         """
         super().__init__(
-            parentItem=parentItem, meshdata=self.__get_mesh_data(), color=color,
+            parentItem=parent_item, meshdata=self.__get_mesh_data(), color=color,
         )
 
         self.x = 0

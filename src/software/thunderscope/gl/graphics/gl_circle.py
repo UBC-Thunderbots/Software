@@ -16,7 +16,7 @@ class GLCircle(GLShape):
 
     def __init__(
         self,
-        parentItem: Optional[GLGraphicsItem] = None,
+        parent_item: Optional[GLGraphicsItem] = None,
         radius: float = 1,
         num_points: int = 24,
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
@@ -25,7 +25,7 @@ class GLCircle(GLShape):
     ):
         """Initialize the GLCircle
         
-        :param parentItem: The parent item of the graphic
+        :param parent_item: The parent item of the graphic
         :param radius: The radius of the circle
         :param num_points: The number of points to generate when creating the circle
         :param outline_color: The color of the circle's outline
@@ -34,7 +34,7 @@ class GLCircle(GLShape):
 
         """
         super().__init__(
-            parentItem=parentItem, 
+            parent_item=parent_item, 
             outline_color=outline_color,
             fill_color=fill_color,
             line_width=line_width, 

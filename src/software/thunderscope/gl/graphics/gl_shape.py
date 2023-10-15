@@ -17,20 +17,20 @@ class GLShape(GLLinePlotItem):
 
     def __init__(
         self,
-        parentItem: Optional[GLGraphicsItem] = None,
+        parent_item: Optional[GLGraphicsItem] = None,
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
     ):
         """Base constructor for the GLShape
         
-        :param parentItem: The parent item of the graphic
+        :param parent_item: The parent item of the graphic
         :param outline_color: The color of the polygon's outline
         :param fill_color: The color used to fill the polygon, or None if no fill
         :param line_width: The line width of the polygon's outline
 
         """
-        super().__init__(parentItem=parentItem, width=line_width)
+        super().__init__(parentItem=parent_item, width=line_width)
 
         self.x = 0
         self.y = 0
