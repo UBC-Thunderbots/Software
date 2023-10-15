@@ -186,7 +186,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                     self.primitive_set_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
-                    # get the time after we get the primitive (after any blocking that happened)
+                    # get the time difference after we get the primitive (after any blocking that happened)
                     primitive_block_time = primitive_block_time - time.time()
                     break
                 except queue.Empty as empty:
