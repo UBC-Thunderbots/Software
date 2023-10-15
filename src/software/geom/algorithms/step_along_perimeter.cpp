@@ -1,11 +1,13 @@
 #include <vector>
+#include <numeric>
 #include "software/geom/algorithms/step_along_perimeter.h"
 #include "software/geom/algorithms/collinear.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/geom/segment.h"
 
 
-Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double distance) {
-    if (distance == 0.0) {
+Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double travelDistance) {
+    if (travelDistance == 0.0) {
         return start;
     }
 
@@ -29,18 +31,27 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double dist
 
     std::size_t segmentIdx = startSegmentIdx;
 
-    bool isClockwise = distance > 0;
+    bool isClockwise = travelDistance > 0;
 
-    // Always work with positive distance in the while loop
-    distance = std::abs(distance);
-    while (distance > 0) {
+    // perimeter, can add this to the polygon class
+    double perimeter = std::accumulate(polygonSegments.begin(), polygonSegments.end(), 0.0,
+                                      [](double acc, const Segment& seg) {
+                                          return acc + seg.length();
+                                      }
+    );
+
+    // if travel distance is negative, it can be equal to perimeter - |travelDistance|.
+    // the fmod function is to support wrapping around and negative distance
+    travelDistance = isClockwise ? travelDistance : perimeter - std::fmod(std::abs(travelDistance), perimeter);
+    while (travelDistance > 0) {
         Segment currSegment = polygonSegments[segmentIdx];
-        double segmentLength = currSegment.length();
+
+        double segmentLength = currSegment == polygonSegments[startSegmentIdx] ? distance(start, currSegment.getEnd()) : currSegment.length();
 
         // If the remaining distance to travel is less than or equal to the length
         // of the current segment, calculate the final point and return it
-        if (distance <= segmentLength) {
-            double ratio = distance / segmentLength;
+        if (travelDistance <= segmentLength) {
+            double ratio = travelDistance / segmentLength;
             double newX =
                     currSegment.getStart().x() + ratio * (currSegment.getEnd().x() - currSegment.getStart().x());
             double newY =
@@ -49,15 +60,10 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double dist
         }
 
         // Subtract the length of the current segment from the total distance
-        distance -= segmentLength;
+        travelDistance -= segmentLength;
 
-        // Update the segment index based on the direction of traversal
-        if (isClockwise) {
-            segmentIdx = (segmentIdx + 1) % polygonSegments.size();
-        } else {
-            segmentIdx = (segmentIdx == 0) ? polygonSegments.size() - 1 : segmentIdx - 1;
-        }
-
+        // Update the segment index
+        segmentIdx = (segmentIdx + 1) % polygonSegments.size();
     }
 
     return start;
