@@ -9,7 +9,6 @@ from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
 from software.thunderscope.gl.graphics.gl_robot import GLRobot
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 from software.thunderscope.gl.helpers.observable_list import ObservableList
-from software.thunderscope.gl.helpers.export_to_pytest import PytestBuilder
 from software.thunderscope.constants import Colors
 
 
@@ -78,9 +77,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         # callback functions to call when the play state changes
         self.play_callbacks = []
-
-        # the pytest builder for exporting as a test
-        self.pytest_builder = PytestBuilder()
 
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
         """
@@ -231,9 +227,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param callback: the callback function to add
         """
         self.play_callbacks.append(callback)
-
-    def export(self):
-        self.pytest_builder.build(self.pre_sim_robot_positions)
 
     def reset_to_pre_sim(self):
         """

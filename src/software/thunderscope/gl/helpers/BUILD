@@ -15,11 +15,3 @@ py_library(
     srcs = ["observable_list.py"],
     deps = [],
 )
-
-py_library(
-    name = "export_to_pytest",
-    srcs = ["export_to_pytest.py"],
-    deps = [
-        requirement("pyqtgraph"),
-    ],
-)

@@ -103,7 +103,7 @@ def setup_gl_widget(
     world_layer.add_play_callback(lambda is_playing: gl_widget.toolbar.toggle_play_button_text(is_playing))
     gl_widget.toolbar.undo_button.clicked.connect(world_layer.undo)
     gl_widget.toolbar.redo_button.clicked.connect(world_layer.redo)
-    gl_widget.toolbar.export_button.clicked.connect(world_layer.export)
+    gl_widget.toolbar.reset_button.clicked.connect(world_layer.reset_to_pre_sim)
 
     # Add HRVO layers and have them hidden on startup
     # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages

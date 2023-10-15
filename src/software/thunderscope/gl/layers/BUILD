@@ -62,7 +62,6 @@ py_library(
     srcs = ["gl_sandbox_world_layer.py"],
     deps = [
         ":gl_world_layer",
-        "//software/thunderscope/gl/helpers:export_to_pytest",
         requirement("pyqtgraph"),
     ],
 )

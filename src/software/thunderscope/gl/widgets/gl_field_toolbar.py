@@ -79,11 +79,6 @@ class GLFieldToolbar(QWidget):
             lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
         )
 
-        # Setup Export button
-        self.export_button = QPushButton()
-        self.export_button.setText("Export")
-        self.export_button.setStyleSheet(self.get_button_style())
-
         # Setup play button
         self.play_button = QPushButton()
         self.play_button.setText("Pause")
@@ -99,6 +94,10 @@ class GLFieldToolbar(QWidget):
         self.redo_button.setText("Redo")
         self.redo_button.setStyleSheet(self.get_button_style())
 
+        self.reset_button = QPushButton()
+        self.reset_button.setText("Reset")
+        self.reset_button.setStyleSheet(self.get_button_style())
+
         # Setup toolbar
         self.setSizePolicy(
             QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed
@@ -107,7 +106,7 @@ class GLFieldToolbar(QWidget):
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(self.layers_button)
         self.layout().addStretch()
-        self.layout().addWidget(self.export_button)
+        self.layout().addWidget(self.reset_button)
         self.layout().addWidget(self.undo_button)
         self.layout().addWidget(self.play_button)
         self.layout().addWidget(self.redo_button)
