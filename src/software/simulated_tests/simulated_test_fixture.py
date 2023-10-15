@@ -141,6 +141,9 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         time_elapsed_s = 0
 
+        # initialize the primitive block time to 0
+        primitive_block_time = 0
+
         eventually_validation_failure_msg = "Test Timed Out"
 
         while time_elapsed_s < test_timeout_s:
@@ -161,23 +164,30 @@ class SimulatedTestRunner(TbotsTestRunner):
 
             tick = SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
             self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+            time_elapsed_s += tick_duration_s
 
             if self.thunderscope:
-                time.sleep(tick_duration_s)
+                time.sleep(
+                    tick_duration_s - primitive_block_time
+                    if primitive_block_time >= 0
+                    else 0
+                )
 
             while True:
                 try:
                     world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
-                    # AI is usually slower than getting worlds, so that's the limiting factor
-                    # We get a new primitive set and only update the time if one exists to make time dependant on AI
+
+                    # get time before we try to get the primitive
+                    primitive_block_time = time.time()
+                    # We need this blocking get call to synchronize the running speed of world and primitives
                     # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
-                    primitive_set = self.primitive_set_buffer.get(
-                        block=False, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
+                    self.primitive_set_buffer.get(
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
-                    if primitive_set is not None:
-                        time_elapsed_s += tick_duration_s
+                    # get the time after we get the primitive (after any blocking that happened)
+                    primitive_block_time = primitive_block_time - time.time()
                     break
                 except queue.Empty as empty:
                     # If we timeout, that means full_system missed the last
