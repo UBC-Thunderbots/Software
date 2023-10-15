@@ -1,7 +1,8 @@
+import textwrap
+from typing import Callable
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.thunderscope.constants import CameraView, THUNDERSCOPE_HELP_TEXT
-import textwrap
 
 
 class GLFieldToolbar(QWidget):
@@ -29,13 +30,30 @@ class GLFieldToolbar(QWidget):
         }
         """
     )
-    def __init__(self):
+
+    def __init__(self, on_camera_view_change: Callable[[CameraView], None], on_measure_mode: Callable[[], None], layers_menu: QMenu):
+        """
+        Set up the toolbar with these buttons:
+
+        - Layers select menu
+        - Undo
+        - Pause
+        - Redo
+        - Help
+        - Measure Mode Toggle
+        - Camera View Select menu
+
+        :param on_camera_view_change: the callback function for when the camera view is changed
+        :param on_measure_mode: the callback function for when measure mode is toggled
+        :param layers_menu: the QMenu for the layers menu selection
+        """
         super(GLFieldToolbar, self).__init__()
 
         # Setup Layers button for toggling visibility of layers
         self.layers_button = QPushButton()
         self.layers_button.setText("Layers")
         self.layers_button.setStyleSheet(self.TOOL_BUTTON_STYLESHEET)
+        self.layers_button.setMenu(layers_menu)
 
         # Set up View button for setting the camera position to standard views
         self.camera_view_button = QPushButton()
@@ -50,27 +68,26 @@ class GLFieldToolbar(QWidget):
             QtGui.QAction("[4] Right Half High Angle"),
         ]
         self.camera_view_actions[0].triggered.connect(
-            lambda: self.set_camera_view(CameraView.ORTHOGRAPHIC)
+            lambda: on_camera_view_change(CameraView.ORTHOGRAPHIC)
         )
         self.camera_view_actions[1].triggered.connect(
-            lambda: self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
+            lambda: on_camera_view_change(CameraView.LANDSCAPE_HIGH_ANGLE)
         )
         self.camera_view_actions[2].triggered.connect(
-            lambda: self.set_camera_view(CameraView.LEFT_HALF_HIGH_ANGLE)
+            lambda: on_camera_view_change(CameraView.LEFT_HALF_HIGH_ANGLE)
         )
         self.camera_view_actions[3].triggered.connect(
-            lambda: self.set_camera_view(CameraView.RIGHT_HALF_HIGH_ANGLE)
+            lambda: on_camera_view_change(CameraView.RIGHT_HALF_HIGH_ANGLE)
         )
         for camera_view_action in self.camera_view_actions:
             self.camera_view_menu.addAction(camera_view_action)
 
         # Setup Measure button for enabling/disabling measure mode
-        self.measure_mode_enabled = False
-        self.measure_layer = None
         self.measure_button = QPushButton()
         self.measure_button.setText("Measure")
         self.measure_button.setStyleSheet(self.TOOL_BUTTON_STYLESHEET)
         self.measure_button.setShortcut("m")
+        self.measure_button.clicked.connect(lambda: on_measure_mode())
 
         # Setup Help button
         self.help_button = QPushButton()

@@ -45,12 +45,15 @@ class GLWidget(QWidget):
         )
 
         # Setup toolbar
-        self.toolbar = GLFieldToolbar()
-        self.toolbar.set_camera_view = self.set_camera_view
-        self.toolbar.measure_button.clicked.connect(lambda: self.toggle_measure_mode())
+        self.measure_mode_enabled = False
+        self.measure_layer = None
         self.layers_menu = QMenu()
         self.layers_menu_actions = {}
-        self.toolbar.layers_button.setMenu(self.layers_menu)
+        self.toolbar = GLFieldToolbar(
+            on_camera_view_change=self.set_camera_view,
+            on_measure_mode=self.toggle_measure_mode,
+            layers_menu=self.layers_menu
+        )
 
         # Setup layout
         self.layout = QVBoxLayout()
