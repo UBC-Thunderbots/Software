@@ -5,7 +5,7 @@
 
 
 /**
- * @brief Computes the final position on a polygon's perimeter after traveling a specified
+ * Computes the final position on a polygon's perimeter after traveling a specified
  * distance from a starting point.
  *
  * Given a polygon, a starting point on its perimeter, and a travel distance,
