@@ -17,7 +17,7 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
     }
 
     std::vector<Segment> polygonSegments = polygon.getSegments();
-    std::size_t startSegmentIndex          = 0;
+    std::size_t startSegmentIndex        = 0;
 
     int i = 0;
 
@@ -40,8 +40,9 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
     // if travel distance is negative, it can be equal to perimeter - |travelDistance|.
     // the fmod function is to support wrapping around and negative distance
     bool isCounterClockwise = travelDistance < 0;
-    travelDistance = std::fmod(std::abs(travelDistance), polygon.perimeter());
-    if (isCounterClockwise) {
+    travelDistance          = std::fmod(std::abs(travelDistance), polygon.perimeter());
+    if (isCounterClockwise)
+    {
         travelDistance = polygon.perimeter() - travelDistance;
     }
     while (travelDistance > 0)
@@ -49,7 +50,8 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
         Segment currSegment = polygonSegments[segmentIndex];
 
         double segmentLength = currSegment.length();
-        if (segmentIndex == startSegmentIndex) {
+        if (segmentIndex == startSegmentIndex)
+        {
             segmentLength = distance(start, currSegment.getEnd());
         }
 
