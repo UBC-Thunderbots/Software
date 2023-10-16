@@ -16,12 +16,10 @@
  * @note Assumes that the starting point is exactly on the polygon's perimeter. If
  * distance is zero, the function returns the starting point.
  *
- * @param polygon Reference to a Polygon object representing the polygon to traverse.
- * @param start Reference to a Point object representing the starting position on the
- * polygon's perimeter.
- * @param distance The distance to traverse along the polygon's perimeter. Can be
- * negative.
- * @return Point object representing the final position after traveling the specified
- * distance from the start.
+ * @param polygon The polygon to traverse
+ * @param start The starting position on the polygon's perimeter
+ * @param distance The distance to traverse along the polygon's perimeter. 
+ * Positive to traverse clockwise, or negative to traverse counter-clockwise.
+ * @return The final position after traveling the specified distance from the start
  */
 Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double distance);
