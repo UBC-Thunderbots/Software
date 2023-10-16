@@ -11,11 +11,10 @@ from software.simulated_tests.simulated_test_fixture import (
 )
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-from proto.ssl_gc_geometry_pb2 import Vector2
 
 
 def ball_placement_play_setup(
-    run_enemy_ai, ball_start_point, ball_placement_point, simulated_test_runner
+    ball_start_point, ball_placement_point, simulated_test_runner
 ):
     # Setup Bots
     blue_bots = [
@@ -50,23 +49,12 @@ def ball_placement_play_setup(
     blue_play = Play()
     blue_play.name = PlayName.BallPlacementPlay
 
+    # TODO (#3019): Reenable enemy ai after enemy ball placement is fixed
+    yellow_play = Play()
+    yellow_play.name = PlayName.HaltPlay
+
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-
-    # We can parametrize running in ai_vs_ai mode
-    if run_enemy_ai:
-        yellow_play = Play()
-        yellow_play.name = PlayName.EnemyBallPlacementPlay
-
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
-    else:
-        yellow_play = Play()
-        yellow_play.name = PlayName.HaltPlay
-
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-            Play, yellow_play
-        )
+    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
 
     # Create world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -83,20 +71,20 @@ def ball_placement_play_setup(
 # TODO (#2599): Remove Duration parameter from test
 # TODO (#2690): Robot gets stuck in corner of defense area
 @pytest.mark.parametrize(
-    "run_enemy_ai, ball_start_point, ball_placement_point",
+    "ball_start_point, ball_placement_point",
     [
         # test normal ball placement (not edge case)
-        (False, tbots.Point(2, 2), tbots.Point(0, 1.5)),
+        (tbots.Point(2, 2), tbots.Point(0, 1.5)),
         # test when ball starting point is outside of the goal line
-        (False, tbots.Point(-4.7, 1.6), tbots.Point(0, 0.5)),
+        (tbots.Point(-4.7, 1.6), tbots.Point(0, 0.5)),
         # test when ball starting point is outside of the side lines
-        (False, tbots.Point(-2.0, 3.2), tbots.Point(0, -0.5)),
+        (tbots.Point(-2.0, 3.2), tbots.Point(0, -0.5)),
         # test when ball placement point is inside of the friendly defense area
-        (False, tbots.Point(-3.6, 0.0), tbots.Point(0, -1.5)),
+        (tbots.Point(-3.6, 0.0), tbots.Point(0, -1.5)),
     ],
 )
 def test_two_ai_ball_placement(
-    simulated_test_runner, run_enemy_ai, ball_start_point, ball_placement_point
+    simulated_test_runner, ball_start_point, ball_placement_point
 ):
     # Placement Eventually Validation
     placement_eventually_validation_sequence_set = [
@@ -113,14 +101,12 @@ def test_two_ai_ball_placement(
 
     simulated_test_runner.run_test(
         setup=lambda test_setup_arg: ball_placement_play_setup(
-            test_setup_arg["run_enemy_ai"],
             test_setup_arg["ball_start_point"],
             test_setup_arg["ball_placement_point"],
             simulated_test_runner,
         ),
         params=[
             {
-                "run_enemy_ai": run_enemy_ai,
                 "ball_start_point": ball_start_point,
                 "ball_placement_point": ball_placement_point,
             }

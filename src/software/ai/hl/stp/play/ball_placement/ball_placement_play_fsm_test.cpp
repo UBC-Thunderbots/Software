@@ -31,17 +31,7 @@ TEST(BallPlacementPlayFSMTest, test_transitions)
             world, num_tactics, [](PriorityTacticVector new_tactics) {},
             InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
 
-    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::PlaceBallState>));
-
-    world.updateBall(Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(1)));
-
-    fsm.process_event(BallPlacementPlayFSM::Update(
-        BallPlacementPlayFSM::ControlParams{},
-        PlayUpdate(
-            world, num_tactics, [](PriorityTacticVector new_tactics) {},
-            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
-
-    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::RetreatState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::AlignPlacementState>));
 }
 
 TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
@@ -74,7 +64,7 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
 
     // After the ball is kicked off a wall, it ends up somewhere inside the field lines
     // (but still needs to be moved to the ball placement point)
-    world.updateBall(Ball(Point(-1, 2), Vector(0, 0), Timestamp::fromSeconds(1)));
+    world.updateBall(Ball(Point(-1, 2), Vector(1, 1), Timestamp::fromSeconds(1)));
 
     fsm.process_event(BallPlacementPlayFSM::Update(
         BallPlacementPlayFSM::ControlParams{},
@@ -82,17 +72,7 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
             world, num_tactics, [](PriorityTacticVector new_tactics) {},
             InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
 
-    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::PlaceBallState>));
-
-    world.updateBall(Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(2)));
-
-    fsm.process_event(BallPlacementPlayFSM::Update(
-        BallPlacementPlayFSM::ControlParams{},
-        PlayUpdate(
-            world, num_tactics, [](PriorityTacticVector new_tactics) {},
-            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
-
-    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::RetreatState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::AlignPlacementState>));
 }
 
 TEST(BallPlacementPlayFSMTest, test_kick_off_wall_angle)
@@ -122,7 +102,6 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_angle)
     start_point = Point(2.0, -3.2);
     kick_angle  = fsm.calculateWallKickoffAngle(start_point, field_lines);
     EXPECT_TRUE(kick_angle.toDegrees() == -135);
-
 
     // friendly half, ball outside friendly goal line (left of goal)
     start_point = Point(-4.7, 1.6);
