@@ -1,7 +1,7 @@
 #include "software/geom/algorithms/step_along_perimeter.h"
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 #include "software/geom/algorithms/collinear.h"
 #include "software/geom/algorithms/distance.h"
