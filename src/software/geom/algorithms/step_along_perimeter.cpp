@@ -18,13 +18,13 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
 
 
     std::vector<Segment> polygonSegments = polygon.getSegments();
-    std::size_t startSegmentIndex = 0;
+    std::size_t startSegmentIndex        = 0;
 
-// find initial segment which contains start point
-    std::vector<Segment>::iterator it = std::find_if(polygonSegments.begin(), polygonSegments.end(),
-                                                     [&start](const Segment& segment) {
-                                                         return collinear(segment.getStart(), start, segment.getEnd());
-                                                     });
+    // find initial segment which contains start point
+    std::vector<Segment>::iterator it = std::find_if(
+        polygonSegments.begin(), polygonSegments.end(), [&start](const Segment& segment) {
+            return collinear(segment.getStart(), start, segment.getEnd());
+        });
 
     startSegmentIndex = std::distance(polygonSegments.begin(), it);
 
@@ -33,8 +33,9 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
 
     // fmod travel distance for case where travelDistance > perimeter
     bool isCounterClockwise = travelDistance < 0;
-    travelDistance = std::fmod(std::abs(travelDistance), polygon.perimeter());
-    if (isCounterClockwise) {
+    travelDistance          = std::fmod(std::abs(travelDistance), polygon.perimeter());
+    if (isCounterClockwise)
+    {
         travelDistance = polygon.perimeter() - travelDistance;
     }
 
@@ -44,9 +45,10 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
         Segment currSegment = polygonSegments[segmentIndex];
 
         double segmentLength = currSegment.length();
-        if (segmentIndex == startSegmentIndex && !wrapFlag) {
+        if (segmentIndex == startSegmentIndex && !wrapFlag)
+        {
             segmentLength = distance(start, currSegment.getEnd());
-            wrapFlag = true;
+            wrapFlag      = true;
         }
 
         // If the remaining distance to travel is less than or equal to the length

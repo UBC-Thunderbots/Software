@@ -18,7 +18,7 @@
  *
  * @param polygon The polygon to traverse
  * @param start The starting position on the polygon's perimeter
- * @param distance The distance to traverse along the polygon's perimeter. 
+ * @param distance The distance to traverse along the polygon's perimeter.
  * Positive to traverse clockwise, or negative to traverse counter-clockwise.
  * @return The final position after traveling the specified distance from the start
  */
