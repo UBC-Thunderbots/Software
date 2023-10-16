@@ -17,7 +17,7 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
     }
 
     std::vector<Segment> polygonSegments = polygon.getSegments();
-    std::size_t startSegmentIdx          = 0;
+    std::size_t startSegmentIndex          = 0;
 
     int i = 0;
 
@@ -29,29 +29,29 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
 
         if (collinear(segmentStart, start, segmentEnd))
         {
-            startSegmentIdx = i;
+            startSegmentIndex = i;
             break;
         }
         i++;
     }
 
-    std::size_t segmentIdx = startSegmentIdx;
-
-    bool isClockwise = travelDistance > 0;
+    std::size_t segmentIndex = startSegmentIndex;
 
     // if travel distance is negative, it can be equal to perimeter - |travelDistance|.
     // the fmod function is to support wrapping around and negative distance
-    travelDistance = isClockwise
-                         ? travelDistance
-                         : polygon.perimeter() -
-                               std::fmod(std::abs(travelDistance), polygon.perimeter());
+    bool isCounterClockwise = travelDistance < 0;
+    travelDistance = std::fmod(std::abs(travelDistance), polygon.perimeter());
+    if (isCounterClockwise) {
+        travelDistance = polygon.perimeter() - travelDistance;
+    }
     while (travelDistance > 0)
     {
-        Segment currSegment = polygonSegments[segmentIdx];
+        Segment currSegment = polygonSegments[segmentIndex];
 
-        double segmentLength = currSegment == polygonSegments[startSegmentIdx]
-                                   ? distance(start, currSegment.getEnd())
-                                   : currSegment.length();
+        double segmentLength = currSegment.length();
+        if (segmentIndex == startSegmentIndex) {
+            segmentLength = distance(start, currSegment.getEnd());
+        }
 
         // If the remaining distance to travel is less than or equal to the length
         // of the current segment, calculate the final point and return it
@@ -69,7 +69,7 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
         travelDistance -= segmentLength;
 
         // Update the segment index
-        segmentIdx = (segmentIdx + 1) % polygonSegments.size();
+        segmentIndex += 1;
     }
 
     return start;
