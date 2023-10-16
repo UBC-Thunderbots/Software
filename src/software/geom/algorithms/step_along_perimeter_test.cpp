@@ -87,6 +87,28 @@ TEST(StepAlongPerimeterTest, NegativeDistanceGoAround)
     EXPECT_EQ(resultPoint, expectedPoint);
 }
 
+TEST(StepAlongPerimeterTest, NegativeDistanceStartsFromMiddle1)
+{
+    Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
+    Point startPoint(0.5, 0);
+    double travelDistance =
+            -1.0;  // Assuming we travel a distance equal to one side backward.
+    Point expectedPoint(1.5, 0);  // Expect to be at the last vertex when moving backward.
+    Point resultPoint = stepAlongPerimeter(polygon, startPoint, travelDistance);
+    EXPECT_EQ(resultPoint, expectedPoint);
+}
+
+TEST(StepAlongPerimeterTest, NegativeDistanceStartsFromMiddle2)
+{
+    Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
+    Point startPoint(0.5, 0);
+    double travelDistance =
+            1.0;  // Assuming we travel a distance equal to one side backward.
+    Point expectedPoint(0, 0.5);  // Expect to be at the last vertex when moving backward.
+    Point resultPoint = stepAlongPerimeter(polygon, startPoint, travelDistance);
+    EXPECT_EQ(resultPoint, expectedPoint);
+}
+
 TEST(StepAlongPerimeterTest, NonConvexPolygonMoveForward1)
 {
     Polygon polygon({{0, 0}, {1, 2}, {2, 0}, {1, 1}});
