@@ -24,8 +24,8 @@ TEST(StepAlongPerimeterTest, PositiveDistanceEndsInMiddle) {
 TEST(StepAlongPerimeterTest, PositiveDistanceGoAround1) {
     Polygon polygon({{0,0}, {0,2}, {2,2}, {2,0}});
     Point startPoint(0, 0);
-    double travelDistance = 11.0;  // Assuming we travel a distance equal to one side + half of the next side.
-    Point expectedPoint(1, 2);  // Expect to end in the middle of the second side.
+    double travelDistance = 11.0;
+    Point expectedPoint(1, 2);
     Point resultPoint = stepAlongPerimeter(polygon, startPoint, travelDistance);
     EXPECT_EQ(resultPoint, expectedPoint);
 }
@@ -33,8 +33,8 @@ TEST(StepAlongPerimeterTest, PositiveDistanceGoAround1) {
 TEST(StepAlongPerimeterTest, PositiveDistanceGoAround2) {
 Polygon polygon({{0,0}, {0,2}, {2,2}, {2,0}});
 Point startPoint(0, 0);
-double travelDistance = 17.0;  // Assuming we travel a distance equal to one side + half of the next side.
-Point expectedPoint(0, 1);  // Expect to end in the middle of the second side.
+double travelDistance = 17.0;
+Point expectedPoint(0, 1);
 Point resultPoint = stepAlongPerimeter(polygon, startPoint, travelDistance);
 EXPECT_EQ(resultPoint, expectedPoint);
 }
@@ -106,6 +106,33 @@ TEST(StepAlongPerimeterTest, NonConvexPolygonMoveBackward1) {
     Point startPoint(0, 0);
     double travelDistance = -1.0;
     Point expectedPoint(1/ sqrt(2), 1/ sqrt(2));
+    Point resultPoint = stepAlongPerimeter(polygon, startPoint, travelDistance);
+    EXPECT_EQ(resultPoint, expectedPoint);
+}
+
+
+TEST(StepAlongPerimeterTest, NonConvexPolygonMoveBackward2) {
+    Polygon polygon({{0,0}, {1,2}, {2,0}, {1,1}});
+    Point startPoint(0, 0);
+    double travelDistance = 2* (sqrt(5) + sqrt(2));
+    Point resultPoint = stepAlongPerimeter(polygon, startPoint, travelDistance);
+    EXPECT_EQ(resultPoint, startPoint);
+}
+
+TEST(StepAlongPerimeterTest, ComplexShapeBeyondPerimeter) {
+    Polygon polygon({{0,0}, {0,2}, {2,3}, {3,2}, {2,0}});
+    Point startPoint(0, 0);
+    double travelDistance = polygon.perimeter() + 1.7;
+    Point expectedPoint(0, 1.7);  // Should wrap around and end up back at the starting point
+    Point resultPoint = stepAlongPerimeter(polygon, startPoint, travelDistance);
+    EXPECT_EQ(resultPoint, expectedPoint);
+}
+
+TEST(StepAlongPerimeterTest, TriangularPolygon) {
+    Polygon polygon({{0,0}, {1, sqrt(3)}, {2, 0}});
+    Point startPoint(0, 0);
+    double travelDistance = 3.0;
+    Point expectedPoint(1.5, sqrt(3)/2);  // Should land on the last vertex
     Point resultPoint = stepAlongPerimeter(polygon, startPoint, travelDistance);
     EXPECT_EQ(resultPoint, expectedPoint);
 }
