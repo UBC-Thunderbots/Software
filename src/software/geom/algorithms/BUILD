@@ -16,8 +16,8 @@ cc_library(
         "intersection.cpp",
         "intersects.cpp",
         "rasterize.cpp",
+        "step_along_perimeter.cpp",
         "voronoi_diagram.cpp",
-        "step_along_perimeter.cpp"
     ],
     hdrs = [
         "almost_equal.h",
@@ -33,8 +33,8 @@ cc_library(
         "intersection.h",
         "intersects.h",
         "rasterize.h",
+        "step_along_perimeter.h",
         "voronoi_diagram.h",
-        "step_along_perimeter.h"
     ],
     deps = [
         "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
@@ -221,6 +221,6 @@ cc_test(
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",
-        "//software/test_util"
-    ]
+        "//software/test_util",
+    ],
 )

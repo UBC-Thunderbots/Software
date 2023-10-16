@@ -1,6 +1,6 @@
 #include "software/geom/polygon.h"
-#include <numeric>
 
+#include <numeric>
 #include <unordered_set>
 
 Polygon::Polygon(const std::vector<Point>& points)
@@ -144,12 +144,11 @@ const std::vector<Point>& Polygon::getPoints() const
     return points_;
 }
 
-double Polygon::perimeter() const {
-    return (std::accumulate(segments_.begin(), segments_.end(), 0.0,
-                            [](double acc, const Segment& seg) {
-                                return acc + seg.length();
-                            }
-    ));
+double Polygon::perimeter() const
+{
+    return (std::accumulate(
+        segments_.begin(), segments_.end(), 0.0,
+        [](double acc, const Segment& seg) { return acc + seg.length(); }));
 }
 
 bool operator==(const Polygon& poly1, const Polygon& poly2)
