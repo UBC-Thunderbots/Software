@@ -5,10 +5,12 @@ cc_library(
     srcs = [
         "halt_fsm.cpp",
         "halt_tactic.cpp",
+        "stop_fsm.cpp",
     ],
     hdrs = [
         "halt_fsm.h",
         "halt_tactic.h",
+        "stop_fsm.h",
     ],
     deps = [
         "//shared:constants",
