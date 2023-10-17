@@ -141,17 +141,6 @@
           args:
             chdir: ~/
 
-        - name: Load spidev on boot
-          become_method: sudo
-          become: true
-          tags:
-            - sync
-            - device_tree
-          shell: 'echo spidev | sudo tee -a /etc/modules'
-          register: result
-          args:
-            chdir: ~/
-
 
     - name: Run systemd setup
       tags: systemd
