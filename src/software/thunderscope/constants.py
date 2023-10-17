@@ -76,6 +76,9 @@ BALL_HEIGHT_EFFECT_MULTIPLIER = 3
 # in robot communications
 ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
 
+# ignore repeated crash proto
+ROBOT_CRASH_TIMEOUT_S = 5
+
 GAME_CONTROLLER_URL = "http://localhost:8081"
 
 # Mapping between RobotStatus Error Codes and their dialog messages
