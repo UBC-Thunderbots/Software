@@ -16,7 +16,6 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
         return start;
     }
 
-
     std::vector<Segment> polygonSegments = polygon.getSegments();
     std::size_t startSegmentIndex        = 0;
 
@@ -27,7 +26,6 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
         });
 
     startSegmentIndex = std::distance(polygonSegments.begin(), it);
-
 
     std::size_t segmentIndex = startSegmentIndex;
 
