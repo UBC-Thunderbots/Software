@@ -5,7 +5,7 @@ import math
 import numpy as np
 
 from software.py_constants import *
-from software.thunderscope.constants import Colors, LINE_WIDTH
+from software.thunderscope.constants import Colors
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
@@ -64,7 +64,6 @@ class GLMeasureLayer(GLLayer):
             self.measurement_line_graphics.append(
                 GLPolygon(
                     outline_color=(Colors.PRIMARY_TEXT_COLOR),
-                    line_width=LINE_WIDTH,
                     points=[
                         [first_point.x(), first_point.y(), 0],
                         [second_point.x(), second_point.y(), 0],

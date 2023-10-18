@@ -4,7 +4,7 @@ import numpy as np
 
 from proto.visualization_pb2 import HRVOVisualization
 
-from software.thunderscope.constants import Colors, LINE_WIDTH
+from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -49,7 +49,7 @@ class GLHrvoLayer(GLLayer):
         self.velocity_obstacle_graphics.resize(
             len(velocity_obstacle_msg.velocity_obstacles),
             lambda: GLPolygon(
-                outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR, line_width=LINE_WIDTH
+                outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR
             ),
         )
         self.robot_circle_graphics.resize(

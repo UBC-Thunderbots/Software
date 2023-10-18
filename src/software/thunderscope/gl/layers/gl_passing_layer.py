@@ -7,7 +7,7 @@ import numpy as np
 
 from proto.visualization_pb2 import PassVisualization
 
-from software.thunderscope.constants import Colors, LINE_WIDTH
+from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
@@ -71,7 +71,7 @@ class GLPassingLayer(GLLayer):
         self.pass_graphics.resize(
             len(passes_to_show),
             lambda: GLPolygon(
-                outline_color=Colors.PASS_VISUALIZATION_COLOR, line_width=LINE_WIDTH
+                outline_color=Colors.PASS_VISUALIZATION_COLOR
             ),
         )
 

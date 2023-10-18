@@ -4,7 +4,7 @@ import numpy as np
 
 from proto.tbots_software_msgs_pb2 import PrimitiveSet
 
-from software.thunderscope.constants import Colors, LINE_WIDTH
+from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -59,7 +59,7 @@ class GLObstacleLayer(GLLayer):
         self.poly_obstacle_graphics.resize(
             len(poly_obstacles),
             lambda: GLPolygon(
-                outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR, line_width=LINE_WIDTH
+                outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR
             ),
         )
         self.circle_obstacle_graphics.resize(

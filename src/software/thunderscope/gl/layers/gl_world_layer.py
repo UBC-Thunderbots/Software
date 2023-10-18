@@ -10,7 +10,6 @@ from software.py_constants import *
 from software.thunderscope.constants import (
     Colors,
     DepthValues,
-    LINE_WIDTH,
     SPEED_SEGMENT_SCALE,
 )
 
@@ -93,12 +92,10 @@ class GLWorldLayer(GLLayer):
         self.halfway_line_graphic = GLPolygon(
             parent_item=self,
             outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
-            line_width=LINE_WIDTH,
         )
         self.goal_to_goal_line_graphic = GLPolygon(
             parent_item=self,
             outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
-            line_width=LINE_WIDTH,
         )
         self.field_center_circle_graphic = GLCircle(
             parent_item=self, outline_color=Colors.FIELD_LINE_COLOR
