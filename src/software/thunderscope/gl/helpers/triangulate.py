@@ -33,7 +33,7 @@ from typing import List, Tuple
 Point = namedtuple("Point", ["x", "y", "index"])
 
 
-def earclip(polygon: List[Tuple[float, float]]):
+def earclip(polygon: List[Tuple[float, float]]) -> List[Tuple[int, int, int]]:
     """Triangulates a polygon using a simple earclipping algorithm.
 
     Implementation reference:

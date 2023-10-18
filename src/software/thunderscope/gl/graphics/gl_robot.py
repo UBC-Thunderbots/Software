@@ -18,7 +18,7 @@ class GLRobot(GLMeshItem):
         self,
         parent_item: Optional[GLGraphicsItem] = None,
         color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
-    ):
+    ) -> None:
         """Initialize the GLRobot
         
         :param parent_item: The parent item of the graphic
@@ -33,7 +33,7 @@ class GLRobot(GLMeshItem):
         self.y = 0
         self.orientation = 0
 
-    def set_position(self, x: float, y: float):
+    def set_position(self, x: float, y: float) -> None:
         """Set the position of the graphic in the scene
         
         :param x: The x coordinate to position the graphic at
@@ -47,7 +47,7 @@ class GLRobot(GLMeshItem):
         self.x = x
         self.y = y
 
-    def set_orientation(self, degrees: float):
+    def set_orientation(self, degrees: float) -> None:
         """Set the orientation of the graphic in the scene
         
         :param degrees: The orientation of the graphic in degrees
@@ -65,7 +65,7 @@ class GLRobot(GLMeshItem):
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
 
-    def __get_mesh_data(self):
+    def __get_mesh_data(self) -> MeshData:
         """
         Return a MeshData instance with vertices and faces computed
         for the surface of a cylinder with a flat side wall.

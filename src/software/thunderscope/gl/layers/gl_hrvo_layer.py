@@ -16,7 +16,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 class GLHrvoLayer(GLLayer):
     """GLHrvoLayer that visualizes the state of the HRVO Simulator"""
 
-    def __init__(self, name: str, robot_id: int, buffer_size: int = 5):
+    def __init__(self, name: str, robot_id: int, buffer_size: int = 5) -> None:
         """Initialize the GLHrvoLayer
 
         :param name: The displayed name of the layer
@@ -34,7 +34,7 @@ class GLHrvoLayer(GLLayer):
         self.velocity_obstacle_graphics = ObservableList(self._graphics_changed)
         self.robot_circle_graphics = ObservableList(self._graphics_changed)
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         velocity_obstacle_msg = self.prev_message
@@ -54,7 +54,9 @@ class GLHrvoLayer(GLLayer):
         )
         self.robot_circle_graphics.resize(
             len(velocity_obstacle_msg.robots),
-            lambda: GLCircle(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR, num_points=10),
+            lambda: GLCircle(
+                outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR, num_points=10
+            ),
         )
 
         for velocity_obstacle_graphic, velocity_obstacle in zip(

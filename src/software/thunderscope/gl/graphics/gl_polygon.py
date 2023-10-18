@@ -21,7 +21,7 @@ class GLPolygon(GLShape):
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
-    ):
+    ) -> None:
         """Initialize the GLPolygon
         
         :param parent_item: The parent item of the graphic
@@ -33,7 +33,7 @@ class GLPolygon(GLShape):
 
         """
         super().__init__(
-            parent_item=parent_item, 
+            parent_item=parent_item,
             outline_color=outline_color,
             fill_color=fill_color,
             line_width=line_width,
@@ -41,7 +41,7 @@ class GLPolygon(GLShape):
 
         self.set_points(points)
 
-    def set_points(self, points: List[Tuple[float, float]]):
+    def set_points(self, points: List[Tuple[float, float]]) -> None:
         """Update the point data representing the polygon to display.
         A polygon is an ordered sequence of points, where consecutive points
         in the sequence are connected an edge, and an edge connects the first
@@ -54,7 +54,7 @@ class GLPolygon(GLShape):
         self.points = points
         self._update_shape_data()
 
-    def _update_shape_data(self):
+    def _update_shape_data(self) -> None:
         """Update the underlying GLLinePlotItem and GLMeshItem representing
         the outline and fill of this shape
         """

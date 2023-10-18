@@ -29,7 +29,7 @@ class GLValidationLayer(GLLayer):
         buffer_size: int = 10,
         test_name_pos_x: float = -4.5,
         test_name_pos_y: float = 3.6,
-    ):
+    ) -> None:
         """Initialize the GLValidationLayer
 
         :param name: The displayed name of the layer
@@ -59,7 +59,7 @@ class GLValidationLayer(GLLayer):
         self.segment_graphics = ObservableList(self._graphics_changed)
         self.circle_graphics = ObservableList(self._graphics_changed)
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         if not self.test_name_graphic:
@@ -107,7 +107,7 @@ class GLValidationLayer(GLLayer):
             text=self.cached_eventually_validation_set.test_name
         )
 
-    def __update_validation_graphics(self, validations: List[ValidationProto]):
+    def __update_validation_graphics(self, validations: List[ValidationProto]) -> None:
         """Update the GLGraphicsItems that display the validations
         
         :param validations: The list of validation protos
@@ -160,10 +160,12 @@ class GLValidationLayer(GLLayer):
         for segment_graphic, (segment, validation_status) in zip(
             self.segment_graphics, segments
         ):
-            segment_graphic.set_points([
-                [segment.start.x_meters, segment.start.y_meters],
-                [segment.end.x_meters, segment.end.y_meters],
-            ])
+            segment_graphic.set_points(
+                [
+                    [segment.start.x_meters, segment.start.y_meters],
+                    [segment.end.x_meters, segment.end.y_meters],
+                ]
+            )
             segment_graphic.set_outline_color(
                 self.__get_validation_color(validation_status)
             )
@@ -180,10 +182,13 @@ class GLValidationLayer(GLLayer):
                 self.__get_validation_color(validation_status)
             )
 
-    def __get_validation_color(self, validation_status: ValidationStatus):
+    def __get_validation_color(
+        self, validation_status: ValidationStatus
+    ) -> QtGui.QColor:
         """Get the color representing the given validation status
         
         :param validation_status: the validation status
+        :returns: the color representing the validation status
 
         """
         return (

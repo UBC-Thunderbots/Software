@@ -17,7 +17,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 class GLPathLayer(GLLayer):
     """GLLayer that visualizes paths from the navigator"""
 
-    def __init__(self, name: str, buffer_size: int = 5):
+    def __init__(self, name: str, buffer_size: int = 5) -> None:
         """Initialize the GLPathLayer
 
         :param name: The displayed name of the layer
@@ -32,7 +32,7 @@ class GLPathLayer(GLLayer):
         self.path_graphics = ObservableList(self._graphics_changed)
         self.destination_graphics = ObservableList(self._graphics_changed)
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         primitive_set = self.primitive_set_buffer.get(
@@ -55,8 +55,12 @@ class GLPathLayer(GLLayer):
         ]
 
         # Ensure we have the same number of graphics as protos
-        self.path_graphics.resize(len(paths), lambda: GLPolygon(
-            outline_color=Colors.NAVIGATOR_PATH_COLOR, line_width=LINE_WIDTH))
+        self.path_graphics.resize(
+            len(paths),
+            lambda: GLPolygon(
+                outline_color=Colors.NAVIGATOR_PATH_COLOR, line_width=LINE_WIDTH
+            ),
+        )
         self.destination_graphics.resize(
             len(requested_destinations),
             lambda: GLRobotOutline(outline_color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),

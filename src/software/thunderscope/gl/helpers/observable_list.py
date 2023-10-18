@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import TypeVar, List, Iterable, Union, Callable
 
 T = TypeVar("T")
@@ -47,7 +48,7 @@ class ObservableList(list):
 
     def __init__(
         self, observer: Callable[[Change], None] = None, iterable: Iterable[T] = ()
-    ):
+    ) -> None:
         """Initialize the ObservableList
         
         :param observer: Observer method to register
@@ -60,7 +61,7 @@ class ObservableList(list):
         self.extend(iterable)
         self.register_observer(observer)
 
-    def register_observer(self, observer: Callable[[Change], None]):
+    def register_observer(self, observer: Callable[[Change], None]) -> None:
         """Register an observer method that will be called when the
         ObservableList provides a change notification
 
@@ -70,7 +71,7 @@ class ObservableList(list):
         if observer:
             self.observers.append(observer)
 
-    def resize(self, length: int, element_generator: Callable):
+    def resize(self, length: int, element_generator: Callable[[], T]) -> None:
         """Resize the list to a desired target length by either creating new elements
         using the provided `element_generator` and adding them to the list, or by 
         popping elements from the end of the list.
@@ -84,12 +85,12 @@ class ObservableList(list):
         elif len(self) < length:
             self.extend([element_generator() for _ in range(length - len(self))])
 
-    def append(self, element: T):
+    def append(self, element: T) -> None:
         """See list.append"""
         super().append(element)
         self.__notify_elements_added(self.__slice_at_index(len(self) - 1))
 
-    def insert(self, index: int, element: T):
+    def insert(self, index: int, element: T) -> None:
         """See list.insert"""
         super().insert(index, element)
         length = len(self)
@@ -101,24 +102,24 @@ class ObservableList(list):
                 index = 0
         self.__notify_elements_added(self.__slice_at_index(index))
 
-    def extend(self, other: Iterable[T]):
+    def extend(self, other: Iterable[T]) -> None:
         """See list.extend"""
         if other:
             index = len(self)
             super().extend(other)
             self.__notify_elements_added(self.__slice_at_index(index, len(other)))
 
-    def pop(self, index: int = -1):
+    def pop(self, index: int = -1) -> T:
         """See list.pop"""
         self.__notify_elements_removed(self.__slice_at_index(index))
         return super().pop(index)
 
-    def clear(self):
+    def clear(self) -> None:
         """See list.clear"""
         self.__notify_elements_removed(slice(0, len(self)))
         return super().clear()
 
-    def __iadd__(self, other: Iterable[T]):
+    def __iadd__(self, other: Iterable[T]) -> ObservableList:
         """See list.__iadd__"""
         self.extend(other)
         return self
@@ -126,18 +127,18 @@ class ObservableList(list):
     def __imul__(self, multiplier):
         raise NotImplementedError()
 
-    def __delitem__(self, index_or_slice: Union[int, slice]):
+    def __delitem__(self, index_or_slice: Union[int, slice]) -> None:
         """See list.__delitem__"""
         self.__notify_elements_removed_index_or_slice(index_or_slice)
         super().__delitem__(index_or_slice)
 
-    def __setitem__(self, index_or_slice: Union[int, slice], value: T):
+    def __setitem__(self, index_or_slice: Union[int, slice], value: T) -> None:
         """See list.__setitem__"""
         notify_added = self.__notify_elements_removed_index_or_slice(index_or_slice)
         super().__setitem__(index_or_slice, value)
         notify_added()
 
-    def __notify_elements_added(self, added_slice: slice):
+    def __notify_elements_added(self, added_slice: slice) -> None:
         """Notify observers about elements added to the ObservableList
 
         :param added_slice: the slice of the ObservableList with the added elements
@@ -147,7 +148,7 @@ class ObservableList(list):
         for observer in self.observers:
             observer(change)
 
-    def __notify_elements_removed(self, removed_slice: slice):
+    def __notify_elements_removed(self, removed_slice: slice) -> None:
         """Notify observers about elements removed from the ObservableList
 
         :param added_slice: the slice of the ObservableList with the elements to be removed
@@ -159,7 +160,7 @@ class ObservableList(list):
 
     def __notify_elements_removed_index_or_slice(
         self, index_or_slice: Union[int, slice]
-    ) -> Callable:
+    ) -> Callable[[], None]:
         """Notify observers about elements removed at an index or slice
 
         :return: a function that notifies about an add at the same place

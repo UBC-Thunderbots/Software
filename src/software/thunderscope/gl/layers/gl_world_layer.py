@@ -40,7 +40,7 @@ class GLWorldLayer(GLLayer):
         simulator_io: ProtoUnixIO,
         friendly_colour_yellow: bool,
         buffer_size: int = 5,
-    ):
+    ) -> None:
         """Initialize the GLWorldLayer
 
         :param name: The displayed name of the layer
@@ -91,10 +91,14 @@ class GLWorldLayer(GLLayer):
             parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR
         )
         self.halfway_line_graphic = GLPolygon(
-            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR, line_width=LINE_WIDTH
+            parent_item=self,
+            outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
+            line_width=LINE_WIDTH,
         )
         self.goal_to_goal_line_graphic = GLPolygon(
-            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR, line_width=LINE_WIDTH
+            parent_item=self,
+            outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
+            line_width=LINE_WIDTH,
         )
         self.field_center_circle_graphic = GLCircle(
             parent_item=self, outline_color=Colors.FIELD_LINE_COLOR
@@ -123,7 +127,7 @@ class GLWorldLayer(GLLayer):
         self.breakbeam_graphics = ObservableList(self._graphics_changed)
         self.speed_line_graphics = ObservableList(self._graphics_changed)
 
-    def keyPressEvent(self, event: QtGui.QKeyEvent):
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
 
         :param event: The event
@@ -147,7 +151,7 @@ class GLWorldLayer(GLLayer):
 
             self.simulator_io.send_proto(SimulationState, simulator_state)
 
-    def keyReleaseEvent(self, event: QtGui.QKeyEvent):
+    def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
 
         :param event: The event
@@ -155,7 +159,7 @@ class GLWorldLayer(GLLayer):
         """
         self.key_pressed[event.key()] = False
 
-    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was pressed and picked a point in the 3D scene
         
         :param event: The event
@@ -177,7 +181,7 @@ class GLWorldLayer(GLLayer):
         )
         self.simulator_io.send_proto(WorldState, world_state)
 
-    def mouse_in_scene_dragged(self, event: MouseInSceneEvent):
+    def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was dragged within the 3D scene
         
         :param event: The event
@@ -201,7 +205,7 @@ class GLWorldLayer(GLLayer):
                 BALL_MAX_SPEED_METERS_PER_SECOND
             )
 
-    def mouse_in_scene_released(self, event: MouseInSceneEvent):
+    def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was released after picking a point in the 3D scene
         
         :param event: The event
@@ -233,7 +237,7 @@ class GLWorldLayer(GLLayer):
         self.ball_velocity_vector = None
         self.simulator_io.send_proto(WorldState, world_state)
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         self.cached_world = self.world_buffer.get(block=False)
@@ -269,7 +273,7 @@ class GLWorldLayer(GLLayer):
         self.__update_robot_status_graphics()
         self.__update_speed_line_graphics()
 
-    def __update_field_graphics(self, field: Field):
+    def __update_field_graphics(self, field: Field) -> None:
         """Update the GLGraphicsItems that display the field lines and markings
         
         :param field: The field proto
@@ -309,7 +313,7 @@ class GLWorldLayer(GLLayer):
 
         self.field_center_circle_graphic.set_radius(field.center_circle_radius)
 
-    def __update_goal_graphics(self, field: Field):
+    def __update_goal_graphics(self, field: Field) -> None:
         """Update the GLGraphicsItems that display the goals
         
         :param field: The field proto
@@ -328,7 +332,7 @@ class GLWorldLayer(GLLayer):
         self.enemy_goal_graphic.set_position(field.field_x_length / 2, 0)
         self.enemy_goal_graphic.set_orientation(180)
 
-    def __update_ball_graphics(self, ball_state: BallState):
+    def __update_ball_graphics(self, ball_state: BallState) -> None:
         """Update the GLGraphicsItems that display the ball
         
         :param ball_state: The ball state proto
@@ -346,7 +350,7 @@ class GLWorldLayer(GLLayer):
         color: QtGui.QColor,
         robot_graphics: ObservableList,
         robot_id_graphics: ObservableList,
-    ):
+    ) -> None:
         """Update the GLGraphicsItems that display the robots
         
         :param team: The team proto
@@ -395,7 +399,7 @@ class GLWorldLayer(GLLayer):
             else:
                 robot_id_graphic.hide()
 
-    def __update_robot_status_graphics(self):
+    def __update_robot_status_graphics(self) -> None:
         """Update the robot status graphics"""
 
         # Get the robot status messages
@@ -437,7 +441,7 @@ class GLWorldLayer(GLLayer):
             else:
                 breakbeam_graphic.hide()
 
-    def __update_speed_line_graphics(self):
+    def __update_speed_line_graphics(self) -> None:
         """Update the speed lines visualizing the robot and ball speeds"""
 
         # When the user is kicking the ball, show the kick velocity vector

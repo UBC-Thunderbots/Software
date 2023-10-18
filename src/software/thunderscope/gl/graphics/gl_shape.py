@@ -21,7 +21,7 @@ class GLShape(GLLinePlotItem):
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
-    ):
+    ) -> None:
         """Base constructor for the GLShape
         
         :param parent_item: The parent item of the graphic
@@ -42,7 +42,7 @@ class GLShape(GLLinePlotItem):
         self.set_outline_color(outline_color)
         self.set_fill_color(fill_color)
 
-    def set_position(self, x: float, y: float):
+    def set_position(self, x: float, y: float) -> None:
         """Set the position of the graphic in the scene
         
         :param x: The x coordinate to position the graphic at
@@ -56,7 +56,7 @@ class GLShape(GLLinePlotItem):
         self.x = x
         self.y = y
 
-    def set_orientation(self, degrees: float):
+    def set_orientation(self, degrees: float) -> None:
         """Set the orientation of the graphic in the scene
         
         :param degrees: The orientation of the graphic in degrees
@@ -69,7 +69,7 @@ class GLShape(GLLinePlotItem):
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
 
-    def set_outline_color(self, outline_color: QtGui.QColor):
+    def set_outline_color(self, outline_color: QtGui.QColor) -> None:
         """Set the color of the shape's outline
         
         :param outline_color: The color of the shape's outline 
@@ -77,7 +77,7 @@ class GLShape(GLLinePlotItem):
         """
         self.setData(color=outline_color)
 
-    def set_fill_color(self, fill_color: Optional[QtGui.QColor]):
+    def set_fill_color(self, fill_color: Optional[QtGui.QColor]) -> None:
         """Set the color used to fill the shape
         
         :param fill_color: The color used to fill the shape, or None if no fill 
@@ -93,7 +93,7 @@ class GLShape(GLLinePlotItem):
                 self.fill_graphic.setParentItem(None)
                 self.fill_graphic = None
 
-    def _update_shape_data(self):
+    def _update_shape_data(self) -> None:
         """Update the underlying GLLinePlotItem and GLMeshItem representing
         the outline and fill of this shape
         """

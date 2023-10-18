@@ -8,7 +8,7 @@ from software.thunderscope.constants import Colors, LINE_WIDTH
 from software.thunderscope.gl.graphics.gl_shape import GLShape
 import software.thunderscope.gl.helpers.triangulate as triangulate
 
-from typing import Optional
+from typing import Optional, List, Tuple
 
 import math
 import numpy as np
@@ -23,7 +23,7 @@ class GLRobotOutline(GLShape):
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
-    ):
+    ) -> None:
         """Initialize the GLRobotOutline
         
         :param parent_item: The parent item of the graphic
@@ -32,40 +32,42 @@ class GLRobotOutline(GLShape):
 
         """
         super().__init__(
-            parent_item=parent_item, 
+            parent_item=parent_item,
             outline_color=outline_color,
             fill_color=fill_color,
             line_width=line_width,
         )
 
     @staticmethod
-    def get_robot_outline(z_coordinate: float = 0, num_points: int = 10):
+    def get_robot_outline(
+        z_coordinate: float = 0, num_points: int = 10
+    ) -> List[Tuple[float, float, float]]:
         """Returns a list of points that represent the outline of a robot.
         The points will be on a plane parallel to the x-y plane.
 
         :param z_coordinate: The z coordinate of the plane to generate points on
         :param num_points: The number of points to generate
-        :returns: A list of points representing the outline of a robot
+        :returns: A list of 3-tuple points representing the outline of a robot
 
         """
         # We compute points along 3/4 the circumference of a circle.
         # This is so that when we connect the points, there will be a chord
         # that slices the circle and produces a flat side (i.e the front of the bot)
         points = [
-            [
+            (
                 math.cos(1.5 * math.pi / num_points * x) * ROBOT_MAX_RADIUS_METERS,
                 math.sin(1.5 * math.pi / num_points * x) * ROBOT_MAX_RADIUS_METERS,
                 z_coordinate,
-            ]
+            )
             for x in range(0, num_points + 1)
         ]
 
         # We need to repeat the first point at the end in order to close the polygon
-        points = points + points[:1]
+        points.append(points[0])
 
         return points
 
-    def set_orientation(self, degrees: float):
+    def set_orientation(self, degrees: float) -> None:
         """Set the orientation of the graphic in the scene
         
         :param degrees: The orientation of the graphic in degrees
@@ -76,7 +78,7 @@ class GLRobotOutline(GLShape):
         # the right way
         super().set_orientation(degrees + 45)
 
-    def _update_shape_data(self):
+    def _update_shape_data(self) -> None:
         """Update the underlying GLLinePlotItem and GLMeshItem representing
         the outline and fill of this shape
         """

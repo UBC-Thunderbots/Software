@@ -21,7 +21,7 @@ class GLRect(GLShape):
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
-    ):
+    ) -> None:
         """Initialize the GLRect
         
         :param parent_item: The parent item of the graphic
@@ -33,7 +33,7 @@ class GLRect(GLShape):
 
         """
         super().__init__(
-            parent_item=parent_item, 
+            parent_item=parent_item,
             outline_color=outline_color,
             fill_color=fill_color,
             line_width=line_width,
@@ -43,7 +43,7 @@ class GLRect(GLShape):
         self.y_length = 0
         self.set_dimensions(x_length, y_length)
 
-    def set_dimensions(self, x_length: float = 0, y_length: float = 0):
+    def set_dimensions(self, x_length: float = 0, y_length: float = 0) -> None:
         """Set the dimensions of the rectangle
         
         :param x_length: The length of the rectangle in the x direction
@@ -61,7 +61,7 @@ class GLRect(GLShape):
 
         self._update_shape_data()
 
-    def _update_shape_data(self):
+    def _update_shape_data(self) -> None:
         """Update the underlying GLLinePlotItem and GLMeshItem representing
         the outline and fill of this shape
         """

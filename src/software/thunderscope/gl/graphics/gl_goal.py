@@ -17,7 +17,7 @@ class GLGoal(GLMeshItem):
         self,
         parent_item: Optional[GLGraphicsItem] = None,
         color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
-    ):
+    ) -> None:
         """Initialize the GLGoal
         
         :param parent_item: The parent item of the graphic
@@ -42,7 +42,7 @@ class GLGoal(GLMeshItem):
         # runs into "NoneType object is not subscriptable" errors
         self.setMeshData(meshdata=MeshData.sphere(1, 1))
 
-    def set_dimensions(self, x_length: float, y_length: float):
+    def set_dimensions(self, x_length: float, y_length: float) -> None:
         """Set the dimensions of the goal
         
         :param x_length: The length of the goal in the x direction
@@ -67,7 +67,7 @@ class GLGoal(GLMeshItem):
             ),
         )
 
-    def set_position(self, x: float, y: float):
+    def set_position(self, x: float, y: float) -> None:
         """Set the position of the graphic in the scene
         
         :param x: The x coordinate to position the graphic at
@@ -81,7 +81,7 @@ class GLGoal(GLMeshItem):
         self.x = x
         self.y = y
 
-    def set_orientation(self, degrees: float):
+    def set_orientation(self, degrees: float) -> None:
         """Set the orientation of the graphic in the scene
         
         :param degrees: The orientation of the graphic in degrees
@@ -94,7 +94,7 @@ class GLGoal(GLMeshItem):
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
 
-    def __get_mesh_data(self, x_length: float, y_length: float):
+    def __get_mesh_data(self, x_length: float, y_length: float) -> MeshData:
         """
         Return a MeshData instance with vertices and faces computed
         for a mesh representing the goal

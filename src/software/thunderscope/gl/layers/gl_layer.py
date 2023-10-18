@@ -16,7 +16,7 @@ class GLLayer(GLGraphicsItem):
     
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         """Initialize the GLLayer
         
         :param name: The displayed name of the layer
@@ -25,52 +25,52 @@ class GLLayer(GLGraphicsItem):
         super().__init__()
         self.name = name
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Updates the GLGraphicsItems in this layer"""
 
-    def keyPressEvent(self, event: QtGui.QKeyEvent):
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
 
         :param event: The event
 
         """
 
-    def keyReleaseEvent(self, event: QtGui.QKeyEvent):
+    def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
 
         :param event: The event
 
         """
 
-    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was pressed and picked a point in the 3D scene
         
         :param event: The event
         
         """
 
-    def mouse_in_scene_dragged(self, event: MouseInSceneEvent):
+    def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was dragged within the 3D scene
         
         :param event: The event
         
         """
 
-    def mouse_in_scene_released(self, event: MouseInSceneEvent):
+    def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was released after picking a point in the 3D scene
         
         :param event: The event
         
         """
 
-    def mouse_in_scene_moved(self, event: MouseInSceneEvent):
+    def mouse_in_scene_moved(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was moved within the 3D scene
         
         :param event: The event
         
         """
 
-    def _graphics_changed(self, change: Change):
+    def _graphics_changed(self, change: Change) -> None:
         """Called by an ObservableList of GLGraphicsItems to notify 
         this observer that GLGraphicsItems were added or removed from
         the ObservableList.

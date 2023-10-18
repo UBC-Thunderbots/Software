@@ -25,7 +25,7 @@ class GLPassingLayer(GLLayer):
     # The number of passes to show in the visualization
     NUM_PASSES_TO_SHOW = 1
 
-    def __init__(self, name: str, buffer_size: int = 5):
+    def __init__(self, name: str, buffer_size: int = 5) -> None:
         """Initialize the GLPassingLayer
 
         :param name: The displayed name of the layer
@@ -43,7 +43,7 @@ class GLPassingLayer(GLLayer):
 
         self.pass_graphics = ObservableList(self._graphics_changed)
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         try:
@@ -71,8 +71,7 @@ class GLPassingLayer(GLLayer):
         self.pass_graphics.resize(
             len(passes_to_show),
             lambda: GLPolygon(
-                outline_color=Colors.PASS_VISUALIZATION_COLOR, 
-                line_width=LINE_WIDTH
+                outline_color=Colors.PASS_VISUALIZATION_COLOR, line_width=LINE_WIDTH
             ),
         )
 

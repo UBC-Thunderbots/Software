@@ -12,7 +12,9 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 class GLSimulatorLayer(GLLayer):
     """GLLayer that visualizes the simulator"""
 
-    def __init__(self, name: str, friendly_colour_yellow: bool, buffer_size: int = 5):
+    def __init__(
+        self, name: str, friendly_colour_yellow: bool, buffer_size: int = 5
+    ) -> None:
         """Initialize the GLSimulatorLayer
 
         :param name: The displayed name of the layer
@@ -30,7 +32,7 @@ class GLSimulatorLayer(GLLayer):
             parent_item=self, radius=BALL_MAX_RADIUS_METERS, color=Colors.SIM_BALL_COLOR
         )
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         sim_world_state = self.simulator_state_buffer.get(block=False)

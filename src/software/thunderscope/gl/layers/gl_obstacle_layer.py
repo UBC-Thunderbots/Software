@@ -16,7 +16,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 class GLObstacleLayer(GLLayer):
     """GLLayer that visualizes obstacles"""
 
-    def __init__(self, name: str, buffer_size: int = 5):
+    def __init__(self, name: str, buffer_size: int = 5) -> None:
         """Initialize the GLObstacleLayer
 
         :param name: The displayed name of the layer
@@ -31,7 +31,7 @@ class GLObstacleLayer(GLLayer):
         self.poly_obstacle_graphics = ObservableList(self._graphics_changed)
         self.circle_obstacle_graphics = ObservableList(self._graphics_changed)
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         primitive_set = self.primitive_set_buffer.get(

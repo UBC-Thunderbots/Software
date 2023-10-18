@@ -22,7 +22,7 @@ class GLCircle(GLShape):
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
         line_width: float = LINE_WIDTH,
-    ):
+    ) -> None:
         """Initialize the GLCircle
         
         :param parent_item: The parent item of the graphic
@@ -34,7 +34,7 @@ class GLCircle(GLShape):
 
         """
         super().__init__(
-            parent_item=parent_item, 
+            parent_item=parent_item,
             outline_color=outline_color,
             fill_color=fill_color,
             line_width=line_width,
@@ -45,7 +45,7 @@ class GLCircle(GLShape):
 
         self.set_radius(radius, num_points)
 
-    def set_radius(self, radius: float, num_points: int = 24):
+    def set_radius(self, radius: float, num_points: int = 24) -> None:
         """Set the radius of the circle
 
         :param radius: The radius of the circle
@@ -60,7 +60,7 @@ class GLCircle(GLShape):
 
         self._update_shape_data()
 
-    def _update_shape_data(self):
+    def _update_shape_data(self) -> None:
         """Update the underlying GLLinePlotItem and GLMeshItem representing
         the outline and fill of this shape
         """
