@@ -90,12 +90,10 @@ class GLWorldLayer(GLLayer):
             parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR
         )
         self.halfway_line_graphic = GLPolygon(
-            parent_item=self,
-            outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
+            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
         )
         self.goal_to_goal_line_graphic = GLPolygon(
-            parent_item=self,
-            outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
+            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
         )
         self.field_center_circle_graphic = GLCircle(
             parent_item=self, outline_color=Colors.FIELD_LINE_COLOR

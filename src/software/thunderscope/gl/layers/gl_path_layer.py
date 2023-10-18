@@ -56,10 +56,7 @@ class GLPathLayer(GLLayer):
 
         # Ensure we have the same number of graphics as protos
         self.path_graphics.resize(
-            len(paths),
-            lambda: GLPolygon(
-                outline_color=Colors.NAVIGATOR_PATH_COLOR
-            ),
+            len(paths), lambda: GLPolygon(outline_color=Colors.NAVIGATOR_PATH_COLOR),
         )
         self.destination_graphics.resize(
             len(requested_destinations),

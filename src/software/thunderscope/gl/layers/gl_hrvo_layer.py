@@ -48,9 +48,7 @@ class GLHrvoLayer(GLLayer):
         # Ensure we have the same number of graphics as protos
         self.velocity_obstacle_graphics.resize(
             len(velocity_obstacle_msg.velocity_obstacles),
-            lambda: GLPolygon(
-                outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR
-            ),
+            lambda: GLPolygon(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
         self.robot_circle_graphics.resize(
             len(velocity_obstacle_msg.robots),
