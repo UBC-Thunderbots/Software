@@ -1,21 +1,13 @@
 import os
 import logging
-import psutil
 import time
 import threading
-import google.protobuf.internal.encoder as encoder
-import google.protobuf.internal.decoder as decoder
 
 from subprocess import Popen
 from software.python_bindings import *
 from proto.import_all_protos import *
 from software.py_constants import *
-from extlibs.er_force_sim.src.protobuf.world_pb2 import (
-    SimulatorState,
-    SimBall,
-    SimRobot,
-)
-from software.thunderscope.binary_context_managers.util import *
+from software.thunderscope.binary_context_managers.binary_context_managers import is_cmd_running
 
 
 class FullSystem(object):
