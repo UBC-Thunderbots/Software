@@ -1,9 +1,6 @@
 import os
-import socket
 import logging
 import time
-import google.protobuf.internal.encoder as encoder
-import google.protobuf.internal.decoder as decoder
 
 from subprocess import Popen
 from software.python_bindings import *
