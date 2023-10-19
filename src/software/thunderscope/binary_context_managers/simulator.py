@@ -6,9 +6,7 @@ from subprocess import Popen
 from software.python_bindings import *
 from proto.import_all_protos import *
 from software.py_constants import *
-from extlibs.er_force_sim.src.protobuf.world_pb2 import (
-    SimulatorState,
-)
+from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.thunderscope.binary_context_managers.binary_context_managers import *
 
 
