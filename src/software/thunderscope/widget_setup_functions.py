@@ -136,7 +136,9 @@ def setup_parameter_widget(
     config = ThunderbotsConfig()
     config.sensor_fusion_config.friendly_color_yellow = friendly_colour_yellow
 
-    def on_change_callback(attr: Any, value: Any, updated_proto: ThunderbotsConfig) -> None:
+    def on_change_callback(
+        attr: Any, value: Any, updated_proto: ThunderbotsConfig
+    ) -> None:
         proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
 
     return ProtoConfigurationWidget(config, on_change_callback)

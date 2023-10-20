@@ -9,7 +9,7 @@ import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
-from typing import Any, Self, List
+from typing import Any, Self
 from subprocess import Popen
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *

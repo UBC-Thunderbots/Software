@@ -11,7 +11,6 @@ from typing import Type
 import threading
 import time
 import os
-from enum import Enum
 from google.protobuf.message import Message
 
 
