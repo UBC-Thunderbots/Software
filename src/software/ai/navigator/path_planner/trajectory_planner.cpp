@@ -130,9 +130,17 @@ TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
 {
     // TODO: Consider removing this function and just using getTrajectoryWithCost
     return getTrajectoryWithCost(
-        TrajectoryPath(BangBangTrajectory2D(
+        TrajectoryPath(std::make_shared<BangBangTrajectory2D>(
             start, destination, initial_velocity, constraints.getMaxVelocity(),
-            constraints.getMaxAcceleration(), constraints.getMaxDeceleration())),
+            constraints.getMaxAcceleration(), constraints.getMaxDeceleration()),
+           [](const KinematicConstraints &constraints,
+              const Point &initial_pos,
+              const Point &final_pos,
+              const Vector &initial_vel) {
+            return std::make_shared<BangBangTrajectory2D>(
+                    initial_pos, final_pos, initial_vel, constraints.getMaxVelocity(),
+                    constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
+        }),
         obstacle_tree, obstacles, std::nullopt, std::nullopt);
 }
 

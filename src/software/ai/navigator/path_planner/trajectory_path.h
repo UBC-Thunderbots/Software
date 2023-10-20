@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+#include <functional>
 #include "software/ai/navigator/path_planner/kinematic_constraints.h"
 #include "software/ai/navigator/path_planner/trajectory_path_node.h"
 
@@ -17,8 +19,14 @@ class TrajectoryPath : public Trajectory2D
      * Constructor
      *
      * @param initial_trajectory The initial trajectory of this trajectory path
+     * @param traj_generator A function that generates a new trajectory given the
+     * kinematic constraints, initial position, and final position
      */
-    TrajectoryPath(const BangBangTrajectory2D& initial_trajectory);
+    TrajectoryPath(const std::shared_ptr<Trajectory2D>& initial_trajectory,
+                   std::function<std::shared_ptr<Trajectory2D>(const KinematicConstraints& constraints,
+                                                               const Point& initial_pos,
+                                                               const Point& final_pos,
+                                                               const Vector& initial_vel)> traj_generator);
 
     /**
      * Generate and append a new trajectory to the end of this trajectory path
@@ -66,8 +74,13 @@ class TrajectoryPath : public Trajectory2D
      * Get the bounding boxes of the trajectory path
      * @return A list of bounding boxes which wrap this trajectory path
      */
-    std::vector<BoundingBox> getBoundingBoxes() const;
+    std::vector<BoundingBox> getBoundingBoxes() const override;
 
    private:
     std::vector<TrajectoryPathNode> traj_path;
+    std::function<std::shared_ptr<Trajectory2D>(const KinematicConstraints& constraints,
+                                                const Point& initial_pos,
+                                                const Point& final_pos,
+                                                const Vector& initial_vel)>
+        trajectory_generator;
 };

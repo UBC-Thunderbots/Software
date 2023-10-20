@@ -14,7 +14,14 @@ HRVOAgent::HRVOAgent(RobotId robot_id, const RobotState &robot_state,
       neighbours(),
       prev_dynamic_kp_destination(robot_state.position()),
       kp(2.0),
-      trajectory_path(BangBangTrajectory2D())
+      trajectory_path(std::make_shared<BangBangTrajectory2D>(), [](const KinematicConstraints &constraints,
+const Point &initial_pos,
+const Point &final_pos,
+const Vector &initial_vel) {
+return std::make_shared<BangBangTrajectory2D>(
+        initial_pos, final_pos, initial_vel, constraints.getMaxVelocity(),
+        constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
+})
 {
     // Reinitialize obstacle factory with a custom inflation factor
     auto obstacle_config = TbotsProto::RobotNavigationObstacleConfig();

@@ -107,6 +107,6 @@ TEST_F(BangBangTrajectory2DTest, test_trajectory_bounding_box)
     Point start_pos(0, 0);
     Point destination(1, 1);
     traj.generate(start_pos, destination, Vector(0, 0), 1.0, 1.0, 1.0);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(traj.getBoundingBox(),
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(traj.getBoundingBoxes(),
                                                Rectangle(start_pos, destination), 1e-3));
 }

@@ -40,6 +40,15 @@ cc_library(
 )
 
 cc_library(
+    name = "trajectory_2d",
+    hdrs = ["trajectory_2d.h"],
+    deps = [
+        ":trajectory",
+        "//software/geom:point",
+    ],
+)
+
+cc_library(
     name = "bang_bang_trajectory_1d",
     srcs = ["bang_bang_trajectory_1d.cpp"],
     hdrs = ["bang_bang_trajectory_1d.h"],
@@ -68,6 +77,7 @@ cc_library(
     hdrs = ["bang_bang_trajectory_2d.h"],
     deps = [
         ":bang_bang_trajectory_1d",
+        ":trajectory_2d",
         "//software/geom:bounding_box",
         "//software/geom:point",
     ],
