@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/stop/stop_fsm.h"
+#include "software/ai/hl/stp/tactic/halt/halt_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
@@ -22,5 +22,5 @@ class HaltTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    std::map<RobotId, std::unique_ptr<FSM<StopFSM>>> fsm_map;
+    std::map<RobotId, std::unique_ptr<FSM<HaltFSM>>> fsm_map;
 };

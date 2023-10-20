@@ -3,11 +3,11 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "halt_tactic",
     srcs = [
-        "stop_fsm.cpp",
+        "halt_fsm.cpp",
         "halt_tactic.cpp",
     ],
     hdrs = [
-        "stop_fsm.h",
+        "halt_fsm.h",
         "halt_tactic.h",
     ],
     deps = [
@@ -18,8 +18,8 @@ cc_library(
 )
 
 cc_test(
-    name = "stop_fsm_test",
-    srcs = ["stop_fsm_test.cpp"],
+    name = "halt_fsm_test",
+    srcs = ["halt_fsm_test.cpp"],
     deps = [
         ":halt_tactic",
         "//shared/test_util:tbots_gtest_main",
