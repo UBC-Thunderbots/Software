@@ -7,6 +7,7 @@ from queue import Empty
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from typing import Type
 import threading
 import time
 import os
@@ -220,7 +221,7 @@ class RobotCommunication(object):
         elif mode == IndividualRobotMode.AI:
             self.robots_connected_to_fullsystem.add(robot_id)
 
-    def __forward_to_proto_unix_io(self, type: Message, data: Enum) -> None:
+    def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:
         """
         Forwards to proto unix IO iff running is true
         :param data: the data to be passed through

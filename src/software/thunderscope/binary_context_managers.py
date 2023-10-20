@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import socket
 import logging
@@ -7,7 +9,7 @@ import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
-from typing import Any
+from typing import Any, Self, List
 from subprocess import Popen
 from software.python_bindings import *
 from proto.import_all_protos import *
@@ -66,7 +68,7 @@ class FullSystem(object):
 
         self.thread = threading.Thread(target=self.__restart__)
 
-    def __enter__(self) -> "self":
+    def __enter__(self) -> Self:
         """Enter the full_system context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
@@ -227,7 +229,7 @@ class Simulator(object):
         self.er_force_simulator_proc = None
         self.enable_realism = enable_realism
 
-    def __enter__(self) -> "self":
+    def __enter__(self) -> Self:
         """Enter the simulator context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
@@ -391,7 +393,7 @@ class Gamecontroller(object):
         self.referee_port = self.next_free_port()
         self.ci_port = self.next_free_port()
 
-    def __enter__(self) -> "self":
+    def __enter__(self) -> Self:
         """Enter the gamecontroller context manager. 
 
         :return: gamecontroller context managed instance
@@ -469,7 +471,7 @@ class Gamecontroller(object):
 
         """
 
-        def __send_referee_command(data: Message) -> None:
+        def __send_referee_command(data: Referee) -> None:
             """Send a referee command from the gamecontroller to both full
             systems.
 
@@ -487,7 +489,7 @@ class Gamecontroller(object):
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
-        final_ball_placement_point: Any = None,
+        final_ball_placement_point: tbots_cpp.Point = None,
     ) -> Any:
         """Send a ci input to the gamecontroller.
 

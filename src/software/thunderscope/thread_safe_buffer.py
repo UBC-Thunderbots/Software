@@ -1,6 +1,6 @@
 import queue
 from software.logger.logger import createLogger
-from typing import Any
+from typing import Type, Optional
 from google.protobuf import Message
 
 
@@ -22,7 +22,7 @@ class ThreadSafeBuffer(object):
     """
 
     def __init__(
-        self, buffer_size: int, protobuf_type: Any, log_overrun: bool = False
+        self, buffer_size: int, protobuf_type: Type[Message], log_overrun: bool = False
     ) -> None:
 
         """A buffer to hold data to be consumed.
@@ -41,8 +41,8 @@ class ThreadSafeBuffer(object):
         self.last_logged_protos_dropped = 0
 
     def get(
-        self, block: bool = False, timeout: int = None, return_cached: bool = True
-    ) -> Any:
+        self, block: bool = False, timeout: float = None, return_cached: bool = True
+    ) -> Optional[Message]:
         """Get data from the buffer.
 
         If the buffer is empty:
@@ -95,7 +95,7 @@ class ThreadSafeBuffer(object):
 
         return self.cached_msg
 
-    def put(self, proto: Message, block: bool = False, timeout: int = None) -> None:
+    def put(self, proto: Message, block: bool = False, timeout: float = None) -> None:
         """Put data into the buffer. If the buffer is full, then
         the proto will be logged.
 

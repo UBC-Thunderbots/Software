@@ -13,7 +13,7 @@ from software.py_constants import *
 
 from software.thunderscope.thunderscope_config import TScopeConfig
 
-from typing import Any
+from typing import Callable
 
 SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
 LAYOUT_FILE_EXTENSION = "tscopelayout"
@@ -221,7 +221,7 @@ class Thunderscope(object):
                         default_shelf[key] = val
                     default_shelf.sync()
 
-    def register_refresh_function(self, refresh_func: Any) -> None:
+    def register_refresh_function(self, refresh_func: Callable[[], None]) -> None:
         """Register the refresh functions to run at the refresh_interval_ms
         passed into thunderscope.
 

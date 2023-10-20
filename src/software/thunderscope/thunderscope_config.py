@@ -125,7 +125,7 @@ def configure_base_fullsystem(
     replay: bool = False,
     replay_log: os.PathLike = None,
     visualization_buffer_size: int = 5,
-    extra_widgets: list = [],
+    extra_widgets: List[TScopeWidget] = [],
 ) -> list:
     """
     Returns a list of widget data for a FullSystem tab
