@@ -3,7 +3,7 @@
 #include <munkres/munkres.h>
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/ai/hl/stp/tactic/stop/halt_tactic.h"
+#include "software/ai/hl/stp/tactic/halt/halt_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 

@@ -347,7 +347,7 @@ Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</
 
 ```
 
-## [StopFSM](/src/software/ai/hl/stp/tactic/stop/stop_fsm.h)
+## [HaltFSM](/src/software/ai/hl/stp/tactic/halt/halt_fsm.h)
 
 ```mermaid
 
@@ -355,10 +355,10 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> StopState
-StopState --> StopState : [!stopDone]\n<i>updateStop</i>
-StopState --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> StopState : [!stopDone]\n<i>updateStop</i>
-Terminate:::terminate --> Terminate:::terminate : [stopDone]\n<i>updateStop</i>
+StopState --> StopState : [!haltDone]\n<i>updateHalt</i>
+StopState --> Terminate:::terminate : [haltDone]\n<i>updateHalt</i>
+Terminate:::terminate --> StopState : [!haltDone]\n<i>updateHalt</i>
+Terminate:::terminate --> Terminate:::terminate : [haltDone]\n<i>updateHalt</i>
 
 ```
 
