@@ -37,9 +37,12 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
      * @param initial_pos Starting position of the trajectory
      * @param final_pos Destination. Where the trajectory should end at
      * @param initial_vel The velocity at the start of the trajectory
-     * @param max_vel The maximum velocity (magnitude) the trajectory could have
-     * @param max_accel The maximum acceleration the trajectory could have
-     * @param max_decel The maximum deceleration the trajectory could have
+     * @param max_vel The maximum velocity (magnitude) the trajectory could have. Must be
+     * non-zero.
+     * @param max_accel The maximum acceleration the trajectory could have. Must be
+     * non-zero.
+     * @param max_decel The maximum deceleration the trajectory could have. Must be
+     * non-zero.
      */
     void generate(double initial_pos, double final_pos, double initial_vel,
                   double max_vel, double max_accel, double max_decel);

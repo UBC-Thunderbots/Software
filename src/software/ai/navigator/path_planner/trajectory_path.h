@@ -12,8 +12,8 @@ using TrajectoryGenerator = std::function<std::shared_ptr<Trajectory2D>(
 
 /**
  * TrajectoryPath represents a list of 2D trajectories that are connected end-to-end
- * to form a path. A TrajectoryNode is a 2D trajectory and the time at which it ends
- * and the next TrajectoryNode begins.
+ * to form a path. A TrajectoryPathNode is a 2D trajectory and the time at which it ends
+ * and the next TrajectoryPathNode begins.
  */
 class TrajectoryPath : public Trajectory2D
 {

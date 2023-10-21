@@ -8,4 +8,4 @@
  * E.g. Angle::clamp does not make sense in the context of AngularVelocity, as 360 deg/s
  * is different from 0 deg/s, but 360 deg is the same as 0 deg.
  */
-typedef Angle AngularVelocity;
+using AngularVelocity = Angle;
