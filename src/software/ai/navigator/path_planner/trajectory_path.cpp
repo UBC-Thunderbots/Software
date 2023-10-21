@@ -3,10 +3,7 @@
 #include "software/logger/logger.h"
 
 TrajectoryPath::TrajectoryPath(const std::shared_ptr<Trajectory2D>& initial_trajectory,
-                               std::function<std::shared_ptr<Trajectory2D>(const KinematicConstraints& constraints,
-                                                                           const Point& initial_pos,
-                                                                           const Point& final_pos,
-                                                                           const Vector& initial_vel)> traj_generator)
+                               const TrajectoryGenerator& traj_generator)
     : traj_path({TrajectoryPathNode(initial_trajectory)}),
       trajectory_generator(traj_generator)
 {

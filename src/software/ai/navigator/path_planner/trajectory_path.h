@@ -5,6 +5,11 @@
 #include "software/ai/navigator/path_planner/kinematic_constraints.h"
 #include "software/ai/navigator/path_planner/trajectory_path_node.h"
 
+using TrajectoryGenerator = std::function<std::shared_ptr<Trajectory2D>(const KinematicConstraints& constraints,
+                                                                                      const Point& initial_pos,
+                                                                                      const Point& final_pos,
+                                                                                      const Vector& initial_vel)>;
+
 /**
  * TrajectoryPath represents a list of 2D trajectories that are connected end-to-end
  * to form a path. A TrajectoryNode is a 2D trajectory and the time at which it ends
@@ -23,10 +28,7 @@ class TrajectoryPath : public Trajectory2D
      * kinematic constraints, initial position, and final position
      */
     TrajectoryPath(const std::shared_ptr<Trajectory2D>& initial_trajectory,
-                   std::function<std::shared_ptr<Trajectory2D>(const KinematicConstraints& constraints,
-                                                               const Point& initial_pos,
-                                                               const Point& final_pos,
-                                                               const Vector& initial_vel)> traj_generator);
+                   const TrajectoryGenerator& traj_generator);
 
     /**
      * Generate and append a new trajectory to the end of this trajectory path
@@ -78,9 +80,5 @@ class TrajectoryPath : public Trajectory2D
 
    private:
     std::vector<TrajectoryPathNode> traj_path;
-    std::function<std::shared_ptr<Trajectory2D>(const KinematicConstraints& constraints,
-                                                const Point& initial_pos,
-                                                const Point& final_pos,
-                                                const Vector& initial_vel)>
-        trajectory_generator;
+    TrajectoryGenerator trajectory_generator;
 };

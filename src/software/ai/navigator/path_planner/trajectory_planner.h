@@ -47,11 +47,7 @@ class TrajectoryPlanner
 
     std::vector<Vector> relative_sub_destinations;
 
-    std::function<std::shared_ptr<Trajectory2D>(const KinematicConstraints& constraints,
-                                                const Point& initial_pos,
-                                                const Vector& initial_vel,
-                                                const Point& final_pos)>
-            trajectory_generator;
+    TrajectoryGenerator trajectory_generator;
 
     const double SUB_DESTINATION_STEP_INTERVAL_SEC         = 0.2;
     const double COLLISION_CHECK_STEP_INTERVAL_SEC         = 0.1;
