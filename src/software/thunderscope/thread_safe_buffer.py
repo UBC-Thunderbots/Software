@@ -1,7 +1,7 @@
 import queue
 from software.logger.logger import createLogger
 from typing import Type, Optional
-from google.protobuf import Message
+from google.protobuf.message import Message
 
 
 class ThreadSafeBuffer(object):
