@@ -50,58 +50,59 @@ class HRVOLayer(FieldLayer):
             )
             for point in velocity_obstacle_msg.trajectory.points
         ]
-        poly = QtGui.QPolygon(polygon_points)
-        painter.drawPolyline(poly)
+        if len(polygon_points) > 0:
+            poly = QtGui.QPolygon(polygon_points)
+            painter.drawPolyline(poly)
 
-        # for velocity_obstacle in velocity_obstacle_msg.velocity_obstacles:
-        #     polygon_points = [
-        #         QtCore.QPoint(
-        #             int(
-        #                 MILLIMETERS_PER_METER
-        #                 * velocity_obstacle.apex.x_component_meters
-        #             ),
-        #             int(
-        #                 MILLIMETERS_PER_METER
-        #                 * velocity_obstacle.apex.y_component_meters
-        #             ),
-        #         ),
-        #         QtCore.QPoint(
-        #             int(
-        #                 MILLIMETERS_PER_METER
-        #                 * (
-        #                     velocity_obstacle.apex.x_component_meters
-        #                     + velocity_obstacle.left_side.x_component_meters
-        #                 )
-        #             ),
-        #             int(
-        #                 MILLIMETERS_PER_METER
-        #                 * (
-        #                     velocity_obstacle.apex.y_component_meters
-        #                     + velocity_obstacle.left_side.y_component_meters
-        #                 )
-        #             ),
-        #         ),
-        #         QtCore.QPoint(
-        #             int(
-        #                 MILLIMETERS_PER_METER
-        #                 * (
-        #                     velocity_obstacle.apex.x_component_meters
-        #                     + velocity_obstacle.right_side.x_component_meters
-        #                 )
-        #             ),
-        #             int(
-        #                 MILLIMETERS_PER_METER
-        #                 * (
-        #                     velocity_obstacle.apex.y_component_meters
-        #                     + velocity_obstacle.right_side.y_component_meters
-        #                 )
-        #             ),
-        #         ),
-        #     ]
-        #
-        #     velocity_obstacle_triangle = QtGui.QPolygon(polygon_points)
-        #     painter.drawPolygon(velocity_obstacle_triangle)
-        #
+        for velocity_obstacle in velocity_obstacle_msg.velocity_obstacles:
+            polygon_points = [
+                QtCore.QPoint(
+                    int(
+                        MILLIMETERS_PER_METER
+                        * velocity_obstacle.apex.x_component_meters
+                    ),
+                    int(
+                        MILLIMETERS_PER_METER
+                        * velocity_obstacle.apex.y_component_meters
+                    ),
+                ),
+                QtCore.QPoint(
+                    int(
+                        MILLIMETERS_PER_METER
+                        * (
+                            velocity_obstacle.apex.x_component_meters
+                            + velocity_obstacle.left_side.x_component_meters
+                        )
+                    ),
+                    int(
+                        MILLIMETERS_PER_METER
+                        * (
+                            velocity_obstacle.apex.y_component_meters
+                            + velocity_obstacle.left_side.y_component_meters
+                        )
+                    ),
+                ),
+                QtCore.QPoint(
+                    int(
+                        MILLIMETERS_PER_METER
+                        * (
+                            velocity_obstacle.apex.x_component_meters
+                            + velocity_obstacle.right_side.x_component_meters
+                        )
+                    ),
+                    int(
+                        MILLIMETERS_PER_METER
+                        * (
+                            velocity_obstacle.apex.y_component_meters
+                            + velocity_obstacle.right_side.y_component_meters
+                        )
+                    ),
+                ),
+            ]
+
+            velocity_obstacle_triangle = QtGui.QPolygon(polygon_points)
+            painter.drawPolygon(velocity_obstacle_triangle)
+
         for robot_circle in velocity_obstacle_msg.robots:
             painter.drawEllipse(
                 self.createCircle(robot_circle.origin, robot_circle.radius)
