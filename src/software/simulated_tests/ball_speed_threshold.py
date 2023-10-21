@@ -1,4 +1,4 @@
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.simulated_tests.speed_threshold_helpers import *
@@ -28,7 +28,7 @@ class BallSpeedThreshold(Validation):
                   PASSING if the ball speed is at or above some threshold
         """
         if (
-            tbots.createVector(world.ball.current_state.global_velocity).length()
+            tbots_cpp.createVector(world.ball.current_state.global_velocity).length()
             >= self.speed_threshold
         ):
             return ValidationStatus.PASSING
@@ -58,9 +58,9 @@ class BallSpeedThreshold(Validation):
 
         return create_validation_geometry(
             [
-                tbots.Segment(
-                    tbots.Point(validation_start_x, validation_start_y),
-                    tbots.Point(validation_end_x, validation_end_y),
+                tbots_cpp.Segment(
+                    tbots_cpp.Point(validation_start_x, validation_start_y),
+                    tbots_cpp.Point(validation_end_x, validation_end_y),
                 )
             ]
         )
