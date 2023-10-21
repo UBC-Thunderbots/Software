@@ -1,10 +1,9 @@
 #pragma once
 
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d.h"
+#include "software/ai/navigator/path_planner/trajectory_2d.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
-
-using Trajectory2D = Trajectory<Point, Vector, Vector>;
 
 class BangBangTrajectory2D : public Trajectory2D
 {
@@ -86,7 +85,7 @@ class BangBangTrajectory2D : public Trajectory2D
      * Get the bounding box of the trajectory
      * @return bounding box which bounds the trajectory
      */
-    Rectangle getBoundingBox() const;
+    std::vector<Rectangle> getBoundingBoxes() const override;
 
    private:
     BangBangTrajectory1D x_trajectory;

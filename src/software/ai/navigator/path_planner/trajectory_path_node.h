@@ -1,7 +1,15 @@
 #pragma once
 
+#include <memory>
+
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
 
+/**
+ * A class that wraps Trajectory2D and allows for earlier trajectory
+ * end-time than the actual full duration. This is useful for having
+ * multiple trajectories continuously connected to each other to form
+ * a path (TrajectoryPath).
+ */
 class TrajectoryPathNode
 {
    public:
@@ -10,7 +18,8 @@ class TrajectoryPathNode
      * @param trajectory Trajectory of this trajectory path node
      * @param trajectory_end_time End time of this trajectory
      */
-    TrajectoryPathNode(const BangBangTrajectory2D &trajectory, double trajectory_end_time)
+    TrajectoryPathNode(const std::shared_ptr<Trajectory2D> &trajectory,
+                       double trajectory_end_time)
         : trajectory(trajectory), trajectory_end_time_sec(trajectory_end_time){};
 
     /**
@@ -18,14 +27,14 @@ class TrajectoryPathNode
      * is the total time of the trajectory
      * @param trajectory Trajectory of this trajectory path node
      */
-    TrajectoryPathNode(const BangBangTrajectory2D &trajectory)
-        : trajectory(trajectory), trajectory_end_time_sec(trajectory.getTotalTime()){};
+    TrajectoryPathNode(const std::shared_ptr<Trajectory2D> &trajectory)
+        : trajectory(trajectory), trajectory_end_time_sec(trajectory->getTotalTime()){};
 
     /**
      * Get the trajectory of this trajectory path node
      * @return Trajectory of this trajectory path node
      */
-    const BangBangTrajectory2D &getTrajectory() const
+    const std::shared_ptr<Trajectory2D> &getTrajectory() const
     {
         return trajectory;
     }
@@ -49,6 +58,6 @@ class TrajectoryPathNode
     }
 
    private:
-    BangBangTrajectory2D trajectory;
+    std::shared_ptr<Trajectory2D> trajectory;
     double trajectory_end_time_sec;
 };

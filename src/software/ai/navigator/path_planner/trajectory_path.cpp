@@ -2,14 +2,17 @@
 
 #include "software/logger/logger.h"
 
-TrajectoryPath::TrajectoryPath(const BangBangTrajectory2D& initial_trajectory)
-    : traj_path({TrajectoryPathNode(initial_trajectory)})
+TrajectoryPath::TrajectoryPath(const std::shared_ptr<Trajectory2D>& initial_trajectory,
+                               const TrajectoryGenerator& traj_generator)
+    : traj_path({TrajectoryPathNode(initial_trajectory)}),
+      trajectory_generator(traj_generator)
 {
 }
 
 void TrajectoryPath::append(const KinematicConstraints& constraints,
                             double connection_time_sec, const Point& destination)
 {
+    // Find the trajectory path node that the new trajectory should connect to
     for (size_t i = 0; i < traj_path.size(); i++)
     {
         if (connection_time_sec <= traj_path[i].getTrajectoryEndTime())
@@ -21,11 +24,8 @@ void TrajectoryPath::append(const KinematicConstraints& constraints,
 
             Point connection_pos  = getPosition(connection_time_sec);
             Vector connection_vel = getVelocity(connection_time_sec);
-            BangBangTrajectory2D child_traj;
-            child_traj.generate(
-                connection_pos, destination, connection_vel, constraints.getMaxVelocity(),
-                constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
-            traj_path.emplace_back(child_traj);
+            traj_path.emplace_back(trajectory_generator(constraints, connection_pos,
+                                                        destination, connection_vel));
             return;
         }
         else
@@ -45,7 +45,7 @@ Point TrajectoryPath::getPosition(double t_sec) const
     {
         if (t_sec <= traj.getTrajectoryEndTime())
         {
-            return traj.getTrajectory().getPosition(t_sec);
+            return traj.getTrajectory()->getPosition(t_sec);
         }
         else
         {
@@ -53,7 +53,7 @@ Point TrajectoryPath::getPosition(double t_sec) const
         }
     }
 
-    return traj_path.back().getTrajectory().getDestination();
+    return traj_path.back().getTrajectory()->getDestination();
 }
 
 Vector TrajectoryPath::getVelocity(double t_sec) const
@@ -62,7 +62,7 @@ Vector TrajectoryPath::getVelocity(double t_sec) const
     {
         if (t_sec <= traj.getTrajectoryEndTime())
         {
-            return traj.getTrajectory().getVelocity(t_sec);
+            return traj.getTrajectory()->getVelocity(t_sec);
         }
         else
         {
@@ -79,7 +79,7 @@ Vector TrajectoryPath::getAcceleration(double t_sec) const
     {
         if (t_sec <= traj.getTrajectoryEndTime())
         {
-            return traj.getTrajectory().getAcceleration(t_sec);
+            return traj.getTrajectory()->getAcceleration(t_sec);
         }
         else
         {
@@ -105,7 +105,8 @@ std::vector<Rectangle> TrajectoryPath::getBoundingBoxes() const
     std::vector<Rectangle> bounding_boxes;
     for (const TrajectoryPathNode& traj_node : traj_path)
     {
-        bounding_boxes.push_back(traj_node.getTrajectory().getBoundingBox());
+        const std::vector<Rectangle> bbs = traj_node.getTrajectory()->getBoundingBoxes();
+        bounding_boxes.insert(bounding_boxes.begin(), bbs.begin(), bbs.end());
     }
     return bounding_boxes;
 }
