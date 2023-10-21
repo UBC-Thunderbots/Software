@@ -141,14 +141,11 @@ class SimulatedTestRunner(TbotsTestRunner):
 
         time_elapsed_s = 0
 
-        # initialize the primitive block time to 0
-        primitive_block_time = 0
-
         eventually_validation_failure_msg = "Test Timed Out"
 
         while time_elapsed_s < test_timeout_s:
             # get time before we execute the loop
-            primitive_block_time = time.time()
+            processing_start_time = time.time()
 
             # Check for new CI commands at this time step
             for (delay, cmd, team) in ci_cmd_with_delay:
@@ -199,11 +196,11 @@ class SimulatedTestRunner(TbotsTestRunner):
                     )
 
             # get the time difference after we get the primitive (after any blocking that happened)
-            primitive_block_time = primitive_block_time - time.time()
+            processing_time = time.time() - processing_start_time
 
             # if the time we have blocked is less than a tick, sleep for the remaining time (for Thunderscope only)
-            if self.thunderscope and tick_duration_s > primitive_block_time:
-                time.sleep(tick_duration_s - primitive_block_time)
+            if self.thunderscope and tick_duration_s > processing_time:
+                time.sleep(tick_duration_s - processing_time)
 
             # Validate
             (
