@@ -17,12 +17,40 @@ print_status_msg () {
    echo "================================================================"
 }
 
+add_bashrc_if_not_there () {
+    if ! grep -q "$1" ~/.bashrc; then
+        echo "$1" >> ~/.bashrc
+    fi
+}
+
 # Save the parent dir of this so we can always run commands relative to the
 # location of this script, no matter where it is called from. This
 # helps prevent bugs and odd behaviour if this script is run through a symlink
 # or from a different directory.
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 cd "$CURR_DIR" || exit
+
+# Get system CPU architecture and Ubuntu version
+arch=$(uname -i)
+ubuntu_version=$(lsb_release -rs)
+
+# Check that architecture and version are valid
+if [[ ("$arch" == "x86_64" && ("$ubuntu_version" == "20.04" || "$ubuntu_version" == "22.04")) || 
+      ("$arch" == "aarch64" && "$ubuntu_version" == "22.04") ]]; then
+    print_status_msg "Setting up software for architecture $arch and version $ubuntu_version"
+else
+    print_status_msg "Error: Unsupported environment: architecture $arch and version $ubuntu_version"
+    exit 1
+fi
+
+# Display warning message for ARM users
+if [[ "$arch" == "aarch64" ]]; then
+    echo "WARNING: Running this setup script on ARM architecture may cause parts of your Ubuntu installation to become unusable. Continue? [Y/n]"
+    read -r answer
+    if [[ "$answer" != "" && "$answer" != "y" && "$answer" != "Y" ]]; then
+        exit 1
+    fi
+fi
 
 print_status_msg "Installing Utilities and Dependencies"
 
@@ -115,21 +143,56 @@ if [[ $(lsb_release -rs) == "22.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu22_requirements.txt
 fi
 
+if [["$arch" == "aarch64"]]; then
+    print_status_msg "Starting ARM workarounds for pyqt"
+    # There may be a better way to do this that doesn't Frankenstien your ubuntu installation, but this is the only way we found to get pyqt to work.
+    # add mantic as source, install python3-pyqt6 and python3-pyqt6.qtwebengine
+    sudo echo "deb http://ca.ports.ubuntu.com/ubuntu-ports/ mantic main universe" > /etc/apt/sources.list.d/temp.list
+    sudo apt-get update
+    sudo apt-get install python3-pyqt6 python3-pyqt6.qtwebengine
+    # remove the mantic source
+    sudo rm /etc/apt/sources.list.d/temp.list
+    # allow tbotspython to access dist-packages
+    add_bashrc_if_not_there "export PYTHONPATH=/usr/lib/python3/dist-packages/"
+    # fix for pyqtgraph trying to use pyqt5 by default
+    add_bashrc_if_not_there "export PYQTGRAPH_QT_LIB=PyQt6"
+else
+    # else if x86_64, install PyQt6 normally using pip
+    sudo /opt/tbotspython/bin/pip3 install -r pyqt6==6.5.0 PyQt6-WebEngine
+fi
+
 print_status_msg "Done Setting Up Virtual Python Environment"
+print_status_msg "Setting up symlink to qt5 installation"
+sudo ln -s /usr/include/$arch-linux-gnu/qt5/ /opt/tbotspython/qt5
+
 print_status_msg "Fetching game controller"
 
+if [[ "$arch" = "aarch64" ]]; then
+    GAME_CONTROLLER_LINK=https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.7.2/ssl-game-controller_v3.7.2_linux_arm64
+else
+    GAME_CONTROLLER_LINK=https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64
+fi
+
 sudo chown -R $USER:$USER /opt/tbotspython
-sudo wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
+sudo wget -nc $GAME_CONTROLLER_LINK -O /opt/tbotspython/gamecontroller
 sudo chmod +x /opt/tbotspython/gamecontroller
 
 # Install Bazel
 print_status_msg "Installing Bazel"
 
-# Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
-sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
-sudo chmod +x /tmp/bazel-installer.sh
-sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
-echo "source ${HOME}/.bazel/bin/bazel-complete.bash" >> ~/.bashrc
+if [[ "$arch" = "aarch64" ]]; then
+    # Download bazelisk, a bazel version manager that has a version for ARM architecture
+    sudo wget -nc https://github.com/bazelbuild/bazelisk/releases/download/v1.18.0/bazelisk-linux-arm64 -O /usr/local/bin/bazel
+    sudo chmod +x /usr/local/bin/bazel
+else
+    # Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
+    sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
+    sudo chmod +x /tmp/bazel-installer.sh
+    sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
+fi
+
+# Fix for bazel autocomplete, add it to .bashrc if it isn't there already
+add_bashrc_if_not_there "source ${HOME}/.bazel/bin/bazel-complete.bash"
 
 print_status_msg "Done Installing Bazel"
 print_status_msg "Setting Up PlatformIO"
