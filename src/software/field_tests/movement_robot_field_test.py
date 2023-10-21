@@ -1,6 +1,6 @@
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 import sys
 from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
@@ -43,9 +43,9 @@ logger = createLogger(__name__)
 #     # setup world state
 #     initial_worldstate = create_world_state(
 #         yellow_robot_locations=[],
-#         blue_robot_locations=[tbots.Point(robot_starting_x, robot_starting_y)],
-#         ball_location=tbots.Point(1, 1),
-#         ball_velocity=tbots.Point(0, 0),
+#         blue_robot_locations=[tbots_cpp.Point(robot_starting_x, robot_starting_y)],
+#         ball_location=tbots_cpp.Point(1, 1),
+#         ball_velocity=tbots_cpp.Point(0, 0),
 #     )
 #     simulated_test_runner.set_worldState(initial_worldstate)
 #
@@ -59,8 +59,8 @@ logger = createLogger(__name__)
 #         [
 #             RobotEventuallyEntersRegion(
 #                 regions=[
-#                     tbots.Circle(
-#                         tbots.Point(robot_x_destination, robot_y_destination), 0.2
+#                     tbots_cpp.Circle(
+#                         tbots_cpp.Point(robot_x_destination, robot_y_destination), 0.2
 #                     )
 #                 ]
 #             ),

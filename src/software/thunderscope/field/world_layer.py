@@ -1,6 +1,6 @@
 import math
 
-import software.python_bindings as geom
+import software.python_bindings as tbots_cpp
 import pyqtgraph as pg
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore, QtGui
@@ -138,7 +138,7 @@ class WorldLayer(FieldLayer):
         """
         mouse_move_pos = [event.pos().x(), event.pos().y()]
 
-        ball_position = geom.Vector(
+        ball_position = tbots_cpp.Vector(
             self.cached_world.ball.current_state.global_position.x_meters
             * MILLIMETERS_PER_METER,
             self.cached_world.ball.current_state.global_position.y_meters
@@ -151,7 +151,7 @@ class WorldLayer(FieldLayer):
         # velocity vector that is proportional to the distance the
         # mouse has moved away from the ball.
         if self.key_pressed[Qt.Key.Key_Control] and self.mouse_clicked:
-            self.ball_velocity_vector = ball_position - geom.Vector(
+            self.ball_velocity_vector = ball_position - tbots_cpp.Vector(
                 mouse_move_pos[0], mouse_move_pos[1]
             )
 
