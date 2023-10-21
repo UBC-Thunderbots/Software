@@ -4,7 +4,7 @@ import os
 import threading
 
 import pytest
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 import argparse
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team

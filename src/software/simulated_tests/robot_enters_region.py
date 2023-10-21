@@ -1,4 +1,4 @@
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -24,8 +24,8 @@ class RobotEntersRegion(Validation):
         """
         for region in self.regions:
             for robot in world.friendly_team.team_robots:
-                if tbots.contains(
-                    region, tbots.createPoint(robot.current_state.global_position)
+                if tbots_cpp.contains(
+                    region, tbots_cpp.createPoint(robot.current_state.global_position)
                 ):
                     return ValidationStatus.PASSING
 
@@ -70,8 +70,8 @@ class NumberOfRobotsEntersRegion(Validation):
         """
         # Update the map with latest robot status
         for robot in world.friendly_team.team_robots:
-            self.robot_in_zone[robot.id] = tbots.contains(
-                self.region, tbots.createPoint(robot.current_state.global_position)
+            self.robot_in_zone[robot.id] = tbots_cpp.contains(
+                self.region, tbots_cpp.createPoint(robot.current_state.global_position)
             )
         # Check if there are at least req_robot_cnt number of robots in zone
         curr_cnt = 0
