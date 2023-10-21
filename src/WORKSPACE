@@ -179,12 +179,12 @@ git_repository(
     shallow_since = "1614109311 -0800",
 )
 
-# Right now qt5 is installed on the system using the setup_software.sh script
-# We assume we can find the headers in the "standard" path used in this rule
+# /opt/tbotspython/qt5 must be symlinked to the system's installation of qt5
+# usually in /usr/include/(your system)/qt5
 new_local_repository(
     name = "qt",
     build_file = "@bazel_rules_qt//:qt.BUILD",
-    path = "/usr/include/aarch64-linux-gnu/qt5/",
+    path = "/opt/tbotspython/qt5/",
 )
 
 new_local_repository(
