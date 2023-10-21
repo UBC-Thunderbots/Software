@@ -9,7 +9,7 @@ import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
-from typing import Any, Self
+from typing import Any
 from subprocess import Popen
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
@@ -68,7 +68,7 @@ class FullSystem(object):
 
         self.thread = threading.Thread(target=self.__restart__)
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> self:
         """Enter the full_system context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
@@ -229,7 +229,7 @@ class Simulator(object):
         self.er_force_simulator_proc = None
         self.enable_realism = enable_realism
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> self:
         """Enter the simulator context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
@@ -393,7 +393,7 @@ class Gamecontroller(object):
         self.referee_port = self.next_free_port()
         self.ci_port = self.next_free_port()
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> self:
         """Enter the gamecontroller context manager. 
 
         :return: gamecontroller context managed instance
