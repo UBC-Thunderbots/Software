@@ -110,6 +110,9 @@ class ProtoLogger(object):
                     self.log_folder + f"{replay_index}.{REPLAY_FILE_EXTENSION}", "wb"
                 ) as self.log_file:
 
+                    # Allocates 1MB of disk for impending replay
+                    os.ftruncate(self.log_file, 1000000)
+
                     while self.stop_logging is False:
 
                         # Consume the buffer and log the protobuf
