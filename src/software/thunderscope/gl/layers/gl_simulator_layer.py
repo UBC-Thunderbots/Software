@@ -37,6 +37,7 @@ class GLSimulatorLayer(GLLayer):
 
         sim_world_state = self.simulator_state_buffer.get(block=False)
 
+        # X and Y reversed due to ER-Force's coordinate conventions
         self.ball_graphic.set_position(
             sim_world_state.ball.p_y,
             -sim_world_state.ball.p_x,
