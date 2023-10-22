@@ -76,7 +76,7 @@ class RobotCommunication(object):
         # only checks for estop if checking is not disabled
         if not self.disable_estop:
             try:
-                self.estop_reader = ThreadedEstopReader(
+                self.estop_reader = tbots_cpp.ThreadedEstopReader(
                     self.estop_path, self.estop_buadrate
                 )
             except Exception:
@@ -281,7 +281,7 @@ class RobotCommunication(object):
             True,
         )
 
-        self.receive_robot_crash = RobotCrashProtoListener(
+        self.receive_robot_crash = tbots_cpp.RobotCrashProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_CRASH_PORT,
             lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),
