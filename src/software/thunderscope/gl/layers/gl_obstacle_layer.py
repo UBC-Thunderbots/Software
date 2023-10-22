@@ -58,9 +58,7 @@ class GLObstacleLayer(GLLayer):
         # Ensure we have the same number of graphics as obstacles
         self.poly_obstacle_graphics.resize(
             len(poly_obstacles),
-            lambda: GLPolygon(
-                outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR
-            ),
+            lambda: GLPolygon(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
         self.circle_obstacle_graphics.resize(
             len(circle_obstacles),
