@@ -76,7 +76,7 @@ def ball_placement_play_setup(
         # test normal ball placement (not edge case)
         (tbots.Point(2, 2), tbots.Point(0, 1.5)),
         # test when ball starting point is outside of the goal line
-        (tbots.Point(-4.7, 1.6), tbots.Point(0, 0.5)),
+        (tbots.Point(-4.7, 1.5), tbots.Point(0, 0.5)),
         # test when ball starting point is outside of the side lines
         (tbots.Point(-2.0, 3.2), tbots.Point(0, -0.5)),
         # test when ball placement point is inside of the friendly defense area
