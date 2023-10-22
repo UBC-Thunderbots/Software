@@ -109,7 +109,7 @@ class ProtoLogger(object):
                 ) as self.log_file:
 
                     # Allocates 1MB of disk for impending replay
-                    os.ftruncate(self.log_file.fileno(), 1000000)
+                    os.ftruncate(self.log_file.fileno(), REPLAY_MAX_CHUNK_SIZE_BYTES)
 
                     while self.stop_logging is False:
 
