@@ -143,13 +143,13 @@ if [[ $(lsb_release -rs) == "22.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu22_requirements.txt
 fi
 
-if [["$arch" == "aarch64"]]; then
+if [[ "$arch" == "aarch64" ]]; then
     print_status_msg "Starting ARM workarounds for pyqt"
-    # There may be a better way to do this that doesn't Frankenstien your ubuntu installation, but this is the only way we found to get pyqt to work.
+    # There may be a better way to do this that doesn't Frankenstein your ubuntu installation, but this is the only way we found to get pyqt to work.
     # add mantic as source, install python3-pyqt6 and python3-pyqt6.qtwebengine
-    sudo echo "deb http://ca.ports.ubuntu.com/ubuntu-ports/ mantic main universe" > /etc/apt/sources.list.d/temp.list
+    sudo sh -c 'echo "deb http://ca.ports.ubuntu.com/ubuntu-ports/ mantic main universe" > /etc/apt/sources.list.d/temp.list'
     sudo apt-get update
-    sudo apt-get install python3-pyqt6 python3-pyqt6.qtwebengine
+    sudo apt-get install python3-pyqt6 python3-pyqt6.qtwebengine -y
     # remove the mantic source
     sudo rm /etc/apt/sources.list.d/temp.list
     # allow tbotspython to access dist-packages
@@ -158,7 +158,7 @@ if [["$arch" == "aarch64"]]; then
     add_bashrc_if_not_there "export PYQTGRAPH_QT_LIB=PyQt6"
 else
     # else if x86_64, install PyQt6 normally using pip
-    sudo /opt/tbotspython/bin/pip3 install -r pyqt6==6.5.0 PyQt6-WebEngine
+    sudo /opt/tbotspython/bin/pip3 install pyqt6==6.5.0 PyQt6-WebEngine
 fi
 
 print_status_msg "Done Setting Up Virtual Python Environment"
