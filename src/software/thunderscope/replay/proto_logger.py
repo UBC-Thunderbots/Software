@@ -74,10 +74,8 @@ class ProtoLogger(object):
         save a _lot_ of space.
 
         """
-
         self.thread = threading.Thread(target=self.__log_protobufs, daemon=True)
         self.thread.start()
-
         return self
 
     def __exit__(self, type, value, traceback):
@@ -111,7 +109,7 @@ class ProtoLogger(object):
                 ) as self.log_file:
 
                     # Allocates 1MB of disk for impending replay
-                    os.ftruncate(self.log_file, 1000000)
+                    os.ftruncate(self.log_file.fileno(), 1000000)
 
                     while self.stop_logging is False:
 
