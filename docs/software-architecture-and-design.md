@@ -56,6 +56,8 @@
     * [Diagram](#ai-diagram)
   * [Thunderscope](#thunderscope)
     * [Inter-process Communication](#inter-process-communication)
+    * [3D Visualizer](#3d-visualizer)
+      * [Layers](#layers)
   * [Estop](#estop)
 * [Simulator](#simulator)
   * [Standalone Simulator](#standalone-simulator)
@@ -514,6 +516,21 @@ Logging protobufs is done at the <code>VISUALIZE</code> level (e.g. <code>LOG(VI
 </details><br>
 
 On the Python (Thunderscope) side, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. Through `ProtoUnixIO`, classes can register as an [observer](#observer-design-pattern) by providing a protobuf type to observe and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming data. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and send data to all observers of that proto type. Classes can also send out protobufs via `ProtoUnixIO`, which will relay the data to any registered observers.
+
+## 3D Visualizer
+
+Our field visualizer uses [PyQtGraph's 3D graphics system](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/index.html) to render 3D graphics with OpenGL. PyQtGraph handles all the necessary calls to OpenGL for us, and as an abstraction, provides a [scenegraph](https://en.wikipedia.org/wiki/Scene_graph) to organize and manipulate entities/objects within the 3D environment (the scene).
+
+`software/thunderscope/gl` is the main directory for the 3D visualizer. The "GL" prefix lets us identify 3D graphics related code and keeps namings consistent with `pyqtgraph.opengl` class names. Inside this directory:
+
+- [`GLWidget`](../src/software/thunderscope/gl/gl_widget.py) is the widget that displays our 3D visualization. It wraps a PyQtGraph `GLViewWidget` that renders all the `GLGraphicsItem`s that have been added to its [scenegraph](https://en.wikipedia.org/wiki/Scene_graph). 
+- `/graphics` contains custom "graphics items". Graphics items (or just "graphics" for short) are objects that can be added to the [3D scenegraph](https://en.wikipedia.org/wiki/Scene_graph). Graphics should inherit from [`GLGraphicsItem`](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/glgraphicsitem.html) and represent 3D objects that can be visualized in the scene (e.g. a robot, a sphere, a circle, etc.).
+- `/layers` contains all the [layers](#layers) we use to organize and group together graphics.
+
+### Layers
+We organize our graphics into "layers" so that we can toggle the visibility of different parts of our visualization. Each layer is responsible for visualizing a specific portion of our AI (e.g. vision data, path planning, passing, etc.). A layer can also handle layer-specific functionality; for instance, `GLWorldLayer` lets the user place or kick the ball using the mouse. The base class for a layer is [`GLLayer`](../src/software/thunderscope/gl/gl_layer.py).
+
+A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a tree-like structure. In theory, `GLLayers` could also be nested within one another. 
 
 # Estop
 `Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:
