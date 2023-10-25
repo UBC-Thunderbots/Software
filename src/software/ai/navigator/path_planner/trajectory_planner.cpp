@@ -23,7 +23,6 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles,
     const Rectangle &navigable_area)
 {
-    ZoneScopedN("findTrajectory");
     static long int total_time = 0;
     static int num_calls       = 0;
     auto start_time            = std::chrono::high_resolution_clock::now();
@@ -35,17 +34,14 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     aabb::Tree tree(2, 0.0, {false, false},
                     {navigable_area.xLength(), navigable_area.yLength()},
                     std::max(static_cast<unsigned int>(obstacles.size()), 1u), false);
+    for (unsigned int i = 0; i < obstacles.size(); i++)
     {
-        ZoneScopedN("fillObstacleTree");
-        for (unsigned int i = 0; i < obstacles.size(); i++)
-        {
-            Rectangle aabb         = obstacles[i]->axisAlignedBoundingBox();
-            std::vector aabb_lower = {aabb.negXNegYCorner().x(),
-                                      aabb.negXNegYCorner().y()};
-            std::vector aabb_upper = {aabb.posXPosYCorner().x(),
-                                      aabb.posXPosYCorner().y()};
-            tree.insertParticle(i, aabb_lower, aabb_upper);
-        }
+        Rectangle aabb         = obstacles[i]->axisAlignedBoundingBox();
+        std::vector aabb_lower = {aabb.negXNegYCorner().x(),
+                                  aabb.negXNegYCorner().y()};
+        std::vector aabb_upper = {aabb.posXPosYCorner().x(),
+                                  aabb.posXPosYCorner().y()};
+        tree.insertParticle(i, aabb_lower, aabb_upper);
     }
 
     TrajectoryPathWithCost best_traj_with_cost = getDirectTrajectoryWithCost(
@@ -69,35 +65,30 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
         }
     }
     int num_traj = 1;
+    // Add trajectories that go through sub-destinations
+    for (const Point &sub_dest : sub_destinations)
     {
-        ZoneScopedN("generateTrajectories");
-
-        // Add trajectories that go through sub-destinations
-        for (const Point &sub_dest : sub_destinations)
-        {
-            TrajectoryPathWithCost sub_trajectory = getDirectTrajectoryWithCost(
+        TrajectoryPathWithCost sub_trajectory = getDirectTrajectoryWithCost(
                 start, sub_dest, initial_velocity, constraints, tree, obstacles);
 
-            for (double connection_time = SUB_DESTINATION_STEP_INTERVAL_SEC;
-                 connection_time <= sub_trajectory.traj_path.getTotalTime();
-                 connection_time += SUB_DESTINATION_STEP_INTERVAL_SEC)
-            {
-                ZoneScopedN("pushBackAndAppendTrajectoy");
-                // Copy the sub trajectory, then append a trajectory to the
-                // actual destination at connection_time
-                TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;
-                traj_path_to_dest.append(constraints, connection_time, destination);
-                TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
+        for (double connection_time = SUB_DESTINATION_STEP_INTERVAL_SEC;
+             connection_time <= sub_trajectory.traj_path.getTotalTime();
+             connection_time += SUB_DESTINATION_STEP_INTERVAL_SEC)
+        {
+            // Copy the sub trajectory, then append a trajectory to the
+            // actual destination at connection_time
+            TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;
+            traj_path_to_dest.append(constraints, connection_time, destination);
+            TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
                     traj_path_to_dest, tree, obstacles, sub_trajectory, connection_time);
-                num_traj++;
-                // TODO: If full_traj_with_cost doesn't have any collisions, should we
-                // continue to next iter?
-                //       i.e. is it possible that with a later connection_time we get an
-                //       improved score?!
-                if (full_traj_with_cost.cost < best_traj_with_cost.cost)
-                {
-                    best_traj_with_cost = full_traj_with_cost;
-                }
+            num_traj++;
+            // TODO: If full_traj_with_cost doesn't have any collisions, should we
+            // continue to next iter?
+            //       i.e. is it possible that with a later connection_time we get an
+            //       improved score?!
+            if (full_traj_with_cost.cost < best_traj_with_cost.cost)
+            {
+                best_traj_with_cost = full_traj_with_cost;
             }
         }
     }
@@ -150,8 +141,6 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
     const std::optional<double> sub_traj_duration_sec)
 {
-    ZoneScopedN("getTrajectoryWithCost");
-
     TrajectoryPathWithCost traj_with_cost(trajectory);
 
     std::set<unsigned int> possible_collisions_indices;
@@ -209,7 +198,6 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
 double TrajectoryPlanner::calculateCost(
     const TrajectoryPathWithCost &traj_with_cost) const
 {
-    ZoneScopedN("calculateCost");
     double total_cost = traj_with_cost.traj_path.getTotalTime();
 
     // TODO: Tiger's does this dynamically?! collisionPenalty. Mainly for penalty area
@@ -248,7 +236,6 @@ double TrajectoryPlanner::getFirstNonCollisionTime(
     const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
     const std::vector<ObstaclePtr> &obstacles) const
 {
-    ZoneScopedN("getFirstNonCollisionTime");
     double path_length = traj_path.getTotalTime();
     for (double time = 0.0; time <= std::min(path_length, MAX_FUTURE_COLLISION_CHECK_SEC);
          time += FORWARD_COLLISION_CHECK_STEP_INTERVAL_SEC)
@@ -277,7 +264,6 @@ std::pair<double, ObstaclePtr> TrajectoryPlanner::getFirstCollisionTime(
     const std::vector<ObstaclePtr> &obstacles, const double start_time_sec,
     const double stop_time_sec) const
 {
-    ZoneScopedN("getFirstCollisionTime");
     for (double time = start_time_sec;
          time <= std::min(stop_time_sec, MAX_FUTURE_COLLISION_CHECK_SEC);
          time += COLLISION_CHECK_STEP_INTERVAL_SEC)
@@ -299,7 +285,6 @@ double TrajectoryPlanner::getLastNonCollisionTime(
     const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
     const std::vector<ObstaclePtr> &obstacles) const
 {
-    ZoneScopedN("getLastNonCollisionTime");
     double path_length = traj_path.getTotalTime();
     for (double time = std::min(path_length, MAX_FUTURE_COLLISION_CHECK_SEC); time >= 0.0;
          time -= COLLISION_CHECK_STEP_INTERVAL_SEC)

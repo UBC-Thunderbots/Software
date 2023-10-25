@@ -33,7 +33,6 @@ return std::make_shared<BangBangTrajectory2D>(
 void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
                                 const World &world, Duration time_step)
 {
-    ZoneScopedN("HRVOAgent::updatePrimitive");
     RobotPath path;
     static_obstacles.clear();
     ball_obstacle = std::nullopt;

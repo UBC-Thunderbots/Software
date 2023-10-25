@@ -381,7 +381,7 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
         std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     if (num_calls % 200 == 0)
     {
-        std::cout << "Average time per setYellowRobotPrimitiveSet call: "
+        std::cout << "Average time per setBlueRobotPrimitiveSet call: "
                   << total_time_us / num_calls << " us" << std::endl;
         total_time_us = 0;
         num_calls     = 0;
@@ -395,7 +395,6 @@ void ErForceSimulator::setRobotPrimitive(
     const TbotsProto::World& world_msg, const Vector& local_velocity,
     const AngularVelocity angular_velocity)
 {
-    ZoneScopedN("setRobotPrimitive");
     // Set to NEG_X because the world msg in this simulator is normalized
     // correctly
     auto robot_primitive_executor_iter = robot_primitive_executor_map.find(id);

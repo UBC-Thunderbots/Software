@@ -11,7 +11,6 @@ void HRVOSimulator::updateWorld(const World &world,
                                 const RobotConstants_t &robot_constants,
                                 Duration time_step)
 {
-    ZoneScopedN("HRVOSimulator::updateWorld");
     this->world = world;
 
     const Team &friendly_team = world.friendlyTeam();
@@ -213,7 +212,6 @@ void HRVOSimulator::configureLVRobot(const Robot &robot,
 
 void HRVOSimulator::doStep(Duration time_step)
 {
-    ZoneScopedN("HRVOSimulator::doStep");
     if (time_step.toSeconds() == 0.0)
     {
         LOG(WARNING) << "Simulator time step is zero";
