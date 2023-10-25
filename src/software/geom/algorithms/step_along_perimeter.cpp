@@ -17,13 +17,14 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
     }
 
     std::vector<Segment> polygon_segments = polygon.getSegments();
-    std::size_t start_segment_index        = 0;
+    std::size_t start_segment_index       = 0;
 
     // find initial segment which contains start point
-    auto it = std::find_if(
-            polygon_segments.begin(), polygon_segments.end(), [&start](const Segment& segment) {
-            return collinear(segment.getStart(), start, segment.getEnd());
-        });
+    auto it =
+        std::find_if(polygon_segments.begin(), polygon_segments.end(),
+                     [&start](const Segment& segment) {
+                         return collinear(segment.getStart(), start, segment.getEnd());
+                     });
 
     start_segment_index = std::distance(polygon_segments.begin(), it);
 
@@ -31,7 +32,7 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
 
     // fmod travel distance for case where travel_distance > perimeter
     bool is_counter_clockwise = travel_distance < 0;
-    travel_distance          = std::fmod(std::abs(travel_distance), polygon.perimeter());
+    travel_distance           = std::fmod(std::abs(travel_distance), polygon.perimeter());
     if (is_counter_clockwise)
     {
         travel_distance = polygon.perimeter() - travel_distance;
@@ -54,10 +55,12 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
         if (travel_distance <= segment_length)
         {
             double ratio = travel_distance / segment_length;
-            double newX  = curr_segment.getStart().x() +
-                          ratio * (curr_segment.getEnd().x() - curr_segment.getStart().x());
-            double newY = curr_segment.getStart().y() +
-                          ratio * (curr_segment.getEnd().y() - curr_segment.getStart().y());
+            double newX =
+                curr_segment.getStart().x() +
+                ratio * (curr_segment.getEnd().x() - curr_segment.getStart().x());
+            double newY =
+                curr_segment.getStart().y() +
+                ratio * (curr_segment.getEnd().y() - curr_segment.getStart().y());
             return Point{newX, newY};
         }
 
