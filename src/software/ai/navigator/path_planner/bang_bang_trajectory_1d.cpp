@@ -197,6 +197,7 @@ double BangBangTrajectory1D::getVelocity(double t_sec) const
 
 double BangBangTrajectory1D::getAcceleration(double t_sec) const
 {
+    t_sec                   = std::clamp(t_sec, 0.0, getTotalTime());
     size_t trajectory_index = getTrajectoryIndexAtTime(t_sec);
     return trajectory_parts[trajectory_index].acceleration;
 }
@@ -205,6 +206,7 @@ void BangBangTrajectory1D::getTrajPartAndDeltaTime(
     double t_sec, BangBangTrajectory1D::TrajectoryPart &out_traj_part,
     double &out_t_delta_sec) const
 {
+    t_sec                   = std::clamp(t_sec, 0.0, getTotalTime());
     size_t trajectory_index = getTrajectoryIndexAtTime(t_sec);
     out_traj_part           = trajectory_parts[trajectory_index];
 
