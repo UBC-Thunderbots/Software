@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
 
 /**
@@ -17,7 +18,8 @@ class TrajectoryPathNode
      * @param trajectory Trajectory of this trajectory path node
      * @param trajectory_end_time End time of this trajectory
      */
-    TrajectoryPathNode(const std::shared_ptr<Trajectory2D> &trajectory, double trajectory_end_time)
+    TrajectoryPathNode(const std::shared_ptr<Trajectory2D> &trajectory,
+                       double trajectory_end_time)
         : trajectory(trajectory), trajectory_end_time_sec(trajectory_end_time){};
 
     /**

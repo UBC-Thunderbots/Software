@@ -1,6 +1,8 @@
 #pragma once
 
 /**
+ * Interface for a trajectory
+ *
  * A trajectory is a path that is parameterized by time. It is a function that
  * takes in a time and returns a position, velocity, and acceleration.
  *

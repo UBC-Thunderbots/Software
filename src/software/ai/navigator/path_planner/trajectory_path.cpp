@@ -19,12 +19,17 @@ void TrajectoryPath::append(const KinematicConstraints& constraints,
         {
             traj_path[i].setTrajectoryEndTime(connection_time_sec);
 
-            // Delete all trajectory nodes after the on that is being connected to
+            // Delete all trajectory nodes after the node that is at the
+            // connection_time_sec
             traj_path.erase(traj_path.begin() + i + 1, traj_path.end());
 
+            // To have a smooth and continuous trajectory path, we want the start
+            // position and velocity of the newly generated trajectory to be
+            // the end position and velocity of the last trajectory.
             Point connection_pos  = getPosition(connection_time_sec);
             Vector connection_vel = getVelocity(connection_time_sec);
-            traj_path.emplace_back(trajectory_generator(constraints, connection_pos, destination, connection_vel));
+            traj_path.emplace_back(trajectory_generator(constraints, connection_pos,
+                                                        destination, connection_vel));
             return;
         }
         else
