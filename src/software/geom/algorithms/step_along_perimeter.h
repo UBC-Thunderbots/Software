@@ -22,4 +22,4 @@
  * Positive to traverse clockwise, or negative to traverse counter-clockwise.
  * @return The final position after traveling the specified distance from the start
  */
-Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double distance);
+Point stepAlongPerimeter(const Polygon& polygon, const Point& start, double travel_distance);

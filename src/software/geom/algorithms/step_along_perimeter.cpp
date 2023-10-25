@@ -9,63 +9,63 @@
 
 
 Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
-                         double travelDistance)
+                         double travel_distance)
 {
-    if (travelDistance == 0.0)
+    if (travel_distance == 0.0)
     {
         return start;
     }
 
-    std::vector<Segment> polygonSegments = polygon.getSegments();
-    std::size_t startSegmentIndex        = 0;
+    std::vector<Segment> polygon_segments = polygon.getSegments();
+    std::size_t start_segment_index        = 0;
 
     // find initial segment which contains start point
-    std::vector<Segment>::iterator it = std::find_if(
-        polygonSegments.begin(), polygonSegments.end(), [&start](const Segment& segment) {
+    auto it = std::find_if(
+            polygon_segments.begin(), polygon_segments.end(), [&start](const Segment& segment) {
             return collinear(segment.getStart(), start, segment.getEnd());
         });
 
-    startSegmentIndex = std::distance(polygonSegments.begin(), it);
+    start_segment_index = std::distance(polygon_segments.begin(), it);
 
-    std::size_t segmentIndex = startSegmentIndex;
+    std::size_t segment_index = start_segment_index;
 
-    // fmod travel distance for case where travelDistance > perimeter
-    bool isCounterClockwise = travelDistance < 0;
-    travelDistance          = std::fmod(std::abs(travelDistance), polygon.perimeter());
-    if (isCounterClockwise)
+    // fmod travel distance for case where travel_distance > perimeter
+    bool is_counter_clockwise = travel_distance < 0;
+    travel_distance          = std::fmod(std::abs(travel_distance), polygon.perimeter());
+    if (is_counter_clockwise)
     {
-        travelDistance = polygon.perimeter() - travelDistance;
+        travel_distance = polygon.perimeter() - travel_distance;
     }
 
-    bool wrapFlag = false;
-    while (travelDistance > 0)
+    bool wrap_flag = false;
+    while (travel_distance > 0)
     {
-        Segment currSegment = polygonSegments[segmentIndex];
+        Segment curr_segment = polygon_segments[segment_index];
 
-        double segmentLength = currSegment.length();
-        if (segmentIndex == startSegmentIndex && !wrapFlag)
+        double segment_length = curr_segment.length();
+        if (segment_index == start_segment_index && !wrap_flag)
         {
-            segmentLength = distance(start, currSegment.getEnd());
-            wrapFlag      = true;
+            segment_length = distance(start, curr_segment.getEnd());
+            wrap_flag      = true;
         }
 
         // If the remaining distance to travel is less than or equal to the length
         // of the current segment, calculate the final point and return it
-        if (travelDistance <= segmentLength)
+        if (travel_distance <= segment_length)
         {
-            double ratio = travelDistance / segmentLength;
-            double newX  = currSegment.getStart().x() +
-                          ratio * (currSegment.getEnd().x() - currSegment.getStart().x());
-            double newY = currSegment.getStart().y() +
-                          ratio * (currSegment.getEnd().y() - currSegment.getStart().y());
+            double ratio = travel_distance / segment_length;
+            double newX  = curr_segment.getStart().x() +
+                          ratio * (curr_segment.getEnd().x() - curr_segment.getStart().x());
+            double newY = curr_segment.getStart().y() +
+                          ratio * (curr_segment.getEnd().y() - curr_segment.getStart().y());
             return Point{newX, newY};
         }
 
         // Subtract the length of the current segment from the total distance
-        travelDistance -= segmentLength;
+        travel_distance -= segment_length;
 
         // Update the segment index
-        segmentIndex = (segmentIndex + 1) % polygonSegments.size();
+        segment_index = (segment_index + 1) % polygon_segments.size();
     }
 
     return start;
