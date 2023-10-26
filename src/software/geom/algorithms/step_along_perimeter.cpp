@@ -16,7 +16,7 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
         return start;
     }
 
-    std::vector<Segment> polygon_segments = polygon.getSegments();
+    const std::vector<Segment>& polygon_segments = polygon.getSegments();
     std::size_t start_segment_index       = 0;
 
     // find initial segment which contains start point
