@@ -1,5 +1,4 @@
 import time
-import textwrap
 import shelve
 import logging
 import pathlib
@@ -9,14 +8,9 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 
 from software.py_constants import *
+from software.thunderscope.constants import *
 
 from software.thunderscope.thunderscope_config import TScopeConfig
-
-SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
-LAYOUT_FILE_EXTENSION = "tscopelayout"
-LAST_OPENED_LAYOUT_PATH = (
-    f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
-)
 
 
 class Thunderscope(object):
@@ -76,7 +70,7 @@ class Thunderscope(object):
             self.tabs.addTab(tab.dock_area, tab.name)
             self.register_refresh_function(tab.refresh)
 
-        self.window = QtGui.QMainWindow()
+        self.window = QMainWindow()
         self.window.setCentralWidget(self.tabs)
         self.window.setWindowIcon(
             QtGui.QIcon("software/thunderscope/thunderscope-logo.png")
@@ -111,31 +105,7 @@ class Thunderscope(object):
 
         self.show_help = QtGui.QShortcut(QtGui.QKeySequence("h"), self.window)
         self.show_help.activated.connect(
-            lambda: QMessageBox.information(
-                self.window,
-                "Help",
-                textwrap.dedent(
-                    f"""
-                    Keyboard Shortcuts:
-                    
-                    I to identify robots, show their IDs
-                    Cntrl+S: Save Layout
-                    Cntrl+O: Open Layout
-                    Cntrl+R: will remove the file and reset the layout
-                    
-                    Layout file (on save) is located at 
-                            {SAVED_LAYOUT_PATH}
-                    
-                    Mouse Shortcuts:
-                    
-                    Double Click Blue Bar to pop window out
-                    Drag Blue Bar to rearrange docks
-                    Click items in legends to select/deselect
-                    Cntrl-Click and Drag: Move ball and kick
-                    Cntrl-Space: Stop AI vs AI simulation
-                    """
-                ),
-            )
+            lambda: QMessageBox.information(self.window, "Help", THUNDERSCOPE_HELP_TEXT)
         )
 
     def reset_layout(self):
