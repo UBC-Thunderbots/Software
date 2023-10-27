@@ -31,11 +31,12 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
     std::size_t segment_index = start_segment_index;
 
     // fmod travel distance for case where travel_distance > perimeter
+    double perimeter = polygon.perimeter()
     bool is_counter_clockwise = travel_distance < 0;
-    travel_distance           = std::fmod(std::abs(travel_distance), polygon.perimeter());
+    travel_distance           = std::fmod(std::abs(travel_distance), perimeter);
     if (is_counter_clockwise)
     {
-        travel_distance = polygon.perimeter() - travel_distance;
+        travel_distance = perimeter - travel_distance;
     }
 
     bool wrap_flag = false;
