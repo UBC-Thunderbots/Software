@@ -137,7 +137,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
 #     [
 #         # Ball should arrive within 0.15m of placement point
 #         BallEventuallyStopsInRegion(
-#             regions=[tbots.Circle(ball_final_pos, 0.15)]),
+#             regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]),
 #           #Robot should exit from ball at least 0.05m
 #         RobotEventuallyExitsRegion(
 #             regions=[tbots.Circle(ball_final_pos, 0.2)]),
