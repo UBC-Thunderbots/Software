@@ -275,7 +275,7 @@ def test_force_start_ai_ball_placement(simulated_test_runner):
     #             regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]),
     #           # Robot has to be 0.5 m away from the ball
     #         RobotEventuallyExitsRegion(
-    #             regions=[tbots.Circle(ball_final_pos, 0.65)]),
+    #             regions=[tbots_cpp.Circle(ball_final_pos, 0.65)]),
     #     ]
     # ]
 
