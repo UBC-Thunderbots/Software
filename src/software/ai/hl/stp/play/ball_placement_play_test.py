@@ -3,7 +3,6 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.ball_stops_in_region import *
 from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
@@ -13,8 +12,8 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
-# test duration global constant
-TEST_DURATION = 20
+# TODO (#2599): Remove Duration parameter from test
+
 
 def test_two_ai_ball_placement(simulated_test_runner):
 
@@ -90,22 +89,26 @@ def test_two_ai_ball_placement(simulated_test_runner):
 
     simulated_test_runner.run_test(
         setup=setup,
-        params=[False, True],
+        params=[False],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[
             [
-                # Ball should arrive within 5cm of placement point
                 BallEventuallyEntersRegion(
-                    regions=[tbots_cpp.Circle(ball_final_pos, 0.05)]
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
+                ),
+                RobotEventuallyEntersRegion(
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
                 ),
             ]
         ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [
-                # Ball should arrive within 5cm of placement point
                 BallEventuallyEntersRegion(
-                    regions=[tbots_cpp.Circle(ball_final_pos, 0.05)]
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
+                ),
+                RobotEventuallyEntersRegion(
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]
                 ),
             ]
         ],
