@@ -15,7 +15,8 @@ TEST(StepAlongPerimeterTest, ZeroDistanceReturnsStartPoint)
     EXPECT_EQ(resultPoint, startPoint);
 }
 
-TEST(StepAlongPerimeterTest, PointNotOnPolygon) {
+TEST(StepAlongPerimeterTest, PointNotOnPolygon)
+{
     Polygon polygon({{0, 0}, {0, 1}, {1, 1}, {1, 0}});
     Point startPoint(3, 3);
     EXPECT_THROW(stepAlongPerimeter(polygon, startPoint, 1), std::runtime_error);
