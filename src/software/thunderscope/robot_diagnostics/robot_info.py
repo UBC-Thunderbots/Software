@@ -75,9 +75,10 @@ class RobotInfo(QWidget):
 
     def __init__(
         self,
-        robot_id,
+        robot_id: int,
         available_control_modes: List[IndividualRobotMode],
-        control_mode_signal,
+        control_mode_signal: QtCore.pyqtSignal,
+        error_log_signal: QtCore.pyqtSignal,
     ):
         """
         Initialize a single robot's info widget
@@ -92,6 +93,7 @@ class RobotInfo(QWidget):
 
         self.robot_id = robot_id
         self.control_mode_signal = control_mode_signal
+        self.error_log_signal = error_log_signal
 
         # when this robot has a battery warning, this is set to True
         # which prevents spamming the same battery warning
@@ -176,7 +178,7 @@ class RobotInfo(QWidget):
         self.robot_model_layout.addWidget(self.robot_model)
         self.layout.addLayout(self.robot_model_layout)
 
-        self.reset_ui()
+        self.__reset_ui()
 
         self.layout.addLayout(self.status_layout)
         self.setLayout(self.layout)
@@ -292,7 +294,7 @@ class RobotInfo(QWidget):
 
         self.robot_model.setPixmap(self.color_vision_pattern)
 
-        self.update_ui(robot_status)
+        self.__update_ui(robot_status)
 
         QtCore.QTimer.singleShot(DISCONNECT_DURATION_MS, self.disconnect_robot)
 
@@ -306,9 +308,9 @@ class RobotInfo(QWidget):
             time_since_last_robot_status
             > DISCONNECT_DURATION_MS * SECONDS_PER_MILLISECOND
         ):
-            self.reset_ui()
+            self.__reset_ui()
 
-    def reset_ui(self):
+    def __reset_ui(self):
         """
         Resets the UI to the default, uninitialized values
         """
@@ -316,7 +318,17 @@ class RobotInfo(QWidget):
 
         self.breakbeam_label.update_breakbeam_status(None)
 
-    def update_ui(self, robot_status):
+    def __update_stop_primitive(self, is_running: bool):
+        """
+        Updates the stop primitive label based on the current running state
+        :param is_running: if the robot is running currently
+        """
+        self.stop_primitive_label.setText("RUN" if is_running else "STOP")
+        self.stop_primitive_label.setStyleSheet(
+            f"background-color: {'green' if is_running else 'red'}; border: 1px solid black;"
+        )
+
+    def __update_ui(self, robot_status):
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
@@ -335,16 +347,7 @@ class RobotInfo(QWidget):
         network_status = robot_status.network_status
         primitive_executor_status = robot_status.primitive_executor_status
 
-        if primitive_executor_status.running_primitive:
-            self.stop_primitive_label.setText("RUN")
-            self.stop_primitive_label.setStyleSheet(
-                "background-color: green; border: 1px solid black;"
-            )
-        else:
-            self.stop_primitive_label.setText("STOP")
-            self.stop_primitive_label.setStyleSheet(
-                "background-color: red; border: 1px solid black;"
-            )
+        self.__update_stop_primitive(primitive_executor_status.running_primitive)
 
         self.primitive_loss_rate_label.setText(
             f"P%{network_status.primitive_packet_loss_percentage:02d}"
@@ -368,6 +371,7 @@ class RobotInfo(QWidget):
             power_status.battery_voltage <= BATTERY_WARNING_VOLTAGE
             and not self.battery_warning_disabled
         ):
+            self.error_log_signal.emit(LowBatteryErrorLogMessage(self.robot_id))
             # QMessageBox.information(
             #     self,
             #     "Battery Voltage Alert",
@@ -382,6 +386,9 @@ class RobotInfo(QWidget):
 
         for code in error_codes:
             if code != ErrorCode.NO_ERROR and code in ERROR_CODE_MESSAGES.keys():
+                self.error_log_signal.emit(
+                    ErrorCodeLogMessage(self.robot_id, ERROR_CODE_MESSAGES[code])
+                )
                 # QMessageBox.warning(
                 #     self,
                 #     f"Warning: {ERROR_CODE_MESSAGES[code]}",

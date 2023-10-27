@@ -136,7 +136,7 @@ class TScopeQTTab(TScopeTab):
         for refresh_func in self.refresh_functions.values():
             refresh_func()
 
-    def find_widget(self, widget_name):
+    def find_widget(self, widget_name: str) -> QWidget:
         """
         Finds and returns the widget object corresponding to the given name, if exists
         If not, returns None

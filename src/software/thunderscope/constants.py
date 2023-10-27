@@ -51,6 +51,66 @@ class IndividualRobotMode(IntEnum):
     AI = 2
 
 
+class ErrorLogMessages(Enum):
+    LOW_VOLTAGE = 0
+    ROBOT_CRASH = 1
+    ERROR_CODE = 2
+
+
+class RobotErrorLogMessage:
+    """
+    Represents a robot error log message with a type, the message to display,
+    the id of the robot, the icon to display, and the last robot status if needed
+    """
+
+    def __init__(
+        self,
+        type: ErrorLogMessages,
+        message: str,
+        robot_id: int,
+        icon: int,
+        status: RobotStatus = None,
+    ):
+        self.type = type
+        self.message = message
+        self.robot_id = robot_id
+        self.icon = icon
+        self.status = status
+
+
+class LowBatteryErrorLogMessage(RobotErrorLogMessage):
+    """
+    Represents a robot error log message when a robot has low battery
+    """
+
+    def __init__(self, robot_id: int):
+        super(LowBatteryErrorLogMessage, self).__init__(
+            ErrorLogMessages.LOW_VOLTAGE, "", robot_id, 0, None
+        )
+
+
+class RobotCrashErrorLogMessage(RobotErrorLogMessage):
+    """
+    Represents a robot error log message when a robot has crashed
+    """
+
+    def __init__(self, robot_id: int):
+        super(RobotCrashErrorLogMessage, self).__init__(
+            ErrorLogMessages.ROBOT_CRASH, "", robot_id, 0, None
+        )
+
+
+class ErrorCodeLogMessage(RobotErrorLogMessage):
+    """
+   Represents a robot error log message when has an error code
+   """
+
+    def __init__(self, robot_id: int, error_code: str):
+        super(LowBatteryErrorLogMessage, self).__init__(
+            ErrorLogMessages.ROBOT_CRASH, error_code, robot_id, 0, None
+        )
+
+
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2

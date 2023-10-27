@@ -67,6 +67,14 @@ py_library(
 )
 
 py_library(
+    name = "robot_error_log",
+    srcs = ["robot_error_log.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "estop_view",
     srcs = ["estop_view.py"],
     deps = [

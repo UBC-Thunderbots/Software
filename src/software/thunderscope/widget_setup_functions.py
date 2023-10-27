@@ -35,6 +35,7 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
 from software.thunderscope.robot_diagnostics.robot_view import RobotView
+from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
@@ -234,6 +235,10 @@ def setup_robot_view(proto_unix_io, available_control_modes: List[IndividualRobo
     proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
     proto_unix_io.register_observer(RobotCrash, robot_view.robot_crash_buffer)
     return robot_view
+
+
+def setup_robot_error_log_view_widget() -> RobotErrorLog:
+    return RobotErrorLog()
 
 
 def setup_estop_view(proto_unix_io):

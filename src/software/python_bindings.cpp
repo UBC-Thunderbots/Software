@@ -341,4 +341,10 @@ PYBIND11_MODULE(python_bindings, m)
         m, "ThreadedEstopReader")
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
+
+    py::enum_<EstopState>(m, "EstopStates")
+        .value("STOP", EstopState::STOP)
+        .value("PLAY", EstopState::PLAY)
+        .value("STATUS_ERROR", EstopState::STATUS_ERROR)
+        .export_values();
 }

@@ -6,7 +6,11 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 from proto.import_all_protos import *
-from software.thunderscope.constants import IndividualRobotMode
+from software.thunderscope.constants import (
+    IndividualRobotMode,
+    RobotErrorLogMessage,
+    RobotCrashErrorLogMessage,
+)
 from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
 from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -55,6 +59,7 @@ class RobotViewComponent(QWidget):
         robot_id,
         available_control_modes: List[IndividualRobotMode],
         control_mode_signal,
+        error_log_signal,
     ):
         """
         Sets up a Robot Info Widget and a Robot Status Widget for each robot
@@ -73,7 +78,7 @@ class RobotViewComponent(QWidget):
         self.layout = QVBoxLayout()
 
         self.robot_info = RobotInfo(
-            robot_id, available_control_modes, control_mode_signal
+            robot_id, available_control_modes, control_mode_signal, error_log_signal
         )
         self.layout.addWidget(self.robot_info)
 
@@ -122,6 +127,8 @@ class RobotView(QScrollArea):
 
     control_mode_signal = QtCore.pyqtSignal(int, int)
 
+    robot_error_log_signal = QtCore.pyqtSignal(RobotErrorLogMessage)
+
     def __init__(self, available_control_modes: List[IndividualRobotMode]):
 
         """
@@ -143,7 +150,10 @@ class RobotView(QScrollArea):
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
             robot_view_widget = RobotViewComponent(
-                id, available_control_modes, self.control_mode_signal
+                id,
+                available_control_modes,
+                self.control_mode_signal,
+                self.robot_error_log_signal,
             )
             self.robot_view_widgets.append(robot_view_widget)
             self.layout.addWidget(robot_view_widget)
@@ -160,6 +170,18 @@ class RobotView(QScrollArea):
         self.container.setLayout(self.layout)
         self.setWidget(self.container)
         self.setWidgetResizable(True)
+
+        QtCore.QTimer.singleShot(3000, self.send_test)
+
+    def send_test(self):
+        self.robot_crash_buffer.put(
+            RobotCrash(
+                robot_id=5,
+                exit_signal="gg",
+                stack_dump="gg",
+                status=RobotStatus()
+            )
+        )
 
     def refresh(self):
         """
@@ -182,11 +204,7 @@ class RobotView(QScrollArea):
                 time.time() - self.robot_last_crash_time_s[robot_crash.robot_id]
                 > self.ROBOT_CRASH_TIMEOUT_S
             ):
-                robot_crash_text = (
-                    f"robot_id: {robot_crash.robot_id}\n"
-                    + f"exit_signal: {robot_crash.exit_signal}\n"
-                    + f"stack_dump: {robot_crash.stack_dump}"
+                self.robot_error_log_signal.emit(
+                    RobotCrashErrorLogMessage(robot_crash.robot_id)
                 )
-                dialog = RobotCrashDialog(robot_crash_text, robot_crash)
-                dialog.exec()
             self.robot_last_crash_time_s[robot_crash.robot_id] = time.time()

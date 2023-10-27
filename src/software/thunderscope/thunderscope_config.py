@@ -50,8 +50,10 @@ def initialize_application():
     # Setup MainApp and initialize DockArea
     app = pyqtgraph.mkQApp("Thunderscope")
 
+    extra = {}
+
     # Setup stylesheet
-    apply_stylesheet(app, theme="dark_blue.xml")
+    apply_stylesheet(app, theme="dark_blue.xml", extra=extra)
 
 
 def configure_cost_vis(proto_unix_io):
@@ -108,7 +110,7 @@ def configure_robot_view_diagnostics(diagnostics_proto_unix_io):
             }
         ),
         anchor="Logs",
-        stretch=WidgetStretchData(y=5),
+        stretch=WidgetStretchData(x=1, y=5),
         position="above",
     )
 
@@ -169,6 +171,12 @@ def configure_base_fullsystem(
             position="above",
         ),
         TScopeWidget(
+            name="Error Log",
+            widget=setup_robot_error_log_view_widget(),
+            position="below",
+            anchor="Logs",
+        ),
+        TScopeWidget(
             name="Referee Info",
             widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Field",
@@ -211,12 +219,19 @@ def configure_base_diagnostics(diagnostics_proto_unix_io, extra_widgets=[]):
             widget=setup_log_widget(**{"proto_unix_io": diagnostics_proto_unix_io}),
         ),
         TScopeWidget(
+            name="Error Log",
+            widget=setup_robot_error_log_view_widget(),
+            position="below",
+            anchor="Logs",
+        ),
+        TScopeWidget(
             name="Drive and Dribbler",
             widget=setup_drive_and_dribbler_widget(
                 **{"proto_unix_io": diagnostics_proto_unix_io}
             ),
             anchor="Logs",
             position="right",
+            stretch=WidgetStretchData(x=1, y=6),
         ),
         TScopeWidget(
             name="Chicker",
@@ -229,6 +244,7 @@ def configure_base_diagnostics(diagnostics_proto_unix_io, extra_widgets=[]):
             widget=setup_diagnostics_input_widget(),
             anchor="Chicker",
             position="top",
+            stretch=WidgetStretchData(y=1),
         ),
         TScopeWidget(
             name="Estop",
@@ -524,6 +540,22 @@ def configure_replay_view(
     return TScopeConfig(proto_unix_io_map=proto_unix_io_map, tabs=tabs)
 
 
+def connect_robot_status_signals(
+    robot_view_tab: TScopeQTTab, error_log_tab: TScopeQTTab
+):
+    """
+    Connects the robot view widget's error message signal to the error log display widget
+    :param robot_view_tab: the tab that robot view is on
+    :param error_log_tab: the tab that error log is on
+    """
+    robot_view_widget = robot_view_tab.find_widget("Robot View")
+    error_log_widget = error_log_tab.find_widget("Error Log")
+    if robot_view_widget and error_log_widget:
+        robot_view_widget.robot_error_log_signal.connect(
+            lambda message: error_log_widget.add_error_log_message(message)
+        )
+
+
 def configure_ai_or_diagnostics(
     load_blue,
     load_yellow,
@@ -547,7 +579,7 @@ def configure_ai_or_diagnostics(
     :return: the Thunderscope Config for this view
     """
 
-    def get_extra_widgets(proto_unix_io):
+    def __get_extra_widgets(proto_unix_io):
         """
         Gets the extra widgets for the fullsystem tab
         :param proto_unix_io: the proto unix io to configure widgets with
@@ -565,48 +597,50 @@ def configure_ai_or_diagnostics(
     # Must be called before widgets are initialized below
     initialize_application()
 
+    fullsystem_tab = None
+
     if load_blue:
         proto_unix_io_map[ProtoUnixIOTypes.BLUE] = ProtoUnixIO()
         proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[
             ProtoUnixIOTypes.BLUE
         ]
-        tabs.append(
-            TScopeQTTab(
-                name="Blue Fullsystem",
-                key=TabNames.BLUE,
-                widgets=configure_base_fullsystem(
-                    full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
-                    sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
-                    friendly_colour_yellow=False,
-                    visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=get_extra_widgets(
-                        proto_unix_io_map[ProtoUnixIOTypes.BLUE]
-                    ),
+        blue_tab = TScopeQTTab(
+            name="Blue Fullsystem",
+            key=TabNames.BLUE,
+            widgets=configure_base_fullsystem(
+                full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                friendly_colour_yellow=False,
+                visualization_buffer_size=visualization_buffer_size,
+                extra_widgets=__get_extra_widgets(
+                    proto_unix_io_map[ProtoUnixIOTypes.BLUE]
                 ),
-            )
+            ),
         )
+        connect_robot_status_signals(blue_tab, blue_tab)
+        fullsystem_tab = blue_tab
+        tabs.append(blue_tab)
     elif load_yellow:
         proto_unix_io_map[ProtoUnixIOTypes.YELLOW] = ProtoUnixIO()
         proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[
             ProtoUnixIOTypes.YELLOW
         ]
-        tabs.append(
-            TScopeQTTab(
-                name="Yellow Fullsystem",
-                key=TabNames.YELLOW,
-                widgets=configure_base_fullsystem(
-                    full_system_proto_unix_io=proto_unix_io_map[
-                        ProtoUnixIOTypes.YELLOW
-                    ],
-                    sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
-                    friendly_colour_yellow=True,
-                    visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=get_extra_widgets(
-                        proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
-                    ),
+        yellow_tab = TScopeQTTab(
+            name="Yellow Fullsystem",
+            key=TabNames.YELLOW,
+            widgets=configure_base_fullsystem(
+                full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                friendly_colour_yellow=True,
+                visualization_buffer_size=visualization_buffer_size,
+                extra_widgets=__get_extra_widgets(
+                    proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
                 ),
-            )
+            ),
         )
+        fullsystem_tab = yellow_tab
+        connect_robot_status_signals(yellow_tab, yellow_tab)
+        tabs.append(yellow_tab)
 
     if load_diagnostics:
         proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS] = (
@@ -620,23 +654,25 @@ def configure_ai_or_diagnostics(
             proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[
                 ProtoUnixIOTypes.DIAGNOSTICS
             ]
-        tabs.append(
-            TScopeQTTab(
-                name="Robot Diagnostics",
-                key=TabNames.DIAGNOSTICS,
-                widgets=configure_base_diagnostics(
-                    diagnostics_proto_unix_io=proto_unix_io_map[
-                        ProtoUnixIOTypes.DIAGNOSTICS
-                    ],
-                    extra_widgets=[]
-                    if (load_blue or load_yellow)
-                    else [
-                        configure_robot_view_diagnostics(
-                            proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
-                        )
-                    ],
-                ),
-            )
+        diagnostics_tab = TScopeQTTab(
+            name="Robot Diagnostics",
+            key=TabNames.DIAGNOSTICS,
+            widgets=configure_base_diagnostics(
+                diagnostics_proto_unix_io=proto_unix_io_map[
+                    ProtoUnixIOTypes.DIAGNOSTICS
+                ],
+                extra_widgets=[]
+                if (load_blue or load_yellow)
+                else [
+                    configure_robot_view_diagnostics(
+                        proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
+                    )
+                ],
+            ),
         )
+        connect_robot_status_signals(
+            fullsystem_tab if fullsystem_tab else diagnostics_tab, diagnostics_tab
+        )
+        tabs.append(diagnostics_tab)
 
     return TScopeConfig(proto_unix_io_map=proto_unix_io_map, tabs=tabs)
