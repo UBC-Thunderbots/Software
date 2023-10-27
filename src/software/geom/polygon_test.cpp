@@ -106,6 +106,17 @@ TEST(PolygonExpandTest, test_invalid_modifier)
     }
 }
 
+TEST(PolygonPerimeterTest, perimeter_valid_test) {
+    Polygon poly({{0, 0}, {0, 2}, {2, 3}, {3, 2}, {2, 0}});
+    double expected = 4 + 2*sqrt(5) + sqrt(2);
+    EXPECT_DOUBLE_EQ(expected, poly.perimeter());
+}
+
+TEST(PolygonPerimeterTest, zero_perimeter_test) {
+    Polygon poly({{0, 0}, {0, 0}, {0, 0}});
+    EXPECT_EQ(0, poly.perimeter());
+}
+
 TEST(PolygonExpandTest, test_from_segment_single_radius)
 {
     const auto segment = Segment(Point(0, 0), Point(2, 2));
