@@ -26,12 +26,16 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
                          return collinear(segment.getStart(), start, segment.getEnd());
                      });
 
+    if (it == polygon_segments.end()) {
+        throw std::runtime_error("Point not on polygon");
+    }
+
     start_segment_index = std::distance(polygon_segments.begin(), it);
 
     std::size_t segment_index = start_segment_index;
 
     // fmod travel distance for case where travel_distance > perimeter
-    double perimeter = polygon.perimeter()
+    double perimeter = polygon.perimeter();
     bool is_counter_clockwise = travel_distance < 0;
     travel_distance           = std::fmod(std::abs(travel_distance), perimeter);
     if (is_counter_clockwise)
