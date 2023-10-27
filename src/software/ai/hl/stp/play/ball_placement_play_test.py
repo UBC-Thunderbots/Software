@@ -3,6 +3,8 @@ import pytest
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.ball_stops_in_region import *
+from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
     pytest_main,
@@ -11,8 +13,8 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
-# TODO (#2599): Remove Duration parameter from test
-
+# test duration global constant
+TEST_DURATION = 20
 
 def test_two_ai_ball_placement(simulated_test_runner):
 
@@ -88,7 +90,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
 
     simulated_test_runner.run_test(
         setup=setup,
-        params=[False],
+        params=[False, True],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[
             [
@@ -109,6 +111,40 @@ def test_two_ai_ball_placement(simulated_test_runner):
         ],
         test_timeout_s=[20],
     )
+
+    # TODO (#2797): uncomment tests below to verify robots actually drop ball and exit region
+    # send a non free kick command after the ball ball placement command
+    # simulated_test_runner.gamecontroller.send_ci_input(
+    #     gc_command=Command.Type.FORCE_START, team=Team.BLUE
+    # )
+
+    # # Drop Ball Always Validation
+    # drop_ball_always_validation_sequence_set = [
+    #     [
+    #         BallAlwaysStaysInRegion(
+    #             regions=[tbots.Circle(ball_final_pos, 0.1)]),
+    #     ]
+    # ]
+
+    # # Drop Ball Eventually Validation
+    # # Non free kick after ball placement, the robot must be 0.5 away from the ball after the placement
+    # # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
+    # drop_ball_eventually_validation_sequence_set = [
+    #     [
+    #         # Ball should arrive within 0.15m of placement point
+    #         BallEventuallyStopsInRegion(
+    #             regions=[tbots.Circle(ball_final_pos, 0.15)]),
+    #           # Robot has to be 0.5 m away from the ball
+    #         RobotEventuallyExitsRegion(
+    #             regions=[tbots.Circle(ball_final_pos, 0.65)]),
+    #     ]
+    # ]
+
+    # simulated_test_runner.run_test(
+    #     eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
+    #     always_validation_sequence_set=drop_ball_always_validation_sequence_set,
+    #     test_timeout_s=TEST_DURATION,
+    # )
 
 
 if __name__ == "__main__":
