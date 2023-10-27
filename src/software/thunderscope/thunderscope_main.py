@@ -162,7 +162,7 @@ if __name__ == "__main__":
         help="Allows the use of the spacebar as an estop instead of a physical one",
     )
     estop_group.add_argument(
-        "--disable_estop",
+        "--disable_communication",
         action="store_true",
         default=False,
         help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
@@ -264,7 +264,7 @@ if __name__ == "__main__":
         estop_mode = EstopMode.PHYSICAL_ESTOP
         if args.keyboard_estop:
             estop_mode = EstopMode.KEYBOARD_ESTOP
-        if args.disable_estop:
+        if args.disable_communication:
             estop_mode = EstopMode.DISABLE_ESTOP
 
         with RobotCommunication(

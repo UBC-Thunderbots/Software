@@ -4,6 +4,7 @@ from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import IndividualRobotMode, EstopMode
 import software.python_bindings as tbots_cpp
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from queue import Empty
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
@@ -93,7 +94,7 @@ class RobotCommunication(object):
         # only checks for estop if we are in physical estop mode
         if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
             try:
-                self.estop_reader = ThreadedEstopReader(
+                self.estop_reader = tbots_cpp.ThreadedEstopReader(
                     self.estop_path, self.estop_buadrate
                 )
             except Exception:
