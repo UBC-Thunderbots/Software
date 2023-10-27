@@ -37,6 +37,35 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [DefensePlayFSM](/src/software/ai/hl/stp/play/defense/defense_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> DefenseState
+DefenseState --> DefenseState : <i>defendAgainstThreats</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
+## [OffensePlayFSM](/src/software/ai/hl/stp/play/offense/offense_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> OffensiveState
+OffensiveState --> DefensiveState : [enemyHasPossession]\n<i>setupDefensiveStrategy</i>
+OffensiveState --> OffensiveState : <i>setupOffensiveStrategy</i>
+DefensiveState --> OffensiveState : [!enemyHasPossession]\n<i>setupOffensiveStrategy</i>
+DefensiveState --> DefensiveState : <i>setupDefensiveStrategy</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
 ## [PenaltyKickPlayFSM](/src/software/ai/hl/stp/play/penalty_kick/penalty_kick_play_fsm.h)
 
 ```mermaid
@@ -49,6 +78,21 @@ SetupPositionState --> SetupPositionState : [!setupPositionDone]\n<i>setupPositi
 SetupPositionState --> PerformKickState : [setupPositionDone]
 PerformKickState --> PerformKickState : [!kickDone]\n<i>performKick</i>
 PerformKickState --> Terminate:::terminate : [kickDone]
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
+## [PenaltyKickEnemyPlayFSM](/src/software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> SetupPositionState
+SetupPositionState --> SetupPositionState : [!setupPositionDone]\n<i>setupPosition</i>
+SetupPositionState --> DefendKickState : [setupPositionDone]\n<i>defendKick</i>
+DefendKickState --> DefendKickState : <i>defendKick</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -236,7 +280,7 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DribbleFSM
 DribbleFSM --> DribbleFSM : [!takePenaltyShot]\n<i>updateApproachKeeper</i>
-DribbleFSM --> KickFSM : [timeOutApproach]
+DribbleFSM --> KickFSM : [timeOutApproach]\n<i>shoot</i>
 DribbleFSM --> DribbleFSM : <i>adjustOrientationForShot</i>
 DribbleFSM --> KickFSM
 KickFSM --> KickFSM : <i>shoot</i>
@@ -271,11 +315,11 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> WaitingForPassState
 WaitingForPassState --> WaitingForPassState : [!passStarted]\n<i>updateReceive</i>
-WaitingForPassState --> OneTouchShotState : [passStarted_G&&onetouchPossible]\n<i>updateOnetouch</i>
-WaitingForPassState --> ReceiveAndDribbleState : [passStarted_G&&!onetouchPossible]\n<i>updateReceive</i>
+WaitingForPassState --> OneTouchShotState : [passStarted && onetouchPossible]\n<i>updateOnetouch</i>
+WaitingForPassState --> ReceiveAndDribbleState : [passStarted && !onetouchPossible]\n<i>updateReceive</i>
 ReceiveAndDribbleState --> ReceiveAndDribbleState : [!passFinished]\n<i>adjustReceive</i>
-OneTouchShotState --> OneTouchShotState : [!passFinished_G&&!strayPass]\n<i>updateOnetouch</i>
-OneTouchShotState --> ReceiveAndDribbleState : [!passFinished_G&&strayPass]\n<i>adjustReceive</i>
+OneTouchShotState --> OneTouchShotState : [!passFinished && !strayPass]\n<i>updateOnetouch</i>
+OneTouchShotState --> ReceiveAndDribbleState : [!passFinished && strayPass]\n<i>adjustReceive</i>
 ReceiveAndDribbleState --> Terminate:::terminate : [passFinished]\n<i>adjustReceive</i>
 OneTouchShotState --> Terminate:::terminate : [passFinished]\n<i>updateOnetouch</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>

@@ -79,7 +79,7 @@ class ColorProgressBar(QProgressBar):
         self.decimals = 10 ** decimals
 
         super(ColorProgressBar, self).setRange(
-            min_val * self.decimals, max_val * self.decimals
+            int(min_val * self.decimals), int(max_val * self.decimals)
         )
 
         super(ColorProgressBar, self).setStyleSheet(
@@ -213,11 +213,13 @@ def create_slider_abs(slider, text, min_val, max_val, tick_spacing):
     slider.setTickPosition(QSlider.TickPosition.NoTicks)
     slider.setTickInterval(tick_spacing)
 
-    value_label = QLabel(str(slider.value()))
-    slider_label = QLabel(str(text))
-
     vbox = QVBoxLayout()
-    vbox.addWidget(slider_label)
+
+    if text:
+        slider_label = QLabel(str(text))
+        vbox.addWidget(slider_label)
+
+    value_label = QLabel(str(slider.value()))
     vbox.addWidget(value_label)
     vbox.addWidget(slider)
 

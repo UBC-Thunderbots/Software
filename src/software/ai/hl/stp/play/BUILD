@@ -47,29 +47,6 @@ cc_library(
 )
 
 cc_library(
-    name = "defense_play",
-    srcs = ["defense_play.cpp"],
-    hdrs = ["defense_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-        "//software/world:game_state",
-        "//software/world:team",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "enemy_ball_placement_play",
     srcs = ["enemy_ball_placement_play.cpp"],
     hdrs = ["enemy_ball_placement_play.h"],
@@ -193,21 +170,6 @@ cc_library(
 )
 
 cc_library(
-    name = "penalty_kick_enemy_play",
-    srcs = ["penalty_kick_enemy_play.cpp"],
-    hdrs = ["penalty_kick_enemy_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "shoot_or_chip_play",
     srcs = ["shoot_or_chip_play.cpp"],
     hdrs = ["shoot_or_chip_play.h"],
@@ -273,7 +235,6 @@ cc_library(
     deps = [
         ":ball_placement_play",
         ":corner_kick_play",
-        ":defense_play",
         ":enemy_ball_placement_play",
         ":enemy_free_kick_play",
         ":example_play",
@@ -281,16 +242,17 @@ cc_library(
         ":halt_play",
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",
-        ":penalty_kick_enemy_play",
         ":shoot_or_chip_play",
         ":stop_play",
         "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
+        "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:pass_endurance_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_with_static_defenders_play",
         "//software/ai/hl/stp/play/offense:offense_play",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
+        "//software/ai/hl/stp/play/penalty_kick_enemy:penalty_kick_enemy_play",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
     ],
 )
@@ -377,38 +339,6 @@ py_test(
     name = "corner_kick_play_test",
     srcs = [
         "corner_kick_play_test.py",
-    ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
-    deps = [
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
-    ],
-)
-
-cc_test(
-    name = "defense_play_cpp_test",
-    srcs = ["defense_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:defense_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-py_test(
-    name = "defense_play_test",
-    srcs = [
-        "defense_play_test.py",
     ],
     # TODO (#2619) Remove tag to run in parallel
     tags = [
@@ -561,22 +491,6 @@ py_test(
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
         requirement("pytest"),
-    ],
-)
-
-cc_test(
-    name = "penalty_kick_enemy_play_test",
-    srcs = ["penalty_kick_enemy_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:penalty_kick_enemy_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
     ],
 )
 

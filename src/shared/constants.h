@@ -41,6 +41,7 @@ static const short unsigned int PRIMITIVE_PORT = 42070;
 static const short unsigned int ROBOT_STATUS_PORT       = 42071;
 static const short unsigned int ROBOT_LOGS_PORT         = 42072;
 static const short unsigned int HRVO_VISUALIZATION_PORT = 42073;
+static const short unsigned int ROBOT_CRASH_PORT        = 42074;
 
 // the port to listen to for what side of the field to defend
 static const unsigned DEFENDING_SIDE_PORT = 42073;
@@ -114,7 +115,7 @@ static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
 static const unsigned NUM_CELLS_IN_BATTERY    = 3;
 static const unsigned NUM_BATTERIES_IN_SERIES = 2;
 static const double MAX_SINGLE_CELL_VOLTAGE   = 4.2;
-static const double MIN_SINGLE_CELL_VOLTAGE   = 3.2 + 0.1;  // +0.1v headroom
+static const double MIN_SINGLE_CELL_VOLTAGE   = 3.5 + 0.1;  // +0.1v headroom
 
 static const double MIN_BATTERY_VOLTAGE =
     MIN_SINGLE_CELL_VOLTAGE * NUM_CELLS_IN_BATTERY * NUM_BATTERIES_IN_SERIES;

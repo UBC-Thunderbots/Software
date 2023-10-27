@@ -8,7 +8,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
-import software.python_bindings as cpp_bindings
+import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
@@ -257,11 +257,17 @@ if __name__ == "__main__":
         # else, it will be the diagnostics proto
         current_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.CURRENT]
 
+        # different estops use different ports this detects which one to use based on what is plugged in
+        estop_path = (
+            "/dev/ttyACM0" if os.path.isfile("/dev/ttyACM0") else "/dev/ttyUSB0"
+        )
+
         with RobotCommunication(
             current_proto_unix_io,
-            getRobotMulticastChannel(0),
+            getRobotMulticastChannel(args.channel),
             args.interface,
             args.disable_estop,
+            estop_path,
         ) as robot_communication:
             if args.run_diagnostics:
                 for tab in tscope_config.tabs:
@@ -345,15 +351,15 @@ if __name__ == "__main__":
                 if not world_state_received:
                     world_state = tbots_protobuf.create_world_state(
                         blue_robot_locations=[
-                            cpp_bindings.Point(-3, y)
+                            tbots_cpp.Point(-3, y)
                             for y in numpy.linspace(-2, 2, NUM_ROBOTS)
                         ],
                         yellow_robot_locations=[
-                            cpp_bindings.Point(3, y)
+                            tbots_cpp.Point(3, y)
                             for y in numpy.linspace(-2, 2, NUM_ROBOTS)
                         ],
-                        ball_location=cpp_bindings.Point(0, 0),
-                        ball_velocity=cpp_bindings.Vector(0, 0),
+                        ball_location=tbots_cpp.Point(0, 0),
+                        ball_velocity=tbots_cpp.Vector(0, 0),
                     )
                     tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].send_proto(
                         WorldState, world_state
