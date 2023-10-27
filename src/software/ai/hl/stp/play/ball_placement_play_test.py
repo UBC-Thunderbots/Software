@@ -126,7 +126,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
 # drop_ball_always_validation_sequence_set = [
 #     [
 #         BallAlwaysStaysInRegion(
-#             regions=[tbots.Circle(ball_final_pos, 0.15)]),
+#             regions=[tbots_cpp.Circle(ball_final_pos, 0.15)]),
 #     ]
 # ]
 
