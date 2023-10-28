@@ -13,10 +13,13 @@
 #include "software/logger/logger.h"
 
 /**
- * This play is basically:
- * - One robot attempts to shoot first. If there is no good shot, it will attempt to
- *   pass, and finally it will chip towards the enemy goal if it can't find a pass in time
- * - Two robots try to get in good positions near the enemy net to receive a pass
+ * This FSM implements the free kick play. The logic of this play is:
+ * - One robot (the kicker) attempts to shoot first. If there is a good shot, then it
+ * will shoot the ball.
+ * - If there is no good shot, the kicker will attempt to pass. Two robots try to get in
+ * good positions near the enemy net to receive a pass
+ * - If we cannot find a pass in time, the kicker will chip the ball towards the enemy
+ * goal
  * - Two robots crease defend
  * - One robot is goalie
  */
@@ -204,6 +207,7 @@ struct FreeKickPlayFSM
 
             // If the time to look for a pass is over, chip the ball towards the enemy net
             AttemptPassState_S + Update_E[timeExpired_G] = ChipState_S,
+
             // Keep looking for a pass
             AttemptPassState_S + Update_E[!passFound_G] / lookForPass_A =
                 AttemptPassState_S,
