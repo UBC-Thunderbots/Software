@@ -13,7 +13,7 @@ class ShootOrPassPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
-    Field field                      = Field::createField(field_type);
+    Field field                      = Field::createFieldProto(field_type);
 };
 
 // TODO (#2577): re-enable once fixed

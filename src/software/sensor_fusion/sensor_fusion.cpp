@@ -98,7 +98,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 
 void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet)
 {
-    field = createField(geometry_packet);
+    field = createFieldProto(geometry_packet);
     if (!field)
     {
         LOG(WARNING)
@@ -256,7 +256,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                 .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
                 .confidence = 1}};
 
-            std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
+            std::optional<Ball> new_ball = createBallProto(dribbler_in_ball_detection);
 
             if (new_ball)
             {
@@ -266,7 +266,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     }
     else
     {
-        std::optional<Ball> new_ball = createBall(ball_detections);
+        std::optional<Ball> new_ball = createBallProto(ball_detections);
         if (new_ball)
         {
             // If vision detected a new ball, then use that one
@@ -301,7 +301,7 @@ void SensorFusion::updateBall(Ball new_ball)
     game_state.updateBall(*ball);
 }
 
-std::optional<Ball> SensorFusion::createBall(
+std::optional<Ball> SensorFusion::createBallProto(
     const std::vector<BallDetection> &ball_detections)
 {
     if (field)

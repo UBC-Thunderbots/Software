@@ -20,7 +20,7 @@ Field Field::createSSLDivisionAField()
     return field;
 }
 
-Field Field::createField(TbotsProto::FieldType field_type)
+Field Field::createFieldProto(TbotsProto::FieldType field_type)
 {
     if (field_type == TbotsProto::FieldType::DIV_A)
     {

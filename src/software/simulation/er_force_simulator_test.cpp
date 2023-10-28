@@ -227,9 +227,9 @@ TEST_F(ErForceSimulatorTest, yellow_robot_orientation_test)
     auto simState      = simulator->getSimulatorState();
     auto yellow_robots = simState.yellow_robots();
 
-    auto robot_zero    = createRobot(yellow_robots[0], Timestamp::fromSeconds(10));
-    auto robot_quarter = createRobot(yellow_robots[1], Timestamp::fromSeconds(10));
-    auto robot_half    = createRobot(yellow_robots[2], Timestamp::fromSeconds(10));
+    auto robot_zero    = createRobotProto(yellow_robots[0], Timestamp::fromSeconds(10));
+    auto robot_quarter = createRobotProto(yellow_robots[1], Timestamp::fromSeconds(10));
+    auto robot_half    = createRobotProto(yellow_robots[2], Timestamp::fromSeconds(10));
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_zero.orientation(), Angle::zero(),
                                                Angle::fromDegrees(1)));
@@ -260,9 +260,9 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
     auto simState      = simulator->getSimulatorState();
     auto yellow_robots = simState.yellow_robots();
 
-    auto robot_1 = createRobot(yellow_robots[0], Timestamp::fromSeconds(10));
-    auto robot_2 = createRobot(yellow_robots[1], Timestamp::fromSeconds(10));
-    auto robot_3 = createRobot(yellow_robots[2], Timestamp::fromSeconds(10));
+    auto robot_1 = createRobotProto(yellow_robots[0], Timestamp::fromSeconds(10));
+    auto robot_2 = createRobotProto(yellow_robots[1], Timestamp::fromSeconds(10));
+    auto robot_3 = createRobotProto(yellow_robots[2], Timestamp::fromSeconds(10));
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.currentState(), robot_state1, 0.1,
                                                Angle::fromDegrees(1)));
@@ -292,9 +292,9 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
     simState      = simulator->getSimulatorState();
     yellow_robots = simState.yellow_robots();
 
-    robot_1 = createRobot(yellow_robots[0], Timestamp::fromSeconds(20));
-    robot_2 = createRobot(yellow_robots[1], Timestamp::fromSeconds(20));
-    robot_3 = createRobot(yellow_robots[2], Timestamp::fromSeconds(20));
+    robot_1 = createRobotProto(yellow_robots[0], Timestamp::fromSeconds(20));
+    robot_2 = createRobotProto(yellow_robots[1], Timestamp::fromSeconds(20));
+    robot_3 = createRobotProto(yellow_robots[2], Timestamp::fromSeconds(20));
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.currentState(), new_robot_state1,
                                                0.1, Angle::fromDegrees(1)));

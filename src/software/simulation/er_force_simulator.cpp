@@ -27,7 +27,7 @@ ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
       frame_number(0),
       euclidean_to_four_wheel(robot_constants),
       robot_constants(robot_constants),
-      field(Field::createField(field_type)),
+      field(Field::createFieldProto(field_type)),
       blue_robot_with_ball(std::nullopt),
       yellow_robot_with_ball(std::nullopt),
       ramping(ramping)
@@ -130,7 +130,7 @@ void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
 {
     if (world_state.has_ball_state())
     {
-        setBallState(createBallState(world_state.ball_state()));
+        setBallState(createBallStateProto(world_state.ball_state()));
     }
     if (world_state.blue_robots().size() > 0)
     {

@@ -59,7 +59,7 @@ void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     primitive_output->sendProto(primitives);
 
-    LOG(VISUALIZE) << *createNamedValue(
+    LOG(VISUALIZE) << *createNamedValueProto(
         "Primitive Hz",
         static_cast<float>(FirstInFirstOutThreadedObserver<
                            TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
@@ -67,9 +67,9 @@ void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 
 void UnixSimulatorBackend::onValueReceived(World world)
 {
-    world_output->sendProto(*createWorldWithSequenceNumber(world, sequence_number++));
+    world_output->sendProto(*createWorldWithSequenceNumberProto(world, sequence_number++));
 
-    LOG(VISUALIZE) << *createNamedValue(
+    LOG(VISUALIZE) << *createNamedValueProto(
         "World Hz",
         static_cast<float>(
             FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));

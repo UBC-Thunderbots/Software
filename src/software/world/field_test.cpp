@@ -36,7 +36,7 @@ class FieldTest : public ::testing::Test
 
 TEST(TestUtilsTest, create_division_b_field)
 {
-    Field field = Field::createField(TbotsProto::FieldType::DIV_B);
+    Field field = Field::createFieldProto(TbotsProto::FieldType::DIV_B);
 
     // Check that the field has the correct dimensions for a
     // SSL Division B field according to the rules
@@ -97,7 +97,7 @@ TEST(TestUtilsTest, create_division_b_field)
 
 TEST(TestUtilsTest, create_division_a_field)
 {
-    Field field = Field::createField(TbotsProto::FieldType::DIV_A);
+    Field field = Field::createFieldProto(TbotsProto::FieldType::DIV_A);
 
     // Check that the field has the correct dimensions for a
     // SSL Division A field according to the rules
@@ -209,7 +209,7 @@ TEST_F(FieldTest, construct_with_parameters)
 TEST_F(FieldTest, construct_with_protobuf)
 {
     Field original_field = Field::createSSLDivisionAField();
-    auto field_proto     = createField(original_field);
+    auto field_proto     = createFieldProto(original_field);
     Field proto_converted_field(*field_proto);
 
     EXPECT_EQ(original_field, proto_converted_field);

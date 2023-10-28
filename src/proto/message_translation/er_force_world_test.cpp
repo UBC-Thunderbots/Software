@@ -14,7 +14,7 @@ TEST(ErForceWorldTest, test_create_ball)
     sim_ball->set_v_x(4.0);
     sim_ball->set_v_y(5.0);
     sim_ball->set_v_z(6.0);
-    const Ball test_ball = createBall(*sim_ball, Timestamp::fromSeconds(0));
+    const Ball test_ball = createBallProto(*sim_ball, Timestamp::fromSeconds(0));
     const Point pos(sim_ball->p_x(), sim_ball->p_y());
     const Vector vel(sim_ball->v_x(), sim_ball->v_y());
     BallState expected_state(pos, vel);
@@ -43,7 +43,7 @@ TEST(ErForceWorldTest, test_create_robot)
     sim_robot->set_r_y(1.0);
     sim_robot->set_r_z(5.0);
 
-    const Robot test_robot = createRobot(*sim_robot, Timestamp::fromSeconds(0));
+    const Robot test_robot = createRobotProto(*sim_robot, Timestamp::fromSeconds(0));
     const Point expected_pos(sim_robot->p_x(), sim_robot->p_y());
     const Vector expected_vel(sim_robot->v_x(), sim_robot->v_y());
     RobotState expected_state(expected_pos, expected_vel, Angle::zero(),

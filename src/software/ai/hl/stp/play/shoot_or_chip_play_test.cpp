@@ -12,7 +12,7 @@ class ShootOrChipPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
-    Field field                      = Field::createField(field_type);
+    Field field                      = Field::createFieldProto(field_type);
 };
 
 TEST_F(ShootOrChipPlayTest, test_shoot_or_chip_play)

@@ -163,7 +163,7 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
         passes.push_back(zone_and_pass.second);
     }
 
-    LOG(VISUALIZE) << *createProtobufPassVisualization(passes);
+    LOG(VISUALIZE) << *createPassVisualizationProto(passes);
 
     return PassEvaluation<ZoneEnum>(pitch_division_, current_best_passes_,
                                     passing_config_, world.getMostRecentTimestamp());

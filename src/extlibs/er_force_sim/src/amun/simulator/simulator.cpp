@@ -261,7 +261,7 @@ void Simulator::sendSSLSimErrorInternal(ErrorSource source)
     emit sendSSLSimError(errors, source);
 }
 
-static void createProtobufRobot(Simulator::RobotMap &list, float x, float y, uint32_t id,
+static void createRobot(Simulator::RobotMap &list, float x, float y, uint32_t id,
                         const ErrorAggregator *agg, SimulatorData *data,
                         const QMap<uint32_t, robot::Specs> &teamSpecs)
 {
@@ -637,7 +637,7 @@ void Simulator::setTeam(Simulator::RobotMap &list, float side, const robot::Team
         }
         teamSpecs[id].CopyFrom(specs);
 
-        createProtobufRobot(list, x, side * y, id, m_aggregator, m_data, teamSpecs);
+        createRobot(list, x, side * y, id, m_aggregator, m_data, teamSpecs);
         y -= 0.3;
     }
 }
@@ -727,7 +727,7 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
                 ErForceVector targetPos;
                 coordinates::fromVision(robot, targetPos);
                 // TODO: check if the given position is fine
-                createProtobufRobot(list, targetPos.x, targetPos.y, robot.id().id(), m_aggregator,
+                createRobot(list, targetPos.x, targetPos.y, robot.id().id(), m_aggregator,
                             m_data, teamSpecs);
             }
         }

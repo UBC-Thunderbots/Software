@@ -67,7 +67,7 @@ TEST(GameStateTest, construct_with_protobuf)
 {
     GameState original_game_state;
     original_game_state.updateRefereeCommand(RefereeCommand::DIRECT_FREE_US);
-    auto proto_game_state = createGameState(original_game_state);
+    auto proto_game_state = createGameStateProto(original_game_state);
     GameState proto_converted_game_state(*proto_game_state);
 
     EXPECT_EQ(original_game_state, proto_converted_game_state);

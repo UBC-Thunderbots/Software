@@ -71,7 +71,7 @@ class TbotsProtobufTest : public ::testing::Test
 
 TEST(TbotsProtobufTest, timestamp_msg_test)
 {
-    auto timestamp_msg = createCurrentTimestamp();
+    auto timestamp_msg = createCurrentTimestampProto();
     TbotsProtobufTest::assertSaneTimestamp(*timestamp_msg);
 }
 
@@ -86,7 +86,7 @@ TEST(TbotsProtobufTest, robot_state_msg_test)
                 Timestamp::fromSeconds(0));
     auto robot_state_msg = createRobotStateProto(robot);
 
-    EXPECT_EQ(robot.currentState(), createRobotState(*robot_state_msg));
+    EXPECT_EQ(robot.currentState(), createRobotStateProto(*robot_state_msg));
     TbotsProtobufTest::assertRobotStateMessageFromRobot(robot, *robot_state_msg);
 }
 
@@ -96,7 +96,7 @@ TEST(TbotsProtobufTest, ball_state_msg_test)
     auto velocity = Vector(4.20, 4.20);
 
     Ball ball(position, velocity, Timestamp::fromSeconds(0));
-    auto ball_state_msg = createBallState(ball);
+    auto ball_state_msg = createBallStateProto(ball);
 
     TbotsProtobufTest::assertBallStateMessageFromBall(ball, *ball_state_msg);
 }

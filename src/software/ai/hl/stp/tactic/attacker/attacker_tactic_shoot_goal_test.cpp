@@ -24,7 +24,7 @@ class AttackerTacticShootGoalTest
    protected:
     TbotsProto::AiConfig ai_config;
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
-    Field field                      = Field::createField(field_type);
+    Field field                      = Field::createFieldProto(field_type);
 };
 
 TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)

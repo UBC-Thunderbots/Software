@@ -65,7 +65,7 @@ TEST_F(WorldTest, construction_with_parameters)
 
 TEST_F(WorldTest, construct_with_protobuf)
 {
-    auto world_proto = createWorld(world);
+    auto world_proto = createWorldProto(world);
     World proto_converted_world(*world_proto);
 
     // Can not compare the two World objects since TbotsProto::Team does not store the

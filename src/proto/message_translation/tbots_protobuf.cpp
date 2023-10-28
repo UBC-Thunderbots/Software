@@ -1,44 +1,45 @@
 #include "proto/message_translation/tbots_protobuf.h"
 
 
-std::unique_ptr<TbotsProto::World> createWorld(const World& world)
+std::unique_ptr<TbotsProto::World> createWorldProto(const World& world)
 {
     // create msg
     auto world_msg                        = std::make_unique<TbotsProto::World>();
-    *(world_msg->mutable_time_sent())     = *createCurrentTimestamp();
-    *(world_msg->mutable_field())         = *createField(world.field());
-    *(world_msg->mutable_friendly_team()) = *createTeam(world.friendlyTeam());
-    *(world_msg->mutable_enemy_team())    = *createTeam(world.enemyTeam());
-    *(world_msg->mutable_ball())          = *createBall(world.ball());
-    *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
+    *(world_msg->mutable_time_sent())     = *createCurrentTimestampProto();
+    *(world_msg->mutable_field())         = *createFieldProto(world.field());
+    *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
+    *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
+    *(world_msg->mutable_ball())          = *createBallProto(world.ball());
+    *(world_msg->mutable_game_state())    = *createGameStateProto(world.gameState());
 
     return world_msg;
 }
 
-std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumber(
+std::unique_ptr<TbotsProto::World> createWorldWithSequenceNumberProto(
     const World& world, const uint64_t sequence_number)
 {
     // create msg
     auto world_msg                        = std::make_unique<TbotsProto::World>();
-    *(world_msg->mutable_time_sent())     = *createCurrentTimestamp();
-    *(world_msg->mutable_field())         = *createField(world.field());
-    *(world_msg->mutable_friendly_team()) = *createTeam(world.friendlyTeam());
-    *(world_msg->mutable_enemy_team())    = *createTeam(world.enemyTeam());
-    *(world_msg->mutable_ball())          = *createBall(world.ball());
-    *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
+    *(world_msg->mutable_time_sent())     = *createCurrentTimestampProto();
+    *(world_msg->mutable_field())         = *createFieldProto(world.field());
+    *(world_msg->mutable_field())         = *createFieldProto(world.field());
+    *(world_msg->mutable_friendly_team()) = *createTeamProto(world.friendlyTeam());
+    *(world_msg->mutable_enemy_team())    = *createTeamProto(world.enemyTeam());
+    *(world_msg->mutable_ball())          = *createBallProto(world.ball());
+    *(world_msg->mutable_game_state())    = *createGameStateProto(world.gameState());
     world_msg->set_sequence_number(sequence_number);
 
     return world_msg;
 }
 
-std::unique_ptr<TbotsProto::Team> createTeam(const Team& team)
+std::unique_ptr<TbotsProto::Team> createTeamProto(const Team& team)
 {
     // create msg
     auto team_msg      = std::make_unique<TbotsProto::Team>();
     const auto& robots = team.getAllRobots();
 
     std::for_each(robots.begin(), robots.end(), [&](const Robot& robot) {
-        *(team_msg->add_team_robots()) = *createRobot(robot);
+        *(team_msg->add_team_robots()) = *createRobotProto(robot);
     });
 
     auto goalie_id = team.getGoalieId();
@@ -50,13 +51,13 @@ std::unique_ptr<TbotsProto::Team> createTeam(const Team& team)
     return team_msg;
 }
 
-std::unique_ptr<TbotsProto::Robot> createRobot(const Robot& robot)
+std::unique_ptr<TbotsProto::Robot> createRobotProto(const Robot& robot)
 {
     // create msg
     auto robot_msg = std::make_unique<TbotsProto::Robot>();
     robot_msg->set_id(robot.id());
     *(robot_msg->mutable_current_state()) = *createRobotStateProto(robot);
-    *(robot_msg->mutable_timestamp())     = *createTimestamp(robot.timestamp());
+    *(robot_msg->mutable_timestamp())     = *createTimestampProto(robot.timestamp());
 
     for (RobotCapability capability : robot.getUnavailableCapabilities())
     {
@@ -84,17 +85,17 @@ std::unique_ptr<TbotsProto::Robot> createRobot(const Robot& robot)
     return robot_msg;
 }
 
-std::unique_ptr<TbotsProto::Ball> createBall(const Ball& ball)
+std::unique_ptr<TbotsProto::Ball> createBallProto(const Ball& ball)
 {
     // create msg
     auto ball_msg                        = std::make_unique<TbotsProto::Ball>();
-    *(ball_msg->mutable_current_state()) = *createBallState(ball);
-    *(ball_msg->mutable_timestamp())     = *createTimestamp(ball.timestamp());
+    *(ball_msg->mutable_current_state()) = *createBallStateProto(ball);
+    *(ball_msg->mutable_timestamp())     = *createTimestampProto(ball.timestamp());
 
     return ball_msg;
 }
 
-std::unique_ptr<TbotsProto::Field> createField(const Field& field)
+std::unique_ptr<TbotsProto::Field> createFieldProto(const Field& field)
 {
     // create msg
     auto field_msg = std::make_unique<TbotsProto::Field>();
@@ -134,7 +135,7 @@ std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(
     return robot_state_msg;
 }
 
-std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_state)
+std::unique_ptr<TbotsProto::GameState> createGameStateProto(const GameState& game_state)
 {
     auto game_state_msg = std::make_unique<TbotsProto::GameState>();
 
@@ -271,7 +272,7 @@ std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_sta
     auto ball_state = game_state.getBall();
     if (ball_state.has_value())
     {
-        *(game_state_msg->mutable_ball()) = *createBall(ball_state.value());
+        *(game_state_msg->mutable_ball()) = *createBallProto(ball_state.value());
     }
 
     auto ball_placement_point = game_state.getBallPlacementPoint();
@@ -284,7 +285,7 @@ std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_sta
     return game_state_msg;
 }
 
-std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball)
+std::unique_ptr<TbotsProto::BallState> createBallStateProto(const Ball& ball)
 {
     auto position       = createPointProto(ball.position());
     auto velocity       = createVectorProto(ball.velocity());
@@ -297,14 +298,14 @@ std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball)
     return ball_state_msg;
 }
 
-std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestamp)
+std::unique_ptr<TbotsProto::Timestamp> createTimestampProto(const Timestamp& timestamp)
 {
     auto timestamp_msg = std::make_unique<TbotsProto::Timestamp>();
     timestamp_msg->set_epoch_timestamp_seconds(timestamp.toSeconds());
     return timestamp_msg;
 }
 
-std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
+std::unique_ptr<TbotsProto::NamedValue> createNamedValueProto(const std::string name,
                                                          float value)
 {
     auto named_value_msg = std::make_unique<TbotsProto::NamedValue>();
@@ -313,7 +314,7 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
     return named_value_msg;
 }
 
-std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
+std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValueProto(
     const std::map<std::string, double>& values)
 {
     auto plot_juggler_value_msg = std::make_unique<TbotsProto::PlotJugglerValue>();
@@ -328,7 +329,7 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     return plot_juggler_value_msg;
 }
 
-std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
+std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestampProto()
 {
     auto timestamp_msg    = std::make_unique<TbotsProto::Timestamp>();
     const auto clock_time = std::chrono::system_clock::now();
@@ -342,7 +343,7 @@ std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
     return timestamp_msg;
 }
 
-RobotState createRobotState(const TbotsProto::RobotState robot_state)
+RobotState createRobotStateProto(const TbotsProto::RobotState robot_state)
 {
     return RobotState(createPoint(robot_state.global_position()),
                       createVector(robot_state.global_velocity()),
@@ -350,14 +351,14 @@ RobotState createRobotState(const TbotsProto::RobotState robot_state)
                       createAngularVelocity(robot_state.global_angular_velocity()));
 }
 
-BallState createBallState(const TbotsProto::BallState ball_state)
+BallState createBallStateProto(const TbotsProto::BallState ball_state)
 {
     return BallState(createPoint(ball_state.global_position()),
                      createVector(ball_state.global_velocity()),
                      ball_state.distance_from_ground());
 }
 
-std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
+std::unique_ptr<TbotsProto::PassVisualization> createPassVisualizationProto(
     const std::vector<PassWithRating>& passes_with_rating)
 {
     auto pass_visualization_msg = std::make_unique<TbotsProto::PassVisualization>();
@@ -380,7 +381,7 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
-std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger()
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTriggerProto()
 {
     auto world_state_received_trigger_msg =
         std::make_unique<TbotsProto::WorldStateReceivedTrigger>();
@@ -388,7 +389,7 @@ std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedT
     return world_state_received_trigger_msg;
 }
 
-std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
+std::unique_ptr<TbotsProto::CostVisualization> createCostVisualizationProto(
     const std::vector<double>& costs, int num_rows, int num_cols)
 {
     auto cost_visualization_msg = std::make_unique<TbotsProto::CostVisualization>();

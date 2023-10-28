@@ -141,7 +141,7 @@ TEST_F(FilterOutSimilarThreatsTest, filter_out_similarly_angled_threats)
 
 TEST_F(GroupGoalLanesByDensityTest, single_dense_cluster)
 {
-    Field field = Field::createField(TbotsProto::FieldType::DIV_B);
+    Field field = Field::createFieldProto(TbotsProto::FieldType::DIV_B);
 
     std::vector<Point> threat_positions = {Point(-1, -1), Point(-1, -1.5), Point(-1, 0),
                                            Point(-1, 2)};
@@ -173,7 +173,7 @@ TEST_F(GroupGoalLanesByDensityTest, single_dense_cluster)
 
 TEST_F(GroupGoalLanesByDensityTest, multiple_dense_clusters)
 {
-    Field field = Field::createField(TbotsProto::FieldType::DIV_B);
+    Field field = Field::createFieldProto(TbotsProto::FieldType::DIV_B);
 
     std::vector<Point> threat_positions = {Point(-1, -1), Point(-1, -1.5), Point(-1, 0),
                                            Point(-1, 2.5), Point(-1, 2)};

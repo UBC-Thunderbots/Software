@@ -13,7 +13,7 @@
  * @return the corresponding ball object to the er simulator ball
  */
 
-Ball createBall(world::SimBall sim_ball, Timestamp timestamp);
+Ball createBallProto(world::SimBall sim_ball, Timestamp timestamp);
 
 /**
  * Convert a er force simulator robot to a robot object
@@ -23,4 +23,4 @@ Ball createBall(world::SimBall sim_ball, Timestamp timestamp);
  *
  * @return the corresponding robot object to the er simulator robot
  */
-Robot createRobot(world::SimRobot sim_robot, Timestamp timestamp);
+Robot createRobotProto(world::SimRobot sim_robot, Timestamp timestamp);

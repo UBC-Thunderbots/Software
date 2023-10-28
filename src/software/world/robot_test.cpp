@@ -62,7 +62,7 @@ TEST_F(RobotTest, construct_with_protobuf)
               current_time,
               std::set<RobotCapability>{RobotCapability::Chip, RobotCapability::Move,
                                         RobotCapability::Kick, RobotCapability::Dribble});
-    auto robot_proto = createRobot(original_robot);
+    auto robot_proto = createRobotProto(original_robot);
     Robot proto_converted_robot(*robot_proto);
 
     EXPECT_THAT(

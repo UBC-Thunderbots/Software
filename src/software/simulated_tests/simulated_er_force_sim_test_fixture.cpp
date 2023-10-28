@@ -450,19 +450,19 @@ bool SimulatedErForceSimTestFixture::tickTest(
     auto simulator_enemy_sim_robots       = simulator_state.blue_robots();
 
     /* convert simball and simrobot to normal ball and robot in world for comparison */
-    Ball simulator_ball = createBall(simulator_sim_ball, Timestamp::fromSeconds(0));
+    Ball simulator_ball = createBallProto(simulator_sim_ball, Timestamp::fromSeconds(0));
     std::vector<Robot> simulator_friendly_robots;
     std::vector<Robot> simulator_enemy_robots;
 
     for (int i = 0; i < simulator_friendly_sim_robots.size(); i++)
     {
         simulator_friendly_robots.push_back(
-            createRobot(simulator_friendly_sim_robots[i], Timestamp::fromSeconds(0)));
+            createRobotProto(simulator_friendly_sim_robots[i], Timestamp::fromSeconds(0)));
     }
     for (int i = 0; i < simulator_enemy_sim_robots.size(); i++)
     {
         simulator_enemy_robots.push_back(
-            createRobot(simulator_enemy_sim_robots[i], Timestamp::fromSeconds(0)));
+            createRobotProto(simulator_enemy_sim_robots[i], Timestamp::fromSeconds(0)));
     }
 
     /* compare ball position */
@@ -536,7 +536,7 @@ bool SimulatedErForceSimTestFixture::tickTest(
     {
         *friendly_world = friendly_sensor_fusion.getWorld().value();
         *enemy_world    = enemy_sensor_fusion.getWorld().value();
-        LOG(VISUALIZE) << *createWorld(*friendly_world);
+        LOG(VISUALIZE) << *createWorldProto(*friendly_world);
 
         validation_functions_done = validateAndCheckCompletion(
             terminating_function_validators, non_terminating_function_validators);

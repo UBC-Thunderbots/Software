@@ -409,5 +409,5 @@ void samplePassesForVisualization(const World& world,
         }
     }
 
-    LOG(VISUALIZE) << *createCostVisualization(costs, num_rows, num_cols);
+    LOG(VISUALIZE) << *createCostVisualizationProto(costs, num_rows, num_cols);
 }

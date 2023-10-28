@@ -173,7 +173,7 @@ namespace TestUtil
      * @param previous_referee_command The name of the previous referee command to set
      * @return the new GameState
      */
-    GameState createGameState(const RefereeCommand &current_referee_command,
+    GameState createGameStateProto(const RefereeCommand &current_referee_command,
                               const RefereeCommand &previous_referee_command);
 
     /** Create Motion Control from destination

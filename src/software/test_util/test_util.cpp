@@ -22,7 +22,7 @@ namespace TestUtil
 
     World createBlankTestingWorld(TbotsProto::FieldType field_type)
     {
-        return createBlankTestingWorld(createField(Field::createField(field_type)));
+        return createBlankTestingWorld(createFieldProto(Field::createFieldProto(field_type)));
     }
 
     Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_positions,
@@ -131,7 +131,7 @@ namespace TestUtil
         return states;
     }
 
-    GameState createGameState(const RefereeCommand &current_referee_command,
+    GameState createGameStateProto(const RefereeCommand &current_referee_command,
                               const RefereeCommand &previous_referee_command)
     {
         GameState game_state;
