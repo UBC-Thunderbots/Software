@@ -226,6 +226,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
 {
     auto obstacles    = path_planner_factory.getStaticObstacles(motion_constraints);
     auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
+    // TODO (Nima): update this so just paths are returned instead (can later calculate length: EnlsvgPathPlanner::pathLength(path_points, robot_position))
     CreateMotionControl create_motion_control =
         [obstacles, path_planner, motion_constraints](const Robot &robot,
                                                       const Point &destination) {

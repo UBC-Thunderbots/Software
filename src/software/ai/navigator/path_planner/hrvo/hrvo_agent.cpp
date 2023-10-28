@@ -882,12 +882,12 @@ void HRVOAgent::visualize(TeamColour friendly_team_colour)
     // path should be passed as a second argument to LOG
     //    i.e. LOG(VISUALIZE) << hrvo_visualization;
     //    LOG(VISUALIZE) << hrvo_visualization;
-    //    if (friendly_team_colour == TeamColour::YELLOW)
-    //    {
-    //        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
-    //    }
-    //    else
-    //    {
-    //        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
-    //    }
+    if (friendly_team_colour == TeamColour::YELLOW)
+    {
+        LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
+    }
+    else
+    {
+        LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
+    }
 }

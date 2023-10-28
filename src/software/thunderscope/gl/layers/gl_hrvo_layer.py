@@ -33,6 +33,7 @@ class GLHrvoLayer(GLLayer):
 
         self.velocity_obstacle_graphics = ObservableList(self._graphics_changed)
         self.robot_circle_graphics = ObservableList(self._graphics_changed)
+        self.trajectory_graphics = ObservableList(self._graphics_changed)
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
@@ -58,7 +59,7 @@ class GLHrvoLayer(GLLayer):
         )
 
         for velocity_obstacle_graphic, velocity_obstacle in zip(
-            self.velocity_obstacle_graphics, velocity_obstacle_msg.velocity_obstacles,
+                self.velocity_obstacle_graphics, velocity_obstacle_msg.velocity_obstacles,
         ):
             polygon_points = [
                 [
@@ -86,9 +87,18 @@ class GLHrvoLayer(GLLayer):
             velocity_obstacle_graphic.set_points(polygon_points)
 
         for robot_circle_graphic, robot_circle in zip(
-            self.robot_circle_graphics, velocity_obstacle_msg.robots,
+                self.robot_circle_graphics, velocity_obstacle_msg.robots,
         ):
             robot_circle_graphic.set_radius(robot_circle.radius)
             robot_circle_graphic.set_position(
                 robot_circle.origin.x_meters, robot_circle.origin.y_meters
             )
+
+        # Ensure we have the same number of graphics as protos
+        self.trajectory_graphics.resize(
+            1, lambda: GLPolygon(outline_color=Colors.NAVIGATOR_PATH_COLOR),
+        )
+
+        self.trajectory_graphics[0].set_points(
+            [[point.x_meters, point.y_meters] for point in velocity_obstacle_msg.trajectory.points]
+        )
