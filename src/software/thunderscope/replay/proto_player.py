@@ -12,7 +12,7 @@ from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from google.protobuf.message import Message
-from typing import Callable
+from typing import Callable, Type
 
 
 class ProtoPlayer:
@@ -123,7 +123,7 @@ class ProtoPlayer:
         return cached_data
 
     @staticmethod
-    def unpack_log_entry(log_entry: str) -> (float, Message, Message):
+    def unpack_log_entry(log_entry: str) -> (float, Type[Message], Message):
         """Unpacks a log entry into the timestamp and proto.
 
         :param log_entry: The log entry.
