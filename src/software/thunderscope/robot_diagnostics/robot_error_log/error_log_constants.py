@@ -9,18 +9,11 @@ class RobotErrorLogMessage:
     the id of the robot, the icon to display, and the last robot status if needed
     """
 
-    def __init__(
-        self,
-        message: str,
-        robot_id: int,
-        icon: QtGui.QPixmap,
-        status: RobotStatus = None,
-    ):
+    def __init__(self, message: str, robot_id: int, icon: QtGui.QPixmap):
         self.message = message
         self.robot_id = robot_id
         self.icon = icon
-        self.status = status
-        self.timestamp = datetime.now().strftime("%H:%M:%S %f")
+        self.timestamp = datetime.now()
 
 
 class LowBatteryErrorLogMessage(RobotErrorLogMessage):
@@ -39,10 +32,11 @@ class RobotCrashErrorLogMessage(RobotErrorLogMessage):
     Represents a robot error log message when a robot has crashed
     """
 
-    def __init__(self, robot_id: int, last_state: RobotStatus):
+    def __init__(self, crash_message: RobotCrash):
         super(RobotCrashErrorLogMessage, self).__init__(
-            "Robot has Crashed", robot_id, get_robot_crash_icon(), last_state
+            "Robot has Crashed", crash_message.robot_id, get_robot_crash_icon()
         )
+        self.crash_message = crash_message
 
 
 class ErrorCodeLogMessage(RobotErrorLogMessage):

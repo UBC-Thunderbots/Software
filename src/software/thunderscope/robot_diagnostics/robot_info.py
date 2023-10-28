@@ -8,10 +8,6 @@ from typing import List
 from proto.import_all_protos import *
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import *
-from software.thunderscope.robot_diagnostics.robot_error_log.error_log_constants import (
-    ErrorCodeLogMessage,
-    LowBatteryErrorLogMessage,
-)
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
 
@@ -82,7 +78,6 @@ class RobotInfo(QWidget):
         robot_id: int,
         available_control_modes: List[IndividualRobotMode],
         control_mode_signal: QtCore.pyqtSignal,
-        error_log_signal: QtCore.pyqtSignal,
     ):
         """
         Initialize a single robot's info widget
@@ -97,12 +92,6 @@ class RobotInfo(QWidget):
 
         self.robot_id = robot_id
         self.control_mode_signal = control_mode_signal
-        self.error_log_signal = error_log_signal
-
-        # when this robot has a battery warning, this is set to True
-        # which prevents spamming the same battery warning
-        # set back to False if battery is back above warning level
-        self.battery_warning_disabled = False
 
         self.time_of_last_robot_status = time.time()
 
@@ -347,7 +336,7 @@ class RobotInfo(QWidget):
         logging.debug(robot_status)
         motor_status = robot_status.motor_status
         power_status = robot_status.power_status
-        error_codes = robot_status.error_code
+        robot_status.error_code
         network_status = robot_status.network_status
         primitive_executor_status = robot_status.primitive_executor_status
 
@@ -370,24 +359,3 @@ class RobotInfo(QWidget):
         )
 
         self.battery_progress_bar.setValue(power_status.battery_voltage)
-
-        if (
-            power_status.battery_voltage <= BATTERY_WARNING_VOLTAGE
-            and not self.battery_warning_disabled
-        ):
-            self.error_log_signal.emit(LowBatteryErrorLogMessage(self.robot_id))
-            logging.warning(
-                f"Battery Voltage Alert\n\nrobot {self.robot_id} voltage is {power_status.battery_voltage}"
-            )
-            self.battery_warning_disabled = True
-        elif power_status.battery_voltage > BATTERY_WARNING_VOLTAGE:
-            self.battery_warning_disabled = False
-
-        for code in error_codes:
-            if code != ErrorCode.NO_ERROR and code in ERROR_CODE_MESSAGES.keys():
-                self.error_log_signal.emit(
-                    ErrorCodeLogMessage(self.robot_id, ERROR_CODE_MESSAGES[code])
-                )
-                logging.warning(
-                    f"WARNING ERROR CODE FROM ROBOT {self.robot_id}: {ERROR_CODE_MESSAGES[code]} {ERROR_CODE_MESSAGES[code]}"
-                )

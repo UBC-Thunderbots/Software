@@ -12,6 +12,7 @@ py_library(
     ],
     deps = [
         ":error_log_constants",
+        "//software/thunderscope/robot_diagnostics:robot_status",
         requirement("pyqtgraph"),
     ],
 )

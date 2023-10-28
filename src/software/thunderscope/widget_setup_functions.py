@@ -5,6 +5,7 @@ from proto.import_all_protos import *
 from software.thunderscope.common.proto_plotter import ProtoPlotter
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_style import *
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 # Import Widgets
@@ -231,7 +232,9 @@ def setup_cost_visualization_widget(proto_unix_io):
 #################################
 
 
-def setup_robot_view(proto_unix_io, available_control_modes: List[IndividualRobotMode]):
+def setup_robot_view(
+    proto_unix_io: ProtoUnixIO, available_control_modes: List[IndividualRobotMode]
+):
     """Setup the robot view widget
     :param proto_unix_io: The proto unix io object for the full system
     :param available_control_modes: the currently available input modes for the robots
@@ -241,16 +244,19 @@ def setup_robot_view(proto_unix_io, available_control_modes: List[IndividualRobo
     """
     robot_view = RobotView(available_control_modes)
     proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
-    proto_unix_io.register_observer(RobotCrash, robot_view.robot_crash_buffer)
     return robot_view
 
 
-def setup_robot_error_log_view_widget() -> RobotErrorLog:
+def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorLog:
     """
-    Setup the robot error log widget
+    Setup the robot error log widget and connect its buffer to the proto unix io
+    :param proto_unix_io: The proto unix io object for the full system
     :return: the robot error log widget
     """
-    return RobotErrorLog()
+    robot_error_log = RobotErrorLog()
+    proto_unix_io.register_observer(RobotStatus, robot_error_log.robot_status_buffer)
+    proto_unix_io.register_observer(RobotCrash, robot_error_log.robot_crash_buffer)
+    return robot_error_log
 
 
 def setup_estop_view(proto_unix_io):
