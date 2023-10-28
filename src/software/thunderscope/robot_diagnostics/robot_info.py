@@ -8,6 +8,10 @@ from typing import List
 from proto.import_all_protos import *
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import *
+from software.thunderscope.robot_diagnostics.robot_error_log.error_log_constants import (
+    ErrorCodeLogMessage,
+    LowBatteryErrorLogMessage,
+)
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
 
@@ -372,11 +376,6 @@ class RobotInfo(QWidget):
             and not self.battery_warning_disabled
         ):
             self.error_log_signal.emit(LowBatteryErrorLogMessage(self.robot_id))
-            # QMessageBox.information(
-            #     self,
-            #     "Battery Voltage Alert",
-            #     f"robot {self.robot_id} voltage is {power_status.battery_voltage}",
-            # )
             logging.warning(
                 f"Battery Voltage Alert\n\nrobot {self.robot_id} voltage is {power_status.battery_voltage}"
             )
@@ -389,11 +388,6 @@ class RobotInfo(QWidget):
                 self.error_log_signal.emit(
                     ErrorCodeLogMessage(self.robot_id, ERROR_CODE_MESSAGES[code])
                 )
-                # QMessageBox.warning(
-                #     self,
-                #     f"Warning: {ERROR_CODE_MESSAGES[code]}",
-                #     f"{ERROR_CODE_MESSAGES[code]} warning for robot {self.robot_id}",
-                # )
                 logging.warning(
                     f"WARNING ERROR CODE FROM ROBOT {self.robot_id}: {ERROR_CODE_MESSAGES[code]} {ERROR_CODE_MESSAGES[code]}"
                 )

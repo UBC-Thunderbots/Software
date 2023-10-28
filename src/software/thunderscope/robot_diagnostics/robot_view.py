@@ -6,14 +6,14 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 from proto.import_all_protos import *
-from software.thunderscope.constants import (
-    IndividualRobotMode,
-    RobotErrorLogMessage,
-    RobotCrashErrorLogMessage,
-)
+from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
 from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.robot_diagnostics.robot_error_log.error_log_constants import (
+    RobotCrashErrorLogMessage,
+    RobotErrorLogMessage,
+)
 
 
 class RobotCrashDialog(QDialog):
@@ -171,18 +171,6 @@ class RobotView(QScrollArea):
         self.setWidget(self.container)
         self.setWidgetResizable(True)
 
-        QtCore.QTimer.singleShot(3000, self.send_test)
-
-    def send_test(self):
-        self.robot_crash_buffer.put(
-            RobotCrash(
-                robot_id=5,
-                exit_signal="gg",
-                stack_dump="gg",
-                status=RobotStatus()
-            )
-        )
-
     def refresh(self):
         """
         Refresh the view
@@ -200,11 +188,8 @@ class RobotView(QScrollArea):
         robot_crash = self.robot_crash_buffer.get(block=False, return_cached=False)
 
         if robot_crash is not None:
-            if (
-                time.time() - self.robot_last_crash_time_s[robot_crash.robot_id]
-                > self.ROBOT_CRASH_TIMEOUT_S
-            ):
+            if time.time() - self.robot_last_crash_time_s[robot_crash.robot_id] > 0:
                 self.robot_error_log_signal.emit(
-                    RobotCrashErrorLogMessage(robot_crash.robot_id)
+                    RobotCrashErrorLogMessage(robot_crash.robot_id, robot_crash.status)
                 )
             self.robot_last_crash_time_s[robot_crash.robot_id] = time.time()

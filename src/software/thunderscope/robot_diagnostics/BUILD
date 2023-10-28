@@ -40,6 +40,7 @@ py_library(
         ":motor_fault_view",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope/robot_diagnostics/robot_error_log:error_log_constants",
         requirement("pyqtgraph"),
     ],
 )
@@ -62,14 +63,7 @@ py_library(
         "//software/thunderscope:thread_safe_buffer",
         "//software/thunderscope/robot_diagnostics:robot_info",
         "//software/thunderscope/robot_diagnostics:robot_status",
-        requirement("pyqtgraph"),
-    ],
-)
-
-py_library(
-    name = "robot_error_log",
-    srcs = ["robot_error_log.py"],
-    deps = [
+        "//software/thunderscope/robot_diagnostics/robot_error_log:error_log_constants",
         requirement("pyqtgraph"),
     ],
 )
