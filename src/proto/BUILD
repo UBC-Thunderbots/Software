@@ -15,6 +15,7 @@ proto_library(
         "play.proto",
         "power_frame_msg.proto",
         "primitive.proto",
+        "robot_crash_msg.proto",
         "robot_log_msg.proto",
         "robot_status_msg.proto",
         "tactic.proto",
@@ -177,6 +178,7 @@ py_proto_library(
     name = "software_py_proto",
     srcs = [
         "play_info_msg.proto",
+        "robot_crash_msg.proto",
         "robot_log_msg.proto",
         "sensor_msg.proto",
         "ssl_autoref_ci.proto",

@@ -315,11 +315,11 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> WaitingForPassState
 WaitingForPassState --> WaitingForPassState : [!passStarted]\n<i>updateReceive</i>
-WaitingForPassState --> OneTouchShotState : [passStarted_G&&onetouchPossible]\n<i>updateOnetouch</i>
-WaitingForPassState --> ReceiveAndDribbleState : [passStarted_G&&!onetouchPossible]\n<i>updateReceive</i>
+WaitingForPassState --> OneTouchShotState : [passStarted && onetouchPossible]\n<i>updateOnetouch</i>
+WaitingForPassState --> ReceiveAndDribbleState : [passStarted && !onetouchPossible]\n<i>updateReceive</i>
 ReceiveAndDribbleState --> ReceiveAndDribbleState : [!passFinished]\n<i>adjustReceive</i>
-OneTouchShotState --> OneTouchShotState : [!passFinished_G&&!strayPass]\n<i>updateOnetouch</i>
-OneTouchShotState --> ReceiveAndDribbleState : [!passFinished_G&&strayPass]\n<i>adjustReceive</i>
+OneTouchShotState --> OneTouchShotState : [!passFinished && !strayPass]\n<i>updateOnetouch</i>
+OneTouchShotState --> ReceiveAndDribbleState : [!passFinished && strayPass]\n<i>adjustReceive</i>
 ReceiveAndDribbleState --> Terminate:::terminate : [passFinished]\n<i>adjustReceive</i>
 OneTouchShotState --> Terminate:::terminate : [passFinished]\n<i>updateOnetouch</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>

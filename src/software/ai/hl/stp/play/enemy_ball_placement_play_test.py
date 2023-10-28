@@ -1,6 +1,6 @@
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
@@ -14,27 +14,31 @@ from proto.ssl_gc_common_pb2 import Team
 def test_two_ai_ball_placement(simulated_test_runner):
     def setup(*args):
         # Initial position is from Blue's perspective
-        ball_initial_pos = tbots.Point(2, 2)
+        ball_initial_pos = tbots_cpp.Point(2, 2)
         # Final point is going to be from yellow's perspective  (since yellow will be the one placing)
-        ball_final_pos = tbots.Point(-3, -2)
+        ball_final_pos = tbots_cpp.Point(-3, -2)
 
         # Setup Bots
         blue_bots = [
-            tbots.Point(-2.75, 2.5),
-            tbots.Point(-2.75, 1.5),
-            tbots.Point(-2.75, 0.5),
-            tbots.Point(-2.75, -0.5),
-            tbots.Point(-2.75, -1.5),
-            tbots.Point(4.6, -3.1),
+            tbots_cpp.Point(-2.75, 2.5),
+            tbots_cpp.Point(-2.75, 1.5),
+            tbots_cpp.Point(-2.75, 0.5),
+            tbots_cpp.Point(-2.75, -0.5),
+            tbots_cpp.Point(-2.75, -1.5),
+            tbots_cpp.Point(4.6, -3.1),
         ]
 
         yellow_bots = [
-            tbots.Point(1, 0),
-            tbots.Point(1, 2.5),
-            tbots.Point(1, -2.5),
-            tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-            tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-            tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+            tbots_cpp.Point(1, 0),
+            tbots_cpp.Point(1, 2.5),
+            tbots_cpp.Point(1, -2.5),
+            tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXNegYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXPosYCorner(),
         ]
 
         # Game Controller Setup
@@ -71,7 +75,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
                 ball_location=ball_initial_pos,
-                ball_velocity=tbots.Vector(0, 0),
+                ball_velocity=tbots_cpp.Vector(0, 0),
             ),
         )
 
