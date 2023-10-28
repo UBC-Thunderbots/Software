@@ -123,7 +123,7 @@ class ProtoPlayer:
         return cached_data
 
     @staticmethod
-    def unpack_log_entry(log_entry: str) -> (float, type[Message], Message):
+    def unpack_log_entry(log_entry: str) -> (float, Message, Message):
         """Unpacks a log entry into the timestamp and proto.
 
         :param log_entry: The log entry.
