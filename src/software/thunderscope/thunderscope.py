@@ -8,6 +8,8 @@ import pyqtgraph
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 
+from typing import Callable
+
 from software.py_constants import *
 from software.thunderscope.constants import *
 
