@@ -9,7 +9,7 @@ from software.thunderscope.common import common_widgets
 from software.py_constants import *
 
 
-class ReplayControls(QGroupBox):
+class ReplayControls(QWidget):
     def __init__(self, player: ProtoPlayer) -> None:
         """Setup the replay controls. 
 
@@ -21,9 +21,10 @@ class ReplayControls(QGroupBox):
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.setFocus()
 
-        self.controls_layout = QVBoxLayout()
         self.player = player
 
+        self.controls_layout = QVBoxLayout()
+        self.controls_layout.setContentsMargins(12, 12, 12, 12)
         self.buttons_layout = QHBoxLayout()
 
         for button in [
@@ -44,7 +45,7 @@ class ReplayControls(QGroupBox):
         self.buttons_layout.addWidget(self.play_pause)
 
         # Setup playback speed combo box
-        self.playback_speed_combo_box = QtGui.QComboBox(self)
+        self.playback_speed_combo_box = QComboBox(self)
 
         for item in ["3", "2", "1", "0.5", "0.2", "0.1", "0.05", "0.01"]:
             self.playback_speed_combo_box.addItem(item)
@@ -86,7 +87,7 @@ class ReplayControls(QGroupBox):
             self.replay_slider,
             self.replay_label,
         ) = common_widgets.create_slider(
-            "Replay",
+            text="",
             min_val=0,
             max_val=self.player.end_time * MILLISECONDS_PER_SECOND,
             tick_spacing=1,
@@ -134,7 +135,11 @@ class ReplayControls(QGroupBox):
             "%H:%M:%S",
             time.gmtime(self.replay_slider.value() / MILLISECONDS_PER_SECOND),
         )
-        self.replay_label.setText("Current time: {}".format(current_time))
+        total_time = time.strftime(
+            "%H:%M:%S",
+            time.gmtime(self.replay_slider.maximum() / MILLISECONDS_PER_SECOND),
+        )
+        self.replay_label.setText(f"{current_time} / {total_time}")
 
     def refresh(self) -> None:
         """Refresh the slider to match the current time.

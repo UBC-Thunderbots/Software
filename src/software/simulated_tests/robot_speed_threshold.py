@@ -1,4 +1,4 @@
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.simulated_tests.speed_threshold_helpers import *
@@ -31,7 +31,7 @@ class RobotSpeedThreshold(Validation):
 
         for robot in world.friendly_team.team_robots:
             if (
-                tbots.createVector(robot.current_state.global_velocity).length()
+                tbots_cpp.createVector(robot.current_state.global_velocity).length()
                 < self.speed_threshold
             ):
                 return ValidationStatus.FAILING
@@ -59,13 +59,13 @@ class RobotSpeedThreshold(Validation):
 
             segments.append(
                 [
-                    tbots.Point(validation_start_x, validation_start_y),
-                    tbots.Point(validation_end_x, validation_end_y),
+                    tbots_cpp.Point(validation_start_x, validation_start_y),
+                    tbots_cpp.Point(validation_end_x, validation_end_y),
                 ]
             )
 
         return create_validation_geometry(
-            [tbots.Segment(points[0], points[1]) for points in segments]
+            [tbots_cpp.Segment(points[0], points[1]) for points in segments]
         )
 
     def __repr__(self):

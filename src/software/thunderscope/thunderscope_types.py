@@ -92,6 +92,7 @@ class TScopeQTTab(TScopeTab):
 
         # make dock area
         self.dock_area = DockArea()
+        self.dock_area.layout.setContentsMargins(12, 12, 12, 12)
 
         # first widget is initial anchor widget
         # all other widgets will be positioned relative to this one
