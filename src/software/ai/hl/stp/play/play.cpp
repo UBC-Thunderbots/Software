@@ -6,6 +6,8 @@
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/geom/angle.h"
 
 Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
     : ai_config(ai_config),
@@ -103,6 +105,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
     std::optional<Robot> goalie_robot = world.friendlyTeam().goalie();
     std::vector<Robot> robots         = world.friendlyTeam().getAllRobots();
+    std::vector<Robot> injured_robots = world.friendlyTeam().getInjuredRobots();
 
     if (requires_goalie)
     {
@@ -136,6 +139,32 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         else
         {
             LOG(WARNING) << "No goalie ID set!" << std::endl;
+        }
+    }
+
+    // do not assign tactic to injured robots because injured robots are substituted
+    if(injured_robots.size() != 0){
+        unsigned int num_injured = (unsigned int) injured_robots.size();
+        num_tactics -= num_injured;
+
+        // substitution tactic is just a move tactic to a decided location
+        std::shared_ptr<MoveTactic> auto_sub_tactic;
+
+        // move to middle of court and to positive y boundary and stop
+        auto_sub_tactic->updateControlParams(
+            Point(0, world.field().totalYLength()/2), Angle::zero(), 0
+        );
+
+        for(auto robot: injured_robots){
+            
+            // assign robot to auto_sub tactic
+            tactic_robot_id_assignment.emplace(auto_sub_tactic, robot.id());
+
+            // remove substitution robot from robot list 
+            robots.erase(std::remove(robots.begin(), robots.end(), robot),
+                         robots.end());
+
+            /* not sure if the rest in goalie need to be executed */
         }
     }
 

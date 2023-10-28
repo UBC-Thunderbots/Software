@@ -237,6 +237,22 @@ class Team
      */
     Timestamp getMostRecentTimestamp() const;
 
+    /**
+     * Set robots in the team to be injured
+     * 
+     * @param robot_ids robot ids of injured robots
+     */
+
+    void setInjuredRobots(std::vector<Robot> robots);
+
+    /** 
+     * Returns a list of robot ids for robots that are injured
+     * 
+     * @return a list of injured robots
+     */
+    std::vector<Robot> getInjuredRobots() const;
+
+
    private:
     /**
      * Updates the last update timestamp
@@ -266,6 +282,9 @@ class Team
     Duration robot_expiry_buffer_duration;
 
     Timestamp last_update_timestamp;
+
+    // the robots in the team that are injured
+    std::vector<Robot> injured_robots;
 };
 
 enum class TeamType
