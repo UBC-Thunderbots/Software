@@ -13,7 +13,6 @@ from typing import Callable
 from google.protobuf.message import Message
 
 
-
 class ProtoLogger:
 
     """Logs incoming protobufs with metadata to a folder to be played back later.
