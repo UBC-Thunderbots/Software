@@ -156,6 +156,27 @@ fi
 
 if [[ "$arch" == "aarch64" ]]; then
     print_status_msg "Starting ARM workarounds for pyqt"
+    
+    # before we frankenstein, install pyqt6 and build from source
+    # before that, we need qt6 installed and set as the default qt installation
+    sudo apt-get install sip-tools -y
+    sudo apt-get install qtchooser -y
+    sudo apt-get install qt6-base-dev -y
+    sudo apt-get install qt5-base-dev -y
+    sudo /opt/tbotspython/bin/pip3.8 install PyQt-Builder
+    sudo apt install -y qtcreator qtbase5-dev qt5-qmake cmake -y    
+    
+    wget https://files.pythonhosted.org/packages/34/da/e03b7264b1e88cd553ff62a71c0c19f55690e08928130f4aae613723e535/PyQt6-6.5.2.tar.gz
+    cd PyQt6-6.5.2/
+    qtchooser -install qt6 $(which qmake6)
+    sudo mv ~/.config/qtchooser/qt6.conf /usr/share/qtchooser/qt6.conf
+    export QT_SELECT=qt6
+    sudo sip-install --target-dir /opt/tbotspython/lib/python3.8/site-packages/ --verbose
+    sudo /opt/tbotspython/bin/pip3.8 install PyQt6-sip
+    export QT_QPA_PLATFORM=wayland
+    
+    
+    
     # There may be a better way to do this that doesn't Frankenstein your ubuntu installation, but this is the only way we found to get pyqt to work.
     # add mantic as source, install python3-pyqt6 and python3-pyqt6.qtwebengine
     sudo sh -c 'echo "deb http://ca.ports.ubuntu.com/ubuntu-ports/ mantic main universe" > /etc/apt/sources.list.d/temp.list'
@@ -167,6 +188,8 @@ if [[ "$arch" == "aarch64" ]]; then
     add_bashrc_if_not_there "export PYTHONPATH=/usr/lib/python3/dist-packages/"
     # fix for pyqtgraph trying to use pyqt5 by default
     add_bashrc_if_not_there "export PYQTGRAPH_QT_LIB=PyQt6"
+    
+    # change default qt to qt5 again
 else
     # else if x86_64, install PyQt6 normally using pip
     sudo /opt/tbotspython/bin/pip3 install pyqt6==6.5.0 PyQt6-WebEngine
