@@ -1,3 +1,4 @@
+from __future__ import annotations
 import time
 import threading
 import queue
@@ -9,6 +10,8 @@ from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.replay.replay_constants import *
 from typing import Callable
+from google.protobuf.message import Message
+
 
 
 class ProtoLogger:
@@ -72,7 +75,7 @@ class ProtoLogger:
         self.start_time = self.time_provider()
         self.stop_logging = False
 
-    def __enter__(self) -> "ProtoLogger":
+    def __enter__(self) -> ProtoLogger:
         """Starts the logger.
 
         We use gzip to save the data with compression enabled to
@@ -139,7 +142,7 @@ class ProtoLogger:
             logging.exception("Exception detected in ProtoLogger")
 
     @staticmethod
-    def create_log_entry(proto: proto, current_time: float) -> str:
+    def create_log_entry(proto: Message, current_time: float) -> str:
         serialized_proto = base64.b64encode(proto.SerializeToString())
         log_entry = (
             f"{current_time}{REPLAY_METADATA_DELIMETER}"

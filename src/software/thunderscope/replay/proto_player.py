@@ -123,7 +123,7 @@ class ProtoPlayer:
         return cached_data
 
     @staticmethod
-    def unpack_log_entry(log_entry: str) -> (float, Message, Message):
+    def unpack_log_entry(log_entry: str) -> (float, type[Message], Message):
         """Unpacks a log entry into the timestamp and proto.
 
         :param log_entry: The log entry.
@@ -342,7 +342,7 @@ class ProtoPlayer:
             )
 
     @staticmethod
-    def binary_search(arr: list, x: ..., key: Callable = lambda x: x) -> int:
+    def binary_search(arr: list, x, key: Callable = lambda x: x) -> int:
         """Binary search for an element in an array.
 
         Stolen from: https://www.geeksforgeeks.org/python-program-for-binary-search/
