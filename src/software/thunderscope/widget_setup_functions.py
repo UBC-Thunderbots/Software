@@ -246,6 +246,10 @@ def setup_robot_view(proto_unix_io, available_control_modes: List[IndividualRobo
 
 
 def setup_robot_error_log_view_widget() -> RobotErrorLog:
+    """
+    Setup the robot error log widget
+    :return: the robot error log widget
+    """
     return RobotErrorLog()
 
 
