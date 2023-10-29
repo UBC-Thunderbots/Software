@@ -128,7 +128,7 @@ class ProtoLogger(object):
 
                         # Stop writing to this chunk if we've reached the max size
                         size = os.fstat(self.log_file.fileno()).st_size
-                        if size >= REPLAY_MAX_CHUNK_SIZE_BYTES:
+                        if size > REPLAY_MAX_CHUNK_SIZE_BYTES:
                             break
 
         except Exception:
