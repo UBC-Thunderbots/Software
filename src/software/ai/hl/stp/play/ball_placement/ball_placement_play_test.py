@@ -22,8 +22,12 @@ def ball_placement_play_setup(
         tbots_cpp.Point(-0.0, 0.0),
         tbots_cpp.Point(-2.75, -0.5),
         tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter(),
-        tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea().negXNegYCorner(),
-        tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea().negXPosYCorner(),
+        tbots_cpp.Field.createSSLDivisionBField()
+        .friendlyDefenseArea()
+        .negXNegYCorner(),
+        tbots_cpp.Field.createSSLDivisionBField()
+        .friendlyDefenseArea()
+        .negXPosYCorner(),
     ]
     yellow_bots = [
         tbots_cpp.Point(1, 0),
@@ -49,7 +53,7 @@ def ball_placement_play_setup(
     blue_play = Play()
     blue_play.name = PlayName.BallPlacementPlay
 
-    # TODO (#3019): Reenable enemy ai after enemy ball placement is fixed
+    # TODO (#3019): Re-enable enemy ai after enemy ball placement is fixed
     yellow_play = Play()
     yellow_play.name = PlayName.HaltPlay
 
@@ -120,7 +124,11 @@ def test_two_ai_ball_placement(
 
     # Drop Ball Always Validation
     drop_ball_always_validation_sequence_set = [
-        [BallAlwaysStaysInRegion(regions=[tbots_cpp.Circle(ball_placement_point, 0.1)]), ]
+        [
+            BallAlwaysStaysInRegion(
+                regions=[tbots_cpp.Circle(ball_placement_point, 0.1)]
+            ),
+        ]
     ]
 
     # Drop Ball Eventually Validation

@@ -35,9 +35,10 @@ void BallPlacementPlayFSM::kickOffWall(const Update &event)
 void BallPlacementPlayFSM::alignPlacement(const Update &event)
 {
     std::optional<Point> placement_point =
-            event.common.world.gameState().getBallPlacementPoint();
+        event.common.world.gameState().getBallPlacementPoint();
 
-    if (placement_point.has_value()) {
+    if (placement_point.has_value())
+    {
         PriorityTacticVector tactics_to_run = {{}};
 
         // setup move tactics for robots away from ball placing robot
@@ -45,17 +46,18 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
         tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
                                  move_tactics.end());
 
-        // find position behind the ball where the ball is aligned directly in front placement point from the placing robot's POV
+        // find position behind the ball where the ball is aligned directly in front
+        // placement point from the placing robot's POV
         Vector alignment_vector =
-                (placement_point.value() - event.common.world.ball().position()).normalize();
+            (placement_point.value() - event.common.world.ball().position()).normalize();
         Angle setup_angle = alignment_vector.orientation();
-        setup_point = event.common.world.ball().position() -
+        setup_point       = event.common.world.ball().position() -
                       2 * alignment_vector * ROBOT_MAX_RADIUS_METERS;
 
         align_placement_tactic->updateControlParams(
-                setup_point, setup_angle, 0.0, TbotsProto::DribblerMode::OFF,
-                TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+            setup_point, setup_angle, 0.0, TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
 
         tactics_to_run[0].emplace_back(align_placement_tactic);
 
@@ -100,9 +102,11 @@ void BallPlacementPlayFSM::startWait(const Update &event)
 void BallPlacementPlayFSM::retreat(const Update &event)
 {
     World world = event.common.world;
-    std::optional<Robot> nearest_robot = world.friendlyTeam().getNearestRobot(world.ball().position());
+    std::optional<Robot> nearest_robot =
+        world.friendlyTeam().getNearestRobot(world.ball().position());
 
-    if (nearest_robot.has_value()) {
+    if (nearest_robot.has_value())
+    {
         PriorityTacticVector tactics_to_run = {{}};
 
         // setup move tactics for robots away from ball placing robot
@@ -113,25 +117,28 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         Point ball_pos = world.ball().position();
 
         // robot will try to retreat backwards from wherever it is currently facing
-        Angle final_orientation = nearest_robot.value().orientation();
-        Vector retreat_direction =
-                (nearest_robot->position() - ball_pos).normalize();
+        Angle final_orientation  = nearest_robot.value().orientation();
+        Vector retreat_direction = (nearest_robot->position() - ball_pos).normalize();
         Point retreat_position =
-                ball_pos + retreat_direction * (0.5 + ROBOT_MAX_RADIUS_METERS);
+            ball_pos + retreat_direction * (0.5 + ROBOT_MAX_RADIUS_METERS);
 
-        // if the initial retreat position is out of the field boundary, have it retreat towards the closest goal
-        if (!contains(world.field().fieldBoundary(), retreat_position)) {
+        // if the initial retreat position is out of the field boundary, have it retreat
+        // towards the closest goal
+        if (!contains(world.field().fieldBoundary(), retreat_position))
+        {
             bool in_friendly_half = contains(world.field().friendlyHalf(), ball_pos);
-            Point closer_goal = in_friendly_half ? world.field().friendlyGoalCenter() : world.field().enemyGoalCenter();
+            Point closer_goal     = in_friendly_half ? world.field().friendlyGoalCenter()
+                                                 : world.field().enemyGoalCenter();
             retreat_direction = (closer_goal - ball_pos).normalize();
-            retreat_position = ball_pos + retreat_direction * (0.5 + ROBOT_MAX_RADIUS_METERS);
+            retreat_position =
+                ball_pos + retreat_direction * (0.5 + ROBOT_MAX_RADIUS_METERS);
         }
 
         // setup ball placement tactic for ball placing robot
         retreat_tactic->updateControlParams(
-                retreat_position, final_orientation, 0.0, TbotsProto::DribblerMode::OFF,
-                TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+            retreat_position, final_orientation, 0.0, TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
         tactics_to_run[0].emplace_back(retreat_tactic);
 
         event.common.set_tactics(tactics_to_run);

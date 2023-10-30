@@ -44,8 +44,9 @@ struct BallPlacementPlayFSM
     void kickOffWall(const Update& event);
 
     /**
-     * Action that finds a point where the ball's current position aligns with the ball placement position, and
-     * moves the robot so that it is aligned to dribble straight directly to the placement point
+     * Action that finds a point where the ball's current position aligns with the ball
+     * placement position, and moves the robot so that it is aligned to dribble straight
+     * directly to the placement point
      *
      * @param event the BallPlacementPlayFSM Update event
      */
@@ -169,11 +170,13 @@ struct BallPlacementPlayFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StartState_S + Update_E[!shouldKickOffWall_G] / alignPlacement_A = AlignPlacementState_S,
+            *StartState_S + Update_E[!shouldKickOffWall_G] / alignPlacement_A =
+                AlignPlacementState_S,
             StartState_S + Update_E[shouldKickOffWall_G] = KickOffWallState_S,
             KickOffWallState_S + Update_E[!kickDone_G] / kickOffWall_A =
                 KickOffWallState_S,
-            KickOffWallState_S + Update_E[!shouldKickOffWall_G] / alignPlacement_A = AlignPlacementState_S,
+            KickOffWallState_S + Update_E[!shouldKickOffWall_G] / alignPlacement_A =
+                AlignPlacementState_S,
             AlignPlacementState_S + Update_E[shouldKickOffWall_G] = KickOffWallState_S,
             AlignPlacementState_S + Update_E[!alignDone_G] / alignPlacement_A =
                 AlignPlacementState_S,
