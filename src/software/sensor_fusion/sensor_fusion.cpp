@@ -329,7 +329,8 @@ std::optional<Point> SensorFusion::getBallPlacementPoint(const SSLProto::Referee
         return point_opt;
     }
 
-    // if we're defending the positive side, then in our reference frame, we will have everything flipped
+    // if we're defending the positive side, then in our reference frame, we will have
+    // everything flipped
     if (defending_positive_side)
     {
         return Point(-point_opt.value().x(), -point_opt.value().y());
