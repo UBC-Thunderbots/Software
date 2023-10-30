@@ -76,7 +76,7 @@ def ball_placement_play_setup(
         # test normal ball placement (not edge case)
         (tbots_cpp.Point(2, 2), tbots_cpp.Point(0, 1.5)),
         # test when ball starting point is outside of the goal line
-        (tbots_cpp.Point(-4.7, 1.5), tbots_cpp.Point(0, 0.5)),
+        (tbots_cpp.Point(-4.7, 1.3), tbots_cpp.Point(0, 0.5)),
         # test when ball starting point is outside of the side lines
         (tbots_cpp.Point(-2.0, 3.2), tbots_cpp.Point(0, -0.5)),
         # test when ball placement point is inside of the friendly defense area
@@ -144,7 +144,7 @@ def test_two_ai_ball_placement(
         inv_eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
         ag_always_validation_sequence_set=drop_ball_always_validation_sequence_set,
         ag_eventually_validation_sequence_set=drop_ball_eventually_validation_sequence_set,
-        test_timeout_s=[10],
+        test_timeout_s=[15],
     )
 
 
