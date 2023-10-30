@@ -61,9 +61,9 @@ These instructions assume you have a basic understanding of Linux and the comman
 
 ### Operating systems
 
-We currently only support Linux, specifically Ubuntu 20.04 LTS. You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
+We currently only support Linux, specifically Ubuntu 20.04 LTS and Ubuntu 22.04 LTS. You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
 
-You can use Ubuntu 20.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
+You can use Ubuntu 20.04 LTS and Ubuntu 22.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
 ### Getting the Code
 

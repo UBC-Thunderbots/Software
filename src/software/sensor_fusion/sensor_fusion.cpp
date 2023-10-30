@@ -177,12 +177,6 @@ void SensorFusion::updateWorld(
             ball_in_dribbler_timeout =
                 sensor_fusion_config.num_dropped_detections_before_ball_not_in_dribbler();
         }
-        else if (friendly_robot_id_with_ball_in_dribbler.has_value() &&
-                 friendly_robot_id_with_ball_in_dribbler.value() == robot_id)
-        {
-            friendly_robot_id_with_ball_in_dribbler = std::nullopt;
-            ball_in_dribbler_timeout                = 0;
-        }
     }
 }
 

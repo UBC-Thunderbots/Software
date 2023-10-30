@@ -8,7 +8,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
 from proto.message_translation import tbots_protobuf
-import software.python_bindings as cpp_bindings
+import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
@@ -279,7 +279,7 @@ if __name__ == "__main__":
 
         with RobotCommunication(
             current_proto_unix_io,
-            getRobotMulticastChannel(0),
+            getRobotMulticastChannel(args.channel),
             args.interface,
             args.disable_estop,
             estop_path,
@@ -363,8 +363,17 @@ if __name__ == "__main__":
                     block=False, return_cached=False
                 )
                 if not world_state_received:
-                    world_state = tbots_protobuf.create_default_world_state(
-                        DIV_B_NUM_ROBOTS
+                    world_state = tbots_protobuf.create_world_state(
+                        blue_robot_locations=[
+                            tbots_cpp.Point(-3, y)
+                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
+                        ],
+                        yellow_robot_locations=[
+                            tbots_cpp.Point(3, y)
+                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
+                        ],
+                        ball_location=tbots_cpp.Point(0, 0),
+                        ball_velocity=tbots_cpp.Vector(0, 0),
                     )
                     tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].send_proto(
                         WorldState, world_state

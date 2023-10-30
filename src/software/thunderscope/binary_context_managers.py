@@ -8,8 +8,7 @@ import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
 from subprocess import Popen
-from software.python_bindings import *
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
 from software.py_constants import *
@@ -482,7 +481,7 @@ class Gamecontroller(object):
             if autoref_proto_unix_io is not None:
                 autoref_proto_unix_io.send_proto(Referee, data)
 
-        self.receive_referee_command = SSLRefereeProtoListener(
+        self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
         )
 
