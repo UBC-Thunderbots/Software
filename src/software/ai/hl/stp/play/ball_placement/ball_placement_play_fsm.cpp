@@ -131,7 +131,7 @@ void BallPlacementPlayFSM::retreat(const Update &event)
                                                  : world.field().enemyGoalCenter();
             retreat_direction = (closer_goal - ball_pos).normalize();
             retreat_position =
-                ball_pos + retreat_direction * (0.5 + ROBOT_MAX_RADIUS_METERS);
+                ball_pos + retreat_direction * (RETREAT_DISTANCE + ROBOT_MAX_RADIUS_METERS);
         }
 
         // setup ball placement tactic for ball placing robot
@@ -186,7 +186,7 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
     if (placement_point.has_value())
     {
         return comparePoints(ball_pos, placement_point.value(), 0.05) &&
-               event.common.world.ball().velocity().length() < 0.1;
+               event.common.world.ball().velocity().length() < this->ai_config.ai_parameter_config().ball_not_kicked_threshold();
     }
     else
     {

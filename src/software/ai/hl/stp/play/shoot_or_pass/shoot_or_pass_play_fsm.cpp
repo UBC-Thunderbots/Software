@@ -148,7 +148,7 @@ bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
     const auto ball_velocity = event.common.world.ball().velocity().length();
     const auto ball_not_kicked_threshold =
-        this->ai_config.shoot_or_pass_play_config().ball_not_kicked_threshold();
+        this->ai_config.ai_parameter_config().ball_not_kicked_threshold();
 
     return (ball_velocity < ball_not_kicked_threshold) &&
            (best_pass_and_score_so_far.rating > min_pass_score_threshold);

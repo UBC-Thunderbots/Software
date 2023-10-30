@@ -173,7 +173,7 @@ struct BallPlacementPlayFSM
             *StartState_S + Update_E[!shouldKickOffWall_G] / alignPlacement_A =
                 AlignPlacementState_S,
             StartState_S + Update_E[shouldKickOffWall_G] = KickOffWallState_S,
-            KickOffWallState_S + Update_E[!kickDone_G] / kickOffWall_A =
+            KickOffWallState_S + Update_E[!kickDone_G && shouldKickOffWall_G] / kickOffWall_A =
                 KickOffWallState_S,
             KickOffWallState_S + Update_E[!shouldKickOffWall_G] / alignPlacement_A =
                 AlignPlacementState_S,
@@ -201,4 +201,5 @@ struct BallPlacementPlayFSM
     std::chrono::time_point<std::chrono::system_clock> start_time;
     constexpr static double const SHOT_VELOCITY_THRESHOLD_M_PER_S = 1.0;
     constexpr static double const WALL_KICKOFF_VELOCITY_M_PER_S   = 3.0;
+    constexpr static double const RETREAT_DISTANCE                = 0.5;
 };
