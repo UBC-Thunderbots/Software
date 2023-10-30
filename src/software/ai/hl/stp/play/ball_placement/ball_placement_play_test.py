@@ -1,6 +1,6 @@
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_stops_in_region import *
@@ -18,20 +18,20 @@ def ball_placement_play_setup(
 ):
     # Setup Bots
     blue_bots = [
-        tbots.Point(-2.75, 1.5),
-        tbots.Point(-0.0, 0.0),
-        tbots.Point(-2.75, -0.5),
-        tbots.Field.createSSLDivisionBField().friendlyGoalCenter(),
-        tbots.Field.createSSLDivisionBField().friendlyDefenseArea().negXNegYCorner(),
-        tbots.Field.createSSLDivisionBField().friendlyDefenseArea().negXPosYCorner(),
+        tbots_cpp.Point(-2.75, 1.5),
+        tbots_cpp.Point(-0.0, 0.0),
+        tbots_cpp.Point(-2.75, -0.5),
+        tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter(),
+        tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea().negXNegYCorner(),
+        tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea().negXPosYCorner(),
     ]
     yellow_bots = [
-        tbots.Point(1, 0),
-        tbots.Point(1, 2.5),
-        tbots.Point(1, -2.5),
-        tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+        tbots_cpp.Point(1, 0),
+        tbots_cpp.Point(1, 2.5),
+        tbots_cpp.Point(1, -2.5),
+        tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+        tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
+        tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
     ]
 
     # Game Controller Setup
@@ -63,7 +63,7 @@ def ball_placement_play_setup(
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
             ball_location=ball_start_point,
-            ball_velocity=tbots.Vector(0, 0),
+            ball_velocity=tbots_cpp.Vector(0, 0),
         ),
     )
 
@@ -74,13 +74,13 @@ def ball_placement_play_setup(
     "ball_start_point, ball_placement_point",
     [
         # test normal ball placement (not edge case)
-        (tbots.Point(2, 2), tbots.Point(0, 1.5)),
+        (tbots_cpp.Point(2, 2), tbots_cpp.Point(0, 1.5)),
         # test when ball starting point is outside of the goal line
-        (tbots.Point(-4.7, 1.5), tbots.Point(0, 0.5)),
+        (tbots_cpp.Point(-4.7, 1.5), tbots_cpp.Point(0, 0.5)),
         # test when ball starting point is outside of the side lines
-        (tbots.Point(-2.0, 3.2), tbots.Point(0, -0.5)),
+        (tbots_cpp.Point(-2.0, 3.2), tbots_cpp.Point(0, -0.5)),
         # test when ball placement point is inside of the friendly defense area
-        (tbots.Point(-3.6, 0.0), tbots.Point(0, -1.5)),
+        (tbots_cpp.Point(-3.6, 0.0), tbots_cpp.Point(0, -1.5)),
     ],
 )
 def test_two_ai_ball_placement(
@@ -91,10 +91,10 @@ def test_two_ai_ball_placement(
         [
             # Ball should arrive within 0.15m of placement point
             BallEventuallyEntersRegion(
-                regions=[tbots.Circle(ball_placement_point, 0.15)]
+                regions=[tbots_cpp.Circle(ball_placement_point, 0.15)]
             ),
             RobotEventuallyEntersRegion(
-                regions=[tbots.Circle(ball_placement_point, 0.15)]
+                regions=[tbots_cpp.Circle(ball_placement_point, 0.15)]
             ),
         ]
     ]
@@ -120,7 +120,7 @@ def test_two_ai_ball_placement(
 
     # Drop Ball Always Validation
     drop_ball_always_validation_sequence_set = [
-        [BallAlwaysStaysInRegion(regions=[tbots.Circle(ball_placement_point, 0.1)]),]
+        [BallAlwaysStaysInRegion(regions=[tbots_cpp.Circle(ball_placement_point, 0.1)]), ]
     ]
 
     # Drop Ball Eventually Validation
@@ -130,10 +130,10 @@ def test_two_ai_ball_placement(
         [
             # Ball should arrive within 5cm of placement point
             BallEventuallyStopsInRegion(
-                regions=[tbots.Circle(ball_placement_point, 0.05)]
+                regions=[tbots_cpp.Circle(ball_placement_point, 0.05)]
             ),
             RobotEventuallyExitsRegion(
-                regions=[tbots.Circle(ball_placement_point, 0.5)]
+                regions=[tbots_cpp.Circle(ball_placement_point, 0.5)]
             ),
         ]
     ]

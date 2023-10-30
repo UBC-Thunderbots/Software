@@ -2,7 +2,7 @@ from software.py_constants import *
 from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import IndividualRobotMode
-from software.python_bindings import *
+import software.python_bindings as tbots_cpp
 from queue import Empty
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
@@ -76,7 +76,7 @@ class RobotCommunication(object):
         # only checks for estop if checking is not disabled
         if not self.disable_estop:
             try:
-                self.estop_reader = ThreadedEstopReader(
+                self.estop_reader = tbots_cpp.ThreadedEstopReader(
                     self.estop_path, self.estop_buadrate
                 )
             except Exception:
@@ -230,21 +230,21 @@ class RobotCommunication(object):
         Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
         """
 
-        self.receive_ssl_wrapper = SSLWrapperPacketProtoListener(
+        self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
             lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
             True,
         )
 
-        self.receive_ssl_referee_proto = SSLRefereeProtoListener(
+        self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
             SSL_REFEREE_ADDRESS,
             SSL_REFEREE_PORT,
             lambda data: self.current_proto_unix_io.send_proto(Referee, data),
             True,
         )
 
-        self.send_world = WorldProtoSender(
+        self.send_world = tbots_cpp.WorldProtoSender(
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
@@ -260,29 +260,36 @@ class RobotCommunication(object):
 
         """
         # Create the multicast listeners
-        self.receive_robot_status = RobotStatusProtoListener(
+        self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
             lambda data: self.__forward_to_proto_unix_io(RobotStatus, data),
             True,
         )
 
-        self.receive_robot_log = RobotLogProtoListener(
+        self.receive_robot_log = tbots_cpp.RobotLogProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
             lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
             True,
         )
 
-        self.receive_log_visualize = HRVOVisualizationProtoListener(
+        self.receive_log_visualize = tbots_cpp.HRVOVisualizationProtoListener(
             self.multicast_channel + "%" + self.interface,
             HRVO_VISUALIZATION_PORT,
             lambda data: self.current_proto_unix_io.send_proto(HRVOVisualization, data),
             True,
         )
 
+        self.receive_robot_crash = tbots_cpp.RobotCrashProtoListener(
+            self.multicast_channel + "%" + self.interface,
+            ROBOT_CRASH_PORT,
+            lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),
+            True,
+        )
+
         # Create multicast senders
-        self.send_primitive_set = PrimitiveSetProtoSender(
+        self.send_primitive_set = tbots_cpp.PrimitiveSetProtoSender(
             self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
         )
 

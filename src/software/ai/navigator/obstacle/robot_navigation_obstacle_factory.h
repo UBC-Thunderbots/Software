@@ -98,6 +98,7 @@ class RobotNavigationObstacleFactory
      */
     ObstaclePtr createFromShape(const Circle &circle) const;
     ObstaclePtr createFromShape(const Polygon &polygon) const;
+    ObstaclePtr createFromShape(const Rectangle &rectangle) const;
 
     /**
      * Returns an obstacle with the shape of the BallPlacementZone if the state is in
