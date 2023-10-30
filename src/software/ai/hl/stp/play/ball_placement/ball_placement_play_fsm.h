@@ -173,8 +173,8 @@ struct BallPlacementPlayFSM
             *StartState_S + Update_E[!shouldKickOffWall_G] / alignPlacement_A =
                 AlignPlacementState_S,
             StartState_S + Update_E[shouldKickOffWall_G] = KickOffWallState_S,
-            KickOffWallState_S + Update_E[!kickDone_G && shouldKickOffWall_G] / kickOffWall_A =
-                KickOffWallState_S,
+            KickOffWallState_S + Update_E[!kickDone_G && shouldKickOffWall_G] /
+                                     kickOffWall_A = KickOffWallState_S,
             KickOffWallState_S + Update_E[!shouldKickOffWall_G] / alignPlacement_A =
                 AlignPlacementState_S,
             AlignPlacementState_S + Update_E[shouldKickOffWall_G] = KickOffWallState_S,

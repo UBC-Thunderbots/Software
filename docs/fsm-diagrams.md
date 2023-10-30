@@ -34,7 +34,7 @@ direction LR
 [*] --> StartState
 StartState --> AlignPlacementState : [!shouldKickOffWall]\n<i>alignPlacement</i>
 StartState --> KickOffWallState : [shouldKickOffWall]
-KickOffWallState --> KickOffWallState : [!kickDone]\n<i>kickOffWall</i>
+KickOffWallState --> KickOffWallState : [!kickDone && shouldKickOffWall]\n<i>kickOffWall</i>
 KickOffWallState --> AlignPlacementState : [!shouldKickOffWall]\n<i>alignPlacement</i>
 AlignPlacementState --> KickOffWallState : [shouldKickOffWall]
 AlignPlacementState --> AlignPlacementState : [!alignDone]\n<i>alignPlacement</i>
