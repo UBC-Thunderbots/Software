@@ -129,7 +129,6 @@ class RobotCommunication(object):
         """
         if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
             self.estop_is_playing = not self.estop_is_playing
-            self.should_send_stop = not self.estop_is_playing
 
             print(
                 "Keyboard Estop changed from "
@@ -142,10 +141,12 @@ class RobotCommunication(object):
 
     def toggle_robot_connection(self, mode: IndividualRobotMode, robot_id: int):
         """
-        Connects a robot to or disconnects a robot from diagnostics
+        Changes the input mode for a robot between None, Manual, or AI
+        If changing from anything to None, add robot to disconnected map
+        So we can send multiple stop primitives to make sure it stops
 
         :param mode: the mode of input for this robot's primitives
-        :param robot_id: the id of the robot to be added or removed from the diagnostics set
+        :param robot_id: the id of the robot whose mode we're changing
         """
         self.robots_connected_to_fullsystem.discard(robot_id)
         self.robots_connected_to_manual.discard(robot_id)
@@ -161,8 +162,9 @@ class RobotCommunication(object):
     def __send_estop_state(self):
         """
         Constant loop which sends the current estop status proto if estop is not disabled
-        Uses the keyboard estop value
-        Unless estop is plugged in, in which case the physical estop value overrides it
+        Uses the keyboard estop value for keyboard estop mode
+        If we're in physical estop mode, uses the physical estop value
+        If estop has just changed from playing to stop, set flag to send stop primitive once to connected robots
         """
         previous_estop_is_playing = True
         if self.estop_mode != EstopMode.DISABLE_ESTOP:

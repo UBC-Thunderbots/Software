@@ -3,7 +3,7 @@ import time
 import threading
 import argparse
 import numpy
-
+from typing import Tuple
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
@@ -172,9 +172,6 @@ if __name__ == "__main__":
     # Sanity check that an interface was provided
     args = parser.parse_args()
 
-    # use different estop based on what is plugged in
-    estop_path = ESTOP_PATH_1 if os.path.isfile(ESTOP_PATH_1) else ESTOP_PATH_2
-
     if args.run_blue or args.run_yellow:
         if args.interface is None:
             parser.error("Must specify interface")
@@ -240,6 +237,38 @@ if __name__ == "__main__":
     # send/recv packets over the provided multicast channel.
 
     elif args.run_blue or args.run_yellow or args.run_diagnostics:
+
+        def __get_estop_config() -> Tuple[EstopMode, str]:
+            """
+            Based on the estop mode argument provided, gets the corresponding
+            estop mode and estop path (defined for physical estop mode only)
+            :return: tuple of estop mode enum value and estop path if needed
+            """
+
+            mode = EstopMode.PHYSICAL_ESTOP
+            path = None
+
+            if args.keyboard_estop:
+                mode = EstopMode.KEYBOARD_ESTOP
+            if args.disable_communication:
+                mode = EstopMode.DISABLE_ESTOP
+
+            # use different estop based on what is plugged in for physical estop mode
+            if mode == EstopMode.PHYSICAL_ESTOP:
+                path = (
+                    ESTOP_PATH_1
+                    if os.path.isfile(ESTOP_PATH_1)
+                    else ESTOP_PATH_2
+                    if os.path.isfile(ESTOP_PATH_2)
+                    else None
+                )
+                if not path:
+                    raise Exception(
+                        "Estop is not plugged into a valid port, plug one in or use a different estop mode"
+                    )
+
+            return mode, path
+
         tscope_config = config.configure_ai_or_diagnostics(
             args.run_blue,
             args.run_yellow,
@@ -265,11 +294,7 @@ if __name__ == "__main__":
         # else, it will be the diagnostics proto
         current_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.CURRENT]
 
-        estop_mode = EstopMode.PHYSICAL_ESTOP
-        if args.keyboard_estop:
-            estop_mode = EstopMode.KEYBOARD_ESTOP
-        if args.disable_communication:
-            estop_mode = EstopMode.DISABLE_ESTOP
+        estop_mode, estop_path = __get_estop_config()
 
         with RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
