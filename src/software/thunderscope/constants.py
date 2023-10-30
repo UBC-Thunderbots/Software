@@ -105,6 +105,7 @@ ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
 
 GAME_CONTROLLER_URL = "http://localhost:8081"
 
+# Paths to check for estop when running diagnostics
 ESTOP_PATH_1 = "/dev/ttyACM0"
 ESTOP_PATH_2 = "/dev/ttyUSB0"
 

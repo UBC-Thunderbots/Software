@@ -172,8 +172,7 @@ if __name__ == "__main__":
     # Sanity check that an interface was provided
     args = parser.parse_args()
 
-    # if estop path is passed in use that
-    # else, use different estop based on what is plugged in
+    # use different estop based on what is plugged in
     estop_path = ESTOP_PATH_1 if os.path.isfile(ESTOP_PATH_1) else ESTOP_PATH_2
 
     if args.run_blue or args.run_yellow:
