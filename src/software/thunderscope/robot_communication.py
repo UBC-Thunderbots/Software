@@ -10,7 +10,6 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 import threading
 import time
-import os
 
 
 class RobotCommunication(object):
@@ -42,13 +41,8 @@ class RobotCommunication(object):
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
         self.estop_mode = estop_mode
-        # if estop path is passed in use that
-        # else, use different estop based on what is plugged in
-        self.estop_path = (
-            estop_path
-            if estop_path
-            else ("/dev/ttyACM0" if os.path.isfile("/dev/ttyACM0") else "/dev/ttyUSB0")
-        )
+
+        self.estop_path = estop_path
         self.estop_buadrate = estop_buadrate
 
         self.running = False
@@ -175,13 +169,14 @@ class RobotCommunication(object):
             while True:
                 if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
                     self.estop_is_playing = self.estop_reader.isEstopPlay()
-                    # Send stop primitive once when estop is paused
-                    if previous_estop_is_playing and not self.estop_is_playing:
-                        self.should_send_stop = True
-                    else:
-                        self.should_send_stop = False
 
-                    previous_estop_is_playing = self.estop_is_playing
+                # Send stop primitive once when estop is paused
+                if previous_estop_is_playing and not self.estop_is_playing:
+                    self.should_send_stop = True
+                else:
+                    self.should_send_stop = False
+
+                previous_estop_is_playing = self.estop_is_playing
 
                 self.current_proto_unix_io.send_proto(
                     EstopState, EstopState(is_playing=self.estop_is_playing)

@@ -12,9 +12,13 @@ import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.thunderscope.constants import EstopMode
+from software.thunderscope.constants import (
+    EstopMode,
+    ProtoUnixIOTypes,
+    ESTOP_PATH_1,
+    ESTOP_PATH_2,
+)
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import ProtoUnixIOTypes
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
@@ -140,9 +144,6 @@ if __name__ == "__main__":
         help="set realism flag to use realistic config",
     )
     parser.add_argument(
-        "--estop_path", action="store", type=str, help="Path to the Estop",
-    )
-    parser.add_argument(
         "--estop_baudrate",
         action="store",
         type=int,
@@ -170,6 +171,10 @@ if __name__ == "__main__":
 
     # Sanity check that an interface was provided
     args = parser.parse_args()
+
+    # if estop path is passed in use that
+    # else, use different estop based on what is plugged in
+    estop_path = ESTOP_PATH_1 if os.path.isfile(ESTOP_PATH_1) else ESTOP_PATH_2
 
     if args.run_blue or args.run_yellow:
         if args.interface is None:
@@ -272,7 +277,7 @@ if __name__ == "__main__":
             multicast_channel=getRobotMulticastChannel(0),
             interface=args.interface,
             estop_mode=estop_mode,
-            estop_path=args.estop_path,
+            estop_path=estop_path,
         ) as robot_communication:
 
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
