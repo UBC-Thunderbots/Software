@@ -3,9 +3,9 @@ from typing import List
 from software.py_constants import *
 from proto.import_all_protos import *
 from software.thunderscope.common.proto_plotter import ProtoPlotter
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_style import *
-from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 # Import Widgets
@@ -37,9 +37,7 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
 from software.thunderscope.robot_diagnostics.robot_view import RobotView
-from software.thunderscope.robot_diagnostics.robot_error_log.robot_error_log import (
-    RobotErrorLog,
-)
+from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
@@ -232,9 +230,7 @@ def setup_cost_visualization_widget(proto_unix_io):
 #################################
 
 
-def setup_robot_view(
-    proto_unix_io: ProtoUnixIO, available_control_modes: List[IndividualRobotMode]
-):
+def setup_robot_view(proto_unix_io, available_control_modes: List[IndividualRobotMode]):
     """Setup the robot view widget
     :param proto_unix_io: The proto unix io object for the full system
     :param available_control_modes: the currently available input modes for the robots
