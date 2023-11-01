@@ -493,7 +493,7 @@ The `Path Planner` is an interface for the responsibility of path planning a sin
 
 
 # Thunderscope
-[Thunderscope](#thunderscope) is our main visualizer of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
+[Thunderscope](#thunderscope) is our main visualizer of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and it is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
 
 Thunderscope also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through Thunderscope, we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
 
@@ -519,7 +519,7 @@ On the Python (Thunderscope) side, the [`ProtoUnixIO`](../src/software/thundersc
 
 ## 3D Visualizer
 
-Our field visualizer uses [PyQtGraph's 3D graphics system](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/index.html) to render 3D graphics with OpenGL. PyQtGraph handles all the necessary calls to OpenGL for us, and as an abstraction, provides a [scenegraph](https://en.wikipedia.org/wiki/Scene_graph) to organize and manipulate entities/objects within the 3D environment (the scene).
+Thunderscope has a field visualizer that uses [PyQtGraph's 3D graphics system](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/index.html) to render 3D graphics with OpenGL. PyQtGraph handles all the necessary calls to OpenGL for us, and as an abstraction, provides a [scenegraph](https://en.wikipedia.org/wiki/Scene_graph) to organize and manipulate entities/objects within the 3D environment (the scene).
 
 `software/thunderscope/gl` is the main directory for the 3D visualizer. The "GL" prefix lets us identify 3D graphics related code and keeps namings consistent with `pyqtgraph.opengl` class names. Inside this directory:
 
@@ -530,7 +530,7 @@ Our field visualizer uses [PyQtGraph's 3D graphics system](https://pyqtgraph.rea
 ### Layers
 We organize our graphics into "layers" so that we can toggle the visibility of different parts of our visualization. Each layer is responsible for visualizing a specific portion of our AI (e.g. vision data, path planning, passing, etc.). A layer can also handle layer-specific functionality; for instance, `GLWorldLayer` lets the user place or kick the ball using the mouse. The base class for a layer is [`GLLayer`](../src/software/thunderscope/gl/gl_layer.py).
 
-A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a tree-like structure. In theory, `GLLayers` could also be nested within one another. 
+A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a tree-like structure. In theory, `GLLayer`s could also be nested within one another. 
 
 # Estop
 `Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:
