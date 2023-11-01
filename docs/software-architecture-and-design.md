@@ -85,7 +85,7 @@ These are classes that are either heavily used in our code, or are very importan
 The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current referee commands. Altogether, it's the information we have at any given time that we can use to make decisions.
 
 ### Team
-A team is a collection of [Robots](#robot)
+A team is a collection of [Robots](#robot).
 
 ### Robot
 A Robot class represents the state of a single robot on the field. This includes its position, orientation, velocity, angular velocity, and any other information about its current state.
@@ -118,7 +118,7 @@ It is worth noting that constants are still useful, and should still be used whe
 
 
 # Protobuf
-[Protobuf or protocol buffers](https://protobuf.dev/) are used to pass messages between components in our system.
+[Protobufs or protocol buffers](https://protobuf.dev/) are used to pass messages between components in our system.
 After building using Bazel, the `.proto` files are generated into `.pb.h` and `.pb.cc` files, which are found in `bazel-out/k8-fastbuild/bin/proto`.
 To include these files in our code, we simply include `proto/<protobuf_filename>.pb.h`
 
@@ -388,17 +388,22 @@ Because of our [Coordinate Conventions](#coordinates), this means that an angle 
 
 
 # Architecture Overview
-At a high-level our system is made of 4 main components: The [Backend](#backend), the [Sensor Fusion](#sensor-fusion), the [AI](#ai), and [Thunderscope](#thunderscope). These 4 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern).
 
-The [Backend](#backend) is responsible for communicating with the outside world (network and radio), [Sensor Fusion](#sensor-fusion) is responsible for processing and filtering raw data, the [AI](#ai) makes the actual gameplay decisions, and [Thunderscope](#thunderscope) shows us what's happening and lets us control the [AI](#ai).
+At a high-level, our system is split into several independent processes that [communicate with each other](#inter-process-communication). Our architecture is designed in this manner to promote decoupling of different features, making our system easier to expand, maintain, and test.
 
-Each component is described in more detail in their own sections.
+- [**Thunderscope**](#thunderscope) is main entry point of our system and the provides the GUI for our software. It also manages data IO from other processes and external sources (e.g. SSL vision data, gamecontroller/referee data).
 
-#### Architecture Overview Diagram
-![High Level Architecture Diagram](images/high_level_architecture_diagram.svg)
+- [**Fullsystem**](#fullsystem) is the "backend" that processes data and makes decisions for a [team](#team) of [robots](#robot). It manages [Sensor Fusion](#sensor-fusion), which is responsible for processing and filtering raw data, and the [**AI**](#ai) that makes gameplay decisions.
 
+- The [**Simulator**](#simulator) provides a physics simulation of the [World](#world), enabling testing of our gameplay when we don't have access to a real field. This process is optional and used only for development and testing purposes; in a real match, our system will receive data from [SSL-Vision](#ssl-vision).
 
-# Backend
+- [**Thunderloop**](/docs/robot-software-architecture.md#thunderloop) is responsible for coordinating communication between our [AI](#ai) computer and the motor and power boards in our robots. It is part our robot software architecture, which is documented [here](/docs/robot-software-architecture.md).
+
+# Fullsystem
+
+Fullsystem processes data and makes decisions for a [team](#team) of [robots](#robot). It manages [Sensor Fusion](#sensor-fusion), which is responsible for processing and filtering raw data, and the [AI](#ai) that makes gameplay decisions.
+
+## Backend
 The `Backend` is responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into communication using `SensorProto` and [Primitives](#primitives) messages:
 
 * Upon receiving the following messages from the network (outside world), the `Backend` will store it in a `SensorProto` message and send it to [Sensor Fusion](sensor-fusion):
@@ -413,10 +418,10 @@ The `Backend` was designed to be a simple interface that handles all communicati
 #### Backend Diagram
 ![Backend Diagram](images/backend_diagram.svg)
 
-# Sensor Fusion
+## Sensor Fusion
 `Sensor Fusion` is responsible for processing the raw data contained in SensorProto into a coherent snapshot of the [World](#world) that the [AI](#ai) can use. It invokes filters to update components of [World](#world), and then combines the components to send out the most up-to-date version.
 
-## Filters
+### Filters
 Filters take the raw data from SensorProto and returns an updated version of a component of the [World](#world). For example, the `BallFilter` takes `BallDetection`s and returns an updated `Ball`.
 
 * **Why we need to do this:** Programs that provide data like [SSL-Vision](#ssl-vision) only provide raw data. This means that if there are several orange blobs on the field, [SSL-Vision](#ssl-vision) will tell us the ball is in several different locations. It is up to us to filter this data to determine the "correct" position of the ball. The same idea applies to robot positions and other data we receive.
@@ -491,8 +496,12 @@ The `Path Planner` is an interface for the responsibility of path planning a sin
 ## [AI](#ai) Diagram
 ![AI Diagram](images/ai_diagram.svg)
 
-
 # Thunderscope
+
+[`Thunderscope Main`](/src/software/thunderscope/thunderscope_main.py) serves as the main entry point for our entire system. It starts up the [Thunderscope GUI](#thunderscope-gui) and other processes, including a [Fullsystem](#fullsystem) for each AI team.
+
+## Thunderscope GUI
+
 [Thunderscope](#thunderscope) is our main visualizer of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and it is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
 
 Thunderscope also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through Thunderscope, we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
@@ -502,20 +511,6 @@ Thunderscope is implemented using [PyQtGraph](https://www.pyqtgraph.org/), a Pyt
 * [Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html)
 * [Layouts](https://doc.qt.io/qt-6/layout.html)
 * [Signals and Slots](https://doc.qt.io/qt-5/signalsandslots.html)
-
-## Inter-process Communication
-Since [Thunderscope](#thunderscope) runs in a separate process from our [AI](#ai) and C++ software ("full system"), we use [Unix domain sockets](https://en.wikipedia.org/wiki/Unix_domain_socket) to facilitate communication between our full system and Thunderscope. Unix sockets [have high throughput and are very performant](https://stackoverflow.com/a/29436429/20199855); we simply bind the unix socket to a file path and pass data between processes, instead of having to deal with TCP/IP overhead just to send and receive data on the same computer.
-
-The data sent between the full system and Thunderscope is serialized using [protobufs](#protobuf). Some data, such as data that goes through our [Backend](#backend) (vision data, game controller commands, [Worlds](#world) from [Sensor Fusion](#sensor-fusion), etc.), is sent using unix senders owned and managed by those parts of the full system directly. In other parts of our full system (FSMs, pass generator, navigator, etc.), we want to delegate away the responsibility of managing unix senders and have a more lightweight way of sending protobufs to Thunderscope. We don’t want to dependency inject a "communication" object everywhere we have visualizable data to send to Thunderscope, so we use the [`g3log`](https://kjellkod.github.io/g3log/) logger used throughout our codebase.
-
-`g3log` gives us a static singleton that can be called anywhere, and it's a fast and thread-safe way to log data with custom handlers called “sinks". Logging a protobuf will send it to our custom protobuf `g3log` sink, which lazily initializes unix senders based on the type of protobuf that is logged. The sink then sends the protobuf over the socket to listeners.
-
-<details>
-<summary><b>Aside: calling <code>g3log</code> to log protobuf data</b></summary>
-Logging protobufs is done at the <code>VISUALIZE</code> level (e.g. <code>LOG(VISUALIZE) << some_random_proto;</code>). Protobufs need to be converted to strings in order to log them with <code>g3log</code>. We've overloaded the stream (<code><<</code>) operator to automatically pack protobufs into a <code>google::protobuf::Any</code> and serialize them to a string, so you don't need to do the conversion yourself.
-</details><br>
-
-On the Python (Thunderscope) side, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. Through `ProtoUnixIO`, classes can register as an [observer](#observer-design-pattern) by providing a protobuf type to observe and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming data. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and send data to all observers of that proto type. Classes can also send out protobufs via `ProtoUnixIO`, which will relay the data to any registered observers.
 
 ## 3D Visualizer
 
@@ -532,11 +527,19 @@ We organize our graphics into "layers" so that we can toggle the visibility of d
 
 A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a tree-like structure. In theory, `GLLayer`s could also be nested within one another. 
 
-# Estop
-`Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:
+# Inter-process Communication
+Since [Thunderscope](#thunderscope) runs in a separate process from our [Fullsystem](#fullsystem), we use [Unix domain sockets](https://en.wikipedia.org/wiki/Unix_domain_socket) to facilitate communication between our Fullsystem and Thunderscope. Unix sockets [have high throughput and are very performant](https://stackoverflow.com/a/29436429/20199855); we simply bind the unix socket to a file path and pass data between processes, instead of having to deal with TCP/IP overhead just to send and receive data on the same computer.
 
-* For `WifiBackend`, the `Estop` is a stateful switch connected to an Arduino. The switch state is communicated to the `WifiBackend` regularly. When `Estop` is in a `STOP` state, the `WifiBackend` overrides the [Primitives](#primitives) sent to the robot to an `Estop primitive`. when it is in a `PLAY` state, primitives are communicated normally.
-* For `RadioBackend`, The `Estop` switch is part of the Radio dongle, which is responsible for filtering out messages sent to the robots. 
+The data sent between the Fullsystem and Thunderscope is serialized using [protobufs](#protobuf). Some data, such as data that goes through our [Backend](#backend) (vision data, game controller commands, [Worlds](#world) from [Sensor Fusion](#sensor-fusion), etc.), is sent using unix senders owned by those parts of the Fullsystem directly. In other parts of our Fullsystem (FSMs, pass generator, navigator, etc.), we want to delegate away the responsibility of managing unix senders and have a more lightweight way of sending protobufs to Thunderscope. We don’t want to dependency inject a "communication" object everywhere we have visualizable data to send to Thunderscope, so we use the [`g3log`](https://kjellkod.github.io/g3log/) logger used throughout our codebase.
+
+`g3log` is a fast and thread-safe way to log data with custom handlers called “sinks". Importantly, it gives us a static [singleton](#singleton-design-pattern) that can be called anywhere. Logging a protobuf will send it to our custom protobuf `g3log` sink, which lazily initializes unix senders based on the type of protobuf that is logged. The sink then sends the protobuf over the socket to listeners.
+
+<details>
+<summary><b>Aside: calling <code>g3log</code> to log protobuf data</b></summary>
+Logging protobufs is done at the <code>VISUALIZE</code> level (e.g. <code>LOG(VISUALIZE) << some_random_proto;</code>). Protobufs need to be converted to strings in order to log them with <code>g3log</code>. We've overloaded the stream (<code><<</code>) operator to automatically pack protobufs into a <code>google::protobuf::Any</code> and serialize them to a string, so you don't need to do the conversion yourself.
+</details><br>
+
+In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. Through `ProtoUnixIO`, classes can register as an [observer](#observer-design-pattern) by providing a protobuf type to observe and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming data. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and send data to all observers of that proto type. Classes can also send out protobufs via `ProtoUnixIO`, which will relay the data to any registered observers.
 
 # Simulator
 The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` "simulates" the following components' functionalities:
@@ -598,3 +601,9 @@ Notice this is very similar to the [Architecture Overview Diagram](#architecture
 [Thunderscope](#thunderscope) and connections to it are marked with dashed lines, since they are optional and are not run during the tests unless we are debugging.
 
 ![Simulated Testing High-level Architecture Diagram](images/simulated_test_high_level_architecture.svg)
+
+# Estop
+`Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:
+
+* For `WifiBackend`, the `Estop` is a stateful switch connected to an Arduino. The switch state is communicated to the `WifiBackend` regularly. When `Estop` is in a `STOP` state, the `WifiBackend` overrides the [Primitives](#primitives) sent to the robot to an `Estop primitive`. when it is in a `PLAY` state, primitives are communicated normally.
+* For `RadioBackend`, The `Estop` switch is part of the Radio dongle, which is responsible for filtering out messages sent to the robots. 
