@@ -162,7 +162,6 @@ if [[ "$arch" == "aarch64" ]]; then
     # before that, we need qt6 installed and set as the default qt installation
     sudo apt-get install qtchooser -y
     sudo apt-get install qt6-base-dev -y
-    sudo apt-get install qt5-base-dev -y
     sudo /opt/tbotspython/bin/pip3.8 install PyQt-Builder
     sudo apt install -y qtcreator qtbase5-dev qt5-qmake cmake -y    
     sudo apt-get install sip-tools -y
