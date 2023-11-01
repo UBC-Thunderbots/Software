@@ -312,21 +312,11 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     yellow_team_world_msg               = std::move(world_msg);
     const TbotsProto::World world_proto = *yellow_team_world_msg;
 
-    std::vector<std::thread> threads;
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
-                              &robot_to_vel_pair_map]() {
-            tracy::SetThreadName(("Yellow Robot " + std::to_string(robot_id)).c_str());
-            auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
-            setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                              world_proto, local_vel, angular_vel);
-        });
-    }
-
-    for (auto& thread : threads)
-    {
-        thread.join();
+        auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
+        setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
+                          world_proto, local_vel, angular_vel);
     }
 
     auto end = std::chrono::high_resolution_clock::now();
@@ -357,22 +347,11 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
 
     blue_team_world_msg                 = std::move(world_msg);
     const TbotsProto::World world_proto = *blue_team_world_msg;
-
-    std::vector<std::thread> threads;
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        threads.emplace_back([this, robot_id, primitive_set_msg, world_proto,
-                              &robot_to_vel_pair_map]() {
-            tracy::SetThreadName(("Blue Robot " + std::to_string(robot_id)).c_str());
-            auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
-            setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                              world_proto, local_vel, angular_vel);
-        });
-    }
-
-    for (auto& thread : threads)
-    {
-        thread.join();
+        auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
+        setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
+                          world_proto, local_vel, angular_vel);
     }
 
     auto end = std::chrono::high_resolution_clock::now();

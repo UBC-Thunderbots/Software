@@ -52,7 +52,6 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     {
         return best_traj_with_cost.traj_path;
     }
-    // std::cout << "Direct trajectory collides" << std::endl;
 
     std::vector<Point> sub_destinations;
     sub_destinations.reserve(relative_sub_destinations.size());
@@ -82,19 +81,20 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
             TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
                     traj_path_to_dest, tree, obstacles, sub_trajectory, connection_time);
             num_traj++;
-            // TODO: If full_traj_with_cost doesn't have any collisions, should we
-            // continue to next iter?
-            //       i.e. is it possible that with a later connection_time we get an
-            //       improved score?!
             if (full_traj_with_cost.cost < best_traj_with_cost.cost)
             {
                 best_traj_with_cost = full_traj_with_cost;
             }
+
+            // Later connection_times will generally have a larger trajectory duration,
+            // thus, if this trajectory does not have a collision, then we can not
+            // get a better trajectory with a later connection_time
+            if (!full_traj_with_cost.collides())
+            {
+                break;
+            }
         }
     }
-//    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-//          {"num_traj", num_traj}
-//    });
 
     // TODO: Added for debugging
     auto end_time = std::chrono::high_resolution_clock::now();
