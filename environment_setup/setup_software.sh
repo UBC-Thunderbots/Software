@@ -59,6 +59,7 @@ sudo apt-get install -y software-properties-common # required for add-apt-reposi
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update
+sudo apt-get upgrade -y
 
 # Detect if running under WSL
 # See https://github.com/microsoft/WSL/issues/4071#issuecomment-1221588337
@@ -164,15 +165,14 @@ if [[ "$arch" == "aarch64" ]]; then
     sudo apt-get install qt5-base-dev -y
     sudo /opt/tbotspython/bin/pip3.8 install PyQt-Builder
     sudo apt install -y qtcreator qtbase5-dev qt5-qmake cmake -y    
-    
+    sudo apt-get install sip-tools -y
     wget https://files.pythonhosted.org/packages/34/da/e03b7264b1e88cd553ff62a71c0c19f55690e08928130f4aae613723e535/PyQt6-6.5.2.tar.gz
     tar -xzvf PyQt6-6.5.2.tar.gz
     cd PyQt6-6.5.2/
     qtchooser -install qt6 $(which qmake6)
     sudo mv ~/.config/qtchooser/qt6.conf /usr/share/qtchooser/qt6.conf
-    sudo su
-    export QT_SELECT=qt6
-    sip-install --target-dir /opt/tbotspython/lib/python3.8/site-packages/ --verbose
+    sudo pip3 install pyqt-builder
+    sudo QT_SELECT=qt6 sip-install --target-dir /opt/tbotspython/lib/python3.8/site-packages/ --verbose
     sudo /opt/tbotspython/bin/pip3.8 install PyQt6-sip
     export QT_QPA_PLATFORM=wayland
     
@@ -182,7 +182,6 @@ if [[ "$arch" == "aarch64" ]]; then
     # add mantic as source, install python3-pyqt6 and python3-pyqt6.qtwebengine
     sudo sh -c 'echo "deb http://ca.ports.ubuntu.com/ubuntu-ports/ mantic main universe" > /etc/apt/sources.list.d/temp.list'
     sudo apt-get update
-    sudo apt-get install sip-tools -y
     sudo apt-get install python3-pyqt6 python3-pyqt6.qtwebengine -y
     # remove the mantic source
     sudo rm /etc/apt/sources.list.d/temp.list
@@ -225,10 +224,10 @@ else
     sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
     sudo chmod +x /tmp/bazel-installer.sh
     sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
+    # Fix for bazel autocomplete, add it to .bashrc if it isn't there already
+    add_bashrc_if_not_there "source ${HOME}/.bazel/bin/bazel-complete.bash"
 fi
 
-# Fix for bazel autocomplete, add it to .bashrc if it isn't there already
-add_bashrc_if_not_there "source ${HOME}/.bazel/bin/bazel-complete.bash"
 
 print_status_msg "Done Installing Bazel"
 print_status_msg "Setting Up PlatformIO"
