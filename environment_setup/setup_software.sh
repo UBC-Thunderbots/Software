@@ -192,7 +192,7 @@ if [[ "$arch" == "aarch64" ]]; then
     # change default qt to qt5 again
 else
     # else if x86_64, install PyQt6 normally using pip
-    sudo /opt/tbotspython/bin/pip3 install pyqt6==6.5.0 PyQt6-WebEngine
+    sudo /opt/tbotspython/bin/pip3 install pyqt6==6.5.0 PyQt6-WebEngine==6.5.0
 fi
 
 print_status_msg "Done Setting Up Virtual Python Environment"
