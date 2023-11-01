@@ -11,18 +11,17 @@ from software.thunderscope.binary_context_managers.binary_context_managers impor
     is_cmd_running,
 )
 
-
 class FullSystem(object):
 
     """ Full System Binary Context Manager """
 
     def __init__(
         self,
-        full_system_runtime_dir=None,
-        debug_full_system=False,
-        friendly_colour_yellow=False,
-        should_restart_on_crash=True,
-    ):
+        full_system_runtime_dir: os.PathLike = None,
+        debug_full_system: bool = False,
+        friendly_colour_yellow: bool = False,
+        should_restart_on_crash: bool = True,
+    ) -> None:
         """Run FullSystem
 
         :param full_system_runtime_dir: The directory to run the blue full_system in
@@ -37,7 +36,7 @@ class FullSystem(object):
 
         self.thread = threading.Thread(target=self.__restart__)
 
-    def __enter__(self):
+    def __enter__(self) -> self:
         """Enter the full_system context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
@@ -97,7 +96,7 @@ gdb --args bazel-bin/{full_system}
 
         return self
 
-    def __restart__(self):
+    def __restart__(self) -> None:
         "Restarts full system."
         while True:
             if not is_cmd_running(
@@ -111,7 +110,7 @@ gdb --args bazel-bin/{full_system}
 
             time.sleep(1)
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         """Exit the full_system context manager.
 
         :param type: The type of exception that was raised
@@ -126,7 +125,7 @@ gdb --args bazel-bin/{full_system}
         if self.should_restart_on_crash:
             self.thread.join()
 
-    def setup_proto_unix_io(self, proto_unix_io):
+    def setup_proto_unix_io(self, proto_unix_io: ProtoUnixIO) -> None:
         """Helper to run full system and attach the appropriate unix senders/listeners
 
         :param proto_unix_io: The unix io to setup for this full_system instance

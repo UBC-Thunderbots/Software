@@ -15,8 +15,11 @@ class Simulator(object):
     """ Simulator Context Manager """
 
     def __init__(
-        self, simulator_runtime_dir=None, debug_simulator=False, enable_realism=False
-    ):
+        self,
+        simulator_runtime_dir: os.PathLike = None,
+        debug_simulator: bool = False,
+        enable_realism: bool = False,
+    ) -> None:
         """Run Simulator
 
         NOTE: If any of the runtime directories are None, the corresponding binary
@@ -31,7 +34,7 @@ class Simulator(object):
         self.er_force_simulator_proc = None
         self.enable_realism = enable_realism
 
-    def __enter__(self):
+    def __enter__(self) -> self:
         """Enter the simulator context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
@@ -88,7 +91,7 @@ gdb --args bazel-bin/{simulator_command}
 
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         """Exit the full_system context manager.
 
         :param type: The type of exception that was raised
@@ -102,10 +105,10 @@ gdb --args bazel-bin/{simulator_command}
 
     def setup_proto_unix_io(
         self,
-        simulator_proto_unix_io,
-        blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io,
-    ):
+        simulator_proto_unix_io: ProtoUnixIO,
+        blue_full_system_proto_unix_io: ProtoUnixIO,
+        yellow_full_system_proto_unix_io: ProtoUnixIO,
+    ) -> None:
 
         """Setup the proto unix io for the simulator
 

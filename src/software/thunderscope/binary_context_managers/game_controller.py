@@ -19,7 +19,7 @@ class Gamecontroller(object):
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, supress_logs=False, ci_mode=False):
+    def __init__(self, supress_logs: bool = False, ci_mode: bool = False) -> None:
         """Run Gamecontroller
 
         :param supress_logs: Whether to suppress the logs
@@ -34,7 +34,7 @@ class Gamecontroller(object):
         self.referee_port = self.next_free_port()
         self.ci_port = self.next_free_port()
 
-    def __enter__(self):
+    def __enter__(self) -> self:
         """Enter the gamecontroller context manager. 
 
         :return: gamecontroller context managed instance
@@ -65,7 +65,7 @@ class Gamecontroller(object):
 
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         """Exit the gamecontroller context manager.
 
         :param type: The type of exception that was raised
@@ -79,7 +79,7 @@ class Gamecontroller(object):
         if self.ci_mode:
             self.ci_socket.close()
 
-    def next_free_port(self, port=40000, max_port=65535):
+    def next_free_port(self, port: int = 40000, max_port: int = 65535) -> None:
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller
         so that we can run multiple gamecontroller instances in parallel.
 
@@ -101,8 +101,10 @@ class Gamecontroller(object):
         raise IOError("no free ports")
 
     def setup_proto_unix_io(
-        self, blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io
-    ):
+        self,
+        blue_full_system_proto_unix_io: ProtoUnixIO,
+        yellow_full_system_proto_unix_io: ProtoUnixIO,
+    ) -> None:
         """Setup gamecontroller io
 
         :param blue_full_system_proto_unix_io: The proto unix io of the blue full system.
@@ -110,7 +112,7 @@ class Gamecontroller(object):
 
         """
 
-        def __send_referee_command(data):
+        def __send_referee_command(data: Referee) -> None:
             """Send a referee command from the gamecontroller to both full
             systems.
 
@@ -120,7 +122,7 @@ class Gamecontroller(object):
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
 
-        self.receive_referee_command = SSLRefereeProtoListener(
+        self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
         )
 
@@ -128,8 +130,8 @@ class Gamecontroller(object):
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
-        final_ball_placement_point=None,
-    ):
+        final_ball_placement_point: tbots_cpp.Point = None,
+    ) -> Any:
         """Send a ci input to the gamecontroller.
 
         CiInput -> Input -> Change ->  NewCommand -> Command -> (Type, Team)
