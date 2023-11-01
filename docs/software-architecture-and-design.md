@@ -19,10 +19,10 @@
     * [Robot Status](#robot-status)
 * [Design Patterns](#design-patterns)
   * [Abstract Classes and Inheritance](#abstract-classes-and-inheritance)
-  * [Singleton Design Pattern](#singleton-design-pattern)
-  * [Factory Design Pattern](#factory-design-pattern)
-  * [Visitor Design Pattern](#visitor-design-pattern)
-  * [Observer Design Pattern](#observer-design-pattern)
+  * [Singleton Design Pattern](#singleton-pattern)
+  * [Factory Design Pattern](#factory-pattern)
+  * [Visitor Design Pattern](#visitor-pattern)
+  * [Observer Design Pattern](#observer-pattern)
   * [C++ Templating](#c-templating)
 * [Coroutines](#coroutines)
   * [What Are Coroutines?](#what-are-coroutines)
@@ -148,7 +148,7 @@ Below are the main design patterns we use in our code, and what they are used fo
 ## Abstract Classes and Inheritance
 Abstract classes let us define interfaces for various components of our code. Then we can implement different objects that obey the interface, and use them interchangeably, with the guarantee that as long as they follow the same interface we can use them in the same way.
 
-Read [https://www.geeksforgeeks.org/inheritance-in-c/] for more information.
+Read https://www.geeksforgeeks.org/inheritance-in-c/ for more information.
 
 Examples of this can be found in many places, including:
 * [Plays](#plays)
@@ -157,40 +157,40 @@ Examples of this can be found in many places, including:
 * Different implementations of the [Backend](#backend)
 
 
-## Singleton Design Pattern
+## Singleton Pattern
 The Singleton pattern is useful for having a single, global instance of an object that can be accessed from anywhere. Though it's generally considered an anti-pattern (aka _bad_), it is useful in specific scenarios.
 
-Read [https://www.tutorialspoint.com/Explain-Cplusplus-Singleton-design-pattern] for more information.
+Read https://refactoring.guru/design-patterns/singleton for more information.
 
 We use the Singleton pattern for our logger. This allows us to create a single logger for the entire system, and code can make calls to the logger from anywhere, rather than us having to pass a `logger` object literally everywhere.
 
 
-## Factory Design Pattern
-The Factory Design Pattern is useful for hiding or abstracting how certain objects are created.
+## Factory Pattern
+The Factory pattern is useful for hiding or abstracting how certain objects are created.
 
-Read [https://www.geeksforgeeks.org/design-patterns-set-2-factory-method/] for more information.
+Read the Refactoring Guru articles on the [Factory Method pattern](https://refactoring.guru/design-patterns/factory-method) and the [Abstract Factory pattern](https://refactoring.guru/design-patterns/abstract-factory) for more information.
 
 Because the Factory needs to know about what objects are available to be created, it can be taken one step further to auto-register these object types. Rather than a developer having to remember to add code to the Factory every time they create a new class, this can be done "automatically" with some clever code. This helps reduce mistakes and saves developers work.
 
-Read [http://derydoca.com/2019/03/c-tutorial-auto-registering-factory/] for more information.
+Read http://derydoca.com/2019/03/c-tutorial-auto-registering-factory/ for more information.
 
 The auto-registering factory is particularly useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
 
 The Factory pattern is also used to create different [Backends](#backend)
 
 
-## Visitor Design Pattern
-The `Visitor Design Pattern` is arguably the most "advanced" design pattern we use. It is used when we need to perform different operations on a group of "similar" objects, for example a bunch of objects that inherit from the same parent class ([Intents](#intents)). We might only know all these objects are an [Intent](#intent), but we don't know specifically which type each one is (eg. `MoveIntent` vs `KickIntent`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
+## Visitor Pattern
+The Visitor pattern is arguably the most "advanced" design pattern we use. It is used when we need to perform different operations on a group of "similar" objects, for example a bunch of objects that inherit from the same parent class ([Intents](#intents)). We might only know all these objects are an [Intent](#intent), but we don't know specifically which type each one is (eg. `MoveIntent` vs `KickIntent`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
 
-Read [https://www.geeksforgeeks.org/visitor-design-pattern/] for more information.
+Read https://refactoring.guru/design-patterns/visitor for more information.
 
 Examples of the Visitor Pattern can be found with the following classes:
 * [Intents](#intents)
 * [Tactics](#tactics)
 
 
-## Observer Design Pattern
-The Observer Design Pattern is useful for letting components of a system "notify" each other when something happens. Read [https://www.geeksforgeeks.org/observer-pattern-set-1-introduction/] for a general introduction to the pattern.
+## Observer Pattern
+The Observer pattern is useful for letting components of a system "notify" each other when something happens. Read https://refactoring.guru/design-patterns/observer for a general introduction to the pattern.
 
 Our implementation of this pattern consists of two classes, `Observer` and `Subject`. `Observer`s can be registered with a `Subject`, after which new values will be sent from each `Subject` to all of it's registered `Observer`s. Please see the headers of both classes for details. Note that a class can extend both `Observer` and `Subject`, thus receiving and sending out data. In this way we can "chain" multiple classes.
 
@@ -202,10 +202,22 @@ In our system, we need to be able to do multiple things (receive camera data, ru
 ### Example
 One example of this is [SensorFusion](#sensor-fusion), which extends `Subject<World>` and the [AI](#ai), which extends `ThreadedObserver<World>`. [SensorFusion](#sensor-fusion) runs in one thread and sends data to the [AI](#ai), which receives and processes it another thread.
 
+## Publisher-Subscriber Pattern
+
+The publisher-subscriber pattern ("pub-sub") is a messaging pattern for facilitating communication between different components. It is closely related to the [message queue](https://en.wikipedia.org/wiki/Message_queue) design pattern. 
+
+In this pattern, `Publisher`s send messages without knowing who the recipients (`Subscriber`s) are. `Subscriber`s express interest in specific types of messages by subscribing to relevant topics; when a `Publisher` sends a message of a topic, the messaging system ensures that all interested subscribers receive the message.
+
+Read https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern for an introduction to the pub-sub pattern.
+
+### Example
+
+We use the pub-sub pattern to facilitate [inter-process communication](#inter-process-communication) in our system. Through a class called [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py), components can subscribe to receive certain [Protobuf](#protobuf) message types sent out by other processes or system components.
+
 ## C++ Templating
 While debatably not a design pattern depending on who you ask, templating in C++ is a powerful tool that is very useful to understand. [https://www.geeksforgeeks.org/templates-cpp/] gives a great explanantion and example.
 
-We use templating in a few places around the codebase, with the most notable examples being our [Factory Design Patterns](#factory-design-pattern), and our `Gradient Descent` optimizer.
+We use templating in a few places around the codebase, with the most notable examples being our [Factory Design Patterns](#factory-pattern), and our `Gradient Descent` optimizer.
 
 
 # Coroutines
@@ -401,7 +413,9 @@ At a high-level, our system is split into several independent processes that [co
 
 # Fullsystem
 
-Fullsystem processes data and makes decisions for a [team](#team) of [robots](#robot). It manages [Sensor Fusion](#sensor-fusion), which is responsible for processing and filtering raw data, and the [AI](#ai) that makes gameplay decisions.
+Fullsystem processes data and makes decisions for a [team](#team) of [robots](#robot). It manages [Sensor Fusion](#sensor-fusion), which is responsible for processing and filtering raw data, and the [AI](#ai) that makes gameplay decisions. 
+
+Data within Fullsystem is shared between components using the [observer pattern](#observer-pattern); [Sensor Fusion](#sensor-fusion) and the [Backend](#backend) are `Subject`s that the [AI](#ai) observes. 
 
 ## Backend
 Fullsystem contains a `Backend` responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into communication using `SensorProto` and [Primitives](#primitives) messages:
@@ -532,14 +546,14 @@ Since [Thunderscope](#thunderscope) runs in a separate process from [Fullsystem]
 
 The data sent between Fullsystem and Thunderscope is serialized using [protobufs](#protobuf). Some data, such as data that goes through our [Backend](#backend) (vision data, game controller commands, [Worlds](#world) from [Sensor Fusion](#sensor-fusion), etc.), is sent using unix senders owned by those parts of the Fullsystem directly. In other parts of Fullsystem (FSMs, pass generator, navigator, etc.), we want to delegate away the responsibility of managing unix senders and have a more lightweight way of sending protobufs to Thunderscope. We don’t want to dependency inject a "communication" object everywhere we have visualizable data to send to Thunderscope, so we use the [`g3log`](https://kjellkod.github.io/g3log/) logger used throughout our codebase.
 
-`g3log` is a fast and thread-safe way to log data with custom handlers called “sinks". Importantly, it gives us a static [singleton](#singleton-design-pattern) that can be called anywhere. Logging a protobuf will send it to our custom protobuf `g3log` sink, which lazily initializes unix senders based on the type of protobuf that is logged. The sink then sends the protobuf over the socket to listeners.
+`g3log` is a fast and thread-safe way to log data with custom handlers called “sinks". Importantly, it gives us a static [singleton](#singleton-pattern) that can be called anywhere. Logging a protobuf will send it to our custom protobuf `g3log` sink, which lazily initializes unix senders based on the type of protobuf that is logged. The sink then sends the protobuf over the socket to listeners.
 
 <details>
 <summary><b>Aside: calling <code>g3log</code> to log protobuf data</b></summary>
 Logging protobufs is done at the <code>VISUALIZE</code> level (e.g. <code>LOG(VISUALIZE) << some_random_proto;</code>). Protobufs need to be converted to strings in order to log them with <code>g3log</code>. We've overloaded the stream (<code><<</code>) operator to automatically pack protobufs into a <code>google::protobuf::Any</code> and serialize them to a string, so you don't need to do the conversion yourself.
 </details><br>
 
-In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. Through `ProtoUnixIO`, classes can register as an [observer](#observer-design-pattern) by providing a protobuf type to observe and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming data. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and send data to all observers of that proto type. Classes can also send out protobufs via `ProtoUnixIO`, which will relay the data to any registered observers.
+In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. `ProtoUnixIO` utilizes the [publisher-subscriber ("pub-sub")](#publisher-subscriber-pattern) messaging pattern. Through `ProtoUnixIO`, classes can register as an [subscriber](#observer-pattern) by providing a protobuf type to receive and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming those protobuf messages. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and place those messages onto the `ThreadSafeBuffer`s of that proto type's subscribers. Classes can also publish protobufs via `ProtoUnixIO` by configuring it with a unix sender.
 
 # Simulator
 The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` "simulates" the following components' functionalities:
