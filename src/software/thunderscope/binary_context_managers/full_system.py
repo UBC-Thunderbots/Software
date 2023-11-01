@@ -11,6 +11,7 @@ from software.thunderscope.binary_context_managers.binary_context_managers impor
     is_cmd_running,
 )
 
+
 class FullSystem(object):
 
     """ Full System Binary Context Manager """
