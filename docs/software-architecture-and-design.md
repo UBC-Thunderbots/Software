@@ -19,31 +19,35 @@
     * [Robot Status](#robot-status)
 * [Design Patterns](#design-patterns)
   * [Abstract Classes and Inheritance](#abstract-classes-and-inheritance)
-  * [Singleton Design Pattern](#singleton-pattern)
-  * [Factory Design Pattern](#factory-pattern)
-  * [Visitor Design Pattern](#visitor-pattern)
-  * [Observer Design Pattern](#observer-pattern)
+  * [Singleton Pattern](#singleton-pattern)
+  * [Factory Pattern](#factory-pattern)
+  * [Visitor Pattern](#visitor-pattern)
+  * [Observer Pattern](#observer-pattern)
+    * [Threaded Observer](#threaded-observer)
+    * [Example](#example)
+  * [Publisher-Subscriber Pattern](#publisher-subscriber-pattern)
+    * [Example](#example-1)
   * [C++ Templating](#c-templating)
 * [Coroutines](#coroutines)
   * [What Are Coroutines?](#what-are-coroutines)
   * [What Coroutines Do We Use?](#what-coroutines-do-we-use)
   * [How Do We Use Coroutines?](#how-do-we-use-coroutines)
-  * [Best Practices](#couroutine-best-practices)
+  * [Coroutine Best Practices](#coroutine-best-practices)
 * [Finite State Machines](#finite-state-machines)
   * [What Are Finite State Machines?](#what-are-finite-state-machines)
-  * [Boost-Ext SML Library](#boost-ext-sml-library)
+  * [Boost-ext SML Library](#boost-ext-sml-library)
   * [How Do We Use SML?](#how-do-we-use-sml)
   * [SML Best Practices](#sml-best-practices)
 * [Conventions](#conventions)
   * [Coordinates](#coordinates)
   * [Angles](#angles)
-  * [Diagram](#convention-diagram)
+  * [Convention Diagram](#convention-diagram)
 * [Architecture Overview](#architecture-overview)
-  * [Diagram](#architecture-overview-diagram)
-  * [Backend](#backend)
-    * [Diagram](#backend-diagram)
-  * [Sensor Fusion](#sensor-fusion)
-    * [Filters](#filters)
+  * [Fullsystem](#fullsystem)
+    * [Backend](#backend)
+      * [Backend Diagram](#backend-diagram)
+    * [Sensor Fusion](#sensor-fusion)
+      * [Filters](#filters)
   * [AI](#ai)
     * [Strategy](#strategy)
       * [STP Diagram](#stp-diagram)
@@ -53,20 +57,20 @@
       * [Path Manager](#path-manager)
       * [Path Objective](#path-objective)
       * [Path Planner](#path-planner)
-    * [Diagram](#ai-diagram)
+    * [AI Diagram](#ai-diagram)
   * [Thunderscope](#thunderscope)
-    * [Inter-process Communication](#inter-process-communication)
+    * [Thunderscope GUI](#thunderscope-gui)
     * [3D Visualizer](#3d-visualizer)
       * [Layers](#layers)
+  * [Simulator](#simulator)
+    * [Standalone Simulator](#standalone-simulator)
+    * [Simulated Tests](#simulated-tests)
+      * [Simulated Tests Architecture](#simulated-tests-architecture)
+        * [Validation Functions](#validation-functions)
+      * [Component Connections and Determinism](#component-connections-and-determinism)
+      * [Simulated Tests Diagram](#simulated-tests-diagram)
+  * [Inter-process Communication](#inter-process-communication)
   * [Estop](#estop)
-* [Simulator](#simulator)
-  * [Standalone Simulator](#standalone-simulator)
-  * [Simulated Tests](#simulated-tests)
-    * [Architecture](#simulated-tests-architecture)
-      * [Validation Functions](#validation-functions)
-    * [Component Connections and Determinism](#component-connections-and-determinism)
-    * [Diagram](#simulated-tests-diagram)
-
 
 # Tools
 A few commonly-used terms and tools to be familiar with:
@@ -296,7 +300,7 @@ Once it is time to start the pass, the condition for the loop will become false 
 
 Once we have entered the second stage, we know we don't have to look at the first stage again. Because the coroutine "remembers" where the execution is each time the function is called, we will resume inside the second stage and therefore never execute the first stage again! This makes it much easier to write and read this strategy code, because we can clearly see the 2 stages of the strategy, and we know they will be executed in order.
 
-## Couroutine Best Practices
+## Coroutine Best Practices
 Coroutines are a complex feature, and the boost coroutines we use don't always behave in was we expect. We have done extensive testing on how coroutines are safe (or not safe) to us, and derived some best practices from these examples. See [coroutine_test_exmaples.cpp](coroutine_test_examples.cpp) for the full code and more detailed explanantions.
 
 To summarize, the best practices are as follows:
@@ -444,9 +448,9 @@ Filters provide a flexible way to modularize the processing of raw data, making 
 
 
 # AI
-The `AI` is where all of our gameplay logic takes place, and is the main "brain" of our system. It uses the information received from [Sensor Fusion](#sensor-fusion) to make decisions, and sends [Primitives](#primitives) to the [Backend](#backend) for the robots to execute. All together this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
+The `AI` is the part of the [Fullsystem](#fullsystem) where all of our gameplay logic takes place, and it is the main "brain" of our system. It uses the information received from [Sensor Fusion](#sensor-fusion) to make decisions, and then sends [Primitives](#primitives) to the [Backend](#backend) for the robots to execute. Altogether, this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
 
-The 2 main components of the `AI` are strategy and navigation.
+The two main components of the `AI` are strategy and navigation.
 
 ## Strategy
 We use a framework called `STP (Skills, Tactics, Plays)` to implement our stratgy. The `STP` framework was originally proposed by Carnegie Mellon University back in 2004. The original paper can be found [here](https://kilthub.cmu.edu/articles/STP_Skills_Tactics_and_Plays_for_Multi-Robot_Control_in_Adversarial_Environments/6561002/1).
@@ -541,20 +545,6 @@ We organize our graphics into "layers" so that we can toggle the visibility of d
 
 A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a tree-like structure. In theory, `GLLayer`s could also be nested within one another. 
 
-# Inter-process Communication
-Since [Thunderscope](#thunderscope) runs in a separate process from [Fullsystem](#fullsystem), we use [Unix domain sockets](https://en.wikipedia.org/wiki/Unix_domain_socket) to facilitate communication between Fullsystem and Thunderscope. Unix sockets [have high throughput and are very performant](https://stackoverflow.com/a/29436429/20199855); we simply bind the unix socket to a file path and pass data between processes, instead of having to deal with TCP/IP overhead just to send and receive data on the same computer.
-
-The data sent between Fullsystem and Thunderscope is serialized using [protobufs](#protobuf). Some data, such as data that goes through our [Backend](#backend) (vision data, game controller commands, [Worlds](#world) from [Sensor Fusion](#sensor-fusion), etc.), is sent using unix senders owned by those parts of the Fullsystem directly. In other parts of Fullsystem (FSMs, pass generator, navigator, etc.), we want to delegate away the responsibility of managing unix senders and have a more lightweight way of sending protobufs to Thunderscope. We don’t want to dependency inject a "communication" object everywhere we have visualizable data to send to Thunderscope, so we use the [`g3log`](https://kjellkod.github.io/g3log/) logger used throughout our codebase.
-
-`g3log` is a fast and thread-safe way to log data with custom handlers called “sinks". Importantly, it gives us a static [singleton](#singleton-pattern) that can be called anywhere. Logging a protobuf will send it to our custom protobuf `g3log` sink, which lazily initializes unix senders based on the type of protobuf that is logged. The sink then sends the protobuf over the socket to listeners.
-
-<details>
-<summary><b>Aside: calling <code>g3log</code> to log protobuf data</b></summary>
-Logging protobufs is done at the <code>VISUALIZE</code> level (e.g. <code>LOG(VISUALIZE) << some_random_proto;</code>). Protobufs need to be converted to strings in order to log them with <code>g3log</code>. We've overloaded the stream (<code><<</code>) operator to automatically pack protobufs into a <code>google::protobuf::Any</code> and serialize them to a string, so you don't need to do the conversion yourself.
-</details><br>
-
-In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. `ProtoUnixIO` utilizes the [publisher-subscriber ("pub-sub")](#publisher-subscriber-pattern) messaging pattern. Through `ProtoUnixIO`, classes can register as an [subscriber](#observer-pattern) by providing a protobuf type to receive and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming those protobuf messages. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and place those messages onto the `ThreadSafeBuffer`s of that proto type's subscribers. Classes can also publish protobufs via `ProtoUnixIO` by configuring it with a unix sender.
-
 # Simulator
 The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` "simulates" the following components' functionalities:
 * [SSL-Vision](#ssl-vision) by publishing new vision data
@@ -615,6 +605,20 @@ Notice this is very similar to the [Architecture Overview Diagram](#architecture
 [Thunderscope](#thunderscope) and connections to it are marked with dashed lines, since they are optional and are not run during the tests unless we are debugging.
 
 ![Simulated Testing High-level Architecture Diagram](images/simulated_test_high_level_architecture.svg)
+
+# Inter-process Communication
+Since [Thunderscope](#thunderscope) runs in a separate process from [Fullsystem](#fullsystem), we use [Unix domain sockets](https://en.wikipedia.org/wiki/Unix_domain_socket) to facilitate communication between Fullsystem and Thunderscope. Unix sockets [have high throughput and are very performant](https://stackoverflow.com/a/29436429/20199855); we simply bind the unix socket to a file path and pass data between processes, instead of having to deal with TCP/IP overhead just to send and receive data on the same computer.
+
+The data sent between Fullsystem and Thunderscope is serialized using [protobufs](#protobuf). Some data, such as data that goes through our [Backend](#backend) (vision data, game controller commands, [Worlds](#world) from [Sensor Fusion](#sensor-fusion), etc.), is sent using unix senders owned by those parts of the Fullsystem directly. In other parts of Fullsystem (FSMs, pass generator, navigator, etc.), we want to delegate away the responsibility of managing unix senders and have a more lightweight way of sending protobufs to Thunderscope. We don’t want to dependency inject a "communication" object everywhere we have visualizable data to send to Thunderscope, so we use the [`g3log`](https://kjellkod.github.io/g3log/) logger used throughout our codebase.
+
+`g3log` is a fast and thread-safe way to log data with custom handlers called “sinks". Importantly, it gives us a static [singleton](#singleton-pattern) that can be called anywhere. Logging a protobuf will send it to our custom protobuf `g3log` sink, which lazily initializes unix senders based on the type of protobuf that is logged. The sink then sends the protobuf over the socket to listeners.
+
+<details>
+<summary><b>Aside: calling <code>g3log</code> to log protobuf data</b></summary>
+Logging protobufs is done at the <code>VISUALIZE</code> level (e.g. <code>LOG(VISUALIZE) << some_random_proto;</code>). Protobufs need to be converted to strings in order to log them with <code>g3log</code>. We've overloaded the stream (<code><<</code>) operator to automatically pack protobufs into a <code>google::protobuf::Any</code> and serialize them to a string, so you don't need to do the conversion yourself.
+</details><br>
+
+In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. `ProtoUnixIO` utilizes the [publisher-subscriber ("pub-sub")](#publisher-subscriber-pattern) messaging pattern. Through `ProtoUnixIO`, classes can register as an [subscriber](#observer-pattern) by providing a protobuf type to receive and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming those protobuf messages. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and place those messages onto the `ThreadSafeBuffer`s of that proto type's subscribers. Classes can also publish protobufs via `ProtoUnixIO` by configuring it with a unix sender.
 
 # Estop
 `Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:
