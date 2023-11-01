@@ -159,7 +159,6 @@ if [[ "$arch" == "aarch64" ]]; then
     
     # before we frankenstein, install pyqt6 and build from source
     # before that, we need qt6 installed and set as the default qt installation
-    sudo apt-get install sip-tools -y
     sudo apt-get install qtchooser -y
     sudo apt-get install qt6-base-dev -y
     sudo apt-get install qt5-base-dev -y
@@ -167,11 +166,13 @@ if [[ "$arch" == "aarch64" ]]; then
     sudo apt install -y qtcreator qtbase5-dev qt5-qmake cmake -y    
     
     wget https://files.pythonhosted.org/packages/34/da/e03b7264b1e88cd553ff62a71c0c19f55690e08928130f4aae613723e535/PyQt6-6.5.2.tar.gz
+    tar -xzvf PyQt6-6.5.2.tar.gz
     cd PyQt6-6.5.2/
     qtchooser -install qt6 $(which qmake6)
     sudo mv ~/.config/qtchooser/qt6.conf /usr/share/qtchooser/qt6.conf
+    sudo su
     export QT_SELECT=qt6
-    sudo sip-install --target-dir /opt/tbotspython/lib/python3.8/site-packages/ --verbose
+    sip-install --target-dir /opt/tbotspython/lib/python3.8/site-packages/ --verbose
     sudo /opt/tbotspython/bin/pip3.8 install PyQt6-sip
     export QT_QPA_PLATFORM=wayland
     
@@ -181,6 +182,7 @@ if [[ "$arch" == "aarch64" ]]; then
     # add mantic as source, install python3-pyqt6 and python3-pyqt6.qtwebengine
     sudo sh -c 'echo "deb http://ca.ports.ubuntu.com/ubuntu-ports/ mantic main universe" > /etc/apt/sources.list.d/temp.list'
     sudo apt-get update
+    sudo apt-get install sip-tools -y
     sudo apt-get install python3-pyqt6 python3-pyqt6.qtwebengine -y
     # remove the mantic source
     sudo rm /etc/apt/sources.list.d/temp.list
