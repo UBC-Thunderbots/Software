@@ -14,7 +14,6 @@ from software.thunderscope.gl.layers import (
     gl_path_layer,
     gl_validation_layer,
     gl_passing_layer,
-    gl_world_layer,
     gl_sandbox_world_layer,
     gl_simulator_layer,
     gl_hrvo_layer,
@@ -66,6 +65,7 @@ def setup_gl_widget(
     """
     # Create ProtoPlayer if replay is enabled
     player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
+
     # Create widget
     gl_widget = GLWidget(player=player)
 
@@ -81,10 +81,7 @@ def setup_gl_widget(
         "Passing", visualization_buffer_size
     )
     world_layer = gl_sandbox_world_layer.GLSandboxWorldLayer(
-        "Vision",
-        sim_proto_unix_io,
-        friendly_colour_yellow,
-        visualization_buffer_size,
+        "Vision", sim_proto_unix_io, friendly_colour_yellow, visualization_buffer_size
     )
     simulator_layer = gl_simulator_layer.GLSimulatorLayer(
         "Simulator", friendly_colour_yellow, visualization_buffer_size
@@ -98,12 +95,6 @@ def setup_gl_widget(
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
     gl_widget.add_layer(tactic_layer, False)
-
-    gl_widget.toolbar.play_button.clicked.connect(world_layer.toggle_play_state)
-    world_layer.add_play_callback(lambda is_playing: gl_widget.toolbar.toggle_play_button_text(is_playing))
-    gl_widget.toolbar.undo_button.clicked.connect(world_layer.undo)
-    gl_widget.toolbar.redo_button.clicked.connect(world_layer.redo)
-    gl_widget.toolbar.reset_button.clicked.connect(world_layer.reset_to_pre_sim)
 
     # Add HRVO layers and have them hidden on startup
     # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
@@ -247,6 +238,7 @@ def setup_robot_view(proto_unix_io, available_control_modes: List[IndividualRobo
     """
     robot_view = RobotView(available_control_modes)
     proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
+    proto_unix_io.register_observer(RobotCrash, robot_view.robot_crash_buffer)
     return robot_view
 
 

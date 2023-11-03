@@ -8,6 +8,7 @@ from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -15,7 +16,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 class GLObstacleLayer(GLLayer):
     """GLLayer that visualizes obstacles"""
 
-    def __init__(self, name: str, buffer_size: int = 5):
+    def __init__(self, name: str, buffer_size: int = 5) -> None:
         """Initialize the GLObstacleLayer
 
         :param name: The displayed name of the layer
@@ -30,7 +31,7 @@ class GLObstacleLayer(GLLayer):
         self.poly_obstacle_graphics = ObservableList(self._graphics_changed)
         self.circle_obstacle_graphics = ObservableList(self._graphics_changed)
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         primitive_set = self.primitive_set_buffer.get(
@@ -57,11 +58,11 @@ class GLObstacleLayer(GLLayer):
         # Ensure we have the same number of graphics as obstacles
         self.poly_obstacle_graphics.resize(
             len(poly_obstacles),
-            lambda: GLLinePlotItem(color=Colors.NAVIGATOR_OBSTACLE_COLOR, width=3.0),
+            lambda: GLPolygon(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
         self.circle_obstacle_graphics.resize(
             len(circle_obstacles),
-            lambda: GLCircle(color=Colors.NAVIGATOR_OBSTACLE_COLOR),
+            lambda: GLCircle(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
 
         for poly_obstacle_graphic, poly_obstacle in zip(
@@ -71,10 +72,8 @@ class GLObstacleLayer(GLLayer):
             # the list of points in the polygon
             polygon_points = list(poly_obstacle.points) + poly_obstacle.points[:1]
 
-            poly_obstacle_graphic.setData(
-                pos=np.array(
-                    [[point.x_meters, point.y_meters, 0] for point in polygon_points]
-                ),
+            poly_obstacle_graphic.set_points(
+                [[point.x_meters, point.y_meters] for point in polygon_points]
             )
 
         for circle_obstacle_graphic, circle_obstacle in zip(

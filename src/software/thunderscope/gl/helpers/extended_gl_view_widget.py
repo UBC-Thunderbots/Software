@@ -50,7 +50,7 @@ class ExtendedGLViewWidget(GLViewWidget):
     # (detect_mouse_movement_in_scene must be enabled for this signal to be emitted)
     mouse_in_scene_moved_signal = QtCore.pyqtSignal(MouseInSceneEvent)
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the ExtendedGLViewWidget"""
         super().__init__()
 

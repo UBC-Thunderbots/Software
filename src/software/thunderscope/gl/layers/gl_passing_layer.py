@@ -10,6 +10,7 @@ from proto.visualization_pb2 import PassVisualization
 from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -24,7 +25,7 @@ class GLPassingLayer(GLLayer):
     # The number of passes to show in the visualization
     NUM_PASSES_TO_SHOW = 1
 
-    def __init__(self, name: str, buffer_size: int = 5):
+    def __init__(self, name: str, buffer_size: int = 5) -> None:
         """Initialize the GLPassingLayer
 
         :param name: The displayed name of the layer
@@ -42,7 +43,7 @@ class GLPassingLayer(GLLayer):
 
         self.pass_graphics = ObservableList(self._graphics_changed)
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         try:
@@ -69,21 +70,19 @@ class GLPassingLayer(GLLayer):
         # Ensure we have the same number of graphics as protos
         self.pass_graphics.resize(
             len(passes_to_show),
-            lambda: GLLinePlotItem(color=Colors.PASS_VISUALIZATION_COLOR, width=3.0),
+            lambda: GLPolygon(outline_color=Colors.PASS_VISUALIZATION_COLOR),
         )
 
         for pass_graphic, pass_with_rating in zip(self.pass_graphics, passes_to_show,):
-            pass_graphic.setData(
-                pos=np.array(
+            pass_graphic.set_points(
+                [
                     [
-                        [
-                            pass_with_rating.pass_.passer_point.x_meters,
-                            pass_with_rating.pass_.passer_point.y_meters,
-                        ],
-                        [
-                            pass_with_rating.pass_.receiver_point.x_meters,
-                            pass_with_rating.pass_.receiver_point.y_meters,
-                        ],
-                    ]
-                ),
+                        pass_with_rating.pass_.passer_point.x_meters,
+                        pass_with_rating.pass_.passer_point.y_meters,
+                    ],
+                    [
+                        pass_with_rating.pass_.receiver_point.x_meters,
+                        pass_with_rating.pass_.receiver_point.y_meters,
+                    ],
+                ]
             )

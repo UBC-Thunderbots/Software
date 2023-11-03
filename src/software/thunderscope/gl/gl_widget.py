@@ -4,13 +4,17 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 
+import textwrap
+import numpy as np
+
 from software.thunderscope.constants import *
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
+from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
+from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
-from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
 
 
 class GLWidget(QWidget):
@@ -18,10 +22,11 @@ class GLWidget(QWidget):
     and our AI. GLWidget can also provide replay controls.
     """
 
-    def __init__(self, player=None):
+    def __init__(self, player: ProtoPlayer = None) -> None:
         """Initialize the GLWidget
 
         :param player: The replay player to optionally display media controls for
+
         """
         super().__init__()
 
@@ -78,7 +83,7 @@ class GLWidget(QWidget):
 
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
 
-    def keyPressEvent(self, event: QtGui.QKeyEvent):
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
         
         :param event: The event
@@ -100,7 +105,7 @@ class GLWidget(QWidget):
         for layer in self.layers:
             layer.keyPressEvent(event)
 
-    def keyReleaseEvent(self, event: QtGui.QKeyEvent):
+    def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
         
         :param event: The event
@@ -110,7 +115,7 @@ class GLWidget(QWidget):
         for layer in self.layers:
             layer.keyReleaseEvent(event)
 
-    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Propagate mouse_in_scene_pressed event to all layers
         
         :param event: The event
@@ -124,7 +129,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_pressed(event)
 
-    def mouse_in_scene_dragged(self, event: MouseInSceneEvent):
+    def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """Propagate mouse_in_scene_dragged event to all layers
         
         :param event: The event
@@ -138,7 +143,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_dragged(event)
 
-    def mouse_in_scene_released(self, event: MouseInSceneEvent):
+    def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Propagate mouse_in_scene_released event to all layers
         
         :param event: The event
@@ -152,7 +157,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_released(event)
 
-    def mouse_in_scene_moved(self, event: MouseInSceneEvent):
+    def mouse_in_scene_moved(self, event: MouseInSceneEvent) -> None:
         """Propagate mouse_in_scene_moved event to all layers
         
         :param event: The event
@@ -166,7 +171,7 @@ class GLWidget(QWidget):
             for layer in self.layers:
                 layer.mouse_in_scene_moved(event)
 
-    def add_layer(self, layer: GLLayer, visible: bool = True):
+    def add_layer(self, layer: GLLayer, visible: bool = True) -> None:
         """Add a layer to this GLWidget
         
         :param layer: The GLLayer 
@@ -197,7 +202,7 @@ class GLWidget(QWidget):
 
         self.gl_view_widget.addItem(layer)
 
-    def remove_layer(self, layer: GLLayer):
+    def remove_layer(self, layer: GLLayer) -> None:
         """Remove a layer from this GLWidget
         
         :param layer: The GLLayer to remove
@@ -210,9 +215,9 @@ class GLWidget(QWidget):
         layer_action = self.layers_menu_actions[layer.name]
         self.layers_menu.removeAction(layer_action)
 
-    def refresh(self):
-        """Trigger an update on all the layers
-        """
+    def refresh(self) -> None:
+        """Trigger an update on all the layers"""
+
         if self.player:
             self.replay_controls.refresh()
 
@@ -225,7 +230,7 @@ class GLWidget(QWidget):
             if layer.visible():
                 layer.refresh_graphics()
 
-    def set_camera_view(self, camera_view: CameraView):
+    def set_camera_view(self, camera_view: CameraView) -> None:
         """Set the camera position to a preset camera view
 
         :param camera_view: the preset camera view
@@ -250,7 +255,7 @@ class GLWidget(QWidget):
                 pos=pg.Vector(2.5, 0, 0), distance=10, elevation=45, azimuth=0
             )
 
-    def toggle_measure_mode(self):
+    def toggle_measure_mode(self) -> None:
         """Toggles measure mode in the 3D visualizer"""
 
         self.measure_mode_enabled = not self.measure_mode_enabled

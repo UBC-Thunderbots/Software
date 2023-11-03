@@ -9,6 +9,7 @@ from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -16,7 +17,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 class GLPathLayer(GLLayer):
     """GLLayer that visualizes paths from the navigator"""
 
-    def __init__(self, name: str, buffer_size: int = 5):
+    def __init__(self, name: str, buffer_size: int = 5) -> None:
         """Initialize the GLPathLayer
 
         :param name: The displayed name of the layer
@@ -31,7 +32,7 @@ class GLPathLayer(GLLayer):
         self.path_graphics = ObservableList(self._graphics_changed)
         self.destination_graphics = ObservableList(self._graphics_changed)
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         primitive_set = self.primitive_set_buffer.get(
@@ -54,18 +55,17 @@ class GLPathLayer(GLLayer):
         ]
 
         # Ensure we have the same number of graphics as protos
-        self.path_graphics.resize(len(paths), lambda: GLLinePlotItem(width=3.0))
+        self.path_graphics.resize(
+            len(paths), lambda: GLPolygon(outline_color=Colors.NAVIGATOR_PATH_COLOR),
+        )
         self.destination_graphics.resize(
             len(requested_destinations),
-            lambda: GLRobotOutline(color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
+            lambda: GLRobotOutline(outline_color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
         )
 
         for path_graphic, path in zip(self.path_graphics, paths):
-            path_graphic.setData(
-                pos=np.array(
-                    [[point.x_meters, point.y_meters, 0] for point in path.points]
-                ),
-                color=Colors.NAVIGATOR_PATH_COLOR,
+            path_graphic.set_points(
+                [[point.x_meters, point.y_meters] for point in path.points]
             )
 
         for dest_graphic, (dest, final_angle) in zip(

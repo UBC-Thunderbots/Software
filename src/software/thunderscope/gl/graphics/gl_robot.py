@@ -3,7 +3,10 @@ from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
+from software.thunderscope.constants import Colors
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
+
+from typing import Optional
 
 import numpy as np
 
@@ -13,24 +16,24 @@ class GLRobot(GLMeshItem):
 
     def __init__(
         self,
-        parentItem: GLGraphicsItem = None,
-        color: QtGui.QColor = (1.0, 1.0, 1.0, 0.5),
-    ):
+        parent_item: Optional[GLGraphicsItem] = None,
+        color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
+    ) -> None:
         """Initialize the GLRobot
         
-        :param parentItem: The parent item of the graphic
+        :param parent_item: The parent item of the graphic
         :param color: The color of the graphic
 
         """
         super().__init__(
-            parentItem=parentItem, meshdata=self.__get_mesh_data(), color=color,
+            parentItem=parent_item, meshdata=self.__get_mesh_data(), color=color,
         )
 
         self.x = 0
         self.y = 0
         self.orientation = 0
 
-    def set_position(self, x: float, y: float):
+    def set_position(self, x: float, y: float) -> None:
         """Set the position of the graphic in the scene
         
         :param x: The x coordinate to position the graphic at
@@ -44,7 +47,7 @@ class GLRobot(GLMeshItem):
         self.x = x
         self.y = y
 
-    def set_orientation(self, degrees: float):
+    def set_orientation(self, degrees: float) -> None:
         """Set the orientation of the graphic in the scene
         
         :param degrees: The orientation of the graphic in degrees
@@ -62,7 +65,7 @@ class GLRobot(GLMeshItem):
         self.rotate(degrees - self.orientation, 0, 0, 1, local=True)
         self.orientation = degrees
 
-    def __get_mesh_data(self):
+    def __get_mesh_data(self) -> MeshData:
         """
         Return a MeshData instance with vertices and faces computed
         for the surface of a cylinder with a flat side wall.

@@ -3,15 +3,21 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.opengl import *
 
 import math
-from typing import Tuple
 import numpy as np
 
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.constants import Colors, SPEED_SEGMENT_SCALE
+from software.thunderscope.constants import (
+    Colors,
+    DepthValues,
+    SPEED_SEGMENT_SCALE,
+)
+
+from typing import Tuple
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.graphics.gl_robot import GLRobot
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.thunderscope.gl.graphics.gl_goal import GLGoal
@@ -35,7 +41,7 @@ class GLWorldLayer(GLLayer):
         simulator_io: ProtoUnixIO,
         friendly_colour_yellow: bool,
         buffer_size: int = 5,
-    ):
+    ) -> None:
         """Initialize the GLWorldLayer
 
         :param name: The displayed name of the layer
@@ -74,44 +80,42 @@ class GLWorldLayer(GLLayer):
         self.point_in_scene_picked = None
 
         self.friendly_defense_area_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_COLOR
+            parent_item=self, outline_color=Colors.FIELD_LINE_COLOR
         )
         self.enemy_defense_area_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_COLOR
+            parent_item=self, outline_color=Colors.FIELD_LINE_COLOR
         )
         self.field_lines_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_COLOR
+            parent_item=self, outline_color=Colors.FIELD_LINE_COLOR
         )
         self.field_outer_boundary_graphic = GLRect(
-            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR
+            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR
         )
-        self.halfway_line_graphic = GLLinePlotItem(
-            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=3.0
+        self.halfway_line_graphic = GLPolygon(
+            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
         )
-        self.goal_to_goal_line_graphic = GLLinePlotItem(
-            parentItem=self, color=Colors.FIELD_LINE_LIGHTER_COLOR, width=3.0
+        self.goal_to_goal_line_graphic = GLPolygon(
+            parent_item=self, outline_color=Colors.FIELD_LINE_LIGHTER_COLOR,
         )
         self.field_center_circle_graphic = GLCircle(
-            parentItem=self, color=Colors.FIELD_LINE_COLOR
+            parent_item=self, outline_color=Colors.FIELD_LINE_COLOR
         )
-        self.friendly_goal_graphic = GLGoal(parentItem=self, color=Colors.GOAL_COLOR)
-        self.enemy_goal_graphic = GLGoal(parentItem=self, color=Colors.GOAL_COLOR)
+        self.friendly_goal_graphic = GLGoal(parent_item=self, color=Colors.GOAL_COLOR)
+        self.enemy_goal_graphic = GLGoal(parent_item=self, color=Colors.GOAL_COLOR)
         self.ball_graphic = GLSphere(
-            parentItem=self, radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR
+            parent_item=self, radius=BALL_MAX_RADIUS_METERS, color=Colors.BALL_COLOR
         )
-        self.ball_kick_velocity_graphic = GLLinePlotItem(
-            parentItem=self, color=Colors.SPEED_VECTOR_COLOR
+        self.ball_kick_velocity_graphic = GLPolygon(
+            parent_item=self, outline_color=Colors.SPEED_VECTOR_COLOR
         )
 
-        # Set depth value of field line graphics to -1 so that they are
-        # rendered beneath robots and other graphics
-        self.friendly_defense_area_graphic.setDepthValue(-1)
-        self.enemy_defense_area_graphic.setDepthValue(-1)
-        self.field_lines_graphic.setDepthValue(-1)
-        self.field_outer_boundary_graphic.setDepthValue(-1)
-        self.halfway_line_graphic.setDepthValue(-1)
-        self.goal_to_goal_line_graphic.setDepthValue(-1)
-        self.field_center_circle_graphic.setDepthValue(-1)
+        self.friendly_defense_area_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.enemy_defense_area_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.field_lines_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.field_outer_boundary_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.halfway_line_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.goal_to_goal_line_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
+        self.field_center_circle_graphic.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
         self.friendly_robot_graphics = ObservableList(self._graphics_changed)
         self.enemy_robot_graphics = ObservableList(self._graphics_changed)
@@ -120,7 +124,7 @@ class GLWorldLayer(GLLayer):
         self.breakbeam_graphics = ObservableList(self._graphics_changed)
         self.speed_line_graphics = ObservableList(self._graphics_changed)
 
-    def keyPressEvent(self, event: QtGui.QKeyEvent):
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
 
         :param event: The event
@@ -184,7 +188,7 @@ class GLWorldLayer(GLLayer):
         )
         self.simulator_io.send_proto(WorldState, world_state)
 
-    def mouse_in_scene_dragged(self, event: MouseInSceneEvent):
+    def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was dragged within the 3D scene
         
         :param event: The event
@@ -246,7 +250,7 @@ class GLWorldLayer(GLLayer):
         self.ball_velocity_vector = None
         self.simulator_io.send_proto(WorldState, world_state)
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         self.cached_world = self.world_buffer.get(block=False)
@@ -260,7 +264,7 @@ class GLWorldLayer(GLLayer):
         self.__update_robot_status_graphics()
         self.__update_speed_line_graphics()
 
-    def _update_robots_graphics(self):
+    def _update_robots_graphics(self) -> None:
         friendly_colour = (
             Colors.YELLOW_ROBOT_COLOR
             if self.friendly_colour_yellow
@@ -285,7 +289,7 @@ class GLWorldLayer(GLLayer):
             self.enemy_robot_id_graphics,
         )
 
-    def __update_field_graphics(self, field: Field):
+    def __update_field_graphics(self, field: Field) -> None:
         """Update the GLGraphicsItems that display the field lines and markings
         
         :param field: The field proto
@@ -315,21 +319,17 @@ class GLWorldLayer(GLLayer):
             (field.field_x_length / 2) - (field.defense_x_length / 2), 0
         )
 
-        self.halfway_line_graphic.setData(
-            pos=np.array(
-                [[0, -(field.field_y_length / 2)], [0, (field.field_y_length / 2)]]
-            ),
+        self.halfway_line_graphic.set_points(
+            [(0, -(field.field_y_length / 2)), (0, (field.field_y_length / 2))]
         )
 
-        self.goal_to_goal_line_graphic.setData(
-            pos=np.array(
-                [[-(field.field_x_length / 2), 0], [(field.field_x_length / 2), 0]]
-            ),
+        self.goal_to_goal_line_graphic.set_points(
+            [(-(field.field_x_length / 2), 0), ((field.field_x_length / 2), 0)]
         )
 
         self.field_center_circle_graphic.set_radius(field.center_circle_radius)
 
-    def __update_goal_graphics(self, field: Field):
+    def __update_goal_graphics(self, field: Field) -> None:
         """Update the GLGraphicsItems that display the goals
         
         :param field: The field proto
@@ -348,7 +348,7 @@ class GLWorldLayer(GLLayer):
         self.enemy_goal_graphic.set_position(field.field_x_length / 2, 0)
         self.enemy_goal_graphic.set_orientation(180)
 
-    def __update_ball_graphics(self, ball_state: BallState):
+    def __update_ball_graphics(self, ball_state: BallState) -> None:
         """Update the GLGraphicsItems that display the ball
         
         :param ball_state: The ball state proto
@@ -366,7 +366,7 @@ class GLWorldLayer(GLLayer):
         color: QtGui.QColor,
         robot_graphics: ObservableList,
         robot_id_graphics: ObservableList,
-    ):
+    ) -> None:
         """Update the GLGraphicsItems that display the robots
         
         :param team: The team proto
@@ -408,7 +408,7 @@ class GLWorldLayer(GLLayer):
         id: int,
         pos: Tuple[int, int],
         orientation: float,
-    ):
+    ) -> None:
         """
         Updates 2 GLGraphicsItems, 1 for the robot and 1 for its id
         With the correct position, orientation, id, and color
@@ -461,9 +461,9 @@ class GLWorldLayer(GLLayer):
         self.breakbeam_graphics.resize(
             len(self.cached_world.friendly_team.team_robots),
             lambda: GLCircle(
-                parentItem=self,
+                parent_item=self,
                 radius=ROBOT_MAX_RADIUS_METERS / 2,
-                color=Colors.BREAKBEAM_TRIPPED_COLOR,
+                outline_color=Colors.BREAKBEAM_TRIPPED_COLOR,
             ),
         )
 
@@ -476,8 +476,7 @@ class GLWorldLayer(GLLayer):
             ):
                 breakbeam_graphic.show()
 
-                # Depth value of 1 ensures text is rendered over top robots
-                breakbeam_graphic.setDepthValue(1)
+                breakbeam_graphic.setDepthValue(DepthValues.SECONDARY_TEXT_DEPTH)
 
                 breakbeam_graphic.set_position(
                     robot.current_state.global_position.x_meters,
@@ -486,7 +485,7 @@ class GLWorldLayer(GLLayer):
             else:
                 breakbeam_graphic.hide()
 
-    def __update_speed_line_graphics(self):
+    def __update_speed_line_graphics(self) -> None:
         """Update the speed lines visualizing the robot and ball speeds"""
 
         # When the user is kicking the ball, show the kick velocity vector
@@ -497,19 +496,17 @@ class GLWorldLayer(GLLayer):
             velocity = self.ball_velocity_vector * SPEED_SEGMENT_SCALE
 
             self.ball_kick_velocity_graphic.show()
-            self.ball_kick_velocity_graphic.setData(
-                pos=np.array(
+            self.ball_kick_velocity_graphic.set_points(
+                [
                     [
-                        [
-                            ball_state.global_position.x_meters,
-                            ball_state.global_position.y_meters,
-                        ],
-                        [
-                            ball_state.global_position.x_meters + velocity.x(),
-                            ball_state.global_position.y_meters + velocity.y(),
-                        ],
-                    ]
-                ),
+                        ball_state.global_position.x_meters,
+                        ball_state.global_position.y_meters,
+                    ],
+                    [
+                        ball_state.global_position.x_meters + velocity.x(),
+                        ball_state.global_position.y_meters + velocity.y(),
+                    ],
+                ]
             )
 
         else:
@@ -523,23 +520,21 @@ class GLWorldLayer(GLLayer):
 
         # Ensure we have the same number of graphics as robots/balls
         self.speed_line_graphics.resize(
-            len(objects), lambda: GLLinePlotItem(color=Colors.SPEED_VECTOR_COLOR),
+            len(objects), lambda: GLPolygon(outline_color=Colors.SPEED_VECTOR_COLOR),
         )
 
         for speed_line_graphic, object in zip(self.speed_line_graphics, objects):
             pos_x = object.current_state.global_position.x_meters
             pos_y = object.current_state.global_position.y_meters
             velocity = object.current_state.global_velocity
-            speed_line_graphic.setData(
-                pos=np.array(
+            speed_line_graphic.set_points(
+                [
+                    [pos_x, pos_y],
                     [
-                        [pos_x, pos_y],
-                        [
-                            pos_x + velocity.x_component_meters * SPEED_SEGMENT_SCALE,
-                            pos_y + velocity.y_component_meters * SPEED_SEGMENT_SCALE,
-                        ],
-                    ]
-                ),
+                        pos_x + velocity.x_component_meters * SPEED_SEGMENT_SCALE,
+                        pos_y + velocity.y_component_meters * SPEED_SEGMENT_SCALE,
+                    ],
+                ]
             )
 
     def __should_invert_coordinate_frame(self) -> bool:

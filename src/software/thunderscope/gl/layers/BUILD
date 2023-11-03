@@ -18,6 +18,7 @@ py_library(
     srcs = ["gl_path_layer.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         "//software/thunderscope/gl/graphics:gl_robot_outline",
         requirement("pyqtgraph"),
     ],
@@ -29,6 +30,7 @@ py_library(
     deps = [
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_circle",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],
 )
@@ -38,6 +40,7 @@ py_library(
     srcs = ["gl_passing_layer.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],
 )
@@ -50,6 +53,7 @@ py_library(
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_goal",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         "//software/thunderscope/gl/graphics:gl_rect",
         "//software/thunderscope/gl/graphics:gl_robot",
         "//software/thunderscope/gl/graphics:gl_sphere",
@@ -81,6 +85,7 @@ py_library(
     srcs = ["gl_hrvo_layer.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],
 )
@@ -100,6 +105,7 @@ py_library(
     deps = [
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_circle",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],
 )
@@ -109,6 +115,7 @@ py_library(
     srcs = ["gl_measure_layer.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         "//software/thunderscope/gl/graphics:gl_sphere",
         requirement("pyqtgraph"),
     ],

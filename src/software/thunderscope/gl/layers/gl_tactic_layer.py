@@ -7,7 +7,7 @@ from google.protobuf.json_format import MessageToDict
 
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, DepthValues
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
@@ -19,7 +19,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 class GLTacticLayer(GLLayer):
     """GLLayer that visualizes tactics"""
 
-    def __init__(self, name: str, buffer_size: int = 5):
+    def __init__(self, name: str, buffer_size: int = 5) -> None:
         """Initialize the GLTacticLayer
 
         :param name: The displayed name of the layer
@@ -30,7 +30,7 @@ class GLTacticLayer(GLLayer):
         super().__init__(name)
 
         # Depth value of 1 ensures this layer is rendered over top other layers
-        self.setDepthValue(1)
+        self.setDepthValue(DepthValues.SECONDARY_TEXT_DEPTH)
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.play_info_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
@@ -38,7 +38,7 @@ class GLTacticLayer(GLLayer):
 
         self.tactic_fsm_info_graphics = ObservableList(self._graphics_changed)
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         self.cached_world = self.world_buffer.get(block=False)
@@ -49,7 +49,7 @@ class GLTacticLayer(GLLayer):
             self.cached_world.friendly_team, play_info_dict
         )
 
-    def __update_tactic_name_graphics(self, team: Team, play_info_dict):
+    def __update_tactic_name_graphics(self, team: Team, play_info_dict) -> None:
         """Update the GLGraphicsItems that display tactic data
         
         :param team: The team proto

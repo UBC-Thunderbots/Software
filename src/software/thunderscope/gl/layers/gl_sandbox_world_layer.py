@@ -60,6 +60,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # the currently added robots and the next id to add
         self.next_id = 0
         self.curr_robot_ids = set()
+        # if the world has robots already, update curr_robot_ids on the first tick
+        self.should_init_curr_robot_ids = True
 
         # the local state of robots (if simulator is paused)
         # map of robot id to a QVector3D object of the robot coordinates
@@ -163,6 +165,26 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.selected_robot_pos = None
         self.selected_robot_plane = None
         self.move_in_progress = False
+
+    def refresh_graphics(self) -> None:
+        """
+        Calls the super class refresh graphics
+
+        If there are any pre-loaded robots in the world, updates curr robots ids
+        to reflect this and stay consistent
+        Ensures this is only done once
+        """
+        super().refresh_graphics()
+
+        # if curr robot ids hasn't been synced yet
+        if self.should_init_curr_robot_ids:
+            friendly_team, _ = self.__get_friendly_and_enemy_team()
+
+            # for robots in the world, add the ids them to curr robots
+            for robot in friendly_team:
+                self.curr_robot_ids.add(robot.id)
+
+            self.should_init_curr_robot_ids = False
 
     def undo(self):
         """

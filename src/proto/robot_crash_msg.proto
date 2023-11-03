@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package TbotsProto;
+
+import "proto/robot_status_msg.proto";
+
+message RobotCrash
+{
+    uint32 robot_id    = 1;
+    string exit_signal = 2;
+    string stack_dump  = 3;
+    RobotStatus status = 4;
+}

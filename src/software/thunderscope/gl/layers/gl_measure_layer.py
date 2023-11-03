@@ -9,6 +9,7 @@ from software.thunderscope.constants import Colors
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
+from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
@@ -17,7 +18,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 class GLMeasureLayer(GLLayer):
     """GLLayer that displays UI graphics for measuring coordinates, distances, and angles"""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         """Initialize the GLMeasureLayer
         
         :param name: The displayed name of the layer
@@ -36,7 +37,7 @@ class GLMeasureLayer(GLLayer):
         self.measurement_line_graphics = ObservableList(self._graphics_changed)
         self.measurement_point_graphics = ObservableList(self._graphics_changed)
 
-    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was pressed and picked a point in the 3D scene
         
         :param event: The event
@@ -61,15 +62,12 @@ class GLMeasureLayer(GLLayer):
 
             # Create and add line graphic
             self.measurement_line_graphics.append(
-                GLLinePlotItem(
-                    color=(Colors.PRIMARY_TEXT_COLOR),
-                    width=3.0,
-                    pos=np.array(
-                        [
-                            [first_point.x(), first_point.y(), 0],
-                            [second_point.x(), second_point.y(), 0],
-                        ]
-                    ),
+                GLPolygon(
+                    outline_color=(Colors.PRIMARY_TEXT_COLOR),
+                    points=[
+                        [first_point.x(), first_point.y(), 0],
+                        [second_point.x(), second_point.y(), 0],
+                    ],
                 )
             )
 
@@ -126,7 +124,7 @@ class GLMeasureLayer(GLLayer):
             # Clear the point cache
             self.measurement_points_cache.clear()
 
-    def mouse_in_scene_moved(self, event: MouseInSceneEvent):
+    def mouse_in_scene_moved(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was moved within the 3D scene
         
         :param event: The event
@@ -134,14 +132,14 @@ class GLMeasureLayer(GLLayer):
         """
         self.mouse_point_in_scene = event.point_in_scene
 
-    def clear_measurements(self):
+    def clear_measurements(self) -> None:
         """Clear all measurements in the layer"""
         self.measurement_text_graphics.clear()
         self.measurement_line_graphics.clear()
         self.measurement_point_graphics.clear()
         self.measurement_points_cache.clear()
 
-    def refresh_graphics(self):
+    def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         # Display coordinates of point at mouse cursor
