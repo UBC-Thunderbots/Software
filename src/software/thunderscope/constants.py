@@ -28,7 +28,7 @@ class TabNames(str, Enum):
     DIAGNOSTICS = "DIAGNOSTICS"
     GAMECONTROLLER = "GAMECONTROLLER"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str.__str__(self)
 
 
@@ -144,7 +144,7 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
 )
 
 
-def create_vision_pattern_lookup(color1, color2):
+def create_vision_pattern_lookup(color1: QtGui.QColor, color2: QtGui.QColor) -> dict:
     """
     There is no pattern to this so we just have to create
     mapping from robot id to the four corners of the vision pattern
@@ -177,7 +177,7 @@ def create_vision_pattern_lookup(color1, color2):
     }
 
 
-def rgb_to_bw(r, g, b):
+def rgb_to_bw(r: int, g: int, b: int) -> tuple:
     """
     Converts the given RGB color values into the corresponding black and white RGB values
     :param r: red value
