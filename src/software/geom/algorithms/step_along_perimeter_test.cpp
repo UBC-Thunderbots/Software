@@ -33,6 +33,18 @@ TEST(StepAlongPerimeterTest, PositiveDistanceEndsInMiddle)
     EXPECT_EQ(resultPoint, expectedPoint);
 }
 
+TEST(StepAlongPerimeterTest, SmallDiffNotOnPerimeter)
+{
+    Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
+    const double EPSILON = 1e-9;
+    Point startPoint(0 + EPSILON, 0 - EPSILON);
+    double travelDistance =
+            3.0;  // Assuming we travel a distance equal to one side + half of the next side.
+    Point expectedPoint(1, 2);  // Expect to end in the middle of the second side.
+    Point resultPoint = stepAlongPerimeter(polygon, startPoint, travelDistance);
+    EXPECT_EQ(resultPoint, expectedPoint);
+}
+
 TEST(StepAlongPerimeterTest, PositiveDistanceGoAround1)
 {
     Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});

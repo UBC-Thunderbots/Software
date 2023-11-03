@@ -17,21 +17,38 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
     }
 
     const std::vector<Segment>& polygon_segments = polygon.getSegments();
-    std::size_t start_segment_index              = 0;
+    std::size_t start_segment_index;
 
-    // find initial segment which contains start point
-    auto it =
-        std::find_if(polygon_segments.begin(), polygon_segments.end(),
-                     [&start](const Segment& segment) {
-                         return collinear(segment.getStart(), start, segment.getEnd());
-                     });
+    //finds the closest segment on the polygon to the start point with the maximum distance being 0.05
+//    const double MAX_DISTANCE = 0.05; // arbitrary number, lmk if you need to change
+//    auto min_it = std::find_if(polygon_segments.begin(), polygon_segments.end(),
+//                               [&start, MAX_DISTANCE](const auto& segment) {
+//                                   double dist = distance(start, segment);
+//                                   return dist < MAX_DISTANCE;
+//                               }
+//    );
+//
+//    if (min_it != polygon_segments.end()) {
+//        start_segment_index = std::distance(polygon_segments.begin(), min_it);
+//    } else {
+//        // Handling the case where no segment is within the upper_limit,
+//        throw std::runtime_error("Point not on polygon");
+//    }
 
-    if (it == polygon_segments.end())
-    {
+
+//     Implementation in case no upper limit needs to be imposed
+    // finds the closest segment to start point
+    const double MAX_DISTANCE = 0.05; // arbitrary number, lmk if you need to change
+    auto min_it = std::min_element(polygon_segments.begin(), polygon_segments.end(),
+                                   [&start](const auto& a, const auto& b) {
+                                       return distance(start, a) < distance(start, b);
+                                   }
+    );
+    start_segment_index = std::distance(polygon_segments.begin(), min_it);
+
+    if (distance(start, polygon_segments[start_segment_index]) > MAX_DISTANCE) {
         throw std::runtime_error("Point not on polygon");
     }
-
-    start_segment_index = std::distance(polygon_segments.begin(), it);
 
     std::size_t segment_index = start_segment_index;
 
