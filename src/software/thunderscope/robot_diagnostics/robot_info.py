@@ -1,5 +1,3 @@
-import logging
-
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
@@ -333,10 +331,8 @@ class RobotInfo(QWidget):
             - The primitive and world loss rates
         :param robot_status: The robot status message for this robot
         """
-        logging.debug(robot_status)
         motor_status = robot_status.motor_status
         power_status = robot_status.power_status
-        robot_status.error_code
         network_status = robot_status.network_status
         primitive_executor_status = robot_status.primitive_executor_status
 

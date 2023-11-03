@@ -133,6 +133,7 @@ message NetworkStatus
     // Indicates the time elapsed since the last primitive packet was received in ms
     double ms_since_last_primitive_received = 2;
 
+    // Indicates the percentage of primitive / world packets lost during communication
     uint32 primitive_packet_loss_percentage = 3;
     uint32 world_packet_loss_percentage     = 4;
 }

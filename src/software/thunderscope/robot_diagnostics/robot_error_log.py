@@ -56,6 +56,7 @@ class RobotErrorLog(QScrollArea):
         self.setWidget(self.container)
         self.setWidgetResizable(True)
 
+        # TODO : REMOVE BEFORE MERGE
         QTimer.singleShot(3000, self.test)
         QTimer.singleShot(3100, self.test)
         QTimer.singleShot(3200, self.test)

@@ -21,13 +21,21 @@ class RobotLogMessageWidget(QFrame):
     def __init__(
         self, robot_id: int, message: str, icon: QtGui.QPixmap, timestamp=None
     ):
+        """
+        Creates an error message with the given info
+
+        :param robot_id: the id of the robot that threw the error
+        :param message: the message of the error
+        :param icon: the icon to display for the error
+        :param timestamp: the timestamp the error was thrown
+        """
         super(RobotLogMessageWidget, self).__init__()
 
         self.layout = QHBoxLayout()
         self.icon = QLabel()
 
         # setting up the icon
-        self.icon_size = self.width() / 10
+        self.icon_size = self.width() / 15
         self.icon.setPixmap(
             icon.scaled(
                 self.icon_size, self.icon_size, Qt.AspectRatioMode.KeepAspectRatio
@@ -61,7 +69,7 @@ class RobotLogMessageWidget(QFrame):
 
         # the timestamp the error took place
         self.timestamp = timestamp if timestamp else datetime.now()
-        self.timestamp_label = QLabel(self.timestamp.strftime("%H:%M:%S %f"))
+        self.timestamp_label = QLabel(self.timestamp.strftime("%H:%M:%S.%f"))
         # time since the error was logged (easier to understand than timestamp)
         self.time_since_label = QLabel(str(0))
 
@@ -109,6 +117,10 @@ class LowBatteryLogMessageWidget(RobotLogMessageWidget):
     """
 
     def __init__(self, robot_id):
+        """
+        Creates a low battery error message for the given robot
+        :param robot_id: the id of the robot whose battery is low
+        """
         super(LowBatteryLogMessageWidget, self).__init__(
             robot_id, "Battery voltage is low", error_constants.get_low_battery_icon()
         )
@@ -120,6 +132,12 @@ class ErrorCodeLogMessageWidget(RobotLogMessageWidget):
     """
 
     def __init__(self, robot_id: int, error_code: str):
+        """
+        Creates an error message that the given robot has the given error code
+
+        :param robot_id: the id of the robot with the error code
+        :param error_code: the specific error code
+        """
         super(ErrorCodeLogMessageWidget, self).__init__(
             robot_id,
             f"Robot encountered Error Code: {error_code}",
@@ -136,6 +154,13 @@ class RobotLogMessageWithDialogWidget(RobotLogMessageWidget):
     def __init__(
         self, robot_id: int, message: str, icon: QtGui.QPixmap, timestamp=None
     ):
+        """
+        Creates a error message with hover indication. Dialog is set by child classes
+        :param robot_id: the id of the robot that threw the error
+        :param message: the message of the error
+        :param icon: the icon to display for the error
+        :param timestamp: the timestamp the error was thrown
+        """
         super(RobotLogMessageWithDialogWidget, self).__init__(
             robot_id, message, icon, timestamp
         )
@@ -175,6 +200,10 @@ class RobotCrashLogMessageWidget(RobotLogMessageWithDialogWidget):
     """
 
     def __init__(self, crash_message: RobotCrash):
+        """
+        Creates an error message for a crashed robot. Creates a dialog to display the whole crash message
+        :param crash_message: the crash message containing robot id and other info
+        """
         super(RobotCrashLogMessageWidget, self).__init__(
             crash_message.robot_id,
             "Robot has Crashed",
@@ -196,6 +225,10 @@ class FatalLogMessageWidget(RobotLogMessageWithDialogWidget):
     """
 
     def __init__(self, robot_log: RobotLog):
+        """
+        Creates an error message for a robot with a fatal log message. Creates a dialog to display the whole log
+        :param robot_log: the fatal log message
+        """
         super(FatalLogMessageWidget, self).__init__(
             robot_log.robot_id,
             "Fatal Log Message",
@@ -214,6 +247,11 @@ class RobotFatalLogDialog(QDialog):
     """
 
     def __init__(self, fatal_log: RobotLog, parent=None):
+        """
+        Creates a dialog box to display a robot fatal log clearly
+        :param fatal_log: the fatal log to display
+        :param parent: the parent widget of the dialog
+        """
         super().__init__(parent)
 
         self.setWindowTitle("Fatal Log Alert")
@@ -253,6 +291,12 @@ class RobotCrashDialog(QDialog):
     """
 
     def __init__(self, message, robot_status, parent=None):
+        """
+        Creates a dialog box detailing info about a robot crash + the last status of the robot before crashing
+        :param message: the crash message of the robot
+        :param robot_status: the last robot status of the crashed robot
+        :param parent: the parent widget of the dialog
+        """
         super().__init__(parent)
 
         self.setWindowTitle("Robot Crash")

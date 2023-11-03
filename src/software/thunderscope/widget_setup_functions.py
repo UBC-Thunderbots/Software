@@ -4,6 +4,7 @@ from software.py_constants import *
 from proto.import_all_protos import *
 from software.thunderscope.common.proto_plotter import ProtoPlotter
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from proto.robot_log_msg_pb2 import RobotLog
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_style import *
 
@@ -252,6 +253,7 @@ def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorL
     robot_error_log = RobotErrorLog()
     proto_unix_io.register_observer(RobotStatus, robot_error_log.robot_status_buffer)
     proto_unix_io.register_observer(RobotCrash, robot_error_log.robot_crash_buffer)
+    proto_unix_io.register_observer(RobotLog, robot_error_log.robot_log_buffer)
     return robot_error_log
 
 
