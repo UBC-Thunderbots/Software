@@ -8,8 +8,12 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from queue import Empty
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from typing import Type
 import threading
 import time
+import os
+from google.protobuf.message import Message
 
 
 class RobotCommunication(object):
@@ -22,7 +26,7 @@ class RobotCommunication(object):
         multicast_channel: str,
         interface: str,
         estop_mode: EstopMode,
-        estop_path: str = None,
+        estop_path: os.PathLike = None,
         estop_buadrate: int = 115200,
     ):
         """Initialize the communication with the robots
@@ -94,7 +98,7 @@ class RobotCommunication(object):
             except Exception:
                 raise Exception("Could not find estop, make sure its plugged in")
 
-    def setup_for_fullsystem(self):
+    def setup_for_fullsystem(self) -> None:
         """
         Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
         """
@@ -122,7 +126,7 @@ class RobotCommunication(object):
 
         self.run_world_thread.start()
 
-    def toggle_keyboard_estop(self):
+    def toggle_keyboard_estop(self) -> None:
         """
         If keyboard estop is being used, toggles the estop state
         And sends a message to the console
@@ -159,7 +163,7 @@ class RobotCommunication(object):
         elif mode == IndividualRobotMode.AI:
             self.robots_connected_to_fullsystem.add(robot_id)
 
-    def __send_estop_state(self):
+    def __send_estop_state(self) -> None:
         """
         Constant loop which sends the current estop status proto if estop is not disabled
         Uses the keyboard estop value for keyboard estop mode
@@ -217,7 +221,7 @@ class RobotCommunication(object):
                 # send the world proto
                 self.send_world.send_proto(world)
 
-    def __run_primitive_set(self):
+    def __run_primitive_set(self) -> None:
         """Forward PrimitiveSet protos from fullsystem to the robots.
 
         For AI protos, blocks for 10ms if no proto is available, and then returns a cached proto
@@ -297,7 +301,7 @@ class RobotCommunication(object):
             if not self.robots_connected_to_fullsystem:
                 time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
-    def __forward_to_proto_unix_io(self, type, data):
+    def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:
         """
         Forwards to proto unix IO iff running is true
         :param data: the data to be passed through
@@ -306,7 +310,7 @@ class RobotCommunication(object):
         if self.running:
             self.current_proto_unix_io.send_proto(type, data)
 
-    def __reduce_primitive_size(self, primitive):
+    def __reduce_primitive_size(self, primitive) -> Message:
         """
         Reduces the size of the primitive by removing the static obstacles
         :param primitive: the primitive to be reduced
@@ -323,7 +327,7 @@ class RobotCommunication(object):
         else:
             return primitive
 
-    def __enter__(self):
+    def __enter__(self) -> "self":
         """Enter RobotCommunication context manager. Setup multicast listener
         for RobotStatus and multicast senders for World and PrimitiveSet
 
@@ -369,7 +373,7 @@ class RobotCommunication(object):
 
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         """Exit RobotCommunication context manager
 
         Ends all currently running loops and joins all currently active threads
