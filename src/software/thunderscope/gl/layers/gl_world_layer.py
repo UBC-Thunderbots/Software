@@ -420,6 +420,7 @@ class GLWorldLayer(GLLayer):
         :param orientation: the orientation of the robot
         """
         # update the robot graphic with the robot state
+        # print(f"x {pos[0]} y {pos[1]}")
         robot_graphic.set_position(pos[0], pos[1])
         robot_graphic.set_orientation(math.degrees(orientation))
         robot_graphic.setColor(color)
@@ -537,7 +538,7 @@ class GLWorldLayer(GLLayer):
                 ]
             )
 
-    def __should_invert_coordinate_frame(self) -> bool:
+    def _should_invert_coordinate_frame(self) -> bool:
         """Our coordinate system always assumes that the friendly team is defending
         the negative half of the field.
 
@@ -568,6 +569,6 @@ class GLWorldLayer(GLLayer):
         :return: The inverted point location [x, y] (if needed to be inverted)
 
         """
-        if self.__should_invert_coordinate_frame():
+        if self._should_invert_coordinate_frame():
             return QtGui.QVector3D(-point[0], -point[1], point[2])
         return point

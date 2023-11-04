@@ -167,14 +167,14 @@ def configure_base_fullsystem(
             anchor="Field",
             position="left",
             has_refresh_func=False,
-            stretch=WidgetStretchData(x=3)
+            stretch=WidgetStretchData(x=3),
         ),
         TScopeWidget(
             name="Logs",
             widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Parameters",
             position="above",
-            stretch=WidgetStretchData(x=3)
+            stretch=WidgetStretchData(x=3),
         ),
         TScopeWidget(
             name="Referee Info",

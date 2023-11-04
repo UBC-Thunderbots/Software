@@ -13,7 +13,12 @@ class GLFieldToolbar(QWidget):
     And for undoing / redoing robot state changes
     """
 
-    def __init__(self, on_camera_view_change: Callable[[CameraView], None], on_measure_mode: Callable[[], None], layers_menu: QMenu):
+    def __init__(
+        self,
+        on_camera_view_change: Callable[[CameraView], None],
+        on_measure_mode: Callable[[], None],
+        layers_menu: QMenu,
+    ):
         """
         Set up the toolbar with these buttons:
 
@@ -99,9 +104,7 @@ class GLFieldToolbar(QWidget):
         self.reset_button.setStyleSheet(self.get_button_style())
 
         # Setup toolbar
-        self.setSizePolicy(
-            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed
-        )
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self.setStyleSheet("background-color: black;" "padding: 0px;")
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(self.layers_button)

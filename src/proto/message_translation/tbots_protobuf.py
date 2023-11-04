@@ -1,4 +1,5 @@
 from proto.import_all_protos import *
+import math
 
 
 def create_world_state(
@@ -21,6 +22,7 @@ def create_world_state(
                 global_position=Point(
                     x_meters=robot_location.x(), y_meters=robot_location.y()
                 ),
+                global_orientation=Angle(radians=math.pi),
             )
         )
     for robot_id, robot_location in enumerate(blue_robot_locations):

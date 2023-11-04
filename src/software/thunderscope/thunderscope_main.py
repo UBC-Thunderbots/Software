@@ -335,8 +335,7 @@ if __name__ == "__main__":
 
         tscope = Thunderscope(
             config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size,
-                args.cost_visualization,
+                args.visualization_buffer_size, args.cost_visualization,
             ),
             layout_path=args.layout,
         )
@@ -364,7 +363,9 @@ if __name__ == "__main__":
                             tbots_cpp.Point(-3, y)
                             for y in numpy.linspace(-2, 2, NUM_ROBOTS)
                         ],
-                        yellow_robot_locations=[] if args.empty else [
+                        yellow_robot_locations=[]
+                        if args.empty
+                        else [
                             tbots_cpp.Point(3, y)
                             for y in numpy.linspace(-2, 2, NUM_ROBOTS)
                         ],

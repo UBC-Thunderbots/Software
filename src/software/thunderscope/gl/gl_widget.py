@@ -4,7 +4,6 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 
-import textwrap
 import numpy as np
 
 from software.thunderscope.constants import *
@@ -56,7 +55,7 @@ class GLWidget(QWidget):
         self.toolbar = GLFieldToolbar(
             on_camera_view_change=self.set_camera_view,
             on_measure_mode=self.toggle_measure_mode,
-            layers_menu=self.layers_menu
+            layers_menu=self.layers_menu,
         )
 
         # Setup layout
