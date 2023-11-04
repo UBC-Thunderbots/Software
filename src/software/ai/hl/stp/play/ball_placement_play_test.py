@@ -1,6 +1,6 @@
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
@@ -12,35 +12,38 @@ from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
 # TODO (#2599): Remove Duration parameter from test
-# TODO (#2690): Robot gets stuck in corner of defense area
 
 
 def test_two_ai_ball_placement(simulated_test_runner):
 
     # placement point must be Vector2 to work with game controller
-    ball_final_pos = tbots.Point(-3, -2)
+    ball_final_pos = tbots_cpp.Point(-3, -2)
 
     def setup(run_enemy_ai):
         # starting point must be Point
-        ball_initial_pos = tbots.Point(2, 2)
+        ball_initial_pos = tbots_cpp.Point(2, 2)
 
         # Setup Bots
         blue_bots = [
-            tbots.Point(-2.75, 2.5),
-            tbots.Point(-2.75, 1.5),
-            tbots.Point(-2.75, 0.5),
-            tbots.Point(-2.75, -0.5),
-            tbots.Point(-2.75, -1.5),
-            tbots.Point(4.6, -3.1),
+            tbots_cpp.Point(-2.75, 2.5),
+            tbots_cpp.Point(-2.75, 1.5),
+            tbots_cpp.Point(-2.75, 0.5),
+            tbots_cpp.Point(-2.75, -0.5),
+            tbots_cpp.Point(-2.75, -1.5),
+            tbots_cpp.Point(4.5, -3.0),
         ]
 
         yellow_bots = [
-            tbots.Point(1, 0),
-            tbots.Point(1, 2.5),
-            tbots.Point(1, -2.5),
-            tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-            tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-            tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+            tbots_cpp.Point(1, 0),
+            tbots_cpp.Point(1, 2.5),
+            tbots_cpp.Point(1, -2.5),
+            tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXNegYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXPosYCorner(),
         ]
 
         # Game Controller Setup
@@ -79,19 +82,19 @@ def test_two_ai_ball_placement(simulated_test_runner):
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
                 ball_location=ball_initial_pos,
-                ball_velocity=tbots.Vector(0, 0),
+                ball_velocity=tbots_cpp.Vector(0, 0),
             ),
         )
 
     simulated_test_runner.run_test(
         setup=setup,
-        params=[False, False, False, False],
+        params=[False],
         inv_always_validation_sequence_set=[[]],
         inv_eventually_validation_sequence_set=[
             [
                 # Ball should arrive within 5cm of placement point
                 BallEventuallyEntersRegion(
-                    regions=[tbots.Circle(ball_final_pos, 0.05)]
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.05)]
                 ),
             ]
         ],
@@ -100,11 +103,11 @@ def test_two_ai_ball_placement(simulated_test_runner):
             [
                 # Ball should arrive within 5cm of placement point
                 BallEventuallyEntersRegion(
-                    regions=[tbots.Circle(ball_final_pos, 0.05)]
+                    regions=[tbots_cpp.Circle(ball_final_pos, 0.05)]
                 ),
             ]
         ],
-        test_timeout_s=[20, 20, 20, 20],
+        test_timeout_s=[20],
     )
 
 

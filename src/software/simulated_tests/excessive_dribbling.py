@@ -1,4 +1,4 @@
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -22,9 +22,9 @@ class ExcessivelyDribbling(Validation):
         :returns: FAILING when the robot is excessively dribbling
                   PASSING when the robot is not excessively dribbling
         """
-        ball_position = tbots.createPoint(world.ball.current_state.global_position)
+        ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:
-            if not tbots.Robot(robot).isNearDribbler(ball_position, 0.01):
+            if not tbots_cpp.Robot(robot).isNearDribbler(ball_position, 0.01):
                 # if ball is not near dribbler then de-activate this validation
                 self.continous_dribbling_start_point = None
             elif (
@@ -41,7 +41,7 @@ class ExcessivelyDribbling(Validation):
         (override) Shows the max allowed dribbling circle
         """
         return create_validation_geometry(
-            [tbots.Circle(self.continous_dribbling_start_point, 1.0)]
+            [tbots_cpp.Circle(self.continous_dribbling_start_point, 1.0)]
             if self.continous_dribbling_start_point is not None
             else []
         )
