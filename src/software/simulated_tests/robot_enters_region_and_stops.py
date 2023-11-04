@@ -7,14 +7,15 @@ from software.simulated_tests.validation import (
     create_validation_types,
     create_validation_geometry,
 )
+from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 
-class RobotEntersRegionAndStops:
+class RobotEntersRegionAndStops(RobotEntersRegion):
     """Checks if a specific robot enters the provided regions and stops there for the provided time"""
 
     ROBOT_MAX_STATIONARY_SPEED_M_PER_S = 0.01
 
-    def __init__(self, robot_id, region=None, num_ticks=1):
+    def __init__(self, regions=None, num_ticks=1):
         """
         Constructs the base validation with the given region
         Sets boolean indicating validation stage to default
@@ -23,12 +24,12 @@ class RobotEntersRegionAndStops:
         :param region: the region the robot has to enter
         :param num_ticks: the time the robot has to stay stationary for in the regions
         """
-        self.region = region
-        self.robot_id = robot_id
+        super().__init__(regions)
         self.num_ticks = num_ticks
         self.ticks_so_far = 0
 
         self.is_stationary = True
+        self.passing_robot_id = None
 
     def get_validation_status(self, world) -> ValidationStatus:
         """
@@ -42,27 +43,36 @@ class RobotEntersRegionAndStops:
                  and is stationary there for the provided time
                  PASSING when a robot is stationary in the region
         """
-        for robot in world.friendly_team.team_robots:
-            if robot.id == self.robot_id:
-                if tbots.contains(
-                    self.region, tbots.createPoint(robot.current_state.global_position)
-                ):
-                    if (
-                        math.hypot(
-                            robot.current_state.global_velocity.x_component_meters,
-                            robot.current_state.global_velocity.y_component_meters,
-                        )
-                        < self.ROBOT_MAX_STATIONARY_SPEED_M_PER_S
-                    ):
-                        self.ticks_so_far = self.ticks_so_far + 1
-                        self.is_stationary = True
-                        if self.ticks_so_far >= self.num_ticks:
-                            return ValidationStatus.PASSING
-                    else:
-                        self.ticks_so_far = 0
-                        self.is_stationary = False
+        robot_in_region_validation = super().get_validation_status(world)
 
-        return ValidationStatus.FAILING
+        # if a robot is currently in the region
+        if (
+            robot_in_region_validation == ValidationStatus.PASSING
+            and self.passing_robot is not None
+        ):
+            # check if robot speed is less than stationary threshold
+            if (
+                math.hypot(
+                    self.passing_robot.current_state.global_velocity.x_component_meters,
+                    self.passing_robot.current_state.global_velocity.y_component_meters,
+                )
+                < self.ROBOT_MAX_STATIONARY_SPEED_M_PER_S
+            ):
+                self.ticks_so_far = self.ticks_so_far + 1
+                self.is_stationary = True
+                # if the robot has been stationary for the specified num ticks
+                if self.ticks_so_far >= self.num_ticks:
+                    return ValidationStatus.PASSING
+            else:
+                # reset the num ticks since robot is moving too fast
+                self.ticks_so_far = 0
+                self.is_stationary = False
+                return ValidationStatus.FAILING
+        else:
+            # reset the num ticks since robot is 
+            self.ticks_so_far = 0
+            self.is_stationary = False
+            return robot_in_region_validation
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """
