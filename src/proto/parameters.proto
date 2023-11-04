@@ -350,7 +350,7 @@ message DefensePlayConfig
 message RobotNavigationObstacleConfig
 {
     required double robot_obstacle_inflation_factor = 1 [
-        default                   = 2.0167,
+        default                   = 1.0, //2.0167,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
