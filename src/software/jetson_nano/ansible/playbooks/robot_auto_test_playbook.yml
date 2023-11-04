@@ -22,7 +22,7 @@
               state: stopped
           tags: always
 
-        - name: Delete everything on ~/
+        - name: Delete robot_auto_test binary under ~/thunderbots_binaries
           file:
             state: absent
             path: ~/thunderbots_binaries/robot_auto_test
