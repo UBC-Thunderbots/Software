@@ -6,8 +6,6 @@ Our main software and firmware repository. To get started, please see [Getting S
 
 For an explanation of our software layout and architecture, check out [software architecture and design](docs/software-architecture-and-design.md).
 
-Got a question? Look at the [FAQ](docs/faq.md) to see if it's already been answered!
-
 Want to learn more about the RoboCup Small Size League? (teams, rules, etc.) Check out the [Official RoboCup SSL Website](https://ssl.robocup.org/).
 
 Want to edit these docs? If you're planning on editing diagrams, read the guide on [editing the docs](docs/editing-the-docs.md).

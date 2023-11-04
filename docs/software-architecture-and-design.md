@@ -402,12 +402,11 @@ Because of our [Coordinate Conventions](#coordinates), this means that an angle 
 ## Convention Diagram
 ![Coordinate Convention Diagram](images/coordinate_and_angle_convention_diagram.svg)
 
-
 # Architecture Overview
 
 At a high-level, our system is split into several independent processes that [communicate with each other](#inter-process-communication). Our architecture is designed in this manner to promote decoupling of different features, making our system easier to expand, maintain, and test.
 
-- [**Thunderscope**](#thunderscope) is main entry point of our system and the provides the GUI for our software. It also manages data IO from other processes and external sources (e.g. SSL vision data, gamecontroller/referee data).
+- [**Thunderscope**](#thunderscope) is main entry point of our system and provides the GUI for our software.
 
 - [**Fullsystem**](#fullsystem) is the "backend" that processes data and makes decisions for a [team](#team) of [robots](#robot). It manages [Sensor Fusion](#sensor-fusion), which is responsible for processing and filtering raw data, and the [**AI**](#ai) that makes gameplay decisions.
 
@@ -419,7 +418,7 @@ At a high-level, our system is split into several independent processes that [co
 
 Fullsystem processes data and makes decisions for a [team](#team) of [robots](#robot). It manages [Sensor Fusion](#sensor-fusion), which is responsible for processing and filtering raw data, and the [AI](#ai) that makes gameplay decisions. 
 
-Data within Fullsystem is shared between components using the [observer pattern](#observer-pattern); [Sensor Fusion](#sensor-fusion) and the [Backend](#backend) are `Subject`s that the [AI](#ai) observes. 
+Data within Fullsystem is shared between components using the [observer pattern](#observer-pattern); for instance, [Sensor Fusion](#sensor-fusion) and the [Backend](#backend) are `Subject`s that the [AI](#ai) observes.
 
 ## Backend
 Fullsystem contains a `Backend` responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into communication using `SensorProto` and [Primitives](#primitives) messages:
@@ -516,7 +515,7 @@ The `Path Planner` is an interface for the responsibility of path planning a sin
 
 # Thunderscope
 
-[`Thunderscope Main`](/src/software/thunderscope/thunderscope_main.py) serves as the main entry point for our entire system. It starts up the [Thunderscope GUI](#thunderscope-gui) and other processes, including a [Fullsystem](#fullsystem) for each AI team.
+[`Thunderscope Main`](/src/software/thunderscope/thunderscope_main.py) serves as the main entry point for our entire system. It starts up the [Thunderscope GUI](#thunderscope-gui) and other processes, such as a [Fullsystem](#fullsystem) for each [AI](#ai) team.
 
 ## Thunderscope GUI
 
@@ -618,7 +617,7 @@ The data sent between Fullsystem and Thunderscope is serialized using [protobufs
 Logging protobufs is done at the <code>VISUALIZE</code> level (e.g. <code>LOG(VISUALIZE) << some_random_proto;</code>). Protobufs need to be converted to strings in order to log them with <code>g3log</code>. We've overloaded the stream (<code><<</code>) operator to automatically pack protobufs into a <code>google::protobuf::Any</code> and serialize them to a string, so you don't need to do the conversion yourself.
 </details><br>
 
-In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. `ProtoUnixIO` utilizes the [publisher-subscriber ("pub-sub")](#publisher-subscriber-pattern) messaging pattern. Through `ProtoUnixIO`, classes can register as an [subscriber](#observer-pattern) by providing a protobuf type to receive and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming those protobuf messages. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and place those messages onto the `ThreadSafeBuffer`s of that proto type's subscribers. Classes can also publish protobufs via `ProtoUnixIO` by configuring it with a unix sender.
+In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. `ProtoUnixIO` utilizes the [publisher-subscriber ("pub-sub")](#publisher-subscriber-pattern) messaging pattern. Through `ProtoUnixIO`, classes can register as a subscriber by providing a protobuf type to receive and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming those protobuf messages. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and place those messages onto the `ThreadSafeBuffer`s of that proto's subscribers. Classes can also publish protobufs via `ProtoUnixIO` by configuring it with a unix sender.
 
 # Estop
 `Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:
