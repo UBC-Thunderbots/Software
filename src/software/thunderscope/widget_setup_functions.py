@@ -89,7 +89,7 @@ def setup_gl_widget(
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
 
     gl_widget.add_layer(validation_layer)
-    gl_widget.add_layer(path_layer, False)
+    gl_widget.add_layer(path_layer)
     gl_widget.add_layer(obstacle_layer)
     gl_widget.add_layer(passing_layer)
     gl_widget.add_layer(world_layer)

@@ -29,7 +29,7 @@ class GLPathLayer(GLLayer):
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 
-        self.path_graphics = ObservableList(self._graphics_changed)
+        # self.path_graphics = ObservableList(self._graphics_changed)
         self.destination_graphics = ObservableList(self._graphics_changed)
 
     def refresh_graphics(self) -> None:
@@ -39,11 +39,11 @@ class GLPathLayer(GLLayer):
             block=False
         ).robot_primitives.values()
 
-        paths = [
-            primitive.move.motion_control.path
-            for primitive in primitive_set
-            if primitive.HasField("move")
-        ]
+        # paths = [
+        #     primitive.move.motion_control.path
+        #     for primitive in primitive_set
+        #     if primitive.HasField("move")
+        # ]
 
         requested_destinations = [
             (
@@ -55,18 +55,18 @@ class GLPathLayer(GLLayer):
         ]
 
         # Ensure we have the same number of graphics as protos
-        self.path_graphics.resize(
-            len(paths), lambda: GLPolygon(outline_color=Colors.NAVIGATOR_PATH_COLOR),
-        )
+        # self.path_graphics.resize(
+        #     len(paths), lambda: GLPolygon(outline_color=Colors.NAVIGATOR_PATH_COLOR),
+        # )
         self.destination_graphics.resize(
             len(requested_destinations),
             lambda: GLRobotOutline(outline_color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
         )
 
-        for path_graphic, path in zip(self.path_graphics, paths):
-            path_graphic.set_points(
-                [[point.x_meters, point.y_meters] for point in path.points]
-            )
+        # for path_graphic, path in zip(self.path_graphics, paths):
+        #     path_graphic.set_points(
+        #         [[point.x_meters, point.y_meters] for point in path.points]
+        #     )
 
         for dest_graphic, (dest, final_angle) in zip(
             self.destination_graphics, requested_destinations

@@ -141,7 +141,7 @@ def hrvo_setup(
     "friendly_robot_positions,friendly_robot_destinations,friendly_robots_final_orientations,"
     + "enemy_robots_positions,enemy_robots_destinations,timeout_s,run_till_end",
     [
-        ([tbots.Point(4.4, -1.5)], [tbots.Point(4.4, 1.5)], [], [], [], 10, True,),
+        ([tbots.Point(3.7, 0.0)], [tbots.Point(4.4, 1.5)], [], [], [], 10, True,),
         # robot moving straight with no obstacles
         ([tbots.Point(-2.5, 0)], [tbots.Point(2.8, 0)], [], [], [], 10, False,),
         # robot moving straight with no obstacles while turning from 0 to 180 degrees
