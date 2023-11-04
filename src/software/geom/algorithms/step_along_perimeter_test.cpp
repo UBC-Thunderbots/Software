@@ -17,9 +17,12 @@ TEST(StepAlongPerimeterTest, ZeroDistanceReturnsStartPoint)
 
 TEST(StepAlongPerimeterTest, PointNotOnPolygon)
 {
-    Polygon polygon({{0, 0}, {0, 1}, {1, 1}, {1, 0}});
-    Point startPoint(3, 3);
-    EXPECT_THROW(stepAlongPerimeter(polygon, startPoint, 1), std::runtime_error);
+    Polygon polygon({{0, 0}, {0, 1}, {2, 1}, {2, 0}});
+    Point startPoint(0.5, 1.5);
+    double travel_distance = 2.0;
+    Point resultPoint = stepAlongPerimeter(polygon, startPoint, travel_distance);
+    Point expectedPoint(2, 0.5);
+    EXPECT_EQ(resultPoint, expectedPoint);
 }
 
 TEST(StepAlongPerimeterTest, PositiveDistanceEndsInMiddle)
