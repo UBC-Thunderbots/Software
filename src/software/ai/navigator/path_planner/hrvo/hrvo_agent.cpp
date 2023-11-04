@@ -48,21 +48,21 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
 
         // Create the path which the robot should follow
         std::vector<PathPoint> path_point_list;
-        Point prev_path_point = position;
-        for (int i = 1; i < path_points_proto.size() - 1; ++i)
-        {
-            Point intermediate_dest        = createPoint(path_points_proto.at(i));
-            Angle intermediate_orientation = angle_at_dest;
-            if (move_primitive.has_should_drive_forward() &&
-                move_primitive.should_drive_forward())
-            {
-                // Robot should drive forward by facing the next path point
-                intermediate_orientation =
-                    (intermediate_dest - prev_path_point).orientation();
-                prev_path_point = intermediate_dest;
-            }
-            path_point_list.emplace_back(intermediate_dest, 0, intermediate_orientation);
-        }
+//        Point prev_path_point = position;
+//        for (int i = 1; i < path_points_proto.size() - 1; ++i)
+//        {
+//            Point intermediate_dest        = createPoint(path_points_proto.at(i));
+//            Angle intermediate_orientation = angle_at_dest;
+//            if (move_primitive.has_should_drive_forward() &&
+//                move_primitive.should_drive_forward())
+//            {
+//                // Robot should drive forward by facing the next path point
+//                intermediate_orientation =
+//                    (intermediate_dest - prev_path_point).orientation();
+//                prev_path_point = intermediate_dest;
+//            }
+//            path_point_list.emplace_back(intermediate_dest, 0, intermediate_orientation);
+//        }
         const TbotsProto::Point &last_point =
             path_points_proto.at(path_points_proto.size() - 1);
         path_point_list.emplace_back(createPoint(last_point), speed_at_dest,
@@ -100,6 +100,7 @@ void HRVOAgent::updatePrimitive(const TbotsProto::Primitive &new_primitive,
             }
             else
             {
+                motion_constraints.insert(constraint);
                 static_obstacles.insert(static_obstacles.end(), new_obstacles.begin(),
                                         new_obstacles.end());
             }

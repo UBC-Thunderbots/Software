@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 cc_library(
     name = "velocity_obstacle",
     srcs = ["velocity_obstacle.cpp"],
@@ -67,7 +69,7 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_hrvo_test",
+    name = "simulated_hrvo_test_cpp",
     srcs = ["simulated_hrvo_test.cpp"],
     deps = [
         ":hrvo",
@@ -80,5 +82,16 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "simulated_hrvo_test",
+    srcs = ["simulated_hrvo_test.py"],
+    deps = [
+        "//proto/message_translation:py_tbots_protobuf",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
