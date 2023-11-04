@@ -69,7 +69,7 @@ class RobotEntersRegionAndStops(RobotEntersRegion):
                 self.is_stationary = False
                 return ValidationStatus.FAILING
         else:
-            # reset the num ticks since robot is 
+            # reset the num ticks since robot is
             self.ticks_so_far = 0
             self.is_stationary = False
             return robot_in_region_validation
