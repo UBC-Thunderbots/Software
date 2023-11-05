@@ -10,7 +10,6 @@ from software.thunderscope.dock_style import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from google.protobuf.message import Message
 
-
 # Import Widgets
 from software.thunderscope.gl.gl_widget import GLWidget
 from software.thunderscope.gl.layers import (

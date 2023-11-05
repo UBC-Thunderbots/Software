@@ -69,13 +69,15 @@ class GLCostVisLayer(GLLayer):
                 self.heatmap_graphic.hide()
                 return
         else:
-            # We received new cost data, so lets update our timeout
+            # We received new cost vis data, so lets update our timeout
             self.timeout = (
                 time.time() + GLCostVisLayer.COST_VISUALIZATION_TIMEOUT_S
             )
             self.cached_cost_vis = cost_vis
 
+        # Cost vis data is in column-major order; reshape into 2D matrix
         data = np.array(cost_vis.cost).reshape(cost_vis.num_rows, cost_vis.num_cols, order="F")
+
         self.heatmap_graphic.set_dimensions(field.field_x_length, field.field_y_length)
         self.heatmap_graphic.setData(data)
         self.heatmap_graphic.show()
