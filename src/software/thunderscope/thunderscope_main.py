@@ -301,9 +301,7 @@ if __name__ == "__main__":
     elif args.blue_log or args.yellow_log:
         tscope = Thunderscope(
             config=config.configure_replay_view(
-                args.blue_log,
-                args.yellow_log,
-                args.visualization_buffer_size,
+                args.blue_log, args.yellow_log, args.visualization_buffer_size,
             ),
             layout_path=args.layout,
         )
