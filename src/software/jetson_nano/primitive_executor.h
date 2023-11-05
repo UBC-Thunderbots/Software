@@ -61,6 +61,7 @@ class PrimitiveExecutor
      * target wheel velocities
      * @param status The status of the primitive executor, set to false if current
      * primitive is a Stop primitive
+     *
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
