@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <vector>
 
+#include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/segment.h"
-#include "software/geom/algorithms/closest_point.h"
 
 
 Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
@@ -18,7 +18,7 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
 
     const std::vector<Segment>& polygon_segments = polygon.getSegments();
     std::size_t start_segment_index;
-    
+
     auto min_it = std::min_element(polygon_segments.begin(), polygon_segments.end(),
                                    [&start](const auto& a, const auto& b) {
                                        return distance(start, a) < distance(start, b);
