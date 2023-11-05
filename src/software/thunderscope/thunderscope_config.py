@@ -234,7 +234,7 @@ def configure_base_diagnostics(
 
 
 def configure_two_ai_gamecontroller_view(
-    visualization_buffer_size: int = 5
+    visualization_buffer_size: int = 5,
 ) -> TScopeConfig:
     """
     Constructs the Thunderscope Config for a view with 2 FullSystem tabs (Blue and Yellow)
@@ -264,7 +264,7 @@ def configure_two_ai_gamecontroller_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[]
+                    extra_widgets=[],
                 ),
             ),
             TScopeQTTab(
@@ -277,7 +277,7 @@ def configure_two_ai_gamecontroller_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[]
+                    extra_widgets=[],
                 ),
             ),
             TScopeWebTab(
@@ -327,7 +327,7 @@ def configure_simulated_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[]
+                    extra_widgets=[],
                 ),
             ),
             TScopeQTTab(
@@ -340,7 +340,7 @@ def configure_simulated_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[]
+                    extra_widgets=[],
                 ),
             ),
         ],
@@ -389,7 +389,7 @@ def configure_field_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[]
+                    extra_widgets=[],
                 ),
             )
         ]
@@ -403,7 +403,7 @@ def configure_field_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[]
+                    extra_widgets=[],
                 ),
             )
         ]
@@ -446,7 +446,7 @@ def configure_replay_view(
                     replay=True,
                     replay_log=blue_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[]
+                    extra_widgets=[],
                 ),
             )
         )
@@ -466,7 +466,7 @@ def configure_replay_view(
                     replay=True,
                     replay_log=yellow_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[]
+                    extra_widgets=[],
                 ),
             )
         )
@@ -518,7 +518,7 @@ def configure_ai_or_diagnostics(
                         configure_robot_view_fullsystem(
                             proto_unix_io_map[ProtoUnixIOTypes.BLUE]
                         )
-                    ]
+                    ],
                 ),
             )
         )
