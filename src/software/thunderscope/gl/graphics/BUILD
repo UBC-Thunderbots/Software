@@ -72,3 +72,11 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_heatmap",
+    srcs = ["gl_heatmap.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
+)

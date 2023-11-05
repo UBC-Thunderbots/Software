@@ -111,3 +111,13 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_cost_vis_layer",
+    srcs = ["gl_cost_vis_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_heatmap",
+        requirement("pyqtgraph"),
+    ],
+)

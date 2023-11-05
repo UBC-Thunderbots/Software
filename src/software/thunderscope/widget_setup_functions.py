@@ -22,6 +22,7 @@ from software.thunderscope.gl.layers import (
     gl_simulator_layer,
     gl_hrvo_layer,
     gl_tactic_layer,
+    gl_cost_vis_layer,
 )
 
 from software.thunderscope.common.proto_configuration_widget import (
@@ -84,6 +85,9 @@ def setup_gl_widget(
     passing_layer = gl_passing_layer.GLPassingLayer(
         "Passing", visualization_buffer_size
     )
+    cost_vis_layer = gl_cost_vis_layer.GLCostVisLayer(
+        "Passing Cost", visualization_buffer_size
+    )
     world_layer = gl_world_layer.GLWorldLayer(
         "Vision", sim_proto_unix_io, friendly_colour_yellow, visualization_buffer_size
     )
@@ -94,6 +98,7 @@ def setup_gl_widget(
 
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(path_layer)
+    gl_widget.add_layer(cost_vis_layer)
     gl_widget.add_layer(obstacle_layer)
     gl_widget.add_layer(passing_layer)
     gl_widget.add_layer(world_layer)
@@ -113,6 +118,7 @@ def setup_gl_widget(
     # Register observers
     for arg in [
         (World, world_layer.world_buffer),
+        (World, cost_vis_layer.world_buffer),
         (RobotStatus, world_layer.robot_status_buffer),
         (Referee, world_layer.referee_buffer),
         (PrimitiveSet, obstacle_layer.primitive_set_buffer),
@@ -122,6 +128,7 @@ def setup_gl_widget(
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
         (SimulatorState, simulator_layer.simulator_state_buffer),
+        (CostVisualization, cost_vis_layer.cost_visualization_buffer),
     ] + [(HRVOVisualization, hrvo_layer.hrvo_buffer) for hrvo_layer in hrvo_layers]:
         full_system_proto_unix_io.register_observer(*arg)
 
