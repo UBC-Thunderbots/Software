@@ -8,9 +8,10 @@
  * Computes the final position on a polygon's perimeter after traveling a specified
  * distance from a starting point.
  *
- * Given a polygon, a starting point, and a travel distance, this function calculates the final point reached upon
- * traveling the distance along the perimeter starting from the point on the perimeter closest to the start point.
- * Travel direction is determined by the sign of the distance: positive travels clockwise, while negative travels
+ * Given a polygon, a starting point, and a travel distance, this function calculates the
+ * final point reached upon traveling the distance along the perimeter starting from the
+ * point on the perimeter closest to the start point. Travel direction is determined by
+ * the sign of the distance: positive travels clockwise, while negative travels
  * counterclockwise.
  *
  * @note If the distance is zero, the function returns the starting point.

@@ -85,7 +85,7 @@ TEST(StepAlongPerimeterTest, DistanceEqualsPerimeterReturnsStart)
     Polygon polygon({{0, 0}, {0, 1}, {1, 1}, {1, 0}});
     Point start_point(0, 0);
     double travel_distance = 4.0;  // Assuming the perimeter of the square is 4.
-    Point result_point    = stepAlongPerimeter(polygon, start_point, travel_distance);
+    Point result_point     = stepAlongPerimeter(polygon, start_point, travel_distance);
     EXPECT_EQ(result_point, start_point);
 }
 
@@ -104,8 +104,8 @@ TEST(StepAlongPerimeterTest, NegativeDistanceGoAround)
     Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
     Point start_point(0, 0);
     double travel_distance = -19.0;  // Assuming we travel a distance equal to one side +
-                                    // half of the next side.
-    Point expected_point(2, 1);     // Expect to end in the middle of the second side.
+                                     // half of the next side.
+    Point expected_point(2, 1);      // Expect to end in the middle of the second side.
     Point result_point = stepAlongPerimeter(polygon, start_point, travel_distance);
     EXPECT_EQ(result_point, expected_point);
 }
@@ -179,7 +179,7 @@ TEST(StepAlongPerimeterTest, NonConvexPolygonMoveBackward2)
     Polygon polygon({{0, 0}, {1, 2}, {2, 0}, {1, 1}});
     Point start_point(0, 0);
     double travel_distance = 2 * (sqrt(5) + sqrt(2));
-    Point result_point    = stepAlongPerimeter(polygon, start_point, travel_distance);
+    Point result_point     = stepAlongPerimeter(polygon, start_point, travel_distance);
     EXPECT_EQ(result_point, start_point);
 }
 
