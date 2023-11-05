@@ -96,7 +96,7 @@ def setup_gl_widget(
 
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(path_layer)
-    gl_widget.add_layer(cost_vis_layer)
+    gl_widget.add_layer(cost_vis_layer, False)
     gl_widget.add_layer(obstacle_layer)
     gl_widget.add_layer(passing_layer)
     gl_widget.add_layer(world_layer)

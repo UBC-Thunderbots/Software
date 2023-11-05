@@ -18,8 +18,8 @@ class GLCostVisLayer(GLLayer):
     This layer enables us to sample different pass cost functions
     in the field and visualize them.
 
-    WARNING: This layer is very slow and will slow down AI significantly if
-    the number of points sampled is too high.
+    WARNING: This layer may slow down AI significantly if the number of points 
+    sampled is too high.
 
     WARNING: The checkbox for generate_sample_passes should only be checked
     when this layer is shown. Otherwise the values will be calculated and
