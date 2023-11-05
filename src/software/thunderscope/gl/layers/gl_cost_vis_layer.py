@@ -11,6 +11,7 @@ from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_heatmap import GLHeatmap
+from software.thunderscope.gl.graphics.gl_rect import GLRect
 
 
 class GLCostVisLayer(GLLayer):
@@ -49,18 +50,13 @@ class GLCostVisLayer(GLLayer):
             time.time() + GLCostVisLayer.COST_VISUALIZATION_TIMEOUT_S
         )
 
-        self.data = np.zeros(shape=(6, 3))
-
-        self.heatmap_graphic = GLHeatmap(parentItem=self)
+        self.heatmap_graphic = GLHeatmap(parent_item=self)
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         self.cached_world = self.world_buffer.get(block=False)
         field = self.cached_world.field
-        if field.field_x_length == 0 or field.field_y_length == 0:
-            self.heatmap_graphic.clear()
-            return
 
         try:
             cost_vis = self.cost_visualization_buffer.queue.get_nowait()
@@ -69,9 +65,10 @@ class GLCostVisLayer(GLLayer):
 
         if not cost_vis:
             cost_vis = self.cached_cost_vis
-            # If we haven't received cost visualizations for a bit, clear the layer
+
+            # If we haven't received cost visualizations for a bit, hide the heatmap
             if time.time() > self.timeout:
-                self.heatmap_graphic.clear()
+                self.heatmap_graphic.hide()
                 return
         else:
             # We received new cost data, so lets update our timeout
@@ -80,26 +77,7 @@ class GLCostVisLayer(GLLayer):
             )
             self.cached_cost_vis = cost_vis
 
-        if cost_vis.num_rows == 0 or cost_vis.num_cols == 0:
-            return
-
-        data = np.array(cost_vis.cost).reshape(cost_vis.num_rows, cost_vis.num_cols, order="F").ravel()
-        colors = np.full(shape=(cost_vis.num_rows * cost_vis.num_cols, 4), fill_value=255)
-        for index, cost in enumerate(data):
-            colors[index][:3] = round(cost * 255);
-        colors = colors.reshape(cost_vis.num_rows, cost_vis.num_cols, 4)
-        
-        self.heatmap_graphic.setData(
-            x=np.arange(
-                start=-(field.field_x_length / 2),
-                stop=(field.field_x_length / 2) + (field.field_x_length / cost_vis.num_cols),
-                step=field.field_x_length / cost_vis.num_cols
-            ),
-            y=np.arange(
-                start=-(field.field_y_length / 2),
-                stop=(field.field_y_length / 2) + (field.field_y_length / cost_vis.num_rows),
-                step=field.field_y_length / cost_vis.num_rows
-            ),
-            colors=colors
-        )
-
+        data = np.array(cost_vis.cost).reshape(cost_vis.num_rows, cost_vis.num_cols, order="F")
+        self.heatmap_graphic.set_dimensions(field.field_x_length, field.field_y_length)
+        self.heatmap_graphic.setData(data)
+        self.heatmap_graphic.show()

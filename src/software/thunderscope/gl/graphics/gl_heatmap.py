@@ -8,44 +8,83 @@ class GLHeatmap(GLMeshItem):
     Displays a surface plot on a regular x,y grid
     """
 
-    def __init__(self, x=None, y=None, colors=None, parentItem=None, **kwds):
+    def __init__(self, x=None, y=None, colors=None, parent_item=None, **kwds):
         """
         The x, y, z, and colors arguments are passed to setData().
         All other keyword arguments are passed to GLMeshItem.__init__().
         """
-        self.__meshdata = MeshData()
+        self.x_length = 0
+        self.y_length = 0
+        self.meshdata = MeshData()
+        
         super().__init__(
-            parentItem=parentItem, 
-            meshdata=self.__meshdata, 
+            parentItem=parent_item, 
+            meshdata=self.meshdata, 
             smooth=False, 
             computeNormals=False,
             **kwds
         )
 
-    def setData(self, x, y, colors):
+    def set_dimensions(self, x_length: float = 0, y_length: float = 0) -> None:
+        """Set the dimensions of the heatmap
+        
+        :param x_length: The length of the heatmap in the x direction
+        :param y_length: The length of the heatmap in the y direction
+
+        """
+        if x_length == 0 or y_length == 0:
+            return
+
+        if self.x_length == x_length and self.y_length == y_length:
+            return
+
+        self.x_length = x_length
+        self.y_length = y_length
+
+
+    def setData(self, data):
+
+        rows = data.shape[0]
+        cols = data.shape[1]
+
+        # Generate x and y coordinate vectors
+        x = np.arange(
+            start=-(self.x_length / 2),
+            stop=(self.x_length / 2) + (self.x_length / cols),
+            step=self.x_length / cols
+        )
+        y = np.arange(
+            start=-(self.y_length / 2),
+            stop=(self.y_length / 2) + (self.y_length / rows),
+            step=self.y_length / rows
+        )
+
         ## Generate vertices
         xx, yy = np.meshgrid(x, y)
         vertices = np.dstack((xx, yy)).reshape(-1, 2)
-        vertices = np.hstack((vertices, np.zeros((vertices.shape[0], 1), dtype=np.int64)))
+        vertices = np.hstack((vertices, np.zeros((vertices.shape[0], 1), dtype=np.uint)))
 
         # Generate faces
-        rows, cols = len(y) - 1, len(x) - 1
-        faces = np.empty((cols*rows*2, 3), dtype=np.uint)
-        rowtemplate1 = np.arange(cols).reshape(cols, 1) + np.array([[0, 1, cols+1]])
-        rowtemplate2 = np.arange(cols).reshape(cols, 1) + np.array([[cols+1, 1, cols+2]])
-        for row in range(rows):
-            start = row * cols * 2 
-            faces[start:start+cols] = rowtemplate1 + row * (cols+1)
-            faces[start+cols:start+(cols*2)] = rowtemplate2 + row * (cols+1)
+        face_rows, face_cols = len(y) - 1, len(x) - 1
+        faces = np.empty((face_cols * face_rows * 2, 3), dtype=np.uint)
+        rowtemplate1 = np.arange(face_cols).reshape(face_cols, 1) + np.array([[0, 1, face_cols + 1]])
+        rowtemplate2 = np.arange(face_cols).reshape(face_cols, 1) + np.array([[face_cols + 1, 1, face_cols + 2]])
+        for row in range(face_rows):
+            start = row * face_cols * 2 
+            faces[start:start + face_cols] = rowtemplate1 + row * (face_cols + 1)
+            faces[start + face_cols:start + (face_cols * 2)] = rowtemplate2 + row * (face_cols + 1)
+        
+        # Compute face color per data point
+        colors = np.full(shape=(rows * cols, 4), fill_value=1.0)
+        for index, cost in enumerate(data.ravel()):
+            colors[index][:3] = np.interp(cost, (0, 1), (0, 0.8));
+        colors = colors.reshape(rows, cols, 4)
 
         colors = np.repeat(colors, repeats=2, axis=0).reshape(len(faces), 4)
 
         ## Update MeshData
-        self.__meshdata.setVertexes(vertices)
-        self.__meshdata.setFaces(faces)
-        self.__meshdata.setFaceColors(colors)
+        self.meshdata.setVertexes(vertices)
+        self.meshdata.setFaces(faces)
+        self.meshdata.setFaceColors(colors)
         self.meshDataChanged()
-
-    def clear(self):
-        self.__meshdata = MeshData()
-        self.setMeshData(meshdata=self.__meshdata)
+        
