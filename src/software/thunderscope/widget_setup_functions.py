@@ -94,14 +94,14 @@ def setup_gl_widget(
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
 
-    gl_widget.add_layer(validation_layer)
-    gl_widget.add_layer(path_layer)
-    gl_widget.add_layer(cost_vis_layer, False)
-    gl_widget.add_layer(obstacle_layer)
-    gl_widget.add_layer(passing_layer)
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
+    gl_widget.add_layer(path_layer)
+    gl_widget.add_layer(obstacle_layer)
+    gl_widget.add_layer(passing_layer)
+    gl_widget.add_layer(cost_vis_layer, False)
     gl_widget.add_layer(tactic_layer, False)
+    gl_widget.add_layer(validation_layer)
 
     # Add HRVO layers and have them hidden on startup
     # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
