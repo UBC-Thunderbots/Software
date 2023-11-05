@@ -1,17 +1,19 @@
 from pyqtgraph.opengl import *
-from pyqtgraph.opengl import *
+from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
+from typing import Optional
 
 import numpy as np
 
 class GLHeatmap(GLMeshItem):
     """
-    Displays a surface plot on a regular x,y grid
+    Displays a heatmap on the cartesian plane (i.e. x-y plane)
     """
 
-    def __init__(self, x=None, y=None, colors=None, parent_item=None, **kwds):
-        """
-        The x, y, z, and colors arguments are passed to setData().
-        All other keyword arguments are passed to GLMeshItem.__init__().
+    def __init__(self, parent_item: Optional[GLGraphicsItem] = None):
+        """Initialize the GLHeatmap
+        
+        :param parent_item: The parent item of the graphic
+
         """
         self.x_length = 0
         self.y_length = 0
@@ -22,7 +24,6 @@ class GLHeatmap(GLMeshItem):
             meshdata=self.meshdata, 
             smooth=False, 
             computeNormals=False,
-            **kwds
         )
 
     def set_dimensions(self, x_length: float = 0, y_length: float = 0) -> None:
@@ -87,4 +88,3 @@ class GLHeatmap(GLMeshItem):
         self.meshdata.setFaces(faces)
         self.meshdata.setFaceColors(colors)
         self.meshDataChanged()
-        

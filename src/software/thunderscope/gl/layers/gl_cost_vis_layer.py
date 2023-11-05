@@ -7,11 +7,9 @@ import numpy as np
 from proto.world_pb2 import World
 from proto.visualization_pb2 import CostVisualization
 
-from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_heatmap import GLHeatmap
-from software.thunderscope.gl.graphics.gl_rect import GLRect
 
 
 class GLCostVisLayer(GLLayer):

@@ -28,7 +28,6 @@ from software.thunderscope.gl.layers import (
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
 )
-from software.thunderscope.cost_vis.cost_vis import CostVisualizationWidget
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
@@ -222,22 +221,6 @@ def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
     proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
 
     return referee_info
-
-
-def setup_cost_visualization_widget(
-    proto_unix_io: ProtoUnixIO,
-) -> CostVisualizationWidget:
-    """Setup the cost visualization widget
-
-    :param proto_unix_io: The proto unix io object
-    :returns: The cost visualization widget
-
-    """
-    cost_vis_widget = CostVisualizationWidget()
-    proto_unix_io.register_observer(
-        CostVisualization, cost_vis_widget.cost_visualization_buffer
-    )
-    return cost_vis_widget
 
 
 #################################

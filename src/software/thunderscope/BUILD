@@ -52,7 +52,6 @@ py_library(
         "//software/thunderscope/common:common_widgets",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/common:proto_plotter",
-        "//software/thunderscope/cost_vis",
         "//software/thunderscope/gl:gl_widget",
         "//software/thunderscope/gl/layers:gl_hrvo_layer",
         "//software/thunderscope/gl/layers:gl_obstacle_layer",
