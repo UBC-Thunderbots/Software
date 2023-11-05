@@ -4,37 +4,25 @@ import os
 import threading
 
 import pytest
-import software.python_bindings as tbots_cpp
 import argparse
 from proto.import_all_protos import *
-from proto.ssl_gc_common_pb2 import Team
-from pyqtgraph.Qt import QtCore, QtGui
-
-from software.networking.threaded_unix_sender import ThreadedUnixSender
-from software.simulated_tests.robot_enters_region import (
-    RobotEntersRegion,
-    RobotEventuallyEntersRegion,
-)
 
 from software.simulated_tests import validation
 from software.thunderscope.constants import EstopMode
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers import (
     FullSystem,
-    Simulator,
     Gamecontroller,
 )
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from proto.message_translation.tbots_protobuf import create_world_state
-
 from software.logger.logger import createLogger
 
 
 from software.thunderscope.thunderscope_config import configure_field_test_view
 from software.simulated_tests.tbots_test_runner import TbotsTestRunner
 from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.estop_helpers import get_estop_config
 from software.py_constants import *
 
 logger = createLogger(__name__)
@@ -314,10 +302,6 @@ def load_command_line_arguments():
     )
 
     parser.add_argument(
-        "--estop_path", action="store", type=str, help="Path to the Estop",
-    )
-
-    parser.add_argument(
         "--estop_baudrate",
         action="store",
         type=int,
@@ -376,11 +360,7 @@ def field_test_runner():
         runtime_dir = f"{args.yellow_full_system_runtime_dir}/test/{test_name}"
         friendly_proto_unix_io = yellow_full_system_proto_unix_io
 
-    estop_mode = EstopMode.PHYSICAL_ESTOP
-    if args.keyboard_estop:
-        estop_mode = EstopMode.KEYBOARD_ESTOP
-    if args.disable_communication:
-        estop_mode = EstopMode.DISABLE_ESTOP
+    estop_mode, estop_path = get_estop_config(args)
 
     # Launch all binaries
     with FullSystem(

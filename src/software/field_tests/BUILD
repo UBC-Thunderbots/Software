@@ -20,6 +20,7 @@ py_library(
         "//software/thunderscope",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:constants",
+        "//software/thunderscope:estop_helpers",
         "//software/thunderscope:robot_communication",
         "//software/thunderscope/replay:proto_logger",
     ],
