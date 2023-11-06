@@ -56,16 +56,16 @@ def start_ai_vs_ai(simulator_runtime_dir, blue_fs_dir, yellow_fs_dir):
 
             time.sleep(0.01)
 
-            while True:
-                # Tick Simulation
-                tick = SimulatorTick(
-                    milliseconds=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK
-                )
-                simulator_proto_unix_io.send_proto(SimulatorTick, tick)
+        while True:
+            # Tick Simulation
+            tick = SimulatorTick(
+                milliseconds=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK
+            )
+            simulator_proto_unix_io.send_proto(SimulatorTick, tick)
 
-                # Wait for full systems to process worlds before continuing
-                yellow_world_buffer.get(block=True)
-                blue_world_buffer.get(block=True)
+            # Wait for full systems to process worlds before continuing
+            yellow_world_buffer.get(block=True)
+            blue_world_buffer.get(block=True)
 
     blue_fs_proto_unix_io = ProtoUnixIO()
     yellow_fs_proto_unix_io = ProtoUnixIO()
