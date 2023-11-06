@@ -2,7 +2,7 @@ from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
 import pyqtgraph as pg
 
-from typing import Optional, Tuple
+from typing import Optional
 
 import numpy as np
 import numpy.typing as npt
@@ -17,7 +17,9 @@ class GLHeatmap(GLMeshItem):
     HEATMAP_ALPHA = 0.8
 
     def __init__(
-        self, parent_item: Optional[GLGraphicsItem] = None, color_map: pg.ColorMap = None,
+        self,
+        parent_item: Optional[GLGraphicsItem] = None,
+        color_map: pg.ColorMap = None,
     ) -> None:
         """Initialize the GLHeatmap
         

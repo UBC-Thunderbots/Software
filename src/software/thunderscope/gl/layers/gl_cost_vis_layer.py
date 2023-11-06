@@ -29,7 +29,7 @@ class GLCostVisOverlayLayer(GLLayer):
 
         super().__init__("GLCostVisOverlayLayer")
         self.setDepthValue(DepthValues.OVERLAY_DEPTH)
-        
+
         self.gradient = gradient
         self.legend: GLGradientLegend = None
 
@@ -42,8 +42,8 @@ class GLCostVisOverlayLayer(GLLayer):
                 size=(10, 100),
                 offset=(16, -16),
                 gradient=self.gradient,
-                labels={'1.0': 1, '0.5': 0.5, '0.0': 0},
-                title="Passing"
+                labels={"1.0": 1, "0.5": 0.5, "0.0": 0},
+                title="Passing",
             )
 
 
@@ -85,7 +85,7 @@ class GLCostVisLayer(GLLayer):
         color_map = pg.colormap.get("CET-L1")
         self.heatmap_graphic = GLHeatmap(parent_item=self, color_map=color_map)
         self.related_layer = GLCostVisOverlayLayer(gradient=color_map.getGradient())
-        
+
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 

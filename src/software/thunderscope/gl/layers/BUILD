@@ -117,8 +117,8 @@ py_library(
     srcs = ["gl_cost_vis_layer.py"],
     deps = [
         ":gl_layer",
-        "//software/thunderscope/gl/graphics:gl_heatmap",
         "//software/thunderscope/gl/graphics:gl_gradient_legend",
+        "//software/thunderscope/gl/graphics:gl_heatmap",
         requirement("pyqtgraph"),
     ],
 )

@@ -267,13 +267,12 @@ class GLWidget(QWidget):
         while layer:
             self.gl_view_widget.addItem(layer)
             layer.setVisible(visible)
-            
+
             # Connect visibility of all related layers to the same item
             # in the layer menu
             layer_checkbox.stateChanged.connect(
                 functools.partial(
-                    lambda l: l.setVisible(layer_checkbox.isChecked()), 
-                    layer
+                    lambda l: l.setVisible(layer_checkbox.isChecked()), layer
                 )
             )
 
@@ -286,7 +285,7 @@ class GLWidget(QWidget):
 
         """
         self.layers.remove(layer)
-        
+
         # Remove the layer from the Layer menu
         layer_action = self.layers_menu_actions[layer.name]
         self.layers_menu.removeAction(layer_action)
