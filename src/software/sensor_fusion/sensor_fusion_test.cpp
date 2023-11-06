@@ -619,10 +619,10 @@ TEST_F(SensorFusionTest, ball_placement_friendly_invalid_point_set_by_referee)
     SensorProto sensor_msg;
 
     SSLProto::Referee ball_placement_ref_msg = *referee_ball_placement_yellow;
-    
+
     // Remove ball placement point
     ball_placement_ref_msg.clear_designated_position();
-    
+
     *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_blue;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
@@ -637,7 +637,8 @@ TEST_F(SensorFusionTest, ball_placement_friendly_invalid_point_set_by_referee)
     EXPECT_EQ(std::nullopt, returned_point);
 }
 
-TEST_F(SensorFusionTest, ball_placement_yellow_but_is_not_defending_positive_side_set_by_referee)
+TEST_F(SensorFusionTest,
+       ball_placement_yellow_but_is_not_defending_positive_side_set_by_referee)
 {
     SensorProto sensor_msg;
 
@@ -656,7 +657,8 @@ TEST_F(SensorFusionTest, ball_placement_yellow_but_is_not_defending_positive_sid
     EXPECT_EQ(Point(0.05, 0.075), returned_point);
 }
 
-TEST_F(SensorFusionTest, ball_placement_friendly_yellow_but_is_defending_positive_side_set_by_referee)
+TEST_F(SensorFusionTest,
+       ball_placement_friendly_yellow_but_is_defending_positive_side_set_by_referee)
 {
     SensorProto sensor_msg;
 
@@ -677,7 +679,8 @@ TEST_F(SensorFusionTest, ball_placement_friendly_yellow_but_is_defending_positiv
     EXPECT_EQ(Point(-0.05, -0.075), returned_point.value());
 }
 
-TEST_F(SensorFusionTest, ball_placement_friendly_blue_but_is_defending_positive_side_set_by_referee)
+TEST_F(SensorFusionTest,
+       ball_placement_friendly_blue_but_is_defending_positive_side_set_by_referee)
 {
     SensorProto sensor_msg;
 
@@ -685,7 +688,8 @@ TEST_F(SensorFusionTest, ball_placement_friendly_blue_but_is_defending_positive_
     *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_blue;
     sensor_msg.mutable_ssl_referee_msg()->set_blue_team_on_positive_half(true);
 
-    TbotsProto::SensorFusionConfig sensor_fusion_blue_config = TbotsProto::SensorFusionConfig();
+    TbotsProto::SensorFusionConfig sensor_fusion_blue_config =
+        TbotsProto::SensorFusionConfig();
     sensor_fusion_blue_config.set_friendly_color_yellow(false);
     SensorFusion sensor_fusion_for_blue(sensor_fusion_blue_config);
 
@@ -702,7 +706,8 @@ TEST_F(SensorFusionTest, ball_placement_friendly_blue_but_is_defending_positive_
     EXPECT_EQ(Point(-0.02, -0.035), returned_point.value());
 }
 
-TEST_F(SensorFusionTest, ball_placement_friendly_blue_but_is_not_defending_friendly_side_set_by_referee)
+TEST_F(SensorFusionTest,
+       ball_placement_friendly_blue_but_is_not_defending_friendly_side_set_by_referee)
 {
     SensorProto sensor_msg;
 
@@ -710,7 +715,8 @@ TEST_F(SensorFusionTest, ball_placement_friendly_blue_but_is_not_defending_frien
     *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_blue;
     sensor_msg.mutable_ssl_referee_msg()->set_blue_team_on_positive_half(false);
 
-    TbotsProto::SensorFusionConfig sensor_fusion_blue_config = TbotsProto::SensorFusionConfig();
+    TbotsProto::SensorFusionConfig sensor_fusion_blue_config =
+        TbotsProto::SensorFusionConfig();
     sensor_fusion_blue_config.set_friendly_color_yellow(false);
     SensorFusion sensor_fusion_for_blue(sensor_fusion_blue_config);
 

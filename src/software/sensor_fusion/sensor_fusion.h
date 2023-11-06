@@ -94,13 +94,14 @@ class SensorFusion
     Team createFriendlyTeam(const std::vector<RobotDetection> &robot_detections);
     Team createEnemyTeam(const std::vector<RobotDetection> &robot_detections);
 
-    
+
     /**
      * Get the ball placement point in our reference frame.
      *
      * @param referee_packet referee packet to parse
      *
-     * @returns ball placement point in the team's reference frame, nothing if the packet does not contain a valid point
+     * @returns ball placement point in the team's reference frame, nothing if the packet
+     * does not contain a valid point
      */
     std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet);
 
