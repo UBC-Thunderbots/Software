@@ -25,6 +25,17 @@ class GLLayer(GLGraphicsItem):
         super().__init__()
         self.name = name
 
+        # GLLayers can point to one another with this field, forming a  
+        # linked list of "related" GLLayers.
+        #
+        # Related layers are grouped together and treated as a single layer
+        # in the layer menu. This lets us treat multiple layers rendered at 
+        # different depths as one unit and toggle their visibility together 
+        # as a whole.
+        #
+        # WARNING: Related GLLayers should not be parents/children of each other
+        self.related_layer: GLLayer = None
+
     def refresh_graphics(self) -> None:
         """Updates the GLGraphicsItems in this layer"""
 

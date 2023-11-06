@@ -1,4 +1,6 @@
+from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
+import pyqtgraph as pg
 
 import time
 import queue
@@ -10,6 +12,39 @@ from proto.visualization_pb2 import CostVisualization
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_heatmap import GLHeatmap
+from software.thunderscope.gl.graphics.gl_gradient_legend import GLGradientLegend
+
+from software.thunderscope.constants import Colors, DepthValues
+
+
+class GLCostVisOverlayLayer(GLLayer):
+    """Overlay for GLCostVisLayer"""
+
+    def __init__(self, gradient: QtGui.QLinearGradient) -> None:
+        """Initialize the GLCostVisOverlayLayer
+        
+        :param gradient: The gradient to use for coloring the legend
+
+        """
+
+        super().__init__("GLCostVisOverlayLayer")
+        self.setDepthValue(DepthValues.OVERLAY_DEPTH)
+        
+        self.gradient = gradient
+        self.legend: GLGradientLegend = None
+
+    def refresh_graphics(self) -> None:
+        """Update graphics in this layer"""
+
+        if not self.legend:
+            self.legend = GLGradientLegend(
+                parent_item=self,
+                size=(10, 100),
+                offset=(16, -16),
+                gradient=self.gradient,
+                labels={'1.0': 1, '0.5': 0.5, '0.0': 0},
+                title="Passing"
+            )
 
 
 class GLCostVisLayer(GLLayer):
@@ -37,6 +72,7 @@ class GLCostVisLayer(GLLayer):
                             
         """
         super().__init__(name)
+        self.setDepthValue(DepthValues.BENEATH_BACKGROUND_DEPTH)
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.cost_visualization_buffer = ThreadSafeBuffer(
@@ -46,8 +82,10 @@ class GLCostVisLayer(GLLayer):
         self.cached_cost_vis = CostVisualization()
         self.timeout = time.time() + GLCostVisLayer.COST_VISUALIZATION_TIMEOUT_S
 
-        self.heatmap_graphic = GLHeatmap(parent_item=self)
-
+        color_map = pg.colormap.get("CET-L1")
+        self.heatmap_graphic = GLHeatmap(parent_item=self, color_map=color_map)
+        self.related_layer = GLCostVisOverlayLayer(gradient=color_map.getGradient())
+        
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 

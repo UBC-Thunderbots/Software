@@ -118,6 +118,7 @@ py_library(
     deps = [
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_heatmap",
+        "//software/thunderscope/gl/graphics:gl_gradient_legend",
         requirement("pyqtgraph"),
     ],
 )

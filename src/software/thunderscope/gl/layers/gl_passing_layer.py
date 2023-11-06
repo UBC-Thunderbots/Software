@@ -7,7 +7,7 @@ import numpy as np
 
 from proto.visualization_pb2 import PassVisualization
 
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
@@ -34,6 +34,7 @@ class GLPassingLayer(GLLayer):
                             
         """
         super().__init__(name)
+        self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
         self.pass_visualization_buffer = ThreadSafeBuffer(
             buffer_size, PassVisualization

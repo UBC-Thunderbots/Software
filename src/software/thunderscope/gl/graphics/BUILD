@@ -80,3 +80,11 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_gradient_legend",
+    srcs = ["gl_gradient_legend.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
+)

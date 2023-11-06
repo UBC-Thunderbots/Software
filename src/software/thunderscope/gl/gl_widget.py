@@ -4,6 +4,7 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 
+import functools
 import textwrap
 import numpy as np
 
@@ -251,27 +252,32 @@ class GLWidget(QWidget):
         """
         self.layers.append(layer)
 
-        if not visible:
-            layer.hide()
-
         # Add the layer to the Layer menu
-
         # Not using a checkable QAction in order to prevent menu from closing
         # when an action is pressed
         layer_checkbox = QCheckBox(layer.name, self.layers_menu)
         layer_checkbox.setStyleSheet("QCheckBox { padding: 0px 8px; }")
-        layer_checkbox.setChecked(layer.visible())
-        layer_checkbox.stateChanged.connect(
-            lambda: layer.setVisible(layer_checkbox.isChecked())
-        )
-
+        layer_checkbox.setChecked(visible)
         layer_action = QWidgetAction(self.layers_menu)
         layer_action.setDefaultWidget(layer_checkbox)
-
         self.layers_menu_actions[layer.name] = layer_action
         self.layers_menu.addAction(layer_action)
 
-        self.gl_view_widget.addItem(layer)
+        # Add layer and its related layers to the scene
+        while layer:
+            self.gl_view_widget.addItem(layer)
+            layer.setVisible(visible)
+            
+            # Connect visibility of all related layers to the same item
+            # in the layer menu
+            layer_checkbox.stateChanged.connect(
+                functools.partial(
+                    lambda l: l.setVisible(layer_checkbox.isChecked()), 
+                    layer
+                )
+            )
+
+            layer = layer.related_layer
 
     def remove_layer(self, layer: GLLayer) -> None:
         """Remove a layer from this GLWidget
@@ -280,11 +286,15 @@ class GLWidget(QWidget):
 
         """
         self.layers.remove(layer)
-        self.gl_view_widget.removeItem(layer)
-
+        
         # Remove the layer from the Layer menu
         layer_action = self.layers_menu_actions[layer.name]
         self.layers_menu.removeAction(layer_action)
+
+        # Remove layer its related layers from the scene
+        while layer:
+            self.gl_view_widget.removeItem(layer)
+            layer = layer.related_layer
 
     def refresh(self) -> None:
         """Trigger an update on all the layers"""
@@ -298,8 +308,10 @@ class GLWidget(QWidget):
             return
 
         for layer in self.layers:
-            if layer.visible():
-                layer.refresh_graphics()
+            while layer:
+                if layer.visible():
+                    layer.refresh_graphics()
+                layer = layer.related_layer
 
     def set_camera_view(self, camera_view: CameraView) -> None:
         """Set the camera position to a preset camera view

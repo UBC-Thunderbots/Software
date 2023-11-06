@@ -1,11 +1,11 @@
 from pyqtgraph.opengl import *
 from pyqtgraph.opengl.GLGraphicsItem import GLGraphicsItem
-from typing import Optional, Callable, Tuple
+import pyqtgraph as pg
+
+from typing import Optional, Tuple
 
 import numpy as np
 import numpy.typing as npt
-
-ColorMap = Callable[[float], Tuple[float, float, float, float]]
 
 
 class GLHeatmap(GLMeshItem):
@@ -13,22 +13,22 @@ class GLHeatmap(GLMeshItem):
     Displays a heatmap on the cartesian plane (i.e. x-y plane)
     """
 
+    # Float between 0.0 - 1.0 representing alpha transparency of heatmap
+    HEATMAP_ALPHA = 0.8
+
     def __init__(
-        self, parent_item: Optional[GLGraphicsItem] = None, color_map: ColorMap = None,
+        self, parent_item: Optional[GLGraphicsItem] = None, color_map: pg.ColorMap = None,
     ) -> None:
         """Initialize the GLHeatmap
         
         :param parent_item: The parent item of the graphic
-        :param color_map: Function to map data values to color space.
-                          Returns a 4-tuple representing the RGBF color for the 
-                          input data value (note that 0 <= RGBF value <= 1).
-                          The default color_map will map data values in the
-                          range [0, 1] to a grayscale color space. 
+        :param color_map: ColorMap to map scalar data values to the color space.
+                          If no ColorMap is provided, the default is a grayscale ColorMap.
 
         """
         self.x_length = 0
         self.y_length = 0
-        self.color_map = color_map if color_map else GLHeatmap.grayscale_color_map
+        self.color_map = color_map if color_map else pg.colormap.get("CET-L1")
         self.meshdata = MeshData()
 
         super().__init__(
@@ -37,6 +37,7 @@ class GLHeatmap(GLMeshItem):
             smooth=False,
             computeNormals=False,
         )
+        self.setGLOptions("additive")
 
     def set_dimensions(self, x_length: float = 0, y_length: float = 0) -> None:
         """Set the dimensions of the heatmap
@@ -99,9 +100,8 @@ class GLHeatmap(GLMeshItem):
             )
 
         # Compute face color per data point
-        colors = np.empty(shape=(rows * cols, 4))
-        for index, value in enumerate(data.ravel()):
-            colors[index] = self.color_map(value)
+        colors = self.color_map.map(data.ravel(), mode=pg.ColorMap.FLOAT)
+        colors[:, 3] = GLHeatmap.HEATMAP_ALPHA
         colors = colors.reshape(rows, cols, 4)
         colors = np.repeat(colors, repeats=2, axis=0).reshape(len(faces), 4)
 
@@ -110,14 +110,3 @@ class GLHeatmap(GLMeshItem):
         self.meshdata.setFaces(faces)
         self.meshdata.setFaceColors(colors)
         self.meshDataChanged()
-
-    @staticmethod
-    def grayscale_color_map(value: float) -> Tuple[float, float, float, float]:
-        """Map a value in the range [0, 1] to a grayscale color space 
-        (linearly interpolate from white to black)
-        
-        :param value: The value in the range [0, 1]
-        :returns: 4-tuple representing the RGBF color for the input value
-        """
-        color = np.interp(value, (0, 1), (0, 0.8))
-        return (color, color, color, 1)
