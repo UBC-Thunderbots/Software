@@ -347,7 +347,7 @@ if __name__ == "__main__":
             layout_path=args.layout,
         )
 
-        def __async_sim_ticker(tick_rate_ms):
+        def __async_sim_ticker(tick_rate_ms: int) -> None:
             """Setup the world and tick simulation forever
 
             :param tick_rate_ms: The tick rate of the simulation

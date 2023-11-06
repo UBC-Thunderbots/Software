@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import socket
 import logging
@@ -7,17 +9,23 @@ import threading
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
+from typing import Any
 from subprocess import Popen
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team
 from software.py_constants import *
-from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.networking.ssl_proto_communication import *
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from google.protobuf.message import Message
+from extlibs.er_force_sim.src.protobuf.world_pb2 import (
+    SimulatorState,
+    SimBall,
+    SimRobot,
+)
 
-
-def is_cmd_running(command):
+def is_cmd_running(command: list) -> bool:
     """Check if there is any running process that was launched
     with the given command.
 
@@ -43,11 +51,11 @@ class FullSystem(object):
 
     def __init__(
         self,
-        full_system_runtime_dir=None,
-        debug_full_system=False,
-        friendly_colour_yellow=False,
-        should_restart_on_crash=True,
-    ):
+        full_system_runtime_dir: os.PathLike = None,
+        debug_full_system: bool = False,
+        friendly_colour_yellow: bool = False,
+        should_restart_on_crash: bool = True,
+    ) -> None:
         """Run FullSystem
 
         :param full_system_runtime_dir: The directory to run the blue full_system in
@@ -62,7 +70,7 @@ class FullSystem(object):
 
         self.thread = threading.Thread(target=self.__restart__)
 
-    def __enter__(self):
+    def __enter__(self) -> self:
         """Enter the full_system context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
@@ -122,7 +130,7 @@ gdb --args bazel-bin/{self.full_system}
 
         return self
 
-    def __restart__(self):
+    def __restart__(self) -> None:
         "Restarts full system."
         while True:
             if not is_cmd_running(
@@ -136,7 +144,7 @@ gdb --args bazel-bin/{self.full_system}
 
             time.sleep(1)
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         """Exit the full_system context manager.
 
         :param type: The type of exception that was raised
@@ -151,7 +159,7 @@ gdb --args bazel-bin/{self.full_system}
         if self.should_restart_on_crash:
             self.thread.join()
 
-    def setup_proto_unix_io(self, proto_unix_io):
+    def setup_proto_unix_io(self, proto_unix_io: ProtoUnixIO) -> None:
         """Helper to run full system and attach the appropriate unix senders/listeners
 
         :param proto_unix_io: The unix io to setup for this full_system instance
@@ -204,8 +212,11 @@ class Simulator(object):
     """ Simulator Context Manager """
 
     def __init__(
-        self, simulator_runtime_dir=None, debug_simulator=False, enable_realism=False
-    ):
+        self,
+        simulator_runtime_dir: os.PathLike = None,
+        debug_simulator: bool = False,
+        enable_realism: bool = False,
+    ) -> None:
         """Run Simulator
 
         NOTE: If any of the runtime directories are None, the corresponding binary
@@ -220,7 +231,7 @@ class Simulator(object):
         self.er_force_simulator_proc = None
         self.enable_realism = enable_realism
 
-    def __enter__(self):
+    def __enter__(self) -> self:
         """Enter the simulator context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
@@ -277,7 +288,7 @@ gdb --args bazel-bin/{simulator_command}
 
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         """Exit the full_system context manager.
 
         :param type: The type of exception that was raised
@@ -291,11 +302,11 @@ gdb --args bazel-bin/{simulator_command}
 
     def setup_proto_unix_io(
         self,
-        simulator_proto_unix_io,
-        blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io,
-        autoref_proto_unix_io,
-    ):
+        simulator_proto_unix_io: ProtoUnixIO,
+        blue_full_system_proto_unix_io: ProtoUnixIO,
+        yellow_full_system_proto_unix_io: ProtoUnixIO,
+        autoref_proto_unix_io: ProtoUnixIO,
+    ) -> None:
 
         """Setup the proto unix io for the simulator
 
@@ -375,7 +386,7 @@ class Gamecontroller(object):
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, supress_logs=False, ci_mode=False):
+    def __init__(self, supress_logs: bool = False, ci_mode: bool = False) -> None:
         """Run Gamecontroller
 
         :param supress_logs: Whether to suppress the logs
@@ -390,7 +401,7 @@ class Gamecontroller(object):
         self.referee_port = self.next_free_port()
         self.ci_port = self.next_free_port()
 
-    def __enter__(self):
+    def __enter__(self) -> self:
         """Enter the gamecontroller context manager. 
 
         :return: gamecontroller context managed instance
@@ -420,7 +431,7 @@ class Gamecontroller(object):
 
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         """Exit the gamecontroller context manager.
 
         :param type: The type of exception that was raised
@@ -434,7 +445,7 @@ class Gamecontroller(object):
         if self.ci_mode:
             self.ci_socket.close()
 
-    def next_free_port(self, port=40000, max_port=65535):
+    def next_free_port(self, port: int = 40000, max_port: int = 65535) -> None:
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller
         so that we can run multiple gamecontroller instances in parallel.
 
@@ -457,11 +468,11 @@ class Gamecontroller(object):
 
     def setup_proto_unix_io(
         self,
-        blue_full_system_proto_unix_io,
-        yellow_full_system_proto_unix_io,
-        autoref_proto_unix_io=None,
-    ):
-        """Setup gamecontroller io. Registers to receive RefereeCommands from the Gamecontroller UI.
+        blue_full_system_proto_unix_io: ProtoUnixIO,
+        yellow_full_system_proto_unix_io: ProtoUnixIO,
+        autoref_proto_unix_io: ProtoUnixIO
+    ) -> None:
+        """Setup gamecontroller io
 
         :param blue_full_system_proto_unix_io: The proto unix io of the blue full system.
         :param yellow_full_system_proto_unix_io: The proto unix io of the yellow full system.
@@ -469,7 +480,7 @@ class Gamecontroller(object):
 
         """
 
-        def __send_referee_command(data):
+        def __send_referee_command(data: Referee) -> None:
             """Send a referee command from the gamecontroller to both full
             systems.
 
@@ -489,8 +500,8 @@ class Gamecontroller(object):
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
-        final_ball_placement_point=None,
-    ):
+        final_ball_placement_point: tbots_cpp.Point = None,
+    ) -> Any:
         """Send a ci input to the gamecontroller.
 
         CiInput -> Input -> Change ->  NewCommand -> Command -> (Type, Team)
