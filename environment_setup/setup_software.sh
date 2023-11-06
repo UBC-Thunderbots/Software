@@ -76,8 +76,8 @@ host_software_packages=(
     libssl-dev # needed to build Python 3 with ssl support
     openssl # possibly also necessary for ssl in Python 3
     sshpass #used to remotely ssh into robots via Ansible
-
     unzip # installing tigers autoref
+    xvfb # used for CI to run GUI applications
 )
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then

@@ -159,7 +159,7 @@ jobs:
       - name: AI vs AI (3 minutes)
         run: |
           cd src
-          timeout 3m bazel run //software:ai_vs_ai_ci || code=$?; if [[$code -ne 124 && $code -ne 0]]; then exit $code; fi
+          timeout 3m bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main -- --enable_autoref || code=$?; if [[$code -ne 124 && $code -ne 0]]; then exit $code; fi
 
 
       - name: Upload AI vs AI logs
