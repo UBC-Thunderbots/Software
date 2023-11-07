@@ -7,7 +7,7 @@
 
 
 // Test case: Traveling a distance of zero should return the starting point
-TEST(StepAlongPerimeterTest, ZeroDistanceReturnsStartPoint)
+TEST(StepAlongPerimeterTest, zero_distance_returns_start_point)
 {
     Polygon polygon({{0, 0}, {0, 1}, {1, 1}, {1, 0}});
     Point start_point(0, 0);
@@ -15,7 +15,16 @@ TEST(StepAlongPerimeterTest, ZeroDistanceReturnsStartPoint)
     EXPECT_EQ(result_point, start_point);
 }
 
-TEST(StepAlongPerimeterTest, PointNotOnPolygon)
+TEST(StepAlongPerimeterTest, zero_distance_not_on_perimeter_returns_closest)
+{
+    Polygon polygon({{0, 0}, {0, 1}, {1, 1}, {1, 0}});
+    Point start_point(-0.4, 0.3);
+    Point result_point = stepAlongPerimeter(polygon, start_point, 0.0);
+    Point expected_point(0, 0.3);
+    EXPECT_EQ(result_point, expected_point);
+}
+
+TEST(StepAlongPerimeterTest, point_not_on_polygon)
 {
     Polygon polygon({{0, 0}, {0, 1}, {2, 1}, {2, 0}});
     Point start_point(0.5, 1.5);
@@ -25,7 +34,7 @@ TEST(StepAlongPerimeterTest, PointNotOnPolygon)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, PositiveDistanceEndsInMiddle)
+TEST(StepAlongPerimeterTest, positive_distance_ends_in_middle)
 {
     Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
     Point start_point(0, 0);
@@ -36,7 +45,7 @@ TEST(StepAlongPerimeterTest, PositiveDistanceEndsInMiddle)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, SmallDiffNotOnPerimeter)
+TEST(StepAlongPerimeterTest, small_diff_not_on_perimeter)
 {
     Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
     const double EPSILON = 1e-9;
@@ -48,7 +57,7 @@ TEST(StepAlongPerimeterTest, SmallDiffNotOnPerimeter)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, PositiveDistanceGoAround1)
+TEST(StepAlongPerimeterTest, positive_distance_go_around)
 {
     Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
     Point start_point(0, 0);
@@ -58,7 +67,7 @@ TEST(StepAlongPerimeterTest, PositiveDistanceGoAround1)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, PositiveDistanceGoAround2)
+TEST(StepAlongPerimeterTest, positive_distance_go_around_2)
 {
     Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
     Point start_point(0, 0);
@@ -68,7 +77,7 @@ TEST(StepAlongPerimeterTest, PositiveDistanceGoAround2)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, PositiveDistanceStartsFromMiddle)
+TEST(StepAlongPerimeterTest, positive_distance_starts_from_middle)
 {
     Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
     Point start_point(0.5, 0);
@@ -80,7 +89,7 @@ TEST(StepAlongPerimeterTest, PositiveDistanceStartsFromMiddle)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, DistanceEqualsPerimeterReturnsStart)
+TEST(StepAlongPerimeterTest, distance_equals_perimeter_returns_start)
 {
     Polygon polygon({{0, 0}, {0, 1}, {1, 1}, {1, 0}});
     Point start_point(0, 0);
@@ -89,7 +98,7 @@ TEST(StepAlongPerimeterTest, DistanceEqualsPerimeterReturnsStart)
     EXPECT_EQ(result_point, start_point);
 }
 
-TEST(StepAlongPerimeterTest, NegativeDistanceStartsAtCorner)
+TEST(StepAlongPerimeterTest, negative_distance_starts_at_corner)
 {
     Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
     Point start_point(0, 0);
@@ -99,7 +108,7 @@ TEST(StepAlongPerimeterTest, NegativeDistanceStartsAtCorner)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, NegativeDistanceGoAround)
+TEST(StepAlongPerimeterTest, negative_distance_go_around)
 {
     Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
     Point start_point(0, 0);
@@ -110,7 +119,7 @@ TEST(StepAlongPerimeterTest, NegativeDistanceGoAround)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, NegativeDistanceStartsFromMiddle1)
+TEST(StepAlongPerimeterTest, negative_distance_starts_from_middle_1)
 {
     Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
     Point start_point(0.5, 0);
@@ -122,7 +131,7 @@ TEST(StepAlongPerimeterTest, NegativeDistanceStartsFromMiddle1)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, NegativeDistanceStartsFromMiddle2)
+TEST(StepAlongPerimeterTest, negative_distance_starts_from_middle_2)
 {
     Polygon polygon({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
     Point start_point(0.5, 0);
@@ -133,7 +142,7 @@ TEST(StepAlongPerimeterTest, NegativeDistanceStartsFromMiddle2)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, NonConvexPolygonMoveForward1)
+TEST(StepAlongPerimeterTest, non_convex_polygon_move_forward_1)
 {
     Polygon polygon({{0, 0}, {1, 2}, {2, 0}, {1, 1}});
     Point start_point(0, 0);
@@ -143,7 +152,7 @@ TEST(StepAlongPerimeterTest, NonConvexPolygonMoveForward1)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, NonConvexPolygonMoveForward2)
+TEST(StepAlongPerimeterTest, non_convex_polygon_move_forward_2)
 {
     Polygon polygon({{0, 0}, {1, 2}, {2, 0}, {1, 1}});
     Point start_point(0, 0);
@@ -153,7 +162,7 @@ TEST(StepAlongPerimeterTest, NonConvexPolygonMoveForward2)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, NonConvexPolygonMoveForward3)
+TEST(StepAlongPerimeterTest, non_convex_polygon_move_forward_3)
 {
     Polygon polygon({{0, 0}, {1, 2}, {2, 0}, {1, 1}});
     Point start_point(0, 0);
@@ -163,7 +172,7 @@ TEST(StepAlongPerimeterTest, NonConvexPolygonMoveForward3)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, NonConvexPolygonMoveBackward1)
+TEST(StepAlongPerimeterTest, non_convex_polygon_move_backward_1)
 {
     Polygon polygon({{0, 0}, {1, 2}, {2, 0}, {1, 1}});
     Point start_point(0, 0);
@@ -174,7 +183,7 @@ TEST(StepAlongPerimeterTest, NonConvexPolygonMoveBackward1)
 }
 
 
-TEST(StepAlongPerimeterTest, NonConvexPolygonMoveBackward2)
+TEST(StepAlongPerimeterTest, non_convex_polygon_move_backward_2)
 {
     Polygon polygon({{0, 0}, {1, 2}, {2, 0}, {1, 1}});
     Point start_point(0, 0);
@@ -183,7 +192,7 @@ TEST(StepAlongPerimeterTest, NonConvexPolygonMoveBackward2)
     EXPECT_EQ(result_point, start_point);
 }
 
-TEST(StepAlongPerimeterTest, ComplexShapeBeyondPerimeter)
+TEST(StepAlongPerimeterTest, complex_shape_beyond_perimeter)
 {
     Polygon polygon({{0, 0}, {0, 2}, {2, 3}, {3, 2}, {2, 0}});
     Point start_point(0, 0);
@@ -195,7 +204,7 @@ TEST(StepAlongPerimeterTest, ComplexShapeBeyondPerimeter)
     EXPECT_EQ(result_point, expected_point);
 }
 
-TEST(StepAlongPerimeterTest, TriangularPolygon)
+TEST(StepAlongPerimeterTest, triangular_polygon)
 {
     Polygon polygon({{0, 0}, {1, sqrt(3)}, {2, 0}});
     Point start_point(0, 0);

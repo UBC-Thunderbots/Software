@@ -11,22 +11,22 @@
 Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
                          double travel_distance)
 {
-    if (travel_distance == 0.0)
-    {
-        return start;
-    }
 
     const std::vector<Segment>& polygon_segments = polygon.getSegments();
-    std::size_t start_segment_index;
 
     auto min_it = std::min_element(polygon_segments.begin(), polygon_segments.end(),
                                    [&start](const auto& a, const auto& b) {
                                        return distance(start, a) < distance(start, b);
                                    });
-    start_segment_index = std::distance(polygon_segments.begin(), min_it);
+    std::size_t start_segment_index = std::distance(polygon_segments.begin(), min_it);
 
     // finds the point closest to start point on the segment
-    Point closestStart = closestPoint(start, polygon_segments[start_segment_index]);
+    Point closest_start = closestPoint(start, polygon_segments[start_segment_index]);
+
+    if (travel_distance == 0.0)
+    {
+        return closest_start;
+    }
 
     std::size_t segment_index = start_segment_index;
 
@@ -47,7 +47,7 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
         double segment_length = curr_segment.length();
         if (segment_index == start_segment_index && !wrap_flag)
         {
-            segment_length = distance(closestStart, curr_segment.getEnd());
+            segment_length = distance(closest_start, curr_segment.getEnd());
             wrap_flag      = true;
         }
 
