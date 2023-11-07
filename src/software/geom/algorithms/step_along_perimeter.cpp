@@ -11,7 +11,6 @@
 Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
                          double travel_distance)
 {
-
     const std::vector<Segment>& polygon_segments = polygon.getSegments();
 
     auto min_it = std::min_element(polygon_segments.begin(), polygon_segments.end(),

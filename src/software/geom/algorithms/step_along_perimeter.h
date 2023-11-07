@@ -14,7 +14,8 @@
  * the sign of the distance: positive travels clockwise, while negative travels
  * counterclockwise.
  *
- * @note If the distance is zero, the function returns the point on the perimeter closest to the starting point
+ * @note If the distance is zero, the function returns the point on the perimeter closest
+ * to the starting point
  *
  * @param polygon The polygon to traverse
  * @param start The starting position on the polygon's perimeter
