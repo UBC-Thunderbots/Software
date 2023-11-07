@@ -117,7 +117,7 @@ class Thunderloop
     int loop_hz_;
 
     // Calibrated power service constants
-    int kick_slope_;
+    double kick_coeff_;
     int kick_constant_;
     int chip_pulse_width_;
 
