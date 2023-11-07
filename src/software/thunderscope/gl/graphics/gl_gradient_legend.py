@@ -13,9 +13,9 @@ class GLGradientLegend(GLPainter):
     The graphic is a 2D static overlay painted over top the viewport.
     
     """
-    
+
     def __init__(
-        self, 
+        self,
         parent_item: Optional[GLGraphicsItem] = None,
         size: Tuple[int, int] = (10, 100),
         offset: Tuple[int, int] = (0, 0),
@@ -46,7 +46,7 @@ class GLGradientLegend(GLPainter):
         self.gradient = gradient
         self.labels = labels
         self.title = title
-        
+
         self.text_pen = QtGui.QPen(Colors.PRIMARY_TEXT_COLOR)
         self.labels_font = QtGui.QFont("Roboto", 8)
         self.title_font = QtGui.QFont("Roboto", 9, QtGui.QFont.Weight.Bold)

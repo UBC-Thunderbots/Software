@@ -226,6 +226,7 @@ class DepthValues:
     Graphics with greater depth values are drawn later.
     Graphics with negative depth values are drawn before their parent.
     """
+
     BENEATH_BACKGROUND_DEPTH = -2
     BACKGROUND_DEPTH = -1
     FOREGROUND_DEPTH = 0
