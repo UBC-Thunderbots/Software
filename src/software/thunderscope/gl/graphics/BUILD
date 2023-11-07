@@ -94,6 +94,6 @@ py_library(
     srcs = ["gl_gradient_legend.py"],
     deps = [
         requirement("pyqtgraph"),
-        ":gl_painter"
+        ":gl_painter",
     ],
 )

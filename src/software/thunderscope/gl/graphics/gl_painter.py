@@ -3,11 +3,12 @@ from pyqtgraph.Qt import QtCore, QtGui
 
 from typing import Optional, Callable
 
+
 class GLPainter(GLGraphicsItem):
     """2D static overlay painted over top the viewport.
     This graphic enables the use of QPainter method calls to draw to the viewport.
     """
-    
+
     def __init__(self, parent_item: Optional[GLGraphicsItem] = None) -> None:
         """Initialize the GLPainter
         
@@ -17,7 +18,9 @@ class GLPainter(GLGraphicsItem):
         super().__init__(parentItem=parent_item)
         self.draw_functions = []
 
-    def add_draw_function(self, draw_function: Callable[[QtGui.QPainter, QtCore.QRect], None]):
+    def add_draw_function(
+        self, draw_function: Callable[[QtGui.QPainter, QtCore.QRect], None]
+    ):
         """Register a draw function with this GLPainter.
         
         The draw function must accept a QPainter that it will use to perform

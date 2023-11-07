@@ -6,6 +6,7 @@ from typing import Optional, Dict, Tuple
 from software.thunderscope.gl.graphics.gl_painter import GLPainter
 from software.thunderscope.constants import Colors
 
+
 class GLGradientLegend(GLPainter):
     """Displays a color gradient rectangle along with text labels denoting 
     the value at specific points along the gradient.
@@ -21,7 +22,7 @@ class GLGradientLegend(GLPainter):
         offset: Tuple[int, int] = (0, 0),
         gradient: QtGui.QLinearGradient = QtGui.QLinearGradient(),
         labels: Dict[str, float] = {},
-        title: Optional[str] = None
+        title: Optional[str] = None,
     ) -> None:
         """Initialize the GLGradientLegend
         
@@ -40,7 +41,7 @@ class GLGradientLegend(GLPainter):
         
         """
         super().__init__(parent_item=parent_item)
-        
+
         self.size = size
         self.offset = offset
         self.gradient = gradient
@@ -53,7 +54,9 @@ class GLGradientLegend(GLPainter):
 
         self.add_draw_function(self.draw_gradient_legend)
 
-    def draw_gradient_legend(self, painter: QtGui.QPainter, viewport_rect: QtCore.QRect):
+    def draw_gradient_legend(
+        self, painter: QtGui.QPainter, viewport_rect: QtCore.QRect
+    ):
         """Draw the gradient legend
         
         :param painter: The QPainter to perform drawing operations with
@@ -65,16 +68,17 @@ class GLGradientLegend(GLPainter):
         label_height = 0
         for label in self.labels:
             bounds = painter.boundingRect(
-                QtCore.QRectF(0, 0, 0, 0), 
-                QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter, 
-                str(label)
+                QtCore.QRectF(0, 0, 0, 0),
+                QtCore.Qt.AlignmentFlag.AlignLeft
+                | QtCore.Qt.AlignmentFlag.AlignVCenter,
+                str(label),
             )
             label_width = max(label_width, bounds.width())
             label_height = max(label_height, bounds.height())
-            
+
         # Determine x and y coordinates of color bar rectangle edges
         if self.offset[0] < 0:
-            x_right = viewport_rect.right() + self.offset[0] - label_width 
+            x_right = viewport_rect.right() + self.offset[0] - label_width
             x_left = x_right - self.size[0]
         else:
             x_left = viewport_rect.left() + self.offset[0]
@@ -87,12 +91,11 @@ class GLGradientLegend(GLPainter):
             y_bottom = y_top + self.size[1]
 
         # Draw color bar
-        self.gradient.setStart(0, y_bottom) 
+        self.gradient.setStart(0, y_bottom)
         self.gradient.setFinalStop(0, y_top)
         painter.setBrush(self.gradient)
         rect = QtCore.QRectF(
-            QtCore.QPointF(x_left, y_top),
-            QtCore.QPointF(x_right, y_bottom)
+            QtCore.QPointF(x_left, y_top), QtCore.QPointF(x_right, y_bottom)
         )
         painter.drawRect(rect)
 
@@ -103,15 +106,15 @@ class GLGradientLegend(GLPainter):
             for label in self.labels:
                 y = y_bottom - self.labels[label] * (y_bottom - y_top)
                 painter.drawText(
-                    QtCore.QRectF(x_right + 4, y - (label_height / 2), label_width, label_height), 
-                    QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter, 
-                    str(label)
+                    QtCore.QRectF(
+                        x_right + 4, y - (label_height / 2), label_width, label_height
+                    ),
+                    QtCore.Qt.AlignmentFlag.AlignLeft
+                    | QtCore.Qt.AlignmentFlag.AlignVCenter,
+                    str(label),
                 )
 
         # Draw legend title
         if self.title:
             painter.setFont(self.title_font)
-            painter.drawText(
-                QtCore.QPoint(x_left, y_top - label_height), 
-                self.title
-            )
+            painter.drawText(QtCore.QPoint(x_left, y_top - label_height), self.title)
