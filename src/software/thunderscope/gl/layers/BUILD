@@ -97,6 +97,7 @@ py_library(
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_polygon",
+        "//software/thunderscope/gl/graphics:gl_painter",
         requirement("pyqtgraph"),
     ],
 )

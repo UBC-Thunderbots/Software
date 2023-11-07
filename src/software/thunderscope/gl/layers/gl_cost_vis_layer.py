@@ -31,13 +31,13 @@ class GLCostVisOverlayLayer(GLLayer):
         self.setDepthValue(DepthValues.OVERLAY_DEPTH)
         
         self.gradient = gradient
-        self.legend: GLGradientLegend = None
+        self.legend_graphic: GLGradientLegend = None
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
-        if not self.legend:
-            self.legend = GLGradientLegend(
+        if not self.legend_graphic:
+            self.legend_graphic = GLGradientLegend(
                 parent_item=self,
                 size=(10, 100),
                 offset=(16, -16),

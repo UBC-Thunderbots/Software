@@ -54,7 +54,7 @@ class GLGradientLegend(GLPainter):
         self.add_draw_function(self.draw_gradient_legend)
 
     def draw_gradient_legend(self, painter: QtGui.QPainter, viewport_rect: QtCore.QRect):
-        """Draws the gradient legend
+        """Draw the gradient legend
         
         :param painter: The QPainter to perform drawing operations with
         :param viewport_rect: The QRect indicating the viewport dimensions 
