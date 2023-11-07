@@ -31,10 +31,10 @@ class GLValidationOverlayLayer(GLLayer):
         :param validation_layer: The GLValidationLayer this overlay layer is related to
 
         """
-        
+
         super().__init__("GLValidationOverlayLayer")
         self.setDepthValue(DepthValues.OVERLAY_DEPTH)
-        
+
         self.validation_layer = validation_layer
         self.overlay_graphic: GLPainter = None
 
@@ -45,7 +45,9 @@ class GLValidationOverlayLayer(GLLayer):
             self.overlay_graphic = GLPainter(parent_item=self)
             self.overlay_graphic.add_draw_function(self.draw_overlay)
 
-    def draw_overlay(self, painter: QtGui.QPainter, viewport_rect: QtCore.QRect) -> None:
+    def draw_overlay(
+        self, painter: QtGui.QPainter, viewport_rect: QtCore.QRect
+    ) -> None:
         """Draw the overlay over top the viewport
         
         :param painter: The QPainter to perform drawing operations with
@@ -63,21 +65,18 @@ class GLValidationOverlayLayer(GLLayer):
 
         af = QtCore.Qt.AlignmentFlag
         painter.drawText(
-            viewport_rect.marginsRemoved(GLValidationOverlayLayer.VIEWPORT_MARGINS), 
-            af.AlignTop | af.AlignLeft, 
-            "\n".join(info_msgs) 
+            viewport_rect.marginsRemoved(GLValidationOverlayLayer.VIEWPORT_MARGINS),
+            af.AlignTop | af.AlignLeft,
+            "\n".join(info_msgs),
         )
+
 
 class GLValidationLayer(GLLayer):
     """GLLayer that visualizes validation"""
 
     PASSED_VALIDATION_PERSISTANCE_TIMEOUT_S = 1.0
 
-    def __init__(
-        self,
-        name: str,
-        buffer_size: int = 10,
-    ) -> None:
+    def __init__(self, name: str, buffer_size: int = 10,) -> None:
         """Initialize the GLValidationLayer
 
         :param name: The displayed name of the layer
@@ -143,7 +142,10 @@ class GLValidationLayer(GLLayer):
         return (
             list(self.cached_always_validation_set.validations)
             + list(self.cached_eventually_validation_set.validations)
-            + [validation for (validation, time) in self.passed_validation_timeout_pairs]
+            + [
+                validation
+                for (validation, time) in self.passed_validation_timeout_pairs
+            ]
         )
 
     def __update_validation_graphics(self, validations: List[ValidationProto]) -> None:
