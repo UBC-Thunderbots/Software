@@ -21,7 +21,7 @@ class GLGradientLegend(GLPainter):
         size: Tuple[int, int] = (10, 100),
         offset: Tuple[int, int] = (0, 0),
         gradient: QtGui.QLinearGradient = QtGui.QLinearGradient(),
-        labels: Dict[str, float] = {},
+        labels: Dict[str, float] = {"1.0": 1, "0.0": 0},
         title: Optional[str] = None,
     ) -> None:
         """Initialize the GLGradientLegend
@@ -56,7 +56,7 @@ class GLGradientLegend(GLPainter):
 
     def draw_gradient_legend(
         self, painter: QtGui.QPainter, viewport_rect: QtCore.QRect
-    ):
+    ) -> None:
         """Draw the gradient legend
         
         :param painter: The QPainter to perform drawing operations with
@@ -118,3 +118,11 @@ class GLGradientLegend(GLPainter):
         if self.title:
             painter.setFont(self.title_font)
             painter.drawText(QtCore.QPoint(x_left, y_top - label_height), self.title)
+
+    def set_labels(self, labels: Dict[str, float]) -> None:
+        """ Update the labels appearing next to the color bar
+
+        :param labels: The labels to appear next to the color bar at specified stops
+                       Accepts a dict of {"label": stop} pairs where stop is in [0, 1]
+        """
+        self.labels = labels
