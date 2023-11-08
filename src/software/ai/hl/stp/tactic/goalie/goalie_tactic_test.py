@@ -35,9 +35,7 @@ from proto.ssl_gc_common_pb2 import Team
         # ball slow inside friendly defense area
         (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 2)),
         # ball slow inside friendly defense area
-        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 2)),
-        # ball slow inside friendly defense area
-        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(-4, 0),),
+        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(-4, 0)),
         # ball stationary inside friendly defense area
         (
             tbots_cpp.Point(-4, 0.0),
