@@ -23,19 +23,18 @@ void Tactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
     this->last_execution_robot = last_execution_robot;
 }
 
-std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
-    const World &world, CreateMotionControl create_motion_control)
+std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(const World &world)
 {
     auto primitive_set = std::make_unique<TbotsProto::PrimitiveSet>();
     for (const auto &robot : world.friendlyTeam().getAllRobots())
     {
         primitive.reset();
         updatePrimitive(TacticUpdate(
-                            robot, world,
-                            [this](std::unique_ptr<TbotsProto::Primitive> new_primitive) {
-                                primitive = std::move(new_primitive);
-                            },
-                            create_motion_control),
+                                robot, world,
+                                [this](std::unique_ptr<TbotsProto::Primitive> new_primitive)
+                                {
+                                    primitive = std::move(new_primitive);
+                                }),
                         !last_execution_robot.has_value() ||
                             last_execution_robot.value() != robot.id());
 

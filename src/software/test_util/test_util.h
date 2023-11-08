@@ -175,13 +175,4 @@ namespace TestUtil
      */
     GameState createGameState(const RefereeCommand &current_referee_command,
                               const RefereeCommand &previous_referee_command);
-
-    /** Create Motion Control from destination
-     *
-     * @param destination
-     *
-     * @return the motion control with that destination
-     */
-    TbotsProto::MotionControl createMotionControl(const Point &destination);
-
 };  // namespace TestUtil

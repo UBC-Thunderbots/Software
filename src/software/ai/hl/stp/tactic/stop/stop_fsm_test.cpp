@@ -16,8 +16,7 @@ TEST(StopFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<StopFSM::StopState>));
     fsm.process_event(StopFSM::Update(
         {}, TacticUpdate(
-                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+                    robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     // robot is still moving
     EXPECT_TRUE(fsm.is(boost::sml::state<StopFSM::StopState>));
     robot = Robot(0,
@@ -26,15 +25,13 @@ TEST(StopFSMTest, test_transitions)
                   Timestamp::fromSeconds(123));
     fsm.process_event(StopFSM::Update(
         {}, TacticUpdate(
-                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+                    robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     // robot is still moving
     EXPECT_TRUE(fsm.is(boost::sml::state<StopFSM::StopState>));
     robot = TestUtil::createRobotAtPos(Point(1, -3));
     fsm.process_event(StopFSM::Update(
         {}, TacticUpdate(
-                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+                    robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     // robot stopped
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }

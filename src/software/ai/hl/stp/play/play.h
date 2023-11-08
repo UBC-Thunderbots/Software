@@ -93,22 +93,6 @@ class Play
      */
     virtual void updateTactics(const PlayUpdate& play_update);
 
-    /**
-     * Gets Primitives from a Tactic given the path planner factory, the world, and the
-     * tactic
-     *
-     * @param path_planner_factory The path planner factory
-     * @param world The updated world
-     * @param tactic the Tactic
-     * @param motion_constraints the motion constraints to use
-     *
-     * @return the PrimitiveSet to execute
-     */
-    static std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitivesFromTactic(
-        const GlobalPathPlannerFactory& path_planner_factory, const World& world,
-        std::shared_ptr<Tactic> tactic,
-        std::set<TbotsProto::MotionConstraint> motion_constraints);
-
    private:
     /**
      * Assigns the given tactics to as many of the given robots
@@ -121,11 +105,8 @@ class Play
      * @return the remaining unassigned robots, the new primitives to assign, and robot to
      * tactic assignment
      */
-    static std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
-                      std::map<std::shared_ptr<const Tactic>, RobotId>>
-    assignTactics(const GlobalPathPlannerFactory& path_planner_factory,
-                  const World& world, TacticVector tactic_vector,
-                  const std::vector<Robot> robots_to_assign);
+    static std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>, std::map<std::shared_ptr<const Tactic>, RobotId>>
+    assignTactics(const World &world, TacticVector tactic_vector, const std::vector<Robot>& robots_to_assign);
 
     /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in

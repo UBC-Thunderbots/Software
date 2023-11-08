@@ -41,6 +41,17 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     std::optional<double> cost_override = std::nullopt);
 
 /**
+ * TODO: Document
+ */
+std::unique_ptr<TbotsProto::Primitive> createDirectTrajectoryPrimitive(
+    const TbotsProto::TrajectoryPathParams2D &xy_traj_params,
+    const TbotsProto::TrajectoryParamsAngular1D &w_traj_params,
+    const TbotsProto::DribblerMode &dribbler_mode,
+    const TbotsProto::BallCollisionType &ball_collision_type,
+    const AutoChipOrKick &auto_chip_or_kick,
+    double cost);
+
+/**
  * Create a Stop Move Primitive Message
  *
  * @return Pointer to Stop Primitive Message

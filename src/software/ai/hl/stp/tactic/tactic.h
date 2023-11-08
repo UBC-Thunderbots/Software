@@ -86,12 +86,10 @@ class Tactic
      * Updates and returns a set of primitives for all friendly robots from this tactic
      *
      * @param world The updated world
-     * @param create_motion_control Function to create a motion control proto
      *
      * @return the next primitive
      */
-    std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const World &world, CreateMotionControl create_motion_control);
+    std::unique_ptr<TbotsProto::PrimitiveSet> get(const World &world);
 
     /**
      * Accepts a Tactic Visitor and calls the visit function on itself

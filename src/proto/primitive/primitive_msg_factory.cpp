@@ -57,6 +57,45 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     return move_primitive_msg;
 }
 
+
+
+std::unique_ptr<TbotsProto::Primitive>
+createDirectTrajectoryPrimitive(const TbotsProto::TrajectoryPathParams2D &xy_traj_params,
+                                const TbotsProto::TrajectoryParamsAngular1D &w_traj_params,
+                                const TbotsProto::DribblerMode &dribbler_mode,
+                                const TbotsProto::BallCollisionType &ball_collision_type,
+                                const AutoChipOrKick &auto_chip_or_kick,
+                                double cost)
+{
+    auto traj_primitive_msg = std::make_unique<TbotsProto::Primitive>();
+
+    *(traj_primitive_msg->mutable_move_traj()->mutable_xy_traj_params()) = xy_traj_params;
+    *(traj_primitive_msg->mutable_move_traj()->mutable_w_traj_params()) = w_traj_params;
+
+    traj_primitive_msg->mutable_move_traj()->set_dribbler_mode(dribbler_mode);
+
+    if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
+    {
+        traj_primitive_msg->mutable_move_traj()
+                ->mutable_auto_chip_or_kick()
+                ->set_autochip_distance_meters(
+                        static_cast<float>(auto_chip_or_kick.autochip_distance_m));
+    }
+    else if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOKICK)
+    {
+        traj_primitive_msg->mutable_move_traj()
+                ->mutable_auto_chip_or_kick()
+                ->set_autokick_speed_m_per_s(
+                        static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
+    }
+
+    traj_primitive_msg->mutable_move_traj()->set_ball_collision_type(ball_collision_type);
+
+    // TODO (NIMA): Use the trajectory factory to calculate the cost of the trajectory. Note that no path is needed for direct trajectory
+    traj_primitive_msg->set_cost(cost);
+    return traj_primitive_msg;
+}
+
 std::unique_ptr<TbotsProto::Primitive> createStopPrimitive()
 {
     auto stop_primitive_msg = std::make_unique<TbotsProto::Primitive>();

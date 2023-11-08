@@ -116,9 +116,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
             auto motion_constraints =
                 buildMotionConstraintSet(world.gameState(), *goalie_tactic);
-            auto primitives = getPrimitivesFromTactic(path_planner_factory, world,
-                                                      goalie_tactic, motion_constraints)
-                                  ->robot_primitives();
+            auto primitives = goalie_tactic->get(world)->robot_primitives();
             CHECK(primitives.contains(goalie_robot_id))
                 << "Couldn't find a primitive for robot id " << goalie_robot_id;
             auto primitive = primitives.at(goalie_robot_id);
@@ -146,6 +144,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     //
     // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
     // algorithm that we use here
+
+    auto now = std::chrono::high_resolution_clock::now();
+    static int num_calls = 0;
+    static long int total_duration_us = 0;
     for (unsigned int i = 0; i < priority_tactics.size(); i++)
     {
         auto tactic_vector = priority_tactics[i];
@@ -170,7 +172,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
         auto [remaining_robots, new_primitives_to_assign,
               current_tactic_robot_id_assignment] =
-            assignTactics(path_planner_factory, world, tactic_vector, robots);
+                assignTactics(world, tactic_vector, robots);
 
         tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 
@@ -181,6 +183,17 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         }
 
         robots = remaining_robots;
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();
+    total_duration_us += duration;
+    if (++num_calls % 200 == 0)
+    {
+        LOG(INFO) << "Average time to assign tactics: "
+                  << total_duration_us / num_calls << " us" << std::endl;
+        total_duration_us = 0;
+        num_calls = 0;
     }
 
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
@@ -219,69 +232,8 @@ void Play::updateTactics(const PlayUpdate &play_update)
     play_update.set_tactics(getTactics(play_update.world));
 }
 
-std::unique_ptr<TbotsProto::PrimitiveSet> Play::getPrimitivesFromTactic(
-    const GlobalPathPlannerFactory &path_planner_factory, const World &world,
-    std::shared_ptr<Tactic> tactic,
-    std::set<TbotsProto::MotionConstraint> motion_constraints)
-{
-    auto obstacles    = path_planner_factory.getStaticObstacles(motion_constraints);
-    auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
-    // TODO (Nima): update this so just paths are returned instead (can later calculate length: EnlsvgPathPlanner::pathLength(path_points, robot_position))
-    CreateMotionControl create_motion_control =
-        [obstacles, path_planner, motion_constraints](const Robot &robot,
-                                                      const Point &destination) {
-            Point robot_position = robot.position();
-            TbotsProto::MotionControl motion_control;
-            TbotsProto::Path path_proto;
-
-            // first point is always the robot_position
-            std::vector<Point> path_points = {robot_position, robot_position};
-            auto path = path_planner->findPath(robot_position, destination);
-            *(motion_control.mutable_requested_destination()) =
-                *createPointProto(destination);
-
-            if (path.has_value())
-            {
-                CHECK(path.value().size() >= 2)
-                    << "Path did not contain at least two points" << std::endl;
-                path_points = path.value();
-                motion_control.set_normalized_path_length(
-                    EnlsvgPathPlanner::pathLength(path_points, robot_position) /
-                    EnlsvgPathPlanner::MAX_PATH_LENGTH);
-            }
-            else
-            {
-                LOG(WARNING) << "No path found for robot " << robot.id() << " to "
-                             << destination << std::endl;
-                motion_control.set_normalized_path_length(1.0);
-            }
-
-            for (const auto &point : path_points)
-            {
-                *(path_proto.add_points()) = *createPointProto(point);
-            }
-            *(motion_control.mutable_path()) = path_proto;
-            for (const auto &motion_constraint : motion_constraints)
-            {
-                motion_control.add_motion_constraints(motion_constraint);
-            }
-
-            *(motion_control.mutable_static_obstacles()) = obstacles;
-
-            return motion_control;
-        };
-
-
-    return tactic->get(world, create_motion_control);
-}
-
-
-
-std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
-           std::map<std::shared_ptr<const Tactic>, RobotId>>
-Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
-                    const World &world, TacticVector tactic_vector,
-                    const std::vector<Robot> robots_to_assign)
+std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>, std::map<std::shared_ptr<const Tactic>, RobotId>>
+Play::assignTactics(const World &world, TacticVector tactic_vector, const std::vector<Robot>& robots_to_assign)
 {
     std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
     size_t num_tactics     = tactic_vector.size();
@@ -294,8 +246,7 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
     for (auto tactic : tactic_vector)
     {
         auto motion_constraints = buildMotionConstraintSet(world.gameState(), *tactic);
-        primitive_sets.emplace_back(getPrimitivesFromTactic(path_planner_factory, world,
-                                                            tactic, motion_constraints));
+        primitive_sets.emplace_back(tactic->get(world));
         CHECK(primitive_sets.back()->robot_primitives().size() ==
               world.friendlyTeam().numRobots())
             << primitive_sets.back()->robot_primitives().size() << " primitives from "

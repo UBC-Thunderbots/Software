@@ -39,15 +39,14 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
         {
             auto tactic = assigned_tactics.at(robot.id());
             tactic_robot_id_assignment.emplace(tactic, robot.id());
+            // TODO (NIMA): Remove unused var?!
             auto motion_constraints =
                 buildMotionConstraintSet(world.gameState(), *goalie_tactic);
             if (override_motion_constraints.contains(robot.id()))
             {
                 motion_constraints = override_motion_constraints.at(robot.id());
             }
-            auto primitives = getPrimitivesFromTactic(path_planner_factory, world, tactic,
-                                                      motion_constraints)
-                                  ->robot_primitives();
+            auto primitives = tactic->get(world)->robot_primitives();
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
             auto primitive = primitives.at(robot.id());

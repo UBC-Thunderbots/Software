@@ -9,19 +9,14 @@
 #include "software/world/world.h"
 
 using SetPrimitiveCallback = std::function<void(std::unique_ptr<TbotsProto::Primitive>)>;
-using CreateMotionControl =
-    std::function<TbotsProto::MotionControl(const Robot &, const Point &)>;
 
 // The tactic update struct is used to update tactics and set the new primitive
 struct TacticUpdate
 {
-    TacticUpdate(const Robot &robot, const World &world,
-                 const SetPrimitiveCallback &set_primitive_fun,
-                 const CreateMotionControl &create_motion_control)
+    TacticUpdate(const Robot &robot, const World &world, const SetPrimitiveCallback &set_primitive_fun)
         : robot(robot),
           world(world),
-          set_primitive(set_primitive_fun),
-          create_motion_control(create_motion_control)
+          set_primitive(set_primitive_fun)
     {
     }
 
@@ -31,8 +26,6 @@ struct TacticUpdate
     World world;
     // callback to return the next primitive
     SetPrimitiveCallback set_primitive;
-    // creator for motion control
-    CreateMotionControl create_motion_control;
 };
 
 /**
