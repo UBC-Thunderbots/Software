@@ -74,7 +74,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
       network_interface_(redis_client_->getSync(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
       loop_hz_(loop_hz),
-      kick_slope_(std::stoi(redis_client_->getSync(ROBOT_KICK_SLOPE_REDIS_KEY))),
+      kick_coeff_(std::stod(redis_client_->getSync(ROBOT_KICK_EXP_COEFF_REDIS_KEY))),
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
@@ -104,7 +104,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
 
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
-        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true, loop_hz);
+        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
@@ -274,7 +274,7 @@ Thunderloop::~Thunderloop() {}
             {
                 ScopedTimespecTimer timer(&poll_time);
                 power_status_ =
-                    power_service_->poll(direct_control_.power_control(), kick_slope_,
+                    power_service_->poll(direct_control_.power_control(), kick_coeff_,
                                          kick_constant_, chip_pulse_width_);
             }
             thunderloop_status_.set_power_service_poll_time_ms(

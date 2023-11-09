@@ -28,8 +28,7 @@ class NetworkService
      */
     NetworkService(const std::string& ip_address, unsigned short world_listener_port,
                    unsigned short primitive_listener_port,
-                   unsigned short robot_status_sender_port, bool multicast,
-                   const unsigned thunderloop_hz);
+                   unsigned short robot_status_sender_port, bool multicast);
 
     /**
      * When the network service is polled, it sends the robot_status and returns
@@ -41,10 +40,25 @@ class NetworkService
         TbotsProto::RobotStatus& robot_status);
 
    private:
+    /**
+     * Return true if a robot status message should be sent over the network.
+     *
+     * The update is required if any of the following are necessary:
+     * 1. Any motor has a motor fault.
+     * 2. The breakbeam status has changed between subsequent messages.
+     * 3. If we have not sent back a robot_status message in a while (heartbeat).
+     *
+     * @param robot_status the current robot status containing all the feedback
+     *
+     * @returns true if an update to the network is required, false otherwise
+     */
+    bool shouldSendNewRobotStatus(const TbotsProto::RobotStatus& robot_status) const;
+
     // Constants
     static constexpr float PROTO_LOSS_WARNING_THRESHOLD          = 0.1f;
     static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
-    const double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO;
+    static constexpr double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
+        ROBOT_STATUS_BROADCAST_RATE_HZ / (CONTROL_LOOP_HZ + 1.0);
 
     // Variables
     TbotsProto::PrimitiveSet primitive_set_msg;
@@ -71,6 +85,4 @@ class NetworkService
 
     // track last breakbeam state for sending RobotStatus outside of specified rate
     bool last_breakbeam_state_sent = false;
-
-    const unsigned control_loop_hz;
 };

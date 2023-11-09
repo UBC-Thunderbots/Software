@@ -116,9 +116,6 @@ class RobotView(QScrollArea):
             self.robot_view_widgets.append(robot_view_widget)
             self.layout.addWidget(robot_view_widget)
 
-        # ignore repeated crash proto
-        self.ROBOT_CRASH_TIMEOUT_S = 5
-
         # for a QScrollArea, widgets cannot be added to it directly
         # doing so causes no scrolling to happen, and all the components get smaller
         # instead, widgets are added to the layout which is set for a container

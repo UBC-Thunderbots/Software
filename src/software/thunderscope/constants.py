@@ -78,6 +78,8 @@ BALL_HEIGHT_EFFECT_MULTIPLIER = 3
 ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
 
 ROBOT_FATAL_TIMEOUT_S = 5
+# Max time (in seconds) tolerated between repeated crash protos until
+# crash alert occurs
 ROBOT_CRASH_TIMEOUT_S = 5
 
 # LogLevel to string conversion map

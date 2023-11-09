@@ -49,10 +49,18 @@ class g3logWidget(QWidget):
         self.layout.addWidget(self.checkbox_widget)
         self.setLayout(self.layout)
 
-        # ignore repeated crash proto
         self.robot_last_fatal_time_s = []
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_last_fatal_time_s.append(0)
+
+        # LogLevel to string conversion map
+        self.log_level_str_map = {
+            LogLevel.DEBUG: "DEBUG",
+            LogLevel.INFO: "INFO",
+            LogLevel.WARNING: "WARNING",
+            LogLevel.FATAL: "FATAL",
+            LogLevel.CONTRACT: "CONTRACT",
+        }
 
     def refresh(self):
         """Update the log widget with another log message
