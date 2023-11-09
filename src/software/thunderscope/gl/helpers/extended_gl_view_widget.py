@@ -66,7 +66,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         # This must be enabled for the mouse_moved_in_scene_signal to be emitted
         self.detect_mouse_movement_in_scene = False
 
-    def mousePressEvent(self, event: QtGui.QMouseEvent):
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was pressed
 
         If Shift is pressed along with mouse click, calculate which point was picked in scene
@@ -91,7 +91,7 @@ class ExtendedGLViewWidget(GLViewWidget):
             # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
             super().mousePressEvent(event)
 
-    def mouseMoveEvent(self, event: QtGui.QMouseEvent):
+    def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was moved
         
         :param event: The event
@@ -116,7 +116,7 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         super().mouseMoveEvent(event)
 
-    def mouseReleaseEvent(self, event: QtGui.QMouseEvent):
+    def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was released
         
         :param event: The event

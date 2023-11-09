@@ -47,6 +47,15 @@ class GLSandboxWorldLayer(GLWorldLayer):
         friendly_colour_yellow: bool,
         buffer_size: int = 5,
     ):
+        """
+        Initializes a GLSandboxWorldLayer
+
+        :param name: The displayed name of the layer
+        :param simulator_io: The simulator io communicate with the simulator
+        :param friendly_colour_yellow: Is the friendly_colour_yellow?
+        :param buffer_size: The buffer size, set higher for smoother plots.
+                            Set lower for more realtime plots. Default is arbitrary
+        """
         super().__init__(name, simulator_io, friendly_colour_yellow, buffer_size)
 
         # double click flags for adding and removing
@@ -82,7 +91,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # callback functions to call when the play state changes
         self.play_callbacks = []
 
-    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """
         Requires Ctrl + Shift to be pressed along with mouse click
         Gets the point(s) that the mouse click corresponds to on the xy-plane and other planes
@@ -110,7 +119,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             # if a robot was clicked
             self.__handle_existing_robot_event(event, robot_id, index)
 
-    def mouse_in_scene_dragged(self, event: MouseInSceneEvent):
+    def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """
         Requires Ctrl + Shift to be pressed along with mouse click
 
@@ -159,7 +168,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 self.selected_robot_id, point_on_current_plane, self.DEFAULT_ROBOT_ANGLE
             )
 
-    def mouse_in_scene_released(self, event: MouseInSceneEvent):
+    def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """
         Reset the selected robot and the in progress move
         :param event: the mouse event
@@ -201,7 +210,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.next_id = len(self.curr_robot_ids)
             self.should_init_curr_robot_ids = False
 
-    def undo(self):
+    def undo(self) -> None:
         """
         Undoes the last operation
         Adds a corresponding opposite move to the redo list so we can redo if necessary
@@ -221,7 +230,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # apply the operation
         self.__undo_redo_internal(operation)
 
-    def redo(self):
+    def redo(self) -> None:
         """
         Redoes the last undo operation
         Adds a corresponding opposite move to the undo list so we can undo if necessary
@@ -258,14 +267,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         return curr_play_state
 
-    def add_play_callback(self, callback: Callable[[bool], None]):
+    def add_play_callback(self, callback: Callable[[bool], None]) -> None:
         """
         Adds a callback function to the list of play state callbacks
         :param callback: the callback function to add
         """
         self.play_callbacks.append(callback)
 
-    def reset_to_pre_sim(self):
+    def reset_to_pre_sim(self) -> None:
         """
         Resets all robot positions to what they were before the simulator ran
         """
@@ -275,7 +284,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         print(self.local_robot_positions)
 
-    def __undo_redo_internal(self, operation: RobotOperation):
+    def __undo_redo_internal(self, operation: RobotOperation) -> None:
         """
         Helper method to apply a RobotOperation
         Updates robot positions and the next id
@@ -292,7 +301,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
     def __handle_existing_robot_event(
         self, event: MouseInSceneEvent, robot_id: int, index: int
-    ):
+    ) -> None:
         """
         Handles a mouse event when a position where a robot is present is clicked
         Marks the robot as selected (for drag moving)
@@ -329,7 +338,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.robot_remove_double_click = event.multi_plane_points[index]
             QTimer.singleShot(500, self.__toggle_robot_remove_double_click)
 
-    def __handle_new_robot_event(self, event: MouseInSceneEvent):
+    def __handle_new_robot_event(self, event: MouseInSceneEvent) -> None:
         """
         Handles a mouse event when an empty position is clicked
         If double clicked, adds a new robot at that position
@@ -372,14 +381,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         return next_id
 
-    def __toggle_robot_add_double_click(self):
+    def __toggle_robot_add_double_click(self) -> None:
         """
         Resets the robot add double click flag
         """
         if self.robot_add_double_click:
             self.robot_add_double_click = None
 
-    def __toggle_robot_remove_double_click(self):
+    def __toggle_robot_remove_double_click(self) -> None:
         """
         Resets the robot remove double click flag
         """
@@ -388,7 +397,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
     def __add_robot_to_state(
         self, world_state: WorldState, id: int, robot_state: RobotState
-    ):
+    ) -> WorldState:
         """
         Adds a robot with the given state and id to the given world state
         To the right team based on current team color
@@ -402,7 +411,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             world_state.blue_robots[id].CopyFrom(robot_state)
         return world_state
 
-    def __remove_robot_from_state(self, world_state: WorldState, id: int):
+    def __remove_robot_from_state(self, world_state: WorldState, id: int) -> WorldState:
         """
         Removes a robot with the given id from the right team in the given world state
         Based on current team color
@@ -486,7 +495,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         new_pos: Optional[QVector3D],
         new_orientation: float,
         clear_redo=True,
-    ):
+    ) -> None:
         """
         Send out a WorldState proto with the existing robots
         If new position is provided, adds a robot with the given id at the given position
@@ -631,7 +640,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
     #       GRAPHICS UPDATE METHODS       #
     # # # # # # # # # # # # # # # # # # # #
 
-    def _update_robots_graphics(self):
+    def _update_robots_graphics(self) -> None:
         """
         Called by the main refresh_graphics method in parent class
         Updates the robot graphics using the cached world state and the local robot state
@@ -645,7 +654,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
     def __update_robots_graphics(
         self, team_robots: List[Robot], color: QColor, is_friendly: bool
-    ):
+    ) -> None:
         """
         Updates graphics for the given team with the given color
         If is_friendly, has to take into account both the robots in the world state and the local state
@@ -705,7 +714,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         color: QColor,
         robot_graphics: ObservableList,
         robot_id_graphics: ObservableList,
-    ):
+    ) -> None:
         """
         Update the GLGraphicsItems with the robots from the cached world state
 

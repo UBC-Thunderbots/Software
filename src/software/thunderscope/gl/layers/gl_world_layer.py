@@ -144,7 +144,7 @@ class GLWorldLayer(GLLayer):
         ):
             self.toggle_play_state()
 
-    def toggle_play_state(self):
+    def toggle_play_state(self) -> bool:
         """
         Pauses the simulated gameplay and toggles the play state
         :return: the current play state
@@ -155,7 +155,7 @@ class GLWorldLayer(GLLayer):
         self.simulator_io.send_proto(SimulationState, simulator_state)
         return self.is_playing
 
-    def keyReleaseEvent(self, event: QtGui.QKeyEvent):
+    def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
 
         :param event: The event
@@ -163,7 +163,7 @@ class GLWorldLayer(GLLayer):
         """
         self.key_pressed[event.key()] = False
 
-    def mouse_in_scene_pressed(self, event: MouseInSceneEvent):
+    def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was pressed and picked a point in the 3D scene
         
         :param event: The event
@@ -215,7 +215,7 @@ class GLWorldLayer(GLLayer):
                 BALL_MAX_SPEED_METERS_PER_SECOND
             )
 
-    def mouse_in_scene_released(self, event: MouseInSceneEvent):
+    def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was released after picking a point in the 3D scene
         
         :param event: The event
@@ -444,7 +444,7 @@ class GLWorldLayer(GLLayer):
         else:
             robot_id_graphic.hide()
 
-    def __update_robot_status_graphics(self):
+    def __update_robot_status_graphics(self) -> None:
         """Update the robot status graphics"""
 
         # Get the robot status messages
@@ -499,14 +499,14 @@ class GLWorldLayer(GLLayer):
             self.ball_kick_velocity_graphic.show()
             self.ball_kick_velocity_graphic.set_points(
                 [
-                    [
+                    (
                         ball_state.global_position.x_meters,
                         ball_state.global_position.y_meters,
-                    ],
-                    [
+                    ),
+                    (
                         ball_state.global_position.x_meters + velocity.x(),
                         ball_state.global_position.y_meters + velocity.y(),
-                    ],
+                    ),
                 ]
             )
 

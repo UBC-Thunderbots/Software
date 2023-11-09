@@ -1,10 +1,15 @@
 from proto.import_all_protos import *
+import software.python_bindings as tbots_cpp
 import math
+from typing import List
 
 
 def create_world_state(
-    yellow_robot_locations, blue_robot_locations, ball_location, ball_velocity
-):
+    yellow_robot_locations: List[tbots_cpp.Point],
+    blue_robot_locations: List[tbots_cpp.Point],
+    ball_location: tbots_cpp.Point,
+    ball_velocity: tbots_cpp.Vector,
+) -> WorldState:
     """Initializes the world from a list of robot locations and ball location/velocity.
 
     NOTE: (index is robot id)
@@ -16,6 +21,7 @@ def create_world_state(
 
     """
     world_state = WorldState()
+
     for robot_id, robot_location in enumerate(yellow_robot_locations):
         world_state.yellow_robots[robot_id].CopyFrom(
             RobotState(
@@ -25,6 +31,7 @@ def create_world_state(
                 global_orientation=Angle(radians=math.pi),
             )
         )
+
     for robot_id, robot_location in enumerate(blue_robot_locations):
         world_state.blue_robots[robot_id].CopyFrom(
             RobotState(
@@ -33,6 +40,7 @@ def create_world_state(
                 ),
             )
         )
+
     world_state.ball_state.CopyFrom(
         BallState(
             global_position=Point(
