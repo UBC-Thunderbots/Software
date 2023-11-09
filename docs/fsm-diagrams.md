@@ -224,6 +224,21 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [HaltFSM](/src/software/ai/hl/stp/tactic/halt/halt_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StopState
+StopState --> StopState : [!haltDone]\n<i>updateHalt</i>
+StopState --> Terminate:::terminate : [haltDone]\n<i>updateHalt</i>
+Terminate:::terminate --> StopState : [!haltDone]\n<i>updateHalt</i>
+Terminate:::terminate --> Terminate:::terminate : [haltDone]\n<i>updateHalt</i>
+
+```
+
 ## [KickFSM](/src/software/ai/hl/stp/tactic/kick/kick_fsm.h)
 
 ```mermaid
@@ -344,21 +359,6 @@ StealAndChipState --> Terminate:::terminate : [!enemyThreatHasBall]\n<i>blockPas
 Terminate:::terminate --> BlockPassState : [!enemyThreatHasBall]\n<i>blockPass</i>
 Terminate:::terminate --> MoveFSM : [enemyThreatHasBall]\n<i>blockShot</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
-
-```
-
-## [HaltFSM](/src/software/ai/hl/stp/tactic/halt/halt_fsm.h)
-
-```mermaid
-
-stateDiagram-v2
-classDef terminate fill:white,color:black,font-weight:bold
-direction LR
-[*] --> StopState
-StopState --> StopState : [!haltDone]\n<i>updateHalt</i>
-StopState --> Terminate:::terminate : [haltDone]\n<i>updateHalt</i>
-Terminate:::terminate --> StopState : [!haltDone]\n<i>updateHalt</i>
-Terminate:::terminate --> Terminate:::terminate : [haltDone]\n<i>updateHalt</i>
 
 ```
 
