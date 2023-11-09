@@ -1,6 +1,7 @@
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import Qt, QTimer
 from proto.import_all_protos import *
+from typing import Dict, List
 from software.py_constants import *
 from software.thunderscope.robot_diagnostics.error_log_widgets import (
     RobotLogMessageWidget,
@@ -37,10 +38,15 @@ class RobotErrorLog(QScrollArea):
         self.robot_last_crash_time_s = {}
         self.robot_last_fatal_time_s = {}
 
-        # when this robot has a battery warning, this is set to True
+        # when a robot has a battery warning, its map entry is set to True
         # which prevents spamming the same battery warning
         # set back to False if battery is back above warning level
-        self.low_battery_log_disabled = False
+        self.low_battery_log_disabled: Dict[int, bool] = {}
+
+        # when the robot has an error code, its added to tne list keyed to the robot id
+        # which prevents spamming the same error code log
+        # list set back to empty if no error code
+        self.error_code_log_disabled: Dict[int, List[ErrorCode]] = {}
 
         self.layout = QVBoxLayout()
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -60,6 +66,18 @@ class RobotErrorLog(QScrollArea):
         QTimer.singleShot(3000, self.test)
         QTimer.singleShot(3100, self.test)
         QTimer.singleShot(3200, self.test)
+        QTimer.singleShot(5200, self.test2)
+        QTimer.singleShot(6200, self.test3)
+
+    def test2(self):
+        self.robot_status_buffer.put(
+            RobotStatus(robot_id=3, error_code=[ErrorCode.NO_ERROR])
+        )
+
+    def test3(self):
+        self.robot_status_buffer.put(
+            RobotStatus(robot_id=3, error_code=[ErrorCode.LOW_CAP])
+        )
 
     def test(self):
         self.robot_crash_buffer.put(RobotCrash(robot_id=5, status=RobotStatus()))
@@ -69,7 +87,38 @@ class RobotErrorLog(QScrollArea):
             )
         )
         self.robot_status_buffer.put(
+            RobotStatus(
+                robot_id=3, error_code=[ErrorCode.LOW_CAP, ErrorCode.LOW_BATTERY,]
+            )
+        )
+        self.robot_status_buffer.put(
+            RobotStatus(
+                robot_id=3, error_code=[ErrorCode.LOW_CAP, ErrorCode.LOW_BATTERY,]
+            )
+        )
+        self.robot_status_buffer.put(
+            RobotStatus(
+                robot_id=3, error_code=[ErrorCode.LOW_CAP, ErrorCode.LOW_BATTERY,]
+            )
+        )
+        self.robot_status_buffer.put(
+            RobotStatus(
+                robot_id=3, error_code=[ErrorCode.LOW_CAP, ErrorCode.LOW_BATTERY,]
+            )
+        )
+        self.robot_status_buffer.put(
             RobotStatus(robot_id=2, power_status=PowerStatus(battery_voltage=0))
+        )
+        self.robot_status_buffer.put(
+            RobotStatus(robot_id=2, power_status=PowerStatus(battery_voltage=0))
+        )
+
+        self.robot_status_buffer.put(
+            RobotStatus(robot_id=2, power_status=PowerStatus(battery_voltage=0))
+        )
+
+        self.robot_status_buffer.put(
+            RobotStatus(robot_id=6, power_status=PowerStatus(battery_voltage=0))
         )
 
         self.robot_log_buffer.put(
@@ -115,6 +164,7 @@ class RobotErrorLog(QScrollArea):
                 robot_log.log_level == LogLevel.FATAL
                 or robot_log.log_level == LogLevel.CONTRACT
             ):
+
                 if (
                     robot_log.robot_id not in self.robot_last_fatal_time_s
                     or time.time() - self.robot_last_fatal_time_s[robot_log.robot_id]
@@ -142,32 +192,45 @@ class RobotErrorLog(QScrollArea):
 
         # empty out the buffer to get statuses for all current robots at once
         while robot_status is not None:
+            # initialize the list if not in dict yet
+            if robot_status.robot_id not in self.error_code_log_disabled:
+                self.error_code_log_disabled[robot_status.robot_id] = []
+
             # if there's an error code, add to log
             for code in robot_status.error_code:
                 if (
                     code != ErrorCode.NO_ERROR
                     and code != ErrorCode.LOW_BATTERY
                     and code in ERROR_CODE_MESSAGES.keys()
+                    and code not in self.error_code_log_disabled[robot_status.robot_id]
                 ):
                     self.add_error_log_message(
                         ErrorCodeLogMessageWidget(
                             robot_status.robot_id, ERROR_CODE_MESSAGES[code]
                         )
                     )
+                    # add to list for this robot id to prevent spamming
+                    self.error_code_log_disabled[robot_status.robot_id].append(code)
+                # if there is no more errors, clear the list so far
+                elif code == ErrorCode.NO_ERROR:
+                    self.error_code_log_disabled[robot_status.robot_id] = []
 
-            # if the battery voltage is too low, log it
+            # if the battery voltage is too low and a voltage log hasn't been sent for this robot yet, log it
             if (
                 robot_status.power_status.battery_voltage <= BATTERY_WARNING_VOLTAGE
-                and not self.low_battery_log_disabled
+                and (
+                    robot_status.robot_id not in self.low_battery_log_disabled
+                    or not self.low_battery_log_disabled[robot_status.robot_id]
+                )
             ):
                 self.add_error_log_message(
                     LowBatteryLogMessageWidget(robot_status.robot_id)
                 )
                 # prevent spamming logs by disabling logs
-                self.low_battery_log_disabled = True
+                self.low_battery_log_disabled[robot_status.robot_id] = True
             elif robot_status.power_status.battery_voltage > BATTERY_WARNING_VOLTAGE:
                 # battery voltage is now above threshold again, so start logging low battery
-                self.low_battery_log_disabled = False
+                self.low_battery_log_disabled[robot_status.robot_id] = False
 
             # get the next robot status and loop again
             robot_status = self.robot_status_buffer.get(
