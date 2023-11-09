@@ -193,7 +193,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                     QVector3D(
                         robot.current_state.global_position.x_meters,
                         robot.current_state.global_position.y_meters,
-                        0
+                        0,
                     ),
                     robot.current_state.global_orientation.radians,
                 )
@@ -685,11 +685,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                     del team_robots_dict[robot_id]
                 elif pos is not None:
                     # override position using local pos
-                    team_robots_dict[robot_id] = (
-                        pos[0].x(),
-                        pos[0].y(),
-                        pos[1]
-                    )
+                    team_robots_dict[robot_id] = (pos[0].x(), pos[0].y(), pos[1])
 
         # Ensure we have the same number of current graphics as world (+ local if friendly) robots
         robot_graphics.resize(len(team_robots_dict), lambda: GLRobot())
