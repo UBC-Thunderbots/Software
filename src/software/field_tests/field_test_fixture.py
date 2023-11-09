@@ -215,9 +215,6 @@ def load_command_line_arguments():
     """
     parser = argparse.ArgumentParser(description="Run simulated or field pytests")
     parser.add_argument(
-        "--enable_thunderscope", action="store_true", help="enable thunderscope"
-    )
-    parser.add_argument(
         "--simulator_runtime_dir",
         type=str,
         help="simulator runtime directory",
@@ -350,7 +347,6 @@ def field_test_runner():
     current_test = current_test.replace("[", "-")
 
     test_name = current_test.split("-")[0]
-    tscope = None
     debug_full_sys = args.debug_blue_full_system
     runtime_dir = f"{args.blue_full_system_runtime_dir}/test/{test_name}"
     friendly_proto_unix_io = blue_full_system_proto_unix_io
@@ -386,18 +382,16 @@ def field_test_runner():
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
             )
-            # If we want to run thunderscope, inject the proto unix ios
-            # and start the test
-            if args.enable_thunderscope:
-                tscope = Thunderscope(
-                    configure_field_test_view(
-                        simulator_proto_unix_io=simulator_proto_unix_io,
-                        blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
-                        yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
-                        yellow_is_friendly=args.run_yellow,
-                    ),
-                    layout_path=None,
-                )
+            # Inject the proto unix ios into thunderscope and start the test
+            tscope = Thunderscope(
+                configure_field_test_view(
+                    simulator_proto_unix_io=simulator_proto_unix_io,
+                    blue_full_system_proto_unix_io=blue_full_system_proto_unix_io,
+                    yellow_full_system_proto_unix_io=yellow_full_system_proto_unix_io,
+                    yellow_is_friendly=args.run_yellow,
+                ),
+                layout_path=None,
+            )
             time.sleep(LAUNCH_DELAY_S)
             runner = FieldTestRunner(
                 test_name=current_test,
