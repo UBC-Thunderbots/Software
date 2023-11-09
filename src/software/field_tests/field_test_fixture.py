@@ -360,7 +360,9 @@ def field_test_runner():
         runtime_dir = f"{args.yellow_full_system_runtime_dir}/test/{test_name}"
         friendly_proto_unix_io = yellow_full_system_proto_unix_io
 
-    estop_mode, estop_path = get_estop_config(args)
+    estop_mode, estop_path = get_estop_config(
+        args.keyboard_estop, args.disable_communication
+    )
 
     # Launch all binaries
     with FullSystem(
@@ -373,7 +375,7 @@ def field_test_runner():
         multicast_channel=getRobotMulticastChannel(args.channel),
         interface=args.interface,
         estop_mode=estop_mode,
-        estop_path=args.estop_path,
+        estop_path=estop_path,
     ) as rc_friendly:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True

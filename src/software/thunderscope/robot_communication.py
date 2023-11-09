@@ -96,7 +96,7 @@ class RobotCommunication(object):
                     self.estop_path, self.estop_buadrate
                 )
             except Exception:
-                raise Exception("Could not find estop, make sure its plugged in")
+                raise Exception(f"Invalid Estop found at location {self.estop_path}")
 
     def setup_for_fullsystem(self) -> None:
         """

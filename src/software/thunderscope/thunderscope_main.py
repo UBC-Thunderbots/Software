@@ -254,7 +254,9 @@ if __name__ == "__main__":
         # else, it will be the diagnostics proto
         current_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.CURRENT]
 
-        estop_mode, estop_path = get_estop_config(args)
+        estop_mode, estop_path = get_estop_config(
+            args.keyboard_estop, args.disable_communication
+        )
 
         with RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
