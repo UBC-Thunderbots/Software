@@ -206,8 +206,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         Undoes the last operation
         Adds a corresponding opposite move to the redo list so we can redo if necessary
         """
-        # TODO: Export button
-        # TODO: Reset button
         # get the operation which undoes the previous one
         operation = self.undo_operations.pop()
 
