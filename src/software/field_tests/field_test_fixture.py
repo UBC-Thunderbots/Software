@@ -392,6 +392,14 @@ def field_test_runner():
                 ),
                 layout_path=None,
             )
+
+            # connect the keyboard estop toggle to the key event if needed
+            if estop_mode == EstopMode.KEYBOARD_ESTOP:
+                tscope.keyboard_estop_shortcut.activated.connect(
+                    rc_friendly.toggle_keyboard_estop
+                )
+                rc_friendly.toggle_keyboard_estop()
+
             time.sleep(LAUNCH_DELAY_S)
             runner = FieldTestRunner(
                 test_name=current_test,
