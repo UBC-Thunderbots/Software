@@ -16,6 +16,7 @@ from software.thunderscope.constants import (
     ERROR_CODE_MESSAGES,
     ROBOT_CRASH_TIMEOUT_S,
     ROBOT_FATAL_TIMEOUT_S,
+    ROBOT_LOG_WIDGET_TIMEOUT,
 )
 
 import time
@@ -32,7 +33,7 @@ class RobotErrorLog(QScrollArea):
         super(RobotErrorLog, self).__init__()
 
         self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
-        self.robot_crash_buffer = ThreadSafeBuffer(10, RobotCrash)
+        self.robot_crash_buffer = ThreadSafeBuffer(1000, RobotCrash)
         self.robot_log_buffer = ThreadSafeBuffer(10, RobotLog)
 
         self.robot_last_crash_time_s = {}
@@ -51,7 +52,7 @@ class RobotErrorLog(QScrollArea):
         self.layout = QVBoxLayout()
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.error_log_messages = []
+        self.error_log_messages: Dict[RobotLogMessageWidget, float] = {}
 
         # for a QScrollArea, widgets cannot be added to it directly
         # doing so causes no scrolling to happen, and all the components get smaller
@@ -71,12 +72,17 @@ class RobotErrorLog(QScrollArea):
 
         Updates the time since of the existing messages
         """
+        # remove all closed widgets first
+        self.__remove_closed_or_old_widgets()
+
         # update time since for all existing logs
-        for error_message in self.error_log_messages:
+        for error_message in self.error_log_messages.keys():
             error_message.update_time()
 
+        # add log widgets for fatal log messages
         self.__refresh_fatal_logs()
 
+        # add log widgets for robot crash messages
         self.__refresh_robot_crash()
 
         # get a RobotStatus message
@@ -85,6 +91,7 @@ class RobotErrorLog(QScrollArea):
         # empty out the buffer to get statuses for all current robots at once
         while robot_status is not None:
 
+            # add log widgets for error code and low battery warnings
             self.__refresh_robot_status_error_code(robot_status)
             self.__refresh_robot_status_battery_voltage(robot_status)
 
@@ -92,6 +99,24 @@ class RobotErrorLog(QScrollArea):
             robot_status = self.robot_status_buffer.get(
                 block=False, return_cached=False
             )
+
+    def __remove_closed_or_old_widgets(self):
+        """
+        Removes all log widgets which have been closed or have timed out from the log
+        """
+        widgets_to_delete = []
+        # get all log widgets which have timed out or are old
+        for error_message, start_time in self.error_log_messages.items():
+            if not error_message.log_open or (
+                not error_message.pinned
+                and time.time() - start_time > ROBOT_LOG_WIDGET_TIMEOUT
+            ):
+                widgets_to_delete.append(error_message)
+
+        # delete them from dict and remove them from layout
+        for widget in widgets_to_delete:
+            self.layout.removeWidget(widget)
+            del self.error_log_messages[widget]
 
     def __refresh_fatal_logs(self) -> None:
         """
@@ -192,5 +217,5 @@ class RobotErrorLog(QScrollArea):
         Adds the given error message to the log by making a new RobotErrorMessage
         :param error_widget: the error widget to add to the log
         """
-        self.error_log_messages.append(error_widget)
+        self.error_log_messages[error_widget] = time.time()
         self.layout.addWidget(error_widget)

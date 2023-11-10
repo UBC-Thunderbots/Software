@@ -31,6 +31,10 @@ class RobotLogMessageWidget(QFrame):
         """
         super(RobotLogMessageWidget, self).__init__()
 
+        # if true, the log is in the log widget and hasn't been cleared
+        self.log_open = True
+        self.pinned = False
+
         self.layout = QHBoxLayout()
         self.icon = QLabel()
 
@@ -76,6 +80,23 @@ class RobotLogMessageWidget(QFrame):
         self.time_layout.addWidget(self.timestamp_label)
         self.time_layout.addWidget(self.time_since_label)
 
+        # close button to clear log
+        self.close_button = QPushButton("X")
+        self.close_button.setStyleSheet("padding: 0")
+        self.close_button.setFixedHeight(self.icon_size / 2)
+        self.close_button.setFixedWidth(self.icon_size / 2)
+        self.close_button.clicked.connect(self.close)
+
+        self.pin_button = QPushButton("📌")
+        self.pin_button.setStyleSheet("padding: 0")
+        self.pin_button.setFixedHeight(self.icon_size / 2)
+        self.pin_button.setFixedWidth(self.icon_size / 2)
+        self.pin_button.clicked.connect(self.pin)
+
+        self.close_and_pin_layout = QVBoxLayout()
+        self.close_and_pin_layout.addWidget(self.close_button)
+        self.close_and_pin_layout.addWidget(self.pin_button)
+
         # adding spacing to look nice
         self.layout.addWidget(self.icon)
         self.layout.addStretch(1)
@@ -83,6 +104,8 @@ class RobotLogMessageWidget(QFrame):
         self.layout.addStretch(16)
         self.layout.addLayout(self.time_layout)
         self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.addStretch(1)
+        self.layout.addLayout(self.close_and_pin_layout)
 
         self.setLayout(self.layout)
         self.base_stylesheet = textwrap.dedent(
@@ -95,7 +118,23 @@ class RobotLogMessageWidget(QFrame):
         )
         self.setStyleSheet(self.base_stylesheet)
 
-    def update_time(self):
+    def close(self) -> None:
+        """
+        Sets the widget to closed
+        """
+        self.log_open = not self.log_open or self.pinned
+
+    def pin(self) -> None:
+        """
+        Sets the widget to pinned (won't be cleared by timeout)
+        """
+        self.pinned = not self.pinned
+        self.pin_button.setStyleSheet(
+            "padding: 0;"
+            f"background-color: {'white' if self.pinned else 'transparent'}"
+        )
+
+    def update_time(self) -> None:
         """
         Updates the time since label for the error log message
         """
@@ -103,7 +142,7 @@ class RobotLogMessageWidget(QFrame):
         time_diff = datetime.now() - self.timestamp
         self.time_since_label.setText(f"{int(time_diff.total_seconds())} seconds ago")
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event) -> None:
         """
         Mouse Release Event handler for child classes to override
         :param event: the mouse release event
@@ -176,14 +215,14 @@ class RobotLogMessageWithDialogWidget(RobotLogMessageWidget):
         )
         self.dialog = None
 
-    def enterEvent(self, event):
+    def enterEvent(self, event) -> None:
         """
         Sets the cursor to indicate that this widget is clickable upon mouse enter
         :param event: the mouse enter event
         """
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event) -> None:
         """
         If the error has a robot status to display, creates and opens a dialog to
         display it on mouse click
