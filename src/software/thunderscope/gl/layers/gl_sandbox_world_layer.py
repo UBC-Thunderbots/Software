@@ -191,10 +191,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         # if curr robot ids hasn't been synced yet
         if self.should_init_curr_robot_ids:
-            friendly_team, _ = self.__get_friendly_and_enemy_team()
-
             # for robots in the world, add the ids them to curr robots
-            for robot in friendly_team:
+            for robot in self.cached_world.friendly_team.team_robots:
                 self.curr_robot_ids.add(robot.id)
                 self.pre_sim_robot_positions[robot.id] = (
                     QVector3D(
@@ -391,15 +389,30 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.robot_remove_double_click = None
 
     def __add_robot_to_state(
-        self, world_state: WorldState, id: int, robot_state: RobotState
+        self, world_state: WorldState, id: int, pos: QVector3D, orientation: float
     ) -> WorldState:
         """
         Adds a robot with the given state and id to the given world state
         To the right team based on current team color
+        Converts position and orientation if needed
         :param world_state: the world state to add robot to
         :param id: the id of the robot to add
-        :param robot_state: the state of the new robot to add
+        :param pos: the new QVector3D position of the robot
+        :param orientation: the new orientation of the robot (radians)
         """
+        # convert position and orientation if needed
+        converted_pos, converted_orientation = self.__invert_robot_if_defending_negative_half(
+            pos,
+            orientation
+        )
+        # build the robot state
+        robot_state = RobotState(
+            global_position=Point(
+                x_meters=converted_pos.x(), y_meters=converted_pos.y(),
+            ),
+            global_orientation=Angle(radians=converted_orientation),
+        )
+
         if self.friendly_colour_yellow:
             world_state.yellow_robots[id].CopyFrom(robot_state)
         else:
@@ -429,7 +442,20 @@ class GLSandboxWorldLayer(GLWorldLayer):
                     along with the index of the plane it was identified on,
                     else None, None
         """
-        # first look for robot in local state
+        # first, check if there's any enemy robots being clicked on
+        # return None immediately if so (since we can't edit enemy robot state)
+        for robot_ in self.cached_world.friendly_team.team_robots:
+            # get the coordinates from the robot state
+            pos_x = robot_.current_state.global_position.x_meters
+            pos_y = robot_.current_state.global_position.y_meters
+
+            # check if robot in position and return if found
+            index = self.__identify_robot_helper(multi_plane_points, pos_x, pos_y)
+
+            if index is not None:
+                return None, None
+
+        # look for robot in local state
         for robot_id, pos in self.local_robot_positions.items():
             # if the local robot has already been removed, skip it
             if pos is None:
@@ -444,11 +470,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 return robot_id, index
 
         # if not found, look for robot in cached world state
-        # determine the current team
-        team_robots, _ = self.__get_friendly_and_enemy_team()
-
-        # look for robot in the cached world state
-        for robot_ in team_robots:
+        for robot_ in self.cached_world.friendly_team.team_robots:
             # get the coordinates from the robot state
             pos_x = robot_.current_state.global_position.x_meters
             pos_y = robot_.current_state.global_position.y_meters
@@ -495,35 +517,26 @@ class GLSandboxWorldLayer(GLWorldLayer):
         Send out a WorldState proto with the existing robots
         If new position is provided, adds a robot with the given id at the given position
         Else, removes the robot with the given id from the robot state
-        :param robots_to_add: map of ids to positions of the robot to add / remove and their orienations
-                              position is defined if adding / moving and None if removing
+        :param new_robot_id: the id of the robot to add / remove / move
+        :param new_pos: the new QVector3D position of the robot (None if robot to be removed)
+        :param new_orientation: the new orientation of the robot (radians)
         :param clear_redo: If True, indicates a new action instead of an action from the undo/redo list.
                             clears redo list if True
         """
+
         world_state = WorldState()
 
-        # determine current team based on current color
-        team_robots, _ = self.__get_friendly_and_enemy_team()
-
         # copy over existing robots for the current team
-        for robot_ in team_robots:
-            converted_pos, orientation = self.__invert_robot_if_defending_negative_half(
+        for robot_ in self.cached_world.friendly_team.team_robots:
+            world_state = self.__add_robot_to_state(
+                world_state,
+                robot_.id,
                 QVector3D(
                     robot_.current_state.global_position.x_meters,
                     robot_.current_state.global_position.y_meters,
                     0,
                 ),
-                robot_.current_state.global_orientation.radians,
-            )
-            world_state = self.__add_robot_to_state(
-                world_state,
-                robot_.id,
-                RobotState(
-                    global_position=Point(
-                        x_meters=converted_pos.x(), y_meters=converted_pos.y(),
-                    ),
-                    global_orientation=Angle(radians=orientation),
-                ),
+                robot_.current_state.global_orientation.radians
             )
 
         # copy over any local state robots if sim is paused
@@ -536,13 +549,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 world_state = self.__add_robot_to_state(
                     world_state,
                     robot_id,
-                    RobotState(
-                        global_position=Point(x_meters=pos[0].x(), y_meters=pos[0].y()),
-                        global_orientation=Angle(radians=pos[1]),
-                    ),
+                    pos[0], pos[1]
                 )
 
-        world_state = self.__update_with_new_positions(
+        world_state = self.__update_with_new_position(
             world_state, new_robot_id, new_pos, new_orientation
         )
 
@@ -554,7 +564,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # send out world state
         self.simulator_io.send_proto(WorldState, world_state)
 
-    def __update_with_new_positions(
+    def __update_with_new_position(
         self,
         world_state: WorldState,
         robot_id: int,
@@ -567,31 +577,19 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param world_state: the world state to change
         :param robot_id: the id of thr robot to add / move / remove
         :param new_pos: the new position of the robot, or None if removing
+        :param new_orientation: the new orientation of the robot if needed (radians)
         :return: the updated world state
         """
         if new_pos:
-            # constructs and adds a new robot state
-            converted_new_pos = self._invert_position_if_defending_negative_half(
-                new_pos
-            )
-            new_orientation = (
-                new_orientation + math.pi
-                if self.friendly_colour_yellow
-                else new_orientation
-            )
             self.curr_robot_ids.add(robot_id)
-            robot_state = RobotState(
-                global_position=Point(
-                    x_meters=converted_new_pos.x(), y_meters=converted_new_pos.y()
-                ),
-                global_orientation=Angle(radians=new_orientation),
-            )
-            world_state = self.__add_robot_to_state(world_state, robot_id, robot_state)
+            world_state = self.__add_robot_to_state(world_state, robot_id, new_pos, new_orientation)
+
+            # saves the state to local and pre-sim dicts
             self.pre_sim_robot_positions[robot_id] = (new_pos, new_orientation)
             if not self.is_playing:
                 # update the local state to the converted position
                 self.local_robot_positions[robot_id] = (
-                    converted_new_pos,
+                    new_pos,
                     new_orientation,
                 )
         else:
@@ -619,115 +617,21 @@ class GLSandboxWorldLayer(GLWorldLayer):
             return converted_point, orientation - math.pi
         return converted_point, orientation
 
-    def __get_friendly_and_enemy_team(self) -> Tuple[List[Robot], List[Robot]]:
-        """
-        Gets the friendly and enemy team robots
-        :return: A Tuple of [list of friendly robots, list of enemy robots]
-        """
-        return (
-            self.cached_world.friendly_team.team_robots,
-            self.cached_world.enemy_team.team_robots,
-        )
-
     # # # # # # # # # # # # # # # # # # # #
     #       GRAPHICS UPDATE METHODS       #
     # # # # # # # # # # # # # # # # # # # #
 
     def _update_robots_graphics(self) -> None:
         """
-        Called by the main refresh_graphics method in parent class
-        Updates the robot graphics using the cached world state and the local robot state
+        Overrides the _update_robots_graphics method in the super class
+        Adds local state robots to the friendly team cache before updating the robot graphics
         """
-        # get the friendly / enemy teams and colors for this layer
-        friendly_team, enemy_team = self.__get_friendly_and_enemy_team()
+        for robot_id, pos in self.local_robot_positions.items():
+            if pos is None and robot_id in self._cached_friendly_team:
+                # if removed in local state, remove from dict
+                del self._cached_friendly_team[robot_id]
+            elif pos is not None:
+                # override position using local pos
+                self._cached_friendly_team[robot_id] = (pos[0].x(), pos[0].y(), pos[1])
 
-        print(f"{self.friendly_colour_yellow} {friendly_team} {enemy_team}")
-
-        self.__update_robots_graphics(friendly_team, Colors.BLUE_ROBOT_COLOR, True)
-
-        self.__update_robots_graphics(enemy_team, Colors.YELLOW_ROBOT_COLOR, False)
-
-    def __update_robots_graphics(
-        self, team_robots: List[Robot], color: QColor, is_friendly: bool
-    ) -> None:
-        """
-        Updates graphics for the given team with the given color
-        If is_friendly, has to take into account both the robots in the world state and the local state
-        Local state takes precedence over world state, so world state robots are overwritten when there are overlaps
-        The resulting number of graphics are updated for the robots
-        :param team_robots: a list of robot states to update graphics with
-        :param color: the color of the robots
-        :param is_friendly: if the current team is the friendly team for this layer
-        """
-        # start with the corresponding robot and robot id graphics before resizing
-        robot_graphics = (
-            self.friendly_robot_graphics if is_friendly else self.enemy_robot_graphics
-        )
-        robot_id_graphics = (
-            self.friendly_robot_id_graphics
-            if is_friendly
-            else self.enemy_robot_id_graphics
-        )
-
-        # convert the team robots into a dictionary
-        team_robots_dict = {
-            robot.id: (
-                robot.current_state.global_position.x_meters,
-                robot.current_state.global_position.y_meters,
-                robot.current_state.global_orientation.radians,
-            )
-            for robot in team_robots
-        }
-
-        # if this team is friendly, use local state to override any overlapping robots
-        if is_friendly:
-            for robot_id, pos in self.local_robot_positions.items():
-                if pos is None and robot_id in team_robots_dict:
-                    # if removed in local state, remove from dict
-                    del team_robots_dict[robot_id]
-                elif pos is not None:
-                    # override position using local pos
-                    team_robots_dict[robot_id] = (pos[0].x(), pos[0].y(), pos[1])
-
-        # Ensure we have the same number of current graphics as world (+ local if friendly) robots
-        robot_graphics.resize(len(team_robots_dict), lambda: GLRobot())
-        robot_id_graphics.resize(
-            len(team_robots_dict),
-            lambda: GLTextItem(
-                font=QFont("Roboto", 10, weight=700), color=Colors.PRIMARY_TEXT_COLOR,
-            ),
-        )
-
-        # update graphics for the correct number of world robots
-        self.__update_world_robot_graphics(
-            team_robots_dict, color, robot_graphics, robot_id_graphics,
-        )
-
-    def __update_world_robot_graphics(
-        self,
-        robots: Dict[int, Tuple[int, int, int]],
-        color: QColor,
-        robot_graphics: ObservableList,
-        robot_id_graphics: ObservableList,
-    ) -> None:
-        """
-        Update the GLGraphicsItems with the robots from the cached world state
-
-        :param robots: A dict of robot ids to a tuple containing [x_pos, y_pos, orientation] of the robot
-        :param color: The color of the robots
-        :param robot_graphics: The ObservableList containing the robot graphics for this team
-        :param robot_id_graphics: The ObservableList containing the robot ID graphics for this team
-        """
-
-        # update the robot and robot id graphics for the filtered robots
-        for robot_graphic, robot_id_graphic, robot_id in zip(
-            robot_graphics, robot_id_graphics, robots,
-        ):
-            self._update_robot_graphic(
-                robot_graphic,
-                robot_id_graphic,
-                color,
-                robot_id,
-                robots[robot_id][0:2],
-                robots[robot_id][2],
-            )
+        super()._update_robots_graphics()
