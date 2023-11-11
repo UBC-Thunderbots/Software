@@ -7,6 +7,9 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
+from software.simulated_tests import {
+    OrValidation
+}
 
 class OrValidation():
     def __init__ (self, validation):
@@ -18,17 +21,6 @@ class OrValidation():
             if validation.get_validation_status(world) == ValidationStatus.PASSING: # should I be using ValidationStatus.PASSING or just == FAILING
                 return ValidationStatus.PASSING
         return ValidationStatus.PASSING
-
-    def get_validation_type(self, world): # do I need to return anything here or even include this at all
-        validation_type_initial = ValidationType
-
-        for validation in self.validation:
-            validation_type = validation.get_validation_type
-            if validation_type != validation_type_initial:
-                raise TypeError("type of validation instances is not consistent")
-            
-        return validation_type_initial
-
 
     def get_validation_geometry(self, world):
 
@@ -42,3 +34,14 @@ class OrValidation():
             validation_geometry.segments += validation.segments
 
         return validation_geometry
+
+
+    def get_validation_type(self, world):
+        validation_type_initial = self.validation[0].get_validation_type
+
+        for validation in self.validation:
+            validation_type = validation.get_validation_type
+            if validation_type != validation_type_initial:
+                raise TypeError("type of validation instances is not consistent")
+                # do I need to write a return statement or will the error account for this
+        return validation_type_initial

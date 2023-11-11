@@ -108,6 +108,7 @@ py_library(
         "friendly_goal_scored.py",
         "friendly_has_ball_possession.py",
         "friendly_team_scored.py",
+        "or_validation.py",
         "robot_enters_region.py",
         "robot_halt.py",
         "robot_speed_threshold.py",

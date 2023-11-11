@@ -85,11 +85,16 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
 
     if is_friendly_test:
         always_validation_sequence_set[0].append(
-            NumberOfRobotsNeverEntersRegion(
-                region=[tbots.Field.createSSLDivisionBField.enemyHalf(),
-                        tbots.Field.createSSLDivisionBField.centerCircle()],
-                req_robot_cnt=2,
-            )
+            OrValidation(
+                [
+                NumberOfRobotsAlwaysStaysInRegion(
+                    region=[tbots.Field.createSSLDivisionBField.centerCircle()],
+                    req_robot_cnt=0,
+                ),
+                NumberOfRobotsAlwaysStaysInRegion(
+                    region=[tbots.Field.createSSLDivisionBField.centerCircle()],
+                    req_robot_cnt=1,
+                )]
         )
     else:
         always_validation_sequence_set[0].append(
