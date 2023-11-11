@@ -107,6 +107,7 @@ py_library(
         "excessive_dribbling.py",
         "friendly_has_ball_possession.py",
         "friendly_team_scored.py",
+        "kicker_double_touch.py",
         "robot_enters_region.py",
         "robot_speed_threshold.py",
         "validation.py",
