@@ -51,11 +51,9 @@ class g3logWidget(QWidget):
         self.layout.addWidget(self.checkbox_widget)
         self.setLayout(self.layout)
 
-        # ignore repeated crash proto
         self.robot_last_fatal_time_s = []
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_last_fatal_time_s.append(0)
-        self.ROBOT_FATAL_TIMEOUT_S = 5
 
         # LogLevel to string conversion map
         self.log_level_str_map = {
@@ -103,7 +101,7 @@ class g3logWidget(QWidget):
             if log.log_level == LogLevel.FATAL or log.log_level == LogLevel.CONTRACT:
                 if (
                     time.time() - self.robot_last_fatal_time_s[log.robot_id]
-                    > self.ROBOT_FATAL_TIMEOUT_S
+                    > ROBOT_CRASH_TIMEOUT_S
                 ):
                     QMessageBox.information(
                         self, "Fatal Log Alert", log_str,
