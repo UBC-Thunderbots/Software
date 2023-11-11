@@ -19,6 +19,7 @@ from software.thunderscope.gl.layers import (
     gl_validation_layer,
     gl_passing_layer,
     gl_sandbox_world_layer,
+    gl_world_layer,
     gl_simulator_layer,
     gl_hrvo_layer,
     gl_tactic_layer,
@@ -100,13 +101,13 @@ def setup_gl_widget(
     gl_widget.add_layer(simulator_layer, False)
     gl_widget.add_layer(tactic_layer, False)
 
-    gl_widget.toolbar.play_button.clicked.connect(world_layer.toggle_play_state)
-    world_layer.add_play_callback(
-        lambda is_playing: gl_widget.toolbar.toggle_play_button_text(is_playing)
-    )
-    gl_widget.toolbar.undo_button.clicked.connect(world_layer.undo)
-    gl_widget.toolbar.redo_button.clicked.connect(world_layer.redo)
-    gl_widget.toolbar.reset_button.clicked.connect(world_layer.reset_to_pre_sim)
+    # gl_widget.toolbar.play_button.clicked.connect(world_layer.toggle_play_state)
+    # world_layer.add_play_callback(
+    #     lambda is_playing: gl_widget.toolbar.toggle_play_button_text(is_playing)
+    # )
+    # gl_widget.toolbar.undo_button.clicked.connect(world_layer.undo)
+    # gl_widget.toolbar.redo_button.clicked.connect(world_layer.redo)
+    # gl_widget.toolbar.reset_button.clicked.connect(world_layer.reset_to_pre_sim)
 
     # Add HRVO layers and have them hidden on startup
     # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages

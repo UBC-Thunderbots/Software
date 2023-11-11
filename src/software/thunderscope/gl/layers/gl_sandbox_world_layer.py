@@ -107,8 +107,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         if not event.mouse_event.modifiers() & Qt.KeyboardModifier.ControlModifier:
             return
 
-        print(event.multi_plane_points)
-
         # determine whether a robot was clicked
         robot_id, index = self.__identify_robot(event.multi_plane_points)
 
@@ -278,11 +276,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         Resets all robot positions to what they were before the simulator ran
         """
-        print(self.local_robot_positions)
         for robot_id, state in self.pre_sim_robot_positions.items():
             self.__update_world_state(robot_id, state[0], state[1])
 
-        print(self.local_robot_positions)
 
     def __undo_redo_internal(self, operation: RobotOperation) -> None:
         """
@@ -359,7 +355,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
             self.__update_world_state(
                 self.next_id, event.point_in_scene, self.DEFAULT_ROBOT_ANGLE
             )
-            print(self.__get_next_robot_id(self.next_id))
             self.next_id = self.__get_next_robot_id(self.next_id)
             self.__toggle_robot_add_double_click()
         else:
@@ -547,7 +542,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
                     ),
                 )
 
-        print(new_robot_id)
         world_state = self.__update_with_new_positions(
             world_state, new_robot_id, new_pos, new_orientation
         )
@@ -600,7 +594,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
                     converted_new_pos,
                     new_orientation,
                 )
-            print(self.curr_robot_ids)
         else:
             # remove an existing robot
             self.curr_robot_ids.remove(robot_id)
@@ -647,6 +640,8 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         # get the friendly / enemy teams and colors for this layer
         friendly_team, enemy_team = self.__get_friendly_and_enemy_team()
+
+        print(f"{self.friendly_colour_yellow} {friendly_team} {enemy_team}")
 
         self.__update_robots_graphics(friendly_team, Colors.BLUE_ROBOT_COLOR, True)
 

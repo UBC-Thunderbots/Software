@@ -227,7 +227,7 @@ class GLWorldLayer(GLLayer):
         if not self.point_in_scene_picked or not self.ball_velocity_vector:
             return
 
-        if self.__should_invert_coordinate_frame():
+        if self._should_invert_coordinate_frame():
             self.ball_velocity_vector = -self.ball_velocity_vector
 
         # Send a command to the simulator to give the ball the specified
@@ -258,6 +258,8 @@ class GLWorldLayer(GLLayer):
         self.__update_field_graphics(self.cached_world.field)
         self.__update_goal_graphics(self.cached_world.field)
         self.__update_ball_graphics(self.cached_world.ball.current_state)
+
+
 
         self._update_robots_graphics()
 
