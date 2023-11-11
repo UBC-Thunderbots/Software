@@ -434,7 +434,7 @@ class GLWorldLayer(GLLayer):
                         pos_x - (ROBOT_MAX_RADIUS_METERS / 2),
                         pos_y,
                         ROBOT_MAX_HEIGHT_METERS + 0.1,
-                        ],
+                    ],
                 )
 
             else:

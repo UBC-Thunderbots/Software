@@ -277,7 +277,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         for robot_id, state in self.pre_sim_robot_positions.items():
             self.__update_world_state(robot_id, state[0], state[1])
 
-
     def __undo_redo_internal(self, operation: RobotOperation) -> None:
         """
         Helper method to apply a RobotOperation
@@ -401,10 +400,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
         :param orientation: the new orientation of the robot (radians)
         """
         # convert position and orientation if needed
-        converted_pos, converted_orientation = self.__invert_robot_if_defending_negative_half(
-            pos,
-            orientation
-        )
+        (
+            converted_pos,
+            converted_orientation,
+        ) = self.__invert_robot_if_defending_negative_half(pos, orientation)
         # build the robot state
         robot_state = RobotState(
             global_position=Point(
@@ -536,7 +535,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                     robot_.current_state.global_position.y_meters,
                     0,
                 ),
-                robot_.current_state.global_orientation.radians
+                robot_.current_state.global_orientation.radians,
             )
 
         # copy over any local state robots if sim is paused
@@ -547,9 +546,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                     continue
 
                 world_state = self.__add_robot_to_state(
-                    world_state,
-                    robot_id,
-                    pos[0], pos[1]
+                    world_state, robot_id, pos[0], pos[1]
                 )
 
         world_state = self.__update_with_new_position(
@@ -582,7 +579,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         if new_pos:
             self.curr_robot_ids.add(robot_id)
-            world_state = self.__add_robot_to_state(world_state, robot_id, new_pos, new_orientation)
+            world_state = self.__add_robot_to_state(
+                world_state, robot_id, new_pos, new_orientation
+            )
 
             # saves the state to local and pre-sim dicts
             self.pre_sim_robot_positions[robot_id] = (new_pos, new_orientation)
