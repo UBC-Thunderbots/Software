@@ -19,6 +19,7 @@ cc_library(
         "//software/geom:point",
         "//software/geom:vector",
         "//software/world",
+        "//software/ai/navigator/path_planner:trajectory_path",
     ],
 )
 

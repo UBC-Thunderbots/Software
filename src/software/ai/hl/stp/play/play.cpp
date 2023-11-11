@@ -233,8 +233,33 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
         *(primitive.mutable_move()->mutable_xy_traj_params()->mutable_sub_destination()) =
                 *createPointProto(path_nodes[0].getTrajectory()->getDestination());
-        primitive.mutable_move()->mutable_xy_traj_params()->set_connection_time(
-                path_nodes[0].getTrajectoryEndTime());
+
+        // TODO (NIMA): Consider improving this logic
+        if (path_nodes[0].getTrajectoryEndTime() != path_nodes[0].getTrajectory()->getTotalTime())
+        {
+            primitive.mutable_move()->mutable_xy_traj_params()->set_connection_time(
+                    path_nodes[0].getTrajectoryEndTime());
+        }
+        else
+        {
+            primitive.mutable_move()->mutable_xy_traj_params()->set_connection_time(0);
+        }
+
+        // TODO: Used for verifying that we have created the params correctly
+        std::optional<TrajectoryPath> converted_traj_path = createTrajectoryPathFromParams(primitive.mutable_move()->xy_traj_params(), robot_constants);
+        for (double time = 0; time <= traj_path.getTotalTime(); time += 0.1)
+        {
+            Point position = traj_path.getPosition(time);
+            Vector velocity = traj_path.getVelocity(time);
+            Vector acceleration = traj_path.getAcceleration(time);
+
+            Point converted_position = converted_traj_path->getPosition(time);
+            Vector converted_velocity = converted_traj_path->getVelocity(time);
+            Vector converted_acceleration = converted_traj_path->getAcceleration(time);
+            CHECK(distance(position, converted_position) < 0.001) << "position: " << position << " != converted_position: " << converted_position << " at time " << time;
+            CHECK((velocity - converted_velocity).length() < 0.001) << "velocity: " << velocity << " != converted_velocity: " << converted_velocity << " at time " << time;
+            CHECK((acceleration - converted_acceleration).length() < 0.001) << "acceleration: " << acceleration << " != converted_acceleration: " << converted_acceleration << " at time " << time;
+        }
     }
     auto end = std::chrono::high_resolution_clock::now();
     auto duration =

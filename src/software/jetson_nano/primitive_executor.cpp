@@ -6,6 +6,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
 #include "software/physics/velocity_conversion_util.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
                                      const RobotConstants_t &robot_constants,
@@ -36,40 +37,7 @@ void PrimitiveExecutor::updatePrimitiveSet(
             const TbotsProto::TrajectoryPathParams2D& trajectory_2d_params = move_traj.xy_traj_params();
             const TbotsProto::TrajectoryParamsAngular1D& trajectory_angular_params = move_traj.w_traj_params();
 
-            double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(trajectory_2d_params.max_speed_mode(), robot_constants_);
-
-            if (max_speed == 0)
-            {
-                trajectory_path_ = std::nullopt;
-                return;
-            }
-
-            // TODO: 2D Trajectory should also take in KinematicConstraints
-            auto trajectory = std::make_shared<BangBangTrajectory2D>(
-                                            createPoint(trajectory_2d_params.start_position()),
-                                            createPoint(trajectory_2d_params.destination()),
-                                            createVector(trajectory_2d_params.initial_velocity()),
-                                            convertMaxAllowedSpeedModeToMaxAllowedSpeed(trajectory_2d_params.max_speed_mode(), robot_constants_),
-                                            robot_constants_.robot_max_acceleration_m_per_s_2,
-                                            robot_constants_.robot_max_deceleration_m_per_s_2);
-
-            trajectory_path_ = TrajectoryPath(trajectory, [](const KinematicConstraints &constraints,
-                                                             const Point &initial_pos,
-                                                             const Point &final_pos,
-                                                             const Vector &initial_vel) {
-                return std::make_shared<BangBangTrajectory2D>(
-                        initial_pos, final_pos, initial_vel, constraints.getMaxVelocity(),
-                        constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
-            });
-
-            if (trajectory_2d_params.connection_time() != 0)
-            {
-                trajectory_path_->append(KinematicConstraints(max_speed,
-                                                              robot_constants_.robot_max_acceleration_m_per_s_2,
-                                                              robot_constants_.robot_max_deceleration_m_per_s_2),
-                                         trajectory_2d_params.connection_time(),
-                                         createPoint(trajectory_2d_params.sub_destination()));
-            }
+            trajectory_path_ = createTrajectoryPathFromParams(trajectory_2d_params, robot_constants_);
 
             // TODO: Combine generate and constructor
             angular_trajectory_ = BangBangTrajectory1DAngular();

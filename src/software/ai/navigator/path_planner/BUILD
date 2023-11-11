@@ -103,6 +103,7 @@ cc_library(
         "//software/ai/navigator/path_planner:kinematic_constraints",
         "//software/logger",
     ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(

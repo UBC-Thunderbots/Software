@@ -7,6 +7,7 @@
 #include "proto/world.pb.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/world/world.h"
+#include "software/ai/navigator/path_planner/trajectory_path.h"
 
 /**
  * Returns a TbotsProto::World proto given a World.
@@ -177,3 +178,29 @@ std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedT
  */
 std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
     const std::vector<double>& costs, int num_rows, int num_cols);
+
+// TODO (NIMA): Add documentation. DOes this also need to be optional?
+std::optional<TrajectoryPath> createTrajectoryPathFromParams(const TbotsProto::TrajectoryPathParams2D& params, const RobotConstants& robot_constants);
+
+/**
+ * Convert dribbler mode to dribbler speed
+ *
+ * @param dribbler_mode The DribblerMode
+ * @param robot_constants The robot constants
+ *
+ * @return the dribbler speed in RPM
+ */
+double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
+                                          RobotConstants_t robot_constants);
+
+/**
+ * Convert max allowed speed mode to max allowed speed
+ *
+ * @param max_allowed_speed_mode The MaxAllowedSpeedMode
+ * @param robot_constants The robot constants
+ *
+ * @return the max allowed speed in m/s
+ */
+double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+        RobotConstants_t robot_constants);

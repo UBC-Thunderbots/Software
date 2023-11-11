@@ -402,3 +402,85 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
 
     return cost_visualization_msg;
 }
+
+std::optional<TrajectoryPath> createTrajectoryPathFromParams(const TbotsProto::TrajectoryPathParams2D& params,
+                                              const RobotConstants& robot_constants)
+{
+
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(params.max_speed_mode(), robot_constants);
+
+    if (max_speed == 0)
+    {
+        return std::nullopt;
+    }
+
+    Point initial_destination = createPoint(params.destination());
+    if (params.connection_time() != 0)
+    {
+        initial_destination = createPoint(params.sub_destination());
+    }
+    // TODO: 2D Trajectory should also take in KinematicConstraints
+    auto trajectory = std::make_shared<BangBangTrajectory2D>(
+            createPoint(params.start_position()),
+            initial_destination,
+            createVector(params.initial_velocity()),
+            max_speed,
+            robot_constants.robot_max_acceleration_m_per_s_2,
+            robot_constants.robot_max_deceleration_m_per_s_2);
+
+    TrajectoryPath trajectory_path(trajectory, [](const KinematicConstraints &constraints,
+                                                     const Point &initial_pos,
+                                                     const Point &final_pos,
+                                                     const Vector &initial_vel) {
+        return std::make_shared<BangBangTrajectory2D>(
+                initial_pos, final_pos, initial_vel, constraints.getMaxVelocity(),
+                constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
+    });
+
+    if (params.connection_time() != 0)
+    {
+        trajectory_path.append(KinematicConstraints(max_speed,
+                                                      robot_constants.robot_max_acceleration_m_per_s_2,
+                                                      robot_constants.robot_max_deceleration_m_per_s_2),
+                                 params.connection_time(),
+                                 createPoint(params.destination()));
+    }
+
+    return trajectory_path;
+}
+
+
+double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
+                                          RobotConstants_t robot_constants)
+{
+    switch (dribbler_mode)
+    {
+        case TbotsProto::DribblerMode::INDEFINITE:
+            return robot_constants.indefinite_dribbler_speed_rpm;
+        case TbotsProto::DribblerMode::MAX_FORCE:
+            return robot_constants.max_force_dribbler_speed_rpm;
+        case TbotsProto::DribblerMode::OFF:
+            return 0.0;
+        default:
+            LOG(WARNING) << "DribblerMode is invalid" << std::endl;
+            return 0.0;
+    }
+}
+
+double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+        RobotConstants_t robot_constants)
+{
+    switch (max_allowed_speed_mode)
+    {
+        case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
+            return robot_constants.robot_max_speed_m_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
+            return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
+        case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
+            return COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND;
+        default:
+            LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
+            return 0.0;
+    }
+}

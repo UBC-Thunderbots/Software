@@ -66,26 +66,3 @@ std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
     const Vector &velocity, AngularVelocity angular_velocity, double dribbler_rpm,
     const TbotsProto::AutoChipOrKick &auto_chip_or_kick);
 
-
-/**
- * Convert dribbler mode to dribbler speed
- *
- * @param dribbler_mode The DribblerMode
- * @param robot_constants The robot constants
- *
- * @return the dribbler speed in RPM
- */
-double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
-                                          RobotConstants_t robot_constants);
-
-/**
- * Convert max allowed speed mode to max allowed speed
- *
- * @param max_allowed_speed_mode The MaxAllowedSpeedMode
- * @param robot_constants The robot constants
- *
- * @return the max allowed speed in m/s
- */
-double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
-    RobotConstants_t robot_constants);
