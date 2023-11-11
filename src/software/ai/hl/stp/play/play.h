@@ -9,6 +9,7 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/navigator/path_planner/global_path_planner_factory.h"
+#include "software/ai/navigator/path_planner/trajectory_planner.h"
 
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
 using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
@@ -166,7 +167,7 @@ class Play
     // Stop tactic common to all plays for robots that don't have tactics assigned
     TacticVector stop_tactics;
 
-    // Whether this plays requires a goalie
+    // Whether this play requires a goalie
     const bool requires_goalie;
 
     // TODO (#2359): remove this
@@ -181,4 +182,7 @@ class Play
     PriorityTacticVector priority_tactics;
 
     uint64_t sequence_number = 0;
+
+    TrajectoryPlanner planner;
+    RobotNavigationObstacleFactory obstacle_factory;
 };

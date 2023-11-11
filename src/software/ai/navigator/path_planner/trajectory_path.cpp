@@ -114,3 +114,8 @@ std::vector<BoundingBox> TrajectoryPath::getBoundingBoxes() const
     }
     return bounding_boxes;
 }
+
+const std::vector<TrajectoryPathNode> &TrajectoryPath::getTrajectoryPathNodes() const
+{
+    return traj_path;
+}

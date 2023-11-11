@@ -44,6 +44,13 @@ class Polygon : public virtual Shape
     Polygon expand(double expansion_amount) const;
 
     /**
+     * Returns perimeter length of the polygon
+     *
+     * @return perimeter length of the polygon
+     */
+    double perimeter() const;
+
+    /**
      * Returns the line segments that form this polygon.
      * @return the line segments that form this polygon.
      */

@@ -34,5 +34,9 @@ void robotStationaryInPolygon(RobotId robot_id, Polygon polygon, unsigned int nu
             yield("Robot with ID " + std::to_string(robot_id) +
                   " is not stationary or has not entered the " + ss.str());
         }
+        std::stringstream ss;
+        ss << polygon;
+        yield("Robot with ID " + std::to_string(robot_id) + " is not stationary for " +
+              toString(num_ticks) + " yet");
     }
 }

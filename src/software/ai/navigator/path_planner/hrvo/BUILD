@@ -84,10 +84,10 @@ cc_test(
         "//software/world",
     ],
 )
-
 py_test(
     name = "simulated_hrvo_test",
     srcs = ["simulated_hrvo_test.py"],
+    tags = ["exclusive"],
     deps = [
         "//proto/message_translation:py_tbots_protobuf",
         "//software/simulated_tests:simulated_test_fixture",

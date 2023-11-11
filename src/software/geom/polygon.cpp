@@ -1,5 +1,6 @@
 #include "software/geom/polygon.h"
 
+#include <numeric>
 #include <unordered_set>
 
 Polygon::Polygon(const std::vector<Point>& points) : points_(points)
@@ -74,6 +75,7 @@ Polygon Polygon::expand(double expansion_amount) const
     return Polygon(expanded_points);
 }
 
+
 Polygon Polygon::fromSegment(const Segment& segment, const double radius)
 {
     return fromSegment(segment, radius, radius);
@@ -138,6 +140,13 @@ const std::vector<Segment>& Polygon::getSegments() const
 const std::vector<Point>& Polygon::getPoints() const
 {
     return points_;
+}
+
+double Polygon::perimeter() const
+{
+    return (std::accumulate(
+        segments_.begin(), segments_.end(), 0.0,
+        [](double acc, const Segment& seg) { return acc + seg.length(); }));
 }
 
 bool operator==(const Polygon& poly1, const Polygon& poly2)

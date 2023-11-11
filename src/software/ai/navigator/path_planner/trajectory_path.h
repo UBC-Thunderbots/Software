@@ -78,6 +78,12 @@ class TrajectoryPath : public Trajectory2D
      */
     std::vector<BoundingBox> getBoundingBoxes() const override;
 
+    /**
+     * TODO (NIMA): docs
+     * @return
+     */
+    const std::vector<TrajectoryPathNode> &getTrajectoryPathNodes() const;
+
    private:
     std::vector<TrajectoryPathNode> traj_path;
     TrajectoryGenerator trajectory_generator;

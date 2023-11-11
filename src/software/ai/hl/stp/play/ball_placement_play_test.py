@@ -46,6 +46,8 @@ def test_two_ai_ball_placement(simulated_test_runner):
             .negXPosYCorner(),
         ]
 
+        simulated_test_runner.clear_world_buffer()
+
         # Game Controller Setup
         simulated_test_runner.gamecontroller.send_ci_input(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN

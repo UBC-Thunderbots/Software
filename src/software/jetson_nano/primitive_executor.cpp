@@ -13,7 +13,7 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
                                      const RobotId robot_id)
     : current_primitive_(),
       current_world_(),
-      friendly_team_colour(friendly_team_colour),
+      friendly_team_colour_(friendly_team_colour),
       robot_constants_(robot_constants),
       hrvo_simulator_(robot_id),
       time_step_(time_step),
@@ -29,6 +29,59 @@ void PrimitiveExecutor::updatePrimitiveSet(
     if (primitive_set_msg_iter != primitive_set_msg.robot_primitives().end())
     {
         current_primitive_ = primitive_set_msg_iter->second;
+
+        if (current_primitive_.has_move())
+        {
+            const TbotsProto::MovePrimitive& move_traj = current_primitive_.move();
+            const TbotsProto::TrajectoryPathParams2D& trajectory_2d_params = move_traj.xy_traj_params();
+            const TbotsProto::TrajectoryParamsAngular1D& trajectory_angular_params = move_traj.w_traj_params();
+
+            double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(trajectory_2d_params.max_speed_mode(), robot_constants_);
+
+            if (max_speed == 0)
+            {
+                trajectory_path_ = std::nullopt;
+            }
+
+            Point destination = createPoint(trajectory_2d_params.destination());
+            Point sub_destination = createPoint(trajectory_2d_params.sub_destination());
+
+            // TODO: 2D Trajectory should also take in KinematicConstraints
+            auto trajectory = std::make_shared<BangBangTrajectory2D>(
+                                            createPoint(trajectory_2d_params.start_position()),
+                                            destination,
+                                            createVector(trajectory_2d_params.initial_velocity()),
+                                            convertMaxAllowedSpeedModeToMaxAllowedSpeed(trajectory_2d_params.max_speed_mode(), robot_constants_),
+                                            robot_constants_.robot_max_acceleration_m_per_s_2,
+                                            robot_constants_.robot_max_deceleration_m_per_s_2);
+
+            trajectory_path_ = TrajectoryPath(trajectory, [](const KinematicConstraints &constraints,
+                                                             const Point &initial_pos,
+                                                             const Point &final_pos,
+                                                             const Vector &initial_vel) {
+                return std::make_shared<BangBangTrajectory2D>(
+                        initial_pos, final_pos, initial_vel, constraints.getMaxVelocity(),
+                        constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
+            });
+
+            if (destination != sub_destination)
+            {
+                trajectory_path_->append(KinematicConstraints(max_speed,
+                                                              robot_constants_.robot_max_acceleration_m_per_s_2,
+                                                              robot_constants_.robot_max_deceleration_m_per_s_2),
+                                         trajectory_2d_params.connection_time(),
+                                         sub_destination);
+            }
+
+            // TODO: Combine generate and constructor
+            angular_trajectory_ = BangBangTrajectory1DAngular();
+            angular_trajectory_->generate(createAngle(trajectory_angular_params.start_angle()),
+                                        createAngle(trajectory_angular_params.final_angle()),
+                                        createAngularVelocity(trajectory_angular_params.initial_velocity()),
+                                        AngularVelocity::fromRadians(robot_constants_.robot_max_ang_speed_rad_per_s),
+                                        AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
+                                        AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2));
+        }
         return;
     }
 }
@@ -104,7 +157,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     hrvo_simulator_.doStep(time_step_);
 
     // Visualize the HRVO Simulator for the current robot
-    hrvo_simulator_.visualize(robot_id_, friendly_team_colour);
+    hrvo_simulator_.visualize(robot_id_, friendly_team_colour_);
 
     switch (current_primitive_.primitive_case())
     {
@@ -123,39 +176,18 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
         case TbotsProto::Primitive::kMove:
         {
-            const TbotsProto::MovePrimitive& move_traj = current_primitive_.move();
-            const TbotsProto::TrajectoryPathParams2D& trajectory_2d_params = move_traj.xy_traj_params();
-            const TbotsProto::TrajectoryParamsAngular1D& trajectory_angular_params = move_traj.w_traj_params();
-
-            double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(trajectory_2d_params.max_speed_mode(), robot_constants_);
-
-            if (max_speed == 0)
+            if (!trajectory_path_.has_value() || !angular_trajectory_.has_value())
             {
                 auto prim   = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,
                                                            TbotsProto::AutoChipOrKick());
                 auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                         prim->direct_control());
+                return output;
             }
 
-            BangBangTrajectory2D trajectory(createPoint(trajectory_2d_params.start_position()),
-                                            createPoint(trajectory_2d_params.destination()),
-                                            createVector(trajectory_2d_params.initial_velocity()),
-                                            convertMaxAllowedSpeedModeToMaxAllowedSpeed(trajectory_2d_params.max_speed_mode(), robot_constants_),
-                                            robot_constants_.robot_max_acceleration_m_per_s_2,
-                                            robot_constants_.robot_max_deceleration_m_per_s_2);
-
-            // TODO: Combine generate and constructor
-            BangBangTrajectory1DAngular angular_trajectory;
-            angular_trajectory.generate(createAngle(trajectory_angular_params.start_angle()),
-                                        createAngle(trajectory_angular_params.final_angle()),
-                                        createAngularVelocity(trajectory_angular_params.initial_velocity()),
-                                        AngularVelocity::fromRadians(robot_constants_.robot_max_ang_speed_rad_per_s),
-                                        AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
-                                        AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2));
-
             auto output = createDirectControlPrimitive(
-                    trajectory.getVelocity(time_step_.toSeconds()),
-                    angular_trajectory.getVelocity(time_step_.toSeconds()),
+                    trajectory_path_->getVelocity(time_step_.toSeconds()),
+                    angular_trajectory_->getVelocity(time_step_.toSeconds()),
                     convertDribblerModeToDribblerSpeed(current_primitive_.move().dribbler_mode(), robot_constants_),
                     current_primitive_.move().auto_chip_or_kick());
 

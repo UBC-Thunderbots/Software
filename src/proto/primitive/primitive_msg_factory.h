@@ -46,14 +46,14 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
  */
 std::unique_ptr<TbotsProto::Primitive>
 createMovePrimitive(const Robot &robot,
-                                const Point &destination,
-                                const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
-                                const Angle &final_angle,
-                                const TbotsProto::DribblerMode &dribbler_mode,
-                                const TbotsProto::BallCollisionType &ball_collision_type,
-                                const AutoChipOrKick &auto_chip_or_kick,
-                                const RobotConstants_t &robot_constants,
-                                std::optional<double> cost_override = std::nullopt);
+                    const Point &destination,
+                    const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
+                    const Angle &final_angle,
+                    const TbotsProto::DribblerMode &dribbler_mode,
+                    const TbotsProto::BallCollisionType &ball_collision_type,
+                    const AutoChipOrKick &auto_chip_or_kick,
+                    const RobotConstants_t &robot_constants,
+                    std::optional<double> cost_override = std::nullopt);
 
 /**
  * Create a Stop Move Primitive Message

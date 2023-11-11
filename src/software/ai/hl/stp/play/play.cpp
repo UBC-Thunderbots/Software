@@ -13,7 +13,8 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
       stop_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
-      world_(std::nullopt)
+      world_(std::nullopt),
+      obstacle_factory(ai_config.robot_navigation_obstacle_config())
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
@@ -114,6 +115,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
                          robots.end());
 
+            // TODO (NIMA): Update this as well to use trajectories
             auto motion_constraints =
                 buildMotionConstraintSet(world.gameState(), *goalie_tactic);
             auto primitives = goalie_tactic->get(world)->robot_primitives();
@@ -196,6 +198,56 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         num_calls = 0;
     }
 
+    // Update direct trajectories to trajectories calculated using
+    // the trajectory planner which avoids obstacles
+    for (auto [id, primitive] : primitives_to_run->robot_primitives())
+    {
+        if (!primitive.has_move())
+        {
+            continue;
+        }
+
+        // Do this logic once?!
+        const auto& robot_opt = world.friendlyTeam().getRobotById(id);
+        if (!robot_opt.has_value())
+        {
+            continue;
+        }
+        const RobotConstants& robot_constants = robot_opt->robotConstants();
+
+        auto tactic_iter = std::find_if(tactic_robot_id_assignment.begin(),
+                                        tactic_robot_id_assignment.end(),
+                                        [id](const auto &tactic_id_pair) { return tactic_id_pair.second == id; });
+        if (tactic_iter == tactic_robot_id_assignment.end())
+        {
+            LOG(WARNING) << "robot " << id << " is assigned a move primitive without an assigned tactic" << std::endl;
+            continue;
+        }
+
+        auto tactic = tactic_iter->first;
+        auto motion_constraints = buildMotionConstraintSet(world.gameState(), *tactic);
+        std::vector<ObstaclePtr> obstacles = obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
+        const TbotsProto::TrajectoryPathParams2D& trajectory_path_params = primitive.move().xy_traj_params();
+        Point start_position = createPoint(trajectory_path_params.start_position());
+        Point destination = createPoint(trajectory_path_params.destination());
+        Vector initial_velocity = createVector(trajectory_path_params.initial_velocity());
+        double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+            trajectory_path_params.max_speed_mode(), robot_constants);
+        KinematicConstraints constraints(max_speed,
+                                         robot_constants.robot_max_acceleration_m_per_s_2,
+                                         robot_constants.robot_max_deceleration_m_per_s_2);
+
+        // TODO: Instead of field boundary, is should be made smaller 9cm
+        TrajectoryPath traj_path = planner.findTrajectory(start_position, destination, initial_velocity,
+                                    constraints, obstacles, world.field().fieldBoundary());
+        const auto& path_nodes = traj_path.getTrajectoryPathNodes();
+
+        *(primitive.mutable_move()->mutable_xy_traj_params()->mutable_sub_destination()) =
+                *createPointProto(path_nodes[0].getTrajectory()->getDestination());
+        primitive.mutable_move()->mutable_xy_traj_params()->set_connection_time(
+                path_nodes[0].getTrajectoryEndTime());
+    }
+
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
         world.getMostRecentTimestamp().toSeconds());
     primitives_to_run->set_sequence_number(sequence_number++);
@@ -245,7 +297,6 @@ Play::assignTactics(const World &world, TacticVector tactic_vector, const std::v
 
     for (auto tactic : tactic_vector)
     {
-        auto motion_constraints = buildMotionConstraintSet(world.gameState(), *tactic);
         primitive_sets.emplace_back(tactic->get(world));
         CHECK(primitive_sets.back()->robot_primitives().size() ==
               world.friendlyTeam().numRobots())
@@ -350,6 +401,8 @@ Play::assignTactics(const World &world, TacticVector tactic_vector, const std::v
             }
         }
     }
+
+
 
     return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
                       std::map<std::shared_ptr<const Tactic>, RobotId>>{
