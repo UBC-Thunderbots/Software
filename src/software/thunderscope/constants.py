@@ -27,7 +27,7 @@ class TabNames(str, Enum):
     DIAGNOSTICS = "DIAGNOSTICS"
     GAMECONTROLLER = "GAMECONTROLLER"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str.__str__(self)
 
 
@@ -75,6 +75,10 @@ BALL_HEIGHT_EFFECT_MULTIPLIER = 3
 # Time (in seconds) to sleep / delay the loop iteration for different protos
 # in robot communications
 ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
+
+# Max time (in seconds) tolerated between repeated crash protos until
+# crash alert occurs
+ROBOT_CRASH_TIMEOUT_S = 5
 
 GAME_CONTROLLER_URL = "http://localhost:8081"
 
@@ -131,7 +135,7 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
 )
 
 
-def create_vision_pattern_lookup(color1, color2):
+def create_vision_pattern_lookup(color1: QtGui.QColor, color2: QtGui.QColor) -> dict:
     """
     There is no pattern to this so we just have to create
     mapping from robot id to the four corners of the vision pattern
@@ -164,7 +168,7 @@ def create_vision_pattern_lookup(color1, color2):
     }
 
 
-def rgb_to_bw(r, g, b):
+def rgb_to_bw(r: int, g: int, b: int) -> tuple:
     """
     Converts the given RGB color values into the corresponding black and white RGB values
     :param r: red value
