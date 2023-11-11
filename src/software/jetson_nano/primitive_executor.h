@@ -79,6 +79,7 @@ class PrimitiveExecutor
     AngularVelocity getTargetAngularVelocity();
 
     TbotsProto::Primitive current_primitive_;
+    Duration time_since_trajectory_creation_;
     TbotsProto::World current_world_;
     TeamColour friendly_team_colour_;
     RobotConstants_t robot_constants_;

@@ -256,9 +256,30 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             Point converted_position = converted_traj_path->getPosition(time);
             Vector converted_velocity = converted_traj_path->getVelocity(time);
             Vector converted_acceleration = converted_traj_path->getAcceleration(time);
-            CHECK(distance(position, converted_position) < 0.001) << "position: " << position << " != converted_position: " << converted_position << " at time " << time;
-            CHECK((velocity - converted_velocity).length() < 0.001) << "velocity: " << velocity << " != converted_velocity: " << converted_velocity << " at time " << time;
-            CHECK((acceleration - converted_acceleration).length() < 0.001) << "acceleration: " << acceleration << " != converted_acceleration: " << converted_acceleration << " at time " << time;
+            /**
+             * 	TODO:
+                    "acceleration: (-2.49999, -0.00766989) != converted_acceleration: (-2.49999, 0.00766989) at time 0.3
+                    start_position {
+                      x_meters: -3.4220966796875
+                      y_meters: 0.55294445800781256
+                    }
+                    destination {
+                      x_meters: -3.4220966796875
+                      y_meters: 0.55294445800781256
+                    }
+                    initial_velocity {
+                      x_component_meters: 0.0006866455078136859
+                      y_component_meters: -0.000732421874996639
+                    }
+                    sub_destination {
+                      x_meters: -3.3220966796874993
+                      y_meters: 0.55294445800781267
+                    }
+                    connection_time: 0.2
+             */
+            CHECK(distance(position, converted_position) < 0.001) << "position: " << position << " != converted_position: " << converted_position << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
+            CHECK((velocity - converted_velocity).length() < 0.001) << "velocity: " << velocity << " != converted_velocity: " << converted_velocity << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
+            CHECK((acceleration - converted_acceleration).length() < 0.001) << "acceleration: " << acceleration << " != converted_acceleration: " << converted_acceleration << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
         }
     }
     auto end = std::chrono::high_resolution_clock::now();

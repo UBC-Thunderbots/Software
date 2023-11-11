@@ -100,3 +100,43 @@ TEST(TbotsProtobufTest, ball_state_msg_test)
 
     TbotsProtobufTest::assertBallStateMessageFromBall(ball, *ball_state_msg);
 }
+
+TEST(TbotsProtobufTest, trajectory_params_msg_test)
+{
+    RobotConstants robot_constants = create2021RobotConstants();
+    Point start_position(1, 2);
+    Point destination(3, 4);
+    Vector initial_velocity(5, 6);
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
+    double max_speed        = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+        max_allowed_speed_mode, robot_constants);
+
+    Point sub_destination(0, 4);
+    double connection_time_s = 0.4;
+    // TODO: 2D Trajectory should also take in KinematicConstraints
+    auto trajectory = std::make_shared<BangBangTrajectory2D>(
+        start_position, sub_destination, initial_velocity, robot_constants.robot_max_speed_m_per_s,
+        robot_constants.motor_max_acceleration_m_per_s_2, robot_constants.robot_max_deceleration_m_per_s_2);
+
+    TrajectoryPath trajectory_path(trajectory, [](const KinematicConstraints &constraints,
+                                                  const Point &initial_pos,
+                                                  const Point &final_pos,
+                                                  const Vector &initial_vel) {
+        return std::make_shared<BangBangTrajectory2D>(
+                initial_pos, final_pos, initial_vel, constraints.getMaxVelocity(),
+                constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
+    });
+    trajectory_path.append(KinematicConstraints(max_speed,
+                                                robot_constants.motor_max_acceleration_m_per_s_2,
+                                                robot_constants.robot_max_deceleration_m_per_s_2),
+                           connection_time_s, destination);
+
+    TbotsProto::TrajectoryPathParams2D params;
+    *(params.mutable_start_position()) = *createPointProto(start_position);
+    *(params.mutable_destination()) = *createPointProto(destination);
+    *(params.mutable_initial_velocity()) = *createVectorProto(initial_velocity);
+    params.set_max_speed_mode(max_allowed_speed_mode);
+
+
+}

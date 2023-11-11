@@ -404,9 +404,8 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
 }
 
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(const TbotsProto::TrajectoryPathParams2D& params,
-                                              const RobotConstants& robot_constants)
+                                                             const RobotConstants& robot_constants)
 {
-
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(params.max_speed_mode(), robot_constants);
 
     if (max_speed == 0)

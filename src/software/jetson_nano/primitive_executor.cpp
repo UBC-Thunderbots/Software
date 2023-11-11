@@ -37,6 +37,10 @@ void PrimitiveExecutor::updatePrimitiveSet(
             const TbotsProto::TrajectoryPathParams2D& trajectory_2d_params = move_traj.xy_traj_params();
             const TbotsProto::TrajectoryParamsAngular1D& trajectory_angular_params = move_traj.w_traj_params();
 
+            if (robot_id_ == 4 && friendly_team_colour_ == TeamColour::BLUE)
+            {
+                LOG(INFO) << trajectory_2d_params.DebugString();
+            }
             trajectory_path_ = createTrajectoryPathFromParams(trajectory_2d_params, robot_constants_);
 
             // TODO: Combine generate and constructor
@@ -47,6 +51,8 @@ void PrimitiveExecutor::updatePrimitiveSet(
                                         AngularVelocity::fromRadians(robot_constants_.robot_max_ang_speed_rad_per_s),
                                         AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
                                         AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2));
+
+            time_since_trajectory_creation_ = Duration::fromSeconds(0);
         }
         return;
     }
@@ -151,9 +157,10 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 return output;
             }
 
+            time_since_trajectory_creation_ += time_step_;
             auto output = createDirectControlPrimitive(
-                    trajectory_path_->getVelocity(time_step_.toSeconds()),
-                    angular_trajectory_->getVelocity(time_step_.toSeconds()),
+                    trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()),
+                    angular_trajectory_->getVelocity(time_since_trajectory_creation_.toSeconds()),
                     convertDribblerModeToDribblerSpeed(current_primitive_.move().dribbler_mode(), robot_constants_),
                     current_primitive_.move().auto_chip_or_kick());
 
