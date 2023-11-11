@@ -100,7 +100,7 @@ class GLValidationLayer(GLLayer):
         self.__update_validation_graphics(
             list(self.cached_always_validation_set.validations)
             + list(self.cached_eventually_validation_set.validations)
-            + list(self.passed_validation_timeout_pairs)
+            + list(map(lambda pair: pair[0], self.passed_validation_timeout_pairs))
         )
 
         self.test_name_graphic.setData(
