@@ -167,10 +167,12 @@ class SimulatedTestRunner(TbotsTestRunner):
 
             while True:
                 try:
+                    print("Enter Loop", flush=True)
                     world = self.world_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
+                        block=True, timeout=0, return_cached=False
                     )
 
+                    print("Gotten World", flush=True)
                     # We block until the timeout for the new primitives from AI. if not found still,
                     # the SSL Wrapper packet is resent in a loop until we actually get a primitive set from AI
                     # Otherwise, if the AI misses the first SSL Wrapper packet and doesn't start
@@ -178,6 +180,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                     self.primitive_set_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
+                    print("Get both", flush=True)
 
                     break
                 except queue.Empty as empty:

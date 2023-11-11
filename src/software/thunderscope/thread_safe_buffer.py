@@ -82,9 +82,13 @@ class ThreadSafeBuffer(object):
 
         if block:
             try:
+                print(f"About to get {self.protobuf_type}", flush=True)
                 self.cached_msg = self.queue.get(timeout=timeout)
+                print(f"Finished Get {self.protobuf_type}", flush=True)
             except queue.Empty as empty:
+                print(f"Caught empty {self.protobuf_type} {return_cached}", flush=True)
                 if not return_cached:
+                    print(f"throw empty {self.protobuf_type}", flush=True)
                     raise empty
         else:
             try:
