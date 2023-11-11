@@ -398,7 +398,11 @@ def field_test_runner():
                 tscope.keyboard_estop_shortcut.activated.connect(
                     rc_friendly.toggle_keyboard_estop
                 )
+                # we call this method to enable estop automatically when a field test starts
                 rc_friendly.toggle_keyboard_estop()
+                logger.warning(
+                    f"Keyboard Estop Enabled, robots will start moving automatically when test starts!"
+                )
 
             time.sleep(LAUNCH_DELAY_S)
             runner = FieldTestRunner(
