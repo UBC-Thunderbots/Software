@@ -87,16 +87,6 @@ class RobotLogMessageWidget(QFrame):
         self.close_button.setFixedWidth(self.icon_size / 2)
         self.close_button.clicked.connect(self.close)
 
-        self.pin_button = QPushButton("📌")
-        self.pin_button.setStyleSheet("padding: 0")
-        self.pin_button.setFixedHeight(self.icon_size / 2)
-        self.pin_button.setFixedWidth(self.icon_size / 2)
-        self.pin_button.clicked.connect(self.pin)
-
-        self.close_and_pin_layout = QVBoxLayout()
-        self.close_and_pin_layout.addWidget(self.close_button)
-        self.close_and_pin_layout.addWidget(self.pin_button)
-
         # adding spacing to look nice
         self.layout.addWidget(self.icon)
         self.layout.addStretch(1)
@@ -105,7 +95,7 @@ class RobotLogMessageWidget(QFrame):
         self.layout.addLayout(self.time_layout)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.addStretch(1)
-        self.layout.addLayout(self.close_and_pin_layout)
+        self.layout.addWidget(self.close_button)
 
         self.setLayout(self.layout)
         self.base_stylesheet = textwrap.dedent(
