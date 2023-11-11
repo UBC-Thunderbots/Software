@@ -123,17 +123,44 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
         case TbotsProto::Primitive::kMove:
         {
-            // Compute the target velocities
-            Vector target_velocity                  = getTargetLinearVelocity();
-            AngularVelocity target_angular_velocity = getTargetAngularVelocity();
+            const TbotsProto::MovePrimitive& move_traj = current_primitive_.move();
+            const TbotsProto::TrajectoryPathParams2D& trajectory_2d_params = move_traj.xy_traj_params();
+            const TbotsProto::TrajectoryParamsAngular1D& trajectory_angular_params = move_traj.w_traj_params();
+
+            double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(trajectory_2d_params.max_speed_mode(), robot_constants_);
+
+            if (max_speed == 0)
+            {
+                auto prim   = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,
+                                                           TbotsProto::AutoChipOrKick());
+                auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
+                        prim->direct_control());
+            }
+
+            BangBangTrajectory2D trajectory(createPoint(trajectory_2d_params.start_position()),
+                                            createPoint(trajectory_2d_params.destination()),
+                                            createVector(trajectory_2d_params.initial_velocity()),
+                                            convertMaxAllowedSpeedModeToMaxAllowedSpeed(trajectory_2d_params.max_speed_mode(), robot_constants_),
+                                            robot_constants_.robot_max_acceleration_m_per_s_2,
+                                            robot_constants_.robot_max_deceleration_m_per_s_2);
+
+            // TODO: Combine generate and constructor
+            BangBangTrajectory1DAngular angular_trajectory;
+            angular_trajectory.generate(createAngle(trajectory_angular_params.start_angle()),
+                                        createAngle(trajectory_angular_params.final_angle()),
+                                        createAngularVelocity(trajectory_angular_params.initial_velocity()),
+                                        AngularVelocity::fromRadians(robot_constants_.robot_max_ang_speed_rad_per_s),
+                                        AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
+                                        AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2));
 
             auto output = createDirectControlPrimitive(
-                target_velocity, target_angular_velocity,
-                current_primitive_.move().dribbler_speed_rpm(),
-                current_primitive_.move().auto_chip_or_kick());
+                    trajectory.getVelocity(time_step_.toSeconds()),
+                    angular_trajectory.getVelocity(time_step_.toSeconds()),
+                    convertDribblerModeToDribblerSpeed(current_primitive_.move().dribbler_mode(), robot_constants_),
+                    current_primitive_.move().auto_chip_or_kick());
 
             return std::make_unique<TbotsProto::DirectControlPrimitive>(
-                output->direct_control());
+                    output->direct_control());
         }
         case TbotsProto::Primitive::PRIMITIVE_NOT_SET:
         {

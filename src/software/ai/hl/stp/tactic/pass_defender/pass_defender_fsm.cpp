@@ -37,7 +37,7 @@ bool PassDefenderFSM::ballDeflected(const Update& event)
 
 void PassDefenderFSM::blockPass(const Update& event)
 {
-    auto position_to_block_from = event.control_params.position_to_block_from;
+//    auto position_to_block_from = event.control_params.position_to_block_from;
     auto ball_position          = event.common.world.ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
@@ -60,14 +60,14 @@ void PassDefenderFSM::interceptBall(const Update& event)
     if ((ball.position() - robot_position).length() >
         BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
     {
-        Point intercept_position = ball.position();
-        if (ball.velocity().length() != 0)
-        {
-            // Find the closest point on the line of the ball's current trajectory
-            // that the defender can move to and intercept the pass
-            intercept_position = closestPoint(
-                robot_position, Line(ball.position(), ball.position() + ball.velocity()));
-        }
+//        Point intercept_position = ball.position();
+//        if (ball.velocity().length() != 0)
+//        {
+//            // Find the closest point on the line of the ball's current trajectory
+//            // that the defender can move to and intercept the pass
+//            intercept_position = closestPoint(
+//                robot_position, Line(ball.position(), ball.position() + ball.velocity()));
+//        }
 
         auto face_ball_orientation = (ball.position() - robot_position).orientation();
 

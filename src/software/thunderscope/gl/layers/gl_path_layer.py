@@ -47,8 +47,8 @@ class GLPathLayer(GLLayer):
 
         requested_destinations = [
             (
-                primitive.move.motion_control.requested_destination,
-                primitive.move.final_angle,
+                primitive.move.xy_traj_params.destination,
+                primitive.move.w_traj_params.final_angle,
             )
             for primitive in primitive_set
             if primitive.HasField("move")

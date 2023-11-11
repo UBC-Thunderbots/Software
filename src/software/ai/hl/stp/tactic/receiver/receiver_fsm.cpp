@@ -154,13 +154,13 @@ void ReceiverFSM::adjustReceive(const Update& event)
     if ((ball.position() - robot_pos).length() >
         BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
     {
-        Point ball_receive_pos = ball.position();
-
-        if (ball.velocity().length() > MIN_PASS_START_SPEED)
-        {
-            ball_receive_pos = closestPoint(
-                robot_pos, Line(ball.position(), ball.position() + ball.velocity()));
-        }
+//        Point ball_receive_pos = ball.position();
+//
+//        if (ball.velocity().length() > MIN_PASS_START_SPEED)
+//        {
+//            ball_receive_pos = closestPoint(
+//                robot_pos, Line(ball.position(), ball.position() + ball.velocity()));
+//        }
 
         Angle ball_receive_orientation = (ball.position() - robot_pos).orientation();
 

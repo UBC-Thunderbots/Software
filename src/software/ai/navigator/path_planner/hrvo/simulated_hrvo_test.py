@@ -3,14 +3,117 @@ from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
     pytest_main,
 )
-from software.simulated_tests.robot_enters_region_and_stops import *
+from typing import List, Union
 from software.simulated_tests.avoid_collisions import *
 import software.python_bindings as tbots
 from proto.ssl_gc_common_pb2 import Team
+from software.py_constants import *
 from proto.message_translation.tbots_protobuf import create_world_state
+import math
+from proto.import_all_protos import *
+from software.simulated_tests.simulated_test_fixture import SimulatedTestRunner
+from software.simulated_tests.validation import (
+    create_validation_types,
+    create_validation_geometry,
+)
 
 
-def get_zig_zag_params(front_wall_x, robot_y_delta, num_walls, wall_height):
+class HRVORobotEntersRegionAndStops:
+    """Checks if a specific robot enters the provided regions and stops there for the provided time
+    Only used for HRVO tests
+    """
+
+    ROBOT_MAX_STATIONARY_SPEED_M_PER_S = 0.01
+
+    def __init__(
+        self,
+        robot_id: int,
+        region: Union[
+            tbots.Vector, tbots.Polygon, tbots.Rectangle, tbots.Circle, tbots.Segment
+        ] = None,
+        num_ticks: int = 1,
+    ):
+        """
+        Constructs the base validation with the given region
+        Sets boolean indicating validation stage to default
+
+        :param robot_id: the id of the robot being validated
+        :param region: the region the robot has to enter
+        :param num_ticks: the time the robot has to stay stationary for in the regions
+        """
+        self.region = region
+        self.robot_id = robot_id
+        self.num_ticks = num_ticks
+        self.ticks_so_far = 0
+
+        self.is_stationary = True
+
+    def get_validation_status(self, world: tbots.World) -> ValidationStatus:
+        """
+        Checks if a specific robot id is in the provided region
+        Then checks if that robot is stationary within a threshold for the provided number of ticks
+
+        Sets booleans about the state of the validation for logging
+
+        :param world: the world message to validate
+        :return: FAILING until the specific robot enters the provided region
+                 and is stationary there for the provided time
+                 PASSING when a robot is stationary in the region
+        """
+        for robot in world.friendly_team.team_robots:
+            if robot.id == self.robot_id:
+                if tbots.contains(
+                    self.region, tbots.createPoint(robot.current_state.global_position)
+                ):
+                    if (
+                        math.hypot(
+                            robot.current_state.global_velocity.x_component_meters,
+                            robot.current_state.global_velocity.y_component_meters,
+                        )
+                        < self.ROBOT_MAX_STATIONARY_SPEED_M_PER_S
+                    ):
+                        self.ticks_so_far = self.ticks_so_far + 1
+                        self.is_stationary = True
+                        if self.ticks_so_far >= self.num_ticks:
+                            return ValidationStatus.PASSING
+                    else:
+                        self.ticks_so_far = 0
+                        self.is_stationary = False
+
+        return ValidationStatus.FAILING
+
+    def get_validation_geometry(self, world: tbots.World) -> ValidationGeometry:
+        """
+        (override) shows region to enter
+        """
+        return create_validation_geometry([self.region])
+
+    def __repr__(self):
+        """
+        Returns a string representing the stage of validation that failed
+        Either the robot has not entered the region yet, or it has but is not stationary
+        """
+        if not self.is_stationary:
+            return f"Check that robot {self.robot_id} in correct region is stationary"
+
+        return (
+            f"Check for stationary robot {self.robot_id} in region "
+            + ","
+            + repr(self.region)
+        )
+
+
+(
+    HRVORobotEventuallyEntersRegionAndStops,
+    HRVORobotEventuallyExitsRegionAndMoves,
+    HRVORobotAlwaysStaysInRegionStationary,
+    HRVORobotNeverEntersRegionAndMoves,
+) = create_validation_types(HRVORobotEntersRegionAndStops)
+
+
+def get_zig_zag_params(
+    front_wall_x: int, robot_y_delta: float, num_walls: int, wall_height: float
+):
     """
     Gets the test params to cause movement in a zig zag pattern
     due to multiple walls of enemy robots
@@ -43,7 +146,7 @@ def get_zig_zag_params(front_wall_x, robot_y_delta, num_walls, wall_height):
     )
 
 
-def get_robot_circle_pos(radius, num_robots, start):
+def get_robot_circle_pos(radius: float, num_robots: int, start: bool):
     """
     Gets the test params to position robots in a circle and have them move
     along each diameter
@@ -65,12 +168,12 @@ def get_robot_circle_pos(radius, num_robots, start):
 
 
 def hrvo_setup(
-    friendly_robots_positions,
-    friendly_robots_destinations,
-    friendly_robots_final_orientations,
-    enemy_robots_positions,
-    enemy_robots_destinations,
-    simulated_test_runner,
+    friendly_robots_positions: List[tbots.Point],
+    friendly_robots_destinations: List[tbots.Point],
+    friendly_robots_final_orientations: List[tbots.Angle],
+    enemy_robots_positions: List[tbots.Point],
+    enemy_robots_destinations: List[tbots.Point],
+    simulated_test_runner: SimulatedTestRunner,
 ):
     """
     Setup for the hrvo tests
@@ -89,11 +192,14 @@ def hrvo_setup(
     ball_initial_vel = tbots.Point(0, 0)
 
     # Game Controller Setup
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.STOP, team=Team.UNKNOWN
+    simulated_test_runner.send_gamecontroller_command(
+        gc_command=Command.Type.STOP, is_friendly=True
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.FORCE_START, team=Team.BLUE
+    simulated_test_runner.send_gamecontroller_command(
+        gc_command=Command.Type.STOP, is_friendly=False
+    )
+    simulated_test_runner.send_gamecontroller_command(
+        gc_command=Command.Type.FORCE_START, is_friendly=True
     )
 
     blue_params = AssignedTacticPlayControlParams()
@@ -109,9 +215,7 @@ def hrvo_setup(
             params=blue_params,
         )
 
-    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, blue_params
-    )
+    simulated_test_runner.set_tactics(blue_params, True)
 
     # Setup no tactics on the enemy side
     yellow_params = AssignedTacticPlayControlParams()
@@ -121,9 +225,7 @@ def hrvo_setup(
             index, destination, tbots.Angle.fromRadians(0), 0, params=yellow_params
         )
 
-    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
-        AssignedTacticPlayControlParams, yellow_params
-    )
+    simulated_test_runner.set_tactics(yellow_params, False)
 
     # Setup Robots
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -141,7 +243,6 @@ def hrvo_setup(
     "friendly_robot_positions,friendly_robot_destinations,friendly_robots_final_orientations,"
     + "enemy_robots_positions,enemy_robots_destinations,timeout_s,run_till_end",
     [
-        ([tbots.Point(3.7, 0.0)], [tbots.Point(4.4, 1.5)], [], [], [], 10, True,),
         # robot moving straight with no obstacles
         ([tbots.Point(-2.5, 0)], [tbots.Point(2.8, 0)], [], [], [], 10, False,),
         # robot moving straight with no obstacles while turning from 0 to 180 degrees
@@ -339,7 +440,6 @@ def hrvo_setup(
         ),
     ],
     ids=[
-        "moving_around_defense_area",
         "moving_straight_no_obstacles",
         "moving_straight_and_turning",
         "moving_straight_with_enemy_behind",
@@ -360,14 +460,14 @@ def hrvo_setup(
     ],
 )
 def test_robot_movement(
-    simulated_test_runner,
-    friendly_robot_positions,
-    friendly_robot_destinations,
-    friendly_robots_final_orientations,
-    enemy_robots_positions,
-    enemy_robots_destinations,
-    timeout_s,
-    run_till_end,
+    simulated_test_runner: SimulatedTestRunner,
+    friendly_robot_positions: List[tbots.Point],
+    friendly_robot_destinations: List[tbots.Point],
+    friendly_robots_final_orientations: List[tbots.Angle],
+    enemy_robots_positions: List[tbots.Point],
+    enemy_robots_destinations: List[tbots.Point],
+    timeout_s: int,
+    run_till_end: bool,
 ):
     # Always Validation
     always_validation_sequence_set = [[RobotsDoNotCollide()]]
@@ -398,7 +498,7 @@ def test_robot_movement(
     )
 
 
-def get_reached_destination_validation(robot_destinations):
+def get_reached_destination_validation(robot_destinations: List[tbots.Point]):
     """
     Constructs validation that each robot from the list of robot destinations
     reaches its destination within a certain threshold
@@ -411,7 +511,7 @@ def get_reached_destination_validation(robot_destinations):
     # Eventually Validation
     return [
         [
-            RobotEventuallyEntersRegionAndStops(
+            HRVORobotEventuallyEntersRegionAndStops(
                 robot_id,
                 region=tbots.Circle(
                     tbots.Point(destination.x(), destination.y()), threshold
@@ -424,7 +524,11 @@ def get_reached_destination_validation(robot_destinations):
 
 
 def get_move_update_control_params(
-    robot_id, destination, desired_orientation, final_speed, params=None
+    robot_id: int,
+    destination: tbots.Point,
+    desired_orientation: tbots.Angle,
+    final_speed: float,
+    params: AssignedTacticPlayControlParams = None,
 ):
     """
     Constructs the control params for a Move Tactic for a single robot

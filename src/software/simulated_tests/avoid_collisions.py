@@ -14,6 +14,8 @@ class RobotsDoNotCollide(Validation):
     Checks if any 2 robots have collided
     """
 
+    ROBOT_COLLISION_BUFFER_M = 0.005
+
     def __init__(self):
         """
         Initialised the list of robots that have fouled to empty
@@ -21,7 +23,7 @@ class RobotsDoNotCollide(Validation):
         """
         self.fouled_robots = []
 
-    def get_validation_status(self, world) -> ValidationStatus:
+    def get_validation_status(self, world: World) -> ValidationStatus:
         """
         Checks if any 2 robots in the world have collided
         :param world: the World message to validate
@@ -38,7 +40,7 @@ class RobotsDoNotCollide(Validation):
 
         return ValidationStatus.PASSING
 
-    def check_robot_collision(self, robot1, robot2):
+    def check_robot_collision(self, robot1: Robot, robot2: Robot):
         """
         Helper function to check if 2 robots have collided
         Also determines which robots have committed a foul
@@ -50,14 +52,14 @@ class RobotsDoNotCollide(Validation):
         """
 
         # robot positions
-        robot_1_pos = tbots.createVector(
+        robot1_pos = tbots.createVector(
             Vector(
                 x_component_meters=robot1.current_state.global_position.x_meters,
                 y_component_meters=robot1.current_state.global_position.y_meters,
             )
         )
 
-        robot_2_pos = tbots.createVector(
+        robot2_pos = tbots.createVector(
             Vector(
                 x_component_meters=robot2.current_state.global_position.x_meters,
                 y_component_meters=robot2.current_state.global_position.y_meters,
@@ -65,14 +67,14 @@ class RobotsDoNotCollide(Validation):
         )
 
         # robot velocities
-        robot_1_vel = tbots.createVector(
+        robot1_vel = tbots.createVector(
             Vector(
                 x_component_meters=robot1.current_state.global_velocity.x_component_meters,
                 y_component_meters=robot1.current_state.global_velocity.y_component_meters,
             )
         )
 
-        robot_2_vel = tbots.createVector(
+        robot2_vel = tbots.createVector(
             Vector(
                 x_component_meters=robot2.current_state.global_velocity.x_component_meters,
                 y_component_meters=robot2.current_state.global_velocity.y_component_meters,
@@ -81,33 +83,45 @@ class RobotsDoNotCollide(Validation):
 
         # check if robots are colliding
         if (
-            robot_1_pos - robot_2_pos
-        ).length() < ROBOT_MAX_RADIUS_METERS * 2 + ROBOT_COLLISION_BUFFER:
-            # the logic on which robot(s) get a foul is from the official SSL rules
-            # https://robocup-ssl.github.io/ssl-rules/sslrules.html#_crashing
-
+            robot1_pos - robot2_pos
+        ).length() < ROBOT_MAX_RADIUS_METERS * 2 + self.ROBOT_COLLISION_BUFFER_M:
             # check if the projection of the difference between their velocities
             # onto the line between their positions > 1.5
             # if this case is true, robots are considered to have collided
             # but still have to determine which ones have fouled
-            if (robot_1_vel - robot_2_vel).dot(robot_1_pos - robot_2_pos) / (
-                robot_1_pos - robot_2_pos
+            if (robot1_vel - robot2_vel).dot(robot1_pos - robot2_pos) / (
+                robot1_pos - robot2_pos
             ).length() > 1.5:
-                # checks if the absolute speed difference between the robots is < 0.3
-                # if so, both get a foul
-                if abs(robot_1_vel.length() - robot_2_vel.length()) < 0.3:
-                    self.fouled_robots.extend([robot1.id, robot2.id])
-                else:
-                    # checks which robot is faster (that one will get a foul)
-                    if robot_1_vel.length() > robot_2_vel.length():
-                        self.fouled_robots.extend([robot1.id])
-                    else:
-                        self.fouled_robots.extend([robot2.id])
+                self.check_fouled_robots(robot1.id, robot1_vel, robot2.id, robot2_vel)
                 return True
 
         return False
 
-    def get_validation_geometry(self, world) -> ValidationGeometry:
+    def check_fouled_robots(
+        self, robot1_id: int, robot1_vel: Vector, robot2_id: int, robot2_vel: Vector
+    ):
+        """
+        Determines which of the 2 robots have fouled based on their speed
+        and adds them to the fouled robots list
+        The logic on which robot(s) get a foul is from the official SSL rules
+        https://robocup-ssl.github.io/ssl-rules/sslrules.html#_crashing
+        :param robot1_id: the id of the first robot
+        :param robot1_vel: the velocity of the first robot
+        :param robot2_id: the id of the second robot
+        :param robot2_vel: the velocity of the second robot
+        """
+        # checks if the absolute speed difference between the robots is < 0.3
+        # if so, both get a foul
+        if abs(robot1_vel.length() - robot2_vel.length()) < 0.3:
+            self.fouled_robots.extend([robot1_id, robot2_id])
+        else:
+            # checks which robot is faster (that one will get a foul)
+            if robot1_vel.length() > robot2_vel.length():
+                self.fouled_robots.extend([robot1_id])
+            else:
+                self.fouled_robots.extend([robot2_id])
+
+    def get_validation_geometry(self, world: World) -> ValidationGeometry:
         """
         Returns a list of circles indicating the boundary of each robot in the world
         :param world: the world message to create geometry for

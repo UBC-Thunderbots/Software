@@ -2,6 +2,8 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/logger/logger.h"
+#include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
+#include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
 
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const TbotsProto::MotionControl &motion_control, const Angle &final_angle,
@@ -15,84 +17,123 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    auto cost = motion_control.normalized_path_length();
-    if (cost_override.has_value())
-    {
-        cost = cost_override.value();
-    }
-
-    *(move_primitive_msg->mutable_move()->mutable_motion_control()) = motion_control;
-    move_primitive_msg->mutable_move()->set_final_speed_m_per_s(
-        static_cast<float>(final_speed));
-    move_primitive_msg->mutable_move()->set_max_speed_m_per_s(
-        static_cast<float>(convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-            max_allowed_speed_mode, robot_constants)));
-    move_primitive_msg->mutable_move()->set_should_drive_forward(should_drive_forward);
-
-    *(move_primitive_msg->mutable_move()->mutable_final_angle()) =
-        *createAngleProto(final_angle);
-    move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(static_cast<float>(
-        convertDribblerModeToDribblerSpeed(dribbler_mode, robot_constants)));
-
-    if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
-    {
-        move_primitive_msg->mutable_move()
-            ->mutable_auto_chip_or_kick()
-            ->set_autochip_distance_meters(
-                static_cast<float>(auto_chip_or_kick.autochip_distance_m));
-    }
-    else if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOKICK)
-    {
-        move_primitive_msg->mutable_move()
-            ->mutable_auto_chip_or_kick()
-            ->set_autokick_speed_m_per_s(
-                static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
-    }
-
-    move_primitive_msg->mutable_move()->set_ball_collision_type(ball_collision_type);
-
-    move_primitive_msg->mutable_move()->set_target_spin_rev_per_s(
-        static_cast<float>(target_spin_rev_per_s));
-    move_primitive_msg->set_cost(cost);
+//    auto cost = motion_control.normalized_path_length();
+//    if (cost_override.has_value())
+//    {
+//        cost = cost_override.value();
+//    }
+//
+//    *(move_primitive_msg->mutable_move()->mutable_motion_control()) = motion_control;
+//    move_primitive_msg->mutable_move()->set_final_speed_m_per_s(
+//        static_cast<float>(final_speed));
+//    move_primitive_msg->mutable_move()->set_max_speed_m_per_s(
+//        static_cast<float>(convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+//            max_allowed_speed_mode, robot_constants)));
+//    move_primitive_msg->mutable_move()->set_should_drive_forward(should_drive_forward);
+//
+//    *(move_primitive_msg->mutable_move()->mutable_final_angle()) =
+//        *createAngleProto(final_angle);
+//    move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(static_cast<float>(
+//        convertDribblerModeToDribblerSpeed(dribbler_mode, robot_constants)));
+//
+//    if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
+//    {
+//        move_primitive_msg->mutable_move()
+//            ->mutable_auto_chip_or_kick()
+//            ->set_autochip_distance_meters(
+//                static_cast<float>(auto_chip_or_kick.autochip_distance_m));
+//    }
+//    else if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOKICK)
+//    {
+//        move_primitive_msg->mutable_move()
+//            ->mutable_auto_chip_or_kick()
+//            ->set_autokick_speed_m_per_s(
+//                static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
+//    }
+//
+//    move_primitive_msg->mutable_move()->set_ball_collision_type(ball_collision_type);
+//
+//    move_primitive_msg->mutable_move()->set_target_spin_rev_per_s(
+//        static_cast<float>(target_spin_rev_per_s));
+//    move_primitive_msg->set_cost(cost);
     return move_primitive_msg;
 }
 
 
 
 std::unique_ptr<TbotsProto::Primitive>
-createDirectTrajectoryPrimitive(const TbotsProto::TrajectoryPathParams2D &xy_traj_params,
-                                const TbotsProto::TrajectoryParamsAngular1D &w_traj_params,
-                                const TbotsProto::DribblerMode &dribbler_mode,
-                                const TbotsProto::BallCollisionType &ball_collision_type,
-                                const AutoChipOrKick &auto_chip_or_kick,
-                                double cost)
+createMovePrimitive(const Robot &robot,
+                    const Point &destination,
+                    const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
+                    const Angle &final_angle,
+                    const TbotsProto::DribblerMode &dribbler_mode,
+                    const TbotsProto::BallCollisionType &ball_collision_type,
+                    const AutoChipOrKick &auto_chip_or_kick,
+                    const RobotConstants_t &robot_constants,
+                    std::optional<double> cost_override)
 {
     auto traj_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    *(traj_primitive_msg->mutable_move_traj()->mutable_xy_traj_params()) = xy_traj_params;
-    *(traj_primitive_msg->mutable_move_traj()->mutable_w_traj_params()) = w_traj_params;
+    TbotsProto::TrajectoryPathParams2D xy_traj_params;
+    *(xy_traj_params.mutable_start_position()) = *createPointProto(robot.position());
+    *(xy_traj_params.mutable_destination()) = *createPointProto(destination);
+    *(xy_traj_params.mutable_initial_velocity()) = *createVectorProto(robot.velocity());
+    xy_traj_params.set_max_speed_mode(max_allowed_speed_mode);
+    *(traj_primitive_msg->mutable_move()->mutable_xy_traj_params()) = xy_traj_params;
 
-    traj_primitive_msg->mutable_move_traj()->set_dribbler_mode(dribbler_mode);
+    TbotsProto::TrajectoryParamsAngular1D w_traj_params;
+    *(w_traj_params.mutable_start_angle()) = *createAngleProto(robot.orientation());
+    *(w_traj_params.mutable_final_angle()) = *createAngleProto(final_angle);
+    *(w_traj_params.mutable_initial_velocity()) = *createAngularVelocityProto(robot.angularVelocity());
+    w_traj_params.set_constraints_multiplier(1.0);
+    *(traj_primitive_msg->mutable_move()->mutable_w_traj_params()) = w_traj_params;
+
+    traj_primitive_msg->mutable_move()->set_dribbler_mode(dribbler_mode);
 
     if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
     {
-        traj_primitive_msg->mutable_move_traj()
+        traj_primitive_msg->mutable_move()
                 ->mutable_auto_chip_or_kick()
                 ->set_autochip_distance_meters(
                         static_cast<float>(auto_chip_or_kick.autochip_distance_m));
     }
     else if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOKICK)
     {
-        traj_primitive_msg->mutable_move_traj()
+        traj_primitive_msg->mutable_move()
                 ->mutable_auto_chip_or_kick()
                 ->set_autokick_speed_m_per_s(
                         static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
     }
 
-    traj_primitive_msg->mutable_move_traj()->set_ball_collision_type(ball_collision_type);
+    traj_primitive_msg->mutable_move()->set_ball_collision_type(ball_collision_type);
 
     // TODO (NIMA): Use the trajectory factory to calculate the cost of the trajectory. Note that no path is needed for direct trajectory
-    traj_primitive_msg->set_cost(cost);
+    if (cost_override.has_value())
+    {
+        traj_primitive_msg->set_cost(cost_override.value());
+    }
+    else
+    {
+        double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+                max_allowed_speed_mode, robot_constants);
+        BangBangTrajectory2D trajectory(robot.position(),
+                                        destination,
+                                        robot.velocity(),
+                                        max_speed,
+                                        robot_constants.robot_max_acceleration_m_per_s_2,
+                                        robot_constants.robot_max_deceleration_m_per_s_2);
+
+        // TODO: Combine generate and constructor
+        BangBangTrajectory1DAngular angular_trajectory;
+        angular_trajectory.generate(robot.orientation(),
+                                    final_angle,
+                                    robot.angularVelocity(),
+                                    AngularVelocity::fromRadians(robot_constants.robot_max_ang_speed_rad_per_s),
+                                    AngularVelocity::fromRadians(robot_constants.robot_max_ang_acceleration_rad_per_s_2),
+                                    AngularVelocity::fromRadians(robot_constants.robot_max_ang_acceleration_rad_per_s_2));
+
+        traj_primitive_msg->set_cost(std::max(trajectory.getTotalTime(), angular_trajectory.getTotalTime()));
+    }
     return traj_primitive_msg;
 }
 

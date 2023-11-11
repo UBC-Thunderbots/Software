@@ -55,15 +55,15 @@ void ShadowEnemyFSM::blockPass(const Update &event)
     // If no enemy_threat is found, the robot will default to blocking
     // the possible shot on net
 
-    Point position_to_block =
-        ball_position + (event.common.world.field().friendlyGoalCenter() - ball_position)
-                            .normalize(event.control_params.shadow_distance);
-    if (enemy_threat_opt.has_value())
-    {
-        position_to_block =
-            findBlockPassPoint(ball_position, enemy_threat_opt.value().robot,
-                               event.control_params.shadow_distance);
-    };
+//    Point position_to_block =
+//        ball_position + (event.common.world.field().friendlyGoalCenter() - ball_position)
+//                            .normalize(event.control_params.shadow_distance);
+//    if (enemy_threat_opt.has_value())
+//    {
+//        position_to_block =
+//            findBlockPassPoint(ball_position, enemy_threat_opt.value().robot,
+//                               event.control_params.shadow_distance);
+//    };
 
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(position_to_block), face_ball_orientation, 0, false,

@@ -69,6 +69,7 @@ cc_library(
         "//software/geom:angular_acceleration",
         "//software/geom:angular_velocity",
     ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -81,6 +82,7 @@ cc_library(
         "//software/geom:bounding_box",
         "//software/geom:point",
     ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(

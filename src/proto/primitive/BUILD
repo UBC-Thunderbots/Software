@@ -17,6 +17,9 @@ cc_library(
         "//software/geom:angular_velocity",
         "//software/geom:point",
         "//software/util/make_enum",
+        "//software/ai/navigator/path_planner:bang_bang_trajectory_2d",
+        "//software/ai/navigator/path_planner:bang_bang_trajectory_1d_angular",
+        "//software/world:robot",
     ],
 )
 

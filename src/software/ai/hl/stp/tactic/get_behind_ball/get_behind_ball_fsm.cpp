@@ -8,10 +8,10 @@ GetBehindBallFSM::GetBehindBallFSM()
 
 void GetBehindBallFSM::updateMove(const Update& event)
 {
-    Vector behind_ball =
-        Vector::createFromAngle(event.control_params.chick_direction + Angle::half());
-    Point point_behind_ball = event.control_params.ball_location +
-                              behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
+//    Vector behind_ball =
+//        Vector::createFromAngle(event.control_params.chick_direction + Angle::half());
+//    Point point_behind_ball = event.control_params.ball_location +
+//                              behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
 
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(point_behind_ball), event.control_params.chick_direction,
