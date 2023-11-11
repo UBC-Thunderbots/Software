@@ -41,15 +41,13 @@ void PrimitiveExecutor::updatePrimitiveSet(
             if (max_speed == 0)
             {
                 trajectory_path_ = std::nullopt;
+                return;
             }
-
-            Point destination = createPoint(trajectory_2d_params.destination());
-            Point sub_destination = createPoint(trajectory_2d_params.sub_destination());
 
             // TODO: 2D Trajectory should also take in KinematicConstraints
             auto trajectory = std::make_shared<BangBangTrajectory2D>(
                                             createPoint(trajectory_2d_params.start_position()),
-                                            destination,
+                                            createPoint(trajectory_2d_params.destination()),
                                             createVector(trajectory_2d_params.initial_velocity()),
                                             convertMaxAllowedSpeedModeToMaxAllowedSpeed(trajectory_2d_params.max_speed_mode(), robot_constants_),
                                             robot_constants_.robot_max_acceleration_m_per_s_2,
@@ -64,13 +62,13 @@ void PrimitiveExecutor::updatePrimitiveSet(
                         constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
             });
 
-            if (destination != sub_destination)
+            if (trajectory_2d_params.connection_time() != 0)
             {
                 trajectory_path_->append(KinematicConstraints(max_speed,
                                                               robot_constants_.robot_max_acceleration_m_per_s_2,
                                                               robot_constants_.robot_max_deceleration_m_per_s_2),
                                          trajectory_2d_params.connection_time(),
-                                         sub_destination);
+                                         createPoint(trajectory_2d_params.sub_destination()));
             }
 
             // TODO: Combine generate and constructor

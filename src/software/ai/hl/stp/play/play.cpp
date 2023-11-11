@@ -186,17 +186,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
         robots = remaining_robots;
     }
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();
-    total_duration_us += duration;
-    if (++num_calls % 200 == 0)
-    {
-        LOG(INFO) << "Average time to assign tactics: "
-                  << total_duration_us / num_calls << " us" << std::endl;
-        total_duration_us = 0;
-        num_calls = 0;
-    }
 
     // Update direct trajectories to trajectories calculated using
     // the trajectory planner which avoids obstacles
@@ -246,6 +235,17 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 *createPointProto(path_nodes[0].getTrajectory()->getDestination());
         primitive.mutable_move()->mutable_xy_traj_params()->set_connection_time(
                 path_nodes[0].getTrajectoryEndTime());
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration =
+            std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();
+    total_duration_us += duration;
+    if (++num_calls % 300 == 0)
+    {
+        LOG(INFO) << "Average time to assign tactics and generate trajs: "
+                  << total_duration_us / num_calls << " us" << std::endl;
+        total_duration_us = 0;
+        num_calls = 0;
     }
 
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(

@@ -3,13 +3,14 @@
 void KickFSM::updateKick(const Update &event)
 {
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(event.control_params.kick_origin),
-        event.control_params.kick_direction, 0.1, false, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                       event.control_params.kick_speed_meters_per_second},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-        event.common.robot.robotConstants()));
+            event.common.robot,
+            event.control_params.kick_origin,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            event.control_params.kick_direction, TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                           event.control_params.kick_speed_meters_per_second},
+            event.common.robot.robotConstants()));
 }
 
 void KickFSM::updateGetBehindBall(

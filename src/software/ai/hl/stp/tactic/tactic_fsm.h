@@ -66,10 +66,5 @@ struct TacticUpdate
         return state_str;                                                                \
     }
 
-// TODO: using default value to avoid errors
-#define CREATE_MOTION_CONTROL(DESTINATION)                                               \
-    TbotsProto::MotionControl()
-//    event.common.create_motion_control(event.common.robot, DESTINATION)
-
 #define SET_STOP_PRIMITIVE_ACTION                                                        \
     [this](auto event) { event.common.set_primitive(createStopPrimitive()); }

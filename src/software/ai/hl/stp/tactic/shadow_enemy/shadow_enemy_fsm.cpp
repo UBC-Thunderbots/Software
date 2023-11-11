@@ -55,22 +55,23 @@ void ShadowEnemyFSM::blockPass(const Update &event)
     // If no enemy_threat is found, the robot will default to blocking
     // the possible shot on net
 
-//    Point position_to_block =
-//        ball_position + (event.common.world.field().friendlyGoalCenter() - ball_position)
-//                            .normalize(event.control_params.shadow_distance);
-//    if (enemy_threat_opt.has_value())
-//    {
-//        position_to_block =
-//            findBlockPassPoint(ball_position, enemy_threat_opt.value().robot,
-//                               event.control_params.shadow_distance);
-//    };
+    Point position_to_block =
+        ball_position + (event.common.world.field().friendlyGoalCenter() - ball_position)
+                            .normalize(event.control_params.shadow_distance);
+    if (enemy_threat_opt.has_value())
+    {
+        position_to_block =
+            findBlockPassPoint(ball_position, enemy_threat_opt.value().robot,
+                               event.control_params.shadow_distance);
+    };
 
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(position_to_block), face_ball_orientation, 0, false,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-        event.common.robot.robotConstants()));
+            event.common.robot,
+            position_to_block,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, face_ball_orientation,
+            TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+            event.common.robot.robotConstants()));
 }
 
 void ShadowEnemyFSM::blockShot(const Update &event,
@@ -115,9 +116,10 @@ void ShadowEnemyFSM::stealAndChip(const Update &event)
         (ball_position - event.common.robot.position()).orientation();
 
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(ball_position), face_ball_orientation, 0, false,
-        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-        event.common.robot.robotConstants(), std::optional<double>()));
+            event.common.robot,
+            ball_position,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, face_ball_orientation,
+            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+            event.common.robot.robotConstants()));
 }

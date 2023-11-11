@@ -360,8 +360,8 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
         std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     if (num_calls % 200 == 0)
     {
-//        std::cout << "Average time per setBlueRobotPrimitiveSet call: "
-//                  << total_time_us / num_calls << " us" << std::endl;
+        std::cout << "Average time per setBlueRobotPrimitiveSet call: "
+                  << total_time_us / num_calls << " us" << std::endl;
         total_time_us = 0;
         num_calls     = 0;
     }
