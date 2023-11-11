@@ -52,7 +52,7 @@ class RobotErrorLog(QScrollArea):
         self.layout = QVBoxLayout()
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.error_log_messages: Dict[RobotLogMessageWidget, float] = {}
+        self.error_log_messages: List[RobotLogMessageWidget] = []
 
         # for a QScrollArea, widgets cannot be added to it directly
         # doing so causes no scrolling to happen, and all the components get smaller
@@ -76,7 +76,7 @@ class RobotErrorLog(QScrollArea):
         self.__remove_closed_or_old_widgets()
 
         # update time since for all existing logs
-        for error_message in self.error_log_messages.keys():
+        for error_message in self.error_log_messages:
             error_message.update_time()
 
         # add log widgets for fatal log messages
@@ -105,12 +105,9 @@ class RobotErrorLog(QScrollArea):
         Removes all log widgets which have been closed or have timed out from the log
         """
         widgets_to_delete = []
-        # get all log widgets which have timed out or are old
-        for error_message, start_time in self.error_log_messages.items():
-            if not error_message.log_open or (
-                not error_message.pinned
-                and time.time() - start_time > ROBOT_LOG_WIDGET_TIMEOUT
-            ):
+        # get all log widgets which have been closed
+        for error_message in self.error_log_messages:
+            if not error_message.log_open:
                 widgets_to_delete.append(error_message)
 
         # delete them from dict and remove them from layout
@@ -217,5 +214,6 @@ class RobotErrorLog(QScrollArea):
         Adds the given error message to the log by making a new RobotErrorMessage
         :param error_widget: the error widget to add to the log
         """
-        self.error_log_messages[error_widget] = time.time()
+        self.error_log_messages.append(error_widget)
         self.layout.addWidget(error_widget)
+        self.ensureVisible(0, self.height())

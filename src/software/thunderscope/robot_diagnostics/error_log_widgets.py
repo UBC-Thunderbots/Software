@@ -122,17 +122,7 @@ class RobotLogMessageWidget(QFrame):
         """
         Sets the widget to closed
         """
-        self.log_open = not self.log_open or self.pinned
-
-    def pin(self) -> None:
-        """
-        Sets the widget to pinned (won't be cleared by timeout)
-        """
-        self.pinned = not self.pinned
-        self.pin_button.setStyleSheet(
-            "padding: 0;"
-            f"background-color: {'white' if self.pinned else 'transparent'}"
-        )
+        self.log_open = not self.log_open
 
     def update_time(self) -> None:
         """
