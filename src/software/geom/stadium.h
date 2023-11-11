@@ -46,7 +46,7 @@ class Stadium : public ConvexShape {
      * Returns the inner rectangle of this Stadium
      * @return the inner rectangle of this Stadium
      */
-    double rectangle() const;
+    //double rectangle() const;
 
     /**
      * Returns the area of this Stadium

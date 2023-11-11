@@ -212,6 +212,18 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "stadium",
+    srcs = ["stadium.cpp"],
+    hdrs = ["stadium.h"],
+    deps = [
+      ":convex_shape",
+      ":point",
+      ":segment",
+      ":rectangle",
+    ],
+)
+
 cc_test(
     name = "angle_test",
     srcs = [
@@ -415,3 +427,4 @@ cc_test(
         "//software/test_util",
     ],
 )
+
