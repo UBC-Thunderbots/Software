@@ -33,7 +33,7 @@ class RobotErrorLog(QScrollArea):
         super(RobotErrorLog, self).__init__()
 
         self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
-        self.robot_crash_buffer = ThreadSafeBuffer(1000, RobotCrash)
+        self.robot_crash_buffer = ThreadSafeBuffer(10, RobotCrash)
         self.robot_log_buffer = ThreadSafeBuffer(10, RobotLog)
 
         self.robot_last_crash_time_s = {}
@@ -63,6 +63,8 @@ class RobotErrorLog(QScrollArea):
         self.setWidget(self.container)
         self.setWidgetResizable(True)
 
+        self.scroll_to_bottom = False
+
     def refresh(self) -> None:
         """
         Refreshes the widget's graphics
@@ -73,7 +75,15 @@ class RobotErrorLog(QScrollArea):
         Updates the time since of the existing messages
         """
         # remove all closed widgets first
-        self.__remove_closed_or_old_widgets()
+        self.__remove_closed_widgets()
+
+        if self.scroll_to_bottom:
+            # scroll the logs to the bottom
+            self.ensureVisible(0, self.container.height())
+            self.verticalScrollBar().setSliderPosition(
+                self.verticalScrollBar().maximum()
+            )
+            self.scroll_to_bottom = False
 
         # update time since for all existing logs
         for error_message in self.error_log_messages:
@@ -100,9 +110,9 @@ class RobotErrorLog(QScrollArea):
                 block=False, return_cached=False
             )
 
-    def __remove_closed_or_old_widgets(self):
+    def __remove_closed_widgets(self):
         """
-        Removes all log widgets which have been closed or have timed out from the log
+        Removes all log widgets which have been closed
         """
         widgets_to_delete = []
         # get all log widgets which have been closed
@@ -113,7 +123,7 @@ class RobotErrorLog(QScrollArea):
         # delete them from dict and remove them from layout
         for widget in widgets_to_delete:
             self.layout.removeWidget(widget)
-            del self.error_log_messages[widget]
+            self.error_log_messages.remove(widget)
 
     def __refresh_fatal_logs(self) -> None:
         """
@@ -216,4 +226,4 @@ class RobotErrorLog(QScrollArea):
         """
         self.error_log_messages.append(error_widget)
         self.layout.addWidget(error_widget)
-        self.ensureVisible(0, self.height())
+        self.scroll_to_bottom = True

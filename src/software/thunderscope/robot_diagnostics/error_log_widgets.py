@@ -33,7 +33,6 @@ class RobotLogMessageWidget(QFrame):
 
         # if true, the log is in the log widget and hasn't been cleared
         self.log_open = True
-        self.pinned = False
 
         self.layout = QHBoxLayout()
         self.icon = QLabel()
