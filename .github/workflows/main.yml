@@ -25,7 +25,7 @@ jobs:
       - name: Software Build Test
         run: |
           cd src
-          bazel build --cpu=k8 --show_timestamps       \
+          bazel build --cpu=k8 --show_timestamps --toolchain_resolution_debug=.*       \
             -- //... -//software:unix_full_system \
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
