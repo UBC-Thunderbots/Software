@@ -54,8 +54,8 @@ message AiControlConfig
 message AiParameterConfig
 {
     // threshold to decide if ball hasn't been kicked
-        required double ball_not_kicked_threshold = 1
-            [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+    required double ball_not_kicked_threshold = 1
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 message AttackerTacticConfig
