@@ -29,6 +29,15 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "end_in_obstacle_sampler",
+    srcs = ["end_in_obstacle_sampler.cpp"],
+    hdrs = ["end_in_obstacle_sampler.h"],
+    deps = [
+        "//software/ai/navigator/obstacle:obstacle"
+    ]
+)
+
 cc_test(
     name = "enlsvg_path_planner_test",
     srcs = ["enlsvg_path_planner_test.cpp"],
@@ -49,4 +58,12 @@ cc_test(
         "//software/test_util",
         "//software/world",
     ],
+)
+
+cc_test(
+    name = "end_in_obstacle_sampler_test",
+    srcs = ["end_in_obstacle_sampler_test.cpp"],
+    deps = [
+        ":end_in_obstacle_sampler"
+    ]
 )
