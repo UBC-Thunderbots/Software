@@ -25,7 +25,6 @@ std::set<TbotsProto::MotionConstraint> buildMotionConstraintSetFromGameState(
     std::set<TbotsProto::MotionConstraint> motion_constraints;
     motion_constraints.insert(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
     motion_constraints.insert(TbotsProto::MotionConstraint::FRIENDLY_GOAL);
-    motion_constraints.insert(TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE);
 
     if (game_state.stayAwayFromBall())
     {
