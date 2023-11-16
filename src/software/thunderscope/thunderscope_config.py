@@ -219,6 +219,7 @@ def configure_base_diagnostics(
     along with any extra widgets passed in
 
     :param diagnostics_proto_unix_io: the proto unix io for diagnostics
+    :param current_proto_unix_io: the current fullsystem proto unix io if it is running
     :param extra_widgets: a list of additional widget data to append
     :return: list of widget data for Diagnostics
     """

@@ -340,5 +340,5 @@ PYBIND11_MODULE(python_bindings, m)
     py::class_<ThreadedEstopReader, std::unique_ptr<ThreadedEstopReader>>(
         m, "ThreadedEstopReader")
         .def(py::init<>(&createThreadedEstopReader))
-        .def("isEstopPlay", &ThreadedEstopReader::i sEstopPlay);
+        .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
 }
