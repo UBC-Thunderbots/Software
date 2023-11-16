@@ -9,6 +9,10 @@ def get_estop_config(
     """
     Based on the estop mode argument provided, gets the corresponding
     estop mode and estop path (defined for physical estop mode only)
+    Defaults to Physical estop if the given args are both False
+
+    :param keyboard_estop: True if keyboard estop mode is enabled
+    :param disable_communication: True if disable communications mode is enableds
     :return: tuple of estop mode enum value and estop path if needed
     """
 

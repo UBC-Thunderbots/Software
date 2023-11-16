@@ -70,7 +70,7 @@ class EstopMode(IntEnum):
 
     DISABLE_ESTOP: No physical / keyboard estop is needed, but we cannot send anything over the network
     KEYBOARD_ESTOP: The spacebar can be used as an estop toggle instead of a physical estop
-    ESTOP: A physical estop is needed to run thunderscope, throws an exception if none is plugged in
+    PHYSICAL_ESTOP: A physical estop is needed to run thunderscope, throws an exception if none is plugged in
     """
 
     DISABLE_ESTOP = 0

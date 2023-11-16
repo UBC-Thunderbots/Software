@@ -1,4 +1,3 @@
-import copy
 from software.py_constants import *
 from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -27,7 +26,7 @@ class RobotCommunication(object):
         interface: str,
         estop_mode: EstopMode,
         estop_path: os.PathLike = None,
-        estop_buadrate: int = 115200,
+        estop_baudrate: int = 115200,
     ):
         """Initialize the communication with the robots
 
@@ -36,7 +35,7 @@ class RobotCommunication(object):
         :param interface: The interface to use
         :param estop_mode: what estop mode we are running right now, of type EstopMode
         :param estop_path: The path to the estop
-        :param estop_buadrate: The baudrate of the estop
+        :param estop_baudrate: The baudrate of the estop
 
         """
         self.sequence_number = 0
@@ -47,7 +46,7 @@ class RobotCommunication(object):
         self.estop_mode = estop_mode
 
         self.estop_path = estop_path
-        self.estop_buadrate = estop_buadrate
+        self.estop_buadrate = estop_baudrate
 
         self.running = False
 
@@ -189,7 +188,7 @@ class RobotCommunication(object):
                 )
                 time.sleep(0.1)
 
-    def __should_send_primitive(self) -> bool:
+    def __should_send_packet(self) -> bool:
         """
         Returns True if the proto sending threads should send a proto
         :return: boolean
@@ -217,7 +216,7 @@ class RobotCommunication(object):
             except Empty:
                 # if empty do nothing
                 pass
-            if world and self.__should_send_primitive():
+            if world and self.__should_send_packet():
                 # send the world proto
                 self.send_world.send_proto(world)
 
@@ -253,9 +252,7 @@ class RobotCommunication(object):
                 fullsystem_primitives = dict(primitive_set.robot_primitives)
                 for robot_id in fullsystem_primitives.keys():
                     if robot_id in self.robots_connected_to_fullsystem:
-                        robot_primitives[robot_id] = self.__reduce_primitive_size(
-                            fullsystem_primitives[robot_id]
-                        )
+                        robot_primitives[robot_id] = fullsystem_primitives[robot_id]
 
             # get the manual control primitive
             diagnostics_primitive = DirectControlPrimitive(
@@ -293,7 +290,7 @@ class RobotCommunication(object):
 
             self.sequence_number += 1
 
-            if self.__should_send_primitive() or self.should_send_stop:
+            if self.__should_send_packet() or self.should_send_stop:
                 self.send_primitive_set.send_proto(primitive_set)
                 self.should_send_stop = False
 
@@ -309,23 +306,6 @@ class RobotCommunication(object):
         """
         if self.running:
             self.current_proto_unix_io.send_proto(type, data)
-
-    def __reduce_primitive_size(self, primitive) -> Message:
-        """
-        Reduces the size of the primitive by removing the static obstacles
-        :param primitive: the primitive to be reduced
-        :return: The reduced primitive
-        """
-
-        # The static_obstacles array is the largest part of the Primitive proto.
-        # Since it is not used by the robots, we will remove all values from its
-        # array.
-        if primitive.HasField("move"):
-            primitive_copy = copy.copy(primitive)
-            del primitive_copy.move.motion_control.static_obstacles[:]
-            return primitive_copy
-        else:
-            return primitive
 
     def __enter__(self) -> "self":
         """Enter RobotCommunication context manager. Setup multicast listener

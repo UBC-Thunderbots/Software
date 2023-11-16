@@ -237,7 +237,7 @@ class GLWorldLayer(GLLayer):
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
-        self.cached_world = self.world_buffer.get(block=False)
+        self.cached_world = self.world_buffer.get(block=False, return_cached=True)
 
         # if not receiving worlds, just render an empty field
         if is_field_message_empty(self.cached_world.field):
