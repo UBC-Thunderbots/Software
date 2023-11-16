@@ -1,12 +1,12 @@
+#include "proto/message_translation/tbots_geometry.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
+#include "software/jetson_nano/primitive_executor.h"
 #include "software/jetson_nano/services/motor.h"
 #include "software/jetson_nano/services/power.h"
-#include "software/jetson_nano/primitive_executor.h"
-#include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
-#include "proto/primitive/primitive_msg_factory.h"
-#include "proto/message_translation/tbots_geometry.h"
 #include "software/logger/network_logger.h"
+#include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 
 extern "C"
 {
@@ -22,14 +22,18 @@ int read_value;
 
 // SPI Chip Selects
 
-static const uint8_t CHIP_SELECT[] = {motor_service_->FRONT_LEFT_MOTOR_CHIP_SELECT, motor_service_->FRONT_RIGHT_MOTOR_CHIP_SELECT, motor_service_->BACK_LEFT_MOTOR_CHIP_SELECT, motor_service_->BACK_RIGHT_MOTOR_CHIP_SELECT};
+static const uint8_t CHIP_SELECT[] = {motor_service_->FRONT_LEFT_MOTOR_CHIP_SELECT,
+                                      motor_service_->FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                                      motor_service_->BACK_LEFT_MOTOR_CHIP_SELECT,
+                                      motor_service_->BACK_RIGHT_MOTOR_CHIP_SELECT};
 
 constexpr int ASCII_4671_IN_HEXADECIMAL = 0x34363731;
-constexpr double THRESHOLD = 0.0001;
-constexpr int DELAY_NS = 10000;
-std::string runtime_dir  = "/tmp/tbots/yellow_test";
+constexpr double THRESHOLD              = 0.0001;
+constexpr int DELAY_NS                  = 10000;
+std::string runtime_dir                 = "/tmp/tbots/yellow_test";
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     LoggerSingleton::initializeLogger(runtime_dir);
     LOG(INFO) << "Running on the Jetson Nano!";
 
