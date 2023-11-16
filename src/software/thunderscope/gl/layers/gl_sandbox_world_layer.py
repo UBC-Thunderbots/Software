@@ -6,10 +6,7 @@ from pyqtgraph.Qt.QtGui import *
 from pyqtgraph.opengl import *
 from software.py_constants import *
 from software.thunderscope.gl.layers.gl_world_layer import GLWorldLayer
-from software.thunderscope.gl.graphics.gl_robot import GLRobot
 from software.thunderscope.gl.helpers.extended_gl_view_widget import MouseInSceneEvent
-from software.thunderscope.gl.helpers.observable_list import ObservableList
-from software.thunderscope.constants import Colors
 
 
 class RobotOperation:
@@ -37,6 +34,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
     """
     GLWorldLayer that adds functionality to add, remove, and change the state of the robots on the field
     """
+
+    undo_toggle_enabled_signal = pyqtSignal(bool)
+    redo_toggle_enabled_signal = pyqtSignal(bool)
 
     DEFAULT_ROBOT_ANGLE = 0
 
@@ -150,7 +150,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 ].prev_pos = point_on_current_plane
             else:
                 # add an undo operation to restore the robot to the position before moving
-                self.undo_operations.append(
+                self.__add_undo_operation(
                     RobotOperation(
                         self.selected_robot_id,
                         point_on_current_plane,
@@ -158,6 +158,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
                         self.next_id,
                     )
                 )
+                self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
                 # move is now in progress
                 self.move_in_progress = True
 
@@ -211,6 +212,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         Undoes the last operation
         Adds a corresponding opposite move to the redo list so we can redo if necessary
         """
+
         # skip if nothing to undo
         if len(self.undo_operations) == 0:
             return
@@ -227,6 +229,11 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 next_id=self.next_id,
             )
         )
+
+        # enable / disable the undo and redo buttons
+        self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
+        self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
+
         # apply the operation
         self.__undo_redo_internal(operation)
 
@@ -235,6 +242,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         Redoes the last undo operation
         Adds a corresponding opposite move to the undo list so we can undo if necessary
         """
+
         # skip if nothing to redo
         if len(self.redo_operations) == 0:
             return
@@ -251,6 +259,11 @@ class GLSandboxWorldLayer(GLWorldLayer):
                 next_id=self.next_id,
             )
         )
+
+        # enable / disable the undo and redo buttons
+        self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
+        self.redo_toggle_enabled_signal.emit(len(self.redo_operations) != 0)
+
         # apply the operation
         self.__undo_redo_internal(operation)
 
@@ -284,6 +297,14 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         for robot_id, state in self.pre_sim_robot_positions.items():
             self.__update_world_state(robot_id, state[0], state[1])
+
+    def __add_undo_operation(self, operation: RobotOperation) -> None:
+        """
+        Adds an undo operation to the list and emits the toggle enable signal
+        :param operation: the operation to add to the undo list
+        """
+        self.undo_operations.append(operation)
+        self.undo_toggle_enabled_signal.emit(len(self.undo_operations) != 0)
 
     def __undo_redo_internal(self, operation: RobotOperation) -> None:
         """
@@ -324,7 +345,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             and self.robot_remove_double_click == event.multi_plane_points[index]
         ):
             # add an undo operation to add back the robot
-            self.undo_operations.append(
+            self.__add_undo_operation(
                 RobotOperation(
                     robot_id, None, event.multi_plane_points[index], self.next_id,
                 )
@@ -352,7 +373,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             and self.robot_add_double_click == event.point_in_scene
         ):
             # add an undo operation to remove the robot that is being added
-            self.undo_operations.append(
+            self.__add_undo_operation(
                 RobotOperation(self.next_id, event.point_in_scene, None, self.next_id)
             )
 

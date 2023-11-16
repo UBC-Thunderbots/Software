@@ -100,13 +100,13 @@ class GLFieldToolbar(QWidget):
         self.undo_button = QPushButton()
         self.undo_button.setToolTip("Undo")
         self.undo_button.setIcon(icons.get_undo_icon(self.BUTTON_ICON_COLOR))
-        self.undo_button.setStyleSheet(self.get_button_style())
+        self.undo_button.setStyleSheet(self.get_button_style(False))
 
         # Setup Redo button
         self.redo_button = QPushButton()
         self.redo_button.setToolTip("Redo")
         self.redo_button.setIcon(icons.get_redo_icon(self.BUTTON_ICON_COLOR))
-        self.redo_button.setStyleSheet(self.get_button_style())
+        self.redo_button.setStyleSheet(self.get_button_style(False))
 
         self.reset_button = QPushButton()
         self.reset_button.setToolTip("Reset")
@@ -128,7 +128,7 @@ class GLFieldToolbar(QWidget):
         self.layout().addWidget(self.measure_button)
         self.layout().addWidget(self.camera_view_button)
 
-    def toggle_play_button_text(self, is_playing: bool):
+    def toggle_pause_button_text(self, is_playing: bool):
         self.pause_button.setText("Pause" if is_playing else "Play")
 
     def get_button_style(self, is_enabled: bool = True):
@@ -136,7 +136,6 @@ class GLFieldToolbar(QWidget):
         return textwrap.dedent(
             f"""
             QPushButton {{
-                color: {"#969696" if is_enabled else "#474747"};
                 background-color: transparent;
                 border-color: transparent;
                 icon-size: 22px;
@@ -145,8 +144,24 @@ class GLFieldToolbar(QWidget):
                 height: 16px;
             }}
             QPushButton:hover {{
-                background-color: #363636;
-                border-color: #363636;
+                background-color: {"#363636" if is_enabled else "transparent"};
+                border-color: {"#363636" if is_enabled else "transparent"};
             }}
             """
         )
+
+    def toggle_undo_enabled(self, enabled: bool) -> None:
+        """
+        Callback function to enable / disable the undo button based on the given state
+        :param enabled: if the undo button is enabled or not
+        """
+        self.undo_button.setStyleSheet(self.get_button_style(enabled))
+        self.undo_button.repaint()
+
+    def toggle_redo_enabled(self, enabled: bool) -> None:
+        """
+        Callback function to enable / disable the redo button based on the given state
+        :param enabled: if the redo button is enabled or not
+        """
+        self.redo_button.setStyleSheet(self.get_button_style(enabled))
+        self.redo_button.repaint()
