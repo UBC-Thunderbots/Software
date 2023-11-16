@@ -64,7 +64,6 @@ def corner_kick_play_test_setup(ball_initial_pos, blue_bots, simulated_test_runn
 
 
 def test_corner_kick_play_bottom_left(simulated_test_runner):
-    # TODO- #2781 Validation
     simulated_test_runner.run_test(
         setup=lambda ball_and_bots_pos: corner_kick_play_test_setup(
             ball_and_bots_pos["ball_initial_pos"],
