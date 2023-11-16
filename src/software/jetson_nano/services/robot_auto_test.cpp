@@ -72,15 +72,15 @@ int main(int argc, char **argv) {
             power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0);
         power_status = power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0);
 
-        if (abs(power_status.battery_voltage() - 0) < THRESHOLD)
+        if (abs(power_status.battery_voltage()) < THRESHOLD)
         {
             LOG(FATAL) << "Battery voltage is zero";
         }
-        else if (abs(power_status.capacitor_voltage() - 0) < THRESHOLD)
+        else if (abs(power_status.capacitor_voltage()) < THRESHOLD)
         {
             LOG(FATAL) << "Capacitor voltage is zero";
         }
-        else if (abs(power_status.current_draw() - 0) < THRESHOLD)
+        else if (abs(power_status.current_draw()) < THRESHOLD)
         {
             LOG(FATAL) << "Current draw is zero";
         }
