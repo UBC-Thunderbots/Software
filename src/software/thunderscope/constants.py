@@ -111,6 +111,12 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>Number Keys:</code></b> Position camera to preset view<br>
     <b><code>Shift + Left Click:</code></b> Place the ball at the cursor<br>
     <b><code>Shift + Left Click Drag:</code></b> Place the ball at the cursor and kick it<br>
+    <b><code>Ctrl + Shirt + Left Double Click:</code></b>
+    <ul style="margin: 0;">
+    <li>If no robot is present at cursor, adds a new friendly robot there</li>
+    <li>If a friendly robot is present at cursor, removes it</li>
+    </ul>
+    <b><code>Ctrl + Shirt + Left Click Drag:</code></b> Moves a friendly robot along with the cursor
 
     <h3>Camera Controls</h3><br>
 

@@ -1,8 +1,9 @@
 import textwrap
 from typing import Callable
-from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from software.thunderscope.constants import CameraView, THUNDERSCOPE_HELP_TEXT
+import software.thunderscope.gl.widgets.toolbar_icons.toolbar_icon_loader as icons
 
 
 class GLFieldToolbar(QWidget):
@@ -12,6 +13,8 @@ class GLFieldToolbar(QWidget):
     Has buttons for measure mode, changing camera views, showing help info
     And for undoing / redoing robot state changes
     """
+
+    BUTTON_ICON_COLOR = "white"
 
     def __init__(
         self,
@@ -44,7 +47,8 @@ class GLFieldToolbar(QWidget):
 
         # Set up View button for setting the camera position to standard views
         self.camera_view_button = QPushButton()
-        self.camera_view_button.setText("View")
+        self.camera_view_button.setToolTip("View")
+        self.camera_view_button.setIcon(icons.get_view_icon(self.BUTTON_ICON_COLOR))
         self.camera_view_button.setStyleSheet(self.get_button_style())
         self.camera_view_menu = QMenu()
         self.camera_view_button.setMenu(self.camera_view_menu)
@@ -71,54 +75,61 @@ class GLFieldToolbar(QWidget):
 
         # Setup Measure button for enabling/disabling measure mode
         self.measure_button = QPushButton()
-        self.measure_button.setText("Measure")
+        self.measure_button.setToolTip("Measure")
+        self.measure_button.setIcon(icons.get_measure_icon(self.BUTTON_ICON_COLOR))
         self.measure_button.setStyleSheet(self.get_button_style())
         self.measure_button.setShortcut("m")
         self.measure_button.clicked.connect(lambda: on_measure_mode())
 
         # Setup Help button
         self.help_button = QPushButton()
-        self.help_button.setText("Help")
+        self.help_button.setToolTip("Help")
+        self.help_button.setIcon(icons.get_help_icon(self.BUTTON_ICON_COLOR))
         self.help_button.setStyleSheet(self.get_button_style())
         self.help_button.clicked.connect(
             lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
         )
 
-        # Setup play button
-        self.play_button = QPushButton()
-        self.play_button.setText("Pause")
-        self.play_button.setStyleSheet(self.get_button_style())
+        # Setup pause button
+        self.pause_button = QPushButton()
+        self.pause_button.setToolTip("Pause")
+        self.pause_button.setIcon(icons.get_pause_icon(self.BUTTON_ICON_COLOR))
+        self.pause_button.setStyleSheet(self.get_button_style())
 
         # Setup Undo button
         self.undo_button = QPushButton()
-        self.undo_button.setText("Undo")
+        self.undo_button.setToolTip("Undo")
+        self.undo_button.setIcon(icons.get_undo_icon(self.BUTTON_ICON_COLOR))
         self.undo_button.setStyleSheet(self.get_button_style())
 
         # Setup Redo button
         self.redo_button = QPushButton()
-        self.redo_button.setText("Redo")
+        self.redo_button.setToolTip("Redo")
+        self.redo_button.setIcon(icons.get_redo_icon(self.BUTTON_ICON_COLOR))
         self.redo_button.setStyleSheet(self.get_button_style())
 
         self.reset_button = QPushButton()
-        self.reset_button.setText("Reset")
+        self.reset_button.setToolTip("Reset")
+        self.reset_button.setIcon(icons.get_reset_icon(self.BUTTON_ICON_COLOR))
         self.reset_button.setStyleSheet(self.get_button_style())
 
         # Setup toolbar
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self.setStyleSheet("background-color: black;" "padding: 0px;")
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(self.layers_button)
         self.layout().addStretch()
         self.layout().addWidget(self.reset_button)
         self.layout().addWidget(self.undo_button)
-        self.layout().addWidget(self.play_button)
+        self.layout().addWidget(self.pause_button)
         self.layout().addWidget(self.redo_button)
         self.layout().addWidget(self.help_button)
         self.layout().addWidget(self.measure_button)
         self.layout().addWidget(self.camera_view_button)
 
     def toggle_play_button_text(self, is_playing: bool):
-        self.play_button.setText("Pause" if is_playing else "Play")
+        self.pause_button.setText("Pause" if is_playing else "Play")
 
     def get_button_style(self, is_enabled: bool = True):
         # the style for each toolbar button
@@ -128,6 +139,7 @@ class GLFieldToolbar(QWidget):
                 color: {"#969696" if is_enabled else "#474747"};
                 background-color: transparent;
                 border-color: transparent;
+                icon-size: 22px;
                 border-width: 4px;
                 border-radius: 4px;
                 height: 16px;

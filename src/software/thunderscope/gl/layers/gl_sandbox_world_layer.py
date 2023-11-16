@@ -211,6 +211,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
         Undoes the last operation
         Adds a corresponding opposite move to the redo list so we can redo if necessary
         """
+        # skip if nothing to undo
+        if len(self.undo_operations) == 0:
+            return
+
         # get the operation which undoes the previous one
         operation = self.undo_operations.pop()
 
@@ -231,6 +235,10 @@ class GLSandboxWorldLayer(GLWorldLayer):
         Redoes the last undo operation
         Adds a corresponding opposite move to the undo list so we can undo if necessary
         """
+        # skip if nothing to redo
+        if len(self.redo_operations) == 0:
+            return
+
         # get the operation
         operation = self.redo_operations.pop()
 
