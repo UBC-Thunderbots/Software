@@ -84,16 +84,16 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
                 ],
             }
         ],
-        inv_always_validation_sequence_set=[
+        inv_always_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=[
             [
-                # Ball should always be in the field
                 BallAlwaysStaysInRegion(
-                    regions=[tbots_cpp.Field.createSSLDivisionBField()]
+                    regions=[tbots_cpp.Field.createSSLDivisionBField().fieldLines()]
                 ),
+                # Ball should always be in the field
                 KickerAlwaysNotDoubleTouch(),
             ]
         ],
-        inv_eventually_validation_sequence_set=[[]],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [
@@ -129,16 +129,16 @@ def test_corner_kick_play_top_right(simulated_test_runner):
                 ],
             }
         ],
-        inv_always_validation_sequence_set=[
+        inv_always_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=[
             [
                 # Ball should always be in the field
-                BallAlwaysStaysInRegion(
-                    regions=[tbots_cpp.Field.createSSLDivisionBField()]
+                BallEventuallyEntersRegion(
+                    regions=[tbots_cpp.Field.createSSLDivisionBField().fieldLines()]
                 ),
                 KickerAlwaysNotDoubleTouch(),
             ]
         ],
-        inv_eventually_validation_sequence_set=[[]],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [

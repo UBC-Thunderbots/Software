@@ -49,7 +49,7 @@ class KickerDoubleTouch(Validation):
         :returns: ValidationGeometry containing geometry to visualize
 
         """
-        return create_validation_geometry(tbots_cpp.Field.createSSLDivisionBField())
+        return create_validation_geometry([tbots_cpp.Field.createSSLDivisionBField().fieldLines()])
 
     def __repr__(self):
         return "Checking that the robot kicking the ball is not touching the ball consecutively"
