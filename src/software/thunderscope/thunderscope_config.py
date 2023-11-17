@@ -154,7 +154,6 @@ def configure_base_fullsystem(
                     "visualization_buffer_size": visualization_buffer_size,
                 }
             ),
-            stretch=WidgetStretchData(x=5, y=5),
         ),
         TScopeWidget(
             name="Parameters",
@@ -181,14 +180,12 @@ def configure_base_fullsystem(
             widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Field",
             position="bottom",
-            stretch=WidgetStretchData(x=5, y=3),
         ),
         TScopeWidget(
             name="Play Info",
             widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Referee Info",
             position="above",
-            stretch=WidgetStretchData(x=5, y=3),
         ),
         TScopeWidget(
             name="Performance",
@@ -202,7 +199,6 @@ def configure_base_fullsystem(
             in_window=True,
             anchor="Play Info",
             position="right",
-            stretch=WidgetStretchData(x=5, y=3),
         ),
     ] + extra_widgets
 
