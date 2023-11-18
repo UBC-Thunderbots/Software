@@ -153,11 +153,6 @@ if __name__ == "__main__":
         help="Estop Baudrate",
     )
     parser.add_argument(
-        "--cost_visualization",
-        action="store_true",
-        help="show pass cost visualization layer",
-    )
-    parser.add_argument(
         "--disable_estop",
         action="store_true",
         default=False,
@@ -186,7 +181,7 @@ if __name__ == "__main__":
 
         tscope = Thunderscope(
             config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size, args.cost_visualization
+                args.visualization_buffer_size
             ),
             layout_path=args.layout,
         )
@@ -237,7 +232,6 @@ if __name__ == "__main__":
             args.run_yellow,
             args.run_diagnostics,
             args.visualization_buffer_size,
-            args.cost_visualization,
         )
         tscope = Thunderscope(config=tscope_config, layout_path=args.layout,)
 
@@ -307,10 +301,7 @@ if __name__ == "__main__":
     elif args.blue_log or args.yellow_log:
         tscope = Thunderscope(
             config=config.configure_replay_view(
-                args.blue_log,
-                args.yellow_log,
-                args.visualization_buffer_size,
-                args.cost_visualization,
+                args.blue_log, args.yellow_log, args.visualization_buffer_size,
             ),
             layout_path=args.layout,
         )
@@ -328,12 +319,12 @@ if __name__ == "__main__":
 
         tscope = Thunderscope(
             config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size, args.cost_visualization
+                args.visualization_buffer_size
             ),
             layout_path=args.layout,
         )
 
-        def __async_sim_ticker(tick_rate_ms):
+        def __async_sim_ticker(tick_rate_ms: int) -> None:
             """Setup the world and tick simulation forever
 
             :param tick_rate_ms: The tick rate of the simulation

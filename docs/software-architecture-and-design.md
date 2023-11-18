@@ -57,6 +57,8 @@
   * [Visualizer](#visualizer)
     * [Diagram](#visualizer-diagram)
     * [Draw Functions](#draw-functions)
+    * [3D Visualizer](#3d-visualizer)
+      * [Layers](#layers)
   * [Estop](#estop)
 * [Simulator](#simulator)
   * [Standalone Simulator](#standalone-simulator)
@@ -532,6 +534,21 @@ In some rare cases, we use the [Qt MetaObject](https://doc.qt.io/qt-5/moc.html) 
 Although we want to display information about the [AI](#ai) in the [Visualizer](#visualizer), we cannot send copies of an [AI](#ai) object to the [Visualizer](#visualizer) over the [Observer](#observer-design-pattern) system because the [AI](#ai) is non-copyable. [Draw Functions](#draw_functions) are our solution that allow us to draw information in the [Visualizer](#visualizer) for non-copyable types.
 
 A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
+
+## 3D Visualizer
+
+Our field visualizer uses [PyQtGraph's 3D graphics system](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/index.html) to render 3D graphics with OpenGL. PyQtGraph handles all the necessary calls to OpenGL for us, and as an abstraction, provides a [scenegraph](https://en.wikipedia.org/wiki/Scene_graph) to organize and manipulate entities/objects within the 3D environment (the scene).
+
+`software/thunderscope/gl` is the main directory for the 3D visualizer. The "GL" prefix lets us identify 3D graphics related code and keeps namings consistent with `pyqtgraph.opengl` class names. Inside this directory:
+
+- [`GLWidget`](../src/software/thunderscope/gl/gl_widget.py) is the widget that displays our 3D visualization. It wraps a PyQtGraph `GLViewWidget` that renders all the `GLGraphicsItem`s that have been added to its [scenegraph](https://en.wikipedia.org/wiki/Scene_graph). 
+- `/graphics` contains custom "graphics items". Graphics items (or just "graphics" for short) are objects that can be added to the [3D scenegraph](https://en.wikipedia.org/wiki/Scene_graph). Graphics should inherit from [`GLGraphicsItem`](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/glgraphicsitem.html) and represent 3D objects that can be visualized in the scene (e.g. a robot, a sphere, a circle, etc.).
+- `/layers` contains all the [layers](#layers) we use to organize and group together graphics.
+
+### Layers
+We organize our graphics into "layers" so that we can toggle the visibility of different parts of our visualization. Each layer is responsible for visualizing a specific portion of our AI (e.g. vision data, path planning, passing, etc.). A layer can also handle layer-specific functionality; for instance, `GLWorldLayer` lets the user place or kick the ball using the mouse. The base class for a layer is [`GLLayer`](../src/software/thunderscope/gl/gl_layer.py).
+
+A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a tree-like structure. In theory, `GLLayers` could also be nested within one another. 
 
 # Estop
 `Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:

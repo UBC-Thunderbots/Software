@@ -32,6 +32,17 @@ sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update
 
+# Detect if running under WSL
+# See https://github.com/microsoft/WSL/issues/4071#issuecomment-1221588337
+if [[ $(grep -i Microsoft /proc/version) ]]; then
+    print_status_msg "WSL Setup"
+
+    sudo apt install unzip
+    sudo apt install libopengl0 -y
+
+    print_status_msg "Done WSL Setup"
+fi
+
 # (sorted alphabetically)
 host_software_packages=(
     cmake # Needed to build some of our dependencies
@@ -47,6 +58,7 @@ host_software_packages=(
     libprotobuf-dev
     libudev-dev
     libusb-1.0-0-dev
+    libxcb-cursor0 # This is used as the Linux platform abstraction by Qt 
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
@@ -156,4 +168,5 @@ if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.0.
 fi
 
 print_status_msg "Done PlatformIO Setup"
+
 print_status_msg "Done Software Setup, please reboot for changes to take place"
