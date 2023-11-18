@@ -3,11 +3,32 @@ package(default_visibility = ["//visibility:public"])
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 py_library(
-    name = "binary_context_managers",
+    name = "simulator",
     srcs = [
-        "binary_context_managers.py",
-        "full_system.py",
-        "game_controller.py",
         "simulator.py",
+        "binary_context_managers.py",
+    ],
+    data = [
+        "//software:er_force_simulator_main",
+    ],
+)
+
+py_library(
+    name = "game_controller",
+    srcs = [
+        "game_controller.py",
+        "binary_context_managers.py",
+    ],
+)
+
+py_library(
+    name = "full_system",
+    srcs = [
+        "full_system.py",
+        "binary_context_managers.py",
+    ],
+
+    data = [
+        "//software:unix_full_system",
     ],
 )

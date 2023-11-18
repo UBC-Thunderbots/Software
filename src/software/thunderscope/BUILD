@@ -9,7 +9,9 @@ py_binary(
         ":config",
         ":constants",
         ":thunderscope",
-        "//software/thunderscope/binary_context_managers",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:simulator",
         "//software/thunderscope/replay:proto_logger",
     ],
 )
@@ -19,10 +21,8 @@ py_library(
     srcs = ["thunderscope.py"],
     data = [
         "thunderscope-logo.png",
-        "//software:er_force_simulator_main",
         "//software:py_constants.so",
         "//software:python_bindings.so",
-        "//software:unix_full_system",
     ],
     deps = [
         ":config",
@@ -35,7 +35,9 @@ py_library(
         "//software/thunderscope:dock_style",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
-        "//software/thunderscope/binary_context_managers",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:simulator",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
