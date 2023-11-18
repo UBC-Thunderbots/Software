@@ -25,7 +25,7 @@ void AssignedTacticsPlay::updateControlParams(
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>> motion_constraints)
 {
     this->assigned_tactics            = assigned_tactics;
-    this->override_motion_constraints = motion_constraints;
+    this->override_motion_constraints = motion_constraints; // TODO (NIMA): Can probably remove?! unless we support it in simulated pytests
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
@@ -39,6 +39,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
         {
             auto tactic = assigned_tactics.at(robot.id());
             tactic_robot_id_assignment.emplace(tactic, robot.id());
+            // TODO (NIMA): For traj planner to work in simulated tests, will need
+            //              to also update primitives here
             // TODO (NIMA): Remove unused var?!
             auto motion_constraints =
                 buildMotionConstraintSet(world.gameState(), *goalie_tactic);

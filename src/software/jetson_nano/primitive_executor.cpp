@@ -34,23 +34,11 @@ void PrimitiveExecutor::updatePrimitiveSet(
         if (current_primitive_.has_move())
         {
             const TbotsProto::MovePrimitive& move_traj = current_primitive_.move();
-//            const TbotsProto::TrajectoryPathParams2D& trajectory_2d_params = move_traj.xy_traj_params();
+            const TbotsProto::TrajectoryPathParams2D& trajectory_2d_params = move_traj.xy_traj_params();
             const TbotsProto::TrajectoryParamsAngular1D& trajectory_angular_params = move_traj.w_traj_params();
 
-            // TODO: Added for testing
+            trajectory_path_ = createTrajectoryPathFromParams(trajectory_2d_params, robot_constants_);
 
-            TbotsProto::TrajectoryPathParams2D* mutable_trajectory_2d_params = current_primitive_.mutable_move()->mutable_xy_traj_params();
-            *mutable_trajectory_2d_params->mutable_initial_velocity() = *createVectorProto(velocity_);
-
-            trajectory_path_ = createTrajectoryPathFromParams(*mutable_trajectory_2d_params, robot_constants_);
-
-            if (robot_id_ == 4 && friendly_team_colour_ == TeamColour::BLUE)
-            {
-//                LOG(INFO) << "Robot 4 Blue Move Primitive";
-//                LOG(INFO) << mutable_trajectory_2d_params->DebugString();
-//                // TODO may cause segfaults .value()
-//                LOG(INFO) << "First traj dest: " << trajectory_path_.value().getTrajectoryPathNodes()[0].getTrajectory()->getDestination();
-            }
             // TODO: Combine generate and constructor
             angular_trajectory_ = BangBangTrajectory1DAngular();
             angular_trajectory_->generate(createAngle(trajectory_angular_params.start_angle()),
@@ -60,7 +48,7 @@ void PrimitiveExecutor::updatePrimitiveSet(
                                         AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
                                         AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2));
 
-            time_since_trajectory_creation_ = Duration::fromSeconds(0.0);
+            time_since_trajectory_creation_ = Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
         }
         return;
     }

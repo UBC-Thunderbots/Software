@@ -23,6 +23,11 @@ message Obstacles
     repeated Circle circle   = 2;
 }
 
+message ObstaclesList
+{
+    repeated Obstacles obstacles = 1;
+}
+
 enum MotionConstraint
 {
     // The box around the friendly goal

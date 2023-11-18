@@ -189,6 +189,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
     // Update direct trajectories to trajectories calculated using
     // the trajectory planner which avoids obstacles
+    TbotsProto::ObstaclesList obstacle_protos;
     for (auto [id, primitive] : primitives_to_run->robot_primitives())
     {
         if (!primitive.has_move())
@@ -237,6 +238,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             }
         }
 
+        for (const auto& obstacle : obstacles)
+        {
+            *(obstacle_protos.mutable_obstacles()->Add()) = obstacle->createObstacleProto();
+        }
+
         const TbotsProto::TrajectoryPathParams2D& trajectory_path_params = primitive.move().xy_traj_params();
         Point start_position = createPoint(trajectory_path_params.start_position());
         Point destination = createPoint(trajectory_path_params.destination());
@@ -246,6 +252,14 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         KinematicConstraints constraints(max_speed,
                                          robot_constants.robot_max_acceleration_m_per_s_2,
                                          robot_constants.robot_max_deceleration_m_per_s_2);
+
+        // Print all obstacles
+//        std::string obstacles_str = "";
+//        for (const auto& obstacle : obstacles)
+//        {
+//            obstacles_str += obstacle->toString() + "\n";
+//        }
+//        LOG(INFO) << "Obstacles for robot " << id << ":\n" << obstacles_str << std::endl;
 
         // TODO: Instead of field boundary, it should be made smaller 9cm
         TrajectoryPath traj_path = planner.findTrajectory(start_position, destination, initial_velocity,
@@ -298,6 +312,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             }
         }
     }
+    LOG(VISUALIZE) << obstacle_protos;
     auto end = std::chrono::high_resolution_clock::now();
     auto duration =
             std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();

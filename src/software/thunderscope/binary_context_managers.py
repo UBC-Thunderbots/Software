@@ -173,6 +173,7 @@ gdb --args bazel-bin/{full_system}
             CostVisualization,
             NamedValue,
             PlayInfo,
+            ObstaclesList,
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir=self.full_system_runtime_dir,
@@ -360,6 +361,7 @@ gdb --args bazel-bin/{simulator_command}
         for arg in [
             (YELLOW_SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (YELLOW_ROBOT_STATUS_PATH, RobotStatus),
+            (SIMULATOR_STATE_PATH, SimulatorState),
         ] + [
             # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
             (YELLOW_HRVO_PATH, HRVOVisualization, True)
