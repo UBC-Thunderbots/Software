@@ -6,7 +6,7 @@
 class DuplicationScorer : public SupportTacticScorer
 {
    public:
-    explicit DuplicationScorer() = default;
+    explicit DuplicationScorer();
 
     /**
      * Records a usage of the given support tactic candidate

@@ -11,6 +11,7 @@ class SupportTacticCandidate;
 
 /**
  * Visits SupportTacticCandidates to score them.
+ *
  * We use the visitor pattern to ensure all SupportTacticScorers implement
  * a `score` method for every SupportTacticCandidate at compile time.
  */
@@ -24,6 +25,8 @@ class SupportTacticScorer
      * Visits the given support tactic candidate to score it
      *
      * @param tactic The support tactic candidate to score
+     *
+     * @return the score for the support tactic candidate
      */
 
     virtual double score(const SupportTacticCandidate<PassReceiverTactic> &candidate)       = 0;

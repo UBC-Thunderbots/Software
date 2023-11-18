@@ -3,11 +3,11 @@
 DynamicPlay::DynamicPlay(TbotsProto::AiConfig ai_config, bool requires_goalie) 
     : Play(ai_config, requires_goalie),
       support_tactic_candidates_(allSupportTacticCandidates()),  
-      support_tactic_feasibility_scorer(std::make_unique<FeasibilityScorer>()),
-      support_tactic_duplication_scorer(std::make_unique<DuplicationScorer>()),
-      support_tactic_success_scorer(std::make_unique<SuccessScorer>()),
-      attacker_tactic(std::make_unique<AttackerTactic>()),
-      support_tactics({})
+      support_tactic_feasibility_scorer_(std::make_unique<FeasibilityScorer>()),
+      support_tactic_duplication_scorer_(std::make_unique<DuplicationScorer>()),
+      support_tactic_success_scorer_(std::make_unique<SuccessScorer>()),
+      attacker_tactic_(std::make_unique<AttackerTactic>()),
+      support_tactics_({})
 {
 }
 
