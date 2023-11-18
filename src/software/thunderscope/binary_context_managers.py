@@ -25,6 +25,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import (
     SimRobot,
 )
 
+
 def is_cmd_running(command: list) -> bool:
     """Check if there is any running process that was launched
     with the given command.
@@ -470,7 +471,7 @@ class Gamecontroller(object):
         self,
         blue_full_system_proto_unix_io: ProtoUnixIO,
         yellow_full_system_proto_unix_io: ProtoUnixIO,
-        autoref_proto_unix_io: ProtoUnixIO = None
+        autoref_proto_unix_io: ProtoUnixIO = None,
     ) -> None:
         """Setup gamecontroller io
 
