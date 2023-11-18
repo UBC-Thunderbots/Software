@@ -193,7 +193,7 @@ class ReplayControls(QWidget):
         if self.clipping and self.player.current_packet_time > self.clip_start:
             self.player.pause()
             end_time = self.player.current_packet_time
-            filename, _ = QtGui.QFileDialog.getSaveFileName(
+            filename, _ = QFileDialog.getSaveFileName(
                 self,
                 "Save clip",
                 "~/log_clip_{}.replay".format(int(time.time())),
