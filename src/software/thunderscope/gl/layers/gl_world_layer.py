@@ -418,6 +418,7 @@ class GLWorldLayer(GLLayer):
             pos_y = robots[robot_id][1]
             orientation = robots[robot_id][2]
 
+            robot_graphic.set_id(robot_id)
             robot_graphic.set_position(pos_x, pos_y)
             robot_graphic.set_orientation(math.degrees(orientation))
             robot_graphic.setColor(color)

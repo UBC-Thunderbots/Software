@@ -30,6 +30,10 @@ class RobotOperation:
         self.next_id = next_id
 
 
+class EnemyAtMousePositionError(Exception):
+    pass
+
+
 class GLSandboxWorldLayer(GLWorldLayer):
     """
     GLWorldLayer that adds functionality to add, remove, and change the state of the robots on the field
@@ -107,8 +111,12 @@ class GLSandboxWorldLayer(GLWorldLayer):
         if not event.mouse_event.modifiers() & Qt.KeyboardModifier.ControlModifier:
             return
 
-        # determine whether a robot was clicked
-        robot_id, index = self.__identify_robot(event.multi_plane_points)
+        try:
+            # determine whether a robot was clicked
+            robot_id, index = self.__identify_robot(event.multi_plane_points)
+        except EnemyAtMousePositionError:
+            # if enemy robot is already at mouse position, return
+            return
 
         if robot_id is None:
             # if no robot was clicked
@@ -137,7 +145,13 @@ class GLSandboxWorldLayer(GLWorldLayer):
         if self.selected_robot_id is not None and self.selected_robot_plane is not None:
             # get the new position on the plane that the robot was initially selected on
             point_on_current_plane = event.multi_plane_points[self.selected_robot_plane]
-            robot_id, _ = self.__identify_robot([point_on_current_plane])
+
+            # check if the mouse position is free or not
+            try:
+                robot_id, _ = self.__identify_robot([point_on_current_plane])
+            except EnemyAtMousePositionError:
+                # if enemy robot is already at mouse position, return
+                return
 
             # skip if new position has a robot already
             if robot_id is not None:
@@ -472,7 +486,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         # first, check if there's any enemy robots being clicked on
         # return None immediately if so (since we can't edit enemy robot state)
-        for robot_ in self.cached_world.friendly_team.team_robots:
+        for robot_ in self.cached_world.enemy_team.team_robots:
             # get the coordinates from the robot state
             pos_x = robot_.current_state.global_position.x_meters
             pos_y = robot_.current_state.global_position.y_meters
@@ -481,7 +495,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
             index = self.__identify_robot_helper(multi_plane_points, pos_x, pos_y)
 
             if index is not None:
-                return None, None
+                raise EnemyAtMousePositionError("Enemy robot at this position already!")
 
         # look for robot in local state
         for robot_id, pos in self.local_robot_positions.items():
@@ -522,13 +536,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         """
         # consider points on the xy-plane, and a few planes above to account for robot height
         for index, point in enumerate(multi_plane_points):
-            point_in_scene = self._invert_position_if_defending_negative_half(point)
-
             # if point is close enough to the robot, return the robot id and index it eas found on
             if (
-                math.sqrt(
-                    (pos_x - point_in_scene[0]) ** 2 + (pos_y - point_in_scene[1]) ** 2
-                )
+                math.sqrt((pos_x - point[0]) ** 2 + (pos_y - point[1]) ** 2)
                 <= ROBOT_MAX_RADIUS_MILLIMETERS / MILLIMETERS_PER_METER
             ):
                 return index

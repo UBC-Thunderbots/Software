@@ -31,7 +31,16 @@ class GLRobot(GLMeshItem):
 
         self.x = 0
         self.y = 0
+        self.robot_id = 0
         self.orientation = 0
+
+    def set_id(self, robot_id: int) -> None:
+        """
+        Set the ID of the graphics in the scene
+
+        :param robot_id: the id of the robot represented by this graphic
+        """
+        self.robot_id = robot_id
 
     def set_position(self, x: float, y: float) -> None:
         """Set the position of the graphic in the scene
