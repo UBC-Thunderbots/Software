@@ -241,8 +241,8 @@ class DepthValues:
     Graphics with negative depth values are drawn before their parent.
     """
 
+    BENEATH_BACKGROUND_DEPTH = -2
     BACKGROUND_DEPTH = -1
     FOREGROUND_DEPTH = 0
-
-    SECONDARY_TEXT_DEPTH = 1
-    PRIMARY_TEXT_DEPTH = 2
+    ABOVE_FOREGROUND_DEPTH = 1
+    OVERLAY_DEPTH = 2

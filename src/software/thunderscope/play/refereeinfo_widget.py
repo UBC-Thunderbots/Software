@@ -6,7 +6,6 @@ from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
 from software.thunderscope.common.common_widgets import set_table_data
-
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
@@ -19,7 +18,7 @@ class RefereeInfoWidget(QWidget):
     HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
     ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
 
-    def __init__(self, buffer_size=5):
+    def __init__(self, buffer_size: int = 5) -> None:
         """Shows the referee information 
 
         :param minimum_column_width: minimum width of columns
@@ -41,7 +40,7 @@ class RefereeInfoWidget(QWidget):
         self.vertical_layout.addWidget(self.referee_info)
         self.setLayout(self.vertical_layout)
 
-    def refresh(self):
+    def refresh(self) -> None:
         """Update the referee info widget with new referee information
         """
         referee = self.referee_buffer.get(block=False)

@@ -52,6 +52,7 @@ class GLWorldLayer(GLLayer):
 
         """
         super().__init__(name)
+        self.setDepthValue(DepthValues.FOREGROUND_DEPTH)
 
         self.simulator_io = simulator_io
         self.friendly_colour_yellow = friendly_colour_yellow
@@ -425,8 +426,7 @@ class GLWorldLayer(GLLayer):
             if self.display_robot_ids:
                 robot_id_graphic.show()
 
-                # Depth value of 2 ensures text is rendered over top other graphics
-                robot_id_graphic.setDepthValue(2)
+                robot_id_graphic.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
 
                 robot_id_graphic.setData(
                     text=str(robot_id),
@@ -473,7 +473,7 @@ class GLWorldLayer(GLLayer):
             ):
                 breakbeam_graphic.show()
 
-                breakbeam_graphic.setDepthValue(DepthValues.SECONDARY_TEXT_DEPTH)
+                breakbeam_graphic.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
 
                 breakbeam_graphic.set_position(
                     robot.current_state.global_position.x_meters,
