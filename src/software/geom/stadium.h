@@ -4,6 +4,7 @@
 #include "software/geom/convex_polygon.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
+#include "software/geom/circle.h"
 
 /**
  * A tube/stadium/pill/discorectangle shape with a radius and a line segment
@@ -37,6 +38,20 @@ class Stadium : public ConvexShape {
       * @param radius the radius of the two semicircles of the Stadium
       */
      explicit Stadium(const Point &point, const Vector &vector, double radius);
+
+    /**
+     * Creates a Stadium with a line segment between arbitrary point and semicircle
+     * @param point the center of the first semicircle of the Stadium
+     * @param circle the second semicircle of the stadium
+     */
+    explicit Stadium(const Point &point, const Circle &circle);
+
+    /**
+     * Creates a Stadium with a line segment between arbitrary semicircle and vector originating from said circle
+     * @param circle the first semicircle of the Stadium
+     * @param vector the vector from the center of the first semicircle of the Stadium to the second
+     */
+    explicit Stadium(const Circle &circle, const Vector &vector);
 
      /**
       * Returns the line Segment defining the top and bottom length of this Stadium

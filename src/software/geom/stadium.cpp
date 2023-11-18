@@ -28,6 +28,24 @@ Stadium::Stadium(const Point &point, const Vector &vector, double radius)
     }
 }
 
+Stadium::Stadium(const Point &point, const Circle &circle)
+        : length_(Segment(point, circle.origin())), radius_(circle.radius())
+{
+    if(circle.radius()<0)
+    {
+        throw std::invalid_argument("Stadium radius cannot be negative, given: " + std::to_string(circle.radius()));
+    }
+}
+
+Stadium::Stadium(const Circle &circle, const Vector &vector)
+        : length_(Segment(circle.origin(), circle.origin() + vector)), radius_(circle.radius())
+{
+    if(circle.radius()<0)
+    {
+        throw std::invalid_argument("Stadium radius cannot be negative, given: " + std::to_string(circle.radius()));
+    }
+}
+
 Segment Stadium::length() const
 {
     return length_;

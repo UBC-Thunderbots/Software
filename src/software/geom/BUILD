@@ -221,6 +221,7 @@ cc_library(
       ":point",
       ":segment",
       ":rectangle",
+      ":circle",
     ],
 )
 

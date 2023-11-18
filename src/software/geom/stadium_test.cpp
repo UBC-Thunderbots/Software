@@ -23,6 +23,27 @@ TEST(StadiumConstructorTests, stadium_points_constructor)
     EXPECT_EQ(Segment(Point(1,2), Point(-1,3)), s.length());
 }
 
+TEST(StadiumConstructorTests, stadium_point_vector_constructor)
+{
+    Stadium s = Stadium(Point(1, 2), Vector(-2, 1), 3);
+    EXPECT_EQ(3, s.radius());
+    EXPECT_EQ(Segment(Point(1,2), Point(-1,3)), s.length());
+}
+
+TEST(StadiumConstructorTests, stadium_point_circle_constructor)
+{
+    Stadium s = Stadium(Point(1, 2), Circle(Point(-8, 4), 1));
+    EXPECT_EQ(1, s.radius());
+    EXPECT_EQ(Segment(Point(1,2), Point(-8,4)), s.length());
+}
+
+TEST(StadiumConstructorTests, stadium_circle_vector_constructor)
+{
+    Stadium s = Stadium(Circle(Point(-2, 1), 6), Vector(1, 2));
+    EXPECT_EQ(6, s.radius());
+    EXPECT_EQ(Segment(Point(-2,1), Point(-1,3)), s.length());
+}
+
 TEST(StadiumConstructorTests, stadium_invalid_points_constructor)
 {
     EXPECT_THROW(Stadium(Point(1, 2), Point(-1, 3), -2), std::invalid_argument);

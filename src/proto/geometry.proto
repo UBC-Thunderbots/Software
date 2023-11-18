@@ -63,3 +63,9 @@ message VelocityObstacle
     required Vector left_side  = 2;
     required Vector right_side = 3;
 }
+
+message Stadium
+{
+    required Segment length = 1;
+    required double radius  = 2;
+}
