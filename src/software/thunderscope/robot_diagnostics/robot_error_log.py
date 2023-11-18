@@ -16,7 +16,7 @@ from software.thunderscope.constants import (
     ERROR_CODE_MESSAGES,
     ROBOT_CRASH_TIMEOUT_S,
     ROBOT_FATAL_TIMEOUT_S,
-    ROBOT_LOG_WIDGET_TIMEOUT,
+    THUNDERSCOPE_REFRESH_INTERVAL_MS,
 )
 
 import time
@@ -28,6 +28,10 @@ class RobotErrorLog(QScrollArea):
 
     Allows for dynamically adding new entries
     """
+
+    # how many Thunderscope ticks to wait before scrolling
+    # ensures that the scrolling properly happens after a new widget is added
+    SCROLL_INTERVAL_TICKS = 15
 
     def __init__(self):
         super(RobotErrorLog, self).__init__()
@@ -77,14 +81,6 @@ class RobotErrorLog(QScrollArea):
         # remove all closed widgets first
         self.__remove_closed_widgets()
 
-        if self.scroll_to_bottom:
-            # scroll the logs to the bottom
-            self.ensureVisible(0, self.container.height())
-            self.verticalScrollBar().setSliderPosition(
-                self.verticalScrollBar().maximum()
-            )
-            self.scroll_to_bottom = False
-
         # update time since for all existing logs
         for error_message in self.error_log_messages:
             error_message.update_time()
@@ -110,7 +106,21 @@ class RobotErrorLog(QScrollArea):
                 block=False, return_cached=False
             )
 
-    def __remove_closed_widgets(self):
+        if self.scroll_to_bottom:
+            QTimer.singleShot(
+                THUNDERSCOPE_REFRESH_INTERVAL_MS * self.SCROLL_INTERVAL_TICKS,
+                self.__scroll_logs_to_bottom,
+            )
+            self.scroll_to_bottom = False
+
+    def __scroll_logs_to_bottom(self) -> None:
+        """
+        Helper function to scroll the widget to the bottom
+        """
+        self.ensureVisible(0, self.container.height())
+        self.verticalScrollBar().setSliderPosition(self.verticalScrollBar().maximum())
+
+    def __remove_closed_widgets(self) -> None:
         """
         Removes all log widgets which have been closed
         """

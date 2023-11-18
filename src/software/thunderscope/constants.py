@@ -77,11 +77,13 @@ BALL_HEIGHT_EFFECT_MULTIPLIER = 3
 # in robot communications
 ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
 
+# time between each refresh of thunderscope in milliseconds
+THUNDERSCOPE_REFRESH_INTERVAL_MS = 10
+
 ROBOT_FATAL_TIMEOUT_S = 5
 # Max time (in seconds) tolerated between repeated crash protos until
 # crash alert occurs
 ROBOT_CRASH_TIMEOUT_S = 5
-ROBOT_LOG_WIDGET_TIMEOUT = 30
 
 # LogLevel to string conversion map
 LOG_LEVEL_STR_MAP = {
