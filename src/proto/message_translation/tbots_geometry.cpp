@@ -71,6 +71,15 @@ std::unique_ptr<TbotsProto::VelocityObstacle> createVelocityObstacleProto(
     return vo_proto;
 }
 
+std::unique_ptr<TbotsProto::Stadium> createStadiumProto(const Stadium& stadium)
+{
+    auto stadium_proto                 = std::make_unique<TbotsProto::Stadium>();
+    *(stadium_proto->mutable_length()) = *createSegmentProto(stadium.length());
+    stadium_proto->set_radius(stadium.radius());
+
+    return stadium_proto;
+}
+
 Point createPoint(const TbotsProto::Point& point)
 {
     return Point(point.x_meters(), point.y_meters());
@@ -120,4 +129,9 @@ VelocityObstacle createVelocityObstacle(
     Vector side1 = createVector(velocity_obstacle_msg.left_side());
     Vector side2 = createVector(velocity_obstacle_msg.right_side());
     return VelocityObstacle(apex, side1, side2);
+}
+
+Stadium createStadium(const TbotsProto::Stadium& stadium)
+{
+    return Stadium(createSegment(stadium.length()), stadium.radius());
 }
