@@ -5,8 +5,8 @@ load("@thunderscope_deps//:requirements.bzl", "requirement")
 py_library(
     name = "simulator",
     srcs = [
-        "simulator.py",
         "binary_context_managers.py",
+        "simulator.py",
     ],
     data = [
         "//software:er_force_simulator_main",
@@ -16,18 +16,17 @@ py_library(
 py_library(
     name = "game_controller",
     srcs = [
-        "game_controller.py",
         "binary_context_managers.py",
+        "game_controller.py",
     ],
 )
 
 py_library(
     name = "full_system",
     srcs = [
-        "full_system.py",
         "binary_context_managers.py",
+        "full_system.py",
     ],
-
     data = [
         "//software:unix_full_system",
     ],
