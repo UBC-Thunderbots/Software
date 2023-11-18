@@ -305,7 +305,7 @@ gdb --args bazel-bin/{simulator_command}
         simulator_proto_unix_io: ProtoUnixIO,
         blue_full_system_proto_unix_io: ProtoUnixIO,
         yellow_full_system_proto_unix_io: ProtoUnixIO,
-        autoref_proto_unix_io: ProtoUnixIO,
+        autoref_proto_unix_io: ProtoUnixIO = None,
     ) -> None:
 
         """Setup the proto unix io for the simulator
@@ -470,7 +470,7 @@ class Gamecontroller(object):
         self,
         blue_full_system_proto_unix_io: ProtoUnixIO,
         yellow_full_system_proto_unix_io: ProtoUnixIO,
-        autoref_proto_unix_io: ProtoUnixIO
+        autoref_proto_unix_io: ProtoUnixIO = None
     ) -> None:
         """Setup gamecontroller io
 
