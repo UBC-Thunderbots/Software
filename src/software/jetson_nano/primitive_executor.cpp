@@ -165,14 +165,14 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             if (robot_id_ == 4 && friendly_team_colour_ == TeamColour::BLUE)
             {
                 auto desired_vel = trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds());
-                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                      {"actual_vx", velocity_.x()},
-                      {"actual_vy", velocity_.y()},
-                      {"actual_v", velocity_.length()},
-                      {"desired_vx", desired_vel.x()},
-                      {"desired_vy", desired_vel.y()},
-                      {"desired_v", desired_vel.length()},
-                  });
+//                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+//                      {"actual_vx", velocity_.x()},
+//                      {"actual_vy", velocity_.y()},
+//                      {"actual_v", velocity_.length()},
+//                      {"desired_vx", desired_vel.x()},
+//                      {"desired_vy", desired_vel.y()},
+//                      {"desired_v", desired_vel.length()},
+//                  });
             }
 
             TbotsProto::HRVOVisualization hrvo_visualization;

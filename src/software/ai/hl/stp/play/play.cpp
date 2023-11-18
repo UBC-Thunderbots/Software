@@ -262,6 +262,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 //        LOG(INFO) << "Obstacles for robot " << id << ":\n" << obstacles_str << std::endl;
 
         // TODO: Instead of field boundary, it should be made smaller 9cm
+        // TODO: Why do the trajs not avoid the obstacles?
         TrajectoryPath traj_path = planner.findTrajectory(start_position, destination, initial_velocity,
                                     constraints, obstacles, world.field().fieldBoundary());
         const auto& path_nodes = traj_path.getTrajectoryPathNodes();
