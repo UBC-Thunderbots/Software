@@ -28,6 +28,8 @@ class FullSystem(object):
 
         :param full_system_runtime_dir: The directory to run the blue full_system in
         :param debug_full_system: Whether to run the full_system in debug mode
+        :param friendly_color_yellow: a argument passed into the unix_full_system binary (--friendly_colour_yellow)
+        :param should_restart_on_crash: whether or not to restart the program after it has been crashed
 
         """
         self.full_system_runtime_dir = full_system_runtime_dir
@@ -80,7 +82,7 @@ Debugging Fullsystem ==============
 
 2. Run the following binaries from src to debug full system:
 
-gdb --args bazel-bin/{full_system}
+gdb --args bazel-bin/{self.full_system}
 
 3. Rerun this binary once the gdb instance is setup
 """

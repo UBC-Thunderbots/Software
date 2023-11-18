@@ -28,6 +28,7 @@ class Simulator(object):
 
         :param simulator_runtime_dir: The directory to run the simulator in
         :param debug_simulator: Whether to run the simulator in debug mode
+        :param enable_realism: a argument (--enable_realism) that is going to be passed to er_force_simulator_main binary
 
         """
         self.simulator_runtime_dir = simulator_runtime_dir
