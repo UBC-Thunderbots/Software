@@ -23,6 +23,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles,
     const Rectangle &navigable_area)
 {
+    LOG(INFO) << obstacles.size() << " obstacles";
     static long int total_time = 0;
     static int num_calls       = 0;
     auto start_time            = std::chrono::high_resolution_clock::now();
@@ -121,6 +122,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
             // actual destination at connection_time
             TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;
             traj_path_to_dest.append(constraints, connection_time, destination);
+            // TODO: Shouldn't need to claculate cost everytime, can sometimes continue knowing that duration has increased
             TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
                     traj_path_to_dest, tree, obstacles, sub_trajectory, connection_time);
             num_traj++;

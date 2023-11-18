@@ -301,10 +301,6 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     std::unique_ptr<TbotsProto::World> world_msg)
 {
     ZoneScopedN("setYellowPrimitives");
-    // Use chrono to time this function
-    static long int total_time_us    = 0;
-    static long int num_calls        = 0;
-    auto start                       = std::chrono::high_resolution_clock::now();
     auto sim_state                   = getSimulatorState();
     const auto& sim_robots           = sim_state.yellow_robots();
     const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots, true);
@@ -318,18 +314,6 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
         setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
                           world_proto, local_vel, angular_vel);
     }
-
-    auto end = std::chrono::high_resolution_clock::now();
-    num_calls++;
-    total_time_us +=
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-    if (num_calls % 200 == 0)
-    {
-//        std::cout << "Average time per setYellowRobotPrimitiveSet call: "
-//                  << total_time_us / num_calls << " us" << std::endl;
-        total_time_us = 0;
-        num_calls     = 0;
-    }
 }
 
 void ErForceSimulator::setBlueRobotPrimitiveSet(
@@ -337,10 +321,6 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     std::unique_ptr<TbotsProto::World> world_msg)
 {
     ZoneScopedN("setBluePrimitives");
-    // Use chrono to time this function
-    static long int total_time_us    = 0;
-    static long int num_calls        = 0;
-    auto start                       = std::chrono::high_resolution_clock::now();
     auto sim_state                   = getSimulatorState();
     const auto& sim_robots           = sim_state.blue_robots();
     const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots, true);
@@ -352,18 +332,6 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
         auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
         setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
                           world_proto, local_vel, angular_vel);
-    }
-
-    auto end = std::chrono::high_resolution_clock::now();
-    num_calls++;
-    total_time_us +=
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-    if (num_calls % 200 == 0)
-    {
-        std::cout << "Average time per setBlueRobotPrimitiveSet call: "
-                  << total_time_us / num_calls << " us" << std::endl;
-        total_time_us = 0;
-        num_calls     = 0;
     }
 }
 
