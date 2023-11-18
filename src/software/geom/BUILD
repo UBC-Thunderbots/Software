@@ -225,6 +225,17 @@ cc_library(
 )
 
 cc_test(
+    name = "stadium_test",
+    srcs = [
+        "stadium_test.cpp"
+    ],
+    deps = [
+        ":stadium",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_test(
     name = "angle_test",
     srcs = [
         "angle_test.cpp",
