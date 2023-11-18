@@ -15,9 +15,12 @@
  * It acts as the visitee for a SupportTacticScorer, which operates under
  * the visitor pattern.
  */
-template<typename SupportTacticType>
+template<typename TSupportTactic>
 class SupportTacticCandidate 
 {
+    static_assert(std::is_base_of<Tactic, TSupportTactic>::value, 
+                  "TSupportTactic must derive from Tactic");
+
    public:
     explicit SupportTacticCandidate();
 
@@ -35,7 +38,7 @@ class SupportTacticCandidate
     void clearScores();
 
     /**
-     * Gets the total score for this support tactic candidate.
+     * Gets the total score for this candidate.
      * 
      * The total score X(x_1, x_2, ..., x_n) summarizes all the individual 
      * scores x_i that have been applied to this candidate. It is calculated 
@@ -65,7 +68,7 @@ class SupportTacticCandidate
      * @return a shared pointer to a newly constructed instance of the
      * candidate's support tactic type
      */
-    std::shared_ptr<SupportTacticType> createSupportTactic() const;
+    std::shared_ptr<TSupportTactic> createSupportTactic() const;
 
    private:
     std::vector<int> scores_;
@@ -92,26 +95,33 @@ static SupportTacticCandidateVector allSupportTacticCandidates()
     };
 }
 
-template<typename SupportTacticType>
-SupportTacticCandidate<SupportTacticType>::SupportTacticCandidate() : scores_() 
+template<typename TSupportTactic>
+SupportTacticCandidate<TSupportTactic>::SupportTacticCandidate() : scores_() 
 {
 }
 
-template<typename SupportTacticType>
-void SupportTacticCandidate<SupportTacticType>::score(SupportTacticScorer &scorer)
+template<typename TSupportTactic>
+void SupportTacticCandidate<TSupportTactic>::score(SupportTacticScorer &scorer)
 {
-    scores_.push_back(scorer.score(*this));
+    // We don't care about scores outside the range [-1.0, 1.0]
+    double score = std::clamp(scorer.score(*this), -1.0, 1.0);
+    scores_.push_back(score);
 }
 
-template<typename SupportTacticType>
-void SupportTacticCandidate<SupportTacticType>::resetTotalScore()
+template<typename TSupportTactic>
+void SupportTacticCandidate<TSupportTactic>::resetTotalScore()
 {
     scores_.clear();
 }
 
-template<typename SupportTacticType>
-double SupportTacticCandidate<SupportTacticType>::getTotalScore() const
+template<typename TSupportTactic>
+double SupportTacticCandidate<TSupportTactic>::getTotalScore() const
 {
+    // Total score is calculated as the generalized mean of the 
+    // scores applied to the candidate
+
+    // See javadoc comment for getTotalScore
+    
     double sum = std::accumulate(scores_.begin(), scores_.end(), 0.0,
         [](double current_sum, double score) {
             double sign = (0.0 < score) - (score < 0.0); 
@@ -120,12 +130,12 @@ double SupportTacticCandidate<SupportTacticType>::getTotalScore() const
         });
 
     double num_scores = std::static_cast<double>(scores_.size());
-    double total_score = std::pow(sum / num_scores, SINGLE_SCORE_INFLUENCE)
+    double total_score = std::pow(sum / num_scores, SINGLE_SCORE_INFLUENCE);
     return total_score;
 }
 
-template<typename SupportTacticType>
-std::shared_ptr<SupportTacticType> SupportTacticCandidate<SupportTacticType>::create() const
+template<typename TSupportTactic>
+std::shared_ptr<TSupportTactic> SupportTacticCandidate<TSupportTactic>::create() const
 {
-    return std::make_shared<SupportTacticType>();
+    return std::make_shared<TSupportTactic>();
 }

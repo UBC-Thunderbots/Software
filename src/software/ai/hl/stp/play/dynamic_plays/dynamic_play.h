@@ -5,7 +5,14 @@
 #include "software/ai/hl/stp/play/dynamic_plays/support_tactic_scorers/support_tactic_scorer.h"
 #include "software/ai/hl/stp/play/dynamic_plays/support_tactic_scorers/support_tactic_candidate.hpp"
 
-class DynamicPlay : public Play {
+/**
+ * A DynamicPlay is a Play that assigns tactics based on scoring functions
+ * whose parameters and outputs are incrementally adjusted over time based 
+ * on the Play's success. This enables the Play to "learn" which tactics are 
+ * most effective for a given gameplay scenario.
+ */
+class DynamicPlay : public Play 
+{
    public:
     /**
      * Creates a new DynamicPlay
@@ -27,6 +34,6 @@ class DynamicPlay : public Play {
     std::unique_ptr<DuplicationScorer> support_tactic_duplication_scorer_;
     std::unique_ptr<SuccessScorer> support_tactic_success_scorer_;
 
-    std::unique_ptr<AttackerTactic> attacker_tactic_;
-    std::vector<std::unique_ptr<Tactic>> support_tactics_;
+    std::shared_ptr<AttackerTactic> attacker_tactic_;
+    std::vector<std::shared_ptr<Tactic>> support_tactics_;
 }

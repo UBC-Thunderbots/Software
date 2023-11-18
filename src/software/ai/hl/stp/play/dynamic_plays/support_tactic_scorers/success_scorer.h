@@ -3,6 +3,10 @@
 #include "software/ai/hl/stp/play/dynamic_plays/support_tactic_scorers/support_tactic_scorer.h"
 #include "software/ai/hl/stp/play/dynamic_plays/support_tactic_scorers/support_tactic_candidate.hpp"
 
+/**
+ * Scores SupportTacticCandidates based on past performance and success of 
+ * each support tactic
+ */
 class SuccessScorer : public SupportTacticScorer
 {
    public:

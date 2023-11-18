@@ -24,11 +24,10 @@ class SupportTacticScorer
      * The javadoc comment for all `score` methods below can be read as:
      * Visits the given support tactic candidate to score it
      *
-     * @param tactic The support tactic candidate to score
+     * @param candidate the SupportTacticCandidate to score
      *
-     * @return the score for the support tactic candidate
+     * @return the score for the SupportTacticCandidate, in the range [-1.0, 1.0]
      */
-
     virtual double score(const SupportTacticCandidate<PassReceiverTactic> &candidate)       = 0;
     virtual double score(const SupportTacticCandidate<FakePassReceiverTactic> &candidate)   = 0;
     virtual double score(const SupportTacticCandidate<CherryPickerTactic> &candidate)       = 0;
