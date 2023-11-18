@@ -225,6 +225,7 @@ cc_library(
         "//software/ai/navigator/path_planner:global_path_planner_factory",
         "//software/ai/passing:pass_with_rating",
         "//software/util/sml_fsm",
+        "//software/ai/hl/stp/play:tactic_assignment",
         "@boost//:coroutine2",
         "@munkres_cpp",
     ],
@@ -532,6 +533,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
         "//software/util/generic_factory",
+        "//software/ai/hl/stp/play:tactic_assignment",
     ],
     alwayslink = True,
 )
@@ -557,4 +559,32 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:play_factory",
     ],
+)
+
+cc_library(
+    name = "tactic_assignment",
+    srcs = ["tactic_assignment.cpp"],
+    hdrs = [
+        "tactic_assignment.h",
+    ],
+    deps = [
+        "//software/world:world",
+        "//software/world:robot",
+        "//software/ai/navigator/path_planner:global_path_planner_factory",
+        "@munkres_cpp",
+    ],
+)
+
+cc_test(
+    name = "tactic_assignment_test",
+    srcs = ["tactic_assignment_test.cpp"],
+    deps = [
+        "//software/test_util",
+        "//software/ai/hl/stp/play:play",
+        "//software/ai/hl/stp/play/offense:offense_play",
+        "//software/ai/hl/stp/play:tactic_assignment",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
+        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
+    ]
 )

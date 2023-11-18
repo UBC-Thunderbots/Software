@@ -4,6 +4,7 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
+#include "tactic_assignment.h"
 
 AssignedTacticsPlay::AssignedTacticsPlay(TbotsProto::AiConfig config)
     : Play(config, false), assigned_tactics(), override_motion_constraints()

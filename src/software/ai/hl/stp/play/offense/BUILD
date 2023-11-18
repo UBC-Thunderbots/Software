@@ -55,5 +55,6 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+        "//software/simulated_tests/terminating_validation_functions",
     ],
 )
