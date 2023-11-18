@@ -3,8 +3,11 @@ import socket
 import time
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
+from typing import Any
 
 from subprocess import Popen
+import software.python_bindings as tbots_cpp
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
 from proto.import_all_protos import *
 from software.py_constants import *
@@ -34,7 +37,7 @@ class Gamecontroller(object):
         self.referee_port = self.next_free_port()
         self.ci_port = self.next_free_port()
 
-    def __enter__(self) -> self:
+    def __enter__(self) -> "self":
         """Enter the gamecontroller context manager. 
 
         :return: gamecontroller context managed instance

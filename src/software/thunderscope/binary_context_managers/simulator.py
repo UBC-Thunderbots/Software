@@ -6,6 +6,7 @@ from subprocess import Popen
 from software.python_bindings import *
 from proto.import_all_protos import *
 from software.py_constants import *
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
 from software.thunderscope.binary_context_managers.binary_context_managers import *
 
@@ -34,7 +35,7 @@ class Simulator(object):
         self.er_force_simulator_proc = None
         self.enable_realism = enable_realism
 
-    def __enter__(self) -> self:
+    def __enter__(self) -> "self":
         """Enter the simulator context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the

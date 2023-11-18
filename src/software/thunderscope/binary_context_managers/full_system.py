@@ -4,6 +4,7 @@ import time
 import threading
 
 from subprocess import Popen
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
 from proto.import_all_protos import *
 from software.py_constants import *
@@ -37,7 +38,7 @@ class FullSystem(object):
 
         self.thread = threading.Thread(target=self.__restart__)
 
-    def __enter__(self) -> self:
+    def __enter__(self) -> "self":
         """Enter the full_system context manager. 
 
         If the debug mode is enabled then the binary is _not_ run and the
