@@ -103,7 +103,7 @@ def setup_gl_widget(
 
     gl_widget.toolbar.pause_button.clicked.connect(world_layer.toggle_play_state)
     world_layer.add_play_callback(
-        lambda is_playing: gl_widget.toolbar.toggle_pause_button_text(is_playing)
+        lambda is_playing: gl_widget.toolbar.toggle_pause_button(is_playing)
     )
     gl_widget.toolbar.undo_button.clicked.connect(world_layer.undo)
     gl_widget.toolbar.redo_button.clicked.connect(world_layer.redo)

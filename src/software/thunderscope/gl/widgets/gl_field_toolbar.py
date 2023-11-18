@@ -6,6 +6,41 @@ from software.thunderscope.constants import CameraView, THUNDERSCOPE_HELP_TEXT
 import software.thunderscope.gl.widgets.toolbar_icons.toolbar_icon_loader as icons
 
 
+class ToggleableButton(QPushButton):
+    """
+    A QPushButton which can be enabled or disabled
+    Indicates with cursor if it is enabled or disabled
+    """
+
+    def __init__(self, enabled: bool):
+        """
+        Creates a new button with the given state
+
+        :param enabled: the starting state of the button
+        """
+        super(ToggleableButton, self).__init__()
+        self.enabled = enabled
+
+    def toggle_enabled(self, enabled: bool):
+        """
+        Toggles the enabled state of the button
+        :param enabled: the new enabled state
+        """
+        self.enabled = enabled
+
+    def enterEvent(self, event) -> None:
+        """
+        Sets the cursor to depending on if the button is enabled
+        to indicate that this widget is clickable or unclickable
+        :param event: the mouse enter event
+        """
+        self.setCursor(
+            QtCore.Qt.CursorShape.PointingHandCursor
+            if self.enabled
+            else QtCore.Qt.CursorShape.ForbiddenCursor
+        )
+
+
 class GLFieldToolbar(QWidget):
     """
     Toolbar for the GL Field Widget
@@ -92,18 +127,17 @@ class GLFieldToolbar(QWidget):
 
         # Setup pause button
         self.pause_button = QPushButton()
-        self.pause_button.setToolTip("Pause")
-        self.pause_button.setIcon(icons.get_pause_icon(self.BUTTON_ICON_COLOR))
         self.pause_button.setStyleSheet(self.get_button_style())
+        self.toggle_pause_button(True)
 
         # Setup Undo button
-        self.undo_button = QPushButton()
+        self.undo_button = ToggleableButton(False)
         self.undo_button.setToolTip("Undo")
         self.undo_button.setIcon(icons.get_undo_icon(self.BUTTON_ICON_COLOR))
         self.undo_button.setStyleSheet(self.get_button_style(False))
 
         # Setup Redo button
-        self.redo_button = QPushButton()
+        self.redo_button = ToggleableButton(False)
         self.redo_button.setToolTip("Redo")
         self.redo_button.setIcon(icons.get_redo_icon(self.BUTTON_ICON_COLOR))
         self.redo_button.setStyleSheet(self.get_button_style(False))
@@ -128,8 +162,13 @@ class GLFieldToolbar(QWidget):
         self.layout().addWidget(self.measure_button)
         self.layout().addWidget(self.camera_view_button)
 
-    def toggle_pause_button_text(self, is_playing: bool):
-        self.pause_button.setText("Pause" if is_playing else "Play")
+    def toggle_pause_button(self, is_playing: bool):
+        self.pause_button.setToolTip("Pause" if is_playing else "Play")
+        self.pause_button.setIcon(
+            icons.get_pause_icon(self.BUTTON_ICON_COLOR)
+            if is_playing
+            else icons.get_play_icon(self.BUTTON_ICON_COLOR)
+        )
 
     def get_button_style(self, is_enabled: bool = True):
         # the style for each toolbar button
@@ -155,6 +194,7 @@ class GLFieldToolbar(QWidget):
         Callback function to enable / disable the undo button based on the given state
         :param enabled: if the undo button is enabled or not
         """
+        self.undo_button.toggle_enabled(enabled)
         self.undo_button.setStyleSheet(self.get_button_style(enabled))
         self.undo_button.repaint()
 
@@ -163,5 +203,6 @@ class GLFieldToolbar(QWidget):
         Callback function to enable / disable the redo button based on the given state
         :param enabled: if the redo button is enabled or not
         """
+        self.redo_button.toggle_enabled(enabled)
         self.redo_button.setStyleSheet(self.get_button_style(enabled))
         self.redo_button.repaint()

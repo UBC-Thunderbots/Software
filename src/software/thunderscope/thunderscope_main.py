@@ -360,14 +360,14 @@ if __name__ == "__main__":
                         blue_robot_locations=[]
                         if args.empty
                         else [
-                            tbots_cpp.Point(-3 + float(y) / 3, y)
+                            tbots_cpp.Point(-3, y)
                             for y in numpy.linspace(-2, 2, NUM_ROBOTS)
                         ],
                         yellow_robot_locations=[]
                         if args.empty
                         else [
-                            tbots_cpp.Point(3, 0)
-                            # for y in numpy.linspace(-2, 2, NUM_ROBOTS)
+                            tbots_cpp.Point(3, y)
+                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
                         ],
                         ball_location=tbots_cpp.Point(0, 0),
                         ball_velocity=tbots_cpp.Vector(0, 0),

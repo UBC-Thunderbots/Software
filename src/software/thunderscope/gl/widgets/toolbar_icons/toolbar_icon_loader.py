@@ -14,6 +14,7 @@ class GLFieldToolbarIconLoader:
     UNDO_ICON = None
     REDO_ICON = None
     PAUSE_ICON = None
+    PLAY_ICON = None
     HELP_ICON = None
     RESET_ICON = None
     VIEW_ICON = None
@@ -78,6 +79,21 @@ def get_pause_icon(color: str) -> QtGui.QPixmap:
         )
 
     return GLFieldToolbarIconLoader.PAUSE_ICON
+
+
+def get_play_icon(color: str) -> QtGui.QPixmap:
+    """
+    Loads the Play icon pixmap as a GLFieldToolbarIconLoader attribute
+
+    :param color: the color the icon should be initialized with if not already created
+    :return: the icon pixmap
+    """
+    if not GLFieldToolbarIconLoader.PLAY_ICON:
+        GLFieldToolbarIconLoader.PLAY_ICON = get_icon(
+            "software/thunderscope/gl/widgets/toolbar_icons/play.svg", color
+        )
+
+    return GLFieldToolbarIconLoader.PLAY_ICON
 
 
 def get_help_icon(color: str) -> QtGui.QPixmap:
