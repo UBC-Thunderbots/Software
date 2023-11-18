@@ -24,12 +24,24 @@ class g3logWidget(QWidget):
         QWidget.__init__(self)
 
         self.console_widget = pg_console.ConsoleWidget()
+        self.console_widget.setStyleSheet(
+            """
+            border: none;
+            border-radius: 5px;
+            background: #232629;
+            """
+        )
+
         self.layout = QVBoxLayout()
 
         # disable input and buttons
         self.console_widget.input.hide()
-        self.console_widget.ui.exceptionBtn.hide()
-        self.console_widget.ui.historyBtn.hide()
+        self.console_widget.exceptionBtn.hide()
+        self.console_widget.historyBtn.hide()
+
+        # _lastCommandRow is initialized to None, which causes errors
+        # when writing to ReplWidget
+        self.console_widget.repl._lastCommandRow = 0
 
         # Creates checkbox widget
         self.checkbox_widget = g3logCheckboxes()
@@ -39,11 +51,9 @@ class g3logWidget(QWidget):
         self.layout.addWidget(self.checkbox_widget)
         self.setLayout(self.layout)
 
-        # ignore repeated crash proto
         self.robot_last_fatal_time_s = []
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
             self.robot_last_fatal_time_s.append(0)
-        self.ROBOT_FATAL_TIMEOUT_S = 5
 
         # LogLevel to string conversion map
         self.log_level_str_map = {
@@ -87,11 +97,11 @@ class g3logWidget(QWidget):
             )
         ):
             log_str = f"R{log.robot_id} {log.created_timestamp.epoch_timestamp_seconds} {self.log_level_str_map[log.log_level]} [{log.file_name}->{log.line_number}] {log.log_msg}\n"
-            self.console_widget.write(log_str)
+            self.console_widget.repl.write(log_str, style="output")
             if log.log_level == LogLevel.FATAL or log.log_level == LogLevel.CONTRACT:
                 if (
                     time.time() - self.robot_last_fatal_time_s[log.robot_id]
-                    > self.ROBOT_FATAL_TIMEOUT_S
+                    > ROBOT_CRASH_TIMEOUT_S
                 ):
                     QMessageBox.information(
                         self, "Fatal Log Alert", log_str,

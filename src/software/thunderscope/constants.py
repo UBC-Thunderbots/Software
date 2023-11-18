@@ -2,6 +2,8 @@ from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
 from enum import Enum, IntEnum
 
+import textwrap
+
 
 class ProtoUnixIOTypes(Enum):
     """
@@ -25,7 +27,7 @@ class TabNames(str, Enum):
     DIAGNOSTICS = "DIAGNOSTICS"
     GAMECONTROLLER = "GAMECONTROLLER"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str.__str__(self)
 
 
@@ -51,6 +53,17 @@ class IndividualRobotMode(IntEnum):
     AI = 2
 
 
+class CameraView(Enum):
+    """
+    Enum for preset camera views in the 3D visualizer
+    """
+
+    ORTHOGRAPHIC = 1
+    LANDSCAPE_HIGH_ANGLE = 2
+    LEFT_HALF_HIGH_ANGLE = 3
+    RIGHT_HALF_HIGH_ANGLE = 4
+
+
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2
@@ -63,6 +76,10 @@ BALL_HEIGHT_EFFECT_MULTIPLIER = 3
 # in robot communications
 ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
 
+# Max time (in seconds) tolerated between repeated crash protos until
+# crash alert occurs
+ROBOT_CRASH_TIMEOUT_S = 5
+
 GAME_CONTROLLER_URL = "http://localhost:8081"
 
 # Mapping between RobotStatus Error Codes and their dialog messages
@@ -73,8 +90,52 @@ ERROR_CODE_MESSAGES = {
     ErrorCode.DRIBBLER_MOTOR_HOT: "Dribbler Motor Hot",
 }
 
+SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
+LAYOUT_FILE_EXTENSION = "tscopelayout"
+LAST_OPENED_LAYOUT_PATH = (
+    f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
+)
 
-def create_vision_pattern_lookup(color1, color2):
+THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
+    f"""
+    <h3>General Controls</h3><br>
+    
+    <b><code>I:</code></b> Identify robots, toggle robot ID visibility<br>
+    <b><code>M:</code></b> Toggle measure mode<br>
+    <b><code>S:</code></b> Toggle visibility of robot/ball speed visualization<br>
+    <b><code>Ctrl + Space:</code></b> Stop AI vs AI simulation<br>
+    <b><code>Number Keys:</code></b> Position camera to preset view<br>
+    <b><code>Shift + Left Click:</code></b> Place the ball at the cursor<br>
+    <b><code>Shift + Left Click Drag:</code></b> Place the ball at the cursor and kick it<br>
+
+    <h3>Camera Controls</h3><br>
+
+    <b>Orbit:</b> Left click and drag mouse<br>
+    <b>Pan:</b> Hold Ctrl while dragging OR drag with middle mouse button<br>
+    <b>Zoom:</b> Scrollwheel<br>
+
+    <h3>Measure Mode</h3><br>
+
+    <b><code>M:</code></b> Toggle measure mode / show coordinates<br>
+    <b>Shift + Left Click:</b> Place a point<br>
+    Placing 2 points will create a distance measurement.<br> 
+    Placing 3 points will create an angle measurement.<br> 
+    All measurements will be cleared when measure mode is toggled off.
+
+    <h3>Layout Controls</h3><br>
+
+    <b>Pop widget out as window:</b> Double click the widgets' blue bar<br>
+    <b>Rearrange/dock widgets:</b> Drag the widgets' blue bar<br><br>
+    <b><code>Ctrl + S:</code></b> Save layout<br>
+    <b><code>Ctrl + O:</code></b> Open layout<br>
+    <b><code>Ctrl + R:</code></b> Remove the current layout file and reset the layout<br><br>
+    Layout file (on save) is located at {SAVED_LAYOUT_PATH}<br>
+
+    """
+)
+
+
+def create_vision_pattern_lookup(color1: QtGui.QColor, color2: QtGui.QColor) -> dict:
     """
     There is no pattern to this so we just have to create
     mapping from robot id to the four corners of the vision pattern
@@ -107,7 +168,7 @@ def create_vision_pattern_lookup(color1, color2):
     }
 
 
-def rgb_to_bw(r, g, b):
+def rgb_to_bw(r: int, g: int, b: int) -> tuple:
     """
     Converts the given RGB color values into the corresponding black and white RGB values
     :param r: red value
@@ -121,28 +182,32 @@ def rgb_to_bw(r, g, b):
 
 class Colors(object):
 
-    FIELD_COLOR = "w"
-    FIELD_LINE_COLOR = "w"
-
-    BLUE_ROBOT = QtGui.QColor(255, 100, 0, 255)
+    DEFAULT_GRAPHICS_COLOR = QtGui.QColor(255, 255, 255, 128)
+    FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 200)
+    FIELD_LINE_LIGHTER_COLOR = QtGui.QColor(255, 255, 255, 100)
+    GOAL_COLOR = QtGui.QColor(200, 200, 200, 255)
     BALL_COLOR = QtGui.QColor(255, 100, 0, 255)
     SIM_BALL_COLOR = QtGui.QColor(255, 100, 0, 150)
     YELLOW_ROBOT_COLOR = QtGui.QColor(255, 255, 0, 255)
     BLUE_ROBOT_COLOR = QtGui.QColor(0, 75, 255, 255)
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
-    DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 150)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
-    ROBOT_MIDDLE_BLUE = "blue"
-    BW_ROBOT_MIDDLE_BLUE = QtGui.QColor(*rgb_to_bw(0, 0, 255))
-    ROBOT_SPEED_SLOW_COLOR = "black"
-    NAVIGATOR_PATH_COLOR = "green"
-    NAVIGATOR_OBSTACLE_COLOR = "orange"
+    DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 150)
+    NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
+    NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 165, 0, 255)
+    PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
+    BREAKBEAM_TRIPPED_COLOR = QtGui.QColor(255, 0, 0, 255)
 
-    VALIDATION_PASSED_COLOR = "g"
-    VALIDATION_FAILED_COLOR = "r"
+    VALIDATION_PASSED_COLOR = QtGui.QColor(0, 200, 0, 255)
+    VALIDATION_FAILED_COLOR = QtGui.QColor(200, 0, 0, 255)
+
+    PRIMARY_TEXT_COLOR = QtGui.QColor(255, 255, 255, 255)
+    SECONDARY_TEXT_COLOR = QtGui.QColor(255, 255, 255, 160)
+    BLACK_TEXT_COLOR = QtGui.QColor(0, 0, 0, 255)
 
     # Colors for vision pattern
+    ROBOT_MIDDLE_BLUE = QtGui.QColor(0, 0, 255, 255)
     PINK = QtGui.QColor(255, 0, 255)
     GREEN = QtGui.QColor(0, 255, 0)
 
@@ -150,8 +215,24 @@ class Colors(object):
     VISION_PATTERN_LOOKUP = create_vision_pattern_lookup(PINK, GREEN)
 
     # Colors for black and white vision pattern
+    BW_ROBOT_MIDDLE_BLUE = QtGui.QColor(*rgb_to_bw(0, 0, 255))
     BW_PINK = QtGui.QColor(*rgb_to_bw(255, 0, 255))
     BW_GREEN = QtGui.QColor(*rgb_to_bw(0, 255, 0))
 
     # Creates a black and white vision pattern to indicate a disconnected robot
     BW_VISION_PATTERN_LOOKUP = create_vision_pattern_lookup(BW_PINK, BW_GREEN)
+
+
+class DepthValues:
+    """Constants for depth values controlling the order in which 
+    graphics are drawn in the 3D visualizer.
+
+    Graphics with greater depth values are drawn later.
+    Graphics with negative depth values are drawn before their parent.
+    """
+
+    BACKGROUND_DEPTH = -1
+    FOREGROUND_DEPTH = 0
+
+    SECONDARY_TEXT_DEPTH = 1
+    PRIMARY_TEXT_DEPTH = 2

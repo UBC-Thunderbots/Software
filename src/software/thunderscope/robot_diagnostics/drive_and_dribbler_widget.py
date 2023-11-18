@@ -1,7 +1,7 @@
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 import time
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
@@ -16,7 +16,7 @@ class DriveAndDribblerWidget(QWidget):
 
         """
         self.input_a = time.time()
-        self.constants = tbots.create2021RobotConstants()
+        self.constants = tbots_cpp.create2021RobotConstants()
         QWidget.__init__(self)
         layout = QVBoxLayout()
 
