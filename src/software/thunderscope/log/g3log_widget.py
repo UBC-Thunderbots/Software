@@ -7,7 +7,7 @@ import pyqtgraph.console as pg_console
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel
 from proto.import_all_protos import *
 
-import software.thunderscope.constants as constants
+from software.thunderscope.constants import ROBOT_CRASH_TIMEOUT_S
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer

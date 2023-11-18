@@ -213,9 +213,30 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             continue;
         }
 
-        auto tactic = tactic_iter->first;
-        auto motion_constraints = buildMotionConstraintSet(world.gameState(), *tactic);
+        // Create the list of obstacles
+        auto motion_constraints = buildMotionConstraintSet(world.gameState(), *tactic_iter->first);
         std::vector<ObstaclePtr> obstacles = obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
+        if (primitive.move().ball_collision_type() == TbotsProto::AVOID)
+        {
+            obstacles.push_back(
+                obstacle_factory.createFromBallPosition(world.ball().position()));
+        }
+
+        for (const Robot &enemy : world.enemyTeam().getAllRobots())
+        {
+            obstacles.push_back(
+                obstacle_factory.createFromRobotPosition(enemy.position()));
+        }
+
+        for (const Robot &friendly : world.friendlyTeam().getAllRobots())
+        {
+            if (friendly.id() != id)
+            {
+                obstacles.push_back(
+                    obstacle_factory.createFromRobotPosition(friendly.position()));
+            }
+        }
+
         const TbotsProto::TrajectoryPathParams2D& trajectory_path_params = primitive.move().xy_traj_params();
         Point start_position = createPoint(trajectory_path_params.start_position());
         Point destination = createPoint(trajectory_path_params.destination());
@@ -226,7 +247,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                                          robot_constants.robot_max_acceleration_m_per_s_2,
                                          robot_constants.robot_max_deceleration_m_per_s_2);
 
-        // TODO: Instead of field boundary, is should be made smaller 9cm
+        // TODO: Instead of field boundary, it should be made smaller 9cm
         TrajectoryPath traj_path = planner.findTrajectory(start_position, destination, initial_velocity,
                                     constraints, obstacles, world.field().fieldBoundary());
         const auto& path_nodes = traj_path.getTrajectoryPathNodes();
@@ -256,30 +277,25 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             Point converted_position = converted_traj_path->getPosition(time);
             Vector converted_velocity = converted_traj_path->getVelocity(time);
             Vector converted_acceleration = converted_traj_path->getAcceleration(time);
-            /**
-             * 	TODO:
-                    "acceleration: (-2.49999, -0.00766989) != converted_acceleration: (-2.49999, 0.00766989) at time 0.3
-                    start_position {
-                      x_meters: -3.4220966796875
-                      y_meters: 0.55294445800781256
-                    }
-                    destination {
-                      x_meters: -3.4220966796875
-                      y_meters: 0.55294445800781256
-                    }
-                    initial_velocity {
-                      x_component_meters: 0.0006866455078136859
-                      y_component_meters: -0.000732421874996639
-                    }
-                    sub_destination {
-                      x_meters: -3.3220966796874993
-                      y_meters: 0.55294445800781267
-                    }
-                    connection_time: 0.2
-             */
-            CHECK(distance(position, converted_position) < 0.001) << "position: " << position << " != converted_position: " << converted_position << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
-            CHECK((velocity - converted_velocity).length() < 0.001) << "velocity: " << velocity << " != converted_velocity: " << converted_velocity << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
-            CHECK((acceleration - converted_acceleration).length() < 0.001) << "acceleration: " << acceleration << " != converted_acceleration: " << converted_acceleration << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
+
+            CHECK(distance(position, converted_position) < 0.001) << "Robot " << id << " position: " << position << " != converted_position: " << converted_position << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
+            CHECK((velocity - converted_velocity).length() < 0.001) << "Robot " << id << " velocity: " << velocity << " != converted_velocity: " << converted_velocity << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
+            if ((acceleration - converted_acceleration).length() > 0.001)
+            {
+                // See if any obstacles `contains` the start position of the trajectory
+                auto obstacle_iter = std::find_if(obstacles.begin(), obstacles.end(), [start_position](const auto& obstacle) {
+                    return obstacle->contains(start_position);
+                });
+                if (obstacle_iter != obstacles.end())
+                {
+                    LOG(DEBUG) << "start position " << start_position << " collides with " << obstacle_iter->get()->toString() << std::endl;
+                }
+                else
+                {
+                    LOG(DEBUG) << "no collision detected";
+                }
+                LOG(FATAL) << "Robot " << id << " acceleration: " << acceleration << " != converted_acceleration: " << converted_acceleration << " at time " << time << "\n" << tactic_iter->first->getFSMState() << " " << objectTypeName(*tactic_iter->first) << "\n" << "obstacles.size()=" << obstacles.size() << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
+            }
         }
     }
     auto end = std::chrono::high_resolution_clock::now();
