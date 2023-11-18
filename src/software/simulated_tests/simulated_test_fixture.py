@@ -166,10 +166,11 @@ class SimulatedTestRunner(TbotsTestRunner):
             time_elapsed_s += tick_duration_s
 
             while True:
+                print("LOOP")
                 try:
                     print("Enter Loop", flush=True)
                     world = self.world_buffer.get(
-                        block=True, timeout=0, return_cached=False
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
 
                     print("Gotten World", flush=True)
