@@ -156,8 +156,8 @@ class RobotsDoNotCollide(Validation):
 
 
 (
-    RobotEventuallyDoesNotCollide,
-    RobotEventuallyCollides,
-    RobotAlwaysDoesNotCollide,
-    RobotAlwaysCollides,
+    RobotsEventuallyDoesNotCollide,
+    RobotsEventuallyCollides,
+    RobotsAlwaysDoesNotCollide,
+    RobotsAlwaysCollides,
 ) = create_validation_types(RobotsDoNotCollide)
