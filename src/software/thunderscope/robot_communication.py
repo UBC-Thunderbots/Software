@@ -134,12 +134,14 @@ class RobotCommunication(object):
             self.estop_is_playing = not self.estop_is_playing
 
             print(
-                "Keyboard Estop changed from "
+                "Keyboard Estop changed to "
+                + "\x1b[31;20m"
                 + (
                     str(tbots_cpp.EstopStates.PLAY)
                     if self.estop_is_playing
                     else str(tbots_cpp.EstopStates.STOP)
                 )
+                + "\x1b[0m"
             )
 
     def toggle_robot_connection(self, mode: IndividualRobotMode, robot_id: int):

@@ -28,9 +28,7 @@ class GLTacticLayer(GLLayer):
 
         """
         super().__init__(name)
-
-        # Depth value of 1 ensures this layer is rendered over top other layers
-        self.setDepthValue(DepthValues.SECONDARY_TEXT_DEPTH)
+        self.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.play_info_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)

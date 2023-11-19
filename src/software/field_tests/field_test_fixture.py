@@ -401,7 +401,9 @@ def field_test_runner():
                 # we call this method to enable estop automatically when a field test starts
                 rc_friendly.toggle_keyboard_estop()
                 logger.warning(
-                    f"Keyboard Estop Enabled, robots will start moving automatically when test starts!"
+                    "\x1b[31;20m"
+                    + "Keyboard Estop Enabled, robots will start moving automatically when test starts!"
+                    + "\x1b[0m"
                 )
 
             time.sleep(LAUNCH_DELAY_S)

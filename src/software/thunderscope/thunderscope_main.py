@@ -142,11 +142,6 @@ if __name__ == "__main__":
         default=115200,
         help="Estop Baudrate",
     )
-    parser.add_argument(
-        "--cost_visualization",
-        action="store_true",
-        help="show pass cost visualization layer",
-    )
     estop_group = parser.add_mutually_exclusive_group()
     estop_group.add_argument(
         "--keyboard_estop",
@@ -183,7 +178,7 @@ if __name__ == "__main__":
 
         tscope = Thunderscope(
             config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size, args.cost_visualization
+                args.visualization_buffer_size
             ),
             layout_path=args.layout,
         )
@@ -234,7 +229,6 @@ if __name__ == "__main__":
             args.run_yellow,
             args.run_diagnostics,
             args.visualization_buffer_size,
-            args.cost_visualization,
         )
         tscope = Thunderscope(config=tscope_config, layout_path=args.layout,)
 
@@ -309,10 +303,7 @@ if __name__ == "__main__":
     elif args.blue_log or args.yellow_log:
         tscope = Thunderscope(
             config=config.configure_replay_view(
-                args.blue_log,
-                args.yellow_log,
-                args.visualization_buffer_size,
-                args.cost_visualization,
+                args.blue_log, args.yellow_log, args.visualization_buffer_size,
             ),
             layout_path=args.layout,
         )
@@ -330,7 +321,7 @@ if __name__ == "__main__":
 
         tscope = Thunderscope(
             config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size, args.cost_visualization
+                args.visualization_buffer_size
             ),
             layout_path=args.layout,
         )
