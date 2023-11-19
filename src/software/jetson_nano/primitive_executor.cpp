@@ -194,6 +194,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
 
             // TODO: Notes
             //  By default, the robot is very tweaky/shaky around destination
+            //  This helps, even with local velocity feedback its twitchy
             orientation_ = angular_trajectory_->getPosition(time_since_trajectory_creation_.toSeconds());
             Vector local_velocity = globalToLocalVelocity(trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()), orientation_);
             Point position = trajectory_path_->getPosition(time_since_trajectory_creation_.toSeconds());
