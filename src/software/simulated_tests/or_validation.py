@@ -7,9 +7,7 @@ from software.simulated_tests.validation import (
     create_validation_geometry,
     create_validation_types,
 )
-from software.simulated_tests import {
-    OrValidation
-}
+
 
 class OrValidation():
     def __init__ (self, validation):

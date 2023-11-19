@@ -10,7 +10,7 @@ from proto.import_all_protos import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
-
+from software.simulated_tests.or_validation import OrValidation
 
 @pytest.mark.parametrize("is_friendly_test", [True, False])
 def test_kickoff_play(simulated_test_runner, is_friendly_test):
@@ -86,8 +86,8 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     if is_friendly_test:
         always_validation_sequence_set[0].append(
             NumberOfRobotsAlwaysStaysInRegion(
-                region=[tbots.Field.createSSLDivisionBField.friendlyHalf(),
-                        tbots.Field.createSSLDivisionBField.centerCircle],
+                regions=[tbots.Field.createSSLDivisionBField().friendlyHalf(),
+                        tbots.Field.createSSLDivisionBField().centerCircle()],
                 req_robot_cnt=6,
             )
         )
@@ -96,37 +96,45 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             OrValidation(
                 [
                 NumberOfRobotsAlwaysStaysInRegion(
-                    region=[tbots.Field.createSSLDivisionBField.centerCircle()],
+                    regions=[tbots.Field.createSSLDivisionBField().centerCircle()],
                     req_robot_cnt=0,
                 ),
                 NumberOfRobotsAlwaysStaysInRegion(
-                    region=[tbots.Field.createSSLDivisionBField.centerCircle()],
+                    regions=[tbots.Field.createSSLDivisionBField().centerCircle()],
                     req_robot_cnt=1,
                 )]
             )
         )
     else:
         always_validation_sequence_set[0].append(
-            NumberOfRobotsNeverEntersRegion(
-                region=[tbots.Field.createSSLDivisionBField().friendlyHalf(),
-                        tbots.Field.createSSLDivisionBField.centerCircle()],
-                req_robot_cnt=2,
+            NumberOfRobotsAlwaysStaysInRegion(
+                regions=[tbots.Field.createSSLDivisionBField().friendlyHalf(),
+                        tbots.Field.createSSLDivisionBField().centerCircle()],
+                req_robot_cnt=6,
+            )
+        )
+
+        always_validation_sequence_set[0].append(
+            NumberOfRobotsAlwaysStaysInRegion(
+                regions=[tbots.Field.createSSLDivisionBField().centerCircle()],
+                req_robot_cnt=0,
             )
         )
 
     # Eventually Validation
     # TODO- #2809 Validation
     # make only for friendly
-    eventually_validation_sequence_set = [
-        [BallEventuallyExitsRegion(region=[tbots.Circle(ball_initial_pos, 0.05)])]
-    ]
+    eventually_validation_sequence_set = [[]]
 
-    simulated_test_runner.run_test(
-        eventually_validation_sequence_set=eventually_validation_sequence_set,
-        always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=10,
+    eventually_validation_sequence_set[0].append(
+        BallEventuallyExitsRegion(regions=tbots.Circle(ball_initial_pos, 0.05))
     )
 
+    simulated_test_runner.run_test(
+        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        inv_always_validation_sequence_set=always_validation_sequence_set,
+        test_timeout_s=10,
+    )
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
