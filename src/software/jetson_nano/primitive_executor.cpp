@@ -43,7 +43,7 @@ void PrimitiveExecutor::updatePrimitiveSet(
             angular_trajectory_ = BangBangTrajectory1DAngular();
             angular_trajectory_->generate(createAngle(trajectory_angular_params.start_angle()),
                                         createAngle(trajectory_angular_params.final_angle()),
-                                        createAngularVelocity(trajectory_angular_params.initial_velocity()),
+                                        angular_velocity_, // createAngularVelocity(trajectory_angular_params.initial_velocity()),
                                         AngularVelocity::fromRadians(robot_constants_.robot_max_ang_speed_rad_per_s),
                                         AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
                                         AngularVelocity::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2));
@@ -94,6 +94,7 @@ void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
 
     AngularVelocity curr_angular_velocity =
         hrvo_simulator_.getRobotAngularVelocity(robot_id_);
+    angular_velocity_ = angular_velocity;
     if (angular_velocity.minDiff(curr_angular_velocity).toDegrees() >
         ANGULAR_VELOCITY_FEEDBACK_THRESHOLD_DEG_PER_S)
     {
@@ -202,31 +203,34 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 local_velocity *= distance_to_destination / 0.05;
             }
 
-//            Angle orientation_to_destination = (orientation_ - angular_trajectory_->getDestination()).abs();
-//            if (orientation_to_destination.toDegrees() < 5)
-//            {
-//                orientation_ *= orientation_to_destination.toDegrees() / 5;
-//            }
+            AngularVelocity angular_velocity = angular_trajectory_->getVelocity(time_since_trajectory_creation_.toSeconds());
+            Angle orientation_to_destination = orientation_.minDiff(angular_trajectory_->getDestination());
+            if (orientation_to_destination.toDegrees() < 5)
+            {
+                angular_velocity *= orientation_to_destination.toDegrees() / 5;
+            }
 
             LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                                                                {"orientation_", orientation_.toRadians()},
-                                                                {"v", local_velocity.length()},
-                                                                {"vx", local_velocity.x()},
-                                                                {"vy", local_velocity.y()},
-                                                                {"local_v", velocity_.length()},
-                                                                {"local_vx", velocity_.x()},
-                                                                {"local_vy", velocity_.y()},
-                                                                {"px", position.x()},
-                                                                {"py", position.y()},
-                                                                {"d_to_dest", distance_to_destination   },
-                                                                {"actual_vel_desired_vel",  (local_velocity - velocity_).length()},
-                                                                {"actual_vel_desired_vel_x",  (local_velocity - velocity_).x()},
-                                                                {"actual_vel_desired_vel_y",  (local_velocity - velocity_).y()},
-                                                        });
+                    {"orientation_", orientation_.toRadians()},
+                    {"v", local_velocity.length()},
+                    {"vx", local_velocity.x()},
+                    {"vy", local_velocity.y()},
+                    {"local_v", velocity_.length()},
+                    {"local_vx", velocity_.x()},
+                    {"local_vy", velocity_.y()},
+                    {"px", position.x()},
+                    {"py", position.y()},
+                    {"d_to_dest", distance_to_destination   },
+                    {"actual_vel_desired_vel",  (local_velocity - velocity_).length()},
+                    {"actual_vel_desired_vel_x",  (local_velocity - velocity_).x()},
+                    {"actual_vel_desired_vel_y",  (local_velocity - velocity_).y()},
+                    {"vt", angular_velocity.toRadians()},
+                    {"dt", orientation_to_destination.toRadians()}
+            });
 
             auto output = createDirectControlPrimitive(
                     local_velocity,
-                    angular_trajectory_->getVelocity(time_since_trajectory_creation_.toSeconds()),
+                    angular_velocity,
                     convertDribblerModeToDribblerSpeed(current_primitive_.move().dribbler_mode(), robot_constants_),
                     current_primitive_.move().auto_chip_or_kick());
 

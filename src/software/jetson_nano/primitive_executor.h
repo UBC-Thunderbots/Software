@@ -81,6 +81,7 @@ class PrimitiveExecutor
     TbotsProto::Primitive current_primitive_;
     Duration time_since_trajectory_creation_;
     Vector velocity_;
+    AngularVelocity angular_velocity_;
     Angle orientation_;
     TbotsProto::World current_world_;
     TeamColour friendly_team_colour_;
