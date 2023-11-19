@@ -64,6 +64,8 @@ cc_test(
     name = "end_in_obstacle_sampler_test",
     srcs = ["end_in_obstacle_sampler_test.cpp"],
     deps = [
-        ":end_in_obstacle_sampler"
+        ":end_in_obstacle_sampler",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ]
 )

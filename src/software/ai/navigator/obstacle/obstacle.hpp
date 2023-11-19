@@ -8,6 +8,7 @@
 #include "proto/primitive.pb.h"
 #include "shared/constants.h"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
+#include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/generate_velocity_obstacle.h"
@@ -47,6 +48,15 @@ class Obstacle
      * @return true if the given Segment intersects this Obstacle
      */
     virtual bool intersects(const Segment& segment) const = 0;
+
+    /**
+     * Finds the Point closest to the given Point that is outside of the obstacle.
+     *
+     * @param p the point.
+     *
+     * @return the Point on polygon closest to point.
+     */
+    virtual Point closestPoint(const Point& p) const = 0;
 
     /**
      * Determines what coordinates on the field are blocked by this Obstacle
@@ -105,6 +115,7 @@ class GeomObstacle : public Obstacle
     bool contains(const Point& p) const override;
     double distance(const Point& p) const override;
     bool intersects(const Segment& segment) const override;
+    Point closestPoint(const Point& p) const override;
     TbotsProto::Obstacles createObstacleProto() const override;
     std::string toString(void) const override;
     void accept(ObstacleVisitor& visitor) const override;
@@ -165,6 +176,12 @@ template <typename GEOM_TYPE>
 bool GeomObstacle<GEOM_TYPE>::intersects(const Segment& segment) const
 {
     return ::intersects(geom_, segment);
+}
+
+template <typename GEOM_TYPE>
+Point GeomObstacle<GEOM_TYPE>::closestPoint(const Point &p) const
+{
+    return ::closestPoint(geom_, p);
 }
 
 template <typename GEOM_TYPE>

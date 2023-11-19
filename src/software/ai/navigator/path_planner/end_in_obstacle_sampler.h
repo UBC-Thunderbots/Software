@@ -8,17 +8,21 @@ class EndInObstacleSampler
 public:
     EndInObstacleSampler() = delete;
 
-    EndInObstacleSampler(const std::vector<ObstaclePtr> obstacles, const Point& destination);
+    EndInObstacleSampler(float rad_multiplier, float step_multiplier);
 
-    void compute();
+    void setRadMultiplier(float rad_multiplier);
 
-    void randomSample();
+    void setStepMultiplier(float step_multiplier);
 
-    void circularSample();
+    Point compute(const std::vector<ObstaclePtr> obstacles, const Point& destination);
+
+//    void randomSample();
+
+    Point circularSample(const std::vector<ObstaclePtr> obstacles, const Point& destination, float range);
 
 
 private:
-    std::vector<ObstaclePtr> obstacles;
-    Point destination;
+    float rad_multiplier;
+    float step_multiplier;
     std::vector<Point> results;
 };
