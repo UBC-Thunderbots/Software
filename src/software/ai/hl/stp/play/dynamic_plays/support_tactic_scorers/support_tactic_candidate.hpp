@@ -43,7 +43,7 @@ class SupportTacticCandidate
      * 
      * @return the total score for this candidate
      */
-    double getTotalScore() const;
+    double getTotalScore();
 
     /**
      * Returns a shared pointer to a newly constructed instance of the
@@ -61,6 +61,9 @@ class SupportTacticCandidate
     // The total score for this candidate, cached to reduce repeated
     // calculation upon calls to getTotalScore
     double total_score_;
+
+    // Flag to indicate whether total score needs to be recomputed
+    bool total_score_invalidated_;
 
     /**
      * Computes and updates the total score for this candidate.
@@ -108,7 +111,7 @@ static SupportTacticCandidateVector allSupportTacticCandidates()
 
 template<typename TSupportTactic>
 SupportTacticCandidate<TSupportTactic>::SupportTacticCandidate() 
-    : scores_(), total_score_(0.0) 
+    : scores_(), total_score_(0.0), total_score_invalidated_(false)
 {
 }
 
@@ -118,7 +121,9 @@ void SupportTacticCandidate<TSupportTactic>::score(SupportTacticScorer &scorer)
     // We don't care about scores outside the range [-1.0, 1.0]
     double score = std::clamp(scorer.score(*this), -1.0, 1.0);
     scores_.push_back(score);
-    computeTotalScore();
+
+    // Indicate that total score needs to be recomputed
+    total_score_invalidated_ = true;
 }
 
 template<typename TSupportTactic>
@@ -129,8 +134,14 @@ void SupportTacticCandidate<TSupportTactic>::resetTotalScore()
 }
 
 template<typename TSupportTactic>
-double SupportTacticCandidate<TSupportTactic>::getTotalScore() const
+double SupportTacticCandidate<TSupportTactic>::getTotalScore()
 {
+    if (total_score_invalidated_) 
+    {
+        computeTotalScore();
+        total_score_invalidated_ = false;
+    }
+    
     return total_score_;
 }
 
