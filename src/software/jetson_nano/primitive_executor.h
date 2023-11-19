@@ -99,5 +99,5 @@ class PrimitiveExecutor
     static constexpr const double ANGULAR_VELOCITY_FEEDBACK_THRESHOLD_DEG_PER_S = 200.0;
 
     // Estimated delay between a vision frame to AI processing to robot executing
-    static constexpr const double VISION_TO_ROBOT_DELAY_S = 0.030;
+    static constexpr const double VISION_TO_ROBOT_DELAY_S = 0.03;
 };

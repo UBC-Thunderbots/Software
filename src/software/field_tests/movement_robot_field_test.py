@@ -10,6 +10,7 @@ from software.simulated_tests.simulated_test_fixture import *
 from software.logger.logger import createLogger
 from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
 from proto.message_translation.tbots_protobuf import create_world_state
+import math
 
 logger = createLogger(__name__)
 

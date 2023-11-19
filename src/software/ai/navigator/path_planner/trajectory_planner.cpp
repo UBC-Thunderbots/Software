@@ -23,7 +23,6 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles,
     const Rectangle &navigable_area)
 {
-    LOG(INFO) << obstacles.size() << " obstacles";
     static long int total_time = 0;
     static int num_calls       = 0;
     auto start_time            = std::chrono::high_resolution_clock::now();
@@ -147,6 +146,8 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
         }
     }
 
+//    LOG(DEBUG) << "Best traj found with cost: " << best_traj_with_cost.cost << " num_traj: " << num_traj << " which has collision? " << best_traj_with_cost.collides();
+
     // TODO: Added for debugging
     auto end_time = std::chrono::high_resolution_clock::now();
     total_time +=
@@ -156,7 +157,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     num_calls++;
     if (num_calls % 1000 == 0)
     {
-        std::cout << "Average total time: " << total_time / num_calls << "us"
+        std::cout << "Average findTrajectory time (ignoring direct trajs): " << total_time / num_calls << "us"
                   << std::endl;
         total_time = 0;
         num_calls  = 0;

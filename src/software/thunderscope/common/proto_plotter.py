@@ -84,7 +84,7 @@ class ProtoPlotter(QWidget):
         self.configuration = configuration
 
         self.buffers = {
-            key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()
+            type: ThreadSafeBuffer(buffer_size, type) for type in configuration.keys()
         }
 
         self.time = time.time()

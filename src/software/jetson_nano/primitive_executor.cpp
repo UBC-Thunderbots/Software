@@ -37,7 +37,7 @@ void PrimitiveExecutor::updatePrimitiveSet(
             const TbotsProto::TrajectoryPathParams2D& trajectory_2d_params = move_traj.xy_traj_params();
             const TbotsProto::TrajectoryParamsAngular1D& trajectory_angular_params = move_traj.w_traj_params();
 
-            trajectory_path_ = createTrajectoryPathFromParams(trajectory_2d_params, robot_constants_);
+            trajectory_path_ = createTrajectoryPathFromParams(trajectory_2d_params, robot_constants_, velocity_);
 
             // TODO: Combine generate and constructor
             angular_trajectory_ = BangBangTrajectory1DAngular();
@@ -65,13 +65,7 @@ void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
     if (world_msg.time_sent().epoch_timestamp_seconds() >
         current_world_.time_sent().epoch_timestamp_seconds())
     {
-        World new_world(world_msg);
-        hrvo_simulator_.updateWorld(new_world, robot_constants_, time_step_);
-        auto robot_opt = new_world.friendlyTeam().getRobotById(robot_id_);
-        if (robot_opt.has_value())
-        {
-            orientation_ = robot_opt.value().orientation();
-        }
+        hrvo_simulator_.updateWorld(World(world_msg), robot_constants_, time_step_);
     }
 }
 
@@ -89,7 +83,7 @@ void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
 
     Vector curr_hrvo_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
     Vector actual_global_velocity =
-        localToGlobalVelocity(local_velocity, orientation_opt.value());
+        localToGlobalVelocity(local_velocity, orientation_);
     velocity_ = actual_global_velocity;
     if ((curr_hrvo_velocity - actual_global_velocity).length() >
         LINEAR_VELOCITY_FEEDBACK_THRESHOLD_M_PER_S)
@@ -165,14 +159,14 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             if (robot_id_ == 4 && friendly_team_colour_ == TeamColour::BLUE)
             {
                 auto desired_vel = trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds());
-//                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-//                      {"actual_vx", velocity_.x()},
-//                      {"actual_vy", velocity_.y()},
-//                      {"actual_v", velocity_.length()},
-//                      {"desired_vx", desired_vel.x()},
-//                      {"desired_vy", desired_vel.y()},
-//                      {"desired_v", desired_vel.length()},
-//                  });
+                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+                      {"actual_vx", velocity_.x()},
+                      {"actual_vy", velocity_.y()},
+                      {"actual_v", velocity_.length()},
+                      {"desired_vx", desired_vel.x()},
+                      {"desired_vy", desired_vel.y()},
+                      {"desired_v", desired_vel.length()},
+                  });
             }
 
             TbotsProto::HRVOVisualization hrvo_visualization;
@@ -197,8 +191,41 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
             }
 
+            // TODO: Notes
+            //  By default, the robot is very tweaky/shaky around destination
+            orientation_ = angular_trajectory_->getPosition(time_since_trajectory_creation_.toSeconds());
+            Vector local_velocity = globalToLocalVelocity(trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()), orientation_);
+            Point position = trajectory_path_->getPosition(time_since_trajectory_creation_.toSeconds());
+            double distance_to_destination = distance(position, trajectory_path_->getDestination());
+            if (distance_to_destination < 0.05)
+            {
+                local_velocity *= distance_to_destination / 0.05;
+            }
+
+//            Angle orientation_to_destination = (orientation_ - angular_trajectory_->getDestination()).abs();
+//            if (orientation_to_destination.toDegrees() < 5)
+//            {
+//                orientation_ *= orientation_to_destination.toDegrees() / 5;
+//            }
+
+            LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+                                                                {"orientation_", orientation_.toRadians()},
+                                                                {"v", local_velocity.length()},
+                                                                {"vx", local_velocity.x()},
+                                                                {"vy", local_velocity.y()},
+                                                                {"local_v", velocity_.length()},
+                                                                {"local_vx", velocity_.x()},
+                                                                {"local_vy", velocity_.y()},
+                                                                {"px", position.x()},
+                                                                {"py", position.y()},
+                                                                {"d_to_dest", distance_to_destination   },
+                                                                {"actual_vel_desired_vel",  (local_velocity - velocity_).length()},
+                                                                {"actual_vel_desired_vel_x",  (local_velocity - velocity_).x()},
+                                                                {"actual_vel_desired_vel_y",  (local_velocity - velocity_).y()},
+                                                        });
+
             auto output = createDirectControlPrimitive(
-                    globalToLocalVelocity(trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()), orientation_),
+                    local_velocity,
                     angular_trajectory_->getVelocity(time_since_trajectory_creation_.toSeconds()),
                     convertDribblerModeToDribblerSpeed(current_primitive_.move().dribbler_mode(), robot_constants_),
                     current_primitive_.move().auto_chip_or_kick());

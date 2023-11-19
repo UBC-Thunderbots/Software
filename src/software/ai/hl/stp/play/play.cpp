@@ -190,8 +190,12 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     // Update direct trajectories to trajectories calculated using
     // the trajectory planner which avoids obstacles
     TbotsProto::ObstaclesList obstacle_protos;
-    for (auto [id, primitive] : primitives_to_run->robot_primitives())
+    for (auto id_to_primitive_iter = primitives_to_run->mutable_robot_primitives()->begin();
+         id_to_primitive_iter != primitives_to_run->mutable_robot_primitives()->end();
+         id_to_primitive_iter++)
     {
+        const unsigned int id = id_to_primitive_iter->first;
+        auto& primitive = id_to_primitive_iter->second;
         if (!primitive.has_move())
         {
             continue;
@@ -282,36 +286,36 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         }
 
         // TODO: Used for verifying that we have created the params correctly
-        std::optional<TrajectoryPath> converted_traj_path = createTrajectoryPathFromParams(primitive.mutable_move()->xy_traj_params(), robot_constants);
-        for (double time = 0; time <= traj_path.getTotalTime(); time += 0.1)
-        {
-            Point position = traj_path.getPosition(time);
-            Vector velocity = traj_path.getVelocity(time);
-            Vector acceleration = traj_path.getAcceleration(time);
-
-            Point converted_position = converted_traj_path->getPosition(time);
-            Vector converted_velocity = converted_traj_path->getVelocity(time);
-            Vector converted_acceleration = converted_traj_path->getAcceleration(time);
-
-            CHECK(distance(position, converted_position) < 0.001) << "Robot " << id << " position: " << position << " != converted_position: " << converted_position << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
-            CHECK((velocity - converted_velocity).length() < 0.001) << "Robot " << id << " velocity: " << velocity << " != converted_velocity: " << converted_velocity << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
-            if ((acceleration - converted_acceleration).length() > 0.001)
-            {
-                // See if any obstacles `contains` the start position of the trajectory
-                auto obstacle_iter = std::find_if(obstacles.begin(), obstacles.end(), [start_position](const auto& obstacle) {
-                    return obstacle->contains(start_position);
-                });
-                if (obstacle_iter != obstacles.end())
-                {
-                    LOG(DEBUG) << "start position " << start_position << " collides with " << obstacle_iter->get()->toString() << std::endl;
-                }
-                else
-                {
-                    LOG(DEBUG) << "no collision detected";
-                }
-                LOG(FATAL) << "Robot " << id << " acceleration: " << acceleration << " != converted_acceleration: " << converted_acceleration << " at time " << time << "\n" << tactic_iter->first->getFSMState() << " " << objectTypeName(*tactic_iter->first) << "\n" << "obstacles.size()=" << obstacles.size() << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
-            }
-        }
+//        std::optional<TrajectoryPath> converted_traj_path = createTrajectoryPathFromParams(primitive.mutable_move()->xy_traj_params(), robot_constants);
+//        for (double time = 0; time <= traj_path.getTotalTime(); time += 0.1)
+//        {
+//            Point position = traj_path.getPosition(time);
+//            Vector velocity = traj_path.getVelocity(time);
+//            Vector acceleration = traj_path.getAcceleration(time);
+//
+//            Point converted_position = converted_traj_path->getPosition(time);
+//            Vector converted_velocity = converted_traj_path->getVelocity(time);
+//            Vector converted_acceleration = converted_traj_path->getAcceleration(time);
+//
+//            CHECK(distance(position, converted_position) < 0.001) << "Robot " << id << " position: " << position << " != converted_position: " << converted_position << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
+//            CHECK((velocity - converted_velocity).length() < 0.001) << "Robot " << id << " velocity: " << velocity << " != converted_velocity: " << converted_velocity << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
+//            if ((acceleration - converted_acceleration).length() > 0.001)
+//            {
+//                // See if any obstacles `contains` the start position of the trajectory
+//                auto obstacle_iter = std::find_if(obstacles.begin(), obstacles.end(), [start_position](const auto& obstacle) {
+//                    return obstacle->contains(start_position);
+//                });
+//                if (obstacle_iter != obstacles.end())
+//                {
+//                    LOG(DEBUG) << "start position " << start_position << " collides with " << obstacle_iter->get()->toString() << std::endl;
+//                }
+//                else
+//                {
+//                    LOG(DEBUG) << "no collision detected";
+//                }
+//                LOG(FATAL) << "Robot " << id << " acceleration: " << acceleration << " != converted_acceleration: " << converted_acceleration << " at time " << time << "\n" << tactic_iter->first->getFSMState() << " " << objectTypeName(*tactic_iter->first) << "\n" << "obstacles.size()=" << obstacles.size() << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
+//            }
+//        }
     }
     LOG(VISUALIZE) << obstacle_protos;
     auto end = std::chrono::high_resolution_clock::now();

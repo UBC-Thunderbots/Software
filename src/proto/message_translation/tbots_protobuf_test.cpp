@@ -162,7 +162,7 @@ connection_time: 0.4
     params.set_max_speed_mode(max_allowed_speed_mode);
     params.set_connection_time(connection_time_s);
 
-    auto converted_trajectory_path_opt = createTrajectoryPathFromParams(params, robot_constants);
+    auto converted_trajectory_path_opt = createTrajectoryPathFromParams(params, robot_constants, <#initializer#>);
     ASSERT_TRUE(converted_trajectory_path_opt.has_value());
 
     TrajectoryPath converted_trajectory_path = converted_trajectory_path_opt.value();

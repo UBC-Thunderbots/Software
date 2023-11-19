@@ -377,6 +377,7 @@ def field_test_runner():
         multicast_channel=getRobotMulticastChannel(args.channel),
         interface=args.interface,
         disable_estop=False,
+        estop_path="/dev/ttyUSB0" # TODO (NIMA): Hardcoded
     ) as rc_friendly:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs), ci_mode=True

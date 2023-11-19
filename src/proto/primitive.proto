@@ -19,12 +19,14 @@ enum BallCollisionType
 
 message Obstacles
 {
+    // TODO: Deprecate?!
     repeated Polygon polygon = 1;
     repeated Circle circle   = 2;
 }
 
 message ObstaclesList
 {
+    // TODO: Could use a one of?!
     repeated Obstacles obstacles = 1;
 }
 

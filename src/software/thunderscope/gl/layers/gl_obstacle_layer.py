@@ -33,6 +33,7 @@ class GLObstacleLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
+        return
 
         # TODO (NIMA): Update this to use new obstacle proto
         obstacles = self.obstacles_list_buffer.get(

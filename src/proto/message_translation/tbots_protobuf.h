@@ -180,7 +180,9 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
     const std::vector<double>& costs, int num_rows, int num_cols);
 
 // TODO (NIMA): Add documentation. DOes this also need to be optional?
-std::optional<TrajectoryPath> createTrajectoryPathFromParams(const TbotsProto::TrajectoryPathParams2D& params, const RobotConstants& robot_constants);
+std::optional<TrajectoryPath>
+createTrajectoryPathFromParams(const TbotsProto::TrajectoryPathParams2D &params, const RobotConstants &robot_constants,
+                               const Vector &initial_velocity);
 
 /**
  * Convert dribbler mode to dribbler speed
