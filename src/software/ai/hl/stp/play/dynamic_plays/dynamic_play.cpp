@@ -46,5 +46,5 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
         support_tactic_duplication_scorer_->recordCandidateSelection(best_candidate);
     }
 
-    play_update.set_tactics({{attacker_tactic}, support_tactics_}});
+    play_update.set_tactics({{attacker_tactic_}, support_tactics_}});
 }

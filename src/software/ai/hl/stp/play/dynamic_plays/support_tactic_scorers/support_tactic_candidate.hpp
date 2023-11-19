@@ -38,7 +38,32 @@ class SupportTacticCandidate
     void clearScores();
 
     /**
-     * Gets the total score for this candidate.
+     * Gets the total score for this candidate, which summarizes all
+     * of the individual scores applied to this candidate
+     * 
+     * @return the total score for this candidate
+     */
+    double getTotalScore() const;
+
+    /**
+     * Returns a shared pointer to a newly constructed instance of the
+     * candidate's support tactic type
+     *
+     * @return a shared pointer to a newly constructed instance of the
+     * candidate's support tactic type
+     */
+    std::shared_ptr<TSupportTactic> createSupportTactic() const;
+
+   private:
+    // The individual scores applied to this candidate
+    std::vector<double> scores_;
+
+    // The total score for this candidate, cached to reduce repeated
+    // calculation upon calls to getTotalScore
+    double total_score_;
+
+    /**
+     * Computes and updates the total score for this candidate.
      * 
      * The total score X(x_1, x_2, ..., x_n) summarizes all the individual 
      * scores x_i that have been applied to this candidate. It is calculated 
@@ -56,22 +81,8 @@ class SupportTacticCandidate
      * to penalize and scores close to 0 indicate low viability, so they
      * should disproportionately impact the total score more so than any 
      * single large positive score.
-     * 
-     * @return the total score for this support tactic candidate
      */
-    double getTotalScore() const;
-
-    /**
-     * Returns a shared pointer to a newly constructed instance of the
-     * candidate's support tactic type
-     *
-     * @return a shared pointer to a newly constructed instance of the
-     * candidate's support tactic type
-     */
-    std::shared_ptr<TSupportTactic> createSupportTactic() const;
-
-   private:
-    std::vector<int> scores_;
+    void computeTotalScore();
 
     // Parameter p in total score calculation
     static constexpr double SINGLE_SCORE_INFLUENCE = 2.5;
@@ -96,7 +107,8 @@ static SupportTacticCandidateVector allSupportTacticCandidates()
 }
 
 template<typename TSupportTactic>
-SupportTacticCandidate<TSupportTactic>::SupportTacticCandidate() : scores_() 
+SupportTacticCandidate<TSupportTactic>::SupportTacticCandidate() 
+    : scores_(), total_score_(0.0) 
 {
 }
 
@@ -106,21 +118,35 @@ void SupportTacticCandidate<TSupportTactic>::score(SupportTacticScorer &scorer)
     // We don't care about scores outside the range [-1.0, 1.0]
     double score = std::clamp(scorer.score(*this), -1.0, 1.0);
     scores_.push_back(score);
+    computeTotalScore();
 }
 
 template<typename TSupportTactic>
 void SupportTacticCandidate<TSupportTactic>::resetTotalScore()
 {
     scores_.clear();
+    total_score_ = 0.0;
 }
 
 template<typename TSupportTactic>
 double SupportTacticCandidate<TSupportTactic>::getTotalScore() const
 {
+    return total_score_;
+}
+
+template<typename TSupportTactic>
+std::shared_ptr<TSupportTactic> SupportTacticCandidate<TSupportTactic>::create() const
+{
+    return std::make_shared<TSupportTactic>();
+}
+
+template<typename TSupportTactic>
+void SupportTacticCandidate<TSupportTactic>::computeTotalScore()
+{
     // Total score is calculated as the generalized mean of the 
     // scores applied to the candidate
 
-    // See javadoc comment for getTotalScore
+    // See javadoc comment for computeTotalScore
     
     double sum = std::accumulate(scores_.begin(), scores_.end(), 0.0,
         [](double current_sum, double score) {
@@ -130,12 +156,5 @@ double SupportTacticCandidate<TSupportTactic>::getTotalScore() const
         });
 
     double num_scores = std::static_cast<double>(scores_.size());
-    double total_score = std::pow(sum / num_scores, SINGLE_SCORE_INFLUENCE);
-    return total_score;
-}
-
-template<typename TSupportTactic>
-std::shared_ptr<TSupportTactic> SupportTacticCandidate<TSupportTactic>::create() const
-{
-    return std::make_shared<TSupportTactic>();
+    total_score_ = std::pow(sum / num_scores, SINGLE_SCORE_INFLUENCE);
 }

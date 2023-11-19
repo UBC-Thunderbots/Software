@@ -4,6 +4,7 @@
 
 #include "software/ai/hl/stp/play/dynamic_plays/support_tactic_scorers/support_tactic_scorer.h"
 #include "software/ai/hl/stp/play/dynamic_plays/support_tactic_scorers/support_tactic_candidate.hpp"
+#include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 
 /**
  * A DynamicPlay is a Play that assigns tactics based on scoring functions
