@@ -28,9 +28,9 @@ def get_estop_config(
     if mode == EstopMode.PHYSICAL_ESTOP:
         path = (
             ESTOP_PATH_1
-            if os.path.isfile(ESTOP_PATH_1)
+            if os.path.exists(ESTOP_PATH_1)
             else ESTOP_PATH_2
-            if os.path.isfile(ESTOP_PATH_2)
+            if os.path.exists(ESTOP_PATH_2)
             else None
         )
         if not path:
