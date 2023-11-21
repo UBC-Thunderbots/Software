@@ -25,8 +25,8 @@ class TypeMap
      */
     Iterator begin();
     Iterator end();
-    ConstIterator begin();
-    ConstIterator end();
+    ConstIterator begin() const;
+    ConstIterator end() const;
 
     /**
      * Finds the value associated with the type `TKey` in the TypeMap
@@ -39,11 +39,9 @@ class TypeMap
 
     /**
      * Const version of find
-     *
-     * @see TypeMap<TValue>::find<TKey>
      */
     template <class TKey>
-    ConstIterator find();
+    ConstIterator find() const;
 
     /**
      * Associates a value with the type `TKey` in the TypeMap

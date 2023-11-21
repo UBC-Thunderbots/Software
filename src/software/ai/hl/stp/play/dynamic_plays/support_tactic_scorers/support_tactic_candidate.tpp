@@ -9,11 +9,9 @@ SupportTacticCandidate<TSupportTactic>::SupportTacticCandidate()
 template<typename TSupportTactic>
 void SupportTacticCandidate<TSupportTactic>::score(SupportTacticScorer &scorer)
 {
-    // We don't care about scores outside the range [-1.0, 1.0]
     double score = std::clamp(scorer.score(*this), -1.0, 1.0);
     scores_.push_back(score);
 
-    // Indicate that total score needs to be recomputed
     total_score_invalidated_ = true;
 }
 
@@ -22,6 +20,8 @@ void SupportTacticCandidate<TSupportTactic>::resetTotalScore()
 {
     scores_.clear();
     total_score_ = 0.0;
+    
+    total_score_invalidated_ = false;
 }
 
 template<typename TSupportTactic>
@@ -45,11 +45,6 @@ std::shared_ptr<TSupportTactic> SupportTacticCandidate<TSupportTactic>::create()
 template<typename TSupportTactic>
 void SupportTacticCandidate<TSupportTactic>::computeTotalScore()
 {
-    // Total score is calculated as the generalized mean of the 
-    // scores applied to the candidate
-
-    // See javadoc comment for computeTotalScore
-    
     double sum = std::accumulate(scores_.begin(), scores_.end(), 0.0,
         [](double current_sum, double score) {
             double sign = (0.0 < score) - (score < 0.0); 
