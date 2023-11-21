@@ -65,7 +65,7 @@ int main(int argc, char **argv)
         }
     }
 
-    // Testing Power board SPI transfer
+    // Testing Power board UART transfer
     try
     {
         power_service_ = std::make_unique<PowerService>();
