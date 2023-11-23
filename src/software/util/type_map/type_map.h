@@ -3,6 +3,9 @@
 /**
  * A TypeMap is an unordered hash map that uses types as its keys.
  *
+ * See https://gpfault.net/posts/mapping-types-to-values.txt.html
+ * for details.
+ *
  * @tparam TValue the type of the values in the TypeMap
  */
 template <class TValue>
