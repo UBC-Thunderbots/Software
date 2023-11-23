@@ -54,6 +54,13 @@ cc_library(
 )
 
 cc_library(
+    name = "end_in_obstacle_sample",
+    srcs = ["end_in_obstacle_sample.cpp"],
+    hdrs = ["end_in_obstacle_sample.h"],
+    deps = ["//software/ai/navigator/obstacle:obstacle"],
+)
+
+cc_library(
     name = "nearest_neighbor_search",
     hdrs = [
         "nearest_neighbor_search.hpp",
@@ -223,4 +230,15 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],
+)
+
+cc_test(
+    name = "end_in_obstacle_sampler_test",
+    srcs = ["end_in_obstacle_sample_test.cpp"],
+    deps = [
+        ":end_in_obstacle_sample",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ]
 )

@@ -29,26 +29,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "end_in_obstacle_sampler",
-    srcs = ["end_in_obstacle_sampler.cpp"],
-    hdrs = ["end_in_obstacle_sampler.h"],
-    deps = [
-        "//software/ai/navigator/obstacle:obstacle"
-    ]
-)
-
-cc_test(
-    name = "enlsvg_path_planner_test",
-    srcs = ["enlsvg_path_planner_test.cpp"],
-    deps = [
-        ":enlsvg_path_planner",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
-        "//software/test_util",
-    ],
-)
-
 cc_test(
     name = "global_path_planner_factory_test",
     srcs = ["global_path_planner_factory_test.cpp"],
@@ -58,14 +38,4 @@ cc_test(
         "//software/test_util",
         "//software/world",
     ],
-)
-
-cc_test(
-    name = "end_in_obstacle_sampler_test",
-    srcs = ["end_in_obstacle_sampler_test.cpp"],
-    deps = [
-        ":end_in_obstacle_sampler",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-    ]
 )
