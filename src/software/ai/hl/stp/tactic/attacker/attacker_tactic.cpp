@@ -7,31 +7,15 @@
 
 AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
-      fsm_map(),
-      best_pass_so_far(std::nullopt),
-      pass_committed(false),
-      chip_target(std::nullopt),
+      //fsm_map(),
       ai_config(ai_config)
 {
-    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    {
-        fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()),
-            AttackerFSM(ai_config.attacker_tactic_config()));
-    }
-}
-
-void AttackerTactic::updateControlParams(const Pass& best_pass_so_far,
-                                         bool pass_committed)
-{
-    // Update the control parameters stored by this Tactic
-    this->best_pass_so_far = best_pass_so_far;
-    this->pass_committed   = pass_committed;
-}
-
-void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
-{
-    this->chip_target = chip_target;
+//    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
+//    {
+//        fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
+//            DribbleFSM(ai_config.dribble_tactic_config()),
+//            AttackerFSM(ai_config.attacker_tactic_config()));
+//    }
 }
 
 void AttackerTactic::accept(TacticVisitor& visitor) const
@@ -39,32 +23,30 @@ void AttackerTactic::accept(TacticVisitor& visitor) const
     visitor.visit(*this);
 }
 
+void AttackerTactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
+{
+    Tactic::setLastExecutionRobot(last_execution_robot);
+    if (last_execution_robot && skill_sequence.top() != next_skill_map[last_execution_robot.value().id()])
+    {
+       skill_sequence.push(next_skill_map[last_execution_robot.value().id()]); 
+    }
+}
+
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
-    if (reset_fsm)
+    Skill robot_skill = skill_sequence.top();
+
+    auto primitive_set = std::make_unique<TbotsProto::PrimitiveSet>();
+    if (reset_fsm || !robot_skill || robot_skill.isDone())
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()),
-            AttackerFSM(ai_config.attacker_tactic_config()));
+        primitive.reset();
+
+        robot_skill = calculateNextSkill(tactic_update.robot, tactic_update.world, tactic_update.strategy);
     }
 
-    std::optional<Shot> shot = calcBestShotOnGoal(
-        tactic_update.world.field(), tactic_update.world.friendlyTeam(),
-        tactic_update.world.enemyTeam(), tactic_update.world.ball().position(),
-        TeamType::ENEMY, {tactic_update.robot});
-    if (shot && shot->getOpenAngle() <
-                    Angle::fromDegrees(
-                        ai_config.attacker_tactic_config().min_open_angle_for_shot_deg()))
-    {
-        // reject shots that have an open angle below the minimum
-        shot = std::nullopt;
-    }
+    next_skill_map[tactic_update.robot.id()] = robot_skill;
 
-    AttackerFSM::ControlParams control_params{.best_pass_so_far = best_pass_so_far,
-                                              .pass_committed   = pass_committed,
-                                              .shot             = shot,
-                                              .chip_target      = chip_target};
+    // TODO(arun) process the tactic update obstain a primitive
 
-    fsm_map.at(tactic_update.robot.id())
-        ->process_event(AttackerFSM::Update(control_params, tactic_update));
+    return primitive_set;
 }

@@ -33,6 +33,8 @@ struct TacticUpdate
     SetPrimitiveCallback set_primitive;
     // creator for motion control
     CreateMotionControl create_motion_control;
+    // current gameplay strategy
+    Strategy strategy;
 };
 
 /**

@@ -377,7 +377,7 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
         {
             auto val = matrix(row, col);
             if (val == 0)
-            {
+            
                 RobotId robot_id = robots_to_assign.at(row).id();
                 current_tactic_robot_id_assignment.emplace(tactic_vector.at(col),
                                                            robot_id);

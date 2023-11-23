@@ -23,39 +23,19 @@ class AttackerTactic : public Tactic
 
     AttackerTactic() = delete;
 
-    /**
-     * Updates the control parameters for this AttackerTactic.
-     *
-     * @param updated_pass The pass to perform
-     */
-    void updateControlParams(const Pass& best_pass_so_far, bool pass_committed);
-
-    /**
-     * Updates the control parameters for this AttackerTactic
-     *
-     * @param chip_target An optional point that the robot will chip towards when it is
-     * unable to shoot and is in danger of losing the ball to an enemy. If this value is
-     * not provided, the point defaults to the enemy goal
-     */
-    void updateControlParams(std::optional<Point> chip_target);
-
     void accept(TacticVisitor& visitor) const override;
+
+    void setLastExecutionRobot(std::optional<RobotId> last_execution_robot) override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    std::map<RobotId, std::unique_ptr<FSM<AttackerFSM>>> fsm_map;
-
-    // The pass to execute
-    std::optional<Pass> best_pass_so_far;
-    // whether we have committed to the above pass
-    bool pass_committed;
-    // The point the robot will chip towards if it is unable to shoot and is in danger
-    // of losing the ball to an enemy
-    std::optional<Point> chip_target;
-
     // AI config
     TbotsProto::AiConfig ai_config;
+
+    std::stack<Skill> skill_sequence;
+
+    std::map<RobotId, std::shared_ptr<Skill>> next_skill_map;
 };
