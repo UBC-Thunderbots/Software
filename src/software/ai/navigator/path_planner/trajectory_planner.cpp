@@ -122,6 +122,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
             TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;
             traj_path_to_dest.append(constraints, connection_time, destination);
             // TODO: Shouldn't need to claculate cost everytime, can sometimes continue knowing that duration has increased
+            // TODO: The first sub trajectory will be checked over and over again!!!
             TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
                     traj_path_to_dest, tree, obstacles, sub_trajectory, connection_time);
             num_traj++;
