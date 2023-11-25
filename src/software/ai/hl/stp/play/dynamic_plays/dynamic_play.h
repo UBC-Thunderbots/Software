@@ -2,9 +2,10 @@
 
 #include "software/ai/hl/stp/play/play.h"
 
-#include "software/ai/hl/stp/play/dynamic_plays/support_tactic_scorers/support_tactic_scorer.h"
-#include "software/ai/hl/stp/play/dynamic_plays/support_tactic_scorers/support_tactic_candidate.hpp"
-#include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
+#include "software/ai/evaluation/scoring/support_tactics/duplication_scorer.h"
+#include "software/ai/evaluation/scoring/support_tactics/feasibility_scorer.h"
+#include "software/ai/evaluation/scoring/support_tactics/success_scorer.h"
+#include "software/ai/evaluation/scoring/support_tactics/support_tactic_candidate.hpp"
 
 /**
  * A DynamicPlay is a Play that assigns tactics based on scoring functions
@@ -35,6 +36,6 @@ class DynamicPlay : public Play
     std::unique_ptr<DuplicationScorer> support_tactic_duplication_scorer_;
     std::unique_ptr<SuccessScorer> support_tactic_success_scorer_;
 
-    std::shared_ptr<AttackerTactic> attacker_tactic_;
+    std::shared_ptr<Tactic> attacker_tactic_;
     std::vector<std::shared_ptr<Tactic>> support_tactics_;
-}
+};

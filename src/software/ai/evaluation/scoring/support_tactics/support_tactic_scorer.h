@@ -1,13 +1,11 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/pass_receiver/pass_receiver_tactic.h"
-#include "software/ai/hl/stp/tactic/fake_pass_receiver/fake_pass_receiver_tactic.h"
-#include "software/ai/hl/stp/tactic/cherry_picker/cherry_picker_tactic.h"
-#include "software/ai/hl/stp/tactic/disrupter/disrupter_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 
 // We forward-declare SupportTacticCandidate because if we include it, we induce a 
 // circular dependency between support_tactic_candidate.h and support_tactic_scorer.hpp.
-class SupportTacticCandidate;
+template <typename TSupportTactic>
+class TypedSupportTacticCandidate;
 
 /**
  * Visits SupportTacticCandidates to score them.
@@ -28,8 +26,5 @@ class SupportTacticScorer
      *
      * @return the score for the SupportTacticCandidate, in the range [-1.0, 1.0]
      */
-    virtual double score(const SupportTacticCandidate<PassReceiverTactic> &candidate)       = 0;
-    virtual double score(const SupportTacticCandidate<FakePassReceiverTactic> &candidate)   = 0;
-    virtual double score(const SupportTacticCandidate<CherryPickerTactic> &candidate)       = 0;
-    virtual double score(const SupportTacticCandidate<DisrupterTactic> &candidate)          = 0;
-}   
+    virtual double score(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) = 0;
+};

@@ -6,7 +6,6 @@ DynamicPlay::DynamicPlay(TbotsProto::AiConfig ai_config, bool requires_goalie)
       support_tactic_feasibility_scorer_(std::make_unique<FeasibilityScorer>()),
       support_tactic_duplication_scorer_(std::make_unique<DuplicationScorer>()),
       support_tactic_success_scorer_(std::make_unique<SuccessScorer>()),
-      attacker_tactic_(std::make_shared<AttackerTactic>()),
       support_tactics_()
 {
 }
@@ -26,25 +25,23 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
     unsigned int num_support_tactics = play_update.num_tactics - 1;
     while (num_support_tactics > support_tactics_.size()) 
     {
-        for (const SupportTacticCandidate<Tactic> &candidate : support_tactic_candidates_) 
+        for (auto &candidate : support_tactic_candidates_) 
         {
-            candidate.clearScores();
-            candidate.score(support_tactic_feasibility_scorer_);
-            candidate.score(support_tactic_duplication_scorer_);
-            candidate.score(support_tactic_success_scorer_);
+            candidate->clearScores();
+            candidate->score(*support_tactic_feasibility_scorer_);
+            candidate->score(*support_tactic_duplication_scorer_);
+            candidate->score(*support_tactic_success_scorer_);
         }
 
         auto best_candidate = std::max_element(
             support_tactic_candidates_.begin(), support_tactic_candidates_.end(),
-            [](const SupportTacticCandidate<Tactic> &a, SupportTacticCandidate<Tactic> &b) { 
-                return a.getTotalScore() < b.getTotalScore(); 
-            });
+            [](auto &a, auto &b) { return a->getTotalScore() < b->getTotalScore(); });
 
-        std::shared_ptr<Tactic> support_tactic = best_candidate->createSupportTactic();
+        std::shared_ptr<Tactic> support_tactic = (*best_candidate)->createSupportTactic();
         support_tactics_.push_back(support_tactic);
 
-        support_tactic_duplication_scorer_->recordCandidateSelection(best_candidate);
+        support_tactic_duplication_scorer_->recordCandidateSelection(**best_candidate);
     }
 
-    play_update.set_tactics({{attacker_tactic_}, support_tactics_}});
+    play_update.set_tactics({{attacker_tactic_}, support_tactics_});
 }

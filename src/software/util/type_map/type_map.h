@@ -79,3 +79,4 @@ class TypeMap
         return id;
     }
 };
+#include "software/util/type_map/type_map.tpp"
