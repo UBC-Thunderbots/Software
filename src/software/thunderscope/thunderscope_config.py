@@ -55,26 +55,12 @@ def initialize_application() -> None:
     apply_stylesheet(app, theme="dark_blue.xml")
 
 
-def configure_cost_vis(proto_unix_io: ProtoUnixIO) -> TScopeWidget:
-    """
-    Returns Widget Data for the Cost Visualization Widget
-    :param proto_unix_io: the proto unix io key to configure the widget with
-    :return: the widget data
-    """
-    return TScopeWidget(
-        name="Cost Visualization",
-        widget=setup_cost_visualization_widget(**{"proto_unix_io": proto_unix_io}),
-        anchor="Field",
-        position="right",
-    )
-
-
 def configure_robot_view_fullsystem(
     fullsystem_proto_unix_io: ProtoUnixIO,
 ) -> TScopeWidget:
     """
     Returns Widget Data for the Robot View Widget for FullSystem
-    :param fullsystem_proto_unix_io: the proto unix io key to configure the widget with
+    :param fullsystem_proto_unix_io: the proto unix io to configure the widget with
     :return: the widget data
     """
     return TScopeWidget(
@@ -115,6 +101,21 @@ def configure_robot_view_diagnostics(
         anchor="Logs",
         stretch=WidgetStretchData(y=5),
         position="above",
+    )
+
+
+def configure_estop(proto_unix_io):
+    """
+    Returns Widget Data for the Estop widget
+    :param proto_unix_io: the proto unix io to configure the widget with
+    :return:
+    """
+    return TScopeWidget(
+        name="Estop",
+        widget=setup_estop_view(**{"proto_unix_io": proto_unix_io}),
+        anchor="Logs",
+        stretch=WidgetStretchData(y=1),
+        position="bottom",
     )
 
 
@@ -256,18 +257,11 @@ def configure_base_diagnostics(
             anchor="Chicker",
             position="top",
         ),
-        TScopeWidget(
-            name="Estop",
-            widget=setup_estop_view(**{"proto_unix_io": diagnostics_proto_unix_io}),
-            anchor="Logs",
-            stretch=WidgetStretchData(y=1),
-            position="bottom",
-        ),
     ] + extra_widgets
 
 
 def configure_two_ai_gamecontroller_view(
-    visualization_buffer_size: int = 5, cost_visualization: bool = False
+    visualization_buffer_size: int = 5,
 ) -> TScopeConfig:
     """
     Constructs the Thunderscope Config for a view with 2 FullSystem tabs (Blue and Yellow)
@@ -275,8 +269,6 @@ def configure_two_ai_gamecontroller_view(
 
     :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime.
-    :param cost_visualization: True if cost visualization widget should be enabled
-                                False if not
     :return: the Thunderscope Config for this view
     """
     proto_unix_io_map = {
@@ -299,11 +291,7 @@ def configure_two_ai_gamecontroller_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
-                    ]
-                    if cost_visualization
-                    else [],
+                    extra_widgets=[],
                 ),
             ),
             TScopeQTTab(
@@ -316,11 +304,7 @@ def configure_two_ai_gamecontroller_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
-                    ]
-                    if cost_visualization
-                    else [],
+                    extra_widgets=[],
                 ),
             ),
             TScopeWebTab(
@@ -337,7 +321,6 @@ def configure_simulated_test_view(
     blue_full_system_proto_unix_io: ProtoUnixIO,
     yellow_full_system_proto_unix_io: ProtoUnixIO,
     visualization_buffer_size: int = 5,
-    cost_visualization: bool = False,
 ) -> TScopeConfig:
     """
     Constructs the Thunderscope Config for simulated tests
@@ -349,8 +332,6 @@ def configure_simulated_test_view(
     :param yellow_full_system_proto_unix_io: the proto unix io for the yellow fullsystem
     :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime.
-    :param cost_visualization: True if cost visualization widget should be enabled
-                                False if not
     :return: the Thunderscope Config for this view
     """
     proto_unix_io_map = {
@@ -373,11 +354,7 @@ def configure_simulated_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
-                    ]
-                    if cost_visualization
-                    else [],
+                    extra_widgets=[],
                 ),
             ),
             TScopeQTTab(
@@ -390,11 +367,7 @@ def configure_simulated_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
-                    ]
-                    if cost_visualization
-                    else [],
+                    extra_widgets=[],
                 ),
             ),
         ],
@@ -406,7 +379,6 @@ def configure_field_test_view(
     blue_full_system_proto_unix_io: ProtoUnixIO,
     yellow_full_system_proto_unix_io: ProtoUnixIO,
     visualization_buffer_size: int = 5,
-    cost_visualization: bool = False,
     yellow_is_friendly: bool = False,
 ) -> TScopeConfig:
     """
@@ -419,8 +391,6 @@ def configure_field_test_view(
     :param yellow_full_system_proto_unix_io: the proto unix io for the yellow fullsystem
     :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime.
-    :param cost_visualization: True if cost visualization widget should be enabled
-                                False if not
     :return: the Thunderscope Config for this view
     """
     proto_unix_io_map = {
@@ -446,11 +416,7 @@ def configure_field_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
-                    ]
-                    if cost_visualization
-                    else [],
+                    extra_widgets=[],
                 ),
             )
         ]
@@ -464,11 +430,7 @@ def configure_field_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
-                    ]
-                    if cost_visualization
-                    else [],
+                    extra_widgets=[],
                 ),
             )
         ]
@@ -480,7 +442,6 @@ def configure_replay_view(
     blue_replay_log: os.PathLike,
     yellow_replay_log: os.PathLike,
     visualization_buffer_size: int = 5,
-    cost_visualization: bool = False,
 ) -> TScopeConfig:
     """
     Constructs the Thunderscope Config for a replay view
@@ -491,8 +452,6 @@ def configure_replay_view(
     :param yellow_replay_log: the file path for the yellow replay log
     :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime.
-    :param cost_visualization: True if cost visualization widget should be enabled
-                                False if not
     :return: the Thunderscope Config for this view
     """
     proto_unix_io_map = {ProtoUnixIOTypes.SIM: ProtoUnixIO()}
@@ -514,11 +473,7 @@ def configure_replay_view(
                     replay=True,
                     replay_log=blue_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
-                    ]
-                    if cost_visualization
-                    else [],
+                    extra_widgets=[],
                 ),
             )
         )
@@ -538,11 +493,7 @@ def configure_replay_view(
                     replay=True,
                     replay_log=yellow_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[
-                        configure_cost_vis(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
-                    ]
-                    if cost_visualization
-                    else [],
+                    extra_widgets=[],
                 ),
             )
         )
@@ -555,7 +506,6 @@ def configure_ai_or_diagnostics(
     load_yellow: bool,
     load_diagnostics: bool,
     visualization_buffer_size: int = 5,
-    cost_visualization: bool = False,
 ) -> TScopeConfig:
     """
     Constructs a view with one of:
@@ -568,8 +518,6 @@ def configure_ai_or_diagnostics(
     :param load_diagnostics: if diagnostics should be loaded
     :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime.
-    :param cost_visualization: True if cost visualization widget should be enabled
-                                False if not
     :return: the Thunderscope Config for this view
     """
 
@@ -579,10 +527,8 @@ def configure_ai_or_diagnostics(
         :param proto_unix_io: the proto unix io to configure widgets with
         :return: list of widget data for the extra widgets
         """
-        extra_widgets = (
-            [configure_cost_vis(proto_unix_io)] if cost_visualization else []
-        )
-        extra_widgets.append(configure_robot_view_fullsystem(proto_unix_io))
+        extra_widgets = [configure_robot_view_fullsystem(proto_unix_io)]
+        extra_widgets.append(configure_estop(proto_unix_io))
         return extra_widgets
 
     proto_unix_io_map = {ProtoUnixIOTypes.SIM: ProtoUnixIO()}
@@ -646,6 +592,15 @@ def configure_ai_or_diagnostics(
             proto_unix_io_map[ProtoUnixIOTypes.CURRENT] = proto_unix_io_map[
                 ProtoUnixIOTypes.DIAGNOSTICS
             ]
+        diagnostics_extra_widgets = (
+            []
+            if load_blue or load_yellow
+            else [
+                configure_robot_view_diagnostics(
+                    proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
+                ),
+            ]
+        )
         tabs.append(
             TScopeQTTab(
                 name="Robot Diagnostics",
@@ -655,13 +610,10 @@ def configure_ai_or_diagnostics(
                         ProtoUnixIOTypes.DIAGNOSTICS
                     ],
                     current_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.CURRENT],
-                    extra_widgets=[]
-                    if (load_blue or load_yellow)
-                    else [
-                        configure_robot_view_diagnostics(
-                            proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS]
-                        )
-                    ],
+                    extra_widgets=[
+                        configure_estop(proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS])
+                    ]
+                    + diagnostics_extra_widgets,
                 ),
             )
         )

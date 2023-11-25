@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
@@ -8,6 +9,7 @@ import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import *
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
+from typing import Type, List
 
 
 class BreakbeamLabel(QLabel):
@@ -18,13 +20,13 @@ class BreakbeamLabel(QLabel):
 
     BREAKBEAM_BORDER = "border: 1px solid black"
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Constructs a breakbeam indicator and sets the UI to the default uninitialized state
         """
         super().__init__()
 
-    def update_breakbeam_status(self, new_breakbeam_status):
+    def update_breakbeam_status(self, new_breakbeam_status: bool) -> None:
         """
         Updates the current breakbeam status and refreshes the UI accordingly
         :param new_breakbeam_status: the new breakbeam status
@@ -45,7 +47,7 @@ class BreakbeamLabel(QLabel):
                 "border-color: green"
             )
 
-    def event(self, event):
+    def event(self, event: QtCore.QEvent) -> bool:
         """
         Overridden event function which intercepts all events
         On hover, displays a tooltip with the current breakbeam status
@@ -75,8 +77,8 @@ class RobotInfo(QWidget):
         self,
         robot_id: int,
         available_control_modes: List[IndividualRobotMode],
-        control_mode_signal: QtCore.pyqtSignal,
-    ):
+        control_mode_signal: Type[QtCore.pyqtSignal],
+    ) -> None:
         """
         Initialize a single robot's info widget
 
@@ -174,7 +176,7 @@ class RobotInfo(QWidget):
         self.layout.addLayout(self.status_layout)
         self.setLayout(self.layout)
 
-    def create_robot_status_expand_button(self):
+    def create_robot_status_expand_button(self) -> QPushButton:
         """
         Creates the button to expand / collapse the robot status view
         :return: QPushButton object
@@ -186,7 +188,7 @@ class RobotInfo(QWidget):
 
     def create_control_mode_menu(
         self, available_control_modes: List[IndividualRobotMode]
-    ):
+    ) -> QComboBox:
         """
         Creates the drop down menu to select the input for each robot
         :param robot_id: the id of the robot this menu belongs to
@@ -217,7 +219,9 @@ class RobotInfo(QWidget):
 
         return control_mode_menu
 
-    def create_vision_pattern(self, team_colour, radius, connected):
+    def create_vision_pattern(
+        self, team_colour: QtGui.QColor, radius: int, connected: bool
+    ) -> QtGui.QPixmap:
         """Given a robot id, team color and radius, draw the vision
         pattern on a pixmap and return it.
 
@@ -271,7 +275,7 @@ class RobotInfo(QWidget):
 
         return pixmap
 
-    def update(self, robot_status):
+    def update(self, robot_status: RobotStatus):
         """
         Receives parts of a RobotStatus message
 
@@ -289,7 +293,7 @@ class RobotInfo(QWidget):
 
         QtCore.QTimer.singleShot(DISCONNECT_DURATION_MS, self.disconnect_robot)
 
-    def disconnect_robot(self):
+    def disconnect_robot(self) -> None:
         """
         Calculates the time between the last robot status and now
         If more than our threshold, resets UI
@@ -301,7 +305,7 @@ class RobotInfo(QWidget):
         ):
             self.__reset_ui()
 
-    def __reset_ui(self):
+    def __reset_ui(self) -> None:
         """
         Resets the UI to the default, uninitialized values
         """
@@ -309,7 +313,7 @@ class RobotInfo(QWidget):
 
         self.breakbeam_label.update_breakbeam_status(None)
 
-    def __update_stop_primitive(self, is_running: bool):
+    def __update_stop_primitive(self, is_running: bool) -> None:
         """
         Updates the stop primitive label based on the current running state
         :param is_running: if the robot is running currently
@@ -319,7 +323,7 @@ class RobotInfo(QWidget):
             f"background-color: {'green' if is_running else 'red'}; border: 1px solid black;"
         )
 
-    def __update_ui(self, robot_status):
+    def __update_ui(self, robot_status: RobotStatus) -> None:
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for

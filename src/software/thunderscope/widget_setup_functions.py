@@ -12,7 +12,6 @@ from software.thunderscope.dock_style import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from google.protobuf.message import Message
 
-
 # Import Widgets
 from software.thunderscope.gl.gl_widget import GLWidget
 from software.thunderscope.gl.layers import (
@@ -24,12 +23,12 @@ from software.thunderscope.gl.layers import (
     gl_simulator_layer,
     gl_hrvo_layer,
     gl_tactic_layer,
+    gl_cost_vis_layer,
 )
 
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
 )
-from software.thunderscope.cost_vis.cost_vis import CostVisualizationWidget
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
@@ -87,6 +86,9 @@ def setup_gl_widget(
     passing_layer = gl_passing_layer.GLPassingLayer(
         "Passing", visualization_buffer_size
     )
+    cost_vis_layer = gl_cost_vis_layer.GLCostVisLayer(
+        "Passing Cost", visualization_buffer_size
+    )
     world_layer = gl_world_layer.GLWorldLayer(
         "Vision", sim_proto_unix_io, friendly_colour_yellow, visualization_buffer_size
     )
@@ -95,13 +97,14 @@ def setup_gl_widget(
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
 
-    gl_widget.add_layer(validation_layer)
+    gl_widget.add_layer(world_layer)
+    gl_widget.add_layer(simulator_layer, False)
     gl_widget.add_layer(path_layer)
     gl_widget.add_layer(obstacle_layer)
     gl_widget.add_layer(passing_layer)
-    gl_widget.add_layer(world_layer)
-    gl_widget.add_layer(simulator_layer, False)
+    gl_widget.add_layer(cost_vis_layer, False)
     gl_widget.add_layer(tactic_layer, False)
+    gl_widget.add_layer(validation_layer)
 
     # Add HRVO layers and have them hidden on startup
     # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
@@ -116,6 +119,7 @@ def setup_gl_widget(
     # Register observers
     for arg in [
         (World, world_layer.world_buffer),
+        (World, cost_vis_layer.world_buffer),
         (RobotStatus, world_layer.robot_status_buffer),
         (Referee, world_layer.referee_buffer),
         (PrimitiveSet, obstacle_layer.primitive_set_buffer),
@@ -125,6 +129,7 @@ def setup_gl_widget(
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
         (SimulatorState, simulator_layer.simulator_state_buffer),
+        (CostVisualization, cost_vis_layer.cost_visualization_buffer),
     ] + [(HRVOVisualization, hrvo_layer.hrvo_buffer) for hrvo_layer in hrvo_layers]:
         full_system_proto_unix_io.register_observer(*arg)
 
@@ -218,22 +223,6 @@ def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
     proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
 
     return referee_info
-
-
-def setup_cost_visualization_widget(
-    proto_unix_io: ProtoUnixIO,
-) -> CostVisualizationWidget:
-    """Setup the cost visualization widget
-
-    :param proto_unix_io: The proto unix io object
-    :returns: The cost visualization widget
-
-    """
-    cost_vis_widget = CostVisualizationWidget()
-    proto_unix_io.register_observer(
-        CostVisualization, cost_vis_widget.cost_visualization_buffer
-    )
-    return cost_vis_widget
 
 
 #################################

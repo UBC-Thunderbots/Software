@@ -5,7 +5,7 @@ import math
 import numpy as np
 
 from software.py_constants import *
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, DepthValues
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
@@ -25,12 +25,13 @@ class GLMeasureLayer(GLLayer):
 
         """
         super().__init__(name)
+        self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
         self.mouse_point_in_scene = QtGui.QVector3D()
         self.measurement_points_cache = []
 
         # GLTextItem must be initialized later, outside of this constructor
-        # Otherwise we run into some strange bugs: 'NoneType' object has no attribute 'width'
+        # Avoid pyqtgraph bug: 'NoneType' object has no attribute 'width'
         self.cursor_coords_graphic: GLTextItem = None
 
         self.measurement_text_graphics = ObservableList(self._graphics_changed)

@@ -32,6 +32,9 @@ class GLRect(GLShape):
         :param line_width: The line width of the rectangle's outline
 
         """
+        self.x_length = 0
+        self.y_length = 0
+
         super().__init__(
             parent_item=parent_item,
             outline_color=outline_color,
@@ -39,8 +42,6 @@ class GLRect(GLShape):
             line_width=line_width,
         )
 
-        self.x_length = 0
-        self.y_length = 0
         self.set_dimensions(x_length, y_length)
 
     def set_dimensions(self, x_length: float = 0, y_length: float = 0) -> None:
