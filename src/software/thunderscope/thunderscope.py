@@ -90,6 +90,12 @@ class Thunderscope(object):
         except Exception:
             pass
 
+        # Keyboard Estop shortcut
+        # only used when in keyboard estop mode
+        self.keyboard_estop_shortcut = QtGui.QShortcut(
+            QtGui.QKeySequence(" "), self.window
+        )
+
         # Save and Load Prompts
         #
         # NOTE: As long as Thunderscope has focus, the keyboard shortcuts will
@@ -150,11 +156,17 @@ class Thunderscope(object):
 
         with shelve.open(filename, "c") as shelf:
             for key, val in self.tab_dock_map.items():
-                shelf[key] = val.saveState()
+                try:
+                    shelf[key] = val.saveState()
+                except AttributeError:
+                    pass
 
         with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as shelf:
             for key, val in self.tab_dock_map.items():
-                shelf[key] = val.saveState()
+                try:
+                    shelf[key] = val.saveState()
+                except AttributeError:
+                    pass
 
     def load_layout(self, filename: os.PathLike = None) -> None:
         """Open a file dialog to load the layout and state to all widgets

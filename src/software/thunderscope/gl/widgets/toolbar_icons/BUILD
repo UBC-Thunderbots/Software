@@ -9,6 +9,7 @@ py_library(
         ":help.svg",
         ":measure.svg",
         ":pause.svg",
+        ":play.svg",
         ":redo.svg",
         ":reset.svg",
         ":undo.svg",

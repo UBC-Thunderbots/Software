@@ -56,6 +56,7 @@ jobs:
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
             -//software/field_tests/...      \
+            -//software/ai/navigator/...
 
   jetson-nano-tests:
     name: Jetson Nano Software Tests
@@ -105,7 +106,8 @@ jobs:
           bazel test --show_timestamps       \
             //software:unix_full_system           \
             //software/simulated_tests/...   \
-            //software/ai/hl/...
+            //software/ai/hl/... \
+            //software/ai/navigator/...
 
       - name: Upload simulated test proto logs
         uses: actions/upload-artifact@v3
@@ -129,7 +131,8 @@ jobs:
           bazel test --show_timestamps       \
             //software:unix_full_system           \
             //software/simulated_tests/...   \
-            //software/ai/hl/...
+            //software/ai/hl/... \
+            //software/ai/navigator/...
 
       - name: Simulated Test Run 3 (Check for errors)
         # Run Simulated Tests a third time and finally check for failures
@@ -138,4 +141,6 @@ jobs:
           bazel test --show_timestamps       \
             //software:unix_full_system           \
             //software/simulated_tests/...   \
-            //software/ai/hl/...
+            //software/ai/hl/... \
+            //software/ai/navigator/...
+

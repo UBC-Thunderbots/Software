@@ -8,6 +8,7 @@ py_binary(
     deps = [
         ":config",
         ":constants",
+        ":estop_helpers",
         ":thunderscope",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
@@ -128,6 +129,14 @@ py_library(
     data = [
         "//software:py_constants.so",
     ],
+    deps = [
+        "//software/thunderscope:constants",
+    ],
+)
+
+py_library(
+    name = "estop_helpers",
+    srcs = ["estop_helpers.py"],
     deps = [
         "//software/thunderscope:constants",
     ],

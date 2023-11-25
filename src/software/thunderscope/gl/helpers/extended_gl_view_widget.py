@@ -143,6 +143,9 @@ class ExtendedGLViewWidget(GLViewWidget):
         :param mouse_pos: the coordinates of the mouse relative to the ExtendedGLViewWidget
         :return: a list of points in the 3D scene representing where the mouse is pointing to on multiple planes
         """
+        # gets the points on the planes z = ROBOT_MAX_HEIGHT_METERS * (0/n-1, 1/n-1, 2/n-1, ..., n-1/n-1)
+        # for the n planes we want to consider from 0 to the height of the robot
+        # Eg: for n = 3, we consider z = 0, z = 1/2 robot height, and z = robot height as the planes
         return [
             self.get_point_in_scene(
                 mouse_pos,

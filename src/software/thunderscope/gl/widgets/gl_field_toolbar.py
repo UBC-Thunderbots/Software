@@ -56,6 +56,7 @@ class GLFieldToolbar(QWidget):
         on_camera_view_change: Callable[[CameraView], None],
         on_measure_mode: Callable[[], None],
         layers_menu: QMenu,
+        sandbox_mode: bool = False,
     ):
         """
         Set up the toolbar with these buttons:
@@ -71,6 +72,7 @@ class GLFieldToolbar(QWidget):
         :param on_camera_view_change: the callback function for when the camera view is changed
         :param on_measure_mode: the callback function for when measure mode is toggled
         :param layers_menu: the QMenu for the layers menu selection
+        :param sandbox_mode: if sandbox mode should be enabled
         """
         super(GLFieldToolbar, self).__init__()
 
@@ -130,22 +132,24 @@ class GLFieldToolbar(QWidget):
         self.pause_button.setStyleSheet(self.get_button_style())
         self.toggle_pause_button(True)
 
-        # Setup Undo button
-        self.undo_button = ToggleableButton(False)
-        self.undo_button.setToolTip("Undo")
-        self.undo_button.setIcon(icons.get_undo_icon(self.BUTTON_ICON_COLOR))
-        self.undo_button.setStyleSheet(self.get_button_style(False))
+        # if sandbox mode, set up the sandbox control buttons
+        if sandbox_mode:
+            # Setup Undo button
+            self.undo_button = ToggleableButton(False)
+            self.undo_button.setToolTip("Undo")
+            self.undo_button.setIcon(icons.get_undo_icon(self.BUTTON_ICON_COLOR))
+            self.undo_button.setStyleSheet(self.get_button_style(False))
 
-        # Setup Redo button
-        self.redo_button = ToggleableButton(False)
-        self.redo_button.setToolTip("Redo")
-        self.redo_button.setIcon(icons.get_redo_icon(self.BUTTON_ICON_COLOR))
-        self.redo_button.setStyleSheet(self.get_button_style(False))
+            # Setup Redo button
+            self.redo_button = ToggleableButton(False)
+            self.redo_button.setToolTip("Redo")
+            self.redo_button.setIcon(icons.get_redo_icon(self.BUTTON_ICON_COLOR))
+            self.redo_button.setStyleSheet(self.get_button_style(False))
 
-        self.reset_button = QPushButton()
-        self.reset_button.setToolTip("Reset")
-        self.reset_button.setIcon(icons.get_reset_icon(self.BUTTON_ICON_COLOR))
-        self.reset_button.setStyleSheet(self.get_button_style())
+            self.reset_button = QPushButton()
+            self.reset_button.setToolTip("Reset")
+            self.reset_button.setIcon(icons.get_reset_icon(self.BUTTON_ICON_COLOR))
+            self.reset_button.setStyleSheet(self.get_button_style())
 
         # Setup toolbar
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
@@ -154,10 +158,12 @@ class GLFieldToolbar(QWidget):
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(self.layers_button)
         self.layout().addStretch()
-        self.layout().addWidget(self.reset_button)
-        self.layout().addWidget(self.undo_button)
+        if sandbox_mode:
+            self.layout().addWidget(self.reset_button)
+            self.layout().addWidget(self.undo_button)
         self.layout().addWidget(self.pause_button)
-        self.layout().addWidget(self.redo_button)
+        if sandbox_mode:
+            self.layout().addWidget(self.redo_button)
         self.layout().addWidget(self.help_button)
         self.layout().addWidget(self.measure_button)
         self.layout().addWidget(self.camera_view_button)

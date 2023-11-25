@@ -66,9 +66,36 @@ class CameraView(Enum):
     RIGHT_HALF_HIGH_ANGLE = 4
 
 
+class EstopMode(IntEnum):
+    """
+    Enum for the various estop modes we can run thunderscope in
+
+    DISABLE_ESTOP: No physical / keyboard estop is needed, but we cannot send anything over the network
+    KEYBOARD_ESTOP: The spacebar can be used as an estop toggle instead of a physical estop
+    PHYSICAL_ESTOP: A physical estop is needed to run thunderscope, throws an exception if none is plugged in
+    """
+
+    DISABLE_ESTOP = 0
+    KEYBOARD_ESTOP = 1
+    PHYSICAL_ESTOP = 2
+
+
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2
+
+DEFAULT_EMPTY_FIELD_WORLD = World(
+    field=Field(
+        field_x_length=9.0,
+        field_y_length=6.0,
+        defense_x_length=1.0,
+        defense_y_length=2.0,
+        goal_x_length=0.18,
+        goal_y_length=1.0,
+        boundary_buffer_size=0.3,
+        center_circle_radius=0.5,
+    )
+)
 
 MULTI_PLANE_POINTS = 3
 
@@ -85,6 +112,10 @@ ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
 ROBOT_CRASH_TIMEOUT_S = 5
 
 GAME_CONTROLLER_URL = "http://localhost:8081"
+
+# Paths to check for estop when running diagnostics
+ESTOP_PATH_1 = "/dev/ttyACM0"
+ESTOP_PATH_2 = "/dev/ttyUSB0"
 
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {
@@ -143,6 +174,17 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
 
     """
 )
+
+
+def is_field_message_empty(field: Field) -> bool:
+    """
+    Checks if a field message is empty
+    All values in a field message are required so the message will never be None
+    So we have to check if the field itself has 0 length
+    :param field: the field to check
+    :return: True if field message is empty, False if not
+    """
+    return field.field_x_length == 0
 
 
 def create_vision_pattern_lookup(color1: QtGui.QColor, color2: QtGui.QColor) -> dict:

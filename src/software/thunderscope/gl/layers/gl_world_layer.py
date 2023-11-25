@@ -11,9 +11,11 @@ from software.thunderscope.constants import (
     Colors,
     DepthValues,
     SPEED_SEGMENT_SCALE,
+    DEFAULT_EMPTY_FIELD_WORLD,
+    is_field_message_empty,
 )
 
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Callable
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
@@ -65,6 +67,9 @@ class GLWorldLayer(GLLayer):
         self._cached_friendly_team = {}
         self._cached_enemy_team = {}
         self.cached_robot_status = {}
+
+        # callback functions to call when the play state changes
+        self.play_callbacks = []
 
         self.key_pressed = {}
         self.accepted_keys = [
@@ -151,13 +156,26 @@ class GLWorldLayer(GLLayer):
     def toggle_play_state(self) -> bool:
         """
         Pauses the simulated gameplay and toggles the play state
+        Calls all callback functions with the new play state
         :return: the current play state
         """
         simulator_state = SimulationState(is_playing=not self.is_playing)
         self.is_playing = not self.is_playing
 
         self.simulator_io.send_proto(SimulationState, simulator_state)
+
+        # calls each of the callback function with the new play state
+        for callback in self.play_callbacks:
+            callback(self.is_playing)
+
         return self.is_playing
+
+    def add_play_callback(self, callback: Callable[[bool], None]) -> None:
+        """
+        Adds a callback function to the list of play state callbacks
+        :param callback: the callback function to add
+        """
+        self.play_callbacks.append(callback)
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
@@ -257,7 +275,11 @@ class GLWorldLayer(GLLayer):
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
-        self.cached_world = self.world_buffer.get(block=False)
+        self.cached_world = self.world_buffer.get(block=False, return_cached=True)
+
+        # if not receiving worlds, just render an empty field
+        if is_field_message_empty(self.cached_world.field):
+            self.cached_world = DEFAULT_EMPTY_FIELD_WORLD
 
         self.__update_field_graphics(self.cached_world.field)
         self.__update_goal_graphics(self.cached_world.field)
@@ -394,7 +416,7 @@ class GLWorldLayer(GLLayer):
     ) -> None:
         """Update the GLGraphicsItems that display the robots
         
-        :param team: The team proto
+        :param robots: a mapping of robot ids to a tuple containing x-coord, y-coord, and orientation
         :param color: The color of the robots
         :param robot_graphics: The ObservableList containing the robot graphics for this team
         :param robot_id_graphics: The ObservableList containing the robot ID graphics for this team
@@ -418,7 +440,6 @@ class GLWorldLayer(GLLayer):
             pos_y = robots[robot_id][1]
             orientation = robots[robot_id][2]
 
-            robot_graphic.set_id(robot_id)
             robot_graphic.set_position(pos_x, pos_y)
             robot_graphic.set_orientation(math.degrees(orientation))
             robot_graphic.setColor(color)

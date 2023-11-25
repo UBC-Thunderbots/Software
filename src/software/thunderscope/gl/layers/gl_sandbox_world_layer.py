@@ -1,5 +1,5 @@
 import math
-from typing import List, Tuple, Optional, Dict, Callable
+from typing import List, Tuple, Optional, Dict
 from proto.import_all_protos import *
 from pyqtgraph.Qt.QtCore import *
 from pyqtgraph.Qt.QtGui import *
@@ -92,9 +92,6 @@ class GLSandboxWorldLayer(GLWorldLayer):
         self.undo_operations = []
         self.redo_operations = []
 
-        # callback functions to call when the play state changes
-        self.play_callbacks = []
-
     def mouse_in_scene_pressed(self, event: MouseInSceneEvent) -> None:
         """
         Requires Ctrl + Shift to be pressed along with mouse click
@@ -127,7 +124,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """
-        Requires Ctrl + Shift to be pressed along with mouse click
+        Requires Ctrl + Shift to be pressed Ralong with mouse click
 
         Gets the point(s) that the mouse has moved to on the xy-plane and other planes
         If a robot is currently selected, determines if another robot is present at the new position
@@ -292,18 +289,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # reset the local state
         self.local_robot_positions = {}
 
-        # calls each of the callback function with the new play state
-        for callback in self.play_callbacks:
-            callback(curr_play_state)
-
         return curr_play_state
-
-    def add_play_callback(self, callback: Callable[[bool], None]) -> None:
-        """
-        Adds a callback function to the list of play state callbacks
-        :param callback: the callback function to add
-        """
-        self.play_callbacks.append(callback)
 
     def reset_to_pre_sim(self) -> None:
         """
@@ -537,10 +523,9 @@ class GLSandboxWorldLayer(GLWorldLayer):
         # consider points on the xy-plane, and a few planes above to account for robot height
         for index, point in enumerate(multi_plane_points):
             # if point is close enough to the robot, return the robot id and index it eas found on
-            if (
-                math.sqrt((pos_x - point[0]) ** 2 + (pos_y - point[1]) ** 2)
-                <= ROBOT_MAX_RADIUS_MILLIMETERS / MILLIMETERS_PER_METER
-            ):
+            if (pos_x - point[0]) ** 2 + (pos_y - point[1]) ** 2 <= (
+                ROBOT_MAX_RADIUS_MILLIMETERS / MILLIMETERS_PER_METER
+            ) ** 2:
                 return index
         return None
 

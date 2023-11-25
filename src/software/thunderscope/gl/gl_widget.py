@@ -22,10 +22,11 @@ class GLWidget(QWidget):
     and our AI. GLWidget can also provide replay controls.
     """
 
-    def __init__(self, player: ProtoPlayer = None) -> None:
+    def __init__(self, player: ProtoPlayer = None, sandbox_mode: bool = False) -> None:
         """Initialize the GLWidget
 
         :param player: The replay player to optionally display media controls for
+        :param sandbox_mode: if sandbox mode should be enabled
 
         """
         super().__init__()
@@ -57,6 +58,7 @@ class GLWidget(QWidget):
             on_camera_view_change=self.set_camera_view,
             on_measure_mode=self.toggle_measure_mode,
             layers_menu=self.layers_menu,
+            sandbox_mode=sandbox_mode,
         )
 
         # Setup layout

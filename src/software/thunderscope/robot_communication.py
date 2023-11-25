@@ -1,8 +1,9 @@
 from software.py_constants import *
 from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.constants import IndividualRobotMode
+from software.thunderscope.constants import IndividualRobotMode, EstopMode
 import software.python_bindings as tbots_cpp
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from queue import Empty
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
@@ -23,16 +24,16 @@ class RobotCommunication(object):
         current_proto_unix_io: ProtoUnixIO,
         multicast_channel: str,
         interface: str,
-        disable_estop: bool,
-        estop_path: os.PathLike,
-        estop_buadrate: int = 115200,
-    ) -> None:
+        estop_mode: EstopMode,
+        estop_path: os.PathLike = None,
+        estop_baudrate: int = 115200,
+    ):
         """Initialize the communication with the robots
 
         :param current_proto_unix_io: the current proto unix io object
         :param multicast_channel: The multicast channel to use
         :param interface: The interface to use
-        :param disable_estop: whether to disable estop checks (ONLY FOR TESTING LOCALLY)
+        :param estop_mode: what estop mode we are running right now, of type EstopMode
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
 
@@ -42,9 +43,10 @@ class RobotCommunication(object):
         self.current_proto_unix_io = current_proto_unix_io
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
-        self.disable_estop = disable_estop
+        self.estop_mode = estop_mode
+
         self.estop_path = estop_path
-        self.estop_buadrate = estop_buadrate
+        self.estop_buadrate = estop_baudrate
 
         self.running = False
 
@@ -72,29 +74,132 @@ class RobotCommunication(object):
         )
 
         self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
-        self.run_world_thread = threading.Thread(target=self.run_world, daemon=True)
+        self.run_world_thread = threading.Thread(target=self.__run_world, daemon=True)
         self.run_primitive_set_thread = threading.Thread(
-            target=self.run_primitive_set, daemon=True
+            target=self.__run_primitive_set, daemon=True
         )
 
-        # only checks for estop if checking is not disabled
-        if not self.disable_estop:
+        # initialising the estop
+        # tries to access a plugged in estop. if not found, throws an exception
+        # if using keyboard estop, skips this step
+        self.estop_reader = None
+        self.estop_is_playing = False
+        # when the estop has just been stopped,
+        # we want to send a stop primitive once to all currently connected robots
+        self.should_send_stop = False
+
+        # only checks for estop if we are in physical estop mode
+        if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
             try:
                 self.estop_reader = tbots_cpp.ThreadedEstopReader(
                     self.estop_path, self.estop_buadrate
                 )
             except Exception:
-                raise Exception("Could not find estop, make sure its plugged in")
+                raise Exception(f"Invalid Estop found at location {self.estop_path}")
+
+    def setup_for_fullsystem(self) -> None:
+        """
+        Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
+        """
+        self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
+            SSL_VISION_ADDRESS,
+            SSL_VISION_PORT,
+            lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
+            True,
+        )
+
+        self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
+            SSL_REFEREE_ADDRESS,
+            SSL_REFEREE_PORT,
+            lambda data: self.current_proto_unix_io.send_proto(Referee, data),
+            True,
+        )
+
+        self.send_world = tbots_cpp.WorldProtoSender(
+            self.multicast_channel + "%" + self.interface, VISION_PORT, True
+        )
+
+        self.robots_connected_to_fullsystem = {
+            robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+        }
+
+        self.run_world_thread.start()
+
+    def toggle_keyboard_estop(self) -> None:
+        """
+        If keyboard estop is being used, toggles the estop state
+        And sends a message to the console
+        """
+        if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
+            self.estop_is_playing = not self.estop_is_playing
+
+            print(
+                "Keyboard Estop changed to "
+                + (
+                    f"\x1b[32mPLAY \x1b[0m"
+                    if self.estop_is_playing
+                    else f"\x1b[31;20mSTOP \x1b[0m"
+                )
+            )
+
+    def toggle_robot_connection(self, mode: IndividualRobotMode, robot_id: int):
+        """
+        Changes the input mode for a robot between None, Manual, or AI
+        If changing from anything to None, add robot to disconnected map
+        So we can send multiple stop primitives to make sure it stops
+
+        :param mode: the mode of input for this robot's primitives
+        :param robot_id: the id of the robot whose mode we're changing
+        """
+        self.robots_connected_to_fullsystem.discard(robot_id)
+        self.robots_connected_to_manual.discard(robot_id)
+        self.robots_to_be_disconnected.pop(robot_id, None)
+
+        if mode == IndividualRobotMode.NONE:
+            self.robots_to_be_disconnected[robot_id] = NUM_TIMES_SEND_STOP
+        elif mode == IndividualRobotMode.MANUAL:
+            self.robots_connected_to_manual.add(robot_id)
+        elif mode == IndividualRobotMode.AI:
+            self.robots_connected_to_fullsystem.add(robot_id)
 
     def __send_estop_state(self) -> None:
-        if not self.disable_estop:
-            while self.running:
+        """
+        Constant loop which sends the current estop status proto if estop is not disabled
+        Uses the keyboard estop value for keyboard estop mode
+        If we're in physical estop mode, uses the physical estop value
+        If estop has just changed from playing to stop, set flag to send stop primitive once to connected robots
+        """
+        previous_estop_is_playing = True
+        if self.estop_mode != EstopMode.DISABLE_ESTOP:
+            while True:
+                if self.estop_mode == EstopMode.PHYSICAL_ESTOP:
+                    self.estop_is_playing = self.estop_reader.isEstopPlay()
+
+                # Send stop primitive once when estop is paused
+                if previous_estop_is_playing and not self.estop_is_playing:
+                    self.should_send_stop = True
+                else:
+                    self.should_send_stop = False
+
+                previous_estop_is_playing = self.estop_is_playing
+
                 self.current_proto_unix_io.send_proto(
-                    EstopState, EstopState(is_playing=self.estop_reader.isEstopPlay())
+                    EstopState, EstopState(is_playing=self.estop_is_playing)
                 )
                 time.sleep(0.1)
 
-    def run_world(self) -> None:
+    def __should_send_packet(self) -> bool:
+        """
+        Returns True if the proto sending threads should send a proto
+        :return: boolean
+        """
+        return (
+            self.estop_mode != EstopMode.DISABLE_ESTOP
+            and self.estop_is_playing
+            and (self.robots_connected_to_fullsystem or self.robots_connected_to_manual)
+        )
+
+    def __run_world(self):
         """
         Forward World protos from fullsystem to the robots
         Blocks if no world is available and does not return a cached world
@@ -111,19 +216,11 @@ class RobotCommunication(object):
             except Empty:
                 # if empty do nothing
                 pass
-            if (
-                world
-                and not self.disable_estop
-                and self.estop_reader.isEstopPlay()
-                and (
-                    self.robots_connected_to_fullsystem
-                    or self.robots_connected_to_manual
-                )
-            ):
+            if world and self.__should_send_packet():
                 # send the world proto
                 self.send_world.send_proto(world)
 
-    def run_primitive_set(self) -> None:
+    def __run_primitive_set(self) -> None:
         """Forward PrimitiveSet protos from fullsystem to the robots.
 
         For AI protos, blocks for 10ms if no proto is available, and then returns a cached proto
@@ -182,43 +279,24 @@ class RobotCommunication(object):
             primitive_set = PrimitiveSet(
                 time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
                 stay_away_from_ball=False,
-                robot_primitives=robot_primitives,
+                robot_primitives=robot_primitives
+                if not self.should_send_stop
+                else {
+                    robot_id: Primitive(stop=StopPrimitive())
+                    for robot_id in robot_primitives.keys()
+                },
                 sequence_number=self.sequence_number,
             )
 
             self.sequence_number += 1
 
-            if (
-                not self.disable_estop
-                and self.estop_reader.isEstopPlay()
-                and (
-                    self.robots_connected_to_fullsystem
-                    or self.robots_connected_to_manual
-                )
-            ):
+            if self.__should_send_packet() or self.should_send_stop:
                 self.send_primitive_set.send_proto(primitive_set)
+                self.should_send_stop = False
 
             # sleep if not running fullsystem
             if not self.robots_connected_to_fullsystem:
                 time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
-
-    def toggle_robot_connection(self, mode: IndividualRobotMode, robot_id: int) -> None:
-        """
-        Connects a robot to or disconnects a robot from diagnostics
-
-        :param mode: the mode of input for this robot's primitives
-        :param robot_id: the id of the robot to be added or removed from the diagnostics set
-        """
-        self.robots_connected_to_fullsystem.discard(robot_id)
-        self.robots_connected_to_manual.discard(robot_id)
-        self.robots_to_be_disconnected.pop(robot_id, None)
-
-        if mode == IndividualRobotMode.NONE:
-            self.robots_to_be_disconnected[robot_id] = NUM_TIMES_SEND_STOP
-        elif mode == IndividualRobotMode.MANUAL:
-            self.robots_connected_to_manual.add(robot_id)
-        elif mode == IndividualRobotMode.AI:
-            self.robots_connected_to_fullsystem.add(robot_id)
 
     def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:
         """
@@ -228,35 +306,6 @@ class RobotCommunication(object):
         """
         if self.running:
             self.current_proto_unix_io.send_proto(type, data)
-
-    def setup_for_fullsystem(self) -> None:
-        """
-        Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
-        """
-
-        self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
-            SSL_VISION_ADDRESS,
-            SSL_VISION_PORT,
-            lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
-            True,
-        )
-
-        self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
-            SSL_REFEREE_ADDRESS,
-            SSL_REFEREE_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(Referee, data),
-            True,
-        )
-
-        self.send_world = tbots_cpp.WorldProtoSender(
-            self.multicast_channel + "%" + self.interface, VISION_PORT, True
-        )
-
-        self.robots_connected_to_fullsystem = {
-            robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
-        }
-
-        self.run_world_thread.start()
 
     def __enter__(self) -> "self":
         """Enter RobotCommunication context manager. Setup multicast listener

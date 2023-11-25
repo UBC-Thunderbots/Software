@@ -27,7 +27,7 @@ class GLValidationOverlayLayer(GLLayer):
 
     def __init__(self, validation_layer: GLValidationLayer) -> None:
         """Initialize the GLValidationOverlayLayer
-        
+
         :param validation_layer: The GLValidationLayer this overlay layer is related to
 
         """
@@ -49,10 +49,10 @@ class GLValidationOverlayLayer(GLLayer):
         self, painter: QtGui.QPainter, viewport_rect: QtCore.QRect
     ) -> None:
         """Draw the overlay over top the viewport
-        
+
         :param painter: The QPainter to perform drawing operations with
-        :param viewport_rect: The QRect indicating the viewport dimensions 
-        
+        :param viewport_rect: The QRect indicating the viewport dimensions
+
         """
         info_msgs = []
 
@@ -135,7 +135,7 @@ class GLValidationLayer(GLLayer):
 
     def get_validations(self) -> List[ValidationProto]:
         """Get a list of the cached validations
-        
+
         :returns: A list of the cached validation protos
 
         """
