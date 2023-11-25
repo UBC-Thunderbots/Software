@@ -8,6 +8,7 @@ py_binary(
     deps = [
         ":config",
         ":constants",
+        ":estop_helpers",
         ":thunderscope",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
@@ -54,8 +55,8 @@ py_library(
         "//software/thunderscope/common:common_widgets",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/common:proto_plotter",
-        "//software/thunderscope/cost_vis",
         "//software/thunderscope/gl:gl_widget",
+        "//software/thunderscope/gl/layers:gl_cost_vis_layer",
         "//software/thunderscope/gl/layers:gl_hrvo_layer",
         "//software/thunderscope/gl/layers:gl_obstacle_layer",
         "//software/thunderscope/gl/layers:gl_passing_layer",
@@ -124,6 +125,14 @@ py_library(
     data = [
         "//software:py_constants.so",
     ],
+    deps = [
+        "//software/thunderscope:constants",
+    ],
+)
+
+py_library(
+    name = "estop_helpers",
+    srcs = ["estop_helpers.py"],
     deps = [
         "//software/thunderscope:constants",
     ],

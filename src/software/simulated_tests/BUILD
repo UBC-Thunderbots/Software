@@ -104,6 +104,7 @@ py_library(
 py_library(
     name = "validation",
     srcs = [
+        "avoid_collisions.py",
         "ball_enters_region.py",
         "ball_moves_forward.py",
         "ball_speed_threshold.py",
@@ -112,6 +113,7 @@ py_library(
         "friendly_has_ball_possession.py",
         "friendly_team_scored.py",
         "robot_enters_region.py",
+        "robot_enters_region_and_stops.py",
         "robot_speed_threshold.py",
         "validation.py",
     ],

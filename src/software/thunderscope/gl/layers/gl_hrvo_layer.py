@@ -4,7 +4,7 @@ import numpy as np
 
 from proto.visualization_pb2 import HRVOVisualization
 
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -26,6 +26,7 @@ class GLHrvoLayer(GLLayer):
 
         """
         super().__init__(name)
+        self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
         self.robot_id = robot_id
         self.hrvo_buffer = ThreadSafeBuffer(buffer_size, HRVOVisualization)

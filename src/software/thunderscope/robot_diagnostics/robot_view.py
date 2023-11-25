@@ -10,6 +10,7 @@ from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
 from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from typing import Type
 
 
 class RobotCrashDialog(QDialog):
@@ -19,7 +20,9 @@ class RobotCrashDialog(QDialog):
 
     """
 
-    def __init__(self, message, robot_status, parent=None):
+    def __init__(
+        self, message: str, robot_status: RobotStatusView, parent: QWidget = None
+    ) -> None:
         super().__init__(parent)
 
         self.setWindowTitle("Robot Crash")
@@ -52,9 +55,9 @@ class RobotViewComponent(QWidget):
 
     def __init__(
         self,
-        robot_id,
+        robot_id: int,
         available_control_modes: List[IndividualRobotMode],
-        control_mode_signal,
+        control_mode_signal: Type[QtCore.pyqtSignal],
     ):
         """
         Sets up a Robot Info Widget and a Robot Status Widget for each robot
@@ -84,7 +87,7 @@ class RobotViewComponent(QWidget):
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
-    def robot_status_expand(self):
+    def robot_status_expand(self) -> None:
         """
         Handles the info button click event from the Robot Info widget
         If robot status widget is not defined, initialises one and adds it to this layout
@@ -96,7 +99,7 @@ class RobotViewComponent(QWidget):
 
         self.robot_status.toggle_visibility()
 
-    def update(self, robot_status):
+    def update(self, robot_status: RobotStatus) -> None:
         """
         Updates the Robot View Components with the new robot status message
         Updates the robot info widget and, if initialized, the robot status widget as well
@@ -122,7 +125,7 @@ class RobotView(QScrollArea):
 
     control_mode_signal = QtCore.pyqtSignal(int, int)
 
-    def __init__(self, available_control_modes: List[IndividualRobotMode]):
+    def __init__(self, available_control_modes: List[IndividualRobotMode]) -> None:
 
         """
         Initialize the robot view component for each robot.
@@ -149,9 +152,6 @@ class RobotView(QScrollArea):
             self.layout.addWidget(robot_view_widget)
             self.robot_last_crash_time_s.append(0)
 
-        # ignore repeated crash proto
-        self.ROBOT_CRASH_TIMEOUT_S = 5
-
         # for a QScrollArea, widgets cannot be added to it directly
         # doing so causes no scrolling to happen, and all the components get smaller
         # instead, widgets are added to the layout which is set for a container
@@ -161,7 +161,7 @@ class RobotView(QScrollArea):
         self.setWidget(self.container)
         self.setWidgetResizable(True)
 
-    def refresh(self):
+    def refresh(self) -> None:
         """
         Refresh the view
         Gets a RobotStatus proto and calls the corresponding update method
@@ -180,7 +180,7 @@ class RobotView(QScrollArea):
         if robot_crash is not None:
             if (
                 time.time() - self.robot_last_crash_time_s[robot_crash.robot_id]
-                > self.ROBOT_CRASH_TIMEOUT_S
+                > ROBOT_CRASH_TIMEOUT_S
             ):
                 robot_crash_text = (
                     f"robot_id: {robot_crash.robot_id}\n"

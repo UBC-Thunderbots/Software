@@ -90,6 +90,12 @@ class Thunderscope(object):
         except Exception:
             pass
 
+        # Keyboard Estop shortcut
+        # only used when in keyboard estop mode
+        self.keyboard_estop_shortcut = QtGui.QShortcut(
+            QtGui.QKeySequence(" "), self.window
+        )
+
         # Save and Load Prompts
         #
         # NOTE: As long as Thunderscope has focus, the keyboard shortcuts will
@@ -137,7 +143,7 @@ class Thunderscope(object):
                 f"Could not create folder at '{SAVED_LAYOUT_PATH}' for layout files"
             )
 
-        filename, _ = QtGui.QFileDialog.getSaveFileName(
+        filename, _ = QFileDialog.getSaveFileName(
             self.window,
             "Save layout",
             f"{SAVED_LAYOUT_PATH}/dock_layout_{int(time.time())}.{LAYOUT_FILE_EXTENSION}",
@@ -165,7 +171,7 @@ class Thunderscope(object):
         """
 
         if filename is None:
-            filename, _ = QtGui.QFileDialog.getOpenFileName(
+            filename, _ = QFileDialog.getOpenFileName(
                 self.window,
                 "Open layout",
                 f"{SAVED_LAYOUT_PATH}/",
