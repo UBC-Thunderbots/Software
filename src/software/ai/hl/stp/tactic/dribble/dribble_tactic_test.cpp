@@ -339,8 +339,7 @@ TEST_F(DribbleTacticTest, test_close_proximity_slow_moving_ball)
             checkPossession(tactic, world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {
-        };
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
@@ -370,8 +369,7 @@ TEST_F(DribbleTacticTest, test_close_proximity_stationary_ball)
             checkPossession(tactic, world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {
-        };
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
@@ -401,8 +399,7 @@ TEST_F(DribbleTacticTest, test_close_proximity_fast_moving_ball)
             checkPossession(tactic, world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {
-        };
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
