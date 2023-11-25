@@ -8,6 +8,7 @@ py_binary(
     deps = [
         ":config",
         ":constants",
+        ":estop_helpers",
         ":thunderscope",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
@@ -33,7 +34,7 @@ py_library(
         "//software/networking:threaded_unix_sender_py",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:constants",
-        "//software/thunderscope:dock_label_style",
+        "//software/thunderscope:dock_style",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
         requirement("pyqtgraph"),
@@ -52,16 +53,16 @@ py_library(
         "//software/thunderscope/common:common_widgets",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/common:proto_plotter",
-        "//software/thunderscope/cost_vis",
-        "//software/thunderscope/field",
-        "//software/thunderscope/field:field_layer",
-        "//software/thunderscope/field:hrvo_layer",
-        "//software/thunderscope/field:obstacle_layer",
-        "//software/thunderscope/field:passing_layer",
-        "//software/thunderscope/field:path_layer",
-        "//software/thunderscope/field:simulator_layer",
-        "//software/thunderscope/field:validation_layer",
-        "//software/thunderscope/field:world_layer",
+        "//software/thunderscope/gl:gl_widget",
+        "//software/thunderscope/gl/layers:gl_cost_vis_layer",
+        "//software/thunderscope/gl/layers:gl_hrvo_layer",
+        "//software/thunderscope/gl/layers:gl_obstacle_layer",
+        "//software/thunderscope/gl/layers:gl_passing_layer",
+        "//software/thunderscope/gl/layers:gl_path_layer",
+        "//software/thunderscope/gl/layers:gl_simulator_layer",
+        "//software/thunderscope/gl/layers:gl_tactic_layer",
+        "//software/thunderscope/gl/layers:gl_validation_layer",
+        "//software/thunderscope/gl/layers:gl_world_layer",
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/play:playinfo_widget",
@@ -107,8 +108,8 @@ py_library(
 )
 
 py_library(
-    name = "dock_label_style",
-    srcs = ["dock_label_style.py"],
+    name = "dock_style",
+    srcs = ["dock_style.py"],
 )
 
 py_library(
@@ -127,6 +128,14 @@ py_library(
     data = [
         "//software:py_constants.so",
     ],
+    deps = [
+        "//software/thunderscope:constants",
+    ],
+)
+
+py_library(
+    name = "estop_helpers",
+    srcs = ["estop_helpers.py"],
     deps = [
         "//software/thunderscope:constants",
     ],

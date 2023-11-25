@@ -41,6 +41,7 @@ static const short unsigned int PRIMITIVE_PORT = 42070;
 static const short unsigned int ROBOT_STATUS_PORT       = 42071;
 static const short unsigned int ROBOT_LOGS_PORT         = 42072;
 static const short unsigned int HRVO_VISUALIZATION_PORT = 42073;
+static const short unsigned int ROBOT_CRASH_PORT        = 42074;
 
 // the port to listen to for what side of the field to defend
 static const unsigned DEFENDING_SIDE_PORT = 42073;
@@ -131,6 +132,11 @@ static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND
 // How many robots are allowed in each division
 static const unsigned DIV_A_NUM_ROBOTS = 11;
 static const unsigned DIV_B_NUM_ROBOTS = 6;
+
+// Kick Spd to Pulse Width Safety Constraint Constants
+
+static const int MAX_KICK_CONSTANT       = 850;
+static const double MAX_KICK_COEFFICIENT = 0.4;
 
 // Arduino
 
