@@ -18,7 +18,7 @@ public:
     *
     * @return the primitive proto message
     */
-    virtual TbotsProto::Primitive generatePrimitiveProtoMessage() const = 0;
+    virtual std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage() = 0;
 
     /**
      * Gets the estimated cost of the primitive

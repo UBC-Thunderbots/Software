@@ -49,35 +49,35 @@ createMovePrimitive(const Robot &robot,
                         static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
     }
 
-    traj_primitive_msg->mutable_move()->set_ball_collision_type(ball_collision_type);
+//    traj_primitive_msg->mutable_move()->set_ball_collision_type(ball_collision_type);
 
     // TODO (NIMA): Use the trajectory factory to calculate the cost of the trajectory. Note that no path is needed for direct trajectory
-    if (cost_override.has_value())
-    {
-        traj_primitive_msg->set_cost(cost_override.value());
-    }
-    else
-    {
-        double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-                max_allowed_speed_mode, robot_constants);
-        BangBangTrajectory2D trajectory(robot.position(),
-                                        destination,
-                                        robot.velocity(),
-                                        max_speed,
-                                        robot_constants.robot_max_acceleration_m_per_s_2,
-                                        robot_constants.robot_max_deceleration_m_per_s_2);
-
-        // TODO: Combine generate and constructor
-        BangBangTrajectory1DAngular angular_trajectory;
-        angular_trajectory.generate(robot.orientation(),
-                                    final_angle,
-                                    robot.angularVelocity(),
-                                    AngularVelocity::fromRadians(robot_constants.robot_max_ang_speed_rad_per_s),
-                                    AngularVelocity::fromRadians(robot_constants.robot_max_ang_acceleration_rad_per_s_2),
-                                    AngularVelocity::fromRadians(robot_constants.robot_max_ang_acceleration_rad_per_s_2));
-
-        traj_primitive_msg->set_cost(std::max(trajectory.getTotalTime(), angular_trajectory.getTotalTime()));
-    }
+//    if (cost_override.has_value())
+//    {
+//        traj_primitive_msg->set_cost(cost_override.value());
+//    }
+//    else
+//    {
+//        double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+//                max_allowed_speed_mode, robot_constants);
+//        BangBangTrajectory2D trajectory(robot.position(),
+//                                        destination,
+//                                        robot.velocity(),
+//                                        max_speed,
+//                                        robot_constants.robot_max_acceleration_m_per_s_2,
+//                                        robot_constants.robot_max_deceleration_m_per_s_2);
+//
+//        // TODO: Combine generate and constructor
+//        BangBangTrajectory1DAngular angular_trajectory;
+//        angular_trajectory.generate(robot.orientation(),
+//                                    final_angle,
+//                                    robot.angularVelocity(),
+//                                    AngularVelocity::fromRadians(robot_constants.robot_max_ang_speed_rad_per_s),
+//                                    AngularVelocity::fromRadians(robot_constants.robot_max_ang_acceleration_rad_per_s_2),
+//                                    AngularVelocity::fromRadians(robot_constants.robot_max_ang_acceleration_rad_per_s_2));
+//
+//        traj_primitive_msg->set_cost(std::max(trajectory.getTotalTime(), angular_trajectory.getTotalTime()));
+//    }
     return traj_primitive_msg;
 }
 
@@ -87,7 +87,7 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive()
 
     stop_primitive_msg->mutable_stop();
 
-    stop_primitive_msg->set_cost(1.0);
+//    stop_primitive_msg->set_cost(1.0);
 
     return stop_primitive_msg;
 }

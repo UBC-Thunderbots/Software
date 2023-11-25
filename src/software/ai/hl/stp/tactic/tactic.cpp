@@ -2,6 +2,8 @@
 
 #include "software/logger/logger.h"
 #include "software/util/typename/typename.h"
+#include "software/ai/hl/stp/tactic/primitive.h"
+#include "proto/parameters.pb.h"
 
 Tactic::Tactic(const std::set<RobotCapability> &capability_reqs_)
     : last_execution_robot(std::nullopt), capability_reqs(capability_reqs_)
@@ -23,26 +25,27 @@ void Tactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
     this->last_execution_robot = last_execution_robot;
 }
 
-std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(const World &world)
+std::map<RobotId, std::unique_ptr<Primitive>> Tactic::get(const World &world)
 {
-    auto primitive_set = std::make_unique<TbotsProto::PrimitiveSet>();
+    TbotsProto::RobotNavigationObstacleConfig obstacle_config;
+    std::map<RobotId, std::unique_ptr<Primitive>> primitives_map;
     for (const auto &robot : world.friendlyTeam().getAllRobots())
     {
-        primitive.reset();
         updatePrimitive(TacticUpdate(
                                 robot, world,
-                                [this](std::unique_ptr<TbotsProto::Primitive> new_primitive)
+                                // TODO (NIMA): This is a hack that needs to be injected
+                                obstacle_config,
+                                [this](std::unique_ptr<Primitive> new_primitive)
                                 {
                                     primitive = std::move(new_primitive);
                                 }),
                         !last_execution_robot.has_value() ||
                             last_execution_robot.value() != robot.id());
 
-        CHECK(static_cast<bool>(primitive))
+        CHECK(primitive != nullptr)
             << "Primitive for " << objectTypeName(*this) << " in state " << getFSMState()
             << " was not set" << std::endl;
-        primitive_set->mutable_robot_primitives()->insert(
-            google::protobuf::MapPair(robot.id(), *primitive));
+        primitives_map[robot.id()] = std::move(primitive);
     }
-    return primitive_set;
+    return primitives_map;
 }

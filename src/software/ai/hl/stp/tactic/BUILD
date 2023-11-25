@@ -47,6 +47,7 @@ cc_library(
         "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",
+        ":stop_primitive",
     ],
 )
 
@@ -88,6 +89,40 @@ cc_library(
     deps = [
         ":all_tactics",
         "//proto:tbots_cc_proto",
+        "//proto/message_translation:tbots_protobuf",
+    ],
+)
+
+cc_library(
+    name = "primitive",
+    hdrs = [
+        "primitive.h",
+    ],
+    deps = [
+        "//proto:tbots_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "move_primitive",
+    srcs = ["move_primitive.cpp"],
+    hdrs = [
+        "move_primitive.h",
+    ],
+    deps = [
+        ":primitive",
+        "//proto/message_translation:tbots_protobuf",
+    ],
+)
+
+cc_library(
+    name = "stop_primitive",
+    srcs = ["stop_primitive.cpp"],
+    hdrs = [
+        "stop_primitive.h",
+    ],
+    deps = [
+        ":primitive",
         "//proto/message_translation:tbots_protobuf",
     ],
 )

@@ -27,6 +27,14 @@ message Obstacles
 message ObstaclesList
 {
     // TODO: Could use a one of?!
+//    message ObstacleType
+//    {
+//        oneof obstacles
+//        {
+//            Polygon polygon = 1;
+//            Circle circle   = 2;
+//        }
+//    }
     repeated Obstacles obstacles = 1;
 }
 

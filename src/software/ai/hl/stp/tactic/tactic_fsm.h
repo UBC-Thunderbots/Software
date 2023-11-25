@@ -7,23 +7,31 @@
 #include "software/ai/navigator/path_planner/enlsvg_path_planner.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
+#include "software/ai/hl/stp/tactic/primitive.h"
+#include "software/ai/hl/stp/tactic/stop_primitive.h"
 
 using SetPrimitiveCallback = std::function<void(std::unique_ptr<Primitive>)>;
 
 // The tactic update struct is used to update tactics and set the new primitive
 struct TacticUpdate
 {
-    TacticUpdate(const Robot &robot, const World &world, const SetPrimitiveCallback &set_primitive_fun)
-        : robot(robot),
-          world(world),
-          set_primitive(set_primitive_fun)
+    TacticUpdate(const Robot &robot,
+                 const World &world,
+                 const TbotsProto::RobotNavigationObstacleConfig &obstacle_config,
+                 const SetPrimitiveCallback &set_primitive_fun)
+            : robot(robot),
+              world(world),
+              obstacle_config(obstacle_config),
+              set_primitive(set_primitive_fun)
     {
     }
 
     // updated robot that tactic is assigned to
     Robot robot;
     // updated world
-    World world;
+    World world; // TODO: Update to use shared_ptr
+    // obstacle config
+    TbotsProto::RobotNavigationObstacleConfig obstacle_config;
     // callback to return the next primitive
     SetPrimitiveCallback set_primitive;
 };
@@ -66,5 +74,21 @@ struct TacticUpdate
         return state_str;                                                                \
     }
 
+#define SET_MOVE_PRIMITIVE(DESTINATION, FINAL_ANGLE, MAX_ALLOWED_SPEED_MODE, DRIBBLE_MODE, BALL_COLLISION_TYPE, AUTO_CHIP_OR_KICK, COST_OVERRIDE)                                                  \
+    event.common.set_primitive(                                                          \
+        std::make_unique<Primitive>(                                                     \
+                event.common.world,                                                      \
+                std::make_shared<Tactic>(*this),                                         \
+                event.common.robot,                                                      \
+                event.common.obstacle_config,                                            \
+                        DESTINATION,                                                     \
+                        FINAL_ANGLE,                                                     \
+                        MAX_ALLOWED_SPEED_MODE,                                          \
+                        DRIBBLE_MODE,                                                    \
+                        BALL_COLLISION_TYPE,                                             \
+                        AUTO_CHIP_OR_KICK,                                               \
+                        COST_OVERRIDE                                                    \
+                ));
+
 #define SET_STOP_PRIMITIVE_ACTION                                                        \
-    [this](auto event) { event.common.set_primitive(createStopPrimitive()); }
+    [this](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>); }

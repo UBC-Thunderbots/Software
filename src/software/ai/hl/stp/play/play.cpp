@@ -375,14 +375,14 @@ Play::assignTactics(const World &world, TacticVector tactic_vector, const std::v
     auto remaining_robots  = robots_to_assign;
 
 
-    std::vector<std::unique_ptr<TbotsProto::PrimitiveSet>> primitive_sets;
+    std::vector<std::map<RobotId, std::unique_ptr<Primitive>>> primitive_sets;
 
     for (auto tactic : tactic_vector)
     {
         primitive_sets.emplace_back(tactic->get(world));
-        CHECK(primitive_sets.back()->robot_primitives().size() ==
+        CHECK(primitive_sets.back().size() ==
               world.friendlyTeam().numRobots())
-            << primitive_sets.back()->robot_primitives().size() << " primitives from "
+            << primitive_sets.back().size() << " primitives from "
             << objectTypeName(*tactic)
             << " is not equal to the number of robots, which is "
             << world.friendlyTeam().numRobots();
@@ -414,10 +414,10 @@ Play::assignTactics(const World &world, TacticVector tactic_vector, const std::v
         {
             Robot robot                    = robots_to_assign.at(row);
             std::shared_ptr<Tactic> tactic = tactic_vector.at(col);
-            auto primitives                = primitive_sets.at(col)->robot_primitives();
+            auto primitives                = primitive_sets.at(col);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
-            double robot_cost_for_tactic = primitives.at(robot.id()).cost();
+            double robot_cost_for_tactic = primitives.at(robot.id())->getEstimatedPrimitiveCost();
 
             std::set<RobotCapability> required_capabilities =
                 tactic->robotCapabilityRequirements();
@@ -468,11 +468,13 @@ Play::assignTactics(const World &world, TacticVector tactic_vector, const std::v
                                                            robot_id);
                 tactic_vector.at(col)->setLastExecutionRobot(robot_id);
 
-                auto primitives = primitive_sets.at(col)->robot_primitives();
+                auto primitives = primitive_sets.at(col);
                 CHECK(primitives.contains(robot_id))
                     << "Couldn't find a primitive for robot id " << robot_id;
+
+                // Only generate primitive proto message for the final primitive to robot assignment
                 primitives_to_run->mutable_robot_primitives()->insert(
-                    google::protobuf::MapPair(robot_id, primitives.at(robot_id)));
+                    google::protobuf::MapPair(robot_id, *primitives.at(robot_id)->generatePrimitiveProtoMessage()));
                 remaining_robots.erase(
                     std::remove_if(remaining_robots.begin(), remaining_robots.end(),
                                    [robots_to_assign, row](const Robot &robot) {
