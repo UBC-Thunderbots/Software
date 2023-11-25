@@ -76,7 +76,7 @@ struct TacticUpdate
 
 #define SET_MOVE_PRIMITIVE(DESTINATION, FINAL_ANGLE, MAX_ALLOWED_SPEED_MODE, DRIBBLE_MODE, BALL_COLLISION_TYPE, AUTO_CHIP_OR_KICK, COST_OVERRIDE)                                                  \
     event.common.set_primitive(                                                          \
-        std::make_unique<Primitive>(                                                     \
+        std::make_unique<MovePrimitive>(                                                     \
                 event.common.world,                                                      \
                 std::make_shared<Tactic>(*this),                                         \
                 event.common.robot,                                                      \

@@ -1,3 +1,5 @@
+import time
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
@@ -57,6 +59,15 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         # This must be enabled for the mouse_moved_in_scene_signal to be emitted
         self.detect_mouse_movement_in_scene = False
+
+        self.previous_time = time.time()
+
+        self.frameSwapped.connect(self.callback)
+
+
+    def callback(self):
+        print(1000 * (time.time() - self.previous_time))
+        self.previous_time = time.time()
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was pressed

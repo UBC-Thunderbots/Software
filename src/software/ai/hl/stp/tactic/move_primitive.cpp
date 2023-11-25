@@ -6,7 +6,7 @@
 MovePrimitive::MovePrimitive(const World &world,
                              const shared_ptr<Tactic> &tactic,
                              const Robot &robot,
-                             const TbotsProto::RobotNavigationObstacleConfig &config,
+//                             const TbotsProto::RobotNavigationObstacleConfig &config,
                              const Point &destination,
                              const Angle &final_angle,
                              const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
@@ -117,10 +117,11 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
 
 std::vector<ObstaclePtr> MovePrimitive::generateObstacles() const
 {
+    // TODO: Pass motion constraints instead of tactic
     auto motion_constraints = buildMotionConstraintSet(world.gameState(), *tactic);
     std::vector<ObstaclePtr> obstacles = obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints,
                                                                                                world);
-
+    // TODO: Could dependency inject the obstacle_factory
     for (const Robot &enemy: world.enemyTeam().getAllRobots())
     {
         obstacles.push_back(

@@ -16,10 +16,7 @@ class MovePrimitive : public Primitive
 {
 public:
     MovePrimitive(
-            const World &world,
-            const shared_ptr<Tactic> &tactic,
             const Robot &robot,
-            const TbotsProto::RobotNavigationObstacleConfig &config,
             const Point &destination,
             const Angle &final_angle,
             const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
@@ -35,7 +32,15 @@ public:
     *
     * @return the primitive proto message
     */
-    std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage() override;
+    [obstacles](start, destination){
+        return traj;
+    }
+
+    std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
+            const World &world,
+            const shared_ptr<Tactic> &tactic, // -> set<motionConstraints>
+            const TbotsProto::RobotNavigationObstacleConfig &config, // -> obstacle factory
+            ) override;
 
 private:
     std::vector<ObstaclePtr> generateObstacles() const;
