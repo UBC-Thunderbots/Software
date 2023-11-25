@@ -90,6 +90,12 @@ class Thunderscope(object):
         except Exception:
             pass
 
+        # Keyboard Estop shortcut
+        # only used when in keyboard estop mode
+        self.keyboard_estop_shortcut = QtGui.QShortcut(
+            QtGui.QKeySequence(" "), self.window
+        )
+
         # Save and Load Prompts
         #
         # NOTE: As long as Thunderscope has focus, the keyboard shortcuts will
