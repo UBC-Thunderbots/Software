@@ -50,12 +50,6 @@ class ChickerWidget(QWidget):
         self.no_auto_button.setChecked(True)
 
         # sliders
-        (
-            self.geneva_slider_layout,
-            self.geneva_slider,
-            self.geneva_label,
-        ) = common_widgets.create_slider("Geneva Position", 1, NUM_GENEVA_ANGLES, 1)
-        vbox_layout.addLayout(self.geneva_slider_layout)
 
         (
             self.power_slider_layout,
@@ -70,7 +64,6 @@ class ChickerWidget(QWidget):
         self.radio_checkable = {"no_auto": True, "auto_kick": True, "auto_chip": True}
 
         # initial values
-        self.geneva_value = 3
         self.power_value = 1
 
     def change_button_state(self, button, enable):
@@ -90,10 +83,6 @@ class ChickerWidget(QWidget):
 
     def refresh(self):
 
-        # slider values
-        geneva_value = self.geneva_slider.value()
-        self.geneva_label.setText(Slot.Name(geneva_value))
-
         power_value = self.power_slider.value()
         self.power_label.setText(str(power_value))
 
@@ -105,7 +94,6 @@ class ChickerWidget(QWidget):
         self.change_button_state(self.chip_button, not auto_kick_enabled)
 
         power_control = PowerControl()
-        power_control.geneva_slot = geneva_value
 
         # If auto is enabled, we want to populate the autochip or kick message
         if self.auto_kick_button.isChecked():
