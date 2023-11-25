@@ -1,5 +1,7 @@
 import argparse
 import numpy
+
+from software.thunderscope.robot_comminication_source import DiagnosticsControlManager
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
@@ -237,6 +239,7 @@ if __name__ == "__main__":
             args.run_diagnostics,
             args.visualization_buffer_size,
         )
+        print(tscope_config.tabs[3].widgets)
         tscope = Thunderscope(config=tscope_config, layout_path=args.layout,)
 
         current_proto_unix_io = None
@@ -276,16 +279,19 @@ if __name__ == "__main__":
                 )
 
             if args.run_diagnostics:
+                diagnostics_control_manager = DiagnosticsControlManager()
+                robot_communication.add_diagnostics_control_manager(diagnostics_control_manager)
                 for tab in tscope_config.tabs:
                     if hasattr(tab, "widgets"):
                         robot_view_widget = tab.find_widget("Robot View")
 
                         if robot_view_widget:
                             robot_view_widget.control_mode_signal.connect(
-                                lambda mode, robot_id: robot_communication.toggle_robot_connection(
+                                lambda mode, robot_id: diagnostics_control_manager.toggle_robot_connection(
                                     mode, robot_id
                                 )
                             )
+
 
             if args.run_blue or args.run_yellow:
                 robot_communication.setup_for_fullsystem()

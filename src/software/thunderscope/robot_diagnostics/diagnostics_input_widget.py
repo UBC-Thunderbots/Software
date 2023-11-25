@@ -5,9 +5,9 @@ import software.thunderscope.common.common_widgets as common_widgets
 from enum import IntEnum
 
 
-class ControlMode(IntEnum):
+class DirectControlMode(IntEnum):
     """
-    Enum for the 2 modes of control (Manual and XBox)
+    Enum for the 2 modes of direct control (Manual and XBox)
     """
 
     DIAGNOSTICS = 0
@@ -25,9 +25,9 @@ class FullSystemConnectWidget(QWidget):
     # Signal to indicate if manual controls should be disabled based on boolean parameter
     toggle_controls_signal = pyqtSignal(bool)
 
-    def __init__(self) -> None:
+    def __init__(self, control_mode_signal_handler) -> None:
         """
-        Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control
+        Initialises a new communication manager that handles signals received from control mode switching widgets.
         """
 
         super(FullSystemConnectWidget, self).__init__()

@@ -1,5 +1,6 @@
 from software.py_constants import *
 from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
+from software.thunderscope.robot_comminication_source import DiagnosticsControlManager
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import IndividualRobotMode, EstopMode
 import software.python_bindings as tbots_cpp
@@ -12,6 +13,7 @@ from typing import Type
 import threading
 import time
 import os
+import enum
 from google.protobuf.message import Message
 
 
@@ -47,6 +49,9 @@ class RobotCommunication(object):
 
         self.estop_path = estop_path
         self.estop_buadrate = estop_baudrate
+
+        self.robots_connected_to_handheld_controllers = set()
+        self.robots_connected_to_diagnostics = set()
 
         self.running = False
 
@@ -96,6 +101,9 @@ class RobotCommunication(object):
                 )
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
+
+    def add_diagnostics_control_manager(self, manager: DiagnosticsControlManager):
+        self.diagnostics_control_manager = manager
 
     def setup_for_fullsystem(self) -> None:
         """

@@ -37,6 +37,7 @@ py_library(
         "//software/thunderscope:dock_style",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
+        "//software/thunderscope:robot_communication_source",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
