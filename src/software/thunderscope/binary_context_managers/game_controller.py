@@ -11,7 +11,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
 from proto.import_all_protos import *
 from software.py_constants import *
-from software.thunderscope.binary_context_managers.binary_context_managers import *
+from software.thunderscope.binary_context_managers.util import *
 
 
 class Gamecontroller(object):
