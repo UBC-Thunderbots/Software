@@ -6,6 +6,7 @@ from proto.import_all_protos import *
 from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class ChickerCommandMode(Enum):
@@ -16,7 +17,7 @@ class ChickerCommandMode(Enum):
 
 
 class ChickerWidget(QWidget):
-    def __init__(self, proto_unix_io):
+    def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
         """Handles the robot diagnostics input to create a PowerControl message
         to be sent to the robots.
 
@@ -111,7 +112,7 @@ class ChickerWidget(QWidget):
         self.geneva_value = 3
         self.power_value = 1
 
-    def send_command_and_timeout(self, command):
+    def send_command_and_timeout(self, command: ChickerCommandMode) -> None:
         """
         If buttons are enabled, sends a Kick command and disables buttons
 
@@ -128,13 +129,13 @@ class ChickerWidget(QWidget):
             # set and start timer to re-enable buttons after 3 seconds
             QTimer.singleShot(CHICKER_TIMEOUT, self.enable_kick_chip_buttons)
 
-    def disable_kick_chip_buttons(self):
+    def disable_kick_chip_buttons(self) -> None:
         """
         Disables the buttons
         """
         self.kick_chip_buttons_enable = False
 
-    def enable_kick_chip_buttons(self):
+    def enable_kick_chip_buttons(self) -> None:
         """
         If buttons should be enabled, enables them
         """
@@ -145,7 +146,7 @@ class ChickerWidget(QWidget):
             # just to start fresh and clear any unwanted protos
             self.clear_proto_buffer()
 
-    def set_should_enable_buttons(self, enable):
+    def set_should_enable_buttons(self, enable: bool) -> None:
         """
         Changes if buttons are clickable or not based on boolean parameter
 
@@ -158,7 +159,7 @@ class ChickerWidget(QWidget):
         else:
             self.disable_kick_chip_buttons()
 
-    def send_command(self, command):
+    def send_command(self, command: ChickerCommandMode) -> None:
         """Sends a [auto]kick or [auto]chip primitive
 
         :param command: enum int value to indicate what primitive to send
@@ -194,7 +195,7 @@ class ChickerWidget(QWidget):
         if command == ChickerCommandMode.KICK or command == ChickerCommandMode.CHIP:
             self.clear_proto_buffer()
 
-    def clear_proto_buffer(self):
+    def clear_proto_buffer(self) -> None:
         """
         Sends an empty proto to the proto unix io buffer
         This is due to a bug in robot_communication where if a new PowerControl message is not sent,
@@ -205,7 +206,7 @@ class ChickerWidget(QWidget):
         power_control = PowerControl()
         self.proto_unix_io.send_proto(PowerControl, power_control, True)
 
-    def change_button_state(self, button, enable):
+    def change_button_state(self, button: QPushButton, enable: bool) -> None:
         """Change button color and clickable state.
 
         :param button: button to change the state of
@@ -220,7 +221,7 @@ class ChickerWidget(QWidget):
             button.setStyleSheet("background-color: Grey")
             button.setCheckable(False)
 
-    def refresh(self):
+    def refresh(self) -> None:
 
         # gets slider values and sets label to that value
         geneva_value = self.geneva_slider.value()
