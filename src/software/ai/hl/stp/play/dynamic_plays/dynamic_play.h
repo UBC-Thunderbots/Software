@@ -30,7 +30,7 @@ class DynamicPlay : public Play
 
     void updateTactics(const PlayUpdate &play_update) override;
 
-    SupportTacticCandidateVector support_tactic_candidates_;
+    std::vector<std::shared_ptr<SupportTacticCandidate>> support_tactic_candidates_;
 
     std::unique_ptr<FeasibilityScorer> support_tactic_feasibility_scorer_;
     std::unique_ptr<DuplicationScorer> support_tactic_duplication_scorer_;
@@ -39,3 +39,11 @@ class DynamicPlay : public Play
     std::shared_ptr<Tactic> attacker_tactic_;
     std::vector<std::shared_ptr<Tactic>> support_tactics_;
 };
+
+/**
+ * Returns all SupportTacticCandidates eligible for scoring and assignment
+ * in a DynamicPlay
+ * 
+ * @return a vector of shared pointers to all SupportTacticCandidates
+ */
+std::vector<std::shared_ptr<SupportTacticCandidate>> allSupportTacticCandidates();

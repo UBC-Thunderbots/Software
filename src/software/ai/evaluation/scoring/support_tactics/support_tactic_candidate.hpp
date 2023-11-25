@@ -27,7 +27,7 @@ class SupportTacticCandidate : public Candidate
     /**
      * Accepts a SupportTacticScorer and calls the scorer's `update` function 
      * on itself. This lets SupportTacticScorer update its state based on
-     * the subtype of SupportTacticCandidate provided to it.
+     * this SupportTacticCandidate
      *
      * @param scorer a SupportTacticScorer to update
      */
@@ -76,18 +76,3 @@ class TypedSupportTacticCandidate : public SupportTacticCandidate
         return std::make_shared<TSupportTactic>();
     }
 };
-
-using SupportTacticCandidateVector = std::vector<std::shared_ptr<SupportTacticCandidate>>;
-
-/**
- * Returns all SupportTacticCandidates
- * 
- * @return a vector of shared pointers to all SupportTacticCandidates
- */
-inline SupportTacticCandidateVector allSupportTacticCandidates() 
-{
-    return 
-    {
-        std::make_shared<TypedSupportTacticCandidate<ReceiverTactic>>()
-    };
-}

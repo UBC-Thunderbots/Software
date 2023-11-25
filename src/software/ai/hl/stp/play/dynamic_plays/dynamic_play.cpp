@@ -45,3 +45,11 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
 
     play_update.set_tactics({{attacker_tactic_}, support_tactics_});
 }
+
+std::vector<std::shared_ptr<SupportTacticCandidate>> allSupportTacticCandidates()
+{
+    return 
+    {
+        std::make_shared<TypedSupportTacticCandidate<ReceiverTactic>>()
+    };
+}
