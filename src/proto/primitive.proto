@@ -117,23 +117,21 @@ message PowerControl
 
 message Primitive
 {
+    reserved 5;
     oneof primitive
     {
         MovePrimitive move                    = 1;
         StopPrimitive stop                    = 2;
         DirectControlPrimitive direct_control = 3;
     }
-    double cost = 5;
 }
 
 message MovePrimitive
 {
     // Fields deprecated after transitioning to trajectory planning
-    reserved 1, 2, 3, 4, 5, 7, 9;
+    reserved 1, 2, 3, 4, 5, 7, 8, 9;
 
     AutoChipOrKick auto_chip_or_kick      = 6;
-    BallCollisionType ball_collision_type = 8;
-
     TrajectoryPathParams2D xy_traj_params   = 10;
     TrajectoryParamsAngular1D w_traj_params = 11;
     DribblerMode dribbler_mode              = 12;
@@ -153,7 +151,7 @@ message TrajectoryPathParams2D
     Vector initial_velocity = 3;
     MaxAllowedSpeedMode max_speed_mode = 4;
     Point sub_destination = 5;
-    double connection_time = 6; // Multiple of 0.2, could simplify to char (i.e. uint8)
+    float connection_time = 6; // Multiple of 0.2, could simplify to char (i.e. uint8)
 }
 
 message TrajectoryParamsAngular1D
