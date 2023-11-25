@@ -1,5 +1,3 @@
-#include "software/util/type_map/type_map.h"
-
 template <class TValue>
 TypeMap<TValue>::TypeMap() : map_()
 {
@@ -48,7 +46,14 @@ TypeMap<TValue>::ConstIterator TypeMap<TValue>::find() const
 
 template <class TValue>
 template <class TKey>
-TypeMap<TValue>::void TypeMap<TValue>::put(TValue &&value) 
+void TypeMap<TValue>::put(TValue &&value) 
 {
     map_[getTypeId<TKey>()] = std::forward<TValue>(value);
 }  
+
+template <class TValue>
+template <class TKey>
+TValue& TypeMap<TValue>::getOrDefault()
+{
+    return map_[getTypeId<TKey>()];
+}

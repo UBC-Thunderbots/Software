@@ -40,7 +40,7 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
         std::shared_ptr<Tactic> support_tactic = (*best_candidate)->createSupportTactic();
         support_tactics_.push_back(support_tactic);
 
-        support_tactic_duplication_scorer_->recordCandidateSelection(**best_candidate);
+        (*best_candidate)->updateScorer(*support_tactic_duplication_scorer_);
     }
 
     play_update.set_tactics({{attacker_tactic_}, support_tactics_});

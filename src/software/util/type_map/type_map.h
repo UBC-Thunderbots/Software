@@ -32,10 +32,10 @@ class TypeMap
     ConstIterator end() const;
 
     /**
-     * Finds the value associated with the type `TKey` in the TypeMap
+     * Finds the element associated with the type `TKey` in the TypeMap
      *
      * @tparam TKey the type of the key to lookup in the TypeMap
-     * @return the value associated with the given key type
+     * @return the element associated with the given key type
      */
     template <class TKey>
     Iterator find();
@@ -54,6 +54,18 @@ class TypeMap
      */
     template <class TKey>
     void put(TValue &&value);
+
+    /**
+     * Returns a reference to the value that is mapped to the type `TKey`, 
+     * performing an insertion if such key does not already exist
+     *
+     * @see std::unordered_map::operator[]
+     *
+     * @tparam TKey the type of the key to lookup in the TypeMap
+     * @return a reference to the value mapped to the given key
+     */
+    template <class TKey>
+    TValue& getOrDefault();
 
    private:
     InternalMap map_;

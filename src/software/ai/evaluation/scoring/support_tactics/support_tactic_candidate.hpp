@@ -23,6 +23,15 @@ class SupportTacticCandidate : public Candidate
      * @param scorer a SupportTacticScorer to use to score this candidate
      */
     virtual void score(SupportTacticScorer &scorer) = 0;
+
+    /**
+     * Accepts a SupportTacticScorer and calls the scorer's `update` function 
+     * on itself. This lets SupportTacticScorer update its state based on
+     * the subtype of SupportTacticCandidate provided to it.
+     *
+     * @param scorer a SupportTacticScorer to update
+     */
+    virtual void updateScorer(SupportTacticScorer &scorer) = 0;
     
     /**
      * Returns a shared pointer to a newly constructed instance of the
@@ -57,21 +66,25 @@ class TypedSupportTacticCandidate : public SupportTacticCandidate
         applyScore(scorer.score(*this));
     }
 
+    void updateScorer(SupportTacticScorer &scorer) override
+    {
+        scorer.update(*this);
+    }
+
     std::shared_ptr<Tactic> createSupportTactic() override
     {
         return std::make_shared<TSupportTactic>();
     }
 };
 
-using SupportTacticCandidateVector = 
-    std::vector<std::shared_ptr<SupportTacticCandidate>>;
+using SupportTacticCandidateVector = std::vector<std::shared_ptr<SupportTacticCandidate>>;
 
 /**
  * Returns all SupportTacticCandidates
  * 
  * @return a vector of shared pointers to all SupportTacticCandidates
  */
-static inline SupportTacticCandidateVector allSupportTacticCandidates() 
+inline SupportTacticCandidateVector allSupportTacticCandidates() 
 {
     return 
     {
