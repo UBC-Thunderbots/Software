@@ -29,6 +29,7 @@ message Tactic
         ReceiverTactic receiver                             = 12;
         ShadowEnemyTactic shadow_enemy                      = 13;
         StopTactic stop                                     = 14;
+        PassDefenderTactic pass_defender                    = 15;
     }
 }
 
@@ -127,6 +128,12 @@ message MoveTactic
     required double target_spin_rev_per_s = 8;
 }
 
+message PassDefenderTactic
+{
+    // The location on the field to block enemy passes from
+    required Point position_to_block_from = 1;
+}
+
 message PenaltyKickTactic {}
 
 message PivotKickTactic
@@ -158,7 +165,4 @@ message ShadowEnemyTactic
     required double shadow_distance = 2;
 }
 
-message StopTactic
-{
-    required bool coast = 1;
-}
+message StopTactic {}

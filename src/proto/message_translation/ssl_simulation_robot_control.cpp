@@ -174,7 +174,10 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
     }
     if (dribbler_speed.has_value())
     {
-        robot_command->set_dribbler_speed(static_cast<float>(dribbler_speed.value()));
+        // NOTE: our dribbler speed for the robots is negative RPM to dribble, but
+        // the RobotCommand expects positive RPM to dribble. So we invert the sign
+        robot_command->set_dribbler_speed(-1.0f *
+                                          static_cast<float>(dribbler_speed.value()));
     }
 
     *(robot_command->mutable_move_command()) = *move_command;

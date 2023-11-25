@@ -11,17 +11,13 @@
 #include "software/math/math_functions.h"
 
 
-BallFilter::BallFilter(double ball_rolling_acceleration)
-    : ball_detection_buffer(MAX_BUFFER_SIZE),
-      ball_rolling_acceleration(ball_rolling_acceleration)
-{
-}
+BallFilter::BallFilter() : ball_detection_buffer(MAX_BUFFER_SIZE) {}
 
 std::optional<Ball> BallFilter::estimateBallState(
     const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area)
 {
     addNewDetectionsToBuffer(new_ball_detections, filter_area);
-    return estimateBallStateFromBuffer(ball_detection_buffer, ball_rolling_acceleration);
+    return estimateBallStateFromBuffer(ball_detection_buffer);
 }
 
 void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
@@ -104,7 +100,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
 }
 
 std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
-    boost::circular_buffer<BallDetection> ball_detections, double ball_rolling_acceleration=0)
+    boost::circular_buffer<BallDetection> ball_detections)
 {
     // Sort the detections in decreasing order before processing. This places the most
     // recent detections (with the largest timestamp) at the front of the buffer, and the
@@ -132,16 +128,17 @@ std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
     }
     ball_detections.resize(*adjusted_buffer_size);
 
-    auto regression= calculateLineOfBestFit(ball_detections);
+    auto regression = calculateLineOfBestFit(ball_detections);
 
-    Point filtered_position = estimateBallPosition(ball_detections, regression.regression_line);
+    Point filtered_position =
+        estimateBallPosition(ball_detections, regression.regression_line);
 
     auto estimated_velocity = estimateBallVelocity(ball_detections, std::nullopt);
 
-    // TODO: update this threshold
-    if(regression.regression_error < 1000)
+    if (regression.regression_error < LINEAR_REGRESSION_ERROR_THRESHOLD)
     {
-        estimated_velocity = estimateBallVelocity(ball_detections, regression.regression_line);
+        estimated_velocity =
+            estimateBallVelocity(ball_detections, regression.regression_line);
     }
     if (!estimated_velocity)
     {
@@ -150,16 +147,7 @@ std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
 
     BallState ball_state(filtered_position, estimated_velocity->average_velocity,
                          ball_detections.front().distance_from_ground);
-    Vector acceleration = Vector();
-
-
-    if (estimated_velocity->average_velocity.length() < 0.1)
-    {
-        acceleration =
-            -1 * std::abs(ball_rolling_acceleration) * estimated_velocity->average_velocity;
-    }
-
-    return Ball(ball_state, ball_detections.front().timestamp, acceleration);
+    return Ball(ball_state, ball_detections.front().timestamp);
 }
 
 std::optional<size_t> BallFilter::getAdjustedBufferSize(
@@ -273,7 +261,7 @@ BallFilter::LinearRegressionResults BallFilter::calculateLinearRegression(
     // Perform linear regression to find the line of best fit through the ball positions.
     // This is solving the formula Ax = b, where x is the vector we want to solve for.
     Eigen::Vector2f regression_vector =
-        A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+        A.bdcSvd<Eigen::ComputeThinU | Eigen::ComputeThinV>().solve(b);
     // How to calculate the error is from
     // https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
     double regression_error = std::numeric_limits<double>::max();

@@ -4,9 +4,9 @@ echo "================================================================"
 echo "Installing CLion"
 echo "================================================================"
 
-clion_version_year="2019"
-clion_version_major="3"
-clion_version_minor="5"
+clion_version_year="2021"
+clion_version_major="2"
+clion_version_minor="4"
 clion_version="${clion_version_year}.${clion_version_major}.${clion_version_minor}"
 clion_executable_path="/usr/local/bin/clion"
 
@@ -19,7 +19,7 @@ then
         echo "================================================================"
 else
     # Download clion
-    wget -O /tmp/CLion-${clion_version}.tar.gz "https://download-cf.jetbrains.com/cpp/CLion-${clion_version}.tar.gz"
+    wget -O /tmp/CLion-${clion_version}.tar.gz "https://download.jetbrains.com/cpp/CLion-${clion_version}.tar.gz"
 
     # Unzip and symlink to usr location
     sudo tar xfz /tmp/CLion-${clion_version}.tar.gz -C /opt
@@ -43,9 +43,9 @@ echo "Installing Bazel Plugin"
 echo "================================================================"
 
 clion_plugin_dir="${HOME}/.CLion${clion_version_year}.${clion_version_major}/config/plugins"
-bazel_plugin_version_year="2020"
-bazel_plugin_version_major="04"
-bazel_plugin_version_minor="13"
+bazel_plugin_version_year="2022"
+bazel_plugin_version_major="03"
+bazel_plugin_version_minor="22"
 bazel_plugin_version="v${bazel_plugin_version_year}.${bazel_plugin_version_major}.${bazel_plugin_version_minor}"
 
 if [ -d "${clion_plugin_dir}/clwb" ]

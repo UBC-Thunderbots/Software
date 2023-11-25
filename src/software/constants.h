@@ -33,6 +33,7 @@ const std::string YELLOW_PRIMITIVE_SET                   = "/yellow_primitive_se
 const std::string SIMULATOR_STATE_PATH                   = "/simulator_state";
 const std::string DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH  = "/dynamic_parameter_request";
 const std::string DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH = "/dynamic_parameter_response";
+const std::string WORLD_STATE_RECEIVED_TRIGGER_PATH = "/world_state_received_trigger";
 
 const unsigned UNIX_BUFFER_SIZE = 20000;
 
@@ -40,12 +41,16 @@ static const double BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING =
     BALL_MAX_RADIUS_METERS -
     2 * BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
 
-static const double SPECIAL_INDICATOR_DISTANCE_FOR_BREAKBEAM = 0.01;
-
 // Redis Keys
 const std::string ROBOT_ID_REDIS_KEY                = "/robot_id";
 const std::string ROBOT_MULTICAST_CHANNEL_REDIS_KEY = "/channel_id";
 const std::string ROBOT_NETWORK_INTERFACE_REDIS_KEY = "/network_interface";
+const std::string ROBOT_KICK_CONSTANT_REDIS_KEY     = "/kick_constant";
+const std::string ROBOT_KICK_EXP_COEFF_REDIS_KEY    = "/kick_coeff";
+const std::string ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY  = "/chip_pulse_width";
+const std::string ROBOT_CURRENT_DRAW_REDIS_KEY      = "/current_draw";
+const std::string ROBOT_BATTERY_VOLTAGE_REDIS_KEY   = "/battery_voltage";
+const std::string ROBOT_CAPACITOR_VOLTAGE_REDIS_KEY = "/cap_voltage";
 
 const std::string SSL_VISION_ADDRESS          = "224.5.23.2";
 static constexpr unsigned int SSL_VISION_PORT = 10020;

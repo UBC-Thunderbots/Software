@@ -23,13 +23,13 @@ message Field
 
 message World
 {
-    required Timestamp time_sent  = 1;
-    required Field field          = 2;
-    required Team friendly_team   = 3;
-    required Team enemy_team      = 4;
-    required Ball ball            = 5;
-    required GameState game_state = 6;
-    // required uint64 sequence_number = 7;
+    required Timestamp time_sent    = 1;
+    required Field field            = 2;
+    required Team friendly_team     = 3;
+    required Team enemy_team        = 4;
+    required Ball ball              = 5;
+    required GameState game_state   = 6;
+    optional uint64 sequence_number = 7;
 }
 
 enum FieldType
@@ -46,12 +46,18 @@ message WorldState
     optional BallState ball_state         = 3;
 }
 
+message WorldStateReceivedTrigger {}
+
 message SimulatorTick
 {
     // The duration to step the simulation
     required double milliseconds = 1;
 }
 
+message SimulationState
+{
+    required bool is_playing = 1 [default = true];
+}
 message Pass
 {
     // The location of the passer

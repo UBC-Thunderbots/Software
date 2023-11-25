@@ -32,7 +32,7 @@ TEST_F(OffensePlayTest, test_offense_play)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::OffensePlay);
+    setAiPlay(TbotsProto::PlayName::OffensePlay);
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -71,7 +71,7 @@ TEST_F(OffensePlayTest, test_offense_play_with_keep_away)
          field.enemyGoalCenter(), field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TbotsProto::PlayName::OffensePlay);
+    setAiPlay(TbotsProto::PlayName::OffensePlay);
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

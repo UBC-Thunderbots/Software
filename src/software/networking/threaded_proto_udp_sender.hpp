@@ -4,14 +4,14 @@
 #include <boost/bind.hpp>
 #include <string>
 
-#include "software/networking/proto_udp_sender.hpp"
+#include "software/networking/udp_sender.h"
 
 template <class SendProto>
 class ThreadedProtoUdpSender
 {
    public:
     /**
-     * Creates a ProtoUdpSender that sends the SendProto over the network on the
+     * Creates a UdpSender that sends the SendProto over the network on the
      * given address and port.
      *
      * @param ip_address The ip address to send data on
@@ -39,7 +39,10 @@ class ThreadedProtoUdpSender
    private:
     // The io_service that will be used to service all network requests
     boost::asio::io_service io_service;
-    ProtoUdpSender<SendProto> udp_sender;
+
+    std::string data_buffer;
+    UdpSender udp_sender;
+
     // The thread running the io_service in the background. This thread will run for the
     // entire lifetime of the class
     std::thread io_service_thread;
@@ -73,7 +76,8 @@ ThreadedProtoUdpSender<SendProtoT>::~ThreadedProtoUdpSender()
 template <class SendProtoT>
 void ThreadedProtoUdpSender<SendProtoT>::sendProto(const SendProtoT& message)
 {
-    udp_sender.sendProto(message);
+    message.SerializeToString(&data_buffer);
+    udp_sender.sendString(data_buffer);
 }
 
 template<class SendProto>

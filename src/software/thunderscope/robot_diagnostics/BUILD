@@ -15,11 +15,42 @@ py_library(
 
 py_library(
     name = "chicker",
-    srcs = ["chicker.py"],
+    srcs = ["chicker_widget.py"],
     deps = [
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "diagnostics_input_widget",
+    srcs = ["diagnostics_input_widget.py"],
+    deps = [
+        "//software/thunderscope:constants",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "robot_info",
+    srcs = ["robot_info.py"],
+    deps = [
+        ":motor_fault_view",
+        "//software/thunderscope:constants",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "motor_fault_view",
+    srcs = ["motor_fault_view.py"],
+    deps = [
+        "//software/thunderscope/common:common_widgets",
+        "//software/thunderscope/common:proto_parameter_tree_util",
+        "//software/thunderscope/robot_diagnostics/motor_fault_icons:motor_fault_icon_loader",
     ],
 )
 
@@ -29,6 +60,8 @@ py_library(
     deps = [
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope/robot_diagnostics:robot_info",
+        "//software/thunderscope/robot_diagnostics:robot_status",
         requirement("pyqtgraph"),
     ],
 )
@@ -41,4 +74,9 @@ py_library(
         "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),
     ],
+)
+
+py_library(
+    name = "robot_status",
+    srcs = ["robot_status.py"],
 )

@@ -94,9 +94,9 @@ class UartFramingTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        test_message = createNanoPbPowerPulseControl(ChickerCommandMode::AUTOCHIPORKICK,
-                                                     1, 2, AutoChipOrKickMode::AUTOCHIP,
-                                                     3, 4, TbotsProto_Geneva_Slot_LEFT);
+        test_message = createNanoPbPowerPulseControl(
+            ChickerCommandMode::AUTOCHIPORKICK, 1.0, 2.0, AutoChipOrKickMode::AUTOCHIP,
+            3.0, 4.0, TbotsProto_Geneva_Slot_LEFT);
     }
 
     TbotsProto_PowerPulseControl test_message;

@@ -22,12 +22,12 @@ message RobotStatus
 
 message ThunderloopStatus
 {
-    uint64 network_service_poll_time_ns     = 1;
-    uint64 primitive_executor_start_time_ns = 2;
-    uint64 primitive_executor_step_time_ns  = 3;
-    uint64 motor_service_poll_time_ns       = 4;
-    uint64 power_service_poll_time_ns       = 5;
-    uint64 iteration_time_ns                = 6;
+    double network_service_poll_time_ms     = 1;
+    double primitive_executor_start_time_ms = 2;
+    double primitive_executor_step_time_ms  = 3;
+    double motor_service_poll_time_ms       = 4;
+    double power_service_poll_time_ms       = 5;
+    double iteration_time_ms                = 6;
 }
 
 message JetsonStatus
@@ -40,12 +40,10 @@ message JetsonStatus
 message ChipperKickerStatus
 {
     // Indicates the time elapsed since chipper was last fired in ms
-    // UINT64_MAX indicates chipper was never fired
-    uint32 ms_since_chipper_fired = 1;
+    double ms_since_chipper_fired = 1;
 
     // Indicates the time elapsed since kicker was last fired in ms
-    // UINT64_MAX indicates kicker was never fired
-    uint32 ms_since_kicker_fired = 2;
+    double ms_since_kicker_fired = 2;
 }
 
 /* Data about the status of the dribbler
@@ -59,6 +57,9 @@ message DribblerStatus
 
     // Dribbler temperature
     float dribbler_temperature = 2;
+
+    repeated MotorFault motor_faults = 3;
+    bool enabled                     = 4;
 }
 
 /* Error codes are to be displayed in the visualizer */
@@ -74,33 +75,57 @@ enum ErrorCode
     DRIBBLER_MOTOR_HOT = 4;
 }
 
+enum MotorFault
+{
+    // Refer to Trinamic 6100 datasheet for precise definitions of motor faults.
+    // https://trinamic.com/fileadmin/assets/Products/ICs_Documents/TMC6100_datasheet_Rev1.00.pdf
+    // (Section 5.1, p22-23)
+    RESET                             = 0;
+    DRIVER_OVERTEMPERATURE_PREWARNING = 1;
+    DRIVER_OVERTEMPERATURE            = 2;
+    UNDERVOLTAGE_CHARGEPUMP           = 3;
+    PHASE_U_SHORT_COUNTER_DETECTED    = 4;
+    PHASE_U_SHORT_TO_GND_DETECTED     = 5;
+    PHASE_U_SHORT_TO_VS_DETECTED      = 6;
+    // for the sake of consistency with the TMC 6100, "7" is unused
+    PHASE_V_SHORT_COUNTER_DETECTED = 8;
+    PHASE_V_SHORT_TO_GND_DETECTED  = 9;
+    PHASE_V_SHORT_TO_VS_DETECTED   = 10;
+    // for the sake of consistency with the TMC 6100, "11" is unused
+    PHASE_W_SHORT_COUNTER_DETECTED = 12;
+    PHASE_W_SHORT_TO_GND_DETECTED  = 13;
+    PHASE_W_SHORT_TO_VS_DETECTED   = 14;
+}
+
 message DriveUnit
 {
     // The current RPM of the wheel
     float wheel_velocity = 1;
+
+    repeated MotorFault motor_faults = 2;
+    bool enabled = 3;  // certain drive faults cause the motor to be disabled
 }
 
 /* Data from all four drive units and the dribbler */
 message MotorStatus
 {
-    DriveUnit front_left    = 1;
-    DriveUnit front_right   = 2;
-    DriveUnit back_left     = 3;
-    DriveUnit back_right    = 4;
-    DribblerStatus dribbler = 5;
-    Vector local_velocity   = 6;
+    DriveUnit front_left             = 1;
+    DriveUnit front_right            = 2;
+    DriveUnit back_left              = 3;
+    DriveUnit back_right             = 4;
+    DribblerStatus dribbler          = 5;
+    Vector local_velocity            = 6;
+    AngularVelocity angular_velocity = 7;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
 message NetworkStatus
 {
     // Indicates the time elapsed since the last vision packet was received in ms
-    // UINT64_MAX indicates no vision packet was ever received
-    uint32 ms_since_last_vision_received = 1;
+    double ms_since_last_vision_received = 1;
 
     // Indicates the time elapsed since the last primitive packet was received in ms
-    // UINT64_MAX indicates no primitive packet was ever received
-    uint32 ms_since_last_primitive_received = 2;
+    double ms_since_last_primitive_received = 2;
 }
 
 /* Battery and capacitor voltages */

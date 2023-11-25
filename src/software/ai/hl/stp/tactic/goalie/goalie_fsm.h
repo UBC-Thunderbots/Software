@@ -6,10 +6,10 @@
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/convex_angle.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/line.h"
 
@@ -75,6 +75,17 @@ struct GoalieFSM
      * @return the area within the friendly goalie's no-chip rectangle
      */
     static Rectangle getNoChipRectangle(const Field &field);
+
+    /**
+     * Finds a good point to chip the ball to from its current position
+     *
+     * @param world the world
+     * @param goalie_tactic_config the goalie tactic config
+     *
+     * @return a point on the field that is a good place to chip to
+     */
+    static Point findGoodChipTarget(
+        const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
 
     /**
      * Guard that checks if the ball is moving faster than the time_to_panic threshold
@@ -195,22 +206,6 @@ struct GoalieFSM
                 PositionToBlock_S,
             X + Update_E = X);
     }
-
-   private:
-    /*
-     * Restrains the goalie to a rectangle, with the preferred point being the one
-     * that intersects the point the goalie wants to move to and the center of the
-     * goal
-     *
-     * @param field the field to restrain the goalie on
-     * @param goalie_desired_position The point the goalie would like to go to
-     * @param goalie_restricted_area The rectangle that the goalie is to stay in
-     * @return goalie_suggested_position That the goalie should go to
-     */
-    // TODO: Refactor this function (#2045)
-    static std::optional<Point> restrainGoalieInRectangle(
-        const Field &field, Point goalie_desired_position,
-        Rectangle goalie_restricted_area);
 
    private:
     // the goalie tactic config

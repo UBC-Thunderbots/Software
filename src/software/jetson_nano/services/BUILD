@@ -11,7 +11,6 @@ cc_library(
         "//software/logger",
         "//software/physics:euclidean_to_wheel",
         "//software/util/scoped_timespec_timer",
-        "//proto/message_translation:tbots_geometry",
         "@eigen",
         "@trinamic",
     ],
@@ -27,19 +26,6 @@ cc_library(
         "//software/logger",
         "//software/uart:boost_uart_communication",
         "@boost//:asio",
-    ],
-)
-
-cc_library(
-    name = "network",
-    srcs = ["network.cpp"],
-    hdrs = ["network.h"],
-    deps = [
-        "//proto:tbots_cc_proto",
-        "//shared:robot_constants",
-        "//software/logger",
-        "//software/networking:threaded_proto_udp_listener",
-        "//software/networking:threaded_proto_udp_sender",
-        "@boost//:asio",
+        "@boost//:filesystem",
     ],
 )

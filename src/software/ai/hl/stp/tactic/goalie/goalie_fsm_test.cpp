@@ -4,59 +4,58 @@
 
 #include "software/geom/algorithms/contains.h"
 #include "software/test_util/test_util.h"
-#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 
 TEST(GoalieFSMTest, test_get_goalie_position_to_block)
 {
     Field field = Field::createSSLDivisionBField();
     TbotsProto::GoalieTacticConfig goalie_tactic_config;
-    RobotConstants_t robot_constants = create2021RobotConstants();
-    Team friendly_team;
 
-    // ball at center field, goalie should position itself at the front of the friendly
-    // defense area
+    // ball at center field, goalie should position itself at conservative depth
+    // in line with the ball
     Ball ball = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(123));
     Point goalie_pos =
-        GoalieFSM::getGoaliePositionToBlock(robot_constants, friendly_team, ball, field);
+        GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config);
     EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos));
-    EXPECT_EQ(Point(field.friendlyDefenseArea().xMax(), 0), goalie_pos);
+    EXPECT_EQ(Point(field.friendlyDefenseArea().xMin() +
+                        goalie_tactic_config.conservative_depth_meters(),
+                    0),
+              goalie_pos);
 
-    // ball at positive friendly corner, goalie should snap to centre of goal
+    // ball at positive friendly corner, goalie should snap to positive goal post
     ball.updateState(BallState(field.friendlyCornerPos(), Vector(0, 0)),
                      Timestamp::fromSeconds(123));
     Point goalie_pos_corner_positive =
-        GoalieFSM::getGoaliePositionToBlock(robot_constants, friendly_team, ball, field);
+        GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config);
     EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos_corner_positive));
-    EXPECT_EQ(field.friendlyGoalCenter() + Vector(robot_constants.robot_radius_m, 0),
+    EXPECT_EQ(field.friendlyGoalpostPos() + Vector(ROBOT_MAX_RADIUS_METERS, 0),
               goalie_pos_corner_positive);
 
-    // ball at negative friendly corner, goalie should snap to centre of goal
+    // ball at negative friendly corner, goalie should snap to negative goal post
     ball.updateState(BallState(field.friendlyGoalpostNeg(), Vector(0, 0)),
                      Timestamp::fromSeconds(123));
     Point goalie_pos_corner_negative =
-        GoalieFSM::getGoaliePositionToBlock(robot_constants, friendly_team, ball, field);
+        GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config);
     EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos_corner_negative));
-    EXPECT_EQ(field.friendlyGoalCenter() + Vector(robot_constants.robot_radius_m, 0),
+    EXPECT_EQ(field.friendlyGoalpostNeg() + Vector(ROBOT_MAX_RADIUS_METERS, 0),
               goalie_pos_corner_negative);
 
     // ball in friendly defense area
     ball.updateState(BallState(Point(-4, 0), Vector(0, 0)), Timestamp::fromSeconds(123));
     EXPECT_TRUE(
         contains(field.friendlyDefenseArea(),
-                 GoalieFSM::getGoaliePositionToBlock(robot_constants, friendly_team,ball, field)));
+                 GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config)));
 
     // ball on positive-y side of field
     ball.updateState(BallState(Point(-4, 2), Vector(0, 0)), Timestamp::fromSeconds(123));
     EXPECT_TRUE(
         contains(field.friendlyDefenseArea(),
-                 GoalieFSM::getGoaliePositionToBlock(robot_constants, friendly_team,ball, field)));
+                 GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config)));
 
     // ball on negative-y side of field
     ball.updateState(BallState(Point(-4, -2), Vector(0, 0)), Timestamp::fromSeconds(123));
     EXPECT_TRUE(
         contains(field.friendlyDefenseArea(),
-                 GoalieFSM::getGoaliePositionToBlock(robot_constants, friendly_team,ball, field)));
-
+                 GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config)));
 }
 
 TEST(GoalieFSMTest, test_get_intersections_between_ball_velocity_and_full_goal_segment)
@@ -187,4 +186,10 @@ TEST(GoalieFSMTest, test_transitions)
                 goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
                 TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
+
+    // ball is now moving quickly towards the friendly goal
+    world =
+        ::TestUtil::setBallPosition(world, Point(-3.5, 1), Timestamp::fromSeconds(124));
+    world =
+        ::TestUtil::setBallVelocity(world, Vector(-2, -1), Timestamp::fromSeconds(124));
 }

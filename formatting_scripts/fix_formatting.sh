@@ -94,9 +94,9 @@ function run_code_spell(){
     fi
 
     printf "Fixing spelling...\n\n"
-    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D $CURR_DIR/dictionary/edited_dictionary.txt # Skip binaries
+    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D $CURR_DIR/dictionary/edited_dictionary.txt -I $CURR_DIR/codespell_ignored_words.txt # Skip binaries
     cd $CURR_DIR/../src/shared && codespell -w -D $CURR_DIR/dictionary/edited_dictionary.txt
-    cd $CURR_DIR/../docs && codespell -w --skip="*.png" -D $CURR_DIR/dictionary/edited_dictionary.txt # Skip images
+    cd $CURR_DIR/../docs && codespell -w --skip="*.png,*.svg" -D $CURR_DIR/dictionary/edited_dictionary.txt # Skip images
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to fix spelling!***\n\n"

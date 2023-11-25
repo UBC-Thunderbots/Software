@@ -43,11 +43,14 @@ class BallFilter
     static constexpr double MAX_BUFFER_SIZE_VELOCITY_MAGNITUDE = 4.0;
     // The extra amount beyond the ball's max speed that we treat ball detections as valid
     static constexpr double MAX_ACCEPTABLE_BALL_SPEED_BUFFER = 2.0;
+    // The maximum error threshold to considering using the generated linear regression
+    // TODO (#2752): Investigate different values of error threshold
+    static constexpr double LINEAR_REGRESSION_ERROR_THRESHOLD = 1000.0;
 
     /**
      * Creates a new Ball Filter
      */
-    explicit BallFilter(double ball_rolling_acceleration = 0);
+    explicit BallFilter();
 
     /**
      * Update the filter with the new ball detection data, and returns the new
@@ -109,7 +112,7 @@ class BallFilter
      * calculated, returns std::nullopt
      */
     static std::optional<Ball> estimateBallStateFromBuffer(
-        boost::circular_buffer<BallDetection> ball_detections, double ball_rolling_acceleration);
+        boost::circular_buffer<BallDetection> ball_detections);
 
     /**
      * Returns how large the buffer of ball detections should be based on the ball's
@@ -128,15 +131,16 @@ class BallFilter
 
     /**
      * Given a buffer of ball detections, returns the line of best fit through
-     * the detection positions.
+     * the detection positions, and calculate the error of this regression.
+     * Note: also considers vertical lines.
      *
      * @throws std::invalid_argument if ball_detections has less than 2 elements
      *
      * @param ball_detections The ball detections to fit
      *
-     * @return The line of best fit through the given ball detection positions, and the error
+     * @return The line of best fit through the given ball detection positions
      */
-    static BallFilter::LinearRegressionResults  calculateLineOfBestFit(
+    static LinearRegressionResults calculateLineOfBestFit(
         boost::circular_buffer<BallDetection> ball_detections);
 
     /**
@@ -185,5 +189,4 @@ class BallFilter
         const std::optional<Line>& ball_regression_line = std::nullopt);
 
     boost::circular_buffer<BallDetection> ball_detection_buffer;
-    double ball_rolling_acceleration;
 };

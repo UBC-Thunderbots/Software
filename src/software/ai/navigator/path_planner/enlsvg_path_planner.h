@@ -3,7 +3,7 @@
 #include <boost/functional/hash/hash.hpp>
 #include <queue>
 
-#include "extlibs/enlsvg/Pathfinding/ENLSVG.h"
+#include "extlibs/enlsvg/enlsvg.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/linear_spline2d.h"
 #include "software/logger/logger.h"
@@ -84,8 +84,8 @@ class EnlsvgPathPlanner
    private:
     using EnlsvgPath      = Pathfinding::Path;
     using EnlsvgGrid      = Pathfinding::Grid;
-    using EnlsvgAlgorithm = Pathfinding::ENLSVG::Algorithm;
-    using EnlsvgMemory    = Pathfinding::ENLSVG::Memory;
+    using EnlsvgAlgorithm = Pathfinding::Enlsvg::Algorithm;
+    using EnlsvgMemory    = Pathfinding::Enlsvg::Memory;
 
     /**
      * This struct is just the internal representation of a grid coordinate. This exists
@@ -169,13 +169,16 @@ class EnlsvgPathPlanner
      * Returns the closest unblocked internal coordinate for a point. It may return the
      * given point itself.
      *
-     * @param ep an internal point to investigate
+     * @param ep an internal point to find the closest unblocked point to
+     * @param other_point If ep is blocked, then we will try to find the closest unblocked
+     * towards this point. It is used to reduce the chance of the start point moving
+     * further away from the end point (or vise versa).
      *
      * @return std::optional<EnlsvgPoint>    returns std::nullopt if the entire field is
      * blocked, or an internal grid coordinate representing a closest unblocked location
      */
     std::optional<EnlsvgPoint> findClosestUnblockedEnlsvgPoint(
-        const EnlsvgPoint &ep) const;
+        const EnlsvgPoint &ep, const EnlsvgPoint &other_point) const;
 
     /*
      * Returns true if a given internal coordinate is blocked, false otherwise.

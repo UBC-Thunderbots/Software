@@ -45,6 +45,8 @@ enum MotionConstraint
     AVOID_BALL_PLACEMENT_INTERFERENCE = 8 [(dynamic) = true];
     // The enemy half of the field without the centre circle
     ENEMY_HALF_WITHOUT_CENTRE_CIRCLE = 9;
+    // The friendly goal
+    FRIENDLY_GOAL = 10;
 }
 
 message MotionControl
@@ -71,10 +73,6 @@ enum MaxAllowedSpeedMode
     STOP_COMMAND = 1;
     // Move at speed at which collisions are allowed
     COLLISIONS_ALLOWED = 2;
-    // Move at speed at which we can grab the ball
-    DRIBBLE_GET_POSSESSION = 3;
-    // Move at speed at which we can safely dribble the ball
-    DRIBBLE_DRIBBLING = 4;
 }
 
 message AutoChipOrKick
@@ -86,6 +84,8 @@ message AutoChipOrKick
     };
 }
 
+// This is only used for simulation. Similar proto in power_frame_msg.proto but with pulse
+// width instead of m_per_s
 message PowerControl
 {
     message ChickerControl
@@ -112,15 +112,12 @@ message Primitive
 {
     oneof primitive
     {
-        EstopPrimitive estop                  = 1;
-        MovePrimitive move                    = 2;
-        StopPrimitive stop                    = 3;
-        DirectControlPrimitive direct_control = 4;
+        MovePrimitive move                    = 1;
+        StopPrimitive stop                    = 2;
+        DirectControlPrimitive direct_control = 3;
     }
     double cost = 5;
 }
-
-message EstopPrimitive {}
 
 message MovePrimitive
 {
@@ -132,22 +129,12 @@ message MovePrimitive
     AutoChipOrKick auto_chip_or_kick      = 6;
     float target_spin_rev_per_s           = 7;
     BallCollisionType ball_collision_type = 8;
-    float robot_max_ang_speed_rad_per_s = 9;
-    float robot_max_acceleration_m_per_s_2 = 10;
-    float robot_max_ang_acceleration_rad_per_s_2 = 11;
-    float hrvo_start_deceleration_dist = 12;
-    bool run_hrvo = 13;
+    // Whether the robot should face the direction of intermediate path points
+    // (if there is any) or just the final destination
+    optional bool should_drive_forward = 9;
 }
 
-message StopPrimitive
-{
-    enum StopType
-    {
-        BRAKE = 0;
-        COAST = 1;
-    }
-    StopType stop_type = 1;
-}
+message StopPrimitive {}
 
 message MotorControl
 {

@@ -67,7 +67,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // move tactics to use to move to positions defined above
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
+        std::make_shared<PrepareKickoffMoveTactic>(), std::make_shared<MoveTactic>(),
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
         std::make_shared<MoveTactic>()};
 
@@ -75,7 +75,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>();
 
     // Part 1: setup state (move to key positions)
-    while (true)
+    while (world.gameState().isSetupState())
     {
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
@@ -88,6 +88,34 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // setup 5 kickoff positions in order of priority
         for (unsigned i = 0; i < kickoff_setup_positions.size(); i++)
+        {
+            move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
+                                                    Angle::zero(), 0);
+            result[0].emplace_back(move_tactics.at(i));
+        }
+
+        // yield the Tactics this Play wants to run, in order of priority
+        yield(result);
+    }
+
+    // Part 2: not normal play, currently ready state (chip the ball)
+    while (!world.gameState().isPlaying())
+    {
+        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball(), false);
+
+        PriorityTacticVector result = {{}};
+
+        // TODO (#2612): This needs to be adjusted post field testing, ball needs to land
+        // exactly in the middle of the enemy field
+        kickoff_chip_tactic->updateControlParams(
+            world.ball().position(),
+            world.field().centerPoint() + Vector(world.field().xLength() / 6, 0));
+        result[0].emplace_back(kickoff_chip_tactic);
+
+        // the robot at position 0 will be closest to the ball, so positions starting from
+        // 1 will be assigned to the rest of the robots
+        for (unsigned i = 1; i < kickoff_setup_positions.size(); i++)
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
                                                     Angle::zero(), 0);

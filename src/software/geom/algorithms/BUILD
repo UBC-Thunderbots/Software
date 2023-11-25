@@ -3,12 +3,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "algorithms",
     srcs = [
-        "acute_angle.cpp",
         "almost_equal.cpp",
         "calculate_block_cone.cpp",
         "closest_point.cpp",
         "collinear.cpp",
         "contains.cpp",
+        "convex_angle.cpp",
         "distance.cpp",
         "find_open_circles.cpp",
         "furthest_point.cpp",
@@ -16,16 +16,16 @@ cc_library(
         "intersection.cpp",
         "intersects.cpp",
         "rasterize.cpp",
-        "tangent.cpp",
+        "step_along_perimeter.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
-        "acute_angle.h",
         "almost_equal.h",
         "calculate_block_cone.h",
         "closest_point.h",
         "collinear.h",
         "contains.h",
+        "convex_angle.h",
         "distance.h",
         "find_open_circles.h",
         "furthest_point.h",
@@ -33,7 +33,7 @@ cc_library(
         "intersection.h",
         "intersects.h",
         "rasterize.h",
-        "tangent.h",
+        "step_along_perimeter.h",
         "voronoi_diagram.h",
     ],
     deps = [
@@ -50,6 +50,24 @@ cc_library(
         "//software/geom:segment",
         "//software/geom:vector",
         "//software/logger",
+    ],
+)
+
+cc_library(
+    name = "nearest_neighbor_search",
+    hdrs = [
+        "nearest_neighbor_search.hpp",
+    ],
+    deps = [],
+)
+
+cc_test(
+    name = "nearest_neighbor_test",
+    srcs = ["nearest_neighbor_test.cpp"],
+    deps = [
+        ":nearest_neighbor_search",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
 
@@ -179,8 +197,8 @@ cc_test(
 )
 
 cc_test(
-    name = "acute_angle_test",
-    srcs = ["acute_angle_test.cpp"],
+    name = "convex_angle_test",
+    srcs = ["convex_angle_test.cpp"],
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",
@@ -190,6 +208,16 @@ cc_test(
 cc_test(
     name = "rasterize_test",
     srcs = ["rasterize_test.cpp"],
+    deps = [
+        ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_test(
+    name = "step_along_perimeter_test",
+    srcs = ["step_along_perimeter_test.cpp"],
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",

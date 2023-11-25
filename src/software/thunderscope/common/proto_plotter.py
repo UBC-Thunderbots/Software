@@ -20,7 +20,7 @@ class ProtoPlotter(QWidget):
     the user can control the way the data is plotted.
 
     Examples:
-    
+
     NamedValueProto: we can plot the value directly
     RobotStatus: the data comes in over multiple packets, with each one having
     a different robot id. We need to append the robot id to the name so that
@@ -70,7 +70,7 @@ class ProtoPlotter(QWidget):
         """
         QWidget.__init__(self)
 
-        self.win = pg.plot()
+        self.win = pg.PlotWidget()
         self.win.disableAutoRange()
         self.win.setYRange(min_y, max_y)
 
@@ -94,7 +94,7 @@ class ProtoPlotter(QWidget):
         self.buffer_size = buffer_size
 
     def refresh(self):
-        """Refreshes NamedValuePlotter and updates data in the respective
+        """Refreshes ProtoPlotter and updates data in the respective
         plots.
 
         """

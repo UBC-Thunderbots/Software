@@ -12,8 +12,8 @@ py_test(
         "exclusive",
     ],
     deps = [
-        "//software/simulated_tests:pytest_main",
         "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:speed_threshold_helpers",
         "//software/simulated_tests:validation",
         requirement("pytest"),
     ],
@@ -63,12 +63,11 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
-        ":pytest_main",
+        ":tbots_test_runner",
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
-        "//software/simulated_tests:tbots_test_runner",
         "//software/simulated_tests:validation",
         "//software/thunderscope",
         "//software/thunderscope:binary_context_managers",
@@ -85,7 +84,6 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
-        ":pytest_main",
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
@@ -93,75 +91,25 @@ py_library(
         "//software/simulated_tests:validation",
         "//software/thunderscope",
         "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope:config",
+        "//software/thunderscope:constants",
         "//software/thunderscope/replay:proto_logger",
-    ],
-)
-
-py_library(
-    name = "tbots_test_fixture",
-    srcs = [
-        "tbots_test_fixture.py",
-    ],
-    data = [
-        "//software:py_constants.so",
-    ],
-    deps = [
-        ":pytest_main",
-        "//proto:import_all_protos",
-        "//software/field_tests:field_test_fixture",
-        "//software/logger:py_logger",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
-        "//software/thunderscope",
-        "//software/thunderscope:binary_context_managers",
-        "//software/thunderscope/replay:proto_logger",
-    ],
-)
-
-py_library(
-    name = "pytest_main",
-    srcs = [
-        "pytest_main.py",
-    ],
-    data = [
-        "//software:py_constants.so",
-    ],
-    deps = [
-        "//proto:import_all_protos",
-        "//software/logger:py_logger",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
-        "//software/simulated_tests:validation",
-        "//software/thunderscope",
-        "//software/thunderscope:binary_context_managers",
-        "//software/thunderscope/replay:proto_logger",
-    ],
-)
-
-py_library(
-    name = "data_logger",
-    srcs = [
-        "data_logger.py",
-    ],
-    data = [
-        "//software:py_constants.so",
-    ],
-    deps = [
     ],
 )
 
 py_library(
     name = "validation",
     srcs = [
+        "avoid_collisions.py",
         "ball_enters_region.py",
         "ball_moves_forward.py",
         "ball_speed_threshold.py",
         "ball_stops_in_region.py",
         "excessive_dribbling.py",
         "friendly_has_ball_possession.py",
+        "friendly_team_scored.py",
         "robot_enters_region.py",
+        "robot_enters_region_and_stops.py",
         "robot_speed_threshold.py",
         "validation.py",
     ],
@@ -174,4 +122,9 @@ py_library(
         "//proto:tbots_py_proto",
         "//software/logger:py_logger",
     ],
+)
+
+py_library(
+    name = "speed_threshold_helpers",
+    srcs = ["speed_threshold_helpers.py"],
 )

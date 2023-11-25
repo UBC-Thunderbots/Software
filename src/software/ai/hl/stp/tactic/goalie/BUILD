@@ -15,6 +15,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
+        "//software/ai/evaluation:find_open_areas",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
@@ -22,6 +23,7 @@ cc_library(
         "//software/geom:line",
         "//software/geom/algorithms",
         "//software/logger",
+        "//software/math:math_functions",
     ],
 )
 
@@ -36,6 +38,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "goalie_tactic_chip_test",
+    srcs = ["goalie_tactic_chip_test.cpp"],
+    deps = [
+        ":goalie_tactic",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
 py_test(
     name = "goalie_tactic_test",
     srcs = [
@@ -44,6 +56,7 @@ py_test(
     deps = [
         "//software/simulated_tests:pytest_main",
         "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:speed_threshold_helpers",
         "//software/simulated_tests:validation",
         requirement("pytest"),
     ],

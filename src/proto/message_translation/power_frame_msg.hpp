@@ -4,6 +4,7 @@
 #include <pb_encode.h>
 #include <proto/power_frame_msg.nanopb.h>
 
+#include <cmath>
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
@@ -15,6 +16,7 @@
 #include "proto/power_frame_msg.pb.h"
 #include "proto/primitive.pb.h"
 #include "proto/primitive/primitive_types.h"
+#include "shared/constants.h"
 
 extern "C"
 {
@@ -119,25 +121,32 @@ TbotsProto_PowerStatus inline createNanoPbPowerStatus(
  * @param google_control protobuf message to convert
  * @return a nanopb power control msg matching provided protobuf
  */
+
 TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
-    const TbotsProto::PowerControl& google_control)
+    const TbotsProto::PowerControl& google_control, double kick_coeff, int kick_constant,
+    int chip_pulse_width)
 {
     TbotsProto_PowerPulseControl nanopb_control =
         TbotsProto_PowerPulseControl_init_default;
+
+    // Safety bounds
+    kick_constant = std::min(kick_constant, MAX_KICK_CONSTANT);
+    kick_coeff    = std::min(kick_coeff, MAX_KICK_COEFFICIENT);
+
     switch (google_control.chicker().chicker_command_case())
     {
         case TbotsProto::PowerControl::ChickerControl::kKickSpeedMPerS:
-            // TODO: convert with redis
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
             nanopb_control.chicker.chicker_command.kick_pulse_width =
-                static_cast<uint32_t>(google_control.chicker().kick_speed_m_per_s());
+                static_cast<uint32_t>(
+                    kick_constant *
+                    std::exp(kick_coeff * google_control.chicker().kick_speed_m_per_s()));
             break;
         case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
-            nanopb_control.chicker.chicker_command.chip_pulse_width =
-                static_cast<uint32_t>(google_control.chicker().chip_distance_meters());
+            nanopb_control.chicker.chicker_command.chip_pulse_width = chip_pulse_width;
             break;
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
             nanopb_control.chicker.which_chicker_command =
@@ -149,21 +158,20 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                         .which_auto_chip_or_kick =
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autokick_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
-                        .auto_chip_or_kick.autokick_pulse_width =
-                        static_cast<uint32_t>(google_control.chicker()
+                        .auto_chip_or_kick.autokick_pulse_width = static_cast<uint32_t>(
+                        kick_constant *
+                        std::exp(kick_coeff * google_control.chicker()
                                                   .auto_chip_or_kick()
-                                                  .autokick_speed_m_per_s());
+                                                  .autokick_speed_m_per_s()));
                     break;
                 case TbotsProto::AutoChipOrKick::kAutochipDistanceMeters:
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
                         .which_auto_chip_or_kick =
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autochip_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
-                        .auto_chip_or_kick.autochip_pulse_width =
-                        static_cast<uint32_t>(google_control.chicker()
-                                                  .auto_chip_or_kick()
-                                                  .autochip_distance_meters());
+                        .auto_chip_or_kick.autochip_pulse_width = chip_pulse_width;
                     break;
+
                 default:
                     break;
             }

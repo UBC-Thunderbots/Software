@@ -5,10 +5,14 @@ Description=thunderloop service
 PartOf=thunderbots.service
 
 # At startup, start this unit after the thunderbots.service start
-After=thunderbots.service network.target
+After=thunderbots.service network.target network-online.target
+Wants=network-online.target
 
 [Service]
 ExecStart=/home/robot/thunderbots_binaries/thunderloop_main
+
+# How long to wait after KillSignal (SIGTERM by default) to send FinalKillSignal (SIGKILL by default)
+TimeoutStopSec=15s
 
 # Always restart on crash
 Restart=always

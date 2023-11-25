@@ -1,160 +1,192 @@
 import pyqtgraph as pg
+import time
+from google.protobuf import text_format
+from typing import List
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
-import software.thunderscope.common.common_widgets as common_widgets
 from proto.import_all_protos import *
-
-
+from software.thunderscope.constants import IndividualRobotMode
+from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
+from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from typing import Type
 
 
-class RobotView(QWidget):
-    """Class to show a snapshot of the robot's current state.
+class RobotCrashDialog(QDialog):
+    """Dialog to show information about a robot before it crashed,
 
-    Displays the vision pattern, capacitor/battery voltages,
-    and other information about the robot state.
+    Displays the a message and RobotStatus.
 
     """
 
-    def __init__(self):
+    def __init__(
+        self, message: str, robot_status: RobotStatusView, parent: QWidget = None
+    ) -> None:
+        super().__init__(parent)
 
-        """Initialize the robot view."""
+        self.setWindowTitle("Robot Crash")
+
+        self.buttonBox = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        self.layout = QVBoxLayout()
+        self.message = QLabel(message)
+        self.layout.addWidget(self.message)
+        self.robot_status = RobotStatusView()
+        if robot_status is not None:
+            self.robot_status.update(robot_status)
+            self.robot_status.toggle_visibility()
+        self.layout.addWidget(self.robot_status)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
+
+
+class RobotViewComponent(QWidget):
+    """Class to show a snapshot of the robot's current state,
+    along with an expandable view of the full robot state
+
+    Displays the vision pattern, capacitor/battery voltages,
+    and other information about the robot state. Displays the whole RobotStatus
+    message when expanded
+
+    """
+
+    def __init__(
+        self,
+        robot_id: int,
+        available_control_modes: List[IndividualRobotMode],
+        control_mode_signal: Type[QtCore.pyqtSignal],
+    ):
+        """
+        Sets up a Robot Info Widget and a Robot Status Widget for each robot
+
+        Sets the Robot Status widget to None so that it can be added later on button click
+
+        :param robot_id: id of the current robot
+        :param available_control_modes: the currently available input modes for the robots
+                                        according to what mode thunderscope is run in
+        :param control_mode_signal: the signal to emit when control mode changes
+                                    in order to communicate to robot communications
+        """
+        super().__init__()
+
+        self.robot_id = robot_id
+        self.layout = QVBoxLayout()
+
+        self.robot_info = RobotInfo(
+            robot_id, available_control_modes, control_mode_signal
+        )
+        self.layout.addWidget(self.robot_info)
+
+        self.robot_status = None
+
+        self.robot_info.robot_status_expand.clicked.connect(self.robot_status_expand)
+
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.layout)
+
+    def robot_status_expand(self) -> None:
+        """
+        Handles the info button click event from the Robot Info widget
+        If robot status widget is not defined, initialises one and adds it to this layout
+        If robot status widget is defined, toggles its visibility
+        """
+        if not self.robot_status:
+            self.robot_status = RobotStatusView()
+            self.layout.addWidget(self.robot_status)
+
+        self.robot_status.toggle_visibility()
+
+    def update(self, robot_status: RobotStatus) -> None:
+        """
+        Updates the Robot View Components with the new robot status message
+        Updates the robot info widget and, if initialized, the robot status widget as well
+
+        :param robot_status: the new message data to update the widget with
+        """
+        self.robot_info.update(
+            robot_status.motor_status,
+            robot_status.power_status,
+            robot_status.error_code,
+        )
+        if self.robot_status:
+            self.robot_status.update(robot_status)
+
+
+class RobotView(QScrollArea):
+    """
+    Widget that displays a collection of robot view components for all
+    robots currently being used
+
+    Contains signal to communicate with robot diagnostics when control mode changes
+    """
+
+    control_mode_signal = QtCore.pyqtSignal(int, int)
+
+    def __init__(self, available_control_modes: List[IndividualRobotMode]) -> None:
+
+        """
+        Initialize the robot view component for each robot.
+
+        :param available_control_modes: the currently available input modes for the robots
+                                        according to what mode thunderscope is run in
+        """
 
         super().__init__()
 
-        self.pink = QtGui.QColor(255, 0, 255)
-        self.green = QtGui.QColor(0, 255, 0)
-
-        self.robot_status_buffer = ThreadSafeBuffer(100, RobotStatus)
-        self.MIN_VOLTAGE_LEVEL = 20.5  # TODO PULL THIS OUT
-
-        # There is no pattern to this so we just have to create
-        # mapping from robot id to the four corners of the vision pattern
-        #
-        # robot-id: top-right, top-left, bottom-left, bottom-right
-        #
-        # https://robocup-ssl.github.io/ssl-rules/sslrules.html
-        self.vision_pattern_lookup = {
-            0: [self.pink, self.pink, self.green, self.pink],
-            1: [self.pink, self.green, self.green, self.pink],
-            2: [self.green, self.green, self.green, self.pink],
-            3: [self.green, self.pink, self.green, self.pink],
-            4: [self.pink, self.pink, self.pink, self.green],
-            5: [self.pink, self.green, self.pink, self.green],
-            6: [self.green, self.green, self.pink, self.green],
-            7: [self.green, self.pink, self.pink, self.green],
-            8: [self.green, self.green, self.green, self.green],
-            9: [self.pink, self.pink, self.pink, self.pink],
-            10: [self.pink, self.pink, self.green, self.green],
-            11: [self.green, self.green, self.pink, self.pink],
-            12: [self.pink, self.green, self.green, self.green],
-            13: [self.pink, self.green, self.pink, self.pink],
-            14: [self.green, self.pink, self.green, self.green],
-            15: [self.green, self.pink, self.pink, self.pink],
-        }
+        self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
+        self.robot_crash_buffer = ThreadSafeBuffer(10, RobotCrash)
 
         self.layout = QVBoxLayout()
 
-        self.robot_layouts = [QHBoxLayout() for x in range(8)]
-        self.robot_status_layouts = [QVBoxLayout() for x in range(8)]
-        self.robot_battery_progress_bars = [QProgressBar() for x in range(8)]
-        self.breakbeam_labels = [QLabel() for x in range(8)]
+        self.robot_view_widgets = []
+        self.robot_last_crash_time_s = []
 
-        for x in range(8):
-            QVBoxLayout()
-            self.robot_battery_progress_bars[x].setMaximum(100)
-            self.robot_battery_progress_bars[x].setMinimum(0)
-            self.robot_battery_progress_bars[x].setValue(10)
-
-            self.breakbeam_labels[x].setText("BREAKBEAM")
-            self.breakbeam_labels[x].setStyleSheet("background-color: blue")
-
-            self.robot_status_layouts[x].addWidget(self.robot_battery_progress_bars[x])
-            self.robot_status_layouts[x].addWidget(self.breakbeam_labels[x])
-
-            self.robot_layouts[x].addWidget(
-                self.create_vision_pattern_label(x, "b", 25)
+        for id in range(MAX_ROBOT_IDS_PER_SIDE):
+            robot_view_widget = RobotViewComponent(
+                id, available_control_modes, self.control_mode_signal
             )
-            self.robot_layouts[x].addLayout(self.robot_status_layouts[x])
-            self.layout.addLayout(self.robot_layouts[x])
+            self.robot_view_widgets.append(robot_view_widget)
+            self.layout.addWidget(robot_view_widget)
+            self.robot_last_crash_time_s.append(0)
 
-        self.setLayout(self.layout)
+        # for a QScrollArea, widgets cannot be added to it directly
+        # doing so causes no scrolling to happen, and all the components get smaller
+        # instead, widgets are added to the layout which is set for a container
+        # the container is set as the current QScrollArea's widget
+        self.container = QFrame(self)
+        self.container.setLayout(self.layout)
+        self.setWidget(self.container)
+        self.setWidgetResizable(True)
 
-    def create_vision_pattern_label(self, id, team_colour, radius):
-        """Given a robot id, team color and radius, draw the vision
-        pattern on a label and return it.
-
-        :param id: The robot
-        :param team_colour: The team colour
-        :param radius: The radius of the robot
-
+    def refresh(self) -> None:
         """
-        pixmap = QtGui.QPixmap(radius * 2, radius * 2)
-        pixmap.fill(QtCore.Qt.GlobalColor.transparent)
-
-        painter = QtGui.QPainter(pixmap)
-        painter.setPen(pg.mkPen("black"))
-        painter.setBrush(pg.mkBrush("black"))
-
-        convert_degree = -16
-
-        painter.drawChord(
-            QtCore.QRectF(0, 0, int(radius * 2), int(radius * 2),),
-            -45 * convert_degree,
-            270 * convert_degree,
-        )
-
-        # Draw the vision pattern
-        # Draw the centre team color
-        painter.setBrush(pg.mkBrush(team_colour))
-        painter.drawEllipse(QtCore.QPointF(radius, radius), radius / 4, radius / 4)
-
-        # Grab the collors for the vision pattern and setup the locations
-        # for the four cicles in the four corners
-        top_right, top_left, bottom_left, bottom_right = self.vision_pattern_lookup[id]
-        top_circle_locations = [
-            QtCore.QPointF(radius + radius / 2 + 5, radius - radius / 2),
-            QtCore.QPointF(radius - radius / 2 - 5, radius - radius / 2),
-            QtCore.QPointF(radius - radius / 2, radius + radius / 2 + 5),
-            QtCore.QPointF(radius + radius / 2, radius + radius / 2 + 5),
-        ]
-
-        for color, location in zip(
-            self.vision_pattern_lookup[id], top_circle_locations
-        ):
-            painter.setBrush(pg.mkBrush(color))
-            painter.drawEllipse(location, radius / 5, radius / 5)
-
-        painter.end()
-
-        label = QLabel()
-        label.setPixmap(pixmap)
-
-        return label
-
-    def refresh(self):
-        return
-        """Refresh the view
+        Refresh the view
+        Gets a RobotStatus proto and calls the corresponding update method
+        Until the buffer is empty
         """
-        robot_status_buffer = self.robot_status_buffer.get(block=False)
-        for i in range(8):
-            if breakbeam_status.ball_in_beam:
-                self.breakbeam_labels[i].setText("In Beam")
-                self.breakbeam_labels[i].setStyleSheet("background-color: red")
-            else:
-                self.breakbeam_labels[i].setText("Not in Beam")
-                self.breakbeam_labels[i].setStyleSheet("background-color: green")
+        robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
 
-        power_status = self.power_status_buffer.get(block=False)
-        for i in range(8):
-            self.robot_battery_progress_bars[i].setValue(power_status.battery_voltage)
+        while robot_status is not None:
+            self.robot_view_widgets[robot_status.robot_id].update(robot_status)
+            robot_status = self.robot_status_buffer.get(
+                block=False, return_cached=False
+            )
 
-            if power_status.battery_voltage > self.MIN_VOLTAGE_LEVEL:
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Information)
-                msg.setText(f"robot {i} voltage is {power_status.battery_voltage}")
-                msg.setWindowTitle("battery voltage alert")
-                msg.setDetailedText("not cool man")
+        robot_crash = self.robot_crash_buffer.get(block=False, return_cached=False)
 
-                msg.show()
+        if robot_crash is not None:
+            if (
+                time.time() - self.robot_last_crash_time_s[robot_crash.robot_id]
+                > ROBOT_CRASH_TIMEOUT_S
+            ):
+                robot_crash_text = (
+                    f"robot_id: {robot_crash.robot_id}\n"
+                    + f"exit_signal: {robot_crash.exit_signal}\n"
+                    + f"stack_dump: {robot_crash.stack_dump}"
+                )
+                dialog = RobotCrashDialog(robot_crash_text, robot_crash)
+                dialog.exec()
+            self.robot_last_crash_time_s[robot_crash.robot_id] = time.time()

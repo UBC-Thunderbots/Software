@@ -1,6 +1,5 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
-#include "proto/message_translation/tbots_protobuf.h"
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
@@ -11,10 +10,12 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       enemy_team(),
       game_state(),
       referee_stage(std::nullopt),
-      ball_filter(sensor_fusion_config.rolling_acceleration_ms2()),
+      ball_filter(),
       friendly_team_filter(),
       enemy_team_filter(),
-      team_with_possession(TeamSide::ENEMY),
+      possession(TeamPossession::FRIENDLY_TEAM),
+      possession_tracker(std::make_shared<PossessionTracker>(
+          sensor_fusion_config.possession_tracker_config())),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
       defending_positive_side(false),
@@ -30,25 +31,10 @@ std::optional<World> SensorFusion::getWorld() const
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
-        new_world.setTeamWithPossession(team_with_possession);
+        new_world.setTeamWithPossession(possession);
         if (referee_stage)
         {
             new_world.updateRefereeStage(*referee_stage);
-        }
-
-        const auto &friendly_robots = new_world.friendlyTeam().getAllRobots();
-        unsigned int robot_id = 7;
-        const auto robot_proto_it =
-                std::find_if(friendly_robots.begin(), friendly_robots.end(),
-                             [&](const auto& robot) { return robot.id() == robot_id; });
-        if (robot_proto_it != friendly_robots.end())
-        {
-            LOG(VISUALIZE) << *createNamedValue(
-                        "ang vel " + std::to_string(robot_id),
-                        static_cast<float>(robot_proto_it->angularVelocity().toRadians()));
-            LOG(VISUALIZE) << *createNamedValue(
-                        "vel " + std::to_string(robot_id),
-                        static_cast<float>(robot_proto_it->velocity().length()));
         }
 
         return new_world;
@@ -187,16 +173,9 @@ void SensorFusion::updateWorld(
         if (robot_status_msg.has_power_status() &&
             robot_status_msg.power_status().breakbeam_tripped())
         {
-            LOG(DEBUG) << "break beam tripped for robot : " << robot_id;
             friendly_robot_id_with_ball_in_dribbler = robot_id;
             ball_in_dribbler_timeout =
                 sensor_fusion_config.num_dropped_detections_before_ball_not_in_dribbler();
-        }
-        else if (friendly_robot_id_with_ball_in_dribbler.has_value() &&
-                 friendly_robot_id_with_ball_in_dribbler.value() == robot_id)
-        {
-            friendly_robot_id_with_ball_in_dribbler = std::nullopt;
-            ball_in_dribbler_timeout                = 0;
         }
     }
 }
@@ -265,8 +244,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                     Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
                         // MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT of the ball should be
                         // inside the robot
-                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS -
-                                   SPECIAL_INDICATOR_DISTANCE_FOR_BREAKBEAM),
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                                   BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
                 .distance_from_ground = 0,
                 .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
                 .confidence = 1}};
@@ -303,21 +282,10 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         }
     }
 
-    if (ball)
+    if (ball && field)
     {
-        bool friendly_team_has_ball = teamHasBall(friendly_team, *ball);
-        bool enemy_team_has_ball    = teamHasBall(enemy_team, *ball);
-
-        if (friendly_team_has_ball && !enemy_team_has_ball)
-        {
-            // take defensive view of exclusive possession for friendly possession
-            team_with_possession = TeamSide::FRIENDLY;
-        }
-
-        if (enemy_team_has_ball)
-        {
-            team_with_possession = TeamSide::ENEMY;
-        }
+        possession = possession_tracker->getTeamWithPossession(friendly_team, enemy_team,
+                                                               *ball, *field);
     }
 }
 
@@ -409,8 +377,8 @@ void SensorFusion::resetWorldComponents()
     enemy_team           = Team();
     game_state           = GameState();
     referee_stage        = std::nullopt;
-    ball_filter          = BallFilter(sensor_fusion_config.rolling_acceleration_ms2());
+    ball_filter          = BallFilter();
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
-    team_with_possession = TeamSide::ENEMY;
+    possession           = TeamPossession::FRIENDLY_TEAM;
 }

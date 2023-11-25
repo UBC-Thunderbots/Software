@@ -1,93 +1,62 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
-#include "software/ai/evaluation/intercept.h"
 
-Point GoalieFSM::getGoaliePositionToBlock(const RobotConstants_t robot_constants, const Team &friendly_team,
-    const Ball &ball, const Field &field)
+#include "software/ai/evaluation/find_open_areas.h"
+#include "software/math/math_functions.h"
+
+Point GoalieFSM::getGoaliePositionToBlock(
+    const Ball &ball, const Field &field,
+    TbotsProto::GoalieTacticConfig goalie_tactic_config)
 {
-
-    //strategy: we assign the robot to cover the largest uncovered part of the goal, starting from the center of the goal
-    // to find this , we sweep to the positive and negative sides of the goals to find where friendly robots may be covering
-    // parts of the goal.
-    double INTERSECTION_INCREMENT_INTERVAL = BALL_MAX_RADIUS_METERS;
-
-    Segment ball_to_pos_goal = Segment(ball.position(), field.friendlyGoalpostPos());
-    Segment ball_to_neg_goal = Segment(ball.position(), field.friendlyGoalpostNeg());
-
-    Segment positive_sweep = Segment(ball.position(), field.friendlyGoalCenter());
-    Segment negative_sweep = Segment(ball.position(), field.friendlyGoalCenter());
-
-    bool pos_intersection_found = false;
-    bool neg_intersection_found = false;
-
-    auto robots = friendly_team.getAllRobotsExceptGoalie();
-
-    while((positive_sweep.getEnd().y() < ball_to_pos_goal.getEnd().y() && negative_sweep.getEnd().y() > ball_to_neg_goal.getEnd().y() )){
-
-        if (!pos_intersection_found){
-
-            //check if the current positive sweep will intersect with a friendly robot
-            pos_intersection_found = std::any_of(robots.begin(), robots.end(), [=](Robot robot){
-                Circle robot_circle = Circle(robot.position(), robot_constants.robot_radius_m);
-                return intersects(robot_circle, positive_sweep);
-            });
-
-            //if no friendly robot intersects this path to the goal, then we increase the sweep that the goalie needs to cover
-            if(!pos_intersection_found){
-                Point new_end = Point(positive_sweep.getEnd().x(), positive_sweep.getEnd().y() + INTERSECTION_INCREMENT_INTERVAL);
-                positive_sweep.setEnd(new_end);
-            }
-        }
-
-        if(!neg_intersection_found){
-            neg_intersection_found = std::any_of(robots.begin(), robots.end(), [=](Robot robot){
-                Circle robot_circle = Circle(robot.position(), robot_constants.robot_radius_m);
-                return intersects(robot_circle, negative_sweep);
-            });
-
-            if(!neg_intersection_found){
-                Point new_end = Point(negative_sweep.getEnd().x(), negative_sweep.getEnd().y() - INTERSECTION_INCREMENT_INTERVAL);
-                negative_sweep.setEnd(new_end);
-            }
-        }
-
-        if(neg_intersection_found && pos_intersection_found){
-            break;
-        }
-    }
-
-    Angle angle_to_cover = acuteAngle(negative_sweep.getEnd(), ball.position(),
-                                      positive_sweep.getEnd());
-
-    Point clamped_goalie_pos = field.friendlyGoalCenter() + Vector(0.75, 0);
-
-
-    if (distanceSquared(field.friendlyGoalpostNeg(), ball.position()) > 0 &&
-        distanceSquared(field.friendlyGoalpostPos(), ball.position()) > 0 && angle_to_cover != Angle::zero())
+    // Check if the ball is in the region where it will be at a sharp
+    // angle to the goal -- if so, goalie should snap to goalposts
+    //
+    //       ┌───┬───────────────────────┐
+    //       │xxx│                       │
+    //       │xxx│◄──────┐               │
+    //       │xxx│       │               │
+    //       ├───┴───┐   │               │
+    //     ┌─┤       │   │               │
+    // goal│ │d-area │   ├──snap_to_post_region
+    //     └─┤       │   │               │
+    //       ├───┬───┘   │               │
+    //       │xxx│       │               │
+    //       │xxx│◄──────┘               │
+    //       │xxx│                       │
+    //       └───┴───────────────────────┘
+    //
+    double snap_to_post_region_x =
+        field.friendlyHalf().xMin() + (field.defenseAreaXLength() / 2);
+    if (ball.position().x() < snap_to_post_region_x)
     {
-
-        // compute block cone position
-        Point goalie_pos = calculateBlockCone(
-                positive_sweep.getEnd(), negative_sweep.getEnd(), ball.position(),
-                robot_constants.robot_radius_m);
-
-        //restrain goalie in semi circle
-        double speed_factor = std::max(0.0, 1 - (std::abs(ball.velocity().y()) / BALL_MAX_SPEED_METERS_PER_SECOND)) ;
-        Circle semi_circle = Circle(field.friendlyGoalCenter(), field.friendlyDefenseArea().yMax() * speed_factor);
-        if (!contains(semi_circle, goalie_pos) || goalie_pos.x() < field.friendlyGoalCenter().x()){
-            //project on to semi circle
-            if(goalie_pos.x() < field.friendlyGoalCenter().x()){
-                clamped_goalie_pos = field.friendlyGoalCenter() + ((ball.position() - field.friendlyGoalCenter()) * -1 ).normalize();
-            } else {
-                clamped_goalie_pos = field.friendlyGoalCenter() + ((ball.position() - field.friendlyGoalCenter()).normalize(semi_circle.radius()));
-            }
-        } else{
-            clamped_goalie_pos = goalie_pos;
+        if (ball.position().y() > 0)
+        {
+            return field.friendlyGoalpostPos() + Vector(ROBOT_MAX_RADIUS_METERS, 0);
+        }
+        else
+        {
+            return field.friendlyGoalpostNeg() + Vector(ROBOT_MAX_RADIUS_METERS, 0);
         }
     }
 
+    // Default to conservative depth when ball is at opposite end of field
+    double depth = goalie_tactic_config.conservative_depth_meters();
 
-    return clamped_goalie_pos;
+    if (field.pointInFriendlyHalf(ball.position()))
+    {
+        // As the ball gets deeper into our friendly half, the goalie should transition
+        // from playing aggressively out far to a deeper conservative depth
+        depth = normalizeValueToRange(ball.position().x(), snap_to_post_region_x,
+                                      field.centerPoint().x(),
+                                      goalie_tactic_config.conservative_depth_meters(),
+                                      goalie_tactic_config.aggressive_depth_meters());
+    }
 
+    Vector goalie_direction_vector =
+        (ball.position() - field.friendlyGoalCenter()).normalize();
+    Point goalie_position =
+        field.friendlyGoalCenter() + (depth * goalie_direction_vector);
+
+    return goalie_position;
 }
 
 std::vector<Point> GoalieFSM::getIntersectionsBetweenBallVelocityAndFullGoalSegment(
@@ -114,82 +83,31 @@ Rectangle GoalieFSM::getNoChipRectangle(const Field &field)
         field.friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
 }
 
-std::optional<Point> GoalieFSM::restrainGoalieInRectangle(
-    const Field &field, Point goalie_desired_position, Rectangle goalie_restricted_area)
+Point GoalieFSM::findGoodChipTarget(
+    const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config)
 {
-    //           NW    pos_side   NE
-    //            +---------------+
-    //            |               |
-    //            |               |
-    //            |               |
-    //       +----+               |
-    //       |    |               |
-    //       |    |               |
-    // goal  |    |               | width
-    //       |    |               |
-    //       |    |               |
-    //       |    |               |
-    //       +----+               |
-    //            |               |
-    //            |               |
-    //            |               |
-    //           ++---------------+
-    //           SW    neg_side   SE
-    //
-    // Given the goalies desired position and the restricted area,
-    // first find the 3 intersections with each side of the restricted area
-    // (width, pos_side, neg_side) and the line from the desired position to the
-    // center of the friendly goal
-    auto width_x_goal =
-        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
-                     Line(goalie_restricted_area.posXPosYCorner(),
-                          goalie_restricted_area.posXNegYCorner()));
-    auto pos_side_x_goal =
-        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
-                     Line(goalie_restricted_area.posXPosYCorner(),
-                          goalie_restricted_area.negXPosYCorner()));
-    auto neg_side_x_goal =
-        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
-                     Line(goalie_restricted_area.posXNegYCorner(),
-                          goalie_restricted_area.negXNegYCorner()));
+    // Default chip target is the enemy goal
+    Point chip_target = world.field().enemyGoalCenter();
 
-    // if the goalie restricted area already contains the point, then we are
-    // safe to move there.
-    if (contains(goalie_restricted_area, goalie_desired_position))
+    // Avoid chipping out of field or towards friendly corners by restraining the
+    // chip target to the region in front of the friendly defense area
+    Vector inset(goalie_tactic_config.chip_target_area_inset_meters(),
+                 -goalie_tactic_config.chip_target_area_inset_meters());
+    Vector offset_from_goal_line(
+        world.field().defenseAreaXLength() +
+            goalie_tactic_config.min_chip_distance_from_crease_meters(),
+        0);
+    Rectangle chip_target_area =
+        Rectangle(world.field().friendlyCornerPos() + offset_from_goal_line + inset,
+                  world.field().enemyCornerNeg() - inset);
+
+    std::vector<Circle> open_areas = findGoodChipTargets(world, chip_target_area);
+    if (!open_areas.empty())
     {
-        return std::make_optional<Point>(goalie_desired_position);
-    }
-    // Due to the nature of the line intersection, its important to make sure the
-    // corners are included, if the goalies desired position intersects with width
-    // (see above), use those positions The last comparison is for the edge case when
-    // the ball is behind the net
-    else if (width_x_goal &&
-             width_x_goal->y() <= goalie_restricted_area.posXPosYCorner().y() &&
-             width_x_goal->y() >= goalie_restricted_area.posXNegYCorner().y() &&
-             field.friendlyGoalCenter().x() <= goalie_desired_position.x())
-    {
-        return std::make_optional<Point>(*width_x_goal);
+        chip_target = open_areas[0].origin();
     }
 
-    // if either two sides of the goal are intercepted, then use those positions
-    else if (pos_side_x_goal &&
-             pos_side_x_goal->x() <= goalie_restricted_area.posXPosYCorner().x() &&
-             pos_side_x_goal->x() >= goalie_restricted_area.negXPosYCorner().x())
-    {
-        return std::make_optional<Point>(*pos_side_x_goal);
-    }
-    else if (neg_side_x_goal &&
-             neg_side_x_goal->x() <= goalie_restricted_area.posXNegYCorner().x() &&
-             neg_side_x_goal->x() >= goalie_restricted_area.negXNegYCorner().x())
-    {
-        return std::make_optional<Point>(*neg_side_x_goal);
-    }
-
-    // if there are no intersections (ex. ball behind net), then we are out of luck
-    else
-    {
-        return std::nullopt;
-    }
+    return chip_target;
 }
 
 bool GoalieFSM::shouldPanic(const Update &event)
@@ -233,11 +151,8 @@ void GoalieFSM::panic(const Update &event)
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();
 
-    Ball ball = event.common.world.ball();
-    Robot robot = event.common.robot;
-
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation,0.0,
+        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 0.0, false,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
@@ -246,19 +161,22 @@ void GoalieFSM::panic(const Update &event)
 void GoalieFSM::updatePivotKick(
     const Update &event, boost::sml::back::process<PivotKickFSM::Update> processEvent)
 {
+    // Ensure that we start our chip away from the no chip zone in front of
+    // the goal (prevents accidentally scoring an own goal)
     double clear_origin_x =
         getNoChipRectangle(event.common.world.field()).xMax() + ROBOT_MAX_RADIUS_METERS;
-    Point clear_origin = Point(clear_origin_x, event.common.world.ball().position().y());
+    double chip_origin_x =
+        std::max(clear_origin_x, event.common.world.ball().position().x());
+    Point chip_origin = Point(chip_origin_x, event.common.world.ball().position().y());
 
-    Angle clear_direction = (event.common.world.ball().position() -
-                             event.common.world.field().friendlyGoalCenter())
-                                .orientation();
+    Point chip_target  = findGoodChipTarget(event.common.world, goalie_tactic_config);
+    Vector chip_vector = chip_target - chip_origin;
 
     PivotKickFSM::ControlParams control_params{
-        .kick_origin    = clear_origin,
-        .kick_direction = clear_direction,
+        .kick_origin    = chip_origin,
+        .kick_direction = chip_vector.orientation(),
         .auto_chip_or_kick =
-            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_vector.length()},
     };
 
     // update the pivotkick fsm
@@ -267,8 +185,8 @@ void GoalieFSM::updatePivotKick(
 
 void GoalieFSM::positionToBlock(const Update &event)
 {
-    Point goalie_pos = getGoaliePositionToBlock(event.common.robot.robotConstants(), event.common.world.friendlyTeam(),
-        event.common.world.ball(), event.common.world.field());
+    Point goalie_pos = getGoaliePositionToBlock(
+        event.common.world.ball(), event.common.world.field(), goalie_tactic_config);
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();
 
@@ -277,10 +195,11 @@ void GoalieFSM::positionToBlock(const Update &event)
     auto goalie_final_speed = goalie_tactic_config.goalie_final_speed();
 
     event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, goalie_final_speed,
+        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, goalie_final_speed, false,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-        max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
+        max_allowed_speed_mode, 0.0, event.common.robot.robotConstants(),
+        std::optional<double>()));
 }
 
 bool GoalieFSM::ballInDefenseArea(const Update &event)
@@ -298,8 +217,8 @@ void GoalieFSM::moveToGoalLine(const Update &event)
 {
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(event.common.world.field().friendlyGoalCenter()),
-        Angle::zero(), 10, TbotsProto::DribblerMode::OFF,
+        Angle::zero(), 0, false, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
-        event.common.robot.robotConstants()));
+        event.common.robot.robotConstants(), std::optional<double>()));
 }

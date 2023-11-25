@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "proto/primitive/primitive_msg_factory.h"
 #include "software/test_util/test_util.h"
 
 class EuclideanToWheelTest : public ::testing::Test
@@ -11,7 +12,14 @@ class EuclideanToWheelTest : public ::testing::Test
     EuclideanSpace_t target_euclidean_velocity{};
     WheelSpace_t expected_wheel_speeds{};
     WheelSpace_t calculated_wheel_speeds{};
-    double robot_radius = create2021RobotConstants().robot_radius_m;
+    RobotConstants robot_constants = create2021RobotConstants();
+    double robot_radius            = create2021RobotConstants().robot_radius_m;
+
+    WheelSpace_t target_wheel_velocity{};
+    WheelSpace_t current_wheel_velocity{};
+    double time_to_ramp = 0.1;
+
+
 
     EuclideanToWheel euclidean_to_four_wheel =
         EuclideanToWheel(create2021RobotConstants());
@@ -27,95 +35,111 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_zero)
         euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity), 0.001));
 }
 
-// Note: The tests below assume that counter-clockwise motor rotation is positive velocity, and vise-versa.
+// Note: The tests below assume that counter-clockwise motor rotation is positive
+// velocity, and vise-versa.
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_x)
 {
     // Test +x/right
     target_euclidean_velocity = {1, 0, 0};
-    calculated_wheel_speeds     = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+    calculated_wheel_speeds =
+        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
     // Front wheels must be - velocity, back wheels must be + velocity.
-    EXPECT_LT(calculated_wheel_speeds[0], 0);
-    EXPECT_LT(calculated_wheel_speeds[1], 0);
-    EXPECT_GT(calculated_wheel_speeds[2], 0);
-    EXPECT_GT(calculated_wheel_speeds[3], 0);
+    EXPECT_LT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_x)
 {
     // Test -x/left
     target_euclidean_velocity = {-1, 0, 0};
-    calculated_wheel_speeds     = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+    calculated_wheel_speeds =
+        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
     // Front wheels must be + velocity, back wheels must be - velocity.
-    EXPECT_GT(calculated_wheel_speeds[0], 0);
-    EXPECT_GT(calculated_wheel_speeds[1], 0);
-    EXPECT_LT(calculated_wheel_speeds[2], 0);
-    EXPECT_LT(calculated_wheel_speeds[3], 0);
+    EXPECT_GT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_y)
 {
     // Test +y/forwards
     target_euclidean_velocity = {0, 1, 0};
-    calculated_wheel_speeds     = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+    calculated_wheel_speeds =
+        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
     // Right wheels must be + velocity, Left wheels must be - velocity.
-    EXPECT_GT(calculated_wheel_speeds[0], 0);
-    EXPECT_LT(calculated_wheel_speeds[1], 0);
-    EXPECT_LT(calculated_wheel_speeds[2], 0);
-    EXPECT_GT(calculated_wheel_speeds[3], 0);
+    EXPECT_GT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 
     // Right wheels must have same velocity magnitude as left wheels, but opposite sign.
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[0], -calculated_wheel_speeds[1]);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[2], -calculated_wheel_speeds[3]);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX],
+                     -calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX]);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX],
+                     -calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX]);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_y)
 {
     // Test -y/backwards
     target_euclidean_velocity = {0, -1, 0};
-    calculated_wheel_speeds     = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+    calculated_wheel_speeds =
+        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
     // Right wheels must be + velocity, Left wheels must be - velocity.
-    EXPECT_LT(calculated_wheel_speeds[0], 0);
-    EXPECT_GT(calculated_wheel_speeds[1], 0);
-    EXPECT_GT(calculated_wheel_speeds[2], 0);
-    EXPECT_LT(calculated_wheel_speeds[3], 0);
+    EXPECT_LT(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_GT(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], 0);
+    EXPECT_LT(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], 0);
 
     // Right wheels must have same velocity magnitude as left wheels, but opposite sign.
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[0], -calculated_wheel_speeds[1]);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[2], -calculated_wheel_speeds[3]);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX],
+                     -calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX]);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX],
+                     -calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX]);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_positive_w)
 {
     // Test +w/counter-clockwise
     target_euclidean_velocity = {0, 0, 1};
-    calculated_wheel_speeds   = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+    calculated_wheel_speeds =
+        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
     // Formula for the length of a segment: length = radius * angle
     // Since angle = 1rad, the length of the segment is equal to the radius.
     // Therefore, all wheel speeds must be equal to the robot radius.
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[0], robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[1], robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[2], robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[3], robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX],
+                     robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX], robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX], robot_radius);
 }
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_negative_w)
 {
     // Test -w/clockwise
     target_euclidean_velocity = {0, 0, -1};
-    calculated_wheel_speeds     = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+    calculated_wheel_speeds =
+        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
 
     // Formula for the length of a segment: length = radius * angle
     // Since angle = -1rad, the length of the segment is equal to the -radius.
-    // Therefore, all wheel speeds (=length of segment/sec) must be equal to the robot radius.
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[0], -robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[1], -robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[2], -robot_radius);
-    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[3], -robot_radius);
+    // Therefore, all wheel speeds (=length of segment/sec) must be equal to the robot
+    // radius.
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_RIGHT_WHEEL_SPACE_INDEX],
+                     -robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[FRONT_LEFT_WHEEL_SPACE_INDEX],
+                     -robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_LEFT_WHEEL_SPACE_INDEX], -robot_radius);
+    EXPECT_DOUBLE_EQ(calculated_wheel_speeds[BACK_RIGHT_WHEEL_SPACE_INDEX],
+                     -robot_radius);
 }
 
 TEST_F(EuclideanToWheelTest, test_conversion_is_linear)
@@ -132,12 +156,142 @@ TEST_F(EuclideanToWheelTest, test_conversion_is_linear)
 
 TEST_F(EuclideanToWheelTest, test_double_convertion)
 {
-    // Converting from euclidean to wheel velocity and back should result in the same value
+    // Converting from euclidean to wheel velocity and back should result in the same
+    // value
     target_euclidean_velocity = {3, 1, 5};
 
-    auto wheel_velocity = euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
+    auto wheel_velocity =
+        euclidean_to_four_wheel.getWheelVelocity(target_euclidean_velocity);
     auto calculated_euclidean_velocity =
-            euclidean_to_four_wheel.getEuclideanVelocity(wheel_velocity);
+        euclidean_to_four_wheel.getEuclideanVelocity(wheel_velocity);
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(target_euclidean_velocity, calculated_euclidean_velocity, 0.001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(target_euclidean_velocity,
+                                               calculated_euclidean_velocity, 0.001));
+}
+
+TEST_F(EuclideanToWheelTest, test_velocity_no_ramping)
+{
+    auto allowable_delta_wheel_velocity =
+        static_cast<double>(robot_constants.motor_max_acceleration_m_per_s_2) *
+        time_to_ramp;
+    auto max_allowable_wheel_velocity =
+        static_cast<double>(robot_constants.robot_max_speed_m_per_s);
+
+    current_wheel_velocity = {0, 0, 0, 0};
+
+    auto target_wheel_velocity_coefficient = allowable_delta_wheel_velocity * 0.9;
+
+    target_wheel_velocity = {
+        target_wheel_velocity_coefficient, target_wheel_velocity_coefficient,
+        target_wheel_velocity_coefficient, target_wheel_velocity_coefficient};
+
+    auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
+        current_wheel_velocity, target_wheel_velocity, time_to_ramp);
+
+    EXPECT_LE((ramped_wheel_velocity - current_wheel_velocity).cwiseAbs().maxCoeff(),
+              allowable_delta_wheel_velocity);
+
+    EXPECT_LE(ramped_wheel_velocity.cwiseAbs().maxCoeff(), max_allowable_wheel_velocity);
+}
+
+TEST_F(EuclideanToWheelTest, test_velocity_delta_ramp)
+{
+    auto allowable_delta_wheel_velocity =
+        static_cast<double>(robot_constants.motor_max_acceleration_m_per_s_2) *
+        time_to_ramp;
+    auto max_allowable_wheel_velocity =
+        static_cast<double>(robot_constants.robot_max_speed_m_per_s);
+
+    current_wheel_velocity = {0, 0, 0, 0};
+
+    auto target_wheel_velocity_coefficient = 5 * allowable_delta_wheel_velocity;
+
+    target_wheel_velocity = {
+        target_wheel_velocity_coefficient, target_wheel_velocity_coefficient,
+        target_wheel_velocity_coefficient, target_wheel_velocity_coefficient};
+
+    auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
+        current_wheel_velocity, target_wheel_velocity, time_to_ramp);
+
+    WheelSpace_t expected_wheel_velocity = {
+        allowable_delta_wheel_velocity, allowable_delta_wheel_velocity,
+        allowable_delta_wheel_velocity, allowable_delta_wheel_velocity};
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(ramped_wheel_velocity,
+                                               expected_wheel_velocity, 0.001));
+
+    EXPECT_LE((ramped_wheel_velocity - current_wheel_velocity).cwiseAbs().maxCoeff(),
+              allowable_delta_wheel_velocity);
+
+    EXPECT_LE(ramped_wheel_velocity.cwiseAbs().maxCoeff(), max_allowable_wheel_velocity);
+}
+
+TEST_F(EuclideanToWheelTest, test_velocity_total_ramp)
+{
+    auto allowable_delta_wheel_velocity =
+        static_cast<double>(robot_constants.motor_max_acceleration_m_per_s_2) *
+        time_to_ramp;
+    auto max_allowable_wheel_velocity =
+        static_cast<double>(robot_constants.robot_max_speed_m_per_s);
+
+    auto current_speed = max_allowable_wheel_velocity * 0.95;
+
+    current_wheel_velocity = {current_speed, current_speed, current_speed, current_speed};
+
+    auto target_wheel_velocity_coefficient = allowable_delta_wheel_velocity;
+
+    target_wheel_velocity = {current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient};
+
+    auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
+        current_wheel_velocity, target_wheel_velocity, time_to_ramp);
+
+    WheelSpace_t expected_wheel_velocity = {
+        max_allowable_wheel_velocity, max_allowable_wheel_velocity,
+        max_allowable_wheel_velocity, max_allowable_wheel_velocity};
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(ramped_wheel_velocity,
+                                               expected_wheel_velocity, 0.001));
+
+    EXPECT_LE((ramped_wheel_velocity - current_wheel_velocity).cwiseAbs().maxCoeff(),
+              allowable_delta_wheel_velocity);
+
+    EXPECT_LE(ramped_wheel_velocity.cwiseAbs().maxCoeff(), max_allowable_wheel_velocity);
+}
+
+TEST_F(EuclideanToWheelTest, test_velocity_both_ramps)
+{
+    auto allowable_delta_wheel_velocity =
+        static_cast<double>(robot_constants.motor_max_acceleration_m_per_s_2) *
+        time_to_ramp;
+    auto max_allowable_wheel_velocity =
+        static_cast<double>(robot_constants.robot_max_speed_m_per_s);
+
+    auto current_speed = max_allowable_wheel_velocity * 0.95;
+
+    current_wheel_velocity = {current_speed, current_speed, current_speed, current_speed};
+
+    auto target_wheel_velocity_coefficient = 5 * allowable_delta_wheel_velocity;
+
+    target_wheel_velocity = {current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient,
+                             current_speed + target_wheel_velocity_coefficient};
+
+    auto ramped_wheel_velocity = euclidean_to_four_wheel.rampWheelVelocity(
+        current_wheel_velocity, target_wheel_velocity, time_to_ramp);
+
+    WheelSpace_t expected_wheel_velocity = {
+        max_allowable_wheel_velocity, max_allowable_wheel_velocity,
+        max_allowable_wheel_velocity, max_allowable_wheel_velocity};
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(ramped_wheel_velocity,
+                                               expected_wheel_velocity, 0.001));
+
+    EXPECT_LE((ramped_wheel_velocity - current_wheel_velocity).cwiseAbs().maxCoeff(),
+              allowable_delta_wheel_velocity);
+
+    EXPECT_LE(ramped_wheel_velocity.cwiseAbs().maxCoeff(), max_allowable_wheel_velocity);
 }

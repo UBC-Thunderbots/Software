@@ -8,6 +8,8 @@
 #include <sys/time.h>      // needed for getrusage
 #include <unistd.h>        // needed for sysconf(int name);
 
+#include <boost/program_options.hpp>
+
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
@@ -86,6 +88,22 @@ int main(int argc, char** argv)
 {
     std::cout << BANNER << std::endl;
 
+    struct CommandLineArgs
+    {
+        bool enable_log_merging = true;
+    };
+
+    CommandLineArgs args;
+    boost::program_options::options_description desc{"Options"};
+
+    desc.add_options()("enable_log_merging",
+                       boost::program_options::value<bool>(&args.enable_log_merging),
+                       "merging repeated log messages");
+
+    boost::program_options::variables_map vm;
+    boost::program_options::store(parse_command_line(argc, argv, desc), vm);
+    boost::program_options::notify(vm);
+
     // Page faults are bad, lets setup malloc and reserve some memory
     configureMallocBehaviour();
 
@@ -93,7 +111,8 @@ int main(int argc, char** argv)
     const int pre_allocation_size = 20 * 1024 * 1024;
     reserveProcessMemory(pre_allocation_size);
 
-    static auto thunderloop = Thunderloop(create2021RobotConstants(), CONTROL_LOOP_HZ);
+    auto thunderloop =
+        Thunderloop(create2021RobotConstants(), args.enable_log_merging, CONTROL_LOOP_HZ);
     thunderloop.runLoop();
 
     return 0;

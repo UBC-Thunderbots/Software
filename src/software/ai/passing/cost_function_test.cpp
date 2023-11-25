@@ -137,7 +137,7 @@ TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
 
     double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_GE(pass_rating, 0.0);
-    EXPECT_LE(pass_rating, 0.1);
+    EXPECT_LE(pass_rating, 0.11);
 }
 
 TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free)

@@ -64,14 +64,21 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             break;
         case TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE:
         {
-            double larger_radius                 = field.centerCircleRadius() + 0.2;
+            double radius                        = field.centerCircleRadius();
             Polygon centre_circle_and_enemy_half = Polygon(
-                {Point(0, field.yLength() / 2), Point(0, larger_radius),
-                 Point(larger_radius, larger_radius), Point(larger_radius + 0.2, 0),
-                 Point(larger_radius, -larger_radius), Point(0, -larger_radius),
-                 Point(0, -field.yLength() / 2), field.fieldBoundary().posXNegYCorner(),
+                {Point(-robot_radius_expansion_amount,
+                       field.fieldBoundary().yLength() / 2),
+                 Point(-robot_radius_expansion_amount, radius), Point(0, radius),
+                 Point(radius * std::cos(M_PI / 4), radius * std::sin(M_PI / 4)),
+                 Point(radius, 0),
+                 Point(radius * std::cos(M_PI / 4), -radius * std::sin(M_PI / 4)),
+                 Point(0, -radius), Point(-robot_radius_expansion_amount, -radius),
+                 Point(-robot_radius_expansion_amount,
+                       -field.fieldBoundary().yLength() / 2),
+                 field.fieldBoundary().posXNegYCorner(),
                  field.fieldBoundary().posXPosYCorner()});
-            obstacles.push_back(createFromShape(centre_circle_and_enemy_half));
+            obstacles.push_back(
+                std::make_shared<GeomObstacle<Polygon>>(centre_circle_and_enemy_half));
             break;
         }
         case TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
@@ -105,6 +112,32 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             // AVOID_BALL_PLACEMENT_INTERFERENCE is not handled by this obstacle factory
             // since it's a dynamic obstacle
             break;
+        case TbotsProto::MotionConstraint::FRIENDLY_GOAL:
+        {
+            const Rectangle &friendly_goal = field.friendlyGoal();
+
+            // Reduce the size of the goal obstacle slightly to avoid the goalie
+            // appear to be inside the obstacle if it is touching one of the goal
+            // walls (e.g. due to noisy vision).
+            const double goal_obstacle_radius = ROBOT_MAX_RADIUS_METERS - 0.01;
+
+            // Top goal post
+            obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(
+                Polygon::fromSegment(Segment(friendly_goal.posXPosYCorner(),
+                                             friendly_goal.negXPosYCorner()),
+                                     0, goal_obstacle_radius)));
+            // Bottom goal post
+            obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(
+                Polygon::fromSegment(Segment(friendly_goal.posXNegYCorner(),
+                                             friendly_goal.negXNegYCorner()),
+                                     0, goal_obstacle_radius)));
+            // Left goal wall
+            obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(
+                Polygon::fromSegment(Segment(friendly_goal.negXPosYCorner(),
+                                             friendly_goal.negXNegYCorner()),
+                                     goal_obstacle_radius)));
+            break;
+        }
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:;
             break;
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MAX_SENTINEL_DO_NOT_USE_:;
@@ -163,6 +196,9 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
                     createFromShape(Circle(world.ball().position(), 0.5)));
             }
             break;
+        case TbotsProto::MotionConstraint::FRIENDLY_GOAL:;
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:;
             break;
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MAX_SENTINEL_DO_NOT_USE_:;
@@ -210,6 +246,13 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Polygon &polyg
 {
     return std::make_shared<GeomObstacle<Polygon>>(
         polygon.expand(robot_radius_expansion_amount));
+}
+
+ObstaclePtr RobotNavigationObstacleFactory::createFromShape(
+    const Rectangle &rectangle) const
+{
+    return std::make_shared<GeomObstacle<Rectangle>>(
+        rectangle.expand(robot_radius_expansion_amount));
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(

@@ -1,6 +1,7 @@
 #include <boost/program_options.hpp>
 
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/vision.pb.h"
 #include "proto/world.pb.h"
@@ -17,6 +18,7 @@ int main(int argc, char **argv)
         bool help               = false;
         std::string runtime_dir = "/tmp/tbots";
         std::string division    = "div_b";
+        bool enable_realism     = false;  // realism flag
     };
 
     CommandLineArgs args;
@@ -30,6 +32,9 @@ int main(int argc, char **argv)
     desc.add_options()("division",
                        boost::program_options::value<std::string>(&args.division),
                        "div_a or div_b");
+    desc.add_options()("enable_realism",
+                       boost::program_options::bool_switch(&args.enable_realism),
+                       "realism simulator");  // install terminal flag
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -69,18 +74,28 @@ int main(int argc, char **argv)
          *                        └────────────────────────────┘
          */
         std::shared_ptr<ErForceSimulator> er_force_sim;
+        std::unique_ptr<RealismConfigErForce> realism_config;
 
-        // Setup the field
+        if (args.enable_realism)
+        {
+            realism_config = ErForceSimulator::createRealisticRealismConfig();
+        }
+        else
+        {
+            realism_config = ErForceSimulator::createDefaultRealismConfig();
+        }
+
         if (args.division == "div_a")
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_A, create2021RobotConstants());
+                TbotsProto::FieldType::DIV_A, create2021RobotConstants(), realism_config);
         }
         else
         {
             er_force_sim = std::make_shared<ErForceSimulator>(
-                TbotsProto::FieldType::DIV_B, create2021RobotConstants());
+                TbotsProto::FieldType::DIV_B, create2021RobotConstants(), realism_config);
         }
+
         std::mutex simulator_mutex;
 
         // World Buffer
@@ -107,12 +122,29 @@ int main(int argc, char **argv)
         auto simulator_state_output = ThreadedProtoUnixSender<world::SimulatorState>(
             runtime_dir + SIMULATOR_STATE_PATH);
 
+
+        // World State Received Trigger as Simulator Output
+        auto world_state_received_trigger =
+            ThreadedProtoUnixSender<TbotsProto::WorldStateReceivedTrigger>(
+                runtime_dir + WORLD_STATE_RECEIVED_TRIGGER_PATH);
+
+        bool has_sent_world_state_trigger = false;
+
         // Inputs
         // World State Input: Configures the ERForceSimulator
         auto world_state_input = ThreadedProtoUnixListener<TbotsProto::WorldState>(
             runtime_dir + WORLD_STATE_PATH, [&](TbotsProto::WorldState input) {
                 std::scoped_lock lock(simulator_mutex);
                 er_force_sim->setWorldState(input);
+
+                if (!has_sent_world_state_trigger)
+                {
+                    auto world_state_received_trigger_msg =
+                        *createWorldStateReceivedTrigger();
+                    world_state_received_trigger.sendProto(
+                        world_state_received_trigger_msg);
+                    has_sent_world_state_trigger = true;
+                }
             });
 
         // World Input: Buffer vision until we have primitives to tick

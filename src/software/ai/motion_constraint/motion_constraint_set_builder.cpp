@@ -6,7 +6,6 @@
 std::set<TbotsProto::MotionConstraint> buildMotionConstraintSet(
     const GameState &game_state, const Tactic &tactic)
 {
-    std::set<TbotsProto::MotionConstraint> current_allowed_constraints;
     MotionConstraintVisitor motion_constraint_visitor;
 
     std::set<TbotsProto::MotionConstraint> current_motion_constraints =
@@ -25,6 +24,7 @@ std::set<TbotsProto::MotionConstraint> buildMotionConstraintSetFromGameState(
 {
     std::set<TbotsProto::MotionConstraint> motion_constraints;
     motion_constraints.insert(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
+    motion_constraints.insert(TbotsProto::MotionConstraint::FRIENDLY_GOAL);
 
     if (game_state.stayAwayFromBall())
     {

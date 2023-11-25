@@ -28,7 +28,7 @@ class CreaseDefenderTacticTest
 
 TEST_F(CreaseDefenderTacticTest, test_chip_ball)
 {
-    Point enemy_threat_point = Point(-0.5, 0);
+    Point enemy_threat_point = Point(0.0, 0);
     TbotsProto::CreaseDefenderAlignment alignment =
         TbotsProto::CreaseDefenderAlignment::CENTRE;
 
@@ -46,7 +46,7 @@ TEST_F(CreaseDefenderTacticTest, test_chip_ball)
         ai_config.robot_navigation_obstacle_config());
 
     tactic->updateControlParams(enemy_threat_point, alignment);
-    setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
@@ -80,7 +80,7 @@ TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
     auto tactic = std::make_shared<CreaseDefenderTactic>(
         ai_config.robot_navigation_obstacle_config());
     tactic->updateControlParams(enemy_threat_point, alignment);
-    setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
@@ -94,7 +94,10 @@ TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
                  ValidationCoroutine::push_type& yield) {
-            robotsAvoidBall(0, {}, world_ptr, yield);
+            if (world_ptr->ball().velocity().length() > 0.01)
+            {
+                yield("Ball was hit");
+            }
         }};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -122,7 +125,7 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
         ai_config.robot_navigation_obstacle_config());
 
     tactic->updateControlParams(enemy_threat_point, alignment);
-    setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setTactic(0, tactic);
 
     Rectangle defense_area         = field.friendlyDefenseArea();
     Rectangle field_lines          = field.fieldLines();
@@ -198,11 +201,8 @@ INSTANTIATE_TEST_CASE_P(
         // Enemy threat left side of crease, RIGHT
         std::make_tuple(Point(-3.5, 2.5), TbotsProto::CreaseDefenderAlignment::RIGHT, 1),
         // Enemy threat left side of crease, CENTRE
-        std::make_tuple(Point(-4, 2.5), TbotsProto::CreaseDefenderAlignment::CENTRE, 0)
-
-        // TODO (#2519): Re-enable tests where robot overshoots path and gets stuck behind
-        // goal Enemy threat right side of crease, RIGHT std::make_tuple(Point(-4, -2),
-        // TbotsProto::CreaseDefenderAlignment::RIGHT, 5), Enemy threat right side of
-        // crease, LEFT std::make_tuple(Point(-4.25, -2),
-        // TbotsProto::CreaseDefenderAlignment::LEFT, 5)
-        ));
+        std::make_tuple(Point(-4, 2.5), TbotsProto::CreaseDefenderAlignment::CENTRE, 0),
+        // goal Enemy threat right side of crease, RIGHT
+        std::make_tuple(Point(-4, -2), TbotsProto::CreaseDefenderAlignment::RIGHT, 5),
+        // Enemy threat right side of crease, LEFT
+        std::make_tuple(Point(-4.25, -2), TbotsProto::CreaseDefenderAlignment::LEFT, 5)));

@@ -17,20 +17,20 @@
  * objects, passing them to the `AI`, getting the primitives to send to the
  * robots based on the World state, and sending them out.
  */
-class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
+class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
                    public FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>,
                    public Subject<TbotsProto::PrimitiveSet>,
                    public Subject<TbotsProto::PlayInfo>
 {
    public:
-    ThreadedAI() = delete;
+    ThreadedAi() = delete;
 
     /**
-     * Constructs a new ThreadedAI object.
+     * Constructs a new ThreadedAi object.
      *
      * @param tbots_proto The AI configuration
      */
-    explicit ThreadedAI(TbotsProto::AiConfig ai_config);
+    explicit ThreadedAi(const TbotsProto::AiConfig& ai_config);
 
     /**
      * Override the AI play
@@ -56,9 +56,9 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
      *
      * @param world the new world
      */
-    void runAIAndSendPrimitives(const World &world);
+    void runAiAndSendPrimitives(const World& world);
 
-    AI ai;
+    Ai ai;
     TbotsProto::AiConfig ai_config;
     TbotsProto::AiControlConfig ai_control_config;
     std::mutex ai_mutex;

@@ -3,12 +3,15 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/logger/logger.h"
 
-std::unique_ptr<TbotsProto::Primitive>
-createMovePrimitive(const TbotsProto::MotionControl &motion_control, const Angle &final_angle, double final_speed,
-                    const TbotsProto::DribblerMode &dribbler_mode,
-                    const TbotsProto::BallCollisionType &ball_collision_type, const AutoChipOrKick &auto_chip_or_kick,
-                    const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode, double target_spin_rev_per_s,
-                    const RobotConstants_t &robot_constants, std::optional<double> cost_override, bool run_hrvo)
+std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
+    const TbotsProto::MotionControl &motion_control, const Angle &final_angle,
+    double final_speed, bool should_drive_forward,
+    const TbotsProto::DribblerMode &dribbler_mode,
+    const TbotsProto::BallCollisionType &ball_collision_type,
+    const AutoChipOrKick &auto_chip_or_kick,
+    const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
+    double target_spin_rev_per_s, const RobotConstants_t &robot_constants,
+    std::optional<double> cost_override)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
@@ -24,10 +27,7 @@ createMovePrimitive(const TbotsProto::MotionControl &motion_control, const Angle
     move_primitive_msg->mutable_move()->set_max_speed_m_per_s(
         static_cast<float>(convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             max_allowed_speed_mode, robot_constants)));
-    move_primitive_msg->mutable_move()->set_robot_max_ang_speed_rad_per_s(robot_constants.robot_max_ang_speed_rad_per_s);
-    move_primitive_msg->mutable_move()->set_robot_max_acceleration_m_per_s_2(robot_constants.robot_max_acceleration_m_per_s_2);
-    move_primitive_msg->mutable_move()->set_robot_max_ang_acceleration_rad_per_s_2(robot_constants.robot_max_ang_speed_rad_per_s);
-    move_primitive_msg->mutable_move()->set_hrvo_start_deceleration_dist(0.4);
+    move_primitive_msg->mutable_move()->set_should_drive_forward(should_drive_forward);
 
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) =
         *createAngleProto(final_angle);
@@ -57,38 +57,20 @@ createMovePrimitive(const TbotsProto::MotionControl &motion_control, const Angle
     return move_primitive_msg;
 }
 
-std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitive()
 {
     auto stop_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    if (coast)
-    {
-        stop_primitive_msg->mutable_stop()->set_stop_type(
-            TbotsProto::StopPrimitive::COAST);
-    }
-    else
-    {
-        stop_primitive_msg->mutable_stop()->set_stop_type(
-            TbotsProto::StopPrimitive::BRAKE);
-    }
+    stop_primitive_msg->mutable_stop();
 
     stop_primitive_msg->set_cost(1.0);
 
     return stop_primitive_msg;
 }
 
-std::unique_ptr<TbotsProto::Primitive> createEstopPrimitive()
-{
-    auto estop_primitive_msg = std::make_unique<TbotsProto::Primitive>();
-
-    estop_primitive_msg->mutable_estop();
-
-    return estop_primitive_msg;
-}
-
 std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
-    const Vector& velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm,
-    const TbotsProto::AutoChipOrKick& auto_chip_or_kick)
+    const Vector &velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm,
+    const TbotsProto::AutoChipOrKick &auto_chip_or_kick)
 {
     auto direct_control_primitive_msg = std::make_unique<TbotsProto::Primitive>();
     auto direct_velocity_control =
@@ -142,10 +124,6 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
         case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
             return COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND;
-        case TbotsProto::MaxAllowedSpeedMode::DRIBBLE_GET_POSSESSION:
-            return 0.5;
-        case TbotsProto::MaxAllowedSpeedMode::DRIBBLE_DRIBBLING:
-            return 1.5;
         default:
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;

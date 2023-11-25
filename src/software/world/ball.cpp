@@ -1,10 +1,6 @@
 #include "software/world/ball.h"
 
-#include <cmath>
-
 #include "shared/constants.h"
-#include "software/geom/algorithms/almost_equal.h"
-#include "software/geom/algorithms/distance.h"
 #include "software/physics/physics.h"
 
 Ball::Ball(const Point &position, const Vector &velocity, const Timestamp &timestamp,
@@ -65,60 +61,22 @@ Vector Ball::acceleration() const
 
 BallState Ball::estimateFutureState(const Duration &duration_in_future) const
 {
-    Duration effective_duration(duration_in_future);
-
-    Vector future_velocity = calculateFutureVelocity(current_state_.velocity(),
-                                                     acceleration_, duration_in_future);
-
-    bool velocities_in_opposite_direction =
-        std::abs(future_velocity.cross(current_state_.velocity())) < 1e-6;
-
-
-    if (acceleration_.length() > 0 && velocities_in_opposite_direction)
-    {
-        // this is the time it takes for velocity to accelerate to a stop
-        effective_duration = Duration::fromSeconds(current_state_.velocity().length() /
-                                                   acceleration_.length());
-
-        future_velocity = Vector();
-    }
-
     const Point future_position =
         calculateFuturePosition(current_state_.position(), current_state_.velocity(),
-                                acceleration_, effective_duration);
+                                acceleration_, duration_in_future);
+    const Vector future_velocity = calculateFutureVelocity(
+        current_state_.velocity(), acceleration_, duration_in_future);
 
     return BallState(future_position, future_velocity);
 }
 
-std::optional<Duration> Ball::getTimeToMoveDistance(const double distance) const
+bool Ball::hasBallBeenKicked(const Angle &expected_kick_direction, double min_kick_speed,
+                             const Angle &max_angle_difference) const
 {
-    double a = -1 * std::max(1e-6, acceleration_.length());
-
-    double descriminant =
-        std::pow(current_state_.velocity().length(), 2) + 2 * a * distance;
-
-    if (descriminant < 0)
-    {
-        return {};
-    }
-
-    // solving for t using quadratic formula applied to kinematic equation
-    double t_total = (-current_state_.velocity().length() + std::sqrt(descriminant)) / a;
-
-    return Duration::fromSeconds(t_total);
-}
-
-bool Ball::hasBallBeenKicked(const Angle &expected_kick_direction,
-                             double min_kick_speed) const
-{
-    // 20deg arbitrarily chosen as the maximum angle difference to determine
-    // if ball has been kicked in the approximate direction as expected
-    static constexpr Angle MAX_ANGLE_DIFFERENCE = Angle::fromDegrees(20);
-
     Angle kick_orientation_difference =
         velocity().orientation().minDiff(expected_kick_direction);
 
-    return (kick_orientation_difference.abs() < MAX_ANGLE_DIFFERENCE &&
+    return (kick_orientation_difference.abs() < max_angle_difference &&
             velocity().length() >= min_kick_speed);
 }
 

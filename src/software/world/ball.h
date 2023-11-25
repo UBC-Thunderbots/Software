@@ -116,12 +116,15 @@ class Ball final
      * towards
      * @param min_kick_speed The minimum speed of the ball to be considered a kick, in
      * metres per second
+     * @param max_angle_difference The maximum angle difference for determining
+     * if ball has been kicked in the approximate direction as expected
      *
      * @return True if ball was kicked in the approximate direction we expect, false
      * otherwise
      */
-    bool hasBallBeenKicked(const Angle &expected_kick_direction,
-                           double min_kick_speed = 0.5) const;
+    bool hasBallBeenKicked(
+        const Angle &expected_kick_direction, double min_kick_speed = 0.5,
+        const Angle &max_angle_difference = Angle::fromDegrees(20)) const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and

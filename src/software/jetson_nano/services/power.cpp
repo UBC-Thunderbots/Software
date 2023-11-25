@@ -1,12 +1,17 @@
 #include "software/jetson_nano/services/power.h"
 
 #include <boost/bind/bind.hpp>
+#include <boost/filesystem.hpp>
 #include <cstdint>
 
 #include "proto/power_frame_msg.nanopb.h"
 
 PowerService::PowerService()
 {
+    if (!boost::filesystem::exists(DEVICE_SERIAL_PORT))
+    {
+        LOG(FATAL) << "PLUG THE USB INTO THE JETSON NANO";
+    }
     this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
     this->read_thread = std::thread(boost::bind(&PowerService::continuousRead, this));
 }
@@ -67,9 +72,12 @@ void PowerService::tick()
     }
 }
 
-TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& command)
+TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& command,
+                                           double kick_coeff, int kick_constant,
+                                           int chip_constant)
 {
     // Store msg for later transmission
-    nanopb_command = createNanoPbPowerPulseControl(command);
+    nanopb_command =
+        createNanoPbPowerPulseControl(command, kick_coeff, kick_constant, chip_constant);
     return *createTbotsPowerStatus(status);
 }

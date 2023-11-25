@@ -141,6 +141,12 @@ template <class ZoneEnum>
 PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
     const World& world)
 {
+    // Generate sample passes for cost visualization
+    if (passing_config_.cost_vis_config().generate_sample_passes())
+    {
+        samplePassesForVisualization(world, passing_config_);
+    }
+
     auto generated_passes = samplePasses(world);
     generated_passes = optimizePasses(world, generated_passes);
     std::optional<Robot> effective_robot_with_ball = getRobotWithEffectiveBallPossession(world.friendlyTeam(), world.ball(), world.field());
