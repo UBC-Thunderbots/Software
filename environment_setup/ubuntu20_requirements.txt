@@ -13,3 +13,4 @@ PyOpenGL==3.1.6
 PyOpenGL-accelerate==3.1.5
 psutil==5.9.0
 numpy==1.24.4
+evdev==1.6.1

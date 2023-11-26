@@ -155,6 +155,13 @@ if __name__ == "__main__":
         default=False,
         help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
     )
+    parser.add_argument(
+        "--xbox",
+        action="store",
+        type=str,
+        default='/dev/input/input1',
+        help="Path to the controller",
+    )
 
     # Sanity check that an interface was provided
     args = parser.parse_args()
@@ -222,6 +229,9 @@ if __name__ == "__main__":
     #
     # We want to run either 1 instance of AI or 1 instance of RobotCommunication or both which will
     # send/recv packets over the provided multicast channel.
+
+    if args.xbox is not None :
+        controller_diagnostics = ControllerDiagnostics(args.xbox, proto_unix_io)
 
     elif args.run_blue or args.run_yellow or args.run_diagnostics:
         tscope_config = config.configure_ai_or_diagnostics(
