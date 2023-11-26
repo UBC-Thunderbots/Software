@@ -12,6 +12,5 @@ class FeasibilityScorer : public SupportTacticScorer
    public:
     explicit FeasibilityScorer() = default;
 
-    virtual double score(
-        const TypedSupportTacticCandidate<ReceiverTactic> &candidate) override;
+    double score(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) override;
 };
