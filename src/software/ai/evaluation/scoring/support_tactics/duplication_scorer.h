@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/evaluation/scoring/support_tactics/support_tactic_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/support_tactic_candidate.hpp"
+#include "software/ai/evaluation/scoring/support_tactics/support_tactic_scorer.h"
 #include "software/util/type_map/type_map.h"
 
 /**
@@ -18,7 +18,8 @@ class DuplicationScorer : public SupportTacticScorer
      * The javadoc comment for all `update` methods below can be read as:
      * Records a usage of the support tactic associated with the candidate
      *
-     * @param candidate the SupportTacticCandidate whose associated support tactic was used 
+     * @param candidate the SupportTacticCandidate whose associated support tactic was
+     * used
      */
     void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) override;
 

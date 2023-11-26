@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/play/dynamic_plays/dynamic_play.h"
 
-DynamicPlay::DynamicPlay(TbotsProto::AiConfig ai_config, bool requires_goalie) 
+DynamicPlay::DynamicPlay(TbotsProto::AiConfig ai_config, bool requires_goalie)
     : Play(ai_config, requires_goalie),
-      support_tactic_candidates_(allSupportTacticCandidates()),  
+      support_tactic_candidates_(allSupportTacticCandidates()),
       support_tactic_feasibility_scorer_(std::make_unique<FeasibilityScorer>()),
       support_tactic_duplication_scorer_(std::make_unique<DuplicationScorer>()),
       support_tactic_success_scorer_(std::make_unique<SuccessScorer>()),
@@ -23,9 +23,9 @@ void DynamicPlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 void DynamicPlay::updateTactics(const PlayUpdate &play_update)
 {
     unsigned int num_support_tactics = play_update.num_tactics - 1;
-    while (num_support_tactics > support_tactics_.size()) 
+    while (num_support_tactics > support_tactics_.size())
     {
-        for (auto &candidate : support_tactic_candidates_) 
+        for (auto &candidate : support_tactic_candidates_)
         {
             candidate->clearScores();
             candidate->score(*support_tactic_feasibility_scorer_);
@@ -33,9 +33,8 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
             candidate->score(*support_tactic_success_scorer_);
         }
 
-        auto best_candidate = std::max_element(
-            support_tactic_candidates_.begin(), support_tactic_candidates_.end(),
-            [](auto &a, auto &b) { return a->getTotalScore() < b->getTotalScore(); });
+        auto best_candidate = std::max_element(support_tactic_candidates_.begin(),
+                                               support_tactic_candidates_.end());
 
         std::shared_ptr<Tactic> support_tactic = (*best_candidate)->createSupportTactic();
         support_tactics_.push_back(support_tactic);
@@ -48,8 +47,5 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
 
 std::vector<std::shared_ptr<SupportTacticCandidate>> allSupportTacticCandidates()
 {
-    return 
-    {
-        std::make_shared<TypedSupportTacticCandidate<ReceiverTactic>>()
-    };
+    return {std::make_shared<TypedSupportTacticCandidate<ReceiverTactic>>()};
 }

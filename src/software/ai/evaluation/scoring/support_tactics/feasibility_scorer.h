@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/evaluation/scoring/support_tactics/support_tactic_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/support_tactic_candidate.hpp"
+#include "software/ai/evaluation/scoring/support_tactics/support_tactic_scorer.h"
 
 /**
  * Scores SupportTacticCandidates based on their feasibility for a specific play
@@ -12,5 +12,6 @@ class FeasibilityScorer : public SupportTacticScorer
    public:
     explicit FeasibilityScorer() = default;
 
-    virtual double score(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) override;
+    virtual double score(
+        const TypedSupportTacticCandidate<ReceiverTactic> &candidate) override;
 };

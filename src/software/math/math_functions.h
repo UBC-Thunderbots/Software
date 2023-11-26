@@ -96,7 +96,7 @@ T normalizeValueToRange(T value, const T& value_min, const T& value_max,
 
 /**
  * Returns the sign (-1, 0, or 1) of a number
- * 
+ *
  * @tparam T The type of the given number. Must be an integral or floating point type
  * @param value The number to return the sign of
  *

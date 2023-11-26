@@ -7,7 +7,7 @@
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 
 /**
- * A SupportTacticCandidate makes a type of tactic eligible for scoring and 
+ * A SupportTacticCandidate makes a type of tactic eligible for scoring and
  * assignment as a support tactic in a DynamicPlay.
  *
  * It acts as the visitee for a SupportTacticScorer, which operates under
@@ -17,7 +17,7 @@ class SupportTacticCandidate : public Candidate
 {
    public:
     /**
-     * Accepts a SupportTacticScorer and calls the scorer's `score` function 
+     * Accepts a SupportTacticScorer and calls the scorer's `score` function
      * on itself. The scorer's returned score is applied to this candidate.
      *
      * @param scorer a SupportTacticScorer to use to score this candidate
@@ -25,14 +25,14 @@ class SupportTacticCandidate : public Candidate
     virtual void score(SupportTacticScorer &scorer) = 0;
 
     /**
-     * Accepts a SupportTacticScorer and calls the scorer's `update` function 
+     * Accepts a SupportTacticScorer and calls the scorer's `update` function
      * on itself. This lets SupportTacticScorer update its state based on
      * this SupportTacticCandidate
      *
      * @param scorer a SupportTacticScorer to update
      */
     virtual void updateScorer(SupportTacticScorer &scorer) = 0;
-    
+
     /**
      * Returns a shared pointer to a newly constructed instance of the
      * type of support tactic this candidate represents
@@ -55,7 +55,7 @@ class SupportTacticCandidate : public Candidate
 template <typename TSupportTactic>
 class TypedSupportTacticCandidate : public SupportTacticCandidate
 {
-    static_assert(std::is_base_of<Tactic, TSupportTactic>::value, 
+    static_assert(std::is_base_of<Tactic, TSupportTactic>::value,
                   "TSupportTactic must derive from Tactic");
 
    public:

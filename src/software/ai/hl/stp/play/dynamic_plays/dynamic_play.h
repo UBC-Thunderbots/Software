@@ -1,19 +1,18 @@
 #pragma once
 
-#include "software/ai/hl/stp/play/play.h"
-
 #include "software/ai/evaluation/scoring/support_tactics/duplication_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/feasibility_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/success_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/support_tactic_candidate.hpp"
+#include "software/ai/hl/stp/play/play.h"
 
 /**
  * A DynamicPlay is a Play that assigns tactics based on scoring functions
- * whose parameters and outputs are incrementally adjusted over time based 
- * on the Play's success. This enables the Play to "learn" which tactics are 
+ * whose parameters and outputs are incrementally adjusted over time based
+ * on the Play's success. This enables the Play to "learn" which tactics are
  * most effective for a given gameplay scenario.
  */
-class DynamicPlay : public Play 
+class DynamicPlay : public Play
 {
    public:
     /**
@@ -43,7 +42,7 @@ class DynamicPlay : public Play
 /**
  * Returns all SupportTacticCandidates eligible for scoring and assignment
  * in a DynamicPlay
- * 
+ *
  * @return a vector of shared pointers to all SupportTacticCandidates
  */
 std::vector<std::shared_ptr<SupportTacticCandidate>> allSupportTacticCandidates();
