@@ -24,9 +24,7 @@
   * [Visitor Pattern](#visitor-pattern)
   * [Observer Pattern](#observer-pattern)
     * [Threaded Observer](#threaded-observer)
-    * [Example](#example)
   * [Publisher-Subscriber Pattern](#publisher-subscriber-pattern)
-    * [Example](#example-1)
   * [C++ Templating](#c-templating)
 * [Coroutines](#coroutines)
   * [What Are Coroutines?](#what-are-coroutines)
@@ -203,7 +201,6 @@ In our system, we need to be able to do multiple things (receive camera data, ru
 
 **WARNING:** If a class extends multiple `ThreadedObserver`s (for example, [AI](#ai) could extend `ThreadedObserver<World>` and `ThreadedObserver<RobotStatus>`), then there will be two threads running, one for each observer. We **do not check** for data race conditions between observers, so it's entirely possible that one `ThreadedObserver` thread could read/write from data at the same time as the other `ThreadedObserver` is reading/writing the same data. Please make sure any data read/written to/from multiple `ThreadedObserver`s is thread-safe.
 
-### Example
 One example of this is [SensorFusion](#sensor-fusion), which extends `Subject<World>` and the [AI](#ai), which extends `ThreadedObserver<World>`. [SensorFusion](#sensor-fusion) runs in one thread and sends data to the [AI](#ai), which receives and processes it another thread.
 
 ## Publisher-Subscriber Pattern
@@ -213,8 +210,6 @@ The publisher-subscriber pattern ("pub-sub") is a messaging pattern for facilita
 In this pattern, `Publisher`s send messages without knowing who the recipients (`Subscriber`s) are. `Subscriber`s express interest in specific types of messages by subscribing to relevant topics; when a `Publisher` sends a message of a topic, the messaging system ensures that all interested subscribers receive the message.
 
 Read https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern for an introduction to the pub-sub pattern.
-
-### Example
 
 We use the pub-sub pattern to facilitate [inter-process communication](#inter-process-communication) in our system. Through a class called [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py), components can subscribe to receive certain [Protobuf](#protobuf) message types sent out by other processes or system components.
 
@@ -521,7 +516,7 @@ The `Path Planner` is an interface for the responsibility of path planning a sin
 
 [Thunderscope](#thunderscope) is our main visualizer of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and it is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
 
-Thunderscope also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through Thunderscope, we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
+Thunderscope also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). The GUI lets us choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
 
 Thunderscope is implemented using [PyQtGraph](https://www.pyqtgraph.org/), a Python graphics and GUI library. PyQtGraph is built upon [PyQt](https://riverbankcomputing.com/software/pyqt/intro), which provides Python bindings for [Qt](https://www.qt.io/), a C++ library for creating cross-platform GUIs. The general documentation for [Qt](https://www.qt.io/) can be found [here](https://doc.qt.io/qt-5/index.html). The most important parts of Qt to understand are:
 
@@ -608,7 +603,7 @@ Notice this is very similar to the [Architecture Overview Diagram](#architecture
 # Inter-process Communication
 Since [Thunderscope](#thunderscope) runs in a separate process from [Fullsystem](#fullsystem), we use [Unix domain sockets](https://en.wikipedia.org/wiki/Unix_domain_socket) to facilitate communication between Fullsystem and Thunderscope. Unix sockets [have high throughput and are very performant](https://stackoverflow.com/a/29436429/20199855); we simply bind the unix socket to a file path and pass data between processes, instead of having to deal with TCP/IP overhead just to send and receive data on the same computer.
 
-The data sent between Fullsystem and Thunderscope is serialized using [protobufs](#protobuf). Some data, such as data that goes through our [Backend](#backend) (vision data, game controller commands, [Worlds](#world) from [Sensor Fusion](#sensor-fusion), etc.), is sent using unix senders owned by those parts of the Fullsystem directly. In other parts of Fullsystem (FSMs, pass generator, navigator, etc.), we want to delegate away the responsibility of managing unix senders and have a more lightweight way of sending protobufs to Thunderscope. We don’t want to dependency inject a "communication" object everywhere we have visualizable data to send to Thunderscope, so we use the [`g3log`](https://kjellkod.github.io/g3log/) logger used throughout our codebase.
+The data sent between Fullsystem and Thunderscope is serialized using [protobufs](#protobuf). Some data, such as data that goes through our [Backend](#backend) (vision data, game controller commands, [Worlds](#world) from [Sensor Fusion](#sensor-fusion), etc.), is sent using unix senders owned by those parts of the Fullsystem directly. In other higher level components of the Fullsystem (such as FSMs, pass generator, navigator, etc.), we want to delegate away the responsibility of managing unix senders directly and have a lightweight way of sending protobufs to Thunderscope. To avoid needing to dependency inject a "communication" object in places we have visualizable data to send to Thunderscope, we take advantage of the [`g3log`](https://kjellkod.github.io/g3log/) logger already used throughout the codebase to log and send visualizable data.
 
 `g3log` is a fast and thread-safe way to log data with custom handlers called “sinks". Importantly, it gives us a static [singleton](#singleton-pattern) that can be called anywhere. Logging a protobuf will send it to our custom protobuf `g3log` sink, which lazily initializes unix senders based on the type of protobuf that is logged. The sink then sends the protobuf over the socket to listeners.
 
@@ -617,7 +612,7 @@ The data sent between Fullsystem and Thunderscope is serialized using [protobufs
 Logging protobufs is done at the <code>VISUALIZE</code> level (e.g. <code>LOG(VISUALIZE) << some_random_proto;</code>). Protobufs need to be converted to strings in order to log them with <code>g3log</code>. We've overloaded the stream (<code><<</code>) operator to automatically pack protobufs into a <code>google::protobuf::Any</code> and serialize them to a string, so you don't need to do the conversion yourself.
 </details><br>
 
-In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. `ProtoUnixIO` utilizes a variation of the [publisher-subscriber ("pub-sub")](#publisher-subscriber-pattern) messaging pattern. Through `ProtoUnixIO`, clients can register as a subscriber by providing a protobuf type to receive and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming those protobuf messages. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and place those messages onto the `ThreadSafeBuffer`s of that proto's subscribers. Classes can also publish protobufs via `ProtoUnixIO` by configuring it with a unix sender.
+In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. `ProtoUnixIO` utilizes a variation of the [publisher-subscriber ("pub-sub")](#publisher-subscriber-pattern) messaging pattern. Through `ProtoUnixIO`, clients can register as a subscriber by providing a type of protobuf to receive and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming those protobuf messages. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and place those messages onto the `ThreadSafeBuffer`s of that proto's subscribers. Classes can also publish protobufs via `ProtoUnixIO` by configuring it with a unix sender.
 
 # Estop
 `Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:
