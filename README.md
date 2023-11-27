@@ -1,6 +1,6 @@
 # Software
 
-![Tbots CI](https://github.com/UBC-Thunderbots/Software/actions/workflows/main.yml/badge.svg)
+[![Tbots CI](https://github.com/UBC-Thunderbots/Software/actions/workflows/main.yml/badge.svg)](https://github.com/UBC-Thunderbots/Software/actions?query=workflow%3A%22Tbots+CI%22+branch%3Amaster)
 
 Our main software and firmware repository. To get started, please see [Getting Started](docs/getting-started.md). Please thoroughly read this guide, along with our [style guide](docs/code-style-guide.md), before making *any* contributions.
 
