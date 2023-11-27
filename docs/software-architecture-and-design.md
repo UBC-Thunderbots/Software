@@ -182,14 +182,11 @@ The Factory pattern is also used to create different [Backends](#backend)
 
 
 ## Visitor Pattern
-The Visitor pattern is arguably the most "advanced" design pattern we use. It is used when we need to perform different operations on a group of "similar" objects, for example a bunch of objects that inherit from the same parent class ([Intents](#intents)). We might only know all these objects are an [Intent](#intent), but we don't know specifically which type each one is (eg. `MoveIntent` vs `KickIntent`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
+The Visitor pattern is useful when we need to perform different operations on a group of "similar" objects, like objects that inherit from the same parent class (e.g. [Tactic](#tactics)). We might only know all these objects are a [Tactic](#tactic), but we don't know specifically which type each one is (eg. `AttackerTactic` vs `ReceiverTactic`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
 
 Read https://refactoring.guru/design-patterns/visitor for more information.
 
-Examples of the Visitor Pattern can be found with the following classes:
-* [Intents](#intents)
-* [Tactics](#tactics)
-
+An example of where we use the Visitor pattern is in our `MotionConstraintVisitor`. This visitor allows us to update the current set of motion constraints based on the types of tactics that are currently assigned.
 
 ## Observer Pattern
 The Observer pattern is useful for letting components of a system "notify" each other when something happens. Read https://refactoring.guru/design-patterns/observer for a general introduction to the pattern.
