@@ -1,11 +1,30 @@
 #include "software/ai/hl/stp/strategy.h"
 
-std::map<Robot, Point> getBestDribbleLocations(const std::vector<Robot>& robots)
+Pose Strategy::getBestDribblePose(const Robot& robot)
 {
-    return {};
+    if (robot_to_best_dribble_location_.contains(robot))
+    {
+        return robot_to_best_dribble_location_.at(robot);
+    }
+
+    // calculate best dribble position
+    return Pose();
 }
 
-std::map<Robot, Pass> getBestPasses(const std::vector<Robot>& robots)
+Pass Strategy::getBestPass(const Robot& robot)
 {
-    return {};
+    if (robot_to_best_pass_.contains(robot))
+    {
+        return robot_to_best_pass_.at(robot);
+    }
+
+    // calculate best pass
+
+    return Pass(Point(), Point(), 1);
+}
+
+void Strategy::reset()
+{
+    robot_to_best_dribble_location_ = {};
+    robot_to_best_pass_ = {};
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "software/ai/passing/pass.h"
+#include "software/geom/pose.h"
 #include "software/world/robot.h"
 #include "software/world/robot_state.h"
 
@@ -10,14 +12,29 @@ class Strategy
 {
 public:
     /**
-     * Get a map of Robot to the best dribble locations.
+     * Get the best dribble pose for the given robot
+     *
+     * @param robot robot to find best dribble location for
+     *
+     * @returns best dribble pose
      */
-    std::map<Robot, Point> getBestDribbleLocations(const std::vector<Robot>& robots);
+    Pose getBestDribblePose(const Robot& robot);
 
     /**
-     * Get a map of Robot to the best pass locations.
+     * Get the best pass for the given robot.
+     *
+     * @param robot robot to find the best pass for
+     *
+     * @returns best pass for the robot
      */
-    std::map<Robot, Pass> getBestPasses(const std::vector<Robot>& robots);
+    Pass getBestPass(const Robot& robot);
 
+    /**
+     * Reset internal strategy calculations.
+     */
     void reset();
-}
+
+private:
+    std::unordered_map<Robot, Pose, Robot::Hash> robot_to_best_dribble_location_;
+    std::unordered_map<Robot, Pass, Robot::Hash> robot_to_best_pass_;
+};

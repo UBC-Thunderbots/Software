@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/functional/hash/hash.hpp>
 #include <optional>
 
 #include "proto/team.pb.h"
@@ -208,6 +209,26 @@ class Robot
      * @return True if the other robot is not equal to this robots, and false otherwise
      */
     bool operator!=(const Robot &other) const;
+
+    /**
+     * Hash for the Robot using the robot position, orientation and velocity.
+     */
+    struct Hash
+    {
+        std::size_t operator()(const Robot& robot) const
+        {
+            std::size_t seed = 0;
+
+            boost::hash_combine(seed, std::hash<double>{}(robot.position().x()));
+            boost::hash_combine(seed, std::hash<double>{}(robot.position().y()));
+            boost::hash_combine(seed, std::hash<double>{}(robot.velocity().x()));
+            boost::hash_combine(seed, std::hash<double>{}(robot.velocity().y()));
+            boost::hash_combine(seed, std::hash<double>{}(robot.orientation().toRadians()));
+            boost::hash_combine(seed, std::hash<RobotId>{}(robot.id_));
+
+            return seed;
+        }
+    };
 
     // A comparator for the Robot class that compares Robots by ID. This is equivalent
     // to the "less-than" operator.

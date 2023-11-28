@@ -415,3 +415,13 @@ cc_test(
         "//software/test_util",
     ],
 )
+
+cc_library(
+    name = "pose",
+    srcs = ["pose.cpp"],
+    hdrs = ["pose.h"],
+    deps = [
+        ":point",
+        ":angle",
+    ],
+)
