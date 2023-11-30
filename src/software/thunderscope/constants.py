@@ -17,7 +17,7 @@ class ProtoUnixIOTypes(Enum):
     CURRENT = 5
 
 
-class TabNames(str, Enum):
+class TabKeys(str, Enum):
     """
     Different keys for tabs used in various Thunderscope views
     """
@@ -112,6 +112,9 @@ GAME_CONTROLLER_URL = "http://localhost:8081"
 # Paths to check for estop when running diagnostics
 ESTOP_PATH_1 = "/dev/ttyACM0"
 ESTOP_PATH_2 = "/dev/ttyUSB0"
+
+# Path to check for handheld controller when running diagnostics
+HANDHELD_PATH = "/dev/input/input1"
 
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {

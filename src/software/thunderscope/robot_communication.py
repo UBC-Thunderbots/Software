@@ -1,18 +1,20 @@
-from software.py_constants import *
-from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.constants import IndividualRobotMode, EstopMode
-import software.python_bindings as tbots_cpp
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from queue import Empty
-from proto.import_all_protos import *
-from pyqtgraph.Qt import QtCore
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-from typing import Type
 import threading
 import time
 import os
+
+from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S, IndividualRobotMode, EstopMode
+from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
+from software.thunderscope.robot_input_control_manager import RobotInputControlManager
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+import software.python_bindings as tbots_cpp
+from software.py_constants import *
 from google.protobuf.message import Message
+from proto.import_all_protos import *
+from pyqtgraph.Qt import QtCore
+from typing import Type
+from queue import Empty
+
 
 
 class RobotCommunication(object):
@@ -25,6 +27,7 @@ class RobotCommunication(object):
         multicast_channel: str,
         interface: str,
         estop_mode: EstopMode,
+        input_device_path: str = None,
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
     ):
@@ -58,9 +61,13 @@ class RobotCommunication(object):
 
         self.current_proto_unix_io.register_observer(World, self.world_buffer)
 
-        self.robots_connected_to_fullsystem = set()
-        self.robots_connected_to_manual = set()
-        self.robots_to_be_disconnected = {}
+        self.control_manager = RobotInputControlManager(
+            input_device_path,
+            self.send_move_command,
+            self.send_kick_command,
+            self.end_chip_command,
+        )
+        # TODO initialize callbacks for manager
 
         self.current_proto_unix_io.register_observer(
             PrimitiveSet, self.primitive_buffer
@@ -79,6 +86,7 @@ class RobotCommunication(object):
             target=self.__run_primitive_set, daemon=True
         )
 
+        # TODO move this to estop helpers
         # initialising the estop
         # tries to access a plugged in estop. if not found, throws an exception
         # if using keyboard estop, skips this step
@@ -142,7 +150,7 @@ class RobotCommunication(object):
                 )
             )
 
-    def toggle_robot_connection(self, mode: IndividualRobotMode, robot_id: int):
+    def toggle_robot_control_mode(self, robot_id: int, mode: IndividualRobotMode):
         """
         Changes the input mode for a robot between None, Manual, or AI
         If changing from anything to None, add robot to disconnected map
@@ -151,6 +159,9 @@ class RobotCommunication(object):
         :param mode: the mode of input for this robot's primitives
         :param robot_id: the id of the robot whose mode we're changing
         """
+
+        self.control_manager.toggle_control_mode_for_robot(robot_id, mode)
+        # TODO remove this
         self.robots_connected_to_fullsystem.discard(robot_id)
         self.robots_connected_to_manual.discard(robot_id)
         self.robots_to_be_disconnected.pop(robot_id, None)
@@ -161,6 +172,14 @@ class RobotCommunication(object):
             self.robots_connected_to_manual.add(robot_id)
         elif mode == IndividualRobotMode.AI:
             self.robots_connected_to_fullsystem.add(robot_id)
+
+    def toggle_input_mode(self, mode: ControlMode):
+        """
+        Changes the diagnostics input mode for all robots between Xbox and Diagnostics.
+
+        :param mode: Control mode to use when sending diagnostics primitives
+        """
+        self.control_manager.toggle_input_mode(mode)
 
     def __send_estop_state(self) -> None:
         """
@@ -219,6 +238,42 @@ class RobotCommunication(object):
             if world and self.__should_send_packet():
                 # send the world proto
                 self.send_world.send_proto(world)
+
+    def send_move_command(self, dribbler_speed: int, move_x: int, move_y: int, ang_vel: int):
+        motor_control = MotorControl()
+
+        motor_control.dribbler_speed_rpm = 0
+        if self.enable_dribbler:
+            motor_control.dribbler_speed_rpm = dribbler_speed
+
+        motor_control.direct_velocity_control.velocity.x_component_meters = move_x
+        motor_control.direct_velocity_control.velocity.y_component_meters = move_y
+        motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+            ang_vel
+        )
+
+        print(motor_control)
+
+        self.proto_unix_io.send_proto(MotorControl, motor_control)
+
+    def send_kick_command(self, power: int):
+        power_control = PowerControl()
+        power_control.geneva_slot = 1
+        power_control.chicker.kick_speed_m_per_s = power
+
+        print(power_control)
+
+        self.proto_unix_io.send_proto(PowerControl, power_control)
+
+    def send_chip_command(self, distance: int):
+        power_control = PowerControl()
+        power_control.geneva_slot = 1
+        power_control.chicker.chip_distance_meters = distance
+
+        print(power_control)
+
+        self.proto_unix_io.send_proto(PowerControl, power_control)
+
 
     def __run_primitive_set(self) -> None:
         """Forward PrimitiveSet protos from fullsystem to the robots.

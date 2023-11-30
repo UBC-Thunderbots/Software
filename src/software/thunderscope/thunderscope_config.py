@@ -1,6 +1,6 @@
 from software.thunderscope.widget_setup_functions import *
 from software.thunderscope.constants import (
-    TabNames,
+    TabKeys,
     ProtoUnixIOTypes,
     GAME_CONTROLLER_URL,
 )
@@ -266,7 +266,7 @@ def configure_two_ai_gamecontroller_view(
         tabs=[
             TScopeQTTab(
                 name="Blue FullSystem",
-                key=TabNames.BLUE,
+                key=TabKeys.BLUE,
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
@@ -277,7 +277,7 @@ def configure_two_ai_gamecontroller_view(
             ),
             TScopeQTTab(
                 name="Yellow FullSystem",
-                key=TabNames.YELLOW,
+                key=TabKeys.YELLOW,
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[
                         ProtoUnixIOTypes.YELLOW
@@ -290,7 +290,7 @@ def configure_two_ai_gamecontroller_view(
             ),
             TScopeWebTab(
                 name="Gamecontroller",
-                key=TabNames.GAMECONTROLLER,
+                key=TabKeys.GAMECONTROLLER,
                 url=GAME_CONTROLLER_URL,
             ),
         ],
@@ -329,7 +329,7 @@ def configure_simulated_test_view(
         tabs=[
             TScopeQTTab(
                 name="Blue FullSystem",
-                key=TabNames.BLUE,
+                key=TabKeys.BLUE,
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
@@ -340,7 +340,7 @@ def configure_simulated_test_view(
             ),
             TScopeQTTab(
                 name="Yellow FullSystem",
-                key=TabNames.YELLOW,
+                key=TabKeys.YELLOW,
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[
                         ProtoUnixIOTypes.YELLOW
@@ -389,7 +389,7 @@ def configure_field_test_view(
         tabs = [
             TScopeQTTab(
                 name="Yellow FullSystem",
-                key=TabNames.YELLOW,
+                key=TabKeys.YELLOW,
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[
                         ProtoUnixIOTypes.YELLOW
@@ -405,7 +405,7 @@ def configure_field_test_view(
         tabs = [
             TScopeQTTab(
                 name="Blue FullSystem",
-                key=TabNames.BLUE,
+                key=TabKeys.BLUE,
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
@@ -446,7 +446,7 @@ def configure_replay_view(
         tabs.append(
             TScopeQTTab(
                 name="Blue FullSystem",
-                key=TabNames.BLUE,
+                key=TabKeys.BLUE,
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
@@ -464,7 +464,7 @@ def configure_replay_view(
         tabs.append(
             TScopeQTTab(
                 name="Yellow FullSystem",
-                key=TabNames.YELLOW,
+                key=TabKeys.YELLOW,
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[
                         ProtoUnixIOTypes.YELLOW
@@ -526,7 +526,7 @@ def configure_ai_or_diagnostics(
         tabs.append(
             TScopeQTTab(
                 name="Blue Fullsystem",
-                key=TabNames.BLUE,
+                key=TabKeys.BLUE,
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
@@ -546,7 +546,7 @@ def configure_ai_or_diagnostics(
         tabs.append(
             TScopeQTTab(
                 name="Yellow Fullsystem",
-                key=TabNames.YELLOW,
+                key=TabKeys.YELLOW,
                 widgets=configure_base_fullsystem(
                     full_system_proto_unix_io=proto_unix_io_map[
                         ProtoUnixIOTypes.YELLOW
@@ -585,7 +585,7 @@ def configure_ai_or_diagnostics(
         tabs.append(
             TScopeQTTab(
                 name="Robot Diagnostics",
-                key=TabNames.DIAGNOSTICS,
+                key=TabKeys.DIAGNOSTICS,
                 widgets=configure_base_diagnostics(
                     diagnostics_proto_unix_io=proto_unix_io_map[
                         ProtoUnixIOTypes.DIAGNOSTICS

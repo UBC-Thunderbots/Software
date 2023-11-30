@@ -1,5 +1,5 @@
 from typing import Callable, Optional, Sequence, Any, Dict
-from software.thunderscope.constants import TabNames
+from software.thunderscope.constants import TabKeys
 
 import PyQt6
 from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -59,14 +59,18 @@ class TScopeTab:
     """
 
     name: str  # name of tab
-    key: TabNames  # key to identify this tab
+    key: TabKeys  # key to identify this tab
     dock_area: QWidget  # Dock Area for this tab
 
-    def __init__(self, name: str, key: TabNames) -> None:
+    def __init__(self, name: str, key: TabKeys) -> None:
         self.name = name
         self.key = key
 
     def refresh(self) -> None:
+        pass
+
+    def find_widget(self, param):
+        print('i hate python - is this syntax for super or child getting called? why pass tho')
         pass
 
 
@@ -83,7 +87,7 @@ class TScopeQTTab(TScopeTab):
     ]  # Mapping of widget names to refresh functions
 
     def __init__(
-        self, name: str, key: TabNames, widgets: Sequence[TScopeWidget]
+        self, name: str, key: TabKeys, widgets: Sequence[TScopeWidget]
     ) -> None:
         super().__init__(name, key)
         self.widgets = widgets
@@ -158,7 +162,7 @@ class TScopeWebTab(TScopeTab):
 
     url: str  # url of webpage displayed by this tab
 
-    def __init__(self, name: str, key: TabNames, url: str) -> None:
+    def __init__(self, name: str, key: TabKeys, url: str) -> None:
         super().__init__(name, key)
         self.url = url
 

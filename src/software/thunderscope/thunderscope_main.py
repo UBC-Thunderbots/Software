@@ -1,15 +1,18 @@
 import argparse
 import numpy
+
+from proto.message_translation import tbots_protobuf
+from software.thunderscope.robot_input_control_manager import RobotInputControlManager
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
-from proto.message_translation import tbots_protobuf
-import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
+from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes, TabKeys, HANDHELD_PATH
 from software.thunderscope.estop_helpers import get_estop_config
+
+import software.python_bindings as tbots_cpp
 import software.thunderscope.thunderscope_config as config
 
 NUM_ROBOTS = 6
@@ -159,7 +162,7 @@ if __name__ == "__main__":
         "--xbox",
         action="store",
         type=str,
-        default='/dev/input/input1',
+        default=HANDHELD_PATH,
         help="Path to the controller",
     )
 
@@ -230,9 +233,6 @@ if __name__ == "__main__":
     # We want to run either 1 instance of AI or 1 instance of RobotCommunication or both which will
     # send/recv packets over the provided multicast channel.
 
-    if args.xbox is not None :
-        controller_diagnostics = ControllerDiagnostics(args.xbox, proto_unix_io)
-
     elif args.run_blue or args.run_yellow or args.run_diagnostics:
         tscope_config = config.configure_ai_or_diagnostics(
             args.run_blue,
@@ -265,6 +265,7 @@ if __name__ == "__main__":
         with RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
             multicast_channel=getRobotMulticastChannel(args.channel),
+            input_device_path=args.xbox,
             interface=args.interface,
             estop_mode=estop_mode,
             estop_path=estop_path,
@@ -277,15 +278,23 @@ if __name__ == "__main__":
 
             if args.run_diagnostics:
                 for tab in tscope_config.tabs:
-                    if hasattr(tab, "widgets"):
-                        robot_view_widget = tab.find_widget("Robot View")
-
-                        if robot_view_widget:
-                            robot_view_widget.control_mode_signal.connect(
-                                lambda mode, robot_id: robot_communication.toggle_robot_connection(
-                                    mode, robot_id
+                    # handle the signal emitted from switching
+                    if tab.key == TabKeys.DIAGNOSTICS:
+                        control_input_widget = tab.find_widget("Manual Control Input")
+                        if control_input_widget:
+                            control_input_widget.toggle_controls_signal(
+                                lambda control_mode: robot_communication.toggle_input_mode(
+                                    control_mode
                                 )
                             )
+
+                    robot_view_widget = tab.find_widget("Robot View")
+                    if robot_view_widget:
+                        robot_view_widget.control_mode_signal.connect(
+                            lambda robot_mode, robot_id: robot_communication.toggle_robot_control_mode(
+                                robot_id, robot_mode
+                            )
+                        )
 
             if args.run_blue or args.run_yellow:
                 robot_communication.setup_for_fullsystem()
