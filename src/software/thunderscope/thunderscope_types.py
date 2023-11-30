@@ -70,8 +70,9 @@ class TScopeTab:
         pass
 
     def find_widget(self, param):
-        print('i hate python - is this syntax for super or child getting called? why pass tho')
-        pass
+        print(
+            "i hate python - is this syntax for super or child getting called? why pass tho"
+        )
 
 
 class TScopeQTTab(TScopeTab):

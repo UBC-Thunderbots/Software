@@ -2,7 +2,11 @@ import threading
 import time
 import os
 
-from software.thunderscope.constants import ROBOT_COMMUNICATIONS_TIMEOUT_S, IndividualRobotMode, EstopMode
+from software.thunderscope.constants import (
+    ROBOT_COMMUNICATIONS_TIMEOUT_S,
+    IndividualRobotMode,
+    EstopMode,
+)
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 from software.thunderscope.robot_input_control_manager import RobotInputControlManager
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -14,7 +18,6 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 from typing import Type
 from queue import Empty
-
 
 
 class RobotCommunication(object):
@@ -239,7 +242,9 @@ class RobotCommunication(object):
                 # send the world proto
                 self.send_world.send_proto(world)
 
-    def send_move_command(self, dribbler_speed: int, move_x: int, move_y: int, ang_vel: int):
+    def send_move_command(
+        self, dribbler_speed: int, move_x: int, move_y: int, ang_vel: int
+    ):
         motor_control = MotorControl()
 
         motor_control.dribbler_speed_rpm = 0
@@ -273,7 +278,6 @@ class RobotCommunication(object):
         print(power_control)
 
         self.proto_unix_io.send_proto(PowerControl, power_control)
-
 
     def __run_primitive_set(self) -> None:
         """Forward PrimitiveSet protos from fullsystem to the robots.

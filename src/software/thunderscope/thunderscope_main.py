@@ -9,7 +9,12 @@ from software.thunderscope.binary_context_managers import *
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes, TabKeys, HANDHELD_PATH
+from software.thunderscope.constants import (
+    EstopMode,
+    ProtoUnixIOTypes,
+    TabKeys,
+    HANDHELD_PATH,
+)
 from software.thunderscope.estop_helpers import get_estop_config
 
 import software.python_bindings as tbots_cpp

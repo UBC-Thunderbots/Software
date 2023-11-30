@@ -17,11 +17,11 @@ class RobotInputControlManager:
     """
 
     def __init__(
-            self,
-            controller_device_path: str,
-            perform_move: Callable[[int, int, int, int], None],
-            perform_kick: Callable[[int], None],
-            perform_chip: Callable[[int], None]
+        self,
+        controller_device_path: str,
+        perform_move: Callable[[int, int, int, int], None],
+        perform_kick: Callable[[int], None],
+        perform_chip: Callable[[int], None],
     ):
         self.__perform_move = perform_move
         self.__perform_kick = perform_kick
@@ -37,22 +37,26 @@ class RobotInputControlManager:
 
     def setup_controller(self, controller_device_path: str):
         if controller_device_path:
-            if os.path.exists(controller_device_path) and util.is_device(controller_device_path):
+            if os.path.exists(controller_device_path) and util.is_device(
+                controller_device_path
+            ):
                 self.__input_mode = ControlMode.XBOX
                 self.__controller_diagnostics = ControllerDiagnostics(
                     controller_device_path,
                     self.__perform_move,
                     self.__perform_kick,
-                    self.__perform_chip
+                    self.__perform_chip,
                 )
             else:
                 self.__input_mode = ControlMode.DIAGNOSTICS
 
     def set_full_system_control(self):
-        self.__robot_id_input_source_map = set(map(
-            lambda robot_control: (robot_control[0], IndividualRobotMode.AI),
-            self.__robot_id_input_source_map
-        ))
+        self.__robot_id_input_source_map = set(
+            map(
+                lambda robot_control: (robot_control[0], IndividualRobotMode.AI),
+                self.__robot_id_input_source_map,
+            )
+        )
 
     def get_diagnostics_input_mode(self) -> ControlMode:
         """
@@ -79,8 +83,12 @@ class RobotInputControlManager:
         :param mode: The input mode this robot should use - one of AI, MANUAL, or NONE
         """
         self.__robots_to_be_disconnected[robot_id] = NUM_TIMES_SEND_STOP
-        self.__robot_id_input_source_map = set(map(
-            # TODO figure way to destruct params or make callback maybe
-            lambda robot_control: (robot_id, mode) if robot_id == robot_control[0] else robot_control,
-            self.__robot_id_input_source_map
-        ))
+        self.__robot_id_input_source_map = set(
+            map(
+                # TODO figure way to destruct params or make callback maybe
+                lambda robot_control: (robot_id, mode)
+                if robot_id == robot_control[0]
+                else robot_control,
+                self.__robot_id_input_source_map,
+            )
+        )

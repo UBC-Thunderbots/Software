@@ -35,9 +35,9 @@ py_library(
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:constants",
         "//software/thunderscope:dock_style",
+        "//software/thunderscope:input_control_manager",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
-        "//software/thunderscope:input_control_manager",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
@@ -82,9 +82,9 @@ py_library(
 py_library(
     name = "input_control_manager",
     srcs = [
-        "robot_input_control_manager.py",
         "controller_diagnostics.py",
-        ],
+        "robot_input_control_manager.py",
+    ],
     deps = [
         "//software/thunderscope:constants",
     ],

@@ -22,11 +22,11 @@ class ControllerDiagnostics(object):
 
     # TODO add function descriptions
     def __init__(
-            self,
-            input_path: str,
-            perform_move: Callable[[int, int, int, int], None],
-            perform_kick: Callable[[int], None],
-            perform_chip: Callable[[int], None]
+        self,
+        input_path: str,
+        perform_move: Callable[[int, int, int, int], None],
+        perform_kick: Callable[[int], None],
+        perform_chip: Callable[[int], None],
     ):
         self.__perform_move = perform_move
         self.__perform_kick = perform_kick
@@ -90,13 +90,15 @@ class ControllerDiagnostics(object):
                     print("dribbler enabled")
 
             if (
-                    event_t == "ABS_X"
-                    or event_t == "ABS_Y"
-                    or event_t == "ABS_RX"
-                    or event_t == "ABS_HAT0Y"
-                    or event_t == "ABS_RZ"
+                event_t == "ABS_X"
+                or event_t == "ABS_Y"
+                or event_t == "ABS_RX"
+                or event_t == "ABS_HAT0Y"
+                or event_t == "ABS_RZ"
             ):
-                self.__perform_move(self.dribbler_speed, self.move_x, self.move_y, self.ang_vel)
+                self.__perform_move(
+                    self.dribbler_speed, self.move_x, self.move_y, self.ang_vel
+                )
         elif event.type == ecodes.EV_KEY:
             print("event code: " + str(event.code))
             if event.code == ecodes.ecodes["BTN_A"] and event.value == 1:
@@ -136,7 +138,11 @@ class ControllerDiagnostics(object):
         self.ang_vel = 0
 
     def update_angular_velocity(self, ang_vel):
-        self.ang_vel = ang_vel if ang_vel > (MAX_ANGULAR_SPEED_RAD_PER_S * DEADZONE_PERCENTAGE) else 0
+        self.ang_vel = (
+            ang_vel
+            if ang_vel > (MAX_ANGULAR_SPEED_RAD_PER_S * DEADZONE_PERCENTAGE)
+            else 0
+        )
         self.move_x = 0
         self.move_y = 0
         print("new and vel: " + str(self.ang_vel))
