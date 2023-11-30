@@ -7,7 +7,12 @@ Pose Strategy::getBestDribblePose(const Robot& robot)
         return robot_to_best_dribble_location_.at(robot);
     }
 
-    // calculate best dribble position
+    // TODO(#3082): find best dribble_position
+
+    // cache the dribble position
+    // robot_to_best_dribble_location_[robot] = ...
+
+    // return robot_to_best_dribble_location_.at(robot)
     return Pose();
 }
 
