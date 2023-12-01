@@ -55,8 +55,7 @@ message DribblerStatus
     // The current speed of the dribbler in RPM
     float dribbler_rpm = 1;
 
-    // Dribbler temperature
-    float dribbler_temperature = 2;
+    reserved 2;
 
     repeated MotorFault motor_faults = 3;
     bool enabled                     = 4;

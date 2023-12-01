@@ -12,6 +12,7 @@
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 #include "software/world/team.h"
+#include "proto/robot_status_msg.pb.h"
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -28,6 +29,7 @@ extern "C"
     static int channel_id;
     static std::string network_interface;
     static int robot_id;
+    static int sent_errors[3] = {false, false, false};
 
     /**
      * Handles process signals
@@ -350,6 +352,9 @@ Thunderloop::~Thunderloop() {}
             redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
                                        std::to_string(power_status_.current_draw()));
             redis_client_->asyncCommit();
+
+            sendErrorCodes();
+
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
@@ -406,5 +411,25 @@ double Thunderloop::getCpuTemperature()
     {
         LOG(WARNING) << "Could not open CPU temperature file";
         return 0.0;
+    }
+}
+
+void Thunderloop::sendErrorCodes()
+{
+    //TODO SEARCH UP JETSON TEMPS, ADD SEND ONCE TO EACH WARNING (BOOL)
+    if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE && !sent_errors[0])
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
+        sent_errors[0] = true;
+    }
+    if (power_status_.capacitor_voltage() < MIN_CAPACITOR_VOLTAGE && !sent_errors[1])
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_CAP);
+        sent_errors[1] = true;
+    }
+    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP && !sent_errors[2])
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
+        sent_errors[2] = true;
     }
 }

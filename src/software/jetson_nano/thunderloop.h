@@ -92,6 +92,11 @@ class Thunderloop
      */
     double getNanoseconds(timespec time);
 
+    /**
+     * Sends ErrorCodes for BAT, CAP, CPU TEMP, DRIBBLER TEMP if over thresholds
+     */
+     void sendErrorCodes();
+
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
@@ -108,6 +113,8 @@ class Thunderloop
     TbotsProto::ChipperKickerStatus chipper_kicker_status_;
     TbotsProto::Timestamp time_sent_;
 
+    //Error Codes
+    TbotsProto::ErrorCode error_code;
     // Current State
     RobotConstants_t robot_constants_;
     Angle current_orientation_;
