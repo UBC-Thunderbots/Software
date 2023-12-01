@@ -13,8 +13,7 @@ class RobotEntersRegion(Validation):
     """Checks if a Robot enters any of the provided regions."""
 
     def __init__(self, regions=None, num_robots=1):
-        self.regions = regions if regions else []
-        self.num_robots = num_robots
+        self.passing_robot = None
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if _any_ robot enters the provided regions
@@ -28,11 +27,10 @@ class RobotEntersRegion(Validation):
             for robot in world.friendly_team.team_robots:
                 if tbots_cpp.contains(
                     region, tbots_cpp.createPoint(robot.current_state.global_position)
-                ):
-                    num_robots -= 1
-                    if num_robots == 0:
-                        return ValidationStatus.PASSING
+                    self.passing_robot = robot
+                    return ValidationStatus.PASSING
 
+        self.passing_robot = None
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
