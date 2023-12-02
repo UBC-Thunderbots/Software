@@ -48,12 +48,11 @@ TEST(PassDefenderFSMTest, test_transitions)
                             robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
                             TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
-
 }
 
 // This is created to test one single edge case in interceptBall
-TEST(PassDefenderFSMTest, test_intercept_edge_case) {
-
+TEST(PassDefenderFSMTest, test_intercept_edge_case)
+{
     // create the world and the robot to test at (0,0)
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = ::TestUtil::createRobotAtPos(Point(0, 0));
@@ -65,16 +64,19 @@ TEST(PassDefenderFSMTest, test_intercept_edge_case) {
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
 
     // set ball to be inside of robot at (0,0)
-    TestUtil::setBallPosition(world, Point(0,0), Timestamp());
+    TestUtil::setBallPosition(world, Point(0, 0), Timestamp());
 
     // Ball is now kicked "towards" pass defender
-    world = ::TestUtil::setBallVelocity(world, Vector(-2, 0), Timestamp::fromSeconds(123));
+    world =
+        ::TestUtil::setBallVelocity(world, Vector(-2, 0), Timestamp::fromSeconds(123));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(Angle::half()));
 
     // Transition to InterceptBallState
     fsm.process_event(PassDefenderFSM::Update(
-            control_params, TacticUpdate(
-                    robot, world, [](std::unique_ptr<TbotsProto::Primitive> x) {EXPECT_TRUE(x != nullptr);},
-                    TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params,
+        TacticUpdate(
+            robot, world,
+            [](std::unique_ptr<TbotsProto::Primitive> x) { EXPECT_TRUE(x != nullptr); },
+            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::InterceptBallState>));
 }

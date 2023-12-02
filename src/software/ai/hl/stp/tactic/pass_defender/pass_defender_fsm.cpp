@@ -88,16 +88,18 @@ void PassDefenderFSM::interceptBall(const Update& event)
 
     // to avoid dividing by 0
     Angle face_ball_orientation;
-    if ((ball.position() - robot_position).length() == 0) {
+    if ((ball.position() - robot_position).length() == 0)
+    {
         face_ball_orientation = Angle().zero();
     }
-    else {
+    else
+    {
         face_ball_orientation = (ball.position() - robot_position).orientation();
     }
 
     // backup by the length of the ball
     Point backup_position = Point(robot_position.x() - ROBOT_MAX_RADIUS_METERS,
-                                         robot_position.y() - ROBOT_MAX_RADIUS_METERS);
+                                  robot_position.y() - ROBOT_MAX_RADIUS_METERS);
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(backup_position), face_ball_orientation, 0, false,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
