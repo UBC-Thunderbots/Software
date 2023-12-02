@@ -121,6 +121,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
         .def("rotate", &Vector::rotate)
         .def("orientation", &Vector::orientation)
+        .def("dot", &Vector::dot)
         // Overloaded
         .def(py::self + py::self)
         .def(py::self += py::self)
@@ -341,4 +342,10 @@ PYBIND11_MODULE(python_bindings, m)
         m, "ThreadedEstopReader")
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
+
+    py::enum_<EstopState>(m, "EstopStates")
+        .value("STOP", EstopState::STOP)
+        .value("PLAY", EstopState::PLAY)
+        .value("STATUS_ERROR", EstopState::STATUS_ERROR)
+        .export_values();
 }

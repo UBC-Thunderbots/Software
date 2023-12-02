@@ -11,6 +11,8 @@ from software.thunderscope.constants import (
     Colors,
     DepthValues,
     SPEED_SEGMENT_SCALE,
+    DEFAULT_EMPTY_FIELD_WORLD,
+    is_field_message_empty,
 )
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -50,6 +52,7 @@ class GLWorldLayer(GLLayer):
 
         """
         super().__init__(name)
+        self.setDepthValue(DepthValues.FOREGROUND_DEPTH)
 
         self.simulator_io = simulator_io
         self.friendly_colour_yellow = friendly_colour_yellow
@@ -235,7 +238,11 @@ class GLWorldLayer(GLLayer):
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
-        self.cached_world = self.world_buffer.get(block=False)
+        self.cached_world = self.world_buffer.get(block=False, return_cached=True)
+
+        # if not receiving worlds, just render an empty field
+        if is_field_message_empty(self.cached_world.field):
+            self.cached_world = DEFAULT_EMPTY_FIELD_WORLD
 
         self.__update_field_graphics(self.cached_world.field)
         self.__update_goal_graphics(self.cached_world.field)
@@ -379,7 +386,7 @@ class GLWorldLayer(GLLayer):
             if self.display_robot_ids:
                 robot_id_graphic.show()
 
-                robot_id_graphic.setDepthValue(DepthValues.PRIMARY_TEXT_DEPTH)
+                robot_id_graphic.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
 
                 robot_id_graphic.setData(
                     text=str(robot.id),
@@ -427,7 +434,7 @@ class GLWorldLayer(GLLayer):
             ):
                 breakbeam_graphic.show()
 
-                breakbeam_graphic.setDepthValue(DepthValues.SECONDARY_TEXT_DEPTH)
+                breakbeam_graphic.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
 
                 breakbeam_graphic.set_position(
                     robot.current_state.global_position.x_meters,
