@@ -38,14 +38,16 @@ public:
 
     std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
             const World &world,
-            const shared_ptr<Tactic> &tactic, // -> set<motionConstraints>
-            const TbotsProto::RobotNavigationObstacleConfig &config, // -> obstacle factory
-            ) override;
+            const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+            const RobotNavigationObstacleFactory &obstacle_factory
+    ) override;
 
 private:
-    std::vector<ObstaclePtr> generateObstacles() const;
+    std::vector<ObstaclePtr> generateObstacles(
+            const World &world,
+            const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+            const RobotNavigationObstacleFactory &obstacle_factory) const;
 
-    World world;
     std::shared_ptr<Tactic> tactic;
     Robot robot;
     Point destination;
@@ -60,6 +62,5 @@ private:
     BangBangTrajectory2D trajectory;
     BangBangTrajectory1DAngular angular_trajectory;
 
-    RobotNavigationObstacleFactory obstacle_factory;
     TrajectoryPlanner planner;
 };

@@ -48,12 +48,18 @@ MovePrimitive::MovePrimitive(const World &world,
     }
 }
 
-std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMessage()
+std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
+        const World &world,
+        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+        const RobotNavigationObstacleFactory &obstacle_factory
+)
 {
     auto primitive_proto = std::make_unique<TbotsProto::Primitive>();
 
     // Generate obstacle avoiding trajectory
-    std::vector<ObstaclePtr> obstacles = generateObstacles();
+    std::vector<ObstaclePtr> obstacles = generateObstacles(
+            world, motion_constraints, obstacle_factory
+    );
 
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             max_allowed_speed_mode, robot.robotConstants());
@@ -115,13 +121,14 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
     return std::move(primitive_proto);
 }
 
-std::vector<ObstaclePtr> MovePrimitive::generateObstacles() const
+std::vector<ObstaclePtr> MovePrimitive::generateObstacles(
+        const World &world,
+        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+        const RobotNavigationObstacleFactory &obstacle_factory) const
 {
-    // TODO: Pass motion constraints instead of tactic
-    auto motion_constraints = buildMotionConstraintSet(world.gameState(), *tactic);
     std::vector<ObstaclePtr> obstacles = obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints,
                                                                                                world);
-    // TODO: Could dependency inject the obstacle_factory
+
     for (const Robot &enemy: world.enemyTeam().getAllRobots())
     {
         obstacles.push_back(
