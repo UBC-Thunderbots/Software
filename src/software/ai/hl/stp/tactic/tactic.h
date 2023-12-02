@@ -90,7 +90,7 @@ class Tactic
      *
      * @return the next primitive
      */
-    std::map<RobotId, std::unique_ptr<Primitive>> get(const World &world);
+    std::map<RobotId, std::shared_ptr<Primitive>> get(const World &world);
 
     /**
      * Accepts a Tactic Visitor and calls the visit function on itself
@@ -105,7 +105,7 @@ class Tactic
     std::optional<RobotId> last_execution_robot;
 
    private:
-    std::unique_ptr<Primitive> primitive;
+    std::shared_ptr<Primitive> primitive;
 
     /**
      * Updates the primitive ptr with the new primitive

@@ -10,7 +10,7 @@
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
 
-using SetPrimitiveCallback = std::function<void(std::unique_ptr<Primitive>)>;
+using SetPrimitiveCallback = std::function<void(std::shared_ptr<Primitive>)>;
 
 // The tactic update struct is used to update tactics and set the new primitive
 struct TacticUpdate

@@ -25,17 +25,17 @@ void Tactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
     this->last_execution_robot = last_execution_robot;
 }
 
-std::map<RobotId, std::unique_ptr<Primitive>> Tactic::get(const World &world)
+std::map<RobotId, std::shared_ptr<Primitive>> Tactic::get(const World &world)
 {
     TbotsProto::RobotNavigationObstacleConfig obstacle_config;
-    std::map<RobotId, std::unique_ptr<Primitive>> primitives_map;
+    std::map<RobotId, std::shared_ptr<Primitive>> primitives_map;
     for (const auto &robot : world.friendlyTeam().getAllRobots())
     {
         updatePrimitive(
             TacticUpdate(robot, world,
                          // TODO (NIMA): This is a hack that needs to be injected
                          obstacle_config,
-                         [this](std::unique_ptr<Primitive> new_primitive) {
+                         [this](std::shared_ptr<Primitive> new_primitive) {
                              primitive = std::move(new_primitive);
                          }),
             !last_execution_robot.has_value() ||

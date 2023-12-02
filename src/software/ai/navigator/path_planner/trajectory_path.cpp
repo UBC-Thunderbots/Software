@@ -37,10 +37,6 @@ void TrajectoryPath::append(const KinematicConstraints& constraints,
             connection_time_sec -= traj_path[i].getTrajectoryEndTime();
         }
     }
-
-    LOG(FATAL) << "TrajectoryPath::append called with connection_time > getTotalTime() = "
-               << getTotalTime()
-               << " (Num trajectories already in path: " << traj_path.size() << ")";
 }
 
 Point TrajectoryPath::getPosition(double t_sec) const
