@@ -416,7 +416,6 @@ double Thunderloop::getCpuTemperature()
 
 void Thunderloop::sendErrorCodes()
 {
-    //TODO SEARCH UP JETSON TEMPS, ADD SEND ONCE TO EACH WARNING (BOOL)
     if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE && !sent_errors[0])
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
