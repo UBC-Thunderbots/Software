@@ -114,6 +114,7 @@ cc_library(
         ":primitive",
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/path_planner:trajectory_planner",
+        "//proto/primitive:primitive_msg_factory",
     ],
 )
 

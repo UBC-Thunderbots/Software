@@ -118,13 +118,15 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             // TODO (NIMA): Update this as well to use trajectories
             auto motion_constraints =
                 buildMotionConstraintSet(world.gameState(), *goalie_tactic);
-            auto primitives = goalie_tactic->get(world)->robot_primitives();
+            auto primitives = goalie_tactic->get(world);
             CHECK(primitives.contains(goalie_robot_id))
                 << "Couldn't find a primitive for robot id " << goalie_robot_id;
-            auto primitive = primitives.at(goalie_robot_id);
+            auto primitive_proto = primitives[goalie_robot_id]->generatePrimitiveProtoMessage(
+                world, motion_constraints, obstacle_factory
+            );
 
             primitives_to_run->mutable_robot_primitives()->insert(
-                google::protobuf::MapPair(goalie_robot_id, primitive));
+                    {goalie_robot_id, *primitive_proto});
             goalie_tactic->setLastExecutionRobot(goalie_robot_id);
         }
         else if (world.friendlyTeam().getGoalieId().has_value())

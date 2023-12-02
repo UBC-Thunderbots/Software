@@ -92,22 +92,13 @@ void DribbleFSM::getPossession(const Update &event)
                               event.common.world.field()) +
         Vector::createFromAngle(face_ball_orientation).normalize(0.05);
 
-    SET_MOVE_PRIMITIVE(intercept_position, face_ball_orientation,
-                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                       TbotsProto::DribblerMode::MAX_FORCE,
-                       TbotsProto::BallCollisionType::ALLOW,
-                       AutoChipOrKick{AutoChipOrKickMode::OFF,
-                                      0},  // TODO: Extra comma makes it count as two args
-                       std::nullopt);
-
-    //    event.common.set_primitive(createMovePrimitive(
-    //            event.common.robot,
-    //            intercept_position,
-    //            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, face_ball_orientation,
-    //            TbotsProto::DribblerMode::MAX_FORCE,
-    //            TbotsProto::BallCollisionType::ALLOW,
-    //            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-    //            event.common.robot.robotConstants()));
+    event.common.set_primitive(std::make_unique<MovePrimitive>(event.common.robot,
+                               intercept_position, face_ball_orientation,
+                               TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                               TbotsProto::DribblerMode::MAX_FORCE,
+                               TbotsProto::BallCollisionType::ALLOW,
+                               AutoChipOrKick{AutoChipOrKickMode::OFF,
+                                              0}));
 }
 
 void DribbleFSM::dribble(const Update &event)

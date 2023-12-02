@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
 
 MovePrimitive::MovePrimitive(
@@ -109,7 +108,7 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
         path_nodes[0].getTrajectory()->getTotalTime())
     {
         primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time(
-            path_nodes[0].getTrajectoryEndTime());
+            static_cast<float>(path_nodes[0].getTrajectoryEndTime()));
     }
     else
     {

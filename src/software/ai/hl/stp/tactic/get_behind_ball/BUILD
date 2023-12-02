@@ -16,6 +16,7 @@ cc_library(
         "//software/geom:triangle",
         "//software/geom/algorithms",
         "//software/logger",
+        "//software/ai/hl/stp/tactic:move_primitive",
     ],
 )
 
