@@ -16,6 +16,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic:move_primitive",
         "//software/geom/algorithms",
         "//software/logger",
     ],

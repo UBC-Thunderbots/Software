@@ -14,12 +14,12 @@ cc_library(
         ":tbots_geometry",
         "//proto:tbots_cc_proto",
         "//proto:visualization_cc_proto",
+        "//software/ai/navigator/path_planner:trajectory_path",
         "//software/ai/passing:pass_with_rating",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",
         "//software/world",
-        "//software/ai/navigator/path_planner:trajectory_path",
     ],
 )
 

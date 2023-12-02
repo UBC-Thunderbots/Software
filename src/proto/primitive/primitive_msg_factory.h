@@ -13,6 +13,13 @@
 #include "software/world/robot.h"
 
 /**
+ * Create a Stop Primitive proto Message
+ *
+ * @return Pointer to Stop Primitive proto Message
+ */
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitiveProto();
+
+/**
  * Creates a new DirectControl Primitive AI could output this primitive to control the
  * linear velocity, angular velocity, and dribbler speed of a specific robot
  *
@@ -25,4 +32,3 @@
 std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
     const Vector &velocity, AngularVelocity angular_velocity, double dribbler_rpm,
     const TbotsProto::AutoChipOrKick &auto_chip_or_kick);
-

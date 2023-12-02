@@ -133,7 +133,12 @@ def test_one_robots_square(field_test_runner):
         raise Exception("The first world received had no robots in it!")
 
     print("Here are the robots:")
-    print([robot.current_state.global_position for robot in world.friendly_team.team_robots])
+    print(
+        [
+            robot.current_state.global_position
+            for robot in world.friendly_team.team_robots
+        ]
+    )
 
     id = world.friendly_team.team_robots[0].id
     print(f"Running test on robot {id}")
@@ -147,41 +152,41 @@ def test_one_robots_square(field_test_runner):
         destination=point1,
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi/2),
+        final_orientation=Angle(radians=-math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        target_spin_rev_per_s=0.0
+        target_spin_rev_per_s=0.0,
     )
     tactic_1 = MoveTactic(
         destination=point2,
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi/2),
+        final_orientation=Angle(radians=-math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        target_spin_rev_per_s=0.0
+        target_spin_rev_per_s=0.0,
     )
     tactic_2 = MoveTactic(
         destination=point3,
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi/2),
+        final_orientation=Angle(radians=-math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        target_spin_rev_per_s=0.0
+        target_spin_rev_per_s=0.0,
     )
     tactic_3 = MoveTactic(
         destination=point4,
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi/2),
+        final_orientation=Angle(radians=-math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-        target_spin_rev_per_s=0.0
+        target_spin_rev_per_s=0.0,
     )
     tactics = [tactic_0, tactic_1, tactic_2, tactic_3]
 
@@ -196,7 +201,6 @@ def test_one_robots_square(field_test_runner):
             eventually_validation_sequence_set=[[]],
             test_timeout_s=4,
         )
-
 
     # Send a stop tactic after the test finishes
     stop_tactic = StopTactic()

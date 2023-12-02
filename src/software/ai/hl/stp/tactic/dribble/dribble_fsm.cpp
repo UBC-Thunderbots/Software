@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
+#include "software/ai/hl/stp/tactic/move_primitive.h"
+
 Point DribbleFSM::robotPositionToFaceBall(const Point &ball_position,
                                           const Angle &face_ball_angle,
                                           double additional_offset)
@@ -90,21 +92,22 @@ void DribbleFSM::getPossession(const Update &event)
                               event.common.world.field()) +
         Vector::createFromAngle(face_ball_orientation).normalize(0.05);
 
-    SET_MOVE_PRIMITIVE(intercept_position,
-                       face_ball_orientation,
+    SET_MOVE_PRIMITIVE(intercept_position, face_ball_orientation,
                        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
                        TbotsProto::DribblerMode::MAX_FORCE,
                        TbotsProto::BallCollisionType::ALLOW,
-                       AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, // TODO: Extra comma makes it count as two args
+                       AutoChipOrKick{AutoChipOrKickMode::OFF,
+                                      0},  // TODO: Extra comma makes it count as two args
                        std::nullopt);
 
-//    event.common.set_primitive(createMovePrimitive(
-//            event.common.robot,
-//            intercept_position,
-//            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, face_ball_orientation,
-//            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-//            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-//            event.common.robot.robotConstants()));
+    //    event.common.set_primitive(createMovePrimitive(
+    //            event.common.robot,
+    //            intercept_position,
+    //            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, face_ball_orientation,
+    //            TbotsProto::DribblerMode::MAX_FORCE,
+    //            TbotsProto::BallCollisionType::ALLOW,
+    //            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+    //            event.common.robot.robotConstants()));
 }
 
 void DribbleFSM::dribble(const Update &event)
@@ -115,13 +118,11 @@ void DribbleFSM::dribble(const Update &event)
             event.control_params.dribble_destination,
             event.control_params.final_dribble_orientation);
 
-    event.common.set_primitive(createMovePrimitive(
-            event.common.robot,
-            target_destination,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, target_orientation,
-            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-            event.common.robot.robotConstants()));
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, target_destination, target_orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
 
 void DribbleFSM::loseBall(const Update &event)
@@ -133,13 +134,11 @@ void DribbleFSM::loseBall(const Update &event)
         ball_position, face_ball_orientation,
         dribble_tactic_config.lose_ball_possession_threshold() * 2);
 
-    event.common.set_primitive(createMovePrimitive(
-            event.common.robot,
-            away_from_ball_position,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, face_ball_orientation,
-            TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
-            AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 0.5},
-            event.common.robot.robotConstants()));
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, away_from_ball_position, face_ball_orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 0.5}));
 }
 
 void DribbleFSM::startDribble(const Update &event)

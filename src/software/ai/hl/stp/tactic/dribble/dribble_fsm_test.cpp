@@ -22,38 +22,33 @@ TEST(DribbleFSMTest, test_transitions)
     // Stay in Dribble since ball not in possession yet
     fsm.process_event(DribbleFSM::Update(
         {std::nullopt, std::nullopt, false},
-        TacticUpdate(
-                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        TacticUpdate(robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::GetPossession>));
 
     // Robot at ball point, so it has possession, so transition to dribble state
     robot = ::TestUtil::createRobotAtPos(Point(0.5, 0));
     fsm.process_event(DribbleFSM::Update(
         {std::nullopt, std::nullopt, false},
-        TacticUpdate(
-                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        TacticUpdate(robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::Dribble>));
 
     // No dribble destination set, so tactic is done
     fsm.process_event(DribbleFSM::Update(
         {std::nullopt, std::nullopt, false},
-        TacticUpdate(
-                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        TacticUpdate(robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     // Set dribble destination, so tactic should be undone
     fsm.process_event(DribbleFSM::Update(
         {Point(1, -1), std::nullopt, false},
-        TacticUpdate(
-                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        TacticUpdate(robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::Dribble>));
 
     // Move ball to destination, but not the robot, so we should try to regain possession
     world = ::TestUtil::setBallPosition(world, Point(1, -1), Timestamp::fromSeconds(124));
     fsm.process_event(DribbleFSM::Update(
         {Point(1, -1), std::nullopt, false},
-        TacticUpdate(
-                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        TacticUpdate(robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::GetPossession>));
 
     // Move robot to where the ball is, so we now have possession and ball is at the
@@ -61,14 +56,12 @@ TEST(DribbleFSMTest, test_transitions)
     robot = ::TestUtil::createRobotAtPos(Point(1, -1));
     fsm.process_event(DribbleFSM::Update(
         {Point(1, -1), std::nullopt, false},
-        TacticUpdate(
-                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        TacticUpdate(robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::Dribble>));
 
     // Finally FSM is done again
     fsm.process_event(DribbleFSM::Update(
         {Point(1, -1), std::nullopt, false},
-        TacticUpdate(
-                robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        TacticUpdate(robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }

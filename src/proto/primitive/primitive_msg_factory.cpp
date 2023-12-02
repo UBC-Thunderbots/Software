@@ -1,9 +1,16 @@
 #include "proto/primitive/primitive_msg_factory.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/logger/logger.h"
-#include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
+#include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
+#include "software/logger/logger.h"
+
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitiveProto()
+{
+    auto stop_primitive_msg = std::make_unique<TbotsProto::Primitive>();
+    stop_primitive_msg->mutable_stop();
+    return stop_primitive_msg;
+}
 
 std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
     const Vector &velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm,

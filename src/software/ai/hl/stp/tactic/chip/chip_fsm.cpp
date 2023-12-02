@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 
+#include "software/ai/hl/stp/tactic/move_primitive.h"
+
 void ChipFSM::updateGetBehindBall(
     const Update &event, boost::sml::back::process<GetBehindBallFSM::Update> processEvent)
 {
@@ -13,15 +15,13 @@ void ChipFSM::updateGetBehindBall(
 
 void ChipFSM::updateChip(const Update &event)
 {
-    event.common.set_primitive(createMovePrimitive(
-            event.common.robot,
-            event.control_params.chip_origin,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            event.control_params.chip_direction, TbotsProto::DribblerMode::OFF,
-            TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
-                           event.control_params.chip_distance_meters},
-            event.common.robot.robotConstants()));
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, event.control_params.chip_origin,
+        event.control_params.chip_direction,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                       event.control_params.chip_distance_meters}));
 }
 
 bool ChipFSM::ballChicked(const Update &event)

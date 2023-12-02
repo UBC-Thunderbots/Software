@@ -34,4 +34,5 @@ class AssignedTacticsPlay : public Play
    private:
     std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics;
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>> override_motion_constraints;
+    RobotNavigationObstacleFactory obstacle_factory;
 };

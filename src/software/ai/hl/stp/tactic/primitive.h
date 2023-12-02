@@ -8,22 +8,21 @@
  */
 class Primitive
 {
-public:
+   public:
     /**
      * Destructor
      */
     virtual ~Primitive() = default;
 
     /**
-    * Gets the primitive proto message
-    *
-    * @return the primitive proto message
-    */
+     * Gets the primitive proto message
+     *
+     * @return the primitive proto message
+     */
     virtual std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
-            const World &world,
-            const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-            const RobotNavigationObstacleFactory &obstacle_factory
-    ) = 0;
+        const World &world,
+        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+        const RobotNavigationObstacleFactory &obstacle_factory) = 0;
 
     /**
      * Gets the estimated cost of the primitive
@@ -35,6 +34,6 @@ public:
         return estimated_cost;
     }
 
-protected:
+   protected:
     double estimated_cost = 0;
 };

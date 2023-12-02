@@ -84,7 +84,7 @@ TEST_F(BangBangTrajectory2DTest, test_random_start_and_final_position_sampling)
     // basic constraints.
     // Get time now with chrono:
 
-    auto start = std::chrono::system_clock::now();
+    auto start             = std::chrono::system_clock::now();
     const double max_vel   = 4;
     const double max_accel = 3;
     const double max_decel = 5;
@@ -103,7 +103,11 @@ TEST_F(BangBangTrajectory2DTest, test_random_start_and_final_position_sampling)
         EXPECT_LE(final_vel.length(), 0.001)
             << "Final velocity is " << final_vel << " instead of 0";
     }
-    LOG(DEBUG) << "Time taken: " << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - start).count() << "us" << std::endl;
+    LOG(DEBUG) << "Time taken: "
+               << std::chrono::duration_cast<std::chrono::microseconds>(
+                      std::chrono::system_clock::now() - start)
+                      .count()
+               << "us" << std::endl;
 }
 
 TEST_F(BangBangTrajectory2DTest, test_trajectory_bounding_box)
@@ -113,6 +117,7 @@ TEST_F(BangBangTrajectory2DTest, test_trajectory_bounding_box)
     traj.generate(start_pos, destination, Vector(0, 0), 1.0, 1.0, 1.0);
     std::vector<BoundingBox> bounding_boxes = traj.getBoundingBoxes();
     ASSERT_EQ(bounding_boxes.size(), 1);
-//    EXPECT_TRUE(TestUtil::equalWithinTolerance(bounding_boxes[0],
-//                                               BoundingBox(start_pos, destination), 1e-3));
+    //    EXPECT_TRUE(TestUtil::equalWithinTolerance(bounding_boxes[0],
+    //                                               BoundingBox(start_pos, destination),
+    //                                               1e-3));
 }

@@ -101,8 +101,7 @@ TEST(GoalieFSMTest, test_transitions)
 
     // goalie should remain in PositionToBlock
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(
-                    goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        {}, TacticUpdate(goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is now moving quickly towards the friendly goal
@@ -111,8 +110,7 @@ TEST(GoalieFSMTest, test_transitions)
 
     // goalie should transition to Panic
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(
-                    goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        {}, TacticUpdate(goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::Panic>));
 
     // ball is now out of danger
@@ -120,8 +118,7 @@ TEST(GoalieFSMTest, test_transitions)
 
     // process event again to reset goalie to PositionToBlock
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(
-                    goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        {}, TacticUpdate(goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is now stationary in the "no-chip" rectangle
@@ -131,8 +128,7 @@ TEST(GoalieFSMTest, test_transitions)
 
     // goalie should transition to DribbleFSM
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(
-                    goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        {}, TacticUpdate(goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
     // goalie has ball, at the correct position and orientation to clear the ball
@@ -144,8 +140,7 @@ TEST(GoalieFSMTest, test_transitions)
 
     // goalie should stay in PivotKickFSM but be ready to chip
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(
-                    goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        {}, TacticUpdate(goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
     goalie = ::TestUtil::createRobotAtPos(clear_ball_origin + Vector(-0.2, 0));
@@ -158,13 +153,11 @@ TEST(GoalieFSMTest, test_transitions)
     // ball is out of defense area
     world = ::TestUtil::setBallPosition(world, Point(-2, 0), Timestamp::fromSeconds(123));
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(
-                    goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        {}, TacticUpdate(goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
 
     // process event once to reset goalie to PositionToBlock
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(
-                    goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        {}, TacticUpdate(goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is now moving slowly inside the friendly defense area
@@ -175,8 +168,7 @@ TEST(GoalieFSMTest, test_transitions)
 
     // goalie should transition to PivotKickFSM
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(
-                    goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        {}, TacticUpdate(goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
     // ball is now moving quickly towards the friendly goal

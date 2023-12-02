@@ -82,7 +82,7 @@ class TrajectoryPath : public Trajectory2D
      * TODO (NIMA): docs
      * @return
      */
-    const std::vector<TrajectoryPathNode> &getTrajectoryPathNodes() const;
+    const std::vector<TrajectoryPathNode>& getTrajectoryPathNodes() const;
 
    private:
     std::vector<TrajectoryPathNode> traj_path;

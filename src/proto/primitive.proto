@@ -27,14 +27,14 @@ message Obstacles
 message ObstaclesList
 {
     // TODO: Could use a one of?!
-//    message ObstacleType
-//    {
-//        oneof obstacles
-//        {
-//            Polygon polygon = 1;
-//            Circle circle   = 2;
-//        }
-//    }
+    //    message ObstacleType
+    //    {
+    //        oneof obstacles
+    //        {
+    //            Polygon polygon = 1;
+    //            Circle circle   = 2;
+    //        }
+    //    }
     repeated Obstacles obstacles = 1;
 }
 
@@ -139,7 +139,7 @@ message MovePrimitive
     // Fields deprecated after transitioning to trajectory planning
     reserved 1, 2, 3, 4, 5, 7, 8, 9;
 
-    AutoChipOrKick auto_chip_or_kick      = 6;
+    AutoChipOrKick auto_chip_or_kick        = 6;
     TrajectoryPathParams2D xy_traj_params   = 10;
     TrajectoryParamsAngular1D w_traj_params = 11;
     DribblerMode dribbler_mode              = 12;
@@ -155,19 +155,19 @@ message TrajectoryPathParams2D
     // Could create new PointF class (uses floats) or PointS (uses
     // shorts to represent the milli-meter position, might have to
     // signed)
-    Point destination = 2;
-    Vector initial_velocity = 3;
+    Point destination                  = 2;
+    Vector initial_velocity            = 3;
     MaxAllowedSpeedMode max_speed_mode = 4;
-    Point sub_destination = 5;
-    float connection_time = 6; // Multiple of 0.2, could simplify to char (i.e. uint8)
+    Point sub_destination              = 5;
+    float connection_time = 6;  // Multiple of 0.2, could simplify to char (i.e. uint8)
 }
 
 message TrajectoryParamsAngular1D
 {
-    Angle start_angle = 1;
-    Angle final_angle = 2;
+    Angle start_angle                = 1;
+    Angle final_angle                = 2;
     AngularVelocity initial_velocity = 3;
-    float constraints_multiplier = 4;
+    float constraints_multiplier     = 4;
 }
 
 message MotorControl

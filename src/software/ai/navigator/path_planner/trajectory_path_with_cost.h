@@ -27,6 +27,6 @@ class TrajectoryPathWithCost
     // Equals duration of trajectory if it does not end in an obstacle.
     double collision_duration_back_s = 0.0;
     double first_collision_time_s    = 0.0;
-    double collision_lookahead     = 0.0;
-    ObstaclePtr colliding_obstacle = nullptr;
+    double collision_lookahead       = 0.0;
+    ObstaclePtr colliding_obstacle   = nullptr;
 };

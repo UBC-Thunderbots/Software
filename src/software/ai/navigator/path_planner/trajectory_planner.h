@@ -52,7 +52,8 @@ class TrajectoryPlanner
      */
     std::pair<double, ObstaclePtr> getFirstCollisionTime(
         const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
-        const std::vector<ObstaclePtr> &obstacles, const double start_time_sec, // TODO: Somewhere we use sec, somewhere we use _s
+        const std::vector<ObstaclePtr> &obstacles,
+        const double start_time_sec,  // TODO: Somewhere we use sec, somewhere we use _s
         const double search_end_time_s) const;
 
     /**
@@ -70,7 +71,8 @@ class TrajectoryPlanner
      */
     double getLastNonCollisionTime(const TrajectoryPath &traj_path,
                                    const std::set<unsigned int> &obstacle_indices,
-                                   const std::vector<ObstaclePtr> &obstacles, const double search_end_time_s) const;
+                                   const std::vector<ObstaclePtr> &obstacles,
+                                   const double search_end_time_s) const;
 
     std::vector<Vector> relative_sub_destinations;
     std::optional<Point> last_sub_dest;
@@ -85,7 +87,7 @@ class TrajectoryPlanner
     const double FORWARD_COLLISION_CHECK_STEP_INTERVAL_SEC = 0.05;
     const double MAX_FUTURE_COLLISION_CHECK_SEC            = 2.0;
 
-    static constexpr std::array<double, 4> SUB_DESTINATION_DISTANCES_METERS = {0.1, 1.1, 2.1,
-                                                                               3};
+    static constexpr std::array<double, 4> SUB_DESTINATION_DISTANCES_METERS = {0.1, 1.1,
+                                                                               2.1, 3};
     static constexpr unsigned int NUM_SUB_DESTINATION_ANGLES                = 16;
 };

@@ -41,13 +41,13 @@ cc_library(
         "tactic_visitor.h",
     ],
     deps = [
+        ":stop_primitive",
         ":transition_conditions",
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/path_planner:enlsvg_path_planner",
         "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",
-        ":stop_primitive",
     ],
 )
 
@@ -113,6 +113,7 @@ cc_library(
     deps = [
         ":primitive",
         "//proto/message_translation:tbots_protobuf",
+        "//software/ai/navigator/path_planner:trajectory_planner",
     ],
 )
 

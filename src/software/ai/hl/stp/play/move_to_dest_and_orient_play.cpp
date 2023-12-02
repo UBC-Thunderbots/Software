@@ -11,7 +11,7 @@ MoveToDestAndOrientPlay::MoveToDestAndOrientPlay(TbotsProto::AiConfig config)
 void MoveToDestAndOrientPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                              const World &world)
 {
-    Angle target_orientation = Angle::fromDegrees(-90);// * (std::rand() % 4);
+    Angle target_orientation = Angle::fromDegrees(-90);  // * (std::rand() % 4);
     LOG(INFO) << "Selected target orientation is: " << target_orientation.toDegrees()
               << " degrees";
     std::vector<std::shared_ptr<MoveTactic>> move_tactics(DIV_A_NUM_ROBOTS);

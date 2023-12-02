@@ -27,11 +27,15 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
     return obstacles;
 }
 
-std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
-        const std::set<TbotsProto::MotionConstraint> &motion_constraints, const World &world) const
+std::vector<ObstaclePtr>
+RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
+    const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const World &world) const
 {
-    std::vector<ObstaclePtr> static_obstacles = createStaticObstaclesFromMotionConstraints(motion_constraints, world.field());
-    std::vector<ObstaclePtr> dynamic_obstacles = createDynamicObstaclesFromMotionConstraints(motion_constraints, world);
+    std::vector<ObstaclePtr> static_obstacles =
+        createStaticObstaclesFromMotionConstraints(motion_constraints, world.field());
+    std::vector<ObstaclePtr> dynamic_obstacles =
+        createDynamicObstaclesFromMotionConstraints(motion_constraints, world);
 
     // Combine two vectors of obstacles into one and return it
     std::vector<ObstaclePtr> obstacles;

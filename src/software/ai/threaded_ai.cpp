@@ -50,7 +50,7 @@ void ThreadedAi::overrideTactics(
 void ThreadedAi::onValueReceived(World world)
 {
     // Update world to `const shared_ptr<const World>` <= WorldPtr
-//    const shared_ptr<const World> world_ptr = make_shared<const World>(world);
+    //    const shared_ptr<const World> world_ptr = make_shared<const World>(world);
     runAiAndSendPrimitives(world);
 }
 

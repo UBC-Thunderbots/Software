@@ -26,11 +26,11 @@ TEST_F(PrimitiveFactoryTest, test_auto_chip_or_kick_equality)
 }
 
 // TODO (NIMA): Re-enable these tests with updated createMovePrimitive
-//TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
+// TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
 //{
 //    auto move_primitive = createMovePrimitive(
-//            TestUtil::createMotionControl(Point(-5, 1)), TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-//            Angle::threeQuarter(),
+//            TestUtil::createMotionControl(Point(-5, 1)),
+//            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, Angle::threeQuarter(),
 //            TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::AVOID,
 //            {AutoChipOrKickMode::OFF, 0}, robot_constants, 3.0, true,
 //            5.0, std::optional<double>());
@@ -50,7 +50,7 @@ TEST_F(PrimitiveFactoryTest, test_auto_chip_or_kick_equality)
 //    EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 5);
 //}
 //
-//TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
+// TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
 //{
 //    auto move_primitive = createMovePrimitive(
 //            TestUtil::createMotionControl(Point(-5, 1)),
@@ -76,7 +76,7 @@ TEST_F(PrimitiveFactoryTest, test_auto_chip_or_kick_equality)
 //    EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 0.0f);
 //}
 //
-//TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
+// TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
 //{
 //    auto move_primitive = createMovePrimitive(
 //            TestUtil::createMotionControl(Point(-5, 1)),
@@ -135,7 +135,7 @@ TEST_F(PrimitiveFactoryTest, test_create_direct_velocity)
 
 TEST_F(PrimitiveFactoryTest, test_create_stop_primitive_brake)
 {
-    auto stop_primitive = createStopPrimitive();
+    auto stop_primitive = createStopPrimitiveProto();
 
     ASSERT_TRUE(stop_primitive->has_stop());
 }

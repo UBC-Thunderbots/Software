@@ -104,11 +104,10 @@ TEST(TbotsProtobufTest, ball_state_msg_test)
 TEST(TbotsProtobufTest, trajectory_params_msg_test)
 {
     /**
-     * 	*******	 EXIT trigger caused by broken Contract: CHECK((acceleration - converted_acceleration).length() < 0.001)
-	"acceleration: (-2.49999, 0.00766989) != converted_acceleration: (-2.49999, -0.00766989) at time 0.5
-start_position {
-  x_meters: -3.5806357421875
-  y_meters: 0.7719898071289063
+     * 	*******	 EXIT trigger caused by broken Contract: CHECK((acceleration -
+converted_acceleration).length() < 0.001) "acceleration: (-2.49999, 0.00766989) !=
+converted_acceleration: (-2.49999, -0.00766989) at time 0.5 start_position { x_meters:
+-3.5806357421875 y_meters: 0.7719898071289063
 }
 destination {
   x_meters: -3.5806357421875
@@ -131,45 +130,48 @@ connection_time: 0.4
     Vector initial_velocity(-6.1035156234678868e-05, -0.00010299682617204144);
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
-    double max_speed        = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-        max_allowed_speed_mode, robot_constants);
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(max_allowed_speed_mode,
+                                                                   robot_constants);
 
     Point sub_destination(-2.4806357421875, 0.77198980712890641);
     double connection_time_s = 0.4;
     // TODO: 2D Trajectory should also take in KinematicConstraints
     auto trajectory = std::make_shared<BangBangTrajectory2D>(
-        start_position, sub_destination, initial_velocity, robot_constants.robot_max_speed_m_per_s,
-        robot_constants.motor_max_acceleration_m_per_s_2, robot_constants.robot_max_deceleration_m_per_s_2);
+        start_position, sub_destination, initial_velocity,
+        robot_constants.robot_max_speed_m_per_s,
+        robot_constants.motor_max_acceleration_m_per_s_2,
+        robot_constants.robot_max_deceleration_m_per_s_2);
 
-    TrajectoryPath trajectory_path(trajectory, [](const KinematicConstraints &constraints,
-                                                  const Point &initial_pos,
-                                                  const Point &final_pos,
-                                                  const Vector &initial_vel) {
-        return std::make_shared<BangBangTrajectory2D>(
+    TrajectoryPath trajectory_path(
+        trajectory, [](const KinematicConstraints& constraints, const Point& initial_pos,
+                       const Point& final_pos, const Vector& initial_vel) {
+            return std::make_shared<BangBangTrajectory2D>(
                 initial_pos, final_pos, initial_vel, constraints.getMaxVelocity(),
                 constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
-    });
-    trajectory_path.append(KinematicConstraints(max_speed,
-                                                robot_constants.motor_max_acceleration_m_per_s_2,
-                                                robot_constants.robot_max_deceleration_m_per_s_2),
-                           connection_time_s, destination);
+        });
+    trajectory_path.append(
+        KinematicConstraints(max_speed, robot_constants.motor_max_acceleration_m_per_s_2,
+                             robot_constants.robot_max_deceleration_m_per_s_2),
+        connection_time_s, destination);
 
     TbotsProto::TrajectoryPathParams2D params;
-    *(params.mutable_start_position()) = *createPointProto(start_position);
-    *(params.mutable_destination()) = *createPointProto(destination);
+    *(params.mutable_start_position())   = *createPointProto(start_position);
+    *(params.mutable_destination())      = *createPointProto(destination);
     *(params.mutable_initial_velocity()) = *createVectorProto(initial_velocity);
-    *(params.mutable_sub_destination()) = *createPointProto(sub_destination);
+    *(params.mutable_sub_destination())  = *createPointProto(sub_destination);
     params.set_max_speed_mode(max_allowed_speed_mode);
     params.set_connection_time(connection_time_s);
 
-    auto converted_trajectory_path_opt = createTrajectoryPathFromParams(params, robot_constants, <#initializer#>);
+    auto converted_trajectory_path_opt =
+        createTrajectoryPathFromParams(params, robot_constants, <#initializer #>);
     ASSERT_TRUE(converted_trajectory_path_opt.has_value());
 
     TrajectoryPath converted_trajectory_path = converted_trajectory_path_opt.value();
-    auto initial_traj_nodes = trajectory_path.getTrajectoryPathNodes();
+    auto initial_traj_nodes                  = trajectory_path.getTrajectoryPathNodes();
     auto converted_traj_nodes = converted_trajectory_path.getTrajectoryPathNodes();
     ASSERT_EQ(initial_traj_nodes.size(), converted_traj_nodes.size());
-    ASSERT_EQ(initial_traj_nodes[0].getTrajectoryEndTime(), converted_traj_nodes[0].getTrajectoryEndTime());
+    ASSERT_EQ(initial_traj_nodes[0].getTrajectoryEndTime(),
+              converted_traj_nodes[0].getTrajectoryEndTime());
 
     for (int i = 0; i < initial_traj_nodes.size(); i++)
     {

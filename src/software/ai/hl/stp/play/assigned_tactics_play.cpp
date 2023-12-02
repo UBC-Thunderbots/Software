@@ -6,7 +6,10 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 AssignedTacticsPlay::AssignedTacticsPlay(TbotsProto::AiConfig config)
-    : Play(config, false), assigned_tactics(), override_motion_constraints()
+    : Play(config, false),
+      assigned_tactics(),
+      override_motion_constraints(),
+      obstacle_factory(config.robot_navigation_obstacle_config())
 {
 }
 
@@ -24,8 +27,10 @@ void AssignedTacticsPlay::updateControlParams(
     std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics,
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>> motion_constraints)
 {
-    this->assigned_tactics            = assigned_tactics;
-    this->override_motion_constraints = motion_constraints; // TODO (NIMA): Can probably remove?! unless we support it in simulated pytests
+    this->assigned_tactics = assigned_tactics;
+    this->override_motion_constraints =
+        motion_constraints;  // TODO (NIMA): Can probably remove?! unless we support it in
+                             // simulated pytests
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
@@ -48,12 +53,13 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
             {
                 motion_constraints = override_motion_constraints.at(robot.id());
             }
-            auto primitives = tactic->get(world)->robot_primitives();
+            auto primitives = tactic->get(world);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
-            auto primitive = primitives.at(robot.id());
+            auto primitive = primitives[robot.id()]->generatePrimitiveProtoMessage(
+                world, motion_constraints, obstacle_factory);
             primitives_to_run->mutable_robot_primitives()->insert(
-                google::protobuf::MapPair(robot.id(), primitive));
+                {robot.id(), std::move(primitive)});
             tactic->setLastExecutionRobot(robot.id());
         }
     }

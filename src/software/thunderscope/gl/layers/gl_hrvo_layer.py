@@ -59,7 +59,7 @@ class GLHrvoLayer(GLLayer):
         )
 
         for velocity_obstacle_graphic, velocity_obstacle in zip(
-                self.velocity_obstacle_graphics, velocity_obstacle_msg.velocity_obstacles,
+            self.velocity_obstacle_graphics, velocity_obstacle_msg.velocity_obstacles,
         ):
             polygon_points = [
                 [
@@ -87,7 +87,7 @@ class GLHrvoLayer(GLLayer):
             velocity_obstacle_graphic.set_points(polygon_points)
 
         for robot_circle_graphic, robot_circle in zip(
-                self.robot_circle_graphics, velocity_obstacle_msg.robots,
+            self.robot_circle_graphics, velocity_obstacle_msg.robots,
         ):
             robot_circle_graphic.set_radius(robot_circle.radius)
             robot_circle_graphic.set_position(
@@ -100,5 +100,8 @@ class GLHrvoLayer(GLLayer):
         )
 
         self.trajectory_graphics[0].set_points(
-            [[point.x_meters, point.y_meters] for point in velocity_obstacle_msg.trajectory.points]
+            [
+                [point.x_meters, point.y_meters]
+                for point in velocity_obstacle_msg.trajectory.points
+            ]
         )

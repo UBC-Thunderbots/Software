@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/navigator/path_planner/trajectory.hpp"
-#include "software/geom/point.h"
 #include "software/geom/bounding_box.h"
+#include "software/geom/point.h"
 
 class Trajectory2D : virtual public Trajectory<Point, Vector, Vector>
 {

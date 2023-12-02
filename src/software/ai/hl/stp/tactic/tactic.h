@@ -1,10 +1,10 @@
 #pragma once
 
+#include "software/ai/hl/stp/tactic/primitive.h"
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/world/world.h"
-#include "software/ai/hl/stp/tactic/primitive.h"
 
 /**
  * Copies a tactic, the new tactic will be the same besides having a different name

@@ -63,26 +63,26 @@ cc_library(
     name = "bang_bang_trajectory_1d_angular",
     srcs = ["bang_bang_trajectory_1d_angular.cpp"],
     hdrs = ["bang_bang_trajectory_1d_angular.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":bang_bang_trajectory_1d",
         "//software/geom:angle",
         "//software/geom:angular_acceleration",
         "//software/geom:angular_velocity",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "bang_bang_trajectory_2d",
     srcs = ["bang_bang_trajectory_2d.cpp"],
     hdrs = ["bang_bang_trajectory_2d.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":bang_bang_trajectory_1d",
         ":trajectory_2d",
         "//software/geom:bounding_box",
         "//software/geom:point",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -98,12 +98,12 @@ cc_library(
     name = "trajectory_path",
     srcs = ["trajectory_path.cpp"],
     hdrs = ["trajectory_path.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":trajectory_path_node",
         "//software/ai/navigator/path_planner:kinematic_constraints",
         "//software/logger",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -123,8 +123,8 @@ cc_library(
     deps = [
         ":kinematic_constraints",
         ":trajectory_path",
-        "//proto/message_translation:tbots_protobuf",
         "//extlibs/AABB:aabb_tree",
+        "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/path_planner:trajectory_path_with_cost",
         "@tracy",

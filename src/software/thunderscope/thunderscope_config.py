@@ -54,7 +54,7 @@ def initialize_application() -> None:
     # Setup stylesheet
     extra = {
         # Make thunderscope more dense
-        'density_scale': '-2',
+        "density_scale": "-2",
     }
     apply_stylesheet(app, theme="dark_blue.xml", extra=extra)
 

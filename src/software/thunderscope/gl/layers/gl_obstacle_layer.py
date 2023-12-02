@@ -36,9 +36,7 @@ class GLObstacleLayer(GLLayer):
         return
 
         # TODO (NIMA): Update this to use new obstacle proto
-        obstacles = self.obstacles_list_buffer.get(
-            block=False
-        ).obstacles
+        obstacles = self.obstacles_list_buffer.get(block=False).obstacles
 
         poly_obstacles = [
             poly_obstacle

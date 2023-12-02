@@ -64,7 +64,6 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         self.frameSwapped.connect(self.callback)
 
-
     def callback(self):
         print(1000 * (time.time() - self.previous_time))
         self.previous_time = time.time()

@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h"
 
+#include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
 
 bool PassDefenderFSM::passStarted(const Update& event)
@@ -44,13 +45,11 @@ void PassDefenderFSM::blockPass(const Update& event)
 
     // Face the ball and move to position_to_block_from, which should be a location
     // on the field that blocks a passing lane between two enemy robots
-    event.common.set_primitive(createMovePrimitive(
-            event.common.robot,
-            position_to_block_from,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, face_ball_orientation,
-            TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-            event.common.robot.robotConstants()));
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, position_to_block_from, face_ball_orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
 
 void PassDefenderFSM::interceptBall(const Update& event)
@@ -74,12 +73,10 @@ void PassDefenderFSM::interceptBall(const Update& event)
 
         // Move to intercept the pass by positioning defender in front of the
         // ball's current trajectory
-        event.common.set_primitive(createMovePrimitive(
-                event.common.robot,
-                intercept_position,
-                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, face_ball_orientation,
-                TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                event.common.robot.robotConstants()));
+        event.common.set_primitive(std::make_unique<MovePrimitive>(
+            event.common.robot, intercept_position, face_ball_orientation,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
     }
 }

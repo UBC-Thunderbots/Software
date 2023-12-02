@@ -147,8 +147,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
     // algorithm that we use here
 
-    auto now = std::chrono::high_resolution_clock::now();
-    static int num_calls = 0;
+    auto now                          = std::chrono::high_resolution_clock::now();
+    static int num_calls              = 0;
     static long int total_duration_us = 0;
     for (unsigned int i = 0; i < priority_tactics.size(); i++)
     {
@@ -174,7 +174,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
         auto [remaining_robots, new_primitives_to_assign,
               current_tactic_robot_id_assignment] =
-                assignTactics(world, tactic_vector, robots);
+            assignTactics(world, tactic_vector, robots);
 
         tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 
@@ -190,37 +190,43 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     // Update direct trajectories to trajectories calculated using
     // the trajectory planner which avoids obstacles
     TbotsProto::ObstaclesList obstacle_protos;
-    for (auto id_to_primitive_iter = primitives_to_run->mutable_robot_primitives()->begin();
+    for (auto id_to_primitive_iter =
+             primitives_to_run->mutable_robot_primitives()->begin();
          id_to_primitive_iter != primitives_to_run->mutable_robot_primitives()->end();
          id_to_primitive_iter++)
     {
         const unsigned int id = id_to_primitive_iter->first;
-        auto& primitive = id_to_primitive_iter->second;
+        auto &primitive       = id_to_primitive_iter->second;
         if (!primitive.has_move())
         {
             continue;
         }
 
         // Do this logic once?!
-        const auto& robot_opt = world.friendlyTeam().getRobotById(id);
+        const auto &robot_opt = world.friendlyTeam().getRobotById(id);
         if (!robot_opt.has_value())
         {
             continue;
         }
-        const RobotConstants& robot_constants = robot_opt->robotConstants();
+        const RobotConstants &robot_constants = robot_opt->robotConstants();
 
-        auto tactic_iter = std::find_if(tactic_robot_id_assignment.begin(),
-                                        tactic_robot_id_assignment.end(),
-                                        [id](const auto &tactic_id_pair) { return tactic_id_pair.second == id; });
+        auto tactic_iter = std::find_if(
+            tactic_robot_id_assignment.begin(), tactic_robot_id_assignment.end(),
+            [id](const auto &tactic_id_pair) { return tactic_id_pair.second == id; });
         if (tactic_iter == tactic_robot_id_assignment.end())
         {
-            LOG(WARNING) << "robot " << id << " is assigned a move primitive without an assigned tactic" << std::endl;
+            LOG(WARNING) << "robot " << id
+                         << " is assigned a move primitive without an assigned tactic"
+                         << std::endl;
             continue;
         }
 
         // Create the list of obstacles
-        auto motion_constraints = buildMotionConstraintSet(world.gameState(), *tactic_iter->first);
-        std::vector<ObstaclePtr> obstacles = obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
+        auto motion_constraints =
+            buildMotionConstraintSet(world.gameState(), *tactic_iter->first);
+        std::vector<ObstaclePtr> obstacles =
+            obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints,
+                                                                  world);
         if (primitive.move().ball_collision_type() == TbotsProto::AVOID)
         {
             obstacles.push_back(
@@ -242,43 +248,48 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             }
         }
 
-        for (const auto& obstacle : obstacles)
+        for (const auto &obstacle : obstacles)
         {
-            *(obstacle_protos.mutable_obstacles()->Add()) = obstacle->createObstacleProto();
+            *(obstacle_protos.mutable_obstacles()->Add()) =
+                obstacle->createObstacleProto();
         }
 
-        const TbotsProto::TrajectoryPathParams2D& trajectory_path_params = primitive.move().xy_traj_params();
-        Point start_position = createPoint(trajectory_path_params.start_position());
-        Point destination = createPoint(trajectory_path_params.destination());
+        const TbotsProto::TrajectoryPathParams2D &trajectory_path_params =
+            primitive.move().xy_traj_params();
+        Point start_position    = createPoint(trajectory_path_params.start_position());
+        Point destination       = createPoint(trajectory_path_params.destination());
         Vector initial_velocity = createVector(trajectory_path_params.initial_velocity());
-        double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+        double max_speed        = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             trajectory_path_params.max_speed_mode(), robot_constants);
-        KinematicConstraints constraints(max_speed,
-                                         robot_constants.robot_max_acceleration_m_per_s_2,
-                                         robot_constants.robot_max_deceleration_m_per_s_2);
+        KinematicConstraints constraints(
+            max_speed, robot_constants.robot_max_acceleration_m_per_s_2,
+            robot_constants.robot_max_deceleration_m_per_s_2);
 
         // Print all obstacles
-//        std::string obstacles_str = "";
-//        for (const auto& obstacle : obstacles)
-//        {
-//            obstacles_str += obstacle->toString() + "\n";
-//        }
-//        LOG(INFO) << "Obstacles for robot " << id << ":\n" << obstacles_str << std::endl;
+        //        std::string obstacles_str = "";
+        //        for (const auto& obstacle : obstacles)
+        //        {
+        //            obstacles_str += obstacle->toString() + "\n";
+        //        }
+        //        LOG(INFO) << "Obstacles for robot " << id << ":\n" << obstacles_str <<
+        //        std::endl;
 
         // TODO: Instead of field boundary, it should be made smaller 9cm
         // TODO: Why do the trajs not avoid the obstacles?
-        TrajectoryPath traj_path = planner.findTrajectory(start_position, destination, initial_velocity,
-                                    constraints, obstacles, world.field().fieldBoundary());
-        const auto& path_nodes = traj_path.getTrajectoryPathNodes();
+        TrajectoryPath traj_path =
+            planner.findTrajectory(start_position, destination, initial_velocity,
+                                   constraints, obstacles, world.field().fieldBoundary());
+        const auto &path_nodes = traj_path.getTrajectoryPathNodes();
 
         *(primitive.mutable_move()->mutable_xy_traj_params()->mutable_sub_destination()) =
-                *createPointProto(path_nodes[0].getTrajectory()->getDestination());
+            *createPointProto(path_nodes[0].getTrajectory()->getDestination());
 
         // TODO (NIMA): Consider improving this logic
-        if (path_nodes[0].getTrajectoryEndTime() != path_nodes[0].getTrajectory()->getTotalTime())
+        if (path_nodes[0].getTrajectoryEndTime() !=
+            path_nodes[0].getTrajectory()->getTotalTime())
         {
             primitive.mutable_move()->mutable_xy_traj_params()->set_connection_time(
-                    path_nodes[0].getTrajectoryEndTime());
+                path_nodes[0].getTrajectoryEndTime());
         }
         else
         {
@@ -286,48 +297,66 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         }
 
         // TODO: Used for verifying that we have created the params correctly
-//        std::optional<TrajectoryPath> converted_traj_path = createTrajectoryPathFromParams(primitive.mutable_move()->xy_traj_params(), robot_constants);
-//        for (double time = 0; time <= traj_path.getTotalTime(); time += 0.1)
-//        {
-//            Point position = traj_path.getPosition(time);
-//            Vector velocity = traj_path.getVelocity(time);
-//            Vector acceleration = traj_path.getAcceleration(time);
-//
-//            Point converted_position = converted_traj_path->getPosition(time);
-//            Vector converted_velocity = converted_traj_path->getVelocity(time);
-//            Vector converted_acceleration = converted_traj_path->getAcceleration(time);
-//
-//            CHECK(distance(position, converted_position) < 0.001) << "Robot " << id << " position: " << position << " != converted_position: " << converted_position << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
-//            CHECK((velocity - converted_velocity).length() < 0.001) << "Robot " << id << " velocity: " << velocity << " != converted_velocity: " << converted_velocity << " at time " << time << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
-//            if ((acceleration - converted_acceleration).length() > 0.001)
-//            {
-//                // See if any obstacles `contains` the start position of the trajectory
-//                auto obstacle_iter = std::find_if(obstacles.begin(), obstacles.end(), [start_position](const auto& obstacle) {
-//                    return obstacle->contains(start_position);
-//                });
-//                if (obstacle_iter != obstacles.end())
-//                {
-//                    LOG(DEBUG) << "start position " << start_position << " collides with " << obstacle_iter->get()->toString() << std::endl;
-//                }
-//                else
-//                {
-//                    LOG(DEBUG) << "no collision detected";
-//                }
-//                LOG(FATAL) << "Robot " << id << " acceleration: " << acceleration << " != converted_acceleration: " << converted_acceleration << " at time " << time << "\n" << tactic_iter->first->getFSMState() << " " << objectTypeName(*tactic_iter->first) << "\n" << "obstacles.size()=" << obstacles.size() << "\n" << primitive.mutable_move()->xy_traj_params().DebugString();
-//            }
-//        }
+        //        std::optional<TrajectoryPath> converted_traj_path =
+        //        createTrajectoryPathFromParams(primitive.mutable_move()->xy_traj_params(),
+        //        robot_constants); for (double time = 0; time <=
+        //        traj_path.getTotalTime(); time += 0.1)
+        //        {
+        //            Point position = traj_path.getPosition(time);
+        //            Vector velocity = traj_path.getVelocity(time);
+        //            Vector acceleration = traj_path.getAcceleration(time);
+        //
+        //            Point converted_position = converted_traj_path->getPosition(time);
+        //            Vector converted_velocity = converted_traj_path->getVelocity(time);
+        //            Vector converted_acceleration =
+        //            converted_traj_path->getAcceleration(time);
+        //
+        //            CHECK(distance(position, converted_position) < 0.001) << "Robot " <<
+        //            id << " position: " << position << " != converted_position: " <<
+        //            converted_position << " at time " << time << "\n" <<
+        //            primitive.mutable_move()->xy_traj_params().DebugString();
+        //            CHECK((velocity - converted_velocity).length() < 0.001) << "Robot "
+        //            << id << " velocity: " << velocity << " != converted_velocity: " <<
+        //            converted_velocity << " at time " << time << "\n" <<
+        //            primitive.mutable_move()->xy_traj_params().DebugString(); if
+        //            ((acceleration - converted_acceleration).length() > 0.001)
+        //            {
+        //                // See if any obstacles `contains` the start position of the
+        //                trajectory auto obstacle_iter = std::find_if(obstacles.begin(),
+        //                obstacles.end(), [start_position](const auto& obstacle) {
+        //                    return obstacle->contains(start_position);
+        //                });
+        //                if (obstacle_iter != obstacles.end())
+        //                {
+        //                    LOG(DEBUG) << "start position " << start_position << "
+        //                    collides with " << obstacle_iter->get()->toString() <<
+        //                    std::endl;
+        //                }
+        //                else
+        //                {
+        //                    LOG(DEBUG) << "no collision detected";
+        //                }
+        //                LOG(FATAL) << "Robot " << id << " acceleration: " <<
+        //                acceleration << " != converted_acceleration: " <<
+        //                converted_acceleration << " at time " << time << "\n" <<
+        //                tactic_iter->first->getFSMState() << " " <<
+        //                objectTypeName(*tactic_iter->first) << "\n" <<
+        //                "obstacles.size()=" << obstacles.size() << "\n" <<
+        //                primitive.mutable_move()->xy_traj_params().DebugString();
+        //            }
+        //        }
     }
     LOG(VISUALIZE) << obstacle_protos;
     auto end = std::chrono::high_resolution_clock::now();
     auto duration =
-            std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();
+        std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();
     total_duration_us += duration;
     if (++num_calls % 300 == 0)
     {
         LOG(INFO) << "Average time to assign tactics and generate trajs: "
                   << total_duration_us / num_calls << " us" << std::endl;
         total_duration_us = 0;
-        num_calls = 0;
+        num_calls         = 0;
     }
 
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
@@ -366,8 +395,10 @@ void Play::updateTactics(const PlayUpdate &play_update)
     play_update.set_tactics(getTactics(play_update.world));
 }
 
-std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>, std::map<std::shared_ptr<const Tactic>, RobotId>>
-Play::assignTactics(const World &world, TacticVector tactic_vector, const std::vector<Robot>& robots_to_assign)
+std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
+           std::map<std::shared_ptr<const Tactic>, RobotId>>
+Play::assignTactics(const World &world, TacticVector tactic_vector,
+                    const std::vector<Robot> &robots_to_assign)
 {
     std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
     size_t num_tactics     = tactic_vector.size();
@@ -380,8 +411,7 @@ Play::assignTactics(const World &world, TacticVector tactic_vector, const std::v
     for (auto tactic : tactic_vector)
     {
         primitive_sets.emplace_back(tactic->get(world));
-        CHECK(primitive_sets.back().size() ==
-              world.friendlyTeam().numRobots())
+        CHECK(primitive_sets.back().size() == world.friendlyTeam().numRobots())
             << primitive_sets.back().size() << " primitives from "
             << objectTypeName(*tactic)
             << " is not equal to the number of robots, which is "
@@ -417,7 +447,8 @@ Play::assignTactics(const World &world, TacticVector tactic_vector, const std::v
             auto primitives                = primitive_sets.at(col);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
-            double robot_cost_for_tactic = primitives.at(robot.id())->getEstimatedPrimitiveCost();
+            double robot_cost_for_tactic =
+                primitives.at(robot.id())->getEstimatedPrimitiveCost();
 
             std::set<RobotCapability> required_capabilities =
                 tactic->robotCapabilityRequirements();
@@ -472,9 +503,12 @@ Play::assignTactics(const World &world, TacticVector tactic_vector, const std::v
                 CHECK(primitives.contains(robot_id))
                     << "Couldn't find a primitive for robot id " << robot_id;
 
-                // Only generate primitive proto message for the final primitive to robot assignment
+                // Only generate primitive proto message for the final primitive to robot
+                // assignment
                 primitives_to_run->mutable_robot_primitives()->insert(
-                    google::protobuf::MapPair(robot_id, *primitives.at(robot_id)->generatePrimitiveProtoMessage()));
+                    google::protobuf::MapPair(
+                        robot_id,
+                        *primitives.at(robot_id)->generatePrimitiveProtoMessage()));
                 remaining_robots.erase(
                     std::remove_if(remaining_robots.begin(), remaining_robots.end(),
                                    [robots_to_assign, row](const Robot &robot) {

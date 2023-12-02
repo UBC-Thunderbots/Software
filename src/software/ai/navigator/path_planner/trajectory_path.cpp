@@ -109,13 +109,14 @@ std::vector<BoundingBox> TrajectoryPath::getBoundingBoxes() const
     std::vector<BoundingBox> bounding_boxes;
     for (const TrajectoryPathNode& traj_node : traj_path)
     {
-        const std::vector<BoundingBox> bbs = traj_node.getTrajectory()->getBoundingBoxes();
+        const std::vector<BoundingBox> bbs =
+            traj_node.getTrajectory()->getBoundingBoxes();
         bounding_boxes.insert(bounding_boxes.begin(), bbs.begin(), bbs.end());
     }
     return bounding_boxes;
 }
 
-const std::vector<TrajectoryPathNode> &TrajectoryPath::getTrajectoryPathNodes() const
+const std::vector<TrajectoryPathNode>& TrajectoryPath::getTrajectoryPathNodes() const
 {
     return traj_path;
 }
