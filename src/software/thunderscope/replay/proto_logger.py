@@ -81,10 +81,8 @@ class ProtoLogger:
         save a _lot_ of space.
 
         """
-
         self.thread = threading.Thread(target=self.__log_protobufs, daemon=True)
         self.thread.start()
-
         return self
 
     def __exit__(self, type, value, traceback) -> None:
@@ -117,6 +115,9 @@ class ProtoLogger:
                     self.log_folder + f"{replay_index}.{REPLAY_FILE_EXTENSION}", "wb"
                 ) as self.log_file:
 
+                    # Allocates 1MB of disk for impending replay
+                    os.ftruncate(self.log_file.fileno(), REPLAY_MAX_CHUNK_SIZE_BYTES)
+
                     while self.stop_logging is False:
 
                         # Consume the buffer and log the protobuf
@@ -134,7 +135,7 @@ class ProtoLogger:
 
                         # Stop writing to this chunk if we've reached the max size
                         size = os.fstat(self.log_file.fileno()).st_size
-                        if size >= REPLAY_MAX_CHUNK_SIZE_BYTES:
+                        if size > REPLAY_MAX_CHUNK_SIZE_BYTES:
                             break
 
         except Exception:

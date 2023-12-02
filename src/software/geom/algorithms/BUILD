@@ -16,6 +16,7 @@ cc_library(
         "intersection.cpp",
         "intersects.cpp",
         "rasterize.cpp",
+        "step_along_perimeter.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
@@ -32,6 +33,7 @@ cc_library(
         "intersection.h",
         "intersects.h",
         "rasterize.h",
+        "step_along_perimeter.h",
         "voronoi_diagram.h",
     ],
     deps = [
@@ -206,6 +208,16 @@ cc_test(
 cc_test(
     name = "rasterize_test",
     srcs = ["rasterize_test.cpp"],
+    deps = [
+        ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_test(
+    name = "step_along_perimeter_test",
+    srcs = ["step_along_perimeter_test.cpp"],
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",

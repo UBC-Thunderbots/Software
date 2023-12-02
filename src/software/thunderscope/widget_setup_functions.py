@@ -1,11 +1,14 @@
-from typing import List
+import os
+
+from typing import List, Any
 
 from software.py_constants import *
 from proto.import_all_protos import *
 from software.thunderscope.common.proto_plotter import ProtoPlotter
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_style import *
-
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from google.protobuf.message import Message
 
 # Import Widgets
 from software.thunderscope.gl.gl_widget import GLWidget
@@ -18,12 +21,12 @@ from software.thunderscope.gl.layers import (
     gl_simulator_layer,
     gl_hrvo_layer,
     gl_tactic_layer,
+    gl_cost_vis_layer,
 )
 
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
 )
-from software.thunderscope.cost_vis.cost_vis import CostVisualizationWidget
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
@@ -45,13 +48,13 @@ from software.thunderscope.replay.proto_player import ProtoPlayer
 
 
 def setup_gl_widget(
-    sim_proto_unix_io,
-    full_system_proto_unix_io,
-    friendly_colour_yellow,
-    visualization_buffer_size,
-    replay=False,
-    replay_log=None,
-):
+    sim_proto_unix_io: ProtoUnixIO,
+    full_system_proto_unix_io: ProtoUnixIO,
+    friendly_colour_yellow: bool,
+    visualization_buffer_size: int,
+    replay: bool = False,
+    replay_log: os.PathLike = None,
+) -> Field:
     """Setup the GLWidget with its constituent layers
 
     :param sim_proto_unix_io: The proto unix io object for the simulator
@@ -80,6 +83,9 @@ def setup_gl_widget(
     passing_layer = gl_passing_layer.GLPassingLayer(
         "Passing", visualization_buffer_size
     )
+    cost_vis_layer = gl_cost_vis_layer.GLCostVisLayer(
+        "Passing Cost", visualization_buffer_size
+    )
     world_layer = gl_world_layer.GLWorldLayer(
         "Vision", sim_proto_unix_io, friendly_colour_yellow, visualization_buffer_size
     )
@@ -88,13 +94,14 @@ def setup_gl_widget(
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
 
-    gl_widget.add_layer(validation_layer)
+    gl_widget.add_layer(world_layer)
+    gl_widget.add_layer(simulator_layer, False)
     gl_widget.add_layer(path_layer)
     gl_widget.add_layer(obstacle_layer)
     gl_widget.add_layer(passing_layer)
-    gl_widget.add_layer(world_layer)
-    gl_widget.add_layer(simulator_layer, False)
+    gl_widget.add_layer(cost_vis_layer, False)
     gl_widget.add_layer(tactic_layer, False)
+    gl_widget.add_layer(validation_layer)
 
     # Add HRVO layers and have them hidden on startup
     # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
@@ -109,6 +116,7 @@ def setup_gl_widget(
     # Register observers
     for arg in [
         (World, world_layer.world_buffer),
+        (World, cost_vis_layer.world_buffer),
         (RobotStatus, world_layer.robot_status_buffer),
         (Referee, world_layer.referee_buffer),
         (PrimitiveSet, obstacle_layer.primitive_set_buffer),
@@ -118,13 +126,16 @@ def setup_gl_widget(
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
         (SimulatorState, simulator_layer.simulator_state_buffer),
+        (CostVisualization, cost_vis_layer.cost_visualization_buffer),
     ] + [(HRVOVisualization, hrvo_layer.hrvo_buffer) for hrvo_layer in hrvo_layers]:
         full_system_proto_unix_io.register_observer(*arg)
 
     return gl_widget
 
 
-def setup_parameter_widget(proto_unix_io, friendly_colour_yellow):
+def setup_parameter_widget(
+    proto_unix_io: ProtoUnixIO, friendly_colour_yellow: bool
+) -> ProtoConfigurationWidget:
     """Setup the parameter widget
 
     :param proto_unix_io: The proto unix io object
@@ -136,13 +147,15 @@ def setup_parameter_widget(proto_unix_io, friendly_colour_yellow):
     config = ThunderbotsConfig()
     config.sensor_fusion_config.friendly_color_yellow = friendly_colour_yellow
 
-    def on_change_callback(attr, value, updated_proto):
+    def on_change_callback(
+        attr: Any, value: Any, updated_proto: ThunderbotsConfig
+    ) -> None:
         proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
 
     return ProtoConfigurationWidget(config, on_change_callback)
 
 
-def setup_log_widget(proto_unix_io):
+def setup_log_widget(proto_unix_io: ProtoUnixIO) -> g3logWidget:
     """Setup the wiget that receives logs from full system
 
     :param proto_unix_io: The proto unix io object
@@ -158,7 +171,7 @@ def setup_log_widget(proto_unix_io):
     return logs
 
 
-def setup_performance_plot(proto_unix_io):
+def setup_performance_plot(proto_unix_io: ProtoUnixIO) -> ProtoPlotter:
     """Setup the performance plot
 
     :param proto_unix_io: The proto unix io object
@@ -182,7 +195,7 @@ def setup_performance_plot(proto_unix_io):
     return proto_plotter
 
 
-def setup_play_info(proto_unix_io):
+def setup_play_info(proto_unix_io: ProtoUnixIO) -> PlayInfoWidget:
     """Setup the play info widget
 
     :param proto_unix_io: The proto unix io object
@@ -195,7 +208,7 @@ def setup_play_info(proto_unix_io):
     return play_info
 
 
-def setup_referee_info(proto_unix_io):
+def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
     """Setup the referee info widget
 
     :param proto_unix_io: The proto unix io object
@@ -209,26 +222,14 @@ def setup_referee_info(proto_unix_io):
     return referee_info
 
 
-def setup_cost_visualization_widget(proto_unix_io):
-    """Setup the cost visualization widget
-
-    :param proto_unix_io: The proto unix io object
-    :returns: The cost visualization widget
-
-    """
-    cost_vis_widget = CostVisualizationWidget()
-    proto_unix_io.register_observer(
-        CostVisualization, cost_vis_widget.cost_visualization_buffer
-    )
-    return cost_vis_widget
-
-
 #################################
 #  DIAGNOSTICS RELATED WIDGETS  #
 #################################
 
 
-def setup_robot_view(proto_unix_io, available_control_modes: List[IndividualRobotMode]):
+def setup_robot_view(
+    proto_unix_io: ProtoUnixIO, available_control_modes: List[IndividualRobotMode]
+) -> RobotView:
     """Setup the robot view widget
     :param proto_unix_io: The proto unix io object for the full system
     :param available_control_modes: the currently available input modes for the robots
@@ -242,7 +243,7 @@ def setup_robot_view(proto_unix_io, available_control_modes: List[IndividualRobo
     return robot_view
 
 
-def setup_estop_view(proto_unix_io):
+def setup_estop_view(proto_unix_io: ProtoUnixIO) -> EstopView:
     """Setup the estop view widget
 
     :param proto_unix_io: The proto unix io object for the full system
@@ -254,7 +255,7 @@ def setup_estop_view(proto_unix_io):
     return estop_view
 
 
-def setup_chicker_widget(proto_unix_io):
+def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
     """Setup the chicker widget for robot diagnostics
 
     :param proto_unix_io: The proto unix io object
@@ -265,7 +266,7 @@ def setup_chicker_widget(proto_unix_io):
     return chicker_widget
 
 
-def setup_diagnostics_input_widget():
+def setup_diagnostics_input_widget() -> FullSystemConnectWidget:
     """
     Sets up the diagnostics input widget
 
@@ -277,7 +278,9 @@ def setup_diagnostics_input_widget():
     return diagnostics_input_widget
 
 
-def setup_drive_and_dribbler_widget(proto_unix_io):
+def setup_drive_and_dribbler_widget(
+    proto_unix_io: ProtoUnixIO,
+) -> DriveAndDribblerWidget:
     """Setup the drive and dribbler widget
 
     :param proto_unix_io: The proto unix io object
