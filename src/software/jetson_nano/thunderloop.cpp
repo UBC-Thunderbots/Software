@@ -29,7 +29,6 @@ extern "C"
     static int channel_id;
     static std::string network_interface;
     static int robot_id;
-    static int sent_errors[3] = {false, false, false};
 
     /**
      * Handles process signals
@@ -416,6 +415,7 @@ double Thunderloop::getCpuTemperature()
 
 void Thunderloop::sendErrorCodes()
 {
+    //Sends error code once for threshold
     if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE && !sent_errors[0])
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
@@ -432,3 +432,4 @@ void Thunderloop::sendErrorCodes()
         sent_errors[2] = true;
     }
 }
+

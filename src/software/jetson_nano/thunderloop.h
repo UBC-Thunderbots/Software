@@ -95,7 +95,7 @@ class Thunderloop
     /**
      * Sends ErrorCodes for BAT, CAP, CPU TEMP, DRIBBLER TEMP if over thresholds
      */
-     void sendErrorCodes();
+    void sendErrorCodes();
 
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
@@ -115,6 +115,7 @@ class Thunderloop
 
     //Error Codes
     TbotsProto::ErrorCode error_code;
+    bool sent_errors[3] = {false, false, false};
     // Current State
     RobotConstants_t robot_constants_;
     Angle current_orientation_;
