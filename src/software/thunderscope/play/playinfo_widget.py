@@ -43,6 +43,13 @@ class PlayInfoWidget(QWidget):
     def refresh(self):
         """Update the play info widget with new play information
         """
+        # SuperFastPython.com
+        # report the number of active threads
+        from threading import active_count
+        # get the number of active threads
+        count = active_count()
+        # report the number of active threads
+        print(count)
         playinfo = self.playinfo_buffer.get(block=False)
 
         play_info_dict = MessageToDict(playinfo)

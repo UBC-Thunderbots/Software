@@ -106,7 +106,7 @@ class Play
      * @return the remaining unassigned robots, the new primitives to assign, and robot to
      * tactic assignment
      */
-    static std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
+    std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
                       std::map<std::shared_ptr<const Tactic>, RobotId>>
     assignTactics(const World& world, TacticVector tactic_vector,
                   const std::vector<Robot>& robots_to_assign);

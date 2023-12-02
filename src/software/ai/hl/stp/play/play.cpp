@@ -505,12 +505,17 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
                 CHECK(primitives.contains(robot_id))
                     << "Couldn't find a primitive for robot id " << robot_id;
 
+                // Create the list of obstacles
+                auto motion_constraints =
+                        buildMotionConstraintSet(world.gameState(), *tactic_vector.at(col));
+
                 // Only generate primitive proto message for the final primitive to robot
                 // assignment
                 primitives_to_run->mutable_robot_primitives()->insert(
-                    google::protobuf::MapPair(
-                        robot_id,
-                        *primitives.at(robot_id)->generatePrimitiveProtoMessage()));
+                        {robot_id,
+                        *primitives[robot_id]->generatePrimitiveProtoMessage( // TODO: Does this only run 6 times? or 36times?
+                                world, motion_constraints, obstacle_factory
+                        )});
                 remaining_robots.erase(
                     std::remove_if(remaining_robots.begin(), remaining_robots.end(),
                                    [robots_to_assign, row](const Robot &robot) {

@@ -115,7 +115,7 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
         primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time(0);
     }
 
-    return std::move(primitive_proto);
+    return primitive_proto;
 }
 
 std::vector<ObstaclePtr> MovePrimitive::generateObstacles(
