@@ -4,7 +4,7 @@ import numpy as np
 
 from proto.tbots_software_msgs_pb2 import PrimitiveSet
 
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -25,6 +25,7 @@ class GLObstacleLayer(GLLayer):
 
         """
         super().__init__(name)
+        self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
 

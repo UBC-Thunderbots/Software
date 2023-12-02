@@ -44,17 +44,17 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
       boundary_buffer_size_(boundary_buffer_size),
       center_circle_radius_(center_circle_radius),
       goal_centre_to_penalty_mark_(field_x_length_ * 2 / 3),
-      enemy_defense_area(
+      enemy_defense_area_(
           Point(field_x_length_ * 0.5, defense_y_length_ / 2.0),
           Point(field_x_length_ * 0.5 - defense_x_length_, -defense_y_length_ / 2.0)),
-      friendly_defense_area(Rectangle(
+      friendly_defense_area_(Rectangle(
           Point(-field_x_length_ * 0.5, defense_y_length_ / 2.0),
           Point(-field_x_length_ * 0.5 + defense_x_length_, -defense_y_length_ / 2.0))),
-      field_lines(Rectangle(friendlyCornerNeg(), enemyCornerPos())),
-      enemy_goal(Rectangle(
+      field_lines_(Rectangle(friendlyCornerNeg(), enemyCornerPos())),
+      enemy_goal_(Rectangle(
           Point(enemyGoalCenter().x(), enemyGoalpostPos().y()),
           Point(enemyGoalCenter().x() + goalXLength(), enemyGoalpostNeg().y()))),
-      friendly_goal(Rectangle(
+      friendly_goal_(Rectangle(
           Point(friendlyGoalCenter().x() - goalXLength(), friendlyGoalpostPos().y()),
           Point(friendlyGoalCenter().x(), friendlyGoalpostNeg().y())))
 {
@@ -117,12 +117,12 @@ double Field::defenseAreaXLength() const
 
 const Rectangle &Field::friendlyDefenseArea() const
 {
-    return friendly_defense_area;
+    return friendly_defense_area_;
 }
 
 const Rectangle &Field::enemyDefenseArea() const
 {
-    return enemy_defense_area;
+    return enemy_defense_area_;
 }
 
 Rectangle Field::friendlyHalf() const
@@ -157,7 +157,7 @@ Rectangle Field::enemyNegativeYQuadrant() const
 
 const Rectangle &Field::fieldLines() const
 {
-    return field_lines;
+    return field_lines_;
 }
 
 Rectangle Field::fieldBoundary() const
@@ -199,12 +199,12 @@ Point Field::enemyGoalCenter() const
 
 const Rectangle &Field::friendlyGoal() const
 {
-    return friendly_goal;
+    return friendly_goal_;
 }
 
 const Rectangle &Field::enemyGoal() const
 {
-    return enemy_goal;
+    return enemy_goal_;
 }
 
 Point Field::friendlyPenaltyMark() const

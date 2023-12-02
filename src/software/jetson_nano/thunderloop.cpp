@@ -262,15 +262,10 @@ Thunderloop::~Thunderloop() {}
                 if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
                     primitive_executor_.setStopPrimitive();
-
-                    // Log milliseconds since last world received if we are timing out
-                    LOG(WARNING)
-                        << "Primitive timeout, overriding with StopPrimitive - Milliseconds since last primitive: "
-                        << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
-                               MILLISECONDS_PER_NANOSECOND;
                 }
 
-                direct_control_ = *primitive_executor_.stepPrimitive();
+                direct_control_ =
+                    *primitive_executor_.stepPrimitive(primitive_executor_status_);
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(
@@ -344,6 +339,8 @@ Thunderloop::~Thunderloop() {}
             *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
             *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
+            *(robot_status_.mutable_primitive_executor_status()) =
+                primitive_executor_status_;
 
             // Update Redis
             redis_client_->setNoCommit(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
