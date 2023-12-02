@@ -114,7 +114,7 @@ class Thunderloop
     TbotsProto::PrimitiveExecutorStatus primitive_executor_status_;
     TbotsProto::Timestamp time_sent_;
 
-    //Error Codes
+    // Error Codes
     TbotsProto::ErrorCode error_code;
     bool sent_errors[3] = {false, false, false};
     // Current State

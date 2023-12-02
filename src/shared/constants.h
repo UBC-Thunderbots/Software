@@ -172,5 +172,5 @@ static const unsigned CONTROL_LOOP_HZ                  = 60u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;
 
-//Jetson Nano Constants
+// Jetson Nano Constants
 static const double MAX_JETSON_TEMP = 97;

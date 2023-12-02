@@ -2,6 +2,7 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_crash_msg.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
@@ -12,7 +13,6 @@
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 #include "software/world/team.h"
-#include "proto/robot_status_msg.pb.h"
 
 /**
  * https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -350,7 +350,6 @@ Thunderloop::~Thunderloop() {}
             redis_client_->asyncCommit();
 
             sendErrorCodes();
-
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
@@ -412,7 +411,7 @@ double Thunderloop::getCpuTemperature()
 
 void Thunderloop::sendErrorCodes()
 {
-    //Sends error code once for threshold
+    // Sends error code once for threshold
     if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE && !sent_errors[0])
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
@@ -429,4 +428,3 @@ void Thunderloop::sendErrorCodes()
         sent_errors[2] = true;
     }
 }
-

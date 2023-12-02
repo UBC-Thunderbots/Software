@@ -74,7 +74,7 @@ enum ErrorCode
     NO_ERROR = 0;
 
     // Level triggered events
-    HIGH_CAP            = 1;
+    HIGH_CAP           = 1;
     LOW_BATTERY        = 2;
     HIGH_BOARD_TEMP    = 3;
     DRIBBLER_MOTOR_HOT = 4;
