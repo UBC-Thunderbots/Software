@@ -1,6 +1,7 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
 from enum import Enum, IntEnum
+from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
 
@@ -103,9 +104,22 @@ BALL_HEIGHT_EFFECT_MULTIPLIER = 3
 # in robot communications
 ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
 
+# time between each refresh of thunderscope in milliseconds
+THUNDERSCOPE_REFRESH_INTERVAL_MS = 10
+
+ROBOT_FATAL_TIMEOUT_S = 5
 # Max time (in seconds) tolerated between repeated crash protos until
 # crash alert occurs
 ROBOT_CRASH_TIMEOUT_S = 5
+
+# LogLevel to string conversion map
+LOG_LEVEL_STR_MAP = {
+    LogLevel.DEBUG: "DEBUG",
+    LogLevel.INFO: "INFO",
+    LogLevel.WARNING: "WARNING",
+    LogLevel.FATAL: "FATAL",
+    LogLevel.CONTRACT: "CONTRACT",
+}
 
 GAME_CONTROLLER_URL = "http://localhost:8081"
 

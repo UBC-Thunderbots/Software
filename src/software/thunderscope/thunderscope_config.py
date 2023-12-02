@@ -175,6 +175,14 @@ def configure_base_fullsystem(
             position="above",
         ),
         TScopeWidget(
+            name="Error Log",
+            widget=setup_robot_error_log_view_widget(
+                **{"proto_unix_io": full_system_proto_unix_io}
+            ),
+            position="below",
+            anchor="Logs",
+        ),
+        TScopeWidget(
             name="Referee Info",
             widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Field",
@@ -203,13 +211,16 @@ def configure_base_fullsystem(
 
 
 def configure_base_diagnostics(
-    diagnostics_proto_unix_io: ProtoUnixIO, extra_widgets: list = []
+    diagnostics_proto_unix_io: ProtoUnixIO,
+    current_proto_unix_io: ProtoUnixIO,
+    extra_widgets: List[TScopeWidget] = [],
 ) -> list:
     """
     Returns a list of widget data for a Diagnostics tab
     along with any extra widgets passed in
 
     :param diagnostics_proto_unix_io: the proto unix io for diagnostics
+    :param current_proto_unix_io: the current fullsystem proto unix io if it is running
     :param extra_widgets: a list of additional widget data to append
     :return: list of widget data for Diagnostics
     """
@@ -217,6 +228,14 @@ def configure_base_diagnostics(
         TScopeWidget(
             name="Logs",
             widget=setup_log_widget(**{"proto_unix_io": diagnostics_proto_unix_io}),
+        ),
+        TScopeWidget(
+            name="Error Log",
+            widget=setup_robot_error_log_view_widget(
+                **{"proto_unix_io": current_proto_unix_io}
+            ),
+            position="below",
+            anchor="Logs",
         ),
         TScopeWidget(
             name="Drive and Dribbler",
@@ -590,6 +609,7 @@ def configure_ai_or_diagnostics(
                     diagnostics_proto_unix_io=proto_unix_io_map[
                         ProtoUnixIOTypes.DIAGNOSTICS
                     ],
+                    current_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.CURRENT],
                     extra_widgets=[
                         configure_estop(proto_unix_io_map[ProtoUnixIOTypes.DIAGNOSTICS])
                     ]

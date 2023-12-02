@@ -8,16 +8,22 @@ import "proto/geometry.proto";
 
 message RobotStatus
 {
-    uint32 robot_id                           = 1;
-    repeated ErrorCode error_code             = 2;
-    ChipperKickerStatus chipper_kicker_status = 4;
-    MotorStatus motor_status                  = 5;
-    NetworkStatus network_status              = 6;
-    PowerStatus power_status                  = 7;
-    JetsonStatus jetson_status                = 8;
-    ThunderloopStatus thunderloop_status      = 9;
-    Timestamp time_sent                       = 10;
-    uint64 last_handled_primitive_set         = 11;
+    uint32 robot_id                                   = 1;
+    repeated ErrorCode error_code                     = 2;
+    ChipperKickerStatus chipper_kicker_status         = 4;
+    MotorStatus motor_status                          = 5;
+    NetworkStatus network_status                      = 6;
+    PowerStatus power_status                          = 7;
+    JetsonStatus jetson_status                        = 8;
+    ThunderloopStatus thunderloop_status              = 9;
+    Timestamp time_sent                               = 10;
+    uint64 last_handled_primitive_set                 = 11;
+    PrimitiveExecutorStatus primitive_executor_status = 12;
+}
+
+message PrimitiveExecutorStatus
+{
+    bool running_primitive = 1;
 }
 
 message ThunderloopStatus
@@ -126,6 +132,10 @@ message NetworkStatus
 
     // Indicates the time elapsed since the last primitive packet was received in ms
     double ms_since_last_primitive_received = 2;
+
+    // Indicates the percentage of primitive / world packets lost during communication
+    uint32 primitive_packet_loss_percentage = 3;
+    uint32 world_packet_loss_percentage     = 4;
 }
 
 /* Battery and capacitor voltages */
