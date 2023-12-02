@@ -6,7 +6,6 @@
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
 #include "software/world/world.h"
 #include "proto/primitive/primitive_types.h"
-#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_planner/trajectory_planner.h"
 
 // Forward declare Tactic to avoid circular dependency between Tactic and MovePrimitive
@@ -15,6 +14,24 @@ class Tactic;
 class MovePrimitive : public Primitive
 {
 public:
+
+    /**
+     * Create a Move Primitive Message TODO: Double check docs
+     *
+     * @param dest The final destination of the movement
+     * @param final_speed_m_per_s The speed at final destination
+     * @param final_angle The final orientation the robot should have at the end
+     * of the movement
+     * @param should_drive_forward Whether the robot should face the direction of intermediate
+     * path points (if there is any) or just the final destination
+     * @param dribbler_mode The dribbler mode
+     * @param auto_chip_or_kick The command to autochip or autokick
+     * @param max_allowed_speed_mode The mode of maximum speed allowed
+     * @param target_spin_rev_per_s The target spin while moving in revolutions per second
+     * @param robot_constants The robot constants
+     * @param cost_override optionally override the cost of the move primitive, defaults to
+     * the path length
+     */
     MovePrimitive(
             const Robot &robot,
             const Point &destination,
@@ -32,10 +49,6 @@ public:
     *
     * @return the primitive proto message
     */
-    [obstacles](start, destination){
-        return traj;
-    }
-
     std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
             const World &world,
             const std::set<TbotsProto::MotionConstraint> &motion_constraints,
@@ -48,7 +61,6 @@ private:
             const std::set<TbotsProto::MotionConstraint> &motion_constraints,
             const RobotNavigationObstacleFactory &obstacle_factory) const;
 
-    std::shared_ptr<Tactic> tactic;
     Robot robot;
     Point destination;
     Angle final_angle;
@@ -61,6 +73,5 @@ private:
 
     BangBangTrajectory2D trajectory;
     BangBangTrajectory1DAngular angular_trajectory;
-
     TrajectoryPlanner planner;
 };

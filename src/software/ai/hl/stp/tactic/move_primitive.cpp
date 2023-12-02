@@ -3,22 +3,14 @@
 #include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 
-MovePrimitive::MovePrimitive(const World &world,
-                             const shared_ptr<Tactic> &tactic,
-                             const Robot &robot,
-//                             const TbotsProto::RobotNavigationObstacleConfig &config,
-                             const Point &destination,
-                             const Angle &final_angle,
+MovePrimitive::MovePrimitive(const Robot &robot, const Point &destination, const Angle &final_angle,
                              const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
                              const TbotsProto::DribblerMode &dribbler_mode,
                              const TbotsProto::BallCollisionType &ball_collision_type,
-                             const AutoChipOrKick &auto_chip_or_kick,
-                             std::optional<double> cost_override) :
-        world(world), tactic(tactic),
+                             const AutoChipOrKick &auto_chip_or_kick, std::optional<double> cost_override) :
         robot(robot), destination(destination), final_angle(final_angle), dribbler_mode(dribbler_mode),
         auto_chip_or_kick(auto_chip_or_kick), ball_collision_type(ball_collision_type),
-        max_allowed_speed_mode(max_allowed_speed_mode),
-        obstacle_factory(config)
+        max_allowed_speed_mode(max_allowed_speed_mode)
 {
     if (cost_override.has_value())
     {
@@ -48,7 +40,7 @@ MovePrimitive::MovePrimitive(const World &world,
     }
 }
 
-std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
+std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMessage(
         const World &world,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const RobotNavigationObstacleFactory &obstacle_factory
@@ -58,8 +50,7 @@ std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
 
     // Generate obstacle avoiding trajectory
     std::vector<ObstaclePtr> obstacles = generateObstacles(
-            world, motion_constraints, obstacle_factory
-    );
+            world, motion_constraints, obstacle_factory);
 
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             max_allowed_speed_mode, robot.robotConstants());
@@ -149,4 +140,7 @@ std::vector<ObstaclePtr> MovePrimitive::generateObstacles(
         obstacles.push_back(
                 obstacle_factory.createFromBallPosition(world.ball().position()));
     }
+
+    return obstacles;
 }
+
