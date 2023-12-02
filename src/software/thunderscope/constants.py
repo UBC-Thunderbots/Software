@@ -84,7 +84,7 @@ GAME_CONTROLLER_URL = "http://localhost:8081"
 
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {
-    ErrorCode.LOW_CAP: "Low Cap",
+    ErrorCode.HIGH_CAP: "High Cap",
     ErrorCode.LOW_BATTERY: "Low Battery",
     ErrorCode.HIGH_BOARD_TEMP: "High Board Temp",
     ErrorCode.DRIBBLER_MOTOR_HOT: "Dribbler Motor Hot",

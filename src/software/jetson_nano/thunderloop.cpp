@@ -421,9 +421,9 @@ void Thunderloop::sendErrorCodes()
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
         sent_errors[0] = true;
     }
-    if (power_status_.capacitor_voltage() < MIN_CAPACITOR_VOLTAGE && !sent_errors[1])
+    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE && !sent_errors[1])
     {
-        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_CAP);
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
         sent_errors[1] = true;
     }
     if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP && !sent_errors[2])
