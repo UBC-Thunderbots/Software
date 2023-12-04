@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/functional/hash/hash.hpp>
 #include <optional>
 
 #include "proto/team.pb.h"
@@ -217,16 +216,7 @@ class Robot
     {
         std::size_t operator()(const Robot& robot) const
         {
-            std::size_t seed = 0;
-
-            boost::hash_combine(seed, std::hash<double>{}(robot.position().x()));
-            boost::hash_combine(seed, std::hash<double>{}(robot.position().y()));
-            boost::hash_combine(seed, std::hash<double>{}(robot.velocity().x()));
-            boost::hash_combine(seed, std::hash<double>{}(robot.velocity().y()));
-            boost::hash_combine(seed, std::hash<double>{}(robot.orientation().toRadians()));
-            boost::hash_combine(seed, std::hash<RobotId>{}(robot.id_));
-
-            return seed;
+            return robot.id_;
         }
     };
 
