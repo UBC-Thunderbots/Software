@@ -212,6 +212,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "pose",
+    srcs = ["pose.cpp"],
+    hdrs = ["pose.h"],
+    deps = [
+        ":point",
+        ":angle",
+    ],
+)
+
 cc_test(
     name = "angle_test",
     srcs = [
@@ -416,12 +426,13 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "pose",
-    srcs = ["pose.cpp"],
-    hdrs = ["pose.h"],
+cc_test(
+    name = "pose_test",
+    srcs = ["pose_test.cpp"],
     deps = [
-        ":point",
         ":angle",
+        ":point",
+        ":pose",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
