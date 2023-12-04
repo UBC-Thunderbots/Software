@@ -35,6 +35,6 @@ public:
     void reset();
 
 private:
-    std::unordered_map<Robot, Pose, Robot::Hash> robot_to_best_dribble_location_;
-    std::unordered_map<Robot, Pass, Robot::Hash> robot_to_best_pass_;
+    std::unordered_map<RobotId, Pose> robot_to_best_dribble_location_;
+    std::unordered_map<RobotId, Pass> robot_to_best_pass_;
 };

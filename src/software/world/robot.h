@@ -209,17 +209,6 @@ class Robot
      */
     bool operator!=(const Robot &other) const;
 
-    /**
-     * Hash for the Robot using the robot position, orientation and velocity.
-     */
-    struct Hash
-    {
-        std::size_t operator()(const Robot& robot) const
-        {
-            return robot.id_;
-        }
-    };
-
     // A comparator for the Robot class that compares Robots by ID. This is equivalent
     // to the "less-than" operator.
     // This comparator is necessary for the Robot class to be used as a key in maps. See
