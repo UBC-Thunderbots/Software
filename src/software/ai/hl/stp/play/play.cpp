@@ -149,7 +149,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         num_tactics -= num_injured;
 
         // substitution tactic is just a move tactic to a decided location
-        std::shared_ptr<MoveTactic> auto_sub_tactic;
+        std::shared_ptr<MoveTactic> auto_sub_tactic = std::make_shared<MoveTactic>();
 
         // move to middle of court and to positive y boundary and stop
         auto_sub_tactic->updateControlParams(

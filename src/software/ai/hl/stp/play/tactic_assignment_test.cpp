@@ -706,6 +706,7 @@ TEST_F(TacticAssignmentTest, test_offense_play_with_substitution)
                   Timestamp::fromSeconds(0));
     Robot robot_2(2, Point(0, 5.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
+
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
     std::vector<Robot> injured_robots;
     injured_robots.push_back(robot_1);
@@ -718,6 +719,7 @@ TEST_F(TacticAssignmentTest, test_offense_play_with_substitution)
     GlobalPathPlannerFactory path_planner_factory(robot_navigation_obstacle_config, world.field());
     InterPlayCommunication comm;
     auto p_set = play.get(path_planner_factory, world, comm, [this](InterPlayCommunication comm) {});
+
     auto injured_primitive = p_set->robot_primitives().at(1);
     Point expected_pos(0, world.field().totalYLength()/2);
     Point injured_robot_pos = createPoint(injured_primitive.move().motion_control().requested_destination());

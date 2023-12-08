@@ -76,7 +76,7 @@ void Team::updateState(const Team& new_team_data)
 {
     updateRobots(new_team_data.getAllRobots());
     this->goalie_id = new_team_data.goalie_id;
-
+    this->injured_robots = new_team_data.getInjuredRobots();
     updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
