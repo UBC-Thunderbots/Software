@@ -3,14 +3,13 @@
 #include <munkres/munkres.h>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 
-Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
-    : ai_config(ai_config),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
-      stop_tactics(),
+Play::Play(bool requires_goalie)
+    : stop_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
       world_(std::nullopt)
@@ -19,6 +18,12 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
     {
         stop_tactics.push_back(std::make_shared<StopTactic>());
     }
+}
+
+void Play::reset(const TbotsProto::AiConfig& ai_config)
+{
+    this->ai_config = ai_config;
+    goalie_tactic(std::make_shared<GoalieTactic>(ai_config);
 }
 
 PriorityTacticVector Play::getTactics(const World &world)

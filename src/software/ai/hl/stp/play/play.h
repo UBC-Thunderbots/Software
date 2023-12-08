@@ -39,7 +39,9 @@ class Play
      * @param ai_config The AI configuration
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
+    explicit Play(bool requires_goalie);
+
+    void reset(const TbotsProto::AiConfig& ai_config);
 
     /**
      * Gets Primitives from the Play given the path planner factory, the world, and
@@ -92,6 +94,8 @@ class Play
      * updating the tactics
      */
     virtual void updateTactics(const PlayUpdate& play_update);
+
+    inline virtual void initialize() {};
 
     /**
      * Gets Primitives from a Tactic given the path planner factory, the world, and the
