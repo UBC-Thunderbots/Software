@@ -1,6 +1,6 @@
 #include "software/ai/threaded_ai.h"
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"

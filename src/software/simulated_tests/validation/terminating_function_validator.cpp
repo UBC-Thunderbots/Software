@@ -1,6 +1,6 @@
 #include "software/simulated_tests/validation/terminating_function_validator.h"
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 TerminatingFunctionValidator::TerminatingFunctionValidator(
     ValidationFunction validation_function,

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/coroutine2/all.hpp>
 #include <vector>
 

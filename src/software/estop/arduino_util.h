@@ -1,7 +1,8 @@
 #pragma once
-#include <boost/filesystem.hpp>
 #include <optional>
 #include <string>
+#include <filesystem>
+#include <vector>
 
 class ArduinoUtil
 {
@@ -40,5 +41,5 @@ class ArduinoUtil
      * @param path path to the file
      * @return the first line in the file
      */
-    static std::optional<std::string> readFileLine(boost::filesystem::path path);
+    static std::optional<std::string> readFileLine(std::filesystem::path path);
 };

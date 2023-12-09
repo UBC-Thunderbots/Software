@@ -12,10 +12,10 @@ NetworkService::NetworkService(const std::string& ip_address,
     listener_primitive_set =
         std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(
             ip_address, primitive_listener_port,
-            boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast);
+            boost::bind(&NetworkService::primitiveSetCallback, this, std::placeholders::_1), multicast);
     listener_world = std::make_unique<ThreadedProtoUdpListener<TbotsProto::World>>(
         ip_address, world_listener_port,
-        boost::bind(&NetworkService::worldCallback, this, _1), multicast);
+        boost::bind(&NetworkService::worldCallback, this, std::placeholders::_1), multicast);
 }
 
 std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> NetworkService::poll(

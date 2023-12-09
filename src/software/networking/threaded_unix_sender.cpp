@@ -1,7 +1,7 @@
 #include "software/networking/threaded_unix_sender.h"
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <string>
 
 ThreadedUnixSender::ThreadedUnixSender(const std::string& unix_socket_path)

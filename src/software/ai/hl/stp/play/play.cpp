@@ -12,7 +12,7 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
       stop_tactics(),
       requires_goalie(requires_goalie),
-      tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
+      tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1)),
       world_(std::nullopt)
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
@@ -38,7 +38,7 @@ PriorityTacticVector Play::getTactics(const World &world)
     {
         // Make a new tactic_sequence
         tactic_sequence = TacticCoroutine::pull_type(
-            boost::bind(&Play::getNextTacticsWrapper, this, _1));
+            boost::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1));
         // Run the coroutine. This will call the bound getNextTactics function
         tactic_sequence();
     }
@@ -57,7 +57,7 @@ PriorityTacticVector Play::getTactics(const World &world)
     {
         // Make a new tactic_sequence
         tactic_sequence = TacticCoroutine::pull_type(
-            boost::bind(&Play::getNextTacticsWrapper, this, _1));
+            boost::bind(&Play::getNextTacticsWrapper, this, std::placeholders::_1));
         // Run the coroutine. This will call the bound getNextTactics function
         tactic_sequence();
         if (tactic_sequence)

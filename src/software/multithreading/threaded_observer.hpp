@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <thread>
 
 #include "software/multithreading/observer.hpp"

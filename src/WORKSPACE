@@ -97,11 +97,19 @@ load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
 
-git_repository(
+#git_repository(
+#    name = "com_github_nelhage_rules_boost",
+#    commit = "7332c6cf2afb2642f53bc23f9b4d9c1817318685",
+#    remote = "https://github.com/nelhage/rules_boost",
+#    shallow_since = "1606097530 -0500",
+#)
+
+http_archive(
     name = "com_github_nelhage_rules_boost",
-    commit = "7332c6cf2afb2642f53bc23f9b4d9c1817318685",
-    remote = "https://github.com/nelhage/rules_boost",
-    shallow_since = "1606097530 -0500",
+    url = "https://github.com/nelhage/rules_boost/archive/d76039fef74781301e94ea419c62e1dd51808483.tar.gz",
+    strip_prefix = "rules_boost-d76039fef74781301e94ea419c62e1dd51808483",
+    # When you first run this tool, it'll recommend a sha256 hash to put here with a message like: "DEBUG: Rule 'com_github_nelhage_rules_boost' indicated that a canonical reproducible form can be obtained by modifying arguments sha256 = ..."
+    sha256 = "7da6c741d8eb32dd489b32262a87333da627dace6788cb976840fdb83e97f9c1",
 )
 
 git_repository(

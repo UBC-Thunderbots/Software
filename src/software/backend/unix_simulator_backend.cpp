@@ -15,24 +15,24 @@ UnixSimulatorBackend::UnixSimulatorBackend(std::string runtime_dir)
     // Protobuf Inputs
     robot_status_input.reset(new ThreadedProtoUnixListener<TbotsProto::RobotStatus>(
         runtime_dir + ROBOT_STATUS_PATH,
-        boost::bind(&Backend::receiveRobotStatus, this, _1)));
+        boost::bind(&Backend::receiveRobotStatus, this, std::placeholders::_1)));
 
     ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
         runtime_dir + SSL_WRAPPER_PATH,
-        boost::bind(&Backend::receiveSSLWrapperPacket, this, _1)));
+        boost::bind(&Backend::receiveSSLWrapperPacket, this, std::placeholders::_1)));
 
     ssl_referee_input.reset(new ThreadedProtoUnixListener<SSLProto::Referee>(
         runtime_dir + SSL_REFEREE_PATH,
-        boost::bind(&Backend::receiveSSLReferee, this, _1)));
+        boost::bind(&Backend::receiveSSLReferee, this, std::placeholders::_1)));
 
     sensor_proto_input.reset(new ThreadedProtoUnixListener<SensorProto>(
         runtime_dir + SENSOR_PROTO_PATH,
-        boost::bind(&Backend::receiveSensorProto, this, _1)));
+        boost::bind(&Backend::receiveSensorProto, this, std::placeholders::_1)));
 
     dynamic_parameter_update_request_listener.reset(
         new ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>(
             runtime_dir + DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
-            boost::bind(&UnixSimulatorBackend::receiveThunderbotsConfig, this, _1)));
+            boost::bind(&UnixSimulatorBackend::receiveThunderbotsConfig, this, std::placeholders::_1)));
 
     // Protobuf Outputs
     world_output.reset(

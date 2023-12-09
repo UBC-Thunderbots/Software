@@ -4,9 +4,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <filesystem>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <iostream>
+#include <fstream>
 
 #include "shared/constants.h"
 
@@ -40,23 +42,23 @@ std::optional<ArduinoUtil::HwInfo> ArduinoUtil::getInfo(std::string port)
     std::string device_path_string =
         (boost::format("/sys/class/tty/%1%/device") % port).str();
 
-    if (!boost::filesystem::is_directory(device_path_string))
+    if (!std::filesystem::is_directory(device_path_string))
     {
         return std::nullopt;
     }
 
-    boost::filesystem::path device_path = realpath(device_path_string.c_str(), NULL);
-    boost::filesystem::path subsystem;
-    boost::filesystem::path usb_interface_path;
-    boost::filesystem::path usb_device_path;
+    std::filesystem::path device_path = realpath(device_path_string.c_str(), NULL);
+    std::filesystem::path subsystem;
+    std::filesystem::path usb_interface_path;
+    std::filesystem::path usb_device_path;
 
-    if (!boost::filesystem::is_directory(device_path / "subsystem"))
+    if (!std::filesystem::is_directory(device_path / "subsystem"))
     {
         return std::nullopt;
     }
 
-    subsystem =
-        boost::filesystem::basename(realpath((device_path / "subsystem").c_str(), NULL));
+    std::filesystem::path system = realpath((device_path / "subsystem").c_str(), NULL);
+    subsystem = system.stem();
 
     if (subsystem == "usb-serial")
     {
@@ -89,11 +91,11 @@ std::optional<ArduinoUtil::HwInfo> ArduinoUtil::getInfo(std::string port)
 
 std::vector<std::string> ArduinoUtil::getSerialDevices()
 {
-    boost::filesystem::path dev("/dev");
-    boost::filesystem::directory_iterator end_itr;
+    std::filesystem::path dev("/dev");
+    std::filesystem::directory_iterator end_itr;
     std::vector<std::string> devices;
 
-    for (boost::filesystem::directory_iterator itr(dev); itr != end_itr; ++itr)
+    for (std::filesystem::directory_iterator itr(dev); itr != end_itr; ++itr)
     {
         std::string filename = itr->path().stem().string();
         if (filename.find("ttyUSB") != std::string::npos ||
@@ -107,9 +109,9 @@ std::vector<std::string> ArduinoUtil::getSerialDevices()
     return devices;
 }
 
-std::optional<std::string> ArduinoUtil::readFileLine(boost::filesystem::path path)
+std::optional<std::string> ArduinoUtil::readFileLine(std::filesystem::path path)
 {
-    boost::filesystem::ifstream f(path.c_str());
+    std::ifstream f(path.c_str());
     std::string res;
     if (f.is_open())
     {

@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 NonTerminatingFunctionValidator::NonTerminatingFunctionValidator(
     ValidationFunction validation_function, std::shared_ptr<World> world)
