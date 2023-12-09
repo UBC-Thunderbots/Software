@@ -5,7 +5,7 @@
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 
 Point endInObstacleSample(const std::vector<ObstaclePtr> obstacles,
-                          const Point& destination,
+                          const Point& point,
                           const Rectangle& navigable_area,
                           double multiplier = 1.5,
                           double range = 2.0);

@@ -4,48 +4,62 @@
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 
 
-Point endInObstacleSample(const std::vector<ObstaclePtr> obstacles, const Point &destination, const Rectangle &navigable_area, double multiplier, double range)
+Point endInObstacleSample(const std::vector<ObstaclePtr> obstacles, const Point &point, const Rectangle &navigable_area, double multiplier, double range)
 {
+    bool point_in_obstacle = false;
     for (auto const &obstacle : obstacles) {
-        if (obstacle->contains(destination)) {
-            goto get_nearest;
-        }
-    }
-    return destination;
+        if (obstacle->contains(point) || !contains(navigable_area, point)) {
+            if (!point_in_obstacle) {
+                point_in_obstacle = true;
+            }
 
-get_nearest:
-    for (auto const &obstacle : obstacles) {
-        if (obstacle->contains(destination)) {
-
-            Point closest_point = obstacle->closestPoint(destination);
+            Point closest_point = obstacle->closestPoint(point);
+            bool closest_point_in_obstacle = false;
             for (auto const &obstacle : obstacles) {
                 if (obstacle->contains(closest_point)) {
-                    goto do_sampling;
+                    closest_point_in_obstacle = true;
+                    break;
+                }
+                if (!contains(navigable_area, closest_point)) {
+                    closest_point_in_obstacle = true;
+                    break;
                 }
             }
-            return closest_point;
+
+            if (closest_point_in_obstacle) {
+                break;
+            } else {
+                return closest_point;
+            }
         }
     }
 
-do_sampling:
+    if (!point_in_obstacle) {
+        return point;
+    }
+
+    // sample if original point or closest point outside initial obstacle checked aren't valid
     double rad = 0.15;
     int steps_per_rad = 6;
     while (rad <= range) {
         double increment = 360.0 / steps_per_rad;
         for (int i = 0; i < steps_per_rad; i++) {
-            Angle angle = Angle::fromDegrees(float(i) * increment);
+            Angle angle = Angle::fromDegrees(static_cast<float>(i) * increment);
             Vector direction = Vector::createFromAngle(angle);
-            Point sample_point = destination + direction * rad;
+            Point sample_point = point + direction * rad;
+            bool sample_point_in_obstacle = false;
             for (auto const &obstacle : obstacles) {
-                if (obstacle->contains(sample_point)) {
-                    goto point_invalid;
+                if (obstacle->contains(sample_point) || !contains(navigable_area, sample_point)) {
+                    sample_point_in_obstacle = true;
+                    break;
                 }
             }
-            return sample_point;
-point_invalid:;
+            if (!sample_point_in_obstacle) {
+                return sample_point;
+            }
         }
-        steps_per_rad = int(steps_per_rad * multiplier);
+        steps_per_rad = static_cast<int>(steps_per_rad * multiplier);
         rad *= multiplier;
     }
-    return destination;
+    return point;
 }

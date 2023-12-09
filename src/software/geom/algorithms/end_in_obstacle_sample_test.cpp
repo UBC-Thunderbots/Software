@@ -8,7 +8,7 @@
 class TestEndInObstacleSampler : public testing::Test {
 public:
     TestEndInObstacleSampler()
-    : world(TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_A)),
+    : world(TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B)),
       obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()) {};
 protected:
     World world;
@@ -43,7 +43,7 @@ TEST_F(TestEndInObstacleSampler, test_end_in_defense_area)
     std::vector<ObstaclePtr> friendly_defense_area = obstacle_factory.createStaticObstaclesFromMotionConstraint(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, field);
     obstacles.insert(obstacles.end(), friendly_defense_area.begin(), friendly_defense_area.end());
 
-    Point destination(4, 0.5);
+    Point destination(-4, 0.5);
     Point end_point = endInObstacleSample(obstacles, destination, navigable_area);
     LOG(WARNING) << "test_end_in_defense_area " << end_point.x() << " " << end_point.y();
 
