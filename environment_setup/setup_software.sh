@@ -58,6 +58,7 @@ host_software_packages=(
     libprotobuf-dev
     libudev-dev
     libusb-1.0-0-dev
+    libxcb-cursor0 # This is used as the Linux platform abstraction by Qt 
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
@@ -95,6 +96,9 @@ fi
 
 if [[ $(lsb_release -rs) == "22.04" ]]; then
     host_software_packages+=(qtbase5-dev)
+
+    wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/85-brltty.rules
+    sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
