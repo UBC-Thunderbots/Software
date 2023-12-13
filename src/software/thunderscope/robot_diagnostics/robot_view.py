@@ -10,6 +10,7 @@ from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from typing import Type
 
+
 class RobotViewComponent(QWidget):
     """Class to show a snapshot of the robot's current state,
     along with an expandable view of the full robot state
