@@ -2,7 +2,7 @@ import sys
 
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.friendly_team_scored import *
 from software.simulated_tests.ball_enters_region import *
@@ -15,28 +15,28 @@ from proto.ssl_gc_common_pb2 import Team
 def test_offense_play(simulated_test_runner):
 
     # starting point must be Point
-    ball_initial_pos = tbots.Point(-4.4, 2.9)
+    ball_initial_pos = tbots_cpp.Point(-4.4, 2.9)
     # placement point must be Vector2 to work with game controller
     tbots.Point(-3, -2)
     field = tbots.Field.createSSLDivisionBField()
 
     # Setup Bots
     blue_bots = [
-        tbots.Point(-4.5, 3.0),
-        tbots.Point(-2, 1.5),
-        tbots.Point(-2, 0.5),
-        tbots.Point(-2, -1.7),
-        tbots.Point(-2, -1.5),
-        tbots.Point(-2, -0.5),
+        tbots_cpp.Point(-4.5, 3.0),
+        tbots_cpp.Point(-2, 1.5),
+        tbots_cpp.Point(-2, 0.5),
+        tbots_cpp.Point(-2, -1.7),
+        tbots_cpp.Point(-2, -1.5),
+        tbots_cpp.Point(-2, -0.5),
     ]
 
     yellow_bots = [
-        tbots.Point(1, 0),
-        tbots.Point(1, 2.5),
-        tbots.Point(1, -2.5),
-        tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+        tbots_cpp.Point(1, 0),
+        tbots_cpp.Point(1, 2.5),
+        tbots_cpp.Point(1, -2.5),
+        tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+        tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
+        tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
     ]
 
     # Game Controller Setup
@@ -64,7 +64,7 @@ def test_offense_play(simulated_test_runner):
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
             ball_location=ball_initial_pos,
-            ball_velocity=tbots.Vector(0, 0),
+            ball_velocity=tbots_cpp.Vector(0, 0),
         ),
     )
 

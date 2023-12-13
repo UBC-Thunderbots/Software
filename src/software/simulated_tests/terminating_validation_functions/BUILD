@@ -12,7 +12,6 @@ cc_library(
         "robot_in_polygon_validation.cpp",
         "robot_received_ball_validation.cpp",
         "robot_state_validation.cpp",
-        "robot_stationary_in_polygon_validation.cpp",
     ],
     hdrs = [
         "ball_at_point_validation.h",
@@ -23,7 +22,6 @@ cc_library(
         "robot_in_polygon_validation.h",
         "robot_received_ball_validation.h",
         "robot_state_validation.h",
-        "robot_stationary_in_polygon_validation.h",
     ],
     deps = [
         "//software/geom/algorithms",
