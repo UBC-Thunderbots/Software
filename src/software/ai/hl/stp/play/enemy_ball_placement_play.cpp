@@ -8,8 +8,8 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyBallPlacementPlay::EnemyBallPlacementPlay(TbotsProto::AiConfig config)
-    : Play(config, true)
+EnemyBallPlacementPlay::EnemyBallPlacementPlay()
+    : Play(true)
 {
 }
 

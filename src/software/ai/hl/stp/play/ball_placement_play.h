@@ -10,7 +10,7 @@
 class BallPlacementPlay : public Play
 {
    public:
-    BallPlacementPlay(TbotsProto::AiConfig config);
+    BallPlacementPlay();
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

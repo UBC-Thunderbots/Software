@@ -9,7 +9,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyFreekickPlay::EnemyFreekickPlay(TbotsProto::AiConfig config) : Play(config, true) {}
+EnemyFreekickPlay::EnemyFreekickPlay() : Play(true) {}
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)

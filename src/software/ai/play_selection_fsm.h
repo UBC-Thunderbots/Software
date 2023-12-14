@@ -120,4 +120,16 @@ struct PlaySelectionFSM
    private:
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<Play> current_play;
+
+    std::shared_ptr<BallPlacementPlay> ball_placement_play;
+    std::shared_ptr<EnemyBallPlacementPlay> enemy_ball_placement_play;
+    std::shared_ptr<EnemyFreekickPlay> enemy_free_kick_play;
+    std::shared_ptr<FreeKickPlay> free_kick_play;
+    std::shared_ptr<HaltPlay> halt_play;
+    std::shared_ptr<KickoffEnemyPlay> kickoff_enemy_play;
+    std::shared_ptr<KickoffFriendlyPlay> kickoff_friendly_play;
+    std::shared_ptr<OffensePlay> offense_play;
+    std::shared_ptr<PenaltyKickEnemyPlay> penalty_kick_enemy_play;
+    std::shared_ptr<PenaltyKickPlay> penalty_kick_play;
+    std::shared_ptr<StopPlay> stop_play;
 };

@@ -9,7 +9,7 @@
 class EnemyFreekickPlay : public Play
 {
    public:
-    EnemyFreekickPlay(TbotsProto::AiConfig config);
+    EnemyFreekickPlay();
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

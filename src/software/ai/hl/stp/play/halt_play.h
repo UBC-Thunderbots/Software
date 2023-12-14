@@ -10,7 +10,7 @@
 class HaltPlay : public Play
 {
    public:
-    HaltPlay(TbotsProto::AiConfig config);
+    HaltPlay();
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

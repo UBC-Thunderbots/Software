@@ -23,7 +23,12 @@ Play::Play(bool requires_goalie)
 void Play::reset(const TbotsProto::AiConfig& ai_config)
 {
     this->ai_config = ai_config;
-    goalie_tactic(std::make_shared<GoalieTactic>(ai_config);
+    goalie_tactic(std::make_shared<GoalieTactic>(ai_config));
+
+    // Make a new tactic_sequence
+    tactic_sequence = TacticCoroutine::pull_type(
+        boost::bind(&Play::getNextTacticsWrapper, this, _1));
+
 }
 
 PriorityTacticVector Play::getTactics(const World &world)

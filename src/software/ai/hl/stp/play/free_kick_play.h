@@ -12,7 +12,7 @@
 class FreeKickPlay : public Play
 {
    public:
-    FreeKickPlay(TbotsProto::AiConfig config);
+    FreeKickPlay();
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

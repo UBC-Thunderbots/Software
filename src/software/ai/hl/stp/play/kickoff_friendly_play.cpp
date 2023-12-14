@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffFriendlyPlay::KickoffFriendlyPlay(TbotsProto::AiConfig config) : Play(config, true)
+KickoffFriendlyPlay::KickoffFriendlyPlay() : Play(true)
 {
 }
 

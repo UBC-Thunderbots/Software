@@ -9,7 +9,7 @@
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffEnemyPlay::KickoffEnemyPlay(TbotsProto::AiConfig config) : Play(config, true) {}
+KickoffEnemyPlay::KickoffEnemyPlay() : Play(true) {}
 
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                       const World &world)

@@ -10,7 +10,7 @@
 class EnemyBallPlacementPlay : public Play
 {
    public:
-    EnemyBallPlacementPlay(TbotsProto::AiConfig config);
+    EnemyBallPlacementPlay();
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

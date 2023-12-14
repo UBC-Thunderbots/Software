@@ -15,7 +15,14 @@
 
 
 PlaySelectionFSM::PlaySelectionFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config), current_play(std::make_unique<HaltPlay>(ai_config))
+    : ai_config(ai_config),
+      ball_placement_play(std::make_shared<BallPlacementPlay>()),
+      enemy_ball_placement_play(std::make_shared<EnemyBallPlacementPlay>()),
+      enemy_free_kick_play(std::make_shared<EnemyFreeKickPlay>()),
+      free_kick_play(std::make_shared<FreeKickPlay>()),
+      halt_play(std::make_shared<HaltPlay>()),
+      kickoff_enemy_play(std::make_shared<KickoffEnemyPlay>()),
+      kickoff_friendly_play(std::make_shared<KickoffFriendlyPlay>())
 {
 }
 
@@ -44,7 +51,7 @@ void PlaySelectionFSM::setupSetPlay(const Update& event)
     current_play.reset();
     if (event.game_state.isOurBallPlacement())
     {
-        event.set_current_play(std::make_unique<BallPlacementPlay>(ai_config));
+        event.set_current_play(std::move(ball_placement_play));
     }
 
     if (event.game_state.isTheirBallPlacement())

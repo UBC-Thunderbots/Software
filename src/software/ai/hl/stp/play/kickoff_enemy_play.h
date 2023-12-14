@@ -12,7 +12,7 @@
 class KickoffEnemyPlay : public Play
 {
    public:
-    KickoffEnemyPlay(TbotsProto::AiConfig config);
+    KickoffEnemyPlay();
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

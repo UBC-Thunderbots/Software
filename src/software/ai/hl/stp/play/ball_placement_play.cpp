@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-BallPlacementPlay::BallPlacementPlay(TbotsProto::AiConfig config) : Play(config, true) {}
+BallPlacementPlay::BallPlacementPlay() : Play(true) {}
 
 void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
