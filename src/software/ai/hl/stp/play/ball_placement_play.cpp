@@ -11,7 +11,7 @@ BallPlacementPlay::BallPlacementPlay() : Play(true) {}
 void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
-    auto place_ball_tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto place_ball_tactic = std::make_shared<DribbleTactic>(ai_config.value());
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
@@ -46,5 +46,5 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, BallPlacementPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, BallPlacementPlay>
     factory;

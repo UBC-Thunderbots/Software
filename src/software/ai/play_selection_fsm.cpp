@@ -22,7 +22,11 @@ PlaySelectionFSM::PlaySelectionFSM(TbotsProto::AiConfig ai_config)
       free_kick_play(std::make_shared<FreeKickPlay>()),
       halt_play(std::make_shared<HaltPlay>()),
       kickoff_enemy_play(std::make_shared<KickoffEnemyPlay>()),
-      kickoff_friendly_play(std::make_shared<KickoffFriendlyPlay>())
+      kickoff_friendly_play(std::make_shared<KickoffFriendlyPlay>()),
+      offense_play(std::make_shared<OffensePlay>()),
+      penalty_kick_enemy_play(std::make_shared<PenaltyKickEnemyPlay>()),
+      penalty_kick_play(std::make_shared<PenaltyKickPlay>()),
+      stop_play(std::make_shared<StopPlay>())
 {
 }
 

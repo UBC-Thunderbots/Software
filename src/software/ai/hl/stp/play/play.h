@@ -55,7 +55,7 @@ class Play
      *
      * @return the PrimitiveSet to execute
      */
-    virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
+    std::unique_ptr<TbotsProto::PrimitiveSet> get(
         const GlobalPathPlannerFactory& path_planner_factory, const World& world,
         const InterPlayCommunication& inter_play_communication,
         const SetInterPlayCommunicationCallback& set_inter_play_communication_fun);
@@ -79,7 +79,7 @@ class Play
 
    protected:
     // The Play configuration
-    TbotsProto::AiConfig ai_config;
+    std::optional<TbotsProto::AiConfig> ai_config;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;

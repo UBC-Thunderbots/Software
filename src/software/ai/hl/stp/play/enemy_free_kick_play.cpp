@@ -16,7 +16,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     // Init a Crease Defender Tactic
     auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.robot_navigation_obstacle_config());
+        ai_config.value().robot_navigation_obstacle_config());
 
     // These robots will both block the enemy robot taking a free kick
     std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_free_kicker = {
@@ -132,5 +132,5 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreekickPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, EnemyFreekickPlay>
     factory;

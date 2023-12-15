@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-StopPlay::StopPlay(TbotsProto::AiConfig config) : Play(config, true) {}
+StopPlay::StopPlay() : Play(true) {}
 
 void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
@@ -44,12 +44,12 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
         std::make_shared<MoveTactic>()};
 
-    goalie_tactic = std::make_shared<GoalieTactic>(ai_config, stop_mode);
+    goalie_tactic = std::make_shared<GoalieTactic>(ai_config.value(), stop_mode);
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            ai_config.value().robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            ai_config.value().robot_navigation_obstacle_config()),
     };
 
     do

@@ -4,8 +4,8 @@
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-OffensePlay::OffensePlay(TbotsProto::AiConfig config)
-    : Play(config, true), fsm{OffensePlayFSM{config}}, control_params{}
+OffensePlay::OffensePlay()
+    : Play(true), fsm{OffensePlayFSM{config}}, control_params{}
 {
 }
 

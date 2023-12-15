@@ -11,7 +11,7 @@
 class OffensePlay : public Play
 {
    public:
-    OffensePlay(TbotsProto::AiConfig config);
+    OffensePlay();
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
     void updateTactics(const PlayUpdate &play_update) override;

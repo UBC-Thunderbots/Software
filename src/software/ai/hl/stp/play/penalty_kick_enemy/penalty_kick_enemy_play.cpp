@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(TbotsProto::AiConfig config)
+PenaltyKickEnemyPlay::PenaltyKickEnemyPlay()
     : Play(config, true),
       fsm{PenaltyKickEnemyPlayFSM{config}},
       control_params{.goalie_tactic = goalie_tactic}

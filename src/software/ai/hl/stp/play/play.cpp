@@ -22,7 +22,7 @@ Play::Play(bool requires_goalie)
 
 void Play::reset(const TbotsProto::AiConfig& ai_config)
 {
-    this->ai_config = ai_config;
+    this->ai_config = std::make_optional(ai_config);
     goalie_tactic(std::make_shared<GoalieTactic>(ai_config));
 
     // Make a new tactic_sequence
@@ -93,6 +93,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     const InterPlayCommunication &inter_play_communication,
     const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
+    CHECK(ai_config != std::nullopt) << "AiConfig must be set before getting tactics from the Play!";
+
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =
         static_cast<unsigned int>(world.friendlyTeam().numRobots());

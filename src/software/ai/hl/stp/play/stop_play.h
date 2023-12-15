@@ -11,7 +11,7 @@
 class StopPlay : public Play
 {
    public:
-    StopPlay(TbotsProto::AiConfig config);
+    StopPlay();
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };
