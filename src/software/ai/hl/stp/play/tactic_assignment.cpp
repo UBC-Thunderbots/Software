@@ -1,11 +1,11 @@
 #include "software/ai/hl/stp/play/tactic_assignment.h"
+
 #include <munkres/munkres.h>
 
 std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
            std::map<std::shared_ptr<const Tactic>, RobotId>>
-           assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
-                    const World &world, TacticVector tactic_vector,
-                    const std::vector<Robot> robots_to_assign)
+assignTactics(const GlobalPathPlannerFactory &path_planner_factory, const World &world,
+              TacticVector tactic_vector, const std::vector<Robot> robots_to_assign)
 {
     std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
     size_t num_tactics     = tactic_vector.size();

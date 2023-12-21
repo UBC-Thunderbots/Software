@@ -92,7 +92,7 @@ class Play
      * updating the tactics
      */
     virtual void updateTactics(const PlayUpdate& play_update);
-    
+
    private:
     /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in

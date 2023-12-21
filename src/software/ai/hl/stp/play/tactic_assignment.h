@@ -1,9 +1,9 @@
-#include "software/world/world.h"
-#include "software/world/robot.h"
-#include "software/ai/navigator/path_planner/global_path_planner_factory.h"
 #include "proto/primitive.pb.h"
+#include "software/ai/navigator/path_planner/global_path_planner_factory.h"
+#include "software/world/robot.h"
+#include "software/world/world.h"
 
-using TacticVector              = std::vector<std::shared_ptr<Tactic>>;
+using TacticVector = std::vector<std::shared_ptr<Tactic>>;
 
 
 /**
@@ -19,9 +19,8 @@ using TacticVector              = std::vector<std::shared_ptr<Tactic>>;
  */
 std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
            std::map<std::shared_ptr<const Tactic>, RobotId>>
-           assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
-                    const World &world, TacticVector tactic_vector,
-                    const std::vector<Robot> robots_to_assign);
+assignTactics(const GlobalPathPlannerFactory &path_planner_factory, const World &world,
+              TacticVector tactic_vector, const std::vector<Robot> robots_to_assign);
 
 /**
  * Gets Primitives from a Tactic given the path planner factory, the world, and the

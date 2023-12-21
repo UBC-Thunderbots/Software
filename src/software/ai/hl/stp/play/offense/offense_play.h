@@ -15,7 +15,7 @@ class OffensePlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
     void updateTactics(const PlayUpdate &play_update) override;
-    std::vector<Robot> getInjuredRobots(const World& world) override;
+    std::vector<Robot> getInjuredRobots(const World &world) override;
 
    private:
     FSM<OffensePlayFSM> fsm;
