@@ -2,10 +2,13 @@ import time
 import shelve
 import logging
 import pathlib
+import os
 
 import pyqtgraph
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
+
+from typing import Callable
 
 from software.py_constants import *
 from software.thunderscope.constants import *
@@ -30,8 +33,11 @@ class Thunderscope(object):
     """
 
     def __init__(
-        self, config: TScopeConfig, layout_path=None, refresh_interval_ms=10,
-    ):
+        self,
+        config: TScopeConfig,
+        layout_path: os.PathLike = None,
+        refresh_interval_ms: int = THUNDERSCOPE_REFRESH_INTERVAL_MS,
+    ) -> None:
         """Initialize Thunderscope
 
         :param config: The current Thunderscope UI configuration
@@ -84,6 +90,12 @@ class Thunderscope(object):
         except Exception:
             pass
 
+        # Keyboard Estop shortcut
+        # only used when in keyboard estop mode
+        self.keyboard_estop_shortcut = QtGui.QShortcut(
+            QtGui.QKeySequence(" "), self.window
+        )
+
         # Save and Load Prompts
         #
         # NOTE: As long as Thunderscope has focus, the keyboard shortcuts will
@@ -108,7 +120,7 @@ class Thunderscope(object):
             lambda: QMessageBox.information(self.window, "Help", THUNDERSCOPE_HELP_TEXT)
         )
 
-    def reset_layout(self):
+    def reset_layout(self) -> None:
         """Reset the layout to the default layout"""
         saved_layout_path = pathlib.Path(LAST_OPENED_LAYOUT_PATH)
         saved_layout_path.unlink(missing_ok=True)
@@ -118,7 +130,7 @@ class Thunderscope(object):
             "Restart thunderscope to reset the layout.",
         )
 
-    def save_layout(self):
+    def save_layout(self) -> None:
         """Open a file dialog to save the layout and any other
         registered state to a file
 
@@ -131,7 +143,7 @@ class Thunderscope(object):
                 f"Could not create folder at '{SAVED_LAYOUT_PATH}' for layout files"
             )
 
-        filename, _ = QtGui.QFileDialog.getSaveFileName(
+        filename, _ = QFileDialog.getSaveFileName(
             self.window,
             "Save layout",
             f"{SAVED_LAYOUT_PATH}/dock_layout_{int(time.time())}.{LAYOUT_FILE_EXTENSION}",
@@ -150,7 +162,7 @@ class Thunderscope(object):
             for key, val in self.tab_dock_map.items():
                 shelf[key] = val.saveState()
 
-    def load_layout(self, filename=None):
+    def load_layout(self, filename: os.PathLike = None) -> None:
         """Open a file dialog to load the layout and state to all widgets
 
         :param filename: The filename to load the layout from. If None, then
@@ -159,7 +171,7 @@ class Thunderscope(object):
         """
 
         if filename is None:
-            filename, _ = QtGui.QFileDialog.getOpenFileName(
+            filename, _ = QFileDialog.getOpenFileName(
                 self.window,
                 "Open layout",
                 f"{SAVED_LAYOUT_PATH}/",
@@ -185,7 +197,7 @@ class Thunderscope(object):
                         default_shelf[key] = val
                     default_shelf.sync()
 
-    def register_refresh_function(self, refresh_func):
+    def register_refresh_function(self, refresh_func: Callable[[], None]) -> None:
         """Register the refresh functions to run at the refresh_interval_ms
         passed into thunderscope.
 
@@ -199,18 +211,18 @@ class Thunderscope(object):
 
         self.refresh_timers.append(refresh_timer)
 
-    def show(self):
+    def show(self) -> None:
         """Show the main window"""
 
         self.window.show()
         self.window.showMaximized()
         pyqtgraph.exec()
 
-    def is_open(self):
+    def is_open(self) -> bool:
         """Returns true if the window is open"""
         return self.window.isVisible()
 
-    def close(self):
+    def close(self) -> None:
         """Close the main window"""
 
         QtCore.QTimer.singleShot(0, self.window.close)
