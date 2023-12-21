@@ -3,12 +3,12 @@
 #include <munkres/munkres.h>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/hl/stp/play/tactic_assignment.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
-#include "software/logger/logger.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/angle.h"
-#include "software/ai/hl/stp/play/tactic_assignment.h"
+#include "software/logger/logger.h"
 
 Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
     : ai_config(ai_config),
@@ -144,32 +144,31 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     }
 
     /* substitute injured robots when the game is in play */
-    if(injured_robots.size() > 0){
-        unsigned int num_injured = (unsigned int) injured_robots.size();
+    if (injured_robots.size() > 0)
+    {
+        unsigned int num_injured = (unsigned int)injured_robots.size();
         num_tactics -= num_injured;
 
         // substitution tactic is just a move tactic to a decided location
         std::shared_ptr<MoveTactic> auto_sub_tactic = std::make_shared<MoveTactic>();
 
         // move to middle of court and to positive y boundary and stop
-        auto_sub_tactic->updateControlParams(
-            Point(0, world.field().totalYLength()/2), Angle::zero(), 0
-        );
+        auto_sub_tactic->updateControlParams(Point(0, world.field().totalYLength() / 2),
+                                             Angle::zero(), 0);
 
-        for(auto robot: injured_robots){
-            
+        for (auto robot : injured_robots)
+        {
             // assign robot to auto_sub tactic
             tactic_robot_id_assignment.emplace(auto_sub_tactic, robot.id());
 
-            // remove substitution robot from robot list 
-            robots.erase(std::remove(robots.begin(), robots.end(), robot),
-                        robots.end());
+            // remove substitution robot from robot list
+            robots.erase(std::remove(robots.begin(), robots.end(), robot), robots.end());
 
             auto motion_constraints =
                 buildMotionConstraintSet(world.gameState(), *auto_sub_tactic);
             auto primitives = getPrimitivesFromTactic(path_planner_factory, world,
-                                                    auto_sub_tactic, motion_constraints)
-                                ->robot_primitives();
+                                                      auto_sub_tactic, motion_constraints)
+                                  ->robot_primitives();
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
             auto primitive = primitives.at(robot.id());
@@ -265,7 +264,8 @@ std::vector<std::string> Play::getState()
     return {objectTypeName(*this)};
 }
 
-std::vector<Robot> Play::getInjuredRobots(const World& world){
+std::vector<Robot> Play::getInjuredRobots(const World &world)
+{
     std::vector<Robot> injured_robots;
     return injured_robots;
 }

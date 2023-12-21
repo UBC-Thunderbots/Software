@@ -239,15 +239,15 @@ class Team
 
     /**
      * Set robots in the team to be injured
-     * 
+     *
      * @param robot_ids robot ids of injured robots
      */
 
     void setInjuredRobots(std::vector<Robot> robots);
 
-    /** 
+    /**
      * Returns a list of robot ids for robots that are injured
-     * 
+     *
      * @return a list of injured robots
      */
     std::vector<Robot> getInjuredRobots() const;

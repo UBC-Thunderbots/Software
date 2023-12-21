@@ -24,7 +24,7 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
     fsm.process_event(OffensePlayFSM::Update(control_params, play_update));
 }
 
-std::vector<Robot> OffensePlay::getInjuredRobots(const World& world)
+std::vector<Robot> OffensePlay::getInjuredRobots(const World &world)
 {
     return world.friendlyTeam().getInjuredRobots();
 }
