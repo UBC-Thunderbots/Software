@@ -281,7 +281,7 @@ class Team
     // being removed from this team.
     Duration robot_expiry_buffer_duration_;
 
-    Timestamp last_update_timestamp;
+    Timestamp last_update_timestamp_;
 
     // the robots in the team that are injured
     std::vector<Robot> injured_robots;

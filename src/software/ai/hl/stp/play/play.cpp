@@ -144,7 +144,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     }
 
     /* substitute injured robots when the game is in play */
-    if(injured_robots.size() > 0){
+    if(injured_robots.size() > 0)
+    {
         unsigned int num_injured = (unsigned int) injured_robots.size();
         num_tactics -= num_injured;
 
@@ -156,8 +157,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             Point(0, world.field().totalYLength()/2), Angle::zero(), 0
         );
 
-        for(auto robot: injured_robots){
-            
+        for(auto robot: injured_robots)
+        { 
             // assign robot to auto_sub tactic
             tactic_robot_id_assignment.emplace(auto_sub_tactic, robot.id());
 

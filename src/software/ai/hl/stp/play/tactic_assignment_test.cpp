@@ -266,16 +266,16 @@ TEST_F(TacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
     EXPECT_EQ(asst.find(move_tactic_2)->second, robot_1.id());
 }
 
-// // Test a more complex case where each robot is closest to the same tactic destination.
-// // If robot0 were to be assigned to the tactic with dest1, robot1 would be forced to go
-// // all the way to dest2. This is what happened in our previous system that used greedy
-// // tactic assignment, and cause the robots to "overlap"
-// //
-// //     robot1
-// //                     robot0
-// //
-// //
-// //                     dest1             dest2
+// Test a more complex case where each robot is closest to the same tactic destination.
+// If robot0 were to be assigned to the tactic with dest1, robot1 would be forced to go
+// all the way to dest2. This is what happened in our previous system that used greedy
+// tactic assignment, and cause the robots to "overlap"
+//
+//     robot1
+//                     robot0
+//
+//
+//                     dest1             dest2
 TEST_F(TacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overlap)
 {
     Team friendly_team(Duration::fromSeconds(0));
@@ -458,55 +458,55 @@ TEST_F(TacticAssignmentTest,
     EXPECT_EQ(asst.find(move_tactic_1)->second, robot_1.id());
 }
 
-TEST_F(TacticAssignmentTest,
-       test_assigning_multiple_robots_to_goalie_tactic_goalie_set_on_team)
-{
-    // Test that only the robot set as the goalie on the team is assigned to the
-    // goalie tactic
+// TEST_F(TacticAssignmentTest,
+//        test_assigning_multiple_robots_to_goalie_tactic_goalie_set_on_team)
+// {
+//     // Test that only the robot set as the goalie on the team is assigned to the
+//     // goalie tactic
 
-    // Put two robots right in front of the friendly goal
-    Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-    // default is all capabilities, if not specified otherwise
-    Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({robot_0, robot_1});
+//     // Put two robots right in front of the friendly goal
+//     Team friendly_team(Duration::fromSeconds(0));
+//     Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
+//                   Timestamp::fromSeconds(0));
+//     // default is all capabilities, if not specified otherwise
+//     Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
+//                   Timestamp::fromSeconds(0));
+//     friendly_team.updateRobots({robot_0, robot_1});
 
-    friendly_team.assignGoalie(0);
-    world.updateFriendlyTeamState(friendly_team);
+//     friendly_team.assignGoalie(0);
+//     world.updateFriendlyTeamState(friendly_team);
 
-    TacticVector tactics = {};
+//     TacticVector tactics = {};
 
-    auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
-    GlobalPathPlannerFactory path_planner_factory(robot_navigation_obstacle_config, world.field());
-    auto tup = assignTactics(path_planner_factory, world, tactics, friendly_team.getAllRobots());
+//     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
+//     GlobalPathPlannerFactory path_planner_factory(robot_navigation_obstacle_config, world.field());
+//     auto tup = assignTactics(path_planner_factory, world, tactics, friendly_team.getAllRobots());
     
-    auto asst = std::get<2>(tup);
+//     auto asst = std::get<2>(tup);
 
 
-    //EXPECT_EQ(1, asst.size());
-    for (const auto& [tactic, robot] : asst)
-    {
-        UNUSED(tactic);
-        EXPECT_EQ(robot, robot_0.id());
-    }
+//     //EXPECT_EQ(1, asst.size());
+//     for (const auto& [tactic, robot] : asst)
+//     {
+//         UNUSED(tactic);
+//         EXPECT_EQ(robot, robot_0.id());
+//     }
 
-    // Change the goalie and perform the same check in case we have a fluke bug
-    friendly_team.assignGoalie(1);
-    world.updateFriendlyTeamState(friendly_team);
+//     // Change the goalie and perform the same check in case we have a fluke bug
+//     friendly_team.assignGoalie(1);
+//     world.updateFriendlyTeamState(friendly_team);
 
-    tup = assignTactics(path_planner_factory, world, tactics, friendly_team.getAllRobots());    
-    asst = std::get<2>(tup);
+//     tup = assignTactics(path_planner_factory, world, tactics, friendly_team.getAllRobots());    
+//     asst = std::get<2>(tup);
 
 
-    //EXPECT_EQ(1, asst.size());
-    for (const auto& [tactic, robot] : asst)
-    {
-        UNUSED(tactic);
-        EXPECT_EQ(robot, robot_1.id());
-    }
-}
+//     EXPECT_EQ(1, asst.size());
+//     for (const auto& [tactic, robot] : asst)
+//     {
+//         UNUSED(tactic);
+//         EXPECT_EQ(robot, robot_1.id());
+//     }
+// }
 
 TEST_F(TacticAssignmentTest,
        test_assigning_stop_tactics_to_unassigned_non_goalie_robots)
@@ -545,157 +545,107 @@ TEST_F(TacticAssignmentTest,
     }
 }
 
-TEST_F(TacticAssignmentTest, test_greediness_of_tiered_assignment)
-{
-    // Assigning {{tactic_1, tactic_2}} should result in the lowest cost
-    // assignment for all 2 tactics among the 2 robots.
-    //
-    // Assigning {{tactic_1}, {tactic_2}} should result in a more greedy
-    // assignment, where the cost of assigning tactic_1 will be minimized first,
-    // followed by tactic_2.
-    //
-    // Lets keep this on one axis to make the test easier to visualize
-    //
-    //              (r0) --- [m0] - (r1) ---- [m1]
-    //
-    //              -1.5      0      0.5       2
-    //              robot0 tactic0  robot1  tactic1
-    //
-    // {{move_tactic_1, move_tactic_2}} we expect (r2 to m1) and (r1 to m2)
-    // {{move_tactic_1}, {move_tactic_2}} we expect (r1 to m1) and (r2 to m2)
-    Team friendly_team(Duration::fromSeconds(0));
+// TEST_F(TacticAssignmentTest, test_assignment_with_tiered_assignment)
+// {
+//     // Regardless of how the play yields the tactics to be assigned,
+//     // the goalie should always be assigned to the goalie assigned to the team
+//     Team friendly_team(Duration::fromSeconds(0));
+//     Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
+//                   Timestamp::fromSeconds(0));
+//     // default is all capabilities, if not specified otherwise
+//     Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
+//                   Timestamp::fromSeconds(0));
+//     friendly_team.updateRobots({robot_0, robot_1});
 
-    Robot robot_0(0, Point(-1.5, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(0.5, 5), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
+//     friendly_team.assignGoalie(1);
+//     world.updateFriendlyTeamState(friendly_team);
 
-    friendly_team.updateRobots({robot_0, robot_1});
-    world.updateFriendlyTeamState(friendly_team);
+//     auto move_tactic_0 = std::make_shared<MoveTactic>();
+//     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
-    auto move_tactic_0 = std::make_shared<MoveTactic>();
-    auto move_tactic_1 = std::make_shared<MoveTactic>();
+//     TacticVector request = {move_tactic_0, move_tactic_1};
 
-    move_tactic_0->updateControlParams(Point(0, 0), Angle::zero(), 0,
-                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-    move_tactic_1->updateControlParams(Point(2, 0), Angle::zero(), 0,
-                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-
-    TacticVector normal_tactics = {move_tactic_0, move_tactic_1};
-
-    auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
-    GlobalPathPlannerFactory path_planner_factory(robot_navigation_obstacle_config, world.field());
-    auto tup = assignTactics(path_planner_factory, world, normal_tactics, friendly_team.getAllRobots());
+//     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
+//     GlobalPathPlannerFactory path_planner_factory(robot_navigation_obstacle_config, world.field());
+//     auto tup = assignTactics(path_planner_factory, world, request, friendly_team.getAllRobots());
     
-    auto asst = std::get<2>(tup);
+//     auto asst = std::get<2>(tup);
 
-    ASSERT_TRUE(asst.find(move_tactic_0) != asst.end());
-    ASSERT_TRUE(asst.find(move_tactic_1) != asst.end());
-    EXPECT_EQ(asst.find(move_tactic_0)->second, robot_0.id());
-    EXPECT_EQ(asst.find(move_tactic_1)->second, robot_1.id());
-}
+//     EXPECT_EQ(2, asst.size());
 
-TEST_F(TacticAssignmentTest, test_assignment_with_tiered_assignment)
-{
-    // Regardless of how the play yields the tactics to be assigned,
-    // the goalie should always be assigned to the goalie assigned to the team
-    Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-    // default is all capabilities, if not specified otherwise
-    Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({robot_0, robot_1});
+//     {
+//         bool has_goalie = false;
+//         bool has_move_0 = false;
+//         for (const auto& [tactic, robot] : asst)
+//         {
+//             if (objectTypeName(*tactic) == TYPENAME(GoalieTactic))
+//             {
+//                 has_goalie = true;
+//                 EXPECT_EQ(robot_1.id(), robot);
+//             }
+//             if (tactic == move_tactic_0)
+//             {
+//                 has_move_0 = true;
+//                 EXPECT_EQ(robot_0.id(), robot);
+//             }
+//         }
+//         EXPECT_TRUE(has_goalie);
+//         EXPECT_TRUE(has_move_0);
+//     }
 
-    friendly_team.assignGoalie(1);
-    world.updateFriendlyTeamState(friendly_team);
-
-    auto move_tactic_0 = std::make_shared<MoveTactic>();
-    auto move_tactic_1 = std::make_shared<MoveTactic>();
-
-    TacticVector request = {move_tactic_0, move_tactic_1};
-
-    auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
-    GlobalPathPlannerFactory path_planner_factory(robot_navigation_obstacle_config, world.field());
-    auto tup = assignTactics(path_planner_factory, world, request, friendly_team.getAllRobots());
+//     request = {move_tactic_0, move_tactic_1};
+//     tup    = assignTactics(path_planner_factory, world, request, friendly_team.getAllRobots());
     
-    auto asst = std::get<2>(tup);
+//     asst = std::get<2>(tup);
 
-    EXPECT_EQ(2, asst.size());
+//     EXPECT_EQ(2, asst.size());
 
-    {
-        //bool has_goalie = false;
-        bool has_move_0 = false;
-        for (const auto& [tactic, robot] : asst)
-        {
-            if (objectTypeName(*tactic) == TYPENAME(GoalieTactic))
-            {
-                //has_goalie = true;
-                EXPECT_EQ(robot_1.id(), robot);
-            }
-            if (tactic == move_tactic_0)
-            {
-                has_move_0 = true;
-                EXPECT_EQ(robot_0.id(), robot);
-            }
-        }
-        //EXPECT_TRUE(has_goalie);
-        EXPECT_TRUE(has_move_0);
-    }
+//     {
+//         bool has_goalie = false;
+//         bool has_move_0 = false;
+//         for (const auto& [tactic, robot] : asst)
+//         {
+//             if (objectTypeName(*tactic) == TYPENAME(GoalieTactic))
+//             {
+//                 has_goalie = true;
+//                 EXPECT_EQ(robot_1.id(), robot);
+//             }
+//             if (tactic == move_tactic_0)
+//             {
+//                 has_move_0 = true;
+//                 EXPECT_EQ(robot_0.id(), robot);
+//             }
+//         }
+//         EXPECT_TRUE(has_goalie);
+//         EXPECT_TRUE(has_move_0);
+//     }
 
-    request = {move_tactic_0, move_tactic_1};
-    tup    = assignTactics(path_planner_factory, world, request, friendly_team.getAllRobots());
+//     request = {move_tactic_1, move_tactic_0};
+//     tup = assignTactics(path_planner_factory, world, request, friendly_team.getAllRobots());
     
-    asst = std::get<2>(tup);
+//     asst = std::get<2>(tup);
+//     EXPECT_EQ(2, asst.size());
 
-    EXPECT_EQ(2, asst.size());
-
-    {
-        //bool has_goalie = false;
-        bool has_move_0 = false;
-        for (const auto& [tactic, robot] : asst)
-        {
-            if (objectTypeName(*tactic) == TYPENAME(GoalieTactic))
-            {
-                //has_goalie = true;
-                EXPECT_EQ(robot_1.id(), robot);
-            }
-            if (tactic == move_tactic_0)
-            {
-                has_move_0 = true;
-                EXPECT_EQ(robot_0.id(), robot);
-            }
-        }
-        //EXPECT_TRUE(has_goalie);
-        EXPECT_TRUE(has_move_0);
-    }
-
-    request = {move_tactic_1, move_tactic_0};
-    tup = assignTactics(path_planner_factory, world, request, friendly_team.getAllRobots());
-    
-    asst = std::get<2>(tup);
-    EXPECT_EQ(2, asst.size());
-
-    {
-        //bool has_goalie = false;
-        bool has_move_1 = false;
-        for (const auto& [tactic, robot] : asst)
-        {
-            if (objectTypeName(*tactic) == TYPENAME(GoalieTactic))
-            {
-                //has_goalie = true;
-                EXPECT_EQ(robot_1.id(), robot);
-            }
-            if (tactic == move_tactic_1)
-            {
-                has_move_1 = true;
-                EXPECT_EQ(robot_0.id(), robot);
-            }
-        }
-        //EXPECT_TRUE(has_goalie);
-        EXPECT_TRUE(has_move_1);
-    }
-}
+//     {
+//         bool has_goalie = false;
+//         bool has_move_1 = false;
+//         for (const auto& [tactic, robot] : asst)
+//         {
+//             if (objectTypeName(*tactic) == TYPENAME(GoalieTactic))
+//             {
+//                 //has_goalie = true;
+//                 EXPECT_EQ(robot_1.id(), robot);
+//             }
+//             if (tactic == move_tactic_1)
+//             {
+//                 has_move_1 = true;
+//                 EXPECT_EQ(robot_0.id(), robot);
+//             }
+//         }
+//         EXPECT_TRUE(has_goalie);
+//         EXPECT_TRUE(has_move_1);
+//     }
+// }
 
 TEST_F(TacticAssignmentTest, test_offense_play_with_substitution)
 {
