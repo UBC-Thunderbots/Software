@@ -37,7 +37,7 @@ class NetworkService
      * @returns a tuple of the stored primitive_set and world
      */
     std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> poll(
-        const TbotsProto::RobotStatus& robot_status);
+        TbotsProto::RobotStatus& robot_status);
 
    private:
     /**

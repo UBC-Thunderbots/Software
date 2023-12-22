@@ -2,7 +2,7 @@ from pyqtgraph.opengl import *
 
 from proto.visualization_pb2 import ObstacleList
 
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -23,6 +23,7 @@ class GLObstacleLayer(GLLayer):
 
         """
         super().__init__(name)
+        self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
         self.obstacles_list_buffer = ThreadSafeBuffer(buffer_size, ObstacleList)
 

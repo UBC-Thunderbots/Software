@@ -1,14 +1,12 @@
 import pyqtgraph as pg
 from pyqtgraph.Qt.QtWidgets import *
 import queue
-import time
 from software.py_constants import *
 import pyqtgraph.console as pg_console
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel
 from proto.import_all_protos import *
 
-from software.thunderscope.constants import ROBOT_CRASH_TIMEOUT_S
-from software.networking.threaded_unix_listener import ThreadedUnixListener
+import software.thunderscope.constants as constants
 from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
@@ -96,16 +94,7 @@ class g3logWidget(QWidget):
                 and self.checkbox_widget.fatal_checkbox.isChecked()
             )
         ):
-            log_str = f"R{log.robot_id} {log.created_timestamp.epoch_timestamp_seconds} {self.log_level_str_map[log.log_level]} [{log.file_name}->{log.line_number}] {log.log_msg}\n"
+            log_str = f"R{log.robot_id} {log.created_timestamp.epoch_timestamp_seconds} {constants.LOG_LEVEL_STR_MAP[log.log_level]} [{log.file_name}->{log.line_number}] {log.log_msg}\n"
             self.console_widget.repl.write(log_str, style="output")
-            if log.log_level == LogLevel.FATAL or log.log_level == LogLevel.CONTRACT:
-                if (
-                    time.time() - self.robot_last_fatal_time_s[log.robot_id]
-                    > ROBOT_CRASH_TIMEOUT_S
-                ):
-                    QMessageBox.information(
-                        self, "Fatal Log Alert", log_str,
-                    )
-                self.robot_last_fatal_time_s[log.robot_id] = time.time()
         else:
             return

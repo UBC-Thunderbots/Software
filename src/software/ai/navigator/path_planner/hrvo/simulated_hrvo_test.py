@@ -111,7 +111,7 @@ class HRVORobotEntersRegionAndStops:
 ) = create_validation_types(HRVORobotEntersRegionAndStops)
 
 
-def get_zig_zag_params(
+def create_zig_zag_path_test_params(
     front_wall_x: int, robot_y_delta: float, num_walls: int, wall_height: float
 ):
     """
@@ -146,7 +146,7 @@ def get_zig_zag_params(
     )
 
 
-def get_robot_circle_pos(radius: float, num_robots: int, start: bool):
+def create_robot_circle_pos_params(radius: float, num_robots: int, start: bool):
     """
     Gets the test params to position robots in a circle and have them move
     along each diameter
@@ -384,11 +384,11 @@ def hrvo_setup(
             False,
         ),
         # robot moving in a zig zag path around enemy robots
-        get_zig_zag_params(-2, 0.3, 3, 5),
+        create_zig_zag_path_test_params(-2, 0.3, 3, 5),
         # friendly robots in a circle moving along each diameter
         (
-            get_robot_circle_pos(1.5, 8, True),
-            get_robot_circle_pos(1.5, 8, False),
+            create_robot_circle_pos_params(1.5, 8, True),
+            create_robot_circle_pos_params(1.5, 8, False),
             [],
             [],
             [],
@@ -398,8 +398,8 @@ def hrvo_setup(
         # friendly robots in a circle moving along each diameter
         # while turning from 0 to 180 degrees
         (
-            get_robot_circle_pos(1.5, 8, True),
-            get_robot_circle_pos(1.5, 8, False),
+            create_robot_circle_pos_params(1.5, 8, True),
+            create_robot_circle_pos_params(1.5, 8, False),
             [tbots.Angle.fromRadians(math.pi) for i in range(8)],
             [],
             [],
@@ -410,12 +410,16 @@ def hrvo_setup(
         (
             [
                 pos
-                for index, pos in enumerate(get_robot_circle_pos(1.5, 8, True))
+                for index, pos in enumerate(
+                    create_robot_circle_pos_params(1.5, 8, True)
+                )
                 if index % 2 == 0
             ],
             [
                 pos
-                for index, pos in enumerate(get_robot_circle_pos(1.5, 8, False))
+                for index, pos in enumerate(
+                    create_robot_circle_pos_params(1.5, 8, False)
+                )
                 if index % 2 == 0
             ],
             [],
@@ -427,12 +431,16 @@ def hrvo_setup(
             # so when displayed, the destination positions look correct since they have been flipped for blue
             [
                 pos
-                for index, pos in enumerate(get_robot_circle_pos(1.5, 8, True))
+                for index, pos in enumerate(
+                    create_robot_circle_pos_params(1.5, 8, True)
+                )
                 if index % 2 == 1
             ],
             [
                 pos
-                for index, pos in enumerate(get_robot_circle_pos(1.5, 8, True))
+                for index, pos in enumerate(
+                    create_robot_circle_pos_params(1.5, 8, True)
+                )
                 if index % 2 == 1
             ],
             10,

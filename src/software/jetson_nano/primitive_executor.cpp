@@ -128,13 +128,15 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 }
 
 
-std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive()
+std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
+    TbotsProto::PrimitiveExecutorStatus &status)
 {
     hrvo_simulator_.doStep(time_step_);
 
     // Visualize the HRVO Simulator for the current robot
     //    hrvo_simulator_.visualize(robot_id_, friendly_team_colour_);
 
+    status.set_running_primitive(true);
     switch (current_primitive_.primitive_case())
     {
         case TbotsProto::Primitive::kStop:
@@ -143,6 +145,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                                                      TbotsProto::AutoChipOrKick());
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
+            status.set_running_primitive(false);
             return output;
         }
         case TbotsProto::Primitive::kDirectControl:

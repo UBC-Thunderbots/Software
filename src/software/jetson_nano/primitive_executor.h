@@ -59,10 +59,13 @@ class PrimitiveExecutor
     /**
      * Steps the current primitive and returns a direct control primitive with the
      * target wheel velocities
+     * @param status The status of the primitive executor, set to false if current
+     * primitive is a Stop primitive
      *
      * @returns DirectControlPrimitive The direct control primitive msg
      */
-    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive();
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
+        TbotsProto::PrimitiveExecutorStatus &status);
 
    private:
     /*
