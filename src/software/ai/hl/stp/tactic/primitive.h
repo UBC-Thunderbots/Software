@@ -25,11 +25,14 @@ class Primitive
         const RobotNavigationObstacleFactory &obstacle_factory) = 0;
 
     /**
-     * Get the obstacles generated so far
+     * Fill the obstacle list and path visualization with the obstacles and path
+     * of this primitive
      *
-     * @return the obstacles generated so far
+     * @param obstacle_list_out Reference to the ObstacleList proto to add obstacles to
+     * @param path_visualization_out Reference to the PathVisualization proto to add path
      */
-    virtual std::vector<ObstaclePtr> getGeneratedObstacles() const = 0;
+    virtual void getVisualizationProtos(TbotsProto::ObstacleList& obstacle_list_out,
+                                TbotsProto::PathVisualization& path_visualization_out) const = 0;
 
     /**
      * Gets the estimated cost of the primitive

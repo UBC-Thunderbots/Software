@@ -47,8 +47,6 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
     const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
-    auto primitive_proto = std::make_unique<TbotsProto::Primitive>();
-
     // Generate obstacle avoiding trajectory
     generateObstacles(world, motion_constraints, obstacle_factory);
 
@@ -59,11 +57,13 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
     // TODO: Instead of field boundary, it should be made smaller 9cm
-    TrajectoryPath traj_path =
+    traj_path =
         planner.findTrajectory(robot.position(), destination, robot.velocity(),
                                constraints, obstacles, world.field().fieldBoundary());
 
     // Populate the move primitive proto with the trajectory path parameters
+    auto primitive_proto = std::make_unique<TbotsProto::Primitive>();
+
     TbotsProto::TrajectoryPathParams2D xy_traj_params;
     *(xy_traj_params.mutable_start_position())   = *createPointProto(robot.position());
     *(xy_traj_params.mutable_destination())      = *createPointProto(destination);
@@ -96,7 +96,7 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
                 static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
     }
 
-    const auto &path_nodes = traj_path.getTrajectoryPathNodes();
+    const auto &path_nodes = traj_path->getTrajectoryPathNodes();
     *(primitive_proto->mutable_move()
           ->mutable_xy_traj_params()
           ->mutable_sub_destination()) =
@@ -145,7 +145,23 @@ void MovePrimitive::generateObstacles(
     }
 }
 
-std::vector<ObstaclePtr> MovePrimitive::getGeneratedObstacles() const
+void MovePrimitive::getVisualizationProtos(TbotsProto::ObstacleList& obstacle_list_out,
+                                           TbotsProto::PathVisualization& path_visualization_out) const
 {
-    return obstacles;
+    for (const auto &obstacle : obstacles)
+    {
+        obstacle_list_out.add_obstacles()->CopyFrom(obstacle->createObstacleProto());
+    }
+
+    TbotsProto::Path path;
+    if (traj_path.has_value())
+    {
+        for (unsigned int i = 0; i < NUM_TRAJECTORY_VISUALIZATION_POINTS; i++)
+        {
+            double t = i * traj_path->getTotalTime() / (NUM_TRAJECTORY_VISUALIZATION_POINTS - 1);
+            Point position = traj_path->getPosition(t);
+            path.add_points()->CopyFrom(*createPointProto(position));
+        }
+    }
+    path_visualization_out.add_paths()->CopyFrom(path);
 }

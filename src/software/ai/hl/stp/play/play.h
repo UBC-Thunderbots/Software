@@ -184,7 +184,8 @@ class Play
 
     // List of all obstacles in the world at the current iteration
     // used for visualization
-    std::vector<ObstaclePtr> obstacles;
+    TbotsProto::ObstacleList obstacle_list;
+    TbotsProto::PathVisualization path_visualization;
 
     RobotNavigationObstacleFactory obstacle_factory;
 };

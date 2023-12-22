@@ -36,15 +36,11 @@ class GLObstacleLayer(GLLayer):
 
         poly_obstacles = []
         circle_obstacles = []
-
         for obstacle in obstacles:
             if obstacle.HasField("polygon"):
                 poly_obstacles.append(obstacle.polygon)
-            elif obstacle.HasField("circle"):
+            else:
                 circle_obstacles.append(obstacle.circle)
-
-        print(f"{obstacles=}")
-        print(f"{poly_obstacles=} {circle_obstacles=}")
 
         # Ensure we have the same number of graphics as obstacles
         self.poly_obstacle_graphics.resize(

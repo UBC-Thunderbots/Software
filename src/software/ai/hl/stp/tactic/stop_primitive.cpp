@@ -9,7 +9,6 @@ std::unique_ptr<TbotsProto::Primitive> StopPrimitive::generatePrimitiveProtoMess
     return stop_primitive_msg;
 }
 
-std::vector<ObstaclePtr> StopPrimitive::getGeneratedObstacles() const
-{
-    return std::vector<ObstaclePtr>();
-}
+void StopPrimitive::getVisualizationProtos(TbotsProto::ObstacleList& obstacle_list_out,
+                            TbotsProto::PathVisualization& path_visualization_out)  const
+{}

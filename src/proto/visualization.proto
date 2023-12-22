@@ -7,7 +7,7 @@ package TbotsProto;
 
 message PathVisualization
 {
-    repeated Path path = 1;
+    repeated Path paths = 1;
 }
 
 message NamedValue

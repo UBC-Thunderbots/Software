@@ -164,44 +164,21 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             }
 
             time_since_trajectory_creation_ += time_step_;
-            if (robot_id_ == 4 && friendly_team_colour_ == TeamColour::BLUE)
-            {
-                auto desired_vel = trajectory_path_->getVelocity(
-                    time_since_trajectory_creation_.toSeconds());
-                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                    {"actual_vx", velocity_.x()},
-                    {"actual_vy", velocity_.y()},
-                    {"actual_v", velocity_.length()},
-                    {"desired_vx", desired_vel.x()},
-                    {"desired_vy", desired_vel.y()},
-                    {"desired_v", desired_vel.length()},
-                });
-            }
+//            if (robot_id_ == 4 && friendly_team_colour_ == TeamColour::BLUE)
+//            {
+//                auto desired_vel = trajectory_path_->getVelocity(
+//                    time_since_trajectory_creation_.toSeconds());
+//                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+//                    {"actual_vx", velocity_.x()},
+//                    {"actual_vy", velocity_.y()},
+//                    {"actual_v", velocity_.length()},
+//                    {"desired_vx", desired_vel.x()},
+//                    {"desired_vy", desired_vel.y()},
+//                    {"desired_v", desired_vel.length()},
+//                });
+//            }
 
-            TbotsProto::HRVOVisualization hrvo_visualization;
-            *(hrvo_visualization.add_robots()) = *createCircleProto(
-                Circle(trajectory_path_->getPosition(0), ROBOT_MAX_RADIUS_METERS));
-            hrvo_visualization.set_robot_id(robot_id_);
-            TbotsProto::Path path_proto;
-            const int num_points = 18;
-            for (int j = 0; j <= num_points; ++j)
-            {
-                Point pos = trajectory_path_->getPosition(
-                    j * trajectory_path_->getTotalTime() / num_points);
-                *(path_proto.add_points()) = *createPointProto(pos);
-            }
-            *(hrvo_visualization.mutable_trajectory()) = path_proto;
-
-            if (friendly_team_colour_ == TeamColour::YELLOW)
-            {
-                LOG(VISUALIZE, YELLOW_HRVO_PATH) << hrvo_visualization;
-            }
-            else
-            {
-                LOG(VISUALIZE, BLUE_HRVO_PATH) << hrvo_visualization;
-            }
-
-            // TODO: Notes
+            // TODO (NIMA): Notes
             //  By default, the robot is very tweaky/shaky around destination
             //  This helps, even with local velocity feedback its twitchy
             orientation_ = angular_trajectory_->getPosition(

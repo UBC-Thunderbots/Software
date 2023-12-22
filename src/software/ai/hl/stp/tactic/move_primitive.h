@@ -15,21 +15,17 @@ class MovePrimitive : public Primitive
 {
    public:
     /**
-     * Create a Move Primitive Message TODO: Double check docs
+     * Create a Move Primitive Message
      *
-     * @param dest The final destination of the movement
-     * @param final_speed_m_per_s The speed at final destination
-     * @param final_angle The final orientation the robot should have at the end
-     * of the movement
-     * @param should_drive_forward Whether the robot should face the direction of
-     * intermediate path points (if there is any) or just the final destination
-     * @param dribbler_mode The dribbler mode
-     * @param auto_chip_or_kick The command to autochip or autokick
-     * @param max_allowed_speed_mode The mode of maximum speed allowed
-     * @param target_spin_rev_per_s The target spin while moving in revolutions per second
-     * @param robot_constants The robot constants
+     * @param robot Robot running this primitive
+     * @param destination Destination position of the robot
+     * @param final_angle Desired final orientation of the robot
+     * @param max_allowed_speed_mode Max allowed speed the robot can move at
+     * @param dribbler_mode Dribbler mode during this primitive
+     * @param ball_collision_type Ball collision type specifying if collision with the ball is allowed
+     * @param auto_chip_or_kick Whether auto chip or kick is enabled and the target distance/speed
      * @param cost_override optionally override the cost of the move primitive, defaults
-     * to the path length
+     * to the total duration of reaching the destination (ignoring obstacles)
      */
     MovePrimitive(const Robot &robot, const Point &destination, const Angle &final_angle,
                   const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
@@ -51,19 +47,22 @@ class MovePrimitive : public Primitive
         const RobotNavigationObstacleFactory &obstacle_factory) override;
 
     /**
-     * Get the obstacles generated so far
+     * Fill the obstacle list and path visualization with the obstacles and path
+     * of this primitive
      *
-     * @return the obstacles generated so far
+     * @param obstacle_list_out Reference to the ObstacleList proto to add obstacles to
+     * @param path_visualization_out Reference to the PathVisualization proto to add path
      */
-    std::vector<ObstaclePtr> getGeneratedObstacles() const override;
+    void getVisualizationProtos(TbotsProto::ObstacleList& obstacle_list_out,
+                                               TbotsProto::PathVisualization& path_visualization_out) const override;
 
    private:
     /**
-     * Fills the `obstacles` vector with the obstacles that the primitive should avoid
+     * Helper for filling the `obstacles` vector with the obstacles that the primitive should avoid
      *
-     * @param world TODO (NIMA)
-     * @param motion_constraints
-     * @param obstacle_factory
+     * @param world Current state of the world
+     * @param motion_constraints Motion constraints
+     * @param obstacle_factory Obstacle factory to use
      */
     void generateObstacles(
         const World &world,
@@ -83,6 +82,9 @@ class MovePrimitive : public Primitive
     std::vector<ObstaclePtr> obstacles;
 
     BangBangTrajectory2D trajectory;
+    std::optional<TrajectoryPath> traj_path;
     BangBangTrajectory1DAngular angular_trajectory;
     TrajectoryPlanner planner;
+
+    constexpr static unsigned int NUM_TRAJECTORY_VISUALIZATION_POINTS = 10;
 };
