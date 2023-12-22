@@ -34,17 +34,13 @@ static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 static const char REDIS_DEFAULT_HOST[REDIS_HOST_LENGTH] = "127.0.0.1";
 static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
 
-// the port robots are listening to for vision and primitives
-static const short unsigned int VISION_PORT    = 42069;
+// the UDP port robots are listening to for primitives
 static const short unsigned int PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
 static const short unsigned int ROBOT_STATUS_PORT       = 42071;
 static const short unsigned int ROBOT_LOGS_PORT         = 42072;
 static const short unsigned int ROBOT_CRASH_PORT        = 42074;
-
-// the port to listen to for what side of the field to defend
-static const unsigned DEFENDING_SIDE_PORT = 42073;
 
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip

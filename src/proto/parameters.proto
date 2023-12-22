@@ -126,9 +126,8 @@ message PassingConfig
 
 message GoalieTacticConfig
 {
-    // Control the final speed of the goalie to be able to intercept shots better
-    required double goalie_final_speed = 1
-        [default = 0.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
+    reserved 1;
+
     // At what speed of the ball should the goalie panic and stop the ball
     required double ball_speed_panic = 2
         [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 6.0];

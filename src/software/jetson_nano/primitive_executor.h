@@ -35,14 +35,6 @@ class PrimitiveExecutor
     void setStopPrimitive();
 
     /**
-     * Update primitive executor with a new World
-     * @param world_msg Protobuf representation of the current World (World from the
-     * perspective of the team which the robot with this Primitive Executor is a member
-     * of)
-     */
-    void updateWorld(const TbotsProto::World &world_msg);
-
-    /**
      * Update primitive executor with the current velocity of the robot
      *
      * @param local_velocity The current _local_ velocity

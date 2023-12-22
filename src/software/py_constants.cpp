@@ -72,7 +72,6 @@ PYBIND11_MODULE(py_constants, m)
     });
 
     // Ports
-    m.attr("VISION_PORT")             = VISION_PORT;
     m.attr("PRIMITIVE_PORT")          = PRIMITIVE_PORT;
     m.attr("ROBOT_STATUS_PORT")       = ROBOT_STATUS_PORT;
     m.attr("ROBOT_LOGS_PORT")         = ROBOT_LOGS_PORT;

@@ -33,8 +33,6 @@ std::map<RobotId, std::shared_ptr<Primitive>> Tactic::get(const World &world)
     {
         updatePrimitive(
             TacticUpdate(robot, world,
-                         // TODO (NIMA): This is a hack that needs to be injected
-                         obstacle_config,
                          [this](std::shared_ptr<Primitive> new_primitive) {
                              primitive = std::move(new_primitive);
                          }),

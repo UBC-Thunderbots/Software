@@ -42,9 +42,6 @@ cc_library(
         "TRACY_ENABLE",
     ],
     includes = [
-        "/usr/include/capstone",
-        "/usr/include/freetype2",
-        "/usr/include/libpng16",
         "client",
         "common",
         "imgui",

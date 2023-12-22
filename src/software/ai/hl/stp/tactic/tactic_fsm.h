@@ -15,11 +15,9 @@ using SetPrimitiveCallback = std::function<void(std::shared_ptr<Primitive>)>;
 struct TacticUpdate
 {
     TacticUpdate(const Robot &robot, const World &world,
-                 const TbotsProto::RobotNavigationObstacleConfig &obstacle_config,
                  const SetPrimitiveCallback &set_primitive_fun)
         : robot(robot),
           world(world),
-          obstacle_config(obstacle_config),
           set_primitive(set_primitive_fun)
     {
     }
@@ -27,9 +25,7 @@ struct TacticUpdate
     // updated robot that tactic is assigned to
     Robot robot;
     // updated world
-    World world;  // TODO: Update to use shared_ptr
-    // obstacle config
-    TbotsProto::RobotNavigationObstacleConfig obstacle_config;
+    World world;  // TODO (NIMA): Update to use shared_ptr
     // callback to return the next primitive
     SetPrimitiveCallback set_primitive;
 };

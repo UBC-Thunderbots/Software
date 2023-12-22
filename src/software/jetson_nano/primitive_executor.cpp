@@ -67,11 +67,6 @@ void PrimitiveExecutor::setStopPrimitive()
     current_primitive_ = *createStopPrimitiveProto();
 }
 
-void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
-{
-    // TODO (NIMA): Remove function
-}
-
 void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
                                        const AngularVelocity &angular_velocity)
 {

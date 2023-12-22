@@ -190,11 +190,6 @@ void GoalieFSM::positionToBlock(const Update &event)
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();
 
-    // what should the final goalie speed be, so that the goalie accelerates
-    // faster
-    // TODO (NIMA): Remove this parameter from the config file
-    //    auto goalie_final_speed = goalie_tactic_config.goalie_final_speed();
-
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
