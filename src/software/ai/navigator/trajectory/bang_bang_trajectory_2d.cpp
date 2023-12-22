@@ -1,4 +1,4 @@
-#include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_2d.h"
 
 BangBangTrajectory2D::BangBangTrajectory2D(const Point& initial_pos,
                                            const Point& final_pos,

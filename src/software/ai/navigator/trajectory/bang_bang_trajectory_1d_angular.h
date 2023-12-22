@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/navigator/path_planner/bang_bang_trajectory_1d.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_1d.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_acceleration.h"
 #include "software/geom/angular_velocity.h"

@@ -4,8 +4,8 @@
 
 #include "extlibs/AABB/AABB.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
-#include "software/ai/navigator/path_planner/trajectory_path.h"
-#include "software/ai/navigator/path_planner/trajectory_path_with_cost.h"
+#include "software/ai/navigator/trajectory/trajectory_path.h"
+#include "software/ai/navigator/trajectory/trajectory_path_with_cost.h"
 
 class TrajectoryPlanner
 {

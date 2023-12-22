@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_2d.h"
 
 /**
  * A class that wraps Trajectory2D and allows for earlier trajectory

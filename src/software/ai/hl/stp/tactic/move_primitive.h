@@ -3,9 +3,9 @@
 
 #include "proto/primitive/primitive_types.h"
 #include "software/ai/hl/stp/tactic/primitive.h"
-#include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
-#include "software/ai/navigator/path_planner/bang_bang_trajectory_2d.h"
-#include "software/ai/navigator/path_planner/trajectory_planner.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_2d.h"
+#include "software/ai/navigator/trajectory/trajectory_planner.h"
 #include "software/world/world.h"
 
 // Forward declare Tactic to avoid circular dependency between Tactic and MovePrimitive

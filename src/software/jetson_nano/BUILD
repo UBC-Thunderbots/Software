@@ -11,8 +11,8 @@ cc_library(
         "//software/math:math_functions",
         "//software/physics:velocity_conversion_util",
         "//software/world",
-        "//software/ai/navigator/path_planner:trajectory_path",
-        "//software/ai/navigator/path_planner:bang_bang_trajectory_1d_angular",
+        "//software/ai/navigator/trajectory:trajectory_path",
+        "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
     ],
 )
 

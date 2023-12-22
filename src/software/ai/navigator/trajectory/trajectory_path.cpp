@@ -1,4 +1,4 @@
-#include "software/ai/navigator/path_planner/trajectory_path.h"
+#include "software/ai/navigator/trajectory/trajectory_path.h"
 
 #include "software/logger/logger.h"
 

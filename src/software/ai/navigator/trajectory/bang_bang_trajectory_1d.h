@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include "software/ai/navigator/path_planner/trajectory.hpp"
+#include "software/ai/navigator/trajectory/trajectory.hpp"
 
 class BangBangTrajectory1D : public Trajectory<double, double, double>
 {

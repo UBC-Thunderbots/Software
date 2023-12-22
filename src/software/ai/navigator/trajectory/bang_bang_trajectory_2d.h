@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/navigator/path_planner/bang_bang_trajectory_1d.h"
-#include "software/ai/navigator/path_planner/trajectory_2d.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_1d.h"
+#include "software/ai/navigator/trajectory/trajectory_2d.h"
 #include "software/geom/bounding_box.h"
 #include "software/geom/point.h"
 

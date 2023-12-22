@@ -77,7 +77,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":trajectory_path_node",
-        "//software/ai/navigator/path_planner:kinematic_constraints",
+        "//software/ai/navigator/trajectory:kinematic_constraints",
         "//software/logger",
     ],
 )
@@ -102,7 +102,7 @@ cc_library(
         "//extlibs/AABB:aabb_tree",
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/obstacle",
-        "//software/ai/navigator/path_planner:trajectory_path_with_cost",
+        "//software/ai/navigator/trajectory:trajectory_path_with_cost",
         "@tracy", # TODO (NIMA): Remove
     ],
 )

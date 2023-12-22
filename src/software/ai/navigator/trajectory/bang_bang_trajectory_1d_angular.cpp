@@ -1,4 +1,4 @@
-#include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 
 void BangBangTrajectory1DAngular::generate(Angle initial_orient, Angle final_orient,
                                            AngularVelocity initial_angular_vel,

@@ -4,8 +4,8 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
-#include "software/ai/navigator/path_planner/trajectory_path.h"
-#include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
+#include "software/ai/navigator/trajectory/trajectory_path.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 
 class PrimitiveExecutor
 {

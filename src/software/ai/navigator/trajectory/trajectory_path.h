@@ -3,8 +3,8 @@
 #include <functional>
 #include <memory>
 
-#include "software/ai/navigator/path_planner/kinematic_constraints.h"
-#include "software/ai/navigator/path_planner/trajectory_path_node.h"
+#include "software/ai/navigator/trajectory/kinematic_constraints.h"
+#include "software/ai/navigator/trajectory/trajectory_path_node.h"
 
 using TrajectoryGenerator = std::function<std::shared_ptr<Trajectory2D>(
     const KinematicConstraints& constraints, const Point& initial_pos,

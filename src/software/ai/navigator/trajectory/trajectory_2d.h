@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/navigator/path_planner/trajectory.hpp"
+#include "software/ai/navigator/trajectory/trajectory.hpp"
 #include "software/geom/bounding_box.h"
 #include "software/geom/point.h"
 
