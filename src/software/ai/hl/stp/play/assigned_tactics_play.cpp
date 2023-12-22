@@ -4,6 +4,7 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
+#include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 
 AssignedTacticsPlay::AssignedTacticsPlay(TbotsProto::AiConfig config)
     : Play(config, false),
@@ -34,7 +35,7 @@ void AssignedTacticsPlay::updateControlParams(
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
-    const GlobalPathPlannerFactory &path_planner_factory, const World &world,
+    const World &world,
     const InterPlayCommunication &, const SetInterPlayCommunicationCallback &)
 {
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
@@ -44,9 +45,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
         {
             auto tactic = assigned_tactics.at(robot.id());
             tactic_robot_id_assignment.emplace(tactic, robot.id());
-            // TODO (NIMA): For traj planner to work in simulated tests, will need
-            //              to also update primitives here
-            // TODO (NIMA): Remove unused var?!
             auto motion_constraints =
                 buildMotionConstraintSet(world.gameState(), *goalie_tactic);
             if (override_motion_constraints.contains(robot.id()))

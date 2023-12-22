@@ -8,7 +8,6 @@
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/navigator/path_planner/global_path_planner_factory.h"
 #include "software/ai/navigator/path_planner/trajectory_planner.h"
 
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
@@ -43,10 +42,8 @@ class Play
     explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
 
     /**
-     * Gets Primitives from the Play given the path planner factory, the world, and
-     * inter-play communication
+     * Gets Primitives from the Play given the the world, and inter-play communication
      *
-     * @param path_planner_factory The path planner factory
      * @param world The updated world
      * @param inter_play_communication The inter-play communication struct
      * @param set_inter_play_communication_fun The callback to set the inter-play
@@ -55,7 +52,7 @@ class Play
      * @return the PrimitiveSet to execute
      */
     virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const GlobalPathPlannerFactory& path_planner_factory, const World& world,
+        const World& world,
         const InterPlayCommunication& inter_play_communication,
         const SetInterPlayCommunicationCallback& set_inter_play_communication_fun);
 

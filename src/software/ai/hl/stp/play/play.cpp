@@ -80,7 +80,7 @@ PriorityTacticVector Play::getTactics(const World &world)
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
-    const GlobalPathPlannerFactory &path_planner_factory, const World &world,
+    const World &world,
     const InterPlayCommunication &inter_play_communication,
     const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
@@ -115,7 +115,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
                          robots.end());
 
-            // TODO (NIMA): Update this as well to use trajectories
             auto motion_constraints =
                 buildMotionConstraintSet(world.gameState(), *goalie_tactic);
             auto primitives = goalie_tactic->get(world);
