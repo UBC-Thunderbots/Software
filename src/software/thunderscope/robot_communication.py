@@ -327,13 +327,6 @@ class RobotCommunication(object):
             True,
         )
 
-        self.receive_log_visualize = tbots_cpp.HRVOVisualizationProtoListener(
-            self.multicast_channel + "%" + self.interface,
-            HRVO_VISUALIZATION_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(HRVOVisualization, data),
-            True,
-        )
-
         self.receive_robot_crash = tbots_cpp.RobotCrashProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_CRASH_PORT,

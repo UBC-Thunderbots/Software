@@ -33,14 +33,6 @@ message PassVisualization
     repeated PassWithRating best_passes = 1;
 }
 
-message HRVOVisualization
-{
-    uint32 robot_id                              = 1;
-    repeated VelocityObstacle velocity_obstacles = 2;
-    repeated Circle robots                       = 3;
-    Path trajectory                              = 4;
-}
-
 message CostVisualization
 {
     uint32 num_rows      = 1;

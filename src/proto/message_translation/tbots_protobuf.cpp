@@ -1,4 +1,5 @@
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/logger/logger.h"
 
 
 std::unique_ptr<TbotsProto::World> createWorld(const World& world)

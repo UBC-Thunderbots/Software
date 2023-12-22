@@ -39,7 +39,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//proto:tbots_cc_proto",
-        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:circle",

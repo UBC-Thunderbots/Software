@@ -3,6 +3,8 @@ package(default_visibility = [
     "//software/simulated_tests:__subpackages__",
 ])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 cc_library(
     name = "enlsvg_path_planner",
     srcs = ["enlsvg_path_planner.cpp"],
@@ -170,5 +172,17 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "simulated_hrvo_test",
+    srcs = ["simulated_hrvo_test.py"],
+    tags = ["exclusive"],
+    deps = [
+        "//proto/message_translation:py_tbots_protobuf",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )

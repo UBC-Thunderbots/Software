@@ -20,6 +20,7 @@ cc_library(
         "//software/world",
         "//software/world:field",
         "//software/world:team_colour",
+        "@tracy", # TODO (NIMA): Remove
     ],
 )
 

@@ -13,7 +13,6 @@ cc_library(
         "distance.cpp",
         "find_open_circles.cpp",
         "furthest_point.cpp",
-        "generate_velocity_obstacle.cpp",
         "intersection.cpp",
         "intersects.cpp",
         "rasterize.cpp",
@@ -31,7 +30,6 @@ cc_library(
         "distance.h",
         "find_open_circles.h",
         "furthest_point.h",
-        "generate_velocity_obstacle.h",
         "intersection.h",
         "intersects.h",
         "rasterize.h",
@@ -39,7 +37,6 @@ cc_library(
         "voronoi_diagram.h",
     ],
     deps = [
-        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:angle",
         "//software/geom:circle",
         "//software/geom:geom_constants",

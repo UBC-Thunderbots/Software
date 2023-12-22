@@ -2,9 +2,10 @@
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "software/ai/navigator/path_planner/hrvo/hrvo_simulator.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
+#include "software/ai/navigator/path_planner/trajectory_path.h"
+#include "software/ai/navigator/path_planner/bang_bang_trajectory_1d_angular.h"
 
 class PrimitiveExecutor
 {
@@ -91,16 +92,11 @@ class PrimitiveExecutor
     RobotConstants_t robot_constants_;
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
-    HRVOSimulator hrvo_simulator_;
 
     // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
     // time step to be used, in Seconds
     Duration time_step_;
     RobotId robot_id_;
-
-    // Thresholds for when we should update HRVO Simulator's velocity
-    static constexpr const double LINEAR_VELOCITY_FEEDBACK_THRESHOLD_M_PER_S    = 1.0;
-    static constexpr const double ANGULAR_VELOCITY_FEEDBACK_THRESHOLD_DEG_PER_S = 200.0;
 
     // Estimated delay between a vision frame to AI processing to robot executing
     static constexpr const double VISION_TO_ROBOT_DELAY_S = 0.03;
