@@ -127,7 +127,7 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/path_planner:trajectory_path_with_cost",
-        "@tracy",
+        "@tracy", # TODO (NIMA): Remove
     ],
 )
 

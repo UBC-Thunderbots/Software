@@ -4,8 +4,6 @@
 
 #include "software/ai/navigator/path_planner/trajectory.hpp"
 
-static const unsigned int MAX_TRAJECTORY_PARTS = 4;
-
 class BangBangTrajectory1D : public Trajectory<double, double, double>
 {
    public:
@@ -215,6 +213,7 @@ class BangBangTrajectory1D : public Trajectory<double, double, double>
 
     // We use a fixed size array instead of a vector to avoid the overhead
     // of dynamic memory allocation + emplace_back, push_back, etc.
+    static constexpr unsigned int MAX_TRAJECTORY_PARTS                = 4;
     size_t num_trajectory_parts                                       = 0;
     std::array<TrajectoryPart, MAX_TRAJECTORY_PARTS> trajectory_parts = {
         TrajectoryPart(), TrajectoryPart(), TrajectoryPart(), TrajectoryPart()};
