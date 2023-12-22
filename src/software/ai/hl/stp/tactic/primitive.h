@@ -25,6 +25,13 @@ class Primitive
         const RobotNavigationObstacleFactory &obstacle_factory) = 0;
 
     /**
+     * Get the obstacles generated so far
+     *
+     * @return the obstacles generated so far
+     */
+    virtual std::vector<ObstaclePtr> getGeneratedObstacles() const = 0;
+
+    /**
      * Gets the estimated cost of the primitive
      *
      * @return estimated cost of the primitive

@@ -1,8 +1,6 @@
 from pyqtgraph.opengl import *
 
-import numpy as np
-
-from proto.primitive_pb2 import ObstaclesList
+from proto.visualization_pb2 import ObstacleList
 
 from software.thunderscope.constants import Colors
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -26,28 +24,27 @@ class GLObstacleLayer(GLLayer):
         """
         super().__init__(name)
 
-        self.obstacles_list_buffer = ThreadSafeBuffer(buffer_size, ObstaclesList)
+        self.obstacles_list_buffer = ThreadSafeBuffer(buffer_size, ObstacleList)
 
         self.poly_obstacle_graphics = ObservableList(self._graphics_changed)
         self.circle_obstacle_graphics = ObservableList(self._graphics_changed)
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-        return
-
-        # TODO (NIMA): Update this to use new obstacle proto
+        # TODO (NIMA): Should we just return if there's no new val? Why redraw if nothing changed?
         obstacles = self.obstacles_list_buffer.get(block=False).obstacles
 
-        poly_obstacles = [
-            poly_obstacle
-            for obstacle in obstacles
-            for poly_obstacle in obstacle.polygon
-        ]
-        circle_obstacles = [
-            circle_obstacle
-            for obstacle in obstacles
-            for circle_obstacle in obstacle.circle
-        ]
+        poly_obstacles = []
+        circle_obstacles = []
+
+        for obstacle in obstacles:
+            if obstacle.HasField("polygon"):
+                poly_obstacles.append(obstacle.polygon)
+            elif obstacle.HasField("circle"):
+                circle_obstacles.append(obstacle.circle)
+
+        print(f"{obstacles=}")
+        print(f"{poly_obstacles=} {circle_obstacles=}")
 
         # Ensure we have the same number of graphics as obstacles
         self.poly_obstacle_graphics.resize(

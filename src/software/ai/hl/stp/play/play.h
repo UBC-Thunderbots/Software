@@ -182,6 +182,9 @@ class Play
 
     uint64_t sequence_number = 0;
 
-    TrajectoryPlanner planner;
+    // List of all obstacles in the world at the current iteration
+    // used for visualization
+    std::vector<ObstaclePtr> obstacles;
+
     RobotNavigationObstacleFactory obstacle_factory;
 };

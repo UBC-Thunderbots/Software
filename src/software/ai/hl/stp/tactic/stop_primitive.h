@@ -20,4 +20,11 @@ class StopPrimitive : public Primitive
         const World &world,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const RobotNavigationObstacleFactory &obstacle_factory) override;
+
+    /**
+     * Get the obstacles generated so far
+     *
+     * @return the obstacles generated so far
+     */
+    std::vector<ObstaclePtr> getGeneratedObstacles() const override;
 };

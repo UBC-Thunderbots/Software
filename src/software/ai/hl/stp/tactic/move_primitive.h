@@ -50,11 +50,25 @@ class MovePrimitive : public Primitive
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const RobotNavigationObstacleFactory &obstacle_factory) override;
 
+    /**
+     * Get the obstacles generated so far
+     *
+     * @return the obstacles generated so far
+     */
+    std::vector<ObstaclePtr> getGeneratedObstacles() const override;
+
    private:
-    std::vector<ObstaclePtr> generateObstacles(
+    /**
+     * Fills the `obstacles` vector with the obstacles that the primitive should avoid
+     *
+     * @param world TODO (NIMA)
+     * @param motion_constraints
+     * @param obstacle_factory
+     */
+    void generateObstacles(
         const World &world,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const RobotNavigationObstacleFactory &obstacle_factory) const;
+        const RobotNavigationObstacleFactory &obstacle_factory);
 
     Robot robot;
     Point destination;
@@ -65,6 +79,8 @@ class MovePrimitive : public Primitive
 
     TbotsProto::BallCollisionType ball_collision_type;
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+
+    std::vector<ObstaclePtr> obstacles;
 
     BangBangTrajectory2D trajectory;
     BangBangTrajectory1DAngular angular_trajectory;

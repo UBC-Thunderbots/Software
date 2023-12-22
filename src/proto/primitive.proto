@@ -17,27 +17,6 @@ enum BallCollisionType
     AVOID = 1;
 }
 
-message Obstacles
-{
-    // TODO: Deprecate?!
-    repeated Polygon polygon = 1;
-    repeated Circle circle   = 2;
-}
-
-message ObstaclesList
-{
-    // TODO: Could use a one of?!
-    //    message ObstacleType
-    //    {
-    //        oneof obstacles
-    //        {
-    //            Polygon polygon = 1;
-    //            Circle circle   = 2;
-    //        }
-    //    }
-    repeated Obstacles obstacles = 1;
-}
-
 enum MotionConstraint
 {
     // The box around the friendly goal
@@ -62,15 +41,6 @@ enum MotionConstraint
     ENEMY_HALF_WITHOUT_CENTRE_CIRCLE = 9;
     // The friendly goal
     FRIENDLY_GOAL = 10;
-}
-
-message MotionControl
-{
-    Path path                                    = 1;
-    double normalized_path_length                = 2;
-    repeated MotionConstraint motion_constraints = 3;
-    Point requested_destination                  = 4;
-    repeated Obstacles static_obstacles          = 5;
 }
 
 enum DribblerMode

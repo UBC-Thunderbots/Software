@@ -100,6 +100,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
 
+    obstacles.clear();
     tactic_robot_id_assignment.clear();
 
     std::optional<Robot> goalie_robot = world.friendlyTeam().goalie();
@@ -127,6 +128,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             primitives_to_run->mutable_robot_primitives()->insert(
                     {goalie_robot_id, *primitive_proto});
             goalie_tactic->setLastExecutionRobot(goalie_robot_id);
+
+            const auto goalie_obstacles = primitives[goalie_robot_id]->getGeneratedObstacles();
+            obstacles.insert(obstacles.end(),
+                             goalie_obstacles.begin(),
+                             goalie_obstacles.end());
         }
         else if (world.friendlyTeam().getGoalieId().has_value())
         {
@@ -188,8 +194,19 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         robots = remaining_robots;
     }
 
-    // TODO (NIMA): Update this
-    TbotsProto::ObstaclesList obstacle_protos;
+    // TODO (NIMA): Try to remove duplicate obstacles (note: std::set<proto> isnt natively possible due to no comparators, maybe with custom comparators?!?)
+    // Use STD to go through obstacles convert to obstacle proto and add to a std set
+//    std::set<Obstacle> obstacle_set;
+//    for (const auto &obstacle : obstacles)
+//    {
+//        obstacle_set.insert(*obstacle);
+//    }
+
+    TbotsProto::ObstacleList obstacle_protos;
+    for (const auto &obstacle : obstacles)
+    {
+        obstacle_protos.add_obstacles()->CopyFrom(obstacle->createObstacleProto());
+    }
     LOG(VISUALIZE) << obstacle_protos;
     auto end = std::chrono::high_resolution_clock::now();
     auto duration =
@@ -365,6 +382,11 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
                                        return robot.id() == robots_to_assign.at(row).id();
                                    }),
                     remaining_robots.end());
+
+                const auto tactic_obstacles = primitives[robot_id]->getGeneratedObstacles();
+                obstacles.insert(obstacles.end(),
+                                 tactic_obstacles.begin(),
+                                 tactic_obstacles.end());
                 break;
             }
         }

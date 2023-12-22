@@ -47,3 +47,17 @@ message CostVisualization
     uint32 num_cols      = 2;
     repeated double cost = 3;
 }
+
+message Obstacle
+{
+    oneof obstacle
+    {
+        Polygon polygon = 1;
+        Circle circle   = 2;
+    }
+}
+
+message ObstacleList
+{
+    repeated Obstacle obstacles = 1;
+}

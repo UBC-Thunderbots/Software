@@ -57,7 +57,7 @@ class Obstacle
     /**
      * Creates an obstacle proto representation
      */
-    virtual TbotsProto::Obstacles createObstacleProto() const = 0;
+    virtual TbotsProto::Obstacle createObstacleProto() const = 0;
 
     /**
      * Draw a velocity obstacle for the given agent to this obstacle
@@ -91,9 +91,9 @@ class Obstacle
  * @param the geom object
  * @return the obstacle proto
  */
-TbotsProto::Obstacles createObstacleProto(const Polygon& polygon);
-TbotsProto::Obstacles createObstacleProto(const Rectangle& rectangle);
-TbotsProto::Obstacles createObstacleProto(const Circle& circle);
+TbotsProto::Obstacle createObstacleProto(const Polygon& polygon);
+TbotsProto::Obstacle createObstacleProto(const Rectangle& rectangle);
+TbotsProto::Obstacle createObstacleProto(const Circle& circle);
 
 template <typename GEOM_TYPE>
 class GeomObstacle : public Obstacle
@@ -111,7 +111,7 @@ class GeomObstacle : public Obstacle
     bool contains(const Point& p) const override;
     double distance(const Point& p) const override;
     bool intersects(const Segment& segment) const override;
-    TbotsProto::Obstacles createObstacleProto() const override;
+    TbotsProto::Obstacle createObstacleProto() const override;
     Rectangle axisAlignedBoundingBox(double inflation_radius = 0) const override;
     std::string toString(void) const override;
     void accept(ObstacleVisitor& visitor) const override;
@@ -180,7 +180,7 @@ std::vector<Point> GeomObstacle<GEOM_TYPE>::rasterize(const double resolution_si
 }
 
 template <typename GEOM_TYPE>
-TbotsProto::Obstacles GeomObstacle<GEOM_TYPE>::createObstacleProto() const
+TbotsProto::Obstacle GeomObstacle<GEOM_TYPE>::createObstacleProto() const
 {
     return ::createObstacleProto(geom_);
 }

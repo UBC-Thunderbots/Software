@@ -167,13 +167,12 @@ gdb --args bazel-bin/{full_system}
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for proto_class in [
-            Obstacles,
             PathVisualization,
             PassVisualization,
             CostVisualization,
             NamedValue,
             PlayInfo,
-            ObstaclesList,
+            ObstacleList,
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir=self.full_system_runtime_dir,

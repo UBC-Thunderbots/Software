@@ -56,13 +56,11 @@ void Ai::checkAiConfig()
             TbotsProto::Play play_proto;
             play_proto.set_name(current_override);
             overridePlayFromProto(play_proto);
-            std::cout << "Overriding to " << current_override << std::endl;
         }
         else
         {
             // Clear play override if we're running Ai Selection
             overridePlay(nullptr);
-            std::cout << "Clearing override" << std::endl;
         }
     }
 }

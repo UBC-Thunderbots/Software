@@ -8,3 +8,8 @@ std::unique_ptr<TbotsProto::Primitive> StopPrimitive::generatePrimitiveProtoMess
     stop_primitive_msg->mutable_stop();
     return stop_primitive_msg;
 }
+
+std::vector<ObstaclePtr> StopPrimitive::getGeneratedObstacles() const
+{
+    return std::vector<ObstaclePtr>();
+}
