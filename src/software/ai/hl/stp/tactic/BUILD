@@ -44,7 +44,6 @@ cc_library(
         ":stop_primitive",
         ":transition_conditions",
         "//proto/primitive:primitive_msg_factory",
-        "//software/ai/navigator/path_planner:enlsvg_path_planner",
         "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",

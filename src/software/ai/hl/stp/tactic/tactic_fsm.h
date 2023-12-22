@@ -6,7 +6,6 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/hl/stp/tactic/primitive.h"
 #include "software/ai/hl/stp/tactic/stop_primitive.h"
-#include "software/ai/navigator/path_planner/enlsvg_path_planner.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
 
