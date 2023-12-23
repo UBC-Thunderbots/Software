@@ -101,8 +101,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
 
     // Reset the visualization protobufs
-    obstacle_list = TbotsProto::ObstacleList();
-    path_visualization          = TbotsProto::PathVisualization();
+    obstacle_list.Clear();
+    path_visualization.Clear();
 
     tactic_robot_id_assignment.clear();
 
@@ -363,7 +363,7 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
 
                 // Only generate primitive proto message for the final primitive to robot
                 // assignment
-                auto primitive_proto = primitives[robot_id]->generatePrimitiveProtoMessage( // TODO: Does this only run 6 times? or 36times?
+                auto primitive_proto = primitives[robot_id]->generatePrimitiveProtoMessage( // TODO (NIMA): Does this only run 6 times? or 36times?
                         world, motion_constraints, obstacle_factory
                 );
                 primitives_to_run->mutable_robot_primitives()->insert(

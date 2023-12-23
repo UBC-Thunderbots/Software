@@ -179,7 +179,15 @@ std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedT
 std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
     const std::vector<double>& costs, int num_rows, int num_cols);
 
-// TODO (NIMA): Add documentation. DOes this also need to be optional?
+/**
+ * Generate a 2D Trajectory Path given 2D trajectory parameters
+ *
+ * @param params 2D Trajectory Path
+ * @param robot_constants Constants to use for the trajectory
+ * @param initial_velocity Initial velocity to use for the trajectory
+ * @return TrajectoryPath, or std::nullopt if the trajectory path could not be created
+ * from the given parameters
+ */
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     const TbotsProto::TrajectoryPathParams2D& params,
     const RobotConstants& robot_constants, const Vector& initial_velocity);

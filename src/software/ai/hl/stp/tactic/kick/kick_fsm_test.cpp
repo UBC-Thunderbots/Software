@@ -22,7 +22,7 @@ TEST(KickFSMTest, test_transitions)
     // Transition to GetBehindBallFSM state's GetBehindBallState
     fsm.process_event(KickFSM::Update(
         control_params,
-        TacticUpdate(robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
         boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
@@ -34,7 +34,7 @@ TEST(KickFSMTest, test_transitions)
                   Timestamp::fromSeconds(123));
     fsm.process_event(KickFSM::Update(
         control_params,
-        TacticUpdate(robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     // Transition to KickState
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM::KickState>));
 
@@ -46,6 +46,6 @@ TEST(KickFSMTest, test_transitions)
     // Tactic is done
     fsm.process_event(KickFSM::Update(
         control_params,
-        TacticUpdate(robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {})));
+        TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }

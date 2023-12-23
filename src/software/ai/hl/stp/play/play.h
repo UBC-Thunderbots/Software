@@ -82,6 +82,11 @@ class Play
 
     std::map<std::shared_ptr<const Tactic>, RobotId> tactic_robot_id_assignment;
 
+    // List of all obstacles in the world at the current iteration
+    // and all robot paths. Used for visualization
+    TbotsProto::ObstacleList obstacle_list;
+    TbotsProto::PathVisualization path_visualization;
+
     // TODO (#2359): make pure virtual once all plays are not coroutines
     /**
      * Updates the priority tactic vector with new tactics
@@ -181,11 +186,6 @@ class Play
     PriorityTacticVector priority_tactics;
 
     uint64_t sequence_number = 0;
-
-    // List of all obstacles in the world at the current iteration
-    // used for visualization
-    TbotsProto::ObstacleList obstacle_list;
-    TbotsProto::PathVisualization path_visualization;
 
     RobotNavigationObstacleFactory obstacle_factory;
 };

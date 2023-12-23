@@ -79,8 +79,9 @@ class TrajectoryPath : public Trajectory2D
     std::vector<BoundingBox> getBoundingBoxes() const override;
 
     /**
-     * TODO (NIMA): docs
-     * @return
+     * Get the list of TrajectoryPathNodes that make up this trajectory path
+     *
+     * @return The list of TrajectoryPathNodes that make up this trajectory path
      */
     const std::vector<TrajectoryPathNode>& getTrajectoryPathNodes() const;
 

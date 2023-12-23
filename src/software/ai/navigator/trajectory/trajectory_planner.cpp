@@ -1,6 +1,7 @@
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 
-#include "external/tracy/public/tracy/Tracy.hpp"
+#include <tracy/Tracy.hpp>
+
 #include "proto/message_translation/tbots_protobuf.h"
 
 TrajectoryPlanner::TrajectoryPlanner()

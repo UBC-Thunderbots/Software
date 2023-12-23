@@ -7,7 +7,8 @@
 #include <QtCore/QString>
 #include <iostream>
 
-#include "external/tracy/public/tracy/Tracy.hpp"
+#include <tracy/Tracy.hpp>
+
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"

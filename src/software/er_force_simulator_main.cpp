@@ -1,6 +1,6 @@
 #include <boost/program_options.hpp>
 
-#include "external/tracy/public/tracy/Tracy.hpp"
+#include <tracy/Tracy.hpp>
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/tbots_software_msgs.pb.h"

@@ -38,6 +38,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
     const World &world,
     const InterPlayCommunication &, const SetInterPlayCommunicationCallback &)
 {
+    obstacle_list.Clear();
+    path_visualization.Clear();
+
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
     for (const auto &robot : world.friendlyTeam().getAllRobots())
     {
@@ -59,10 +62,17 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
             primitives_to_run->mutable_robot_primitives()->insert(
                 {robot.id(), *primitive_proto});
             tactic->setLastExecutionRobot(robot.id());
+
+            primitives[robot.id()]->getVisualizationProtos(obstacle_list, path_visualization);
         }
     }
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
         world.getMostRecentTimestamp().toSeconds());
+
+    // Visualize all obstacles and paths
+    LOG(VISUALIZE) << obstacle_list;
+    LOG(VISUALIZE) << path_visualization;
+
     return primitives_to_run;
 }
 
