@@ -4,9 +4,13 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 
-TrajectoryPlanner::TrajectoryPlanner()
+TrajectoryPlanner::TrajectoryPlanner() : relative_sub_destinations(getRelativeSubDestinations())
 {
-    // Initialize the relative sub-destinations array
+}
+
+std::vector<Vector> TrajectoryPlanner::getRelativeSubDestinations()
+{
+    std::vector<Vector> relative_sub_destinations;
     const Angle sub_angles = Angle::full() / NUM_SUB_DESTINATION_ANGLES;
     for (const double distance : SUB_DESTINATION_DISTANCES_METERS)
     {
@@ -14,9 +18,10 @@ TrajectoryPlanner::TrajectoryPlanner()
         {
             Angle angle = sub_angles * i;
             relative_sub_destinations.emplace_back(
-                Vector::createFromAngle(angle).normalize(distance));
+                    Vector::createFromAngle(angle).normalize(distance));
         }
     }
+    return relative_sub_destinations;
 }
 
 TrajectoryPath TrajectoryPlanner::findTrajectory(
@@ -49,7 +54,6 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     // Return direct trajectory to the destination if it doesn't have any collisions
     if (!best_traj_with_cost.collides())
     {
-        last_sub_dest = std::nullopt;
         return best_traj_with_cost.traj_path;
     }
 
@@ -63,52 +67,6 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
             sub_destinations.emplace_back(sub_dest);
         }
     }
-
-    //    // TODO: Don't know last sub destination doesnt improve
-    //    if (last_sub_dest.has_value())
-    //    {
-    //        Point sub_dest = last_sub_dest.value();
-    //        TrajectoryPathWithCost sub_trajectory = getDirectTrajectoryWithCost(
-    //                start, sub_dest, initial_velocity, constraints, tree, obstacles);
-    //
-    //        for (double connection_time = SUB_DESTINATION_STEP_INTERVAL_SEC;
-    //             connection_time <= sub_trajectory.traj_path.getTotalTime();
-    //             connection_time += LAST_SUB_DESTINATION_STEP_INTERVAL_SEC)
-    //        {
-    //            // Copy the sub trajectory, then append a trajectory to the
-    //            // actual destination at connection_time
-    //            TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;
-    //            traj_path_to_dest.append(constraints, connection_time, destination);
-    //            TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
-    //                    traj_path_to_dest, tree, obstacles, sub_trajectory,
-    //                    connection_time);
-    //
-    //            // Incentivize following the last sub-destination
-    //            full_traj_with_cost.cost -= LAST_SUB_DESTINATION_BONUS;
-    //            if (full_traj_with_cost.cost< best_traj_with_cost.cost)
-    //            {
-    //                best_traj_with_cost = full_traj_with_cost;
-    //                last_sub_dest = sub_dest;
-    //            }
-    //
-    //            // Later connection_times will generally result in a longer trajectory
-    //            duration,
-    //            // thus, if this trajectory does not have a collision, then we can not
-    //            // get a better trajectory with a later connection_time
-    //            // Alternatively, if this trajectory does collide and their exists a
-    //            trajectory
-    //            // that doesn't collide and has a shorter duration, then we're not going
-    //            to find
-    //            // a better trajectory by increasing the connection time.
-    //            if (!full_traj_with_cost.collides() ||
-    //                (!best_traj_with_cost.collides() &&
-    //                 full_traj_with_cost.traj_path.getTotalTime() >
-    //                 best_traj_with_cost.traj_path.getTotalTime()))
-    //            {
-    //                break;
-    //            }
-    //        }
-    //    }
 
     int num_traj = 1;
     // Add trajectories that go through sub-destinations
@@ -134,7 +92,6 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
             if (full_traj_with_cost.cost < best_traj_with_cost.cost)
             {
                 best_traj_with_cost = full_traj_with_cost;
-                last_sub_dest       = sub_dest;
             }
 
             // Later connection_times will generally result in a longer trajectory
@@ -153,11 +110,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
         }
     }
 
-    //    LOG(DEBUG) << "Best traj found with cost: " << best_traj_with_cost.cost << "
-    //    num_traj: " << num_traj << " which has collision? " <<
-    //    best_traj_with_cost.collides();
-
-    // TODO: Added for debugging
+    // TODO (NIMA): Added for debugging
     auto end_time = std::chrono::high_resolution_clock::now();
     total_time +=
         std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time)
@@ -166,7 +119,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     num_calls++;
     if (num_calls % 1000 == 0)
     {
-        std::cout << "Average findTrajectory time (ignoring direct trajs): "
+        std::cout << "Average single findTrajectory time (ignoring direct trajs): "
                   << total_time / num_calls << "us" << std::endl;
         total_time = 0;
         num_calls  = 0;
@@ -180,18 +133,13 @@ TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
     const KinematicConstraints &constraints, aabb::Tree &obstacle_tree,
     const std::vector<ObstaclePtr> &obstacles)
 {
-    // TODO: Consider removing this function and just using getTrajectoryWithCost
+    // TODO (NIMA): Consider removing this function and just using getTrajectoryWithCost
     return getTrajectoryWithCost(
         TrajectoryPath(
             std::make_shared<BangBangTrajectory2D>(
                 start, destination, initial_velocity, constraints.getMaxVelocity(),
                 constraints.getMaxAcceleration(), constraints.getMaxDeceleration()),
-            [](const KinematicConstraints &constraints, const Point &initial_pos,
-               const Point &final_pos, const Vector &initial_vel) {
-                return std::make_shared<BangBangTrajectory2D>(
-                    initial_pos, final_pos, initial_vel, constraints.getMaxVelocity(),
-                    constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
-            }),
+            BangBangTrajectory2D::generator),
         obstacle_tree, obstacles, std::nullopt, std::nullopt);
 }
 
@@ -231,7 +179,7 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     }
     traj_with_cost.collision_duration_front_s = first_non_collision_time;
 
-    // TODO: Should fill colliding_obstacle ptr if it collides
+    // TODO (NIMA): Should fill colliding_obstacle ptr if it collides
 
     // Find the duration we're within an obstacle before search_end_time_s
     double last_non_collision_time = getLastNonCollisionTime(
@@ -252,7 +200,7 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     {
         std::pair<double, ObstaclePtr> collision = getFirstCollisionTime(
             trajectory, possible_collisions_indices, obstacles, first_non_collision_time,
-            last_non_collision_time);  // TODO: Can we limit start based on
+            last_non_collision_time);  // TODO (NIMA): Can we limit start based on
                                        // sub_traj_duration_sec?
         traj_with_cost.first_collision_time_s = collision.first;
         traj_with_cost.colliding_obstacle     = collision.second;

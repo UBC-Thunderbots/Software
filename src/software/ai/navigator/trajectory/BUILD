@@ -58,6 +58,7 @@ cc_library(
         ":trajectory_2d",
         "//software/geom:bounding_box",
         "//software/geom:point",
+        "//software/ai/navigator/trajectory:kinematic_constraints",
     ],
 )
 

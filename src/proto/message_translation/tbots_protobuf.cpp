@@ -421,19 +421,13 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     {
         initial_destination = createPoint(params.sub_destination());
     }
-    // TODO: 2D Trajectory should also take in KinematicConstraints
+    // TODO (NIMA): 2D Trajectory should also take in KinematicConstraints
     auto trajectory = std::make_shared<BangBangTrajectory2D>(
         createPoint(params.start_position()), initial_destination, initial_velocity,
         max_speed, robot_constants.robot_max_acceleration_m_per_s_2,
         robot_constants.robot_max_deceleration_m_per_s_2);
 
-    TrajectoryPath trajectory_path(
-        trajectory, [](const KinematicConstraints& constraints, const Point& initial_pos,
-                       const Point& final_pos, const Vector& initial_vel) {
-            return std::make_shared<BangBangTrajectory2D>(
-                initial_pos, final_pos, initial_vel, constraints.getMaxVelocity(),
-                constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
-        });
+    TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);
 
     if (params.connection_time() != 0)
     {

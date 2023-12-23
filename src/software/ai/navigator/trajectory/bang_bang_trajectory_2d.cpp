@@ -114,3 +114,12 @@ std::vector<BoundingBox> BangBangTrajectory2D::getBoundingBoxes() const
     return {BoundingBox({x_min_max.first, y_min_max.first},
                         {x_min_max.second, y_min_max.second})};
 }
+
+std::shared_ptr<Trajectory2D>
+BangBangTrajectory2D::generator(const KinematicConstraints &constraints, const Point &initial_pos,
+                                const Point &final_pos, const Vector &initial_vel)
+{
+    return std::make_shared<BangBangTrajectory2D>(
+            initial_pos, final_pos, initial_vel, constraints.getMaxVelocity(),
+            constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
+}

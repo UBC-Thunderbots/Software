@@ -143,12 +143,7 @@ connection_time: 0.4
         robot_constants.robot_max_deceleration_m_per_s_2);
 
     TrajectoryPath trajectory_path(
-        trajectory, [](const KinematicConstraints& constraints, const Point& initial_pos,
-                       const Point& final_pos, const Vector& initial_vel) {
-            return std::make_shared<BangBangTrajectory2D>(
-                initial_pos, final_pos, initial_vel, constraints.getMaxVelocity(),
-                constraints.getMaxAcceleration(), constraints.getMaxDeceleration());
-        });
+        trajectory, BangBangTrajectory2D::generator);
     trajectory_path.append(
         KinematicConstraints(max_speed, robot_constants.motor_max_acceleration_m_per_s_2,
                              robot_constants.robot_max_deceleration_m_per_s_2),

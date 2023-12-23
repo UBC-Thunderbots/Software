@@ -1,9 +1,11 @@
 #pragma once
 
+#include <memory>
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d.h"
 #include "software/ai/navigator/trajectory/trajectory_2d.h"
 #include "software/geom/bounding_box.h"
 #include "software/geom/point.h"
+#include "software/ai/navigator/trajectory/kinematic_constraints.h"
 
 class BangBangTrajectory2D : public Trajectory2D
 {
@@ -30,6 +32,9 @@ class BangBangTrajectory2D : public Trajectory2D
     BangBangTrajectory2D(const Point& initial_pos, const Point& final_pos,
                          const Vector& initial_vel, double max_vel, double max_accel,
                          double max_decel);
+
+    static std::shared_ptr<Trajectory2D> generator(const KinematicConstraints &constraints, const Point &initial_pos,
+                                                const Point &final_pos, const Vector &initial_vel);
 
     /**
      * Generate a 2D trajectory from the initial position to the final position with the
