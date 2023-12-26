@@ -98,6 +98,9 @@ fi
 
 if [[ $(lsb_release -rs) == "22.04" ]]; then
     host_software_packages+=(qtbase5-dev)
+
+    wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/85-brltty.rules
+    sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then

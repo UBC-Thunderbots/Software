@@ -1,10 +1,6 @@
-import os
-import time
-import threading
 import argparse
 import contextlib
 import numpy
-
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
@@ -13,9 +9,9 @@ import software.python_bindings as tbots_cpp
 from software.py_constants import *
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
+from software.thunderscope.estop_helpers import get_estop_config
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import ProtoUnixIOTypes
 
 NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
@@ -148,13 +144,6 @@ if __name__ == "__main__":
         help="set realism flag to use realistic config",
     )
     parser.add_argument(
-        "--estop_path",
-        action="store",
-        type=str,
-        default="/dev/ttyACM0",
-        help="Path to the Estop",
-    )
-    parser.add_argument(
         "--estop_baudrate",
         action="store",
         type=int,
@@ -172,11 +161,15 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--cost_visualization",
+    estop_group = parser.add_mutually_exclusive_group()
+    estop_group.add_argument(
+        "--keyboard_estop",
         action="store_true",
-        help="show pass cost visualization layer",
+        default=False,
+        help="Allows the use of the spacebar as an estop instead of a physical one",
     )
-    parser.add_argument(
-        "--disable_estop",
+    estop_group.add_argument(
+        "--disable_communication",
         action="store_true",
         default=False,
         help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
@@ -204,7 +197,7 @@ if __name__ == "__main__":
 
         tscope = Thunderscope(
             config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size, args.cost_visualization
+                args.visualization_buffer_size
             ),
             layout_path=args.layout,
         )
@@ -255,7 +248,6 @@ if __name__ == "__main__":
             args.run_yellow,
             args.run_diagnostics,
             args.visualization_buffer_size,
-            args.cost_visualization,
         )
         tscope = Thunderscope(config=tscope_config, layout_path=args.layout,)
 
@@ -275,18 +267,23 @@ if __name__ == "__main__":
         # else, it will be the diagnostics proto
         current_proto_unix_io = tscope.proto_unix_io_map[ProtoUnixIOTypes.CURRENT]
 
-        # different estops use different ports this detects which one to use based on what is plugged in
-        estop_path = (
-            "/dev/ttyACM0" if os.path.isfile("/dev/ttyACM0") else "/dev/ttyUSB0"
+        estop_mode, estop_path = get_estop_config(
+            args.keyboard_estop, args.disable_communication
         )
 
         with RobotCommunication(
-            current_proto_unix_io,
-            getRobotMulticastChannel(args.channel),
-            args.interface,
-            args.disable_estop,
-            estop_path,
+            current_proto_unix_io=current_proto_unix_io,
+            multicast_channel=getRobotMulticastChannel(args.channel),
+            interface=args.interface,
+            estop_mode=estop_mode,
+            estop_path=estop_path,
         ) as robot_communication:
+
+            if estop_mode == EstopMode.KEYBOARD_ESTOP:
+                tscope.keyboard_estop_shortcut.activated.connect(
+                    robot_communication.toggle_keyboard_estop
+                )
+
             if args.run_diagnostics:
                 for tab in tscope_config.tabs:
                     if hasattr(tab, "widgets"):
@@ -325,10 +322,7 @@ if __name__ == "__main__":
     elif args.blue_log or args.yellow_log:
         tscope = Thunderscope(
             config=config.configure_replay_view(
-                args.blue_log,
-                args.yellow_log,
-                args.visualization_buffer_size,
-                args.cost_visualization,
+                args.blue_log, args.yellow_log, args.visualization_buffer_size,
             ),
             layout_path=args.layout,
         )
@@ -345,7 +339,7 @@ if __name__ == "__main__":
     else:
         tscope = Thunderscope(
             config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size, args.cost_visualization
+                args.visualization_buffer_size
             ),
             layout_path=args.layout,
         )
