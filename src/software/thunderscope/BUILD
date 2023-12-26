@@ -10,6 +10,7 @@ py_binary(
         ":constants",
         ":estop_helpers",
         ":thunderscope",
+        ":util",
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope/replay:proto_logger",
     ],
@@ -39,6 +40,17 @@ py_library(
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
+)
+
+py_library(
+    name = "util",
+    srcs = ["util.py"],
+    data = ["//software:py_constants.so"],
+    deps = [
+        "/:constants",
+        ":thread_safe_buffer",
+        "//proto/message_translation:py_tbots_protobuf",
+    ]
 )
 
 py_library(

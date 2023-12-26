@@ -1,6 +1,5 @@
 import argparse
 import contextlib
-import numpy
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
@@ -12,6 +11,7 @@ from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 import software.thunderscope.thunderscope_config as config
+from software.thunderscope.util import sync_simulation
 
 NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
@@ -150,6 +150,8 @@ if __name__ == "__main__":
         default=115200,
         help="Estop Baudrate",
     )
+    parser.add_argument(
+        "--ci_mode", action="store_true", default=False, help="Runs the simulation with sped-up time")
     parser.add_argument(
         "--enable_autoref", action="store_true", default=False, help="Enable autoref"
     )
@@ -344,41 +346,41 @@ if __name__ == "__main__":
             layout_path=args.layout,
         )
 
-        def __async_sim_ticker(tick_rate_ms: int) -> None:
+        def __sim_ticker(tick_rate_ms: int) -> None:
             """Setup the world and tick simulation forever
 
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
-            tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].register_observer(
-                WorldStateReceivedTrigger, world_state_received_buffer
-            )
+            sync_simulation()
 
-            while True:
-                world_state_received = world_state_received_buffer.get(
-                    block=False, return_cached=False
-                )
-                if not world_state_received:
-                    world_state = tbots_protobuf.create_world_state(
-                        blue_robot_locations=[
-                            tbots_cpp.Point(-3, y)
-                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                        ],
-                        yellow_robot_locations=[
-                            tbots_cpp.Point(3, y)
-                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                        ],
-                        ball_location=tbots_cpp.Point(0, 0),
-                        ball_velocity=tbots_cpp.Vector(0, 0),
+            if args.ci_mode:
+                async_sim_ticker()
+            else :
+                realtime_sim_ticker()
+           world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger) 
+           sim_proto_unix_io.register_observer(
+                   WorldStateReceivedTrigger, world_state_received_buffer)
+    
+           while True:
+               world_state_received = world_state_received_buffer.get(
+                       block=False, return_cached=False)
+               if not world_state_received:
+                   world_state = tbots_protobuf.create_world_state(
+                       blue_robot_locations=[
+                           tbots_cpp.Point(-3. y)
+                           for y in numpy.linspace(-2, 2, num_robots)
+                       ],
+                       yellow_robot_locations=[
+                           tbots_cpp.Point(3, y)
+                           for y in numpy.linspace(-2, 2, num_robots)
+                       ],
+                       ball_location=tbots_cpp.Point(0, 0),
+                       ball_velocity=tbots_cpp.Vector(0, 0),
                     )
-                    tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].send_proto(
-                        WorldState, world_state
-                    )
+                    sim_proto_unix_io.send_proto(WorldState, world_state)
                 else:
                     break
-
-                time.sleep(0.01)
 
             simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
             tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].register_observer(
@@ -396,7 +398,8 @@ if __name__ == "__main__":
                         SimulatorTick, tick
                     )
 
-                time.sleep(tick_rate_ms / 1000)
+                if not args.ci_mode:
+                    time.sleep(tick_rate_ms / 1000)
 
         # Launch all binaries
         with Simulator(
