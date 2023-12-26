@@ -3,6 +3,7 @@ import time
 import threading
 import argparse
 import contextlib
+import numpy
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
@@ -15,6 +16,8 @@ from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
 from software.thunderscope.constants import ProtoUnixIOTypes
+
+NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
 ###########################################################################
 #                         Thunderscope Main                               #
