@@ -93,7 +93,7 @@ class Thunderloop
     double getNanoseconds(timespec time);
 
     /**
-     * Sends ErrorCodes for BAT, CAP, CPU TEMP, DRIBBLER TEMP if over thresholds
+     * Sends ErrorCodes for BAT, CAP, CPU TEMP if over thresholds
      */
     void sendErrorCodes();
 
@@ -116,7 +116,6 @@ class Thunderloop
 
     // Error Codes
     TbotsProto::ErrorCode error_code;
-    bool sent_errors[3] = {false, false, false};
     // Current State
     RobotConstants_t robot_constants_;
     Angle current_orientation_;

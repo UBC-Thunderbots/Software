@@ -411,20 +411,20 @@ double Thunderloop::getCpuTemperature()
 
 void Thunderloop::sendErrorCodes()
 {
+    // Clear existing codes
+    robot_status_.clear_error_code();
+
     // Sends error code once for threshold
-    if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE && !sent_errors[0])
+    if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
-        sent_errors[0] = true;
     }
-    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE && !sent_errors[1])
+    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
-        sent_errors[1] = true;
     }
-    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP && !sent_errors[2])
+    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
-        sent_errors[2] = true;
     }
 }

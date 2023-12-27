@@ -245,7 +245,7 @@ class SensorFusionTest : public ::testing::Test
         return robot_msg;
     }
 
-    std::unique_ptr<TbotsProto::RobotStatus> initLowCapErrorCode()
+    std::unique_ptr<TbotsProto::RobotStatus> initHighCapErrorCode()
     {
         // Adding a HIGH_CAP error code to robotStatus of robot 2
         auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
@@ -270,8 +270,6 @@ class SensorFusionTest : public ::testing::Test
         auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
         robot_msg->set_robot_id(2);
         robot_msg->add_error_code(TbotsProto::ErrorCode::HIGH_CAP);
-        robot_msg->add_error_code(TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT);
-
         return robot_msg;
     }
 
