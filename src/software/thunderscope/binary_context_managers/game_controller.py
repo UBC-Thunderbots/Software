@@ -193,7 +193,7 @@ class Gamecontroller(object):
 
         return ci_output_list
 
-    def send_ci_input(self, ci_input):
+    def send_ci_input(self, ci_input: proto.ssl_gc_ci_pb2.CiInput):
         """
         Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
 
@@ -215,7 +215,7 @@ class Gamecontroller(object):
 
         return ci_output_list
 
-    def reset_team(self, name, team):
+    def reset_team(self, name: str, team: str):
         """
         Returns an UpdateTeamState proto for the gamecontroller to reset team info.
 
@@ -234,7 +234,7 @@ class Gamecontroller(object):
 
         return update_team_state
 
-    def reset_game(self, division):
+    def reset_game(self, division: proto.ssl_gc_common_pb2.Division):
         """
         Returns an UpdateConfig proto for the Gamecontroller to reset game info.
 
@@ -250,11 +250,11 @@ class Gamecontroller(object):
 
         return game_update
 
-    def reset_team_info(self, division):
+    def reset_team_info(self, division: proto.ssl_gc_common_pb2.Division):
         """
         Sends a message to the Gamecontroller to reset Team information.
 
-        :param division the Division proto corresponding to the game division to set up the Gamecontroller for
+        :param division: the Division proto corresponding to the game division to set up the Gamecontroller for
 
         :return: a list of CiOutput protos from the Gamecontroller
         """
@@ -278,5 +278,22 @@ class Gamecontroller(object):
         ci_input.api_inputs.append(input_blue_update)
         ci_input.api_inputs.append(input_yellow_update)
         ci_input.api_inputs.append(input_game_update)
+
+        return self.send_ci_input(ci_input)
+
+    def update_game_engine_config(self, config: proto.ssl_gc_engine_config_pb2):
+        """
+        Sends a game engine config update.
+
+        :param config: the new SSL game engine config
+
+        :return: a list of CiOutput protos from the Gamecontroller
+        """
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+
+        game_config_input = Input()
+        game_config_input.config_delta.CopyFrom(config)
+
+        ci_input.api_inputs.append(game_config_input)
 
         return self.send_ci_input(ci_input)

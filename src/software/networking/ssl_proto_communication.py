@@ -85,7 +85,7 @@ class SslSocket(object):
                 ci_output.ParseFromString(response_data[offset : offset + msg_len])
             except protobuf_message.DecodeError as err:
                 raise SslSocketProtoParseException(
-                    "ProtoDecode Error parsing proto: " + err.args
+                    "Error parsing proto: {}".format(err)
                 )
 
             if not ci_output.IsInitialized():

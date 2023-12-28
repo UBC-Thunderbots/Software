@@ -7,6 +7,7 @@ from software.networking.ssl_proto_communication import (
 from software.py_constants import NANOSECONDS_PER_MILLISECOND
 import software.python_bindings as tbots_cpp
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from subprocess import Popen
 
@@ -65,18 +66,33 @@ class TigersAutoref(object):
             return
 
         self.auto_ref_proc_thread = threading.Thread(
-            target=self.start_autoref, daemon=True
+            target=self._start_autoref, daemon=True
         )
         self.auto_ref_proc_thread.start()
 
         self.auto_ref_wrapper_thread = threading.Thread(
-            target=self.send_to_autoref_and_forward_to_gamecontroller
+            target=self._send_to_autoref_and_forward_to_gamecontroller
         )
         self.auto_ref_wrapper_thread.start()
 
         return self
 
-    def send_geometry(self):
+    def _force_gamecontroller_to_accept_all_events(self):
+        """
+        Force the Gamecontroller to accept all game events proposed by the Autoref
+
+        :return: a list of CiOutput protos from the Gamecontroller
+        """
+        game_event_proto_map = Config()
+
+        for game_event in GameEvent.Type.DESCRIPTOR.values_by_name:
+            game_event_proto_map.game_event_behavior[
+                game_event
+            ] = Config.Behavior.BEHAVIOR_ACCEPT
+
+        return self.gamecontroller.update_game_engine_config(game_event_proto_map)
+
+    def _send_geometry(self):
         """
         Sends updated field geometry to the AutoRef so that the TigersAutoref knows about field sizes.
         """
@@ -98,9 +114,9 @@ class TigersAutoref(object):
                 logging.info("error with sending geometry data: \n" + parse_err.args)
 
         for ci_output in response_data:
-            self.forward_to_gamecontroller(ci_output.tracker_wrapper_packet)
+            self._forward_to_gamecontroller(ci_output.tracker_wrapper_packet)
 
-    def persistently_connect_to_autoref(self):
+    def _persistently_connect_to_autoref(self):
         """
         Connect to the TigersAutoref binary. Retry connection a few times if the connection doesn't go through in case
         the binary hasn't started yet.
@@ -120,16 +136,17 @@ class TigersAutoref(object):
 
         return False
 
-    def send_to_autoref_and_forward_to_gamecontroller(self):
+    def _send_to_autoref_and_forward_to_gamecontroller(self):
         """
         Main communication loop that sets up the TigersAutoref and coordinates communication between Simulator,
         TigersAutoref and Gamecontroller. Returns early if connection to the TigersAutoref binary was unsuccessful.
         """
-        if not self.persistently_connect_to_autoref():
+        if not self._persistently_connect_to_autoref():
             logging.info("Failed to connect to autoref binary. Is it running?")
             return
 
-        self.send_geometry()
+        self._force_gamecontroller_to_accept_all_events()
+        self._send_geometry()
         self.gamecontroller.reset_team_info(Division.DIV_B)
 
         self.gamecontroller.send_gc_command(
@@ -150,13 +167,15 @@ class TigersAutoref(object):
                 response_data = self.ci_socket.receive(AutoRefCiOutput)
 
                 for ci_output in response_data:
-                    self.forward_to_gamecontroller(ci_output.tracker_wrapper_packet)
+                    self._forward_to_gamecontroller(ci_output.tracker_wrapper_packet)
             except SslSocketProtoParseException:
                 logging.info(
                     "error with receiving AutoRefCiOutput, ignoring this packet..."
                 )
 
-    def forward_to_gamecontroller(self, tracker_wrapper):
+    def _forward_to_gamecontroller(
+        self, tracker_wrapper: proto.ssl_vision_wrapper_tracked_pb2.TrackerWrapperPacket
+    ):
         """
         Uses the given tracker_wrapper to create a CiInput for the Gamecontroller to track. Uses the timestamp from the
         given tracker_wrapper to support asynchronous ticking.
@@ -173,7 +192,7 @@ class TigersAutoref(object):
 
         return self.gamecontroller.send_ci_input(ci_input)
 
-    def start_autoref(self):
+    def _start_autoref(self):
         """
         Starts the TigersAutoref binary.
         """
@@ -193,7 +212,7 @@ class TigersAutoref(object):
         else:
             self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
 
-    def setup_ssl_wrapper_packets(self, autoref_proto_unix_io):
+    def setup_ssl_wrapper_packets(self, autoref_proto_unix_io: ProtoUnixIO):
         """
         Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the
         Gamecontroller in CI mode.

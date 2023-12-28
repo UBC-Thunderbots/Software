@@ -56,7 +56,7 @@ class ThreadedUnixSender:
                     send = proto.SerializeToString()
                     self.socket.sendto(send, self.unix_path)
                 except EncodeError:
-                    logging.warning(
+                    logging.error(
                         "Received an invalid proto of type {}".format(
                             proto.DESCRIPTOR.full_name
                         )
