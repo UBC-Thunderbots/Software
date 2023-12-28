@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 import socket
@@ -18,7 +20,6 @@ from software.thunderscope.binary_context_managers.util import *
 
 
 class Gamecontroller(object):
-
     """ Gamecontroller Context Manager """
 
     CI_MODE_LAUNCH_DELAY_S = 0.3
@@ -193,7 +194,7 @@ class Gamecontroller(object):
 
         return ci_output_list
 
-    def send_ci_input(self, ci_input: proto.ssl_gc_ci_pb2.CiInput):
+    def send_ci_input(self, ci_input: proto.ssl_gc_ci_pb2.CiInput) -> list[CiOutput]:
         """
         Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
 
@@ -215,7 +216,7 @@ class Gamecontroller(object):
 
         return ci_output_list
 
-    def reset_team(self, name: str, team: str):
+    def reset_team(self, name: str, team: str) -> UpdateTeamState:
         """
         Returns an UpdateTeamState proto for the gamecontroller to reset team info.
 
@@ -234,7 +235,7 @@ class Gamecontroller(object):
 
         return update_team_state
 
-    def reset_game(self, division: proto.ssl_gc_common_pb2.Division):
+    def reset_game(self, division: proto.ssl_gc_common_pb2.Division) -> UpdateConfig:
         """
         Returns an UpdateConfig proto for the Gamecontroller to reset game info.
 
@@ -250,7 +251,9 @@ class Gamecontroller(object):
 
         return game_update
 
-    def reset_team_info(self, division: proto.ssl_gc_common_pb2.Division):
+    def reset_team_info(
+        self, division: proto.ssl_gc_common_pb2.Division
+    ) -> list[CiOutput]:
         """
         Sends a message to the Gamecontroller to reset Team information.
 
@@ -281,7 +284,9 @@ class Gamecontroller(object):
 
         return self.send_ci_input(ci_input)
 
-    def update_game_engine_config(self, config: proto.ssl_gc_engine_config_pb2):
+    def update_game_engine_config(
+        self, config: proto.ssl_gc_engine_config_pb2
+    ) -> list[CiOutput]:
         """
         Sends a game engine config update.
 

@@ -14,7 +14,15 @@ def async_sim_ticker(
     blue_proto_unix_io: ProtoUnixIO,
     yellow_proto_unix_io: ProtoUnixIO,
     sim_proto_unix_io: ProtoUnixIO,
-):
+) -> None:
+    """
+    Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
+
+    :param tick_rate_ms:            the interval between consequent ticks (ms) 
+    :param blue_proto_unix_io:      ProtoUnixIO for the Blue FullSystem 
+    :param yellow_proto_unix_io:    ProtoUnixIO for the Yellow FullSystem
+    :param sim_proto_unix_io:       ProtoUnixIO for the Simulation
+    """
     blue_primitive_set_buffer = ThreadSafeBuffer(
         buffer_size=1, protobuf_type=PrimitiveSet
     )
@@ -36,7 +44,14 @@ def async_sim_ticker(
 
 def realtime_sim_ticker(
     tick_rate_ms: int, sim_proto_unix_io: ProtoUnixIO, tscope: Thunderscope
-):
+) -> None:
+    """
+    Tick simulation in real-time. Requires Thunderscope to be open.
+
+    :param tick_rate_ms:        the interval between consequent ticks (ms) and delay between sending Vision messages
+    :param sim_proto_unix_io:   ProtoUnixIO for the Simulation
+    :param tscope:              Thunderscope instance that is tied to the simulation ticking
+    """
     simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
     sim_proto_unix_io.register_observer(SimulationState, simulation_state_buffer)
 
@@ -51,7 +66,13 @@ def realtime_sim_ticker(
         time.sleep(tick_rate_ms / 1000)
 
 
-def sync_simulation(sim_proto_unix_io: ProtoUnixIO, num_robots: int):
+def sync_simulation(sim_proto_unix_io: ProtoUnixIO, num_robots: int) -> None:
+    """
+    Ensure that simulator has synchronized with the default world state.
+
+    :param sim_proto_unix_io:   ProtoUnixIO for the Simulation
+    :param num_robots:          Number of robots to initialize the simulator with
+    """
     world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
     sim_proto_unix_io.register_observer(
         WorldStateReceivedTrigger, world_state_received_buffer
@@ -62,16 +83,7 @@ def sync_simulation(sim_proto_unix_io: ProtoUnixIO, num_robots: int):
             block=False, return_cached=False
         )
         if not world_state_received:
-            world_state = tbots_protobuf.create_world_state(
-                blue_robot_locations=[
-                    tbots_cpp.Point(-3, y) for y in numpy.linspace(-2, 2, num_robots)
-                ],
-                yellow_robot_locations=[
-                    tbots_cpp.Point(3, y) for y in numpy.linspace(-2, 2, num_robots)
-                ],
-                ball_location=tbots_cpp.Point(0, 0),
-                ball_velocity=tbots_cpp.Vector(0, 0),
-            )
+            world_state = tbots_protobuf.create_default_world_state(num_robots)
             sim_proto_unix_io.send_proto(WorldState, world_state)
         else:
             break

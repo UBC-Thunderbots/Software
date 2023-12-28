@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import socket
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
@@ -24,7 +26,7 @@ class SslSocket(object):
 
     RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, port):
+    def __init__(self, port: int) -> None:
         """
         Open a TCP socket with the given port, to communicate with other processes. It binds the socket to INADDR_ANY
         which binds the socket to all local interfaces, meaning that it will listen to traffic on the specified port on
@@ -36,7 +38,7 @@ class SslSocket(object):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect(("", port))
 
-    def send(self, proto):
+    def send(self, proto: protobuf_message.Message) -> None:
         """
         Send the proto through the socket.
 
@@ -51,7 +53,9 @@ class SslSocket(object):
         # Send a request to the host with the size of the message
         self.socket.send(encoder._VarintBytes(size) + proto.SerializeToString())
 
-    def receive(self, proto_type):
+    def receive(
+        self, proto_type: type[protobuf_message.Message]
+    ) -> List[protobuf_message.Message]:
         """
         Receives proto(s) on the socket and returns them, given the proto type to expect. This function is blocking
 
@@ -98,7 +102,7 @@ class SslSocket(object):
 
         return responses
 
-    def close(self):
+    def close(self) -> None:
         """
         Closes the socket associated with this object.
         """

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.networking.ssl_proto_communication import (
@@ -37,14 +39,14 @@ class TigersAutoref(object):
 
     def __init__(
         self,
-        tick_rate_ms,
-        ci_mode=False,
-        autoref_runtime_dir=None,
-        buffer_size=5,
-        gc=Gamecontroller(),
-        supress_logs=True,
-        show_gui=False,
-    ):
+        tick_rate_ms: int,
+        ci_mode: bool = False,
+        autoref_runtime_dir: str = None,
+        buffer_size: int = 5,
+        gc: Gamecontroller = Gamecontroller(),
+        supress_logs: bool = True,
+        show_gui: bool = False,
+    ) -> None:
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
         self.auto_ref_wrapper_thread = None
@@ -58,7 +60,7 @@ class TigersAutoref(object):
         self.current_timestamp = int(time.time_ns())
         self.show_gui = show_gui
 
-    def __enter__(self):
+    def __enter__(self) -> "self":
         if not os.path.exists("/opt/tbotspython/autoReferee/bin/autoReferee"):
             logging.info(
                 "Could not find autoref binary, did you run ./setup_software.sh"
@@ -77,7 +79,7 @@ class TigersAutoref(object):
 
         return self
 
-    def _force_gamecontroller_to_accept_all_events(self):
+    def _force_gamecontroller_to_accept_all_events(self) -> list[CiOutput]:
         """
         Force the Gamecontroller to accept all game events proposed by the Autoref
 
@@ -92,7 +94,7 @@ class TigersAutoref(object):
 
         return self.gamecontroller.update_game_engine_config(game_event_proto_map)
 
-    def _send_geometry(self):
+    def _send_geometry(self) -> None:
         """
         Sends updated field geometry to the AutoRef so that the TigersAutoref knows about field sizes.
         """
@@ -116,7 +118,7 @@ class TigersAutoref(object):
         for ci_output in response_data:
             self._forward_to_gamecontroller(ci_output.tracker_wrapper_packet)
 
-    def _persistently_connect_to_autoref(self):
+    def _persistently_connect_to_autoref(self) -> bool:
         """
         Connect to the TigersAutoref binary. Retry connection a few times if the connection doesn't go through in case
         the binary hasn't started yet.
@@ -136,7 +138,7 @@ class TigersAutoref(object):
 
         return False
 
-    def _send_to_autoref_and_forward_to_gamecontroller(self):
+    def _send_to_autoref_and_forward_to_gamecontroller(self) -> None:
         """
         Main communication loop that sets up the TigersAutoref and coordinates communication between Simulator,
         TigersAutoref and Gamecontroller. Returns early if connection to the TigersAutoref binary was unsuccessful.
@@ -175,7 +177,7 @@ class TigersAutoref(object):
 
     def _forward_to_gamecontroller(
         self, tracker_wrapper: proto.ssl_vision_wrapper_tracked_pb2.TrackerWrapperPacket
-    ):
+    ) -> list[CiOutput]:
         """
         Uses the given tracker_wrapper to create a CiInput for the Gamecontroller to track. Uses the timestamp from the
         given tracker_wrapper to support asynchronous ticking.
@@ -192,7 +194,7 @@ class TigersAutoref(object):
 
         return self.gamecontroller.send_ci_input(ci_input)
 
-    def _start_autoref(self):
+    def _start_autoref(self) -> None:
         """
         Starts the TigersAutoref binary.
         """
@@ -212,7 +214,7 @@ class TigersAutoref(object):
         else:
             self.tigers_autoref_proc = Popen(autoref_cmd.split(" "))
 
-    def setup_ssl_wrapper_packets(self, autoref_proto_unix_io: ProtoUnixIO):
+    def setup_ssl_wrapper_packets(self, autoref_proto_unix_io: ProtoUnixIO) -> None:
         """
         Registers as an observer of TrackerWrapperPackets from the Simulator, so that they can be forwarded to the
         Gamecontroller in CI mode.
@@ -222,7 +224,7 @@ class TigersAutoref(object):
         autoref_proto_unix_io.register_observer(SSL_WrapperPacket, self.wrapper_buffer)
         autoref_proto_unix_io.register_observer(Referee, self.referee_buffer)
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         if self.tigers_autoref_proc:
             self.tigers_autoref_proc.kill()
             self.tigers_autoref_proc.wait()

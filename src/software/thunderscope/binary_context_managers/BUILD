@@ -44,4 +44,7 @@ py_library(
     data = [
         "//software/autoref:run_autoref",
     ],
+    deps = [
+        ":game_controller",
+    ],
 )
