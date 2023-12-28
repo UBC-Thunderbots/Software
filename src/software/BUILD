@@ -103,20 +103,3 @@ pybind_extension(
         ":python_bindings_lib",
     ],
 )
-
-py_binary(
-    name = "ai_vs_ai_ci",
-    srcs = ["ai_vs_ai_ci.py"],
-    data = [
-        "//software:er_force_simulator_main",
-        "//software:python_bindings.so",
-    ],
-    deps = [
-        "//proto/message_translation:py_tbots_protobuf",
-        "//software/thunderscope:binary_context_managers",
-        "//software/thunderscope:proto_unix_io",
-        "//software/thunderscope:thread_safe_buffer",
-        "//software/thunderscope/replay:proto_logger",
-        requirement("numpy"),
-    ],
-)
