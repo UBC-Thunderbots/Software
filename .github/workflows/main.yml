@@ -171,11 +171,11 @@ jobs:
         with:
           name: blue-ai-vs-ai-proto-logs
           path: |
-            /tmp/tbots/blue/logs
+            /tmp/tbots/blue/proto_.*
 
       - name: Upload AI vs AI logs
         uses: actions/upload-artifact@v3
         with:
           name: yellow-ai-vs-ai-proto-logs
           path: |
-            /tmp/tbots/yellow/logs
+            /tmp/tbots/yellow/proto_.*

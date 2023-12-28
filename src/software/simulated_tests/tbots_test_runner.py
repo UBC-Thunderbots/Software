@@ -96,7 +96,7 @@ class TbotsTestRunner(object):
         ):
             team = Team.YELLOW
 
-        self.gamecontroller.send_ci_input(
+        self.gamecontroller.send_gc_command(
             gc_command=gc_command,
             team=team,
             final_ball_placement_point=final_ball_placement_point,
