@@ -5,6 +5,7 @@ from threading import Thread
 
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
+from google.protobuf.message import EncodeError
 from software.py_constants import UNIX_BUFFER_SIZE
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
@@ -51,9 +52,16 @@ class ThreadedUnixSender:
         while not self.stop:
             proto = self.proto_buffer.get(block=True, return_cached=False)
             if proto is not None:
-                send = proto.SerializeToString()
                 try:
+                    send = proto.SerializeToString()
                     self.socket.sendto(send, self.unix_path)
+                except EncodeError:
+                    logging.warning(
+                        "Received an invalid proto of type {}".format(
+                            proto.DESCRIPTOR.full_name
+                        )
+                    )
+                    self.send_failures = 0
                 except Exception:
                     self.send_failures += 1
                     if (

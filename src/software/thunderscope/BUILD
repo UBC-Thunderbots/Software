@@ -11,7 +11,9 @@ py_binary(
         ":estop_helpers",
         ":thunderscope",
         ":util",
-        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
         "//software/thunderscope/replay:proto_logger",
     ],
 )
@@ -21,7 +23,6 @@ py_library(
     srcs = ["thunderscope.py"],
     data = [
         "thunderscope-logo.png",
-        "//software:er_force_simulator_main",
         "//software:py_constants.so",
         "//software:python_bindings.so",
     ],
@@ -32,11 +33,14 @@ py_library(
         "//proto/message_translation:py_tbots_protobuf",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
-        "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:constants",
         "//software/thunderscope:dock_style",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
+        "//software/thunderscope/binary_context_managers:tigers_autoref",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
@@ -47,10 +51,10 @@ py_library(
     srcs = ["util.py"],
     data = ["//software:py_constants.so"],
     deps = [
-        "/:constants",
+        ":constants",
         ":thread_safe_buffer",
         "//proto/message_translation:py_tbots_protobuf",
-    ]
+    ],
 )
 
 py_library(
@@ -132,22 +136,6 @@ py_library(
 py_library(
     name = "thread_safe_buffer",
     srcs = ["thread_safe_buffer.py"],
-)
-
-py_library(
-    name = "binary_context_managers",
-    srcs = ["binary_context_managers.py"],
-    data = [
-        "//software:er_force_simulator_main",
-        "//software:unix_full_system",
-        "//software/autoref:run_autoref",
-    ],
-    deps = [
-        ":thread_safe_buffer",
-        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
-        "//proto/message_translation:py_tbots_protobuf",
-        "//software/networking:ssl_proto_communication",
-    ],
 )
 
 py_library(
