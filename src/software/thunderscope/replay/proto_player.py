@@ -405,14 +405,19 @@ class ProtoPlayer:
 
                 with self.replay_controls_mutex:
 
-                    # Unpack the current entry in the chunk
-                    (
-                        self.current_packet_time,
-                        proto_class,
-                        proto,
-                    ) = ProtoPlayer.unpack_log_entry(
-                        self.current_chunk[self.current_entry_index]
-                    )
+                    try:
+                        # Unpack the current entry in the chunk
+                        (
+                            self.current_packet_time,
+                            proto_class,
+                            proto,
+                        ) = ProtoPlayer.unpack_log_entry(
+                            self.current_chunk[self.current_entry_index]
+                        )
+                    except ValueError:
+                        self.current_entry_index += 1
+                        logging.error("[ProtoPlayer] Error parsing log entry")
+                        continue
                     self.current_entry_index += 1
 
                     # Manage playback speed, if this packet needs to be sent
