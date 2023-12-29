@@ -155,8 +155,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     // algorithm that we use here
 
     auto now                          = std::chrono::high_resolution_clock::now();
-    static int num_calls              = 0;
-    static long int total_duration_us = 0;
     for (unsigned int i = 0; i < priority_tactics.size(); i++)
     {
         auto tactic_vector = priority_tactics[i];
@@ -204,13 +202,19 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     auto end = std::chrono::high_resolution_clock::now();
     auto duration =
         std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();
-    total_duration_us += duration;
-    if (++num_calls % 300 == 0)
+    durations.push_back(duration);
+    if (durations.size() > 300)
     {
-        LOG(INFO) << "Average time to assign tactics and generate trajs: "
-                  << total_duration_us / num_calls << " us" << std::endl;
-        total_duration_us = 0;
-        num_calls         = 0;
+        std::sort(durations.begin(), durations.end());
+        // Get and print 50th, 80th, 90th, 95th, 99th percentile
+        LOG(INFO) << "Play::Get  50th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.5)]
+                  << "us, 80th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.8)]
+                  << "us, 90th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.9)]
+                  << "us, 95th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.95)]
+                  << "us, 99th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.99)]
+                  << "us, 100th: " << durations[durations.size() - 1] << "us"
+                  << std::endl;
+        durations.clear();
     }
 
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(

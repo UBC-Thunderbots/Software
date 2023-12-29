@@ -83,7 +83,7 @@ class TrajectoryPlanner
 
     const std::vector<Vector> relative_sub_destinations;
     static constexpr std::array<double, 4> SUB_DESTINATION_DISTANCES_METERS = {0.1, 1.1,
-                                                                               2.1, 3};
+                                                                               2.3, 3};
     static constexpr unsigned int NUM_SUB_DESTINATION_ANGLES                = 16;
 
     const double SUB_DESTINATION_STEP_INTERVAL_SEC         = 0.2;

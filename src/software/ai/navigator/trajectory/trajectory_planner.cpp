@@ -29,8 +29,9 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles,
     const Rectangle &navigable_area)
 {
-    static long int total_time = 0;
-    static int num_calls       = 0;
+
+    // TODO (NIMA): REMOVE
+    static std::vector<long int> durations;
     auto start_time            = std::chrono::high_resolution_clock::now();
 
     // TODO: This can probably be shared between all findTrajectory calls in the same
@@ -112,17 +113,20 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
 
     // TODO (NIMA): Added for debugging
     auto end_time = std::chrono::high_resolution_clock::now();
-    total_time +=
-        std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time)
-            .count();
-
-    num_calls++;
-    if (num_calls % 1000 == 0)
+    durations.push_back(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time)
+                                .count());
+    if (durations.size() > 1800)
     {
-        std::cout << "Average single findTrajectory time (ignoring direct trajs): "
-                  << total_time / num_calls << "us" << std::endl;
-        total_time = 0;
-        num_calls  = 0;
+        std::sort(durations.begin(), durations.end());
+        // Get and print 50th, 80th, 90th, 95th, 99th percentile
+        std::cout << "Single Traj  50th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.5)]
+                  << "us, 80th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.8)]
+                  << "us, 90th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.9)]
+                  << "us, 95th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.95)]
+                  << "us, 99th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.99)]
+                  << "us, 100th: " << durations[durations.size() - 1] << "us"
+                  << std::endl;
+        durations.clear();
     }
 
     return best_traj_with_cost.traj_path;
