@@ -128,3 +128,14 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
     ],
 )
+
+cc_test(
+    name = "primitive_test",
+    srcs = ["primitive_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        ":move_primitive",
+        ":stop_primitive",
+        "//software/test_util",
+    ],
+)
