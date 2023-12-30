@@ -21,7 +21,7 @@ class SensorFusionTest : public ::testing::Test
           geom_data(initSSLDivBGeomData()),
           robot_status_msg_id_1(initRobotStatusId1()),
           robot_status_msg_id_2(initRobotStatusId2()),
-          robot_status_msg_high_cap(initLowCapErrorCode()),
+          robot_status_msg_high_cap(initHighCapErrorCode()),
           robot_status_msg_dribble_motor_hot(initDribbleMotorHotErrorCode()),
           robot_status_msg_multiple_error_codes(initMultipleErrorCode()),
           robot_status_msg_no_error_code(initNoErrorCode()),

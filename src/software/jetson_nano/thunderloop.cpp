@@ -349,7 +349,7 @@ Thunderloop::~Thunderloop() {}
                                        std::to_string(power_status_.current_draw()));
             redis_client_->asyncCommit();
 
-            sendErrorCodes();
+            updateErrorCodes();
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
@@ -409,12 +409,12 @@ double Thunderloop::getCpuTemperature()
     }
 }
 
-void Thunderloop::sendErrorCodes()
+void Thunderloop:: updateErrorCodes()
 {
     // Clear existing codes
     robot_status_.clear_error_code();
 
-    // Sends error code once for threshold
+    // Updates error status
     if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
