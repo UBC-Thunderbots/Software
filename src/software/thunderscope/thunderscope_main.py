@@ -1,16 +1,25 @@
 import argparse
 import numpy
+import os
+import threading
+import time
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
-from proto.message_translation import tbots_protobuf
+from proto.import_all_protos import *
 import software.python_bindings as tbots_cpp
 from software.py_constants import *
+import proto.message_translation.tbots_protobuf as tbots_protobuf
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 import software.thunderscope.thunderscope_config as config
+
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
