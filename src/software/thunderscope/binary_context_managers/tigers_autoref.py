@@ -6,11 +6,12 @@ from software.networking.ssl_proto_communication import (
     SslSocketProtoParseException,
     SslSocket,
 )
-from software.py_constants import NANOSECONDS_PER_MILLISECOND
+from software.py_constants import NANOSECONDS_PER_MILLISECOND, SECONDS_PER_NANOSECOND
 import software.python_bindings as tbots_cpp
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.time_provider import TimeProvider
 from subprocess import Popen
 
 import logging
@@ -19,7 +20,7 @@ import threading
 import time
 
 
-class TigersAutoref(object):
+class TigersAutoref(TimeProvider):
     """
     A wrapper over the TigersAutoref binary. It coordinates communication between the Simulator, TigersAutoref and
     Gamecontroller. 
@@ -39,30 +40,41 @@ class TigersAutoref(object):
 
     def __init__(
         self,
+        gc: Gamecontroller,
         tick_rate_ms: int,
         ci_mode: bool = False,
-        autoref_runtime_dir: str = None,
         buffer_size: int = 5,
-        gc: Gamecontroller = Gamecontroller(),
         supress_logs: bool = True,
         show_gui: bool = False,
     ) -> None:
+        """
+        Constructor
+
+        :param gc:              gamecontroller instance
+        :param tick_rate_ms:    the interval between subsequent SSL Vision packets
+        :param ci_mode:         true to run the autoref binary in CI mode (use system time or use the time from the
+                                CiInput messages)
+        :param buffer_size:     buffer size for the SSL wrapper and referee packets
+        :supress_logs:          true silences logs from the Autoref binary, otherwise shows them (its very verbose)
+        :show_gui:              true shows the Tigers' autoref GUI, false runs it in headless mode
+        """
         self.tigers_autoref_proc = None
         self.auto_ref_proc_thread = None
         self.auto_ref_wrapper_thread = None
         self.ci_mode = ci_mode
-        self.autoref_runtime_dir = autoref_runtime_dir
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
         self.gamecontroller = gc
         self.supress_logs = supress_logs
         self.tick_rate_ms = tick_rate_ms
-        self.current_timestamp = int(time.time_ns())
         self.show_gui = show_gui
+
+        self.current_timestamp = int(time.time_ns())
+        self.timestamp_mutex = threading.Lock()
 
     def __enter__(self) -> "self":
         if not os.path.exists("/opt/tbotspython/autoReferee/bin/autoReferee"):
-            logging.info(
+            logging.warning(
                 "Could not find autoref binary, did you run ./setup_software.sh"
             )
             return
@@ -73,11 +85,15 @@ class TigersAutoref(object):
         self.auto_ref_proc_thread.start()
 
         self.auto_ref_wrapper_thread = threading.Thread(
-            target=self._send_to_autoref_and_forward_to_gamecontroller
+            target=self._send_to_autoref_and_forward_to_gamecontroller, daemon=True
         )
         self.auto_ref_wrapper_thread.start()
 
         return self
+
+    def time_provider(self):
+        with self.timestamp_mutex:
+            return self.current_timestamp * SECONDS_PER_NANOSECOND
 
     def _force_gamecontroller_to_accept_all_events(self) -> list[CiOutput]:
         """
@@ -107,7 +123,6 @@ class TigersAutoref(object):
 
         self.ci_socket.send(ci_input)
 
-        response_data = None
         while True:
             try:
                 response_data = self.ci_socket.receive(AutoRefCiOutput)
@@ -144,7 +159,7 @@ class TigersAutoref(object):
         TigersAutoref and Gamecontroller. Returns early if connection to the TigersAutoref binary was unsuccessful.
         """
         if not self._persistently_connect_to_autoref():
-            logging.info("Failed to connect to autoref binary. Is it running?")
+            logging.warning("Failed to connect to autoref binary. Is it running?")
             return
 
         self._force_gamecontroller_to_accept_all_events()
@@ -175,6 +190,11 @@ class TigersAutoref(object):
                     "error with receiving AutoRefCiOutput, ignoring this packet..."
                 )
 
+            with self.timestamp_mutex:
+                self.current_timestamp += int(
+                    self.tick_rate_ms * NANOSECONDS_PER_MILLISECOND
+                )
+
     def _forward_to_gamecontroller(
         self, tracker_wrapper: proto.ssl_vision_wrapper_tracked_pb2.TrackerWrapperPacket
     ) -> list[CiOutput]:
@@ -186,8 +206,8 @@ class TigersAutoref(object):
 
         :return: a list of CiOutput protos received from the Gamecontroller
         """
-        ci_input = CiInput(timestamp=self.current_timestamp)
-        self.current_timestamp += int(self.tick_rate_ms * NANOSECONDS_PER_MILLISECOND)
+        with self.timestamp_mutex:
+            ci_input = CiInput(timestamp=self.current_timestamp)
 
         ci_input.api_inputs.append(Input())
         ci_input.tracker_packet.CopyFrom(tracker_wrapper)

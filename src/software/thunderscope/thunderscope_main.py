@@ -391,18 +391,13 @@ if __name__ == "__main__":
             args.debug_yellow_full_system,
             True,
             False,
-        ) as yellow_fs, ProtoLogger(
-            args.blue_full_system_runtime_dir,
-        ) as blue_logger, ProtoLogger(
-            args.yellow_full_system_runtime_dir,
-        ) as yellow_logger, Gamecontroller(
+        ) as yellow_fs, Gamecontroller(
             supress_logs=(not args.verbose), ci_mode=args.enable_autoref
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
             # All calls to autoref should be guarded with args.enable_autoref
             TigersAutoref(
-                autoref_runtime_dir="/tmp/tbots/autoref",
                 ci_mode=True,
                 gc=gamecontroller,
                 supress_logs=(not args.verbose),
@@ -411,7 +406,13 @@ if __name__ == "__main__":
             )
             if args.enable_autoref
             else contextlib.nullcontext()
-        ) as autoref:
+        ) as autoref, ProtoLogger(
+            log_path=args.blue_full_system_runtime_dir,
+            time_provider=autoref.time_provider if args.enable_autoref else None,
+        ) as blue_logger, ProtoLogger(
+            log_path=args.yellow_full_system_runtime_dir,
+            time_provider=autoref.time_provider if args.enable_autoref else None,
+        ) as yellow_logger:
             autoref_proto_unix_io = ProtoUnixIO()
 
             tscope.proto_unix_io_map[

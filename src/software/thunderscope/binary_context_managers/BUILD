@@ -46,5 +46,6 @@ py_library(
     ],
     deps = [
         ":game_controller",
+        "//software/thunderscope:time_provider",
     ],
 )

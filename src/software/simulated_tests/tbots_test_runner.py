@@ -5,6 +5,7 @@ import pytest
 from proto.import_all_protos import *
 from software.logger.logger import createLogger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.time_provider import TimeProvider
 from software.thunderscope.thunderscope import Thunderscope
 from proto.ssl_gc_common_pb2 import Team
 
@@ -12,7 +13,7 @@ from proto.ssl_gc_common_pb2 import Team
 logger = createLogger(__name__)
 
 
-class TbotsTestRunner(object):
+class TbotsTestRunner(object, TimeProvider):
 
     """An abstract class that represents a test runner"""
 
@@ -146,12 +147,6 @@ class TbotsTestRunner(object):
         :param worldstate: the worldstate proto to use
         """
         raise NotImplementedError("abstract class method called set_worldstate")
-
-    def time_provider(self):
-        """Provide the current time in seconds since the epoch"""
-        raise NotImplementedError(
-            "abstract method time_provider called from base class"
-        )
 
     def run_test(
         self,

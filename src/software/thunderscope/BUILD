@@ -47,6 +47,11 @@ py_library(
 )
 
 py_library(
+    name = "time_provider",
+    srcs = ["time_provider.py"],
+)
+
+py_library(
     name = "util",
     srcs = ["util.py"],
     data = ["//software:py_constants.so"],
