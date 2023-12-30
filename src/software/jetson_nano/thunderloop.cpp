@@ -409,7 +409,7 @@ double Thunderloop::getCpuTemperature()
     }
 }
 
-void Thunderloop:: updateErrorCodes()
+void Thunderloop::updateErrorCodes()
 {
     // Clear existing codes
     robot_status_.clear_error_code();
