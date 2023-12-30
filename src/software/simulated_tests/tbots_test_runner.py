@@ -13,7 +13,7 @@ from proto.ssl_gc_common_pb2 import Team
 logger = createLogger(__name__)
 
 
-class TbotsTestRunner(object, TimeProvider):
+class TbotsTestRunner(TimeProvider):
 
     """An abstract class that represents a test runner"""
 

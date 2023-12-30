@@ -11,7 +11,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from google.protobuf.message import Message
+from google.protobuf.message import DecodeError, Message
 from typing import Callable, Type
 
 
@@ -89,7 +89,10 @@ class ProtoPlayer:
 
         # We can get the total runtime of the log from the last entry in the last chunk
         last_chunk_data = ProtoPlayer.load_replay_chunk(self.sorted_chunks[-1])
-        self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-1])
+        try:
+            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-1])
+        except DecodeError:
+            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-2])
         logging.info(
             "Loaded log file with total runtime of {:.2f} seconds".format(self.end_time)
         )
