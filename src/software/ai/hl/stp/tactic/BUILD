@@ -114,6 +114,7 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/trajectory:trajectory_planner",
         "//proto/primitive:primitive_msg_factory",
+        "@tracy", # TODO (NIMA): Remove
     ],
 )
 

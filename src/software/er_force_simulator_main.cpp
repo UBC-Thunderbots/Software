@@ -1,6 +1,5 @@
 #include <boost/program_options.hpp>
 
-#include <tracy/Tracy.hpp>
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -182,7 +181,6 @@ int main(int argc, char **argv)
         // Simulator Tick Input
         auto simulator_tick = ThreadedProtoUnixListener<TbotsProto::SimulatorTick>(
             runtime_dir + SIMULATION_TICK_PATH, [&](TbotsProto::SimulatorTick input) {
-                FrameMarkNamed("TickSim");
                 std::scoped_lock lock(simulator_mutex);
 
                 // Step the simulation and send back the wrapper packets and

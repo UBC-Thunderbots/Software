@@ -1,3 +1,4 @@
+#include <tracy/Tracy.hpp>
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
@@ -47,6 +48,7 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
     const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
+    ZoneScopedN("MovePrimitive::generatePrimitiveProtoMessage");
     // Generate obstacle avoiding trajectory
     generateObstacles(world, motion_constraints, obstacle_factory);
 

@@ -2,8 +2,6 @@
 
 #include <tracy/Tracy.hpp>
 
-#include "proto/message_translation/tbots_protobuf.h"
-
 TrajectoryPlanner::TrajectoryPlanner() : relative_sub_destinations(getRelativeSubDestinations())
 {
 }
@@ -29,10 +27,10 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles,
     const Rectangle &navigable_area)
 {
-
+    ZoneScopedN("TrajectoryPlanner::findTrajectory");
     // TODO (NIMA): REMOVE
     static std::vector<long int> durations;
-    auto start_time            = std::chrono::high_resolution_clock::now();
+//    auto start_time            = std::chrono::high_resolution_clock::now();
 
     // TODO: This can probably be shared between all findTrajectory calls in the same
     // tick.
@@ -73,6 +71,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     // Add trajectories that go through sub-destinations
     for (const Point &sub_dest : sub_destinations)
     {
+        ZoneScopedN("for sub_destinations");
         TrajectoryPathWithCost sub_trajectory = getDirectTrajectoryWithCost(
             start, sub_dest, initial_velocity, constraints, tree, obstacles);
 
@@ -80,13 +79,19 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
              connection_time <= sub_trajectory.traj_path.getTotalTime();
              connection_time += SUB_DESTINATION_STEP_INTERVAL_SEC)
         {
+            ZoneScopedN("for traj");
             // Copy the sub trajectory, then append a trajectory to the
             // actual destination at connection_time
             TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;
             traj_path_to_dest.append(constraints, connection_time, destination);
+            // Return early for this sub trajectory if the trajectory can
+            // not have a lower cost than the best trajectory.
+            if (traj_path_to_dest.getTotalTime() >= best_traj_with_cost.cost)
+            {
+                break;
+            }
             // TODO: Shouldn't need to calculate cost every time, can sometimes continue
             // knowing that duration has increased
-            // TODO: The first sub trajectory will be checked over and over again!!!
             TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
                 traj_path_to_dest, tree, obstacles, sub_trajectory, connection_time);
             num_traj++;
@@ -112,9 +117,9 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     }
 
     // TODO (NIMA): Added for debugging
-    auto end_time = std::chrono::high_resolution_clock::now();
-    durations.push_back(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time)
-                                .count());
+//    auto end_time = std::chrono::high_resolution_clock::now();
+//    durations.push_back(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time)
+//                                .count());
     if (durations.size() > 1800)
     {
         std::sort(durations.begin(), durations.end());
@@ -153,6 +158,8 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
     const std::optional<double> sub_traj_duration_sec)
 {
+    ZoneScopedN("TrajectoryPlanner::getTrajectoryWithCost");
+    // TODO (NIMA): Return early if cost is over some limit?!
     TrajectoryPathWithCost traj_with_cost(trajectory);
 
     std::set<unsigned int> possible_collisions_indices;
@@ -227,30 +234,19 @@ double TrajectoryPlanner::calculateCost(
     if (traj_with_cost.colliding_obstacle != nullptr)
     {
         total_cost += 6.0;
-        // std::cout << "Colliding with obstacle: " <<
-        // traj_with_cost.colliding_obstacle->toString() << " ";
     }
 
     Point first_collision_position =
         traj_with_cost.traj_path.getPosition(traj_with_cost.first_collision_time_s);
     Point destination = traj_with_cost.traj_path.getDestination();
     total_cost += (first_collision_position - destination).length();
-    // std::cout << " + (first_collision_position - destination).length(): " <<
-    // (first_collision_position - destination).length() << " ";
 
     total_cost += std::max(
         0.0, (MAX_FUTURE_COLLISION_CHECK_SEC - traj_with_cost.first_collision_time_s));
-    // std::cout << " + std::max(0.0, (MAX_FUTURE_COLLISION_CHECK -
-    // traj_with_cost.first_collision_time)): " << std::max(0.0,
-    // (MAX_FUTURE_COLLISION_CHECK - traj_with_cost.first_collision_time)) << " ";
 
     total_cost += 3 * traj_with_cost.collision_duration_front_s;
-    // std::cout << " + 3 * traj_with_cost.collision_duration_front: " << 3 *
-    // traj_with_cost.collision_duration_front << " ";
 
     total_cost += 1 * traj_with_cost.collision_duration_back_s;
-    // std::cout << " + 1 * traj_with_cost.collision_duration_back: " << 1 *
-    // traj_with_cost.collision_duration_back << " = " << total_cost << std::endl;
 
     return total_cost;
 }

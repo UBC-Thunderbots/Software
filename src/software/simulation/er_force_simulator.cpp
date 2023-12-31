@@ -7,8 +7,6 @@
 #include <QtCore/QString>
 #include <iostream>
 
-#include <tracy/Tracy.hpp>
-
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
@@ -301,7 +299,6 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
-    ZoneScopedN("setYellowPrimitives");
     auto sim_state                   = getSimulatorState();
     const auto& sim_robots           = sim_state.yellow_robots();
     const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots, true);
@@ -321,7 +318,6 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
     const TbotsProto::PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::World> world_msg)
 {
-    ZoneScopedN("setBluePrimitives");
     auto sim_state                   = getSimulatorState();
     const auto& sim_robots           = sim_state.blue_robots();
     const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots, true);
