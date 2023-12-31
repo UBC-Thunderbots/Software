@@ -73,6 +73,10 @@ class TrajectoryPlanner
                                    const std::vector<ObstaclePtr> &obstacles,
                                    const double search_end_time_s) const;
 
+    std::vector<Point>
+    getSubDestinations(const Point &start, const Point &destination,
+                       const Rectangle &navigable_area) const;
+
     /**
      * Helper function for generating the relative sub destinations
      * given the constants below.
@@ -82,9 +86,13 @@ class TrajectoryPlanner
     static std::vector<Vector> getRelativeSubDestinations();
 
     const std::vector<Vector> relative_sub_destinations;
-    static constexpr std::array<double, 4> SUB_DESTINATION_DISTANCES_METERS = {0.1, 1.1,
-                                                                               2.3, 3};
+    static constexpr std::array<double, 4> SUB_DESTINATION_DISTANCES_METERS = {1.1, 2.3, 3};
     static constexpr unsigned int NUM_SUB_DESTINATION_ANGLES                = 16;
+
+    static constexpr double MIN_SUB_DESTINATION_DISTANCE_M                = 0.5;
+    static constexpr double MAX_SUB_DESTINATION_DISTANCE_M                = 1.5;
+    static constexpr Angle MIN_SUB_DESTINATION_ANGLE                = Angle::fromDegrees(20);
+    static constexpr Angle MAX_SUB_DESTINATION_ANGLE                = Angle::fromDegrees(140);
 
     const double SUB_DESTINATION_STEP_INTERVAL_SEC         = 0.2;
     const double COLLISION_CHECK_STEP_INTERVAL_SEC         = 0.1;

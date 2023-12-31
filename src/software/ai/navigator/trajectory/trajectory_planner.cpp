@@ -56,20 +56,9 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
         return best_traj_with_cost.traj_path;
     }
 
-    std::vector<Point> sub_destinations;
-    sub_destinations.reserve(relative_sub_destinations.size());
-    for (const Vector &relative_sub_dest : relative_sub_destinations)
-    {
-        Point sub_dest = start + relative_sub_dest;
-        if (contains(navigable_area, sub_dest))
-        {
-            sub_destinations.emplace_back(sub_dest);
-        }
-    }
-
     int num_traj = 1;
     // Add trajectories that go through sub-destinations
-    for (const Point &sub_dest : sub_destinations)
+    for (const Point &sub_dest : getSubDestinations(start, destination, navigable_area))
     {
         ZoneScopedN("for sub_destinations");
         TrajectoryPathWithCost sub_trajectory = getDirectTrajectoryWithCost(
@@ -84,14 +73,14 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
             // actual destination at connection_time
             TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;
             traj_path_to_dest.append(constraints, connection_time, destination);
-            // Return early for this sub trajectory if the trajectory can
+
+            // Return early for this sub destination if the trajectory can
             // not have a lower cost than the best trajectory.
             if (traj_path_to_dest.getTotalTime() >= best_traj_with_cost.cost)
             {
                 break;
             }
-            // TODO: Shouldn't need to calculate cost every time, can sometimes continue
-            // knowing that duration has increased
+
             TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
                 traj_path_to_dest, tree, obstacles, sub_trajectory, connection_time);
             num_traj++;
@@ -135,6 +124,32 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     }
 
     return best_traj_with_cost.traj_path;
+}
+
+std::vector<Point> TrajectoryPlanner::getSubDestinations(const Point &start, const Point &destination,
+                                                         const Rectangle& navigable_area) const
+{
+    std::vector<Point> sub_destinations;
+    Angle direction = (destination - start).orientation();
+    sub_destinations.reserve(relative_sub_destinations.size());
+
+    for (const Vector &relative_sub_dest : relative_sub_destinations)
+    {
+        Angle sub_dest_angle_to_dest = relative_sub_dest.orientation().minDiff(direction);
+        if (sub_dest_angle_to_dest < MIN_SUB_DESTINATION_ANGLE ||
+            sub_dest_angle_to_dest > MAX_SUB_DESTINATION_ANGLE)
+        {
+            continue;
+        }
+
+        Point sub_dest = start + relative_sub_dest;
+        if (!contains(navigable_area, sub_dest))
+        {
+            continue;
+        }
+        sub_destinations.emplace_back(sub_dest);
+    }
+    return sub_destinations;
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
