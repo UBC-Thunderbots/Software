@@ -5,7 +5,8 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-ShootOrPassPlay::ShootOrPassPlay(const TbotsProto::AiConfig& config, std::shared_ptr<Strategy> strategy)
+ShootOrPassPlay::ShootOrPassPlay(const TbotsProto::AiConfig &config,
+                                 std::shared_ptr<Strategy> strategy)
     : Play(config, true, strategy), control_params{}
 {
 }
@@ -20,7 +21,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-void ShootOrPassPlay::reset(const TbotsProto::AiConfig& config)
+void ShootOrPassPlay::reset(const TbotsProto::AiConfig &config)
 {
     Play::reset(config);
 
@@ -40,4 +41,6 @@ std::vector<std::string> ShootOrPassPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrPassPlay, TbotsProto::AiConfig, std::shared_ptr<Strategy>> factory;
+static TGenericFactory<std::string, Play, ShootOrPassPlay, TbotsProto::AiConfig,
+                       std::shared_ptr<Strategy>>
+    factory;

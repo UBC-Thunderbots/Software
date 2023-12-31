@@ -6,10 +6,10 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/strategy.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/navigator/path_planner/global_path_planner_factory.h"
-#include "software/ai/hl/stp/strategy.h"
 
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
 using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
@@ -39,10 +39,10 @@ class Play
      *
      * @param ai_config The AI configuration
      * @param requires_goalie Whether this plays requires a goalie
-     * @param strategy   to get and store shared calculations 
+     * @param strategy   to get and store shared calculations
      */
     explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie,
-            std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+                  std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     /**
      * Resets the play with the new given AiConfig on a configuration update
@@ -89,7 +89,8 @@ class Play
     // The Play configuration
     TbotsProto::AiConfig ai_config;
 
-    std::shared_ptr<Strategy> strategy;  // holds information about coordinating strategy between multiple Plays
+    std::shared_ptr<Strategy>
+        strategy;  // holds information about coordinating strategy between multiple Plays
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
@@ -105,7 +106,7 @@ class Play
      */
     virtual void updateTactics(const PlayUpdate& play_update);
 
-    inline virtual void initialize() {};
+    inline virtual void initialize(){};
 
     /**
      * Gets Primitives from a Tactic given the path planner factory, the world, and the

@@ -12,8 +12,8 @@
 class KickoffEnemyPlay : public Play
 {
    public:
-    KickoffEnemyPlay(const TbotsProto::AiConfig& config,
-            std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+    KickoffEnemyPlay(const TbotsProto::AiConfig &config,
+                     std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

@@ -5,7 +5,8 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-DefensePlay::DefensePlay(const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy)
+DefensePlay::DefensePlay(const TbotsProto::AiConfig &config,
+                         std::shared_ptr<Strategy> strategy)
     : Play(config, true, strategy),
       control_params{.max_allowed_speed_mode =
                          TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
@@ -21,7 +22,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     }
 }
 
-void DefensePlay::reset(const TbotsProto::AiConfig& config)
+void DefensePlay::reset(const TbotsProto::AiConfig &config)
 {
     Play::reset(config);
 
@@ -40,4 +41,6 @@ void DefensePlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, DefensePlay, TbotsProto::AiConfig, std::shared_ptr<Strategy>> factory;
+static TGenericFactory<std::string, Play, DefensePlay, TbotsProto::AiConfig,
+                       std::shared_ptr<Strategy>>
+    factory;

@@ -10,7 +10,8 @@
 class HaltPlay : public Play
 {
    public:
-    HaltPlay(const TbotsProto::AiConfig& config, std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+    HaltPlay(const TbotsProto::AiConfig &config,
+             std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

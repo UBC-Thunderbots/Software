@@ -4,7 +4,8 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-HaltTestPlay::HaltTestPlay(const TbotsProto::AiConfig& config, std::shared_ptr<Strategy> strategy)
+HaltTestPlay::HaltTestPlay(const TbotsProto::AiConfig &config,
+                           std::shared_ptr<Strategy> strategy)
     : Play(config, false, strategy)
 {
 }
@@ -22,4 +23,6 @@ void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, HaltTestPlay, TbotsProto::AiConfig, std::shared_ptr<Strategy>> factory;
+static TGenericFactory<std::string, Play, HaltTestPlay, TbotsProto::AiConfig,
+                       std::shared_ptr<Strategy>>
+    factory;

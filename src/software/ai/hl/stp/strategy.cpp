@@ -31,5 +31,5 @@ Pass Strategy::getBestPass(const Robot& robot)
 void Strategy::reset()
 {
     robot_to_best_dribble_location_ = {};
-    robot_to_best_pass_ = {};
+    robot_to_best_pass_             = {};
 }

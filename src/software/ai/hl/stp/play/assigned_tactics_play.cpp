@@ -5,7 +5,8 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-AssignedTacticsPlay::AssignedTacticsPlay(const TbotsProto::AiConfig& config, std::shared_ptr<Strategy> strategy)
+AssignedTacticsPlay::AssignedTacticsPlay(const TbotsProto::AiConfig &config,
+                                         std::shared_ptr<Strategy> strategy)
     : Play(config, false, strategy), assigned_tactics(), override_motion_constraints()
 {
 }

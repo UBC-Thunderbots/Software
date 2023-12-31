@@ -3,9 +3,9 @@
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(const TbotsProto::AiConfig& config, std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy),
-      control_params{.goalie_tactic = goalie_tactic}
+PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(const TbotsProto::AiConfig &config,
+                                           std::shared_ptr<Strategy> strategy)
+    : Play(config, true, strategy), control_params{.goalie_tactic = goalie_tactic}
 {
 }
 
@@ -16,7 +16,7 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // are phased out
 }
 
-void PenaltyKickEnemyPlay::reset(const TbotsProto::AiConfig& config)
+void PenaltyKickEnemyPlay::reset(const TbotsProto::AiConfig &config)
 {
     Play::reset(config);
 
@@ -36,5 +36,6 @@ std::vector<std::string> PenaltyKickEnemyPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay, TbotsProto::AiConfig, std::shared_ptr<Strategy>>
+static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay, TbotsProto::AiConfig,
+                       std::shared_ptr<Strategy>>
     factory;

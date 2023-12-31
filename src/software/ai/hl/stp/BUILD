@@ -9,5 +9,5 @@ cc_library(
         "//software/geom:pose",
         "//software/world:robot",
         "//software/world:robot_state",
-    ]
+    ],
 )

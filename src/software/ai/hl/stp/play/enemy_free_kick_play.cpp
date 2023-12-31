@@ -9,7 +9,8 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyFreekickPlay::EnemyFreekickPlay(const TbotsProto::AiConfig& config, std::shared_ptr<Strategy> strategy)
+EnemyFreekickPlay::EnemyFreekickPlay(const TbotsProto::AiConfig &config,
+                                     std::shared_ptr<Strategy> strategy)
     : Play(config, true, strategy)
 {
 }

@@ -11,8 +11,7 @@
 // A quality of life typedef to make things shorter and more readable
 template <class IndexType, class TypeToCreate, typename... Args>
 using GenericRegistry =
-    std::unordered_map<IndexType,
-                       std::function<std::unique_ptr<TypeToCreate>(Args...)>>;
+    std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>(Args...)>>;
 /**
  * The GenericFactory is an Abstract class that provides an interface for Generic type
  * Factories to follow. This makes it easy to maintain a list of factories and get the
@@ -116,8 +115,7 @@ class TGenericFactory : public GenericFactory<IndexType, TypeToCreate, Args...>
     TGenericFactory()
     {
         // TODO (Issue #1142): Change to use a function instead of a static variable
-        auto generic_creator =
-            [](Args... args) -> std::unique_ptr<TypeToCreate> {
+        auto generic_creator = [](Args... args) -> std::unique_ptr<TypeToCreate> {
             return std::make_unique<T>(std::forward<Args>(args)...);
         };
         GenericFactory<IndexType, TypeToCreate, Args...>::registerCreator(

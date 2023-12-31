@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-StopPlay::StopPlay(const TbotsProto::AiConfig& config, std::shared_ptr<Strategy> strategy)
+StopPlay::StopPlay(const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy)
     : Play(config, true, strategy)
 {
 }

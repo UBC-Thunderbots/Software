@@ -10,7 +10,7 @@
  */
 class Strategy
 {
-public:
+   public:
     /**
      * Get the best dribble pose for the given robot
      *
@@ -34,7 +34,7 @@ public:
      */
     void reset();
 
-private:
+   private:
     std::unordered_map<RobotId, Pose> robot_to_best_dribble_location_;
     std::unordered_map<RobotId, Pass> robot_to_best_pass_;
 };

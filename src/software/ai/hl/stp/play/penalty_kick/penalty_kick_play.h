@@ -10,11 +10,11 @@
 class PenaltyKickPlay : public Play
 {
    public:
-    PenaltyKickPlay(const TbotsProto::AiConfig& config,
-            std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+    PenaltyKickPlay(const TbotsProto::AiConfig &config,
+                    std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
-    void reset(const TbotsProto::AiConfig& config) override;
+    void reset(const TbotsProto::AiConfig &config) override;
     void updateTactics(const PlayUpdate &play_update) override;
     std::vector<std::string> getState() override;
 

@@ -8,7 +8,8 @@
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 
-Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie, std::shared_ptr<Strategy> strategy)
+Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie,
+           std::shared_ptr<Strategy> strategy)
     : strategy(strategy),
       stop_tactics(),
       requires_goalie(requires_goalie),
@@ -23,15 +24,14 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie, std::shared_ptr
     reset(ai_config);
 }
 
-void Play::reset(const TbotsProto::AiConfig& ai_config)
+void Play::reset(const TbotsProto::AiConfig &ai_config)
 {
     this->ai_config = ai_config;
-    goalie_tactic = std::make_shared<GoalieTactic>(ai_config);
+    goalie_tactic   = std::make_shared<GoalieTactic>(ai_config);
 
     // Make a new tactic_sequence
-    tactic_sequence = TacticCoroutine::pull_type(
-        boost::bind(&Play::getNextTacticsWrapper, this, _1));
-
+    tactic_sequence =
+        TacticCoroutine::pull_type(boost::bind(&Play::getNextTacticsWrapper, this, _1));
 }
 
 PriorityTacticVector Play::getTactics(const World &world)

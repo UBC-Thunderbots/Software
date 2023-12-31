@@ -10,10 +10,11 @@
 class CreaseDefensePlay : public Play
 {
    public:
-    CreaseDefensePlay(TbotsProto::AiConfig config, std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+    CreaseDefensePlay(TbotsProto::AiConfig config,
+                      std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
-    void reset(const TbotsProto::AiConfig& ai_config) override;
+    void reset(const TbotsProto::AiConfig &ai_config) override;
     void updateTactics(const PlayUpdate &play_update) override;
 
     /**

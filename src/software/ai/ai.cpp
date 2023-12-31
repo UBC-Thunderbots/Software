@@ -73,8 +73,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
     }
 
     fsm->process_event(PlaySelectionFSM::Update(
-        [this](std::shared_ptr<Play> play)
-        {
+        [this](std::shared_ptr<Play> play) {
             current_play = play;
             current_play->reset(ai_config_);
         },

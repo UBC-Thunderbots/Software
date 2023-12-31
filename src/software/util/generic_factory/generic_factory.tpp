@@ -35,8 +35,7 @@ template <class IndexType, class TypeToCreate, typename... Args>
 std::vector<std::function<std::unique_ptr<TypeToCreate>(Args...)>>
 GenericFactory<IndexType, TypeToCreate, Args...>::getRegisteredConstructors()
 {
-    std::vector<std::function<std::unique_ptr<TypeToCreate>(Args...)>>
-        constructors;
+    std::vector<std::function<std::unique_ptr<TypeToCreate>(Args...)>> constructors;
     auto registry = GenericFactory::getRegistry();
 
     for (auto iter = registry.begin(); iter != registry.end(); iter++)

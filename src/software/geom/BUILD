@@ -217,8 +217,8 @@ cc_library(
     srcs = ["pose.cpp"],
     hdrs = ["pose.h"],
     deps = [
-        ":point",
         ":angle",
+        ":point",
     ],
 )
 

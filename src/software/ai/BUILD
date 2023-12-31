@@ -16,11 +16,11 @@ cc_library(
     # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
     deps = [
         "//proto:play_info_msg_cc_proto",
+        "//software/ai/hl/stp:strategy",
         "//software/ai/hl/stp/play:all_plays",
         "//software/ai/hl/stp/play:assigned_tactics_play",
         "//software/ai/hl/stp/play:halt_play",
         "//software/ai/hl/stp/play:play_factory",
-        "//software/ai/hl/stp:strategy",
         "//software/ai/hl/stp/tactic:tactic_factory",
         "//software/time:timestamp",
         "//software/world",
