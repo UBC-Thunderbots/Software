@@ -9,14 +9,17 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyFreekickPlay::EnemyFreekickPlay() : Play(true) {}
+EnemyFreekickPlay::EnemyFreekickPlay(const TbotsProto::AiConfig& config, std::shared_ptr<Strategy> strategy)
+    : Play(config, true, strategy)
+{
+}
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
     // Init a Crease Defender Tactic
     auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.value().robot_navigation_obstacle_config());
+        ai_config.robot_navigation_obstacle_config());
 
     // These robots will both block the enemy robot taking a free kick
     std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_free_kicker = {
@@ -132,5 +135,5 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreekickPlay>
+static TGenericFactory<std::string, Play, EnemyFreekickPlay, TbotsProto::AiConfig>
     factory;

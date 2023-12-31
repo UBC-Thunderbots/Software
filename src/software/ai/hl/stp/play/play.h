@@ -9,6 +9,7 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/navigator/path_planner/global_path_planner_factory.h"
+#include "software/ai/hl/stp/strategy.h"
 
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
 using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
@@ -38,10 +39,17 @@ class Play
      *
      * @param ai_config The AI configuration
      * @param requires_goalie Whether this plays requires a goalie
+     * @param strategy   to get and store shared calculations 
      */
-    explicit Play(bool requires_goalie);
+    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie,
+            std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
-    void reset(const TbotsProto::AiConfig& ai_config);
+    /**
+     * Resets the play with the new given AiConfig on a configuration update
+     *
+     * @param ai_config the new AI configuration
+     */
+    virtual void reset(const TbotsProto::AiConfig& ai_config);
 
     /**
      * Gets Primitives from the Play given the path planner factory, the world, and
@@ -55,7 +63,7 @@ class Play
      *
      * @return the PrimitiveSet to execute
      */
-    std::unique_ptr<TbotsProto::PrimitiveSet> get(
+    virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
         const GlobalPathPlannerFactory& path_planner_factory, const World& world,
         const InterPlayCommunication& inter_play_communication,
         const SetInterPlayCommunicationCallback& set_inter_play_communication_fun);
@@ -79,7 +87,9 @@ class Play
 
    protected:
     // The Play configuration
-    std::optional<TbotsProto::AiConfig> ai_config;
+    TbotsProto::AiConfig ai_config;
+
+    std::shared_ptr<Strategy> strategy;  // holds information about coordinating strategy between multiple Plays
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;

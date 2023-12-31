@@ -20,6 +20,7 @@ cc_library(
         "//software/ai/hl/stp/play:assigned_tactics_play",
         "//software/ai/hl/stp/play:halt_play",
         "//software/ai/hl/stp/play:play_factory",
+        "//software/ai/hl/stp:strategy",
         "//software/ai/hl/stp/tactic:tactic_factory",
         "//software/time:timestamp",
         "//software/world",

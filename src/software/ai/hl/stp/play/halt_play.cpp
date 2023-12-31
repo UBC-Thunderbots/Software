@@ -3,7 +3,10 @@
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-HaltPlay::HaltPlay() : Play(false) {}
+HaltPlay::HaltPlay(const TbotsProto::AiConfig& config, std::shared_ptr<Strategy> strategy)
+    : Play(config, false, strategy)
+{
+}
 
 void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {

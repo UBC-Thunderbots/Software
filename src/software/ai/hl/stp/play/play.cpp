@@ -8,8 +8,9 @@
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 
-Play::Play(bool requires_goalie)
-    : stop_tactics(),
+Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie, std::shared_ptr<Strategy> strategy)
+    : strategy(strategy),
+      stop_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
       world_(std::nullopt)
@@ -18,12 +19,14 @@ Play::Play(bool requires_goalie)
     {
         stop_tactics.push_back(std::make_shared<StopTactic>());
     }
+
+    reset(ai_config);
 }
 
 void Play::reset(const TbotsProto::AiConfig& ai_config)
 {
-    this->ai_config = std::make_optional(ai_config);
-    goalie_tactic(std::make_shared<GoalieTactic>(ai_config));
+    this->ai_config = ai_config;
+    goalie_tactic = std::make_shared<GoalieTactic>(ai_config);
 
     // Make a new tactic_sequence
     tactic_sequence = TacticCoroutine::pull_type(
@@ -93,8 +96,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     const InterPlayCommunication &inter_play_communication,
     const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
-    CHECK(ai_config != std::nullopt) << "AiConfig must be set before getting tactics from the Play!";
-
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =
         static_cast<unsigned int>(world.friendlyTeam().numRobots());

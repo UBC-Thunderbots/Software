@@ -8,8 +8,8 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyBallPlacementPlay::EnemyBallPlacementPlay()
-    : Play(true)
+EnemyBallPlacementPlay::EnemyBallPlacementPlay(const TbotsProto::AiConfig& config, std::shared_ptr<Strategy> strategy)
+    : Play(config, true, strategy)
 {
 }
 
@@ -135,11 +135,11 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders = {
         // TODO-AKHIL: Remove this hard-coded value
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.value().robot_navigation_obstacle_config()),
+            ai_config.robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.value().robot_navigation_obstacle_config()),
+            ai_config.robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.value().robot_navigation_obstacle_config())};
+            ai_config.robot_navigation_obstacle_config())};
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_tactics = {
         std::make_shared<MoveTactic>(),
@@ -159,5 +159,5 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-static TGenericFactory<std::string, Play, EnemyBallPlacementPlay>
+static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, TbotsProto::AiConfig, std::shared_ptr<Strategy>>
     factory;

@@ -218,6 +218,7 @@ cc_library(
         "play_fsm.h",
     ],
     deps = [
+        "//software/ai/hl/stp:strategy",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",

@@ -9,9 +9,10 @@
 
 Ai::Ai(const TbotsProto::AiConfig& ai_config)
     : ai_config_(ai_config),
-      fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
+      strategy(std::make_shared<Strategy>()),
+      fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config, strategy})),
       override_play(nullptr),
-      current_play(std::make_unique<HaltPlay>(ai_config)),
+      current_play(std::make_shared<HaltPlay>(ai_config)),
       field_to_path_planner_factory(),
       ai_config_changed(false)
 {
@@ -33,7 +34,7 @@ void Ai::overridePlay(std::unique_ptr<Play> play)
 void Ai::overridePlayFromProto(TbotsProto::Play play_proto)
 {
     current_override_play_proto = play_proto;
-    overridePlay(std::move(createPlay(play_proto, ai_config_)));
+    overridePlay(std::move(createPlay(play_proto, ai_config_, strategy)));
 }
 
 void Ai::updateAiConfig(TbotsProto::AiConfig& ai_config)
@@ -68,11 +69,15 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 
     if (ai_config_changed)
     {
-        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_});
+        current_play->reset(ai_config_);
     }
 
     fsm->process_event(PlaySelectionFSM::Update(
-        [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
+        [this](std::shared_ptr<Play> play)
+        {
+            current_play = play;
+            current_play->reset(ai_config_);
+        },
         world.gameState(), ai_config_));
 
     // We construct the global path planner once for the field. If the AI Config
