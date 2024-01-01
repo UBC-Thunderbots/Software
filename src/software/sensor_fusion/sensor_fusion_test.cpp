@@ -270,6 +270,7 @@ class SensorFusionTest : public ::testing::Test
         auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
         robot_msg->set_robot_id(2);
         robot_msg->add_error_code(TbotsProto::ErrorCode::HIGH_CAP);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT);
         return robot_msg;
     }
 
