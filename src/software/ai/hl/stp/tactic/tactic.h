@@ -102,8 +102,6 @@ class Tactic
 
     virtual ~Tactic() = default;
 
-    virtual Skill calculateNextSkill();
-
    protected:
     std::optional<RobotId> last_execution_robot;
 

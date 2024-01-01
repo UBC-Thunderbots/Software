@@ -4,8 +4,8 @@ package TbotsProto;
 
 enum SkillName
 {
-    DribbleSkill    = 1;
-    PassSkill       = 2;
-    ShootSkill      = 3;
-    WingerSkill     = 4;
+    DribbleSkill    = 0;
+    PassSkill       = 1;
+    ShootSkill      = 2;
+    WingerSkill     = 3;
 }

@@ -37,17 +37,24 @@ cc_library(
     srcs = ["tactic.cpp"],
     hdrs = [
         "tactic.h",
-        "tactic_fsm.h",
         "tactic_visitor.h",
     ],
     deps = [
+        ":tactic_fsm",
         ":transition_conditions",
-        "//proto/primitive:primitive_msg_factory",
-        "//software/ai/navigator/path_planner:enlsvg_path_planner",
-        "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",
     ],
+)
+
+cc_library(
+    name = "tactic_fsm",
+    hdrs = ["tactic_fsm.h"],
+    deps = [
+        "//proto/primitive:primitive_msg_factory",
+        "//software/ai/navigator/path_planner:enlsvg_path_planner",
+        "//software/util/sml_fsm",
+    ]
 )
 
 cc_library(

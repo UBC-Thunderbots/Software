@@ -1,20 +1,28 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "dribble_tactic",
-    srcs = [
-        "dribble_fsm.cpp",
-        "dribble_tactic.cpp",
-    ],
-    hdrs = [
-        "dribble_fsm.h",
-        "dribble_tactic.h",
-    ],
+    name = "dribble_fsm",
+    srcs = ["dribble_fsm.cpp"],
+    hdrs = ["dribble_fsm.h"],
     deps = [
         "//shared:constants",
         "//software/ai/evaluation:time_to_travel",
-        "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//proto:tbots_cc_proto",
+    ]
+)
+
+cc_library(
+    name = "dribble_tactic",
+    srcs = [
+        "dribble_tactic.cpp",
+    ],
+    hdrs = [
+        "dribble_tactic.h",
+    ],
+    deps = [
+        ":dribble_fsm",
+        "//software/ai/hl/stp/tactic",
         "//software/logger",
     ],
 )

@@ -3,12 +3,19 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "skill",
     hdrs = ["skill.h"],
-    deps = ["//software/ai/hl/stp:robot_control_strategy"]
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software/ai/hl/stp/tactic/dribble:dribble_fsm",
+        "//software/ai/hl/stp/tactic:tactic_fsm",
+        "//software/ai/hl/stp:strategy",
+        "//software/util/generic_factory",
+    ]
 )
 
 cc_library(
     name = "dribble_skill",
     hdrs = ["dribble_skill.h"],
+    srcs = ["dribble_skill.cpp"],
     deps = [":skill"]
 )
 
