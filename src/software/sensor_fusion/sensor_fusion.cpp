@@ -1,6 +1,7 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
 #include "software/logger/logger.h"
+#include <tracy/Tracy.hpp>
 
 SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
     : sensor_fusion_config(sensor_fusion_config),
@@ -49,6 +50,7 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
     {
+        FrameMarkNamed("SensorFusion: New World");
         updateWorld(sensor_msg.ssl_vision_msg());
     }
 
