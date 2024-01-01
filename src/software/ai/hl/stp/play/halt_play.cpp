@@ -26,4 +26,6 @@ void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, HaltPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, HaltPlay, TbotsProto::AiConfig,
+                       std::shared_ptr<Strategy>>
+    factory;

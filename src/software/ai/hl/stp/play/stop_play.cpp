@@ -110,4 +110,6 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, StopPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, StopPlay, TbotsProto::AiConfig,
+                       std::shared_ptr<Strategy>>
+    factory;

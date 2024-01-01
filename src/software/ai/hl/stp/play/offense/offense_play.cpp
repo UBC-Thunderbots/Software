@@ -6,7 +6,9 @@
 
 OffensePlay::OffensePlay(const TbotsProto::AiConfig config,
                          std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy), control_params{}
+    : Play(config, true, strategy),
+      fsm(std::make_unique<FSM<OffensePlayFSM>>(OffensePlayFSM(config, strategy))),
+      control_params{}
 {
 }
 
@@ -20,11 +22,11 @@ void OffensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     }
 }
 
-void OffensePlay::reset(const TbotsProto::AiConfig &config)
+void OffensePlay::reset()
 {
-    Play::reset(config);
+    Play::reset();
 
-    fsm = std::make_unique<FSM<OffensePlayFSM>>(OffensePlayFSM(config));
+    fsm = std::make_unique<FSM<OffensePlayFSM>>(OffensePlayFSM(ai_config, strategy));
 }
 
 void OffensePlay::updateTactics(const PlayUpdate &play_update)

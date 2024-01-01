@@ -136,5 +136,6 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreekickPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, EnemyFreekickPlay, TbotsProto::AiConfig,
+                       std::shared_ptr<Strategy>>
     factory;

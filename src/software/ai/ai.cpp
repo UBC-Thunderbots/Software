@@ -69,13 +69,13 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 
     if (ai_config_changed)
     {
-        current_play->reset(ai_config_);
+        current_play->updateAiConfig(ai_config_);
     }
 
     fsm->process_event(PlaySelectionFSM::Update(
         [this](std::shared_ptr<Play> play) {
             current_play = play;
-            current_play->reset(ai_config_);
+            current_play->updateAiConfig(ai_config_);
         },
         world.gameState(), ai_config_));
 

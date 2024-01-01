@@ -45,11 +45,9 @@ class Play
                   std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     /**
-     * Resets the play with the new given AiConfig on a configuration update
-     *
-     * @param ai_config the new AI configuration
+     * Resets the play, required after a change in the AiConfig.
      */
-    virtual void reset(const TbotsProto::AiConfig& ai_config);
+    virtual void reset();
 
     /**
      * Gets Primitives from the Play given the path planner factory, the world, and
@@ -84,6 +82,15 @@ class Play
      * @return a vector strings representing the state
      */
     virtual std::vector<std::string> getState();
+
+    /**
+     * Updates this Play's AI config in case of a parameter change.
+     *
+     * @warning this function is NOT thread-safe
+     *
+     * @param new_config the new AI config to use for this Play
+     */
+    void updateAiConfig(const TbotsProto::AiConfig& new_config);
 
    protected:
     // The Play configuration
@@ -215,4 +222,6 @@ class Play
     PriorityTacticVector priority_tactics;
 
     uint64_t sequence_number = 0;
+
+    bool should_reset;
 };

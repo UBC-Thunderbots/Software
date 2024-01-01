@@ -42,8 +42,9 @@ struct PlaySelectionFSM
      *
      * @param ai_config the default play config for this play fsm
      */
-    explicit PlaySelectionFSM(const TbotsProto::AiConfig& ai_config,
-                              std::shared_ptr<Strategy> strategy);
+    explicit PlaySelectionFSM(
+        const TbotsProto::AiConfig& ai_config,
+        std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     /**
      * Guards for whether the game state is stopped, halted, playing, or in set up

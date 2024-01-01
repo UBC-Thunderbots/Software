@@ -5,7 +5,10 @@
 
 PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(const TbotsProto::AiConfig &config,
                                            std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy), control_params{.goalie_tactic = goalie_tactic}
+    : Play(config, true, strategy),
+      fsm(std::make_unique<FSM<PenaltyKickEnemyPlayFSM>>(
+          PenaltyKickEnemyPlayFSM(config))),
+      control_params{.goalie_tactic = goalie_tactic}
 {
 }
 
@@ -16,11 +19,12 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // are phased out
 }
 
-void PenaltyKickEnemyPlay::reset(const TbotsProto::AiConfig &config)
+void PenaltyKickEnemyPlay::reset()
 {
-    Play::reset(config);
+    Play::reset();
 
-    fsm = std::make_unique<FSM<PenaltyKickEnemyPlayFSM>>(PenaltyKickEnemyPlayFSM(config));
+    fsm = std::make_unique<FSM<PenaltyKickEnemyPlayFSM>>(
+        PenaltyKickEnemyPlayFSM(ai_config));
 }
 
 void PenaltyKickEnemyPlay::updateTactics(const PlayUpdate &play_update)

@@ -6,7 +6,9 @@
 
 PenaltyKickPlay::PenaltyKickPlay(const TbotsProto::AiConfig &config,
                                  std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy), control_params{}
+    : Play(config, true, strategy),
+      fsm(std::make_unique<FSM<PenaltyKickPlayFSM>>(PenaltyKickPlayFSM(config))),
+      control_params{}
 {
 }
 
@@ -17,11 +19,11 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // out
 }
 
-void PenaltyKickPlay::reset(const TbotsProto::AiConfig &config)
+void PenaltyKickPlay::reset()
 {
-    Play::reset(config);
+    Play::reset();
 
-    fsm = std::make_unique<FSM<PenaltyKickPlayFSM>>(PenaltyKickPlayFSM(config));
+    fsm = std::make_unique<FSM<PenaltyKickPlayFSM>>(PenaltyKickPlayFSM(ai_config));
 }
 
 void PenaltyKickPlay::updateTactics(const PlayUpdate &play_update)
