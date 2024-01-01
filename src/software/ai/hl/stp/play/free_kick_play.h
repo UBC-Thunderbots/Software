@@ -12,7 +12,8 @@
 class FreeKickPlay : public Play
 {
    public:
-    FreeKickPlay(TbotsProto::AiConfig config);
+    FreeKickPlay(const TbotsProto::AiConfig &config,
+                 std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

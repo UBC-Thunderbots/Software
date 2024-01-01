@@ -6,8 +6,8 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 ScoringFromContestedPossessionPlay::ScoringFromContestedPossessionPlay(
-    TbotsProto::AiConfig config)
-    : Play(config, false)
+    const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy)
+    : Play(config, false, strategy)
 {
 }
 
@@ -39,5 +39,5 @@ void ScoringFromContestedPossessionPlay::getNextTactics(TacticCoroutine::push_ty
 
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, ScoringFromContestedPossessionPlay,
-                       TbotsProto::AiConfig>
+                       TbotsProto::AiConfig, std::shared_ptr<Strategy>>
     factory;

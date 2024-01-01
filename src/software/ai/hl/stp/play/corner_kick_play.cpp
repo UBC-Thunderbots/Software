@@ -13,7 +13,11 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
 
-CornerKickPlay::CornerKickPlay(TbotsProto::AiConfig config) : Play(config, true) {}
+CornerKickPlay::CornerKickPlay(const TbotsProto::AiConfig &config,
+                               std::shared_ptr<Strategy> strategy)
+    : Play(config, true, strategy)
+{
+}
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
@@ -171,4 +175,6 @@ void CornerKickPlay::updateAlignToBallTactic(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, CornerKickPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, CornerKickPlay, TbotsProto::AiConfig,
+                       std::shared_ptr<Strategy>>
+    factory;

@@ -11,9 +11,11 @@
 class DefensePlay : public Play
 {
    public:
-    DefensePlay(const TbotsProto::AiConfig &config);
+    DefensePlay(const TbotsProto::AiConfig &config,
+                std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void reset() override;
     void updateTactics(const PlayUpdate &play_update) override;
 
     /**
@@ -25,6 +27,6 @@ class DefensePlay : public Play
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
    private:
-    FSM<DefensePlayFSM> fsm;
+    std::unique_ptr<FSM<DefensePlayFSM>> fsm;
     DefensePlayFSM::ControlParams control_params;
 };
