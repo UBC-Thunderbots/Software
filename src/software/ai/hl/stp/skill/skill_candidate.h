@@ -3,7 +3,7 @@
 template <typename TSkill>
 class SkillCandidate
 {
-    using SkillCreatorFun = std::function<std::shared_ptr<TSkill>();
+    using SkillCreatorFun = std::function<std::shared_ptr<TSkill>>();
 
     virtual void accept(SkillCandidateVisitor& skill_candidate_visitor, const Robot& robot, const Strategy& strategy, const World &world);
 
