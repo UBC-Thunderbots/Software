@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/skill/dribble_skill.h"
+#include "software/ai/hl/stp/tactic/attacker/skill/dribble_skill.h"
 
 DribbleSkill::DribbleSkill(const TbotsProto::AiConfig& ai_config, double inital_score)
     : Skill(ai_config, inital_score),
@@ -7,6 +7,11 @@ DribbleSkill::DribbleSkill(const TbotsProto::AiConfig& ai_config, double inital_
                                                .final_dribble_orientation = std::nullopt,
                                                .allow_excessive_dribbling = false}}
 {
+}
+
+bool DribbleSkill::done() const
+{
+    return fsm.is(boost::sml::X);
 }
 
 void DribbleSkill::updatePrimitive(const Robot& robot, const World& world,
@@ -22,9 +27,9 @@ void DribbleSkill::updatePrimitive(const Robot& robot, const World& world,
     fsm.process_event(DribbleFSM::Update(control_params, tactic_update));
 }
 
-double DribbleSkill::calculateViability(const Robot& robot, const World& world)
+double DribbleSkill::calculateViability(const Robot& robot, const World& world, std::shared_ptr<Strategy> strategy)
 {
-    return 1.0;
+    return score;
 }
 
 static TGenericFactory<std::string, Skill, DribbleSkill, TbotsProto::AiConfig, double>

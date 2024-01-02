@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/strategy.h"
+#include "software/ai/hl/stp/strategy/strategy.h"
 
 Pose Strategy::getBestDribblePose(const Robot& robot)
 {

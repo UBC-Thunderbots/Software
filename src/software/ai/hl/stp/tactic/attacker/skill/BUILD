@@ -6,11 +6,20 @@ cc_library(
     hdrs = ["skill.h"],
     deps = [
         "//proto:tbots_cc_proto",
-        "//software/ai/hl/stp:strategy",
+        "//software/ai/hl/stp/strategy:strategy",
         "//software/ai/hl/stp/tactic:tactic_fsm",
         "//software/ai/hl/stp/tactic/dribble:dribble_fsm",
         "//software/util/generic_factory",
     ],
+)
+
+cc_test(
+    name = "skill_test",
+    srcs = ["skill_test.cpp"],
+    deps = [
+        ":skill",
+        "//shared/test_util:tbots_gtest_main",
+    ]
 )
 
 cc_library(

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/skill/skill.h"
+#include "software/ai/hl/stp/tactic/attacker/skill/skill.h"
 
 Skill::Skill(const TbotsProto::AiConfig& ai_config, double default_score,
              std::optional<unsigned> seed)
@@ -9,6 +9,17 @@ Skill::Skill(const TbotsProto::AiConfig& ai_config, double default_score,
     {
         random_generator = std::mt19937(seed.value());
     }
+}
+
+double Skill::getScore()
+{
+    if (!children)
+    {
+        return score;
+    }
+
+    // TODO(#3096): This returned score should reflect the maximum score of the children
+    return 1.0;
 }
 
 void Skill::updateScore(double score)
@@ -29,6 +40,7 @@ std::shared_ptr<Skill> Skill::getNextSkill(const Robot& robot, const World& worl
         std::transform(all_registered_skill_constructors.begin(),
                        all_registered_skill_constructors.end(), children.value().begin(),
                        [&](auto& constructor) {
+                           // TODO(#3097): Make the default values adjustable via dynamic params on a per-skill basis
                            return std::move(constructor(ai_config, DEFAULT_SKILL_SCORE));
                        });
     }
