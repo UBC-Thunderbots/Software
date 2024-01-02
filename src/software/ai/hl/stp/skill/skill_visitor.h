@@ -4,8 +4,8 @@
 
 class SkillScorer
 {
-    public:
-        virtual void score(const Skill&) = delete;
+   public:
+    virtual void score(const Skill&) = delete;
 
-        virtual void score(const DribbleSkill& skill);
+    virtual void score(const DribbleSkill& skill);
 };

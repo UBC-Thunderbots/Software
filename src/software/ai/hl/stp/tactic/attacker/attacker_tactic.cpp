@@ -7,15 +7,15 @@
 
 AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
-      //fsm_map(),
+      // fsm_map(),
       ai_config(ai_config)
 {
-//    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-//    {
-//        fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
-//            DribbleFSM(ai_config.dribble_tactic_config()),
-//            AttackerFSM(ai_config.attacker_tactic_config()));
-//    }
+    //    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
+    //    {
+    //        fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
+    //            DribbleFSM(ai_config.dribble_tactic_config()),
+    //            AttackerFSM(ai_config.attacker_tactic_config()));
+    //    }
 }
 
 void AttackerTactic::accept(TacticVisitor& visitor) const
@@ -26,9 +26,10 @@ void AttackerTactic::accept(TacticVisitor& visitor) const
 void AttackerTactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
 {
     Tactic::setLastExecutionRobot(last_execution_robot);
-    if (last_execution_robot && skill_sequence.top() != next_skill_map[last_execution_robot.value().id()])
+    if (last_execution_robot &&
+        skill_sequence.top() != next_skill_map[last_execution_robot.value().id()])
     {
-       skill_sequence.push(next_skill_map[last_execution_robot.value().id()]); 
+        skill_sequence.push(next_skill_map[last_execution_robot.value().id()]);
     }
 }
 
@@ -41,7 +42,8 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     {
         primitive.reset();
 
-        robot_skill = calculateNextSkill(tactic_update.robot, tactic_update.world, tactic_update.strategy);
+        robot_skill = calculateNextSkill(tactic_update.robot, tactic_update.world,
+                                         tactic_update.strategy);
     }
 
     next_skill_map[tactic_update.robot.id()] = robot_skill;

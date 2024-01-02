@@ -2,8 +2,8 @@
 
 //#include <map>
 
-#include "software/ai/evaluation/scoring/support_tactics/support_tactic_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/support_tactic_candidate.hpp"
+#include "software/ai/evaluation/scoring/support_tactics/support_tactic_scorer.h"
 
 /**
  * Scores SupportTacticCandidates based on how many times they have already been selected
@@ -23,5 +23,5 @@ class DuplicationScorer : public SupportTacticScorer
     double score(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) override;
 
    private:
-    //std::map<SupportTacticCandidate, int> selection_counter_;
+    // std::map<SupportTacticCandidate, int> selection_counter_;
 };

@@ -9,20 +9,20 @@
  * @tparam TValue the type of the values in the TypeMap
  */
 template <class TValue>
-class TypeMap 
+class TypeMap
 {
     // Internally, we'll use a hashmap to store mappings from type
     // IDs to values
     using InternalMap = std::unordered_map<int, TValue>;
-   
+
    public:
     using Iterator      = typename InternalMap::iterator;
     using ConstIterator = typename InternalMap::const_iterator;
 
     explicit TypeMap();
-    
+
     /**
-     * Iterator methods 
+     * Iterator methods
      *
      * @see begin and end for std::unordered_map
      */
@@ -58,19 +58,19 @@ class TypeMap
    private:
     InternalMap map_;
     static int type_id_counter_;
-    
+
     /**
      * Obtains a unique identifier for the given `TKey` type
      *
      * @return a unique ID for the given `TKey` type
      */
     template <class TKey>
-    inline static int getTypeId() 
+    inline static int getTypeId()
     {
         // It is not guaranteed that std::type_info::hash_code will return
         // different hash codes for different types, so we cannot rely on it.
 
-        // The trick here is that every template instantiation of getTypeId  
+        // The trick here is that every template instantiation of getTypeId
         // is considered a completely different function, so they each will
         // have completely different static variables `id` instantiated to
         // different values. Here, `id` is instantiated to whatever the global

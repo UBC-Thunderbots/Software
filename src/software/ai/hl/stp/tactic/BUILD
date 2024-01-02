@@ -54,7 +54,7 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/path_planner:enlsvg_path_planner",
         "//software/util/sml_fsm",
-    ]
+    ],
 )
 
 cc_library(

@@ -2,7 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 
-// We forward-declare SupportTacticCandidate because if we include it, we induce a 
+// We forward-declare SupportTacticCandidate because if we include it, we induce a
 // circular dependency between support_tactic_candidate.h and support_tactic_scorer.hpp.
 template <typename TSupportTactic>
 class TypedSupportTacticCandidate;
@@ -13,7 +13,7 @@ class TypedSupportTacticCandidate;
  * We use the visitor pattern to ensure all SupportTacticScorers implement
  * a `score` method for every SupportTacticCandidate at compile time.
  */
-class SupportTacticScorer 
+class SupportTacticScorer
 {
    public:
     virtual ~SupportTacticScorer() = default;
@@ -26,5 +26,6 @@ class SupportTacticScorer
      *
      * @return the score for the SupportTacticCandidate, in the range [-1.0, 1.0]
      */
-    virtual double score(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) = 0;
+    virtual double score(
+        const TypedSupportTacticCandidate<ReceiverTactic> &candidate) = 0;
 };

@@ -5,11 +5,11 @@ cc_library(
     srcs = ["dribble_fsm.cpp"],
     hdrs = ["dribble_fsm.h"],
     deps = [
+        "//proto:tbots_cc_proto",
         "//shared:constants",
         "//software/ai/evaluation:time_to_travel",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//proto:tbots_cc_proto",
-    ]
+    ],
 )
 
 cc_library(
