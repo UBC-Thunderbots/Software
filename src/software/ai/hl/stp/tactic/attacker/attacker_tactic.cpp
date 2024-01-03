@@ -7,15 +7,8 @@
 
 AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
-      // fsm_map(),
       ai_config(ai_config)
 {
-    //    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
-    //    {
-    //        fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
-    //            DribbleFSM(ai_config.dribble_tactic_config()),
-    //            AttackerFSM(ai_config.attacker_tactic_config()));
-    //    }
 }
 
 void AttackerTactic::accept(TacticVisitor& visitor) const

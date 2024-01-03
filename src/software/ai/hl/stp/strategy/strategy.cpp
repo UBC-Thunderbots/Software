@@ -28,8 +28,29 @@ Pass Strategy::getBestPass(const Robot& robot)
     return Pass(Point(), Point(), 1);
 }
 
+std::optional<Shot> Strategy::getBestShot(const Robot& robot, const World& world)
+{
+    if (robot_to_best_shot_.contains(robot.id()))
+    {
+        return robot_to_best_shot_.at(robot.id());
+    }
+
+    robot_to_best_shot_[robot.id()] =
+        calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                           robot.position(), TeamType::ENEMY, {robot});
+    return robot_to_best_shot_[robot.id()];
+}
+
+std::vector<OffenseSupportType> Strategy::getCommittedOffenseSupport() const
+{
+    // TODO(#3098): Commit the Support tactics to this Strategy class and return their
+    // types here
+    return std::vector<OffenseSupportType>();
+}
+
 void Strategy::reset()
 {
     robot_to_best_dribble_location_ = {};
     robot_to_best_pass_             = {};
+    robot_to_best_shot_             = {};
 }

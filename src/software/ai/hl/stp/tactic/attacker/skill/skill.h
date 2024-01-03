@@ -13,14 +13,14 @@
 class Skill
 {
    public:
-    Skill(const TbotsProto::AiConfig& ai_config, double default_score,
+    Skill(const TbotsProto::AiConfig& ai_config, std::shared_ptr<Strategy> strategy,
+          double default_score,
           std::optional<unsigned> randomization_seed = std::nullopt);
 
-    virtual double calculateViability(const Robot& robot, const World& world, std::shared_ptr<Strategy> strategy) = 0;
+    virtual double calculateViability(const Robot& robot, const World& world);
 
     virtual void updatePrimitive(const Robot& robot, const World& world,
-                                 const TacticUpdate& tactic_update,
-                                 std::shared_ptr<Strategy> strategy) = 0;
+                                 const TacticUpdate& tactic_update) = 0;
 
     virtual bool done() const = 0;
 
@@ -28,8 +28,9 @@ class Skill
     void updateScore(double score);
 
    protected:
-    TbotsProto::AiConfig ai_config;
-    double score;
+    TbotsProto::AiConfig ai_config_;
+    std::shared_ptr<Strategy> strategy_;
+    double score_;
 
    private:
     virtual std::shared_ptr<Skill> getNextSkill(const Robot& robot,

@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/attacker/skill/skill.h"
 
-Skill::Skill(const TbotsProto::AiConfig& ai_config, double default_score,
-             std::optional<unsigned> seed)
-    : ai_config(ai_config), score(default_score)
+Skill::Skill(const TbotsProto::AiConfig& ai_config, std::shared_ptr<Strategy> strategy,
+             double default_score, std::optional<unsigned> seed)
+    : ai_config_(ai_config), strategy_(strategy), score_(default_score)
 {
     random_generator = std::mt19937(std::random_device()());
     if (seed)
@@ -11,11 +11,16 @@ Skill::Skill(const TbotsProto::AiConfig& ai_config, double default_score,
     }
 }
 
+double Skill::calculateViability(const Robot& robot, const World& world)
+{
+    return score_;
+}
+
 double Skill::getScore()
 {
     if (!children)
     {
-        return score;
+        return score_;
     }
 
     // TODO(#3096): This returned score should reflect the maximum score of the children
@@ -34,15 +39,18 @@ std::shared_ptr<Skill> Skill::getNextSkill(const Robot& robot, const World& worl
         children = std::make_optional<std::vector<std::shared_ptr<Skill>>>();
         auto all_registered_skill_constructors =
             GenericFactory<std::string, Skill, TbotsProto::AiConfig,
+                           std::shared_ptr<Strategy>,
                            double>::getRegisteredConstructors();
         CHECK(all_registered_skill_constructors.size() > 0)
             << "No Skills registered in the Skill factory!";
-        std::transform(all_registered_skill_constructors.begin(),
-                       all_registered_skill_constructors.end(), children.value().begin(),
-                       [&](auto& constructor) {
-                           // TODO(#3097): Make the default values adjustable via dynamic params on a per-skill basis
-                           return std::move(constructor(ai_config, DEFAULT_SKILL_SCORE));
-                       });
+        std::transform(
+            all_registered_skill_constructors.begin(),
+            all_registered_skill_constructors.end(), children.value().begin(),
+            [&](auto& constructor) {
+                // TODO(#3097): Make the default values adjustable via dynamic params on a
+                // per-skill basis
+                return std::move(constructor(ai_config_, strategy_, DEFAULT_SKILL_SCORE));
+            });
     }
 
     unsigned max_weight = 0;

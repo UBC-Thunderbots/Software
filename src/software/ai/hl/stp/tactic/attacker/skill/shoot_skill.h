@@ -1,10 +1,10 @@
 #include "software/ai/hl/stp/tactic/attacker/skill/skill.h"
 
-class PassSkill : public Skill
+class ShootSkill : public Skill
 {
    public:
-    PassSkill(const TbotsProto::AiConfig& ai_config, std::shared_ptr<Strategy> strategy,
-              double initial_score);
+    ShootSkill(const TbotsProto::AiConfig& ai_config, std::shared_ptr<Strategy> strategy,
+               double initial_score);
 
     double calculateViability(const Robot& robot, const World& world) override;
     bool done() const override;
@@ -14,4 +14,4 @@ class PassSkill : public Skill
    private:
     FSM<AttackerFSM> fsm;
     AttackerFSM::ControlParams control_params;
-};
+}

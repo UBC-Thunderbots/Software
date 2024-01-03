@@ -33,6 +33,15 @@ cc_library(
 )
 
 cc_library(
+    name = "offense_support_tactic",
+    hdrs = ["offense_support_tactic.h"],
+    deps = [
+        ":tactic",
+        "//software/util/make_enum",
+    ],
+)
+
+cc_library(
     name = "tactic",
     srcs = ["tactic.cpp"],
     hdrs = [

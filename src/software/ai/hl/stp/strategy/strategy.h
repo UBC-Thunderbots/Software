@@ -1,5 +1,7 @@
 #pragma once
 
+#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/tactic/offense_support_tactic.h"
 #include "software/ai/passing/pass.h"
 #include "software/geom/pose.h"
 #include "software/world/robot.h"
@@ -29,6 +31,10 @@ class Strategy
      */
     Pass getBestPass(const Robot& robot);
 
+    std::optional<Shot> getBestShot(const Robot& robot, const World& world);
+
+    std::vector<OffenseSupportType> getCommittedOffenseSupport() const;
+
     /**
      * Reset internal strategy calculations.
      */
@@ -37,4 +43,5 @@ class Strategy
    private:
     std::unordered_map<RobotId, Pose> robot_to_best_dribble_location_;
     std::unordered_map<RobotId, Pass> robot_to_best_pass_;
+    std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
 };

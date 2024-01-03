@@ -5,15 +5,13 @@
 class DribbleSkill : public Skill
 {
    public:
-    DribbleSkill(const TbotsProto::AiConfig& ai_config, double initial_score);
-
-    double calculateViability(const Robot& robot, const World& world, std::shared_ptr<Strategy> strategy) override;
+    DribbleSkill(const TbotsProto::AiConfig& ai_config,
+                 std::shared_ptr<Strategy> strategy, double initial_score);
 
     bool done() const override;
 
     void updatePrimitive(const Robot& robot, const World& world,
-                         const TacticUpdate& tactic_update,
-                         std::shared_ptr<Strategy> strategy) override;
+                         const TacticUpdate& tactic_update) override;
 
    private:
     FSM<DribbleFSM> fsm;
