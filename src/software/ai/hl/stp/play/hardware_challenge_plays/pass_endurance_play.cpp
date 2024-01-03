@@ -4,7 +4,11 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PassEndurancePlay::PassEndurancePlay(TbotsProto::AiConfig config) : Play(config, false) {}
+PassEndurancePlay::PassEndurancePlay(const TbotsProto::AiConfig &config,
+                                     std::shared_ptr<Strategy> strategy)
+    : Play(config, false, strategy)
+{
+}
 
 void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
@@ -53,5 +57,6 @@ void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PassEndurancePlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, PassEndurancePlay, TbotsProto::AiConfig,
+                       std::shared_ptr<Strategy>>
     factory;

@@ -13,8 +13,9 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
 
-FreeKickPlay::FreeKickPlay(TbotsProto::AiConfig config)
-    : Play(config, true), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
+FreeKickPlay::FreeKickPlay(const TbotsProto::AiConfig &config,
+                           std::shared_ptr<Strategy> strategy)
+    : Play(config, true, strategy), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
 }
 
@@ -242,4 +243,6 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, FreeKickPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, FreeKickPlay, TbotsProto::AiConfig,
+                       std::shared_ptr<Strategy>>
+    factory;

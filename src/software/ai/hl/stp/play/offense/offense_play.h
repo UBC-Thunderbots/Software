@@ -11,12 +11,14 @@
 class OffensePlay : public Play
 {
    public:
-    OffensePlay(TbotsProto::AiConfig config);
+    OffensePlay(const TbotsProto::AiConfig config,
+                std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void reset() override;
     void updateTactics(const PlayUpdate &play_update) override;
 
    private:
-    FSM<OffensePlayFSM> fsm;
+    std::unique_ptr<FSM<OffensePlayFSM>> fsm;
     OffensePlayFSM::ControlParams control_params;
 };

@@ -2,7 +2,18 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "software/ai/hl/stp/play/ball_placement_play.h"
+#include "software/ai/hl/stp/play/enemy_ball_placement_play.h"
+#include "software/ai/hl/stp/play/enemy_free_kick_play.h"
+#include "software/ai/hl/stp/play/free_kick_play.h"
+#include "software/ai/hl/stp/play/halt_play.h"
+#include "software/ai/hl/stp/play/kickoff_enemy_play.h"
+#include "software/ai/hl/stp/play/kickoff_friendly_play.h"
+#include "software/ai/hl/stp/play/offense/offense_play.h"
+#include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play.h"
+#include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/play/stop_play.h"
 
 struct PlaySelectionFSM
 {
@@ -14,14 +25,14 @@ struct PlaySelectionFSM
 
     struct Update
     {
-        Update(const std::function<void(std::unique_ptr<Play>)>& set_current_play,
+        Update(const std::function<void(std::shared_ptr<Play>)>& set_current_play,
                const GameState& game_state, const TbotsProto::AiConfig& ai_config)
             : set_current_play(set_current_play),
               game_state(game_state),
               ai_config(ai_config)
         {
         }
-        std::function<void(std::unique_ptr<Play>)> set_current_play;
+        std::function<void(std::shared_ptr<Play>)> set_current_play;
         GameState game_state;
         TbotsProto::AiConfig ai_config;
     };
@@ -31,7 +42,9 @@ struct PlaySelectionFSM
      *
      * @param ai_config the default play config for this play fsm
      */
-    explicit PlaySelectionFSM(TbotsProto::AiConfig ai_config);
+    explicit PlaySelectionFSM(
+        const TbotsProto::AiConfig& ai_config,
+        std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     /**
      * Guards for whether the game state is stopped, halted, playing, or in set up
@@ -120,4 +133,16 @@ struct PlaySelectionFSM
    private:
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<Play> current_play;
+
+    std::shared_ptr<BallPlacementPlay> ball_placement_play;
+    std::shared_ptr<EnemyBallPlacementPlay> enemy_ball_placement_play;
+    std::shared_ptr<EnemyFreekickPlay> enemy_free_kick_play;
+    std::shared_ptr<FreeKickPlay> free_kick_play;
+    std::shared_ptr<HaltPlay> halt_play;
+    std::shared_ptr<KickoffEnemyPlay> kickoff_enemy_play;
+    std::shared_ptr<KickoffFriendlyPlay> kickoff_friendly_play;
+    std::shared_ptr<OffensePlay> offense_play;
+    std::shared_ptr<PenaltyKickEnemyPlay> penalty_kick_enemy_play;
+    std::shared_ptr<PenaltyKickPlay> penalty_kick_play;
+    std::shared_ptr<StopPlay> stop_play;
 };

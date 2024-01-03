@@ -6,6 +6,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/strategy.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/navigator/path_planner/global_path_planner_factory.h"
@@ -38,8 +39,15 @@ class Play
      *
      * @param ai_config The AI configuration
      * @param requires_goalie Whether this plays requires a goalie
+     * @param strategy   to get and store shared calculations
      */
-    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
+    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie,
+                  std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+
+    /**
+     * Resets the play, required after a change in the AiConfig.
+     */
+    virtual void reset();
 
     /**
      * Gets Primitives from the Play given the path planner factory, the world, and
@@ -75,9 +83,21 @@ class Play
      */
     virtual std::vector<std::string> getState();
 
+    /**
+     * Updates this Play's AI config in case of a parameter change.
+     *
+     * @warning this function is NOT thread-safe
+     *
+     * @param new_config the new AI config to use for this Play
+     */
+    void updateAiConfig(const TbotsProto::AiConfig& new_config);
+
    protected:
     // The Play configuration
     TbotsProto::AiConfig ai_config;
+
+    std::shared_ptr<Strategy>
+        strategy;  // holds information about coordinating strategy between multiple Plays
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
@@ -200,4 +220,6 @@ class Play
     PriorityTacticVector priority_tactics;
 
     uint64_t sequence_number = 0;
+
+    bool should_reset;
 };

@@ -1,10 +1,13 @@
 #include "software/ai/hl/stp/play/offense/offense_play_fsm.h"
 
-OffensePlayFSM::OffensePlayFSM(TbotsProto::AiConfig ai_config)
+OffensePlayFSM::OffensePlayFSM(TbotsProto::AiConfig ai_config,
+                               std::shared_ptr<Strategy> strategy)
     : ai_config(ai_config),
-      shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config)),
-      defense_play(std::make_shared<DefensePlay>(ai_config))
+      shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config, strategy)),
+      defense_play(std::make_shared<DefensePlay>(ai_config, strategy))
 {
+    shoot_or_pass_play->reset();
+    defense_play->reset();
 }
 
 bool OffensePlayFSM::enemyHasPossession(const Update& event)

@@ -10,9 +10,11 @@
 class CreaseDefensePlay : public Play
 {
    public:
-    CreaseDefensePlay(TbotsProto::AiConfig config);
+    CreaseDefensePlay(TbotsProto::AiConfig config,
+                      std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void reset() override;
     void updateTactics(const PlayUpdate &play_update) override;
 
     /**
@@ -26,6 +28,6 @@ class CreaseDefensePlay : public Play
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
    private:
-    FSM<CreaseDefensePlayFSM> fsm;
+    std::unique_ptr<FSM<CreaseDefensePlayFSM>> fsm;
     CreaseDefensePlayFSM::ControlParams control_params;
 };

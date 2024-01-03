@@ -3,22 +3,34 @@
 #include <munkres/munkres.h>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 
-Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
-    : ai_config(ai_config),
+Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie,
+           std::shared_ptr<Strategy> strategy)
+    : strategy(strategy),
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
       stop_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
-      world_(std::nullopt)
+      world_(std::nullopt),
+      should_reset(false)
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
         stop_tactics.push_back(std::make_shared<StopTactic>());
     }
+}
+
+void Play::reset()
+{
+    goalie_tactic = std::make_shared<GoalieTactic>(ai_config);
+
+    // Make a new tactic_sequence
+    tactic_sequence =
+        TacticCoroutine::pull_type(boost::bind(&Play::getNextTacticsWrapper, this, _1));
 }
 
 PriorityTacticVector Play::getTactics(const World &world)
@@ -83,6 +95,12 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     const InterPlayCommunication &inter_play_communication,
     const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
+    if (should_reset)
+    {
+        reset();
+        should_reset = false;
+    }
+
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =
         static_cast<unsigned int>(world.friendlyTeam().numRobots());
@@ -409,4 +427,10 @@ std::vector<std::string> Play::getState()
 {
     // by default just return the name of the play
     return {objectTypeName(*this)};
+}
+
+void Play::updateAiConfig(const TbotsProto::AiConfig &new_config)
+{
+    ai_config    = new_config;
+    should_reset = true;
 }
