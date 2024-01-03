@@ -113,8 +113,6 @@ class Play
      */
     virtual void updateTactics(const PlayUpdate& play_update);
 
-    inline virtual void initialize(){};
-
     /**
      * Gets Primitives from a Tactic given the path planner factory, the world, and the
      * tactic
