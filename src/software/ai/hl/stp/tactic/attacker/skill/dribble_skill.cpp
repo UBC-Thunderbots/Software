@@ -15,10 +15,9 @@ bool DribbleSkill::done() const
     return fsm.is(boost::sml::X);
 }
 
-void DribbleSkill::updatePrimitive(const Robot& robot, const World& world,
-                                   const TacticUpdate& tactic_update)
+void DribbleSkill::updatePrimitive(const TacticUpdate& tactic_update)
 {
-    Pose dribble_pose = strategy_->getBestDribblePose(robot);
+    Pose dribble_pose = strategy_->getBestDribblePose(tactic_update.robot);
 
     control_params.dribble_destination       = dribble_pose.point();
     control_params.final_dribble_orientation = dribble_pose.orientation();

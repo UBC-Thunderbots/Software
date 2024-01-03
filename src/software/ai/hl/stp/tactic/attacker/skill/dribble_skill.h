@@ -10,8 +10,9 @@ class DribbleSkill : public Skill
 
     bool done() const override;
 
-    void updatePrimitive(const Robot& robot, const World& world,
-                         const TacticUpdate& tactic_update) override;
+    void updatePrimitive(const TacticUpdate& tactic_update) override;
+
+    DEFINE_SKILL_GET_FSM_STATE
 
    private:
     FSM<DribbleFSM> fsm;

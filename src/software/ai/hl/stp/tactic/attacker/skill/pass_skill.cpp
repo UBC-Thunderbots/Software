@@ -31,8 +31,7 @@ bool PassSkill::done() const
     return fsm.is(boost::sml::X);
 }
 
-void PassSkill::updatePrimitive(const Robot& robot, const World& world,
-                                const TacticUpdate& tactic_update)
+void PassSkill::updatePrimitive(const TacticUpdate& tactic_update)
 {
     Pass best_pass                  = strategy->getBestPass(robot);
     control_params.best_pass_so_far = best_pass;
@@ -42,4 +41,5 @@ void PassSkill::updatePrimitive(const Robot& robot, const World& world,
 }
 
 static TGenericFactory<std::string, Skill, PassSkill, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>, double> factory;
+                       std::shared_ptr<Strategy>, double>
+    factory;

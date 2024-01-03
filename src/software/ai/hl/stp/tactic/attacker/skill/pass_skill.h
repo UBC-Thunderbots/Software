@@ -8,8 +8,9 @@ class PassSkill : public Skill
 
     double calculateViability(const Robot& robot, const World& world) override;
     bool done() const override;
-    void updatePrimitive(const Robot& robot, const World& world,
-                         const TacticUpdate& tactic_update) override;
+    void updatePrimitive(const TacticUpdate& tactic_update) override;
+
+    DEFINE_SKILL_GET_FSM_STATE
 
    private:
     FSM<AttackerFSM> fsm;

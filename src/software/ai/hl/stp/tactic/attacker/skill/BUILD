@@ -1,6 +1,13 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "head_skill",
+    srcs = ["head_skill.cpp"],
+    hdrs = ["head_skill.h"],
+    deps = [":skill"],
+)
+
+cc_library(
     name = "skill",
     srcs = ["skill.cpp"],
     hdrs = ["skill.h"],

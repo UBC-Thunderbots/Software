@@ -7,6 +7,13 @@
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/util/generic_factory/generic_factory.h"
 
+#define DEFINE_SKILL_GET_FSM_STATE                                                       \
+    std::string getCurrentState() const override                                         \
+    {                                                                                    \
+        return getCurrentFullStateName(fsm);                                             \
+    }
+
+
 /**
  * In the new framework
  */
@@ -19,12 +26,15 @@ class Skill
 
     virtual double calculateViability(const Robot& robot, const World& world);
 
-    virtual void updatePrimitive(const Robot& robot, const World& world,
-                                 const TacticUpdate& tactic_update) = 0;
+    virtual void updatePrimitive(const TacticUpdate& tactic_update) = 0;
 
     virtual bool done() const = 0;
 
-    double getScore();
+    virtual std::string getCurrentState() const;
+
+    std::shared_ptr<Skill> getNextSkill(const Robot& robot, const World& world);
+
+    virtual double getScore() const;
     void updateScore(double score);
 
    protected:
@@ -33,9 +43,6 @@ class Skill
     double score_;
 
    private:
-    virtual std::shared_ptr<Skill> getNextSkill(const Robot& robot,
-                                                const World& world) final;
-
     std::mt19937 random_generator;
     std::optional<std::vector<std::shared_ptr<Skill>>> children;
 

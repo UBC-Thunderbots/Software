@@ -2,9 +2,10 @@
 
 #include <algorithm>
 
-ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
+ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config,
+                                       std::shared_ptr<Strategy> strategy)
     : ai_config(ai_config),
-      attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
+      attacker_tactic(std::make_shared<AttackerTactic>(ai_config, strategy)),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       pass_generator(

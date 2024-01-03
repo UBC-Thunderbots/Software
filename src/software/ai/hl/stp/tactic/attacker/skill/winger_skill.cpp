@@ -27,8 +27,7 @@ bool WingerSkill::done() const
     return true;
 }
 
-void WingerSkill::updatePrimitive(const Robot& robot, const World& world,
-                                  const TacticUpdate& tactic_update)
+void WingerSkill::updatePrimitive(const TacticUpdate& tactic_update)
 {
     // TODO(#3075): Implement WingerSkill
 }
@@ -36,4 +35,4 @@ void WingerSkill::updatePrimitive(const Robot& robot, const World& world,
 
 // TODO(#3075): Register in the GenericFactory after implementing WingerSkill
 // static TGenericFactory<std::string, Skill, WingerSkill, TbotsProto::AiConfig,
-// std::shared_ptr<Strategy>, double>
+// std::shared_ptr<Strategy>, double> factory

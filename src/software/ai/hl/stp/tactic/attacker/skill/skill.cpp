@@ -16,15 +16,9 @@ double Skill::calculateViability(const Robot& robot, const World& world)
     return score_;
 }
 
-double Skill::getScore()
+double Skill::getScore() const
 {
-    if (!children)
-    {
-        return score_;
-    }
-
-    // TODO(#3096): This returned score should reflect the maximum score of the children
-    return 1.0;
+    return score_;
 }
 
 void Skill::updateScore(double score)

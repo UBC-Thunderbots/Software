@@ -8,7 +8,8 @@
 ShootOrPassPlay::ShootOrPassPlay(const TbotsProto::AiConfig &config,
                                  std::shared_ptr<Strategy> strategy)
     : Play(config, true, strategy),
-      fsm(std::make_unique<FSM<ShootOrPassPlayFSM>>(ShootOrPassPlayFSM(config))),
+      fsm(std::make_unique<FSM<ShootOrPassPlayFSM>>(
+          ShootOrPassPlayFSM(config, strategy))),
       control_params{}
 {
 }
@@ -27,7 +28,8 @@ void ShootOrPassPlay::reset()
 {
     Play::reset();
 
-    fsm = std::make_unique<FSM<ShootOrPassPlayFSM>>(ShootOrPassPlayFSM(ai_config));
+    fsm = std::make_unique<FSM<ShootOrPassPlayFSM>>(
+        ShootOrPassPlayFSM(ai_config, strategy_));
 }
 
 void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
+#include <stack>
+
+#include "software/ai/hl/stp/tactic/attacker/skill/head_skill.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/passing/pass.h"
 
 /**
  * This tactic is for a robot performing a pass. It should be used in conjunction with
@@ -19,23 +20,32 @@ class AttackerTactic : public Tactic
      *
      * @param ai_config The AI configuration
      */
-    explicit AttackerTactic(TbotsProto::AiConfig ai_config);
+    explicit AttackerTactic(TbotsProto::AiConfig ai_config,
+                            std::shared_ptr<Strategy> strategy);
 
     AttackerTactic() = delete;
 
     void accept(TacticVisitor& visitor) const override;
 
+    inline bool done() const override
+    {
+        return false;
+    }
+
+    std::string getFSMState() const override;
+
     void setLastExecutionRobot(std::optional<RobotId> last_execution_robot) override;
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
+    void updateAiConfig(const TbotsProto::AiConfig& ai_config);
 
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    // AI config
-    TbotsProto::AiConfig ai_config;
+    TbotsProto::AiConfig ai_config;  // AI config
+    std::shared_ptr<Strategy> strategy;
 
-    std::stack<Skill> skill_sequence;
+    std::shared_ptr<HeadSkill> head_skill;
+    std::stack<std::shared_ptr<Skill>> skill_sequence;
 
     std::map<RobotId, std::shared_ptr<Skill>> next_skill_map;
 };
