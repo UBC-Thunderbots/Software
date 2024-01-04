@@ -36,15 +36,21 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     // tick.
     //       Should create a wrapper which automatically creates this (and hides it) and
     //       stores the obstacles
-    aabb::Tree tree(2, 0.0, {false, false},
-                    {navigable_area.xLength(), navigable_area.yLength()},
-                    std::max(static_cast<unsigned int>(obstacles.size()), 1u), false);
-    for (unsigned int i = 0; i < obstacles.size(); i++)
+    aabb::Tree tree;
     {
-        Rectangle aabb         = obstacles[i]->axisAlignedBoundingBox();
-        std::vector aabb_lower = {aabb.negXNegYCorner().x(), aabb.negXNegYCorner().y()};
-        std::vector aabb_upper = {aabb.posXPosYCorner().x(), aabb.posXPosYCorner().y()};
-        tree.insertParticle(i, aabb_lower, aabb_upper);
+        // TODO (NIMA): In a 66 sec profile, findTraj took
+        //  4.5 sec with this region taking 1.0 seconds
+        ZoneScopedN("aabb::Tree creation");
+        tree = aabb::Tree(2, 0.0, {false, false},
+                        {navigable_area.xLength(), navigable_area.yLength()},
+                        std::max(static_cast<unsigned int>(obstacles.size()), 1u), false);
+        for (unsigned int i = 0; i < obstacles.size(); i++)
+        {
+            Rectangle aabb         = obstacles[i]->axisAlignedBoundingBox();
+            std::vector aabb_lower = {aabb.negXNegYCorner().x(), aabb.negXNegYCorner().y()};
+            std::vector aabb_upper = {aabb.posXPosYCorner().x(), aabb.posXPosYCorner().y()};
+            tree.insertParticle(i, aabb_lower, aabb_upper);
+        }
     }
 
     TrajectoryPathWithCost best_traj_with_cost = getDirectTrajectoryWithCost(
