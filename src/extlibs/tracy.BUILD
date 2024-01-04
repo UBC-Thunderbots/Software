@@ -37,7 +37,6 @@ cc_library(
         "common/**/*.hpp",
         "tracy/*.h",
     ]),
-    #alwayslink = True,
     defines = [
         "TRACY_ENABLE",
     ],
