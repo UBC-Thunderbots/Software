@@ -6,7 +6,7 @@
 /**
  * An example Play that moves the robots in a circle around the ball
  */
-class MoveToDestAndOrientPlay : public Play
+class MoveToDestAndOrientPlay : public Play // TODO (NIMA): Remove
 {
    public:
     explicit MoveToDestAndOrientPlay(TbotsProto::AiConfig config);
