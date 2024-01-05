@@ -6,7 +6,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/ai/hl/stp/strategy.h"
+#include "software/ai/hl/stp/strategy/strategy.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/navigator/path_planner/global_path_planner_factory.h"

@@ -19,6 +19,15 @@ void AttackerTactic::accept(TacticVisitor& visitor) const
     visitor.visit(*this);
 }
 
+void AttackerTactic::updateControlParams(const Pass& best_pass_so_far,
+                                         bool pass_committed)
+{
+}
+
+void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
+{
+}
+
 std::string AttackerTactic::getFSMState() const
 {
     std::string state_str = "";

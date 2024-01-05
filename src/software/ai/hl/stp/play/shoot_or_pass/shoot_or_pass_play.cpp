@@ -29,7 +29,7 @@ void ShootOrPassPlay::reset()
     Play::reset();
 
     fsm = std::make_unique<FSM<ShootOrPassPlayFSM>>(
-        ShootOrPassPlayFSM(ai_config, strategy_));
+        ShootOrPassPlayFSM(ai_config, strategy));
 }
 
 void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)

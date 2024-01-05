@@ -1,6 +1,16 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "all_skills",
+    deps = [
+        ":dribble_skill",
+        ":pass_skill",
+        ":shoot_skill",
+        ":winger_skill"
+    ]
+)
+
+cc_library(
     name = "head_skill",
     srcs = ["head_skill.cpp"],
     hdrs = ["head_skill.h"],
@@ -34,6 +44,7 @@ cc_library(
     srcs = ["dribble_skill.cpp"],
     hdrs = ["dribble_skill.h"],
     deps = [":skill"],
+    alwayslink = True,
 )
 
 cc_test(
@@ -49,6 +60,7 @@ cc_library(
     name = "pass_skill",
     hdrs = ["pass_skill.h"],
     deps = [":skill"],
+    alwayslink = True,
 )
 
 cc_test(
@@ -65,6 +77,7 @@ cc_library(
     srcs = ["winger_skill.cpp"],
     hdrs = ["winger_skill.h"],
     deps = [":skill"],
+    alwayslink = True,
 )
 
 cc_test(
@@ -80,6 +93,7 @@ cc_library(
     name = "shoot_skill",
     hdrs = ["shoot_skill.h"],
     deps = [":skill"],
+    alwayslink = True,
 )
 
 cc_test(

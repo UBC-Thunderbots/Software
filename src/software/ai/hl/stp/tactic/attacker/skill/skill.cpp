@@ -39,12 +39,14 @@ std::shared_ptr<Skill> Skill::getNextSkill(const Robot& robot, const World& worl
             << "No Skills registered in the Skill factory!";
         std::transform(
             all_registered_skill_constructors.begin(),
-            all_registered_skill_constructors.end(), children.value().begin(),
-            [&](auto& constructor) {
+            all_registered_skill_constructors.end(),
+            std::back_inserter(children.value()),
+            [&](auto constructor) {
                 // TODO(#3097): Make the default values adjustable via dynamic params on a
                 // per-skill basis
                 return std::move(constructor(ai_config_, strategy_, DEFAULT_SKILL_SCORE));
-            });
+            }
+        );
     }
 
     unsigned max_weight = 0;

@@ -8,12 +8,13 @@ class WingerSkill : public Skill
 
     double calculateViability(const Robot& robot, const World& world) override;
 
-    // TODO(#3075): Update the return string output when the WingerSkill (& fsm) is
-    // implemented
-    std::string getFSMState() const override
+    std::string getCurrentState() const override
     {
         return std::string();
     }
+
+    // TODO(#3075): Uncomment once the implementation of the WingerFSM is done
+    // DEFINE_SKILL_GET_FSM_STATE
 
     bool done() const override;
 

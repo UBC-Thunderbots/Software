@@ -4,7 +4,7 @@
 
 #include "proto/play_info_msg.pb.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/strategy.h"
+#include "software/ai/hl/stp/strategy/strategy.h"
 #include "software/ai/play_selection_fsm.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"

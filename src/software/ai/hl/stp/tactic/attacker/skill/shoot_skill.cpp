@@ -13,7 +13,7 @@ ShootSkill::ShootSkill(const TbotsProto::AiConfig& ai_config,
 
 double ShootSkill::calculateViability(const Robot& robot, const World& world)
 {
-    if (!strategy_->getBestShot(robot, w orld))
+    if (!strategy_->getBestShot(robot, world))
     {
         return 0;
     }

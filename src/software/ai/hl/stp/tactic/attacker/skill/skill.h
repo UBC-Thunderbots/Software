@@ -30,7 +30,7 @@ class Skill
 
     virtual bool done() const = 0;
 
-    virtual std::string getCurrentState() const;
+    virtual std::string getCurrentState() const = 0;
 
     std::shared_ptr<Skill> getNextSkill(const Robot& robot, const World& world);
 

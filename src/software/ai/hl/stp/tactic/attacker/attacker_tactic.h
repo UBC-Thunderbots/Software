@@ -1,9 +1,9 @@
 #pragma once
 
-#include <stack>
-
 #include "software/ai/hl/stp/tactic/attacker/skill/head_skill.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+
+#include <stack>
 
 /**
  * This tactic is for a robot performing a pass. It should be used in conjunction with
@@ -21,7 +21,7 @@ class AttackerTactic : public Tactic
      * @param ai_config The AI configuration
      */
     explicit AttackerTactic(TbotsProto::AiConfig ai_config,
-                            std::shared_ptr<Strategy> strategy);
+                            std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
 
     AttackerTactic() = delete;
 
@@ -35,6 +35,22 @@ class AttackerTactic : public Tactic
     std::string getFSMState() const override;
 
     void setLastExecutionRobot(std::optional<RobotId> last_execution_robot) override;
+
+    /**
+     * Updates the control parameters for this AttackerTactic.
+     *
+     * @param updated_pass The pass to perform
+     */
+    void updateControlParams(const Pass& best_pass_so_far, bool pass_committed);
+
+    /**
+     * Updates the control parameters for this AttackerTactic
+     *
+     * @param chip_target An optional point that the robot will chip towards when it is
+     * unable to shoot and is in danger of losing the ball to an enemy. If this value is
+     * not provided, the point defaults to the enemy goal
+     */
+    void updateControlParams(std::optional<Point> chip_target);
 
     void updateAiConfig(const TbotsProto::AiConfig& ai_config);
 

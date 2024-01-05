@@ -395,30 +395,31 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
         {
             auto val = matrix(row, col);
             if (val == 0)
-
+            {
                 RobotId robot_id = robots_to_assign.at(row).id();
-            current_tactic_robot_id_assignment.emplace(tactic_vector.at(col), robot_id);
-            tactic_vector.at(col)->setLastExecutionRobot(robot_id);
+                current_tactic_robot_id_assignment.emplace(tactic_vector.at(col), robot_id);
+                tactic_vector.at(col)->setLastExecutionRobot(robot_id);
 
-            auto primitives = primitive_sets.at(col)->robot_primitives();
-            CHECK(primitives.contains(robot_id))
-                << "Couldn't find a primitive for robot id " << robot_id;
-            primitives_to_run->mutable_robot_primitives()->insert(
-                google::protobuf::MapPair(robot_id, primitives.at(robot_id)));
-            remaining_robots.erase(
-                std::remove_if(remaining_robots.begin(), remaining_robots.end(),
-                               [robots_to_assign, row](const Robot &robot) {
-                                   return robot.id() == robots_to_assign.at(row).id();
-                               }),
-                remaining_robots.end());
-            break;
+                auto primitives = primitive_sets.at(col)->robot_primitives();
+                CHECK(primitives.contains(robot_id))
+                    << "Couldn't find a primitive for robot id " << robot_id;
+                primitives_to_run->mutable_robot_primitives()->insert(
+                    google::protobuf::MapPair(robot_id, primitives.at(robot_id)));
+                remaining_robots.erase(
+                    std::remove_if(remaining_robots.begin(), remaining_robots.end(),
+                                   [robots_to_assign, row](const Robot &robot) {
+                                       return robot.id() == robots_to_assign.at(row).id();
+                                   }),
+                    remaining_robots.end());
+                break;
+            }
         }
     }
-}
 
-return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
-                  std::map<std::shared_ptr<const Tactic>, RobotId>>{
-    remaining_robots, std::move(primitives_to_run), current_tactic_robot_id_assignment};
+    return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
+                      std::map<std::shared_ptr<const Tactic>, RobotId>>{
+            remaining_robots, std::move(primitives_to_run),
+            current_tactic_robot_id_assignment};
 }
 
 std::vector<std::string> Play::getState()
