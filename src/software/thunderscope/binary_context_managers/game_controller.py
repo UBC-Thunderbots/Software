@@ -43,6 +43,7 @@ class Gamecontroller(object):
         :return: gamecontroller context managed instance
 
         """
+        print("__enter__ gamecontroller START", flush=True)
         command = ["/opt/tbotspython/gamecontroller"]
 
         if self.ci_mode:
@@ -66,6 +67,8 @@ class Gamecontroller(object):
             self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.ci_socket.connect(("", self.ci_port))
 
+        print("__enter__ gamecontroller END", flush=True)
+
         return self
 
     def __exit__(self, type, value, traceback) -> None:
@@ -76,11 +79,17 @@ class Gamecontroller(object):
         :param traceback: The traceback of the exception
 
         """
-        self.gamecontroller_proc.kill()
+        print("__exit__ gamecontroller close udp", flush=True)
+        self.receive_referee_command.close()  # TODO: This hangs due to #include, fixed without it
+
+        print("__exit__ gamecontroller terminate", flush=True)
+        self.gamecontroller_proc.terminate()  # TODO: Kill -> Terminate (closes more cleanly it seems like)
+        print("__exit__ gamecontroller terminate waiting", flush=True)
         self.gamecontroller_proc.wait()
 
         if self.ci_mode:
             self.ci_socket.close()
+        print("__exit__ gamecontroller END", flush=True)
 
     def next_free_port(self, port: int = 40000, max_port: int = 65535) -> None:
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller
