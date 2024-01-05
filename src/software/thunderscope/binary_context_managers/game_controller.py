@@ -85,6 +85,8 @@ class Gamecontroller(object):
         if self.ci_mode:
             self.ci_socket.close()
 
+        logging.info("[Gamecontroller] Process exited")
+
     def next_free_port(self, port: int = 40000, max_port: int = 65535) -> None:
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller
         so that we can run multiple gamecontroller instances in parallel.

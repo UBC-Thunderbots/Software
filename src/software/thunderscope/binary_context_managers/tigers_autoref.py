@@ -260,3 +260,5 @@ class TigersAutoref(TimeProvider):
 
         self.end_autoref = True
         self.auto_ref_wrapper_thread.join()
+
+        logging.info("[TigersAutoref] Process exited")

@@ -8,6 +8,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.time_provider import TimeProvider
 
+import logging
 import time
 
 
@@ -30,6 +31,7 @@ def exit_poller(
     while time_provider.time_provider() <= (time_now_s + exit_duration_s):
         time.sleep(poll_duration_s)
 
+    logging.info("exit_poller: Starting exit() sequence")
     on_exit()
 
 

@@ -35,7 +35,7 @@ jobs:
       - name: Jetson Nano Build Test
         run: |
           cd src
-          bazel build --cpu=jetson_nano //software/jetson_nano:thunderloop_main
+          bazel build --cpu=jetson_nano //software/jetson_nano:thunderloop_main --copt=-O3
 
   software-tests:
     name: Software Tests
@@ -51,7 +51,7 @@ jobs:
       - name: Software Test
         run: |
           cd src
-          bazel test --show_timestamps       \
+          bazel test --copt=-O3 --show_timestamps       \
             -- //... -//software:unix_full_system \
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
@@ -85,7 +85,7 @@ jobs:
       - name: Jetson Nano Build
         run: |
          cd src
-         bazel build --cpu=jetson_nano //software/jetson_nano:thunderloop_main
+         bazel build --cpu=jetson_nano //software/jetson_nano:thunderloop_main --copt=-O3
 
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
@@ -98,12 +98,10 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
-      - name: Simulated Test Run 1 (Continue on error)
-        # make sure that replays are uploaded even if tests fail
-        continue-on-error: true
+      - name: Simulated Test Run
         run: |
           cd src
-          bazel test --show_timestamps       \
+          bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps       \
             //software:unix_full_system           \
             //software/simulated_tests/...   \
             //software/ai/hl/... \
@@ -123,27 +121,6 @@ jobs:
           path: |
             /tmp/tbots/yellow/logs
 
-      - name: Simulated Test Run 2 (Continue on error)
-        # Run a second time without checking for errors
-        continue-on-error: true
-        run: |
-          cd src
-          bazel test --show_timestamps       \
-            //software:unix_full_system           \
-            //software/simulated_tests/...   \
-            //software/ai/hl/... \
-            //software/ai/navigator/...
-
-      - name: Simulated Test Run 3 (Check for errors)
-        # Run Simulated Tests a third time and finally check for failures
-        run: |
-          cd src
-          bazel test --show_timestamps       \
-            //software:unix_full_system           \
-            //software/simulated_tests/...   \
-            //software/ai/hl/... \
-            //software/ai/navigator/...
-
   autorefd-game:
     name: AutoRef'd Game (3 Minutes)
     runs-on: ubuntu-20.04
@@ -159,7 +136,6 @@ jobs:
         run: |
           cd src
           bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main -- --enable_autoref --ci_mode
-
 
       - name: Upload AI vs AI logs
         uses: actions/upload-artifact@v3

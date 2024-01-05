@@ -16,13 +16,13 @@ from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
+from software.thunderscope.constants import CI_DURATION_S
 from software.thunderscope.util import *
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 
-CI_DURATION_S = 180
 NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
 ###########################################################################
@@ -30,6 +30,8 @@ NUM_ROBOTS = DIV_B_NUM_ROBOTS
 ###########################################################################
 
 if __name__ == "__main__":
+
+    logging.getLogger().setLevel(logging.INFO)
 
     # Setup parser
     parser = argparse.ArgumentParser(
@@ -440,29 +442,36 @@ if __name__ == "__main__":
                 autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io,)
 
             # Start the simulator
-            thread = threading.Thread(
+            sim_ticker_thread = threading.Thread(
                 target=__ticker,
                 args=(DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,),
                 daemon=True,
             )
 
             if args.enable_autoref and args.ci_mode:
+                # In CI mode, we want AI vs AI to end automatically after a given time (CI_DURATION_S). The exiter
+                # thread is passed an exit handler that will close the Thunderscope window
+                # This exit handler is necessary because Qt runs on the main thread, so tscope.show() is a blocking
+                # call so we need to somehow close it before doing our resource cleanup
                 exiter_thread = threading.Thread(
                     target=exit_poller,
                     args=(autoref, CI_DURATION_S, lambda: tscope.close()),
                     daemon=True,
                 )
 
-                exiter_thread.start()
-                thread.start()
+                exiter_thread.start()  # start the exit countdown
+                sim_ticker_thread.start()  # start the simulation ticking
 
                 tscope.show()  # blocking!
 
+                # these resource cleanups occur after tscope.close() is called by the exiter_thread
                 exiter_thread.join()
-                thread.join()
+                sim_ticker_thread.join()
 
                 sys.exit(0)
             else:
-                thread.start()
+                sim_ticker_thread.start()  # start the simulation ticking
                 tscope.show()  # blocking!
-                thread.join()
+
+                # resource cleanup occurs after Thunderscope is closed by the user
+                sim_ticker_thread.join()
