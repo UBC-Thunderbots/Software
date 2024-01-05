@@ -1,12 +1,36 @@
+from typing import Callable, NoReturn
+
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.time_provider import TimeProvider
 
-import numpy
 import time
+
+
+def exit_poller(
+    time_provider: TimeProvider,
+    exit_duration_s: float,
+    on_exit: Callable[[], None],
+    poll_duration_s: float = 0.5,
+) -> NoReturn:
+    """
+    Calls the on_exit callback once the elapsed exit_duration has passed from the start of this function call, 
+    polling every poll_duration using system time
+
+    :param time_provider:   used to compare all timestamps
+    :param exit_duration_s: how long to poll from the start of this program before exiting
+    :param on_exit:         callback once the exit_duration time has elapsed
+    :param poll_duration_s: interval between polling the time_provider for the current timestamp
+    """
+    time_now_s = time_provider.time_provider()
+    while time_provider.time_provider() <= (time_now_s + exit_duration_s):
+        time.sleep(poll_duration_s)
+
+    on_exit()
 
 
 def async_sim_ticker(
@@ -14,6 +38,7 @@ def async_sim_ticker(
     blue_proto_unix_io: ProtoUnixIO,
     yellow_proto_unix_io: ProtoUnixIO,
     sim_proto_unix_io: ProtoUnixIO,
+    tscope: Thunderscope,
 ) -> None:
     """
     Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
@@ -22,6 +47,7 @@ def async_sim_ticker(
     :param blue_proto_unix_io:      ProtoUnixIO for the Blue FullSystem 
     :param yellow_proto_unix_io:    ProtoUnixIO for the Yellow FullSystem
     :param sim_proto_unix_io:       ProtoUnixIO for the Simulation
+    :param tscope:                  Thunderscope instance that is tied to the simulation ticking
     """
     blue_primitive_set_buffer = ThreadSafeBuffer(
         buffer_size=1, protobuf_type=PrimitiveSet
@@ -33,7 +59,7 @@ def async_sim_ticker(
     blue_proto_unix_io.register_observer(PrimitiveSet, blue_primitive_set_buffer)
     yellow_proto_unix_io.register_observer(PrimitiveSet, yellow_primitive_set_buffer)
 
-    while True:
+    while tscope.is_open():
         # Tick simulation
         tick = SimulatorTick(milliseconds=tick_rate_ms)
         sim_proto_unix_io.send_proto(SimulatorTick, tick)

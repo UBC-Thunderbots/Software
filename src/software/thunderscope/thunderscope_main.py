@@ -1,6 +1,7 @@
 import argparse
 import contextlib
 import os
+import sys
 import threading
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
@@ -15,16 +16,13 @@ from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.util import (
-    async_sim_ticker,
-    realtime_sim_ticker,
-    sync_simulation,
-)
+from software.thunderscope.util import *
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 
+CI_DURATION_S = 180
 NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
 ###########################################################################
@@ -375,6 +373,7 @@ if __name__ == "__main__":
                     tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                     tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
                     tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                    tscope,
                 )
             else:
                 realtime_sim_ticker(
@@ -447,6 +446,23 @@ if __name__ == "__main__":
                 daemon=True,
             )
 
-            thread.start()
-            tscope.show()
-            thread.join()
+            if args.enable_autoref and args.ci_mode:
+                exiter_thread = threading.Thread(
+                    target=exit_poller,
+                    args=(autoref, CI_DURATION_S, lambda: tscope.close()),
+                    daemon=True,
+                )
+
+                exiter_thread.start()
+                thread.start()
+
+                tscope.show()  # blocking!
+
+                exiter_thread.join()
+                thread.join()
+
+                sys.exit(0)
+            else:
+                thread.start()
+                tscope.show()  # blocking!
+                thread.join()

@@ -58,6 +58,7 @@ py_library(
     deps = [
         ":constants",
         ":thread_safe_buffer",
+        ":time_provider",
         "//proto/message_translation:py_tbots_protobuf",
     ],
 )

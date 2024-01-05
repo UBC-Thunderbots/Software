@@ -14,6 +14,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.time_provider import TimeProvider
 from subprocess import Popen
 
+import queue
 import logging
 import os
 import threading
@@ -36,6 +37,7 @@ class TigersAutoref(TimeProvider):
 
     AUTOREF_COMM_PORT = 10013
     AUTOREF_NUM_RETRIES = 20
+    BUFFER_TIMEOUT = 10
     NEXT_PACKET_DELAY = 1.0 / 30  # 30 Hz
 
     def __init__(
@@ -62,6 +64,7 @@ class TigersAutoref(TimeProvider):
         self.auto_ref_proc_thread = None
         self.auto_ref_wrapper_thread = None
         self.ci_mode = ci_mode
+        self.end_autoref = False
         self.wrapper_buffer = ThreadSafeBuffer(buffer_size, SSL_WrapperPacket)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee)
         self.gamecontroller = gc
@@ -170,9 +173,11 @@ class TigersAutoref(TimeProvider):
             gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN
         )
 
-        while True:
+        while not self.end_autoref:
             try:
-                ssl_wrapper = self.wrapper_buffer.get(block=True)
+                ssl_wrapper = self.wrapper_buffer.get(
+                    block=True, timeout=TigersAutoref.BUFFER_TIMEOUT
+                )
                 referee_packet = self.referee_buffer.get(block=False)
 
                 ci_input = AutoRefCiInput()
@@ -189,6 +194,8 @@ class TigersAutoref(TimeProvider):
                 logging.info(
                     "error with receiving AutoRefCiOutput, ignoring this packet..."
                 )
+            except queue.Empty:
+                pass
 
             with self.timestamp_mutex:
                 self.current_timestamp += int(
@@ -250,4 +257,6 @@ class TigersAutoref(TimeProvider):
             self.tigers_autoref_proc.wait()
 
             self.auto_ref_proc_thread.join()
+
+        self.end_autoref = True
         self.auto_ref_wrapper_thread.join()
