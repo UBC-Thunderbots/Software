@@ -58,4 +58,8 @@ py_test(
         "//software/simulated_tests:validation",
         requirement("pytest"),
     ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
 )
