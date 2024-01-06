@@ -51,6 +51,9 @@ private:
 
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT &)> receive_callback;
+
+    // Whether or not the listener is running
+    bool running_ = true;
 };
 
 template<class ReceiveProtoT>
@@ -92,14 +95,16 @@ template<class ReceiveProtoT>
 void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code &error, size_t num_bytes_received)
 {
-    std::cout << "Received " << TYPENAME(ReceiveProtoT) << std::endl; // TODO (NIMA) Remove
+    if (!running_)
+    {
+        return;
+    }
+
     if (!error)
     {
-        std::cout << "Starting Parsing " << TYPENAME(ReceiveProtoT) << std::endl;
         auto packet_data = ReceiveProtoT();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
-        std::cout << "Finished Parsing " << TYPENAME(ReceiveProtoT) << std::endl;
         receive_callback(packet_data);
 
         // Once we've handled the data, start listening again
@@ -112,8 +117,8 @@ void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
 
         LOG(WARNING)
             << "An unknown network error occurred when attempting to receive " << TYPENAME(ReceiveProtoT) <<
- " Data. The boost system error code is "
-            << error << std::endl;
+ " Data. The boost system error is: "
+            << error.message() << std::endl;
     }
 
     if (num_bytes_received > UNIX_BUFFER_SIZE)
@@ -128,13 +133,21 @@ void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
 template<class ReceiveProtoT>
 ProtoUnixListener<ReceiveProtoT>::~ProtoUnixListener()
 {
+    running_ = false;
+
     boost::system::error_code error_code;
     socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error_code);
     if (error_code)
     {
         LOG(WARNING) << "An unknown network error occurred when attempting to shutdown Unix socket for " <<
-                    TYPENAME(ReceiveProtoT) << ". The boost system error code is " << error_code
+                    TYPENAME(ReceiveProtoT) << ". The boost system error is: " << error_code.message()
                      << std::endl;
     }
-    socket_.close();
+
+    socket_.close(error_code);
+    if (error_code)
+    {
+        LOG(WARNING) << "An unknown network error occurred when attempting to close Unix socket for " << TYPENAME(ReceiveProtoT) << ". The boost system error is: " << error_code.message()
+                     << std::endl;
+    }
 }
