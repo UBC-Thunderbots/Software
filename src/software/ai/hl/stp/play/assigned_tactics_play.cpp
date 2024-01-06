@@ -30,8 +30,7 @@ void AssignedTacticsPlay::updateControlParams(
 {
     this->assigned_tactics = assigned_tactics;
     this->override_motion_constraints =
-        motion_constraints;  // TODO (NIMA): Can probably remove?! unless we support it in
-                             // simulated pytests
+        motion_constraints;
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(

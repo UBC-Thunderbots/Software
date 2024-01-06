@@ -42,7 +42,7 @@ void PrimitiveExecutor::updatePrimitiveSet(
             trajectory_path_ = createTrajectoryPathFromParams(
                 trajectory_2d_params, robot_constants_, velocity_);
 
-            // TODO: Combine generate and constructor
+            // TODO (NIMA): Combine generate and constructor
             angular_trajectory_ = BangBangTrajectory1DAngular();
             angular_trajectory_->generate(
                 createAngle(trajectory_angular_params.start_angle()),
@@ -148,7 +148,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     << "Not moving because trajectory_path_ or angular_trajectory_ is not set";
                 return output;
             }
-//            if (robot_id_ == 4 && friendly_team_colour_ == TeamColour::BLUE)
+//            if (robot_id_ == 4 && friendly_team_colour_ == TeamColour::BLUE) TODO (NIMA): Remove this and below with the extra move to plays
 //            {
 //                auto desired_vel = trajectory_path_->getVelocity(
 //                    time_since_trajectory_creation_.toSeconds());

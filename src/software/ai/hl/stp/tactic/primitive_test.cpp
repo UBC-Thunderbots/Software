@@ -38,9 +38,10 @@ TEST_F(PrimitiveTest, test_create_move_primitive)
             Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive_msg->move().dribbler_mode(),
               TbotsProto::DribblerMode::INDEFINITE);
-    EXPECT_FALSE(move_primitive_msg->move().has_auto_chip_or_kick());
+    EXPECT_EQ(move_primitive_msg->move().auto_chip_or_kick().autochip_distance_meters(), 0.0);
+    EXPECT_EQ(move_primitive_msg->move().auto_chip_or_kick().autokick_speed_m_per_s(), 0.0);
     EXPECT_EQ(move_primitive_msg->move().xy_traj_params().max_speed_mode(),
-              TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT); // TODO (NIMA): Check auto chip or kick is disabled
+              TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 }
 
 TEST_F(PrimitiveTest, test_create_move_primitive_with_autochip)
@@ -64,7 +65,6 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autochip)
               Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive_msg->move().dribbler_mode(),
               TbotsProto::DribblerMode::OFF);
-    EXPECT_FALSE(move_primitive_msg->move().has_auto_chip_or_kick());
     EXPECT_EQ(move_primitive_msg->move().xy_traj_params().max_speed_mode(),
               TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND);
 
@@ -93,7 +93,6 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autokick)
               Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive_msg->move().dribbler_mode(),
               TbotsProto::DribblerMode::OFF);
-    EXPECT_FALSE(move_primitive_msg->move().has_auto_chip_or_kick());
     EXPECT_EQ(move_primitive_msg->move().xy_traj_params().max_speed_mode(),
               TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND);
 
