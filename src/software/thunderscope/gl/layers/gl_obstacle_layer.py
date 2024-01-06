@@ -32,7 +32,6 @@ class GLObstacleLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-        # TODO (NIMA): Should we just return if there's no new val? Why redraw if nothing changed?
         obstacles = self.obstacles_list_buffer.get(block=False).obstacles
 
         poly_obstacles = []

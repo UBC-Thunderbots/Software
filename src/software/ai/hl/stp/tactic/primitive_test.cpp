@@ -9,7 +9,6 @@
 
 class PrimitiveTest : public testing::Test
 {
-    // TODO (NIMA): Figure out why these tests are failing
 protected:
     RobotConstants_t robot_constants = create2021RobotConstants();
     Robot robot = TestUtil::createRobotAtPos(Point(0, 0));

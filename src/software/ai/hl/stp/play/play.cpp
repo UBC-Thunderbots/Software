@@ -157,9 +157,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     //
     // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
     // algorithm that we use here
-
-//    auto now                          = std::chrono::high_resolution_clock::now();
-
     for (unsigned int i = 0; i < priority_tactics.size(); i++)
     {
         auto tactic_vector = priority_tactics[i];
@@ -203,24 +200,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     // Visualize all obstacles and paths
     LOG(VISUALIZE) << obstacle_list;
     LOG(VISUALIZE) << path_visualization;
-
-//    auto end = std::chrono::high_resolution_clock::now();
-//    auto duration =
-//        std::chrono::duration_cast<std::chrono::microseconds>(end - now).count();
-//    durations.push_back(duration);
-    if (durations.size() > 300)
-    {
-        std::sort(durations.begin(), durations.end());
-        // Get and print 50th, 80th, 90th, 95th, 99th percentile
-        LOG(INFO) << "Play::Get  50th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.5)]
-                  << "us, 80th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.8)]
-                  << "us, 90th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.9)]
-                  << "us, 95th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.95)]
-                  << "us, 99th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.99)]
-                  << "us, 100th: " << durations[durations.size() - 1] << "us"
-                  << std::endl;
-        durations.clear();
-    }
 
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
         world.getMostRecentTimestamp().toSeconds());
@@ -373,7 +352,7 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
 
                 // Only generate primitive proto message for the final primitive to robot
                 // assignment
-                auto primitive_proto = primitives[robot_id]->generatePrimitiveProtoMessage( // TODO (NIMA): Does this only run 6 times? or 36times?
+                auto primitive_proto = primitives[robot_id]->generatePrimitiveProtoMessage(
                         world, motion_constraints, obstacle_factory
                 );
                 primitives_to_run->mutable_robot_primitives()->insert(

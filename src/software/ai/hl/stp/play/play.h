@@ -185,9 +185,6 @@ class Play
     // TODO (#2359): remove this
     PriorityTacticVector priority_tactics;
 
-    // TODO (NIMA): REMOVE
-    std::vector<long int> durations;
-
     uint64_t sequence_number = 0;
 
     RobotNavigationObstacleFactory obstacle_factory;

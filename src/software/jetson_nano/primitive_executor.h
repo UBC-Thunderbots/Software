@@ -91,5 +91,9 @@ class PrimitiveExecutor
     RobotId robot_id_;
 
     // Estimated delay between a vision frame to AI processing to robot executing
-    static constexpr const double VISION_TO_ROBOT_DELAY_S = 0.03;
+    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
+
+    // The distance away from the destination at which we start dampening the velocity
+    // to avoid jittering around the destination.
+    static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
 };

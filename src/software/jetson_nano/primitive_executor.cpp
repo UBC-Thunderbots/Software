@@ -70,7 +70,6 @@ void PrimitiveExecutor::setStopPrimitive()
 void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
                                        const AngularVelocity &angular_velocity)
 {
-    // TODO (NIMA): Update orientation_
     Vector actual_global_velocity = localToGlobalVelocity(local_velocity, orientation_);
     velocity_                     = actual_global_velocity;
     angular_velocity_ = angular_velocity;
@@ -86,12 +85,11 @@ Vector PrimitiveExecutor::getTargetLinearVelocity()
             time_since_trajectory_creation_.toSeconds());
     double distance_to_destination =
             distance(position, trajectory_path_->getDestination());
-    // TODO (NIMA): Notes
-    //  By default, the robot is very tweaky/shaky around destination
-    //  This helps, even with local velocity feedback its twitchy
-    if (distance_to_destination < 0.05)
+
+    // Dampen velocity as we get closer to the destination to reduce jittering
+    if (distance_to_destination < MAX_DAMPENING_VELOCITY_DISTANCE_M)
     {
-        local_velocity *= distance_to_destination / 0.05;
+        local_velocity *= distance_to_destination / MAX_DAMPENING_VELOCITY_DISTANCE_M;
     }
     return local_velocity;
 }
@@ -144,23 +142,10 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                                                          TbotsProto::AutoChipOrKick());
                 auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                     prim->direct_control());
-                LOG(DEBUG)
+                LOG(INFO)
                     << "Not moving because trajectory_path_ or angular_trajectory_ is not set";
                 return output;
             }
-//            if (robot_id_ == 4 && friendly_team_colour_ == TeamColour::BLUE) TODO (NIMA): Remove this and below with the extra move to plays
-//            {
-//                auto desired_vel = trajectory_path_->getVelocity(
-//                    time_since_trajectory_creation_.toSeconds());
-//                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-//                    {"actual_vx", velocity_.x()},
-//                    {"actual_vy", velocity_.y()},
-//                    {"actual_v", velocity_.length()},
-//                    {"desired_vx", desired_vel.x()},
-//                    {"desired_vy", desired_vel.y()},
-//                    {"desired_v", desired_vel.length()},
-//                });
-//            }
 
             Vector local_velocity = getTargetLinearVelocity();
             AngularVelocity angular_velocity = getTargetAngularVelocity();

@@ -28,9 +28,6 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     const Rectangle &navigable_area)
 {
     ZoneScopedN("TrajectoryPlanner::findTrajectory");
-    // TODO (NIMA): REMOVE
-    static std::vector<long int> durations;
-//    auto start_time            = std::chrono::high_resolution_clock::now();
 
     // TODO: This can probably be shared between all findTrajectory calls in the same
     // tick.
@@ -109,24 +106,6 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
                 break;
             }
         }
-    }
-
-    // TODO (NIMA): Added for debugging
-//    auto end_time = std::chrono::high_resolution_clock::now();
-//    durations.push_back(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time)
-//                                .count());
-    if (durations.size() > 1800)
-    {
-        std::sort(durations.begin(), durations.end());
-        // Get and print 50th, 80th, 90th, 95th, 99th percentile
-        std::cout << "Single Traj  50th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.5)]
-                  << "us, 80th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.8)]
-                  << "us, 90th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.9)]
-                  << "us, 95th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.95)]
-                  << "us, 99th: " << durations[static_cast<int>(static_cast<double>(durations.size()) * 0.99)]
-                  << "us, 100th: " << durations[durations.size() - 1] << "us"
-                  << std::endl;
-        durations.clear();
     }
 
     return best_traj_with_cost.traj_path;
