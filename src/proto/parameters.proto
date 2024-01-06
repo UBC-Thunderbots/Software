@@ -122,6 +122,9 @@ message PassingConfig
         [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
     // Cost visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
+    // How long to cache a pass before we find another pass
+    required double pass_recalculation_commit_time_s = 11
+        [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
 message GoalieTacticConfig

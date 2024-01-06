@@ -2,6 +2,7 @@
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/hl/stp/strategy/strategy.h"
 #include "software/logger/logger.h"
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
@@ -42,7 +43,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
 std::shared_ptr<Tactic> createTactic(const TbotsProto::AttackerTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    auto tactic = std::make_shared<AttackerTactic>(ai_config);
+    auto tactic = std::make_shared<AttackerTactic>(ai_config, std::make_shared<Strategy>(ai_config));
 
     if (tactic_proto.has_best_pass_so_far())
     {

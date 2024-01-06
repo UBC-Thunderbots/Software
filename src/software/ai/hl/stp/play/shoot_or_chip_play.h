@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/strategy/strategy.h"
 
 /**
  * The Defense Play tries to grab the ball from the enemy that has it, and all other
@@ -10,8 +11,7 @@
 class ShootOrChipPlay : public Play
 {
    public:
-    ShootOrChipPlay(const TbotsProto::AiConfig &config,
-                    std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+    ShootOrChipPlay(const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

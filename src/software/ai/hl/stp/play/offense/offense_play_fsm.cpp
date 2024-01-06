@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/play/offense/offense_play_fsm.h"
 
-OffensePlayFSM::OffensePlayFSM(TbotsProto::AiConfig ai_config,
+OffensePlayFSM::OffensePlayFSM(const TbotsProto::AiConfig& ai_config,
                                std::shared_ptr<Strategy> strategy)
     : ai_config(ai_config),
       shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config, strategy)),

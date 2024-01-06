@@ -20,8 +20,7 @@ class AttackerTactic : public Tactic
      *
      * @param ai_config The AI configuration
      */
-    explicit AttackerTactic(TbotsProto::AiConfig ai_config,
-                            std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+    explicit AttackerTactic(TbotsProto::AiConfig ai_config, std::shared_ptr<Strategy> strategy);
 
     AttackerTactic() = delete;
 

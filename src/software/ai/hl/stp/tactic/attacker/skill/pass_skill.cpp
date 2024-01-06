@@ -23,6 +23,12 @@ double PassSkill::calculateViability(const Robot& robot, const World& world)
         return 0;
     }
 
+    PassWithRating best_pass = strategy_->getBestPass();
+    if (best_pass.rating < ai_config_.passing_config().abs_min_pass_score())
+    {
+        return 0;
+    }
+
     return score;
 }
 

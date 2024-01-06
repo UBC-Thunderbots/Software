@@ -14,4 +14,4 @@
  */
 std::unique_ptr<Play> createPlay(
     const TbotsProto::Play& play_proto, TbotsProto::AiConfig ai_config,
-    std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+    std::shared_ptr<Strategy> strategy);

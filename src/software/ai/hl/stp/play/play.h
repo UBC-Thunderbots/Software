@@ -42,7 +42,7 @@ class Play
      * @param strategy   to get and store shared calculations
      */
     explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie,
-                  std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+                  std::shared_ptr<Strategy> strategy);
 
     /**
      * Resets the play, required after a change in the AiConfig.
