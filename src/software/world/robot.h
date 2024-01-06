@@ -34,7 +34,7 @@ class Robot
                    const Timestamp &timestamp,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>(),
-                   const RobotConstants_t &robot_constants = create2021RobotConstants());
+                   const RobotConstants_t &robot_constants = DEFAULT_ROBOT_CONSTANTS);
 
     /**
      * Creates a new robot with the given initial state
@@ -238,4 +238,7 @@ class Robot
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapability> unavailable_capabilities_;
     RobotConstants_t robot_constants_;
+
+    // Default robot constants that should be used for all robots
+    inline static const RobotConstants DEFAULT_ROBOT_CONSTANTS = create2021RobotConstants();
 };
