@@ -47,7 +47,7 @@ void PrimitiveExecutor::updatePrimitiveSet(
             angular_trajectory_->generate(
                 createAngle(trajectory_angular_params.start_angle()),
                 createAngle(trajectory_angular_params.final_angle()),
-                angular_velocity_,  // createAngularVelocity(trajectory_angular_params.initial_velocity()),
+                angular_velocity_,
                 AngularVelocity::fromRadians(
                     robot_constants_.robot_max_ang_speed_rad_per_s),
                 AngularVelocity::fromRadians(

@@ -125,6 +125,7 @@ cc_test(
         ":bang_bang_trajectory_2d",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
+        "//software/logger",
     ],
 )
 
