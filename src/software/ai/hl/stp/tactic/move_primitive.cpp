@@ -60,6 +60,7 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
 
     // TODO (#3104): The fieldBounary should be shrinked by the robot radius before being
     //  passed to the planner.
+    // TODO (NIMA): Just move destination outside of static obstacles for now.
     traj_path =
         planner.findTrajectory(robot.position(), destination, robot.velocity(),
                                constraints, obstacles, world.field().fieldBoundary());
