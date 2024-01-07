@@ -1,25 +1,23 @@
 import argparse
-import numpy
 import os
 import threading
 import time
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.binary_context_managers import *
-from proto.import_all_protos import *
+
+import numpy
 import software.python_bindings as tbots_cpp
 from software.py_constants import *
+
 import proto.message_translation.tbots_protobuf as tbots_protobuf
-from software.thunderscope.robot_communication import RobotCommunication
-from software.thunderscope.replay.proto_logger import ProtoLogger
+import software.thunderscope.thunderscope_config as config
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
-import software.thunderscope.thunderscope_config as config
-
-from software.thunderscope.binary_context_managers.full_system import FullSystem
-from software.thunderscope.binary_context_managers.simulator import Simulator
-from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-
+from software.thunderscope.replay.proto_logger import ProtoLogger
+from software.thunderscope.robot_communication import RobotCommunication
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.thunderscope import Thunderscope
 
 NUM_ROBOTS = 6
 SIM_TICK_RATE_MS = 16
@@ -196,7 +194,7 @@ if __name__ == "__main__":
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for arg in [
-            {"proto_class": Obstacles},
+            {"proto_class": ObstacleList},
             {"proto_class": PathVisualization},
             {"proto_class": PassVisualization},
             {"proto_class": CostVisualization},

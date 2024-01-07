@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/play/play.h"
 
+#include <numeric>
 #include <munkres/munkres.h>
 #include <tracy/Tracy.hpp>
 
@@ -330,6 +331,8 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
     //        -1, 0,-1,         and            0,-1,
     //         0,-1,-1,                       -1, 0,
     //        -1,-1, 0,
+    double cost = 0;
+    LOG(DEBUG) << "\n\n\n START";
     for (size_t row = 0; row < num_rows; row++)
     {
         for (size_t col = 0; col < num_tactics; col++)
@@ -355,6 +358,8 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
                 auto primitive_proto = primitives[robot_id]->generatePrimitiveProtoMessage(
                         world, motion_constraints, obstacle_factory
                 );
+                cost += primitives[robot_id]->getEstimatedPrimitiveCost();
+                LOG(DEBUG) << std::to_string(robot_id) << " cost: " << primitives[robot_id]->getEstimatedPrimitiveCost() << " Total cost so far: " << cost;
                 primitives_to_run->mutable_robot_primitives()->insert(
                         {robot_id,
                         *primitive_proto});
@@ -370,7 +375,7 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
             }
         }
     }
-
+    LOG(DEBUG) << "!!!! TOTAL COST: " << cost;
 
 
     return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
