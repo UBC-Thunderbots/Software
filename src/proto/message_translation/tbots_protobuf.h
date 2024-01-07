@@ -5,6 +5,7 @@
 #include "proto/vision.pb.h"
 #include "proto/visualization.pb.h"
 #include "proto/world.pb.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/world/world.h"
@@ -189,8 +190,20 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
  * from the given parameters
  */
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
-    const TbotsProto::TrajectoryPathParams2D& params,
-    const RobotConstants& robot_constants, const Vector& initial_velocity);
+ const TbotsProto::TrajectoryPathParams2D& params,
+ const Vector& initial_velocity, const RobotConstants& robot_constants);
+
+/**
+ * Generate an angular trajectory Path given angular trajectory proto parameters
+ *
+ * @param params angular Trajectory Path
+ * @param robot_constants Constants to use for the trajectory
+ * @param initial_velocity Initial velocity to use for the trajectory
+ * @return Generate angular trajectory
+ */
+BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
+ const TbotsProto::TrajectoryParamsAngular1D& params,
+ const AngularVelocity& initial_velocity, const RobotConstants& robot_constants);
 
 /**
  * Convert dribbler mode to dribbler speed

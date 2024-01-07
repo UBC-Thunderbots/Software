@@ -79,7 +79,6 @@ class PrimitiveExecutor
     Vector velocity_;
     AngularVelocity angular_velocity_;
     Angle orientation_;
-    TbotsProto::World current_world_;
     TeamColour friendly_team_colour_;
     RobotConstants_t robot_constants_;
     std::optional<TrajectoryPath> trajectory_path_;

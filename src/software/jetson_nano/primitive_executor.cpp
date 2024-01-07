@@ -15,7 +15,6 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
                                      const TeamColour friendly_team_colour,
                                      const RobotId robot_id)
     : current_primitive_(),
-      current_world_(),
       friendly_team_colour_(friendly_team_colour),
       robot_constants_(robot_constants),
       time_step_(time_step),
@@ -33,32 +32,14 @@ void PrimitiveExecutor::updatePrimitiveSet(
 
         if (current_primitive_.has_move())
         {
-            const TbotsProto::MovePrimitive &move_traj = current_primitive_.move();
-            const TbotsProto::TrajectoryPathParams2D &trajectory_2d_params =
-                move_traj.xy_traj_params();
-            const TbotsProto::TrajectoryParamsAngular1D &trajectory_angular_params =
-                move_traj.w_traj_params();
-
             trajectory_path_ = createTrajectoryPathFromParams(
-                trajectory_2d_params, robot_constants_, velocity_);
+                current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
 
-            // TODO (NIMA): Combine generate and constructor
-            angular_trajectory_ = BangBangTrajectory1DAngular();
-            angular_trajectory_->generate(
-                createAngle(trajectory_angular_params.start_angle()),
-                createAngle(trajectory_angular_params.final_angle()),
-                angular_velocity_,
-                AngularVelocity::fromRadians(
-                    robot_constants_.robot_max_ang_speed_rad_per_s),
-                AngularVelocity::fromRadians(
-                    robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
-                AngularVelocity::fromRadians(
-                    robot_constants_.robot_max_ang_acceleration_rad_per_s_2));
+            angular_trajectory_ = createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(), angular_velocity_, robot_constants_);
 
             time_since_trajectory_creation_ =
                 Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
         }
-        return;
     }
 }
 
