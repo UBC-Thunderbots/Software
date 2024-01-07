@@ -9,8 +9,8 @@ TrajectoryPath::TrajectoryPath(const std::shared_ptr<Trajectory2D>& initial_traj
 {
 }
 
-void TrajectoryPath::append(const KinematicConstraints& constraints,
-                            double connection_time_sec, const Point& destination)
+void TrajectoryPath::append(double connection_time_sec,
+                            const Point& destination, const KinematicConstraints& constraints)
 {
     // Find the trajectory path node that the new trajectory should connect to
     for (size_t i = 0; i < traj_path.size(); i++)
@@ -28,8 +28,8 @@ void TrajectoryPath::append(const KinematicConstraints& constraints,
             // the end position and velocity of the last trajectory.
             Point connection_pos  = getPosition(connection_time_sec);
             Vector connection_vel = getVelocity(connection_time_sec);
-            traj_path.emplace_back(trajectory_generator(constraints, connection_pos,
-                                                        destination, connection_vel));
+            traj_path.emplace_back(trajectory_generator(connection_pos,
+                                                        destination, connection_vel, constraints));
             return;
         }
         else

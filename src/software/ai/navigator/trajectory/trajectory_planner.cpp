@@ -75,7 +75,7 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
             // Copy the sub trajectory, then append a trajectory to the
             // actual destination at connection_time
             TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;
-            traj_path_to_dest.append(constraints, connection_time, destination);
+            traj_path_to_dest.append(connection_time, destination, constraints);
 
             // Return early for this sub destination if the trajectory can
             // not have a lower cost than the best trajectory.
@@ -146,8 +146,7 @@ TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
     return getTrajectoryWithCost(
         TrajectoryPath(
             std::make_shared<BangBangTrajectory2D>(
-                start, destination, initial_velocity, constraints.getMaxVelocity(),
-                constraints.getMaxAcceleration(), constraints.getMaxDeceleration()),
+                start, destination, initial_velocity, constraints),
             BangBangTrajectory2D::generator),
         obstacle_tree, obstacles, std::nullopt, std::nullopt);
 }

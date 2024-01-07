@@ -129,7 +129,11 @@ message TrajectoryPathParams2D
     Vector initial_velocity            = 3;
     MaxAllowedSpeedMode max_speed_mode = 4;
     Point sub_destination              = 5;
-    float connection_time = 6;  // Multiple of 0.2, could simplify to char (i.e. uint8)
+    // If connection_time is non-zero, then the trajectory path is
+    // assumed to be comprised of two sub-trajectories, with the
+    // first sub-trajectory ending at sub_destination and the second
+    // sub-trajectory ending at destination.
+    float connection_time_s = 6;
 }
 
 message TrajectoryParamsAngular1D

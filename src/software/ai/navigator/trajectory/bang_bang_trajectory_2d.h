@@ -22,19 +22,14 @@ class BangBangTrajectory2D : public Trajectory2D
      * @param initial_pos Starting position of the trajectory
      * @param final_pos Destination. Where the trajectory should end at
      * @param initial_vel The initial velocity of the trajectory
-     * @param max_vel The max velocity (in 2D) that the trajectory can reach at any given
-     * point
-     * @param max_accel The max acceleration (in 2D) that the trajectory can reach at any
-     * given point
-     * @param max_decel The max deceleration (in 2D) that the trajectory can reach at any
-     * given point
+     * @param constraints Kinematic constraints of the new generated trajectory
      */
     BangBangTrajectory2D(const Point& initial_pos, const Point& final_pos,
-                         const Vector& initial_vel, double max_vel, double max_accel,
-                         double max_decel);
+                         const Vector& initial_vel, const KinematicConstraints &constraints);
 
-    static std::shared_ptr<Trajectory2D> generator(const KinematicConstraints &constraints, const Point &initial_pos,
-                                                const Point &final_pos, const Vector &initial_vel);
+    static std::shared_ptr<Trajectory2D> generator(const Point &initial_pos,
+                                                   const Point &final_pos, const Vector &initial_vel,
+                                                   const KinematicConstraints &constraints);
 
     /**
      * Generate a 2D trajectory from the initial position to the final position with the
@@ -58,7 +53,7 @@ class BangBangTrajectory2D : public Trajectory2D
     /**
      * Get the position at time t
      *
-     * @param t The time elapsed since the start of the trajectory in seconds
+     * @param t_sec The time elapsed since the start of the trajectory in seconds
      * @return The position at time t
      */
     Point getPosition(double t_sec) const override;
@@ -66,7 +61,7 @@ class BangBangTrajectory2D : public Trajectory2D
     /**
      * Get the velocity at time t
      *
-     * @param t The time elapsed since the start of the trajectory in seconds
+     * @param t_sec The time elapsed since the start of the trajectory in seconds
      * @return The velocity at time t
      */
     Vector getVelocity(double t_sec) const override;
@@ -74,7 +69,7 @@ class BangBangTrajectory2D : public Trajectory2D
     /**
      * Get the acceleration at time t
      *
-     * @param t The time elapsed since the start of the trajectory in seconds
+     * @param t_sec The time elapsed since the start of the trajectory in seconds
      * @return The acceleration at time t
      */
     Vector getAcceleration(double t_sec) const override;

@@ -7,8 +7,9 @@
 #include "software/ai/navigator/trajectory/trajectory_path_node.h"
 
 using TrajectoryGenerator = std::function<std::shared_ptr<Trajectory2D>(
-    const KinematicConstraints& constraints, const Point& initial_pos,
-    const Point& final_pos, const Vector& initial_vel)>;
+const Point& initial_pos,
+    const Point& final_pos, const Vector& initial_vel,
+    const KinematicConstraints& constraints)>;
 
 /**
  * TrajectoryPath represents a list of 2D trajectories that are connected end-to-end
@@ -38,8 +39,8 @@ class TrajectoryPath : public Trajectory2D
      * connect to the newly generated trajectory
      * @param destination Destination of the newly generated trajectory
      */
-    void append(const KinematicConstraints& constraints, double connection_time_sec,
-                const Point& destination);
+    void append(double connection_time_sec, const Point& destination,
+                const KinematicConstraints& constraints);
 
     /**
      * Get the position at time t of this trajectory path

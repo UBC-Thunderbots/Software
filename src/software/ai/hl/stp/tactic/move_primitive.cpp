@@ -108,12 +108,12 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
     if (path_nodes[0].getTrajectoryEndTime() !=
         path_nodes[0].getTrajectory()->getTotalTime())
     {
-        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time(
+        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(
             static_cast<float>(path_nodes[0].getTrajectoryEndTime()));
     }
     else
     {
-        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time(0);
+        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(0);
     }
 
     return primitive_proto;

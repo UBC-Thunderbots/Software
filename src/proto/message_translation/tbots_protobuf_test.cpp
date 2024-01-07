@@ -103,6 +103,7 @@ TEST(TbotsProtobufTest, ball_state_msg_test)
 
 TEST(TbotsProtobufTest, trajectory_params_msg_test)
 {
+    // TODO (NIMA)
     /**
      * 	*******	 EXIT trigger caused by broken Contract: CHECK((acceleration -
 converted_acceleration).length() < 0.001) "acceleration: (-2.49999, 0.00766989) !=
@@ -132,22 +133,20 @@ connection_time: 0.4
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(max_allowed_speed_mode,
                                                                    robot_constants);
+    KinematicConstraints constraints(max_speed, robot_constants.motor_max_acceleration_m_per_s_2,
+                                          robot_constants.robot_max_deceleration_m_per_s_2);
 
     Point sub_destination(-2.4806357421875, 0.77198980712890641);
-    double connection_time_s = 0.4;
-    // TODO: 2D Trajectory should also take in KinematicConstraints
+    float connection_time_s = 0.4f;
     auto trajectory = std::make_shared<BangBangTrajectory2D>(
         start_position, sub_destination, initial_velocity,
-        robot_constants.robot_max_speed_m_per_s,
-        robot_constants.motor_max_acceleration_m_per_s_2,
-        robot_constants.robot_max_deceleration_m_per_s_2);
+        constraints);
 
     TrajectoryPath trajectory_path(
         trajectory, BangBangTrajectory2D::generator);
     trajectory_path.append(
-        KinematicConstraints(max_speed, robot_constants.motor_max_acceleration_m_per_s_2,
-                             robot_constants.robot_max_deceleration_m_per_s_2),
-        connection_time_s, destination);
+        connection_time_s,
+        destination, constraints);
 
     TbotsProto::TrajectoryPathParams2D params;
     *(params.mutable_start_position())   = *createPointProto(start_position);
@@ -155,10 +154,10 @@ connection_time: 0.4
     *(params.mutable_initial_velocity()) = *createVectorProto(initial_velocity);
     *(params.mutable_sub_destination())  = *createPointProto(sub_destination);
     params.set_max_speed_mode(max_allowed_speed_mode);
-    params.set_connection_time(connection_time_s);
+    params.set_connection_time_s(connection_time_s);
 
     auto converted_trajectory_path_opt =
-        createTrajectoryPathFromParams(params, robot_constants, <#initializer #>);
+        createTrajectoryPathFromParams(params, initial_velocity, robot_constants);
     ASSERT_TRUE(converted_trajectory_path_opt.has_value());
 
     TrajectoryPath converted_trajectory_path = converted_trajectory_path_opt.value();

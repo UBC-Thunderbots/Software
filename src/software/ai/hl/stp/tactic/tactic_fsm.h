@@ -25,7 +25,8 @@ struct TacticUpdate
     // updated robot that tactic is assigned to
     Robot robot;
     // updated world
-    World world;  // TODO (NIMA): Update to use shared_ptr
+    // TODO (#3103): Wrap in shared_ptr to avoid unintended copying
+    World world;
     // callback to return the next primitive
     SetPrimitiveCallback set_primitive;
 };
