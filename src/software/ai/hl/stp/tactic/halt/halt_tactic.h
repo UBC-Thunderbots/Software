@@ -11,7 +11,7 @@ class HaltTactic : public Tactic
 {
    public:
     /**
-     * Creates a new HALTTactic
+     * Creates a new HaltTactic
      */
     explicit HaltTactic();
 
