@@ -155,12 +155,13 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     const TrajectoryPath &trajectory, aabb::Tree &obstacle_tree,
     const std::vector<ObstaclePtr> &obstacles,
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-    const std::optional<double> sub_traj_duration_sec)
+    const std::optional<double> sub_traj_duration_s)
 {
     ZoneScopedN("TrajectoryPlanner::getTrajectoryWithCost");
-    // TODO (NIMA): Return early if cost is over some limit?!
     TrajectoryPathWithCost traj_with_cost(trajectory);
 
+    // Get the list of obstacle indices that this trajectory path could collide with
+    // This is used as an optimization to avoid checking every obstacle for collisions
     std::set<unsigned int> possible_collisions_indices;
     for (const BoundingBox &bounding_box : trajectory.getBoundingBoxes())
     {
@@ -173,12 +174,14 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     const double search_end_time_s =
         std::min(trajectory.getTotalTime(), MAX_FUTURE_COLLISION_CHECK_SEC);
 
-    // Find the duration before the trajectory leaves all obstacles
+    /**
+     * Find the start duration before the trajectory leaves all obstacles
+     */
     double first_non_collision_time;
     // Avoid finding the first non-collision time if the cache sub-trajectory
     // has a collision time.
     if (sub_traj_with_cost.has_value() &&
-        sub_traj_with_cost->collision_duration_front_s < sub_traj_duration_sec)
+        sub_traj_with_cost->collision_duration_front_s < sub_traj_duration_s)
     {
         first_non_collision_time = sub_traj_with_cost->collision_duration_front_s;
     }
@@ -189,18 +192,20 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     }
     traj_with_cost.collision_duration_front_s = first_non_collision_time;
 
-    // TODO (NIMA): Should fill colliding_obstacle ptr if it collides
-
-    // Find the duration we're within an obstacle before search_end_time_s
+    /**
+     * Find the duration we're within an obstacle before search_end_time_s
+     */
     double last_non_collision_time = getLastNonCollisionTime(
         trajectory, possible_collisions_indices, obstacles, search_end_time_s);
     traj_with_cost.collision_duration_back_s =
         search_end_time_s - last_non_collision_time;
 
-    // Get the first collision time, excluding the time at the start and end of path
-    // that we may be in an obstacle for.
+    /**
+     * Get the first collision time, excluding the time at the start and end of path
+     * that we may be in an obstacle for.
+     */
     if (sub_traj_with_cost.has_value() &&
-        sub_traj_with_cost->first_collision_time_s < sub_traj_duration_sec)
+        sub_traj_with_cost->first_collision_time_s < sub_traj_duration_s)
     {
         traj_with_cost.first_collision_time_s =
             sub_traj_with_cost->first_collision_time_s;
@@ -210,14 +215,10 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     {
         std::pair<double, ObstaclePtr> collision = getFirstCollisionTime(
             trajectory, possible_collisions_indices, obstacles, first_non_collision_time,
-            last_non_collision_time);  // TODO (NIMA): Can we limit start based on
-                                       // sub_traj_duration_sec?
+            last_non_collision_time);
         traj_with_cost.first_collision_time_s = collision.first;
         traj_with_cost.colliding_obstacle     = collision.second;
     }
-
-    // TODO: Add collision_penalty?! Tiger's does it for defense area based on how much it
-    // goes into it
 
     traj_with_cost.cost = calculateCost(traj_with_cost);
 
@@ -229,12 +230,15 @@ double TrajectoryPlanner::calculateCost(
 {
     double total_cost = traj_with_cost.traj_path.getTotalTime();
 
-    // TODO: Tiger's does this dynamically?! collisionPenalty. Mainly for penalty area
+    // Add a large cost if the trajectory collides with an obstacle
+    // Note that this ignores collisions that may be in at the
+    // start of the trajectory as those are unavoidable by all trajectories.
     if (traj_with_cost.colliding_obstacle != nullptr)
     {
         total_cost += 6.0;
     }
 
+    // The closer the collision is to the destination, the lower its cost will be
     Point first_collision_position =
         traj_with_cost.traj_path.getPosition(traj_with_cost.first_collision_time_s);
     Point destination = traj_with_cost.traj_path.getDestination();
@@ -254,7 +258,7 @@ double TrajectoryPlanner::getFirstNonCollisionTime(
     const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
     const std::vector<ObstaclePtr> &obstacles, const double search_end_time_s) const
 {
-    double path_length = traj_path.getTotalTime();
+    double path_duration = traj_path.getTotalTime();
     for (double time = 0.0; time <= search_end_time_s;
          time += FORWARD_COLLISION_CHECK_STEP_INTERVAL_SEC)
     {
@@ -274,15 +278,15 @@ double TrajectoryPlanner::getFirstNonCollisionTime(
             return time;
         }
     }
-    return path_length;
+    return path_duration;
 }
 
 std::pair<double, ObstaclePtr> TrajectoryPlanner::getFirstCollisionTime(
     const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
-    const std::vector<ObstaclePtr> &obstacles, const double start_time_sec,
+    const std::vector<ObstaclePtr> &obstacles, const double start_time_s,
     const double search_end_time_s) const
 {
-    for (double time = start_time_sec; time <= search_end_time_s;
+    for (double time = start_time_s; time <= search_end_time_s;
          time += COLLISION_CHECK_STEP_INTERVAL_SEC)
     {
         Point position = traj_path.getPosition(time);
@@ -294,7 +298,8 @@ std::pair<double, ObstaclePtr> TrajectoryPlanner::getFirstCollisionTime(
             }
         }
     }
-    // return double limit
+
+    // No collision found
     return std::make_pair(std::numeric_limits<double>::max(), nullptr);
 }
 
@@ -309,7 +314,6 @@ double TrajectoryPlanner::getLastNonCollisionTime(
         bool collision_found = false;
         for (unsigned int obstacle_index : obstacle_indices)
         {
-            // TODO: Tiger's adds extra margin based on velocity
             if (obstacles[obstacle_index]->contains(position))
             {
                 collision_found = true;

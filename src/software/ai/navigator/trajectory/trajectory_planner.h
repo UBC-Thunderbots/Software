@@ -12,6 +12,16 @@ class TrajectoryPlanner
    public:
     TrajectoryPlanner();
 
+    /**
+     * \brief 
+     * @param start Start position of the trajectory
+     * @param destination 
+     * @param initial_velocity 
+     * @param constraints 
+     * @param obstacles 
+     * @param navigable_area 
+     * \return 
+     */
     TrajectoryPath findTrajectory(const Point &start, const Point &destination,
                                   const Vector &initial_velocity,
                                   const KinematicConstraints &constraints,
@@ -19,8 +29,12 @@ class TrajectoryPlanner
                                   const Rectangle &navigable_area);
 
    private:
-    // TODO (NIMA): Add documentation
+    /**
+     * Calculate the cost of the given trajectory
+     * @param traj_with_cost A complete trajectory path with cost
+     */
     double calculateCost(const TrajectoryPathWithCost &traj_with_cost) const;
+    
     TrajectoryPathWithCost getDirectTrajectoryWithCost(
         const Point &start, const Point &destination, const Vector &initial_velocity,
         const KinematicConstraints &constraints, aabb::Tree &obstacle_tree,
@@ -29,7 +43,7 @@ class TrajectoryPlanner
         const TrajectoryPath &trajectory, aabb::Tree &obstacle_tree,
         const std::vector<ObstaclePtr> &obstacles,
         const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
-        const std::optional<double> sub_traj_duration_sec);
+        const std::optional<double> sub_traj_duration_s);
 
     double getFirstNonCollisionTime(const TrajectoryPath &traj_path,
                                     const std::set<unsigned int> &obstacle_indices,
@@ -43,7 +57,7 @@ class TrajectoryPlanner
      * @param traj_path The trajectory path to check
      * @param obstacle_indices The indices of the obstacles to check for collisions
      * @param obstacles The list of all obstacles
-     * @param start_time_sec The time in seconds to start the search from
+     * @param start_time_s The time in seconds to start the search from
      * @param search_end_time_s The time in seconds to stop the search at
      * @return The first collision time within [start_time_sec and search_end_time_s]
      * and a pointer to the obstacle if a collision exists, otherwise returns
@@ -52,7 +66,7 @@ class TrajectoryPlanner
     std::pair<double, ObstaclePtr> getFirstCollisionTime(
         const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
         const std::vector<ObstaclePtr> &obstacles,
-        const double start_time_sec,  // TODO: Somewhere we use sec, somewhere we use _s
+        const double start_time_s,
         const double search_end_time_s) const;
 
     /**

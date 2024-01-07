@@ -8,9 +8,6 @@
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 #include "software/world/world.h"
 
-// Forward declare Tactic to avoid circular dependency between Tactic and MovePrimitive
-class Tactic;
-
 class MovePrimitive : public Primitive
 {
    public:

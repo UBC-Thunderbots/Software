@@ -58,11 +58,13 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
         max_speed, robot.robotConstants().robot_max_acceleration_m_per_s_2,
         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
-    // TODO: Instead of field boundary, it should be made smaller 9cm
+    // TODO (#3104): The fieldBounary should be shrinked by the robot radius before being
+    //  passed to the planner.
     traj_path =
         planner.findTrajectory(robot.position(), destination, robot.velocity(),
                                constraints, obstacles, world.field().fieldBoundary());
 
+    // TODO (NIMA): This should be moved to a helper function
     // Populate the move primitive proto with the trajectory path parameters
     auto primitive_proto = std::make_unique<TbotsProto::Primitive>();
 
@@ -99,20 +101,22 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
     }
 
     const auto &path_nodes = traj_path->getTrajectoryPathNodes();
-    *(primitive_proto->mutable_move()
-          ->mutable_xy_traj_params()
-          ->mutable_sub_destination()) =
-        *createPointProto(path_nodes[0].getTrajectory()->getDestination());
-
-    // TODO (NIMA): Consider improving this logic
-    if (path_nodes[0].getTrajectoryEndTime() !=
-        path_nodes[0].getTrajectory()->getTotalTime())
+    // Set sub_destination and connection_time_s fields, if the trajectory path
+    // consists of more than 1 trajectory
+    if (path_nodes.size() >= 2)
     {
+        *(primitive_proto->mutable_move()
+              ->mutable_xy_traj_params()
+              ->mutable_sub_destination()) =
+            *createPointProto(path_nodes[0].getTrajectory()->getDestination());
+
         primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(
             static_cast<float>(path_nodes[0].getTrajectoryEndTime()));
     }
     else
     {
+        // If the trajectory path consists of only 1 trajectory,
+        // then the connection time is set to 0
         primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(0);
     }
 

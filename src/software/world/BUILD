@@ -113,6 +113,8 @@ cc_library(
         "//software/logger",
         "//software/time:duration",
         "//software/time:timestamp",
+        "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
+        "//software/ai/navigator/trajectory:bang_bang_trajectory_2d",
     ],
 )
 

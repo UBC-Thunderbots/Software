@@ -252,6 +252,7 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
     }
 
     // Figure out what time the robot would have to receive the ball at
+    // TODO (#2988): We should generate a more realistic ball trajectory
     Duration ball_travel_time = Duration::fromSeconds(
         (pass.receiverPoint() - pass.passerPoint()).length() / pass.speed());
     Timestamp receive_time = best_receiver.timestamp() + ball_travel_time;
@@ -263,8 +264,8 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
         best_receiver.timestamp() + min_robot_travel_time;
 
     // Figure out what angle the robot would have to be at to receive the ball
-    Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
-    Duration time_to_receive_angle = best_receiver.getTimeToOrientation(receive_angle);
+    Angle receive_angle                      = (pass.passerPoint() - best_receiver.position()).orientation();
+    Duration time_to_receive_angle           = best_receiver.getTimeToOrientation(receive_angle);
     Timestamp earliest_time_to_receive_angle =
         best_receiver.timestamp() + time_to_receive_angle;
 

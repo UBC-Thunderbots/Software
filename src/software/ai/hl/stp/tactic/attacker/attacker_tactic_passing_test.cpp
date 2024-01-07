@@ -122,7 +122,7 @@ INSTANTIATE_TEST_CASE_P(
                         BallState(Point(-0.5, -0.5), Vector(1, 0))),
 
         // TODO (#2859): Robot does not kick ball when dribbler is off since it is
-        // too far away. TODO (NIMA): Try Vlada's branch
+        // too far away.
         // Attacker point != Balls location & Balls location == Robots Location
         // std::make_tuple(Pass(Point(0.4, 0.4), Point(0, 1), 5),
         //                 RobotStateWithId{
