@@ -52,14 +52,14 @@ py_test(
     srcs = [
         "goalie_tactic_test.py",
     ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:speed_threshold_helpers",
         "//software/simulated_tests:validation",
         requirement("pytest"),
-    ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
     ],
 )
