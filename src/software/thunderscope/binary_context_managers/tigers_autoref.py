@@ -253,7 +253,7 @@ class TigersAutoref(TimeProvider):
 
     def __exit__(self, type, value, traceback) -> None:
         if self.tigers_autoref_proc:
-            self.tigers_autoref_proc.kill()
+            self.tigers_autoref_proc.terminate()
             self.tigers_autoref_proc.wait()
 
             self.auto_ref_proc_thread.join()
