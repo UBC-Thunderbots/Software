@@ -214,4 +214,5 @@ struct DribbleFSM
     // the dribble tactic config
     TbotsProto::DribbleTacticConfig dribble_tactic_config;
     Point continuous_dribbling_start_point;
+     static constexpr double INTERCEPTION_POINT_ADJUSTMENT = 0.05015;
 };
