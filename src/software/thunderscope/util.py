@@ -29,7 +29,7 @@ def exit_poller(
     """
     time_now_s = time_provider.time_provider()
     while time_provider.time_provider() <= (time_now_s + exit_duration_s):
-        logging.debug("time provider: " + time_provider.time_provider())
+        logging.debug("time provider: " + str(time_provider.time_provider()))
         time.sleep(poll_duration_s)
 
     logging.info("exit_poller: Starting exit() sequence")
