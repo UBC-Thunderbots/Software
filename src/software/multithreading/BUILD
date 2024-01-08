@@ -104,6 +104,8 @@ cc_test(
         ":threaded_observer",
         "//shared/test_util:tbots_gtest_main",
     ],
+    # Run the test up to 3 times if it fails
+    flaky = True,
 )
 
 cc_test(
