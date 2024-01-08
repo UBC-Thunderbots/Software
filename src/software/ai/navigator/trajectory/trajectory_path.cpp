@@ -17,8 +17,6 @@ void TrajectoryPath::append(double connection_time_sec,
     {
         if (connection_time_sec <= traj_path[i].getTrajectoryEndTime())
         {
-            traj_path[i].setTrajectoryEndTime(connection_time_sec);
-
             // Delete all trajectory nodes after the node that is at the
             // connection_time_sec
             traj_path.erase(traj_path.begin() + i + 1, traj_path.end());
@@ -30,6 +28,8 @@ void TrajectoryPath::append(double connection_time_sec,
             Vector connection_vel = getVelocity(connection_time_sec);
             traj_path.emplace_back(trajectory_generator(connection_pos,
                                                         destination, connection_vel, constraints));
+
+            traj_path[i].setTrajectoryEndTime(connection_time_sec);
             return;
         }
         else

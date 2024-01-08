@@ -103,40 +103,21 @@ TEST(TbotsProtobufTest, ball_state_msg_test)
 
 TEST(TbotsProtobufTest, trajectory_params_msg_test)
 {
-    // TODO (NIMA)
-    /**
-     * 	*******	 EXIT trigger caused by broken Contract: CHECK((acceleration -
-converted_acceleration).length() < 0.001) "acceleration: (-2.49999, 0.00766989) !=
-converted_acceleration: (-2.49999, -0.00766989) at time 0.5 start_position { x_meters:
--3.5806357421875 y_meters: 0.7719898071289063
-}
-destination {
-  x_meters: -3.5806357421875
-  y_meters: 0.7719898071289063
-}
-initial_velocity {
-  x_component_meters: -6.1035156234678868e-05
-  y_component_meters: -0.00010299682617204144
-}
-sub_destination {
-  x_meters: -2.4806357421875
-  y_meters: 0.77198980712890641
-}
-connection_time: 0.4
-     */
-
+    // Generate a trajectory, and then generate a TbotsProto::TrajectoryPathParams2D
+    // with the same parameters as the trajectory, finally, generate a second trajectory
+    // from the parameters and make sure the two trajectories are equal.
     RobotConstants robot_constants = create2021RobotConstants();
-    Point start_position(-3.5806357421875, 0.7719898071289063);
-    Point destination(-3.5806357421875, 0.7719898071289063);
-    Vector initial_velocity(-6.1035156234678868e-05, -0.00010299682617204144);
+    Point start_position(0.0, 0.0);
+    Point destination(0.0, 0.0);
+    Vector initial_velocity(-1.0, -1.0);
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(max_allowed_speed_mode,
                                                                    robot_constants);
-    KinematicConstraints constraints(max_speed, robot_constants.motor_max_acceleration_m_per_s_2,
+    KinematicConstraints constraints(max_speed, robot_constants.robot_max_acceleration_m_per_s_2,
                                           robot_constants.robot_max_deceleration_m_per_s_2);
 
-    Point sub_destination(-2.4806357421875, 0.77198980712890641);
+    Point sub_destination(1.2, 0.0);
     float connection_time_s = 0.4f;
     auto trajectory = std::make_shared<BangBangTrajectory2D>(
         start_position, sub_destination, initial_velocity,
@@ -170,24 +151,24 @@ connection_time: 0.4
     for (int i = 0; i < initial_traj_nodes.size(); i++)
     {
         EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getPosition(0.0),
-                  converted_traj_nodes[i].getTrajectory()->getPosition(0.0));
+                  converted_traj_nodes[i].getTrajectory()->getPosition(0.0)) << " Position at index " << i << " is not equal";
     }
 
     for (int i = 0; i < initial_traj_nodes.size(); i++)
     {
         EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getVelocity(0.0),
-                  converted_traj_nodes[i].getTrajectory()->getVelocity(0.0));
+                  converted_traj_nodes[i].getTrajectory()->getVelocity(0.0)) << " Velocity at index " << i << " is not equal";
     }
 
     for (int i = 0; i < initial_traj_nodes.size(); i++)
     {
         EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getAcceleration(0.0),
-                  converted_traj_nodes[i].getTrajectory()->getAcceleration(0.0));
+                  converted_traj_nodes[i].getTrajectory()->getAcceleration(0.0)) << " Acceleration at index " << i << " is not equal";
     }
 
     for (int i = 0; i < initial_traj_nodes.size(); i++)
     {
         EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getDestination(),
-                  converted_traj_nodes[i].getTrajectory()->getDestination());
+                  converted_traj_nodes[i].getTrajectory()->getDestination()) << " Destination at index " << i << " is not equal";
     }
 }
