@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 
 #include "shared/2021_robot_constants.h"
-#include "shared/constants.h"
 #include "software/test_util/test_util.h"
 
 class PrimitiveTest : public testing::Test
@@ -41,6 +40,45 @@ TEST_F(PrimitiveTest, test_create_move_primitive)
     EXPECT_EQ(move_primitive_msg->move().auto_chip_or_kick().autokick_speed_m_per_s(), 0.0);
     EXPECT_EQ(move_primitive_msg->move().xy_traj_params().max_speed_mode(),
               TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+}
+
+TEST_F(PrimitiveTest, test_create_move_primitive_with_sub_destination)
+{
+    // Add friendly defense area as a motion constraint and path plan around it
+    const Point start(-4,-1.5);
+    const Point destination(-4, 1.5);
+
+    robot.updateState(RobotState(start, Vector(0, 0), Angle::zero(), AngularVelocity::zero()), Timestamp::fromSeconds(0.0));
+
+    std::shared_ptr<MovePrimitive> primitive = std::make_shared<MovePrimitive>(
+        robot, destination, Angle::threeQuarter(),
+        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, TbotsProto::DribblerMode::INDEFINITE,
+        TbotsProto::BallCollisionType::AVOID, AutoChipOrKick(), std::optional<double>());
+
+    auto move_primitive_msg = primitive->generatePrimitiveProtoMessage(
+        world, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA}, obstacle_factory);
+
+    ASSERT_TRUE(move_primitive_msg->has_move());
+    TbotsProto::MovePrimitive move_primitive                                    = move_primitive_msg->move();
+    TbotsProto::TrajectoryPathParams2D xy_traj_params = move_primitive.xy_traj_params();
+    auto generated_destination                        = xy_traj_params.destination();
+    EXPECT_EQ(generated_destination.x_meters(), destination.x());
+    EXPECT_EQ(generated_destination.y_meters(), destination.y());
+
+    // Greater than 0 connection time indicating a sub destination
+    EXPECT_GT(xy_traj_params.connection_time_s(), 0.0);
+    // Sub destination should not be the default (0,0)
+    EXPECT_NE(xy_traj_params.sub_destination().x_meters(), 0.0);
+    EXPECT_NE(xy_traj_params.sub_destination().y_meters(), 0.0);
+
+    EXPECT_EQ(move_primitive.w_traj_params().final_angle().radians(),
+            Angle::threeQuarter().toRadians());
+    EXPECT_EQ(move_primitive.dribbler_mode(),
+              TbotsProto::DribblerMode::INDEFINITE);
+    EXPECT_EQ(move_primitive.auto_chip_or_kick().autochip_distance_meters(), 0.0);
+    EXPECT_EQ(move_primitive.auto_chip_or_kick().autokick_speed_m_per_s(), 0.0);
+    EXPECT_EQ(move_primitive.xy_traj_params().max_speed_mode(),
+              TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND);
 }
 
 TEST_F(PrimitiveTest, test_create_move_primitive_with_autochip)
@@ -97,4 +135,9 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autokick)
 
     ASSERT_TRUE(move_primitive_msg->move().has_auto_chip_or_kick());
     EXPECT_EQ(move_primitive_msg->move().auto_chip_or_kick().autokick_speed_m_per_s(), 3.5);
+}
+
+TEST_F(PrimitiveTest, test_create_stop_primitive)
+{
+    // TODO (NIMA)
 }

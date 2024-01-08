@@ -60,12 +60,10 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
 
     // TODO (#3104): The fieldBounary should be shrinked by the robot radius before being
     //  passed to the planner.
-    // TODO (NIMA): Just move destination outside of static obstacles for now.
     traj_path =
         planner.findTrajectory(robot.position(), destination, robot.velocity(),
                                constraints, obstacles, world.field().fieldBoundary());
 
-    // TODO (NIMA): This should be moved to a helper function
     // Populate the move primitive proto with the trajectory path parameters
     auto primitive_proto = std::make_unique<TbotsProto::Primitive>();
 
@@ -75,6 +73,26 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
     *(xy_traj_params.mutable_initial_velocity()) = *createVectorProto(robot.velocity());
     xy_traj_params.set_max_speed_mode(max_allowed_speed_mode);
     *(primitive_proto->mutable_move()->mutable_xy_traj_params()) = xy_traj_params;
+
+    const auto &path_nodes = traj_path->getTrajectoryPathNodes();
+    // Set sub_destination and connection_time_s fields, if the trajectory path
+    // consists of more than 1 trajectory
+    if (path_nodes.size() >= 2)
+    {
+        *(primitive_proto->mutable_move()
+              ->mutable_xy_traj_params()
+              ->mutable_sub_destination()) =
+            *createPointProto(path_nodes[0].getTrajectory()->getDestination());
+
+        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(
+            static_cast<float>(path_nodes[0].getTrajectoryEndTime()));
+    }
+    else
+    {
+        // If the trajectory path consists of only 1 trajectory,
+        // then the connection time is set to 0
+        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(0);
+    }
 
     TbotsProto::TrajectoryParamsAngular1D w_traj_params;
     *(w_traj_params.mutable_start_angle()) = *createAngleProto(robot.orientation());
@@ -99,26 +117,6 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
             ->mutable_auto_chip_or_kick()
             ->set_autokick_speed_m_per_s(
                 static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
-    }
-
-    const auto &path_nodes = traj_path->getTrajectoryPathNodes();
-    // Set sub_destination and connection_time_s fields, if the trajectory path
-    // consists of more than 1 trajectory
-    if (path_nodes.size() >= 2)
-    {
-        *(primitive_proto->mutable_move()
-              ->mutable_xy_traj_params()
-              ->mutable_sub_destination()) =
-            *createPointProto(path_nodes[0].getTrajectory()->getDestination());
-
-        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(
-            static_cast<float>(path_nodes[0].getTrajectoryEndTime()));
-    }
-    else
-    {
-        // If the trajectory path consists of only 1 trajectory,
-        // then the connection time is set to 0
-        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(0);
     }
 
     return primitive_proto;
