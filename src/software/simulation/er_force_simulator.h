@@ -168,7 +168,7 @@ class ErForceSimulator
      */
     static std::map<RobotId, std::pair<Vector, AngularVelocity>>
     getRobotIdToLocalVelocityMap(
-        const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots, bool plot);
+        const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots);
 
     /**
      * Update Simulator Robot and get the latest robot control

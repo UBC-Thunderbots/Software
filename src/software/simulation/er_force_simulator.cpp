@@ -301,11 +301,10 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
 {
     auto sim_state                   = getSimulatorState();
     const auto& sim_robots           = sim_state.yellow_robots();
-    const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots, true);
+    const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots);
 
     yellow_team_world_msg               = std::move(world_msg);
     const TbotsProto::World world_proto = *yellow_team_world_msg;
-
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
         auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
@@ -320,7 +319,7 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
 {
     auto sim_state                   = getSimulatorState();
     const auto& sim_robots           = sim_state.blue_robots();
-    const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots, true);
+    const auto robot_to_vel_pair_map = getRobotIdToLocalVelocityMap(sim_robots);
 
     blue_team_world_msg                 = std::move(world_msg);
     const TbotsProto::World world_proto = *blue_team_world_msg;
@@ -368,12 +367,12 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
     if (side == gameController::Team::BLUE)
     {
         const auto& sim_robots = sim_state.blue_robots();
-        current_velocity_map   = getRobotIdToLocalVelocityMap(sim_robots, false);
+        current_velocity_map   = getRobotIdToLocalVelocityMap(sim_robots);
     }
     else
     {
         const auto& sim_robots = sim_state.yellow_robots();
-        current_velocity_map   = getRobotIdToLocalVelocityMap(sim_robots, false);
+        current_velocity_map   = getRobotIdToLocalVelocityMap(sim_robots);
     }
 
     for (auto& primitive_executor_with_id : robot_primitive_executor_map)
@@ -560,9 +559,8 @@ void ErForceSimulator::resetCurrentTime()
 
 std::map<RobotId, std::pair<Vector, AngularVelocity>>
 ErForceSimulator::getRobotIdToLocalVelocityMap(
-    const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots, bool plot)
+    const google::protobuf::RepeatedPtrField<world::SimRobot>& sim_robots)
 {
-    //    std::map<std::string, double> plot_juggler_values;
     std::map<RobotId, std::pair<Vector, AngularVelocity>> robot_to_local_velocity;
     for (const auto& sim_robot : sim_robots)
     {
@@ -571,17 +569,6 @@ ErForceSimulator::getRobotIdToLocalVelocityMap(
                                   Angle::fromRadians(sim_robot.angle()));
         const AngularVelocity angular_vel       = Angle::fromRadians(sim_robot.r_z());
         robot_to_local_velocity[sim_robot.id()] = {local_vel, angular_vel};
-
-        //        plot_juggler_values[std::to_string(sim_robot.id()) + "_sim_vx"] =
-        //        sim_robot.v_x(); plot_juggler_values[std::to_string(sim_robot.id()) +
-        //        "_sim_vy"] = sim_robot.v_y();
-        //        plot_juggler_values[std::to_string(sim_robot.id()) + "_sim_px"] =
-        //        sim_robot.p_x(); plot_juggler_values[std::to_string(sim_robot.id()) +
-        //        "_sim_py"] = sim_robot.p_y();
-    }
-    if (plot)
-    {
-        //        LOG(PLOTJUGGLER) << *createPlotJugglerValue(plot_juggler_values);
     }
     return robot_to_local_velocity;
 }

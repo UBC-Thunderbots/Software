@@ -207,5 +207,5 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
     // camera frames we receive per AI tick. For example, a value of 2 means
     // that we will simulate 2 time steps (2 camera frames) before we give
     // the latest data to the AI and run it.
-    static constexpr unsigned int CAMERA_FRAMES_PER_AI_TICK = 1;
+    static constexpr unsigned int CAMERA_FRAMES_PER_AI_TICK = 2;
 };
