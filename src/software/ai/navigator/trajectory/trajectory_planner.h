@@ -10,18 +10,24 @@
 class TrajectoryPlanner
 {
    public:
+    /**
+     * Constructor
+     */
     TrajectoryPlanner();
 
     /**
-     * \brief 
+     * Find a trajectory from the start position to the destination which
+     * attempts to avoid the list of obstacles.
+     *
      * @param start Start position of the trajectory
-     * @param destination 
-     * @param initial_velocity 
-     * @param constraints 
-     * @param obstacles 
-     * @param navigable_area 
-     * \return 
+     * @param destination Destination of the trajectory
+     * @param initial_velocity Initial velocity of the trajectory
+     * @param constraints Kinematic constraints of the trajectory
+     * @param obstacles List of obstacles to avoid
+     * @param navigable_area The navigable area of the field
+     * @return TrajectoryPath which attempts to avoid the obstacles
      */
+ // TODO (NIMA): Test
     TrajectoryPath findTrajectory(const Point &start, const Point &destination,
                                   const Vector &initial_velocity,
                                   const KinematicConstraints &constraints,
@@ -30,21 +36,58 @@ class TrajectoryPlanner
 
    private:
     /**
-     * Calculate the cost of the given trajectory
+     * Calculate the cost of the given trajectory path with cost
+     *
      * @param traj_with_cost A complete trajectory path with cost
+     * @return The cost of the trajectory
      */
     double calculateCost(const TrajectoryPathWithCost &traj_with_cost) const;
-    
+
+    /**
+     * Get a single trajectory with cost that goes directly from the start to the
+     * destination.
+     *
+     * @param start Start position of the trajectory
+     * @param destination Destination of the trajectory
+     * @param initial_velocity Initial velocity of the trajectory
+     * @param constraints Kinematic constraints of the trajectory
+     * @param obstacle_tree Axis aligned bounding box tree of the obstacles
+     * @param obstacles List of all obstacles
+     * @return A trajectory path with only a single trajectory + its cost
+     */
     TrajectoryPathWithCost getDirectTrajectoryWithCost(
         const Point &start, const Point &destination, const Vector &initial_velocity,
         const KinematicConstraints &constraints, aabb::Tree &obstacle_tree,
         const std::vector<ObstaclePtr> &obstacles);
+
+    /**
+     * Given a trajectory path, calculate its cost
+     *
+     * @param trajectory The trajectory path to calculate the cost of
+     * @param obstacle_tree Axis aligned bounding box tree of the obstacles
+     * @param obstacles List of all obstacles
+     * @param sub_traj_with_cost Optional cached trajectory path with cost of the sub trajectory
+     * @param sub_traj_duration_s Optional duration of the cached sub_traj_with_cost
+     * @return The trajectory path with its cost
+     */
     TrajectoryPathWithCost getTrajectoryWithCost(
         const TrajectoryPath &trajectory, aabb::Tree &obstacle_tree,
         const std::vector<ObstaclePtr> &obstacles,
         const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
         const std::optional<double> sub_traj_duration_s);
 
+    /**
+     * Get the earliest time at which the trajectory is not in a collision, in seconds
+     * E.g. will return 0 if the trajectory's start position is not in an obstacle
+     *
+     * @param traj_path The trajectory path to check
+     * @param obstacle_indices A list of indices of the obstacles which this trajectory
+     * may collide with. Used to reduce the number of collision checks
+     * @param obstacles A list of all obstacles
+     * @param search_end_time_s The latest time to check for collisions
+     * @return Earliest non-collision time, or traj_path.getTotalDuration() if the
+     * trajectory is in a collision from start to search_end_time_s
+     */
     double getFirstNonCollisionTime(const TrajectoryPath &traj_path,
                                     const std::set<unsigned int> &obstacle_indices,
                                     const std::vector<ObstaclePtr> &obstacles,
@@ -87,6 +130,15 @@ class TrajectoryPlanner
                                    const std::vector<ObstaclePtr> &obstacles,
                                    const double search_end_time_s) const;
 
+    /**
+     * Get a list of sub destinations which trajectory paths should be sampled through for the given start position
+     * and destination. All sub destinations will be within the navigable area.
+     *
+     * @param start Start position of the trajectory
+     * @param destination Destination of the trajectory
+     * @param navigable_area The navigable area of the field
+     * @return A list of sub destinations for trajectory paths be sampled through
+     */
     std::vector<Point>
     getSubDestinations(const Point &start, const Point &destination,
                        const Rectangle &navigable_area) const;

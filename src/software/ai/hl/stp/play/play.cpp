@@ -195,9 +195,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         robots = remaining_robots;
     }
 
-    // TODO (NIMA): Try to remove duplicate obstacles (note: std::set<proto> isnt natively possible due to no comparators, maybe with custom comparators?!?)
-    // Use STD to go through obstacles convert to obstacle proto and add to a std set
-
+    // TODO (#3104): Remove duplicated obstacles from obstacle_list
     // Visualize all obstacles and paths
     LOG(VISUALIZE) << obstacle_list;
     LOG(VISUALIZE) << path_visualization;

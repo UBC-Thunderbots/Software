@@ -28,15 +28,8 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     const Rectangle &navigable_area)
 {
     ZoneScopedN("TrajectoryPlanner::findTrajectory");
-
-    // TODO: This can probably be shared between all findTrajectory calls in the same
-    // tick.
-    //       Should create a wrapper which automatically creates this (and hides it) and
-    //       stores the obstacles
     aabb::Tree tree;
     {
-        // TODO (NIMA): In a 66 sec profile, findTraj took
-        //  4.5 sec with this region taking 1.0 seconds
         ZoneScopedN("aabb::Tree creation");
         tree = aabb::Tree(2, 0.0, {false, false},
                         {navigable_area.xLength(), navigable_area.yLength()},
@@ -142,7 +135,6 @@ TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
     const KinematicConstraints &constraints, aabb::Tree &obstacle_tree,
     const std::vector<ObstaclePtr> &obstacles)
 {
-    // TODO (NIMA): Consider removing this function and just using getTrajectoryWithCost
     return getTrajectoryWithCost(
         TrajectoryPath(
             std::make_shared<BangBangTrajectory2D>(

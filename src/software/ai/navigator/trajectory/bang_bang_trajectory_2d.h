@@ -27,10 +27,6 @@ class BangBangTrajectory2D : public Trajectory2D
     BangBangTrajectory2D(const Point& initial_pos, const Point& final_pos,
                          const Vector& initial_vel, const KinematicConstraints &constraints);
 
-    static std::shared_ptr<Trajectory2D> generator(const Point &initial_pos,
-                                                   const Point &final_pos, const Vector &initial_vel,
-                                                   const KinematicConstraints &constraints);
-
     /**
      * Generate a 2D trajectory from the initial position to the final position with the
      * given initial velocity and kinematic constraints.
@@ -86,6 +82,18 @@ class BangBangTrajectory2D : public Trajectory2D
      * @return bounding box which bounds the trajectory
      */
     std::vector<BoundingBox> getBoundingBoxes() const override;
+
+    /**
+     * Static function for generating a BangBangTrajectory2D pointer with Trajectory2D interface
+     * @param initial_pos Where the trajectory should start at
+     * @param final_pos Where the trajectory should end at
+     * @param initial_vel The initial velocity of the trajectory
+     * @param constraints The kinematic constraints of the trajectory
+     * @return A shared pointer to a BangBangTrajectory2D
+     */
+    static std::shared_ptr<Trajectory2D> generator(const Point &initial_pos,
+                                                   const Point &final_pos, const Vector &initial_vel,
+                                                   const KinematicConstraints &constraints);
 
    private:
     BangBangTrajectory1D x_trajectory;

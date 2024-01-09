@@ -49,7 +49,7 @@ double sigmoid(const double& v, const double& offset, const double& sig_width)
     // TODO (#1985) there are much faster sigmoid implementations we can use
     // even max(tanh((2/sig_width) * (offset-v))) because tanh is faster than exp
 
-    return 1 / (1 + std::exp(sig_change_factor * (offset - v))); // TODO (NIMA): Causes segfault
+    return 1 / (1 + std::exp(sig_change_factor * (offset - v)));
 }
 
 double percent_difference(double a, double b)
