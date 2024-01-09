@@ -104,6 +104,7 @@ cc_library(
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/trajectory:trajectory_path_with_cost",
         "@aabbcc",
+        "@tracy",  # TODO (NIMA): Remove
     ],
 )
 
