@@ -243,8 +243,6 @@ cc_library(
         ":halt_play",
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",
-        ":move_to_dest_and_orient_play",
-        ":move_to_dest_play",
         ":shoot_or_chip_play",
         ":stop_play",
         "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
