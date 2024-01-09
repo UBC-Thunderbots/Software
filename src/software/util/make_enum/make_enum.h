@@ -41,7 +41,7 @@ std::vector<std::string> separateEnumStrings(std::string enum_string);
  *
  * IMPORTANT: This macro does NOT support enums that have manually specified values
  * Eg.
- * MAKE_ENUM(MyEnum, getTrajPartAndDeltaTime=1, bar)
+ * MAKE_ENUM(MyEnum, foo=1, bar)
  * is not valid
  *
  * @param name The name of the enum

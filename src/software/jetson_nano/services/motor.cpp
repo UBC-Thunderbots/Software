@@ -20,7 +20,6 @@
 
 #include <bitset>
 
-#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
 #include "software/logger/logger.h"
@@ -453,11 +452,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     double back_left_velocity =
         static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
         MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-
-    LOG(PLOTJUGGLER) << *createPlotJugglerValue({{"fr", front_right_velocity},
-                                                 {"fl", front_left_velocity},
-                                                 {"bl", back_left_velocity},
-                                                 {"br", back_right_velocity}});
 
     // Get the current dribbler rpm
     double dribbler_rpm =

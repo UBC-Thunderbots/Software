@@ -33,9 +33,6 @@ class DriveAndDribblerWidget(QWidget):
     def refresh(self) -> None:
         """Refresh the widget and send the a MotorControl message with the current values
         """
-        if not self.enabled:
-            return
-
         motor_control = MotorControl()
         motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
 
