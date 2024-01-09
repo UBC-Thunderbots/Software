@@ -45,7 +45,7 @@ class TrajectoryPath : public Trajectory2D
     /**
      * Get the position at time t of this trajectory path
      *
-     * @param t The time elapsed since the start of the trajectory path
+     * @param t_sec The time elapsed since the start of the trajectory path
      * @return The position at time t
      */
     Point getPosition(double t_sec) const override;
@@ -53,7 +53,7 @@ class TrajectoryPath : public Trajectory2D
     /**
      * Get the velocity at time t of this trajectory path
      *
-     * @param t The time elapsed since the start of the trajectory path
+     * @param t_sec The time elapsed since the start of the trajectory path
      * @return The velocity at time t
      */
     Vector getVelocity(double t_sec) const override;
@@ -61,7 +61,7 @@ class TrajectoryPath : public Trajectory2D
     /**
      * Get the acceleration at time t of this trajectory path
      *
-     * @param t The time elapsed since the start of the trajectory path
+     * @param t_sec The time elapsed since the start of the trajectory path
      * @return The acceleration at time t
      */
     Vector getAcceleration(double t_sec) const override;
@@ -77,7 +77,7 @@ class TrajectoryPath : public Trajectory2D
      * Get the bounding boxes of the trajectory path
      * @return A list of bounding boxes which wrap this trajectory path
      */
-    std::vector<BoundingBox> getBoundingBoxes() const override;
+    std::vector<Rectangle> getBoundingBoxes() const override;
 
     /**
      * Get the list of TrajectoryPathNodes that make up this trajectory path

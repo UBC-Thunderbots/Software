@@ -166,7 +166,7 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     // Get the list of obstacle indices that this trajectory path could collide with
     // This is used as an optimization to avoid checking every obstacle for collisions
     std::set<unsigned int> possible_collisions_indices;
-    for (const BoundingBox &bounding_box : trajectory.getBoundingBoxes())
+    for (const Rectangle &bounding_box : trajectory.getBoundingBoxes())
     {
         std::vector<unsigned int> bb_collisions =
             obstacle_tree.query(aabb::AABB({bounding_box.xMin(), bounding_box.yMin()},

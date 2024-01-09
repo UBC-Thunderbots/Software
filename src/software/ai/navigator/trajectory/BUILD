@@ -56,7 +56,7 @@ cc_library(
     deps = [
         ":bang_bang_trajectory_1d",
         ":trajectory_2d",
-        "//software/geom:bounding_box",
+        "//software/geom:rectangle",
         "//software/geom:point",
         "//software/ai/navigator/trajectory:kinematic_constraints",
     ],

@@ -100,12 +100,12 @@ double TrajectoryPath::getTotalTime() const
     return total_time;
 }
 
-std::vector<BoundingBox> TrajectoryPath::getBoundingBoxes() const
+std::vector<Rectangle> TrajectoryPath::getBoundingBoxes() const
 {
-    std::vector<BoundingBox> bounding_boxes;
+    std::vector<Rectangle> bounding_boxes;
     for (const TrajectoryPathNode& traj_node : traj_path)
     {
-        const std::vector<BoundingBox> bbs =
+        const std::vector<Rectangle> bbs =
             traj_node.getTrajectory()->getBoundingBoxes();
         bounding_boxes.insert(bounding_boxes.begin(), bbs.begin(), bbs.end());
     }

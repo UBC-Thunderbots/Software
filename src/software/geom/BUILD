@@ -103,15 +103,6 @@ cc_library(
 )
 
 cc_library(
-    name = "bounding_box",
-    srcs = ["bounding_box.cpp"],
-    hdrs = ["bounding_box.h"],
-    deps = [
-        ":point",
-    ],
-)
-
-cc_library(
     name = "geom_constants",
     hdrs = ["geom_constants.h"],
 )

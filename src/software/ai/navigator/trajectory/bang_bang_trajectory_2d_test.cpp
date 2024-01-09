@@ -108,10 +108,8 @@ TEST_F(BangBangTrajectory2DTest, test_trajectory_bounding_box)
     Point start_pos(0, 0);
     Point destination(1, 1);
     traj.generate(start_pos, destination, Vector(0, 0), 1.0, 1.0, 1.0);
-    // TODO (NIMA)
-    std::vector<BoundingBox> bounding_boxes = traj.getBoundingBoxes();
+    std::vector<Rectangle> bounding_boxes = traj.getBoundingBoxes();
     ASSERT_EQ(bounding_boxes.size(), 1);
-    //    EXPECT_TRUE(TestUtil::equalWithinTolerance(bounding_boxes[0],
-    //                                               BoundingBox(start_pos, destination),
-    //                                               1e-3));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(traj.getBoundingBoxes()[0],
+                                               Rectangle(start_pos, destination), 1e-3));
 }

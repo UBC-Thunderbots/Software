@@ -3,8 +3,7 @@
 #include <memory>
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d.h"
 #include "software/ai/navigator/trajectory/trajectory_2d.h"
-#include "software/geom/bounding_box.h"
-#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 #include "software/ai/navigator/trajectory/kinematic_constraints.h"
 
 class BangBangTrajectory2D : public Trajectory2D
@@ -81,7 +80,7 @@ class BangBangTrajectory2D : public Trajectory2D
      * Get the bounding box of the trajectory
      * @return bounding box which bounds the trajectory
      */
-    std::vector<BoundingBox> getBoundingBoxes() const override;
+    std::vector<Rectangle> getBoundingBoxes() const override;
 
     /**
      * Static function for generating a BangBangTrajectory2D pointer with Trajectory2D interface
