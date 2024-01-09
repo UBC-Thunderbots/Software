@@ -2,8 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/time_to_travel.h"
-#include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
-#include "software/ai/navigator/trajectory/bang_bang_trajectory_2d.h"
 #include "software/logger/logger.h"
 
 Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
@@ -24,8 +22,7 @@ Robot::Robot(RobotId id, const RobotState &initial_state, const Timestamp &times
     : id_(id),
       current_state_(initial_state),
       timestamp_(timestamp),
-      unavailable_capabilities_(unavailable_capabilities),
-      robot_constants_(DEFAULT_ROBOT_CONSTANTS)
+      unavailable_capabilities_(unavailable_capabilities)
 {
 }
 
@@ -33,7 +30,7 @@ Robot::Robot(const TbotsProto::Robot &robot_proto)
     : id_(robot_proto.id()),
       current_state_(RobotState(robot_proto.current_state())),
       timestamp_(Timestamp::fromTimestampProto(robot_proto.timestamp())),
-      robot_constants_(DEFAULT_ROBOT_CONSTANTS)
+      robot_constants_(create2021RobotConstants())
 {
     for (const auto &unavailable_capability : robot_proto.unavailable_capabilities())
     {
@@ -176,19 +173,30 @@ Polygon Robot::dribblerArea() const
 }
 
 
-Duration Robot::getTimeToOrientation(const Angle &desired_orientation) const
+Duration Robot::getTimeToOrientation(const Angle &desired_orientation,
+                                     const AngularVelocity &final_angular_velocity) const
 {
-    BangBangTrajectory1DAngular traj(orientation(), desired_orientation,
-                                     angularVelocity(),
-                                     AngularVelocity::fromRadians(robot_constants_.robot_max_ang_speed_rad_per_s),
-                                     AngularAcceleration::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2),
-                                     AngularAcceleration::fromRadians(robot_constants_.robot_max_ang_acceleration_rad_per_s_2));
-    return Duration::fromSeconds(traj.getTotalTime());
+    double dist = orientation().minDiff(desired_orientation).toRadians();
+    double initial_ang_vel_rad_per_sec = angularVelocity().toRadians();
+    return getTimeToTravelDistance(
+        dist, robot_constants_.robot_max_ang_speed_rad_per_s,
+        robot_constants_.robot_max_ang_acceleration_rad_per_s_2,
+        initial_ang_vel_rad_per_sec, final_angular_velocity.toRadians());
 }
 
-Duration Robot::getTimeToPosition(const Point &destination) const
+Duration Robot::getTimeToPosition(const Point &destination,
+                                  const Vector &final_velocity) const
 {
-    BangBangTrajectory2D traj(position(), destination, velocity(),
-                              KinematicConstraints(robot_constants_.robot_max_speed_m_per_s, robot_constants_.robot_max_acceleration_m_per_s_2, robot_constants_.robot_max_deceleration_m_per_s_2));
-    return Duration::fromSeconds(traj.getTotalTime());
+    Vector dist_vector = destination - position();
+    double dist        = std::max(0.0, dist_vector.length());
+
+    // To simplify the calculations we will solve this problem with 1D kinematics
+    // by taking the component of the velocities projected onto the vector pointing
+    // towards the destination
+    double initial_velocity_1d = velocity().dot(dist_vector.normalize());
+    double final_velocity_1d   = final_velocity.dot(dist_vector.normalize());
+
+    return getTimeToTravelDistance(dist, robot_constants_.robot_max_speed_m_per_s,
+                                   robot_constants_.robot_max_acceleration_m_per_s_2,
+                                   initial_velocity_1d, final_velocity_1d);
 }

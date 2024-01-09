@@ -34,7 +34,7 @@ class Robot
                    const Timestamp &timestamp,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>(),
-                   const RobotConstants_t &robot_constants = DEFAULT_ROBOT_CONSTANTS);
+                   const RobotConstants_t &robot_constants = create2021RobotConstants());
 
     /**
      * Creates a new robot with the given initial state
@@ -169,21 +169,27 @@ class Robot
      * Estimate the minimum time it would take to turn to the desired orientation
      *
      * @param desired_orientation The orientation which we want the robot to be at
-
+     * @param final_angular_velocity The desired angular velocity which the robot
+     * will be moving at, once it reaches the desired orientation
+     *
      * @return The time required for this robot to rotate to the given orientation
      */
     Duration getTimeToOrientation(
-     const Angle &desired_orientation) const;
+        const Angle &desired_orientation,
+        const AngularVelocity &final_angular_velocity = AngularVelocity::zero()) const;
 
     /**
      * Estimate the minimum time it would take to reach the desired point
      *
      * @param destination The destination that the robot is going to
+     * @param final_velocity The desired final velocity which the robot should be moving
+     * at
      *
      * @return The minimum theoretical time it would take this robot to reach the
      * destination
      */
-    Duration getTimeToPosition(const Point &destination) const;
+    Duration getTimeToPosition(const Point &destination,
+                               const Vector &final_velocity = Vector()) const;
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
@@ -232,7 +238,4 @@ class Robot
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapability> unavailable_capabilities_;
     RobotConstants_t robot_constants_;
-
-    // Default robot constants that should be used for all robots
-    inline static const RobotConstants DEFAULT_ROBOT_CONSTANTS = create2021RobotConstants();
 };
