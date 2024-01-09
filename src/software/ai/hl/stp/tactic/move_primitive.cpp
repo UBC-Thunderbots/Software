@@ -1,5 +1,6 @@
-#include <tracy/Tracy.hpp>
 #include "software/ai/hl/stp/tactic/move_primitive.h"
+
+#include <tracy/Tracy.hpp>
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
@@ -59,7 +60,7 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
         max_speed, robot.robotConstants().robot_max_acceleration_m_per_s_2,
         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
-    // TODO (#3104): The fieldBounary should be shrinked by the robot radius before being
+    // TODO (#3104): The fieldBounary should be shrunk by the robot radius before being
     //  passed to the planner.
     traj_path =
         planner.findTrajectory(robot.position(), destination, robot.velocity(),
@@ -101,7 +102,8 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
     {
         // If the trajectory path consists of only 1 trajectory,
         // then the connection time is set to 0
-        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(0);
+        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(
+            0);
     }
 
     TbotsProto::TrajectoryParamsAngular1D w_traj_params;
@@ -159,8 +161,9 @@ void MovePrimitive::generateObstacles(
     }
 }
 
-void MovePrimitive::getVisualizationProtos(TbotsProto::ObstacleList& obstacle_list_out,
-                                           TbotsProto::PathVisualization& path_visualization_out) const
+void MovePrimitive::getVisualizationProtos(
+    TbotsProto::ObstacleList &obstacle_list_out,
+    TbotsProto::PathVisualization &path_visualization_out) const
 {
     for (const auto &obstacle : obstacles)
     {
@@ -172,7 +175,8 @@ void MovePrimitive::getVisualizationProtos(TbotsProto::ObstacleList& obstacle_li
     {
         for (unsigned int i = 0; i < NUM_TRAJECTORY_VISUALIZATION_POINTS; i++)
         {
-            double t = i * traj_path->getTotalTime() / (NUM_TRAJECTORY_VISUALIZATION_POINTS - 1);
+            double t =
+                i * traj_path->getTotalTime() / (NUM_TRAJECTORY_VISUALIZATION_POINTS - 1);
             Point position = traj_path->getPosition(t);
             path.add_points()->CopyFrom(*createPointProto(position));
         }

@@ -100,12 +100,12 @@ cc_test(
 cc_test(
     name = "first_in_first_out_threaded_observer_test",
     srcs = ["first_in_first_out_threaded_observer_test.cpp"],
+    # Run the test up to 3 times if it fails
+    flaky = True,
     deps = [
         ":threaded_observer",
         "//shared/test_util:tbots_gtest_main",
     ],
-    # Run the test up to 3 times if it fails
-    flaky = True,
 )
 
 cc_test(

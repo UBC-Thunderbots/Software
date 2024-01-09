@@ -217,9 +217,9 @@ void SimulatedErForceSimTestFixture::runTest(
 
     const Timestamp timeout_time = simulator->getTimestamp() + timeout;
 
-    double speed_factor         = 1 / (TbotsGtestMain::test_speed);
-    const Duration ai_time_step = Duration::fromSeconds(
-        simulation_time_step.toSeconds() * speed_factor);
+    double speed_factor = 1 / (TbotsGtestMain::test_speed);
+    const Duration ai_time_step =
+        Duration::fromSeconds(simulation_time_step.toSeconds() * speed_factor);
 
     // declare difference (velocity, position) variables
     double ball_displacement;

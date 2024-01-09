@@ -407,8 +407,8 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
 }
 
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
-    const TbotsProto::TrajectoryPathParams2D& params,
-    const Vector& initial_velocity, const RobotConstants& robot_constants)
+    const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
+    const RobotConstants& robot_constants)
 {
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         params.max_speed_mode(), robot_constants);
@@ -418,8 +418,9 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
         return std::nullopt;
     }
 
-    KinematicConstraints constraints(max_speed, robot_constants.robot_max_acceleration_m_per_s_2,
-        robot_constants.robot_max_deceleration_m_per_s_2);
+    KinematicConstraints constraints(max_speed,
+                                     robot_constants.robot_max_acceleration_m_per_s_2,
+                                     robot_constants.robot_max_deceleration_m_per_s_2);
 
     Point initial_destination = createPoint(params.destination());
     if (params.connection_time_s() != 0)
@@ -437,7 +438,8 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     if (params.connection_time_s() != 0)
     {
         // Append a second sub-trajectory to the final destination
-        trajectory_path.append(params.connection_time_s(), createPoint(params.destination()), constraints);
+        trajectory_path.append(params.connection_time_s(),
+                               createPoint(params.destination()), constraints);
     }
 
     return trajectory_path;
@@ -448,11 +450,9 @@ BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
     const AngularVelocity& initial_velocity, const RobotConstants& robot_constants)
 {
     return BangBangTrajectory1DAngular(
-        createAngle(params.start_angle()),
-        createAngle(params.final_angle()),
+        createAngle(params.start_angle()), createAngle(params.final_angle()),
         initial_velocity,
-        AngularVelocity::fromRadians(
-            robot_constants.robot_max_ang_speed_rad_per_s),
+        AngularVelocity::fromRadians(robot_constants.robot_max_ang_speed_rad_per_s),
         AngularVelocity::fromRadians(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2),
         AngularVelocity::fromRadians(

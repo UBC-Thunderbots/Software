@@ -24,8 +24,7 @@ class NetworkService
      * @param multicast  If true, then the provided IP address is a multicast address and
      * we should join the group
      */
-    NetworkService(const std::string& ip_address,
-                   unsigned short primitive_listener_port,
+    NetworkService(const std::string& ip_address, unsigned short primitive_listener_port,
                    unsigned short robot_status_sender_port, bool multicast);
 
     /**
@@ -34,8 +33,7 @@ class NetworkService
      *
      * @returns a tuple of the stored primitive_set
      */
-    TbotsProto::PrimitiveSet poll(
-        TbotsProto::RobotStatus& robot_status);
+    TbotsProto::PrimitiveSet poll(TbotsProto::RobotStatus& robot_status);
 
    private:
     /**

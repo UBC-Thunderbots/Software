@@ -2,7 +2,8 @@
 
 #include <tracy/Tracy.hpp>
 
-TrajectoryPlanner::TrajectoryPlanner() : relative_sub_destinations(getRelativeSubDestinations())
+TrajectoryPlanner::TrajectoryPlanner()
+    : relative_sub_destinations(getRelativeSubDestinations())
 {
 }
 
@@ -17,14 +18,14 @@ std::vector<Vector> TrajectoryPlanner::getRelativeSubDestinations()
         {
             Angle angle = sub_angles * i;
             relative_sub_destinations.emplace_back(
-                    Vector::createFromAngle(angle).normalize(distance));
+                Vector::createFromAngle(angle).normalize(distance));
         }
     }
     return relative_sub_destinations;
 }
 
-std::vector<Point> TrajectoryPlanner::getSubDestinations(const Point &start, const Point &destination,
-                                                         const Rectangle& navigable_area) const
+std::vector<Point> TrajectoryPlanner::getSubDestinations(
+    const Point &start, const Point &destination, const Rectangle &navigable_area) const
 {
     // Convert the relative sub destinations to actual sub destination points
     // and filter out undesirable sub destinations to reduce trajectory sampling.
@@ -66,14 +67,16 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     aabb::Tree tree;
     {
         ZoneScopedN("aabb::Tree creation");
-        tree = aabb::Tree(2, 0.0, {false, false},
-                        {navigable_area.xLength(), navigable_area.yLength()},
-                        std::max(static_cast<unsigned int>(obstacles.size()), 1u), false);
+        tree = aabb::Tree(
+            2, 0.0, {false, false}, {navigable_area.xLength(), navigable_area.yLength()},
+            std::max(static_cast<unsigned int>(obstacles.size()), 1u), false);
         for (unsigned int i = 0; i < obstacles.size(); i++)
         {
             Rectangle aabb         = obstacles[i]->axisAlignedBoundingBox();
-            std::vector aabb_lower = {aabb.negXNegYCorner().x(), aabb.negXNegYCorner().y()};
-            std::vector aabb_upper = {aabb.posXPosYCorner().x(), aabb.posXPosYCorner().y()};
+            std::vector aabb_lower = {aabb.negXNegYCorner().x(),
+                                      aabb.negXNegYCorner().y()};
+            std::vector aabb_upper = {aabb.posXPosYCorner().x(),
+                                      aabb.posXPosYCorner().y()};
             tree.insertParticle(i, aabb_lower, aabb_upper);
         }
     }
@@ -147,10 +150,9 @@ TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
     const std::vector<ObstaclePtr> &obstacles)
 {
     return getTrajectoryWithCost(
-        TrajectoryPath(
-            std::make_shared<BangBangTrajectory2D>(
-                start, destination, initial_velocity, constraints),
-            BangBangTrajectory2D::generator),
+        TrajectoryPath(std::make_shared<BangBangTrajectory2D>(
+                           start, destination, initial_velocity, constraints),
+                       BangBangTrajectory2D::generator),
         obstacle_tree, obstacles, std::nullopt, std::nullopt);
 }
 
@@ -216,9 +218,9 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     }
     else
     {
-        std::pair<double, ObstaclePtr> collision = getFirstCollisionTime(
-            trajectory, possible_collisions_indices, obstacles, first_non_collision_time,
-            last_non_collision_time);
+        std::pair<double, ObstaclePtr> collision =
+            getFirstCollisionTime(trajectory, possible_collisions_indices, obstacles,
+                                  first_non_collision_time, last_non_collision_time);
         traj_with_cost.first_collision_time_s = collision.first;
         traj_with_cost.colliding_obstacle     = collision.second;
     }

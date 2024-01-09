@@ -27,12 +27,11 @@ class TrajectoryPlanner
      * @param navigable_area The navigable area of the field
      * @return TrajectoryPath which attempts to avoid the obstacles
      */
- // TODO (NIMA): Test
-    std::optional<TrajectoryPath> findTrajectory(const Point &start, const Point &destination,
-                                                 const Vector &initial_velocity,
-                                                 const KinematicConstraints &constraints,
-                                                 const std::vector<ObstaclePtr> &obstacles,
-                                                 const Rectangle &navigable_area);
+    // TODO (NIMA): Test
+    std::optional<TrajectoryPath> findTrajectory(
+        const Point &start, const Point &destination, const Vector &initial_velocity,
+        const KinematicConstraints &constraints,
+        const std::vector<ObstaclePtr> &obstacles, const Rectangle &navigable_area);
 
    private:
     /**
@@ -66,7 +65,8 @@ class TrajectoryPlanner
      * @param trajectory The trajectory path to calculate the cost of
      * @param obstacle_tree Axis aligned bounding box tree of the obstacles
      * @param obstacles List of all obstacles
-     * @param sub_traj_with_cost Optional cached trajectory path with cost of the sub trajectory
+     * @param sub_traj_with_cost Optional cached trajectory path with cost of the sub
+     * trajectory
      * @param sub_traj_duration_s Optional duration of the cached sub_traj_with_cost
      * @return The trajectory path with its cost
      */
@@ -108,8 +108,7 @@ class TrajectoryPlanner
      */
     std::pair<double, ObstaclePtr> getFirstCollisionTime(
         const TrajectoryPath &traj_path, const std::set<unsigned int> &obstacle_indices,
-        const std::vector<ObstaclePtr> &obstacles,
-        const double start_time_s,
+        const std::vector<ObstaclePtr> &obstacles, const double start_time_s,
         const double search_end_time_s) const;
 
     /**
@@ -131,17 +130,17 @@ class TrajectoryPlanner
                                    const double search_end_time_s) const;
 
     /**
-     * Get a list of sub destinations which trajectory paths should be sampled through for the given start position
-     * and destination. All sub destinations will be within the navigable area.
+     * Get a list of sub destinations which trajectory paths should be sampled through for
+     * the given start position and destination. All sub destinations will be within the
+     * navigable area.
      *
      * @param start Start position of the trajectory
      * @param destination Destination of the trajectory
      * @param navigable_area The navigable area of the field
      * @return A list of sub destinations for trajectory paths be sampled through
      */
-    std::vector<Point>
-    getSubDestinations(const Point &start, const Point &destination,
-                       const Rectangle &navigable_area) const;
+    std::vector<Point> getSubDestinations(const Point &start, const Point &destination,
+                                          const Rectangle &navigable_area) const;
 
     /**
      * Helper function for generating the relative sub destinations
@@ -152,13 +151,14 @@ class TrajectoryPlanner
     static std::vector<Vector> getRelativeSubDestinations();
 
     const std::vector<Vector> relative_sub_destinations;
-    static constexpr std::array<double, 4> SUB_DESTINATION_DISTANCES_METERS = {1.1, 2.3, 3};
+    static constexpr std::array<double, 4> SUB_DESTINATION_DISTANCES_METERS = {1.1, 2.3,
+                                                                               3};
     static constexpr unsigned int NUM_SUB_DESTINATION_ANGLES                = 16;
 
-    static constexpr double MIN_SUB_DESTINATION_DISTANCE_M                = 0.5;
-    static constexpr double MAX_SUB_DESTINATION_DISTANCE_M                = 1.5;
-    static constexpr Angle MIN_SUB_DESTINATION_ANGLE                = Angle::fromDegrees(20);
-    static constexpr Angle MAX_SUB_DESTINATION_ANGLE                = Angle::fromDegrees(140);
+    static constexpr double MIN_SUB_DESTINATION_DISTANCE_M = 0.5;
+    static constexpr double MAX_SUB_DESTINATION_DISTANCE_M = 1.5;
+    static constexpr Angle MIN_SUB_DESTINATION_ANGLE       = Angle::fromDegrees(20);
+    static constexpr Angle MAX_SUB_DESTINATION_ANGLE       = Angle::fromDegrees(140);
 
     const double SUB_DESTINATION_STEP_INTERVAL_SEC         = 0.2;
     const double COLLISION_CHECK_STEP_INTERVAL_SEC         = 0.1;

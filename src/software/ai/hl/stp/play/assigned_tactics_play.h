@@ -27,8 +27,7 @@ class AssignedTacticsPlay : public Play
             std::map<RobotId, std::set<TbotsProto::MotionConstraint>>());
 
     std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const World &world,
-        const InterPlayCommunication &,
+        const World &world, const InterPlayCommunication &,
         const SetInterPlayCommunicationCallback &) override;
 
    private:

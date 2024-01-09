@@ -6,6 +6,7 @@
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/primitive.pb.h"
+#include "proto/visualization.pb.h"
 #include "shared/constants.h"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
 #include "software/geom/algorithms/axis_aligned_bounding_box.h"
@@ -15,7 +16,6 @@
 #include "software/geom/algorithms/rasterize.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
-#include "proto/visualization.pb.h"
 
 /**
  * An obstacle is an area to avoid for navigation

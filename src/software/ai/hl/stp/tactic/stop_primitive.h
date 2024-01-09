@@ -31,6 +31,7 @@ class StopPrimitive : public Primitive
      * @param obstacle_list_out Reference to the ObstacleList proto to add obstacles to
      * @param path_visualization_out Reference to the PathVisualization proto to add path
      */
-    void getVisualizationProtos(TbotsProto::ObstacleList& obstacle_list_out,
-                                TbotsProto::PathVisualization& path_visualization_out) const override;
+    void getVisualizationProtos(
+        TbotsProto::ObstacleList &obstacle_list_out,
+        TbotsProto::PathVisualization &path_visualization_out) const override;
 };

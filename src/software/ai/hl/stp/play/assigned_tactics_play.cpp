@@ -2,9 +2,9 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
-#include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 
 AssignedTacticsPlay::AssignedTacticsPlay(TbotsProto::AiConfig config)
     : Play(config, false),
@@ -28,14 +28,13 @@ void AssignedTacticsPlay::updateControlParams(
     std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics,
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>> motion_constraints)
 {
-    this->assigned_tactics = assigned_tactics;
-    this->override_motion_constraints =
-        motion_constraints;
+    this->assigned_tactics            = assigned_tactics;
+    this->override_motion_constraints = motion_constraints;
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
-    const World &world,
-    const InterPlayCommunication &, const SetInterPlayCommunicationCallback &)
+    const World &world, const InterPlayCommunication &,
+    const SetInterPlayCommunicationCallback &)
 {
     obstacle_list.Clear();
     path_visualization.Clear();
@@ -62,7 +61,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
                 {robot.id(), *primitive_proto});
             tactic->setLastExecutionRobot(robot.id());
 
-            primitives[robot.id()]->getVisualizationProtos(obstacle_list, path_visualization);
+            primitives[robot.id()]->getVisualizationProtos(obstacle_list,
+                                                           path_visualization);
         }
     }
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(

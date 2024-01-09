@@ -6,9 +6,9 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
-#include "software/physics/velocity_conversion_util.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
+#include "software/physics/velocity_conversion_util.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
                                      const RobotConstants_t &robot_constants,
@@ -35,7 +35,9 @@ void PrimitiveExecutor::updatePrimitiveSet(
             trajectory_path_ = createTrajectoryPathFromParams(
                 current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
 
-            angular_trajectory_ = createAngularTrajectoryFromParams(current_primitive_.move().w_traj_params(), angular_velocity_, robot_constants_);
+            angular_trajectory_ = createAngularTrajectoryFromParams(
+                current_primitive_.move().w_traj_params(), angular_velocity_,
+                robot_constants_);
 
             time_since_trajectory_creation_ =
                 Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
@@ -53,19 +55,18 @@ void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
 {
     Vector actual_global_velocity = localToGlobalVelocity(local_velocity, orientation_);
     velocity_                     = actual_global_velocity;
-    angular_velocity_ = angular_velocity;
+    angular_velocity_             = angular_velocity;
 }
 
 Vector PrimitiveExecutor::getTargetLinearVelocity()
 {
-    Vector local_velocity =
-            globalToLocalVelocity(trajectory_path_->getVelocity(
-                                          time_since_trajectory_creation_.toSeconds()),
-                                  orientation_);
-    Point position = trajectory_path_->getPosition(
-            time_since_trajectory_creation_.toSeconds());
+    Vector local_velocity = globalToLocalVelocity(
+        trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()),
+        orientation_);
+    Point position =
+        trajectory_path_->getPosition(time_since_trajectory_creation_.toSeconds());
     double distance_to_destination =
-            distance(position, trajectory_path_->getDestination());
+        distance(position, trajectory_path_->getDestination());
 
     // Dampen velocity as we get closer to the destination to reduce jittering
     if (distance_to_destination < MAX_DAMPENING_VELOCITY_DISTANCE_M)
@@ -77,13 +78,13 @@ Vector PrimitiveExecutor::getTargetLinearVelocity()
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 {
-    orientation_ = angular_trajectory_->getPosition(
-            time_since_trajectory_creation_.toSeconds());
+    orientation_ =
+        angular_trajectory_->getPosition(time_since_trajectory_creation_.toSeconds());
 
-    AngularVelocity angular_velocity = angular_trajectory_->getVelocity(
-            time_since_trajectory_creation_.toSeconds());
+    AngularVelocity angular_velocity =
+        angular_trajectory_->getVelocity(time_since_trajectory_creation_.toSeconds());
     Angle orientation_to_destination =
-            orientation_.minDiff(angular_trajectory_->getDestination());
+        orientation_.minDiff(angular_trajectory_->getDestination());
     if (orientation_to_destination.toDegrees() < 5)
     {
         angular_velocity *= orientation_to_destination.toDegrees() / 5;
@@ -128,25 +129,28 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 return output;
             }
 
-            Vector local_velocity = getTargetLinearVelocity();
+            Vector local_velocity            = getTargetLinearVelocity();
             AngularVelocity angular_velocity = getTargetAngularVelocity();
 
-//            LOG(PLOTJUGGLER) << *createPlotJugglerValue(
-//                {{"orientation_", orientation_.toRadians()},
-//                 {"v", local_velocity.length()},
-//                 {"vx", local_velocity.x()},
-//                 {"vy", local_velocity.y()},
-//                 {"local_v", velocity_.length()},
-//                 {"local_vx", velocity_.x()},
-//                 {"local_vy", velocity_.y()},
-//                 {"px", position.x()},
-//                 {"py", position.y()},
-//                 {"d_to_dest", distance_to_destination},
-//                 {"actual_vel_desired_vel", (local_velocity - velocity_).length()},
-//                 {"actual_vel_desired_vel_x", (local_velocity - velocity_).x()},
-//                 {"actual_vel_desired_vel_y", (local_velocity - velocity_).y()},
-//                 {"vt", angular_velocity.toRadians()},
-//                 {"dt", orientation_to_destination.toRadians()}});
+            //            LOG(PLOTJUGGLER) << *createPlotJugglerValue(
+            //                {{"orientation_", orientation_.toRadians()},
+            //                 {"v", local_velocity.length()},
+            //                 {"vx", local_velocity.x()},
+            //                 {"vy", local_velocity.y()},
+            //                 {"local_v", velocity_.length()},
+            //                 {"local_vx", velocity_.x()},
+            //                 {"local_vy", velocity_.y()},
+            //                 {"px", position.x()},
+            //                 {"py", position.y()},
+            //                 {"d_to_dest", distance_to_destination},
+            //                 {"actual_vel_desired_vel", (local_velocity -
+            //                 velocity_).length()},
+            //                 {"actual_vel_desired_vel_x", (local_velocity -
+            //                 velocity_).x()},
+            //                 {"actual_vel_desired_vel_y", (local_velocity -
+            //                 velocity_).y()},
+            //                 {"vt", angular_velocity.toRadians()},
+            //                 {"dt", orientation_to_destination.toRadians()}});
 
             auto output = createDirectControlPrimitive(
                 local_velocity, angular_velocity,

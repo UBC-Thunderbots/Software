@@ -52,8 +52,7 @@ class Play
      * @return the PrimitiveSet to execute
      */
     virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const World& world,
-        const InterPlayCommunication& inter_play_communication,
+        const World& world, const InterPlayCommunication& inter_play_communication,
         const SetInterPlayCommunicationCallback& set_inter_play_communication_fun);
 
     /**
@@ -109,7 +108,7 @@ class Play
      * tactic assignment
      */
     std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
-                      std::map<std::shared_ptr<const Tactic>, RobotId>>
+               std::map<std::shared_ptr<const Tactic>, RobotId>>
     assignTactics(const World& world, TacticVector tactic_vector,
                   const std::vector<Robot>& robots_to_assign);
 

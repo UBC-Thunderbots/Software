@@ -178,7 +178,7 @@ Thunderloop::~Thunderloop() {}
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
-                new_primitive_set       = network_service_->poll(robot_status_);
+                new_primitive_set = network_service_->poll(robot_status_);
             }
 
             thunderloop_status_.set_network_service_poll_time_ms(

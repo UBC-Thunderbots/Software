@@ -8,10 +8,10 @@
 #include "software/logger/logger.h"
 #include "software/util/typename/typename.h"
 
-template<class ReceiveProtoT>
+template <class ReceiveProtoT>
 class ProtoUnixListener
 {
-public:
+   public:
     /*
      * Listens for packets over the provided unix socket and triggers the
      * receive_callback on a new message.
@@ -25,7 +25,7 @@ public:
 
     virtual ~ProtoUnixListener();
 
-private:
+   private:
     /**
      * This function is setup as the callback to handle packets received over the network.
      *
@@ -56,7 +56,7 @@ private:
     bool running_ = true;
 };
 
-template<class ReceiveProtoT>
+template <class ReceiveProtoT>
 ProtoUnixListener<ReceiveProtoT>::ProtoUnixListener(
     boost::asio::io_service &io_service, const std::string &unix_path,
     std::function<void(ReceiveProtoT &)> receive_callback)
@@ -65,7 +65,7 @@ ProtoUnixListener<ReceiveProtoT>::ProtoUnixListener(
     ::unlink(unix_path.c_str());
 
     listen_endpoint_ = boost::asio::local::datagram_protocol::endpoint(unix_path);
-    unix_path_ = unix_path;
+    unix_path_       = unix_path;
 
 
     socket_.open();
@@ -78,7 +78,7 @@ ProtoUnixListener<ReceiveProtoT>::ProtoUnixListener(
     startListen();
 }
 
-template<class ReceiveProtoT>
+template <class ReceiveProtoT>
 void ProtoUnixListener<ReceiveProtoT>::startListen()
 {
     // Start listening for data asynchronously
@@ -91,7 +91,7 @@ void ProtoUnixListener<ReceiveProtoT>::startListen()
                                            boost::asio::placeholders::bytes_transferred));
 }
 
-template<class ReceiveProtoT>
+template <class ReceiveProtoT>
 void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code &error, size_t num_bytes_received)
 {
@@ -115,10 +115,10 @@ void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
         // Start listening again to receive the next data
         startListen();
 
-        LOG(WARNING)
-            << "An unknown network error occurred when attempting to receive " << TYPENAME(ReceiveProtoT) <<
- " Data. The boost system error is: "
-            << error.message() << std::endl;
+        LOG(WARNING) << "An unknown network error occurred when attempting to receive "
+                     << TYPENAME(ReceiveProtoT)
+                     << " Data. The boost system error is: " << error.message()
+                     << std::endl;
     }
 
     if (num_bytes_received > UNIX_BUFFER_SIZE)
@@ -130,7 +130,7 @@ void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
     }
 }
 
-template<class ReceiveProtoT>
+template <class ReceiveProtoT>
 ProtoUnixListener<ReceiveProtoT>::~ProtoUnixListener()
 {
     running_ = false;
@@ -139,15 +139,18 @@ ProtoUnixListener<ReceiveProtoT>::~ProtoUnixListener()
     socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error_code);
     if (error_code)
     {
-        LOG(WARNING) << "An unknown network error occurred when attempting to shutdown Unix socket for " <<
-                    TYPENAME(ReceiveProtoT) << ". The boost system error is: " << error_code.message()
-                     << std::endl;
+        LOG(WARNING)
+            << "An unknown network error occurred when attempting to shutdown Unix socket for "
+            << TYPENAME(ReceiveProtoT)
+            << ". The boost system error is: " << error_code.message() << std::endl;
     }
 
     socket_.close(error_code);
     if (error_code)
     {
-        LOG(WARNING) << "An unknown network error occurred when attempting to close Unix socket for " << TYPENAME(ReceiveProtoT) << ". The boost system error is: " << error_code.message()
-                     << std::endl;
+        LOG(WARNING)
+            << "An unknown network error occurred when attempting to close Unix socket for "
+            << TYPENAME(ReceiveProtoT)
+            << ". The boost system error is: " << error_code.message() << std::endl;
     }
 }

@@ -112,9 +112,9 @@ cc_library(
     deps = [
         ":primitive",
         "//proto/message_translation:tbots_protobuf",
-        "//software/ai/navigator/trajectory:trajectory_planner",
         "//proto/primitive:primitive_msg_factory",
-        "@tracy", # TODO (NIMA): Remove
+        "//software/ai/navigator/trajectory:trajectory_planner",
+        "@tracy",  # TODO (NIMA): Remove
     ],
 )
 
@@ -134,9 +134,9 @@ cc_test(
     name = "primitive_test",
     srcs = ["primitive_test.cpp"],
     deps = [
-        "//shared/test_util:tbots_gtest_main",
         ":move_primitive",
         ":stop_primitive",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],
 )

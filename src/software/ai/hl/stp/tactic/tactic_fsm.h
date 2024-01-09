@@ -16,9 +16,7 @@ struct TacticUpdate
 {
     TacticUpdate(const Robot &robot, const World &world,
                  const SetPrimitiveCallback &set_primitive_fun)
-        : robot(robot),
-          world(world),
-          set_primitive(set_primitive_fun)
+        : robot(robot), world(world), set_primitive(set_primitive_fun)
     {
     }
 

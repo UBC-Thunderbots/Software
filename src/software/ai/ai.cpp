@@ -75,16 +75,14 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 
     if (static_cast<bool>(override_play))
     {
-        return override_play->get(world,
-                                  inter_play_communication,
+        return override_play->get(world, inter_play_communication,
                                   [this](InterPlayCommunication comm) {
                                       inter_play_communication = std::move(comm);
                                   });
     }
     else
     {
-        return current_play->get(world,
-                                 inter_play_communication,
+        return current_play->get(world, inter_play_communication,
                                  [this](InterPlayCommunication comm) {
                                      inter_play_communication = std::move(comm);
                                  });

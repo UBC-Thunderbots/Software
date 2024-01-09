@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/navigator/trajectory/trajectory.hpp"
-#include "software/geom/rectangle.h"
 #include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 
 class Trajectory2D : virtual public Trajectory<Point, Vector, Vector>
 {

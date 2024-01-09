@@ -56,9 +56,9 @@ cc_library(
     deps = [
         ":bang_bang_trajectory_1d",
         ":trajectory_2d",
-        "//software/geom:rectangle",
-        "//software/geom:point",
         "//software/ai/navigator/trajectory:kinematic_constraints",
+        "//software/geom:point",
+        "//software/geom:rectangle",
     ],
 )
 
@@ -104,7 +104,7 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/trajectory:trajectory_path_with_cost",
-        "@tracy", # TODO (NIMA): Remove
+        "@tracy",  # TODO (NIMA): Remove
     ],
 )
 
@@ -124,8 +124,8 @@ cc_test(
     deps = [
         ":bang_bang_trajectory_2d",
         "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
         "//software/logger",
+        "//software/test_util",
     ],
 )
 
@@ -134,8 +134,8 @@ cc_test(
     srcs = ["trajectory_planner_test.cpp"],
     deps = [
         ":trajectory_planner",
-        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//shared/test_util:tbots_gtest_main",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
     ],
 )

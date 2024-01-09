@@ -95,7 +95,7 @@ cc_library(
     visibility = ["//visibility:private"],
     deps = [
         "//software:constants",
-        "//software/util/typename:typename",
+        "//software/util/typename",
         "@boost//:asio",
     ],
 )

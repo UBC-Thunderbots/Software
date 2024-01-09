@@ -243,5 +243,6 @@ class Robot
     RobotConstants_t robot_constants_;
 
     // Default robot constants that should be used for all robots
-    inline static const RobotConstants DEFAULT_ROBOT_CONSTANTS = create2021RobotConstants();
+    inline static const RobotConstants DEFAULT_ROBOT_CONSTANTS =
+        create2021RobotConstants();
 };

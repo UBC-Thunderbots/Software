@@ -1,7 +1,8 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
-#include "software/logger/logger.h"
 #include <tracy/Tracy.hpp>
+
+#include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
     : sensor_fusion_config(sensor_fusion_config),

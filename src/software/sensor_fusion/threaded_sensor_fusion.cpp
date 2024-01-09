@@ -1,6 +1,7 @@
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 
 #include <google/protobuf/util/message_differencer.h>
+
 #include <tracy/Tracy.hpp>
 
 ThreadedSensorFusion::ThreadedSensorFusion(

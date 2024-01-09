@@ -19,8 +19,10 @@ class MovePrimitive : public Primitive
      * @param final_angle Desired final orientation of the robot
      * @param max_allowed_speed_mode Max allowed speed the robot can move at
      * @param dribbler_mode Dribbler mode during this primitive
-     * @param ball_collision_type Ball collision type specifying if collision with the ball is allowed
-     * @param auto_chip_or_kick Whether auto chip or kick is enabled and the target distance/speed
+     * @param ball_collision_type Ball collision type specifying if collision with the
+     * ball is allowed
+     * @param auto_chip_or_kick Whether auto chip or kick is enabled and the target
+     * distance/speed
      * @param cost_override optionally override the cost of the move primitive, defaults
      * to the total duration of reaching the destination (ignoring obstacles)
      */
@@ -53,12 +55,14 @@ class MovePrimitive : public Primitive
      * @param obstacle_list_out Reference to the ObstacleList proto to add obstacles to
      * @param path_visualization_out Reference to the PathVisualization proto to add path
      */
-    void getVisualizationProtos(TbotsProto::ObstacleList& obstacle_list_out,
-                                               TbotsProto::PathVisualization& path_visualization_out) const override;
+    void getVisualizationProtos(
+        TbotsProto::ObstacleList &obstacle_list_out,
+        TbotsProto::PathVisualization &path_visualization_out) const override;
 
    private:
     /**
-     * Helper for filling the `obstacles` vector with the obstacles that the primitive should avoid
+     * Helper for filling the `obstacles` vector with the obstacles that the primitive
+     * should avoid
      *
      * @param world Current state of the world
      * @param motion_constraints Motion constraints

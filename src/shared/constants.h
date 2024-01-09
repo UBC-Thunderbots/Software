@@ -37,9 +37,9 @@ static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
 static const short unsigned int PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
-static const short unsigned int ROBOT_STATUS_PORT       = 42071;
-static const short unsigned int ROBOT_LOGS_PORT         = 42072;
-static const short unsigned int ROBOT_CRASH_PORT        = 42074;
+static const short unsigned int ROBOT_STATUS_PORT = 42071;
+static const short unsigned int ROBOT_LOGS_PORT   = 42072;
+static const short unsigned int ROBOT_CRASH_PORT  = 42074;
 
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip
@@ -162,6 +162,6 @@ static const char ARDUINO_VENDOR_ID[ARDUINO_ID_LENGTH]  = "2341";
 static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 
 // Number of times the control loop should tick per trajectory element
-static const unsigned CONTROL_LOOP_HZ                  = 60u;
+static const unsigned CONTROL_LOOP_HZ = 60u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;

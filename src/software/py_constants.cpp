@@ -72,10 +72,10 @@ PYBIND11_MODULE(py_constants, m)
     });
 
     // Ports
-    m.attr("PRIMITIVE_PORT")          = PRIMITIVE_PORT;
-    m.attr("ROBOT_STATUS_PORT")       = ROBOT_STATUS_PORT;
-    m.attr("ROBOT_LOGS_PORT")         = ROBOT_LOGS_PORT;
-    m.attr("ROBOT_CRASH_PORT")        = ROBOT_CRASH_PORT;
+    m.attr("PRIMITIVE_PORT")    = PRIMITIVE_PORT;
+    m.attr("ROBOT_STATUS_PORT") = ROBOT_STATUS_PORT;
+    m.attr("ROBOT_LOGS_PORT")   = ROBOT_LOGS_PORT;
+    m.attr("ROBOT_CRASH_PORT")  = ROBOT_CRASH_PORT;
 
     // PlotJuggler
     m.attr("PLOTJUGGLER_GUI_DEFAULT_HOST") = PLOTJUGGLER_GUI_DEFAULT_HOST;

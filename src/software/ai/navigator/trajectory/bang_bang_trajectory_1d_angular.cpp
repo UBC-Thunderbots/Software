@@ -1,11 +1,12 @@
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 
-BangBangTrajectory1DAngular::BangBangTrajectory1DAngular(Angle initial_orient, Angle final_orient,
-    AngularVelocity initial_angular_vel, AngularVelocity max_angular_vel, AngularAcceleration max_angular_accel,
+BangBangTrajectory1DAngular::BangBangTrajectory1DAngular(
+    Angle initial_orient, Angle final_orient, AngularVelocity initial_angular_vel,
+    AngularVelocity max_angular_vel, AngularAcceleration max_angular_accel,
     AngularAcceleration max_angular_decel)
 {
     generate(initial_orient, final_orient, initial_angular_vel, max_angular_vel,
-        max_angular_accel, max_angular_decel);
+             max_angular_accel, max_angular_decel);
 }
 
 void BangBangTrajectory1DAngular::generate(Angle initial_orient, Angle final_orient,

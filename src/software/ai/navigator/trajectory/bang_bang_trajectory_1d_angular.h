@@ -9,26 +9,27 @@ class BangBangTrajectory1DAngular
     : public Trajectory<Angle, AngularVelocity, AngularAcceleration>
 {
    public:
- BangBangTrajectory1DAngular() = default;
+    BangBangTrajectory1DAngular() = default;
 
- /**
-  * Generate a 1D trajectory from the initial orientation to the final orientation with
-  * the given initial angular velocity and kinematic constraints.
-  *
-  * @note Refer to BangBangTrajectory1DAngular::generate for more details
-  *
-  * @param initial_orient Starting orientation of the trajectory
-  * @param final_orient Destination. Where the trajectory should end at
-  * @param initial_angular_vel The angular velocity at the start of the trajectory
-  * @param max_angular_vel The maximum angular velocity (magnitude) the
-  * trajectory could have
-  * @param max_angular_accel The maximum angular acceleration the trajectory could have
-  * @param max_angular_decel The maximum deceleration the trajectory could have
-  */
- BangBangTrajectory1DAngular(Angle initial_orient, Angle final_orient,
-               AngularVelocity initial_angular_vel, AngularVelocity max_angular_vel,
-               AngularAcceleration max_angular_accel,
-               AngularAcceleration max_angular_decel);
+    /**
+     * Generate a 1D trajectory from the initial orientation to the final orientation with
+     * the given initial angular velocity and kinematic constraints.
+     *
+     * @note Refer to BangBangTrajectory1DAngular::generate for more details
+     *
+     * @param initial_orient Starting orientation of the trajectory
+     * @param final_orient Destination. Where the trajectory should end at
+     * @param initial_angular_vel The angular velocity at the start of the trajectory
+     * @param max_angular_vel The maximum angular velocity (magnitude) the
+     * trajectory could have
+     * @param max_angular_accel The maximum angular acceleration the trajectory could have
+     * @param max_angular_decel The maximum deceleration the trajectory could have
+     */
+    BangBangTrajectory1DAngular(Angle initial_orient, Angle final_orient,
+                                AngularVelocity initial_angular_vel,
+                                AngularVelocity max_angular_vel,
+                                AngularAcceleration max_angular_accel,
+                                AngularAcceleration max_angular_decel);
 
     /**
      * Generate a 1D trajectory from the initial orientation to the final orientation with

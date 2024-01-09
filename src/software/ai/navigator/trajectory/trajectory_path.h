@@ -7,8 +7,7 @@
 #include "software/ai/navigator/trajectory/trajectory_path_node.h"
 
 using TrajectoryGenerator = std::function<std::shared_ptr<Trajectory2D>(
-const Point& initial_pos,
-    const Point& final_pos, const Vector& initial_vel,
+    const Point& initial_pos, const Point& final_pos, const Vector& initial_vel,
     const KinematicConstraints& constraints)>;
 
 /**

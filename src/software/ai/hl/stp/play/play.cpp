@@ -1,7 +1,8 @@
 #include "software/ai/hl/stp/play/play.h"
 
-#include <numeric>
 #include <munkres/munkres.h>
+
+#include <numeric>
 #include <tracy/Tracy.hpp>
 
 #include "proto/message_translation/tbots_protobuf.h"
@@ -82,8 +83,7 @@ PriorityTacticVector Play::getTactics(const World &world)
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
-    const World &world,
-    const InterPlayCommunication &inter_play_communication,
+    const World &world, const InterPlayCommunication &inter_play_communication,
     const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
     FrameMarkNamed("Play::get");
@@ -129,15 +129,16 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             auto primitives = goalie_tactic->get(world);
             CHECK(primitives.contains(goalie_robot_id))
                 << "Couldn't find a primitive for robot id " << goalie_robot_id;
-            auto primitive_proto = primitives[goalie_robot_id]->generatePrimitiveProtoMessage(
-                world, motion_constraints, obstacle_factory
-            );
+            auto primitive_proto =
+                primitives[goalie_robot_id]->generatePrimitiveProtoMessage(
+                    world, motion_constraints, obstacle_factory);
 
             primitives_to_run->mutable_robot_primitives()->insert(
-                    {goalie_robot_id, *primitive_proto});
+                {goalie_robot_id, *primitive_proto});
             goalie_tactic->setLastExecutionRobot(goalie_robot_id);
 
-            primitives[goalie_robot_id]->getVisualizationProtos(obstacle_list, path_visualization);
+            primitives[goalie_robot_id]->getVisualizationProtos(obstacle_list,
+                                                                path_visualization);
         }
         else if (world.friendlyTeam().getGoalieId().has_value())
         {
@@ -347,16 +348,15 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
 
                 // Create the list of obstacles
                 auto motion_constraints =
-                        buildMotionConstraintSet(world.gameState(), *tactic_vector.at(col));
+                    buildMotionConstraintSet(world.gameState(), *tactic_vector.at(col));
 
                 // Only generate primitive proto message for the final primitive to robot
                 // assignment
-                auto primitive_proto = primitives[robot_id]->generatePrimitiveProtoMessage(
-                        world, motion_constraints, obstacle_factory
-                );
+                auto primitive_proto =
+                    primitives[robot_id]->generatePrimitiveProtoMessage(
+                        world, motion_constraints, obstacle_factory);
                 primitives_to_run->mutable_robot_primitives()->insert(
-                        {robot_id,
-                        *primitive_proto});
+                    {robot_id, *primitive_proto});
                 remaining_robots.erase(
                     std::remove_if(remaining_robots.begin(), remaining_robots.end(),
                                    [robots_to_assign, row](const Robot &robot) {
@@ -364,7 +364,8 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
                                    }),
                     remaining_robots.end());
 
-                primitives[robot_id]->getVisualizationProtos(obstacle_list, path_visualization);
+                primitives[robot_id]->getVisualizationProtos(obstacle_list,
+                                                             path_visualization);
                 break;
             }
         }

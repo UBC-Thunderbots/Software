@@ -9,8 +9,8 @@ TrajectoryPath::TrajectoryPath(const std::shared_ptr<Trajectory2D>& initial_traj
 {
 }
 
-void TrajectoryPath::append(double connection_time_sec,
-                            const Point& destination, const KinematicConstraints& constraints)
+void TrajectoryPath::append(double connection_time_sec, const Point& destination,
+                            const KinematicConstraints& constraints)
 {
     // Find the trajectory path node that the new trajectory should connect to
     for (size_t i = 0; i < traj_path.size(); i++)
@@ -26,8 +26,8 @@ void TrajectoryPath::append(double connection_time_sec,
             // the end position and velocity of the last trajectory.
             Point connection_pos  = getPosition(connection_time_sec);
             Vector connection_vel = getVelocity(connection_time_sec);
-            traj_path.emplace_back(trajectory_generator(connection_pos,
-                                                        destination, connection_vel, constraints));
+            traj_path.emplace_back(trajectory_generator(connection_pos, destination,
+                                                        connection_vel, constraints));
 
             traj_path[i].setTrajectoryEndTime(connection_time_sec);
             return;
@@ -105,8 +105,7 @@ std::vector<Rectangle> TrajectoryPath::getBoundingBoxes() const
     std::vector<Rectangle> bounding_boxes;
     for (const TrajectoryPathNode& traj_node : traj_path)
     {
-        const std::vector<Rectangle> bbs =
-            traj_node.getTrajectory()->getBoundingBoxes();
+        const std::vector<Rectangle> bbs = traj_node.getTrajectory()->getBoundingBoxes();
         bounding_boxes.insert(bounding_boxes.begin(), bbs.begin(), bbs.end());
     }
     return bounding_boxes;

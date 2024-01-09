@@ -114,20 +114,17 @@ TEST(TbotsProtobufTest, trajectory_params_msg_test)
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(max_allowed_speed_mode,
                                                                    robot_constants);
-    KinematicConstraints constraints(max_speed, robot_constants.robot_max_acceleration_m_per_s_2,
-                                          robot_constants.robot_max_deceleration_m_per_s_2);
+    KinematicConstraints constraints(max_speed,
+                                     robot_constants.robot_max_acceleration_m_per_s_2,
+                                     robot_constants.robot_max_deceleration_m_per_s_2);
 
     Point sub_destination(1.2, 0.0);
     float connection_time_s = 0.4f;
-    auto trajectory = std::make_shared<BangBangTrajectory2D>(
-        start_position, sub_destination, initial_velocity,
-        constraints);
+    auto trajectory         = std::make_shared<BangBangTrajectory2D>(
+        start_position, sub_destination, initial_velocity, constraints);
 
-    TrajectoryPath trajectory_path(
-        trajectory, BangBangTrajectory2D::generator);
-    trajectory_path.append(
-        connection_time_s,
-        destination, constraints);
+    TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);
+    trajectory_path.append(connection_time_s, destination, constraints);
 
     TbotsProto::TrajectoryPathParams2D params;
     *(params.mutable_start_position())   = *createPointProto(start_position);
@@ -151,24 +148,28 @@ TEST(TbotsProtobufTest, trajectory_params_msg_test)
     for (int i = 0; i < initial_traj_nodes.size(); i++)
     {
         EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getPosition(0.0),
-                  converted_traj_nodes[i].getTrajectory()->getPosition(0.0)) << " Position at index " << i << " is not equal";
+                  converted_traj_nodes[i].getTrajectory()->getPosition(0.0))
+            << " Position at index " << i << " is not equal";
     }
 
     for (int i = 0; i < initial_traj_nodes.size(); i++)
     {
         EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getVelocity(0.0),
-                  converted_traj_nodes[i].getTrajectory()->getVelocity(0.0)) << " Velocity at index " << i << " is not equal";
+                  converted_traj_nodes[i].getTrajectory()->getVelocity(0.0))
+            << " Velocity at index " << i << " is not equal";
     }
 
     for (int i = 0; i < initial_traj_nodes.size(); i++)
     {
         EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getAcceleration(0.0),
-                  converted_traj_nodes[i].getTrajectory()->getAcceleration(0.0)) << " Acceleration at index " << i << " is not equal";
+                  converted_traj_nodes[i].getTrajectory()->getAcceleration(0.0))
+            << " Acceleration at index " << i << " is not equal";
     }
 
     for (int i = 0; i < initial_traj_nodes.size(); i++)
     {
         EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getDestination(),
-                  converted_traj_nodes[i].getTrajectory()->getDestination()) << " Destination at index " << i << " is not equal";
+                  converted_traj_nodes[i].getTrajectory()->getDestination())
+            << " Destination at index " << i << " is not equal";
     }
 }

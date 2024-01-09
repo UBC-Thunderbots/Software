@@ -4,7 +4,6 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import IndividualRobotMode, EstopMode
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from queue import Empty
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -70,7 +69,9 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
-        self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state, daemon=True)
+        self.send_estop_state_thread = threading.Thread(
+            target=self.__send_estop_state, daemon=True
+        )
         self.run_primitive_set_thread = threading.Thread(
             target=self.__run_primitive_set, daemon=True
         )

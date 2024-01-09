@@ -9,6 +9,8 @@ std::unique_ptr<TbotsProto::Primitive> StopPrimitive::generatePrimitiveProtoMess
     return stop_primitive_msg;
 }
 
-void StopPrimitive::getVisualizationProtos(TbotsProto::ObstacleList& obstacle_list_out,
-                            TbotsProto::PathVisualization& path_visualization_out)  const
-{}
+void StopPrimitive::getVisualizationProtos(
+    TbotsProto::ObstacleList &obstacle_list_out,
+    TbotsProto::PathVisualization &path_visualization_out) const
+{
+}

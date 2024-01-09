@@ -38,8 +38,8 @@ class TrajectoryPathWithCost
     // Note that collisions that the trajectory starts or ends in are not considered as
     // those are unavoidable + they are handled by collision_duration_front_s and
     // collision_duration_back_s.
-    double first_collision_time_s    = std::numeric_limits<double>::max();
-    ObstaclePtr colliding_obstacle   = nullptr;
+    double first_collision_time_s  = std::numeric_limits<double>::max();
+    ObstaclePtr colliding_obstacle = nullptr;
 
     // Total cost of the trajectory path
     double cost = 0.0;

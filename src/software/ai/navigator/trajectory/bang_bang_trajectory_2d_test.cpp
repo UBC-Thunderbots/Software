@@ -4,8 +4,8 @@
 
 #include <random>
 
-#include "software/test_util/test_util.h"
 #include "software/logger/logger.h"
+#include "software/test_util/test_util.h"
 
 class BangBangTrajectory2DTest : public testing::Test
 {

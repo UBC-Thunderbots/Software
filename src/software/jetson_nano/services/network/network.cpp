@@ -13,8 +13,7 @@ NetworkService::NetworkService(const std::string& ip_address,
             boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast);
 }
 
-TbotsProto::PrimitiveSet NetworkService::poll(
-    TbotsProto::RobotStatus& robot_status)
+TbotsProto::PrimitiveSet NetworkService::poll(TbotsProto::RobotStatus& robot_status)
 {
     std::scoped_lock lock{primitive_set_mutex};
 

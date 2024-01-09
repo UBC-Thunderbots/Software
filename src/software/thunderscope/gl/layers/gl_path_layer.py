@@ -29,7 +29,9 @@ class GLPathLayer(GLLayer):
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
-        self.path_visualization_buffer = ThreadSafeBuffer(buffer_size, PathVisualization)
+        self.path_visualization_buffer = ThreadSafeBuffer(
+            buffer_size, PathVisualization
+        )
 
         self.destination_graphics = ObservableList(self._graphics_changed)
         self.path_graphics = ObservableList(self._graphics_changed)
@@ -42,9 +44,7 @@ class GLPathLayer(GLLayer):
             block=False
         ).robot_primitives.values()
 
-        paths = [
-            path for path in path_list
-        ]
+        paths = [path for path in path_list]
         requested_destinations = [
             (
                 primitive.move.xy_traj_params.destination,

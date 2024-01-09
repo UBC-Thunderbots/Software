@@ -134,7 +134,7 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//software/optimization:gradient_descent",
         "//software/world",
-        "@tracy", # TODO (NIMA): Remove
+        "@tracy",  # TODO (NIMA): Remove
     ],
 )
 

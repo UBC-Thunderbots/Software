@@ -8,11 +8,11 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",
+        "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
+        "//software/ai/navigator/trajectory:trajectory_path",
         "//software/math:math_functions",
         "//software/physics:velocity_conversion_util",
         "//software/world",
-        "//software/ai/navigator/trajectory:trajectory_path",
-        "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
     ],
 )
 

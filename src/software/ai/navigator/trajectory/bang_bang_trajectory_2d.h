@@ -1,10 +1,11 @@
 #pragma once
 
 #include <memory>
+
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d.h"
+#include "software/ai/navigator/trajectory/kinematic_constraints.h"
 #include "software/ai/navigator/trajectory/trajectory_2d.h"
 #include "software/geom/rectangle.h"
-#include "software/ai/navigator/trajectory/kinematic_constraints.h"
 
 class BangBangTrajectory2D : public Trajectory2D
 {
@@ -24,7 +25,8 @@ class BangBangTrajectory2D : public Trajectory2D
      * @param constraints Kinematic constraints of the new generated trajectory
      */
     BangBangTrajectory2D(const Point& initial_pos, const Point& final_pos,
-                         const Vector& initial_vel, const KinematicConstraints &constraints);
+                         const Vector& initial_vel,
+                         const KinematicConstraints& constraints);
 
     /**
      * Generate a 2D trajectory from the initial position to the final position with the
@@ -83,16 +85,17 @@ class BangBangTrajectory2D : public Trajectory2D
     std::vector<Rectangle> getBoundingBoxes() const override;
 
     /**
-     * Static function for generating a BangBangTrajectory2D pointer with Trajectory2D interface
+     * Static function for generating a BangBangTrajectory2D pointer with Trajectory2D
+     * interface
      * @param initial_pos Where the trajectory should start at
      * @param final_pos Where the trajectory should end at
      * @param initial_vel The initial velocity of the trajectory
      * @param constraints The kinematic constraints of the trajectory
      * @return A shared pointer to a BangBangTrajectory2D
      */
-    static std::shared_ptr<Trajectory2D> generator(const Point &initial_pos,
-                                                   const Point &final_pos, const Vector &initial_vel,
-                                                   const KinematicConstraints &constraints);
+    static std::shared_ptr<Trajectory2D> generator(
+        const Point& initial_pos, const Point& final_pos, const Vector& initial_vel,
+        const KinematicConstraints& constraints);
 
    private:
     BangBangTrajectory1D x_trajectory;
