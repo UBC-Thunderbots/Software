@@ -84,7 +84,12 @@ def test_basic_rotation(field_test_runner):
         raise Exception("The first world received had no robots in it!")
 
     print("Here are the robots:")
-    print([robot.current_state.global_position for robot in world.friendly_team.team_robots])
+    print(
+        [
+            robot.current_state.global_position
+            for robot in world.friendly_team.team_robots
+        ]
+    )
 
     id = world.friendly_team.team_robots[0].id
     print(f"Running test on robot {id}")

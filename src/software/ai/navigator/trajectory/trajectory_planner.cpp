@@ -62,15 +62,13 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     }
 
     aabb::Tree tree = aabb::Tree(
-            2, 0.0, {false, false}, {navigable_area.xLength(), navigable_area.yLength()},
-            std::max(static_cast<unsigned int>(obstacles.size()), 1u), false);
+        2, 0.0, {false, false}, {navigable_area.xLength(), navigable_area.yLength()},
+        std::max(static_cast<unsigned int>(obstacles.size()), 1u), false);
     for (unsigned int i = 0; i < obstacles.size(); i++)
     {
         Rectangle aabb         = obstacles[i]->axisAlignedBoundingBox();
-        std::vector aabb_lower = {aabb.negXNegYCorner().x(),
-                                  aabb.negXNegYCorner().y()};
-        std::vector aabb_upper = {aabb.posXPosYCorner().x(),
-                                  aabb.posXPosYCorner().y()};
+        std::vector aabb_lower = {aabb.negXNegYCorner().x(), aabb.negXNegYCorner().y()};
+        std::vector aabb_upper = {aabb.posXPosYCorner().x(), aabb.posXPosYCorner().y()};
         tree.insertParticle(i, aabb_lower, aabb_upper);
     }
 
