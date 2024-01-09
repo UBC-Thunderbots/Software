@@ -141,7 +141,6 @@ message TrajectoryParamsAngular1D
     Angle start_angle                = 1;
     Angle final_angle                = 2;
     AngularVelocity initial_velocity = 3;
-    float constraints_multiplier     = 4;
 }
 
 message MotorControl

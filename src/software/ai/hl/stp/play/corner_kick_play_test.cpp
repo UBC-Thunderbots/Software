@@ -50,7 +50,7 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play_bottom_left)
             Duration::fromSeconds(15));
 }
 
- TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
+TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
 {
     BallState ball_state(Point(4.5, 3), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(

@@ -28,11 +28,11 @@ class TrajectoryPlanner
      * @return TrajectoryPath which attempts to avoid the obstacles
      */
  // TODO (NIMA): Test
-    TrajectoryPath findTrajectory(const Point &start, const Point &destination,
-                                  const Vector &initial_velocity,
-                                  const KinematicConstraints &constraints,
-                                  const std::vector<ObstaclePtr> &obstacles,
-                                  const Rectangle &navigable_area);
+    std::optional<TrajectoryPath> findTrajectory(const Point &start, const Point &destination,
+                                                 const Vector &initial_velocity,
+                                                 const KinematicConstraints &constraints,
+                                                 const std::vector<ObstaclePtr> &obstacles,
+                                                 const Rectangle &navigable_area);
 
    private:
     /**

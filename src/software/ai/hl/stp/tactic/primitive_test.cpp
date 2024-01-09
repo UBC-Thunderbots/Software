@@ -25,6 +25,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive)
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::DribblerMode::INDEFINITE,
         TbotsProto::BallCollisionType::AVOID, AutoChipOrKick(), std::optional<double>());
 
+    EXPECT_GT(move_primitive->getEstimatedPrimitiveCost(), 0.0);
+
     auto move_primitive_msg = move_primitive->generatePrimitiveProtoMessage(
         world, {}, obstacle_factory);
 
@@ -54,6 +56,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_sub_destination)
         robot, destination, Angle::threeQuarter(),
         TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, TbotsProto::DribblerMode::INDEFINITE,
         TbotsProto::BallCollisionType::AVOID, AutoChipOrKick(), std::optional<double>());
+
+    EXPECT_GT(primitive->getEstimatedPrimitiveCost(), 0.0);
 
     auto move_primitive_msg = primitive->generatePrimitiveProtoMessage(
         world, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA}, obstacle_factory);
@@ -91,6 +95,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autochip)
             TbotsProto::BallCollisionType::AVOID, AutoChipOrKick({AutoChipOrKickMode::AUTOCHIP, 2.5}),
             std::optional<double>());
 
+    EXPECT_GT(move_primitive->getEstimatedPrimitiveCost(), 0.0);
+
     auto move_primitive_msg = move_primitive->generatePrimitiveProtoMessage(
             world, {}, obstacle_factory);
 
@@ -119,6 +125,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autokick)
             TbotsProto::BallCollisionType::AVOID, AutoChipOrKick({AutoChipOrKickMode::AUTOKICK, 3.5}),
             std::optional<double>());
 
+    EXPECT_GT(move_primitive->getEstimatedPrimitiveCost(), 0.0);
+
     auto move_primitive_msg = move_primitive->generatePrimitiveProtoMessage(
             world, {}, obstacle_factory);
 
@@ -139,5 +147,10 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autokick)
 
 TEST_F(PrimitiveTest, test_create_stop_primitive)
 {
-    // TODO (NIMA)
+    StopPrimitive stop_primitive;
+    EXPECT_EQ(stop_primitive.getEstimatedPrimitiveCost(), 0.0);
+
+    auto primitive_proto = stop_primitive.generatePrimitiveProtoMessage(
+        world, {}, obstacle_factory);
+    EXPECT_TRUE(primitive_proto->has_stop());
 }

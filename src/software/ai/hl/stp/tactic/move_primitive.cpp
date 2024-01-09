@@ -2,6 +2,7 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 
 MovePrimitive::MovePrimitive(
@@ -64,6 +65,15 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
         planner.findTrajectory(robot.position(), destination, robot.velocity(),
                                constraints, obstacles, world.field().fieldBoundary());
 
+    if (!traj_path.has_value())
+    {
+        LOG(WARNING) << "Could not find trajectory path for robot " << robot.id()
+                     << " to move to " << destination;
+        return createStopPrimitiveProto();
+    }
+
+    estimated_cost = traj_path->getTotalTime();
+
     // Populate the move primitive proto with the trajectory path parameters
     auto primitive_proto = std::make_unique<TbotsProto::Primitive>();
 
@@ -99,7 +109,6 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
     *(w_traj_params.mutable_final_angle()) = *createAngleProto(final_angle);
     *(w_traj_params.mutable_initial_velocity()) =
         *createAngularVelocityProto(robot.angularVelocity());
-    w_traj_params.set_constraints_multiplier(1.0);
     *(primitive_proto->mutable_move()->mutable_w_traj_params()) = w_traj_params;
 
     primitive_proto->mutable_move()->set_dribbler_mode(dribbler_mode);

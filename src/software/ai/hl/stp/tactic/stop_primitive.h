@@ -14,6 +14,9 @@ class StopPrimitive : public Primitive
     /**
      * Gets the primitive proto message
      *
+     * @param world Current state of the world
+     * @param motion_constraints Motion constraints to consider
+     * @param obstacle_factory Obstacle factory to use for generating obstacles
      * @return the primitive proto message
      */
     std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(

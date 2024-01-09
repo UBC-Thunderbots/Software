@@ -8,6 +8,7 @@ TrajectoryPlanner::TrajectoryPlanner() : relative_sub_destinations(getRelativeSu
 
 std::vector<Vector> TrajectoryPlanner::getRelativeSubDestinations()
 {
+    // A set of sub destinations positioned around a circle relative to the robot.
     std::vector<Vector> relative_sub_destinations;
     const Angle sub_angles = Angle::full() / NUM_SUB_DESTINATION_ANGLES;
     for (const double distance : SUB_DESTINATION_DISTANCES_METERS)
@@ -22,12 +23,46 @@ std::vector<Vector> TrajectoryPlanner::getRelativeSubDestinations()
     return relative_sub_destinations;
 }
 
-TrajectoryPath TrajectoryPlanner::findTrajectory(
+std::vector<Point> TrajectoryPlanner::getSubDestinations(const Point &start, const Point &destination,
+                                                         const Rectangle& navigable_area) const
+{
+    // Convert the relative sub destinations to actual sub destination points
+    // and filter out undesirable sub destinations to reduce trajectory sampling.
+    std::vector<Point> sub_destinations;
+    Angle direction = (destination - start).orientation();
+    sub_destinations.reserve(relative_sub_destinations.size());
+
+    for (const Vector &relative_sub_dest : relative_sub_destinations)
+    {
+        Angle sub_dest_angle_to_dest = relative_sub_dest.orientation().minDiff(direction);
+        if (sub_dest_angle_to_dest < MIN_SUB_DESTINATION_ANGLE ||
+            sub_dest_angle_to_dest > MAX_SUB_DESTINATION_ANGLE)
+        {
+            continue;
+        }
+
+        Point sub_dest = start + relative_sub_dest;
+        if (!contains(navigable_area, sub_dest))
+        {
+            continue;
+        }
+        sub_destinations.emplace_back(sub_dest);
+    }
+    return sub_destinations;
+}
+
+std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     const Point &start, const Point &destination, const Vector &initial_velocity,
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles,
     const Rectangle &navigable_area)
 {
     ZoneScopedN("TrajectoryPlanner::findTrajectory");
+    if (constraints.getMaxVelocity() <= 0.0 || constraints.getMaxAcceleration() <= 0.0 ||
+        constraints.getMaxDeceleration() <= 0.0)
+    {
+        return std::nullopt;
+    }
+
     aabb::Tree tree;
     {
         ZoneScopedN("aabb::Tree creation");
@@ -53,10 +88,12 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     }
 
     int num_traj = 1;
-    // Add trajectories that go through sub-destinations
+    // Sample trajectory paths by trying different sub destinations and connection times
+    // and store the best trajectory path (min cost)
     for (const Point &sub_dest : getSubDestinations(start, destination, navigable_area))
     {
         ZoneScopedN("for sub_destinations");
+        // Generate a direct trajectory to the sub destination
         TrajectoryPathWithCost sub_trajectory = getDirectTrajectoryWithCost(
             start, sub_dest, initial_velocity, constraints, tree, obstacles);
 
@@ -65,8 +102,8 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
              connection_time += SUB_DESTINATION_STEP_INTERVAL_SEC)
         {
             ZoneScopedN("for traj");
-            // Copy the sub trajectory, then append a trajectory to the
-            // actual destination at connection_time
+            // Branch off of a copy of the initial trajectory at connection_time
+            // to move towards the actual destination.
             TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;
             traj_path_to_dest.append(connection_time, destination, constraints);
 
@@ -102,32 +139,6 @@ TrajectoryPath TrajectoryPlanner::findTrajectory(
     }
 
     return best_traj_with_cost.traj_path;
-}
-
-std::vector<Point> TrajectoryPlanner::getSubDestinations(const Point &start, const Point &destination,
-                                                         const Rectangle& navigable_area) const
-{
-    std::vector<Point> sub_destinations;
-    Angle direction = (destination - start).orientation();
-    sub_destinations.reserve(relative_sub_destinations.size());
-
-    for (const Vector &relative_sub_dest : relative_sub_destinations)
-    {
-        Angle sub_dest_angle_to_dest = relative_sub_dest.orientation().minDiff(direction);
-        if (sub_dest_angle_to_dest < MIN_SUB_DESTINATION_ANGLE ||
-            sub_dest_angle_to_dest > MAX_SUB_DESTINATION_ANGLE)
-        {
-            continue;
-        }
-
-        Point sub_dest = start + relative_sub_dest;
-        if (!contains(navigable_area, sub_dest))
-        {
-            continue;
-        }
-        sub_destinations.emplace_back(sub_dest);
-    }
-    return sub_destinations;
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(

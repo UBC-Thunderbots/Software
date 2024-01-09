@@ -24,15 +24,12 @@ class TrajectoryPathWithCost
     // The trajectory path that the costs are associated with
     TrajectoryPath traj_path;
 
-    // Total cost of the trajectory path
-    double cost = 0.0;
-
     // The duration before the trajectory leaves an obstacle that it starts
     // within. 0 if the trajectory does not start within an obstacle.
     double collision_duration_front_s = 0.0;
 
     // The duration we're within an obstacle before the trajectory end.
-    // Equals duration of trajectory if it does not end in an obstacle.
+    // 0 if the trajectory does not end within an obstacle.
     double collision_duration_back_s = 0.0;
 
     // The time and obstacle at which the trajectory first collides with an obstacle
@@ -43,4 +40,7 @@ class TrajectoryPathWithCost
     // collision_duration_back_s.
     double first_collision_time_s    = std::numeric_limits<double>::max();
     ObstaclePtr colliding_obstacle   = nullptr;
+
+    // Total cost of the trajectory path
+    double cost = 0.0;
 };
