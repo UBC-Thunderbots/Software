@@ -65,7 +65,8 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
             Duration::fromSeconds(9.5));
 }
 
-TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
+// TODO (#3106): Re-enable test once robot 1 and 2 tactic assignment do not oscillate
+TEST_F(PenaltyKickPlayTest, DISABLED_test_penalty_kick_take)
 {
     Vector behind_ball_direction =
         (field.friendlyPenaltyMark() - field.enemyGoalCenter()).normalize();

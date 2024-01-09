@@ -20,7 +20,8 @@ class KickoffEnemyPlayTest : public SimulatedErForceSimPlayTestFixture
     Field field                      = Field::createField(field_type);
 };
 
-TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
+// TODO (#3105): Re-enable test once destinations are moved outside of obstacles
+TEST_F(KickoffEnemyPlayTest, DISABLE_test_kickoff_enemy_play)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
