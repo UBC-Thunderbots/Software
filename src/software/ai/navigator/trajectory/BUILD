@@ -129,6 +129,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "trajectory_planner_test",
+    srcs = ["trajectory_planner_test.cpp"],
+    deps = [
+        ":trajectory_planner",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
 py_test(
     name = "simulated_hrvo_test",
     srcs = ["simulated_hrvo_test.py"],

@@ -188,7 +188,7 @@ void SimulatedErForceSimTestFixture::runTest(
     simulator->setBallState(ball);
     simulator->setYellowRobots(friendly_robots);
     simulator->setBlueRobots(enemy_robots);
-    // step the simulator to make sure the ball is in position
+    // step the simulator to make sure the robots and the ball are in position
     simulator->stepSimulation(simulation_time_step);
     // TODO (#2419): remove this to re-enable sigfpe checks
     feenableexcept(FE_INVALID | FE_OVERFLOW);
