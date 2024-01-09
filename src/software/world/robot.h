@@ -34,7 +34,7 @@ class Robot
                    const Timestamp &timestamp,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>(),
-                   const RobotConstants_t &robot_constants = create2021RobotConstants());
+                   const RobotConstants_t &robot_constants = DEFAULT_ROBOT_CONSTANTS);
 
     /**
      * Creates a new robot with the given initial state
@@ -44,11 +44,14 @@ class Robot
      * @param timestamp The timestamp at which the robot was observed to be in the given
      * state
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
+     * @param robot_constants The robot constants for this robot
      */
     explicit Robot(RobotId id, const RobotState &initial_state,
                    const Timestamp &timestamp,
                    const std::set<RobotCapability> &unavailable_capabilities =
-                       std::set<RobotCapability>());
+                       std::set<RobotCapability>(),
+                   const RobotConstants_t &robot_constants = DEFAULT_ROBOT_CONSTANTS);
+
 
     /**
      * Creates a new robot based on the TbotsProto::Robot protobuf representation
@@ -238,4 +241,7 @@ class Robot
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapability> unavailable_capabilities_;
     RobotConstants_t robot_constants_;
+
+    // Default robot constants that should be used for all robots
+    inline static const RobotConstants DEFAULT_ROBOT_CONSTANTS = create2021RobotConstants();
 };
