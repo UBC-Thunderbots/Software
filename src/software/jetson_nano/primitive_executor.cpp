@@ -132,26 +132,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             Vector local_velocity            = getTargetLinearVelocity();
             AngularVelocity angular_velocity = getTargetAngularVelocity();
 
-            //            LOG(PLOTJUGGLER) << *createPlotJugglerValue(
-            //                {{"orientation_", orientation_.toRadians()},
-            //                 {"v", local_velocity.length()},
-            //                 {"vx", local_velocity.x()},
-            //                 {"vy", local_velocity.y()},
-            //                 {"local_v", velocity_.length()},
-            //                 {"local_vx", velocity_.x()},
-            //                 {"local_vy", velocity_.y()},
-            //                 {"px", position.x()},
-            //                 {"py", position.y()},
-            //                 {"d_to_dest", distance_to_destination},
-            //                 {"actual_vel_desired_vel", (local_velocity -
-            //                 velocity_).length()},
-            //                 {"actual_vel_desired_vel_x", (local_velocity -
-            //                 velocity_).x()},
-            //                 {"actual_vel_desired_vel_y", (local_velocity -
-            //                 velocity_).y()},
-            //                 {"vt", angular_velocity.toRadians()},
-            //                 {"dt", orientation_to_destination.toRadians()}});
-
             auto output = createDirectControlPrimitive(
                 local_velocity, angular_velocity,
                 convertDribblerModeToDribblerSpeed(
