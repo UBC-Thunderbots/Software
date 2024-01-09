@@ -195,12 +195,14 @@ class TigersAutoref(TimeProvider):
                     "error with receiving AutoRefCiOutput, ignoring this packet..."
                 )
             except queue.Empty:
+                logging.info("[TigersAutoref] No SSL Wrapper packet received in {} s".format(TigersAutoref.BUFFER_TIMEOUT))
                 pass
 
             with self.timestamp_mutex:
                 self.current_timestamp += int(
                     self.tick_rate_ms * NANOSECONDS_PER_MILLISECOND
                 )
+
 
     def _forward_to_gamecontroller(
         self, tracker_wrapper: proto.ssl_vision_wrapper_tracked_pb2.TrackerWrapperPacket
