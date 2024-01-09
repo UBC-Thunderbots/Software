@@ -186,10 +186,10 @@ void SimulatedErForceSimTestFixture::runTest(
     // TODO (#2419): remove this to re-enable sigfpe checks
     fedisableexcept(FE_INVALID | FE_OVERFLOW);
     simulator->setBallState(ball);
-    // step the simulator to make sure the ball is in position
-    simulator->stepSimulation(simulation_time_step);
     simulator->setYellowRobots(friendly_robots);
     simulator->setBlueRobots(enemy_robots);
+    // step the simulator to make sure the ball is in position
+    simulator->stepSimulation(simulation_time_step);
     // TODO (#2419): remove this to re-enable sigfpe checks
     feenableexcept(FE_INVALID | FE_OVERFLOW);
 
@@ -219,7 +219,7 @@ void SimulatedErForceSimTestFixture::runTest(
 
     double speed_factor         = 1 / (TbotsGtestMain::test_speed);
     const Duration ai_time_step = Duration::fromSeconds(
-        simulation_time_step.toSeconds() * CAMERA_FRAMES_PER_AI_TICK * speed_factor);
+        simulation_time_step.toSeconds() * speed_factor);
 
     // declare difference (velocity, position) variables
     double ball_displacement;
@@ -521,15 +521,12 @@ bool SimulatedErForceSimTestFixture::tickTest(
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
 
-    for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
-    {
-        // TODO (#2419): remove this to re-enable sigfpe checks
-        fedisableexcept(FE_INVALID | FE_OVERFLOW);
-        simulator->stepSimulation(simulation_time_step);
-        // TODO (#2419): remove this to re-enable sigfpe checks
-        feenableexcept(FE_INVALID | FE_OVERFLOW);
-        updateSensorFusion(simulator);
-    }
+    // TODO (#2419): remove this to re-enable sigfpe checks
+    fedisableexcept(FE_INVALID | FE_OVERFLOW);
+    simulator->stepSimulation(simulation_time_step);
+    // TODO (#2419): remove this to re-enable sigfpe checks
+    feenableexcept(FE_INVALID | FE_OVERFLOW);
+    updateSensorFusion(simulator);
 
     if (friendly_sensor_fusion.getWorld().has_value() &&
         enemy_sensor_fusion.getWorld().has_value())
