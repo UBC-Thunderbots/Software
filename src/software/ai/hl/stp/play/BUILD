@@ -227,7 +227,6 @@ cc_library(
         "//software/util/sml_fsm",
         "@boost//:coroutine2",
         "@munkres_cpp",
-        "@tracy",  # TODO (NIMA): Remove
     ],
 )
 

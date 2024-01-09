@@ -2,8 +2,6 @@
 
 #include <google/protobuf/util/message_differencer.h>
 
-#include <tracy/Tracy.hpp>
-
 ThreadedSensorFusion::ThreadedSensorFusion(
     TbotsProto::SensorFusionConfig sensor_fusion_config)
     : FirstInFirstOutThreadedObserver<SensorProto>(DIFFERENT_GRSIM_FRAMES_RECEIVED),
@@ -27,7 +25,6 @@ void ThreadedSensorFusion::onValueReceived(TbotsProto::ThunderbotsConfig config)
 void ThreadedSensorFusion::onValueReceived(SensorProto sensor_msg)
 {
     std::scoped_lock lock(sensor_fusion_mutex);
-    ZoneScopedN("ThreadedSensorFusion");
     sensor_fusion.processSensorProto(sensor_msg);
 
     // Limit sensor fusion to only send out worlds on ssl wrapper packets

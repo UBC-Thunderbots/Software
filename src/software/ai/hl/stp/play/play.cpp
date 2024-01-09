@@ -3,7 +3,6 @@
 #include <munkres/munkres.h>
 
 #include <numeric>
-#include <tracy/Tracy.hpp>
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
@@ -86,8 +85,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     const World &world, const InterPlayCommunication &inter_play_communication,
     const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
-    FrameMarkNamed("Play::get");
-    ZoneScopedN("Play::get");
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =
         static_cast<unsigned int>(world.friendlyTeam().numRobots());
@@ -117,7 +114,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     {
         if (goalie_robot.has_value())
         {
-            ZoneScopedN("Assign goalie");
             RobotId goalie_robot_id = goalie_robot.value().id();
             tactic_robot_id_assignment.emplace(goalie_tactic, goalie_robot_id);
 
@@ -242,7 +238,6 @@ std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
 Play::assignTactics(const World &world, TacticVector tactic_vector,
                     const std::vector<Robot> &robots_to_assign)
 {
-    ZoneScopedN("Play::assignTactics");
     std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
     size_t num_tactics     = tactic_vector.size();
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();

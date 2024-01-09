@@ -15,7 +15,6 @@ cc_library(
         "//software/sensor_fusion/filter:vision_detection",
         "//software/sensor_fusion/possession:possession_tracker",
         "//software/world",
-        "@tracy",  # TODO (NIMA): Remove
     ],
 )
 
