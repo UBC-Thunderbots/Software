@@ -99,6 +99,8 @@ jobs:
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
       - name: Simulated Test Run
+        # Ensure that simulated test logs get uploaded
+        continue-on-error: true
         run: |
           cd src
           bazel test --copt=-O3 --flaky_test_attempts=3 --show_timestamps       \
@@ -135,7 +137,7 @@ jobs:
       - name: AI vs AI (3 minutes)
         run: |
           cd src
-          bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main -- --enable_autoref --ci_mode
+          bazel run --run_under="xvfb-run" //software/thunderscope:thunderscope_main --copt=-O3 -- --enable_autoref --ci_mode
 
       - name: Upload AI vs AI logs
         uses: actions/upload-artifact@v3

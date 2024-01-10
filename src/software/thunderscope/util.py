@@ -42,7 +42,7 @@ def async_sim_ticker(
     yellow_proto_unix_io: ProtoUnixIO,
     sim_proto_unix_io: ProtoUnixIO,
     tscope: Thunderscope,
-    buffer_timeout_s: int = 1
+    buffer_timeout_s: int = 1,
 ) -> None:
     """
     Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
@@ -52,6 +52,8 @@ def async_sim_ticker(
     :param yellow_proto_unix_io:    ProtoUnixIO for the Yellow FullSystem
     :param sim_proto_unix_io:       ProtoUnixIO for the Simulation
     :param tscope:                  Thunderscope instance that is tied to the simulation ticking
+    :param buffer_timeout_s:        How long to wait for a response from the AI before assuming that the AI missed the
+                                    SSL Vision packet
     """
     blue_primitive_set_buffer = ThreadSafeBuffer(
         buffer_size=1, protobuf_type=PrimitiveSet
@@ -64,6 +66,14 @@ def async_sim_ticker(
     yellow_proto_unix_io.register_observer(PrimitiveSet, yellow_primitive_set_buffer)
 
     while tscope.is_open():
+        # flush primitive set buffers before sending the next tick
+        while (
+            blue_primitive_set_buffer.get(block=False, return_cached=False) is not None
+            or yellow_primitive_set_buffer.get(block=False, return_cached=False)
+            is not None
+        ):
+            pass
+
         # Tick simulation
         tick = SimulatorTick(milliseconds=tick_rate_ms)
         sim_proto_unix_io.send_proto(SimulatorTick, tick)
