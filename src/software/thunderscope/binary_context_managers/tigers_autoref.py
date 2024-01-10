@@ -202,6 +202,7 @@ class TigersAutoref(TimeProvider):
                 self.current_timestamp += int(
                     self.tick_rate_ms * NANOSECONDS_PER_MILLISECOND
                 )
+            logging.debug("[ARUN] Incrementing time: " + str(time.time()))
 
 
     def _forward_to_gamecontroller(

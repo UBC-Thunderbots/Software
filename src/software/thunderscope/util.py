@@ -66,8 +66,11 @@ def async_sim_ticker(
         tick = SimulatorTick(milliseconds=tick_rate_ms)
         sim_proto_unix_io.send_proto(SimulatorTick, tick)
 
+        logging.debug("[ARUN] pre blue primitive set: " + str(time.time()))
         blue_primitive_set_buffer.get(block=True)
+        logging.debug("[ARUN] post blue primitive set: " + str(time.time()))
         yellow_primitive_set_buffer.get(block=True)
+        logging.debug("[ARUN] post yellow primitive set: " + str(time.time()))
 
 
 def realtime_sim_ticker(
