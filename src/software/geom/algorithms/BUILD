@@ -93,6 +93,18 @@ cc_test(
 )
 
 cc_test(
+    name = "axis_aligned_bounding_box_test",
+    srcs = [
+        "axis_aligned_bounding_box_test.cpp",
+    ],
+    deps = [
+        ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_test(
     name = "intersects_test",
     srcs = [
         "intersects_test.cpp",

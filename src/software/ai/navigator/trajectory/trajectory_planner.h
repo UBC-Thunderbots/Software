@@ -27,7 +27,6 @@ class TrajectoryPlanner
      * @param navigable_area The navigable area of the field
      * @return TrajectoryPath which attempts to avoid the obstacles
      */
-    // TODO (NIMA): Test
     std::optional<TrajectoryPath> findTrajectory(
         const Point &start, const Point &destination, const Vector &initial_velocity,
         const KinematicConstraints &constraints,

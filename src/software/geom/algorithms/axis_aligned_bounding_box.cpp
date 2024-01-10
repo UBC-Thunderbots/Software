@@ -12,7 +12,12 @@ Rectangle axisAlignedBoundingBox(const Circle& circle, const double inflation_ra
 Rectangle axisAlignedBoundingBox(const Rectangle& rectangle,
                                  const double inflation_radius)
 {
-    return rectangle;
+    if (inflation_radius == 0)
+    {
+        return rectangle;
+    }
+
+    return rectangle.expand(inflation_radius);
 }
 
 Rectangle axisAlignedBoundingBox(const Polygon& polygon, const double inflation_radius)

@@ -4,8 +4,6 @@
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
 
-// TODO: Add tests
-
 /**
  * Returns the axis-aligned bounding box of the given circle, inflated by the given
  *
