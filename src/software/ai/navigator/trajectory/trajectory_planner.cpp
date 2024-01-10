@@ -81,7 +81,6 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
         return best_traj_with_cost.traj_path;
     }
 
-    int num_traj = 1;
     // Sample trajectory paths by trying different sub destinations and connection times
     // and store the best trajectory path (min cost)
     for (const Point &sub_dest : getSubDestinations(start, destination, navigable_area))
@@ -108,7 +107,6 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
 
             TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
                 traj_path_to_dest, tree, obstacles, sub_trajectory, connection_time);
-            num_traj++;
             if (full_traj_with_cost.cost < best_traj_with_cost.cost)
             {
                 best_traj_with_cost = full_traj_with_cost;

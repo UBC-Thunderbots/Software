@@ -98,16 +98,14 @@ std::vector<Rectangle> BangBangTrajectory2D::getBoundingBoxes() const
 {
     std::pair<double, double> x_min_max = x_trajectory.getMinMaxPositions();
     std::pair<double, double> y_min_max = y_trajectory.getMinMaxPositions();
-    // If min max are the same, shift them slightly so a valid bounding box can
-    // be created
-    if (std::abs(x_min_max.first - x_min_max.second) <=
-        std::numeric_limits<double>::epsilon())
+    // If min max are basically the same, shift them slightly so a valid
+    // bounding box can be created
+    if (std::abs(x_min_max.first - x_min_max.second) <= 0.001)
     {
         x_min_max.first -= 0.001;
         x_min_max.second += 0.001;
     }
-    if (std::abs(y_min_max.first - y_min_max.second) <=
-        std::numeric_limits<double>::epsilon())
+    if (std::abs(y_min_max.first - y_min_max.second) <= 0.001)
     {
         y_min_max.first -= 0.001;
         y_min_max.second += 0.001;
