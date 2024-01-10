@@ -42,7 +42,7 @@ def async_sim_ticker(
     yellow_proto_unix_io: ProtoUnixIO,
     sim_proto_unix_io: ProtoUnixIO,
     tscope: Thunderscope,
-    buffer_timeout_s: int = 1
+    buffer_timeout_s: int = 1,
 ) -> None:
     """
     Tick simulation as fast as possible, waiting for the Blue and Yellow AIs to process the vision packet before ticking next.
