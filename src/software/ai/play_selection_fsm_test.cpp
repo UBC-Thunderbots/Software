@@ -13,7 +13,7 @@ class PlaySelectionFSMTest : public ::testing::Test
    protected:
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<FSM<PlaySelectionFSM>> fsm =
-        std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config});
+        std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config, std::make_shared<Strategy>(ai_config)});
     GameState game_state;
 };
 

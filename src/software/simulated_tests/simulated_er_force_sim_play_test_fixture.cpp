@@ -53,7 +53,7 @@ void SimulatedErForceSimPlayTestFixture::setTactic(
 {
     CHECK(static_cast<bool>(tactic)) << "Tactic is invalid" << std::endl;
     std::unique_ptr<AssignedTacticsPlay> play =
-        std::make_unique<AssignedTacticsPlay>(friendly_thunderbots_config.ai_config());
+        std::make_unique<AssignedTacticsPlay>(friendly_thunderbots_config.ai_config(), std::make_shared<Strategy>(friendly_thunderbots_config.ai_config()));
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>>
         motion_constraint_override_map;
     motion_constraint_override_map[id] = motion_constraints;

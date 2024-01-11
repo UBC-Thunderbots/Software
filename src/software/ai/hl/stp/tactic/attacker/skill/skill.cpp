@@ -58,8 +58,8 @@ std::shared_ptr<Skill> Skill::getNextSkill(const Robot& robot, const World& worl
                 static_cast<unsigned>(std::round(skill->calculateViability(robot, world) *
                                                  MAX_VIABILITY_SCORE)),
                 0u, MAX_VIABILITY_SCORE);
-            skill_dist_map[viability] = skill;
             max_weight += viability;
+            skill_dist_map[max_weight] = skill;
         });
     CHECK(max_weight > 0) << "No skill is viable for the next action!";
 

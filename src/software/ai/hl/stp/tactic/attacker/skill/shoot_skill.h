@@ -1,4 +1,8 @@
+#pragma once
+
 #include "software/ai/hl/stp/tactic/attacker/skill/skill.h"
+
+#include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
 
 class ShootSkill : public Skill
 {
@@ -15,4 +19,4 @@ class ShootSkill : public Skill
    private:
     FSM<AttackerFSM> fsm;
     AttackerFSM::ControlParams control_params;
-}
+};

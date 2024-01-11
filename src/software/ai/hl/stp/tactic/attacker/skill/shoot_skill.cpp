@@ -3,7 +3,8 @@
 ShootSkill::ShootSkill(const TbotsProto::AiConfig& ai_config,
                        std::shared_ptr<Strategy> strategy, double initial_score)
     : Skill(ai_config, strategy, initial_score),
-      fsm(AttackerFSM(ai_config.attacker_tactic_config())),
+      fsm(DribbleFSM(ai_config.dribble_tactic_config()),
+          AttackerFSM(ai_config.attacker_tactic_config())),
       control_params({.best_pass_so_far = std::nullopt,
                       .pass_committed   = false,
                       .shot             = std::nullopt,
@@ -13,12 +14,12 @@ ShootSkill::ShootSkill(const TbotsProto::AiConfig& ai_config,
 
 double ShootSkill::calculateViability(const Robot& robot, const World& world)
 {
-    if (!strategy_->getBestShot(robot, world))
+    if (!strategy_->getBestShot(robot))
     {
         return 0;
     }
 
-    return score;
+    return score_;
 }
 
 bool ShootSkill::done() const
@@ -29,7 +30,7 @@ bool ShootSkill::done() const
 void ShootSkill::updatePrimitive(const TacticUpdate& tactic_update)
 {
     control_params.shot =
-        strategy_->getBestShot(tactic_update.robot, tactic_update.world);
+        strategy_->getBestShot(tactic_update.robot);
 
     fsm.process_event(AttackerFSM::Update(control_params, tactic_update));
 }
