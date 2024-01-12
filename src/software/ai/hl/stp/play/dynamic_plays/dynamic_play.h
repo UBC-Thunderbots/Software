@@ -21,7 +21,7 @@ class DynamicPlay : public Play
      * @param ai_config The AI configuration
      * @param requires_goalie Whether this play requires a goalie
      */
-    explicit DynamicPlay(TbotsProto::AiConfig ai_config, bool requires_goalie);
+    explicit DynamicPlay(TbotsProto::AiConfig ai_config, std::shared_ptr<Strategy> strategy);
 
    protected:
     // TODO (#2359): delete once all plays are not coroutines

@@ -35,7 +35,7 @@ TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)
 
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({initial_robot_point});
-    auto tactic = std::make_shared<AttackerTactic>(ai_config);
+    auto tactic = std::make_shared<AttackerTactic>(ai_config, getStrategy());
     // Make it very obvious when we decide to chip
     tactic->updateControlParams(Point(0, field.fieldLines().yMin()));
     setTactic(0, tactic, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
