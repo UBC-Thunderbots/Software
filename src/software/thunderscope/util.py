@@ -32,7 +32,6 @@ def exit_poller(
     while time_provider.time_provider() <= (time_now_s + exit_duration_s):
         time.sleep(poll_duration_s)
 
-    logging.info("exit_poller: Starting exit() sequence")
     on_exit()
 
 

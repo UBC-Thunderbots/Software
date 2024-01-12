@@ -95,7 +95,6 @@ class ProtoLogger:
         """
         self.stop_logging = True
         self.thread.join()
-        logging.info("[ProtoLogger] Process exited")
 
     def __log_protobufs(self) -> None:
         """Logs all protos in the queue. 
