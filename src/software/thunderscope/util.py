@@ -8,7 +8,6 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.time_provider import TimeProvider
 
-import logging
 import queue
 import time
 
