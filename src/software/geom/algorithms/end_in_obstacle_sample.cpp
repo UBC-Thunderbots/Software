@@ -4,7 +4,7 @@
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 
 
-Point endInObstacleSample(const std::vector<ObstaclePtr> obstacles, const Point &point, const Rectangle &navigable_area, double multiplier, double range)
+std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> obstacles, const Point &point, const Rectangle &navigable_area, int initial_count, double multiplier, double range)
 {
     bool point_in_obstacle = false;
     for (auto const &obstacle : obstacles) {
@@ -61,5 +61,5 @@ Point endInObstacleSample(const std::vector<ObstaclePtr> obstacles, const Point 
         steps_per_rad = static_cast<int>(steps_per_rad * multiplier);
         rad *= multiplier;
     }
-    return point;
+    return std::nullopt;
 }
