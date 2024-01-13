@@ -73,10 +73,9 @@ class ColorQLabel(QLabel):
         self.__update_background_color(val)
 
     def __update_background_color(self, val: float):
-        percent = float(val - self.min) / (self.max - self.min)
+        percent = max(0, min(float(val - self.min) / (self.max - self.min), 1))
 
         self.setStyleSheet(f"background: rgba(255, 0, 0, {percent})")
-        print(percent)
 
 
 class ColorProgressBar(QProgressBar):
@@ -129,7 +128,12 @@ class ColorProgressBar(QProgressBar):
         # clamp percent to make sure it's between 0% and 100%
         percent = min(
             1,
-            max(0, int((self.value() - self.minimum()) / (self.maximum() - self.minimum()))),
+            max(
+                0,
+                int(
+                    (self.value() - self.minimum()) / (self.maximum() - self.minimum())
+                ),
+            ),
         )
 
         if percent < 0.5:

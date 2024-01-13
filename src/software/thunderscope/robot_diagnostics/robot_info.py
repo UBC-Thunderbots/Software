@@ -118,11 +118,11 @@ class RobotInfo(QWidget):
         self.battery_layout.addWidget(self.stop_primitive_label)
 
         # Primitive loss rate label
-        self.primitive_loss_rate_label = common_widgets.ColorQLabel()
+        self.primitive_loss_rate_label = common_widgets.ColorQLabel(max_val=30)
         self.battery_layout.addWidget(self.primitive_loss_rate_label)
 
         # World loss rate label
-        self.world_loss_rate_label = common_widgets.ColorQLabel()
+        self.world_loss_rate_label = common_widgets.ColorQLabel(max_val=30)
         self.battery_layout.addWidget(self.world_loss_rate_label)
 
         self.battery_layout.addWidget(self.battery_progress_bar)
