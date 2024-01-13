@@ -59,8 +59,24 @@ class FloatSlider(QSlider):
 
 
 class ColorQLabel(QLabel):
-    def __init__(self, min_val: int, max_val: int):
+    def __init__(self, min_val: float = 0, max_val: float = 100):
+        super(ColorQLabel, self).__init__()
 
+        self.min = min_val
+        self.max = max_val
+
+        self.setText("P%NA")
+        self.__update_background_color(0)
+
+    def set_float_val(self, val: float):
+        self.setText(f"P%{val:02d}")
+        self.__update_background_color(val)
+
+    def __update_background_color(self, val: float):
+        percent = float(val - self.min) / (self.max - self.min)
+
+        self.setStyleSheet(f"background: rgba(255, 0, 0, {percent})")
+        print(percent)
 
 
 class ColorProgressBar(QProgressBar):

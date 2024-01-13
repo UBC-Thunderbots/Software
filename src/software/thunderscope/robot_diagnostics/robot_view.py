@@ -128,7 +128,14 @@ class RobotView(QScrollArea):
         Gets a RobotStatus proto and calls the corresponding update method
         Until the buffer is empty
         """
-        robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
+        # robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
+
+        robot_status = RobotStatus(
+            network_status=NetworkStatus(
+                primitive_packet_loss_percentage=80,
+                world_packet_loss_percentage=30
+            )
+        )
 
         while robot_status is not None:
             self.robot_view_widgets[robot_status.robot_id].update(robot_status)
