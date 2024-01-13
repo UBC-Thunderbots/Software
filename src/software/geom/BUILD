@@ -37,6 +37,12 @@ cc_library(
 )
 
 cc_library(
+    name = "angular_acceleration",
+    hdrs = ["angular_acceleration.h"],
+    deps = [":angle"],
+)
+
+cc_library(
     name = "shape",
     hdrs = ["shape.h"],
     deps = [":point"],

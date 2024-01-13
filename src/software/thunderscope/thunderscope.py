@@ -36,7 +36,7 @@ class Thunderscope(object):
         self,
         config: TScopeConfig,
         layout_path: os.PathLike = None,
-        refresh_interval_ms: int = 10,
+        refresh_interval_ms: int = THUNDERSCOPE_REFRESH_INTERVAL_MS,
     ) -> None:
         """Initialize Thunderscope
 
@@ -89,6 +89,12 @@ class Thunderscope(object):
             self.load_layout(path)
         except Exception:
             pass
+
+        # Keyboard Estop shortcut
+        # only used when in keyboard estop mode
+        self.keyboard_estop_shortcut = QtGui.QShortcut(
+            QtGui.QKeySequence(" "), self.window
+        )
 
         # Save and Load Prompts
         #

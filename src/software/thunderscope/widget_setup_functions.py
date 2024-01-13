@@ -5,6 +5,8 @@ from typing import List, Any
 from software.py_constants import *
 from proto.import_all_protos import *
 from software.thunderscope.common.proto_plotter import ProtoPlotter
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from proto.robot_log_msg_pb2 import RobotLog
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_style import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -39,6 +41,7 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
 from software.thunderscope.robot_diagnostics.robot_view import RobotView
+from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
 
@@ -239,11 +242,23 @@ def setup_robot_view(
     """
     robot_view = RobotView(available_control_modes)
     proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
-    proto_unix_io.register_observer(RobotCrash, robot_view.robot_crash_buffer)
     return robot_view
 
 
-def setup_estop_view(proto_unix_io: ProtoUnixIO) -> EstopView:
+def setup_robot_error_log_view_widget(proto_unix_io: ProtoUnixIO) -> RobotErrorLog:
+    """
+    Setup the robot error log widget and connect its buffer to the proto unix io
+    :param proto_unix_io: The proto unix io object for the full system
+    :return: the robot error log widget
+    """
+    robot_error_log = RobotErrorLog()
+    proto_unix_io.register_observer(RobotStatus, robot_error_log.robot_status_buffer)
+    proto_unix_io.register_observer(RobotCrash, robot_error_log.robot_crash_buffer)
+    proto_unix_io.register_observer(RobotLog, robot_error_log.robot_log_buffer)
+    return robot_error_log
+
+
+def setup_estop_view(proto_unix_io) -> EstopView:
     """Setup the estop view widget
 
     :param proto_unix_io: The proto unix io object for the full system
