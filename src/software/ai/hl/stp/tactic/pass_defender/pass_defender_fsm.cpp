@@ -98,7 +98,8 @@ void PassDefenderFSM::interceptBall(const Update& event)
     }
 
     // backup by the length of the ball
-    Point backup_position = robot_position + ball.velocity().normalize(ROBOT_MAX_RADIUS_METERS);
+    Point backup_position =
+        robot_position + ball.velocity().normalize(ROBOT_MAX_RADIUS_METERS);
     event.common.set_primitive(createMovePrimitive(
         CREATE_MOTION_CONTROL(backup_position), face_ball_orientation, 0, false,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,

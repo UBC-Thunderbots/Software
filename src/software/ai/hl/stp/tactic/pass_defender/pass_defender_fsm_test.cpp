@@ -71,13 +71,14 @@ TEST(PassDefenderFSMTest, test_intercept_edge_case)
         ::TestUtil::setBallVelocity(world, Vector(-2, 0), Timestamp::fromSeconds(123));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(Angle::half()));
 
-        std::unique_ptr<TbotsProto::Primitive> primitive;
+    std::unique_ptr<TbotsProto::Primitive> primitive;
     fsm.process_event(PassDefenderFSM::Update(
-        control_params,
-        TacticUpdate(
-            robot, world,
-            [&primitive](std::unique_ptr<TbotsProto::Primitive> x) { primitive = std::move(x); },
-            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(
+                            robot, world,
+                            [&primitive](std::unique_ptr<TbotsProto::Primitive> x) {
+                                primitive = std::move(x);
+                            },
+                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
     EXPECT_TRUE(primitive != nullptr);
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::InterceptBallState>));
 }
