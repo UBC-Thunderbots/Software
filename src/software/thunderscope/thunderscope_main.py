@@ -383,7 +383,6 @@ if __name__ == "__main__":
             while tscope.is_open():
 
                 simulation_state_message = simulation_state_buffer.get()
-
                 if simulation_state_message.is_playing:
                     tick = SimulatorTick(milliseconds=tick_rate_ms)
                     tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].send_proto(

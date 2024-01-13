@@ -236,6 +236,9 @@ class GLWidget(QWidget):
         if self.isVisible() == False:
             return
 
+        if self.toolbar:
+            self.toolbar.refresh()
+
         for layer in self.layers:
             while layer:
                 if layer.visible():

@@ -15,7 +15,7 @@ from software.thunderscope.constants import (
     is_field_message_empty,
 )
 
-from typing import Tuple, Dict, Callable
+from typing import Dict, Tuple
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
@@ -67,9 +67,6 @@ class GLWorldLayer(GLLayer):
         self._cached_friendly_team = {}
         self._cached_enemy_team = {}
         self.cached_robot_status = {}
-
-        # callback functions to call when the play state changes
-        self.play_callbacks = []
 
         self.key_pressed = {}
         self.accepted_keys = [
@@ -164,18 +161,7 @@ class GLWorldLayer(GLLayer):
 
         self.simulator_io.send_proto(SimulationState, simulator_state)
 
-        # calls each of the callback function with the new play state
-        for callback in self.play_callbacks:
-            callback(self.is_playing)
-
         return self.is_playing
-
-    def add_play_callback(self, callback: Callable[[bool], None]) -> None:
-        """
-        Adds a callback function to the list of play state callbacks
-        :param callback: the callback function to add
-        """
-        self.play_callbacks.append(callback)
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released

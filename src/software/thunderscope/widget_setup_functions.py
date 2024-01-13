@@ -119,9 +119,6 @@ def setup_gl_widget(
     gl_widget.add_layer(validation_layer)
 
     gl_widget.toolbar.pause_button.clicked.connect(world_layer.toggle_play_state)
-    world_layer.add_play_callback(
-        lambda is_playing: gl_widget.toolbar.toggle_pause_button(is_playing)
-    )
 
     # connect all sandbox controls if using sandbox mode
     if sandbox_mode:
@@ -146,6 +143,10 @@ def setup_gl_widget(
         gl_widget.add_layer(hrvo_layer, False)
 
     # Register observers
+    sim_proto_unix_io.register_observer(
+        SimulationState, gl_widget.toolbar.simulation_state_buffer
+    )
+
     for arg in [
         (World, world_layer.world_buffer),
         (World, cost_vis_layer.world_buffer),
@@ -158,6 +159,7 @@ def setup_gl_widget(
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
         (SimulatorState, simulator_layer.simulator_state_buffer),
+        (SimulationState, gl_widget.toolbar.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
     ] + [(HRVOVisualization, hrvo_layer.hrvo_buffer) for hrvo_layer in hrvo_layers]:
         full_system_proto_unix_io.register_observer(*arg)

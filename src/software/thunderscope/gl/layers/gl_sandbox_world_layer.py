@@ -124,7 +124,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
     def mouse_in_scene_dragged(self, event: MouseInSceneEvent) -> None:
         """
-        Requires Ctrl + Shift to be pressed Ralong with mouse click
+        Requires Ctrl + Shift to be pressed along with mouse click
 
         Gets the point(s) that the mouse has moved to on the xy-plane and other planes
         If a robot is currently selected, determines if another robot is present at the new position

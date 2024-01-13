@@ -2,6 +2,8 @@ import textwrap
 from typing import Callable
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Qt.QtWidgets import *
+from proto.import_all_protos import *
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import CameraView, THUNDERSCOPE_HELP_TEXT
 import software.thunderscope.gl.widgets.toolbar_icons.toolbar_icon_loader as icons
 
@@ -131,6 +133,8 @@ class GLFieldToolbar(QWidget):
         self.pause_button = QPushButton()
         self.pause_button.setStyleSheet(self.get_button_style())
         self.toggle_pause_button(True)
+        # buffer for the simulator pause / play state
+        self.simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
 
         # if sandbox mode, set up the sandbox control buttons
         if sandbox_mode:
@@ -168,7 +172,22 @@ class GLFieldToolbar(QWidget):
         self.layout().addWidget(self.measure_button)
         self.layout().addWidget(self.camera_view_button)
 
+    def refresh(self):
+        """
+        Refreshes the UI for all the toolbar icons
+        """
+        # update the pause button state
+        simulation_state = self.simulation_state_buffer.get(
+            block=False, return_cached=False
+        )
+        if simulation_state:
+            self.toggle_pause_button(simulation_state.is_playing)
+
     def toggle_pause_button(self, is_playing: bool):
+        """
+        Toggles the state of the pause button by updating its text and icon
+        :param is_playing: True if the button is in the Play state, False if its in the Pause state
+        """
         self.pause_button.setToolTip("Pause" if is_playing else "Play")
         self.pause_button.setIcon(
             icons.get_pause_icon(self.BUTTON_ICON_COLOR)
@@ -176,7 +195,12 @@ class GLFieldToolbar(QWidget):
             else icons.get_play_icon(self.BUTTON_ICON_COLOR)
         )
 
-    def get_button_style(self, is_enabled: bool = True):
+    def get_button_style(self, is_enabled: bool = True) -> str:
+        """
+        Returns the stylesheet for a QPushButton based on if it's enabled or not
+        :param is_enabled: True if button is enabled, False if not
+        :return: the corresponding stylesheet indicating the button state
+        """
         # the style for each toolbar button
         return textwrap.dedent(
             f"""
