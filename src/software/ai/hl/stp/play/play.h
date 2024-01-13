@@ -216,9 +216,6 @@ class Play
     // The Play's knowledge of the most up-to-date World
     std::optional<World> world_;
 
-    // TODO (#2359): remove this
-    PriorityTacticVector priority_tactics;
-
     uint64_t sequence_number = 0;
 
     bool should_reset;
