@@ -3,6 +3,8 @@ from typing import Callable
 from evdev import InputDevice, categorize, ecodes
 from threading import Event, Thread
 
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+
 XBOX_MAX_RANGE = 32768
 XBOX_BUTTON_MAX_RANGE = 1024
 
@@ -24,16 +26,13 @@ class ControllerDiagnostics(object):
     def __init__(
         self,
         input_path: str,
-        perform_move: Callable[[int, int, int, int], None],
-        perform_kick: Callable[[int], None],
-        perform_chip: Callable[[int], None],
+        proto_unix_io: ProtoUnixIO,
     ):
-        self.__perform_move = perform_move
-        self.__perform_kick = perform_kick
-        self.__perform_chip = perform_chip
         self.controller = InputDevice(input_path)
+        # TODO check valid path
+        # TODO add auto detect controller
         print("Start input device " + input_path)
-        # self.proto_unix_io = proto_unix_io
+        self.proto_unix_io = proto_unix_io
 
         self.stop_event_thread = Event()
         self._event_thread = Thread(target=self._event_loop)

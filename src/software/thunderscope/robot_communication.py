@@ -2,11 +2,14 @@ import threading
 import time
 import os
 
+from evdev import util
+
 from software.thunderscope.constants import (
     ROBOT_COMMUNICATIONS_TIMEOUT_S,
     IndividualRobotMode,
     EstopMode,
 )
+from software.thunderscope.controller_diagnostics import ControllerDiagnostics
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 from software.thunderscope.robot_input_control_manager import RobotInputControlManager
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -49,8 +52,8 @@ class RobotCommunication(object):
         self.current_proto_unix_io = current_proto_unix_io
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
+        # TODO merge estops attributes into 1 data type
         self.estop_mode = estop_mode
-
         self.estop_path = estop_path
         self.estop_buadrate = estop_baudrate
 
@@ -89,7 +92,9 @@ class RobotCommunication(object):
             target=self.__run_primitive_set, daemon=True
         )
 
-        # TODO move this to estop helpers
+        self.__robot_id_input_source_map: set[(int, IndividualRobotMode)] = set()
+        self.__robots_to_be_disconnected: set[int] = {}
+
         # initialising the estop
         # tries to access a plugged in estop. if not found, throws an exception
         # if using keyboard estop, skips this step
@@ -107,6 +112,18 @@ class RobotCommunication(object):
                 )
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
+
+        if input_device_path:
+            if os.path.exists(input_device_path) and util.is_device(
+                    input_device_path
+            ):
+                self.__input_mode = ControlMode.XBOX
+                self.__controller_diagnostics = ControllerDiagnostics(
+                    input_device_path,
+                )
+            else:
+                self.__input_mode = ControlMode.DIAGNOSTICS
+
 
     def setup_for_fullsystem(self) -> None:
         """
@@ -163,7 +180,16 @@ class RobotCommunication(object):
         :param robot_id: the id of the robot whose mode we're changing
         """
 
-        self.control_manager.toggle_control_mode_for_robot(robot_id, mode)
+        self.__robots_to_be_disconnected[robot_id] = NUM_TIMES_SEND_STOP
+        self.__robot_id_input_source_map = set(
+            map(
+                lambda robot_control: (robot_id, mode)
+                if robot_id == robot_control[0]
+                else robot_control,
+                self.__robot_id_input_source_map,
+            )
+        )
+
         # TODO remove this
         self.robots_connected_to_fullsystem.discard(robot_id)
         self.robots_connected_to_manual.discard(robot_id)
