@@ -10,7 +10,9 @@ py_binary(
         ":constants",
         ":estop_helpers",
         ":thunderscope",
-        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
         "//software/thunderscope/replay:proto_logger",
     ],
 )
@@ -20,10 +22,8 @@ py_library(
     srcs = ["thunderscope.py"],
     data = [
         "thunderscope-logo.png",
-        "//software:er_force_simulator_main",
         "//software:py_constants.so",
         "//software:python_bindings.so",
-        "//software:unix_full_system",
     ],
     deps = [
         ":config",
@@ -32,11 +32,13 @@ py_library(
         "//proto/message_translation:py_tbots_protobuf",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
-        "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:constants",
         "//software/thunderscope:dock_style",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
@@ -116,11 +118,6 @@ py_library(
 py_library(
     name = "thread_safe_buffer",
     srcs = ["thread_safe_buffer.py"],
-)
-
-py_library(
-    name = "binary_context_managers",
-    srcs = ["binary_context_managers.py"],
 )
 
 py_library(
