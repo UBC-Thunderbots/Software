@@ -6,41 +6,7 @@ from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import CameraView, THUNDERSCOPE_HELP_TEXT
 import software.thunderscope.gl.widgets.toolbar_icons.toolbar_icon_loader as icons
-
-
-class ToggleableButton(QPushButton):
-    """
-    A QPushButton which can be enabled or disabled
-    Indicates with cursor if it is enabled or disabled
-    """
-
-    def __init__(self, enabled: bool):
-        """
-        Creates a new button with the given state
-
-        :param enabled: the starting state of the button
-        """
-        super(ToggleableButton, self).__init__()
-        self.enabled = enabled
-
-    def toggle_enabled(self, enabled: bool):
-        """
-        Toggles the enabled state of the button
-        :param enabled: the new enabled state
-        """
-        self.enabled = enabled
-
-    def enterEvent(self, event) -> None:
-        """
-        Sets the cursor to depending on if the button is enabled
-        to indicate that this widget is clickable or unclickable
-        :param event: the mouse enter event
-        """
-        self.setCursor(
-            QtCore.Qt.CursorShape.PointingHandCursor
-            if self.enabled
-            else QtCore.Qt.CursorShape.ForbiddenCursor
-        )
+from software.thunderscope.common.common_widgets import ToggleableButton
 
 
 class GLFieldToolbar(QWidget):

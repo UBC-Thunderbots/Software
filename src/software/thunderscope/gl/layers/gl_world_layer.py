@@ -422,9 +422,7 @@ class GLWorldLayer(GLLayer):
             robot_graphics, robot_id_graphics, robots.keys(),
         ):
             # update the robot graphic with the robot state
-            pos_x = robots[robot_id][0]
-            pos_y = robots[robot_id][1]
-            orientation = robots[robot_id][2]
+            pos_x, pos_y, orientation = robots[robot_id]
 
             robot_graphic.set_position(pos_x, pos_y)
             robot_graphic.set_orientation(math.degrees(orientation))
