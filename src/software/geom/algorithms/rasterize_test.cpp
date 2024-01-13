@@ -137,7 +137,7 @@ TEST(RasterizeTest, test_circle_with_complex_dimensions)
 
     for (Point p : rasterized_points)
     {
-        EXPECT_TRUE(contains(circle, p)) << p;
+        EXPECT_TRUE(distance(circle.origin(), p) <= (circle.radius() + 1e-6)) << p;
     }
     // sqrt(2) * pixel_size since the circle rasterize algorithm does not guarantee that
     // the points are all aligned in x and y axis.

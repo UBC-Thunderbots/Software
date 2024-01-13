@@ -39,11 +39,15 @@ void Candidate::computeTotalScore()
 
     double sum = std::accumulate(
         scores_.begin(), scores_.end(), 0.0, [](double current_sum, double score) {
-            double term =
-                signum(score) * std::pow(std::abs(score), 1.0 / SINGLE_SCORE_INFLUENCE);
-            return current_sum + term;
+            double term = std::pow(std::abs(score), 1.0 / SINGLE_SCORE_INFLUENCE);
+            return current_sum + signum(score) * term;
         });
 
     double num_scores = static_cast<double>(scores_.size());
     total_score_      = std::pow(sum / num_scores, SINGLE_SCORE_INFLUENCE);
+}
+
+bool Candidate::operator<(Candidate &other)
+{
+    return getTotalScore() < other.getTotalScore();
 }

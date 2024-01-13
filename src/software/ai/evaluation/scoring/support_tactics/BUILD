@@ -23,8 +23,9 @@ cc_library(
     srcs = ["duplication_scorer.cpp"],
     hdrs = ["duplication_scorer.h"],
     deps = [
-        ":support_tactic_candidate",
         ":support_tactic_scorer",
+        ":support_tactic_candidate",
+        "//software/util/type_map:type_map",
     ],
 )
 
@@ -33,8 +34,8 @@ cc_library(
     srcs = ["feasibility_scorer.cpp"],
     hdrs = ["feasibility_scorer.h"],
     deps = [
-        ":support_tactic_candidate",
         ":support_tactic_scorer",
+        ":support_tactic_candidate",
     ],
 )
 
@@ -43,7 +44,7 @@ cc_library(
     srcs = ["success_scorer.cpp"],
     hdrs = ["success_scorer.h"],
     deps = [
-        ":support_tactic_candidate",
         ":support_tactic_scorer",
+        ":support_tactic_candidate",
     ],
 )

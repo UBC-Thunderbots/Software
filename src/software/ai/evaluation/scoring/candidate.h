@@ -25,6 +25,16 @@ class Candidate
      */
     void clearScores();
 
+    /**
+     * Compares another Candidate with this Candidate
+     *
+     * @param other the other Candidate to compare to
+     *
+     * @return true if this Candidate's total score is less than the other
+     * Candidate's total score
+     */
+    bool operator<(Candidate &other);
+
    protected:
     explicit Candidate();
 

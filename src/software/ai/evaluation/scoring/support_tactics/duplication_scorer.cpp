@@ -2,15 +2,16 @@
 
 DuplicationScorer::DuplicationScorer() {}
 
-void DuplicationScorer::recordCandidateSelection(const SupportTacticCandidate &candidate)
-{
-    // selection_counter_[candidate]++;
-}
-
 double DuplicationScorer::score(
     const TypedSupportTacticCandidate<ReceiverTactic> &candidate)
 {
-    // int num_selections = selection_counter_[candidate];
-    // return std::exp(-num_selections);
-    return 1;
+    int num_selections = usage_counter_.getOrDefault<ReceiverTactic>();
+    return std::exp(-num_selections);
+}
+
+void DuplicationScorer::update(
+    const TypedSupportTacticCandidate<ReceiverTactic> &candidate)
+{
+    int num_selections = usage_counter_.getOrDefault<ReceiverTactic>();
+    usage_counter_.put<ReceiverTactic>(num_selections + 1);
 }
