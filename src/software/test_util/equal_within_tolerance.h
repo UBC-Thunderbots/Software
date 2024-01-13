@@ -10,6 +10,7 @@
 #include "software/geom/geom_constants.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
+#include "software/geom/stadium.h"
 #include "software/physics/physics.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
@@ -46,6 +47,21 @@ namespace TestUtil
      */
     ::testing::AssertionResult equalWithinTolerance(const Polygon &poly1,
                                                     const Polygon &poly2,
+                                                    double tolerance);
+
+    /**
+     * Checks if two stadiums are within tolerance of each other
+     * Two stadiums are within tolerance of each other if the corresponding points are
+     * within tolerance of each other and the radii are within tolerance
+     *
+     * @param stadium1, stadium2 Polygons to compare
+     * @param tolerance tolerance to check equality with, default is
+     * METERS_PER_MILLIMETER
+     *
+     * @return AssertionSuccess if the two polygons are within tolerance of each other
+     */
+    ::testing::AssertionResult equalWithinTolerance(const Stadium &stadium1,
+                                                    const Stadium &stadium2,
                                                     double tolerance);
 
     /**
