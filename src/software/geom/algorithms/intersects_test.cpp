@@ -344,3 +344,318 @@ TEST(IntersectsTest, ray_far_from_segment)
     EXPECT_FALSE(intersects(r, s));
     EXPECT_FALSE(intersects(s, r));
 }
+
+TEST(IntersectsTest, ray_intersects_stadium_start_straight)
+{
+    Ray ray(Point(0, 0), Angle::fromDegrees(90));
+    Stadium stadium(Point(2,3), Point(8,3), 2);
+
+    EXPECT_TRUE(intersects(ray, stadium));
+    EXPECT_TRUE(intersects(stadium, ray));
+}
+
+TEST(IntersectsTest, ray_not_intersects_stadium_start_straight)
+{
+    Ray ray(Point(0, 0), Angle::fromDegrees(-90));
+    Stadium stadium(Point(2,3), Point(8,3), 2);
+
+    EXPECT_FALSE(intersects(ray, stadium));
+    EXPECT_FALSE(intersects(stadium, ray));
+}
+
+TEST(IntersectsTest, ray_intersects_stadium_end_straight)
+{
+    Ray ray(Point(9, 7), Angle::fromDegrees(-90));
+    Stadium stadium(Point(2,3), Point(8,3), 2);
+
+    EXPECT_TRUE(intersects(ray, stadium));
+    EXPECT_TRUE(intersects(stadium, ray));
+}
+
+TEST(IntersectsTest, ray_not_intersects_stadium_end_straight)
+{
+    Ray ray(Point(9, 7), Angle::fromDegrees(90));
+    Stadium stadium(Point(2,3), Point(8,3), 2);
+
+    EXPECT_FALSE(intersects(ray, stadium));
+    EXPECT_FALSE(intersects(stadium, ray));
+}
+
+TEST(IntersectsTest, ray_intersects_stadium_start_angle)
+{
+    Ray ray(Point(-0.5, 0), Angle::fromDegrees(75));
+    Stadium stadium(Point(2,3), Point(8,3), 2);
+
+    EXPECT_TRUE(intersects(ray, stadium));
+    EXPECT_TRUE(intersects(stadium, ray));
+}
+
+TEST(IntersectsTest, ray_not_intersects_stadium_start_angle)
+{
+    Ray ray(Point(-0.5, 0), Angle::fromDegrees(95));
+    Stadium stadium(Point(2,3), Point(8,3), 2);
+
+    EXPECT_FALSE(intersects(ray, stadium));
+    EXPECT_FALSE(intersects(stadium, ray));
+}
+
+TEST(IntersectsTest, ray_intersects_stadium_top)
+{
+    Ray ray(Point(3, 0.2), Angle::fromDegrees(75));
+    Stadium stadium(Point(0,0), Point(8,0), 1);
+
+    EXPECT_TRUE(intersects(ray, stadium));
+    EXPECT_TRUE(intersects(stadium, ray));
+}
+
+TEST(IntersectsTest, ray_intersects_stadium_bottom)
+{
+    Ray ray(Point(3, -0.9), Angle::fromDegrees(-100));
+    Stadium stadium(Point(0,0), Point(8,0), 1);
+
+    EXPECT_TRUE(intersects(ray, stadium));
+    EXPECT_TRUE(intersects(stadium, ray));
+}
+
+TEST(IntersectsTest, ray_intersects_stadium_bottom_outside)
+{
+    Ray ray(Point(3, -1.2), Angle::fromDegrees(82));
+    Stadium stadium(Point(0,0), Point(8,0), 1);
+
+    EXPECT_TRUE(intersects(ray, stadium));
+    EXPECT_TRUE(intersects(stadium, ray));
+}
+
+TEST(IntersectsTest, ray_not_intersects_stadium_bottom_outside)
+{
+    Ray ray(Point(3, -1.1), Angle::fromDegrees(-90));
+    Stadium stadium(Point(0,0), Point(8,0), 1);
+
+    EXPECT_FALSE(intersects(ray, stadium));
+    EXPECT_FALSE(intersects(stadium, ray));
+}
+
+TEST(IntersectsTest, circle_intersects_stadium_inside_end)
+{
+    Circle circle(Point(0.1, -3), 3);
+    Stadium stadium(Point(8,-3), Point(4,-3), 1);
+
+    EXPECT_TRUE(intersects(circle, stadium));
+    EXPECT_TRUE(intersects(stadium, circle));
+}
+
+TEST(IntersectsTest, circle_not_intersects_stadium_inside_end)
+{
+    Circle circle(Point(0, -3), 2.9);
+    Stadium stadium(Point(8,-3), Point(4,-3), 1);
+
+    EXPECT_FALSE(intersects(circle, stadium));
+    EXPECT_FALSE(intersects(stadium, circle));
+}
+
+TEST(IntersectsTest, circle_intersects_stadium_inside_start)
+{
+    Circle circle(Point(8, 0.9), 3);
+    Stadium stadium(Point(8,-3), Point(4,-3), 1);
+
+    EXPECT_TRUE(intersects(circle, stadium));
+    EXPECT_TRUE(intersects(stadium, circle));
+}
+
+TEST(IntersectsTest, circle_not_intersects_stadium_inside_start)
+{
+    Circle circle(Point(8, 1.1), 3);
+    Stadium stadium(Point(8,-3), Point(4,-3), 1);
+
+    EXPECT_FALSE(intersects(circle, stadium));
+    EXPECT_FALSE(intersects(stadium, circle));
+}
+
+TEST(IntersectsTest, circle_in_stadium)
+{
+    Circle circle(Point(0,0), 0.5);
+    Stadium stadium(Point(-3,-4), Point(3,4), 2);
+
+    EXPECT_TRUE(intersects(circle, stadium));
+    EXPECT_TRUE(intersects(stadium, circle));
+}
+
+TEST(IntersectsTest, circle_intersects_stadium)
+{
+    Circle circle(Point(0,-0.1), 1);
+    Stadium stadium(Point(-3,-4), Point(3,-4), 3);
+
+    EXPECT_TRUE(intersects(circle, stadium));
+    EXPECT_TRUE(intersects(stadium, circle));
+}
+
+TEST(IntersectsTest, circle_not_intersects_stadium)
+{
+    Circle circle(Point(0,0.1), 1);
+    Stadium stadium(Point(-3,-4), Point(3,-4), 3);
+
+    EXPECT_FALSE(intersects(circle, stadium));
+    EXPECT_FALSE(intersects(stadium, circle));
+}
+
+TEST(IntersectsTest, segment_intersects_stadium_start)
+{
+    Segment segment(Point(-0.9,-4), Point(-0.9,4));
+    Stadium stadium(Point(0,0), Point(5,0), 1);
+
+    EXPECT_TRUE(intersects(segment, stadium));
+    EXPECT_TRUE(intersects(stadium, segment));
+}
+
+TEST(IntersectsTest, segment_not_intersects_stadium_start)
+{
+    Segment segment(Point(-2.1,-4), Point(-2.1,4));
+    Stadium stadium(Point(0,0), Point(5,0), 2);
+
+    EXPECT_FALSE(intersects(segment, stadium));
+    EXPECT_FALSE(intersects(stadium, segment));
+}
+
+TEST(IntersectsTest, segment_intersects_stadium_end)
+{
+    Segment segment(Point(5.9,-4), Point(5.9,4));
+    Stadium stadium(Point(0,0), Point(5,0), 1);
+
+    EXPECT_TRUE(intersects(segment, stadium));
+    EXPECT_TRUE(intersects(stadium, segment));
+}
+
+TEST(IntersectsTest, segment_inside_stadium)
+{
+    Segment segment(Point(0,0.5), Point(0,-0.5));
+    Stadium stadium(Point(-2,0), Point(2,0), 1);
+
+    EXPECT_TRUE(intersects(segment, stadium));
+    EXPECT_TRUE(intersects(stadium, segment));
+}
+
+TEST(IntersectsTest, segment_half_inside_stadium)
+{
+    Segment segment(Point(0.2,3), Point(0,-0.5));
+    Stadium stadium(Point(-2,0), Point(2,0), 2);
+
+    EXPECT_TRUE(intersects(segment, stadium));
+    EXPECT_TRUE(intersects(stadium, segment));
+}
+
+TEST(IntersectsTest, segment_not_inside_stadium)
+{
+    Segment segment(Point(0.2,3), Point(0,6));
+    Stadium stadium(Point(-2,0), Point(2,0), 2);
+
+    EXPECT_FALSE(intersects(segment, stadium));
+    EXPECT_FALSE(intersects(stadium, segment));
+}
+
+TEST(IntersectsTest, polygon_first_intersects_stadium_start)
+{
+    Stadium stadium(Point(2 ,0), Point(5,0), 2);
+    Polygon polygon{Point(0.1,5), Point(0.1,-5), Point(-5, 2)};
+
+    EXPECT_TRUE(intersects(stadium, polygon));
+    EXPECT_TRUE(intersects(polygon, stadium));
+}
+
+TEST(IntersectsTest, polygon_first_not_intersects_stadium_start)
+{
+    Stadium stadium(Point(2 ,0), Point(5,0), 3);
+    Polygon polygon{Point(-1.1,5), Point(-1.1,-5), Point(-5, 2)};
+
+    EXPECT_FALSE(intersects(stadium, polygon));
+    EXPECT_FALSE(intersects(polygon, stadium));
+}
+
+TEST(IntersectsTest, polygon_second_intersects_stadium_start)
+{
+    Stadium stadium(Point(2 ,0), Point(5,0), 2);
+    Polygon polygon{Point(-5, 2), Point(0.1,5), Point(0.1,-5)};
+
+    EXPECT_TRUE(intersects(stadium, polygon));
+    EXPECT_TRUE(intersects(polygon, stadium));
+}
+
+TEST(IntersectsTest, polygon_second_not_intersects_stadium_start)
+{
+    Stadium stadium(Point(2 ,0), Point(5,0), 3);
+    Polygon polygon{Point(-5, 2), Point(-1.1,5), Point(-1.1,-5)};
+
+    EXPECT_FALSE(intersects(stadium, polygon));
+    EXPECT_FALSE(intersects(polygon, stadium));
+}
+
+TEST(IntersectsTest, stadium_start_intersects_stadium_start)
+{
+    Stadium stadium1(Point(0,0), Point(0,6), 2);
+    Stadium stadium2(Point(-3.9, 0), Point(-9, 0), 2);
+
+    EXPECT_TRUE(intersects(stadium1, stadium2));
+    EXPECT_TRUE(intersects(stadium2, stadium1));
+}
+
+TEST(IntersectsTest, stadium_start_not_intersects_stadium_start)
+{
+    Stadium stadium1(Point(0,0), Point(0,6), 2);
+    Stadium stadium2(Point(-4.1, 0), Point(-9, 0), 2);
+
+    EXPECT_FALSE(intersects(stadium1, stadium2));
+    EXPECT_FALSE(intersects(stadium2, stadium1));
+}
+
+TEST(IntersectsTest, stadium_start_intersects_stadium_end)
+{
+    Stadium stadium1(Point(0,0), Point(0,6), 3);
+    Stadium stadium2(Point(0, 10.9), Point(20, 11.9), 2);
+
+    EXPECT_TRUE(intersects(stadium1, stadium2));
+    EXPECT_TRUE(intersects(stadium2, stadium1));
+}
+
+TEST(IntersectsTest, stadium_start_not_intersects_stadium_end)
+{
+    Stadium stadium1(Point(0,0), Point(0,6), 2);
+    Stadium stadium2(Point(0, 11.1), Point(20, 11.1), 3);
+
+    EXPECT_FALSE(intersects(stadium1, stadium2));
+    EXPECT_FALSE(intersects(stadium2, stadium1));
+}
+
+TEST(IntersectsTest, stadium_start_intersects_stadium_span)
+{
+    Stadium stadium1(Point(0,0), Point(0,6), 3);
+    Stadium stadium2(Point(-10, 10.9), Point(10, 10.9), 2);
+
+    EXPECT_TRUE(intersects(stadium1, stadium2));
+    EXPECT_TRUE(intersects(stadium2, stadium1));
+}
+
+TEST(IntersectsTest, stadium_start_not_intersects_stadium_span)
+{
+    Stadium stadium1(Point(0,0), Point(0,6), 2);
+    Stadium stadium2(Point(-7, 11.1), Point(5, 11.1), 3);
+
+    EXPECT_FALSE(intersects(stadium1, stadium2));
+    EXPECT_FALSE(intersects(stadium2, stadium1));
+}
+
+TEST(IntersectsTest, stadiums_cross)
+{
+    Stadium stadium1(Point(0,-6), Point(0,6), 1);
+    Stadium stadium2(Point(-6, 0), Point(6, 0), 1);
+
+    EXPECT_TRUE(intersects(stadium1, stadium2));
+    EXPECT_TRUE(intersects(stadium2, stadium1));
+}
+
+TEST(IntersectsTest, stadiums_far)
+{
+    Stadium stadium1(Point(0,0), Point(0,6), 2);
+    Stadium stadium2(Point(20, 30), Point(60, 80), 3);
+
+    EXPECT_FALSE(intersects(stadium1, stadium2));
+    EXPECT_FALSE(intersects(stadium2, stadium1));
+}

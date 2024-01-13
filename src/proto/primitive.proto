@@ -21,6 +21,7 @@ message Obstacles
 {
     repeated Polygon polygon = 1;
     repeated Circle circle   = 2;
+    repeated Stadium stadium = 3;
 }
 
 enum MotionConstraint

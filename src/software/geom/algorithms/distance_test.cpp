@@ -240,6 +240,106 @@ TEST(DistanceTest, point_outside_circle)
     EXPECT_DOUBLE_EQ(distance(circle, point), expected);
 }
 
+TEST(ContainsTest, horizontal_stadium_outside_start_point)
+{
+    // A point that is outside the radius of the start point
+    Stadium stadium(Point(0, 0), Point(5,0), 2);
+    Point point(-3*cos(M_PI/6), 3*sin(M_PI/6));
+
+    EXPECT_DOUBLE_EQ(distance(stadium, point), 1.0);
+    EXPECT_DOUBLE_EQ(distance(point, stadium), 1.0);
+}
+
+TEST(ContainsTest, horizontal_stadium_on_start_point)
+{
+    // A point that is on the radius of the start point
+    Stadium stadium(Point(0, 0), Point(5,0), 2);
+    Point point(-2.0*cos(M_PI/6), -2.0*sin(M_PI/6));
+
+    EXPECT_DOUBLE_EQ(distance(stadium, point), 0);
+    EXPECT_DOUBLE_EQ(distance(point, stadium), 0);
+}
+
+TEST(ContainsTest, horizontal_stadium_inside_start_point)
+{
+    // A point that is inside the radius of the start point
+    Stadium stadium(Point(0, 0), Point(5,0), 2);
+    Point point(-1.5*cos(M_PI/6), -1.5*sin(M_PI/6));
+
+    EXPECT_DOUBLE_EQ(distance(stadium, point), 0);
+    EXPECT_DOUBLE_EQ(distance(point, stadium), 0);
+}
+
+TEST(ContainsTest, horizontal_stadium_outside_end_point)
+{
+    // A point that is outside the radius of the end point
+    Stadium stadium(Point(0, 0), Point(8,0), 3);
+    Point point = Point(8,0) + Vector(5*cos(20), 5*sin(20));
+
+    EXPECT_DOUBLE_EQ(distance(stadium, point), 2.0);
+    EXPECT_DOUBLE_EQ(distance(point, stadium), 2.0);
+}
+
+TEST(ContainsTest, horizontal_stadium_on_end_point)
+{
+    // A point that is on the radius of the end point
+    Stadium stadium(Point(0, 0), Point(8,0), 3);
+    Point point(8+3, 0);
+
+    EXPECT_DOUBLE_EQ(distance(stadium, point), 0);
+    EXPECT_DOUBLE_EQ(distance(point, stadium), 0);
+}
+
+TEST(ContainsTest, horizontal_stadium_on_end_point_2)
+{
+    // A point that is on the radius of the end point
+    Stadium stadium(Point(0, 0), Point(8,0), 3);
+    Point point(8+3.0*cos(M_PI/3), 3.0*sin(M_PI/3));
+
+    EXPECT_DOUBLE_EQ(distance(stadium, point), 0);
+    EXPECT_DOUBLE_EQ(distance(point, stadium), 0);
+}
+
+TEST(ContainsTest, horizontal_stadium_outside_above_point)
+{
+    // A point that is above the start point outside the radius
+    Stadium stadium(Point(-2, 1), Point(6,1), 3);
+    Point point = Point(2,6);
+
+    EXPECT_DOUBLE_EQ(distance(stadium, point), 2);
+    EXPECT_DOUBLE_EQ(distance(point, stadium), 2);
+}
+
+TEST(ContainsTest, horizontal_stadium_on_above_point)
+{
+    // A point that is on the top length of the stadium
+    Stadium stadium(Point(-2, 1), Point(6,1), 3);
+    Point point = Point(2, 4);
+
+    EXPECT_DOUBLE_EQ(distance(stadium, point), 0);
+    EXPECT_DOUBLE_EQ(distance(point, stadium), 0);
+}
+
+TEST(ContainsTest, angled_stadium_doesnt_contain_point)
+{
+    // A point that is just outside the radius of the end point
+    Stadium stadium(Point(0, 0), Point(5,-5), 1);
+    Point point = Point(2, -2) + Vector(2*cos(M_PI_4), 2*sin(M_PI_4));
+
+    EXPECT_DOUBLE_EQ(distance(stadium, point), 1);
+    EXPECT_DOUBLE_EQ(distance(point, stadium), 1);
+}
+
+TEST(ContainsTest, angled_stadium_contains_point)
+{
+    // A point that is just outside the radius of the end point
+    Stadium stadium(Point(0, 0), Point(5,-5), 1);
+    Point point = Point(2, -2) + Vector(1*cos(M_PI_4), 1*sin(M_PI_4));
+
+    EXPECT_DOUBLE_EQ(distance(stadium, point), 0);
+    EXPECT_DOUBLE_EQ(distance(point, stadium), 0);
+}
+
 TEST(DistanceTest, point_on_segment_end_squared)
 {
     Point p(12, 5);

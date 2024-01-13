@@ -83,6 +83,72 @@ TEST(SegmentOperatorTests, segment_operator_unequal_start_end)
     EXPECT_FALSE(s1.operator==(s2));
 }
 
+TEST(SegmentOffsetTests, segment_offset_zero)
+{
+    Segment s = Segment(Point(3, 5), Point(8, 6));
+    Vector v = Vector(0, 0);
+    Segment add = s+v;
+    EXPECT_DOUBLE_EQ(add.getStart().x(), 3);
+    EXPECT_DOUBLE_EQ(add.getStart().y(), 5);
+    EXPECT_DOUBLE_EQ(add.getEnd().x(), 8);
+    EXPECT_DOUBLE_EQ(add.getEnd().y(), 6);
+}
+
+TEST(SegmentOffsetTests, segment_offset_diag)
+{
+    Segment s = Segment(Point(3, 5), Point(8, 6));
+    Vector v = Vector(1, 2);
+    Segment add = s+v;
+    EXPECT_DOUBLE_EQ(add.getStart().x(), 4);
+    EXPECT_DOUBLE_EQ(add.getStart().y(), 7);
+    EXPECT_DOUBLE_EQ(add.getEnd().x(), 9);
+    EXPECT_DOUBLE_EQ(add.getEnd().y(), 8);
+}
+
+TEST(SegmentOffsetTests, segment_offset_negative)
+{
+    Segment s = Segment(Point(3, 5), Point(8, 6));
+    Vector v = Vector(1, -2);
+    Segment add = v+s;
+    EXPECT_DOUBLE_EQ(add.getStart().x(), 4);
+    EXPECT_DOUBLE_EQ(add.getStart().y(), 3);
+    EXPECT_DOUBLE_EQ(add.getEnd().x(), 9);
+    EXPECT_DOUBLE_EQ(add.getEnd().y(), 4);
+}
+
+TEST(SegmentOffsetTests, segment_backset_zero)
+{
+    Segment s = Segment(Point(3, 5), Point(8, 6));
+    Vector v = Vector(0, 0);
+    Segment add = s-v;
+    EXPECT_DOUBLE_EQ(add.getStart().x(), 3);
+    EXPECT_DOUBLE_EQ(add.getStart().y(), 5);
+    EXPECT_DOUBLE_EQ(add.getEnd().x(), 8);
+    EXPECT_DOUBLE_EQ(add.getEnd().y(), 6);
+}
+
+TEST(SegmentOffsetTests, segment_backset_diag)
+{
+    Segment s = Segment(Point(3, 5), Point(8, 6));
+    Vector v = Vector(1, 2);
+    Segment add = s-v;
+    EXPECT_DOUBLE_EQ(add.getStart().x(), 2);
+    EXPECT_DOUBLE_EQ(add.getStart().y(), 3);
+    EXPECT_DOUBLE_EQ(add.getEnd().x(), 7);
+    EXPECT_DOUBLE_EQ(add.getEnd().y(), 4);
+}
+
+TEST(SegmentOffsetTests, segment_backset_negative)
+{
+    Segment s = Segment(Point(3, 5), Point(8, 6));
+    Vector v = Vector(1, -2);
+    Segment add = s-v;
+    EXPECT_DOUBLE_EQ(add.getStart().x(), 2);
+    EXPECT_DOUBLE_EQ(add.getStart().y(), 7);
+    EXPECT_DOUBLE_EQ(add.getEnd().x(), 7);
+    EXPECT_DOUBLE_EQ(add.getEnd().y(), 8);
+}
+
 TEST(SegmentMidPointTest, test_mid_point_1)
 {
     Segment segment(Point(202, 15), Point(202, -15));

@@ -255,6 +255,8 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromShape(
         rectangle.expand(robot_radius_expansion_amount));
 }
 
+
+
 ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
     const Rectangle &field_rectangle, const Rectangle &field_lines,
     const Rectangle &field_boundary, double additional_expansion_amount) const

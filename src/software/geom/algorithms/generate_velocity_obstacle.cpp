@@ -86,3 +86,10 @@ VelocityObstacle generateVelocityObstacle(const Polygon& obstacle, const Circle&
 
     return VelocityObstacle(obstacle_velocity, left_side, right_side);
 }
+
+// TODO: implement this function
+VelocityObstacle generateVelocityObstacle(const Stadium& stadium, const Circle& robot,
+                                          const Vector& obstacle_velocity)
+{
+    return VelocityObstacle(Vector(), Vector(), Vector());
+}

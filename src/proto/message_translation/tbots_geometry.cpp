@@ -73,8 +73,8 @@ std::unique_ptr<TbotsProto::VelocityObstacle> createVelocityObstacleProto(
 
 std::unique_ptr<TbotsProto::Stadium> createStadiumProto(const Stadium& stadium)
 {
-    auto stadium_proto                 = std::make_unique<TbotsProto::Stadium>();
-    *(stadium_proto->mutable_length()) = *createSegmentProto(stadium.length());
+    auto stadium_proto                  = std::make_unique<TbotsProto::Stadium>();
+    *(stadium_proto->mutable_segment()) = *createSegmentProto(stadium.segment());
     stadium_proto->set_radius(stadium.radius());
 
     return stadium_proto;
@@ -133,5 +133,5 @@ VelocityObstacle createVelocityObstacle(
 
 Stadium createStadium(const TbotsProto::Stadium& stadium)
 {
-    return Stadium(createSegment(stadium.length()), stadium.radius());
+    return Stadium(createSegment(stadium.segment()), stadium.radius());
 }

@@ -284,3 +284,5 @@ TEST(RasterizeTest, test_rasterize_complex_self_intersecting_polygon)
     TestUtil::checkPolygonPointsInsideBoundingBox(intersecting_poly, rasterized_points);
     TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
 }
+
+// TODO: write tests for stadium rasterization.

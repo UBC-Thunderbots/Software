@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/geom/convex_shape.h"
-#include "software/geom/convex_polygon.h"
+#include "software/geom/polygon.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
 #include "software/geom/circle.h"
@@ -14,14 +14,14 @@ class Stadium : public ConvexShape {
      /**
       * Creates a Stadium with radius 0 and line segment from (0,0) to (0,0)
       */
-     explicit Stadium();
+     Stadium() = delete;
 
      /**
       * Creates a Stadium with arbitrary line segment and radius
       * @param length the line segment between the centers of the two semicircles of the Stadium
       * @param radius the radius of the two semicircles of the Stadium
       */
-     explicit Stadium(const Segment &length, double radius);
+     explicit Stadium(const Segment &segment, double radius);
 
      /**
       * Creates a Stadium with line segment between two arbitrary points and radius
@@ -39,25 +39,11 @@ class Stadium : public ConvexShape {
       */
      explicit Stadium(const Point &point, const Vector &vector, double radius);
 
-    /**
-     * Creates a Stadium with a line segment between arbitrary point and semicircle
-     * @param point the center of the first semicircle of the Stadium
-     * @param circle the second semicircle of the stadium
-     */
-    explicit Stadium(const Point &point, const Circle &circle);
-
-    /**
-     * Creates a Stadium with a line segment between arbitrary semicircle and vector originating from said circle
-     * @param circle the first semicircle of the Stadium
-     * @param vector the vector from the center of the first semicircle of the Stadium to the second
-     */
-    explicit Stadium(const Circle &circle, const Vector &vector);
-
      /**
-      * Returns the line Segment defining the top and bottom length of this Stadium
+      * Returns the line Segment between the centers of the semicircles of this Stadium
       * @return the line segment between the centers of the semicircles of this Stadium
       */
-     Segment length() const;
+     Segment segment() const;
 
      /**
       * Returns the radius of the semicircles of this Stadium
@@ -65,28 +51,20 @@ class Stadium : public ConvexShape {
       */
      double radius() const;
 
+    /**
+     * Returns the inner rectangle of this Stadium
+     * @return the inner rectangle of this Stadium
+     */
+    Polygon rectangle() const;
+
      /**
       * Returns the area of this Stadium
       * @return the area of this Stadium
       */
      double area() const override;
 
-     /**
-      * Returns the absolute largest x distance between any two points on this Stadium
-      *
-      * @return the absolute largest x distance between any two points on this Stadium
-      */
-     double x_span() const;
-
-    /**
-     * Returns the absolute largest y distance between any two points on this Stadium
-     *
-     * @return the absolute largest y distance between any two points on this Stadium
-     */
-     double y_span() const;
-
     private:
-     Segment length_;
+     Segment segment_;
      double radius_;
 
 };

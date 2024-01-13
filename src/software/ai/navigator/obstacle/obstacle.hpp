@@ -88,6 +88,7 @@ class Obstacle
 TbotsProto::Obstacles createObstacleProto(const Polygon& polygon);
 TbotsProto::Obstacles createObstacleProto(const Rectangle& rectangle);
 TbotsProto::Obstacles createObstacleProto(const Circle& circle);
+TbotsProto::Obstacles createObstacleProto(const Stadium& stadium);
 
 template <typename GEOM_TYPE>
 class GeomObstacle : public Obstacle

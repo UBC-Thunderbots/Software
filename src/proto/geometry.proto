@@ -66,6 +66,6 @@ message VelocityObstacle
 
 message Stadium
 {
-    required Segment length = 1;
+    required Segment segment = 1;
     required double radius  = 2;
 }

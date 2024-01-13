@@ -1,8 +1,6 @@
 #include "software/geom/stadium.h"
 
-Stadium::Stadium() : length_(Segment()), radius_(0) {}
-
-Stadium::Stadium(const Segment &length, double radius) : length_(length), radius_(radius)
+Stadium::Stadium(const Segment &length, double radius) : segment_(length), radius_(radius)
 {
     if(radius<0)
     {
@@ -11,7 +9,7 @@ Stadium::Stadium(const Segment &length, double radius) : length_(length), radius
 }
 
 Stadium::Stadium(const Point &point1, const Point &point2, double radius)
-: length_(Segment(point1, point2)), radius_(radius)
+: segment_(Segment(point1, point2)), radius_(radius)
 {
     if(radius<0)
     {
@@ -20,7 +18,7 @@ Stadium::Stadium(const Point &point1, const Point &point2, double radius)
 }
 
 Stadium::Stadium(const Point &point, const Vector &vector, double radius)
-: length_(Segment(point, point + vector)), radius_(radius)
+: segment_(Segment(point, point + vector)), radius_(radius)
 {
     if(radius<0)
     {
@@ -28,27 +26,9 @@ Stadium::Stadium(const Point &point, const Vector &vector, double radius)
     }
 }
 
-Stadium::Stadium(const Point &point, const Circle &circle)
-        : length_(Segment(point, circle.origin())), radius_(circle.radius())
+Segment Stadium::segment() const
 {
-    if(circle.radius()<0)
-    {
-        throw std::invalid_argument("Stadium radius cannot be negative, given: " + std::to_string(circle.radius()));
-    }
-}
-
-Stadium::Stadium(const Circle &circle, const Vector &vector)
-        : length_(Segment(circle.origin(), circle.origin() + vector)), radius_(circle.radius())
-{
-    if(circle.radius()<0)
-    {
-        throw std::invalid_argument("Stadium radius cannot be negative, given: " + std::to_string(circle.radius()));
-    }
-}
-
-Segment Stadium::length() const
-{
-    return length_;
+    return segment_;
 }
 
 double Stadium::radius() const
@@ -56,24 +36,26 @@ double Stadium::radius() const
     return radius_;
 }
 
+Polygon Stadium::rectangle() const
+{
+    Vector normal = segment_.toVector().rotate(Angle::fromDegrees(90)).normalize() * radius_;
+
+    Point p1 = segment_.getStart()+normal;
+    Point p2 = segment_.getEnd()+normal;
+    Point p3 = segment_.getEnd()-normal;
+    Point p4 = segment_.getStart()-normal;
+
+    return Polygon{p1, p2, p3, p4};
+}
+
 double Stadium::area() const
 {
-    return radius_ * (M_PI * radius_ + 2 * length_.length());
-}
-
-double Stadium::x_span() const
-{
-    return 2 * radius_ + fabs(length_.toVector().x());
-}
-
-double Stadium::y_span() const
-{
-    return 2 * radius_ + fabs(length_.toVector().y());
+    return radius_ * (M_PI * radius_ + 2 * segment_.length());
 }
 
 bool operator==(const Stadium &s1, const Stadium &s2)
 {
-    return ((s1.length() == s2.length() || s1.length().reverse() == s2.length()) &&
+    return ((s1.segment() == s2.segment() || s1.segment().reverse() == s2.segment()) &&
             std::abs(s1.radius() - s2.radius()) < FIXED_EPSILON);
 }
 
@@ -84,7 +66,7 @@ bool operator!=(const Stadium &s1, const Stadium &s2)
 
 std::ostream &operator<<(std::ostream &os, const Stadium &stadium)
 {
-    os  << "Stadium starting at " << stadium.length().getStart() << " ending at "
-        << stadium.length().getEnd() << "with radius " << stadium.radius();
+    os  << "Stadium starting at " << stadium.segment().getStart() << " ending at "
+        << stadium.segment().getEnd() << "with radius " << stadium.radius();
     return os;
 }

@@ -27,7 +27,8 @@ cc_library(
     name = "segment",
     srcs = ["segment.cpp"],
     hdrs = ["segment.h"],
-    deps = [":point"],
+    deps = [":point",
+            ":vector"],
 )
 
 cc_library(
@@ -222,6 +223,7 @@ cc_library(
       ":segment",
       ":rectangle",
       ":circle",
+      ":polygon",
     ],
 )
 

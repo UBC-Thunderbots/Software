@@ -20,3 +20,10 @@ TbotsProto::Obstacles createObstacleProto(const Circle &circle)
     *(obstacle_proto.add_circle()) = *createCircleProto(circle);
     return obstacle_proto;
 }
+
+TbotsProto::Obstacles createObstacleProto(const Stadium &stadium)
+{
+    TbotsProto::Obstacles obstacle_proto;
+    *(obstacle_proto.add_stadium()) = *createStadiumProto(stadium);
+    return obstacle_proto;
+}

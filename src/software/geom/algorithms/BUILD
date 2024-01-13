@@ -49,6 +49,7 @@ cc_library(
         "//software/geom:rectangle",
         "//software/geom:segment",
         "//software/geom:vector",
+        "//software/geom:stadium",
         "//software/logger",
     ],
 )

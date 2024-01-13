@@ -5,6 +5,7 @@
 #include "software/ai/navigator/path_planner/hrvo/velocity_obstacle.h"
 #include "software/geom/circle.h"
 #include "software/geom/polygon.h"
+#include "software/geom/stadium.h"
 
 /**
  * Set of functions that generate velocity obstacles for an obstacle
@@ -23,4 +24,7 @@ VelocityObstacle generateVelocityObstacle(const Circle& obstacle, const Circle& 
  *       - the polygon is concave
  */
 VelocityObstacle generateVelocityObstacle(const Polygon& obstacle, const Circle& robot,
+                                          const Vector& obstacle_velocity);
+
+VelocityObstacle generateVelocityObstacle(const Stadium& stadium, const Circle& robot,
                                           const Vector& obstacle_velocity);
