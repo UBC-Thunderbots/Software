@@ -201,5 +201,7 @@ struct BallPlacementPlayFSM
     std::chrono::time_point<std::chrono::system_clock> start_time;
     constexpr static double const SHOT_VELOCITY_THRESHOLD_M_PER_S = 1.0;
     constexpr static double const WALL_KICKOFF_VELOCITY_M_PER_S   = 3.0;
-    constexpr static double const RETREAT_DISTANCE                = 0.5;
+    constexpr static double const RETREAT_DISTANCE_METERS         = 0.5;
+    constexpr static double const PLACEMENT_DIST_THRESHOLD_METERS = 0.05;
+    constexpr static double const BALL_IS_PLACED_WAIT_S           = 3.0;
 };

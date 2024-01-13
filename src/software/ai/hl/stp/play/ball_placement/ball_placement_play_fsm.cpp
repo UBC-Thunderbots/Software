@@ -120,17 +120,20 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         Angle final_orientation  = nearest_robot.value().orientation();
         Vector retreat_direction = (nearest_robot->position() - ball_pos).normalize();
         Point retreat_position =
-            ball_pos + retreat_direction * (0.5 + ROBOT_MAX_RADIUS_METERS);
+            ball_pos + retreat_direction * (RETREAT_DISTANCE_METERS + ROBOT_MAX_RADIUS_METERS);
 
         // if the initial retreat position is out of the field boundary, have it retreat
         // towards the closest goal
         if (!contains(world.field().fieldBoundary(), retreat_position))
         {
             bool in_friendly_half = contains(world.field().friendlyHalf(), ball_pos);
-            Point closer_goal     = in_friendly_half ? world.field().friendlyGoalCenter()
-                                                 : world.field().enemyGoalCenter();
+            Point closer_goal     = world.field().friendlyGoalCenter();
+            if (!in_friendly_half)
+            {
+                closer_goal = world.field().enemyGoalCenter();
+            }
             retreat_direction = (closer_goal - ball_pos).normalize();
-            retreat_position  = ball_pos + retreat_direction * (RETREAT_DISTANCE +
+            retreat_position  = ball_pos + retreat_direction * (RETREAT_DISTANCE_METERS +
                                                                ROBOT_MAX_RADIUS_METERS);
         }
 
@@ -185,9 +188,9 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
     // see if the ball is at the placement destination
     if (placement_point.has_value())
     {
-        return comparePoints(ball_pos, placement_point.value(), 0.05) &&
+        return comparePoints(ball_pos, placement_point.value(), PLACEMENT_DIST_THRESHOLD_METERS) &&
                event.common.world.ball().velocity().length() <
-                   this->ai_config.ai_parameter_config().ball_not_kicked_threshold();
+                   this->ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
     }
     else
     {
@@ -201,7 +204,7 @@ bool BallPlacementPlayFSM::waitDone(const Update &event)
         std::chrono::system_clock::now();
     return static_cast<double>(
                std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time)
-                   .count()) > 3.0;
+                   .count()) > BALL_IS_PLACED_WAIT_S;
 }
 
 bool BallPlacementPlayFSM::retreatDone(const Update &event)
@@ -209,7 +212,7 @@ bool BallPlacementPlayFSM::retreatDone(const Update &event)
     Point ball_position = event.common.world.ball().position();
     return distance(ball_position, event.common.world.friendlyTeam()
                                        .getNearestRobot(ball_position)
-                                       ->position()) > 0.5;
+                                       ->position()) > RETREAT_DISTANCE_METERS;
 }
 
 Angle BallPlacementPlayFSM::calculateWallKickoffAngle(const Point &ball_pos,
