@@ -110,18 +110,28 @@ TEST_F(TestEndInObstacleSampler, test_sampling_performance)
             LOG(WARNING) << "point " << sample_point.x() << " " << sample_point.y() << " added to points_in_obstacles";
         }
     }
+
     for (double multiplier = 1.2; multiplier <= 2.0; multiplier += 0.1) {
         auto t1 = std::chrono::high_resolution_clock::now();
+        double distance_total = 0;
         for (auto const &point : points_in_obstacles) {
             std::optional<Point> end_point = endInObstacleSample(obstacles, point, navigable_area, 6, multiplier);
             if (!end_point.has_value()) {
-                LOG(WARNING) << "FAILED TO FIND CLOSEST POINT";
+                LOG(WARNING) << "TEST FAILED: COULD NOT FIND CLOSEST POINT";
                 FAIL();
             }
+            distance_total += distance(end_point.value(), point);
+            for (auto const &obstacle : obstacles) {
+                if (obstacle->contains(end_point.value())) {
+                    LOG(WARNING) << "TEST FAILED: END POINT " << end_point.value().x() << " " << end_point.value().y() << " IN OBSTACLE";
+                    FAIL();
+                }
+            }
         }
+        double distance_avg = distance_total / 40;
         auto t2 = std::chrono::high_resolution_clock::now();
         auto microseconds_int = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
-        LOG(WARNING) << microseconds_int.count() << " microseconds to sample all points with multiplier " << multiplier;
+        LOG(WARNING) << microseconds_int.count() << " microseconds to sample all points with multiplier " << multiplier << " and average distance of " << distance_avg;
     }
 
 }
