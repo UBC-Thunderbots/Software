@@ -119,8 +119,8 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         // robot will try to retreat backwards from wherever it is currently facing
         Angle final_orientation  = nearest_robot.value().orientation();
         Vector retreat_direction = (nearest_robot->position() - ball_pos).normalize();
-        Point retreat_position =
-            ball_pos + retreat_direction * (RETREAT_DISTANCE_METERS + ROBOT_MAX_RADIUS_METERS);
+        Point retreat_position = ball_pos + retreat_direction * (RETREAT_DISTANCE_METERS +
+                                                                 ROBOT_MAX_RADIUS_METERS);
 
         // if the initial retreat position is out of the field boundary, have it retreat
         // towards the closest goal
@@ -188,9 +188,11 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
     // see if the ball is at the placement destination
     if (placement_point.has_value())
     {
-        return comparePoints(ball_pos, placement_point.value(), PLACEMENT_DIST_THRESHOLD_METERS) &&
+        return comparePoints(ball_pos, placement_point.value(),
+                             PLACEMENT_DIST_THRESHOLD_METERS) &&
                event.common.world.ball().velocity().length() <
-                   this->ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
+                   this->ai_config.ai_parameter_config()
+                       .ball_is_kicked_m_per_s_threshold();
     }
     else
     {
