@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
@@ -8,6 +9,7 @@ import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.constants import *
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
+from typing import Type, List
 
 
 class BreakbeamLabel(QLabel):
@@ -16,15 +18,15 @@ class BreakbeamLabel(QLabel):
     Extension of a QLabel which displays a tooltip and updates the UI with the current status
     """
 
-    BREAKBEAM_BORDER = "border: 2px solid black"
+    BREAKBEAM_BORDER = "border: 1px solid black"
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Constructs a breakbeam indicator and sets the UI to the default uninitialized state
         """
         super().__init__()
 
-    def update_breakbeam_status(self, new_breakbeam_status):
+    def update_breakbeam_status(self, new_breakbeam_status: bool) -> None:
         """
         Updates the current breakbeam status and refreshes the UI accordingly
         :param new_breakbeam_status: the new breakbeam status
@@ -45,7 +47,7 @@ class BreakbeamLabel(QLabel):
                 "border-color: green"
             )
 
-    def event(self, event):
+    def event(self, event: QtCore.QEvent) -> bool:
         """
         Overridden event function which intercepts all events
         On hover, displays a tooltip with the current breakbeam status
@@ -73,10 +75,10 @@ class RobotInfo(QWidget):
 
     def __init__(
         self,
-        robot_id,
+        robot_id: int,
         available_control_modes: List[IndividualRobotMode],
-        control_mode_signal,
-    ):
+        control_mode_signal: Type[QtCore.pyqtSignal],
+    ) -> None:
         """
         Initialize a single robot's info widget
 
@@ -90,11 +92,6 @@ class RobotInfo(QWidget):
 
         self.robot_id = robot_id
         self.control_mode_signal = control_mode_signal
-
-        # when this robot has a battery warning, this is set to True
-        # which prevents spamming the same battery warning
-        # set back to False if battery is back above warning level
-        self.battery_warning_disabled = False
 
         self.time_of_last_robot_status = time.time()
 
@@ -114,6 +111,22 @@ class RobotInfo(QWidget):
         self.battery_progress_bar.floatValueChanged.connect(
             lambda float_val: self.battery_label.setText("%.2fV" % float_val)
         )
+
+        # Stop primitive received indicator
+        self.stop_primitive_label = QLabel()
+        self.stop_primitive_label.setText("NA")
+        self.battery_layout.addWidget(self.stop_primitive_label)
+
+        # Primitive loss rate label
+        self.primitive_loss_rate_label = QLabel()
+        self.primitive_loss_rate_label.setText("P%NA")
+        self.battery_layout.addWidget(self.primitive_loss_rate_label)
+
+        # World loss rate label
+        self.world_loss_rate_label = QLabel()
+        self.world_loss_rate_label.setText("W%NA")
+        self.battery_layout.addWidget(self.world_loss_rate_label)
+
         self.battery_layout.addWidget(self.battery_progress_bar)
         self.battery_layout.addWidget(self.battery_label)
 
@@ -137,7 +150,7 @@ class RobotInfo(QWidget):
 
         # Layout containing the Vision Pattern and breakbeam indicator
         self.robot_model_layout = QVBoxLayout()
-        self.robot_model_layout.setContentsMargins(0, 15, 5, 10)
+        self.robot_model_layout.setContentsMargins(0, 5, 5, 0)
 
         # Vision Pattern
         self.color_vision_pattern = self.create_vision_pattern(
@@ -151,19 +164,19 @@ class RobotInfo(QWidget):
 
         # breakbeam indicator above robot
         self.breakbeam_label = BreakbeamLabel()
-        self.breakbeam_label.setFixedWidth(self.robot_model.sizeHint().width())
-        self.breakbeam_label.setFixedHeight(self.robot_model.sizeHint().width() * 0.25)
+        self.breakbeam_label.setFixedWidth(self.color_vision_pattern.width())
+        self.breakbeam_label.setFixedHeight(self.color_vision_pattern.width() * 0.25)
 
         self.robot_model_layout.addWidget(self.breakbeam_label)
         self.robot_model_layout.addWidget(self.robot_model)
         self.layout.addLayout(self.robot_model_layout)
 
-        self.reset_ui()
+        self.__reset_ui()
 
         self.layout.addLayout(self.status_layout)
         self.setLayout(self.layout)
 
-    def create_robot_status_expand_button(self):
+    def create_robot_status_expand_button(self) -> QPushButton:
         """
         Creates the button to expand / collapse the robot status view
         :return: QPushButton object
@@ -175,7 +188,7 @@ class RobotInfo(QWidget):
 
     def create_control_mode_menu(
         self, available_control_modes: List[IndividualRobotMode]
-    ):
+    ) -> QComboBox:
         """
         Creates the drop down menu to select the input for each robot
         :param robot_id: the id of the robot this menu belongs to
@@ -206,7 +219,9 @@ class RobotInfo(QWidget):
 
         return control_mode_menu
 
-    def create_vision_pattern(self, team_colour, radius, connected):
+    def create_vision_pattern(
+        self, team_colour: QtGui.QColor, radius: int, connected: bool
+    ) -> QtGui.QPixmap:
         """Given a robot id, team color and radius, draw the vision
         pattern on a pixmap and return it.
 
@@ -260,7 +275,7 @@ class RobotInfo(QWidget):
 
         return pixmap
 
-    def update(self, motor_status, power_status, error_codes):
+    def update(self, robot_status: RobotStatus):
         """
         Receives parts of a RobotStatus message
 
@@ -268,19 +283,17 @@ class RobotInfo(QWidget):
         Sets the robot UI as connected and updates the UI
         Then sets a timer callback to disconnect the robot if needed
 
-        :param motor_status: The motor status message for this robot
-        :param power_status: The power status message for this robot
-        :param error_codes: The error codes of this robot
+        :param robot_status: The robot status message for this robot
         """
         self.time_of_last_robot_status = time.time()
 
         self.robot_model.setPixmap(self.color_vision_pattern)
 
-        self.update_ui(motor_status, power_status, error_codes)
+        self.__update_ui(robot_status)
 
         QtCore.QTimer.singleShot(DISCONNECT_DURATION_MS, self.disconnect_robot)
 
-    def disconnect_robot(self):
+    def disconnect_robot(self) -> None:
         """
         Calculates the time between the last robot status and now
         If more than our threshold, resets UI
@@ -290,9 +303,9 @@ class RobotInfo(QWidget):
             time_since_last_robot_status
             > DISCONNECT_DURATION_MS * SECONDS_PER_MILLISECOND
         ):
-            self.reset_ui()
+            self.__reset_ui()
 
-    def reset_ui(self):
+    def __reset_ui(self) -> None:
         """
         Resets the UI to the default, uninitialized values
         """
@@ -300,18 +313,41 @@ class RobotInfo(QWidget):
 
         self.breakbeam_label.update_breakbeam_status(None)
 
-    def update_ui(self, motor_status, power_status, error_codes):
+    def __update_stop_primitive(self, is_running: bool) -> None:
+        """
+        Updates the stop primitive label based on the current running state
+        :param is_running: if the robot is running currently
+        """
+        self.stop_primitive_label.setText("RUN" if is_running else "STOP")
+        self.stop_primitive_label.setStyleSheet(
+            f"background-color: {'green' if is_running else 'red'}; border: 1px solid black;"
+        )
+
+    def __update_ui(self, robot_status: RobotStatus) -> None:
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
             - Whether breakbeam is tripped
             - If there are any motor faults
-            - If Battery Voltage is too low
+            - Battery voltage, and warns if it's too low
             - If this robot has errors
-        :param motor_status: The motor status message for this robot
-        :param power_status: The power status message for this robot
-        :param error_codes: The error codes of this robot
+            - If the robot is stopped or running
+            - The primitive and world loss rates
+        :param robot_status: The robot status message for this robot
         """
+        motor_status = robot_status.motor_status
+        power_status = robot_status.power_status
+        network_status = robot_status.network_status
+        primitive_executor_status = robot_status.primitive_executor_status
+
+        self.__update_stop_primitive(primitive_executor_status.running_primitive)
+
+        self.primitive_loss_rate_label.setText(
+            f"P%{network_status.primitive_packet_loss_percentage:02d}"
+        )
+        self.world_loss_rate_label.setText(
+            f"W%{network_status.world_packet_loss_percentage:02d}"
+        )
 
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)
 
@@ -323,24 +359,3 @@ class RobotInfo(QWidget):
         )
 
         self.battery_progress_bar.setValue(power_status.battery_voltage)
-
-        if (
-            power_status.battery_voltage <= BATTERY_WARNING_VOLTAGE
-            and not self.battery_warning_disabled
-        ):
-            QMessageBox.information(
-                self,
-                "Battery Voltage Alert",
-                f"robot {self.robot_id} voltage is {power_status.battery_voltage}",
-            )
-            self.battery_warning_disabled = True
-        elif power_status.battery_voltage > BATTERY_WARNING_VOLTAGE:
-            self.battery_warning_disabled = False
-
-        for code in error_codes:
-            if code != ErrorCode.NO_ERROR:
-                QMessageBox.warning(
-                    self,
-                    f"Warning: {ERROR_CODE_MESSAGES[code]}",
-                    f"{ERROR_CODE_MESSAGES[code]} warning for robot {self.robot_id}",
-                )

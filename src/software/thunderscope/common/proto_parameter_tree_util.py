@@ -5,7 +5,7 @@ from thefuzz import fuzz
 
 
 def __create_int_parameter_writable(key, value, descriptor):
-    """Converts an int field of a proto to a SliderParameter with
+    """Converts an int field of a proto to a NumericParameterItem with
     the min/max bounds set according to the provided ParameterRangeOptions
 
     min/vax options.
@@ -27,7 +27,7 @@ def __create_int_parameter_writable(key, value, descriptor):
 
     return {
         "name": key,
-        "type": "slider",
+        "type": "int",
         "value": value,
         "default": value,
         "limits": (int(min_max["min_int_value"]), int(min_max["max_int_value"])),
@@ -36,7 +36,7 @@ def __create_int_parameter_writable(key, value, descriptor):
 
 
 def __create_double_parameter_writable(key, value, descriptor):
-    """Converts a double field of a proto to a SliderParameter with
+    """Converts a double field of a proto to a NumericParameterItem with
     the min/max bounds set according to the provided ParameterRangeOptions
     min/vax options.
 
@@ -57,7 +57,7 @@ def __create_double_parameter_writable(key, value, descriptor):
 
     return {
         "name": key,
-        "type": "slider",
+        "type": "float",
         "value": value,
         "default": value,
         "limits": (min_max["min_double_value"], min_max["max_double_value"],),
