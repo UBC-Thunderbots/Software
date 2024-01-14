@@ -70,7 +70,9 @@ py_library(
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests:validation",
         "//software/thunderscope",
-        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
         "//software/thunderscope/replay:proto_logger",
     ],
 )
@@ -90,9 +92,11 @@ py_library(
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests:validation",
         "//software/thunderscope",
-        "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:config",
         "//software/thunderscope:constants",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
         "//software/thunderscope/replay:proto_logger",
     ],
 )
@@ -100,6 +104,7 @@ py_library(
 py_library(
     name = "validation",
     srcs = [
+        "avoid_collisions.py",
         "ball_enters_region.py",
         "ball_moves_forward.py",
         "ball_speed_threshold.py",
@@ -108,6 +113,7 @@ py_library(
         "friendly_has_ball_possession.py",
         "friendly_team_scored.py",
         "robot_enters_region.py",
+        "robot_enters_region_and_stops.py",
         "robot_speed_threshold.py",
         "validation.py",
     ],

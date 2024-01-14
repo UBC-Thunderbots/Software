@@ -74,7 +74,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
       network_interface_(redis_client_->getSync(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
       loop_hz_(loop_hz),
-      kick_slope_(std::stoi(redis_client_->getSync(ROBOT_KICK_SLOPE_REDIS_KEY))),
+      kick_coeff_(std::stod(redis_client_->getSync(ROBOT_KICK_EXP_COEFF_REDIS_KEY))),
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
@@ -261,15 +261,10 @@ Thunderloop::~Thunderloop() {}
                 if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
                     primitive_executor_.setStopPrimitive();
-
-                    // Log milliseconds since last world received if we are timing out
-                    LOG(WARNING)
-                        << "Primitive timeout, overriding with StopPrimitive - Milliseconds since last primitive: "
-                        << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
-                               MILLISECONDS_PER_NANOSECOND;
                 }
 
-                direct_control_ = *primitive_executor_.stepPrimitive();
+                direct_control_ =
+                    *primitive_executor_.stepPrimitive(primitive_executor_status_);
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(
@@ -279,7 +274,7 @@ Thunderloop::~Thunderloop() {}
             {
                 ScopedTimespecTimer timer(&poll_time);
                 power_status_ =
-                    power_service_->poll(direct_control_.power_control(), kick_slope_,
+                    power_service_->poll(direct_control_.power_control(), kick_coeff_,
                                          kick_constant_, chip_pulse_width_);
             }
             thunderloop_status_.set_power_service_poll_time_ms(
@@ -343,6 +338,8 @@ Thunderloop::~Thunderloop() {}
             *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
             *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
+            *(robot_status_.mutable_primitive_executor_status()) =
+                primitive_executor_status_;
 
             // Update Redis
             redis_client_->setNoCommit(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
