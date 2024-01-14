@@ -487,6 +487,10 @@ py_test(
     srcs = [
         "shoot_or_chip_play_test.py",
     ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",

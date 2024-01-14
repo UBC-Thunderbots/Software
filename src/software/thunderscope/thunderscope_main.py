@@ -1,8 +1,9 @@
 import argparse
-import numpy
+import contextlib
+import logging
 import os
+import sys
 import threading
-import time
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
@@ -14,21 +15,24 @@ from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
-
+from software.thunderscope.constants import CI_DURATION_S
+from software.thunderscope.util import *
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 
-
-NUM_ROBOTS = 6
-SIM_TICK_RATE_MS = 16
+NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
 ###########################################################################
 #                         Thunderscope Main                               #
 ###########################################################################
 
 if __name__ == "__main__":
+
+    logging.getLogger().setLevel(logging.INFO)
 
     # Setup parser
     parser = argparse.ArgumentParser(
@@ -99,6 +103,14 @@ if __name__ == "__main__":
         help="Replay folder for the yellow full_system",
         default=None,
     )
+
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        default=False,
+        help="Include logs from the Gamecontroller and Autoref",
+    )
+
     # Run blue or yellow full system over WiFi
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -151,6 +163,22 @@ if __name__ == "__main__":
         default=115200,
         help="Estop Baudrate",
     )
+    parser.add_argument(
+        "--ci_mode",
+        action="store_true",
+        default=False,
+        help="Runs the simulation with sped-up time",
+    )
+    parser.add_argument(
+        "--enable_autoref", action="store_true", default=False, help="Enable autoref"
+    )
+    parser.add_argument(
+        "--show_autoref_gui",
+        action="store_true",
+        default=False,
+        help="Show TigersAutoref GUI",
+    )
+
     estop_group = parser.add_mutually_exclusive_group()
     estop_group.add_argument(
         "--keyboard_estop",
@@ -327,7 +355,6 @@ if __name__ == "__main__":
     #
     # The async sim ticket ticks the simulator at a fixed rate.
     else:
-
         tscope = Thunderscope(
             config=config.configure_two_ai_gamecontroller_view(
                 args.visualization_buffer_size
@@ -335,59 +362,26 @@ if __name__ == "__main__":
             layout_path=args.layout,
         )
 
-        def __async_sim_ticker(tick_rate_ms: int) -> None:
+        def __ticker(tick_rate_ms: int) -> None:
             """Setup the world and tick simulation forever
 
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            world_state_received_buffer = ThreadSafeBuffer(1, WorldStateReceivedTrigger)
-            tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].register_observer(
-                WorldStateReceivedTrigger, world_state_received_buffer
-            )
+            sync_simulation(tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], NUM_ROBOTS)
 
-            while True:
-                world_state_received = world_state_received_buffer.get(
-                    block=False, return_cached=False
+            if args.ci_mode:
+                async_sim_ticker(
+                    tick_rate_ms,
+                    tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
+                    tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                    tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                    tscope,
                 )
-                if not world_state_received:
-                    world_state = tbots_protobuf.create_world_state(
-                        blue_robot_locations=[
-                            tbots_cpp.Point(-3, y)
-                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                        ],
-                        yellow_robot_locations=[
-                            tbots_cpp.Point(3, y)
-                            for y in numpy.linspace(-2, 2, NUM_ROBOTS)
-                        ],
-                        ball_location=tbots_cpp.Point(0, 0),
-                        ball_velocity=tbots_cpp.Vector(0, 0),
-                    )
-                    tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].send_proto(
-                        WorldState, world_state
-                    )
-                else:
-                    break
-
-                time.sleep(0.01)
-
-            simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
-            tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].register_observer(
-                SimulationState, simulation_state_buffer
-            )
-
-            # Tick Simulation
-            while tscope.is_open():
-
-                simulation_state_message = simulation_state_buffer.get()
-
-                if simulation_state_message.is_playing:
-                    tick = SimulatorTick(milliseconds=tick_rate_ms)
-                    tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].send_proto(
-                        SimulatorTick, tick
-                    )
-
-                time.sleep(tick_rate_ms / 1000)
+            else:
+                realtime_sim_ticker(
+                    tick_rate_ms, tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], tscope
+                )
 
         # Launch all binaries
         with Simulator(
@@ -399,11 +393,29 @@ if __name__ == "__main__":
             args.debug_yellow_full_system,
             True,
             False,
-        ) as yellow_fs, ProtoLogger(
-            args.blue_full_system_runtime_dir,
+        ) as yellow_fs, Gamecontroller(
+            supress_logs=(not args.verbose), ci_mode=args.enable_autoref
+        ) as gamecontroller, (
+            # Here we only initialize autoref if the --enable_autoref flag is requested.
+            # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
+            # All calls to autoref should be guarded with args.enable_autoref
+            TigersAutoref(
+                ci_mode=True,
+                gc=gamecontroller,
+                supress_logs=(not args.verbose),
+                tick_rate_ms=DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,
+                show_gui=args.show_autoref_gui,
+            )
+            if args.enable_autoref
+            else contextlib.nullcontext()
+        ) as autoref, ProtoLogger(
+            log_path=args.blue_full_system_runtime_dir,
+            time_provider=autoref.time_provider if args.enable_autoref else None,
         ) as blue_logger, ProtoLogger(
-            args.yellow_full_system_runtime_dir,
-        ) as yellow_logger, Gamecontroller() as gamecontroller:
+            log_path=args.yellow_full_system_runtime_dir,
+            time_provider=autoref.time_provider if args.enable_autoref else None,
+        ) as yellow_logger:
+            autoref_proto_unix_io = ProtoUnixIO()
 
             tscope.proto_unix_io_map[
                 ProtoUnixIOTypes.BLUE
@@ -420,17 +432,47 @@ if __name__ == "__main__":
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                autoref_proto_unix_io,
             )
             gamecontroller.setup_proto_unix_io(
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE],
                 tscope.proto_unix_io_map[ProtoUnixIOTypes.YELLOW],
+                autoref_proto_unix_io,
             )
+            if args.enable_autoref:
+                autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io,)
 
             # Start the simulator
-            thread = threading.Thread(
-                target=__async_sim_ticker, args=(SIM_TICK_RATE_MS,), daemon=True,
+            sim_ticker_thread = threading.Thread(
+                target=__ticker,
+                args=(DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK,),
+                daemon=True,
             )
 
-            thread.start()
-            tscope.show()
-            thread.join()
+            if args.enable_autoref and args.ci_mode:
+                # In CI mode, we want AI vs AI to end automatically after a given time (CI_DURATION_S). The exiter
+                # thread is passed an exit handler that will close the Thunderscope window
+                # This exit handler is necessary because Qt runs on the main thread, so tscope.show() is a blocking
+                # call so we need to somehow close it before doing our resource cleanup
+                exiter_thread = threading.Thread(
+                    target=exit_poller,
+                    args=(autoref, CI_DURATION_S, lambda: tscope.close()),
+                    daemon=True,
+                )
+
+                exiter_thread.start()  # start the exit countdown
+                sim_ticker_thread.start()  # start the simulation ticking
+
+                tscope.show()  # blocking!
+
+                # these resource cleanups occur after tscope.close() is called by the exiter_thread
+                exiter_thread.join()
+                sim_ticker_thread.join()
+
+                sys.exit(0)
+            else:
+                sim_ticker_thread.start()  # start the simulation ticking
+                tscope.show()  # blocking!
+
+                # resource cleanup occurs after Thunderscope is closed by the user
+                sim_ticker_thread.join()
