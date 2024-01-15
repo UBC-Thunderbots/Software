@@ -423,22 +423,33 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
                                      robot_constants.robot_max_deceleration_m_per_s_2);
 
     Point initial_destination = createPoint(params.destination());
-    if (params.connection_time_s() != 0)
+    if (!params.sub_destinations().empty())
     {
-        // The trajectory is composed of 2 sub-trajectories
+        // The trajectory is composed of multiple sub-trajectories
         // We will first create the first sub-trajectory to the sub-destination
-        initial_destination = createPoint(params.sub_destination());
+        initial_destination = createPoint(params.sub_destinations(0).sub_destination());
     }
+
     auto trajectory = std::make_shared<BangBangTrajectory2D>(
         createPoint(params.start_position()), initial_destination, initial_velocity,
         constraints);
 
     TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);
 
-    if (params.connection_time_s() != 0)
+    // Append the rest of the sub-trajectories
+    for (int i = 1; i < params.sub_destinations_size(); ++i)
     {
-        // Append a second sub-trajectory to the final destination
-        trajectory_path.append(params.connection_time_s(),
+        // Append a sub-trajectory to the sub-destination
+        trajectory_path.append(params.sub_destinations(i - 1).connection_time_s(),
+                               createPoint(params.sub_destinations(i).sub_destination()),
+                               constraints);
+    }
+
+    if (!params.sub_destinations().empty())
+    {
+        // Append a final sub-trajectory to the final destination
+        trajectory_path.append(params.sub_destinations(params.sub_destinations_size() - 1)
+                                   .connection_time_s(),
                                createPoint(params.destination()), constraints);
     }
 

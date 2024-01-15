@@ -83,24 +83,21 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
     *(primitive_proto->mutable_move()->mutable_xy_traj_params()) = xy_traj_params;
 
     const auto &path_nodes = traj_path->getTrajectoryPathNodes();
-    // Set sub_destination and connection_time_s fields, if the trajectory path
-    // consists of more than 1 trajectory
+    // Populate the sub-destinations if there are any
     if (path_nodes.size() >= 2)
     {
-        *(primitive_proto->mutable_move()
-              ->mutable_xy_traj_params()
-              ->mutable_sub_destination()) =
-            *createPointProto(path_nodes[0].getTrajectory()->getDestination());
-
-        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(
-            static_cast<float>(path_nodes[0].getTrajectoryEndTime()));
-    }
-    else
-    {
-        // If the trajectory path consists of only 1 trajectory,
-        // then the connection time is set to 0
-        primitive_proto->mutable_move()->mutable_xy_traj_params()->set_connection_time_s(
-            0);
+        // The last path node goes to the destination which is stored above
+        for (unsigned int i = 0; i < path_nodes.size() - 1; ++i)
+        {
+            TbotsProto::TrajectoryPathParams2D::SubDestination sub_destination_proto;
+            *(sub_destination_proto.mutable_sub_destination()) =
+                *createPointProto(path_nodes[i].getTrajectory()->getDestination());
+            sub_destination_proto.set_connection_time_s(
+                static_cast<float>(path_nodes[i].getTrajectoryEndTime()));
+            *(primitive_proto->mutable_move()
+                  ->mutable_xy_traj_params()
+                  ->add_sub_destinations()) = sub_destination_proto;
+        }
     }
 
     TbotsProto::TrajectoryParamsAngular1D w_traj_params;

@@ -119,21 +119,23 @@ message StopPrimitive {}
 
 message TrajectoryPathParams2D
 {
-    // Could remove this and subtract it from destination and
-    // sub_destination. i.e. Trajectories are always from (0,0)
-    Point start_position = 1;
-    // Could create new PointF class (uses floats) or PointS (uses
-    // shorts to represent the milli-meter position, might have to
-    // signed)
-    Point destination                  = 2;
-    Vector initial_velocity            = 3;
-    MaxAllowedSpeedMode max_speed_mode = 4;
-    Point sub_destination              = 5;
-    // If connection_time is non-zero, then the trajectory path is
-    // assumed to be comprised of two sub-trajectories, with the
-    // first sub-trajectory ending at sub_destination and the second
-    // sub-trajectory ending at destination.
-    float connection_time_s = 6;
+    message SubDestination
+    {
+        // Intermediate destination for the trajectory path
+        // to travel to prior to going to the destination.
+        Point sub_destination = 1;
+
+        // The time at which a new trajectory is branched
+        // off of the last trajectory in path to go towards the
+        // sub_destination.
+        float connection_time_s = 2;
+    }
+
+    Point start_position                     = 1;
+    Point destination                        = 2;
+    Vector initial_velocity                  = 3;
+    MaxAllowedSpeedMode max_speed_mode       = 4;
+    repeated SubDestination sub_destinations = 5;
 }
 
 message TrajectoryParamsAngular1D

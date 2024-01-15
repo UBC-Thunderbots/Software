@@ -67,6 +67,44 @@ class TbotsProtobufTest : public ::testing::Test
             MICROSECONDS_PER_SECOND;
         ASSERT_TRUE(timestamp.epoch_timestamp_seconds() <= time_in_seconds);
     }
+
+    static void assertTrajectoryPathsAreSame(const TrajectoryPath& traj_path_1,
+                                             const TrajectoryPath& traj_path_2)
+    {
+        auto traj_path_nodes_1 = traj_path_1.getTrajectoryPathNodes();
+        auto traj_path_nodes_2 = traj_path_2.getTrajectoryPathNodes();
+        ASSERT_EQ(traj_path_nodes_1.size(), traj_path_nodes_2.size());
+        ASSERT_FLOAT_EQ(traj_path_nodes_1[0].getTrajectoryEndTime(),
+                        traj_path_nodes_2[0].getTrajectoryEndTime());
+
+        for (int i = 0; i < traj_path_nodes_1.size(); i++)
+        {
+            EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getPosition(0.0),
+                      traj_path_nodes_2[i].getTrajectory()->getPosition(0.0))
+                << " Position at index " << i << " is not equal";
+        }
+
+        for (int i = 0; i < traj_path_nodes_1.size(); i++)
+        {
+            EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getVelocity(0.0),
+                      traj_path_nodes_2[i].getTrajectory()->getVelocity(0.0))
+                << " Velocity at index " << i << " is not equal";
+        }
+
+        for (int i = 0; i < traj_path_nodes_1.size(); i++)
+        {
+            EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getAcceleration(0.0),
+                      traj_path_nodes_2[i].getTrajectory()->getAcceleration(0.0))
+                << " Acceleration at index " << i << " is not equal";
+        }
+
+        for (int i = 0; i < traj_path_nodes_1.size(); i++)
+        {
+            EXPECT_EQ(traj_path_nodes_1[i].getTrajectory()->getDestination(),
+                      traj_path_nodes_2[i].getTrajectory()->getDestination())
+                << " Destination at index " << i << " is not equal";
+        }
+    }
 };
 
 TEST(TbotsProtobufTest, timestamp_msg_test)
@@ -101,7 +139,12 @@ TEST(TbotsProtobufTest, ball_state_msg_test)
     TbotsProtobufTest::assertBallStateMessageFromBall(ball, *ball_state_msg);
 }
 
-TEST(TbotsProtobufTest, trajectory_params_msg_test)
+class TrajectoryParamConversionTest
+    : public ::testing::TestWithParam<std::tuple<std::vector<Point>, std::vector<double>>>
+{
+};
+
+TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
 {
     // Generate a trajectory, and then generate a TbotsProto::TrajectoryPathParams2D
     // with the same parameters as the trajectory, finally, generate a second trajectory
@@ -109,6 +152,11 @@ TEST(TbotsProtobufTest, trajectory_params_msg_test)
     RobotConstants robot_constants = create2021RobotConstants();
     Point start_position(0.0, 0.0);
     Point destination(0.0, 0.0);
+
+    std::vector<Point> sub_destinations                  = std::get<0>(GetParam());
+    std::vector<double> sub_destination_connection_times = std::get<1>(GetParam());
+    ASSERT_EQ(sub_destinations.size(), sub_destination_connection_times.size());
+
     Vector initial_velocity(-1.0, -1.0);
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
@@ -118,58 +166,60 @@ TEST(TbotsProtobufTest, trajectory_params_msg_test)
                                      robot_constants.robot_max_acceleration_m_per_s_2,
                                      robot_constants.robot_max_deceleration_m_per_s_2);
 
-    Point sub_destination(1.2, 0.0);
-    float connection_time_s = 0.4f;
-    auto trajectory         = std::make_shared<BangBangTrajectory2D>(
-        start_position, sub_destination, initial_velocity, constraints);
+    Point initial_destination = destination;
+    if (!sub_destinations.empty())
+    {
+        initial_destination = sub_destinations[0];
+    }
 
+    auto trajectory = std::make_shared<BangBangTrajectory2D>(
+        start_position, initial_destination, initial_velocity, constraints);
     TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);
-    trajectory_path.append(connection_time_s, destination, constraints);
+
+    for (int i = 1; i < sub_destinations.size(); i++)
+    {
+        trajectory_path.append(sub_destination_connection_times[i - 1],
+                               sub_destinations[i], constraints);
+    }
+
+    if (!sub_destinations.empty())
+    {
+        trajectory_path.append(
+            sub_destination_connection_times[sub_destination_connection_times.size() - 1],
+            destination, constraints);
+    }
 
     TbotsProto::TrajectoryPathParams2D params;
     *(params.mutable_start_position())   = *createPointProto(start_position);
     *(params.mutable_destination())      = *createPointProto(destination);
     *(params.mutable_initial_velocity()) = *createVectorProto(initial_velocity);
-    *(params.mutable_sub_destination())  = *createPointProto(sub_destination);
     params.set_max_speed_mode(max_allowed_speed_mode);
-    params.set_connection_time_s(connection_time_s);
+
+    for (int i = 0; i < sub_destinations.size(); ++i)
+    {
+        TbotsProto::TrajectoryPathParams2D::SubDestination sub_destination_proto;
+        *(sub_destination_proto.mutable_sub_destination()) =
+            *createPointProto(sub_destinations[i]);
+        sub_destination_proto.set_connection_time_s(sub_destination_connection_times[i]);
+        *(params.add_sub_destinations()) = sub_destination_proto;
+    }
 
     auto converted_trajectory_path_opt =
         createTrajectoryPathFromParams(params, initial_velocity, robot_constants);
     ASSERT_TRUE(converted_trajectory_path_opt.has_value());
 
     TrajectoryPath converted_trajectory_path = converted_trajectory_path_opt.value();
-    auto initial_traj_nodes                  = trajectory_path.getTrajectoryPathNodes();
-    auto converted_traj_nodes = converted_trajectory_path.getTrajectoryPathNodes();
-    ASSERT_EQ(initial_traj_nodes.size(), converted_traj_nodes.size());
-    ASSERT_EQ(initial_traj_nodes[0].getTrajectoryEndTime(),
-              converted_traj_nodes[0].getTrajectoryEndTime());
-
-    for (int i = 0; i < initial_traj_nodes.size(); i++)
-    {
-        EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getPosition(0.0),
-                  converted_traj_nodes[i].getTrajectory()->getPosition(0.0))
-            << " Position at index " << i << " is not equal";
-    }
-
-    for (int i = 0; i < initial_traj_nodes.size(); i++)
-    {
-        EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getVelocity(0.0),
-                  converted_traj_nodes[i].getTrajectory()->getVelocity(0.0))
-            << " Velocity at index " << i << " is not equal";
-    }
-
-    for (int i = 0; i < initial_traj_nodes.size(); i++)
-    {
-        EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getAcceleration(0.0),
-                  converted_traj_nodes[i].getTrajectory()->getAcceleration(0.0))
-            << " Acceleration at index " << i << " is not equal";
-    }
-
-    for (int i = 0; i < initial_traj_nodes.size(); i++)
-    {
-        EXPECT_EQ(initial_traj_nodes[i].getTrajectory()->getDestination(),
-                  converted_traj_nodes[i].getTrajectory()->getDestination())
-            << " Destination at index " << i << " is not equal";
-    }
+    TbotsProtobufTest::assertTrajectoryPathsAreSame(trajectory_path,
+                                                    converted_trajectory_path);
 }
+
+INSTANTIATE_TEST_CASE_P(
+    TrajectoryParamConversionTests, TrajectoryParamConversionTest,
+    ::testing::Values(
+        // No sub destinations
+        std::make_tuple<std::vector<Point>, std::vector<double>>({}, {}),
+        // One sub destination
+        std::make_tuple<std::vector<Point>, std::vector<double>>({Point(1, 1)}, {0.4}),
+        // Multiple sub destination
+        std::make_tuple<std::vector<Point>, std::vector<double>>(
+            {Point(0, 2), Point(2, 2), Point(2, 0)}, {0.5, 1.0, 1.5})));
