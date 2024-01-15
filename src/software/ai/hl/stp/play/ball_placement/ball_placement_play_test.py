@@ -39,11 +39,11 @@ def ball_placement_play_setup(
     ]
 
     # Game Controller Setup
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
     # Pass in placement point here - not required for all play tests
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.BALL_PLACEMENT,
         team=Team.BLUE,
         final_ball_placement_point=ball_placement_point,

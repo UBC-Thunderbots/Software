@@ -94,6 +94,7 @@ py_library(
         "//software/thunderscope",
         "//software/thunderscope:config",
         "//software/thunderscope:constants",
+        "//software/thunderscope:time_provider",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
