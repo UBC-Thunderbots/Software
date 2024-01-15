@@ -135,19 +135,26 @@ struct GoalieFSM
     bool panicDone(const Update &event);
 
     /**
-     * Action that prompts the goalie to leave the crease momentarily to chip the ball
-     * away
-     *
-     * @param event
-     */
-    void evacuateCrease(const Update &event);
-
-    /**
      * Action that updates the MovePrimitive to time_to_panic and stop the ball
      *
      * @param event GoalieFSM::Update event
      */
     void panic(const Update &event);
+
+    /**
+     * Guard that checks whether the goalie has finished retrieving the ball from the dead zone
+     *
+     * @param event
+     */
+    bool retrieveDone(const Update &event);
+
+    /**
+     * Action that prompts the goalie to leave the crease momentarily to chip the ball
+     * away
+     *
+     * @param event
+     */
+    void retrieveFromDeadZone(const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent);
 
     /**
      * Move the robot to the goal line
@@ -188,6 +195,7 @@ struct GoalieFSM
         DEFINE_SML_STATE(PivotKickFSM)
         DEFINE_SML_STATE(PositionToBlock)
         DEFINE_SML_STATE(MoveToGoalLine)
+        DEFINE_SML_STATE(DribbleFSM)
 
         DEFINE_SML_EVENT(Update)
 
@@ -197,22 +205,31 @@ struct GoalieFSM
         DEFINE_SML_GUARD(shouldPivotChip)
         DEFINE_SML_GUARD(shouldPanic)
         DEFINE_SML_GUARD(shouldMoveToGoalLine)
+        DEFINE_SML_GUARD(retrieveDone)
 
         DEFINE_SML_ACTION(panic)
         DEFINE_SML_ACTION(positionToBlock)
         DEFINE_SML_ACTION(moveToGoalLine)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updatePivotKick, PivotKickFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(retrieveFromDeadZone, DribbleFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *PositionToBlock_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            PositionToBlock_S + Update_E[shouldEvacuateCrease_G] / updatePivotKick_A =
-                PivotKickFSM_S,
+            PositionToBlock_S + Update_E[shouldEvacuateCrease_G] / retrieveFromDeadZone_A=
+                DribbleFSM_S,
             PositionToBlock_S + Update_E[shouldPanic_G] / panic_A = Panic_S,
             PositionToBlock_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
                 PivotKickFSM_S,
             PositionToBlock_S + Update_E / positionToBlock_A,
+            DribbleFSM_S + Update_E[retrieveDone_G] / updatePivotKick_A =
+                    PivotKickFSM_S,
+            DribbleFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
+                    MoveToGoalLine_S,
+            DribbleFSM_S + Update_E[ballInInflatedDefenseArea_G] / retrieveFromDeadZone_A,
+            DribbleFSM_S + Update_E[!ballInInflatedDefenseArea_G] / positionToBlock_A =
+                    PositionToBlock_S,
             Panic_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
             Panic_S + Update_E[shouldPivotChip_G] / updatePivotKick_A = PivotKickFSM_S,

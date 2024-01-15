@@ -107,7 +107,6 @@ Point GoalieFSM::findGoodChipTarget(
     {
         chip_target = open_areas[0].origin();
     }
-
     return chip_target;
 }
 
@@ -216,19 +215,6 @@ void GoalieFSM::updatePivotKick(
     Rectangle inflated_defense_area =
             friendly_defense_area.expand(robot_radius_expansion_amount);
 
-    bool ball_in_dead_zone =
-            !contains(friendly_defense_area, ball.position()) &&
-            contains(friendly_defense_area.expand(robot_radius_expansion_amount),
-                     ball.position());
-
-    // if goalie is in dead zone, retreat back into defense area
-    if (ball_in_dead_zone) {
-        Point defense_area_center = event.common.world.field().friendlyDefenseArea().centre();
-        Vector retreat_direction = (defense_area_center - event.common.world.ball().position()).normalize();
-        Point closest_point = closestPoint(event.common.world.field().friendlyDefenseArea(), event.common.world.friendlyTeam().goalie()->position());
-        chip_origin = closest_point + retreat_direction * 2 * ROBOT_MAX_RADIUS_METERS;
-    }
-
     Vector chip_vector = chip_target - chip_origin;
 
     PivotKickFSM::ControlParams control_params{
@@ -286,4 +272,26 @@ void GoalieFSM::moveToGoalLine(const Update &event)
         TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
         event.common.robot.robotConstants(), std::optional<double>()));
+}
+
+bool GoalieFSM::retrieveDone(const Update &event)
+{
+    Point ball_position = event.common.world.ball().position();
+    Point retrieve_destination = event.common.world.field().friendlyDefenseArea().centre();
+    return comparePoints(ball_position, retrieve_destination, 0.05);
+}
+
+void GoalieFSM::retrieveFromDeadZone(const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+{
+    Point ball_position = event.common.world.ball().position();
+    Vector final_dribble_orientation = event.common.world.field().enemyGoalCenter() - ball_position;
+
+    DribbleFSM::ControlParams control_params{
+            .dribble_destination    = event.common.world.field().friendlyDefenseArea().centre(),
+            .final_dribble_orientation = final_dribble_orientation.orientation(),
+            .allow_excessive_dribbling = true,
+    };
+
+    // update the dribble fsm
+    processEvent(DribbleFSM::Update(control_params, event.common));
 }
