@@ -332,8 +332,6 @@ if __name__ == "__main__":
     # the gamecontroller which can be accessed from http://localhost:8081
     #
     # The async sim ticket ticks the simulator at a fixed rate.
-    #
-    # Can optionally enable sandbox mode for testing
     else:
 
         tscope = Thunderscope(
@@ -392,6 +390,7 @@ if __name__ == "__main__":
             while tscope.is_open():
 
                 simulation_state_message = simulation_state_buffer.get()
+
                 if simulation_state_message.is_playing:
                     tick = SimulatorTick(milliseconds=tick_rate_ms)
                     tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM].send_proto(
