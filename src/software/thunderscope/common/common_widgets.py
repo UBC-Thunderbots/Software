@@ -59,7 +59,18 @@ class FloatSlider(QSlider):
 
 
 class ColorQLabel(QLabel):
+    """
+    A QLabel that changes color based on the float value it holds
+    Can provide a custom min and max value
+    The label starts off with no color and becomes more Red as the value increases up till the max value
+    """
     def __init__(self, min_val: float = 0, max_val: float = 100):
+        """
+        Initializes the ColorQLabel with the given min and max bounds
+        Or 0 and 100 as default
+        :param min_val: the minimum value of the label color (no color)
+        :param max_val: the maxmimum value of the label color (100% red)
+        """
         super(ColorQLabel, self).__init__()
 
         self.min = min_val
@@ -68,11 +79,16 @@ class ColorQLabel(QLabel):
         self.setText("P%NA")
         self.__update_background_color(0)
 
-    def set_float_val(self, val: float):
+    def set_float_val(self, val: float) -> None:
+        """
+        Sets the current value of the label to the given float value
+        :param val:  the value to 
+        :return: 
+        """
         self.setText(f"P%{val:02d}")
         self.__update_background_color(val)
 
-    def __update_background_color(self, val: float):
+    def __update_background_color(self, val: float) -> None:
         percent = max(0, min(float(val - self.min) / (self.max - self.min), 1))
 
         self.setStyleSheet(f"background: rgba(255, 0, 0, {percent})")
