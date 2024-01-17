@@ -17,7 +17,11 @@ from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import CI_DURATION_S, ProtoUnixIOTypes, SIM_TICK_RATE_MS
+from software.thunderscope.constants import (
+    CI_DURATION_S,
+    ProtoUnixIOTypes,
+    SIM_TICK_RATE_MS,
+)
 from software.thunderscope.util import *
 
 from software.thunderscope.binary_context_managers.full_system import FullSystem
@@ -376,7 +380,10 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            sync_simulation(tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], 0 if args.empty else NUM_ROBOTS)
+            sync_simulation(
+                tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                0 if args.empty else NUM_ROBOTS,
+            )
 
             if args.ci_mode:
                 async_sim_ticker(
