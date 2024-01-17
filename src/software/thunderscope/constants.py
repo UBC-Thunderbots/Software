@@ -98,6 +98,9 @@ DEFAULT_EMPTY_FIELD_WORLD = World(
     )
 )
 
+# How long AI vs AI runs before ending in CI
+CI_DURATION_S = 180
+
 MULTI_PLANE_POINTS = 3
 
 ROBOT_RADIUS = 25

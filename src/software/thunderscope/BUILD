@@ -10,6 +10,7 @@ py_binary(
         ":constants",
         ":estop_helpers",
         ":thunderscope",
+        ":util",
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
@@ -39,8 +40,26 @@ py_library(
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
+        "//software/thunderscope/binary_context_managers:tigers_autoref",
         requirement("pyqtgraph"),
         requirement("numpy"),
+    ],
+)
+
+py_library(
+    name = "time_provider",
+    srcs = ["time_provider.py"],
+)
+
+py_library(
+    name = "util",
+    srcs = ["util.py"],
+    data = ["//software:py_constants.so"],
+    deps = [
+        ":constants",
+        ":thread_safe_buffer",
+        ":time_provider",
+        "//proto/message_translation:py_tbots_protobuf",
     ],
 )
 
@@ -104,6 +123,11 @@ py_library(
 py_library(
     name = "proto_unix_io",
     srcs = ["proto_unix_io.py"],
+    deps = [
+        ":thread_safe_buffer",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+    ],
 )
 
 py_library(

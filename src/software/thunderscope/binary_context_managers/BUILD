@@ -19,6 +19,10 @@ py_library(
         "game_controller.py",
         "util.py",
     ],
+    deps = [
+        "//proto:import_all_protos",
+        "//software/networking:ssl_proto_communication",
+    ],
 )
 
 py_library(
@@ -29,5 +33,19 @@ py_library(
     ],
     data = [
         "//software:unix_full_system",
+    ],
+)
+
+py_library(
+    name = "tigers_autoref",
+    srcs = [
+        "tigers_autoref.py",
+    ],
+    data = [
+        "//software/autoref:run_autoref",
+    ],
+    deps = [
+        ":game_controller",
+        "//software/thunderscope:time_provider",
     ],
 )
