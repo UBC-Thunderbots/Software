@@ -90,6 +90,11 @@ class ColorQLabel(QLabel):
         self.__update_background_color(val)
 
     def __update_background_color(self, val: float) -> None:
+        """
+        Converts the given float to an percentage using the current min-max range
+        Updates the background color's opacity to be that percentage
+        :param val: the float value of the label to update
+        """
         percent = max(0, min(float(val - self.min) / (self.max - self.min), 1))
 
         self.setStyleSheet(f"background: rgba(255, 0, 0, {percent})")

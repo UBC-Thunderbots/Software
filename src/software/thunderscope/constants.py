@@ -78,7 +78,7 @@ class EstopMode(IntEnum):
     KEYBOARD_ESTOP = 1
     PHYSICAL_ESTOP = 2
 
-
+# the maximum packet / world loss percent indicated by UI
 MAX_ACCEPTABLE_LOSS_PERCENT = 30
 
 
