@@ -99,6 +99,9 @@ DEFAULT_EMPTY_FIELD_WORLD = World(
     )
 )
 
+# How long AI vs AI runs before ending in CI
+CI_DURATION_S = 180
+
 ROBOT_RADIUS = 25
 
 BALL_HEIGHT_EFFECT_MULTIPLIER = 3

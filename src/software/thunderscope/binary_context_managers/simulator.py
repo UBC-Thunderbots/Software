@@ -110,6 +110,7 @@ gdb --args bazel-bin/{simulator_command}
         simulator_proto_unix_io: ProtoUnixIO,
         blue_full_system_proto_unix_io: ProtoUnixIO,
         yellow_full_system_proto_unix_io: ProtoUnixIO,
+        autoref_proto_unix_io: ProtoUnixIO = None,
     ) -> None:
 
         """Setup the proto unix io for the simulator
@@ -117,6 +118,7 @@ gdb --args bazel-bin/{simulator_command}
         :param simulator_proto_unix_io: The proto unix io of the simulator.
         :param blue_full_system_proto_unix_io: The proto unix io of the blue full system.
         :param yellow_full_system_proto_unix_io: The proto unix io of the yellow full system.
+        :param autoref_proto_unix_io: the proto unix io for the autoref
 
         """
 
@@ -175,3 +177,7 @@ gdb --args bazel-bin/{simulator_command}
             yellow_full_system_proto_unix_io.attach_unix_receiver(
                 self.simulator_runtime_dir, *arg
             )
+
+        autoref_proto_unix_io.attach_unix_receiver(
+            self.simulator_runtime_dir, SSL_WRAPPER_PATH, SSL_WrapperPacket
+        )
