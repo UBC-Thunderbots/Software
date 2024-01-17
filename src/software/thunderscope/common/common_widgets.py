@@ -64,6 +64,7 @@ class ColorQLabel(QLabel):
     Can provide a custom min and max value
     The label starts off with no color and becomes more Red as the value increases up till the max value
     """
+
     def __init__(self, min_val: float = 0, max_val: float = 100):
         """
         Initializes the ColorQLabel with the given min and max bounds
