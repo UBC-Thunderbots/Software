@@ -376,7 +376,7 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            sync_simulation(tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], NUM_ROBOTS)
+            sync_simulation(tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], 0 if args.empty else NUM_ROBOTS)
 
             if args.ci_mode:
                 async_sim_ticker(
