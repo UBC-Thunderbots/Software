@@ -24,7 +24,7 @@ class GLCircle(GLShape):
         line_width: float = LINE_WIDTH,
     ) -> None:
         """Initialize the GLCircle
-
+        
         :param parent_item: The parent item of the graphic
         :param radius: The radius of the circle
         :param num_points: The number of points to generate when creating the circle

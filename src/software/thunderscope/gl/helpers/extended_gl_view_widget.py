@@ -144,8 +144,19 @@ class ExtendedGLViewWidget(GLViewWidget):
         :return: a list of points in the 3D scene representing where the mouse is pointing to on multiple planes
         """
         # gets the points on the planes z = ROBOT_MAX_HEIGHT_METERS * (0/n-1, 1/n-1, 2/n-1, ..., n-1/n-1)
-        # for the n planes we want to consider from 0 to the height of the robot, to take into account 3-D robot height
-        # Eg: for n = 3, we consider z = 0, z = 1/2 robot height, and z = robot height as the planes
+        # for the n planes we want to consider from 0 to the height of the robot,
+        # This is because the robot's height means the mouse click ray may not always intersect with the z = 0 plane
+        # but we still want to detect the click
+        # Eg: for n = 3
+        # (imagine this is the front view of a robot)
+        #
+        #         mouse click ray (only intersects plane 3)
+        #        /
+        # ______/_____________  Plane 3
+        #     |/          |
+        # ____/___________|____ Plane 2
+        #    /|           |
+        # __/_|___________|____ Plane 1
         return [
             self.get_point_in_scene(
                 mouse_pos,
