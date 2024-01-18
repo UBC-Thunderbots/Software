@@ -2,8 +2,6 @@
 
 #include <munkres/munkres.h>
 
-#include <numeric>
-
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
