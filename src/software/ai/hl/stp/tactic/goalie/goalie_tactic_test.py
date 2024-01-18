@@ -174,23 +174,22 @@ def test_goalie_blocks_shot(
 @pytest.mark.parametrize(
     "ball_position",
     [
-
         (tbots_cpp.Point(-3.4, 0)),
         (tbots_cpp.Point(-3.4, 0.9)),
         (tbots_cpp.Point(-4.0, 1.1)),
     ],
 )
-
 def test_goalie_clears_from_dead_zone(
-        ball_position,
-        simulated_test_runner,
+    ball_position, simulated_test_runner,
 ):
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(
         WorldState,
         create_world_state(
             [],
-            blue_robot_locations=[tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea().centre()],
+            blue_robot_locations=[
+                tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea().centre()
+            ],
             ball_location=ball_position,
             ball_velocity=tbots_cpp.Vector(0, 0),
         ),
@@ -244,8 +243,6 @@ def test_goalie_clears_from_dead_zone(
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_always_validation_sequence_set=always_validation_sequence_set,
     )
-
-
 
 
 if __name__ == "__main__":

@@ -142,7 +142,8 @@ struct GoalieFSM
     void panic(const Update &event);
 
     /**
-     * Guard that checks whether the goalie has finished retrieving the ball from the dead zone
+     * Guard that checks whether the goalie has finished retrieving the ball from the dead
+     * zone
      *
      * @param event
      */
@@ -154,7 +155,8 @@ struct GoalieFSM
      *
      * @param event
      */
-    void retrieveFromDeadZone(const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent);
+    void retrieveFromDeadZone(const Update &event,
+                              boost::sml::back::process<DribbleFSM::Update> processEvent);
 
     /**
      * Move the robot to the goal line
@@ -217,19 +219,18 @@ struct GoalieFSM
             // src_state + event [guard] / action = dest_state
             *PositionToBlock_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            PositionToBlock_S + Update_E[shouldEvacuateCrease_G] / retrieveFromDeadZone_A=
-                DribbleFSM_S,
-            PositionToBlock_S + Update_E[shouldPanic_G] / panic_A = Panic_S,
+            PositionToBlock_S +
+                Update_E[shouldEvacuateCrease_G] / retrieveFromDeadZone_A = DribbleFSM_S,
+            PositionToBlock_S + Update_E[shouldPanic_G] / panic_A         = Panic_S,
             PositionToBlock_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
                 PivotKickFSM_S,
             PositionToBlock_S + Update_E / positionToBlock_A,
-            DribbleFSM_S + Update_E[retrieveDone_G] / updatePivotKick_A =
-                    PivotKickFSM_S,
+            DribbleFSM_S + Update_E[retrieveDone_G] / updatePivotKick_A = PivotKickFSM_S,
             DribbleFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
-                    MoveToGoalLine_S,
+                MoveToGoalLine_S,
             DribbleFSM_S + Update_E[ballInInflatedDefenseArea_G] / retrieveFromDeadZone_A,
             DribbleFSM_S + Update_E[!ballInInflatedDefenseArea_G] / positionToBlock_A =
-                    PositionToBlock_S,
+                PositionToBlock_S,
             Panic_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
             Panic_S + Update_E[shouldPivotChip_G] / updatePivotKick_A = PivotKickFSM_S,

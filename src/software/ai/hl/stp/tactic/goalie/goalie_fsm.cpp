@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 
 #include "software/ai/evaluation/find_open_areas.h"
-#include "software/math/math_functions.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/math/math_functions.h"
 
 Point GoalieFSM::getGoaliePositionToBlock(
     const Ball &ball, const Field &field,
@@ -202,7 +202,7 @@ void GoalieFSM::updatePivotKick(
         std::max(clear_origin_x, event.common.world.ball().position().x());
     Point chip_origin = Point(chip_origin_x, event.common.world.ball().position().y());
 
-    Point chip_target  = findGoodChipTarget(event.common.world, goalie_tactic_config);
+    Point chip_target = findGoodChipTarget(event.common.world, goalie_tactic_config);
 
     // check if goalie is outside defense area, inside inflated defense area
     Rectangle friendly_defense_area = event.common.world.field().friendlyDefenseArea();
@@ -210,10 +210,10 @@ void GoalieFSM::updatePivotKick(
 
     // calculate inflated crease obstacle
     double robot_radius_expansion_amount =
-            ROBOT_MAX_RADIUS_METERS *
-            robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
+        ROBOT_MAX_RADIUS_METERS *
+        robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
     Rectangle inflated_defense_area =
-            friendly_defense_area.expand(robot_radius_expansion_amount);
+        friendly_defense_area.expand(robot_radius_expansion_amount);
 
     Vector chip_vector = chip_target - chip_origin;
 
@@ -277,19 +277,22 @@ void GoalieFSM::moveToGoalLine(const Update &event)
 bool GoalieFSM::retrieveDone(const Update &event)
 {
     Point ball_position = event.common.world.ball().position();
-    Point retrieve_destination = event.common.world.field().friendlyDefenseArea().centre();
+    Point retrieve_destination =
+        event.common.world.field().friendlyDefenseArea().centre();
     return comparePoints(ball_position, retrieve_destination, 0.05);
 }
 
-void GoalieFSM::retrieveFromDeadZone(const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+void GoalieFSM::retrieveFromDeadZone(
+    const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
     Point ball_position = event.common.world.ball().position();
-    Vector final_dribble_orientation = event.common.world.field().enemyGoalCenter() - ball_position;
+    Vector final_dribble_orientation =
+        event.common.world.field().enemyGoalCenter() - ball_position;
 
     DribbleFSM::ControlParams control_params{
-            .dribble_destination    = event.common.world.field().friendlyDefenseArea().centre(),
-            .final_dribble_orientation = final_dribble_orientation.orientation(),
-            .allow_excessive_dribbling = true,
+        .dribble_destination = event.common.world.field().friendlyDefenseArea().centre(),
+        .final_dribble_orientation = final_dribble_orientation.orientation(),
+        .allow_excessive_dribbling = true,
     };
 
     // update the dribble fsm
