@@ -178,7 +178,6 @@ class ProtoUnixIO:
             if from_log_visualize and not unix_path
             else runtime_dir + unix_path,
             proto_class=proto_class,
-            is_base64_encoded=from_log_visualize,
         )
         key = proto_class.DESCRIPTOR.full_name
         self.unix_listeners[key] = listener
