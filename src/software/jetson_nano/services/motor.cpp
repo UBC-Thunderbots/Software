@@ -28,6 +28,7 @@
 extern "C"
 {
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
+#include "external/trinamic/tmc/ic/TMC4671/TMC4671_Register.h"
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
 }
@@ -439,23 +440,31 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
           encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
         << "Running without encoder calibration can cause serious harm, exiting";
 
-    // Get current wheel electical RPMs (don't account for pole pairs)
+    // Get current wheel electical RPMs (don't account for pole pairs). Values will be
+    // written on next iteration
     double front_right_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
+        static_cast<double>(tmc4671ReadThenWriteValue(
+            FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+            TMC4671_PID_VELOCITY_TARGET, front_right_target_velocity)) *
         MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double front_left_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
+        static_cast<double>(tmc4671ReadThenWriteValue(
+            FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+            TMC4671_PID_VELOCITY_TARGET, front_left_target_velocity)) *
         MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double back_right_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
+        static_cast<double>(tmc4671ReadThenWriteValue(
+            BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+            TMC4671_PID_VELOCITY_TARGET, back_right_target_velocity)) *
         MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double back_left_velocity =
-        static_cast<double>(tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
+        static_cast<double>(tmc4671ReadThenWriteValue(
+            BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+            TMC4671_PID_VELOCITY_TARGET, back_left_target_velocity)) *
         MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-
-    // Get the current dribbler rpm
-    double dribbler_rpm =
-        static_cast<double>(tmc4671_getActualVelocity(DRIBBLER_MOTOR_CHIP_SELECT));
+    double dribbler_rpm = static_cast<double>(
+        tmc4671ReadThenWriteValue(DRIBBLER_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+                                  TMC4671_PID_VELOCITY_TARGET, dribbler_ramp_rpm_));
 
     // Construct a MotorStatus object with the current velocities and dribbler rpm
     TbotsProto::MotorStatus motor_status =
@@ -543,23 +552,19 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     // TODO (#2719): interleave the angular accelerations in here at some point.
     prev_wheel_velocities_ = target_wheel_velocities;
 
-    // Set target speeds accounting for acceleration
-    tmc4671_writeInt(
-        FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+    // Calculate speeds accounting for acceleration
+    front_right_target_velocity =
         static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] *
-                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(
-        FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                         ELECTRICAL_RPM_PER_MECHANICAL_MPS);
+    front_left_target_velocity =
         static_cast<int>(target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] *
-                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(
-        BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                         ELECTRICAL_RPM_PER_MECHANICAL_MPS);
+    back_left_target_velocity =
         static_cast<int>(target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] *
-                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
-    tmc4671_writeInt(
-        BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_TARGET,
+                         ELECTRICAL_RPM_PER_MECHANICAL_MPS);
+    back_right_target_velocity =
         static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
-                         ELECTRICAL_RPM_PER_MECHANICAL_MPS));
+                         ELECTRICAL_RPM_PER_MECHANICAL_MPS);
 
     // Get target dribbler rpm from the primitive
     int target_dribbler_rpm;
@@ -587,7 +592,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     dribbler_ramp_rpm_ =
         std::clamp(dribbler_ramp_rpm_, -max_dribbler_rpm, max_dribbler_rpm);
 
-    tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, dribbler_ramp_rpm_);
     motor_status.mutable_dribbler()->set_dribbler_rpm(float(dribbler_ramp_rpm_));
 
     return motor_status;
@@ -607,7 +611,7 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 {
     int ret;
 
-    struct spi_ioc_transfer tr[1];
+    struct spi_ioc_transfer tr[2];
     memset(tr, 0, sizeof(tr));
 
     tr[0].tx_buf        = (unsigned long)tx_;
@@ -621,6 +625,40 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 
     CHECK(ret >= 1) << "SPI Transfer to motor failed, not safe to proceed: errno "
                     << strerror(errno);
+}
+
+
+void MotorService::readThenWriteSpiTransfer(int fd, const uint8_t* read_tx,
+                                            const uint8_t* write_tx,
+                                            const uint8_t* read_rx, uint32_t spi_speed)
+{
+    int ret1, ret2;
+
+    uint8_t write_rx[5] = {0};
+
+    struct spi_ioc_transfer tr[2];
+    memset(tr, 0, sizeof(tr));
+
+    tr[0].tx_buf        = (unsigned long)read_tx;
+    tr[0].rx_buf        = (unsigned long)read_rx;
+    tr[0].len           = 5;
+    tr[0].delay_usecs   = 0;
+    tr[0].speed_hz      = spi_speed;
+    tr[0].bits_per_word = 8;
+    tr[0].cs_change     = 0;
+    tr[1].tx_buf        = (unsigned long)write_tx;
+    tr[1].rx_buf        = (unsigned long)write_rx;
+    tr[1].len           = 5;
+    tr[1].delay_usecs   = 0;
+    tr[1].speed_hz      = spi_speed;
+    tr[1].bits_per_word = 8;
+    tr[1].cs_change     = 0;
+
+    ret1 = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+    ret2 = ioctl(fd, SPI_IOC_MESSAGE(1), &tr[1]);
+
+    CHECK(ret1 >= 1 && ret2 >= 1)
+        << "SPI Transfer to motor failed, not safe to proceed: errno " << strerror(errno);
 }
 
 
@@ -664,6 +702,47 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
     spi_demux_select_0_.setValue(GpioState::HIGH);
     spi_demux_select_1_.setValue(GpioState::LOW);
     return readWriteByte(motor, data, last_transfer, TMC4671_SPI_SPEED);
+}
+
+int32_t MotorService::tmc4671ReadThenWriteValue(uint8_t motor, uint8_t read_addr,
+                                                uint8_t write_addr, int32_t write_data)
+{
+    spi_demux_select_0_.setValue(GpioState::HIGH);
+    spi_demux_select_1_.setValue(GpioState::LOW);
+    // ensure tx_ and rx_ are cleared
+    memset(read_tx_, 0, 5);
+    memset(write_tx_, 0, 5);
+    memset(read_rx_, 0, 5);
+
+    //  Trinamic transactions looks like this:
+    //  + - - - + - - - + - - - + - - - + - - - +
+    //  |  ADDR |             DATA              |
+    //  + - - - + - - - + - - - + - - - + - - - +
+    //      0        1      2       3       4
+    //  Also it is in BIG Endian, therefore MSB is leftmost bit of 0.
+    //  For a write, MSB must be 1, for read, MSB must be 0
+    //  https://github.com/trinamic/TMC-API/blob/master/tmc/ic/TMC4671/TMC4671.c
+    read_tx_[0]  = read_addr & 0x7f;
+    write_tx_[0] = write_addr | 0x80;
+
+    // Convert from little endian to big endian
+    for (int i = 3; i >= 0; i--)
+    {
+        uint8_t byte_to_copy = (uint8_t)(0xff & (write_data >> 8 * i));
+        write_tx_[4 - i]     = byte_to_copy;
+    }
+    //    memcpy(write_tx_+1,&write_data,4);
+
+    readThenWriteSpiTransfer(file_descriptors_[motor], read_tx_, write_tx_, read_rx_,
+                             TMC4671_SPI_SPEED);
+
+    int32_t value = read_rx_[0];
+    for (int i = 1; i < 5; i++)
+    {
+        value <<= 8;
+        value |= read_rx_[i];
+    }
+    return value;
 }
 
 uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
@@ -1002,11 +1081,13 @@ void MotorService::startController(uint8_t motor, bool dribbler)
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
     int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
 
+    //    int chip_id = tmc4671ReadThenWriteValue(motor, TMC4671_CHIPINFO_ADDR,
+    //    TMC4671_CHIPINFO_ADDR,0x1); LOG(FATAL) <<"CHIP ID: " << chip_id;
     CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
                                  << static_cast<uint32_t>(motor) << " is not responding";
 
-    LOG(DEBUG) << "Controller " << std::to_string(motor)
-               << " online, responded with: " << chip_id;
+    LOG(INFO) << "Controller " << std::to_string(motor)
+              << " online, responded with: " << chip_id;
 
     // Configure common controller params
     configurePWM(motor);
