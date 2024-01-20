@@ -61,6 +61,17 @@ cc_library(
     deps = [],
 )
 
+cc_library(
+    name = "is_in_range",
+    srcs = [
+        "is_in_range.cpp",
+    ],
+    hdrs = [
+        "is_in_range.h",
+    ],
+    deps = [],
+)
+
 cc_test(
     name = "nearest_neighbor_test",
     srcs = ["nearest_neighbor_test.cpp"],

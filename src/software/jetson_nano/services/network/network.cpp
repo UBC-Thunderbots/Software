@@ -19,9 +19,15 @@ NetworkService::NetworkService(const std::string& ip_address,
 }
 
 std::tuple<TbotsProto::PrimitiveSet, TbotsProto::World> NetworkService::poll(
-    const TbotsProto::RobotStatus& robot_status)
+    TbotsProto::RobotStatus& robot_status)
 {
     std::scoped_lock lock{primitive_set_mutex, world_mutex};
+
+    robot_status.mutable_network_status()->set_primitive_packet_loss_percentage(
+        static_cast<unsigned int>(primitive_tracker.getLossRate() * 100));
+    robot_status.mutable_network_status()->set_world_packet_loss_percentage(
+        static_cast<unsigned int>(world_tracker.getLossRate() * 100));
+
     // Rate limit sending of proto based on thunderloop freq
     if (shouldSendNewRobotStatus(robot_status))
     {
