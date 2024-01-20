@@ -127,7 +127,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     eventually_validation_sequence_set = [[]]
 
     eventually_validation_sequence_set[0].append(
-        BallEventuallyExitsRegion(regions=tbots.Circle(ball_initial_pos, 0.05))
+        BallEventuallyExitsRegion(regions=[tbots.Circle(ball_initial_pos, 0.05)])
     )
 
     simulated_test_runner.run_test(
