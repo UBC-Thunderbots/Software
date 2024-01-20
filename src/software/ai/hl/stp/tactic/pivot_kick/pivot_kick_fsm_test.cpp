@@ -20,9 +20,7 @@ TEST(PivotKickFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM::StartState>));
 
     fsm.process_event(PivotKickFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     // Robot now has the ball at the right location and is pointing in the right direction
@@ -34,13 +32,9 @@ TEST(PivotKickFSMTest, test_transitions)
     EXPECT_TRUE(robot.isNearDribbler(world.ball().position()));
     // it takes two ticks for the fsm to realize that it's in the kick state
     fsm.process_event(PivotKickFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     fsm.process_event(PivotKickFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     // Transition to KickState
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM::KickState>));
 
@@ -52,8 +46,6 @@ TEST(PivotKickFSMTest, test_transitions)
 
     // Tactic is done
     fsm.process_event(PivotKickFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }

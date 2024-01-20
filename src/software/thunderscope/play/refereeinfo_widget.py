@@ -6,7 +6,6 @@ from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.py_constants import SECONDS_PER_MICROSECOND, SECONDS_PER_MINUTE
 from software.thunderscope.common.common_widgets import set_table_data
-
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
@@ -19,10 +18,9 @@ class RefereeInfoWidget(QWidget):
     HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
     ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
 
-    def __init__(self, buffer_size=5):
+    def __init__(self, buffer_size: int = 5) -> None:
         """Shows the referee information 
 
-        :param minimum_column_width: minimum width of columns
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 
@@ -41,7 +39,7 @@ class RefereeInfoWidget(QWidget):
         self.vertical_layout.addWidget(self.referee_info)
         self.setLayout(self.vertical_layout)
 
-    def refresh(self):
+    def refresh(self) -> None:
         """Update the referee info widget with new referee information
         """
         referee = self.referee_buffer.get(block=False)
@@ -73,18 +71,21 @@ class RefereeInfoWidget(QWidget):
             else:
                 team_info.append(team_info_name)
 
+        for team_info_name in referee_msg_dict["yellow"]:
+            if team_info_name in team_info:
+                continue
+
+            if team_info_name == "timeouts":
+                team_info.append("remainingTimeouts")
+            elif team_info_name == "goalkeeper":
+                team_info.append("goalkeeperID")
+            else:
+                team_info.append(team_info_name)
+
         for info in team_info:
             if info == "yellowCardTimes":
-                text = ""
-                for time in referee_msg_dict["blue"]["yellowCardTimes"]:
-                    formatted_time = int(time * SECONDS_PER_MICROSECOND)
-                    text = text + str(formatted_time) + ", "
-                blue.append(text)
-                text = ""
-                for time in referee_msg_dict["yellow"]["yellowCardTimes"]:
-                    formatted_time = int(time * SECONDS_PER_MICROSECOND)
-                    text = text + str(formatted_time) + ", "
-                yellow.append(text)
+                blue.append(self.parse_yellow_card_times(referee_msg_dict["blue"]))
+                yellow.append(self.parse_yellow_card_times(referee_msg_dict["yellow"]))
             elif info == "remainingTimeouts":
                 blue.append(referee_msg_dict["blue"]["timeouts"])
                 yellow.append(referee_msg_dict["yellow"]["timeouts"])
@@ -104,3 +105,25 @@ class RefereeInfoWidget(QWidget):
 
         self.referee_table.resizeColumnsToContents()
         self.referee_table.resizeRowsToContents()
+
+    def parse_yellow_card_times(self, team_info: TeamInfo) -> str:
+        """
+        Parses yellow card times from a TeamInfo Protobuf dict as a string output.
+
+        :param team_info: TeamInfo protobuf dict to parse
+        """
+        text = ""
+        if "yellowCardTimes" in team_info:
+            yellow_card_times = team_info["yellowCardTimes"]
+            for i in range(0, len(yellow_card_times) - 1):
+                formatted_time = int(yellow_card_times[i] * SECONDS_PER_MICROSECOND)
+                text = text + str(formatted_time) + ", "
+
+            formatted_time = int(
+                yellow_card_times[len(yellow_card_times) - 1] * SECONDS_PER_MICROSECOND
+            )
+            text = text + str(formatted_time)
+        else:
+            text = "0"
+
+        return text

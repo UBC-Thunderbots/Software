@@ -13,8 +13,6 @@ from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_geometry_pb2 import Vector2
 
 # TODO (#2599): Remove Duration parameter from test
-
-
 def test_two_ai_ball_placement(simulated_test_runner):
 
     # placement point must be Vector2 to work with game controller
@@ -48,14 +46,14 @@ def test_two_ai_ball_placement(simulated_test_runner):
         ]
 
         # Game Controller Setup
-        simulated_test_runner.gamecontroller.send_ci_input(
+        simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.gamecontroller.send_ci_input(
+        simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
         # Pass in placement point here - not required for all play tests
-        simulated_test_runner.gamecontroller.send_ci_input(
+        simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.BALL_PLACEMENT,
             team=Team.BLUE,
             final_ball_placement_point=ball_final_pos,

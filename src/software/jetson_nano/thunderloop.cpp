@@ -65,7 +65,7 @@ extern "C"
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
                          const int loop_hz)
-    // TODO (#2495): Set the friendly team colour once we receive World proto
+    // TODO (#2495): Set the friendly team colour
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
       motor_status_(std::nullopt),
@@ -74,7 +74,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
       network_interface_(redis_client_->getSync(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
       loop_hz_(loop_hz),
-      kick_slope_(std::stoi(redis_client_->getSync(ROBOT_KICK_SLOPE_REDIS_KEY))),
+      kick_coeff_(std::stod(redis_client_->getSync(ROBOT_KICK_EXP_COEFF_REDIS_KEY))),
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
@@ -104,7 +104,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
 
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
-        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+        PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
@@ -178,9 +178,7 @@ Thunderloop::~Thunderloop() {}
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
-                auto result       = network_service_->poll(robot_status_);
-                new_primitive_set = std::get<0>(result);
-                new_world         = std::get<1>(result);
+                new_primitive_set = network_service_->poll(robot_status_);
             }
 
             thunderloop_status_.set_network_service_poll_time_ms(
@@ -222,22 +220,6 @@ Thunderloop::~Thunderloop() {}
                 }
             }
 
-            struct timespec time_since_last_vision_received;
-            clock_gettime(CLOCK_MONOTONIC, &current_time);
-            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_received_time,
-                                              &time_since_last_vision_received);
-            network_status_.set_ms_since_last_vision_received(
-                getMilliseconds(time_since_last_vision_received));
-
-            // If the world msg is new, update the internal buffer
-            if (new_world.time_sent().epoch_timestamp_seconds() >
-                world_.time_sent().epoch_timestamp_seconds())
-            {
-                clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
-                primitive_executor_.updateWorld(new_world);
-                world_ = new_world;
-            }
-
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
@@ -261,15 +243,10 @@ Thunderloop::~Thunderloop() {}
                 if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
                     primitive_executor_.setStopPrimitive();
-
-                    // Log milliseconds since last world received if we are timing out
-                    LOG(WARNING)
-                        << "Primitive timeout, overriding with StopPrimitive - Milliseconds since last primitive: "
-                        << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
-                               MILLISECONDS_PER_NANOSECOND;
                 }
 
-                direct_control_ = *primitive_executor_.stepPrimitive();
+                direct_control_ =
+                    *primitive_executor_.stepPrimitive(primitive_executor_status_);
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(
@@ -279,7 +256,7 @@ Thunderloop::~Thunderloop() {}
             {
                 ScopedTimespecTimer timer(&poll_time);
                 power_status_ =
-                    power_service_->poll(direct_control_.power_control(), kick_slope_,
+                    power_service_->poll(direct_control_.power_control(), kick_coeff_,
                                          kick_constant_, chip_pulse_width_);
             }
             thunderloop_status_.set_power_service_poll_time_ms(
@@ -343,6 +320,8 @@ Thunderloop::~Thunderloop() {}
             *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
             *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
+            *(robot_status_.mutable_primitive_executor_status()) =
+                primitive_executor_status_;
 
             // Update Redis
             redis_client_->setNoCommit(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,

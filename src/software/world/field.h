@@ -454,11 +454,11 @@ class Field
     // The x-coordinate distance from the goal centre to the penalty mark
     double goal_centre_to_penalty_mark_;
     // The following are used for caching to improve performance
-    Rectangle enemy_defense_area;
-    Rectangle friendly_defense_area;
-    Rectangle field_lines;
-    Rectangle enemy_goal;
-    Rectangle friendly_goal;
+    Rectangle enemy_defense_area_;
+    Rectangle friendly_defense_area_;
+    Rectangle field_lines_;
+    Rectangle enemy_goal_;
+    Rectangle friendly_goal_;
 };
 
 namespace std

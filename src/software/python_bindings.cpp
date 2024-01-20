@@ -7,11 +7,13 @@
 #include <sstream>
 
 #include "proto/geometry.pb.h"
+#include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/parameters.pb.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
+#include "proto/ssl_autoref_ci.pb.h"
 #include "proto/ssl_gc_referee_message.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -121,6 +123,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
         .def("rotate", &Vector::rotate)
         .def("orientation", &Vector::orientation)
+        .def("dot", &Vector::dot)
         // Overloaded
         .def(py::self + py::self)
         .def(py::self += py::self)
@@ -249,6 +252,8 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createVectorProto", &createVectorProto);
     m.def("createSegmentProto", &createSegmentProto);
 
+    m.def("createGeometryData", &createGeometryData);
+
     m.def("contains", py::overload_cast<const Circle&, const Segment&>(&contains));
     m.def("contains", py::overload_cast<const Circle&, const Point&>(&contains));
     m.def("contains", py::overload_cast<const Polygon&, const Point&>(&contains));
@@ -323,8 +328,6 @@ PYBIND11_MODULE(python_bindings, m)
         .def("field", &World::field);
 
     // Listeners
-    declareThreadedProtoUdpListener<TbotsProto::HRVOVisualization>(m,
-                                                                   "HRVOVisualization");
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");
@@ -341,4 +344,10 @@ PYBIND11_MODULE(python_bindings, m)
         m, "ThreadedEstopReader")
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
+
+    py::enum_<EstopState>(m, "EstopStates")
+        .value("STOP", EstopState::STOP)
+        .value("PLAY", EstopState::PLAY)
+        .value("STATUS_ERROR", EstopState::STATUS_ERROR)
+        .export_values();
 }

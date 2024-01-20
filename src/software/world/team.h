@@ -256,16 +256,16 @@ class Team
     Timestamp getMostRecentTimestampFromRobots();
 
     // The robots on this team
-    std::vector<Robot> team_robots;
+    std::vector<Robot> team_robots_;
 
     // The robot id of the goalie for this team
-    std::optional<unsigned int> goalie_id;
+    std::optional<unsigned int> goalie_id_;
 
     // The duration for which a Robot must not have been updated for before
     // being removed from this team.
-    Duration robot_expiry_buffer_duration;
+    Duration robot_expiry_buffer_duration_;
 
-    Timestamp last_update_timestamp;
+    Timestamp last_update_timestamp_;
 };
 
 enum class TeamType
