@@ -1,21 +1,25 @@
+from __future__ import annotations
+
+import logging
 import os
 import socket
 import time
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
+from subprocess import Popen
 from typing import Any
 
-from subprocess import Popen
+from proto.import_all_protos import *
+from proto.ssl_gc_common_pb2 import Team as SslTeam
+from software.networking.ssl_proto_communication import *
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
-from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
 
 
 class Gamecontroller(object):
-
     """ Gamecontroller Context Manager """
 
     CI_MODE_LAUNCH_DELAY_S = 0.3
@@ -63,8 +67,7 @@ class Gamecontroller(object):
             # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
             time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
 
-            self.ci_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.ci_socket.connect(("", self.ci_port))
+            self.ci_socket = SslSocket(self.ci_port)
 
         return self
 
@@ -107,11 +110,13 @@ class Gamecontroller(object):
         self,
         blue_full_system_proto_unix_io: ProtoUnixIO,
         yellow_full_system_proto_unix_io: ProtoUnixIO,
+        autoref_proto_unix_io: ProtoUnixIO = None,
     ) -> None:
         """Setup gamecontroller io
 
         :param blue_full_system_proto_unix_io: The proto unix io of the blue full system.
         :param yellow_full_system_proto_unix_io: The proto unix io of the yellow full system.
+        :param autoref_proto_unix_io: The proto unix io for the autoref
 
         """
 
@@ -124,12 +129,14 @@ class Gamecontroller(object):
             """
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
+            if autoref_proto_unix_io is not None:
+                autoref_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
             Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
         )
 
-    def send_ci_input(
+    def send_gc_command(
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
@@ -144,19 +151,20 @@ class Gamecontroller(object):
 
         :param gc_command: The gc command to send
         :param team: The team to send the command to
+        :param final_ball_placement_point: ball placement point for BallPlacement messages
         :return: The response CiOutput containing 1 or more refree msgs
 
         """
-        ci_ci_input = CiInput(timestamp=int(time.time_ns()))
-        ci_input = Input()
-        ci_change = Change()
-        ci_new_command = NewCommand()
-        ci_command = Command(type=gc_command, for_team=team)
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        api_input = Input()
+        change = Change()
+        new_command = NewCommand()
+        command = Command(type=gc_command, for_team=team)
 
-        ci_new_command.command.CopyFrom(ci_command)
-        ci_change.new_command.CopyFrom(ci_new_command)
-        ci_input.change.CopyFrom(ci_change)
-        ci_ci_input.api_inputs.append(ci_input)
+        new_command.command.CopyFrom(command)
+        change.new_command.CopyFrom(new_command)
+        api_input.change.CopyFrom(change)
+        ci_input.api_inputs.append(api_input)
 
         # Do this only if ball placement pos is specified
         if final_ball_placement_point:
@@ -168,33 +176,129 @@ class Gamecontroller(object):
                     y=float(final_ball_placement_point.y()),
                 )
             )
-            ci_change = Change()
-            ci_input = Input()
-            ci_change.set_ball_placement_pos.CopyFrom(ball_placement_pos)
-            ci_input.change.CopyFrom(ci_change)
-            ci_ci_input.api_inputs.append(ci_input)
+            change = Change()
+            api_input = Input()
+            change.set_ball_placement_pos.CopyFrom(ball_placement_pos)
+            api_input.change.CopyFrom(change)
+            ci_input.api_inputs.append(api_input)
 
             # Start Placement
-            ci_change = Change()
-            ci_input = Input()
+            change = Change()
+            api_input = Input()
             start_placement = StartBallPlacement()
-            ci_change.start_ball_placement.CopyFrom(start_placement)
-            ci_input.change.CopyFrom(ci_change)
-            ci_ci_input.api_inputs.append(ci_input)
+            change.start_ball_placement.CopyFrom(start_placement)
+            api_input.change.CopyFrom(change)
+            ci_input.api_inputs.append(api_input)
 
-        # https://cwiki.apache.org/confluence/display/GEODE/Delimiting+Protobuf+Messages
-        size = ci_ci_input.ByteSize()
+        ci_output_list = self.send_ci_input(ci_input)
 
-        # Send a request to the host with the size of the message
-        self.ci_socket.send(
-            encoder._VarintBytes(size) + ci_ci_input.SerializeToString()
+        return ci_output_list
+
+    def send_ci_input(self, ci_input: proto.ssl_gc_ci_pb2.CiInput) -> list[CiOutput]:
+        """
+        Send CiInput proto to the Gamecontroller. Retries if the Gamecontroller output isn't parseable as a CiOutput proto
+
+        :param CiInput proto to send to the Gamecontroller
+
+        :return: a list of CiOutput protos received from the Gamecontroller
+        """
+        ci_output_list = list()
+        while True:
+            try:
+                self.ci_socket.send(ci_input)
+                ci_output_list = self.ci_socket.receive(CiOutput)
+                break
+            except SslSocketProtoParseException as parse_err:
+                logging.info(
+                    "error receiving CiOutput proto from the gamecontroller: "
+                    + parse_err.args
+                )
+
+        return ci_output_list
+
+    def reset_team(self, name: str, team: str) -> UpdateTeamState:
+        """
+        Returns an UpdateTeamState proto for the gamecontroller to reset team info.
+
+        :param name name of the new team
+        :param team yellow or blue team to update
+
+        :return: corresponding UpdateTeamState proto
+        """
+        update_team_state = UpdateTeamState()
+        update_team_state.for_team = team
+        update_team_state.team_name = name
+        update_team_state.goals = 0
+        update_team_state.timeouts_left = 4
+        update_team_state.timeout_time_left = "05:00"
+        update_team_state.can_place_ball = True
+
+        return update_team_state
+
+    def reset_game(self, division: proto.ssl_gc_common_pb2.Division) -> UpdateConfig:
+        """
+        Returns an UpdateConfig proto for the Gamecontroller to reset game info.
+
+        :param division the Division proto corresponding to the game division to set up the Gamecontroller for
+
+        :return: corresponding UpdateConfig proto
+        """
+        game_update = UpdateConfig()
+        game_update.division = division
+        game_update.first_kickoff_team = SslTeam.BLUE
+        game_update.auto_continue = True
+        game_update.match_type = MatchType.FRIENDLY
+
+        return game_update
+
+    def reset_team_info(
+        self, division: proto.ssl_gc_common_pb2.Division
+    ) -> list[CiOutput]:
+        """
+        Sends a message to the Gamecontroller to reset Team information.
+
+        :param division: the Division proto corresponding to the game division to set up the Gamecontroller for
+
+        :return: a list of CiOutput protos from the Gamecontroller
+        """
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+        input_blue_update = Input()
+        input_blue_update.reset_match = True
+        input_blue_update.change.update_team_state.CopyFrom(
+            self.reset_team("BLUE", SslTeam.BLUE)
         )
 
-        response_data = self.ci_socket.recv(
-            Gamecontroller.CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE
+        input_yellow_update = Input()
+        input_yellow_update.reset_match = True
+        input_yellow_update.change.update_team_state.CopyFrom(
+            self.reset_team("YELLOW", SslTeam.YELLOW)
         )
 
-        msg_len, new_pos = decoder._DecodeVarint32(response_data, 0)
-        ci_output = CiOutput()
-        ci_output.ParseFromString(response_data[new_pos : new_pos + msg_len])
-        return ci_output
+        input_game_update = Input()
+        input_game_update.reset_match = True
+        input_game_update.change.update_config.CopyFrom(self.reset_game(division))
+
+        ci_input.api_inputs.append(input_blue_update)
+        ci_input.api_inputs.append(input_yellow_update)
+        ci_input.api_inputs.append(input_game_update)
+
+        return self.send_ci_input(ci_input)
+
+    def update_game_engine_config(
+        self, config: proto.ssl_gc_engine_config_pb2
+    ) -> list[CiOutput]:
+        """
+        Sends a game engine config update.
+
+        :param config: the new SSL game engine config
+
+        :return: a list of CiOutput protos from the Gamecontroller
+        """
+        ci_input = CiInput(timestamp=int(time.time_ns()))
+
+        game_config_input = Input()
+        game_config_input.config_delta.CopyFrom(config)
+
+        ci_input.api_inputs.append(game_config_input)
+
+        return self.send_ci_input(ci_input)
