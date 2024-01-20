@@ -199,9 +199,8 @@ class GLWorldLayer(GLLayer):
 
         # Cap the maximum kick speed
         if self.ball_velocity_vector.length() > BALL_MAX_SPEED_METERS_PER_SECOND:
-            self.ball_velocity_vector = self.ball_velocity_vector.normalize(
-                BALL_MAX_SPEED_METERS_PER_SECOND
-            )
+            self.ball_velocity_vector.normalize()
+            self.ball_velocity_vector *= BALL_MAX_SPEED_METERS_PER_SECOND
 
     def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was released after picking a point in the 3D scene
