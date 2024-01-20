@@ -285,7 +285,7 @@ if __name__ == "__main__":
                 for tab in tscope_config.tabs:
                     # handle the signal emitted from switching
                     if tab.key == TabKeys.DIAGNOSTICS:
-                        control_input_widget = tab.find_widget("Manual Control Input")
+                        control_input_widget = tab.find_widget("Diagnostics")
                         if control_input_widget:
                             control_input_widget.toggle_controls_signal(
                                 lambda control_mode: robot_communication.toggle_input_mode(

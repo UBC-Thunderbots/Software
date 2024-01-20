@@ -87,12 +87,6 @@ class ChickerWidget(QWidget):
         vbox_layout.addWidget(self.radio_button_box)
 
         # sliders
-        (
-            self.geneva_slider_layout,
-            self.geneva_slider,
-            self.geneva_label,
-        ) = common_widgets.create_slider("Geneva Position", 0, NUM_GENEVA_ANGLES - 1, 1)
-        vbox_layout.addLayout(self.geneva_slider_layout)
 
         (
             self.power_slider_layout,
@@ -168,12 +162,10 @@ class ChickerWidget(QWidget):
         """
 
         # gets slider values
-        geneva_value = self.geneva_slider.value()
-
         power_value = self.power_slider.value()
 
         power_control = PowerControl()
-        power_control.geneva_slot = geneva_value
+        power_control.geneva_slot = self.geneva_value
 
         # sends kick, chip, autokick, or autchip primitive
         if command == ChickerCommandMode.KICK:
@@ -223,10 +215,7 @@ class ChickerWidget(QWidget):
 
     def refresh(self) -> None:
 
-        # gets slider values and sets label to that value
-        geneva_value = self.geneva_slider.value()
-        self.geneva_label.setText(Slot.Name(geneva_value))
-
+        # get power value slider value and set the label to that value
         power_value = self.power_slider.value()
         self.power_label.setText(str(power_value))
 

@@ -11,7 +11,6 @@ from software.thunderscope.constants import (
 )
 from software.thunderscope.controller_diagnostics import ControllerDiagnostics
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
-from software.thunderscope.robot_input_control_manager import RobotInputControlManager
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
@@ -19,8 +18,10 @@ from software.py_constants import *
 from google.protobuf.message import Message
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
-from typing import Type
+from typing import Type, Optional
 from queue import Empty
+
+from software.thunderscope.thunderscope_main import NUM_ROBOTS
 
 
 class RobotCommunication(object):
@@ -67,14 +68,6 @@ class RobotCommunication(object):
 
         self.current_proto_unix_io.register_observer(World, self.world_buffer)
 
-        self.control_manager = RobotInputControlManager(
-            input_device_path,
-            self.send_move_command,
-            self.send_kick_command,
-            self.end_chip_command,
-        )
-        # TODO initialize callbacks for manager
-
         self.current_proto_unix_io.register_observer(
             PrimitiveSet, self.primitive_buffer
         )
@@ -92,8 +85,18 @@ class RobotCommunication(object):
             target=self.__run_primitive_set, daemon=True
         )
 
-        self.__robot_id_input_source_map: set[(int, IndividualRobotMode)] = set()
-        self.__robots_to_be_disconnected: set[int] = {}
+        self.robot_id_control_mode_dict: dict[int, ControlMode] = {
+            i:ControlMode.DIAGNOSTICS for i in range(NUM_ROBOTS)
+        }
+        self.robot_id_individual_mode_dict: dict[int, IndividualRobotMode] = {
+            i:IndividualRobotMode.NONE for i in range(NUM_ROBOTS)
+        }
+
+        self.robot_id_estop_send_count_dict: dict[int, int] = {
+            i:0 for i in range(NUM_ROBOTS)
+        }
+
+
 
         # initialising the estop
         # tries to access a plugged in estop. if not found, throws an exception
@@ -147,9 +150,14 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface, VISION_PORT, True
         )
 
-        self.robots_connected_to_fullsystem = {
-            robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
-        }
+        for key in self.robot_id_individual_mode_dict:
+            # does this work in python. how do lambda not unpack tuples wtf thats an actual sin
+            self.robot_id_individual_mode_dict.items[key] = IndividualRobotMode.AI
+
+
+        # self.robots_connected_to_fullsystem = {
+        #     robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+        # }
 
         self.run_world_thread.start()
 
@@ -170,6 +178,7 @@ class RobotCommunication(object):
                 )
             )
 
+
     def toggle_robot_control_mode(self, robot_id: int, mode: IndividualRobotMode):
         """
         Changes the input mode for a robot between None, Manual, or AI
@@ -180,27 +189,23 @@ class RobotCommunication(object):
         :param robot_id: the id of the robot whose mode we're changing
         """
 
-        self.__robots_to_be_disconnected[robot_id] = NUM_TIMES_SEND_STOP
-        self.__robot_id_input_source_map = set(
+        self.robot_id_individual_mode_dict = set(
             map(
                 lambda robot_control: (robot_id, mode)
                 if robot_id == robot_control[0]
                 else robot_control,
-                self.__robot_id_input_source_map,
+                self.robot_id_individual_mode_dict,
             )
         )
 
-        # TODO remove this
-        self.robots_connected_to_fullsystem.discard(robot_id)
-        self.robots_connected_to_manual.discard(robot_id)
-        self.robots_to_be_disconnected.pop(robot_id, None)
+        self.robot_id_estop_send_count_dict.pop(robot_id, None)
 
         if mode == IndividualRobotMode.NONE:
-            self.robots_to_be_disconnected[robot_id] = NUM_TIMES_SEND_STOP
-        elif mode == IndividualRobotMode.MANUAL:
-            self.robots_connected_to_manual.add(robot_id)
-        elif mode == IndividualRobotMode.AI:
-            self.robots_connected_to_fullsystem.add(robot_id)
+            self.robot_id_estop_send_count_dict[robot_id] = NUM_TIMES_SEND_STOP
+        # elif mode == IndividualRobotMode.MANUAL:
+        #     self.robots_connected_to_manual.add(robot_id)
+        # elif mode == IndividualRobotMode.AI:
+        #     self.robots_connected_to_fullsystem.add(robot_id)
 
     def toggle_input_mode(self, mode: ControlMode):
         """
@@ -208,7 +213,10 @@ class RobotCommunication(object):
 
         :param mode: Control mode to use when sending diagnostics primitives
         """
-        self.control_manager.toggle_input_mode(mode)
+        if mode == ControlMode.XBOX and self.__controller_diagnostics is not None:
+            self.__input_mode = mode
+        else:
+            self.__input_mode = ControlMode.DIAGNOSTICS
 
     def __send_estop_state(self) -> None:
         """
@@ -244,7 +252,8 @@ class RobotCommunication(object):
         return (
             self.estop_mode != EstopMode.DISABLE_ESTOP
             and self.estop_is_playing
-            and (self.robots_connected_to_fullsystem or self.robots_connected_to_manual)
+            # does python do what i think it does here
+            and (IndividualRobotMode.AI or IndividualRobotMode.MANUAL in self.robot_id_individual_mode_dict.values())
         )
 
     def __run_world(self):
@@ -267,43 +276,6 @@ class RobotCommunication(object):
             if world and self.__should_send_packet():
                 # send the world proto
                 self.send_world.send_proto(world)
-
-    def send_move_command(
-        self, dribbler_speed: int, move_x: int, move_y: int, ang_vel: int
-    ):
-        motor_control = MotorControl()
-
-        motor_control.dribbler_speed_rpm = 0
-        if self.enable_dribbler:
-            motor_control.dribbler_speed_rpm = dribbler_speed
-
-        motor_control.direct_velocity_control.velocity.x_component_meters = move_x
-        motor_control.direct_velocity_control.velocity.y_component_meters = move_y
-        motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-            ang_vel
-        )
-
-        print(motor_control)
-
-        self.proto_unix_io.send_proto(MotorControl, motor_control)
-
-    def send_kick_command(self, power: int):
-        power_control = PowerControl()
-        power_control.geneva_slot = 1
-        power_control.chicker.kick_speed_m_per_s = power
-
-        print(power_control)
-
-        self.proto_unix_io.send_proto(PowerControl, power_control)
-
-    def send_chip_command(self, distance: int):
-        power_control = PowerControl()
-        power_control.geneva_slot = 1
-        power_control.chicker.chip_distance_meters = distance
-
-        print(power_control)
-
-        self.proto_unix_io.send_proto(PowerControl, power_control)
 
     def __run_primitive_set(self) -> None:
         """Forward PrimitiveSet protos from fullsystem to the robots.
@@ -328,7 +300,12 @@ class RobotCommunication(object):
             robot_primitives = {}
 
             # fullsystem is running, so world data is being received
-            if self.robots_connected_to_fullsystem:
+            ai_robots : dict[int, IndividualRobotMode] = (
+                filter(lambda robot_mode: robot_mode[1] == IndividualRobotMode.AI,
+                       self.robot_id_individual_mode_dict)
+            )
+
+            if ai_robots:
                 # Get the primitives
                 primitive_set = self.primitive_buffer.get(
                     block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
@@ -336,7 +313,7 @@ class RobotCommunication(object):
 
                 fullsystem_primitives = dict(primitive_set.robot_primitives)
                 for robot_id in fullsystem_primitives.keys():
-                    if robot_id in self.robots_connected_to_fullsystem:
+                    if robot_id in ai_robots.keys():
                         robot_primitives[robot_id] = fullsystem_primitives[robot_id]
 
             # get the manual control primitive
@@ -346,19 +323,24 @@ class RobotCommunication(object):
             )
 
             # diagnostics is running
-            if self.robots_connected_to_manual:
+            manual_robots : dict[int, IndividualRobotMode] = (
+                filter(lambda robot_mode: robot_mode[1] == IndividualRobotMode.AI,
+                       self.robot_id_individual_mode_dict)
+            )
+
+            if manual_robots:
                 # for all robots connected to diagnostics, set their primitive
-                for robot_id in self.robots_connected_to_manual:
+                for robot_id in manual_robots:
                     robot_primitives[robot_id] = Primitive(
                         direct_control=diagnostics_primitive
                     )
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives
-            for robot_id, num_times_to_stop in self.robots_to_be_disconnected.items():
+            for robot_id, num_times_to_stop in self.robot_id_estop_send_count_dict.items():
                 if num_times_to_stop > 0:
                     robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
-                    self.robots_to_be_disconnected[robot_id] = num_times_to_stop - 1
+                    self.robot_id_estop_send_count_dict[robot_id] = num_times_to_stop - 1
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(
@@ -380,7 +362,7 @@ class RobotCommunication(object):
                 self.should_send_stop = False
 
             # sleep if not running fullsystem
-            if not self.robots_connected_to_fullsystem:
+            if not ai_robots:
                 time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
     def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:

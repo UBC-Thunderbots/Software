@@ -35,6 +35,7 @@ from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
     FullSystemConnectWidget,
 )
+from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
@@ -288,5 +289,19 @@ def setup_drive_and_dribbler_widget(
 
     """
     drive_and_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
+
+    return drive_and_dribbler_widget
+
+
+def setup_diagnostics_widget(
+        proto_unix_io: ProtoUnixIO,
+) -> DriveAndDribblerWidget:
+    """Setup the drive and dribbler widget
+
+    :param proto_unix_io: The proto unix io object
+    :returns: The drive and dribbler widget
+
+    """
+    drive_and_dribbler_widget = DiagnosticsWidget(proto_unix_io)
 
     return drive_and_dribbler_widget
