@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 
 #include "software/ai/evaluation/find_open_areas.h"
+#include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/math/math_functions.h"
 
 Point GoalieFSM::getGoaliePositionToBlock(
@@ -151,11 +152,10 @@ void GoalieFSM::panic(const Update &event)
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();
 
-    event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 0.0, false,
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-        max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
 }
 
 void GoalieFSM::updatePivotKick(
@@ -190,16 +190,10 @@ void GoalieFSM::positionToBlock(const Update &event)
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();
 
-    // what should the final goalie speed be, so that the goalie accelerates
-    // faster
-    auto goalie_final_speed = goalie_tactic_config.goalie_final_speed();
-
-    event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, goalie_final_speed, false,
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-        max_allowed_speed_mode, 0.0, event.common.robot.robotConstants(),
-        std::optional<double>()));
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
 }
 
 bool GoalieFSM::ballInDefenseArea(const Update &event)
@@ -215,10 +209,9 @@ bool GoalieFSM::shouldMoveToGoalLine(const Update &event)
 
 void GoalieFSM::moveToGoalLine(const Update &event)
 {
-    event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(event.common.world.field().friendlyGoalCenter()),
-        Angle::zero(), 0, false, TbotsProto::DribblerMode::OFF,
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, event.common.world.field().friendlyGoalCenter(),
+        Angle::zero(), max_allowed_speed_mode, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
-        event.common.robot.robotConstants(), std::optional<double>()));
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
 }

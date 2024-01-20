@@ -83,9 +83,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     // Robot should be trying to block possible pass to the shadowee
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
-        TacticUpdate(
-            shadower, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::BlockPassState>));
 
     // Shadowee now has the ball, our robot should move to block the shot
@@ -94,9 +92,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     world = ::TestUtil::setBallPosition(world, Point(0, -2), Timestamp::fromSeconds(0));
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
-        TacticUpdate(
-            shadower, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // Shadowee now has the ball
@@ -104,9 +100,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     // shot block position
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
-        TacticUpdate(
-            shadower, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // Shadowee still has possession of the ball and robot has arrived at block shot
@@ -120,18 +114,14 @@ TEST(ShadowEnemyFSMTest, test_transitions)
         Timestamp::fromSeconds(0));
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
-        TacticUpdate(
-            shadower, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::StealAndChipState>));
 
     // Shadowee still has possession of the ball
     // Robot should continue to try and steal and chip the ball
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
-        TacticUpdate(
-            shadower, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::StealAndChipState>));
 
     // Either the ball has been stolen and chipped by our robot or the
@@ -141,17 +131,13 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     world = ::TestUtil::setBallPosition(world, Point(0, 2), Timestamp::fromSeconds(0));
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
-        TacticUpdate(
-            shadower, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     // Enemy has the ball but not the shadowee (same as first transition)
     // Robot should be trying to block possible pass to the shadowee
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
-        TacticUpdate(
-            shadower, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::BlockPassState>));
 }
