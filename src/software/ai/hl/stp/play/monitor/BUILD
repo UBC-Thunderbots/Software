@@ -4,7 +4,7 @@ cc_library(
     name = "play_monitor",
     srcs = [
         "play_intent.cpp",
-        "play_monitor.cpp"
+        "play_monitor.cpp",
     ],
     hdrs = [
         "play_intent.h",

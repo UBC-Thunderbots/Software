@@ -1,25 +1,22 @@
 #pragma once
 #include "software/geom/point.h"
-#include "software/world/world.h"
 #include "software/logger/logger.h"
+#include "software/world/world.h"
 
 enum IntentType
 {
-    PASS = 0,
-    SHOT = 1,
+    PASS    = 0,
+    SHOT    = 1,
     DRIBBLE = 2
 };
 
 class PlayIntent
 {
-public:
-
+   public:
     explicit PlayIntent(IntentType play_intent_type);
 
     IntentType getIntentType() const;
 
-private:
+   private:
     const IntentType intent;
 };
-
-

@@ -1,30 +1,29 @@
 #pragma once
 #include "play_intent.h"
-#include "software/world/world.h"
+#include "shared/constants.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
-#include "shared/constants.h"
-#include "play_intent.h"
 #include "software/logger/logger.h"
+#include "software/world/world.h"
 
 /**
- * Represents a class that monitors and computes a sucess score for a running play
+ * Represents a class that monitors and computes a success score for a running play
  */
 class PlayMonitor
 {
-public:
+   public:
     explicit PlayMonitor(const PlayIntent& initialIntent);
 
     void startMonitoring(const World& initialWorld);
-    double endMonitoring(const World &finalWorld);
+    double endMonitoring(const World& finalWorld);
     void updateWorld(const World& newWorld);
     void updatePlayIntent(PlayIntent newIntent);
 
-private:
+   private:
     double calculateIntentBallScore();
     double calculateIntentActionScore();
 
-    double calculateCurrentPlayScore(const World & finalWorld);
+    double calculateCurrentPlayScore(const World& finalWorld);
 
     PlayIntent intent;
     World world;
