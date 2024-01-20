@@ -299,6 +299,25 @@ class RobotCommunication(object):
             # total primitives for all robots
             robot_primitives = {}
 
+            # get the manual control primitive
+            diagnostics_primitive = DirectControlPrimitive(
+                motor_control=self.motor_control_diagnostics_buffer.get(block=False),
+                power_control=self.power_control_diagnostics_buffer.get(block=False),
+            )
+
+            # diagnostics is running
+            manual_robots : dict[int, IndividualRobotMode] = (
+                filter(lambda robot_mode: robot_mode[1] == IndividualRobotMode.MANUAL,
+                       self.robot_id_individual_mode_dict)
+            )
+
+            if manual_robots:
+                # for all robots connected to diagnostics, set their primitive
+                for robot_id in manual_robots:
+                    robot_primitives[robot_id] = Primitive(
+                        direct_control=diagnostics_primitive
+                    )
+
             # fullsystem is running, so world data is being received
             ai_robots : dict[int, IndividualRobotMode] = (
                 filter(lambda robot_mode: robot_mode[1] == IndividualRobotMode.AI,
@@ -316,24 +335,6 @@ class RobotCommunication(object):
                     if robot_id in ai_robots.keys():
                         robot_primitives[robot_id] = fullsystem_primitives[robot_id]
 
-            # get the manual control primitive
-            diagnostics_primitive = DirectControlPrimitive(
-                motor_control=self.motor_control_diagnostics_buffer.get(block=False),
-                power_control=self.power_control_diagnostics_buffer.get(block=False),
-            )
-
-            # diagnostics is running
-            manual_robots : dict[int, IndividualRobotMode] = (
-                filter(lambda robot_mode: robot_mode[1] == IndividualRobotMode.AI,
-                       self.robot_id_individual_mode_dict)
-            )
-
-            if manual_robots:
-                # for all robots connected to diagnostics, set their primitive
-                for robot_id in manual_robots:
-                    robot_primitives[robot_id] = Primitive(
-                        direct_control=diagnostics_primitive
-                    )
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives

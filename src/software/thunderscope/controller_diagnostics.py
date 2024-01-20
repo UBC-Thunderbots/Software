@@ -32,6 +32,7 @@ class ControllerDiagnostics(object):
             input_path: str,
             proto_unix_io: ProtoUnixIO,
     ):
+        # check if estop is in the way
         for device in evdev.list_devices():
             try:
                 self.controller = InputDevice(device)
