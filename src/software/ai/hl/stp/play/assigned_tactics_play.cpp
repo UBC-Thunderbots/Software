@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "software/ai/hl/stp/play/tactic_assignment.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
