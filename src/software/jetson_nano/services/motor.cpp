@@ -731,7 +731,6 @@ int32_t MotorService::tmc4671ReadThenWriteValue(uint8_t motor, uint8_t read_addr
         uint8_t byte_to_copy = (uint8_t)(0xff & (write_data >> 8 * i));
         write_tx_[4 - i]     = byte_to_copy;
     }
-    //    memcpy(write_tx_+1,&write_data,4);
 
     readThenWriteSpiTransfer(file_descriptors_[motor], read_tx_, write_tx_, read_rx_,
                              TMC4671_SPI_SPEED);
@@ -1081,8 +1080,6 @@ void MotorService::startController(uint8_t motor, bool dribbler)
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
     int chip_id = tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA);
 
-    //    int chip_id = tmc4671ReadThenWriteValue(motor, TMC4671_CHIPINFO_ADDR,
-    //    TMC4671_CHIPINFO_ADDR,0x1); LOG(FATAL) <<"CHIP ID: " << chip_id;
     CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
                                  << static_cast<uint32_t>(motor) << " is not responding";
 
