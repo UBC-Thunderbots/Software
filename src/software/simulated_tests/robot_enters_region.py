@@ -77,7 +77,7 @@ class NumberOfRobotsEntersRegion(Validation):
                 )):
                     robots_in_regions.add(robot.id)
 
-        # Validate on curr_cnt
+        # Validate on robots_in_regions
         if len(robots_in_regions) >= self.req_robot_cnt:
             return ValidationStatus.PASSING
 

@@ -17,6 +17,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     # starting point must be Point
     ball_initial_pos = tbots.Point(0, 0)
 
+
     # Setup Bots
     blue_bots = [
         tbots.Point(-3, 2.5),
@@ -43,9 +44,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     simulated_test_runner.gamecontroller.send_ci_input(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
-        gc_command=Command.Type.NORMAL_START, team=Team.BLUE
-    )
+
     if is_friendly_test:
         simulated_test_runner.gamecontroller.send_ci_input(
             gc_command=Command.Type.KICKOFF, team=Team.BLUE
@@ -58,6 +57,10 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         )
         blue_play.name = PlayName.KickoffEnemyPlay
         yellow_play.name = PlayName.KickoffFriendlyPlay
+
+    simulated_test_runner.gamecontroller.send_ci_input(
+        gc_command=Command.Type.NORMAL_START, team=Team.BLUE
+    )
 
     # Force play override here
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
@@ -83,6 +86,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     # TODO- #2809 Validation
     always_validation_sequence_set = [[]]
 
+
     if is_friendly_test:
         always_validation_sequence_set[0].append(
             NumberOfRobotsAlwaysStaysInRegion(
@@ -91,6 +95,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
                 req_robot_cnt=6,
             )
         )
+
 
         always_validation_sequence_set[0].append(
             OrValidation(
@@ -105,6 +110,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
                 )]
             )
         )
+
     else:
         always_validation_sequence_set[0].append(
             NumberOfRobotsAlwaysStaysInRegion(
@@ -113,6 +119,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
                 req_robot_cnt=6,
             )
         )
+
 
         always_validation_sequence_set[0].append(
             NumberOfRobotsAlwaysStaysInRegion(
@@ -124,11 +131,14 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     # Eventually Validation
     # TODO- #2809 Validation
     # make only for friendly
-    eventually_validation_sequence_set = [[]]
+    if(is_friendly_test):
+        eventually_validation_sequence_set = [[]]
+
 
     eventually_validation_sequence_set[0].append(
         BallEventuallyExitsRegion(regions=[tbots.Circle(ball_initial_pos, 0.05)])
     )
+
 
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -139,3 +149,5 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
     sys.exit(pytest.main([__file__, "-svv"]))
+
+
