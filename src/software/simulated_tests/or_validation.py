@@ -37,7 +37,6 @@ class OrValidation(Validation):
 
         return validation_geometry
 
-
     def get_validation_type(self, world):
         validation_type_initial = self.validation[0].get_validation_type
 

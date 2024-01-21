@@ -53,7 +53,7 @@ class RobotEntersRegion(Validation):
 
 class NumberOfRobotsEntersRegion(Validation):
 
-    """Checks if a certain number of Robots enters a specific region."""
+    """Checks if a certain number of Robots enters a specific set of regions."""
 
     def __init__(self, regions, req_robot_cnt):
         self.regions = regions
@@ -62,22 +62,21 @@ class NumberOfRobotsEntersRegion(Validation):
         self.robot_in_zone = {}
 
     def get_validation_status(self, world) -> ValidationStatus:
-        """Checks if a specific number of robots enter the provided region
+        """Checks if a specific number of robots enter the provided set of regions
 
         :param world: The world msg to validate
-        :returns: FAILING until req_robot_cnt robots enter the region
-                  PASSING when req_robot_cnt robots enters
+        :returns: FAILING until req_robot_cnt robots enter the set of regions
+                  PASSING when req_robot_cnt robots enter the set of regions
         # """
-        # Identify distinct robots within specified regions by ID
         robots_in_regions = set()
         for region in self.regions:
             for robot in world.friendly_team.team_robots:
-                if(tbots.contains(
-                         region, tbots.createPoint(robot.current_state.global_position)
-                )):
+                if tbots.contains(
+                    region, tbots.createPoint(robot.current_state.global_position)
+                ):
                     robots_in_regions.add(robot.id)
 
-        # Validate on robots_in_regions
+        # Validate on length of set robots_in_regions
         if len(robots_in_regions) >= self.req_robot_cnt:
             return ValidationStatus.PASSING
 

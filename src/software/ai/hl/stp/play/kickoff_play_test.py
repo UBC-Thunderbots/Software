@@ -12,11 +12,11 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 from software.simulated_tests.or_validation import OrValidation
 
-@pytest.mark.parametrize("is_friendly_test", [True, False])
+# TODO 3119 Fix KickoffEnemyPlay
+@pytest.mark.parametrize("is_friendly_test", [True, """False"""])
 def test_kickoff_play(simulated_test_runner, is_friendly_test):
     # starting point must be Point
     ball_initial_pos = tbots.Point(0, 0)
-
 
     # Setup Bots
     blue_bots = [
@@ -77,50 +77,50 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         ),
     )
 
-
-
-    # Always Validation
-    # add always validation: ball is always within bounds
-    # req_robot_cnt returns pass if it is not equal to 2 -
-    # need to create new validation sequence that works on "at least" logic
-    # TODO- #2809 Validation
+    # Always Validation: Check that robots are within centreCircle + friendlyHalf
     always_validation_sequence_set = [[]]
 
-
     if is_friendly_test:
+        # Checks that all robots are in friendly half + center circle
         always_validation_sequence_set[0].append(
             NumberOfRobotsAlwaysStaysInRegion(
-                regions=[tbots.Field.createSSLDivisionBField().friendlyHalf(),
-                        tbots.Field.createSSLDivisionBField().centerCircle()],
+                regions=[
+                    tbots.Field.createSSLDivisionBField().friendlyHalf(),
+                    tbots.Field.createSSLDivisionBField().centerCircle(),
+                ],
                 req_robot_cnt=6,
             )
         )
 
-
+        # Checks that either 0 or 1 robots are in centerCircle
         always_validation_sequence_set[0].append(
             OrValidation(
                 [
-                NumberOfRobotsAlwaysStaysInRegion(
-                    regions=[tbots.Field.createSSLDivisionBField().centerCircle()],
-                    req_robot_cnt=0,
-                ),
-                NumberOfRobotsAlwaysStaysInRegion(
-                    regions=[tbots.Field.createSSLDivisionBField().centerCircle()],
-                    req_robot_cnt=1,
-                )]
+                    NumberOfRobotsAlwaysStaysInRegion(
+                        regions=[tbots.Field.createSSLDivisionBField().centerCircle()],
+                        req_robot_cnt=0,
+                    ),
+                    NumberOfRobotsAlwaysStaysInRegion(
+                        regions=[tbots.Field.createSSLDivisionBField().centerCircle()],
+                        req_robot_cnt=1,
+                    ),
+                ]
             )
         )
 
     else:
+        # Checks that all robots are in friendly half + center circle
         always_validation_sequence_set[0].append(
             NumberOfRobotsAlwaysStaysInRegion(
-                regions=[tbots.Field.createSSLDivisionBField().friendlyHalf(),
-                        tbots.Field.createSSLDivisionBField().centerCircle()],
+                regions=[
+                    tbots.Field.createSSLDivisionBField().friendlyHalf(),
+                    tbots.Field.createSSLDivisionBField().centerCircle(),
+                ],
                 req_robot_cnt=6,
             )
         )
 
-
+        # Checks that 0 robots are in centerCircle
         always_validation_sequence_set[0].append(
             NumberOfRobotsAlwaysStaysInRegion(
                 regions=[tbots.Field.createSSLDivisionBField().centerCircle()],
@@ -128,17 +128,14 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             )
         )
 
+    eventually_validation_sequence_set = [[]]
+
     # Eventually Validation
-    # TODO- #2809 Validation
-    # make only for friendly
-    if(is_friendly_test):
-        eventually_validation_sequence_set = [[]]
-
-
-    eventually_validation_sequence_set[0].append(
-        BallEventuallyExitsRegion(regions=[tbots.Circle(ball_initial_pos, 0.05)])
-    )
-
+    if is_friendly_test:
+        # Checks that ball leaves center point by 0.05 meters within 10 seconds of kickoff
+        eventually_validation_sequence_set[0].append(
+            BallEventuallyExitsRegion(regions=[tbots.Circle(ball_initial_pos, 0.05)])
+        )
 
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
@@ -146,8 +143,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         test_timeout_s=10,
     )
 
+
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
     sys.exit(pytest.main([__file__, "-svv"]))
-
-
