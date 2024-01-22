@@ -15,6 +15,7 @@ cc_library(
     # PlayFactory. This addresses the issue explained here:
     # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
     deps = [
+        "@tracy",
         "//proto:play_info_msg_cc_proto",
         "//software/ai/hl/stp/play:all_plays",
         "//software/ai/hl/stp/play:assigned_tactics_play",

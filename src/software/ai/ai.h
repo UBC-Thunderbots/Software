@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <Tracy.hpp>
 
 #include "proto/play_info_msg.pb.h"
 #include "software/ai/hl/stp/play/play.h"
