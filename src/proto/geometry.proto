@@ -57,13 +57,6 @@ message Segment
     required Point end   = 2;
 }
 
-message VelocityObstacle
-{
-    required Vector apex       = 1;
-    required Vector left_side  = 2;
-    required Vector right_side = 3;
-}
-
 message Stadium
 {
     required Segment segment = 1;

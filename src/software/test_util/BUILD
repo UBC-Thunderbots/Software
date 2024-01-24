@@ -5,12 +5,10 @@ cc_library(
     testonly = True,
     srcs = [
         "equal_within_tolerance.cpp",
-        "path_planning_test_util.cpp",
         "test_util.cpp",
     ],
     hdrs = [
         "equal_within_tolerance.h",
-        "path_planning_test_util.h",
         "test_util.h",
     ],
     deps = [

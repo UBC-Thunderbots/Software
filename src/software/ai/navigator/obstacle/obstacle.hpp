@@ -6,11 +6,12 @@
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/primitive.pb.h"
+#include "proto/visualization.pb.h"
 #include "shared/constants.h"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
+#include "software/geom/algorithms/axis_aligned_bounding_box.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
-#include "software/geom/algorithms/generate_velocity_obstacle.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/geom/algorithms/rasterize.h"
 #include "software/geom/point.h"
@@ -56,13 +57,12 @@ class Obstacle
     /**
      * Creates an obstacle proto representation
      */
-    virtual TbotsProto::Obstacles createObstacleProto() const = 0;
+    virtual TbotsProto::Obstacle createObstacleProto() const = 0;
 
     /**
-     * Draw a velocity obstacle for the given agent to this obstacle
+     * Create the axis aligned bounding box for this obstacle
      */
-    virtual VelocityObstacle generateVelocityObstacle(const Circle&,
-                                                      const Vector&) const = 0;
+    virtual Rectangle axisAlignedBoundingBox(const double = 0) const = 0;
 
     /**
      * Output string to describe the obstacle
@@ -85,10 +85,10 @@ class Obstacle
  * @param the geom object
  * @return the obstacle proto
  */
-TbotsProto::Obstacles createObstacleProto(const Polygon& polygon);
-TbotsProto::Obstacles createObstacleProto(const Rectangle& rectangle);
-TbotsProto::Obstacles createObstacleProto(const Circle& circle);
-TbotsProto::Obstacles createObstacleProto(const Stadium& stadium);
+TbotsProto::Obstacle createObstacleProto(const Polygon& polygon);
+TbotsProto::Obstacle createObstacleProto(const Rectangle& rectangle);
+TbotsProto::Obstacle createObstacleProto(const Circle& circle);
+TbotsProto::Obstacle createObstacleProto(const Stadium& stadium);
 
 template <typename GEOM_TYPE>
 class GeomObstacle : public Obstacle
@@ -106,12 +106,11 @@ class GeomObstacle : public Obstacle
     bool contains(const Point& p) const override;
     double distance(const Point& p) const override;
     bool intersects(const Segment& segment) const override;
-    TbotsProto::Obstacles createObstacleProto() const override;
+    TbotsProto::Obstacle createObstacleProto() const override;
+    Rectangle axisAlignedBoundingBox(double inflation_radius = 0) const override;
     std::string toString(void) const override;
     void accept(ObstacleVisitor& visitor) const override;
     std::vector<Point> rasterize(const double resolution_size) const override;
-    VelocityObstacle generateVelocityObstacle(const Circle&,
-                                              const Vector&) const override;
 
     /**
      * Gets the underlying GEOM_TYPE
@@ -123,7 +122,6 @@ class GeomObstacle : public Obstacle
    private:
     GEOM_TYPE geom_;
 };
-
 
 /**
  * We use a pointer to Obstacle to support inheritance
@@ -175,16 +173,16 @@ std::vector<Point> GeomObstacle<GEOM_TYPE>::rasterize(const double resolution_si
 }
 
 template <typename GEOM_TYPE>
-TbotsProto::Obstacles GeomObstacle<GEOM_TYPE>::createObstacleProto() const
+TbotsProto::Obstacle GeomObstacle<GEOM_TYPE>::createObstacleProto() const
 {
     return ::createObstacleProto(geom_);
 }
 
 template <typename GEOM_TYPE>
-VelocityObstacle GeomObstacle<GEOM_TYPE>::generateVelocityObstacle(
-    const Circle& robot, const Vector& obstacle_velocity) const
+Rectangle GeomObstacle<GEOM_TYPE>::axisAlignedBoundingBox(
+    const double inflation_radius) const
 {
-    return ::generateVelocityObstacle(geom_, robot, obstacle_velocity);
+    return ::axisAlignedBoundingBox(geom_, inflation_radius);
 }
 
 template <typename GEOM_TYPE>

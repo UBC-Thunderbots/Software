@@ -14,6 +14,8 @@ cc_library(
         ":tbots_geometry",
         "//proto:tbots_cc_proto",
         "//proto:visualization_cc_proto",
+        "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
+        "//software/ai/navigator/trajectory:trajectory_path",
         "//software/ai/passing:pass_with_rating",
         "//software/geom:angle",
         "//software/geom:point",
@@ -38,7 +40,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//proto:tbots_cc_proto",
-        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:circle",

@@ -14,17 +14,13 @@ TEST(GetBehindBallFSMTest, test_transitions)
     FSM<GetBehindBallFSM> fsm{GetBehindBallFSM()};
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
     fsm.process_event(GetBehindBallFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 
     // robot behind ball but far away
     robot = ::TestUtil::createRobotAtPos(Point(2, 2));
     fsm.process_event(GetBehindBallFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 
     // robot behind ball and close enough
@@ -32,17 +28,13 @@ TEST(GetBehindBallFSMTest, test_transitions)
         0, RobotState(Point(2, 2.8), Vector(), Angle::quarter(), AngularVelocity::zero()),
         Timestamp::fromSeconds(123));
     fsm.process_event(GetBehindBallFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     // destination updated so robot needs to move to new destination
     control_params = GetBehindBallFSM::ControlParams{.ball_location   = Point(-2, 1),
                                                      .chick_direction = Angle::quarter()};
     fsm.process_event(GetBehindBallFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 }

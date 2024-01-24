@@ -61,16 +61,6 @@ std::unique_ptr<TbotsProto::Segment> createSegmentProto(const Segment& segment)
     return segment_proto;
 }
 
-std::unique_ptr<TbotsProto::VelocityObstacle> createVelocityObstacleProto(
-    const VelocityObstacle& vo, const Vector& offset)
-{
-    auto vo_proto                     = std::make_unique<TbotsProto::VelocityObstacle>();
-    *(vo_proto->mutable_apex())       = *createVectorProto(vo.getApex() + offset);
-    *(vo_proto->mutable_left_side())  = *createVectorProto(vo.getLeftSide());
-    *(vo_proto->mutable_right_side()) = *createVectorProto(vo.getRightSide());
-    return vo_proto;
-}
-
 std::unique_ptr<TbotsProto::Stadium> createStadiumProto(const Stadium& stadium)
 {
     auto stadium_proto                  = std::make_unique<TbotsProto::Stadium>();
@@ -120,15 +110,6 @@ Circle createCircle(const TbotsProto::Circle& circle)
 Segment createSegment(const TbotsProto::Segment& segment)
 {
     return Segment(createPoint(segment.start()), createPoint(segment.end()));
-}
-
-VelocityObstacle createVelocityObstacle(
-    const TbotsProto::VelocityObstacle& velocity_obstacle_msg)
-{
-    Vector apex  = createVector(velocity_obstacle_msg.apex());
-    Vector side1 = createVector(velocity_obstacle_msg.left_side());
-    Vector side2 = createVector(velocity_obstacle_msg.right_side());
-    return VelocityObstacle(apex, side1, side2);
 }
 
 Stadium createStadium(const TbotsProto::Stadium& stadium)
