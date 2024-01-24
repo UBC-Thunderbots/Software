@@ -21,9 +21,9 @@ TbotsProto::Obstacle createObstacleProto(const Circle &circle)
     return obstacle_proto;
 }
 
-TbotsProto::Obstacles createObstacleProto(const Stadium &stadium)
+TbotsProto::Obstacle createObstacleProto(const Stadium &stadium)
 {
-    TbotsProto::Obstacles obstacle_proto;
-    *(obstacle_proto.add_stadium()) = *createStadiumProto(stadium);
+    TbotsProto::Obstacle obstacle_proto;
+    *(obstacle_proto.mutable_stadium()) = *createStadiumProto(stadium);
     return obstacle_proto;
 }

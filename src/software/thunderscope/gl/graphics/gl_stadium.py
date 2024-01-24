@@ -47,7 +47,7 @@ class GLStadium(GLShape):
 
         self.set_parameters(radius, length, num_points)
 
-    def set_parameters(self, radius, length, num_points):
+    def set_parameters(self, radius: float, length: float, num_points: int = 12):
         """Sets the parameters of the stadium
 
         :param radius: The radius of the stadium
@@ -56,7 +56,7 @@ class GLStadium(GLShape):
 
         """
 
-        if self.radius == radius & self.length == length & self.num_points == num_points:
+        if self.radius == radius and self.length == length and self.num_points == num_points:
             return
 
         self.radius = radius
@@ -65,7 +65,7 @@ class GLStadium(GLShape):
 
         self._update_shape_data()
 
-    def set_radius(self, radius, num_points):
+    def set_radius(self, radius: float, num_points: int = 12):
         """Sets the parameters of the stadium
 
         :param radius: The radius of the stadium
@@ -73,7 +73,7 @@ class GLStadium(GLShape):
 
         """
 
-        if self.radius == radius & self.num_points == num_points:
+        if self.radius == radius and self.num_points == num_points:
             return
 
         self.radius = radius
@@ -81,7 +81,7 @@ class GLStadium(GLShape):
 
         self._update_shape_data()
 
-    def set_length(self, length, num_points):
+    def set_length(self, length: float, num_points: int = 12):
         """Sets the parameters of the stadium
 
         :param length: The length of the top and bottom lines of the stadium
@@ -89,7 +89,7 @@ class GLStadium(GLShape):
 
         """
 
-        if self.length == length & self.num_points == num_points:
+        if self.length == length and self.num_points == num_points:
             return
 
         self.length = length
@@ -117,4 +117,25 @@ class GLStadium(GLShape):
                 0
             ]
             for x in range(0, self.num_points + 1)
+        ] + [
+            [
+                - self.length/2,
+                self.radius,
+                0
+            ]
         ]
+
+        self.setData(pos=self.points)
+
+        if self.fill_graphic:
+            # Add an extra point at (0, 0). This is so that we can construct
+            # the triangular faces that make up the circle by connecting
+            # two adjacent points along the circle to the center point
+            vertexes = self.points + [(0, 0, 0)]
+
+            faces = []
+            for index in range(len(vertexes) - 2):
+                faces.append([index, index + 1, len(vertexes) - 1])
+
+            mesh_data = MeshData(vertexes=vertexes, faces=np.array(faces))
+            self.fill_graphic.setMeshData(meshdata=mesh_data)

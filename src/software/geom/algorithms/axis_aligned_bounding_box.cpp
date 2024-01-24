@@ -37,3 +37,27 @@ Rectangle axisAlignedBoundingBox(const Polygon& polygon, const double inflation_
     Point top_right(max_x + inflation_radius, max_y + inflation_radius);
     return Rectangle(bottom_left, top_right);
 }
+
+Rectangle axisAlignedBoundingBox(const Stadium& stadium,
+                                 const double inflation_radius)
+{
+
+    double start_left = stadium.segment().getStart().x() - stadium.radius();
+    double start_right = stadium.segment().getStart().x() + stadium.radius();
+    double end_left = stadium.segment().getEnd().x() - stadium.radius();
+    double end_right = stadium.segment().getEnd().x() + stadium.radius();
+    double start_bottom = stadium.segment().getStart().y() - stadium.radius();
+    double start_top = stadium.segment().getStart().y() + stadium.radius();
+    double end_bottom = stadium.segment().getEnd().y() - stadium.radius();
+    double end_top = stadium.segment().getEnd().y() + stadium.radius();
+
+    double min_x = std::min(end_right, std::min(end_left, std::min(start_left, start_right)));
+    double max_x = std::max(end_right, std::max(end_left, std::max(start_left, start_right)));
+
+    double min_y = std::min(end_top, std::min(end_bottom, std::min(start_bottom, start_top)));
+    double max_y = std::max(end_top, std::max(end_bottom, std::max(start_bottom, start_top)));
+
+    Point bottom_left(min_x - inflation_radius, min_y - inflation_radius);
+    Point top_right(max_x + inflation_radius, max_y + inflation_radius);
+    return Rectangle(bottom_left, top_right);
+}

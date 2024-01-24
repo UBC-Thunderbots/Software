@@ -121,6 +121,7 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             obstacles.push_back(createFromShape(right_boundary));
             obstacles.push_back(createFromShape(lower_boundary));
             break;
+
         }
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // HALF_METER_AROUND_BALL is not handled by this obstacle factory since it's a
