@@ -251,11 +251,7 @@ std::vector<Point> rasterize(const Stadium &stadium, double resolution_size) {
                                                 resolution_size);
 
     // construct rectangle polygon
-    Vector normal = stadium.segment().toVector().rotate(Angle::fromDegrees(90)).normalize(stadium.radius());
-    Polygon inner_rectangle = Polygon({stadium.segment().getStart()+normal,
-                                       stadium.segment().getEnd()+normal,
-                                       stadium.segment().getEnd()-normal,
-                                       stadium.segment().getStart()-normal});
+    Polygon inner_rectangle = stadium.inner_rectangle();
 
     std::vector<Point> rectangle_points = rasterize(inner_rectangle, resolution_size);
 

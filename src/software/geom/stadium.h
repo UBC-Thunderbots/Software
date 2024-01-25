@@ -4,7 +4,6 @@
 #include "software/geom/polygon.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
-#include "software/geom/circle.h"
 
 /**
  * A tube/stadium/pill/discorectangle shape with a radius and a line segment
@@ -55,7 +54,7 @@ class Stadium : public ConvexShape {
      * Returns the inner rectangle of this Stadium
      * @return the inner rectangle of this Stadium
      */
-    Polygon rectangle() const;
+    Polygon inner_rectangle() const;
 
      /**
       * Returns the area of this Stadium

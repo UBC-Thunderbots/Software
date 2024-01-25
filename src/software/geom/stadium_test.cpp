@@ -38,7 +38,7 @@ TEST(StadiumRectangleTests, stadium_default_rectangle_test)
     Stadium s = Stadium(Segment(), 0);
     Point p = Point();
     Polygon rec = Polygon{p,p,p,p};
-    EXPECT_EQ(s.rectangle(), rec);
+    EXPECT_EQ(s.inner_rectangle(), rec);
 }
 
 TEST(StadiumRectangleTests, stadium_flat_rectangle_test)
@@ -49,7 +49,7 @@ TEST(StadiumRectangleTests, stadium_flat_rectangle_test)
     Point p2 = Point(2, 0);
     Polygon rec = Polygon{p1,p2,p2,p1};
 
-    EXPECT_EQ(s.rectangle(), rec);
+    EXPECT_EQ(s.inner_rectangle(), rec);
 }
 
 TEST(StadiumRectangleTests, stadium_horizontal_rectangle_test)
@@ -61,7 +61,7 @@ TEST(StadiumRectangleTests, stadium_horizontal_rectangle_test)
     Point p2 = Point(2, 0);
     Polygon rec = Polygon{p1+normal,p2+normal,p2-normal,p1-normal};
 
-    EXPECT_EQ(s.rectangle(), rec);
+    EXPECT_EQ(s.inner_rectangle(), rec);
 }
 
 TEST(StadiumRectangleTests, stadium_angled_rectangle_test)
@@ -73,7 +73,7 @@ TEST(StadiumRectangleTests, stadium_angled_rectangle_test)
     Point p2 = Point(1, 1);
     Polygon rec = Polygon{p1+normal,p2+normal,p2-normal,p1-normal};
 
-    EXPECT_EQ(s.rectangle(), rec);
+    EXPECT_EQ(s.inner_rectangle(), rec);
 }
 
 TEST(StadiumAreaTests, stadium_default_area_test)

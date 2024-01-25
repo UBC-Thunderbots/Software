@@ -227,8 +227,6 @@ cc_library(
       ":convex_shape",
       ":point",
       ":segment",
-      ":rectangle",
-      ":circle",
       ":polygon",
     ],
 )

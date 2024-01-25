@@ -176,8 +176,8 @@ bool intersects(const Stadium &first, const Ray &second)
     // The parametric definition of a ray is r(d)=o+tu where o is the origin point and u is a unit vector
     // Find the distance t along the ray that is closest to start and end
     // Distance cannot be negative because rays only go positively along the unit vector u
-    auto startDist = std::fmax(0, second.toUnitVector().dot(start - second.getStart()));
-    auto endDist = std::fmax(0, second.toUnitVector().dot(end - second.getStart()));
+    auto startDist = std::max(0.0, second.toUnitVector().dot(start - second.getStart()));
+    auto endDist = std::max(0.0, second.toUnitVector().dot(end - second.getStart()));
 
     // Find corresponding point on the ray:
     auto startClosestPoint = second.getStart() + second.toUnitVector()*startDist;

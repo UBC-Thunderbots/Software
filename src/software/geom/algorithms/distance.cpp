@@ -68,7 +68,7 @@ double distance(const Circle &first, const Point &second)
 
 double distance(const Point &first, const Stadium &second)
 {
-    return fmax(distance(first, second.segment()) - second.radius(), 0);
+    return std::max(distance(first, second.segment()) - second.radius(), 0.0);
 }
 
 double distance(const Stadium &first, const Point &second)

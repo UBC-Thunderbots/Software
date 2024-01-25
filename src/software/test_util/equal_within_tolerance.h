@@ -47,14 +47,14 @@ namespace TestUtil
      */
     ::testing::AssertionResult equalWithinTolerance(const Polygon &poly1,
                                                     const Polygon &poly2,
-                                                    double tolerance);
+                                                    double tolerance=METERS_PER_MILLIMETER);
 
     /**
      * Checks if two stadiums are within tolerance of each other
      * Two stadiums are within tolerance of each other if the corresponding points are
      * within tolerance of each other and the radii are within tolerance
      *
-     * @param stadium1, stadium2 Polygons to compare
+     * @param stadium1, stadium2 Stadiums to compare
      * @param tolerance tolerance to check equality with, default is
      * METERS_PER_MILLIMETER
      *
@@ -62,7 +62,7 @@ namespace TestUtil
      */
     ::testing::AssertionResult equalWithinTolerance(const Stadium &stadium1,
                                                     const Stadium &stadium2,
-                                                    double tolerance);
+                                                    double tolerance=METERS_PER_MILLIMETER);
 
     /**
      * Checks if two circles are within tolerance of each other
@@ -76,7 +76,7 @@ namespace TestUtil
      * @return AssertionSuccess if the two circles are within tolerance of each other
      */
     ::testing::AssertionResult equalWithinTolerance(const Circle &c1, const Circle &c2,
-                                                    double tolerance);
+                                                    double tolerance=METERS_PER_MILLIMETER);
 
     /**
      * Checks if two Angles are within tolerance of each other

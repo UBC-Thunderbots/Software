@@ -373,8 +373,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_stadiu
     try
     {
         Stadium expected(Point(0,0), Point(1,0), 0.617);
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Stadium>&>(*obstacles[0]);
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
+        auto stadium_obstacle = dynamic_cast<GeomObstacle<Stadium>&>(*obstacles[0]);
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, stadium_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
 
