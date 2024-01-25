@@ -241,26 +241,28 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
     return covered_points;
 }
 
-std::vector<Point> rasterize(const Stadium &stadium, double resolution_size) {
+std::vector<Point> rasterize(const Stadium& stadium, double resolution_size)
+{
     std::vector<Point> covered_points;
-    std::vector<Point> start_circle = rasterize(Circle(stadium.segment().getStart(),
-                                                             stadium.radius()),
-                                                resolution_size);
-    std::vector<Point> end_circle = rasterize(Circle(stadium.segment().getEnd(),
-                                                           stadium.radius()),
-                                                resolution_size);
+    std::vector<Point> start_circle = rasterize(
+        Circle(stadium.segment().getStart(), stadium.radius()), resolution_size);
+    std::vector<Point> end_circle =
+        rasterize(Circle(stadium.segment().getEnd(), stadium.radius()), resolution_size);
 
     // construct rectangle polygon
-    Vector normal = stadium.segment().toVector().rotate(Angle::fromDegrees(90)).normalize(stadium.radius());
-    Polygon inner_rectangle = Polygon({stadium.segment().getStart()+normal,
-                                       stadium.segment().getEnd()+normal,
-                                       stadium.segment().getEnd()-normal,
-                                       stadium.segment().getStart()-normal});
+    Vector normal = stadium.segment()
+                        .toVector()
+                        .rotate(Angle::fromDegrees(90))
+                        .normalize(stadium.radius());
+    Polygon inner_rectangle = Polygon(
+        {stadium.segment().getStart() + normal, stadium.segment().getEnd() + normal,
+         stadium.segment().getEnd() - normal, stadium.segment().getStart() - normal});
 
     std::vector<Point> rectangle_points = rasterize(inner_rectangle, resolution_size);
 
     covered_points.insert(covered_points.end(), start_circle.begin(), start_circle.end());
     covered_points.insert(covered_points.end(), end_circle.begin(), end_circle.end());
-    covered_points.insert(covered_points.end(), rectangle_points.begin(), rectangle_points.end());
+    covered_points.insert(covered_points.end(), rectangle_points.begin(),
+                          rectangle_points.end());
     return covered_points;
 }

@@ -10,6 +10,7 @@ from typing import Optional
 import math
 import numpy as np
 
+
 class GLStadium(GLShape):
     """Displays a stadium on the cartesian plane"""
 
@@ -21,7 +22,7 @@ class GLStadium(GLShape):
         num_points: int = 12,
         outline_color: QtGui.QColor = Colors.DEFAULT_GRAPHICS_COLOR,
         fill_color: Optional[QtGui.QColor] = None,
-        line_width: float = LINE_WIDTH
+        line_width: float = LINE_WIDTH,
     ) -> None:
         """Initialize the GLCircle
 
@@ -56,7 +57,11 @@ class GLStadium(GLShape):
 
         """
 
-        if self.radius == radius and self.length == length and self.num_points == num_points:
+        if (
+            self.radius == radius
+            and self.length == length
+            and self.num_points == num_points
+        ):
             return
 
         self.radius = radius
@@ -102,28 +107,29 @@ class GLStadium(GLShape):
         the outline and fill of this shape
         """
         # Generate points on the circumference of a semicircle, moving them to the negative x by half the length
-        self.points = [
-
+        self.points = (
             [
-                math.cos(math.pi / self.num_points * x + math.pi/2) * self.radius - self.length/2,
-                math.sin(math.pi / self.num_points * x + math.pi/2) * self.radius,
-                0
+                [
+                    math.cos(math.pi / self.num_points * x + math.pi / 2) * self.radius
+                    - self.length / 2,
+                    math.sin(math.pi / self.num_points * x + math.pi / 2) * self.radius,
+                    0,
+                ]
+                for x in range(0, self.num_points + 1)
             ]
-            for x in range(0, self.num_points+1)
-        ] + [
-            [
-                math.cos(math.pi / self.num_points * x + 3*math.pi/2) * self.radius + self.length/2,
-                math.sin(math.pi / self.num_points * x + 3*math.pi/2) * self.radius,
-                0
+            + [
+                [
+                    math.cos(math.pi / self.num_points * x + 3 * math.pi / 2)
+                    * self.radius
+                    + self.length / 2,
+                    math.sin(math.pi / self.num_points * x + 3 * math.pi / 2)
+                    * self.radius,
+                    0,
+                ]
+                for x in range(0, self.num_points + 1)
             ]
-            for x in range(0, self.num_points + 1)
-        ] + [
-            [
-                - self.length/2,
-                self.radius,
-                0
-            ]
-        ]
+            + [[-self.length / 2, self.radius, 0]]
+        )
 
         self.setData(pos=self.points)
 

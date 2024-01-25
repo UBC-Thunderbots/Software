@@ -72,9 +72,11 @@ TEST(TestUtilsTest, stadium_check_if_equal_within_tolerance)
     Stadium stadium2(Point(5.394, 1.114), Point(1.000, 1.002), 6.568);
     Stadium stadium3(Point(5.395, 1.115), Point(0.999, 1.003), 6.569);
     EXPECT_TRUE(
-            TestUtil::equalWithinTolerance(stadium1, stadium2, 2 * METERS_PER_MILLIMETER));
-    EXPECT_FALSE(TestUtil::equalWithinTolerance(stadium1, stadium2, METERS_PER_MILLIMETER));
-    EXPECT_FALSE(TestUtil::equalWithinTolerance(stadium1, stadium3, METERS_PER_MILLIMETER));
+        TestUtil::equalWithinTolerance(stadium1, stadium2, 2 * METERS_PER_MILLIMETER));
+    EXPECT_FALSE(
+        TestUtil::equalWithinTolerance(stadium1, stadium2, METERS_PER_MILLIMETER));
+    EXPECT_FALSE(
+        TestUtil::equalWithinTolerance(stadium1, stadium3, METERS_PER_MILLIMETER));
 }
 
 TEST(TestUtilsTest, vector_check_if_equal_within_tolerance)

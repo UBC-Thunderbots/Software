@@ -60,5 +60,5 @@ message Segment
 message Stadium
 {
     required Segment segment = 1;
-    required double radius  = 2;
+    required double radius   = 2;
 }

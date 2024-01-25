@@ -85,9 +85,9 @@ TEST(SegmentOperatorTests, segment_operator_unequal_start_end)
 
 TEST(SegmentOffsetTests, segment_offset_zero)
 {
-    Segment s = Segment(Point(3, 5), Point(8, 6));
-    Vector v = Vector(0, 0);
-    Segment add = s+v;
+    Segment s   = Segment(Point(3, 5), Point(8, 6));
+    Vector v    = Vector(0, 0);
+    Segment add = s + v;
     EXPECT_DOUBLE_EQ(add.getStart().x(), 3);
     EXPECT_DOUBLE_EQ(add.getStart().y(), 5);
     EXPECT_DOUBLE_EQ(add.getEnd().x(), 8);
@@ -96,9 +96,9 @@ TEST(SegmentOffsetTests, segment_offset_zero)
 
 TEST(SegmentOffsetTests, segment_offset_diag)
 {
-    Segment s = Segment(Point(3, 5), Point(8, 6));
-    Vector v = Vector(1, 2);
-    Segment add = s+v;
+    Segment s   = Segment(Point(3, 5), Point(8, 6));
+    Vector v    = Vector(1, 2);
+    Segment add = s + v;
     EXPECT_DOUBLE_EQ(add.getStart().x(), 4);
     EXPECT_DOUBLE_EQ(add.getStart().y(), 7);
     EXPECT_DOUBLE_EQ(add.getEnd().x(), 9);
@@ -107,9 +107,9 @@ TEST(SegmentOffsetTests, segment_offset_diag)
 
 TEST(SegmentOffsetTests, segment_offset_negative)
 {
-    Segment s = Segment(Point(3, 5), Point(8, 6));
-    Vector v = Vector(1, -2);
-    Segment add = v+s;
+    Segment s   = Segment(Point(3, 5), Point(8, 6));
+    Vector v    = Vector(1, -2);
+    Segment add = v + s;
     EXPECT_DOUBLE_EQ(add.getStart().x(), 4);
     EXPECT_DOUBLE_EQ(add.getStart().y(), 3);
     EXPECT_DOUBLE_EQ(add.getEnd().x(), 9);
@@ -118,9 +118,9 @@ TEST(SegmentOffsetTests, segment_offset_negative)
 
 TEST(SegmentOffsetTests, segment_backset_zero)
 {
-    Segment s = Segment(Point(3, 5), Point(8, 6));
-    Vector v = Vector(0, 0);
-    Segment add = s-v;
+    Segment s   = Segment(Point(3, 5), Point(8, 6));
+    Vector v    = Vector(0, 0);
+    Segment add = s - v;
     EXPECT_DOUBLE_EQ(add.getStart().x(), 3);
     EXPECT_DOUBLE_EQ(add.getStart().y(), 5);
     EXPECT_DOUBLE_EQ(add.getEnd().x(), 8);
@@ -129,9 +129,9 @@ TEST(SegmentOffsetTests, segment_backset_zero)
 
 TEST(SegmentOffsetTests, segment_backset_diag)
 {
-    Segment s = Segment(Point(3, 5), Point(8, 6));
-    Vector v = Vector(1, 2);
-    Segment add = s-v;
+    Segment s   = Segment(Point(3, 5), Point(8, 6));
+    Vector v    = Vector(1, 2);
+    Segment add = s - v;
     EXPECT_DOUBLE_EQ(add.getStart().x(), 2);
     EXPECT_DOUBLE_EQ(add.getStart().y(), 3);
     EXPECT_DOUBLE_EQ(add.getEnd().x(), 7);
@@ -140,9 +140,9 @@ TEST(SegmentOffsetTests, segment_backset_diag)
 
 TEST(SegmentOffsetTests, segment_backset_negative)
 {
-    Segment s = Segment(Point(3, 5), Point(8, 6));
-    Vector v = Vector(1, -2);
-    Segment add = s-v;
+    Segment s   = Segment(Point(3, 5), Point(8, 6));
+    Vector v    = Vector(1, -2);
+    Segment add = s - v;
     EXPECT_DOUBLE_EQ(add.getStart().x(), 2);
     EXPECT_DOUBLE_EQ(add.getStart().y(), 7);
     EXPECT_DOUBLE_EQ(add.getEnd().x(), 7);
