@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <Tracy.hpp>
 
 #include "proto/play_info_msg.pb.h"
 #include "software/ai/hl/stp/play/play.h"
@@ -75,4 +74,9 @@ class Ai final
 
     // inter play communication
     InterPlayCommunication inter_play_communication;
+
+    struct TracyLiterals
+    {
+
+    };
 };

@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <memory>
+#include <Tracy.hpp>
 #include <utility>
 
 #include "software/ai/hl/stp/play/halt_play.h"

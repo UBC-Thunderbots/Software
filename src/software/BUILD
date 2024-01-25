@@ -103,3 +103,8 @@ pybind_extension(
         ":python_bindings_lib",
     ],
 )
+
+sh_binary(
+    name = "tracy",
+    srcs = ["tracy.sh"]
+)
