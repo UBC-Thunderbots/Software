@@ -85,6 +85,16 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     const World &world, const InterPlayCommunication &inter_play_communication,
     const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
+    /**
+     * - Get a list of Primitive (dynamic_cast, std::variant, etc) from the tactics
+     * - Filter using Hungarian algorithm
+     * - Based on tactic priority, or robot id, or cost, go through primitives and
+     * generate obstacle aware trajectory.
+     *   - Obstacle factory should use Robot.traj to generate moving obstacles
+     * - Return a list of primitives + a list of trajectories
+     * - Publish trajectories to SensorFusion
+     * - SensorFusion add to Robot
+     */
     FrameMarkNamed("Play::get");
     ZoneScopedN("Play::get");
     PriorityTacticVector priority_tactics;

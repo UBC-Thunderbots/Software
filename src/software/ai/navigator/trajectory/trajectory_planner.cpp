@@ -2,6 +2,8 @@
 
 #include <tracy/Tracy.hpp>
 
+#include "software/geom/algorithms/contains.h"
+
 TrajectoryPlanner::TrajectoryPlanner()
     : relative_sub_destinations(getRelativeSubDestinations())
 {
@@ -269,7 +271,7 @@ double TrajectoryPlanner::getFirstNonCollisionTime(
         bool collision_found = false;
         for (std::size_t obstacle_index = 0; obstacle_index < obstacles.size(); ++obstacle_index)
         {
-            if (obstacles[obstacle_index]->contains(position))
+            if (obstacles[obstacle_index]->contains(position, time)) // TODO (NIMA): time>0 will likely result in a nullptr exception segfault since Obstacle::traj_ is nullptr
             {
                 collision_found = true;
                 break;
@@ -295,7 +297,7 @@ std::pair<double, ObstaclePtr> TrajectoryPlanner::getFirstCollisionTime(
         Point position = traj_path.getPosition(time);
         for (std::size_t obstacle_index = 0; obstacle_index < obstacles.size(); ++obstacle_index)
         {
-            if (obstacles[obstacle_index]->contains(position))
+            if (obstacles[obstacle_index]->contains(position, time))
             {
                 return std::make_pair(time, obstacles[obstacle_index]);
             }
@@ -317,7 +319,7 @@ double TrajectoryPlanner::getLastNonCollisionTime(
         bool collision_found = false;
         for (std::size_t obstacle_index = 0; obstacle_index < obstacles.size(); ++obstacle_index)
         {
-            if (obstacles[obstacle_index]->contains(position))
+            if (obstacles[obstacle_index]->contains(position, time))
             {
                 collision_found = true;
                 break;

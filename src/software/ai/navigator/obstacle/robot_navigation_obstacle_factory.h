@@ -3,7 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
-#include "software/geom/line.h"
+#include "software/ai/navigator/trajectory/trajectory_2d.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/logger/logger.h"
@@ -103,6 +103,17 @@ class RobotNavigationObstacleFactory
     ObstaclePtr createFromRobotPosition(const Point &robot_position) const;
 
     /**
+     * Create dynamic circle obstacle around robot with additional radius scaling
+     *
+     * @param robot robot to create the obstacle for
+     * @param traj Trajectory which the obstacle is following
+     *
+     * @return moving obstacle around the robot
+     */
+     ObstaclePtr RobotNavigationObstacleFactory::createFromMovingRobot( // TODO (NIMA): test
+     const Robot &robot, const std::shared_ptr<const Trajectory2D> traj) const;
+
+    /**
      * Create circle obstacle around ball
      *
      * @param ball_position ball position to make obstacle around
@@ -123,6 +134,16 @@ class RobotNavigationObstacleFactory
     ObstaclePtr createFromShape(const Circle &circle) const;
     ObstaclePtr createFromShape(const Polygon &polygon) const;
     ObstaclePtr createFromShape(const Rectangle &rectangle) const;
+
+    /**
+     * Generate a dynamic circular obstacle
+     * NOTE: as with all other obstacles created by RobotNavigationObstacleFactory, the
+     * shapes are expanded on all sides to account for the radius of the robot
+     *
+     * @param circle The circle to make obstacle with
+     * @param traj Trajectory which the obstacle is following
+     */
+    ObstaclePtr createDynamicCircle(const Circle &circle, const std::shared_ptr<const Trajectory2D> traj) const;
 
     /**
      * Returns an obstacle with the shape of the BallPlacementZone if the state is in

@@ -139,15 +139,24 @@ void MovePrimitive::generateObstacles(
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {
-        obstacles.push_back(obstacle_factory.createFromRobotPosition(enemy.position()));
+        obstacles.push_back(obstacle_factory.createFromRobotPosition(enemy.position())); // TODO (NIMA): Add constant velocity obstacle?! Or should this be pill shaped
     }
 
     for (const Robot &friendly : world.friendlyTeam().getAllRobots())
     {
         if (friendly.id() != robot.id())
         {
-            obstacles.push_back(
-                obstacle_factory.createFromRobotPosition(friendly.position()));
+            auto traj_iter = trajectories.find(friendly.id());
+            if (traj_iter != trajectories.end())
+            {
+                obstacles.push_back(
+                    obstacle_factory.createFromMovingRobot(friendly, traj_iter->second));
+            }
+            else
+            {
+                obstacles.push_back(
+                    obstacle_factory.createFromRobotPosition(friendly.position()));
+            }
         }
     }
 

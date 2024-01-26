@@ -6,12 +6,32 @@ cc_library(
     hdrs = [
         "obstacle.hpp",
     ],
-    # We expose obstacle so that it can visualized
-    visibility = ["//visibility:public"],
     deps = [
-        "obstacle_visitor",
+        ":obstacle_visitor",
         "//proto/message_translation:tbots_protobuf",
-        "//shared:constants",
+    ],
+)
+
+cc_library(
+    name = "geom_obstacle",
+    hdrs = [
+        "geom_obstacle.hpp",
+    ],
+    deps = [
+        ":obstacle",
+        "//software/geom:point",
+        "//software/geom:segment",
+        "//software/geom/algorithms",
+    ],
+)
+
+cc_library(
+    name = "dynamic_obstacle",
+    hdrs = [
+        "dynamic_obstacle.hpp",
+    ],
+    deps = [
+        ":geom_obstacle",
         "//software/geom:point",
         "//software/geom:segment",
         "//software/geom/algorithms",
@@ -23,7 +43,7 @@ cc_library(
     srcs = ["robot_navigation_obstacle_factory.cpp"],
     hdrs = ["robot_navigation_obstacle_factory.h"],
     deps = [
-        ":obstacle",
+        ":dynamic_obstacle",
         "//proto:tbots_cc_proto",
         "//software/geom:point",
         "//software/logger",

@@ -1,5 +1,7 @@
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 
+#include "software/ai/navigator/obstacle/dynamic_obstacle.hpp"
+
 RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
     TbotsProto::RobotNavigationObstacleConfig config)
     : config(config),
@@ -268,6 +270,18 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromRobotPosition(
     const Point &robot_position) const
 {
     return createFromShape(Circle(robot_position, ROBOT_MAX_RADIUS_METERS));
+}
+
+ObstaclePtr RobotNavigationObstacleFactory::createFromMovingRobot(
+    const Robot &robot, const std::shared_ptr<const Trajectory2D> traj) const
+{
+    return createDynamicCircle(Circle(robot.position(), ROBOT_MAX_RADIUS_METERS), traj);
+}
+
+ObstaclePtr RobotNavigationObstacleFactory::createDynamicCircle(const Circle &circle, const std::shared_ptr<const Trajectory2D> traj) const
+{
+    return std::make_shared<DynamicObstacle<Circle>>(
+        Circle(circle.origin(), circle.radius() + robot_radius_expansion_amount), traj);
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Circle &circle) const
