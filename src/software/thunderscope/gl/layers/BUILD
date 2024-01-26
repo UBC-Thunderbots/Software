@@ -81,16 +81,6 @@ py_library(
 )
 
 py_library(
-    name = "gl_hrvo_layer",
-    srcs = ["gl_hrvo_layer.py"],
-    deps = [
-        ":gl_layer",
-        "//software/thunderscope/gl/graphics:gl_polygon",
-        requirement("pyqtgraph"),
-    ],
-)
-
-py_library(
     name = "gl_tactic_layer",
     srcs = ["gl_tactic_layer.py"],
     deps = [

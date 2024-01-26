@@ -59,7 +59,6 @@ class Time
      */
     explicit Time(double time_seconds);
 
-   private:
     // The stored internal value of the Time, in seconds
     double time_in_seconds;
 };

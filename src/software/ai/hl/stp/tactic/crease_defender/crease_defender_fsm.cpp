@@ -31,11 +31,13 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 void CreaseDefenderFSM::blockThreat(
     const Update& event, boost::sml::back::process<MoveFSM::Update> processEvent)
 {
-    Point destination       = event.common.robot.position();
+    Point destination = event.common.robot.position();
+    // Use a slightly larger inflation factor to avoid the crease defenders from sitting
+    // right on the edge of the defense area obstacle.
     auto block_threat_point = findBlockThreatPoint(
         event.common.world.field(), event.control_params.enemy_threat_origin,
         event.control_params.crease_defender_alignment,
-        robot_navigation_obstacle_config.robot_obstacle_inflation_factor());
+        robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5);
     if (block_threat_point)
     {
         destination = block_threat_point.value();

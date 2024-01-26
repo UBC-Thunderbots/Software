@@ -22,7 +22,6 @@ from software.thunderscope.gl.layers import (
     gl_sandbox_world_layer,
     gl_world_layer,
     gl_simulator_layer,
-    gl_hrvo_layer,
     gl_tactic_layer,
     gl_cost_vis_layer,
 )
@@ -135,16 +134,6 @@ def setup_gl_widget(
             gl_widget.toolbar.toggle_redo_enabled
         )
 
-    # Add HRVO layers and have them hidden on startup
-    # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-    hrvo_layers = []
-    for robot_id in range(MAX_ROBOT_IDS_PER_SIDE):
-        hrvo_layer = gl_hrvo_layer.GLHrvoLayer(
-            f"HRVO {robot_id}", robot_id, visualization_buffer_size
-        )
-        hrvo_layers.append(hrvo_layer)
-        gl_widget.add_layer(hrvo_layer, False)
-
     # Register observers
     sim_proto_unix_io.register_observer(
         SimulationState, gl_widget.toolbar.simulation_state_buffer
@@ -155,16 +144,16 @@ def setup_gl_widget(
         (World, cost_vis_layer.world_buffer),
         (RobotStatus, world_layer.robot_status_buffer),
         (Referee, world_layer.referee_buffer),
-        (PrimitiveSet, obstacle_layer.primitive_set_buffer),
+        (ObstacleList, obstacle_layer.obstacles_list_buffer),
         (PrimitiveSet, path_layer.primitive_set_buffer),
+        (PathVisualization, path_layer.path_visualization_buffer),
         (PassVisualization, passing_layer.pass_visualization_buffer),
         (World, tactic_layer.world_buffer),
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
-        (SimulatorState, simulator_layer.simulator_state_buffer),
         (SimulationState, gl_widget.toolbar.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
-    ] + [(HRVOVisualization, hrvo_layer.hrvo_buffer) for hrvo_layer in hrvo_layers]:
+    ]:
         full_system_proto_unix_io.register_observer(*arg)
 
     return gl_widget
