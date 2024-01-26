@@ -343,7 +343,7 @@ std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestampProto()
     return timestamp_msg;
 }
 
-RobotState createRobotStateProto(const TbotsProto::RobotState robot_state)
+RobotState createRobotState(const TbotsProto::RobotState robot_state)
 {
     return RobotState(createPoint(robot_state.global_position()),
                       createVector(robot_state.global_velocity()),
@@ -351,7 +351,7 @@ RobotState createRobotStateProto(const TbotsProto::RobotState robot_state)
                       createAngularVelocity(robot_state.global_angular_velocity()));
 }
 
-BallState createBallStateProto(const TbotsProto::BallState ball_state)
+BallState createBallState(const TbotsProto::BallState ball_state)
 {
     return BallState(createPoint(ball_state.global_position()),
                      createVector(ball_state.global_velocity()),

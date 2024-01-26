@@ -137,7 +137,7 @@ std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestampProto();
  * @param robot_state The RobotState proto to create a RobotState from
  * @return the RobotState
  */
-RobotState createRobotStateProto(const TbotsProto::RobotState robot_state);
+RobotState createRobotState(const TbotsProto::RobotState robot_state);
 
 /**
  * Return BallState given the TbotsProto::BallState protobuf
@@ -145,7 +145,7 @@ RobotState createRobotStateProto(const TbotsProto::RobotState robot_state);
  * @param robot_state The BallState proto to create a RobotState from
  * @return the BallState
  */
-BallState createBallStateProto(const TbotsProto::BallState ball_state);
+BallState createBallState(const TbotsProto::BallState ball_state);
 
 /**
  * Returns a pass visualization given a vector of the best passes

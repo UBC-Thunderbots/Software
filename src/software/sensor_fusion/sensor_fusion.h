@@ -82,7 +82,7 @@ class SensorFusion
      *
      * @return Ball if filtered from ball detections
      */
-    std::optional<Ball> createBallProto(const std::vector<BallDetection> &ball_detections);
+    std::optional<Ball> createBall(const std::vector<BallDetection> &ball_detections);
 
     /**
      * Create team from a list of robot detections

@@ -86,7 +86,7 @@ TEST(TbotsProtobufTest, robot_state_msg_test)
                 Timestamp::fromSeconds(0));
     auto robot_state_msg = createRobotStateProto(robot);
 
-    EXPECT_EQ(robot.currentState(), createRobotStateProto(*robot_state_msg));
+    EXPECT_EQ(robot.currentState(), createRobotState(*robot_state_msg));
     TbotsProtobufTest::assertRobotStateMessageFromRobot(robot, *robot_state_msg);
 }
 

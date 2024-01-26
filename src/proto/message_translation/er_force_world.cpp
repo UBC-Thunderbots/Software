@@ -1,6 +1,6 @@
 #include "proto/message_translation/er_force_world.h"
 
-Ball createBallProto(world::SimBall sim_ball, Timestamp timestamp)
+Ball createBall(world::SimBall sim_ball, Timestamp timestamp)
 {
     const Point position(sim_ball.p_x(), sim_ball.p_y());
     const Vector velocity(sim_ball.v_x(), sim_ball.v_y());
@@ -9,7 +9,7 @@ Ball createBallProto(world::SimBall sim_ball, Timestamp timestamp)
     return ball;
 }
 
-Robot createRobotProto(world::SimRobot sim_robot, Timestamp timestamp)
+Robot createRobot(world::SimRobot sim_robot, Timestamp timestamp)
 {
     const RobotId id(sim_robot.id());
     const Point position(sim_robot.p_x(), sim_robot.p_y());

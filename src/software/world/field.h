@@ -55,7 +55,7 @@ class Field
      * @param field_type The field type
      * @return a field with the standard SSL Division A or B dimensions
      */
-    static Field createFieldProto(TbotsProto::FieldType field_type);
+    static Field createField(TbotsProto::FieldType field_type);
 
     Field() = delete;
 

@@ -22,7 +22,7 @@ class ReceiverTacticTest
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
-    Field field                      = Field::createFieldProto(field_type);
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)

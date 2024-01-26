@@ -22,7 +22,7 @@ class CreaseDefenderTacticTest
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
-    Field field                      = Field::createFieldProto(field_type);
+    Field field                      = Field::createField(field_type);
     TbotsProto::AiConfig ai_config;
 };
 

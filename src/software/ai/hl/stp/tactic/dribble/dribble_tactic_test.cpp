@@ -41,7 +41,7 @@ class DribbleTacticTest : public SimulatedErForceSimPlayTestFixture
         SimulatedErForceSimPlayTestFixture::SetUp();
     }
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
-    Field field                      = Field::createFieldProto(field_type);
+    Field field                      = Field::createField(field_type);
     std::vector<RobotStateWithId> enemy_robots =
         TestUtil::createStationaryRobotStatesWithId(
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
