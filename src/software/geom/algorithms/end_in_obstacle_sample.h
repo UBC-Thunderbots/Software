@@ -8,5 +8,6 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> obstacle
                           const Point& point,
                           const Rectangle& navigable_area,
                           int initial_count = 6,
-                          double multiplier = 1.5,
+                          double rad_step = 0.15,
+                          int per_rad_step = 2,
                           double range = 2.0);
