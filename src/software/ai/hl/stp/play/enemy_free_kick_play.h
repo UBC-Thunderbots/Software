@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/strategy/strategy.h"
@@ -11,7 +12,8 @@
 class EnemyFreekickPlay : public Play
 {
    public:
-    EnemyFreekickPlay(const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy);
+    EnemyFreekickPlay(const TbotsProto::AiConfig &config,
+                      std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

@@ -40,6 +40,8 @@ class PassEvaluation
         ZonePassMap<ZoneEnum> best_pass_in_zones,
         TbotsProto::PassingConfig passing_config, Timestamp timestamp);
 
+    PassEvaluation(const PassEvaluation& pass_evaluation);
+
     PassEvaluation() = delete;
 
     /**
@@ -105,6 +107,14 @@ PassEvaluation<ZoneEnum>::PassEvaluation(
       best_pass_in_zones_(best_pass_in_zones),
       passing_config_(passing_config),
       timestamp_(timestamp)
+{
+}
+
+template <class ZoneEnum>
+PassEvaluation<ZoneEnum>::PassEvaluation(const PassEvaluation<ZoneEnum>& pass_evaluation)
+    : PassEvaluation<ZoneEnum>(
+          pass_evaluation.pitch_division_, pass_evaluation.best_pass_in_zones_,
+          pass_evaluation.passing_config_, pass_evaluation.timestamp_)
 {
 }
 

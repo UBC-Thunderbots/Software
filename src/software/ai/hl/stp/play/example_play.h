@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/strategy/strategy.h"
@@ -11,8 +12,8 @@
 class ExamplePlay : public Play
 {
    public:
-    explicit ExamplePlay(
-        const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy);
+    explicit ExamplePlay(const TbotsProto::AiConfig &config,
+                         std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

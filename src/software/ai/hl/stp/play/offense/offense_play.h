@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/offense/offense_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"

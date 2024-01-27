@@ -11,7 +11,8 @@
 class PassEndurancePlay : public Play
 {
    public:
-    PassEndurancePlay(const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy);
+    PassEndurancePlay(const TbotsProto::AiConfig &config,
+                      std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

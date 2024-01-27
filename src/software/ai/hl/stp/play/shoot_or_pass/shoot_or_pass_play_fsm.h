@@ -33,8 +33,8 @@ struct ShootOrPassPlayFSM
      *
      * @param ai_config the play config for this play FSM
      */
-    explicit ShootOrPassPlayFSM(
-        TbotsProto::AiConfig ai_config, std::shared_ptr<Strategy> strategy);
+    explicit ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config,
+                                std::shared_ptr<Strategy> strategy);
 
     /**
      * Updates the offensive positioning tactics

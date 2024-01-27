@@ -1,8 +1,7 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/attacker/skill/skill.h"
-
 #include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
+#include "software/ai/hl/stp/tactic/attacker/skill/skill.h"
 
 class ShootSkill : public Skill
 {

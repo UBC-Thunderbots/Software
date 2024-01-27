@@ -10,7 +10,8 @@
 
 Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie,
            std::shared_ptr<Strategy> strategy)
-    : strategy(strategy),
+    : ai_config(ai_config),
+      strategy(strategy),
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
       stop_tactics(),
       requires_goalie(requires_goalie),
@@ -397,7 +398,8 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
             if (val == 0)
             {
                 RobotId robot_id = robots_to_assign.at(row).id();
-                current_tactic_robot_id_assignment.emplace(tactic_vector.at(col), robot_id);
+                current_tactic_robot_id_assignment.emplace(tactic_vector.at(col),
+                                                           robot_id);
                 tactic_vector.at(col)->setLastExecutionRobot(robot_id);
 
                 auto primitives = primitive_sets.at(col)->robot_primitives();
@@ -418,8 +420,8 @@ Play::assignTactics(const GlobalPathPlannerFactory &path_planner_factory,
 
     return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
                       std::map<std::shared_ptr<const Tactic>, RobotId>>{
-            remaining_robots, std::move(primitives_to_run),
-            current_tactic_robot_id_assignment};
+        remaining_robots, std::move(primitives_to_run),
+        current_tactic_robot_id_assignment};
 }
 
 std::vector<std::string> Play::getState()

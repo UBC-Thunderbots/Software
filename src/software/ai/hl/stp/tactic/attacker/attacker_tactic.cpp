@@ -24,9 +24,7 @@ void AttackerTactic::updateControlParams(const Pass& best_pass_so_far,
 {
 }
 
-void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
-{
-}
+void AttackerTactic::updateControlParams(std::optional<Point> chip_target) {}
 
 std::string AttackerTactic::getFSMState() const
 {

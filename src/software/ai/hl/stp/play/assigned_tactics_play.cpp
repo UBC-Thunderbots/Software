@@ -66,5 +66,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
 void AssignedTacticsPlay::updateTactics(const PlayUpdate &play_update) {}
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, AssignedTacticsPlay, TbotsProto::AiConfig, std::shared_ptr<Strategy>>
+static TGenericFactory<std::string, Play, AssignedTacticsPlay, TbotsProto::AiConfig,
+                       std::shared_ptr<Strategy>>
     factory;

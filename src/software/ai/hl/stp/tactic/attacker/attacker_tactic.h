@@ -1,9 +1,9 @@
 #pragma once
 
+#include <stack>
+
 #include "software/ai/hl/stp/tactic/attacker/skill/head_skill.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-
-#include <stack>
 
 /**
  * This tactic is for a robot performing a pass. It should be used in conjunction with
@@ -20,7 +20,8 @@ class AttackerTactic : public Tactic
      *
      * @param ai_config The AI configuration
      */
-    explicit AttackerTactic(TbotsProto::AiConfig ai_config, std::shared_ptr<Strategy> strategy);
+    explicit AttackerTactic(TbotsProto::AiConfig ai_config,
+                            std::shared_ptr<Strategy> strategy);
 
     AttackerTactic() = delete;
 

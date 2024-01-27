@@ -43,7 +43,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
 std::shared_ptr<Tactic> createTactic(const TbotsProto::AttackerTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    auto tactic = std::make_shared<AttackerTactic>(ai_config, std::make_shared<Strategy>(ai_config));
+    auto tactic = std::make_shared<AttackerTactic>(ai_config,
+                                                   std::make_shared<Strategy>(ai_config));
 
     if (tactic_proto.has_best_pass_so_far())
     {

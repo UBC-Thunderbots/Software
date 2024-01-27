@@ -11,7 +11,8 @@ TEST(ShootOrPassPlayFSMTest, test_transitions)
     World world = ::TestUtil::createBlankTestingWorld();
 
     TbotsProto::AiConfig ai_config;
-    FSM<ShootOrPassPlayFSM> fsm(ShootOrPassPlayFSM{ai_config, std::make_shared<Strategy>(ai_config)});
+    FSM<ShootOrPassPlayFSM> fsm(
+        ShootOrPassPlayFSM{ai_config, std::make_shared<Strategy>(ai_config)});
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
@@ -29,7 +30,8 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard)
     world.updateRefereeCommand(RefereeCommand::FORCE_START);
 
     TbotsProto::AiConfig ai_config;
-    FSM<ShootOrPassPlayFSM> fsm(ShootOrPassPlayFSM{ai_config, std::make_shared<Strategy>(ai_config)});
+    FSM<ShootOrPassPlayFSM> fsm(
+        ShootOrPassPlayFSM{ai_config, std::make_shared<Strategy>(ai_config)});
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(
@@ -89,7 +91,8 @@ TEST(ShootOrPassPlayFSMTest, test_took_shot_guard)
     World world = ::TestUtil::createBlankTestingWorld();
 
     TbotsProto::AiConfig ai_config;
-    FSM<ShootOrPassPlayFSM> fsm(ShootOrPassPlayFSM{ai_config, std::make_shared<Strategy>(ai_config)});
+    FSM<ShootOrPassPlayFSM> fsm(
+        ShootOrPassPlayFSM{ai_config, std::make_shared<Strategy>(ai_config)});
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::StartState>));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(

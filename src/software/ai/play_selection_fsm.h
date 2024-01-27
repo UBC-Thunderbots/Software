@@ -12,16 +12,6 @@
 #include "software/ai/hl/stp/play/offense/offense_play.h"
 #include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play.h"
 #include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
-#include "software/ai/hl/stp/play/ball_placement_play.h"
-#include "software/ai/hl/stp/play/enemy_ball_placement_play.h"
-#include "software/ai/hl/stp/play/enemy_free_kick_play.h"
-#include "software/ai/hl/stp/play/free_kick_play.h"
-#include "software/ai/hl/stp/play/halt_play.h"
-#include "software/ai/hl/stp/play/kickoff_enemy_play.h"
-#include "software/ai/hl/stp/play/kickoff_friendly_play.h"
-#include "software/ai/hl/stp/play/offense/offense_play.h"
-#include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play.h"
-#include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play/stop_play.h"
 
@@ -52,8 +42,8 @@ struct PlaySelectionFSM
      *
      * @param ai_config the default play config for this play fsm
      */
-    explicit PlaySelectionFSM(
-        const TbotsProto::AiConfig& ai_config, std::shared_ptr<Strategy> strategy);
+    explicit PlaySelectionFSM(const TbotsProto::AiConfig& ai_config,
+                              std::shared_ptr<Strategy> strategy);
 
     /**
      * Guards for whether the game state is stopped, halted, playing, or in set up

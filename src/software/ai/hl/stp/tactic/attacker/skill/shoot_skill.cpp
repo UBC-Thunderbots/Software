@@ -29,8 +29,7 @@ bool ShootSkill::done() const
 
 void ShootSkill::updatePrimitive(const TacticUpdate& tactic_update)
 {
-    control_params.shot =
-        strategy_->getBestShot(tactic_update.robot);
+    control_params.shot = strategy_->getBestShot(tactic_update.robot);
 
     fsm.process_event(AttackerFSM::Update(control_params, tactic_update));
 }

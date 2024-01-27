@@ -10,8 +10,8 @@
 class DribblingParcourPlay : public Play
 {
    public:
-    DribblingParcourPlay(
-        const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy);
+    DribblingParcourPlay(const TbotsProto::AiConfig &config,
+                         std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };
