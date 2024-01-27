@@ -178,7 +178,7 @@ bool GeomObstacle<GEOM_TYPE>::intersects(const Segment& segment) const
 }
 
 template <typename GEOM_TYPE>
-Point GeomObstacle<GEOM_TYPE>::closestPoint(const Point &p) const
+Point GeomObstacle<GEOM_TYPE>::closestPoint(const Point& p) const
 {
     return ::closestPoint(geom_, p);
 }

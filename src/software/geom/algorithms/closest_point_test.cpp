@@ -157,7 +157,7 @@ TEST(GeomUtilTest, test_closest_polygon_outside_end_point)
 TEST(GeomUtilTest, test_closest_polygon_concave_outside)
 {
     Polygon polygon(
-            {Point(0, 0), Point(1, 0), Point(1, 1), Point(0.5, 0.5), Point(0, 1)});
+        {Point(0, 0), Point(1, 0), Point(1, 1), Point(0.5, 0.5), Point(0, 1)});
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(0.1, 1.5), polygon),
                                                Point(0, 1), 0.00001));
@@ -166,7 +166,7 @@ TEST(GeomUtilTest, test_closest_polygon_concave_outside)
 TEST(GeomUtilTest, test_closest_polygon_concave_inside)
 {
     Polygon polygon(
-            {Point(0, 0), Point(1, 0), Point(1, 1), Point(0.5, 0.85), Point(0, 1)});
+        {Point(0, 0), Point(1, 0), Point(1, 1), Point(0.5, 0.85), Point(0, 1)});
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(0.5, 0.8), polygon),
                                                Point(0.5, 0.85), 0.00001));
