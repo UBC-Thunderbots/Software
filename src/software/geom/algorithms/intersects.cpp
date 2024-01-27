@@ -218,8 +218,8 @@ bool intersects(const Circle &first, const Stadium &second)
 
 bool intersects(const Stadium &first, const Segment &second)
 {
-    auto start_distance    = distance(first.segment(), second.getStart());
-    auto end_distance      = distance(first.segment(), second.getEnd());
+    auto start_distance     = distance(first.segment(), second.getStart());
+    auto end_distance       = distance(first.segment(), second.getEnd());
     auto start_distance_seg = distance(first.segment().getStart(), second);
     auto end_distance_seg   = distance(first.segment().getEnd(), second);
 
@@ -227,7 +227,7 @@ bool intersects(const Stadium &first, const Segment &second)
         std::min({start_distance_seg, end_distance_seg, start_distance, end_distance});
 
 
-    return shortest_distance <= first.radius();
+    return shortest_distance <= first.radius() || intersects(first.segment(), second);
 }
 bool intersects(const Segment &first, const Stadium &second)
 {

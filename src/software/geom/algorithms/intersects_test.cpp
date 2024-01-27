@@ -659,3 +659,12 @@ TEST(IntersectsTest, stadiums_far)
     EXPECT_FALSE(intersects(stadium1, stadium2));
     EXPECT_FALSE(intersects(stadium2, stadium1));
 }
+
+TEST(IntersectsTest, segment_cross_stadium)
+{
+    Segment segment(Point(-2, 0), Point(2, 0));
+    Stadium stadium(Point(0, -2), Point(0, 2), 1);
+
+    EXPECT_TRUE(intersects(segment, stadium));
+    EXPECT_TRUE(intersects(stadium, segment));
+}
