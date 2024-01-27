@@ -176,19 +176,19 @@ bool intersects(const Stadium &first, const Ray &second)
     // The parametric definition of a ray is r(d)=o+tu where o is the origin point and u
     // is a unit vector Find the distance t along the ray that is closest to start and end
     // Distance cannot be negative because rays only go positively along the unit vector u
-    auto startDist = std::max(0.0, second.toUnitVector().dot(start - second.getStart()));
-    auto endDist   = std::max(0.0, second.toUnitVector().dot(end - second.getStart()));
+    auto start_dist = std::max(0.0, second.toUnitVector().dot(start - second.getStart()));
+    auto end_dist   = std::max(0.0, second.toUnitVector().dot(end - second.getStart()));
 
     // Find corresponding point on the ray:
-    auto startClosestPoint = second.getStart() + second.toUnitVector() * startDist;
-    auto endClosestPoint   = second.getStart() + second.toUnitVector() * endDist;
+    auto start_closest_point = second.getStart() + second.toUnitVector() * start_dist;
+    auto end_closest_point   = second.getStart() + second.toUnitVector() * end_dist;
 
     // Check if square of distance is less than square of radius
     // This will check if the ray is intersecting the circle with origin start
     // and circle with origin end, all that is left is to check the two line segments
     // connecting those circles
-    auto startIntersecting = distanceSquared(start, startClosestPoint) <= radius * radius;
-    auto endIntersecting   = distanceSquared(end, endClosestPoint) <= radius * radius;
+    auto start_intersecting = distanceSquared(start, start_closest_point) <= radius * radius;
+    auto end_intersecting   = distanceSquared(end, end_closest_point) <= radius * radius;
 
     Vector normal =
         first.segment().toVector().rotate(Angle::fromDegrees(90)).normalize(radius);
@@ -196,7 +196,7 @@ bool intersects(const Stadium &first, const Ray &second)
     auto s1 = first.segment() + normal;
     auto s2 = first.segment() - normal;
 
-    return startIntersecting || endIntersecting || intersects(second, s1) ||
+    return start_intersecting || end_intersecting || intersects(second, s1) ||
            intersects(second, s2);
 }
 
@@ -218,17 +218,16 @@ bool intersects(const Circle &first, const Stadium &second)
 
 bool intersects(const Stadium &first, const Segment &second)
 {
-    auto startDistance    = distance(first.segment(), second.getStart());
-    auto endDistance      = distance(first.segment(), second.getEnd());
-    auto startDistanceSeg = distance(first.segment().getStart(), second);
-    auto endDistanceSeg   = distance(first.segment().getEnd(), second);
+    auto start_distance    = distance(first.segment(), second.getStart());
+    auto end_distance      = distance(first.segment(), second.getEnd());
+    auto start_distance_seg = distance(first.segment().getStart(), second);
+    auto end_distance_seg   = distance(first.segment().getEnd(), second);
 
-    auto shortestDistance =
-        std::fmin(startDistanceSeg,
-                  std::fmin(endDistanceSeg, std::fmin(startDistance, endDistance)));
+    auto shortest_distance =
+        std::min({start_distance_seg, end_distance_seg, start_distance, end_distance});
 
 
-    return shortestDistance <= first.radius();
+    return shortest_distance <= first.radius();
 }
 bool intersects(const Segment &first, const Stadium &second)
 {
@@ -253,16 +252,15 @@ bool intersects(const Polygon &first, const Stadium &second)
 
 bool intersects(const Stadium &first, const Stadium &second)
 {
-    auto startDistance    = distanceSquared(first.segment(), second.segment().getStart());
-    auto endDistance      = distanceSquared(first.segment(), second.segment().getEnd());
-    auto startDistanceSeg = distanceSquared(first.segment().getStart(), second.segment());
-    auto endDistanceSeg   = distanceSquared(first.segment().getEnd(), second.segment());
+    auto start_distance    = distanceSquared(first.segment(), second.segment().getStart());
+    auto end_distance      = distanceSquared(first.segment(), second.segment().getEnd());
+    auto start_distance_seg = distanceSquared(first.segment().getStart(), second.segment());
+    auto end_distance_seg   = distanceSquared(first.segment().getEnd(), second.segment());
 
-    auto shortestDistanceSquared =
-        std::fmin(startDistanceSeg,
-                  std::fmin(endDistanceSeg, std::fmin(startDistance, endDistance)));
+    auto shortest_distance_squared =
+        std::min({start_distance_seg, end_distance_seg, start_distance, end_distance});
 
 
-    return intersects(first.segment(), second.segment()) ||
-           shortestDistanceSquared <= std::pow(first.radius() + second.radius(), 2);
+    return shortest_distance_squared <= std::pow(first.radius() + second.radius(), 2) ||
+           intersects(first.segment(), second.segment());
 }
