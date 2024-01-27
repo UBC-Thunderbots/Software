@@ -177,12 +177,6 @@ void SensorFusion::updateWorld(
             ball_in_dribbler_timeout =
                 sensor_fusion_config.num_dropped_detections_before_ball_not_in_dribbler();
         }
-        else if (friendly_robot_id_with_ball_in_dribbler.has_value() &&
-                 friendly_robot_id_with_ball_in_dribbler.value() == robot_id)
-        {
-            friendly_robot_id_with_ball_in_dribbler = std::nullopt;
-            ball_in_dribbler_timeout                = 0;
-        }
     }
 }
 
@@ -324,6 +318,25 @@ Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_dete
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
     return new_enemy_team;
+}
+
+std::optional<Point> SensorFusion::getBallPlacementPoint(const SSLProto::Referee &packet)
+{
+    std::optional<Point> point_opt = ::getBallPlacementPoint(packet);
+
+    if (!point_opt)
+    {
+        return point_opt;
+    }
+
+    // if we're defending the positive side, then in our reference frame, we will have
+    // everything flipped
+    if (defending_positive_side)
+    {
+        return Point(-point_opt.value().x(), -point_opt.value().y());
+    }
+
+    return point_opt;
 }
 
 RobotDetection SensorFusion::invert(RobotDetection robot_detection) const

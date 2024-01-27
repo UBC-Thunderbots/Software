@@ -1,21 +1,22 @@
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 import time
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
 class DriveAndDribblerWidget(QWidget):
-    def __init__(self, proto_unix_io):
+    def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
         """Initialize the widget to control the robot's motors
 
         :param proto_unix_io: the proto_unix_io object
 
         """
         self.input_a = time.time()
-        self.constants = tbots.create2021RobotConstants()
+        self.constants = tbots_cpp.create2021RobotConstants()
         QWidget.__init__(self)
         layout = QVBoxLayout()
 
@@ -29,7 +30,7 @@ class DriveAndDribblerWidget(QWidget):
 
         self.setLayout(layout)
 
-    def refresh(self):
+    def refresh(self) -> None:
         """Refresh the widget and send the a MotorControl message with the current values
         """
         motor_control = MotorControl()
@@ -47,7 +48,7 @@ class DriveAndDribblerWidget(QWidget):
 
         self.proto_unix_io.send_proto(MotorControl, motor_control)
 
-    def value_change(self, value):
+    def value_change(self, value: float) -> str:
         """
         Converts the given float value to a string label
 
@@ -58,7 +59,7 @@ class DriveAndDribblerWidget(QWidget):
         value_str = "%.2f" % value
         return value_str
 
-    def setup_direct_velocity(self, title):
+    def setup_direct_velocity(self, title: str) -> QGroupBox:
         """Create a widget to control the direct velocity of the robot's motors
 
         :param title: the name of the slider
@@ -127,7 +128,7 @@ class DriveAndDribblerWidget(QWidget):
 
         return group_box
 
-    def setup_dribbler(self, title):
+    def setup_dribbler(self, title: str) -> QGroupBox:
         """Create a widget to control the dribbler RPM
 
         :param title: the name of the slider
@@ -169,7 +170,7 @@ class DriveAndDribblerWidget(QWidget):
 
         return group_box
 
-    def toggle_all(self, enable):
+    def toggle_all(self, enable: bool) -> None:
         """
         Disables or enables all sliders and buttons depending on boolean parameter
 
@@ -224,7 +225,7 @@ class DriveAndDribblerWidget(QWidget):
                 # change enabled field
                 self.enabled = False
 
-    def disconnect_sliders(self):
+    def disconnect_sliders(self) -> None:
         """
         Disconnect listener for changing values for all sliders
         """
@@ -233,20 +234,20 @@ class DriveAndDribblerWidget(QWidget):
         self.angular_velocity_slider.valueChanged.disconnect()
         self.dribbler_speed_rpm_slider.valueChanged.disconnect()
 
-    def reset_direct_sliders(self):
+    def reset_direct_sliders(self) -> None:
         """Reset direct sliders back to 0
         """
         self.x_velocity_slider.setValue(0)
         self.y_velocity_slider.setValue(0)
         self.angular_velocity_slider.setValue(0)
 
-    def reset_dribbler_slider(self):
+    def reset_dribbler_slider(self) -> None:
         """
         Reset the dribbler slider back to 0
         """
         self.dribbler_speed_rpm_slider.setValue(0)
 
-    def reset_all_sliders(self):
+    def reset_all_sliders(self) -> None:
         """
         Reset all sliders back to 0
         """

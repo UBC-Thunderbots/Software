@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 
+#include "software/ai/hl/stp/tactic/move_primitive.h"
+
 
 GetBehindBallFSM::GetBehindBallFSM()
     : size_of_region_behind_ball(3 * ROBOT_MAX_RADIUS_METERS)
@@ -13,12 +15,11 @@ void GetBehindBallFSM::updateMove(const Update& event)
     Point point_behind_ball = event.control_params.ball_location +
                               behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
 
-    event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(point_behind_ball), event.control_params.chick_direction,
-        0.0, false, TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-        event.common.robot.robotConstants()));
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, point_behind_ball, event.control_params.chick_direction,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
 
 bool GetBehindBallFSM::behindBall(const Update& event)

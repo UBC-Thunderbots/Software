@@ -108,6 +108,24 @@ class Duration : public Time
     Duration operator-(const Duration& duration) const;
 
     /**
+     * Defines the addition compound assignment operator for Durations. Allows Duration
+     * to be increased by another Duration
+     *
+     * @param duration the duration to add to this Duration
+     * @return Reference to the duration that was updated
+     */
+    Duration& operator+=(const Duration& duration);
+
+    /**
+     * Defines the subtraction compound assignment operator for Durations. Allows Duration
+     * to be subtracted from this Durations
+     *
+     * @param duration the Duration to subtract from this Duration
+     * @return Reference to the duration that was updated
+     */
+    Duration& operator-=(const Duration& duration);
+
+    /**
      * Implements the << operator for printing
      *
      * @param ostream The stream to print to

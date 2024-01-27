@@ -2,7 +2,7 @@ import math
 
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import (
@@ -18,26 +18,26 @@ from proto.ssl_gc_geometry_pb2 import Vector2
 
 def test_shoot_or_chip_play(simulated_test_runner):
     def setup(*args):
-        ball_initial_pos = tbots.Point(-1.4, 2)
-        ball_initial_vel = tbots.Vector(0, 0)
+        ball_initial_pos = tbots_cpp.Point(-1.4, 2)
+        ball_initial_vel = tbots_cpp.Vector(0, 0)
 
-        field = tbots.Field.createSSLDivisionBField()
+        field = tbots_cpp.Field.createSSLDivisionBField()
 
         blue_bots = [
             field.friendlyGoalCenter(),
-            tbots.Point(-1.5, 2),
-            tbots.Point(-2, 1.5),
-            tbots.Point(-2, 0.5),
-            tbots.Point(-2, -0.5),
-            tbots.Point(-2, -1.5),
+            tbots_cpp.Point(-1.5, 2),
+            tbots_cpp.Point(-2, 1.5),
+            tbots_cpp.Point(-2, 0.5),
+            tbots_cpp.Point(-2, -0.5),
+            tbots_cpp.Point(-2, -1.5),
         ]
 
         yellow_bots = [
             field.enemyGoalCenter(),
             field.enemyDefenseArea().negXNegYCorner(),
             field.enemyDefenseArea().negXPosYCorner(),
-            tbots.Point(-1, 0),
-            tbots.Point(1, -2.5),
+            tbots_cpp.Point(-1, 0),
+            tbots_cpp.Point(1, -2.5),
         ]
 
         world_state = create_world_state(
@@ -57,10 +57,10 @@ def test_shoot_or_chip_play(simulated_test_runner):
         world_state.yellow_robots[5].CopyFrom(last_robot)
 
         # Game Controller Setup
-        simulated_test_runner.gamecontroller.send_ci_input(
+        simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.gamecontroller.send_ci_input(
+        simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.FORCE_START, team=Team.BLUE
         )
 
