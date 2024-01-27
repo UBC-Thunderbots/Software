@@ -136,8 +136,8 @@ struct BallPlacementPlayFSM
     Angle calculateWallKickoffAngle(const Point& ball_pos, const Rectangle& field_lines);
 
     /**
-     * Helper function that populates the move_tactics field with MoveTactics that organize the robots away from the ball
-     * placing robot
+     * Helper function that populates the move_tactics field with MoveTactics that
+     * organize the robots away from the ball placing robot
      *
      * @param event the BallPlacementPlayFSM Update event
      */
@@ -174,9 +174,9 @@ struct BallPlacementPlayFSM
                 AlignPlacementState_S,
             StartState_S + Update_E[shouldKickOffWall_G] = KickOffWallState_S,
             KickOffWallState_S + Update_E[!kickDone_G && shouldKickOffWall_G] /
-                                     kickOffWall_A = KickOffWallState_S,
-            KickOffWallState_S + Update_E[kickDone_G] = KickOffWallState_S,
-            KickOffWallState_S + Update_E[!kickDone_G] = AlignPlacementState_S,
+                                     kickOffWall_A                = KickOffWallState_S,
+            KickOffWallState_S + Update_E[kickDone_G]             = KickOffWallState_S,
+            KickOffWallState_S + Update_E[!kickDone_G]            = AlignPlacementState_S,
             AlignPlacementState_S + Update_E[shouldKickOffWall_G] = KickOffWallState_S,
             AlignPlacementState_S + Update_E[!alignDone_G] / alignPlacement_A =
                 AlignPlacementState_S,
