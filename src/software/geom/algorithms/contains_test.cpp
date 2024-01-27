@@ -460,8 +460,8 @@ TEST(ContainsTest, vertical_segment_contains_point)
 TEST(ContainsTest, horizontal_stadium_doesnt_contain_start_point)
 {
     // A point that is just outside the radius of the start point
-    Stadium stadium(Point(0, 0), Point(5,0), 2);
-    Point point(-2.001*cos(20), 2.001*sin(20));
+    Stadium stadium(Point(0, 0), Point(5, 0), 2);
+    Point point(-2.001 * cos(20), 2.001 * sin(20));
 
     EXPECT_FALSE(contains(stadium, point));
 }
@@ -469,8 +469,8 @@ TEST(ContainsTest, horizontal_stadium_doesnt_contain_start_point)
 TEST(ContainsTest, horizontal_stadium_contains_start_point)
 {
     // A point that is just outside the radius of the start point
-    Stadium stadium(Point(0, 0), Point(5,0), 2);
-    Point point(-1.999*cos(30), -1.999*sin(30));
+    Stadium stadium(Point(0, 0), Point(5, 0), 2);
+    Point point(-1.999 * cos(30), -1.999 * sin(30));
 
     EXPECT_TRUE(contains(stadium, point));
 }
@@ -478,8 +478,8 @@ TEST(ContainsTest, horizontal_stadium_contains_start_point)
 TEST(ContainsTest, horizontal_stadium_doesnt_contain_end_point)
 {
     // A point that is just outside the radius of the end point
-    Stadium stadium(Point(0, 0), Point(8,0), 3);
-    Point point = Point(8,0) + Vector(3.001*cos(20), 3.001*sin(20));
+    Stadium stadium(Point(0, 0), Point(8, 0), 3);
+    Point point = Point(8, 0) + Vector(3.001 * cos(20), 3.001 * sin(20));
 
     EXPECT_FALSE(contains(stadium, point));
 }
@@ -487,8 +487,8 @@ TEST(ContainsTest, horizontal_stadium_doesnt_contain_end_point)
 TEST(ContainsTest, horizontal_stadium_contains_end_point)
 {
     // A point that is just outside the radius of the end point
-    Stadium stadium(Point(0, 0), Point(8,0), 3);
-    Point point = Point(8,0) + Vector(2.999*cos(30), -2.999*sin(30));
+    Stadium stadium(Point(0, 0), Point(8, 0), 3);
+    Point point = Point(8, 0) + Vector(2.999 * cos(30), -2.999 * sin(30));
 
     EXPECT_TRUE(contains(stadium, point));
 }
@@ -496,8 +496,8 @@ TEST(ContainsTest, horizontal_stadium_contains_end_point)
 TEST(ContainsTest, horizontal_stadium_doesnt_contain_above_point)
 {
     // A point that is just outside the radius of the end point
-    Stadium stadium(Point(-2, 1), Point(6,1), 3);
-    Point point = Point(2,4.001);
+    Stadium stadium(Point(-2, 1), Point(6, 1), 3);
+    Point point = Point(2, 4.001);
 
     EXPECT_FALSE(contains(stadium, point));
 }
@@ -505,7 +505,7 @@ TEST(ContainsTest, horizontal_stadium_doesnt_contain_above_point)
 TEST(ContainsTest, horizontal_stadium_contains_above_point)
 {
     // A point that is just outside the radius of the end point
-    Stadium stadium(Point(-2, 1), Point(6,1), 3);
+    Stadium stadium(Point(-2, 1), Point(6, 1), 3);
     Point point = Point(2, 3.999);
 
     EXPECT_TRUE(contains(stadium, point));
@@ -514,8 +514,8 @@ TEST(ContainsTest, horizontal_stadium_contains_above_point)
 TEST(ContainsTest, horizontal_stadium_doesnt_contain_below_point)
 {
     // A point that is just outside the radius of the end point
-    Stadium stadium(Point(-2, -1), Point(6,-1), 3);
-    Point point = Point(2.5,2.001);
+    Stadium stadium(Point(-2, -1), Point(6, -1), 3);
+    Point point = Point(2.5, 2.001);
 
     EXPECT_FALSE(contains(stadium, point));
 }
@@ -523,7 +523,7 @@ TEST(ContainsTest, horizontal_stadium_doesnt_contain_below_point)
 TEST(ContainsTest, horizontal_stadium_contains_below_point)
 {
     // A point that is just outside the radius of the end point
-    Stadium stadium(Point(-3, 2), Point(5,2), 3);
+    Stadium stadium(Point(-3, 2), Point(5, 2), 3);
     Point point = Point(1, 4.999);
 
     EXPECT_TRUE(contains(stadium, point));
@@ -532,8 +532,8 @@ TEST(ContainsTest, horizontal_stadium_contains_below_point)
 TEST(ContainsTest, angled_stadium_doesnt_contain_point)
 {
     // A point that is just outside the radius of the end point
-    Stadium stadium(Point(0, 0), Point(5,-5), 1);
-    Point point = Point(2, -2) + Vector(1.001*cos(M_PI_4), 1.001*sin(M_PI_4));
+    Stadium stadium(Point(0, 0), Point(5, -5), 1);
+    Point point = Point(2, -2) + Vector(1.001 * cos(M_PI_4), 1.001 * sin(M_PI_4));
 
     EXPECT_FALSE(contains(stadium, point));
 }
@@ -541,8 +541,8 @@ TEST(ContainsTest, angled_stadium_doesnt_contain_point)
 TEST(ContainsTest, angled_stadium_contains_point)
 {
     // A point that is just outside the radius of the end point
-    Stadium stadium(Point(0, 0), Point(5,-5), 1);
-    Point point = Point(2, -2) + Vector(.999*cos(M_PI_4), .999*sin(M_PI_4));
+    Stadium stadium(Point(0, 0), Point(5, -5), 1);
+    Point point = Point(2, -2) + Vector(.999 * cos(M_PI_4), .999 * sin(M_PI_4));
 
     EXPECT_TRUE(contains(stadium, point));
 }

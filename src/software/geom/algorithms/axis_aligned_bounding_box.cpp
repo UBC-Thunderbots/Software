@@ -38,8 +38,7 @@ Rectangle axisAlignedBoundingBox(const Polygon& polygon, const double inflation_
     return Rectangle(bottom_left, top_right);
 }
 
-Rectangle axisAlignedBoundingBox(const Stadium& stadium,
-                                 const double inflation_radius)
+Rectangle axisAlignedBoundingBox(const Stadium& stadium, const double inflation_radius)
 {
     double min_x = std::min(stadium.segment().getEnd().x(),
                             stadium.segment().getStart().x()) - stadium.radius();

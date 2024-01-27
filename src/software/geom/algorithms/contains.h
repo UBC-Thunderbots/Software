@@ -23,4 +23,3 @@ bool contains(const Segment& container, const Point& contained,
               double fixed_epsilon = FIXED_EPSILON, int ulps_distance = ULPS_EPSILON_TEN);
 bool contains(const Rectangle& container, const Point& contained);
 bool contains(const Stadium& container, const Point& contained);
-

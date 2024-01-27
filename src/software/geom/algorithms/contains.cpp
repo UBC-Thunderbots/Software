@@ -116,5 +116,5 @@ bool contains(const Rectangle& container, const Point& contained)
 
 bool contains(const Stadium& container, const Point& contained)
 {
-    return  distance(container.segment(), contained) <= container.radius();
+    return distance(container.segment(), contained) <= container.radius();
 }

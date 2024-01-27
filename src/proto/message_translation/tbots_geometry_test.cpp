@@ -69,10 +69,11 @@ TEST(TbotsProtobufTest, circle_msg_test)
 
 TEST(TbotsProtobufTest, stadium_msg_test)
 {
-    auto stadium_1 = Stadium(Segment(Point(1, 2), Point(0,-2)), 2);
+    auto stadium_1     = Stadium(Segment(Point(1, 2), Point(0, -2)), 2);
     auto stadium_msg_1 = createStadiumProto(stadium_1);
-    auto stadium_2 = createStadium(*stadium_msg_1);
+    auto stadium_2     = createStadium(*stadium_msg_1);
     auto stadium_msg_2 = createStadiumProto(stadium_2);
 
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(*stadium_msg_1, *stadium_msg_2));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(*stadium_msg_1,
+                                                                   *stadium_msg_2));
 }

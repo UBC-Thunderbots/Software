@@ -27,8 +27,10 @@ cc_library(
     name = "segment",
     srcs = ["segment.cpp"],
     hdrs = ["segment.h"],
-    deps = [":point",
-            ":vector"],
+    deps = [
+        ":point",
+        ":vector",
+    ],
 )
 
 cc_library(
@@ -234,7 +236,7 @@ cc_library(
 cc_test(
     name = "stadium_test",
     srcs = [
-        "stadium_test.cpp"
+        "stadium_test.cpp",
     ],
     deps = [
         ":stadium",
@@ -445,4 +447,3 @@ cc_test(
         "//software/test_util",
     ],
 )
-

@@ -40,7 +40,8 @@ namespace TestUtil
         }
     }
 
-    ::testing::AssertionResult equalWithinTolerance(const Stadium &stadium1, const Stadium &stadium2,
+    ::testing::AssertionResult equalWithinTolerance(const Stadium &stadium1,
+                                                    const Stadium &stadium2,
                                                     double tolerance)
     {
         if (((equalWithinTolerance(stadium1.segment().getStart(), stadium2.segment().getStart(), tolerance) &&

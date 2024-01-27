@@ -188,7 +188,7 @@ TEST(NavigatorObstacleTest, circle_obstacle_intersects)
 
 TEST(NavigatorObstacleTest, create_from_stadium)
 {
-    Stadium expected = Stadium(Point(0,0), Point(6,2), 2);
+    Stadium expected = Stadium(Point(0, 0), Point(6, 2), 2);
     GeomObstacle<Stadium> stadium_obstacle(expected);
 
     EXPECT_EQ(expected, stadium_obstacle.getGeom());
@@ -196,7 +196,7 @@ TEST(NavigatorObstacleTest, create_from_stadium)
 
 TEST(NavigatorObstacleTest, stadium_obstacle_stream_operator_test)
 {
-    Stadium expected = Stadium(Point(0,0), Point(6,2), 2);
+    Stadium expected = Stadium(Point(0, 0), Point(6, 2), 2);
     ObstaclePtr obstacle(std::make_shared<GeomObstacle<Stadium>>(expected));
 
     // we expect that the stream operator string for ObstaclePtr with shape Circle will
