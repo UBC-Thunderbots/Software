@@ -127,15 +127,16 @@ message MotorStatus
 /* Data about the network connection with the robots, including network-derived values */
 message NetworkStatus
 {
+    reserved 4;
+
     // Indicates the time elapsed since the last vision packet was received in ms
     double ms_since_last_vision_received = 1;
 
     // Indicates the time elapsed since the last primitive packet was received in ms
     double ms_since_last_primitive_received = 2;
 
-    // Indicates the percentage of primitive / world packets lost during communication
+    // Indicates the percentage of primitive packets lost during communication
     uint32 primitive_packet_loss_percentage = 3;
-    uint32 world_packet_loss_percentage     = 4;
 }
 
 /* Battery and capacitor voltages */

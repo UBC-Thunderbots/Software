@@ -52,7 +52,11 @@ def initialize_application() -> None:
     app = pyqtgraph.mkQApp("Thunderscope")
 
     # Setup stylesheet
-    apply_stylesheet(app, theme="dark_blue.xml")
+    extra = {
+        # Make thunderscope more dense
+        "density_scale": "-2",
+    }
+    apply_stylesheet(app, theme="dark_blue.xml", extra=extra)
 
 
 def configure_robot_view_fullsystem(

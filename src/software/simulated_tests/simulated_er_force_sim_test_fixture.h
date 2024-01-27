@@ -202,10 +202,4 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
     // Each sequential "camera frame" will be 1 / SIMULATED_CAMERA_FPS time step
     // ahead of the previous one
     static constexpr unsigned int SIMULATED_CAMERA_FPS = 60;
-    // In real-life, the AI typically runs slower than we receive data. In order
-    // to mimic real-life as much as possible, we define approximately how many
-    // camera frames we receive per AI tick. For example, a value of 2 means
-    // that we will simulate 2 time steps (2 camera frames) before we give
-    // the latest data to the AI and run it.
-    static constexpr unsigned int CAMERA_FRAMES_PER_AI_TICK = 2;
 };

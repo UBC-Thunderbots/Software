@@ -224,7 +224,7 @@ if __name__ == "__main__":
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for arg in [
-            {"proto_class": Obstacles},
+            {"proto_class": ObstacleList},
             {"proto_class": PathVisualization},
             {"proto_class": PassVisualization},
             {"proto_class": CostVisualization},
@@ -232,10 +232,6 @@ if __name__ == "__main__":
             {"proto_class": PrimitiveSet},
             {"proto_class": World},
             {"proto_class": PlayInfo},
-        ] + [
-            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-            {"proto_class": HRVOVisualization, "unix_path": YELLOW_HRVO_PATH}
-            for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir, from_log_visualize=True, **arg

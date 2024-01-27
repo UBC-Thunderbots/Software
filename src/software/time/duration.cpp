@@ -66,3 +66,15 @@ std::ostream &operator<<(std::ostream &output_stream, const Duration &duration)
 
     return output_stream;
 }
+
+Duration &Duration::operator+=(const Duration &duration)
+{
+    time_in_seconds = time_in_seconds + duration.toSeconds();
+    return *this;
+}
+
+Duration &Duration::operator-=(const Duration &duration)
+{
+    time_in_seconds = time_in_seconds - duration.toSeconds();
+    return *this;
+}
