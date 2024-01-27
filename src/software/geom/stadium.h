@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/geom/convex_shape.h"
-#include "software/geom/polygon.h"
 #include "software/geom/point.h"
+#include "software/geom/polygon.h"
 #include "software/geom/segment.h"
 
 /**

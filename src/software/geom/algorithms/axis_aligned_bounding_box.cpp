@@ -40,15 +40,19 @@ Rectangle axisAlignedBoundingBox(const Polygon& polygon, const double inflation_
 
 Rectangle axisAlignedBoundingBox(const Stadium& stadium, const double inflation_radius)
 {
-    double min_x = std::min(stadium.segment().getEnd().x(),
-                            stadium.segment().getStart().x()) - stadium.radius();
-    double max_x = std::max(stadium.segment().getEnd().x(),
-                            stadium.segment().getStart().x()) + stadium.radius();
+    double min_x =
+        std::min(stadium.segment().getEnd().x(), stadium.segment().getStart().x()) -
+        stadium.radius();
+    double max_x =
+        std::max(stadium.segment().getEnd().x(), stadium.segment().getStart().x()) +
+        stadium.radius();
 
-    double min_y = std::min(stadium.segment().getEnd().y(),
-                            stadium.segment().getStart().y()) - stadium.radius();
-    double max_y = std::max(stadium.segment().getEnd().y(),
-                            stadium.segment().getStart().y()) + stadium.radius();
+    double min_y =
+        std::min(stadium.segment().getEnd().y(), stadium.segment().getStart().y()) -
+        stadium.radius();
+    double max_y =
+        std::max(stadium.segment().getEnd().y(), stadium.segment().getStart().y()) +
+        stadium.radius();
 
     Point bottom_left(min_x - inflation_radius, min_y - inflation_radius);
     Point top_right(max_x + inflation_radius, max_y + inflation_radius);

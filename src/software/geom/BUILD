@@ -226,10 +226,10 @@ cc_library(
     srcs = ["stadium.cpp"],
     hdrs = ["stadium.h"],
     deps = [
-      ":convex_shape",
-      ":point",
-      ":segment",
-      ":polygon",
+        ":convex_shape",
+        ":point",
+        ":polygon",
+        ":segment",
     ],
 )
 
