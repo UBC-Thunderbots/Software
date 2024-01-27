@@ -35,9 +35,9 @@ TEST(StadiumConstructorTests, stadium_invalid_segment_constructor)
 
 TEST(StadiumRectangleTests, stadium_default_rectangle_test)
 {
-    Stadium s = Stadium(Segment(), 0);
-    Point p = Point();
-    Polygon rec = Polygon{p,p,p,p};
+    Stadium s   = Stadium(Segment(), 0);
+    Point p     = Point();
+    Polygon rec = Polygon{p, p, p, p};
     EXPECT_EQ(s.inner_rectangle(), rec);
 }
 
