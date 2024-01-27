@@ -107,29 +107,15 @@ TEST_F(TestEndInObstacleSampler, test_sampling_performance)
         }
     }
 
-    for (double rad_step = 0.10; rad_step <= 0.20; rad_step += 0.02) {
-        for (int per_rad_step = 1; per_rad_step <= 4; per_rad_step++) {
-            auto t1 = std::chrono::high_resolution_clock::now();
-            double distance_total = 0;
-            for (auto const &point : points_in_obstacles) {
-                std::optional<Point> end_point = endInObstacleSample(obstacles, point, navigable_area, 6, rad_step, per_rad_step);
-                if (!end_point.has_value()) {
-                    LOG(WARNING) << "TEST FAILED: COULD NOT FIND CLOSEST POINT";
-                    FAIL();
-                }
-                distance_total += distance(end_point.value(), point);
-                for (auto const &obstacle : obstacles) {
-                    if (obstacle->contains(end_point.value())) {
-                        LOG(WARNING) << "TEST FAILED: END POINT " << end_point.value().x() << " " << end_point.value().y() << " IN OBSTACLE";
-                        FAIL();
-                    }
-                }
+    for (auto const &point : points_in_obstacles) {
+        std::optional<Point> end_point = endInObstacleSample(obstacles, point, navigable_area, 6);
+        if (!end_point.has_value()) {
+            FAIL();
+        }
+        for (auto const &obstacle : obstacles) {
+            if (obstacle->contains(end_point.value())) {
+                FAIL();
             }
-            double distance_avg = distance_total / 40;
-            auto t2 = std::chrono::high_resolution_clock::now();
-            auto microseconds_int = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
-            LOG(WARNING) << microseconds_int.count() << " microseconds to sample all points with rad step " << rad_step << " and per rad step " << per_rad_step << " with average distance of " << distance_avg;
         }
     }
-
 }
