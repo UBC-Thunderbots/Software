@@ -592,7 +592,52 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
     EXPECT_EQ(expected_2, result_2.gameState());
 }
 
-TEST_F(SensorFusionTest, ball_placement_friendly_set_by_referee)
+TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
+{
+    SensorProto sensor_msg;
+
+    // send Point(0.02, 0.035) to Referee message
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_blue;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+    World result = *sensor_fusion.getWorld();
+
+    // ball placement is only set when the Referee command is for friendly team
+    // so result should remain std::nullopt
+    std::optional<Point> returned_point = result.gameState().getBallPlacementPoint();
+    EXPECT_EQ(std::nullopt, returned_point);
+}
+
+TEST_F(SensorFusionTest, ball_placement_friendly_invalid_point_set_by_referee)
+{
+    SensorProto sensor_msg;
+
+    SSLProto::Referee ball_placement_ref_msg = *referee_ball_placement_yellow;
+
+    // Remove ball placement point
+    ball_placement_ref_msg.clear_designated_position();
+
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_blue;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+    World result = *sensor_fusion.getWorld();
+
+    // no valid ball placement point, so expect std::nullopt
+    std::optional<Point> returned_point = result.gameState().getBallPlacementPoint();
+    EXPECT_EQ(std::nullopt, returned_point);
+}
+
+TEST_F(SensorFusionTest,
+       ball_placement_yellow_but_is_not_defending_positive_side_set_by_referee)
 {
     SensorProto sensor_msg;
 
@@ -611,12 +656,14 @@ TEST_F(SensorFusionTest, ball_placement_friendly_set_by_referee)
     EXPECT_EQ(Point(0.05, 0.075), returned_point);
 }
 
-TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
+TEST_F(SensorFusionTest,
+       ball_placement_friendly_yellow_but_is_defending_positive_side_set_by_referee)
 {
     SensorProto sensor_msg;
 
-    // send Point(20, 35) to Referee message
-    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_blue;
+    // send Point(-0.05, -0.075) to Referee message
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_yellow;
+    sensor_msg.mutable_ssl_referee_msg()->set_blue_team_on_positive_half(false);
 
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
@@ -626,10 +673,63 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
     sensor_fusion.processSensorProto(sensor_msg);
     World result = *sensor_fusion.getWorld();
 
-    // ball placement is only set when the Referee command is for friendly team
-    // so result should remain std::nullopt
     std::optional<Point> returned_point = result.gameState().getBallPlacementPoint();
-    EXPECT_EQ(std::nullopt, returned_point);
+    EXPECT_TRUE(returned_point);
+    EXPECT_EQ(Point(-0.05, -0.075), returned_point.value());
+}
+
+TEST_F(SensorFusionTest,
+       ball_placement_friendly_blue_but_is_defending_positive_side_set_by_referee)
+{
+    SensorProto sensor_msg;
+
+    // Point (-0.02, -0.035) to Referee message
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_blue;
+    sensor_msg.mutable_ssl_referee_msg()->set_blue_team_on_positive_half(true);
+
+    TbotsProto::SensorFusionConfig sensor_fusion_blue_config =
+        TbotsProto::SensorFusionConfig();
+    sensor_fusion_blue_config.set_friendly_color_yellow(false);
+    SensorFusion sensor_fusion_for_blue(sensor_fusion_blue_config);
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion_for_blue.processSensorProto(sensor_msg);
+    World result = *sensor_fusion_for_blue.getWorld();
+
+    std::optional<Point> returned_point = result.gameState().getBallPlacementPoint();
+    EXPECT_TRUE(returned_point);
+    EXPECT_EQ(Point(-0.02, -0.035), returned_point.value());
+}
+
+TEST_F(SensorFusionTest,
+       ball_placement_friendly_blue_but_is_not_defending_friendly_side_set_by_referee)
+{
+    SensorProto sensor_msg;
+
+    // Point (0.02, 0.035) to Referee message
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_blue;
+    sensor_msg.mutable_ssl_referee_msg()->set_blue_team_on_positive_half(false);
+
+    TbotsProto::SensorFusionConfig sensor_fusion_blue_config =
+        TbotsProto::SensorFusionConfig();
+    sensor_fusion_blue_config.set_friendly_color_yellow(false);
+    SensorFusion sensor_fusion_for_blue(sensor_fusion_blue_config);
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion_for_blue.processSensorProto(sensor_msg);
+    World result = *sensor_fusion_for_blue.getWorld();
+
+    std::optional<Point> returned_point = result.gameState().getBallPlacementPoint();
+    EXPECT_TRUE(returned_point);
+    EXPECT_EQ(Point(0.02, 0.035), returned_point.value());
 }
 
 TEST_F(SensorFusionTest, goalie_id_set_by_referee)

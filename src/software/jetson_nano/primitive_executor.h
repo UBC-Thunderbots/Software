@@ -2,7 +2,8 @@
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "software/ai/navigator/path_planner/hrvo/hrvo_simulator.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
+#include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
 
@@ -32,14 +33,6 @@ class PrimitiveExecutor
      * Set the current primitive to the stop primitive
      */
     void setStopPrimitive();
-
-    /**
-     * Update primitive executor with a new World
-     * @param world_msg Protobuf representation of the current World (World from the
-     * perspective of the team which the robot with this Primitive Executor is a member
-     * of)
-     */
-    void updateWorld(const TbotsProto::World &world_msg);
 
     /**
      * Update primitive executor with the current velocity of the robot
@@ -82,17 +75,24 @@ class PrimitiveExecutor
     AngularVelocity getTargetAngularVelocity();
 
     TbotsProto::Primitive current_primitive_;
-    TbotsProto::World current_world_;
-    TeamColour friendly_team_colour;
+    Duration time_since_trajectory_creation_;
+    Vector velocity_;
+    AngularVelocity angular_velocity_;
+    Angle orientation_;
+    TeamColour friendly_team_colour_;
     RobotConstants_t robot_constants_;
-    HRVOSimulator hrvo_simulator_;
+    std::optional<TrajectoryPath> trajectory_path_;
+    std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 
     // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
     // time step to be used, in Seconds
     Duration time_step_;
     RobotId robot_id_;
 
-    // Thresholds for when we should update HRVO Simulator's velocity
-    static constexpr const double LINEAR_VELOCITY_FEEDBACK_THRESHOLD_M_PER_S    = 1.0;
-    static constexpr const double ANGULAR_VELOCITY_FEEDBACK_THRESHOLD_DEG_PER_S = 200.0;
+    // Estimated delay between a vision frame to AI processing to robot executing
+    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
+
+    // The distance away from the destination at which we start dampening the velocity
+    // to avoid jittering around the destination.
+    static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
 };

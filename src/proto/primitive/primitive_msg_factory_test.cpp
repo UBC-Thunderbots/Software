@@ -25,80 +25,6 @@ TEST_F(PrimitiveFactoryTest, test_auto_chip_or_kick_equality)
     EXPECT_EQ(auto_chip_or_kick, auto_chip_or_kick_other);
 }
 
-TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
-{
-    auto move_primitive = createMovePrimitive(
-        TestUtil::createMotionControl(Point(-5, 1)), Angle::threeQuarter(), 3.0, true,
-        TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::AVOID,
-        {AutoChipOrKickMode::OFF, 0}, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        5.0, robot_constants);
-
-    ASSERT_TRUE(move_primitive->has_move());
-    auto destination = move_primitive->move().motion_control().path().points().at(0);
-    EXPECT_EQ(destination.x_meters(), -5);
-    EXPECT_EQ(destination.y_meters(), 1);
-    EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
-    EXPECT_EQ(move_primitive->move().final_angle().radians(),
-              Angle::threeQuarter().toRadians());
-    EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
-              robot_constants.indefinite_dribbler_speed_rpm);
-    EXPECT_FALSE(move_primitive->move().has_auto_chip_or_kick());
-    EXPECT_EQ(move_primitive->move().max_speed_m_per_s(),
-              robot_constants.robot_max_speed_m_per_s);
-    EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 5);
-}
-
-TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
-{
-    auto move_primitive = createMovePrimitive(
-        TestUtil::createMotionControl(Point(-5, 1)), Angle::threeQuarter(), 3.0, false,
-        TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::AVOID,
-        {AutoChipOrKickMode::AUTOCHIP, 2.5},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants,
-        std::optional<double>());
-
-
-    ASSERT_TRUE(move_primitive->has_move());
-    auto destination = move_primitive->move().motion_control().path().points().at(0);
-    EXPECT_EQ(destination.x_meters(), -5);
-    EXPECT_EQ(destination.y_meters(), 1);
-    EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
-    EXPECT_EQ(move_primitive->move().final_angle().radians(),
-              Angle::threeQuarter().toRadians());
-    EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
-              robot_constants.indefinite_dribbler_speed_rpm);
-    ASSERT_TRUE(move_primitive->move().has_auto_chip_or_kick());
-    EXPECT_EQ(move_primitive->move().auto_chip_or_kick().autochip_distance_meters(), 2.5);
-    EXPECT_EQ(move_primitive->move().max_speed_m_per_s(),
-              robot_constants.robot_max_speed_m_per_s);
-    EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 0.0f);
-}
-
-TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
-{
-    auto move_primitive = createMovePrimitive(
-        TestUtil::createMotionControl(Point(-5, 1)), Angle::threeQuarter(), 3.0, false,
-        TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::AVOID,
-        {AutoChipOrKickMode::AUTOKICK, 3.5},
-        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, 0.0, robot_constants,
-        std::optional<double>());
-
-    ASSERT_TRUE(move_primitive->has_move());
-    auto destination = move_primitive->move().motion_control().path().points().at(0);
-    EXPECT_EQ(destination.x_meters(), -5);
-    EXPECT_EQ(destination.y_meters(), 1);
-    EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
-    EXPECT_EQ(move_primitive->move().final_angle().radians(),
-              Angle::threeQuarter().toRadians());
-    EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
-              robot_constants.indefinite_dribbler_speed_rpm);
-    ASSERT_TRUE(move_primitive->move().has_auto_chip_or_kick());
-    EXPECT_EQ(move_primitive->move().auto_chip_or_kick().autokick_speed_m_per_s(), 3.5);
-    EXPECT_EQ(move_primitive->move().max_speed_m_per_s(),
-              STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND);
-    EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 0.0f);
-}
-
 TEST_F(PrimitiveFactoryTest, test_create_direct_velocity)
 {
     auto direct_velocity_primitive =
@@ -133,7 +59,7 @@ TEST_F(PrimitiveFactoryTest, test_create_direct_velocity)
 
 TEST_F(PrimitiveFactoryTest, test_create_stop_primitive_brake)
 {
-    auto stop_primitive = createStopPrimitive();
+    auto stop_primitive = createStopPrimitiveProto();
 
     ASSERT_TRUE(stop_primitive->has_stop());
 }

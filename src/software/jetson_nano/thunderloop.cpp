@@ -66,7 +66,7 @@ extern "C"
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
                          const int loop_hz)
-    // TODO (#2495): Set the friendly team colour once we receive World proto
+    // TODO (#2495): Set the friendly team colour
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
       motor_status_(std::nullopt),
@@ -105,7 +105,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
 
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
-        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+        PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
@@ -179,9 +179,7 @@ Thunderloop::~Thunderloop() {}
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
-                auto result       = network_service_->poll(robot_status_);
-                new_primitive_set = std::get<0>(result);
-                new_world         = std::get<1>(result);
+                new_primitive_set = network_service_->poll(robot_status_);
             }
 
             thunderloop_status_.set_network_service_poll_time_ms(
@@ -221,22 +219,6 @@ Thunderloop::~Thunderloop() {}
                     thunderloop_status_.set_primitive_executor_start_time_ms(
                         getMilliseconds(poll_time));
                 }
-            }
-
-            struct timespec time_since_last_vision_received;
-            clock_gettime(CLOCK_MONOTONIC, &current_time);
-            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_received_time,
-                                              &time_since_last_vision_received);
-            network_status_.set_ms_since_last_vision_received(
-                getMilliseconds(time_since_last_vision_received));
-
-            // If the world msg is new, update the internal buffer
-            if (new_world.time_sent().epoch_timestamp_seconds() >
-                world_.time_sent().epoch_timestamp_seconds())
-            {
-                clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
-                primitive_executor_.updateWorld(new_world);
-                world_ = new_world;
             }
 
             if (motor_status_.has_value())
