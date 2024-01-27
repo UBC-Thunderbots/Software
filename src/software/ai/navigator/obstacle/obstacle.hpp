@@ -43,6 +43,16 @@ class Obstacle
     virtual double distance(const Point& p) const = 0;
 
     /**
+     * Gets the signed distance from the obstacle to the point. That is, if point is inside the obstacle then distance
+     * will be negative.
+     * See https://iquilezles.org/articles/distfunctions2d/ for details on the maths
+     *
+     * @param point Point to get distance to
+     * @return distance from point to nearest point on perimeter of obstacle. Positive if outside, negative if inside
+     */
+    virtual double signedDistance(const Point& point) const = 0;
+
+    /**
      * Determines whether the given Segment intersects this Obstacle
      *
      * @return true if the given Segment intersects this Obstacle
@@ -105,6 +115,7 @@ class GeomObstacle : public Obstacle
 
     bool contains(const Point& p) const override;
     double distance(const Point& p) const override;
+    double signedDistance(const Point& point) const override;
     bool intersects(const Segment& segment) const override;
     TbotsProto::Obstacle createObstacleProto() const override;
     Rectangle axisAlignedBoundingBox(double inflation_radius = 0) const override;
@@ -152,6 +163,12 @@ template <typename GEOM_TYPE>
 bool GeomObstacle<GEOM_TYPE>::contains(const Point& p) const
 {
     return ::contains(geom_, p);
+}
+
+template <typename  GEOM_TYPE>
+double GeomObstacle<GEOM_TYPE>::signedDistance(const Point &point) const
+{
+    return ::signedDistance(geom_, point);
 }
 
 template <typename GEOM_TYPE>
