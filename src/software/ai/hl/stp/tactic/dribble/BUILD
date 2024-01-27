@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 cc_library(
     name = "dribble_tactic",
     srcs = [
@@ -30,8 +32,8 @@ cc_test(
 )
 
 cc_test(
-    name = "dribble_tactic_test",
-    srcs = ["dribble_tactic_test.cpp"],
+    name = "dribble_tactic_push_enemy_test",
+    srcs = ["dribble_tactic_push_enemy_test.cpp"],
     deps = [
         ":dribble_tactic",
         "//shared/test_util:tbots_gtest_main",
@@ -45,18 +47,14 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "dribble_tactic_push_enemy_test",
-    srcs = ["dribble_tactic_push_enemy_test.cpp"],
+py_test(
+    name = "dribble_tactic_test",
+    srcs = [
+        "dribble_tactic_test.py",
+    ],
     deps = [
-        ":dribble_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
