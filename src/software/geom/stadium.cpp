@@ -71,6 +71,6 @@ bool operator!=(const Stadium &s1, const Stadium &s2)
 std::ostream &operator<<(std::ostream &os, const Stadium &stadium)
 {
     os << "Stadium starting at " << stadium.segment().getStart() << " ending at "
-       << stadium.segment().getEnd() << "with radius " << stadium.radius();
+       << stadium.segment().getEnd() << " with radius " << stadium.radius();
     return os;
 }
