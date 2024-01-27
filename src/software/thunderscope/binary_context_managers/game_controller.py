@@ -79,7 +79,7 @@ class Gamecontroller(object):
         :param traceback: The traceback of the exception
 
         """
-        self.gamecontroller_proc.kill()
+        self.gamecontroller_proc.terminate()
         self.gamecontroller_proc.wait()
 
         if self.ci_mode:
