@@ -36,7 +36,7 @@ struct BallPlacementPlayFSM
     explicit BallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
 
     /**
-     * Action that has the placing kick the ball off the wall to give more space to
+     * Action that has the placing robot kick the ball off the wall to give more space to
      * dribble
      *
      * @param event the BallPlacementPlayFSM Update event
@@ -128,15 +128,15 @@ struct BallPlacementPlayFSM
     /**
      * Helper function for calculating the angle to kick the ball off of a wall
      *
-     * @param ball_pos
-     * @param field_lines
+     * @param ball_pos the ball position to use when calculating the kick angle
+     * @param field_lines the field lines of the playing area
      *
      * @return the kick angle
      */
     Angle calculateWallKickoffAngle(const Point& ball_pos, const Rectangle& field_lines);
 
     /**
-     * Helper function for setting up the MoveTactics of the robots away from the ball
+     * Helper function that populates the move_tactics field with MoveTactics that organize the robots away from the ball
      * placing robot
      *
      * @param event the BallPlacementPlayFSM Update event
@@ -199,9 +199,8 @@ struct BallPlacementPlayFSM
     std::vector<std::shared_ptr<PlaceBallMoveTactic>> move_tactics;
     Point setup_point;
     std::chrono::time_point<std::chrono::system_clock> start_time;
-    constexpr static double const SHOT_VELOCITY_THRESHOLD_M_PER_S = 1.0;
     constexpr static double const WALL_KICKOFF_VELOCITY_M_PER_S   = 3.0;
-    constexpr static double const RETREAT_DISTANCE_METERS         = 0.5;
+    constexpr static double const RETREAT_DISTANCE_METERS         = 0.6;
     constexpr static double const PLACEMENT_DIST_THRESHOLD_METERS = 0.05;
     constexpr static double const BALL_IS_PLACED_WAIT_S           = 3.0;
 };

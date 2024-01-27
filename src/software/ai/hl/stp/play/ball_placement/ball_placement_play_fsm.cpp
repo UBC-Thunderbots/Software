@@ -175,7 +175,8 @@ bool BallPlacementPlayFSM::alignDone(const Update &event)
 bool BallPlacementPlayFSM::kickDone(const Update &event)
 {
     const auto ball_velocity = event.common.world.ball().velocity().length();
-    return (ball_velocity > SHOT_VELOCITY_THRESHOLD_M_PER_S) && !shouldKickOffWall(event);
+    const auto ball_is_kicked_m_per_s_threshold = this->ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
+    return (ball_velocity > ball_is_kicked_m_per_s_threshold) && !shouldKickOffWall(event);
 }
 
 bool BallPlacementPlayFSM::ballPlaced(const Update &event)
