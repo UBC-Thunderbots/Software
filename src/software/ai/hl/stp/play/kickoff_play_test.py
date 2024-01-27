@@ -59,7 +59,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         yellow_play.name = PlayName.KickoffFriendlyPlay
 
     simulated_test_runner.gamecontroller.send_gc_command(
-        gc_command=Command.Type.NORMAL_START, team=Team.BLU
+        gc_command=Command.Type.NORMAL_START, team=Team.BLUE
     )
 
     # Force play override here
