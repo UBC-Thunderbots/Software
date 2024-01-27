@@ -43,6 +43,7 @@ from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 
 ################################
 #  FULLSYSTEM RELATED WIDGETS  #
@@ -56,6 +57,7 @@ def setup_gl_widget(
     visualization_buffer_size: int,
     replay: bool = False,
     replay_log: os.PathLike = None,
+    gamecontroller: Gamecontroller = None,
 ) -> Field:
     """Setup the GLWidget with its constituent layers
 
@@ -72,7 +74,11 @@ def setup_gl_widget(
     player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
 
     # Create widget
-    gl_widget = GLWidget(player=player)
+    gl_widget = GLWidget(
+        friendly_color_yellow=friendly_colour_yellow,
+        player=player,
+        gamecontroller=gamecontroller,
+    )
 
     # Create layers
     validation_layer = gl_validation_layer.GLValidationLayer(

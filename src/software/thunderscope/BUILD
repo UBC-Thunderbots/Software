@@ -71,6 +71,7 @@ py_library(
         "//software:python_bindings.so",
     ],
     deps = [
+        "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/common:common_widgets",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/common:proto_plotter",

@@ -351,12 +351,7 @@ if __name__ == "__main__":
     #
     # The async sim ticket ticks the simulator at a fixed rate.
     else:
-        tscope = Thunderscope(
-            config=config.configure_two_ai_gamecontroller_view(
-                args.visualization_buffer_size
-            ),
-            layout_path=args.layout,
-        )
+        tscope = None
 
         def __ticker(tick_rate_ms: int) -> None:
             """Setup the world and tick simulation forever
@@ -411,6 +406,13 @@ if __name__ == "__main__":
             log_path=args.yellow_full_system_runtime_dir,
             time_provider=autoref.time_provider if args.enable_autoref else None,
         ) as yellow_logger:
+            tscope = Thunderscope(
+                config=config.configure_two_ai_gamecontroller_view(
+                    gamecontroller, args.visualization_buffer_size
+                ),
+                layout_path=args.layout,
+            )
+
             autoref_proto_unix_io = ProtoUnixIO()
 
             tscope.proto_unix_io_map[

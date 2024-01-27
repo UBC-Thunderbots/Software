@@ -66,7 +66,6 @@ class Gamecontroller(object):
             # We can't connect to the ci port right away, it takes
             # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
             time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
-
             self.ci_socket = SslSocket(self.ci_port)
 
         return self
@@ -127,6 +126,7 @@ class Gamecontroller(object):
             :param data: The referee command to send
 
             """
+            print(data)
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
             if autoref_proto_unix_io is not None:
@@ -155,6 +155,7 @@ class Gamecontroller(object):
         :return: The response CiOutput containing 1 or more refree msgs
 
         """
+        print(gc_command)
         ci_input = CiInput(timestamp=int(time.time_ns()))
         api_input = Input()
         change = Change()
