@@ -138,6 +138,15 @@ class SensorFusion
      */
     static bool teamHasBall(const Team &team, const Ball &ball);
 
+    /**
+     * detect injured robots in the team that needs to be substituted and add it to injuredRobots
+     * 
+     * @param robot_status_msgs The robot statuses from the sensor fusion packet 
+     * @return the list of robotids of the injured robots
+     */
+    void detectInjuredRobots(const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus>
+                         &robot_status_msgs);
+
     TbotsProto::SensorFusionConfig sensor_fusion_config;
     std::optional<Field> field;
     std::optional<Ball> ball;

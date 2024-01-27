@@ -401,3 +401,69 @@ void SensorFusion::resetWorldComponents()
     enemy_team_filter    = RobotTeamFilter();
     possession           = TeamPossession::FRIENDLY_TEAM;
 }
+
+void SensorFusion::detectInjuredRobots(const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
+{
+    std::vector<RobotId> injured_robot_ids;
+    auto world = getWorld();
+
+
+    for (auto &robot_status_msg : robot_status_msgs)
+    {
+        RobotId robot_id = robot_status_msg.robot_id();
+
+        // Note: each check is not continuing when the robot is identified as injured
+
+        /* checking if the robot status include an fatal error code */
+        for (const auto &error_code_msg : robot_status_msg.error_code())
+        {
+            if (error_code_msg != TbotsProto::ErrorCode::NO_ERROR)
+            {
+                injured_robot_ids.push_back(robot_id);
+                continue;
+            }
+        }
+
+        /* checking for motor status in all 4 drive unit */
+        auto motor_status_msgs = robot_status_msg.motor_status();
+
+        std::vector<TbotsProto::DriveUnit> drive_unit_msgs;
+        drive_unit_msgs.push_back(motor_status_msgs.front_left());
+        drive_unit_msgs.push_back(motor_status_msgs.front_right());
+        drive_unit_msgs.push_back(motor_status_msgs.back_left());
+        drive_unit_msgs.push_back(motor_status_msgs.back_right());
+
+        for(auto drive_unit_msg: drive_unit_msgs){
+            auto motor_faults = drive_unit_msg.motor_faults();
+            /* currently only substituting for driver overtemperature or its prewarning */
+            for(auto motor_fault: motor_faults){
+                if(motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE || motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING){
+                    injured_robot_ids.push_back(robot_id);
+                    continue;
+                }
+            }
+        }
+
+
+        /* break beam check */
+        auto power_status_msg = robot_status_msg.power_status();
+        if(power_status_msg.breakbeam_tripped()){
+            auto ball = world->ball();
+            auto robot = world->friendlyTeam().getRobotById(robot_id);
+            auto dist_vector = new Vector(ball.position().x()-robot->position().x(), ball.position().y()-robot->position().y());
+            
+            /* check if the robot has the ball, reference distance 2m */
+            if(dist_vector->length() > 2){
+                injured_robot_ids.push_back(robot_id);
+                continue;
+            }
+        }
+    }
+
+    std::vector<Robot> injured_robots;
+    for(auto id: injured_robot_ids){
+        injured_robots.push_back(world->friendlyTeam().getRobotById(id).value());
+    }
+
+    world->friendlyTeam().setInjuredRobots(injured_robots);
+}
