@@ -61,13 +61,18 @@ namespace TestUtil
     void checkStadiumPointsInsideBoundingBox(Stadium stadium,
                                              std::vector<Point> all_points)
     {
-        auto min_x = std::min(stadium.segment().getStart().x(), stadium.segment().getEnd().x());
-        auto max_x = std::max(stadium.segment().getStart().x(), stadium.segment().getEnd().x());
-        auto min_y = std::min(stadium.segment().getStart().y(), stadium.segment().getEnd().y());
-        auto max_y = std::max(stadium.segment().getStart().y(), stadium.segment().getEnd().y());
+        auto min_x =
+            std::min(stadium.segment().getStart().x(), stadium.segment().getEnd().x());
+        auto max_x =
+            std::max(stadium.segment().getStart().x(), stadium.segment().getEnd().x());
+        auto min_y =
+            std::min(stadium.segment().getStart().y(), stadium.segment().getEnd().y());
+        auto max_y =
+            std::max(stadium.segment().getStart().y(), stadium.segment().getEnd().y());
 
-        Rectangle bounding_box = Rectangle(Point(min_x - stadium.radius(), min_y - stadium.radius()),
-                                           Point(max_x + stadium.radius(), max_y + stadium.radius()));
+        Rectangle bounding_box =
+            Rectangle(Point(min_x - stadium.radius(), min_y - stadium.radius()),
+                      Point(max_x + stadium.radius(), max_y + stadium.radius()));
 
         for (Point p : all_points)
         {
@@ -304,13 +309,14 @@ TEST(RasterizeTest, test_rasterize_complex_self_intersecting_polygon)
 
 TEST(RasterizeTest, test_stadium_flat)
 {
-    Stadium stadium(Point(-1, 2), Point(3,2), 1);
+    Stadium stadium(Point(-1, 2), Point(3, 2), 1);
 
     double offset = 0.5;
 
     std::vector<Point> rasterized_points = rasterize(stadium, offset);
 
-    for(Point p : rasterized_points) {
+    for (Point p : rasterized_points)
+    {
         EXPECT_TRUE(contains(stadium, p));
     }
 
@@ -319,7 +325,7 @@ TEST(RasterizeTest, test_stadium_flat)
 
 TEST(RasterizeTest, test_stadium_angled)
 {
-    Stadium stadium(Point(-1, 1), Point(3,-2), 2);
+    Stadium stadium(Point(-1, 1), Point(3, -2), 2);
 
     double offset = 1.f;
 
@@ -330,7 +336,7 @@ TEST(RasterizeTest, test_stadium_angled)
 
 TEST(RasterizeTest, test_stadium_complex)
 {
-    Stadium stadium(Point(6.231, 1.157291), Point(3.128492,-2.2141859), 2.87592);
+    Stadium stadium(Point(6.231, 1.157291), Point(3.128492, -2.2141859), 2.87592);
 
     double offset = 1.918472;
 

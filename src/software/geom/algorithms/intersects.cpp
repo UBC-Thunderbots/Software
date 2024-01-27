@@ -187,8 +187,9 @@ bool intersects(const Stadium &first, const Ray &second)
     // This will check if the ray is intersecting the circle with origin start
     // and circle with origin end, all that is left is to check the two line segments
     // connecting those circles
-    auto start_intersecting = distanceSquared(start, start_closest_point) <= radius * radius;
-    auto end_intersecting   = distanceSquared(end, end_closest_point) <= radius * radius;
+    auto start_intersecting =
+        distanceSquared(start, start_closest_point) <= radius * radius;
+    auto end_intersecting = distanceSquared(end, end_closest_point) <= radius * radius;
 
     Vector normal =
         first.segment().toVector().rotate(Angle::fromDegrees(90)).normalize(radius);
@@ -252,10 +253,11 @@ bool intersects(const Polygon &first, const Stadium &second)
 
 bool intersects(const Stadium &first, const Stadium &second)
 {
-    auto start_distance    = distanceSquared(first.segment(), second.segment().getStart());
-    auto end_distance      = distanceSquared(first.segment(), second.segment().getEnd());
-    auto start_distance_seg = distanceSquared(first.segment().getStart(), second.segment());
-    auto end_distance_seg   = distanceSquared(first.segment().getEnd(), second.segment());
+    auto start_distance = distanceSquared(first.segment(), second.segment().getStart());
+    auto end_distance   = distanceSquared(first.segment(), second.segment().getEnd());
+    auto start_distance_seg =
+        distanceSquared(first.segment().getStart(), second.segment());
+    auto end_distance_seg = distanceSquared(first.segment().getEnd(), second.segment());
 
     auto shortest_distance_squared =
         std::min({start_distance_seg, end_distance_seg, start_distance, end_distance});
