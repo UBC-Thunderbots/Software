@@ -1,11 +1,11 @@
 from pyqtgraph.opengl import *
 
 import math
-import numpy as np
 
 from proto.tbots_software_msgs_pb2 import PrimitiveSet
+from proto.visualization_pb2 import PathVisualization
 
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
@@ -26,29 +26,29 @@ class GLPathLayer(GLLayer):
                             
         """
         super().__init__(name)
+        self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
         self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
+        self.path_visualization_buffer = ThreadSafeBuffer(
+            buffer_size, PathVisualization
+        )
 
-        self.path_graphics = ObservableList(self._graphics_changed)
         self.destination_graphics = ObservableList(self._graphics_changed)
+        self.path_graphics = ObservableList(self._graphics_changed)
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
+        path_list = self.path_visualization_buffer.get(block=False).paths
         primitive_set = self.primitive_set_buffer.get(
             block=False
         ).robot_primitives.values()
 
-        paths = [
-            primitive.move.motion_control.path
-            for primitive in primitive_set
-            if primitive.HasField("move")
-        ]
-
+        paths = [path for path in path_list]
         requested_destinations = [
             (
-                primitive.move.motion_control.requested_destination,
-                primitive.move.final_angle,
+                primitive.move.xy_traj_params.destination,
+                primitive.move.w_traj_params.final_angle,
             )
             for primitive in primitive_set
             if primitive.HasField("move")
@@ -63,6 +63,7 @@ class GLPathLayer(GLLayer):
             lambda: GLRobotOutline(outline_color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
         )
 
+        # Visualize path and the desired destination
         for path_graphic, path in zip(self.path_graphics, paths):
             path_graphic.set_points(
                 [[point.x_meters, point.y_meters] for point in path.points]
