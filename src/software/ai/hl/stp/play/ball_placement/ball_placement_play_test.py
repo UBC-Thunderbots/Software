@@ -83,7 +83,7 @@ def ball_placement_play_setup(
         (tbots_cpp.Point(-4.7, 2.0), tbots_cpp.Point(0, 0.5)),
         # test when ball starting point is outside of the side lines
         (tbots_cpp.Point(-2.0, 3.2), tbots_cpp.Point(0, -0.5)),
-        # # test when ball placement point is inside of the friendly defense area
+        # test when ball placement point is inside of the friendly defense area
         (tbots_cpp.Point(-3.6, 0.0), tbots_cpp.Point(0, -1.5)),
     ],
 )

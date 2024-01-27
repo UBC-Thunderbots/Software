@@ -153,7 +153,6 @@ bool BallPlacementPlayFSM::shouldKickOffWall(const Update &event)
     // check if ball is too close to border
     Point ball_pos        = event.common.world.ball().position();
     Rectangle field_lines = event.common.world.field().fieldLines();
-
     return !contains(field_lines, ball_pos);
 }
 
@@ -176,7 +175,7 @@ bool BallPlacementPlayFSM::kickDone(const Update &event)
 {
     const auto ball_velocity = event.common.world.ball().velocity().length();
     const auto ball_is_kicked_m_per_s_threshold = this->ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
-    return (ball_velocity > ball_is_kicked_m_per_s_threshold) && !shouldKickOffWall(event);
+    return ball_velocity > ball_is_kicked_m_per_s_threshold;
 }
 
 bool BallPlacementPlayFSM::ballPlaced(const Update &event)
