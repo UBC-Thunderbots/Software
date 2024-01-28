@@ -43,8 +43,8 @@ class Obstacle
     virtual double distance(const Point& p) const = 0;
 
     /**
-     * Gets the signed distance from the obstacle to the point. That is, if point is inside the obstacle then distance
-     * will be negative.
+     * Gets the signed distance from the obstacle's perimeter to the point. That is, if point is inside the obstacle
+     * then distance will be negative.
      * See https://iquilezles.org/articles/distfunctions2d/ for details on the maths
      *
      * @param point Point to get distance to
