@@ -12,6 +12,7 @@
 #include "software/geom/algorithms/axis_aligned_bounding_box.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/signed_distance.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/geom/algorithms/rasterize.h"
 #include "software/geom/point.h"
