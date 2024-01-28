@@ -37,9 +37,8 @@ double signedDistance(const Polygon &first, const Point &second)
         Vector w = second.toVector() - it->toVector();
         Vector b = w - e*std::clamp(w.dot(e) / e.dot(e), 0.0, 1.0);
         min_length = std::min(min_length, b.lengthSquared());
-        std::vector<bool> c = {second.y() >= it->y(), second.y() < j->y(), e.x()*w.y()>e.y()*w.x()};
-        if(std::all_of(c.begin(), c.end(), [](bool v) {return v; }) ||
-           std::none_of(c.begin(), c.end(), [](bool v) {return v; }))
+        if((second.y() >= it->y() && second.y() < j->y() && e.x()*w.y()>e.y()*w.x()) ||
+           (second.y() < it->y() && second.y() >= j->y() && e.x()*w.y()<=e.y()*w.x()))
         {
             s *= -1;
         }
