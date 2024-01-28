@@ -138,12 +138,12 @@ class TScopeQTTab(TScopeTab):
         """
         # only refresh dock that are visible
         if not self.dock_area.isVisible():
-            return 
+            return
 
         for widget_name in self.refresh_functions:
-            #only refresh widget inside the dock that are visible
-            widget = self.widgets_map[widget_name]
-            #if not widget.isVisible():
+            # only refresh widget inside the dock that are visible
+            self.widgets_map[widget_name]
+            # if not widget.isVisible():
             #    continue
 
             refresh_func = self.refresh_functions[widget_name]

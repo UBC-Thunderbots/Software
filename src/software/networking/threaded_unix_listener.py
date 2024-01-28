@@ -9,9 +9,7 @@ logger = createLogger(__name__)
 
 
 class ThreadedUnixListener:
-    def __init__(
-        self, unix_path, proto_class=None,  max_buffer_size=100
-    ):
+    def __init__(self, unix_path, proto_class=None, max_buffer_size=100):
 
         """Receive protobuf over unix sockets and buffers them
 
@@ -29,8 +27,7 @@ class ThreadedUnixListener:
             pass
 
         self.server = socketserver.UnixDatagramServer(
-            unix_path,
-            handler_factory(self.__buffer_protobuf, proto_class),
+            unix_path, handler_factory(self.__buffer_protobuf, proto_class),
         )
         self.server.max_packet_size = py_constants.UNIX_BUFFER_SIZE
         self.stop = False
@@ -88,6 +85,7 @@ class Session(socketserver.BaseRequestHandler):
             self.handle_callback(self.proto_class.FromString(self.request[0]))
         else:
             raise Exception("proto_class is None but handle_proto called")
+
 
 def handler_factory(handle_callback, proto_class):
     """To pass in an arbitrary handle callback into the SocketServer,
