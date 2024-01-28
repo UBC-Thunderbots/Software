@@ -175,8 +175,18 @@ cc_test(
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",
-        "//software/geom:rectangle",
     ],
+)
+
+cc_test(
+    name = "signed_distance_test",
+    srcs = [
+        "signed_distance_test.cpp",
+    ],
+    deps = [
+        ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
+    ]
 )
 
 cc_test(
