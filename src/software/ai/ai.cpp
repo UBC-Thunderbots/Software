@@ -68,6 +68,8 @@ void Ai::checkAiConfig()
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 {
+    ZoneNamedN(tracy::ai, "Ai::getPrimitives", true);
+
     checkAiConfig();
 
     fsm->process_event(PlaySelectionFSM::Update(
