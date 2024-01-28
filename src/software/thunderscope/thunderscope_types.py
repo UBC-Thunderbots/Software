@@ -134,7 +134,7 @@ class TScopeQTTab(TScopeTab):
 
     def refresh(self) -> None:
         """
-        Refreshes all the widgets belonging to this tab, and not refresh widget that are not visible. Note that the peformance
+        Refreshes all the widgets belonging to this tab, and not refresh widget that are not visible.
         """
         # only refresh dock that are visible
         if not self.dock_area.isVisible():
