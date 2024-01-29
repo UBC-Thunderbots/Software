@@ -1,6 +1,7 @@
 #include "software/geom/algorithms/signed_distance.h"
-
 #include "software/geom/algorithms/distance.h"
+
+#include <algorithm>
 
 double signedDistance(const Circle &first, const Point &second)
 {
