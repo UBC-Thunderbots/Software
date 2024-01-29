@@ -17,7 +17,7 @@ bool DribbleSkill::done() const
 
 void DribbleSkill::updatePrimitive(const TacticUpdate& tactic_update)
 {
-    Pose dribble_pose = strategy_->getBestDribblePose(tactic_update.robot);
+    Pose dribble_pose = (*strategy_)->getBestDribblePose(tactic_update.robot);
 
     control_params.dribble_destination       = dribble_pose.point();
     control_params.final_dribble_orientation = dribble_pose.orientation();

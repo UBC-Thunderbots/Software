@@ -85,6 +85,8 @@ class PassEvaluation
      */
     Timestamp getEvaluationTime() const;
 
+    PassEvaluation& operator=(const PassEvaluation& other);
+
    private:
     // The pitch division this pass evaluation was computed for
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division_;
@@ -179,4 +181,18 @@ std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::rankZonesForReceiving(
                                   passing_config_);
               });
     return cherry_pick_zones;
+}
+
+template <class ZoneEnum>
+PassEvaluation<ZoneEnum>& PassEvaluation<ZoneEnum>::operator=(const PassEvaluation<ZoneEnum>& other)
+{
+    if (this != &other)
+    {
+        pitch_division_     = other.pitch_division_;
+        best_pass_in_zones_ = other.best_pass_in_zones_;
+        passing_config_     = other.passing_config_;
+        timestamp_          = other.timestamp_;
+    }
+
+    return *this;
 }

@@ -9,7 +9,7 @@ WingerSkill::WingerSkill(const TbotsProto::AiConfig& ai_config,
 double WingerSkill::calculateViability(const Robot& robot, const World& world)
 {
     std::vector<OffenseSupportType> committed_offense_support =
-        strategy_->getCommittedOffenseSupport();
+        (*strategy_)->getCommittedOffenseSupport();
     auto it =
         std::find(committed_offense_support.begin(), committed_offense_support.end(),
                   OffenseSupportType::PASS_RECEIVER);

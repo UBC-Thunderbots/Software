@@ -2,13 +2,16 @@
 
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_evaluation.hpp"
-#include "software/ai/passing/pass_generator.hpp"
 #include "software/ai/passing/pass_with_rating.h"
-#include "software/time/time.h"
 
 Strategy::Strategy(const TbotsProto::AiConfig& ai_config, const Field& field)
-    : strategy_(ai_config, field)
+    : strategy_(std::make_unique<StrategyImpl>(ai_config, field))
 {
+}
+
+void Strategy::updateAiConfig(const TbotsProto::AiConfig& ai_config)
+{
+    strategy_->updateAiConfig(ai_config);
 }
 
 void Strategy::updateWorld(const World& world)
@@ -18,32 +21,27 @@ void Strategy::updateWorld(const World& world)
 
 std::unique_ptr<StrategyImpl> Strategy::operator->()
 {
-    CHECK(strategy_->getWorld() != std::nullopt)
+    CHECK(strategy_->hasWorld())
         << "[StrategyImpl] Cannot generate next Strategy without a World!";
     return strategy_;
 }
 
 StrategyImpl::StrategyImpl(const TbotsProto::AiConfig& ai_config, const Field& field)
-    : pass_strategy_(ai_config.passing_config(), field)
+    : field_(field),
+      pass_strategy_(std::make_unique<PassStrategy>(ai_config.passing_config(), field))
 {
     updateAiConfig(ai_config);
 }
 
 Pose StrategyImpl::getBestDribblePose(const Robot& robot)
 {
-    CHECK(current_world_.has_value())
-        << "[StrategyImpl] Cannot generate next Stategy without latest world!";
-
     if (robot_to_best_dribble_location_.contains(robot.id()))
     {
         return robot_to_best_dribble_location_.at(robot.id());
     }
 
     // TODO(#3082): temporary logic, find best dribble_position
-    std::lock_guard<std::mutex> lock(world_lock_);
-    CHECK(current_world_.has_value())
-        << "[StrategyImpl] Cannot generate Strategy without altest world!";
-    const World& world     = current_world_.value();
+    const World& world     = world_.value();
     Vector robot_to_goal   = world.field().enemyGoalCenter() - robot.position();
     Point dribble_position = robot.position() + robot_to_goal.normalize(0.8);
 
@@ -59,11 +57,12 @@ PassWithRating StrategyImpl::getBestPass()
     // calculate best pass
     Timestamp current_time;
     {
-        current_time = current_world_.value().getMostRecentTimestamp();
+        const World& world = world_.value();
+        current_time = world.getMostRecentTimestamp();
     }
 
-    PassEvaluation<EighteenZoneId> pass_eval = pass_strategy_.getPassEvaluation();
-    const auto& latest_pass                  = pass_eval_->getBestPassOnField();
+    auto pass_eval = pass_strategy_->getPassEvaluation();
+    const auto& latest_pass                  = pass_eval->getBestPassOnField();
     if (isBetterPassThanCached(current_time, latest_pass))
     {
         cached_pass_eval_ = pass_eval;
@@ -80,10 +79,7 @@ std::optional<Shot> StrategyImpl::getBestShot(const Robot& robot)
         return robot_to_best_shot_.at(robot.id());
     }
 
-    std::lock_guard<std::mutex> world_lock(world_lock_);
-    CHECK(current_world_.has_value())
-        << "[StrategyImpl] Cannot generate Strategy without latest world!";
-    const World& world = current_world_.value();
+    const World& world = world_.value();
     robot_to_best_shot_[robot.id()] =
         calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
                            robot.position(), TeamType::ENEMY, {robot});
@@ -107,23 +103,23 @@ void StrategyImpl::updateAiConfig(const TbotsProto::AiConfig& ai_config)
 {
     ai_config_ = ai_config;
 
+    pass_strategy_ = std::make_unique<PassStrategy>(ai_config.passing_config(), field_);
+    if (world_)
     {
-        std::lock_guard<std::mutex> lock(pass_generator_lock_);
-
-        pass_generator_ = std::make_unique<PassGenerator<EighteenZoneId>>(
-            std::make_shared<const EighteenZonePitchDivision>(
-                Field::createSSLDivisionBField()),
-            ai_config.passing_config());
+        pass_strategy_->updateWorld(static_cast<const World&>(world_.value()));
     }
 
     reset();
 }
 
+bool StrategyImpl::hasWorld() const
+{
+    return world_.has_value();
+}
+
 void StrategyImpl::updateWorld(const World& world)
 {
-    const std::lock_guard<std::mutex> lock(world_lock_);
-    current_world_.emplace(world);
-    world_available_cv_.notify_one();
+    world_.emplace(world);
 }
 
 bool StrategyImpl::isBetterPassThanCached(const Timestamp& timestamp,

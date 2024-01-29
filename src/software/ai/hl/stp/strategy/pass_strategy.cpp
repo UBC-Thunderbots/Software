@@ -17,12 +17,12 @@ PassStrategy::~PassStrategy()
     end_analysis_ = true;
 }
 
-PassEvaluation<EighteenZoneId> PassStrategy::getPassEvaluation()
+std::shared_ptr<PassEvaluation<EighteenZoneId>> PassStrategy::getPassEvaluation()
 {
     std::unique_lock<std::mutex> lock(pass_evaluation_lock_);
     pass_available_cv_.wait(lock, [&] { return latest_pass_eval_ != nullptr; });
 
-    return *latest_pass_eval_;
+    return latest_pass_eval_;
 }
 
 void PassStrategy::evaluatePassOptions()
@@ -35,16 +35,16 @@ void PassStrategy::evaluatePassOptions()
 
     while (!end_analysis_)
     {
-        std::unique_ptr<PassEvaluation<EighteenZoneId>> pass_eval;
+        std::shared_ptr<PassEvaluation<EighteenZoneId>> pass_eval;
         {
             const std::lock_guard<std::mutex> lock(world_lock_);
-            pass_eval = std::make_unique<PassEvaluation<EighteenZoneId>>(
+            pass_eval = std::make_shared<PassEvaluation<EighteenZoneId>>(
                 pass_generator_.generatePassEvaluation(current_world_.value()));
         }
 
         {
             const std::lock_guard<std::mutex> lock(pass_evaluation_lock_);
-            latest_pass_eval_ = std::move(pass_eval);
+            latest_pass_eval_ = pass_eval;
             pass_available_cv_.notify_one();
         }
     }

@@ -8,6 +8,7 @@
 #include "software/world/robot.h"
 #include "software/world/robot_state.h"
 
+class StrategyImpl;
 
 class Strategy
 {
@@ -15,6 +16,7 @@ class Strategy
     Strategy(const TbotsProto::AiConfig& ai_config,
              const Field& field = Field::createSSLDivisionBField());
 
+    void updateAiConfig(const TbotsProto::AiConfig& ai_config);
     void updateWorld(const World& world);
 
     std::unique_ptr<StrategyImpl> operator->();
@@ -23,12 +25,13 @@ class Strategy
     std::unique_ptr<StrategyImpl> strategy_;
 };
 
+
 /**
  * Contains shared gameplay-related calculations.
  */
 class StrategyImpl
 {
-   public:
+  public:
     StrategyImpl(const TbotsProto::AiConfig& ai_config,
                  const Field& field = Field::createSSLDivisionBField());
 
@@ -61,6 +64,7 @@ class StrategyImpl
 
     void updateAiConfig(const TbotsProto::AiConfig& ai_config);
 
+    bool hasWorld() const;
     void updateWorld(const World& world);
 
    private:
@@ -69,11 +73,17 @@ class StrategyImpl
     TbotsProto::AiConfig ai_config_;
 
     // World
-    World world_;
+    Field field_;
+    std::optional<std::reference_wrapper<const World>> world_;
 
     // Passing
-    PassStrategy pass_strategy_;
+    std::unique_ptr<PassStrategy> pass_strategy_;
+    std::shared_ptr<PassEvaluation<EighteenZoneId>> cached_pass_eval_;
+    Timestamp cached_pass_time_;
 
     std::unordered_map<RobotId, Pose> robot_to_best_dribble_location_;
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
+
+    friend class Strategy;
 };
+

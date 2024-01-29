@@ -16,7 +16,7 @@ class PassStrategy
 
     ~PassStrategy();
 
-    PassEvaluation<EighteenZoneId> getPassEvaluation();
+    std::shared_ptr<PassEvaluation<EighteenZoneId>> getPassEvaluation();
 
     void updateWorld(const World& world);
 
@@ -33,7 +33,7 @@ class PassStrategy
     std::mutex pass_evaluation_lock_;
     PassGenerator<EighteenZoneId> pass_generator_;
     std::thread passing_thread_;
-    std::unique_ptr<PassEvaluation<EighteenZoneId>> latest_pass_eval_;
+    std::shared_ptr<PassEvaluation<EighteenZoneId>> latest_pass_eval_;
 
     std::atomic<bool> end_analysis_;
 };
