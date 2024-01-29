@@ -1,3 +1,4 @@
+from __future__ import annotations
 import time
 import threading
 import queue
@@ -5,13 +6,14 @@ import base64
 import os
 import logging
 import gzip
-import proto
 from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.replay.replay_constants import *
+from typing import Callable
+from google.protobuf.message import Message
 
 
-class ProtoLogger(object):
+class ProtoLogger:
 
     """Logs incoming protobufs with metadata to a folder to be played back later.
 
@@ -38,7 +40,12 @@ class ProtoLogger(object):
 
     BLOCK_TIMEOUT = 0.1
 
-    def __init__(self, log_path, log_prefix="protolog_", time_provider=None):
+    def __init__(
+        self,
+        log_path: str,
+        log_prefix: str = "proto_",
+        time_provider: Callable[[], float] = None,
+    ) -> None:
         """Creates a proto logger that logs all protos registered on the queue.
 
         Stores the files to
@@ -67,7 +74,7 @@ class ProtoLogger(object):
         self.start_time = self.time_provider()
         self.stop_logging = False
 
-    def __enter__(self):
+    def __enter__(self) -> ProtoLogger:
         """Starts the logger.
 
         We use gzip to save the data with compression enabled to
@@ -78,7 +85,7 @@ class ProtoLogger(object):
         self.thread.start()
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         """Closes the log file.
 
         :param type: The type of the exception.
@@ -89,7 +96,7 @@ class ProtoLogger(object):
         self.stop_logging = True
         self.thread.join()
 
-    def __log_protobufs(self):
+    def __log_protobufs(self) -> None:
         """Logs all protos in the queue. 
 
         Stores it in the format: where !#! is the delimiter.
@@ -135,7 +142,7 @@ class ProtoLogger(object):
             logging.exception("Exception detected in ProtoLogger")
 
     @staticmethod
-    def create_log_entry(proto, current_time):
+    def create_log_entry(proto: Message, current_time: float) -> str:
         serialized_proto = base64.b64encode(proto.SerializeToString())
         log_entry = (
             f"{current_time}{REPLAY_METADATA_DELIMETER}"

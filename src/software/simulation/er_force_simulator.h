@@ -30,7 +30,9 @@ class ErForceSimulator
     explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
                               const RobotConstants_t& robot_constants,
                               std::unique_ptr<RealismConfigErForce>& realism_config,
-                              const bool ramping = false);
+                              const bool ramping = false,
+                              double primitive_executor_time_step_s =
+                                  DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
@@ -210,7 +212,7 @@ class ErForceSimulator
     std::unique_ptr<TbotsProto::World> yellow_team_world_msg;
     std::unique_ptr<TbotsProto::World> blue_team_world_msg;
 
-    static constexpr double primitive_executor_time_step = 1.0 / 60.0;
+    double primitive_executor_time_step_s;
     unsigned int frame_number;
 
     // The current time.

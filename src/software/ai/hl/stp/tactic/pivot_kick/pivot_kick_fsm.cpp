@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 
+#include "software/ai/hl/stp/tactic/move_primitive.h"
+
 
 void PivotKickFSM::getPossessionAndPivot(
     const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
@@ -14,12 +16,11 @@ void PivotKickFSM::getPossessionAndPivot(
 
 void PivotKickFSM::kickBall(const Update& event)
 {
-    event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(event.control_params.kick_origin),
-        event.control_params.kick_direction, 0, false, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick,
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-        event.common.robot.robotConstants()));
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, event.control_params.kick_origin,
+        event.control_params.kick_direction,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick));
 }
 
 bool PivotKickFSM::ballKicked(const Update& event)
