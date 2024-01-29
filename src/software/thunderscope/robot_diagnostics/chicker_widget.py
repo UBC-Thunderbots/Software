@@ -95,13 +95,23 @@ class ChickerWidget(QWidget):
         vbox_layout.addLayout(self.geneva_slider_layout)
 
         (
-            self.power_slider_layout,
-            self.power_slider,
-            self.power_label,
+            self.kick_slider_layout,
+            self.kick_slider,
+            self.kick_label,
         ) = common_widgets.create_slider(
-            "Power (m/s) (Chipper power is fixed)", 1, 10, 1
+            "Kick Speed (m/s)", 1, 10, 1
         )
-        vbox_layout.addLayout(self.power_slider_layout)
+        vbox_layout.addLayout(self.kick_slider_layout)
+
+        (
+            self.chip_slider_layout,
+            self.chip_slider,
+            self.chip_label,
+        ) = common_widgets.create_slider(
+            #TODO: REPLACE THESE VALUES ONCE CHIP DISTANCE DATA COLLECTED
+            "Chip Distance (m)", 1, 5, 1
+        )
+        vbox_layout.addLayout(self.chip_slider_layout)
 
         self.setLayout(vbox_layout)
 
@@ -110,7 +120,8 @@ class ChickerWidget(QWidget):
 
         # initial values
         self.geneva_value = 3
-        self.power_value = 1
+        self.kick_speed_value = 1
+        self.chip_distance_value = 1
 
     def send_command_and_timeout(self, command: ChickerCommandMode) -> None:
         """
@@ -170,21 +181,22 @@ class ChickerWidget(QWidget):
         # gets slider values
         geneva_value = self.geneva_slider.value()
 
-        power_value = self.power_slider.value()
+        kick_speed_value = self.kick_slider.value()
+        chip_distance_value = self.chip_slider.value()
 
         power_control = PowerControl()
         power_control.geneva_slot = geneva_value
 
         # sends kick, chip, autokick, or autchip primitive
         if command == ChickerCommandMode.KICK:
-            power_control.chicker.kick_speed_m_per_s = power_value
+            power_control.chicker.kick_speed_m_per_s = kick_speed_value
         elif command == ChickerCommandMode.CHIP:
-            power_control.chicker.chip_distance_meters = power_value
+            power_control.chicker.chip_distance_meters = chip_distance_value
         elif command == ChickerCommandMode.AUTOKICK:
-            power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = power_value
+            power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = kick_speed_value
         elif command == ChickerCommandMode.AUTOCHIP:
             power_control.chicker.auto_chip_or_kick.autochip_distance_meters = (
-                power_value
+                chip_distance_value
             )
 
         # sends proto
@@ -227,8 +239,11 @@ class ChickerWidget(QWidget):
         geneva_value = self.geneva_slider.value()
         self.geneva_label.setText(Slot.Name(geneva_value))
 
-        power_value = self.power_slider.value()
-        self.power_label.setText(str(power_value))
+        kick_value = self.kick_slider.value()
+        self.kick_label.setText(str(kick_speed_value))
+
+        chip_distance_value = self.chip_slider.value()
+        self.chip_label.setText(str(chip_distance_value))
 
         # refreshes button state based on enable boolean
         self.change_button_state(self.kick_button, self.kick_chip_buttons_enable)
