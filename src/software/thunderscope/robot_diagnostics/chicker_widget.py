@@ -239,7 +239,7 @@ class ChickerWidget(QWidget):
         geneva_value = self.geneva_slider.value()
         self.geneva_label.setText(Slot.Name(geneva_value))
 
-        kick_value = self.kick_slider.value()
+        kick_speed_value = self.kick_slider.value()
         self.kick_label.setText(str(kick_speed_value))
 
         chip_distance_value = self.chip_slider.value()
