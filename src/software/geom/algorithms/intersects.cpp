@@ -4,6 +4,8 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersection.h"
 
+#include <algorithm>
+
 bool intersects(const Polygon &first, const Segment &second)
 {
     for (const auto &seg : first.getSegments())
@@ -225,8 +227,7 @@ bool intersects(const Stadium &first, const Segment &second)
     auto end_distance_seg   = distance(first.segment().getEnd(), second);
 
     auto shortest_distance =
-        std::min(start_distance_seg,
-                 std::min(end_distance_seg, std::min(start_distance, end_distance)));
+        std::min({start_distance_seg, end_distance_seg, start_distance, end_distance});
 
 
     return shortest_distance <= first.radius() || intersects(first.segment(), second);
@@ -261,8 +262,7 @@ bool intersects(const Stadium &first, const Stadium &second)
     auto end_distance_seg = distanceSquared(first.segment().getEnd(), second.segment());
 
     auto shortest_distance_squared =
-        std::min(start_distance_seg,
-                 std::min(end_distance_seg, std::min(start_distance, end_distance)));
+        std::min({start_distance_seg, end_distance_seg, start_distance, end_distance});
 
 
     return shortest_distance_squared <= std::pow(first.radius() + second.radius(), 2) ||
