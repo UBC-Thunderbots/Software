@@ -17,7 +17,7 @@
 ShootOrChipPlay::ShootOrChipPlay(TbotsProto::AiConfig config) : Play(config, true) {}
 
 void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                     const World &world)
+                                     const WorldPtr &world_ptr)
 {
     /**
      * Our general strategy here is:
@@ -44,7 +44,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
     double fallback_chip_target_x_offset = 1.5;
 
     Point fallback_chip_target =
-        world.field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
+            world_ptr->field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
     auto attacker = std::make_shared<AttackerTactic>(ai_config);
     attacker->updateControlParams(fallback_chip_target);
@@ -55,27 +55,27 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // Update crease defenders
         std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
+            ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::LEFT);
         result[0].emplace_back(std::get<0>(crease_defender_tactics));
         std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
+            ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::RIGHT);
         result[0].emplace_back(std::get<1>(crease_defender_tactics));
 
         // Update tactics moving to open areas
         std::vector<Point> enemy_robot_points;
-        for (auto const &robot : world.enemyTeam().getAllRobots())
+        for (auto const &robot : world_ptr->enemyTeam().getAllRobots())
         {
             enemy_robot_points.emplace_back(robot.position());
         }
-        std::vector<Circle> chip_targets = findGoodChipTargets(world);
+        std::vector<Circle> chip_targets = findGoodChipTargets(world_ptr);
         for (unsigned i = 0;
              i < chip_targets.size() && i < move_to_open_area_tactics.size(); i++)
         {
             // Face towards the ball
             Angle orientation =
-                (world.ball().position() - chip_targets[i].origin()).orientation();
+                (world_ptr->ball().position() - chip_targets[i].origin()).orientation();
             // Move a bit backwards to make it more likely we'll receive the chip
             Point position =
                 chip_targets[i].origin() -

@@ -13,7 +13,7 @@ class CornerKickPlay : public Play
    public:
     CornerKickPlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr) override;
 
     // The maximum distance from the corner that the ball can be for it to be
     // considered a corner kick
@@ -27,7 +27,7 @@ class CornerKickPlay : public Play
      * @param world The current state of the world
      */
     void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
-                                 const World &world);
+                                 const WorldPtr &world_ptr);
 
     /**
      * Sets up the pass for the corner kick: aligns the passer and positions the cherry
@@ -38,5 +38,5 @@ class CornerKickPlay : public Play
      *
      * @return the pass that was committed to
      */
-    Pass setupPass(TacticCoroutine::push_type &yield, const World &world);
+    Pass setupPass(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr);
 };

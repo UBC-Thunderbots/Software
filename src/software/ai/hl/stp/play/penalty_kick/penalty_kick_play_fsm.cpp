@@ -18,17 +18,17 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
-    Vector behind_ball_direction = (event.common.world.ball().position() -
-                                    event.common.world.field().enemyGoalpostPos())
+    Vector behind_ball_direction = (event.common.world_ptr->ball().position() -
+                                    event.common.world_ptr->field().enemyGoalpostPos())
                                        .normalize();
-    Angle shoot_angle = (event.common.world.field().enemyGoalpostPos() -
-                         event.common.world.ball().position())
+    Angle shoot_angle = (event.common.world_ptr->field().enemyGoalpostPos() -
+                         event.common.world_ptr->ball().position())
                             .orientation();
 
-    Point behind_ball = event.common.world.ball().position() +
+    Point behind_ball = event.common.world_ptr->ball().position() +
                         behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                                         BALL_MAX_RADIUS_METERS + 0.1);
-    double ball_position_x = event.common.world.field().friendlyPenaltyMark().x();
+    double ball_position_x = event.common.world_ptr->field().friendlyPenaltyMark().x();
 
     // Adjust number of tactics based on the number of robots available
     unsigned int num_tactics = event.common.num_tactics;
@@ -48,7 +48,7 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
                           ROBOT_MAX_RADIUS_METERS;
         penalty_setup_tactics.at(i)->updateControlParams(
             Point(ball_position_x - 1.25, y_offset),
-            event.common.world.field().enemyGoalCenter().toVector().orientation(), 0);
+            event.common.world_ptr->field().enemyGoalCenter().toVector().orientation(), 0);
     }
 
     // Move shooting robot behind the ball
@@ -61,10 +61,10 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
 
 bool PenaltyKickPlayFSM::setupPositionDone(const Update &event)
 {
-    return !event.common.world.gameState().isSetupState();
+    return !event.common.world_ptr->gameState().isSetupState();
 }
 
 bool PenaltyKickPlayFSM::kickDone(const Update &event)
 {
-    return event.common.world.gameState().isStopped();
+    return event.common.world_ptr->gameState().isStopped();
 }

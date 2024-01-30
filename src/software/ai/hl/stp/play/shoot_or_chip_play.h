@@ -12,5 +12,5 @@ class ShootOrChipPlay : public Play
    public:
     ShootOrChipPlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr) override;
 };

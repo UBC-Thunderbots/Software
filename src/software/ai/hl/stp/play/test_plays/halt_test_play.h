@@ -16,7 +16,7 @@ class HaltTestPlay : public Play
    public:
     HaltTestPlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr) override;
 
    private:
     TbotsProto::AiConfig ai_config;

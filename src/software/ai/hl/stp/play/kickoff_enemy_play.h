@@ -14,5 +14,5 @@ class KickoffEnemyPlay : public Play
    public:
     KickoffEnemyPlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr) override;
 };
