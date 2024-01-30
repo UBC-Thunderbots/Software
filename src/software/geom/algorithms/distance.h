@@ -10,7 +10,7 @@
 #include "software/geom/stadium.h"
 
 /**
- * Finds the shortest distance between a Line and a Point.
+ * Finds the shortest distance between a Line and a Point
  *
  * @param first
  * @param second
