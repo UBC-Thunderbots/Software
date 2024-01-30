@@ -1,10 +1,10 @@
 #include "software/geom/algorithms/intersects.h"
 
+#include <algorithm>
+
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersection.h"
-
-#include <algorithm>
 
 bool intersects(const Polygon &first, const Segment &second)
 {
