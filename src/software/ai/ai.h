@@ -70,7 +70,7 @@ class Ai final
     std::shared_ptr<Strategy> strategy;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
-    std::unique_ptr<Play> current_play;
+    std::shared_ptr<Play> current_play;
     TbotsProto::Play current_override_play_proto;
     bool ai_config_changed;
 

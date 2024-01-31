@@ -12,7 +12,7 @@ Ai::Ai(const TbotsProto::AiConfig& ai_config)
       strategy(std::make_shared<Strategy>()),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config, strategy})),
       override_play(nullptr),
-      current_play(std::make_unique<HaltPlay>(ai_config)),
+      current_play(std::make_shared<HaltPlay>(ai_config)),
       ai_config_changed(false)
 {
     auto current_override = ai_config_.ai_control_config().override_ai_play();
