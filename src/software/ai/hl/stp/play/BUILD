@@ -535,6 +535,7 @@ cc_library(
         ":play",
         "//shared:constants",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/logger",
         "//software/util/generic_factory",
     ],

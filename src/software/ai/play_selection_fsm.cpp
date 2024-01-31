@@ -16,8 +16,7 @@
 
 PlaySelectionFSM::PlaySelectionFSM(const TbotsProto::AiConfig& ai_config,
                                    std::shared_ptr<Strategy> strategy)
-    : ai_config(ai_config),
-      ball_placement_play(std::make_shared<BallPlacementPlay>(ai_config, strategy)),
+    : ball_placement_play(std::make_shared<BallPlacementPlay>(ai_config, strategy)),
       enemy_ball_placement_play(
           std::make_shared<EnemyBallPlacementPlay>(ai_config, strategy)),
       enemy_free_kick_play(std::make_shared<EnemyFreekickPlay>(ai_config, strategy)),

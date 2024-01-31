@@ -130,7 +130,6 @@ struct PlaySelectionFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::shared_ptr<Play> current_play;
 
     std::shared_ptr<BallPlacementPlay> ball_placement_play;

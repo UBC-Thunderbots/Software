@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/util/make_enum/make_enum.h"
 
