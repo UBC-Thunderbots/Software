@@ -9,7 +9,7 @@ cc_library(
         "//software/ai/evaluation:keep_away",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
-    ]
+    ],
 )
 
 cc_library(
@@ -18,10 +18,10 @@ cc_library(
     hdrs = ["attacker_tactic.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/hl/stp/strategy:strategy",
+        "//software/ai/evaluation/scoring/skills:skill_graph",
+        "//software/ai/hl/stp/strategy",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/attacker/skill:skill",
-        "//software/ai/hl/stp/tactic/attacker/skill:head_skill",
+        "//software/ai/hl/stp/tactic/attacker/skill",
         "//software/logger",
         "//software/world:ball",
     ],

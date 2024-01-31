@@ -1,39 +1,21 @@
 #include "software/ai/hl/stp/tactic/attacker/skill/shoot_skill.h"
 
-ShootSkill::ShootSkill(const TbotsProto::AiConfig& ai_config,
-                       std::shared_ptr<Strategy> strategy, double initial_score)
-    : Skill(ai_config, strategy, initial_score),
-      fsm(DribbleFSM(ai_config.dribble_tactic_config()),
-          AttackerFSM(ai_config.attacker_tactic_config())),
-      control_params({.best_pass_so_far = std::nullopt,
-                      .pass_committed   = false,
-                      .shot             = std::nullopt,
-                      .chip_target      = std::nullopt})
-{
-}
+#include "software/ai/hl/stp/tactic/attacker/skill/shoot_skill_fsm.h"
+#include "software/util/generic_factory/generic_factory.h"
 
-double ShootSkill::calculateViability(const Robot& robot, const World& world)
+double ShootSkill::getViability(const Robot& robot, const World& world) const
 {
     if (!(*strategy_)->getBestShot(robot))
     {
         return 0;
     }
-
-    return score_;
+    return 1;
 }
 
-bool ShootSkill::done() const
+std::unique_ptr<SkillFSM> ShootSkill::getFSM() const
 {
-    return fsm.is(boost::sml::X);
+    return std::make_unique<ShootSkillFSM>(strategy_);
 }
 
-void ShootSkill::updatePrimitive(const TacticUpdate& tactic_update)
-{
-    control_params.shot = (*strategy_)->getBestShot(tactic_update.robot);
-
-    fsm.process_event(AttackerFSM::Update(control_params, tactic_update));
-}
-
-static TGenericFactory<std::string, Skill, ShootSkill, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>, double>
-    factory;
+// Register this Skill in the GenericFactory
+static TGenericFactory<std::string, Skill, ShootSkill, std::shared_ptr<Strategy>> factory;

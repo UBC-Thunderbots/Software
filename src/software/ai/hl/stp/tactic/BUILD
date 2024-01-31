@@ -49,8 +49,8 @@ cc_library(
         "tactic_visitor.h",
     ],
     deps = [
-        ":tactic_fsm",
         ":stop_primitive",
+        ":tactic_fsm",
         ":transition_conditions",
         "//software/util/typename",
         "//software/world",
@@ -105,7 +105,7 @@ cc_library(
         ":all_tactics",
         "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_protobuf",
-        "//software/ai/hl/stp/strategy:strategy",
+        "//software/ai/hl/stp/strategy",
     ],
 )
 

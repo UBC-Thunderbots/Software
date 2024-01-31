@@ -13,6 +13,7 @@ class Strategy
     Strategy(const TbotsProto::AiConfig& ai_config,
              const Field& field = Field::createSSLDivisionBField());
 
+    const TbotsProto::AiConfig& getAiConfig() const;
     void updateAiConfig(const TbotsProto::AiConfig& ai_config);
     void updateWorld(const World& world);
 

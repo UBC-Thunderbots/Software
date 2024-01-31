@@ -13,7 +13,7 @@
  */
 class StrategyImpl
 {
-  public:
+   public:
     StrategyImpl(const TbotsProto::AiConfig& ai_config,
                  const Field& field = Field::createSSLDivisionBField());
 
@@ -44,6 +44,7 @@ class StrategyImpl
      */
     void reset();
 
+    const TbotsProto::AiConfig& getAiConfig() const;
     void updateAiConfig(const TbotsProto::AiConfig& ai_config);
 
     bool hasWorld() const;

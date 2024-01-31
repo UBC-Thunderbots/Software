@@ -9,6 +9,11 @@ Strategy::Strategy(const TbotsProto::AiConfig& ai_config, const Field& field)
 {
 }
 
+const TbotsProto::AiConfig& Strategy::getAiConfig() const
+{
+    return strategy_->getAiConfig();
+}
+
 void Strategy::updateAiConfig(const TbotsProto::AiConfig& ai_config)
 {
     strategy_->updateAiConfig(ai_config);

@@ -10,8 +10,8 @@ cc_library(
         "//software/ai/passing:pass",
         "//software/ai/passing:pass_evaluation",
         "//software/ai/passing:pass_generator",
-        "//software/world:world"
-    ]
+        "//software/world",
+    ],
 )
 
 cc_library(
@@ -43,5 +43,5 @@ cc_library(
         "//software/ai/passing:pass_with_rating",
         "//software/geom:pose",
         "//software/world:field",
-    ]
+    ],
 )

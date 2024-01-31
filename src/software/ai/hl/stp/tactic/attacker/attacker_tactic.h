@@ -2,9 +2,8 @@
 
 #include <stack>
 
-#include "software/ai/hl/stp/tactic/attacker/skill/head_skill.h"
+#include "software/ai/evaluation/scoring/skills/skill_graph.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-
 /**
  * This tactic is for a robot performing a pass. It should be used in conjunction with
  * the `ReceiverTactic` in order to complete the pass.
@@ -34,8 +33,6 @@ class AttackerTactic : public Tactic
 
     std::string getFSMState() const override;
 
-    void setLastExecutionRobot(std::optional<RobotId> last_execution_robot) override;
-
     /**
      * Updates the control parameters for this AttackerTactic.
      *
@@ -60,8 +57,7 @@ class AttackerTactic : public Tactic
     TbotsProto::AiConfig ai_config;  // AI config
     std::shared_ptr<Strategy> strategy;
 
-    std::shared_ptr<HeadSkill> head_skill;
-    std::stack<std::shared_ptr<Skill>> skill_sequence;
-
-    std::map<RobotId, std::shared_ptr<Skill>> next_skill_map;
+    SkillGraph skill_graph_;
+    std::map<RobotId, std::shared_ptr<Skill>> skill_map_;
+    std::map<RobotId, std::unique_ptr<SkillFSM>> skill_fsm_map_;
 };

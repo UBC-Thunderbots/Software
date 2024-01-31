@@ -33,11 +33,11 @@ PassWithRating StrategyImpl::getBestPass()
     Timestamp current_time;
     {
         const World& world = world_.value();
-        current_time = world.getMostRecentTimestamp();
+        current_time       = world.getMostRecentTimestamp();
     }
 
-    auto pass_eval = pass_strategy_->getPassEvaluation();
-    const auto& latest_pass                  = pass_eval->getBestPassOnField();
+    auto pass_eval          = pass_strategy_->getPassEvaluation();
+    const auto& latest_pass = pass_eval->getBestPassOnField();
     if (isBetterPassThanCached(current_time, latest_pass))
     {
         cached_pass_eval_ = pass_eval;
@@ -72,6 +72,11 @@ void StrategyImpl::reset()
 {
     robot_to_best_dribble_location_ = {};
     robot_to_best_shot_             = {};
+}
+
+const TbotsProto::AiConfig& StrategyImpl::getAiConfig() const
+{
+    return ai_config_;
 }
 
 void StrategyImpl::updateAiConfig(const TbotsProto::AiConfig& ai_config)

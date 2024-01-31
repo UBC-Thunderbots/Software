@@ -9,8 +9,9 @@ AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config,
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
       ai_config(ai_config),
       strategy(strategy),
-      head_skill(std::make_shared<HeadSkill>(ai_config, strategy)),
-      skill_sequence({head_skill})
+      skill_graph_(strategy),
+      skill_map_(),
+      skill_fsm_map_()
 {
 }
 
@@ -28,25 +29,7 @@ void AttackerTactic::updateControlParams(std::optional<Point> chip_target) {}
 
 std::string AttackerTactic::getFSMState() const
 {
-    std::string state_str = "";
-
-    if (skill_sequence.size() > 1)
-    {
-        state_str = skill_sequence.top()->getCurrentState();
-    }
-
-    return state_str;
-}
-
-void AttackerTactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
-{
-    if (last_execution_robot &&
-        skill_sequence.top() != next_skill_map[last_execution_robot.value()])
-    {
-        skill_sequence.push(next_skill_map[last_execution_robot.value()]);
-    }
-
-    Tactic::setLastExecutionRobot(last_execution_robot);
+    return "AttackerTactic";
 }
 
 void AttackerTactic::updateAiConfig(const TbotsProto::AiConfig& ai_config)
@@ -56,14 +39,21 @@ void AttackerTactic::updateAiConfig(const TbotsProto::AiConfig& ai_config)
 
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
-    std::shared_ptr<Skill> robot_skill = skill_sequence.top();
+    RobotId robot_id = tactic_update.robot.id();
 
-    auto primitive_set = std::make_unique<TbotsProto::PrimitiveSet>();
-    if (reset_fsm || robot_skill->done())
+    if (reset_fsm || skill_fsm_map_[robot_id]->done())
     {
-        robot_skill = robot_skill->getNextSkill(tactic_update.robot, tactic_update.world);
+        std::shared_ptr<Skill> next_skill =
+            skill_graph_.getNextSkill(tactic_update.robot, tactic_update.world);
+
+        if (!reset_fsm && skill_fsm_map_[robot_id]->done())
+        {
+            skill_graph_.extendSequence(next_skill);
+        }
+
+        skill_map_[robot_id] = next_skill;
+        skill_fsm_map_[robot_id] = next_skill->getFSM();
     }
 
-    robot_skill->updatePrimitive(tactic_update);
-    next_skill_map[tactic_update.robot.id()] = robot_skill;
+    skill_fsm_map_[robot_id]->updatePrimitive(tactic_update);
 }

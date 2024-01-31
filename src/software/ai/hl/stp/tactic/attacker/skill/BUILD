@@ -1,80 +1,43 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "head_skill",
-    srcs = ["head_skill.cpp"],
-    hdrs = ["head_skill.h"],
-    deps = [":skill"],
-)
-
-cc_library(
     name = "skill",
-    srcs = [
-        "dribble_skill.cpp",
-        "pass_skill.h",
-        "shoot_skill.cpp",
-        "skill.cpp",
-        "winger_skill.cpp",
-    ],
     hdrs = [
-        "dribble_skill.h",
-        "pass_skill.h",
         "skill.h",
-        "shoot_skill.h",
-        "winger_skill.h"
+        "skill_fsm.h",
     ],
     deps = [
-        "//proto:tbots_cc_proto",
         "//software/ai/hl/stp/strategy",
         "//software/ai/hl/stp/tactic:tactic_fsm",
-        "//software/ai/hl/stp/tactic/dribble:dribble_fsm",
-        "//software/ai/hl/stp/tactic/attacker:attacker_fsm",
-        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
 
-cc_test(
-    name = "skill_test",
-    srcs = ["skill_test.cpp"],
+cc_library(
+    name = "all_skills",
     deps = [
-        ":skill",
-        "//shared/test_util:tbots_gtest_main",
+        ":shoot_skill",
     ],
 )
 
-cc_test(
-    name = "dribble_skill_test",
-    srcs = ["dribble_skill_test.cpp"],
-    deps = [
-        ":skill",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
+# We force linking for all Skills so that the static variables required for the
+# "factory" design pattern to work are linked in
+# https://www.bfilipek.com/2018/02/static-vars-static-lib.html
 
-cc_test(
-    name = "pass_skill_test",
-    srcs = ["pass_skill_test.cpp"],
+cc_library(
+    name = "shoot_skill",
+    srcs = [
+        "shoot_skill.cpp",
+        "shoot_skill_fsm.cpp",
+    ],
+    hdrs = [
+        "shoot_skill.h",
+        "shoot_skill_fsm.h",
+    ],
     deps = [
         ":skill",
-        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/tactic/attacker:attacker_fsm",
+        "//software/util/generic_factory:generic_factory",
     ],
-)
-
-cc_test(
-    name = "winger_skill_test",
-    srcs = ["winger_skill_test.cpp"],
-    deps = [
-        ":skill",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
-cc_test(
-    name = "shoot_skill_test",
-    srcs = ["shoot_skill_test.cpp"],
-    deps = [
-        ":skill",
-        "//shared/test_util:tbots_gtest_main",
-    ],
+    alwayslink = True,
 )
