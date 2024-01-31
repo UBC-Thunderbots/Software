@@ -16,7 +16,7 @@ TEST(FsmStateTest, test_get_fsm_state)
 
     EXPECT_EQ("DribbleFSM.GetPossession", tactic.getFSMState());
     tactic.updateControlParams(pass, true);
-    tactic.get(world, TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST);
+    tactic.get(world);
 
     // robot at attacker point and facing the right way
     robot.updateState(RobotState(pass.passerPoint() - Vector(0.05, 0), Vector(),
@@ -25,16 +25,16 @@ TEST(FsmStateTest, test_get_fsm_state)
     world.updateFriendlyTeamState(Team({robot}));
 
     // process event once to fall through the Dribble FSM
-    tactic.get(world, TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST);
+    tactic.get(world);
     EXPECT_EQ("PivotKickFSM.DribbleFSM.Dribble", tactic.getFSMState());
 
     // robot should now kick the ball
-    tactic.get(world, TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST);
+    tactic.get(world);
     EXPECT_EQ("PivotKickFSM.KickState", tactic.getFSMState());
 
     // FSM should be done now
     world = ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(223));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(pass.passerOrientation()));
-    tactic.get(world, TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST);
+    tactic.get(world);
     EXPECT_EQ("terminate_state", tactic.getFSMState());
 }

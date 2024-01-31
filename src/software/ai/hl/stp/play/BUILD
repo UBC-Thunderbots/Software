@@ -223,7 +223,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
-        "//software/ai/navigator/path_planner:global_path_planner_factory",
+        "//software/ai/navigator/trajectory:trajectory_planner",
         "//software/ai/passing:pass_with_rating",
         "//software/util/sml_fsm",
         "@boost//:coroutine2",
@@ -487,6 +487,10 @@ py_test(
     name = "shoot_or_chip_play_test",
     srcs = [
         "shoot_or_chip_play_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
     ],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",

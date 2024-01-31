@@ -71,7 +71,6 @@ class Ai final
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
     std::shared_ptr<Play> current_play;
-    std::map<Field, GlobalPathPlannerFactory> field_to_path_planner_factory;
     TbotsProto::Play current_override_play_proto;
     bool ai_config_changed;
 
