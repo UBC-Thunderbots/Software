@@ -7,11 +7,13 @@
 #include <sstream>
 
 #include "proto/geometry.pb.h"
+#include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/parameters.pb.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
+#include "proto/ssl_autoref_ci.pb.h"
 #include "proto/ssl_gc_referee_message.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -250,6 +252,8 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createVectorProto", &createVectorProto);
     m.def("createSegmentProto", &createSegmentProto);
 
+    m.def("createGeometryData", &createGeometryData);
+
     m.def("contains", py::overload_cast<const Circle&, const Segment&>(&contains));
     m.def("contains", py::overload_cast<const Circle&, const Point&>(&contains));
     m.def("contains", py::overload_cast<const Polygon&, const Point&>(&contains));
@@ -324,8 +328,6 @@ PYBIND11_MODULE(python_bindings, m)
         .def("field", &World::field);
 
     // Listeners
-    declareThreadedProtoUdpListener<TbotsProto::HRVOVisualization>(m,
-                                                                   "HRVOVisualization");
     declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");

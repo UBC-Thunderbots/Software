@@ -2,12 +2,16 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
+#include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-AssignedTacticsPlay::AssignedTacticsPlay(const TbotsProto::AiConfig &config,
+AssignedTacticsPlay::AssignedTacticsPlay(const TbotsProto::AiConfig& config, 
                                          std::shared_ptr<Strategy> strategy)
-    : Play(config, false, strategy), assigned_tactics(), override_motion_constraints()
+    : Play(config, false, strategy),
+      assigned_tactics(),
+      override_motion_constraints(),
+      obstacle_factory(config.robot_navigation_obstacle_config())
 {
 }
 
@@ -30,9 +34,12 @@ void AssignedTacticsPlay::updateControlParams(
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
-    const GlobalPathPlannerFactory &path_planner_factory, const World &world,
-    const InterPlayCommunication &, const SetInterPlayCommunicationCallback &)
+    const World &world, const InterPlayCommunication &,
+    const SetInterPlayCommunicationCallback &)
 {
+    obstacle_list.Clear();
+    path_visualization.Clear();
+
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
     for (const auto &robot : world.friendlyTeam().getAllRobots())
     {
@@ -46,19 +53,26 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
             {
                 motion_constraints = override_motion_constraints.at(robot.id());
             }
-            auto primitives = getPrimitivesFromTactic(path_planner_factory, world, tactic,
-                                                      motion_constraints)
-                                  ->robot_primitives();
+            auto primitives = tactic->get(world);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
-            auto primitive = primitives.at(robot.id());
+            auto primitive_proto = primitives[robot.id()]->generatePrimitiveProtoMessage(
+                world, motion_constraints, obstacle_factory);
             primitives_to_run->mutable_robot_primitives()->insert(
-                google::protobuf::MapPair(robot.id(), primitive));
+                {robot.id(), *primitive_proto});
             tactic->setLastExecutionRobot(robot.id());
+
+            primitives[robot.id()]->getVisualizationProtos(obstacle_list,
+                                                           path_visualization);
         }
     }
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
         world.getMostRecentTimestamp().toSeconds());
+
+    // Visualize all obstacles and paths
+    LOG(VISUALIZE) << obstacle_list;
+    LOG(VISUALIZE) << path_visualization;
+
     return primitives_to_run;
 }
 

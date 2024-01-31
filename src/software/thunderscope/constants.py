@@ -96,6 +96,9 @@ DEFAULT_EMPTY_FIELD_WORLD = World(
     )
 )
 
+# How long AI vs AI runs before ending in CI
+CI_DURATION_S = 180
+
 ROBOT_RADIUS = 25
 
 BALL_HEIGHT_EFFECT_MULTIPLIER = 3
@@ -129,7 +132,7 @@ ESTOP_PATH_2 = "/dev/ttyUSB0"
 
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {
-    ErrorCode.LOW_CAP: "Low Cap",
+    ErrorCode.HIGH_CAP: "High Cap",
     ErrorCode.LOW_BATTERY: "Low Battery",
     ErrorCode.HIGH_BOARD_TEMP: "High Board Temp",
     ErrorCode.DRIBBLER_MOTOR_HOT: "Dribbler Motor Hot",
@@ -249,9 +252,9 @@ class Colors(object):
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
-    DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 150)
+    DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 255)
     NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
-    NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 165, 0, 255)
+    NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 80, 0, 100)
     PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
     BREAKBEAM_TRIPPED_COLOR = QtGui.QColor(255, 0, 0, 255)
 

@@ -122,11 +122,6 @@ class RobotInfo(QWidget):
         self.primitive_loss_rate_label.setText("P%NA")
         self.battery_layout.addWidget(self.primitive_loss_rate_label)
 
-        # World loss rate label
-        self.world_loss_rate_label = QLabel()
-        self.world_loss_rate_label.setText("W%NA")
-        self.battery_layout.addWidget(self.world_loss_rate_label)
-
         self.battery_layout.addWidget(self.battery_progress_bar)
         self.battery_layout.addWidget(self.battery_label)
 
@@ -332,7 +327,6 @@ class RobotInfo(QWidget):
             - Battery voltage, and warns if it's too low
             - If this robot has errors
             - If the robot is stopped or running
-            - The primitive and world loss rates
         :param robot_status: The robot status message for this robot
         """
         motor_status = robot_status.motor_status
@@ -344,9 +338,6 @@ class RobotInfo(QWidget):
 
         self.primitive_loss_rate_label.setText(
             f"P%{network_status.primitive_packet_loss_percentage:02d}"
-        )
-        self.world_loss_rate_label.setText(
-            f"W%{network_status.world_packet_loss_percentage:02d}"
         )
 
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)

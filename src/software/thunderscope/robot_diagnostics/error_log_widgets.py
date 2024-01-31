@@ -38,7 +38,7 @@ class RobotLogMessageWidget(QFrame):
         self.icon = QLabel()
 
         # setting up the icon
-        self.icon_size = self.width() / 15
+        self.icon_size = int(self.width() / 15)
         self.icon.setPixmap(
             icon.scaled(
                 self.icon_size, self.icon_size, Qt.AspectRatioMode.KeepAspectRatio
@@ -48,7 +48,7 @@ class RobotLogMessageWidget(QFrame):
         # info layout contains the robot id and message
         self.info_layout = QVBoxLayout()
         self.info_layout.setContentsMargins(
-            0, self.icon_size / 4, 0, self.icon_size / 3
+            0, int(self.icon_size / 4), 0, int(self.icon_size / 3)
         )
 
         # robot id displayed more prominently
@@ -67,7 +67,7 @@ class RobotLogMessageWidget(QFrame):
         # layout for timestamp info
         self.time_layout = QVBoxLayout()
         self.time_layout.setContentsMargins(
-            0, self.icon_size / 4, 0, self.icon_size / 3
+            0, int(self.icon_size / 4), 0, int(self.icon_size / 3)
         )
 
         # the timestamp the error took place
@@ -82,8 +82,8 @@ class RobotLogMessageWidget(QFrame):
         # close button to clear log
         self.close_button = QPushButton("X")
         self.close_button.setStyleSheet("padding: 0")
-        self.close_button.setFixedHeight(self.icon_size / 2)
-        self.close_button.setFixedWidth(self.icon_size / 2)
+        self.close_button.setFixedHeight(int(self.icon_size / 2))
+        self.close_button.setFixedWidth(int(self.icon_size / 2))
         self.close_button.clicked.connect(self.close)
 
         # adding spacing to look nice
