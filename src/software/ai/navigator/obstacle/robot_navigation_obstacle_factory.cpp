@@ -33,7 +33,8 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
     const WorldPtr &world_ptr) const
 {
     std::vector<ObstaclePtr> static_obstacles =
-        createStaticObstaclesFromMotionConstraints(motion_constraints, world_ptr->field());
+        createStaticObstaclesFromMotionConstraints(motion_constraints,
+                                                   world_ptr->field());
     std::vector<ObstaclePtr> dynamic_obstacles =
         createDynamicObstaclesFromMotionConstraints(motion_constraints, world_ptr);
 
@@ -167,7 +168,8 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
 
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
-    const TbotsProto::MotionConstraint &motion_constraint, const WorldPtr &world_ptr) const
+    const TbotsProto::MotionConstraint &motion_constraint,
+    const WorldPtr &world_ptr) const
 {
     std::vector<ObstaclePtr> obstacles;
 
@@ -199,7 +201,8 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
             break;
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // 0.5 represents half a metre radius
-            obstacles.push_back(createFromShape(Circle(world_ptr->ball().position(), 0.5)));
+            obstacles.push_back(
+                createFromShape(Circle(world_ptr->ball().position(), 0.5)));
             break;
         case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
             if (world_ptr->gameState().getBallPlacementPoint().has_value())

@@ -19,10 +19,11 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // non goalie and non ball placing robots line up along a line just outside the
     // friendly defense area to wait for ball placement to finish
-    Vector waiting_line_vector = world_ptr->field().friendlyDefenseArea().posXPosYCorner() -
-            world_ptr->field().friendlyDefenseArea().posXNegYCorner();
+    Vector waiting_line_vector =
+        world_ptr->field().friendlyDefenseArea().posXPosYCorner() -
+        world_ptr->field().friendlyDefenseArea().posXNegYCorner();
     Point waiting_line_start_point =
-            world_ptr->field().friendlyDefenseArea().posXNegYCorner() +
+        world_ptr->field().friendlyDefenseArea().posXNegYCorner() +
         Vector(ROBOT_MAX_RADIUS_METERS * 3,
                0);  // Path planner can slow down when pathing through
                     // objects - buffer zone of radius x 3 should help
@@ -37,8 +38,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        place_ball_tactic->updateControlParams(world_ptr->gameState().getBallPlacementPoint(),
-                                               std::nullopt, true);
+        place_ball_tactic->updateControlParams(
+            world_ptr->gameState().getBallPlacementPoint(), std::nullopt, true);
         TacticVector result = {place_ball_tactic};
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());
         yield({result});

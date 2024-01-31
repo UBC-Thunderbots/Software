@@ -8,7 +8,8 @@
 
 StopPlay::StopPlay(TbotsProto::AiConfig config) : Play(config, true) {}
 
-void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr)
+void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                              const WorldPtr &world_ptr)
 {
     // Robot assignments for the Stop Play
     //  - 1 robot will be the goalie
@@ -60,7 +61,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr 
         // for positioning all the robots (excluding the goalie). The positioning vector
         // will be used to position robots tangent to the goal_to_ball_unit_vector
         Vector goal_to_ball_unit_vector =
-            (world_ptr->field().friendlyGoalCenter() - world_ptr->ball().position()).normalize();
+            (world_ptr->field().friendlyGoalCenter() - world_ptr->ball().position())
+                .normalize();
         Vector robot_positioning_unit_vector = goal_to_ball_unit_vector.perpendicular();
 
         // ball_defense_point_center is a point on the circle around the ball that the
@@ -69,7 +71,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr 
         // We add an extra robot radius as a buffer to be extra safe we don't break any
         // rules by getting too close
         Point ball_defense_point_center =
-                world_ptr->ball().position() +
+            world_ptr->ball().position() +
             (0.5 + 2 * ROBOT_MAX_RADIUS_METERS) * goal_to_ball_unit_vector;
         Point ball_defense_point_left =
             ball_defense_point_center -

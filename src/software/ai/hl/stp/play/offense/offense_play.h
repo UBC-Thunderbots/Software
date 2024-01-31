@@ -13,7 +13,8 @@ class OffensePlay : public Play
    public:
     OffensePlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
     void updateTactics(const PlayUpdate &play_update) override;
 
    private:

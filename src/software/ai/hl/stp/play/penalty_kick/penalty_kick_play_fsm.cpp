@@ -48,7 +48,8 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
                           ROBOT_MAX_RADIUS_METERS;
         penalty_setup_tactics.at(i)->updateControlParams(
             Point(ball_position_x - 1.25, y_offset),
-            event.common.world_ptr->field().enemyGoalCenter().toVector().orientation(), 0);
+            event.common.world_ptr->field().enemyGoalCenter().toVector().orientation(),
+            0);
     }
 
     // Move shooting robot behind the ball

@@ -51,8 +51,8 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
     // only look for pass if there are more than 1 robots
     if (event.common.num_tactics > 1)
     {
-        auto pitch_division =
-            std::make_shared<const EighteenZonePitchDivision>(event.common.world_ptr->field());
+        auto pitch_division = std::make_shared<const EighteenZonePitchDivision>(
+            event.common.world_ptr->field());
 
         auto pass_eval    = pass_generator.generatePassEvaluation(event.common.world_ptr);
         auto ranked_zones = pass_eval.rankZonesForReceiving(
@@ -77,8 +77,8 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         // If we've assigned a robot as the passer in the PassGenerator, we
         // lower our threshold based on how long the PassGenerator has been
         // running since we set it
-        time_since_commit_stage_start =
-            event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time;
+        time_since_commit_stage_start = event.common.world_ptr->getMostRecentTimestamp() -
+                                        pass_optimization_start_time;
         min_pass_score_threshold =
             1 - std::min(time_since_commit_stage_start.toSeconds() /
                              pass_score_ramp_down_duration,

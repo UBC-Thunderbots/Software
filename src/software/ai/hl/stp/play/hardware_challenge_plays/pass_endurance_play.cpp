@@ -28,7 +28,7 @@ void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
             for (size_t k = 0; k < move_tactics.size(); k++)
             {
                 move_tactics[k]->updateControlParams(
-                        world_ptr->ball().position() +
+                    world_ptr->ball().position() +
                         Vector::createFromAngle(angle_between_robots *
                                                 static_cast<double>(k + 1)),
                     (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(),
@@ -42,7 +42,7 @@ void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
             for (size_t k = 0; k < move_tactics.size(); k++)
             {
                 auto next_position = Point(
-                        world_ptr->field().centerPoint().x(),
+                    world_ptr->field().centerPoint().x(),
                     (initial_offset + static_cast<int>(k)) * 4 * ROBOT_MAX_RADIUS_METERS);
                 move_tactics[k]->updateControlParams(next_position, Angle::zero(), 0);
             }

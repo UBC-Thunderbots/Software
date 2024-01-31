@@ -44,7 +44,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
     double fallback_chip_target_x_offset = 1.5;
 
     Point fallback_chip_target =
-            world_ptr->field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
+        world_ptr->field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
     auto attacker = std::make_shared<AttackerTactic>(ai_config);
     attacker->updateControlParams(fallback_chip_target);

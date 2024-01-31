@@ -45,7 +45,8 @@ MovePrimitive::MovePrimitive(
 }
 
 std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMessage(
-    const WorldPtr &world_ptr, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const WorldPtr &world_ptr,
+    const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
     // Generate obstacle avoiding trajectory
@@ -59,9 +60,9 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
 
     // TODO (#3104): The fieldBounary should be shrunk by the robot radius before being
     //  passed to the planner.
-    traj_path =
-        planner.findTrajectory(robot.position(), destination, robot.velocity(),
-                               constraints, obstacles, world_ptr->field().fieldBoundary());
+    traj_path = planner.findTrajectory(robot.position(), destination, robot.velocity(),
+                                       constraints, obstacles,
+                                       world_ptr->field().fieldBoundary());
 
     if (!traj_path.has_value())
     {
@@ -128,11 +129,12 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
 }
 
 void MovePrimitive::generateObstacles(
-    const WorldPtr &world_ptr, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const WorldPtr &world_ptr,
+    const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
-    obstacles =
-        obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world_ptr);
+    obstacles = obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints,
+                                                                      world_ptr);
 
     for (const Robot &enemy : world_ptr->enemyTeam().getAllRobots())
     {

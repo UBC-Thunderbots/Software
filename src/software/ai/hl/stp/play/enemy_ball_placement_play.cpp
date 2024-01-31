@@ -41,8 +41,9 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
 
     do
     {
-        auto enemy_threats = getAllEnemyThreats(world_ptr->field(), world_ptr->friendlyTeam(),
-                                                world_ptr->enemyTeam(), world_ptr->ball(), false);
+        auto enemy_threats =
+            getAllEnemyThreats(world_ptr->field(), world_ptr->friendlyTeam(),
+                               world_ptr->enemyTeam(), world_ptr->ball(), false);
 
         // Create tactic vector (starting with Goalie)
         PriorityTacticVector tactics_to_run = {{}};
@@ -62,8 +63,9 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
             (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
                 .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
 
-        Vector placement_to_net = (placement_point - world_ptr->field().friendlyGoalCenter())
-                                      .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
+        Vector placement_to_net =
+            (placement_point - world_ptr->field().friendlyGoalCenter())
+                .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
 
         // Check to see if the enemy has the ball. Once they do, we change our shadowing
         // behaviour
@@ -80,11 +82,11 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         if (!enemy_at_ball)
         {
             move_tactics[0]->updateControlParams(
-                    world_ptr->ball().position() + ball_to_net +
+                world_ptr->ball().position() + ball_to_net +
                     ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
                 ball_to_net.orientation() + Angle::half(), 0);
             move_tactics[1]->updateControlParams(
-                    world_ptr->ball().position() + ball_to_net -
+                world_ptr->ball().position() + ball_to_net -
                     ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
                 ball_to_net.orientation() + Angle::half(), 0);
             tactics_to_run[0].emplace_back(move_tactics[0]);

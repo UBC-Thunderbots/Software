@@ -48,13 +48,13 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     std::vector<Point> defense_positions = {
         Point(world_ptr->field().friendlyGoalpostNeg().x() +
-                      world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                  world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
               -world_ptr->field().defenseAreaYLength() / 2.0),
         Point(world_ptr->field().friendlyGoalpostPos().x() +
-                      world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                  world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
               world_ptr->field().defenseAreaYLength() / 2.0),
         Point(world_ptr->field().friendlyGoalCenter().x() +
-                      world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                  world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
               world_ptr->field().friendlyGoalCenter().y()),
         Point(-(world_ptr->field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
               world_ptr->field().defenseAreaYLength() / 2.0),
@@ -91,8 +91,9 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
             LOG(WARNING) << "No Robot on the Field!";
         }
 
-        auto enemy_threats = getAllEnemyThreats(world_ptr->field(), world_ptr->friendlyTeam(),
-                                                world_ptr->enemyTeam(), world_ptr->ball(), false);
+        auto enemy_threats =
+            getAllEnemyThreats(world_ptr->field(), world_ptr->friendlyTeam(),
+                               world_ptr->enemyTeam(), world_ptr->ball(), false);
 
         PriorityTacticVector result = {{}};
 
@@ -135,7 +136,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
             ->updateControlParams(
                 calculateBlockCone(world_ptr->field().friendlyGoalpostPos(),
                                    world_ptr->field().friendlyGoalpostNeg(),
-                                   world_ptr->field().centerPoint(), ROBOT_MAX_RADIUS_METERS),
+                                   world_ptr->field().centerPoint(),
+                                   ROBOT_MAX_RADIUS_METERS),
                 Angle::zero(), 0, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
         result[0].emplace_back(move_tactics.at(defense_position_index));
 

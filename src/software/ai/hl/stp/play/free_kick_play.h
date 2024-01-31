@@ -14,7 +14,8 @@ class FreeKickPlay : public Play
    public:
     FreeKickPlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
 
    private:
     // The maximum time that we will wait before committing to a pass
