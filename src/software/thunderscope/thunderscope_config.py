@@ -18,7 +18,6 @@ import signal
 import qdarktheme
 import os
 from qt_material import apply_stylesheet, list_themes
-from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 
 
 class TScopeConfig:
@@ -131,7 +130,6 @@ def configure_base_fullsystem(
     replay: bool = False,
     replay_log: os.PathLike = None,
     visualization_buffer_size: int = 5,
-    gamecontroller: Gamecontroller = None,
     extra_widgets: List[TScopeWidget] = [],
 ) -> list:
     """
@@ -158,8 +156,7 @@ def configure_base_fullsystem(
                     "full_system_proto_unix_io": full_system_proto_unix_io,
                     "sim_proto_unix_io": sim_proto_unix_io,
                     "friendly_colour_yellow": friendly_colour_yellow,
-                    "visualization_buffer_size": visualization_buffer_size,
-                    "gamecontroller": gamecontroller,
+                    "visualization_buffer_size": visualization_buffer_size
                 }
             ),
         ),
@@ -268,7 +265,7 @@ def configure_base_diagnostics(
 
 
 def configure_two_ai_gamecontroller_view(
-    gamecontroller: Gamecontroller, visualization_buffer_size: int = 5,
+    visualization_buffer_size: int = 5,
 ) -> TScopeConfig:
     """
     Constructs the Thunderscope Config for a view with 2 FullSystem tabs (Blue and Yellow)
@@ -298,7 +295,6 @@ def configure_two_ai_gamecontroller_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    gamecontroller=gamecontroller,
                     extra_widgets=[],
                 ),
             ),

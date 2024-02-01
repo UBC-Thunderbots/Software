@@ -11,6 +11,7 @@ py_library(
         "//software/thunderscope/gl/layers:gl_measure_layer",
         "//software/thunderscope/gl/widgets:gl_gamecontroller_toolbar",
         "//software/thunderscope/replay:replay_controls",
+        "//software/thunderscope:proto_unix_io",
         requirement("pyqtgraph"),
     ],
 )

@@ -10,6 +10,7 @@ import numpy as np
 
 from software.thunderscope.constants import *
 
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
 from software.thunderscope.replay.proto_player import ProtoPlayer
@@ -18,7 +19,6 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import *
 from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
-from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 
 
 class GLWidget(QWidget):
@@ -28,9 +28,9 @@ class GLWidget(QWidget):
 
     def __init__(
         self,
+        proto_unix_io: ProtoUnixIO,
         friendly_color_yellow: bool,
-        player: ProtoPlayer = None,
-        gamecontroller: Gamecontroller = None,
+        player: ProtoPlayer = None
     ) -> None:
         """Initialize the GLWidget
 
@@ -148,11 +148,11 @@ class GLWidget(QWidget):
         self.layout.addWidget(self.toolbar)
         self.layout.addWidget(self.gl_view_widget)
         # Setup gamecontroller toolbar
-        if gamecontroller:
-            self.gamecontroller_toolbar = GLGamecontrollerToolbar(
-                gamecontroller, friendly_color_yellow
-            )
-            self.layout.addWidget(self.gamecontroller_toolbar)
+        self.gamecontroller_toolbar = GLGamecontrollerToolbar(
+            proto_unix_io,
+            friendly_color_yellow
+        )
+        self.layout.addWidget(self.gamecontroller_toolbar)
 
         # Setup replay controls if player is provided and the log has some size
         self.player = player

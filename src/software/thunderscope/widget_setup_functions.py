@@ -9,7 +9,6 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.robot_log_msg_pb2 import RobotLog
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_style import *
-from software.thunderscope.proto_unix_io import ProtoUnixIO
 from google.protobuf.message import Message
 
 # Import Widgets
@@ -43,7 +42,6 @@ from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
-from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 
 ################################
 #  FULLSYSTEM RELATED WIDGETS  #
@@ -57,7 +55,6 @@ def setup_gl_widget(
     visualization_buffer_size: int,
     replay: bool = False,
     replay_log: os.PathLike = None,
-    gamecontroller: Gamecontroller = None,
 ) -> Field:
     """Setup the GLWidget with its constituent layers
 
@@ -75,9 +72,9 @@ def setup_gl_widget(
 
     # Create widget
     gl_widget = GLWidget(
+        proto_unix_io=full_system_proto_unix_io,
         friendly_color_yellow=friendly_colour_yellow,
-        player=player,
-        gamecontroller=gamecontroller,
+        player=player
     )
 
     # Create layers

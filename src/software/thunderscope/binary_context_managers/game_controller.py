@@ -17,7 +17,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
 from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
-
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class Gamecontroller(object):
     """ Gamecontroller Context Manager """
@@ -26,20 +26,21 @@ class Gamecontroller(object):
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, supress_logs: bool = False, ci_mode: bool = False) -> None:
+    def __init__(self, supress_logs: bool = False) -> None:
         """Run Gamecontroller
 
         :param supress_logs: Whether to suppress the logs
-        :param ci_mode: Whether to run the gamecontroller in CI mode
-
         """
         self.supress_logs = supress_logs
-        self.ci_mode = ci_mode
 
         # We need to find 2 free ports to use for the gamecontroller
         # so that we can run multiple gamecontroller instances in parallel
         self.referee_port = self.next_free_port()
         self.ci_port = self.next_free_port()
+
+        self.manual_gc_command_buffer = ThreadSafeBuffer(
+            buffer_size=2, protobuf_type=ManualGCCommand
+        )
 
     def __enter__(self) -> "self":
         """Enter the gamecontroller context manager. 
@@ -47,10 +48,7 @@ class Gamecontroller(object):
         :return: gamecontroller context managed instance
 
         """
-        command = ["/opt/tbotspython/gamecontroller"]
-
-        if self.ci_mode:
-            command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
+        command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
 
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
@@ -62,11 +60,10 @@ class Gamecontroller(object):
         else:
             self.gamecontroller_proc = Popen(command)
 
-        if self.ci_mode:
-            # We can't connect to the ci port right away, it takes
-            # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
-            time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
-            self.ci_socket = SslSocket(self.ci_port)
+        # We can't connect to the ci port right away, it takes
+        # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
+        time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+        self.ci_socket = SslSocket(self.ci_port)
 
         return self
 
@@ -81,8 +78,23 @@ class Gamecontroller(object):
         self.gamecontroller_proc.terminate()
         self.gamecontroller_proc.wait()
 
-        if self.ci_mode:
-            self.ci_socket.close()
+        self.ci_socket.close()
+
+    def refresh(self):
+        manual_command = self.manual_gc_command_buffer.get(return_cached=False)
+
+        while manual_command is not None:
+            print("A")
+            self.send_gc_command(
+                gc_command=manual_command.manual_command.type,
+                team=manual_command.manual_command.for_team,
+                final_ball_placement_point=tbots_cpp.Point(
+                    manual_command.final_ball_placement_point.x,
+                    manual_command.final_ball_placement_point.y
+                ) if manual_command.final_ball_placement_point else None,
+                from_ui=True
+            )
+            manual_command = self.manual_gc_command_buffer.get(return_cached=False)
 
     def next_free_port(self, port: int = 40000, max_port: int = 65535) -> None:
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller
@@ -126,7 +138,7 @@ class Gamecontroller(object):
             :param data: The referee command to send
 
             """
-            print(data)
+            # print(data)
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
             if autoref_proto_unix_io is not None:
@@ -136,11 +148,20 @@ class Gamecontroller(object):
             Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
         )
 
+        blue_full_system_proto_unix_io.register_observer(
+            ManualGCCommand, self.manual_gc_command_buffer
+        )
+        yellow_full_system_proto_unix_io.register_observer(
+            ManualGCCommand, self.manual_gc_command_buffer
+        )
+
+
     def send_gc_command(
         self,
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
         final_ball_placement_point: tbots_cpp.Point = None,
+        from_ui: bool = False
     ) -> Any:
         """Send a ci input to the gamecontroller.
 
@@ -155,10 +176,16 @@ class Gamecontroller(object):
         :return: The response CiOutput containing 1 or more refree msgs
 
         """
-        print(gc_command)
         ci_input = CiInput(timestamp=int(time.time_ns()))
         api_input = Input()
+
         change = Change()
+        if from_ui:
+            change = Change(
+                origin="UI"
+            )
+
+        
         new_command = NewCommand()
         command = Command(type=gc_command, for_team=team)
 
@@ -166,6 +193,8 @@ class Gamecontroller(object):
         change.new_command.CopyFrom(new_command)
         api_input.change.CopyFrom(change)
         ci_input.api_inputs.append(api_input)
+
+        print(str(Change.origin))
 
         # Do this only if ball placement pos is specified
         if final_ball_placement_point:
@@ -303,3 +332,4 @@ class Gamecontroller(object):
         ci_input.api_inputs.append(game_config_input)
 
         return self.send_ci_input(ci_input)
+

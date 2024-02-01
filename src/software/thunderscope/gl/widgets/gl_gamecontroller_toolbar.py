@@ -1,16 +1,15 @@
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from pyqtgraph.Qt.QtWidgets import *
-from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
-from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 
 
 class GLGamecontrollerToolbar(GLToolbar):
-    def __init__(self, gamecontroller: Gamecontroller, friendly_color_yellow: bool):
+    def __init__(self, proto_unix_io: ProtoUnixIO, friendly_color_yellow: bool):
         super(GLGamecontrollerToolbar, self).__init__()
-
-        self.gamecontroller = gamecontroller
+        
+        self.proto_unix_io = proto_unix_io
         self.friendly_color_yellow = friendly_color_yellow
 
         # Setup Stop button for sending the STOP gamecontroller command
@@ -30,12 +29,26 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.layout().addStretch()
 
     def __send_stop_command(self):
-        self.gamecontroller.send_gc_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
+        self.__send_gc_command(
+            Command.Type.STOP,
+            SslTeam.UNKNOWN
         )
 
     def __send_force_start_command(self):
-        self.gamecontroller.send_gc_command(
-            gc_command=Command.Type.FORCE_START,
-            team=(Team.YELLOW if self.friendly_color_yellow else Team.BLUE),
+        print(self.friendly_color_yellow)
+        self.__send_gc_command(
+            Command.Type.FORCE_START,
+            (SslTeam.YELLOW if self.friendly_color_yellow else SslTeam.BLUE)
+        )
+
+    def __send_gc_command(self, command: Command.Type, team: Team, ball_pos: Vector2 = None): 
+        self.proto_unix_io.send_proto(
+            ManualGCCommand, 
+            ManualGCCommand(
+                manual_command=Command(
+                    type=command,
+                    for_team=team
+                ),
+                final_ball_placement_point=ball_pos
+            )
         )

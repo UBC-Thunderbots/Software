@@ -385,7 +385,7 @@ if __name__ == "__main__":
             True,
             False,
         ) as yellow_fs, Gamecontroller(
-            supress_logs=(not args.verbose), ci_mode=args.enable_autoref
+            supress_logs=(not args.verbose)
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -408,10 +408,12 @@ if __name__ == "__main__":
         ) as yellow_logger:
             tscope = Thunderscope(
                 config=config.configure_two_ai_gamecontroller_view(
-                    gamecontroller, args.visualization_buffer_size
+                    args.visualization_buffer_size
                 ),
                 layout_path=args.layout,
             )
+
+            tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()
 

@@ -23,7 +23,7 @@ proto_library(
         "tbots_timestamp_msg.proto",
         "team.proto",
         "vision.proto",
-        "world.proto",
+        "world.proto"
     ],
     deps = [
         "@com_google_protobuf//:descriptor_proto",
@@ -85,7 +85,7 @@ proto_library(
         "ssl_vision_detection_tracked.proto",
         "ssl_vision_geometry.proto",
         "ssl_vision_wrapper.proto",
-        "ssl_vision_wrapper_tracked.proto",
+        "ssl_vision_wrapper_tracked.proto"
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -181,6 +181,7 @@ py_proto_library(
         "robot_crash_msg.proto",
         "robot_log_msg.proto",
         "sensor_msg.proto",
+        "manual_gc_command.proto",
         "ssl_autoref_ci.proto",
         "ssl_gc_api.proto",
         "ssl_gc_change.proto",
@@ -196,7 +197,7 @@ py_proto_library(
         "ssl_vision_detection_tracked.proto",
         "ssl_vision_geometry.proto",
         "ssl_vision_wrapper.proto",
-        "ssl_vision_wrapper_tracked.proto",
+        "ssl_vision_wrapper_tracked.proto"
     ],
     deps = [
         ":tbots_py_proto",
