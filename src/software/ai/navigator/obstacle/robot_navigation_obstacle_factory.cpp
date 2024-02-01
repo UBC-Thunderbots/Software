@@ -273,12 +273,12 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromRobotPosition(
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromMovingRobot(
-    const Robot &robot, const std::shared_ptr<const Trajectory2D> traj) const
+    const Robot &robot, const TrajectoryPath& traj) const
 {
     return createDynamicCircle(Circle(robot.position(), ROBOT_MAX_RADIUS_METERS), traj);
 }
 
-ObstaclePtr RobotNavigationObstacleFactory::createDynamicCircle(const Circle &circle, const std::shared_ptr<const Trajectory2D> traj) const
+ObstaclePtr RobotNavigationObstacleFactory::createDynamicCircle(const Circle &circle, const TrajectoryPath& traj) const
 {
     return std::make_shared<DynamicObstacle<Circle>>(
         Circle(circle.origin(), circle.radius() + robot_radius_expansion_amount), traj);

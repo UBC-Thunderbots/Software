@@ -2,6 +2,7 @@
 
 #include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/ai/navigator/trajectory/trajectory_path.h"
 
 /**
  * The primitive actions that a robot can perform
@@ -22,10 +23,10 @@ class Primitive
      * @param obstacle_factory Obstacle factory to use for generating obstacles
      * @return the primitive proto message
      */
-    virtual std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
-        const World &world,
-        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const RobotNavigationObstacleFactory &obstacle_factory) = 0;
+    virtual std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>> generatePrimitiveProtoMessage(
+            const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+            const std::map<RobotId, TrajectoryPath> &robot_trajectories,
+            const RobotNavigationObstacleFactory &obstacle_factory) = 0;
 
     /**
      * Fill the obstacle list and path visualization with the obstacles and path

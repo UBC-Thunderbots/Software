@@ -55,8 +55,14 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
             auto primitives = tactic->get(world);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
-            auto primitive_proto = primitives[robot.id()]->generatePrimitiveProtoMessage(
-                world, motion_constraints, obstacle_factory);
+            auto [traj_path, primitive_proto] = primitives[robot.id()]->generatePrimitiveProtoMessage(
+                world, motion_constraints, robot_trajectories, obstacle_factory);
+
+            if (traj_path.has_value())
+            {
+                robot_trajectories.emplace(robot.id(), traj_path.value()); // TODO (NIMA): Robots are never removed!!! But there is no obstacle created for old robots as well since theyre not in world?!
+            }
+
             primitives_to_run->mutable_robot_primitives()->insert(
                 {robot.id(), *primitive_proto});
             tactic->setLastExecutionRobot(robot.id());

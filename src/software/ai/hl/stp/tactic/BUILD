@@ -100,6 +100,7 @@ cc_library(
     deps = [
         "//proto:tbots_cc_proto",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/ai/navigator/trajectory:trajectory_path",
     ],
 )
 

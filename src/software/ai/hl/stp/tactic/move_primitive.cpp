@@ -46,13 +46,14 @@ MovePrimitive::MovePrimitive(
     }
 }
 
-std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMessage(
+std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>> MovePrimitive::generatePrimitiveProtoMessage(
     const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
     ZoneScopedN("MovePrimitive::generatePrimitiveProtoMessage");
     // Generate obstacle avoiding trajectory
-    generateObstacles(world, motion_constraints, obstacle_factory);
+    generateObstacles(world, motion_constraints, robot_trajectories, obstacle_factory);
 
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         max_allowed_speed_mode, robot.robotConstants());
@@ -70,7 +71,7 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
     {
         LOG(WARNING) << "Could not find trajectory path for robot " << robot.id()
                      << " to move to " << destination;
-        return createStopPrimitiveProto();
+        return std::make_pair(std::nullopt, std::move(createStopPrimitiveProto()));
     }
 
     estimated_cost = traj_path->getTotalTime();
@@ -127,11 +128,12 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
                 static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
     }
 
-    return primitive_proto;
+    return std::make_pair(traj_path, std::move(primitive_proto));
 }
 
 void MovePrimitive::generateObstacles(
     const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
     obstacles =
@@ -139,6 +141,7 @@ void MovePrimitive::generateObstacles(
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {
+        // TODO(NIMA) Enemy robots and almost all friendly obstacles are constant for everyone!
         obstacles.push_back(obstacle_factory.createFromRobotPosition(enemy.position())); // TODO (NIMA): Add constant velocity obstacle?! Or should this be pill shaped
     }
 
@@ -146,8 +149,8 @@ void MovePrimitive::generateObstacles(
     {
         if (friendly.id() != robot.id())
         {
-            auto traj_iter = trajectories.find(friendly.id());
-            if (traj_iter != trajectories.end())
+            auto traj_iter = robot_trajectories.find(friendly.id());
+            if (traj_iter != robot_trajectories.end())
             {
                 obstacles.push_back(
                     obstacle_factory.createFromMovingRobot(friendly, traj_iter->second));

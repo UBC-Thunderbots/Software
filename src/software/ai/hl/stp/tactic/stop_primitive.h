@@ -19,10 +19,10 @@ class StopPrimitive : public Primitive
      * @param obstacle_factory Obstacle factory to use for generating obstacles
      * @return the primitive proto message
      */
-    std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
-        const World &world,
-        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const RobotNavigationObstacleFactory &obstacle_factory) override;
+    std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>> generatePrimitiveProtoMessage(
+            const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+            const std::map<RobotId, TrajectoryPath> &robot_trajectories,
+            const RobotNavigationObstacleFactory &obstacle_factory) override;
 
     /**
      * Fill the obstacle list and path visualization with the obstacles and path

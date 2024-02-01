@@ -3,7 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
-#include "software/ai/navigator/trajectory/trajectory_2d.h"
+#include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/logger/logger.h"
@@ -110,8 +110,8 @@ class RobotNavigationObstacleFactory
      *
      * @return moving obstacle around the robot
      */
-     ObstaclePtr RobotNavigationObstacleFactory::createFromMovingRobot( // TODO (NIMA): test
-     const Robot &robot, const std::shared_ptr<const Trajectory2D> traj) const;
+     ObstaclePtr createFromMovingRobot( // TODO (NIMA): test
+     const Robot &robot, const TrajectoryPath& traj) const;
 
     /**
      * Create circle obstacle around ball
@@ -143,7 +143,7 @@ class RobotNavigationObstacleFactory
      * @param circle The circle to make obstacle with
      * @param traj Trajectory which the obstacle is following
      */
-    ObstaclePtr createDynamicCircle(const Circle &circle, const std::shared_ptr<const Trajectory2D> traj) const;
+    ObstaclePtr createDynamicCircle(const Circle &circle, const TrajectoryPath& traj) const;
 
     /**
      * Returns an obstacle with the shape of the BallPlacementZone if the state is in
