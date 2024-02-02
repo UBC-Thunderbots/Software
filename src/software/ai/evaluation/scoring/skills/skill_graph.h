@@ -9,7 +9,7 @@ class SkillGraph
 
     std::shared_ptr<Skill> getNextSkill(const Robot& robot, const World& world);
 
-    void extendSequence(std::shared_ptr<Skill> skill);
+    void extendSequence(const std::shared_ptr<Skill>& skill);
 
     void completeSequence(double sequence_score);
 

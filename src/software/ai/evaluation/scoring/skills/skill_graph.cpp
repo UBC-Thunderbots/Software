@@ -45,7 +45,7 @@ std::shared_ptr<Skill> SkillGraph::getNextSkill(const Robot& robot, const World&
     return nodes_[best_next_node_id];
 }
 
-void SkillGraph::extendSequence(std::shared_ptr<Skill> skill)
+void SkillGraph::extendSequence(const std::shared_ptr<Skill>& skill)
 {
     unsigned int last_node_id = sequence_.back().second;
     unsigned int next_node_id = static_cast<unsigned int>(
