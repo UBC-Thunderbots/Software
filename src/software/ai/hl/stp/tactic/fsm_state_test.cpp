@@ -10,7 +10,7 @@ TEST(FsmStateTest, test_get_fsm_state)
 
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    world.updateFriendlyTeamState(Team({robot}));
+    world->updateFriendlyTeamState(Team({robot}));
     Pass pass = Pass(Point(0, 0), Point(2, 0), 5);
     tactic.setLastExecutionRobot(robot.id());
 
