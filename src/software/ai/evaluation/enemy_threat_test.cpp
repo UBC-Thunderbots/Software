@@ -407,9 +407,9 @@ TEST(EnemyThreatTest, no_enemies_on_field)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
     ::TestUtil::setBallPosition(world,
-                                        Point(world->field().friendlyGoalCenter()) +
-                                            Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
-                                        Timestamp::fromSeconds(0));
+                                Point(world->field().friendlyGoalCenter()) +
+                                    Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
+                                Timestamp::fromSeconds(0));
 
     auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
                                      world->enemyTeam(), world->ball(), false);
@@ -430,9 +430,9 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
     world->updateEnemyTeamState(enemy_team);
 
     ::TestUtil::setBallPosition(world,
-                                        Point(world->field().friendlyGoalCenter()) +
-                                            Vector(2 - DIST_TO_FRONT_OF_ROBOT_METERS, 0),
-                                        Timestamp::fromSeconds(0));
+                                Point(world->field().friendlyGoalCenter()) +
+                                    Vector(2 - DIST_TO_FRONT_OF_ROBOT_METERS, 0),
+                                Timestamp::fromSeconds(0));
 
     auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
                                      world->enemyTeam(), world->ball(), false);
@@ -447,8 +447,8 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
     ASSERT_TRUE(threat.best_shot_angle);
     EXPECT_NEAR(threat.best_shot_angle->toDegrees(), 30, 5);
     ASSERT_TRUE(threat.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat.best_shot_target,
-                                               world->field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        *threat.best_shot_target, world->field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat.num_passes_to_get_possession, 0);
     ASSERT_FALSE(threat.passer);
 }
@@ -523,8 +523,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_0.best_shot_angle);
     EXPECT_NEAR(threat_0.best_shot_angle->toDegrees(), 15, 5);
     ASSERT_TRUE(threat_0.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat_0.best_shot_target,
-                                               world->field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        *threat_0.best_shot_target, world->field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_0.num_passes_to_get_possession, 0);
     ASSERT_FALSE(threat_0.passer);
 
@@ -535,8 +535,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_1.best_shot_angle);
     EXPECT_NEAR(threat_1.best_shot_angle->toDegrees(), 20, 5);
     ASSERT_TRUE(threat_1.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat_1.best_shot_target,
-                                               world->field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        *threat_1.best_shot_target, world->field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_1.num_passes_to_get_possession, 1);
     ASSERT_TRUE(threat_1.passer);
     EXPECT_EQ(threat_1.passer, enemy_robot_1);
@@ -548,8 +548,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_2.best_shot_angle);
     EXPECT_NEAR(threat_2.best_shot_angle->toDegrees(), 5, 5);
     ASSERT_TRUE(threat_2.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat_2.best_shot_target,
-                                               world->field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        *threat_2.best_shot_target, world->field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_2.num_passes_to_get_possession, 1);
     ASSERT_TRUE(threat_2.passer);
     EXPECT_EQ(threat_2.passer, enemy_robot_1);

@@ -7,7 +7,7 @@
 TEST(PivotKickFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
+    Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
     PivotKickFSM::ControlParams control_params{
         .kick_origin       = Point(-2, 1.5),
         .kick_direction    = Angle::threeQuarter(),

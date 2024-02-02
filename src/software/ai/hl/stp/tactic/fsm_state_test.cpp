@@ -9,7 +9,7 @@ TEST(FsmStateTest, test_get_fsm_state)
     AttackerTactic tactic(ai_config);
 
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
+    Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
     world->updateFriendlyTeamState(Team({robot}));
     Pass pass = Pass(Point(0, 0), Point(2, 0), 5);
     tactic.setLastExecutionRobot(robot.id());

@@ -7,8 +7,8 @@
 TEST(AttackerFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    Pass pass   = Pass(Point(0, 0), Point(2, 0), 5);
+    Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
+    Pass pass                    = Pass(Point(0, 0), Point(2, 0), 5);
 
     AttackerFSM::ControlParams control_params{.best_pass_so_far = pass,
                                               .pass_committed   = true,

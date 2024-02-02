@@ -8,7 +8,7 @@
 TEST(PassDefenderFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-    Robot robot = ::TestUtil::createRobotAtPos(Point(-1, 0));
+    Robot robot                  = ::TestUtil::createRobotAtPos(Point(-1, 0));
     PassDefenderFSM::ControlParams control_params{.position_to_block_from = Point(-2, 0)};
 
     FSM<PassDefenderFSM> fsm{PassDefenderFSM()};

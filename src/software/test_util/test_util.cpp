@@ -8,7 +8,8 @@
 
 namespace TestUtil
 {
-    std::shared_ptr<World> createBlankTestingWorld(std::unique_ptr<TbotsProto::Field> field_proto)
+    std::shared_ptr<World> createBlankTestingWorld(
+        std::unique_ptr<TbotsProto::Field> field_proto)
     {
         Field field        = Field(*field_proto);
         Team friendly_team = Team(Duration::fromMilliseconds(1000));
@@ -43,29 +44,33 @@ namespace TestUtil
         return team;
     }
 
-    void setFriendlyRobotPositions(const std::shared_ptr<World> &world, std::vector<Point> robot_positions,
-                                    const Timestamp &timestamp)
+    void setFriendlyRobotPositions(const std::shared_ptr<World> &world,
+                                   std::vector<Point> robot_positions,
+                                   const Timestamp &timestamp)
     {
         Team new_friendly_team =
             setRobotPositionsHelper(world->friendlyTeam(), robot_positions, timestamp);
         world->updateFriendlyTeamState(new_friendly_team);
     }
 
-    void setEnemyRobotPositions(const std::shared_ptr<World> &world, std::vector<Point> robot_positions,
-                                 const Timestamp &timestamp)
+    void setEnemyRobotPositions(const std::shared_ptr<World> &world,
+                                std::vector<Point> robot_positions,
+                                const Timestamp &timestamp)
     {
         Team new_enemy_team =
             setRobotPositionsHelper(world->enemyTeam(), robot_positions, timestamp);
         world->updateEnemyTeamState(new_enemy_team);
     }
 
-    void setBallPosition(const std::shared_ptr<World> &world, Point ball_position, Timestamp timestamp)
+    void setBallPosition(const std::shared_ptr<World> &world, Point ball_position,
+                         Timestamp timestamp)
     {
         BallState ball_state(ball_position, world->ball().velocity());
         world->updateBall(Ball(ball_state, timestamp));
     }
 
-    void setBallVelocity(const std::shared_ptr<World> &world, Vector ball_velocity, Timestamp timestamp)
+    void setBallVelocity(const std::shared_ptr<World> &world, Vector ball_velocity,
+                         Timestamp timestamp)
     {
         BallState ball_state(world->ball().position(), ball_velocity);
         world->updateBall(Ball(ball_state, timestamp));

@@ -122,7 +122,7 @@ TEST(CreaseDefenderFSMTest, test_transitions)
 {
     TbotsProto::RobotNavigationObstacleConfig config;
     double robot_obstacle_inflation_factor = config.robot_obstacle_inflation_factor();
-    std::shared_ptr<World> world                            = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world           = ::TestUtil::createBlankTestingWorld();
     Robot robot                            = ::TestUtil::createRobotAtPos(Point(-2, -3));
     ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(123));
     CreaseDefenderFSM::ControlParams control_params{

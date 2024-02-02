@@ -7,10 +7,11 @@
 
 class PrimitiveTest : public testing::Test
 {
-    public:
-
-    PrimitiveTest() {
-        TestUtil::setFriendlyRobotPositions(world, {Point(0, 0)}, Timestamp::fromSeconds(0));
+   public:
+    PrimitiveTest()
+    {
+        TestUtil::setFriendlyRobotPositions(world, {Point(0, 0)},
+                                            Timestamp::fromSeconds(0));
     }
 
    protected:

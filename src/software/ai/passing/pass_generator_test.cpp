@@ -17,7 +17,8 @@ class PassGeneratorTest : public testing::Test
         passing_config.set_min_pass_speed_m_per_s(3.5);
         passing_config.set_max_pass_speed_m_per_s(5.5);
 
-        pitch_division = std::make_shared<const EighteenZonePitchDivision>(world->field());
+        pitch_division =
+            std::make_shared<const EighteenZonePitchDivision>(world->field());
         pass_generator = std::make_shared<PassGenerator<EighteenZoneId>>(pitch_division,
                                                                          passing_config);
     }
@@ -34,8 +35,8 @@ class PassGeneratorTest : public testing::Test
      * @param max_iters The maximum number of iterations of the PassGenerator to run
      */
     static void stepPassGenerator(
-        std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator, const std::shared_ptr<World>& world,
-        int max_iters)
+        std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator,
+        const std::shared_ptr<World>& world, int max_iters)
     {
         for (int i = 0; i < max_iters; i++)
         {
@@ -66,16 +67,16 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     enemy_team.updateRobots({
         Robot(0, world->field().enemyGoalpostNeg(), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(1, world->field().enemyGoalpostNeg() - Vector(0.1, 0), {0, 0}, Angle::zero(),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(2, world->field().enemyGoalpostNeg() - Vector(0.2, 0), {0, 0}, Angle::zero(),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(1, world->field().enemyGoalpostNeg() - Vector(0.1, 0), {0, 0},
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(2, world->field().enemyGoalpostNeg() - Vector(0.2, 0), {0, 0},
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
         Robot(3, world->field().enemyGoalpostPos(), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(4, world->field().enemyGoalpostPos() - Vector(0.1, 0), {0, 0}, Angle::zero(),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(5, world->field().enemyGoalpostPos() - Vector(0.2, 0), {0, 0}, Angle::zero(),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(4, world->field().enemyGoalpostPos() - Vector(0.1, 0), {0, 0},
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(5, world->field().enemyGoalpostPos() - Vector(0.2, 0), {0, 0},
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
         Robot(6, {-1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
         Robot(7, {-1, 0.5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),

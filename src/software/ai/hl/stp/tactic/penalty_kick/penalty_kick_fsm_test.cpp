@@ -9,7 +9,7 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     ::TestUtil::setBallPosition(world, world->field().friendlyPenaltyMark(),
-                                        Timestamp::fromSeconds(0));
+                                Timestamp::fromSeconds(0));
     Robot robot = ::TestUtil::createRobotAtPos(world->field().friendlyPenaltyMark());
 
     TbotsProto::AiConfig ai_config;
@@ -43,7 +43,7 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
         boost::sml::state<GetBehindBallFSM>));
 
     ::TestUtil::setBallPosition(world, position + Vector(0.1, 0),
-                                        Timestamp::fromSeconds(2));
+                                Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
@@ -51,7 +51,7 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
         boost::sml::state<KickFSM::KickState>));
 
     ::TestUtil::setBallPosition(world, world->field().enemyGoalCenter(),
-                                        Timestamp::fromSeconds(4));
+                                Timestamp::fromSeconds(4));
     ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(4));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
@@ -83,7 +83,7 @@ TEST(PenaltyKickFSMTest, enemy_goalie_offset_left_no_viable_shot)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     ::TestUtil::setBallPosition(world, world->field().friendlyPenaltyMark(),
-                                        Timestamp::fromSeconds(0));
+                                Timestamp::fromSeconds(0));
     ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
 
     Point enemy_goalie_pos = Point(world->field().enemyGoalCenter().x(), 0.2);
@@ -113,9 +113,8 @@ TEST(PenaltyKickFSMTest, enemy_goalie_offset_left_no_viable_shot)
 TEST(PenaltyKickFSMTest, enemy_goalie_offset_right_no_viable_shot)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world,
-                                        world->field().enemyGoalCenter() + Vector(-3, 0),
-                                        Timestamp::fromSeconds(0));
+    ::TestUtil::setBallPosition(world, world->field().enemyGoalCenter() + Vector(-3, 0),
+                                Timestamp::fromSeconds(0));
     ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
 
     Point enemy_goalie_pos = Point(world->field().enemyGoalCenter().x(), -0.2);
@@ -206,7 +205,7 @@ TEST(PenaltyKickFSMTest, no_enemy_goalie_shot_position)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     ::TestUtil::setBallPosition(world, world->field().friendlyPenaltyMark(),
-                                        Timestamp::fromSeconds(0));
+                                Timestamp::fromSeconds(0));
     ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
 
     EXPECT_EQ(PenaltyKickFSM::evaluateNextShotPosition(std::nullopt, world->field()),
@@ -217,7 +216,7 @@ TEST(PenaltyKickFSMTest, enemy_goalie_left_shot_right)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     ::TestUtil::setBallPosition(world, world->field().friendlyPenaltyMark(),
-                                        Timestamp::fromSeconds(0));
+                                Timestamp::fromSeconds(0));
     ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
 
     Point enemy_goalie_pos = Point(world->field().enemyGoalCenter().x(), 0.2);
@@ -234,7 +233,7 @@ TEST(PenaltyKickFSMTest, enemy_goalie_right_shot_left)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     ::TestUtil::setBallPosition(world, world->field().friendlyPenaltyMark(),
-                                        Timestamp::fromSeconds(0));
+                                Timestamp::fromSeconds(0));
     ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
 
     Point enemy_goalie_pos = Point(world->field().enemyGoalCenter().x(), -0.2);

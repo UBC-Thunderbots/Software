@@ -78,8 +78,8 @@ TEST(GoalieFSMTest, test_get_intersections_between_ball_velocity_and_full_goal_s
 
 TEST(GoalieFSMTest, test_transitions)
 {
-    Robot goalie = ::TestUtil::createRobotAtPos(Point(-4.5, 0));
-    std::shared_ptr<World> world  = ::TestUtil::createBlankTestingWorld();
+    Robot goalie                 = ::TestUtil::createRobotAtPos(Point(-4.5, 0));
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
     ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(123));
     ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(123));
@@ -121,7 +121,7 @@ TEST(GoalieFSMTest, test_transitions)
 
     // ball is now stationary in the "no-chip" rectangle
     ::TestUtil::setBallPosition(world, world->field().friendlyGoalCenter(),
-                                        Timestamp::fromSeconds(123));
+                                Timestamp::fromSeconds(123));
     ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(123));
 
     // goalie should transition to DribbleFSM
@@ -130,8 +130,7 @@ TEST(GoalieFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
     // goalie has ball, at the correct position and orientation to clear the ball
-    ::TestUtil::setBallPosition(world, clear_ball_origin,
-                                        Timestamp::fromSeconds(123));
+    ::TestUtil::setBallPosition(world, clear_ball_origin, Timestamp::fromSeconds(123));
     goalie.updateState(RobotState(clear_ball_origin, Vector(0, 0), clear_ball_direction,
                                   AngularVelocity::zero()),
                        Timestamp::fromSeconds(123));
@@ -142,8 +141,7 @@ TEST(GoalieFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
     goalie = ::TestUtil::createRobotAtPos(clear_ball_origin + Vector(-0.2, 0));
-    ::TestUtil::setBallPosition(world, clear_ball_origin,
-                                        Timestamp::fromSeconds(123));
+    ::TestUtil::setBallPosition(world, clear_ball_origin, Timestamp::fromSeconds(123));
     // ball is now chipped
     ::TestUtil::setBallVelocity(world, Vector(1, 0), Timestamp::fromSeconds(123));
     EXPECT_TRUE(world->ball().hasBallBeenKicked(clear_ball_direction));
