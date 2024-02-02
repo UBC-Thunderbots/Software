@@ -230,7 +230,8 @@ bool intersects(const Stadium &first, const Segment &second)
         std::min({start_distance_seg, end_distance_seg, start_distance, end_distance});
 
 
-    return shortest_distance <= std::pow(first.radius(), 2) || intersects(first.segment(), second);
+    return shortest_distance <= std::pow(first.radius(), 2) ||
+           intersects(first.segment(), second);
 }
 bool intersects(const Segment &first, const Stadium &second)
 {
