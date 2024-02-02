@@ -18,7 +18,7 @@ SkillGraph::SkillGraph(std::shared_ptr<Strategy> strategy)
 
     adj_matrix_ = std::vector<std::vector<double>>(
         nodes_.size() + 1,
-        std::vector<double>(nodes_.size() + 1, DEFAULT_TRANSITION_SCORE));
+        std::vector<double>(nodes_.size() + 1, DEFAULT_EDGE_WEIGHT));
 
     sequence_ = {std::make_pair(nodes_.size(), nodes_.size())};
 }
@@ -32,8 +32,9 @@ std::shared_ptr<Skill> SkillGraph::getNextSkill(const Robot& robot, const World&
 
     for (unsigned int node_id = 0; node_id < nodes_.size(); ++node_id)
     {
-        double transition_score = adj_matrix_[last_node_id][node_id];
-        transition_score *= nodes_[node_id]->getViability(robot, world);
+        double edge_weight      = adj_matrix_[last_node_id][node_id];
+        double viability_score  = nodes_[node_id]->getViability(robot, world);
+        double transition_score = edge_weight * viability_score;
 
         if (transition_score > best_transition_score)
         {
@@ -54,11 +55,25 @@ void SkillGraph::extendSequence(const std::shared_ptr<Skill>& skill)
     sequence_.emplace_back(last_node_id, next_node_id);
 }
 
-void SkillGraph::completeSequence(double sequence_score)
+void SkillGraph::scoreSequence(double sequence_score)
 {
+    // Equation used to calculate the edge weight adjustment:
+    // https://www.desmos.com/3d/04931b4dce
+
+    double adjustment_sigmoid =
+        sigmoid(sequence_score, 0, ADJUSTMENT_SIGMOID_WIDTH) - 0.5;
+
     while (sequence_.size() > 1)
     {
-        // TODO: Update sequence edge weights
+        auto [from, to] = sequence_.back();
         sequence_.pop_back();
+
+        double weight                = adj_matrix_[from][to];
+        double adjustment_resistance = signum(adjustment_sigmoid) *
+                                       std::abs(sequence_score) * weight * weight /
+                                       ADJUSTMENT_RESISTANCE;
+        double adjustment = adjustment_sigmoid - adjustment_resistance;
+
+        adj_matrix_[from][to] += adjustment;
     }
 }

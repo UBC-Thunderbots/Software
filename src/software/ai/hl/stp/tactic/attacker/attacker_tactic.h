@@ -27,7 +27,7 @@ class AttackerTactic : public Tactic
 
    private:
     std::shared_ptr<Strategy> strategy;
-    
+
     bool last_execution_robot_changed_;
 
     SkillGraph skill_graph_;

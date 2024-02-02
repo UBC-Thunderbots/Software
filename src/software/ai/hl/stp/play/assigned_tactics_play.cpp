@@ -10,9 +10,9 @@
 AssignedTacticsPlay::AssignedTacticsPlay(const TbotsProto::AiConfig &config,
                                          std::shared_ptr<Strategy> strategy)
     : Play(config, false, strategy),
-    assigned_tactics(),
-    override_motion_constraints(),
-    obstacle_factory(config.robot_navigation_obstacle_config())
+      assigned_tactics(),
+      override_motion_constraints(),
+      obstacle_factory(config.robot_navigation_obstacle_config())
 {
 }
 

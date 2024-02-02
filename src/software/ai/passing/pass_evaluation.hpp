@@ -184,7 +184,8 @@ std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::rankZonesForReceiving(
 }
 
 template <class ZoneEnum>
-PassEvaluation<ZoneEnum>& PassEvaluation<ZoneEnum>::operator=(const PassEvaluation<ZoneEnum>& other)
+PassEvaluation<ZoneEnum>& PassEvaluation<ZoneEnum>::operator=(
+    const PassEvaluation<ZoneEnum>& other)
 {
     if (this != &other)
     {

@@ -36,21 +36,21 @@ void AttackerTactic::setLastExecutionRobot(std::optional<RobotId> last_execution
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
     RobotId robot_id = tactic_update.robot.id();
-    
+
     std::shared_ptr<Skill> next_skill =
         skill_graph_.getNextSkill(tactic_update.robot, tactic_update.world);
 
     if (!skill_map_.contains(robot_id) || last_execution_robot != robot_id)
     {
-        skill_map_[robot_id] = next_skill;
-        skill_fsm_map_[robot_id] = next_skill->getFSM();   
+        skill_map_[robot_id]     = next_skill;
+        skill_fsm_map_[robot_id] = next_skill->getFSM();
     }
     else if (last_execution_robot == robot_id)
     {
         if (skill_fsm_map_[robot_id]->done())
         {
             skill_graph_.extendSequence(next_skill);
-            skill_map_[robot_id] = next_skill;
+            skill_map_[robot_id]     = next_skill;
             skill_fsm_map_[robot_id] = next_skill->getFSM();
         }
         else if (last_execution_robot_changed_)
