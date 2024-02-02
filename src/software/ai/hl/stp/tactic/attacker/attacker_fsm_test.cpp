@@ -6,7 +6,7 @@
 
 TEST(AttackerFSMTest, test_transitions)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
     Pass pass   = Pass(Point(0, 0), Point(2, 0), 5);
 
@@ -56,8 +56,8 @@ TEST(AttackerFSMTest, test_transitions)
 
     // FSM should be done now after 2 ticks, multiple ticks are required due to the
     // subFSMs
-    world = ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(223));
-    EXPECT_TRUE(world.ball().hasBallBeenKicked(pass.passerOrientation()));
+    ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(223));
+    EXPECT_TRUE(world->ball().hasBallBeenKicked(pass.passerOrientation()));
     fsm.process_event(AttackerFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     fsm.process_event(AttackerFSM::Update(

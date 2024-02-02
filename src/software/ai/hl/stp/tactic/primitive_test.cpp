@@ -10,14 +10,15 @@ class PrimitiveTest : public testing::Test
    protected:
     RobotConstants_t robot_constants = create2021RobotConstants();
     Robot robot                      = TestUtil::createRobotAtPos(Point(0, 0));
-    World world                      = TestUtil::setFriendlyRobotPositions(
-        TestUtil::createBlankTestingWorld(), {Point(0, 0)}, Timestamp::fromSeconds(0));
+    std::shared_ptr<World> world     = TestUtil::createBlankTestingWorld();
     RobotNavigationObstacleFactory obstacle_factory =
         RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig());
 };
 
 TEST_F(PrimitiveTest, test_create_move_primitive)
 {
+    TestUtil::setFriendlyRobotPositions(world, {Point(0, 0)}, Timestamp::fromSeconds(0));
+
     const Point destination(-5, 1);
 
     std::shared_ptr<MovePrimitive> move_primitive = std::make_shared<MovePrimitive>(
@@ -50,6 +51,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive)
 
 TEST_F(PrimitiveTest, test_create_move_primitive_with_sub_destination)
 {
+    TestUtil::setFriendlyRobotPositions(world, {Point(0, 0)}, Timestamp::fromSeconds(0));
+
     // Add friendly defense area as a motion constraint and path plan around it
     const Point start(-4, -1.5);
     const Point destination(-4, 1.5);
@@ -93,6 +96,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_sub_destination)
 
 TEST_F(PrimitiveTest, test_create_move_primitive_with_autochip)
 {
+    TestUtil::setFriendlyRobotPositions(world, {Point(0, 0)}, Timestamp::fromSeconds(0));
+
     const Point destination(-5, 1);
 
     std::shared_ptr<MovePrimitive> move_primitive = std::make_shared<MovePrimitive>(
@@ -124,6 +129,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autochip)
 
 TEST_F(PrimitiveTest, test_create_move_primitive_with_autokick)
 {
+    TestUtil::setFriendlyRobotPositions(world, {Point(0, 0)}, Timestamp::fromSeconds(0));
+
     const Point destination(-5, 1);
 
     std::shared_ptr<MovePrimitive> move_primitive = std::make_shared<MovePrimitive>(
@@ -155,6 +162,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autokick)
 
 TEST_F(PrimitiveTest, test_create_stop_primitive)
 {
+    TestUtil::setFriendlyRobotPositions(world, {Point(0, 0)}, Timestamp::fromSeconds(0));
+
     StopPrimitive stop_primitive;
     EXPECT_EQ(stop_primitive.getEstimatedPrimitiveCost(), 0.0);
 

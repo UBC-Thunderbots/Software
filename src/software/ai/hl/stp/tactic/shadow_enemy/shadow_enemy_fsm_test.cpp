@@ -70,8 +70,8 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     Robot enemy    = ::TestUtil::createRobotAtPos(Point(0, 2));
     Robot shadowee = ::TestUtil::createRobotAtPos(Point(0, -2));
     Robot shadower = ::TestUtil::createRobotAtPos(Point(-2, 0));
-    World world    = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, Point(0, 2), Timestamp::fromSeconds(0));
+    std::shared_ptr<World> world    = ::TestUtil::createBlankTestingWorld();
+    ::TestUtil::setBallPosition(world, Point(0, 2), Timestamp::fromSeconds(0));
     EnemyThreat enemy_threat{shadowee,     false, Angle::zero(), std::nullopt,
                              std::nullopt, 1,     enemy};
     FSM<ShadowEnemyFSM> fsm;
@@ -89,7 +89,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     // Shadowee now has the ball, our robot should move to block the shot
     // Robot should be trying to block possible shot on our net
     enemy_threat.has_ball = true;
-    world = ::TestUtil::setBallPosition(world, Point(0, -2), Timestamp::fromSeconds(0));
+    ::TestUtil::setBallPosition(world, Point(0, -2), Timestamp::fromSeconds(0));
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));
@@ -106,10 +106,10 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     // Shadowee still has possession of the ball and robot has arrived at block shot
     // position Robot should try to steal and chip the ball
     Point position_to_block = ShadowEnemyFSM::findBlockShotPoint(
-        shadower, world.field(), world.friendlyTeam(), world.enemyTeam(), shadowee, 0.5);
+        shadower, world->field(), world->friendlyTeam(), world->enemyTeam(), shadowee, 0.5);
     shadower.updateState(
         RobotState(position_to_block, Vector(),
-                   (world.ball().position() - position_to_block).orientation(),
+                   (world->ball().position() - position_to_block).orientation(),
                    AngularVelocity::zero()),
         Timestamp::fromSeconds(0));
     fsm.process_event(ShadowEnemyFSM::Update(
@@ -128,7 +128,7 @@ TEST(ShadowEnemyFSMTest, test_transitions)
     // enemy threat has kicked the ball
     // Tactic is done
     enemy_threat.has_ball = false;
-    world = ::TestUtil::setBallPosition(world, Point(0, 2), Timestamp::fromSeconds(0));
+    ::TestUtil::setBallPosition(world, Point(0, 2), Timestamp::fromSeconds(0));
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::shared_ptr<Primitive>) {})));

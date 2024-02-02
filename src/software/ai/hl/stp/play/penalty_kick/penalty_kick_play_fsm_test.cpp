@@ -8,14 +8,14 @@
 
 TEST(PenaltyKickPlayFSMTest, test_transitions)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::HALT);
-    world.updateGameState(game_state);
+    world->updateGameState(game_state);
     game_state.updateRefereeCommand(RefereeCommand::STOP);
-    world.updateGameState(game_state);
+    world->updateGameState(game_state);
     game_state.updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_US);
-    world.updateGameState(game_state);
+    world->updateGameState(game_state);
 
     int num_tactics = 5;
 
@@ -34,7 +34,7 @@ TEST(PenaltyKickPlayFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<PenaltyKickPlayFSM::SetupPositionState>));
 
     game_state.updateRefereeCommand(RefereeCommand::NORMAL_START);
-    world.updateGameState(game_state);
+    world->updateGameState(game_state);
 
     fsm.process_event(PenaltyKickPlayFSM::Update(
         PenaltyKickPlayFSM::ControlParams{},

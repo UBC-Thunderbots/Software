@@ -6,7 +6,7 @@
 
 TEST(ChipFSMTest, test_transitions)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
     ChipFSM::ControlParams control_params{.chip_origin          = Point(-2, 1.5),
                                           .chip_direction       = Angle::threeQuarter(),
@@ -37,9 +37,9 @@ TEST(ChipFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM::ChipState>));
 
     // Ball is now chipped
-    world =
-        ::TestUtil::setBallVelocity(world, Vector(0, -2.1), Timestamp::fromSeconds(123));
-    EXPECT_TRUE(world.ball().hasBallBeenKicked(Angle::threeQuarter()));
+    ::TestUtil::setBallVelocity(world, Vector(0, -2.1), Timestamp::fromSeconds(123));
+
+    EXPECT_TRUE(world->ball().hasBallBeenKicked(Angle::threeQuarter()));
 
     // Tactic is done
     fsm.process_event(ChipFSM::Update(

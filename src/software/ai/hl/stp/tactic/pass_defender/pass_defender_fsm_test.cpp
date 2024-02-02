@@ -7,7 +7,7 @@
 
 TEST(PassDefenderFSMTest, test_transitions)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot = ::TestUtil::createRobotAtPos(Point(-1, 0));
     PassDefenderFSM::ControlParams control_params{.position_to_block_from = Point(-2, 0)};
 
@@ -23,9 +23,8 @@ TEST(PassDefenderFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
 
     // Ball is now kicked towards pass defender
-    world =
-        ::TestUtil::setBallVelocity(world, Vector(-1, 0), Timestamp::fromSeconds(123));
-    EXPECT_TRUE(world.ball().hasBallBeenKicked(Angle::half()));
+    ::TestUtil::setBallVelocity(world, Vector(-1, 0), Timestamp::fromSeconds(123));
+    EXPECT_TRUE(world->ball().hasBallBeenKicked(Angle::half()));
 
     // Transition to InterceptBallState
     fsm.process_event(PassDefenderFSM::Update(
@@ -33,10 +32,9 @@ TEST(PassDefenderFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::InterceptBallState>));
 
     // Deflect ball away from pass defender
-    world =
-        ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(124));
-    world = ::TestUtil::setBallVelocity(world, Vector(0, 1), Timestamp::fromSeconds(124));
-    EXPECT_TRUE(world.ball().hasBallBeenKicked(Angle::quarter()));
+    ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(124));
+    ::TestUtil::setBallVelocity(world, Vector(0, 1), Timestamp::fromSeconds(124));
+    EXPECT_TRUE(world->ball().hasBallBeenKicked(Angle::quarter()));
 
     // Transition back to BlockPassState
     fsm.process_event(PassDefenderFSM::Update(

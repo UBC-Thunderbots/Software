@@ -6,7 +6,7 @@
 
 TEST(GetBehindBallFSMTest, test_transitions)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
     GetBehindBallFSM::ControlParams control_params{.ball_location   = Point(2, 3),
                                                    .chick_direction = Angle::quarter()};
