@@ -5,7 +5,8 @@
 
 HaltPlay::HaltPlay(TbotsProto::AiConfig config) : Play(config, false) {}
 
-void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr)
+void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                              const WorldPtr &world_ptr)
 {
     auto stop_tactic_1 = std::make_shared<StopTactic>();
     auto stop_tactic_2 = std::make_shared<StopTactic>();

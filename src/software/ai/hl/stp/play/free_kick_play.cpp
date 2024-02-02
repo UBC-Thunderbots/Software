@@ -18,7 +18,8 @@ FreeKickPlay::FreeKickPlay(TbotsProto::AiConfig config)
 {
 }
 
-void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr)
+void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                  const WorldPtr &world_ptr)
 {
     /**
      * This play is basically:
@@ -70,7 +71,7 @@ void FreeKickPlay::updateAlignToBallTactic(
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
-            world_ptr->ball().position() -
+        world_ptr->ball().position() -
             ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
         ball_to_center_vec.orientation(), 0);
 }
@@ -86,7 +87,7 @@ void FreeKickPlay::chipAtGoalStage(
     // This is exerimentally determined to be a reasonable value
     double fallback_chip_target_x_offset = 1.5;
     Point chip_target =
-            world_ptr->field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
+        world_ptr->field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
     do
     {
@@ -151,7 +152,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
-            world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
+        world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
     Zones cherry_pick_region_1 = {ranked_zones[0]};
     Zones cherry_pick_region_2 = {ranked_zones[1]};
 
@@ -233,7 +234,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 
         Duration time_since_commit_stage_start =
-                world_ptr->getMostRecentTimestamp() - commit_stage_start_time;
+            world_ptr->getMostRecentTimestamp() - commit_stage_start_time;
         min_score = 1 - std::min(time_since_commit_stage_start.toSeconds() /
                                      MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
                                  1.0);

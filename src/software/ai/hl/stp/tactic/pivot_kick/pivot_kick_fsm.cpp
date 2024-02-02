@@ -34,7 +34,7 @@ bool PivotKickFSM::ballKicked(const Update& event)
     else
     {
         // check for separation for chipping since kick angle is not reliable
-        return !event.common.robot.isNearDribbler(event.common.world_ptr->ball().position(),
-                                                  ROBOT_MAX_RADIUS_METERS);
+        return !event.common.robot.isNearDribbler(
+            event.common.world_ptr->ball().position(), ROBOT_MAX_RADIUS_METERS);
     }
 }

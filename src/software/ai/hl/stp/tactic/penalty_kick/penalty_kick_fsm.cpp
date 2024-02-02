@@ -169,14 +169,16 @@ bool PenaltyKickFSM::takePenaltyShot(const Update &event)
     if (!complete_approach.has_value())
     {
         Timestamp future_approach_complete_time =
-            event.common.world_ptr->getMostRecentTimestamp() + PENALTY_FINISH_APPROACH_TIMEOUT;
+            event.common.world_ptr->getMostRecentTimestamp() +
+            PENALTY_FINISH_APPROACH_TIMEOUT;
         complete_approach = std::optional<Timestamp>(future_approach_complete_time);
     }
     std::optional<Robot> enemy_goalie = event.common.world_ptr->enemyTeam().goalie();
     Timestamp force_shoot_timestamp =
         complete_approach.value() + PENALTY_FORCE_SHOOT_TIMEOUT;
     bool should_shoot =
-        evaluatePenaltyShot(enemy_goalie, field, event.common.world_ptr->ball().position(),
+        evaluatePenaltyShot(enemy_goalie, field,
+                            event.common.world_ptr->ball().position(),
                             event.common.robot) ||
         (event.common.world_ptr->getMostRecentTimestamp() >= force_shoot_timestamp);
     return should_shoot;

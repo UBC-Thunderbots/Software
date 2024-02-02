@@ -13,7 +13,8 @@ class CornerKickPlay : public Play
    public:
     CornerKickPlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
 
     // The maximum distance from the corner that the ball can be for it to be
     // considered a corner kick

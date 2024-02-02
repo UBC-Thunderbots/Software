@@ -40,7 +40,8 @@ Point findKeepAwayTargetPoint(const WorldPtr& world_ptr, const Pass& best_pass_s
 
 
     // the region to which the optimization is (effectively) constrained to
-    Circle keepaway_search_region(world_ptr->ball().position(), KEEPAWAY_SEARCH_CIRCLE_RADIUS);
+    Circle keepaway_search_region(world_ptr->ball().position(),
+                                  KEEPAWAY_SEARCH_CIRCLE_RADIUS);
 
     // a reduced field rectangle to effectively constrain the optimization to field
     // boundaries
@@ -62,10 +63,11 @@ Point findKeepAwayTargetPoint(const WorldPtr& world_ptr, const Pass& best_pass_s
                rectangleSigmoid(reduced_field_bounds, passer_pt, SIGMOID_WIDTH);
     };
     GradientDescentOptimizer<2> optimizer{PARAM_WEIGHTS};
-    auto passer_pt_array = optimizer.maximize(
-        keepaway_point_cost,
-        std::array<double, 2>{world_ptr->ball().position().x(), world_ptr->ball().position().y()},
-        GRADIENT_STEPS_PER_ITER);
+    auto passer_pt_array =
+        optimizer.maximize(keepaway_point_cost,
+                           std::array<double, 2>{world_ptr->ball().position().x(),
+                                                 world_ptr->ball().position().y()},
+                           GRADIENT_STEPS_PER_ITER);
     Point keepaway_target_point(std::get<0>(passer_pt_array),
                                 std::get<1>(passer_pt_array));
 

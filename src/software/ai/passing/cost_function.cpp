@@ -15,8 +15,8 @@
 double ratePass(const WorldPtr& world_ptr, const Pass& pass, const Rectangle& zone,
                 TbotsProto::PassingConfig passing_config)
 {
-    double static_pass_quality =
-        getStaticPositionQuality(world_ptr->field(), pass.receiverPoint(), passing_config);
+    double static_pass_quality = getStaticPositionQuality(
+        world_ptr->field(), pass.receiverPoint(), passing_config);
 
     double friendly_pass_rating =
         ratePassFriendlyCapability(world_ptr->friendlyTeam(), pass, passing_config);
@@ -26,8 +26,8 @@ double ratePass(const WorldPtr& world_ptr, const Pass& pass, const Rectangle& zo
                           Duration::fromSeconds(passing_config.enemy_reaction_time()),
                           passing_config.enemy_proximity_importance());
 
-    double shoot_pass_rating =
-        ratePassShootScore(world_ptr->field(), world_ptr->enemyTeam(), pass, passing_config);
+    double shoot_pass_rating = ratePassShootScore(
+        world_ptr->field(), world_ptr->enemyTeam(), pass, passing_config);
 
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
@@ -379,21 +379,21 @@ void samplePassesForVisualization(const WorldPtr& world_ptr,
             if (passing_config.cost_vis_config().static_position_quality())
             {
                 static_pos_quality_costs = getStaticPositionQuality(
-                        world_ptr->field(), pass.receiverPoint(), passing_config);
+                    world_ptr->field(), pass.receiverPoint(), passing_config);
             }
 
             // ratePassFriendlyCapability
             if (passing_config.cost_vis_config().pass_friendly_capability())
             {
                 pass_friendly_capability_costs = ratePassFriendlyCapability(
-                        world_ptr->friendlyTeam(), pass, passing_config);
+                    world_ptr->friendlyTeam(), pass, passing_config);
             }
 
             // ratePassEnemyRisk
             if (passing_config.cost_vis_config().pass_enemy_risk())
             {
                 pass_enemy_risk_costs = ratePassEnemyRisk(
-                        world_ptr->enemyTeam(), pass,
+                    world_ptr->enemyTeam(), pass,
                     Duration::fromSeconds(passing_config.enemy_reaction_time()),
                     passing_config.enemy_proximity_importance());
             }
@@ -402,7 +402,7 @@ void samplePassesForVisualization(const WorldPtr& world_ptr,
             if (passing_config.cost_vis_config().pass_shoot_score())
             {
                 pass_shoot_score_costs = ratePassShootScore(
-                        world_ptr->field(), world_ptr->enemyTeam(), pass, passing_config);
+                    world_ptr->field(), world_ptr->enemyTeam(), pass, passing_config);
             }
 
             costs.push_back(static_pos_quality_costs * pass_friendly_capability_costs *

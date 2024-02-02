@@ -47,9 +47,9 @@ void AttackerFSM::keepAway(const Update& event,
     // best pass so far
     DribbleFSM::ControlParams control_params;
 
-    auto best_pass_so_far =
-        Pass(event.common.robot.position(), event.common.world_ptr->field().enemyGoalCenter(),
-             BALL_MAX_SPEED_METERS_PER_SECOND);
+    auto best_pass_so_far = Pass(event.common.robot.position(),
+                                 event.common.world_ptr->field().enemyGoalCenter(),
+                                 BALL_MAX_SPEED_METERS_PER_SECOND);
 
     if (event.control_params.best_pass_so_far)
     {

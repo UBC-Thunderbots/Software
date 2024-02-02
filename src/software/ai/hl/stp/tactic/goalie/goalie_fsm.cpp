@@ -95,7 +95,7 @@ Point GoalieFSM::findGoodChipTarget(
     Vector inset(goalie_tactic_config.chip_target_area_inset_meters(),
                  -goalie_tactic_config.chip_target_area_inset_meters());
     Vector offset_from_goal_line(
-            world_ptr->field().defenseAreaXLength() +
+        world_ptr->field().defenseAreaXLength() +
             goalie_tactic_config.min_chip_distance_from_crease_meters(),
         0);
     Rectangle chip_target_area =
@@ -115,8 +115,8 @@ bool GoalieFSM::shouldPanic(const Update &event)
 {
     double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
     std::vector<Point> intersections =
-        getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world_ptr->ball(),
-                                                              event.common.world_ptr->field());
+        getIntersectionsBetweenBallVelocityAndFullGoalSegment(
+            event.common.world_ptr->ball(), event.common.world_ptr->field());
     return event.common.world_ptr->ball().velocity().length() > ball_speed_panic &&
            !intersections.empty();
 }
@@ -133,8 +133,8 @@ bool GoalieFSM::panicDone(const Update &event)
 {
     double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
     std::vector<Point> intersections =
-        getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world_ptr->ball(),
-                                                              event.common.world_ptr->field());
+        getIntersectionsBetweenBallVelocityAndFullGoalSegment(
+            event.common.world_ptr->ball(), event.common.world_ptr->field());
 
     return event.common.world_ptr->ball().velocity().length() <= ball_speed_panic ||
            intersections.empty();
@@ -143,8 +143,8 @@ bool GoalieFSM::panicDone(const Update &event)
 void GoalieFSM::panic(const Update &event)
 {
     std::vector<Point> intersections =
-        getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world_ptr->ball(),
-                                                              event.common.world_ptr->field());
+        getIntersectionsBetweenBallVelocityAndFullGoalSegment(
+            event.common.world_ptr->ball(), event.common.world_ptr->field());
     Point stop_ball_point = intersections[0];
     Point goalie_pos =
         closestPoint(event.common.robot.position(),
@@ -163,11 +163,12 @@ void GoalieFSM::updatePivotKick(
 {
     // Ensure that we start our chip away from the no chip zone in front of
     // the goal (prevents accidentally scoring an own goal)
-    double clear_origin_x =
-        getNoChipRectangle(event.common.world_ptr->field()).xMax() + ROBOT_MAX_RADIUS_METERS;
+    double clear_origin_x = getNoChipRectangle(event.common.world_ptr->field()).xMax() +
+                            ROBOT_MAX_RADIUS_METERS;
     double chip_origin_x =
         std::max(clear_origin_x, event.common.world_ptr->ball().position().x());
-    Point chip_origin = Point(chip_origin_x, event.common.world_ptr->ball().position().y());
+    Point chip_origin =
+        Point(chip_origin_x, event.common.world_ptr->ball().position().y());
 
     Point chip_target  = findGoodChipTarget(event.common.world_ptr, goalie_tactic_config);
     Vector chip_vector = chip_target - chip_origin;
@@ -185,8 +186,9 @@ void GoalieFSM::updatePivotKick(
 
 void GoalieFSM::positionToBlock(const Update &event)
 {
-    Point goalie_pos = getGoaliePositionToBlock(
-        event.common.world_ptr->ball(), event.common.world_ptr->field(), goalie_tactic_config);
+    Point goalie_pos =
+        getGoaliePositionToBlock(event.common.world_ptr->ball(),
+                                 event.common.world_ptr->field(), goalie_tactic_config);
     Angle goalie_orientation =
         (event.common.world_ptr->ball().position() - goalie_pos).orientation();
 

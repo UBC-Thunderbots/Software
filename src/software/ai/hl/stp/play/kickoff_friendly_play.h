@@ -12,5 +12,6 @@ class KickoffFriendlyPlay : public Play
    public:
     KickoffFriendlyPlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
 };

@@ -80,7 +80,7 @@ PriorityTacticVector Play::getTactics(const WorldPtr &world_ptr)
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
-    const WorldPtr& world_ptr, const InterPlayCommunication &inter_play_communication,
+    const WorldPtr &world_ptr, const InterPlayCommunication &inter_play_communication,
     const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
     PriorityTacticVector priority_tactics;
@@ -137,7 +137,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         else if (world_ptr->friendlyTeam().getGoalieId().has_value())
         {
             LOG(WARNING) << "Robot not found for goalie ID: "
-                         << std::to_string(world_ptr->friendlyTeam().getGoalieId().value())
+                         << std::to_string(
+                                world_ptr->friendlyTeam().getGoalieId().value())
                          << std::endl;
         }
         else
@@ -340,8 +341,8 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                     << "Couldn't find a primitive for robot id " << robot_id;
 
                 // Create the list of obstacles
-                auto motion_constraints =
-                    buildMotionConstraintSet(world_ptr->gameState(), *tactic_vector.at(col));
+                auto motion_constraints = buildMotionConstraintSet(
+                    world_ptr->gameState(), *tactic_vector.at(col));
 
                 // Only generate primitive proto message for the final primitive to robot
                 // assignment

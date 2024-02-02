@@ -15,7 +15,8 @@
 
 CornerKickPlay::CornerKickPlay(TbotsProto::AiConfig config) : Play(config, true) {}
 
-void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr)
+void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                    const WorldPtr &world_ptr)
 {
     /**
      * There are three main stages to this Play:
@@ -63,7 +64,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
     LOG(DEBUG) << "Finished";
 }
 
-Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr)
+Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
+                               const WorldPtr &world_ptr)
 {
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world_ptr->field());
@@ -141,7 +143,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const WorldPtr
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 
         Duration time_since_commit_stage_start =
-                world_ptr->getMostRecentTimestamp() - commit_stage_start_time;
+            world_ptr->getMostRecentTimestamp() - commit_stage_start_time;
         min_score =
             1 -
             std::min(
@@ -165,7 +167,7 @@ void CornerKickPlay::updateAlignToBallTactic(
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
-            world_ptr->ball().position() -
+        world_ptr->ball().position() -
             (ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2)),
         ball_to_center_vec.orientation(), 0);
 }

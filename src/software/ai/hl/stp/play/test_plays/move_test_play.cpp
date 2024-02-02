@@ -5,7 +5,8 @@
 
 MoveTestPlay::MoveTestPlay(TbotsProto::AiConfig config) : Play(config, false) {}
 
-void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr)
+void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                  const WorldPtr &world_ptr)
 {
     auto move_test_tactic_friendly_goal = std::make_shared<MoveTactic>();
     auto move_test_tactic_enemy_goal    = std::make_shared<MoveTactic>();

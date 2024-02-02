@@ -107,7 +107,8 @@ class PassGenerator
      * @param optimized_passes The optimized_passes to update our internal cached
      * passes with.
      */
-    void updatePasses(const WorldPtr& world_ptr, const ZonePassMap<ZoneEnum>& optimized_passes);
+    void updatePasses(const WorldPtr& world_ptr,
+                      const ZonePassMap<ZoneEnum>& optimized_passes);
 
     // All the passes that we are currently trying to optimize in gradient descent
     ZonePassMap<ZoneEnum> current_best_passes_;
@@ -191,10 +192,10 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const WorldPtr& worl
                  Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
                  speed_distribution(random_num_gen_));
 
-        passes.emplace(
-            zone_id,
-            PassWithRating{pass, ratePass(world_ptr, pass, pitch_division_->getZone(zone_id),
-                                          passing_config_)});
+        passes.emplace(zone_id,
+                       PassWithRating{pass, ratePass(world_ptr, pass,
+                                                     pitch_division_->getZone(zone_id),
+                                                     passing_config_)});
     }
 
     return passes;
@@ -215,9 +216,10 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
         const auto objective_function =
             [this, &world_ptr,
              zone_id](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
-                return ratePass(world_ptr,
-                                Pass::fromPassArray(world_ptr->ball().position(), pass_array),
-                                pitch_division_->getZone(zone_id), passing_config_);
+                return ratePass(
+                    world_ptr,
+                    Pass::fromPassArray(world_ptr->ball().position(), pass_array),
+                    pitch_division_->getZone(zone_id), passing_config_);
             };
 
         auto pass_array = optimizer_.maximize(
@@ -225,8 +227,8 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
             passing_config_.number_of_gradient_descent_steps_per_iter());
 
         auto new_pass = Pass::fromPassArray(world_ptr->ball().position(), pass_array);
-        auto score =
-            ratePass(world_ptr, new_pass, pitch_division_->getZone(zone_id), passing_config_);
+        auto score    = ratePass(world_ptr, new_pass, pitch_division_->getZone(zone_id),
+                              passing_config_);
 
         optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
     }
@@ -241,8 +243,9 @@ void PassGenerator<ZoneEnum>::updatePasses(const WorldPtr& world_ptr,
     for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
     {
         // update the passer point of the current best pass
-        current_best_passes_.at(zone_id).pass = Pass::fromPassArray(
-                world_ptr->ball().position(), current_best_passes_.at(zone_id).pass.toPassArray());
+        current_best_passes_.at(zone_id).pass =
+            Pass::fromPassArray(world_ptr->ball().position(),
+                                current_best_passes_.at(zone_id).pass.toPassArray());
 
         if (ratePass(world_ptr, current_best_passes_.at(zone_id).pass,
                      pitch_division_->getZone(zone_id),
