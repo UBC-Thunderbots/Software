@@ -59,7 +59,7 @@ namespace TestUtil
         else
         {
             return ::testing::AssertionFailure()
-                   << "Stadium 1 was" << stadium1 << ", stadium 2 was " << stadium2;
+                   << "Stadium 1 was " << stadium1 << ", stadium 2 was " << stadium2;
         }
     }
 
