@@ -27,6 +27,6 @@ class EnemyBallPlacementPlay : public Play
      */
     void ballPlacementWithShadow(
         TacticCoroutine::push_type &yield, const World &world,
-        std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
-        std::array<std::shared_ptr<MoveTactic>, 2> move_tactics, Point placement_point);
+        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders,
+        std::array<std::shared_ptr<MoveTactic>, 3> move_tactics, Point placement_point);
 };
