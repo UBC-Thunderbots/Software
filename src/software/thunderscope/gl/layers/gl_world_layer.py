@@ -11,6 +11,8 @@ from software.thunderscope.constants import (
     Colors,
     DepthValues,
     SPEED_SEGMENT_SCALE,
+    DEFAULT_EMPTY_FIELD_WORLD,
+    is_field_message_empty,
 )
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -197,9 +199,8 @@ class GLWorldLayer(GLLayer):
 
         # Cap the maximum kick speed
         if self.ball_velocity_vector.length() > BALL_MAX_SPEED_METERS_PER_SECOND:
-            self.ball_velocity_vector = self.ball_velocity_vector.normalize(
-                BALL_MAX_SPEED_METERS_PER_SECOND
-            )
+            self.ball_velocity_vector.normalize()
+            self.ball_velocity_vector *= BALL_MAX_SPEED_METERS_PER_SECOND
 
     def mouse_in_scene_released(self, event: MouseInSceneEvent) -> None:
         """Detect that the mouse was released after picking a point in the 3D scene
@@ -236,7 +237,11 @@ class GLWorldLayer(GLLayer):
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
-        self.cached_world = self.world_buffer.get(block=False)
+        self.cached_world = self.world_buffer.get(block=False, return_cached=True)
+
+        # if not receiving worlds, just render an empty field
+        if is_field_message_empty(self.cached_world.field):
+            self.cached_world = DEFAULT_EMPTY_FIELD_WORLD
 
         self.__update_field_graphics(self.cached_world.field)
         self.__update_goal_graphics(self.cached_world.field)

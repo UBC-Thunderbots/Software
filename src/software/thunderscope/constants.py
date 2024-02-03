@@ -1,6 +1,7 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
 from enum import Enum, IntEnum
+from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
 
@@ -64,9 +65,39 @@ class CameraView(Enum):
     RIGHT_HALF_HIGH_ANGLE = 4
 
 
+class EstopMode(IntEnum):
+    """
+    Enum for the various estop modes we can run thunderscope in
+
+    DISABLE_ESTOP: No physical / keyboard estop is needed, but we cannot send anything over the network
+    KEYBOARD_ESTOP: The spacebar can be used as an estop toggle instead of a physical estop
+    PHYSICAL_ESTOP: A physical estop is needed to run thunderscope, throws an exception if none is plugged in
+    """
+
+    DISABLE_ESTOP = 0
+    KEYBOARD_ESTOP = 1
+    PHYSICAL_ESTOP = 2
+
+
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2
+
+DEFAULT_EMPTY_FIELD_WORLD = World(
+    field=Field(
+        field_x_length=9.0,
+        field_y_length=6.0,
+        defense_x_length=1.0,
+        defense_y_length=2.0,
+        goal_x_length=0.18,
+        goal_y_length=1.0,
+        boundary_buffer_size=0.3,
+        center_circle_radius=0.5,
+    )
+)
+
+# How long AI vs AI runs before ending in CI
+CI_DURATION_S = 180
 
 ROBOT_RADIUS = 25
 
@@ -76,15 +107,32 @@ BALL_HEIGHT_EFFECT_MULTIPLIER = 3
 # in robot communications
 ROBOT_COMMUNICATIONS_TIMEOUT_S = 0.02
 
+# time between each refresh of thunderscope in milliseconds
+THUNDERSCOPE_REFRESH_INTERVAL_MS = 10
+
+ROBOT_FATAL_TIMEOUT_S = 5
 # Max time (in seconds) tolerated between repeated crash protos until
 # crash alert occurs
 ROBOT_CRASH_TIMEOUT_S = 5
 
+# LogLevel to string conversion map
+LOG_LEVEL_STR_MAP = {
+    LogLevel.DEBUG: "DEBUG",
+    LogLevel.INFO: "INFO",
+    LogLevel.WARNING: "WARNING",
+    LogLevel.FATAL: "FATAL",
+    LogLevel.CONTRACT: "CONTRACT",
+}
+
 GAME_CONTROLLER_URL = "http://localhost:8081"
+
+# Paths to check for estop when running diagnostics
+ESTOP_PATH_1 = "/dev/ttyACM0"
+ESTOP_PATH_2 = "/dev/ttyUSB0"
 
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {
-    ErrorCode.LOW_CAP: "Low Cap",
+    ErrorCode.HIGH_CAP: "High Cap",
     ErrorCode.LOW_BATTERY: "Low Battery",
     ErrorCode.HIGH_BOARD_TEMP: "High Board Temp",
     ErrorCode.DRIBBLER_MOTOR_HOT: "Dribbler Motor Hot",
@@ -133,6 +181,17 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
 
     """
 )
+
+
+def is_field_message_empty(field: Field) -> bool:
+    """
+    Checks if a field message is empty
+    All values in a field message are required so the message will never be None
+    So we have to check if the field itself has 0 length
+    :param field: the field to check
+    :return: True if field message is empty, False if not
+    """
+    return field.field_x_length == 0
 
 
 def create_vision_pattern_lookup(color1: QtGui.QColor, color2: QtGui.QColor) -> dict:
@@ -193,9 +252,9 @@ class Colors(object):
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
-    DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 150)
+    DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 255)
     NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
-    NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 165, 0, 255)
+    NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 80, 0, 100)
     PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
     BREAKBEAM_TRIPPED_COLOR = QtGui.QColor(255, 0, 0, 255)
 
@@ -224,7 +283,7 @@ class Colors(object):
 
 
 class DepthValues:
-    """Constants for depth values controlling the order in which 
+    """Constants for depth values controlling the order in which
     graphics are drawn in the 3D visualizer.
 
     Graphics with greater depth values are drawn later.

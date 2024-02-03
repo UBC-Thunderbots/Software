@@ -18,8 +18,12 @@ py_library(
         "//software/simulated_tests:tbots_test_runner",
         "//software/simulated_tests:validation",
         "//software/thunderscope",
-        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope:constants",
+        "//software/thunderscope:estop_helpers",
         "//software/thunderscope:robot_communication",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
         "//software/thunderscope/replay:proto_logger",
     ],
 )
