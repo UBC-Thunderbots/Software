@@ -80,7 +80,7 @@ static const double ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 4.0
 
 static const double ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED = 9.81;
 // The minimum distance the non-placing team must keep to avoid ball placement interference
-// static const double ENEMY_BALL_PLACEMENT_DISTANCE_METERS = 0.5;
+static const double ENEMY_BALL_PLACEMENT_DISTANCE_METERS = 0.5;
 
 /* Unit Conversion */
 static const double MILLIMETERS_PER_METER = 1000.0;

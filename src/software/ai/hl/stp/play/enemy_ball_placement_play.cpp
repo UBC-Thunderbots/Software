@@ -42,13 +42,18 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
     do
     {
 
-        double distance_to_keep = 0.5 + 0.25;
+        double distance_to_keep = ENEMY_BALL_PLACEMENT_DISTANCE_METERS + 0.5;
 
         // auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
         //                                         world.enemyTeam(), world.ball(), false);
 
         // Create tactic vector (starting with Goalie)
         PriorityTacticVector tactics_to_run = {{}};
+
+        if (placement_point == world.ball().position()) {
+            LOG(DEBUG) << "Placement point same as ball position";
+            yield(tactics_to_run);
+        }
 
         // Create crease defenders
         crease_defenders[0]->updateControlParams(
@@ -59,7 +64,7 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         tactics_to_run[0].emplace_back(crease_defenders[0]);
         tactics_to_run[0].emplace_back(crease_defenders[1]);
 
-        Vector placement_to_ball_unit_vector = (world.ball().position() - placement_point).normalize();
+        Vector placement_to_ball_unit_vector = (placement_point - world.ball().position()).normalize();
         Vector down_vector = placement_to_ball_unit_vector.rotate(Angle::fromDegrees(30));
         Vector up_vector = placement_to_ball_unit_vector.rotate(Angle::fromDegrees(-30));
 
