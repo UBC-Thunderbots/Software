@@ -81,18 +81,23 @@ class Gamecontroller(object):
         self.ci_socket.close()
 
     def refresh(self):
+        """
+        Gets any manual gamecontroller commands from the buffer and executes them
+        """
         manual_command = self.manual_gc_command_buffer.get(return_cached=False)
 
         while manual_command is not None:
-            print("A")
             self.send_gc_command(
                 gc_command=manual_command.manual_command.type,
                 team=manual_command.manual_command.for_team,
                 final_ball_placement_point=tbots_cpp.Point(
                     manual_command.final_ball_placement_point.x,
                     manual_command.final_ball_placement_point.y
-                ) if manual_command.final_ball_placement_point else None,
-                from_ui=True
+                ) 
+                # HasField checks if the field was manually set by us
+                # as opposed to if a value exists (since a default value always exists)
+                if manual_command.HasField('final_ball_placement_point') 
+                else None,
             )
             manual_command = self.manual_gc_command_buffer.get(return_cached=False)
 
@@ -161,7 +166,6 @@ class Gamecontroller(object):
         gc_command: proto.ssl_gc_state_pb2.Command,
         team: proto.ssl_gc_common_pb2.Team,
         final_ball_placement_point: tbots_cpp.Point = None,
-        from_ui: bool = False
     ) -> Any:
         """Send a ci input to the gamecontroller.
 
@@ -178,14 +182,7 @@ class Gamecontroller(object):
         """
         ci_input = CiInput(timestamp=int(time.time_ns()))
         api_input = Input()
-
-        change = Change()
-        if from_ui:
-            change = Change(
-                origin="UI"
-            )
-
-        
+        change = Change()        
         new_command = NewCommand()
         command = Command(type=gc_command, for_team=team)
 
@@ -193,8 +190,6 @@ class Gamecontroller(object):
         change.new_command.CopyFrom(new_command)
         api_input.change.CopyFrom(change)
         ci_input.api_inputs.append(api_input)
-
-        print(str(Change.origin))
 
         # Do this only if ball placement pos is specified
         if final_ball_placement_point:
