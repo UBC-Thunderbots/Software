@@ -1,0 +1,36 @@
+// This file should be kept up to data with Robocup SSL's version
+// https://github.com/RoboCup-SSL/ssl-game-controller/blob/master/proto/ssl_autoref_ci.proto
+syntax = "proto2";
+
+package SSLProto;
+
+import "proto/ssl_vision_wrapper_tracked.proto";
+import "proto/ssl_vision_detection.proto";
+import "proto/ssl_vision_geometry.proto";
+import "proto/ssl_gc_referee_message.proto";
+
+// The AutoRefCiInput contains all packets/messages that would otherwise be received
+// through multicast by the auto-referee It may contain either a raw or a tracked
+// SSL-vision packet. If both are given, the implementation may choose either one.
+message AutoRefCiInput
+{
+    // Latest referee message
+    optional Referee referee_message = 1;
+    // A tracked SSL-Vision packet to be processed without filtering
+    optional TrackerWrapperPacket tracker_wrapper_packet = 2;
+    // A list of unfiltered SSL-Vision packets (for multiple cameras) to be filtered and
+    // processed
+    repeated SSL_DetectionFrame detection = 3;
+    // Current geometry data, to be sent at least once at the beginning of the connection
+    optional SSL_GeometryData geometry = 4;
+}
+
+// The AutoRefCiOutput contains any new data created by the auto-referee for further
+// processing
+message AutoRefCiOutput
+{
+    // A resulting tracked SSL-Vision packet for input into the ssl-game-controller.
+    // The auto-referee will either generate it from the unfiltered SSL-Vision packets
+    // or simply return the tracked packet from the input.
+    optional TrackerWrapperPacket tracker_wrapper_packet = 1;
+}

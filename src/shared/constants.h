@@ -33,18 +33,13 @@ static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 static const char REDIS_DEFAULT_HOST[REDIS_HOST_LENGTH] = "127.0.0.1";
 static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
 
-// the port robots are listening to for vision and primitives
-static const short unsigned int VISION_PORT    = 42069;
+// the UDP port robots are listening to for primitives
 static const short unsigned int PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
-static const short unsigned int ROBOT_STATUS_PORT       = 42071;
-static const short unsigned int ROBOT_LOGS_PORT         = 42072;
-static const short unsigned int HRVO_VISUALIZATION_PORT = 42073;
-static const short unsigned int ROBOT_CRASH_PORT        = 42074;
-
-// the port to listen to for what side of the field to defend
-static const unsigned DEFENDING_SIDE_PORT = 42073;
+static const short unsigned int ROBOT_STATUS_PORT = 42071;
+static const short unsigned int ROBOT_LOGS_PORT   = 42072;
+static const short unsigned int ROBOT_CRASH_PORT  = 42074;
 
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip
@@ -106,6 +101,11 @@ static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_NANOSECOND  = 1.0 / 1000000.0;
 static const double SECONDS_PER_MINUTE           = 60.0;
 
+static const double DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK =
+    1.0 / 60.0;  // corresponds to 60 Hz
+static const double DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK =
+    DEFAULT_SIMULATOR_TICK_RATE_SECONDS_PER_TICK * 1000;
+
 // The total number of robot ids on one team
 static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
 // The total number of possible robot ids between two teams
@@ -132,6 +132,11 @@ static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND
 // How many robots are allowed in each division
 static const unsigned DIV_A_NUM_ROBOTS = 11;
 static const unsigned DIV_B_NUM_ROBOTS = 6;
+
+// Kick Spd to Pulse Width Safety Constraint Constants
+
+static const int MAX_KICK_CONSTANT       = 850;
+static const double MAX_KICK_COEFFICIENT = 0.4;
 
 // Arduino
 
@@ -162,7 +167,9 @@ static const char ARDUINO_VENDOR_ID[ARDUINO_ID_LENGTH]  = "2341";
 static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 
 // Number of times the control loop should tick per trajectory element
-static const unsigned NUM_TICKS_PER_TRAJECTORY_ELEMENT = 4u;
-static const unsigned CONTROL_LOOP_HZ                  = 60u;
+static const unsigned CONTROL_LOOP_HZ = 60u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;
+
+// Jetson Nano Constants
+static const double MAX_JETSON_TEMP_C = 97;

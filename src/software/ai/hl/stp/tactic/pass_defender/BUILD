@@ -16,6 +16,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic:move_primitive",
         "//software/geom/algorithms",
         "//software/logger",
     ],
@@ -35,6 +36,10 @@ py_test(
     name = "pass_defender_tactic_test",
     srcs = [
         "pass_defender_tactic_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
     ],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
