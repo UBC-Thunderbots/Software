@@ -30,8 +30,10 @@ class ControllerDiagnostics(object):
             self,
             proto_unix_io: ProtoUnixIO,
     ):
+        self.enabled = False
+
         # TODO: check if estop gets in the way
-        self.__input_mode = ControlMode.DIAGNOSTICS
+
         for device in list_devices():
             try:
                 self.controller = InputDevice(device)
@@ -48,30 +50,20 @@ class ControllerDiagnostics(object):
 
         self.constants = tbots_cpp.create2021RobotConstants()
 
-        self.x_vel = 0
-        self.y_vel = 0
-        self.ang_vel = 0
-        self.kick_power = 0
-        self.dribbler_enabled = 0
-        self.dribbler_speed = 0
+        self.x_vel = 0.0
+        self.y_vel = 0.0
+        self.ang_vel = 0.0
+        self.kick_power = 0.0
+        self.dribbler_speed = 0.0
+        self.dribbler_enabled = False
 
-
-        # self.move_x = 0
-        # self.move_y = 0
-        # self.ang_vel = 0
-        # self.power = 1000
-
-        # self.enable_dribbler = 0
-        # self.dribbler_speed = 0
-
-    def toggle_input_mode(self, mode: ControlMode):
+    def set_enabled(self, enabled: bool):
         """
         Changes the diagnostics input mode for all robots between Xbox and Diagnostics.
 
-        :param mode: Control mode to use when sending diagnostics primitives
+        :param enabled: to which state to set controller enabled.
         """
-        self.__input_mode = mode
-
+        self.enabled = enabled
 
     def __parse_move_event_value(self, value, factor):
         if abs(value) < (DEADZONE_PERCENTAGE * factor):
@@ -85,17 +77,13 @@ class ControllerDiagnostics(object):
         if MIN_DRIBBLER_RPM < new_speed < MAX_DRIBBLER_RPM:
             return new_speed
 
-    def __parse_kick_event_value(self, value):
+    def __parse_kick_event_value(self, value) -> int:
         new_power = self.power + value * POWER_STEPPER
         if MIN_POWER < new_power < MAX_POWER:
             return new_power
 
-    def __parse_dribbler_enabled_event_value(self, value):
-        # there's a way to simplify this logic but im too tired rn probably lift return up and smth
-        if value > (XBOX_BUTTON_MAX_RANGE / 2):
-            return 1
-        if value < (XBOX_BUTTON_MAX_RANGE / 2):
-            return 0
+    def __parse_dribbler_enabled_event_value(self, value) -> bool:
+        return value > (XBOX_BUTTON_MAX_RANGE / 2)
 
     def __send_move_command(self):
         motor_control = MotorControl()
@@ -110,7 +98,9 @@ class ControllerDiagnostics(object):
         #     motor_control.dribbler_speed_rpm = dribbler_speed
         # maybe just use indefinite instead? or have setting to turn on 'smooth scrolling'
         if self.dribbler_enabled:
-            motor_control.dribbler_speed_rpm = self.constants.indefinite_dribbler_speed_rpm
+            motor_control.dribbler_speed_rpm = self.dribbler_enabled ?
+                                                self.constants.indefinite_dribbler_speed_rpm
+
 
         logging.info("Sending motor control: " + motor_control)
 
@@ -177,13 +167,11 @@ class ControllerDiagnostics(object):
 
             case ecodes.EV_KEY:
                 if event.code == ecodes.ecodes["BTN_A"] and event.value == 1:
-                    logging.info("kick")
                     self.__send_kick_command()
                 elif event.code == ecodes.ecodes["BTN_Y"] and event.value == 1:
-                    logging.info("chip")
                     self.__send_chip_command()
 
-        if event.type in ["ABS_X", "ABS_Y", "ABS_RX"]:
+        if self.enabled and event.type in ["ABS_X", "ABS_Y", "ABS_RX"]:
             self.__send_move_command()
 
 
