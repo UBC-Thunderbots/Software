@@ -28,12 +28,12 @@ class TScopeConfig:
     proto_unix_io_map: Dict[
         ProtoUnixIOTypes, ProtoUnixIO
     ]  # mapping of protos needed for this view
-    tabs: Sequence[TScopeTab]  # list of tabs for this view
+    tabs: Sequence[TScopeQTTab]  # list of tabs for this view
 
     def __init__(
         self,
         proto_unix_io_map: Dict[ProtoUnixIOTypes, ProtoUnixIO],
-        tabs: Sequence[TScopeTab],
+        tabs: Sequence[TScopeQTTab],
     ) -> None:
         self.proto_unix_io_map = proto_unix_io_map
         self.tabs = tabs

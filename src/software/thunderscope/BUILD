@@ -35,7 +35,6 @@ py_library(
         "//software/thunderscope:binary_context_managers",
         "//software/thunderscope:constants",
         "//software/thunderscope:dock_style",
-        "//software/thunderscope:input_control_manager",
         "//software/thunderscope:proto_unix_io",
         "//software/thunderscope:robot_communication",
         requirement("pyqtgraph"),
@@ -72,21 +71,11 @@ py_library(
         "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/robot_diagnostics:chicker",
         "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
+        "//software/thunderscope/robot_diagnostics:diagnostics_widget",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         "//software/thunderscope/robot_diagnostics:estop_view",
         "//software/thunderscope/robot_diagnostics:robot_info",
         "//software/thunderscope/robot_diagnostics:robot_view",
-    ],
-)
-
-py_library(
-    name = "input_control_manager",
-    srcs = [
-        "controller_diagnostics.py",
-        "robot_input_control_manager.py",
-    ],
-    deps = [
-        "//software/thunderscope:constants",
     ],
 )
 

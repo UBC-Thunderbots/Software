@@ -1,12 +1,11 @@
-from pyqtgraph.Qt.QtCore import *
-from pyqtgraph.Qt.QtWidgets import *
+from software.thunderscope.robot_diagnostics.controller_diagnostics import ControllerDiagnostics
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import FullSystemConnectWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import DriveAndDribblerWidget
 
 
-class DiagnosticsWidget(QWidget):
+class DiagnosticsWidget(TScopeWidget):
 
     # Signal to indicate if manual controls should be disabled based on boolean parameter
     # diagnostics_input_mode_signal = pyqtSignal(bool)
@@ -15,9 +14,19 @@ class DiagnosticsWidget(QWidget):
 
         vbox_layout = QVBoxLayout()
 
+
         self.diagnostics_control_input_widget = FullSystemConnectWidget(self.diagnostics_input_mode_signal)
         self.drive_dribbler_widget = DriveAndDribblerWidget(proto_unix_io, )
         self.chicker_widget = ChickerWidget(proto_unix_io)
+        self.controller = ControllerDiagnostics(proto_unix_io)
+
+        self.diagnostics_control_input_widget.toggle_control_signal(
+            lambda control_mode: self.controller.toggle_input_mode(
+                control_mode
+            )
+        )
+
+
 
         vbox_layout.addWidget(self.diagnostics_control_input_widget)
         vbox_layout.addWidget(self.drive_dribbler_widget)

@@ -2,14 +2,11 @@ import threading
 import time
 import os
 
-from evdev import util
-
 from software.thunderscope.constants import (
     ROBOT_COMMUNICATIONS_TIMEOUT_S,
     IndividualRobotMode,
     EstopMode,
 )
-from software.thunderscope.controller_diagnostics import ControllerDiagnostics
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -48,6 +45,9 @@ class RobotCommunication(object):
         :param estop_baudrate: The baudrate of the estop
 
         """
+        self.receive_ssl_wrapper = None
+        self.receive_ssl_referee_proto = None
+        self.send_world = None
         self.sequence_number = 0
         self.last_time = time.time()
         self.current_proto_unix_io = current_proto_unix_io
@@ -85,18 +85,16 @@ class RobotCommunication(object):
             target=self.__run_primitive_set, daemon=True
         )
 
-        self.robot_id_control_mode_dict: dict[int, ControlMode] = {
-            i:ControlMode.DIAGNOSTICS for i in range(NUM_ROBOTS)
-        }
         self.robot_id_individual_mode_dict: dict[int, IndividualRobotMode] = {
-            i:IndividualRobotMode.NONE for i in range(NUM_ROBOTS)
+            i: IndividualRobotMode.NONE for i in range(NUM_ROBOTS)
         }
 
         self.robot_id_estop_send_count_dict: dict[int, int] = {
-            i:0 for i in range(NUM_ROBOTS)
+            i: 0 for i in range(NUM_ROBOTS)
         }
 
-
+        # default to diagnostics control.
+        self.__input_mode = ControlMode.DIAGNOSTICS
 
         # initialising the estop
         # tries to access a plugged in estop. if not found, throws an exception
@@ -115,17 +113,6 @@ class RobotCommunication(object):
                 )
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
-
-        if input_device_path:
-            if os.path.exists(input_device_path) and util.is_device(
-                    input_device_path
-            ):
-                self.__input_mode = ControlMode.XBOX
-                self.__controller_diagnostics = ControllerDiagnostics(
-                    input_device_path,
-                )
-            else:
-                self.__input_mode = ControlMode.DIAGNOSTICS
 
 
     def setup_for_fullsystem(self) -> None:
@@ -151,8 +138,7 @@ class RobotCommunication(object):
         )
 
         for key in self.robot_id_individual_mode_dict:
-            # does this work in python. how do lambda not unpack tuples wtf thats an actual sin
-            self.robot_id_individual_mode_dict.items[key] = IndividualRobotMode.AI
+            self.robot_id_individual_mode_dict[key] = IndividualRobotMode.AI
 
 
         # self.robots_connected_to_fullsystem = {
@@ -213,10 +199,8 @@ class RobotCommunication(object):
 
         :param mode: Control mode to use when sending diagnostics primitives
         """
-        if mode == ControlMode.XBOX and self.__controller_diagnostics is not None:
-            self.__input_mode = mode
-        else:
-            self.__input_mode = ControlMode.DIAGNOSTICS
+        self.__input_mode = mode
+
 
     def __send_estop_state(self) -> None:
         """
@@ -299,32 +283,32 @@ class RobotCommunication(object):
             # total primitives for all robots
             robot_primitives = {}
 
-            # get the manual control primitive
-            diagnostics_primitive = DirectControlPrimitive(
-                motor_control=self.motor_control_diagnostics_buffer.get(block=False),
-                power_control=self.power_control_diagnostics_buffer.get(block=False),
-            )
+            # diagnostics is running. Only send diagnostics packets if using diagnostics control mode
+            if self.__input_mode == ControlMode.DIAGNOSTICS:
+                # get the manual control primitive
+                diagnostics_primitive = DirectControlPrimitive(
+                    motor_control=self.motor_control_diagnostics_buffer.get(block=False),
+                    power_control=self.power_control_diagnostics_buffer.get(block=False),
+                )
 
-            # diagnostics is running
-            manual_robots : dict[int, IndividualRobotMode] = (
-                filter(lambda robot_mode: robot_mode[1] == IndividualRobotMode.MANUAL,
-                       self.robot_id_individual_mode_dict)
-            )
-
-            if manual_robots:
+                manually_controlled_robots : dict[int, IndividualRobotMode] = (
+                    filter(lambda robot_mode: robot_mode[1] == IndividualRobotMode.MANUAL,
+                           self.robot_id_individual_mode_dict)
+                )
+                if len(manually_controlled_robots) > 0:
                 # for all robots connected to diagnostics, set their primitive
-                for robot_id in manual_robots:
-                    robot_primitives[robot_id] = Primitive(
-                        direct_control=diagnostics_primitive
-                    )
+                    for robot_id in manually_controlled_robots:
+                        robot_primitives[robot_id] = Primitive(
+                            direct_control=diagnostics_primitive
+                        )
 
             # fullsystem is running, so world data is being received
-            ai_robots : dict[int, IndividualRobotMode] = (
+            ai_controlled_robots : dict[int, IndividualRobotMode] = (
                 filter(lambda robot_mode: robot_mode[1] == IndividualRobotMode.AI,
                        self.robot_id_individual_mode_dict)
             )
 
-            if ai_robots:
+            if ai_controlled_robots:
                 # Get the primitives
                 primitive_set = self.primitive_buffer.get(
                     block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
@@ -332,7 +316,7 @@ class RobotCommunication(object):
 
                 fullsystem_primitives = dict(primitive_set.robot_primitives)
                 for robot_id in fullsystem_primitives.keys():
-                    if robot_id in ai_robots.keys():
+                    if robot_id in ai_controlled_robots:
                         robot_primitives[robot_id] = fullsystem_primitives[robot_id]
 
 
@@ -363,7 +347,7 @@ class RobotCommunication(object):
                 self.should_send_stop = False
 
             # sleep if not running fullsystem
-            if not ai_robots:
+            if not ai_controlled_robots:
                 time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
     def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:

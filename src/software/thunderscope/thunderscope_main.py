@@ -286,20 +286,20 @@ if __name__ == "__main__":
                     # handle the signal emitted from switching
                     if hasattr(tab, "widgets"):
                         robot_view_widget = tab.find_widget("Robot View")
-                        if robot_view_widget:
-                            robot_view_widget.control_mode_signal.connect(
+                        if robot_view_widget is not None:
+                            robot_view_widget.toggle_control_mode_signal.connect(
                                 lambda robot_mode, robot_id: robot_communication.toggle_robot_control_mode(
                                     robot_id, robot_mode
                                 )
                             )
-                        if tab.key == TabKeys.DIAGNOSTICS:
-                            control_input_widget = tab.find_widget("Full System Connect")
-                            if control_input_widget:
-                                control_input_widget.toggle_controls_signal(
-                                    lambda control_mode: robot_communication.toggle_input_mode(
-                                        control_mode
-                                    )
+                        # TODO: remove this below - don't need to check for input mode (xbox/diag)
+                        diagnostics_widget = tab.find_widget("Diagnostics Widget")
+                        if diagnostics_widget is not None:
+                            diagnostics_widget.toggle_control_signal(
+                                lambda control_mode: robot_communication.toggle_input_mode(
+                                    control_mode
                                 )
+                            )
 
 
             if args.run_blue or args.run_yellow:
