@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/dynamic_plays/dynamic_play.h"
 
-DynamicPlay::DynamicPlay(TbotsProto::AiConfig ai_config, bool requires_goalie)
-    : Play(ai_config, requires_goalie),
+DynamicPlay::DynamicPlay(TbotsProto::AiConfig ai_config, bool requires_goalie, std::shared_ptr<Strategy> strategy)
+    : Play(ai_config, requires_goalie, strategy),
       support_tactic_candidates_(allSupportTacticCandidates()),
       support_tactic_feasibility_scorer_(std::make_unique<FeasibilityScorer>()),
       support_tactic_duplication_scorer_(std::make_unique<DuplicationScorer>()),
