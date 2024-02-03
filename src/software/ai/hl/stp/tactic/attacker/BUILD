@@ -1,39 +1,17 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "attacker_fsm",
-    srcs = ["attacker_fsm.cpp"],
-    hdrs = ["attacker_fsm.h"],
-    deps = [
-        "//proto:tbots_cc_proto",
-        "//software/ai/evaluation:keep_away",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
-        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
-    ],
-)
-
-cc_library(
     name = "attacker_tactic",
     srcs = ["attacker_tactic.cpp"],
     hdrs = ["attacker_tactic.h"],
     deps = [
         "//shared:constants",
         "//software/ai/evaluation/scoring/skills:skill_graph",
+        "//software/ai/hl/stp/skill",
         "//software/ai/hl/stp/strategy",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/attacker/skill",
         "//software/logger",
         "//software/world:ball",
-    ],
-)
-
-cc_test(
-    name = "attacker_fsm_test",
-    srcs = ["attacker_fsm_test.cpp"],
-    deps = [
-        ":attacker_fsm",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
     ],
 )
 

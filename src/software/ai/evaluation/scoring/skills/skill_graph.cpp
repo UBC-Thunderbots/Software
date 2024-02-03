@@ -17,8 +17,7 @@ SkillGraph::SkillGraph(std::shared_ptr<Strategy> strategy)
                    });
 
     adj_matrix_ = std::vector<std::vector<double>>(
-        nodes_.size() + 1,
-        std::vector<double>(nodes_.size() + 1, DEFAULT_EDGE_WEIGHT));
+        nodes_.size() + 1, std::vector<double>(nodes_.size() + 1, DEFAULT_EDGE_WEIGHT));
 
     sequence_ = {std::make_pair(nodes_.size(), nodes_.size())};
 }

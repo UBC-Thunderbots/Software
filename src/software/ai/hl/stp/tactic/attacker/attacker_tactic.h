@@ -31,8 +31,7 @@ class AttackerTactic : public Tactic
     bool last_execution_robot_changed_;
 
     SkillGraph skill_graph_;
-    std::unordered_map<RobotId, std::shared_ptr<Skill>> skill_map_;
-    std::unordered_map<RobotId, std::unique_ptr<SkillFSM>> skill_fsm_map_;
+    std::shared_ptr<Skill> current_skill_;
 
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 };

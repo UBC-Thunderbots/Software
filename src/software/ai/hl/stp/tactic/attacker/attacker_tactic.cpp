@@ -9,8 +9,7 @@ AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
       strategy(strategy),
       last_execution_robot_changed_(false),
       skill_graph_(strategy),
-      skill_map_(),
-      skill_fsm_map_()
+      current_skill_(nullptr)
 {
 }
 
@@ -21,7 +20,12 @@ void AttackerTactic::accept(TacticVisitor& visitor) const
 
 std::string AttackerTactic::getFSMState() const
 {
-    return "AttackerTactic";
+    std::string state = "Unknown";
+    if (current_skill_ != nullptr && last_execution_robot)
+    {
+        state = current_skill_->getFSMState(*last_execution_robot);
+    }
+    return state;
 }
 
 void AttackerTactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
@@ -35,30 +39,28 @@ void AttackerTactic::setLastExecutionRobot(std::optional<RobotId> last_execution
 
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
-    RobotId robot_id = tactic_update.robot.id();
-
     std::shared_ptr<Skill> next_skill =
         skill_graph_.getNextSkill(tactic_update.robot, tactic_update.world);
 
-    if (!skill_map_.contains(robot_id) || last_execution_robot != robot_id)
+    if (last_execution_robot == tactic_update.robot.id())
     {
-        skill_map_[robot_id]     = next_skill;
-        skill_fsm_map_[robot_id] = next_skill->getFSM();
-    }
-    else if (last_execution_robot == robot_id)
-    {
-        if (skill_fsm_map_[robot_id]->done())
+        if (current_skill_ == nullptr || last_execution_robot_changed_ ||
+            current_skill_->done(tactic_update.robot))
         {
-            skill_graph_.extendSequence(next_skill);
-            skill_map_[robot_id]     = next_skill;
-            skill_fsm_map_[robot_id] = next_skill->getFSM();
-        }
-        else if (last_execution_robot_changed_)
-        {
-            skill_graph_.extendSequence(skill_map_[robot_id]);
             last_execution_robot_changed_ = false;
-        }
-    }
 
-    skill_fsm_map_[robot_id]->updatePrimitive(tactic_update);
+            current_skill_ = next_skill;
+            current_skill_->reset(tactic_update.robot);
+            skill_graph_.extendSequence(current_skill_);
+        }
+
+        tactic_update.set_primitive(
+            current_skill_->getPrimitive(tactic_update.robot, tactic_update.world));
+    }
+    else
+    {
+        next_skill->reset(tactic_update.robot);
+        tactic_update.set_primitive(
+            next_skill->getPrimitive(tactic_update.robot, tactic_update.world));
+    }
 }
