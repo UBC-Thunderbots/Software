@@ -262,8 +262,8 @@ double PassGenerator<ZoneEnum>::getPassSpeed(const Point& ball_position,
         pass_speed_calc_constant;
     double pass_speed_m_per_s = sqrt(squared_pass_speed);
 
-    double min_pass_speed = passing_config.min_pass_speed_m_per_s();
-    double max_pass_speed = passing_config.max_pass_speed_m_per_s();
+    double min_pass_speed = passing_config_.min_pass_speed_m_per_s();
+    double max_pass_speed = passing_config_.max_pass_speed_m_per_s();
     double clamped_pass_speed_m_per_s =
         std::max(min_pass_speed, std::min(max_pass_speed, pass_speed_m_per_s));
     return clamped_pass_speed_m_per_s;
