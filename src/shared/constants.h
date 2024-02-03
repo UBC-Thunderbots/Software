@@ -80,6 +80,25 @@ static const double ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 4.0
 
 static const double ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED = 9.81;
 
+/*Simulator Constants*/
+
+// these values are set in coordination with other objects the ball will collide with.
+// the resulting coefficient of friction is the product of both objects friction value.
+
+// the sliding friction the ball experiences in Newtons
+static const double BALL_SLIDING_FRICTION_NEWTONS = 1.f;
+// the restitution of the ball
+static const double BALL_RESTITUTION = 1.f;
+// the transition factor where the ball goes from sliding to rolling
+static const double FRICTION_TRANSITION_FACTOR = 5.0 / 7.0;
+// the stationary ball speed in m/s
+static const double STATIONARY_BALL_SPEED_METERS_PER_SECOND = 0.01;
+// the deceleration the ball experiences due to rolling friction in m/s^2
+static const double BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED = 0.5;
+// the deceleration the ball experiences due to sliding friction in m/s^2
+static const double BALL_SLIDING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED =
+    BALL_SLIDING_FRICTION_NEWTONS / BALL_MASS_KG;
+
 /* Unit Conversion */
 static const double MILLIMETERS_PER_METER = 1000.0;
 static const double METERS_PER_MILLIMETER = 1.0 / 1000.0;

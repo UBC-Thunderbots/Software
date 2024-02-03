@@ -10,6 +10,7 @@
 #include "eighteen_zone_pitch_division.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
+#include "shared/constants.h"
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_evaluation.hpp"
@@ -77,9 +78,8 @@ class PassGenerator
     // ensure passes converge as fast as possible, but are also as stable as
     // possible
     static constexpr double PASS_SPACE_WEIGHT                          = 0.1;
-    static constexpr double PASS_SPEED_WEIGHT                          = 0.01;
     std::array<double, NUM_PARAMS_TO_OPTIMIZE> optimizer_param_weights = {
-        PASS_SPACE_WEIGHT, PASS_SPACE_WEIGHT, PASS_SPEED_WEIGHT};
+        PASS_SPACE_WEIGHT, PASS_SPACE_WEIGHT};
 
     /**
      * Randomly samples a receive point across every zone and assigns a random
@@ -90,13 +90,14 @@ class PassGenerator
     ZonePassMap<ZoneEnum> samplePasses(const World& world);
 
     /**
-     *
-     * @param ball_position
-     * @param pass_destination
-     * @return
+     * Determines the speed at which a pass should be executed
+     * Such that it reaches its destination at the given destination speed
+     * Takes into account friction
+     * @param ball_position the current ball position (starting point of the pass)
+     * @param pass_destination the destination of the pass
+     * @return the speed the pass should start with
      */
-    double getPassSpeed(const Point& ball_position, const Point& pass_destination,
-                        double dest_speed);
+    double getPassSpeed(const Point& ball_position, const Point& pass_destination);
 
     /**
      * Given a map of passes, runs a gradient descent optimizer to find
@@ -133,6 +134,10 @@ class PassGenerator
 
     // A random number generator for use across the class
     std::mt19937 random_num_gen_;
+
+    // A constant used in the calculation of a pass's speed
+    // Explanation in the getPassSpeed() method docs
+    double pass_speed_calc_constant;
 };
 template <class ZoneEnum>
 PassGenerator<ZoneEnum>::PassGenerator(
@@ -143,6 +148,15 @@ PassGenerator<ZoneEnum>::PassGenerator(
       passing_config_(passing_config),
       random_num_gen_(PASS_GENERATOR_SEED)
 {
+    // calculating the constant value used in determining pass speed
+    double sq_friction_trans_factor = pow(FRICTION_TRANSITION_FACTOR, 2);
+    pass_speed_calc_constant =
+        sq_friction_trans_factor -
+        ((BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED *
+          sq_friction_trans_factor) /
+         BALL_SLIDING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED) +
+        (BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED /
+         BALL_SLIDING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED);
 }
 
 template <class ZoneEnum>
@@ -198,10 +212,9 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 
         auto pass_destination =
             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_));
-        auto pass_speed = getPassSpeed(world.ball().position(), pass_destination,
-                                       passing_config_.max_receive_speed());
+        auto pass_speed_m_per_s = getPassSpeed(world.ball().position(), pass_destination);
 
-        auto pass = Pass(world.ball().position(), pass_destination, pass_speed);
+        auto pass = Pass(world.ball().position(), pass_destination, pass_speed_m_per_s);
 
         auto rating =
             ratePass(world, pass, pitch_division_->getZone(zone_id), passing_config_);
@@ -214,18 +227,46 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 
 template <class ZoneEnum>
 double PassGenerator<ZoneEnum>::getPassSpeed(const Point& ball_position,
-                                             const Point& pass_destination,
-                                             double dest_speed)
+                                             const Point& pass_destination)
 {
-    Vector pass_distance        = Vector(pass_destination.x() - ball_position.x(),
+    // We have
+    //      - destination speed (m/s)       -> vf
+    //      - rolling deceleration (m/s^2)  -> r
+    //      - sliding deceleration (m/s^2)  -> s
+    //      - length of pass (m)            -> D
+    //      - friction transition factor    -> c
+    //          - this dictates at what speed friction goes from sliding to rolling
+    // We want to find
+    //      - initial starting speed (m/s) -> x
+    //
+    // Ball decelerates with sliding from x -> cx, then with rolling from cx -> vf
+    // Slide Distance (m) -> d1
+    // Roll Distance (m) -> d2
+    // d2 = D - d1
+    //
+    // (cx)^2 = x^2 + 2sd1
+    // d1 = (c^2 - 1)x^2 / 2s
+    // d2 = D + (1 - c^2)x^2 / 2s
+    //
+    // vf^2 = (cx)^2 + 2rd2 = (cx)^2 + 2r(D + (1 - c^2)x^2 / 2s)
+    // Simplify to get
+    // x = sqrt((vf^2 - 2rD) / (c^2 - rc^2/s + b/s))
+    double dest_speed_m_per_s     = passing_config_.max_receive_speed();
+    Vector pass_distance          = Vector(pass_destination.x() - ball_position.x(),
                                   pass_destination.y() - ball_position.y());
-    double pass_distance_length = pass_distance.length();
+    double pass_distance_length_m = pass_distance.length();
+    double squared_pass_speed =
+        (pow(dest_speed_m_per_s, 2) -
+         2 * -BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED *
+             pass_distance_length_m) /
+        pass_speed_calc_constant;
+    double pass_speed_m_per_s = sqrt(squared_pass_speed);
 
-    double deceleration = passing_config_.pass_deceleration();
-
-    double pass_speed =
-        sqrt((dest_speed * dest_speed) - 2 * deceleration * pass_distance_length);
-    return pass_speed;
+    double min_pass_speed = passing_config.min_pass_speed_m_per_s();
+    double max_pass_speed = passing_config.max_pass_speed_m_per_s();
+    double clamped_pass_speed_m_per_s =
+        std::max(min_pass_speed, std::min(max_pass_speed, pass_speed_m_per_s));
+    return clamped_pass_speed_m_per_s;
 }
 
 template <class ZoneEnum>
@@ -243,8 +284,12 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
         const auto objective_function =
             [this, &world,
              zone_id](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
+                // get the new appropriate speed using the new destination
+                double pass_speed_m_per_s = getPassSpeed(
+                    world.ball().position(), Point(pass_array[0], pass_array[1]));
                 return ratePass(world,
-                                Pass::fromPassArray(world.ball().position(), pass_array),
+                                Pass::fromPassArray(world.ball().position(), pass_array,
+                                                    pass_speed_m_per_s),
                                 pitch_division_->getZone(zone_id), passing_config_);
             };
 
@@ -252,7 +297,11 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
             objective_function, generated_passes.at(zone_id).pass.toPassArray(),
             passing_config_.number_of_gradient_descent_steps_per_iter());
 
-        auto new_pass = Pass::fromPassArray(world.ball().position(), pass_array);
+        // get the new appropriate speed using the new destination
+        double pass_speed_m_per_s =
+            getPassSpeed(world.ball().position(), Point(pass_array[0], pass_array[1]));
+        auto new_pass =
+            Pass::fromPassArray(world.ball().position(), pass_array, pass_speed_m_per_s);
         auto score =
             ratePass(world, new_pass, pitch_division_->getZone(zone_id), passing_config_);
 
@@ -262,15 +311,20 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
     return optimized_passes;
 }
 
+
+
 template <class ZoneEnum>
 void PassGenerator<ZoneEnum>::updatePasses(const World& world,
                                            const ZonePassMap<ZoneEnum>& optimized_passes)
 {
     for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
     {
+        auto pass_array = current_best_passes_.at(zone_id).pass.toPassArray();
+        double pass_speed_m_per_s =
+            getPassSpeed(world.ball().position(), Point(pass_array[0], pass_array[1]));
         // update the passer point of the current best pass
-        current_best_passes_.at(zone_id).pass = Pass::fromPassArray(
-            world.ball().position(), current_best_passes_.at(zone_id).pass.toPassArray());
+        current_best_passes_.at(zone_id).pass =
+            Pass::fromPassArray(world.ball().position(), pass_array, pass_speed_m_per_s);
 
         if (ratePass(world, current_best_passes_.at(zone_id).pass,
                      pitch_division_->getZone(zone_id),

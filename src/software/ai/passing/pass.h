@@ -8,8 +8,8 @@
 #include "software/time/timestamp.h"
 
 // The number of parameters (representing a pass) that we optimize
-// (receive_location_x, receive_location_y, pass_speed)
-static const int NUM_PARAMS_TO_OPTIMIZE = 3;
+// (receive_location_x, receive_location_y)
+static const int NUM_PARAMS_TO_OPTIMIZE = 2;
 
 /**
  * This class represents a Pass, a receive point with a speed
@@ -32,17 +32,18 @@ class Pass
      * Create a pass from the given pass array
      *
      * @param passer_point The location of the passer location
-     * @param pass_array [receiver_point.x(), receiver_point.y(), pass_speed_m_per_s]
+     * @param pass_array [receiver_point.x(), receiver_point.y()]
+     * @param pass_speed_m_per_s the speed of the pass in m/s
      * @return The Pass constructed from the pass array
      */
     static Pass fromPassArray(
-        Point passer_point, const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array);
+        Point passer_point, const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array,
+        double pass_speed_m_per_s);
 
     /**
      * Converts a pass to an array
      *
-     * @returns the pass array: [receiver_point.x(), receiver_point.y(),
-     * pass_speed_m_per_s]
+     * @returns the pass array: [receiver_point.x(), receiver_point.y()]
      */
     std::array<double, NUM_PARAMS_TO_OPTIMIZE> toPassArray() const;
 

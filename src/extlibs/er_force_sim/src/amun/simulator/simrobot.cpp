@@ -448,7 +448,7 @@ void SimRobot::begin(SimBall *ball, double time)
         const float speedCompensation = getSpeedCompensation();
 
         ball->kick(t * btVector3(0, dirFloor * power + speedCompensation, dirUp * power) *
-                   (1 / time) * SIMULATOR_SCALE * BALL_MASS);
+                   (1 / time) * SIMULATOR_SCALE * static_cast<float>(BALL_MASS_KG));
         // discharge
         m_isCharged = false;
         m_shootTime = 0.0;

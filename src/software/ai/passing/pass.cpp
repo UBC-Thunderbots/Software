@@ -39,14 +39,15 @@ double Pass::speed() const
 }
 
 Pass Pass::fromPassArray(Point passer_point,
-                         const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& array)
+                         const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& array,
+                         double pass_speed_m_per_s)
 {
-    return Pass(passer_point, Point(array.at(0), array.at(1)), array.at(2));
+    return Pass(passer_point, Point(array.at(0), array.at(1)), pass_speed_m_per_s);
 }
 
 std::array<double, NUM_PARAMS_TO_OPTIMIZE> Pass::toPassArray() const
 {
-    return {receiver_point.x(), receiver_point.y(), pass_speed_m_per_s};
+    return {receiver_point.x(), receiver_point.y()};
 }
 
 Duration Pass::estimatePassDuration() const

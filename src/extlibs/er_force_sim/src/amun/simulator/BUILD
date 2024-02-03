@@ -10,6 +10,7 @@ qt_cc_library(
         "//extlibs/er_force_sim/src/core:core_qt",
         "//extlibs/er_force_sim/src/protobuf:protobuf_qt",
         "//proto:ssl_simulation_cc_proto",
+        "//shared:constants",
         "@bullet",
         "@qt//:qt_core",
         "@qt//:qt_gui",
