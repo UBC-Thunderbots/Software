@@ -51,12 +51,14 @@ class SkillGraph
     void scoreSequence(double sequence_score);
 
    private:
-    static constexpr double DEFAULT_EDGE_WEIGHT = 1.0;
+    static constexpr double DEFAULT_EDGE_WEIGHT       = 1.0;
+    static constexpr double MAX_EDGE_WEIGHT_MAGNITUDE = 5.0;
 
     // Constants used in calculating edge weight adjustments when
     // scoring a skill sequence
     static constexpr double ADJUSTMENT_SIGMOID_WIDTH = 2.0;
     static constexpr double ADJUSTMENT_RESISTANCE    = 20.0;
+    static constexpr double ADJUSTMENT_SCALE         = 0.5;
 
     /**
      * Each node in the graph is represented by a Skill.

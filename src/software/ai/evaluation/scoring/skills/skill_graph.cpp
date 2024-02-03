@@ -56,6 +56,9 @@ void SkillGraph::extendSequence(const std::shared_ptr<Skill>& skill)
 
 void SkillGraph::scoreSequence(double sequence_score)
 {
+    LOG_IF(WARNING, sequence_score < -1 || sequence_score > 1)
+        << "Skill sequence being scored with score outside of range [-1, 1]";
+
     // Equation used to calculate the edge weight adjustment:
     // https://www.desmos.com/3d/04931b4dce
 
@@ -71,8 +74,11 @@ void SkillGraph::scoreSequence(double sequence_score)
         double adjustment_resistance = signum(adjustment_sigmoid) *
                                        std::abs(sequence_score) * weight * weight /
                                        ADJUSTMENT_RESISTANCE;
-        double adjustment = adjustment_sigmoid - adjustment_resistance;
+        double adjustment =
+            ADJUSTMENT_SCALE * (adjustment_sigmoid - adjustment_resistance);
+        double new_weight = std::clamp(weight + adjustment, -MAX_EDGE_WEIGHT_MAGNITUDE,
+                                       MAX_EDGE_WEIGHT_MAGNITUDE);
 
-        adj_matrix_[from][to] += adjustment;
+        adj_matrix_[from][to] = new_weight;
     }
 }
