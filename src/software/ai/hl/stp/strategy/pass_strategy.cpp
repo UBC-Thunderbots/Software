@@ -15,6 +15,10 @@ PassStrategy::PassStrategy(const TbotsProto::PassingConfig& passing_config,
 PassStrategy::~PassStrategy()
 {
     end_analysis_ = true;
+
+    world_available_cv_.notify_one();
+
+    passing_thread_.join();
 }
 
 std::shared_ptr<PassEvaluation<EighteenZoneId>> PassStrategy::getPassEvaluation()
@@ -30,7 +34,7 @@ void PassStrategy::evaluatePassOptions()
     {
         std::unique_lock<std::mutex> lock(world_lock_);
 
-        world_available_cv_.wait(lock, [&] { return current_world_.has_value(); });
+        world_available_cv_.wait(lock, [&] { return current_world_.has_value() || end_analysis_; });
     }
 
     while (!end_analysis_)

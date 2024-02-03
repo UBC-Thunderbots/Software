@@ -27,7 +27,7 @@ std::shared_ptr<Skill> SkillGraph::getNextSkill(const Robot& robot, const World&
 {
     unsigned int last_node_id = sequence_.back().second;
 
-    unsigned int best_next_node_id;
+    unsigned int best_next_node_id = 0;
     double best_transition_score = std::numeric_limits<double>::min();
 
     for (unsigned int node_id = 0; node_id < nodes_.size(); ++node_id)

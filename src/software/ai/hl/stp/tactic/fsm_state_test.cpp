@@ -6,7 +6,7 @@
 TEST(FsmStateTest, test_get_fsm_state)
 {
     TbotsProto::AiConfig ai_config;
-    AttackerTactic tactic(ai_config, std::make_shared<Strategy>(ai_config));
+    AttackerTactic tactic(std::make_shared<Strategy>(ai_config));
 
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
