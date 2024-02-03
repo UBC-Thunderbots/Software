@@ -54,13 +54,13 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
             skill_graph_.extendSequence(current_skill_);
         }
 
-        tactic_update.set_primitive(
-            current_skill_->getPrimitive(tactic_update.robot, tactic_update.world));
+        current_skill_->updatePrimitive(tactic_update.robot, tactic_update.world,
+                                        tactic_update.set_primitive);
     }
     else
     {
         next_skill->reset(tactic_update.robot);
-        tactic_update.set_primitive(
-            next_skill->getPrimitive(tactic_update.robot, tactic_update.world));
+        next_skill->updatePrimitive(tactic_update.robot, tactic_update.world,
+                                    tactic_update.set_primitive);
     }
 }

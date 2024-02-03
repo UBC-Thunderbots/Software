@@ -7,21 +7,17 @@ double KeepAwaySkill::getViability(const Robot& robot, const World& world) const
     return 1;
 }
 
-std::shared_ptr<Primitive> KeepAwaySkill::getPrimitive(const Robot& robot,
-                                                       const World& world)
+void KeepAwaySkill::updatePrimitive(const Robot& robot, const World& world,
+                                    const SetPrimitiveCallback& set_primitive)
 {
     if (!fsm_map_.contains(robot.id()))
     {
         reset(robot);
     }
 
-    std::shared_ptr<Primitive> new_primitive;
-    fsm_map_[robot.id()]->process_event(KeepAwaySkillFSM::Update(
-        KeepAwaySkillFSM::ControlParams{},
-        SkillUpdate(robot, world, strategy_, [&](std::shared_ptr<Primitive> primitive) {
-            new_primitive = std::move(primitive);
-        })));
-    return new_primitive;
+    fsm_map_[robot.id()]->process_event(
+        KeepAwaySkillFSM::Update(KeepAwaySkillFSM::ControlParams{},
+                                 SkillUpdate(robot, world, strategy_, set_primitive)));
 }
 
 void KeepAwaySkill::reset(const Robot& robot)

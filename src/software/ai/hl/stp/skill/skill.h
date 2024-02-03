@@ -10,8 +10,8 @@ class Skill
 
     virtual double getViability(const Robot& robot, const World& world) const = 0;
 
-    virtual std::shared_ptr<Primitive> getPrimitive(const Robot& robot,
-                                                    const World& world) = 0;
+    virtual void updatePrimitive(const Robot& robot, const World& world,
+                                 const SetPrimitiveCallback& set_primitive) = 0;
 
     virtual void reset(const Robot& robot) = 0;
 

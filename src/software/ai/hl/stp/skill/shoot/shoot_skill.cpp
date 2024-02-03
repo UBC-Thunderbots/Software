@@ -11,21 +11,17 @@ double ShootSkill::getViability(const Robot& robot, const World& world) const
     return 1;
 }
 
-std::shared_ptr<Primitive> ShootSkill::getPrimitive(const Robot& robot,
-                                                    const World& world)
+void ShootSkill::updatePrimitive(const Robot& robot, const World& world,
+                                 const SetPrimitiveCallback& set_primitive)
 {
     if (!fsm_map_.contains(robot.id()))
     {
         reset(robot);
     }
 
-    std::shared_ptr<Primitive> new_primitive;
-    fsm_map_[robot.id()]->process_event(ShootSkillFSM::Update(
-        ShootSkillFSM::ControlParams{},
-        SkillUpdate(robot, world, strategy_, [&](std::shared_ptr<Primitive> primitive) {
-            new_primitive = std::move(primitive);
-        })));
-    return new_primitive;
+    fsm_map_[robot.id()]->process_event(
+        ShootSkillFSM::Update(ShootSkillFSM::ControlParams{},
+                              SkillUpdate(robot, world, strategy_, set_primitive)));
 }
 
 void ShootSkill::reset(const Robot& robot)

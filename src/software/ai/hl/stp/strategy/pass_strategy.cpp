@@ -34,7 +34,8 @@ void PassStrategy::evaluatePassOptions()
     {
         std::unique_lock<std::mutex> lock(world_lock_);
 
-        world_available_cv_.wait(lock, [&] { return current_world_.has_value() || end_analysis_; });
+        world_available_cv_.wait(
+            lock, [&] { return current_world_.has_value() || end_analysis_; });
     }
 
     while (!end_analysis_)

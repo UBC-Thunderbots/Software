@@ -10,8 +10,8 @@ class ShootSkill : public Skill
 
     double getViability(const Robot& robot, const World& world) const override;
 
-    std::shared_ptr<Primitive> getPrimitive(const Robot& robot,
-                                            const World& world) override;
+    void updatePrimitive(const Robot& robot, const World& world,
+                         const SetPrimitiveCallback& set_primitive) override;
 
     void reset(const Robot& robot) override;
 
