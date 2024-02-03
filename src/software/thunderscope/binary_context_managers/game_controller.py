@@ -143,7 +143,6 @@ class Gamecontroller(object):
             :param data: The referee command to send
 
             """
-            # print(data)
             blue_full_system_proto_unix_io.send_proto(Referee, data)
             yellow_full_system_proto_unix_io.send_proto(Referee, data)
             if autoref_proto_unix_io is not None:
@@ -159,7 +158,6 @@ class Gamecontroller(object):
         yellow_full_system_proto_unix_io.register_observer(
             ManualGCCommand, self.manual_gc_command_buffer
         )
-
 
     def send_gc_command(
         self,
@@ -182,7 +180,7 @@ class Gamecontroller(object):
         """
         ci_input = CiInput(timestamp=int(time.time_ns()))
         api_input = Input()
-        change = Change()        
+        change = Change()
         new_command = NewCommand()
         command = Command(type=gc_command, for_team=team)
 
