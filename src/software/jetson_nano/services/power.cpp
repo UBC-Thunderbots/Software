@@ -74,11 +74,11 @@ void PowerService::tick()
 }
 
 TbotsProto::PowerStatus PowerService::poll(const TbotsProto::PowerControl& command,
-                                           int kick_slope, int kick_constant,
+                                           double kick_coeff, int kick_constant,
                                            int chip_constant)
 {
     // Store msg for later transmission
     nanopb_command =
-        createNanoPbPowerPulseControl(command, kick_slope, kick_constant, chip_constant);
+        createNanoPbPowerPulseControl(command, kick_coeff, kick_constant, chip_constant);
     return *createTbotsPowerStatus(status);
 }

@@ -21,7 +21,7 @@ class PlayInfoWidget(QWidget):
     HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
     ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
 
-    def __init__(self, minimum_column_width=200, buffer_size=5):
+    def __init__(self, minimum_column_width: int = 200, buffer_size: int = 5) -> None:
         """Shows the current play information including tactic and FSM state
 
         :param minimum_column_width: minimum width of columns
@@ -40,7 +40,7 @@ class PlayInfoWidget(QWidget):
         self.vertical_layout.addWidget(self.play_table)
         self.setLayout(self.vertical_layout)
 
-    def refresh(self):
+    def refresh(self) -> None:
         """Update the play info widget with new play information
         """
         playinfo = self.playinfo_buffer.get(block=False)

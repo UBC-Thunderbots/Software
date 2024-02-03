@@ -19,9 +19,7 @@ TEST(PassDefenderFSMTest, test_transitions)
     // Ball has not been kicked towards the pass defender (i.e. enemy has possession)
     // Should stay in BlockPassState
     fsm.process_event(PassDefenderFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
 
     // Ball is now kicked towards pass defender
@@ -31,9 +29,7 @@ TEST(PassDefenderFSMTest, test_transitions)
 
     // Transition to InterceptBallState
     fsm.process_event(PassDefenderFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::InterceptBallState>));
 
     // Deflect ball away from pass defender
@@ -44,8 +40,6 @@ TEST(PassDefenderFSMTest, test_transitions)
 
     // Transition back to BlockPassState
     fsm.process_event(PassDefenderFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
 }
