@@ -1,7 +1,7 @@
 from software.thunderscope.robot_diagnostics.controller_diagnostics import ControllerDiagnostics
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
-from software.thunderscope.robot_diagnostics.diagnostics_input_widget import FullSystemConnectWidget
+from software.thunderscope.robot_diagnostics.diagnostics_input_widget import FullSystemConnectWidget, ControlMode
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import DriveAndDribblerWidget
 
 
@@ -14,9 +14,11 @@ class DiagnosticsWidget(TScopeWidget):
 
         vbox_layout = QVBoxLayout()
 
+        self.__control_mode = ControlMode.DIAGNOSTICS
+
 
         self.diagnostics_control_input_widget = FullSystemConnectWidget(self.diagnostics_input_mode_signal)
-        self.drive_dribbler_widget = DriveAndDribblerWidget(proto_unix_io, )
+        self.drive_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
         self.chicker_widget = ChickerWidget(proto_unix_io)
         self.controller = ControllerDiagnostics(proto_unix_io)
 
@@ -33,5 +35,7 @@ class DiagnosticsWidget(TScopeWidget):
         vbox_layout.addWidget(self.chicker_widget)
 
         self.setLayout(vbox_layout)
+
+    def __
 
 

@@ -22,6 +22,16 @@ class DriveAndDribblerWidget(QWidget):
 
         self.proto_unix_io = proto_unix_io
 
+        self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
+        self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
+
+        self.proto_unix_io.register_observer(
+            MotorControl, self.motor_control_diagnostics_buffer
+        )
+        self.proto_unix_io.register_observer(
+            PowerControl, self.power_control_diagnostics_buffer
+        )
+
         # Add widgets to layout
         layout.addWidget(self.setup_direct_velocity("Drive"))
         layout.addWidget(self.setup_dribbler("Dribbler"))
