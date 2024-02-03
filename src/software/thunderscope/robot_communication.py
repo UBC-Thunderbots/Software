@@ -37,6 +37,8 @@ class RobotCommunication(object):
         :param estop_baudrate: The baudrate of the estop
 
         """
+        self.receive_ssl_referee_proto = None
+        self.receive_ssl_wrapper = None
         self.sequence_number = 0
         self.last_time = time.time()
         self.current_proto_unix_io = current_proto_unix_io
@@ -322,7 +324,13 @@ class RobotCommunication(object):
 
         """
         self.running = False
-        self.receive_ssl_wrapper.close()
+
+        if self.receive_ssl_wrapper:
+            self.receive_ssl_wrapper.close()
+
+        if self.receive_ssl_wrapper:
+            self.receive_ssl_referee_proto.close()
+
         self.receive_robot_log.close()
         self.receive_robot_status.close()
         self.run_primitive_set_thread.join()
