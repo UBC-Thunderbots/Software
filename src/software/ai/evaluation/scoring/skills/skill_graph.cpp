@@ -16,9 +16,14 @@ SkillGraph::SkillGraph(std::shared_ptr<Strategy> strategy)
                        return std::move(skill_constructor(strategy));
                    });
 
+    // The size of the adjacency matrix must be one more than the size of nodes_
+    // since there is a "start" node not explicitly represented by any Skill
+    // that needs to be accounted for
     adj_matrix_ = std::vector<std::vector<double>>(
         nodes_.size() + 1, std::vector<double>(nodes_.size() + 1, DEFAULT_EDGE_WEIGHT));
 
+    // The first node of the sequence should always be the "start" node, which has
+    // an ID of nodes_.size()
     sequence_ = {std::make_pair(nodes_.size(), nodes_.size())};
 }
 
@@ -31,9 +36,17 @@ std::shared_ptr<Skill> SkillGraph::getNextSkill(const Robot& robot, const World&
 
     for (unsigned int node_id = 0; node_id < nodes_.size(); ++node_id)
     {
+        double viability_score = nodes_[node_id]->getViability(robot, world);
+
+        // A skill with a viability score of 0 is considered inviable
+        // and cannot be selected for execution
+        if (viability_score == 0)
+        {
+            continue;
+        }
+
         double edge_weight      = adj_matrix_[last_node_id][node_id];
-        double viability_score  = nodes_[node_id]->getViability(robot, world);
-        double transition_score = edge_weight * viability_score;
+        double transition_score = edge_weight + viability_score;
 
         if (transition_score > best_transition_score)
         {
@@ -65,6 +78,8 @@ void SkillGraph::scoreSequence(double sequence_score)
     double adjustment_sigmoid =
         sigmoid(sequence_score, 0, ADJUSTMENT_SIGMOID_WIDTH) - 0.5;
 
+    double sequence_length = static_cast<double>(sequence_.size() - 1);
+
     while (sequence_.size() > 1)
     {
         auto [from, to] = sequence_.back();
@@ -75,6 +90,17 @@ void SkillGraph::scoreSequence(double sequence_score)
             sequence_score * weight * weight / ADJUSTMENT_RESISTANCE;
         double adjustment =
             ADJUSTMENT_SCALE * (adjustment_sigmoid - adjustment_resistance);
+
+        // Skills executed near the end of the sequence are considered as
+        // having the most impact on the result of the play, so the weight adjustment
+        // for edges traversed earlier in the sequence should be less substantial
+        // than for those traversed later
+        //
+        // We multiply the adjustment by a "recency factor" so that edges earlier in
+        // the sequence are adjusted by only a portion of the original adjustment
+        double recency_factor = static_cast<double>(sequence_.size()) / sequence_length;
+        adjustment *= recency_factor;
+
         double new_weight = std::clamp(weight + adjustment, -MAX_EDGE_WEIGHT_MAGNITUDE,
                                        MAX_EDGE_WEIGHT_MAGNITUDE);
 
