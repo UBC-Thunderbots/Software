@@ -322,13 +322,18 @@ class GLWidget(QWidget):
         if camera_view == CameraView.ORTHOGRAPHIC:
             field = DEFAULT_EMPTY_FIELD_WORLD.field
             buffer_size = 0.5
-            fov = 60 # Same as default fov of GLViewWidget
+            fov = 60  # Same as default fov of GLViewWidget
             distance = np.tan(np.deg2rad(90 - fov / 2))
-            viewport_width_to_height_ratio = self.gl_view_widget.width() / self.gl_view_widget.height()
+            viewport_width_to_height_ratio = (
+                self.gl_view_widget.width() / self.gl_view_widget.height()
+            )
             half_x_length_with_buffer = field.field_x_length / 2 + buffer_size
             half_y_length_with_buffer = field.field_y_length / 2 + buffer_size
             # Constrained vertically
-            if viewport_width_to_height_ratio > half_x_length_with_buffer / half_y_length_with_buffer:
+            if (
+                viewport_width_to_height_ratio
+                > half_x_length_with_buffer / half_y_length_with_buffer
+            ):
                 distance *= half_y_length_with_buffer * viewport_width_to_height_ratio
             # Constrained horizontally
             else:
