@@ -11,7 +11,7 @@ py_library(
         "//software/networking:ssl_proto_communication",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/common:common_widgets",
-        "//software/thunderscope/gl/widgets/toolbar_icons:toolbar_icon_loader",
+        "//software/thunderscope/gl/widgets/toolbar_icons/gamecontroller:icon_loader",
         requirement("pyqtgraph"),
     ],
 )
@@ -19,6 +19,14 @@ py_library(
 py_library(
     name = "gl_toolbar",
     srcs = ["gl_toolbar.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "icon_loader",
+    srcs = ["icon_loader.py"],
     deps = [
         requirement("pyqtgraph"),
     ],

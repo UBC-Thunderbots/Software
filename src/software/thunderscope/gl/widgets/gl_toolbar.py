@@ -6,6 +6,7 @@ from pyqtgraph.Qt.QtWidgets import *
 class GLToolbar(QWidget):
 
     BUTTON_ICON_COLOR = "white"
+    DISABLED_BUTTON_ICON_COLOR = "#969696"
 
     def __init__(self):
         super(GLToolbar, self).__init__()
@@ -29,6 +30,7 @@ class GLToolbar(QWidget):
         return textwrap.dedent(
             f"""
             QPushButton {{
+                color: #969696;
                 background-color: transparent;
                 border-color: transparent;
                 icon-size: 22px;

@@ -82,7 +82,7 @@ class GLWidget(QWidget):
         self.layers_menu = QMenu()
         self.layers_menu_actions = {}
         self.layers_button.setMenu(self.layers_menu)
-
+        
         # Set up View button for setting the camera position to standard views
         self.camera_view_button = QPushButton()
         self.camera_view_button.setText("View")
@@ -127,6 +127,10 @@ class GLWidget(QWidget):
             lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
         )
 
+        # Setup Toolbars button for toggling visibility of toolbars
+        self.setup_toolbars_button()
+        self.toolbars_button.setStyleSheet(tool_button_stylesheet)
+
         # Setup toolbar
         self.toolbar = QWidget()
         self.toolbar.setSizePolicy(
@@ -135,10 +139,16 @@ class GLWidget(QWidget):
         self.toolbar.setStyleSheet("background-color: black;" "padding: 0px;")
         self.toolbar.setLayout(QHBoxLayout())
         self.toolbar.layout().addWidget(self.layers_button)
+        self.toolbar.layout().addWidget(self.toolbars_button)
         self.toolbar.layout().addStretch()
         self.toolbar.layout().addWidget(self.help_button)
         self.toolbar.layout().addWidget(self.measure_button)
         self.toolbar.layout().addWidget(self.camera_view_button)
+
+        # Setup gamecontroller toolbar
+        self.gamecontroller_toolbar = GLGamecontrollerToolbar(
+            proto_unix_io, friendly_color_yellow
+        )
 
         # Setup layout
         self.layout = QVBoxLayout()
@@ -147,11 +157,14 @@ class GLWidget(QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.toolbar)
         self.layout.addWidget(self.gl_view_widget)
-        # Setup gamecontroller toolbar
-        self.gamecontroller_toolbar = GLGamecontrollerToolbar(
-            proto_unix_io, friendly_color_yellow
-        )
         self.layout.addWidget(self.gamecontroller_toolbar)
+
+        # Connect visibility of the toolbar to the menu item
+        self.toolbars_menu_checkboxes["Gamecontroller"].stateChanged.connect(
+            lambda: self.gamecontroller_toolbar.setVisible(
+                self.toolbars_menu_checkboxes["Gamecontroller"].isChecked()
+            )
+        )
 
         # Setup replay controls if player is provided and the log has some size
         self.player = player
@@ -267,13 +280,7 @@ class GLWidget(QWidget):
         self.layers.append(layer)
 
         # Add the layer to the Layer menu
-        # Not using a checkable QAction in order to prevent menu from closing
-        # when an action is pressed
-        layer_checkbox = QCheckBox(layer.name, self.layers_menu)
-        layer_checkbox.setStyleSheet("QCheckBox { padding: 0px 8px; }")
-        layer_checkbox.setChecked(visible)
-        layer_action = QWidgetAction(self.layers_menu)
-        layer_action.setDefaultWidget(layer_checkbox)
+        [layer_checkbox, layer_action] = self.setup_menu_checkbox(layer.name, self.layers_menu, visible)
         self.layers_menu_actions[layer.name] = layer_action
         self.layers_menu.addAction(layer_action)
 
@@ -369,3 +376,38 @@ class GLWidget(QWidget):
             self.add_layer(self.measure_layer)
         else:
             self.remove_layer(self.measure_layer)
+
+    def setup_toolbars_button(self) -> None:
+        """
+        Sets up the toolbars display toggle menu
+        Where each toolbar's visibility can be toggled
+        """
+        self.toolbars_button = QPushButton()
+        self.toolbars_button.setText("Toolbars")
+        self.toolbars_menu = QMenu()
+        self.toolbars_menu_checkboxes = {}
+        self.toolbars_button.setMenu(self.toolbars_menu)
+
+        # Add each toolbar to the Toolbars menu
+        [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox("Gamecontroller", self.toolbars_menu)
+        self.toolbars_menu_checkboxes["Gamecontroller"] = toolbar_checkbox
+        self.toolbars_menu.addAction(toolbar_action)
+
+    def setup_menu_checkbox(self, name: str, parent: QWidget, checked: bool = True):
+        """
+        Sets up a clickable menu checkbox with the given name
+        attached to the given parent
+
+        :param name: the name displayed on the checkbox
+        :param parent: the checkbox's parent
+        :return: the checkbox and associated action
+        """
+        # Not using a checkable QAction in order to prevent menu from closing
+        # when an action is pressed
+        layer_checkbox = QCheckBox(name, parent)
+        layer_checkbox.setStyleSheet("QCheckBox { padding: 0px 8px; }")
+        layer_checkbox.setChecked(checked)
+        layer_action = QWidgetAction(parent)
+        layer_action.setDefaultWidget(layer_checkbox)
+
+        return [layer_checkbox, layer_action]
