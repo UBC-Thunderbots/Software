@@ -118,7 +118,7 @@ class ProtoPlotter(QWidget):
                         else:
                             new_pen_color = [randint(100, 255) for _ in range(3)]
                             # Ensure that there is sufficient contrast between different plots
-                            while sum([(new_pen_color[i] - self.pen_color[i]) ** 2 for i in range(3)]) < 15000:
+                            while sum([(new_pen_color[i] - self.pen_color[i]) ** 2 for i in range(3)]) < 10000:
                                 new_pen_color = [randint(100, 255) for _ in range(3)]
                             self.pen_color = new_pen_color
                         self.plots[name] = self.win.plot(
