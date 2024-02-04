@@ -60,7 +60,9 @@ def setup_pass_and_robots(
     # construct a world object to match the one sent to the test runner
     world = tbots_cpp.World(
         tbots_cpp.Field.createSSLDivisionBField(),
-        tbots_cpp.Ball(ball_initial_position, ball_initial_velocity, tbots_cpp.Timestamp()),
+        tbots_cpp.Ball(
+            ball_initial_position, ball_initial_velocity, tbots_cpp.Timestamp()
+        ),
         tbots_cpp.Team(
             [
                 tbots_cpp.Robot(
@@ -335,7 +337,11 @@ def test_passing_receive_speed(
             tbots_cpp.Point(0.5, 0),
             [tbots_cpp.Point(-1, 0)],
             [math.pi, 0],
-            [tbots_cpp.Point(0.5, 0.5), tbots_cpp.Point(0.5, -0.5), tbots_cpp.Point(1, 0)],
+            [
+                tbots_cpp.Point(0.5, 0.5),
+                tbots_cpp.Point(0.5, -0.5),
+                tbots_cpp.Point(1, 0),
+            ],
         ),
     ],
     ids=[

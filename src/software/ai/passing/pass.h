@@ -4,9 +4,9 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "shared/constants.h"
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
-#include "shared/constants.h"
 
 // The number of parameters (representing a pass) that we optimize
 // (receive_location_x, receive_location_y)
@@ -41,7 +41,7 @@ class Pass
         Point passer_point, const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array,
         double pass_speed_m_per_s);
 
-    
+
     /**
      * Creates a pass from the given destination point and receive speed
      *
@@ -49,9 +49,11 @@ class Pass
      * @param receive_speed_m_per_s The speed at which the pass should be received
      * @return The Pass constructed from the receiver point and speed
      */
-    static Pass fromDestReceiveSpeed(
-        const Point& ball_position, const Point& pass_destination, double dest_speed_m_per_s,
-        double min_pass_speed_m_per_s, double max_pass_speed_m_per_s);
+    static Pass fromDestReceiveSpeed(const Point& ball_position,
+                                     const Point& pass_destination,
+                                     double dest_speed_m_per_s,
+                                     double min_pass_speed_m_per_s,
+                                     double max_pass_speed_m_per_s);
 
     /**
      * Determines the speed at which a pass should be executed
@@ -61,9 +63,10 @@ class Pass
      * @param pass_destination the destination of the pass
      * @return the speed the pass should start with
      */
-    static double getPassSpeed(
-        const Point& ball_position, const Point& pass_destination, double receive_speed_m_per_s,
-        double min_pass_speed_m_per_s, double max_pass_speed_m_per_s);
+    static double getPassSpeed(const Point& ball_position, const Point& pass_destination,
+                               double receive_speed_m_per_s,
+                               double min_pass_speed_m_per_s,
+                               double max_pass_speed_m_per_s);
 
     /**
      * Converts a pass to an array
