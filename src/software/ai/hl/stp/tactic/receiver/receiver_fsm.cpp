@@ -174,8 +174,7 @@ void ReceiverFSM::adjustReceive(const Update& event)
 bool ReceiverFSM::passStarted(const Update& event)
 {
     return event.common.world.ball().hasBallBeenKicked(
-        event.control_params.pass->passerOrientation(),
-        event.control_params.pass->speed() * MIN_PERCENT_OF_KICK_SPEED_FOR_SUCCESS);
+        event.control_params.pass->passerOrientation());
 }
 
 bool ReceiverFSM::passFinished(const Update& event)

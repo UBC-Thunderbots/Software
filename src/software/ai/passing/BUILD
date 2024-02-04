@@ -36,7 +36,8 @@ cc_library(
     hdrs = ["pass.h"],
     deps = [
         "//software/time:timestamp",
-        "//software/world:field",
+        "//software/world:field",\
+        "//shared:constants"
     ],
 )
 
@@ -133,7 +134,6 @@ cc_library(
         ":pass_evaluation",
         ":pass_with_rating",
         "//proto/message_translation:tbots_protobuf",
-        "//shared:constants",
         "//software/optimization:gradient_descent",
         "//software/world",
     ],

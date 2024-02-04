@@ -394,7 +394,8 @@ PYBIND11_MODULE(python_bindings, m)
     py::class_<Pass, std::unique_ptr<Pass>>(m, "Pass")
         .def("passerPoint", &Pass::passerPoint)
         .def("receiverPoint", &Pass::receiverPoint)
-        .def("speed", &Pass::speed);
+        .def("speed", &Pass::speed)
+        .def_static("fromDestReceiveSpeed", &Pass::fromDestReceiveSpeed);
 
     py::enum_<EighteenZoneId>(m, "EighteenZoneId")
         .value("ZONE_1", EighteenZoneId::ZONE_1)

@@ -1,6 +1,6 @@
 import pytest
 import math
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
@@ -58,31 +58,31 @@ def setup_pass_and_robots(
     )
 
     # construct a world object to match the one sent to the test runner
-    world = tbots.World(
-        tbots.Field.createSSLDivisionBField(),
-        tbots.Ball(ball_initial_position, ball_initial_velocity, tbots.Timestamp()),
-        tbots.Team(
+    world = tbots_cpp.World(
+        tbots_cpp.Field.createSSLDivisionBField(),
+        tbots_cpp.Ball(ball_initial_position, ball_initial_velocity, tbots_cpp.Timestamp()),
+        tbots_cpp.Team(
             [
-                tbots.Robot(
+                tbots_cpp.Robot(
                     index,
                     location,
-                    tbots.Vector(0.0, 0.0),
-                    tbots.Angle.fromRadians(0),
-                    tbots.Angle(),
-                    tbots.Timestamp(),
+                    tbots_cpp.Vector(0.0, 0.0),
+                    tbots_cpp.Angle.fromRadians(0),
+                    tbots_cpp.Angle(),
+                    tbots_cpp.Timestamp(),
                 )
                 for index, location in enumerate(blue_robot_locations)
             ]
         ),
-        tbots.Team(
+        tbots_cpp.Team(
             [
-                tbots.Robot(
+                tbots_cpp.Robot(
                     index,
                     location,
-                    tbots.Vector(0.0, 0.0),
-                    tbots.Angle.fromRadians(0),
-                    tbots.Angle(),
-                    tbots.Timestamp(),
+                    tbots_cpp.Vector(0.0, 0.0),
+                    tbots_cpp.Angle.fromRadians(0),
+                    tbots_cpp.Angle(),
+                    tbots_cpp.Timestamp(),
                 )
                 for index, location in enumerate(enemy_robot_positions)
             ]
@@ -90,8 +90,8 @@ def setup_pass_and_robots(
     )
 
     # construct a pass generator with a max receive speed set
-    pass_generator = tbots.EighteenZoneIdPassGenerator(
-        tbots.EighteenZonePitchDivision(tbots.Field.createSSLDivisionBField()),
+    pass_generator = tbots_cpp.EighteenZoneIdPassGenerator(
+        tbots_cpp.EighteenZonePitchDivision(tbots_cpp.Field.createSSLDivisionBField()),
         PassingConfig(max_receive_speed=py_constants.MAX_PASS_RECEIVE_SPEED),
     )
 
@@ -107,7 +107,7 @@ def setup_pass_and_robots(
     best_pass_eval = pass_evaluation.getBestPassOnField()
     best_pass = best_pass_eval.pass_value
 
-    kick_vec = tbots.Vector(
+    kick_vec = tbots_cpp.Vector(
         best_pass.receiverPoint().x() - best_pass.passerPoint().x(),
         best_pass.receiverPoint().y() - best_pass.passerPoint().y(),
     )
@@ -161,74 +161,74 @@ def setup_pass_and_robots(
     [
         # pass between 2 robots close to each other
         (
-            tbots.Point(-0.85, 0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(-1.0, 0.0),
-            [tbots.Point(1.0, 0.0)],
+            tbots_cpp.Point(-0.85, 0),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(-1.0, 0.0),
+            [tbots_cpp.Point(1.0, 0.0)],
             [0, math.pi],
             [],
         ),
         # pass between 2 robots on opposite ends of the field
         (
-            tbots.Point(-3.35, 0.0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(-3.5, 0.0),
-            [tbots.Point(3.5, 0.0)],
+            tbots_cpp.Point(-3.35, 0.0),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(-3.5, 0.0),
+            [tbots_cpp.Point(3.5, 0.0)],
             [0, math.pi],
             [],
         ),
         # TODO: Make Interception Better
         # pass between 2 robots above one another (on the y-axis)
         (
-            tbots.Point(0.0, 0.0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(0.0, -1.0),
-            [tbots.Point(3.5, 0.0)],
+            tbots_cpp.Point(0.0, 0.0),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(0.0, -1.0),
+            [tbots_cpp.Point(3.5, 0.0)],
             [0, math.pi],
             [],
         ),
         # pass between 2 robots on opposite ends of the field's diagonal
         (
-            tbots.Point(-3.35, 2.35),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(-3.5, 2.5),
-            [tbots.Point(3.5, -2.5)],
+            tbots_cpp.Point(-3.35, 2.35),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(-3.5, 2.5),
+            [tbots_cpp.Point(3.5, -2.5)],
             [0, math.pi],
             [],
         ),
         # straight pass with an enemy in between the 2 robots
         (
-            tbots.Point(-0.5, 0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(-1.0, 0.0),
-            [tbots.Point(1.5, 0.0)],
+            tbots_cpp.Point(-0.5, 0),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(-1.0, 0.0),
+            [tbots_cpp.Point(1.5, 0.0)],
             [0, math.pi],
-            [tbots.Point(0.5, 0.0)],
+            [tbots_cpp.Point(0.5, 0.0)],
         ),
         # pass with a sparse wall of enemy robots in between the 2 robots
         (
-            tbots.Point(-1.7, 0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(-2.0, 0.0),
-            [tbots.Point(2.5, 0.0)],
+            tbots_cpp.Point(-1.7, 0),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(-2.0, 0.0),
+            [tbots_cpp.Point(2.5, 0.0)],
             [0, math.pi],
             [
-                tbots.Point(0.5, 2.0),
-                tbots.Point(0.5, 1.0),
-                tbots.Point(0.5, 0.0),
-                tbots.Point(0.5, -1.0),
-                tbots.Point(0.5, -2.0),
+                tbots_cpp.Point(0.5, 2.0),
+                tbots_cpp.Point(0.5, 1.0),
+                tbots_cpp.Point(0.5, 0.0),
+                tbots_cpp.Point(0.5, -1.0),
+                tbots_cpp.Point(0.5, -2.0),
             ],
         ),
         # pass with a dense wall of enemy robots in between the 2 robots
         (
-            tbots.Point(-1.7, 0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(-2.0, 0.0),
-            [tbots.Point(2.5, 0.0)],
+            tbots_cpp.Point(-1.7, 0),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(-2.0, 0.0),
+            [tbots_cpp.Point(2.5, 0.0)],
             [0, math.pi],
             [
-                tbots.Point(0.5, float(y) / 10)
+                tbots_cpp.Point(0.5, float(y) / 10)
                 for y in range(int(-0.5 * 10), int(0.7 * 10), 2)
             ],
         ),
@@ -285,57 +285,57 @@ def test_passing_receive_speed(
     "receiver_robot_positions,friendly_orientations,enemy_robot_positions",
     [
         (
-            tbots.Point(1.7, -2),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(2.0, -2.0),
-            [tbots.Point(-2.5, 2.0)],
+            tbots_cpp.Point(1.7, -2),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(2.0, -2.0),
+            [tbots_cpp.Point(-2.5, 2.0)],
             [math.pi, 0],
             [],
         ),
         (
-            tbots.Point(0.3, 0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(0.5, 0),
-            [tbots.Point(-0.5, 0)],
+            tbots_cpp.Point(0.3, 0),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(0.5, 0),
+            [tbots_cpp.Point(-0.5, 0)],
             [math.pi, 0],
             [],
         ),
         (
-            tbots.Point(0.4, 0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(0.6, 0),
-            [tbots.Point(-0.6, 0)],
+            tbots_cpp.Point(0.4, 0),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(0.6, 0),
+            [tbots_cpp.Point(-0.6, 0)],
             [math.pi, 0],
             [],
         ),
         (
-            tbots.Point(0.8, 0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(1, 0),
+            tbots_cpp.Point(0.8, 0),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(1, 0),
             [
-                tbots.Point(-1, 0),
-                tbots.Point(1, 1),
-                tbots.Point(1, -1),
-                tbots.Point(2, 0),
+                tbots_cpp.Point(-1, 0),
+                tbots_cpp.Point(1, 1),
+                tbots_cpp.Point(1, -1),
+                tbots_cpp.Point(2, 0),
             ],
             [math.pi, 0],
             [],
         ),
         (
-            tbots.Point(0.8, 0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(1, 0),
-            [tbots.Point(-1, 0), tbots.Point(2.5, 2.5)],
+            tbots_cpp.Point(0.8, 0),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(1, 0),
+            [tbots_cpp.Point(-1, 0), tbots_cpp.Point(2.5, 2.5)],
             [math.pi, 0],
             [],
         ),
         (
-            tbots.Point(0.4, 0),
-            tbots.Vector(0.0, 0.0),
-            tbots.Point(0.5, 0),
-            [tbots.Point(-1, 0)],
+            tbots_cpp.Point(0.4, 0),
+            tbots_cpp.Vector(0.0, 0.0),
+            tbots_cpp.Point(0.5, 0),
+            [tbots_cpp.Point(-1, 0)],
             [math.pi, 0],
-            [tbots.Point(0.5, 0.5), tbots.Point(0.5, -0.5), tbots.Point(1, 0)],
+            [tbots_cpp.Point(0.5, 0.5), tbots_cpp.Point(0.5, -0.5), tbots_cpp.Point(1, 0)],
         ),
     ],
     ids=[
@@ -356,7 +356,7 @@ def test_passing_no_backwards_passes(
     enemy_robot_positions,
     simulated_test_runner,
 ):
-    field = tbots.Field.createSSLDivisionBField()
+    field = tbots_cpp.Field.createSSLDivisionBField()
     best_pass = setup_pass_and_robots(
         ball_initial_position=ball_initial_position,
         ball_initial_velocity=ball_initial_velocity,
@@ -372,7 +372,7 @@ def test_passing_no_backwards_passes(
     eventually_validation_sequence_set = [
         [
             BallEventuallyEntersRegion(
-                regions=[tbots.Circle(best_pass.receiverPoint(), 0.1)]
+                regions=[tbots_cpp.Circle(best_pass.receiverPoint(), 0.1)]
             )
         ]
     ]
@@ -385,9 +385,9 @@ def test_passing_no_backwards_passes(
                 initial_ball_position=ball_initial_position,
                 direction=True,
                 regions=[
-                    tbots.Rectangle(
-                        tbots.Point(-field.xLength() / 2, field.yLength() / 2),
-                        tbots.Point(0 - buffer_x, -field.yLength() / 2),
+                    tbots_cpp.Rectangle(
+                        tbots_cpp.Point(-field.xLength() / 2, field.yLength() / 2),
+                        tbots_cpp.Point(0 - buffer_x, -field.yLength() / 2),
                     )
                 ],
             )

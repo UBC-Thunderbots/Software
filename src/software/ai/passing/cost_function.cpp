@@ -42,26 +42,6 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 double ratePassBackwardsQuality(const Field& field, const Pass& pass,
                                 TbotsProto::PassingConfig& passing_config)
 {
-    // for testing on field, since we only have half a field
-    //    EighteenZonePitchDivision eighteen_zones(field);
-    //    if ((contains(eighteen_zones.getZone(EighteenZoneId::ZONE_7),
-    //    pass.passerPoint()) ||
-    //         contains(eighteen_zones.getZone(EighteenZoneId::ZONE_8),
-    //         pass.passerPoint()) ||
-    //         contains(eighteen_zones.getZone(EighteenZoneId::ZONE_9),
-    //         pass.passerPoint())) &&
-    //        (contains(eighteen_zones.getZone(EighteenZoneId::ZONE_1),
-    //        pass.receiverPoint()) ||
-    //         contains(eighteen_zones.getZone(EighteenZoneId::ZONE_2),
-    //         pass.receiverPoint()) ||
-    //         contains(eighteen_zones.getZone(EighteenZoneId::ZONE_3),
-    //         pass.receiverPoint()) ||
-    //         contains(eighteen_zones.getZone(EighteenZoneId::ZONE_4),
-    //         pass.receiverPoint()) ||
-    //         contains(eighteen_zones.getZone(EighteenZoneId::ZONE_5),
-    //         pass.receiverPoint()) ||
-    //         contains(eighteen_zones.getZone(EighteenZoneId::ZONE_6),
-    //         pass.receiverPoint())))
     if (field.pointInFriendlyHalf(pass.receiverPoint()) &&
         field.pointInEnemyHalf(pass.passerPoint()))
     {

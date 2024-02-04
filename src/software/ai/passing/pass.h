@@ -6,6 +6,7 @@
 
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
+#include "shared/constants.h"
 
 // The number of parameters (representing a pass) that we optimize
 // (receive_location_x, receive_location_y)
@@ -39,6 +40,30 @@ class Pass
     static Pass fromPassArray(
         Point passer_point, const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array,
         double pass_speed_m_per_s);
+
+    
+    /**
+     * Creates a pass from the given destination point and receive speed
+     *
+     * @param receiver_point The destination point of the pass
+     * @param receive_speed_m_per_s The speed at which the pass should be received
+     * @return The Pass constructed from the receiver point and speed
+     */
+    static Pass fromDestReceiveSpeed(
+        const Point& ball_position, const Point& pass_destination, double dest_speed_m_per_s,
+        double min_pass_speed_m_per_s, double max_pass_speed_m_per_s);
+
+    /**
+     * Determines the speed at which a pass should be executed
+     * Such that it reaches its destination at the given destination speed
+     * Takes into account friction
+     * @param ball_position the current ball position (starting point of the pass)
+     * @param pass_destination the destination of the pass
+     * @return the speed the pass should start with
+     */
+    static double getPassSpeed(
+        const Point& ball_position, const Point& pass_destination, double receive_speed_m_per_s,
+        double min_pass_speed_m_per_s, double max_pass_speed_m_per_s);
 
     /**
      * Converts a pass to an array

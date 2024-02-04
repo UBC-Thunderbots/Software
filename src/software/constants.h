@@ -39,8 +39,6 @@ static const double BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING =
     BALL_MAX_RADIUS_METERS -
     2 * BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
 
-static const double MIN_PERCENT_OF_KICK_SPEED_FOR_SUCCESS = 0.6;
-
 // Redis Keys
 const std::string ROBOT_ID_REDIS_KEY                = "/robot_id";
 const std::string ROBOT_MULTICAST_CHANNEL_REDIS_KEY = "/channel_id";

@@ -1,6 +1,6 @@
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 import sys
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
@@ -18,42 +18,23 @@ def test_passing(field_test_runner):
     receiver_robot_id = 6
     should_receive_pass = True
 
-    world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
-    tbots_world = tbots.World(world)
+    passer_point = tbots_cpp.Point(0, 0)
+    receiver_point = tbots_cpp.Point(1, 1)
+    receive_speed_m_per_s = 2
+    min_pass_speed_m_per_s = 1
+    max_pass_speed_m_per_s = 4
 
-    # construct a pass generator with a max receive speed set
-    pass_generator = tbots.EighteenZoneIdPassGenerator(
-        tbots.EighteenZonePitchDivision(tbots.Field.createSSLDivisionBField()),
-        PassingConfig(max_receive_speed=py_constants.MAX_PASS_RECEIVE_SPEED),
+    pass_to_test = Pass.fromDestReceiveSpeed(
+        passer_point,
+        receiver_point,
+        receive_speed_m_per_s,
+        min_pass_speed_m_per_s,
+        max_pass_speed_m_per_s
     )
 
-    # generate the best pass on the world 100 times
-    # this improves the passes generated over time
-    for index in range(0, 100):
-        pass_eval = pass_generator.generatePassEvaluation(tbots_world)
-        best_pass_eval = pass_eval.getBestPassOnField()
-        best_pass = best_pass_eval.pass_value
-
-    # after 100 times, get the best pass we have on the field
-    pass_evaluation = pass_generator.generatePassEvaluation(tbots_world)
-    best_pass_eval = pass_evaluation.getBestPassInZones(
-        {
-            tbots.EighteenZoneId.ZONE_1,
-            tbots.EighteenZoneId.ZONE_2,
-            tbots.EighteenZoneId.ZONE_3,
-            tbots.EighteenZoneId.ZONE_4,
-            tbots.EighteenZoneId.ZONE_5,
-            tbots.EighteenZoneId.ZONE_6,
-            tbots.EighteenZoneId.ZONE_7,
-            tbots.EighteenZoneId.ZONE_8,
-            tbots.EighteenZoneId.ZONE_9,
-        }
-    )
-    best_pass = best_pass_eval.pass_value
-
-    kick_vec = tbots.Vector(
-        best_pass.receiverPoint().x() - best_pass.passerPoint().x(),
-        best_pass.receiverPoint().y() - best_pass.passerPoint().y(),
+    kick_vec = tbots_cpp.Vector(
+        pass_to_test.receiverPoint().x() - pass_to_test.passerPoint().x(),
+        pass_to_test.receiverPoint().y() - pass_to_test.passerPoint().y(),
     )
 
     # Setup the passer's tactic
@@ -63,11 +44,11 @@ def test_passing(field_test_runner):
     params.assigned_tactics[passer_robot_id].kick.CopyFrom(
         KickTactic(
             kick_origin=Point(
-                x_meters=best_pass.passerPoint().x(),
-                y_meters=best_pass.passerPoint().y(),
+                x_meters=pass_to_test.passerPoint().x(),
+                y_meters=pass_to_test.passerPoint().y(),
             ),
             kick_direction=Angle(radians=kick_vec.orientation().toRadians()),
-            kick_speed_meters_per_second=best_pass.speed(),
+            kick_speed_meters_per_second=pass_to_test.speed(),
         )
     )
 
@@ -77,14 +58,14 @@ def test_passing(field_test_runner):
         receiver_args = {
             "pass": Pass(
                 passer_point=Point(
-                    x_meters=best_pass.passerPoint().x(),
-                    y_meters=best_pass.passerPoint().y(),
+                    x_meters=pass_to_test.passerPoint().x(),
+                    y_meters=pass_to_test.passerPoint().y(),
                 ),
                 receiver_point=Point(
-                    x_meters=best_pass.receiverPoint().x(),
-                    y_meters=best_pass.receiverPoint().y(),
+                    x_meters=pass_to_test.receiverPoint().x(),
+                    y_meters=pass_to_test.receiverPoint().y(),
                 ),
-                pass_speed_m_per_s=best_pass.speed(),
+                pass_speed_m_per_s=pass_to_test.speed(),
             ),
             "disable_one_touch_shot": True,
         }
@@ -93,8 +74,8 @@ def test_passing(field_test_runner):
             ReceiverTactic(**receiver_args)
         )
 
-    field = tbots.Field.createSSLDivisionBField()
-    eighteen_zones = tbots.EighteenZonePitchDivision(field)
+    field = tbots_cpp.Field.createSSLDivisionBField()
+    eighteen_zones = tbots_cpp.EighteenZonePitchDivision(field)
 
     # Validate that the ball is always received by the other robot
     # slower than the max receive speed
@@ -106,9 +87,9 @@ def test_passing(field_test_runner):
                 initial_ball_position=tbots_world.ball().position(),
                 direction=True,
                 regions=[
-                    eighteen_zones.getZone(tbots.EighteenZoneId.ZONE_7),
-                    eighteen_zones.getZone(tbots.EighteenZoneId.ZONE_8),
-                    eighteen_zones.getZone(tbots.EighteenZoneId.ZONE_9),
+                    eighteen_zones.getZone(tbots_cpp.EighteenZoneId.ZONE_7),
+                    eighteen_zones.getZone(tbots_cpp.EighteenZoneId.ZONE_8),
+                    eighteen_zones.getZone(tbots_cpp.EighteenZoneId.ZONE_9),
                 ],
             )
         ],
