@@ -35,9 +35,9 @@ cc_library(
     srcs = ["pass.cpp"],
     hdrs = ["pass.h"],
     deps = [
+        "//shared:constants",
         "//software/time:timestamp",
-        "//software/world:field",\
-        "//shared:constants"
+        "//software/world:field",
     ],
 )
 

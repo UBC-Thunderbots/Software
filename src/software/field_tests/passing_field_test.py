@@ -29,7 +29,7 @@ def test_passing(field_test_runner):
         receiver_point,
         receive_speed_m_per_s,
         min_pass_speed_m_per_s,
-        max_pass_speed_m_per_s
+        max_pass_speed_m_per_s,
     )
 
     kick_vec = tbots_cpp.Vector(

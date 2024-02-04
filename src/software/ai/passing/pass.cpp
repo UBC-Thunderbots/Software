@@ -45,21 +45,20 @@ Pass Pass::fromPassArray(Point passer_point,
     return Pass(passer_point, Point(array.at(0), array.at(1)), pass_speed_m_per_s);
 }
 
-Pass Pass::fromDestReceiveSpeed(const Point& passer_point,
-                                const Point& receiver_point,
+Pass Pass::fromDestReceiveSpeed(const Point& passer_point, const Point& receiver_point,
                                 double receive_speed_m_per_s,
                                 double min_pass_speed_m_per_s,
                                 double max_pass_speed_m_per_s)
 {
-    auto pass_speed_m_per_s = Pass::getPassSpeed(passer_point, receiver_point, receive_speed_m_per_s, min_pass_speed_m_per_s, max_pass_speed_m_per_s);
+    auto pass_speed_m_per_s =
+        Pass::getPassSpeed(passer_point, receiver_point, receive_speed_m_per_s,
+                           min_pass_speed_m_per_s, max_pass_speed_m_per_s);
 
     return Pass(passer_point, receiver_point, pass_speed_m_per_s);
 }
 
-double Pass::getPassSpeed(const Point& ball_position,
-                          const Point& pass_destination,
-                          double dest_speed_m_per_s,
-                          double min_pass_speed_m_per_s,
+double Pass::getPassSpeed(const Point& ball_position, const Point& pass_destination,
+                          double dest_speed_m_per_s, double min_pass_speed_m_per_s,
                           double max_pass_speed_m_per_s)
 {
     // We have
@@ -105,8 +104,8 @@ double Pass::getPassSpeed(const Point& ball_position,
         pass_speed_calc_constant;
     double pass_speed_m_per_s = sqrt(squared_pass_speed);
 
-    double clamped_pass_speed_m_per_s =
-        std::max(min_pass_speed_m_per_s, std::min(max_pass_speed_m_per_s, pass_speed_m_per_s));
+    double clamped_pass_speed_m_per_s = std::max(
+        min_pass_speed_m_per_s, std::min(max_pass_speed_m_per_s, pass_speed_m_per_s));
     return clamped_pass_speed_m_per_s;
 }
 
