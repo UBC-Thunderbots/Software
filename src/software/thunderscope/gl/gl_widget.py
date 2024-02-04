@@ -320,10 +320,19 @@ class GLWidget(QWidget):
         """
         self.gl_view_widget.reset()
         if camera_view == CameraView.ORTHOGRAPHIC:
+            field = DEFAULT_EMPTY_FIELD_WORLD.field
+            margin_size = 0.5
+            distance = np.tan(np.deg2rad(60))
+            viewport_width_to_height_ratio = self.gl_view_widget.width() / self.gl_view_widget.height()
+            # Constrained vertically
+            if viewport_width_to_height_ratio > field.field_x_length / field.field_y_length:
+                distance *= (field.field_y_length / 2 + margin_size) * viewport_width_to_height_ratio
+            # Constrained horizontally
+            else:
+                distance *= (field.field_x_length / 2 + margin_size)
             self.gl_view_widget.setCameraPosition(
-                pos=pg.Vector(0, 0, 0), distance=900, elevation=90, azimuth=-90
+                pos=pg.Vector(0, 0, 0), distance=distance, elevation=90, azimuth=-90
             )
-            self.gl_view_widget.setCameraParams(fov=1.0)
         elif camera_view == CameraView.LANDSCAPE_HIGH_ANGLE:
             self.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(0, -0.5, 0), distance=13, elevation=45, azimuth=-90
