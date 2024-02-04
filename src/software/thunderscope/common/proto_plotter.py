@@ -1,4 +1,4 @@
-import random
+from random import randint
 import time
 from collections import deque
 
@@ -82,6 +82,7 @@ class ProtoPlotter(QWidget):
         self.legend.setParentItem(self.win.graphicsItem())
         self.window_secs = window_secs
         self.configuration = configuration
+        self.pen_color = None
 
         self.buffers = {
             key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()
@@ -112,12 +113,16 @@ class ProtoPlotter(QWidget):
                     if name not in self.plots:
                         self.data_x[name] = deque([], self.buffer_size)
                         self.data_y[name] = deque([], self.buffer_size)
+                        if not self.pen_color:
+                            self.pen_color = [randint(100, 255) for _ in range(3)]
+                        else:
+                            new_pen_color = [randint(100, 255) for _ in range(3)]
+                            # Ensure that there is sufficient contrast between different plots
+                            while sum([(new_pen_color[i] - self.pen_color[i]) ** 2 for i in range(3)]) < 15000:
+                                new_pen_color = [randint(100, 255) for _ in range(3)]
+                            self.pen_color = new_pen_color
                         self.plots[name] = self.win.plot(
-                            pen=QtGui.QColor(
-                                random.randint(100, 255),
-                                random.randint(100, 255),
-                                random.randint(100, 255),
-                            ),
+                            pen=QtGui.QColor(*self.pen_color),
                             name=name,
                             disableAutoRange=True,
                             brush=None,
