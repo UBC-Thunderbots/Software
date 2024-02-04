@@ -30,7 +30,7 @@ class GLWidget(QWidget):
         self,
         proto_unix_io: ProtoUnixIO,
         friendly_color_yellow: bool,
-        player: ProtoPlayer = None
+        player: ProtoPlayer = None,
     ) -> None:
         """Initialize the GLWidget
 
@@ -149,8 +149,7 @@ class GLWidget(QWidget):
         self.layout.addWidget(self.gl_view_widget)
         # Setup gamecontroller toolbar
         self.gamecontroller_toolbar = GLGamecontrollerToolbar(
-            proto_unix_io,
-            friendly_color_yellow
+            proto_unix_io, friendly_color_yellow
         )
         self.layout.addWidget(self.gamecontroller_toolbar)
 

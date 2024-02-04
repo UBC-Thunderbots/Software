@@ -74,7 +74,7 @@ def setup_gl_widget(
     gl_widget = GLWidget(
         proto_unix_io=full_system_proto_unix_io,
         friendly_color_yellow=friendly_colour_yellow,
-        player=player
+        player=player,
     )
 
     # Create layers

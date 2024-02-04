@@ -19,6 +19,7 @@ from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
+
 class Gamecontroller(object):
     """ Gamecontroller Context Manager """
 
@@ -92,12 +93,11 @@ class Gamecontroller(object):
                 team=manual_command.manual_command.for_team,
                 final_ball_placement_point=tbots_cpp.Point(
                     manual_command.final_ball_placement_point.x,
-                    manual_command.final_ball_placement_point.y
-                ) 
+                    manual_command.final_ball_placement_point.y,
+                )
                 # HasField checks if the field was manually set by us
                 # as opposed to if a value exists (since a default value always exists)
-                if manual_command.HasField('final_ball_placement_point') 
-                else None,
+                if manual_command.HasField("final_ball_placement_point") else None,
             )
             manual_command = self.manual_gc_command_buffer.get(return_cached=False)
 
@@ -325,4 +325,3 @@ class Gamecontroller(object):
         ci_input.api_inputs.append(game_config_input)
 
         return self.send_ci_input(ci_input)
-

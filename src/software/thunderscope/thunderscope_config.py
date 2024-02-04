@@ -156,7 +156,7 @@ def configure_base_fullsystem(
                     "full_system_proto_unix_io": full_system_proto_unix_io,
                     "sim_proto_unix_io": sim_proto_unix_io,
                     "friendly_colour_yellow": friendly_colour_yellow,
-                    "visualization_buffer_size": visualization_buffer_size
+                    "visualization_buffer_size": visualization_buffer_size,
                 }
             ),
         ),

@@ -18,7 +18,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param friendly_color_yellow True if yellow is friendly team, False if not
         """
         super(GLGamecontrollerToolbar, self).__init__()
-        
+
         self.proto_unix_io = proto_unix_io
         self.friendly_color_yellow = friendly_color_yellow
 
@@ -42,10 +42,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         """
         Sends a STOP command to the gamecontroller
         """
-        self.__send_gc_command(
-            Command.Type.STOP,
-            SslTeam.UNKNOWN
-        )
+        self.__send_gc_command(Command.Type.STOP, SslTeam.UNKNOWN)
 
     def __send_force_start_command(self):
         """
@@ -53,10 +50,12 @@ class GLGamecontrollerToolbar(GLToolbar):
         """
         self.__send_gc_command(
             Command.Type.FORCE_START,
-            (SslTeam.YELLOW if self.friendly_color_yellow else SslTeam.BLUE)
+            (SslTeam.YELLOW if self.friendly_color_yellow else SslTeam.BLUE),
         )
 
-    def __send_gc_command(self, command: Command.Type, team: Team, ball_pos: Vector2 = None): 
+    def __send_gc_command(
+        self, command: Command.Type, team: Team, ball_pos: Vector2 = None
+    ):
         """
         Sends the given command to the gamecontroller for the given Team
         If ball_pos is defined, sets the ball position
@@ -65,18 +64,10 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param team the team the command should be sent for (BLUE, YELLOW, or UNKNOWN)
         :param ball_pos if defined, sets the position of the ball on field
         """
-        command = ManualGCCommand(
-            manual_command=Command(
-                type=command,
-                for_team=team
-            )
-        )
-        
+        command = ManualGCCommand(manual_command=Command(type=command, for_team=team))
+
         # only set it if defined
         if ball_pos:
             command.final_ball_placement_point = ball_pos
-        
-        self.proto_unix_io.send_proto(
-            ManualGCCommand, 
-            command
-        )
+
+        self.proto_unix_io.send_proto(ManualGCCommand, command)
