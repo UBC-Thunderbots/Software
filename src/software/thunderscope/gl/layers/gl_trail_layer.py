@@ -1,14 +1,16 @@
+
 from pyqtgraph.opengl import *
 
 import math
+import time
+from queue import Queue
 
-from proto.tbots_software_msgs_pb2 import PrimitiveSet
-from proto.visualization_pb2 import PathVisualization
+from proto.world_pb2 import World
+from proto.import_all_protos import *
 
 from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
-from software.thunderscope.gl.graphics.gl_robot_outline import GLRobotOutline
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
@@ -28,49 +30,45 @@ class GLTrailLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
-        self.path_visualization_buffer = ThreadSafeBuffer(
-            buffer_size, PathVisualization
+        self.world_buffer = ThreadSafeBuffer(
+            buffer_size, World
         )
-
-        self.destination_graphics = ObservableList(self._graphics_changed)
-        self.path_graphics = ObservableList(self._graphics_changed)
+        self.trail_graphics_head = ObservableList(self._graphics_changed)
+        TRAIL_DURATION_MILLI = 200
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
-        path_list = self.path_visualization_buffer.get(block=False).paths
-        primitive_set = self.primitive_set_buffer.get(
-            block=False
-        ).robot_primitives.values()
+        self.cached_world = self.world_buffer.get(block=False)
+        self.__update_trail_graphics(self.cached_world.friendly_team)
+        # self.__update_trail_graphics(self.cached_world.enemy_team)
 
-        paths = [path for path in path_list]
-        requested_destinations = [
-            (
-                primitive.move.xy_traj_params.destination,
-                primitive.move.w_traj_params.final_angle,
+
+    def __update_trail_graphics(self, team: Team) -> None:
+        self.trail_graphics_head.resize(
+            len(team.team_robots) * 1,
+            lambda: GLPolygon(
+                outline_color=Colors.DEFAULT_GRAPHICS_COLOR,
+            ),
             )
-            for primitive in primitive_set
-            if primitive.HasField("move")
-        ]
-
-        # Ensure we have the same number of graphics as protos
-        self.path_graphics.resize(
-            len(paths), lambda: GLPolygon(outline_color=Colors.NAVIGATOR_PATH_COLOR),
-        )
-        self.destination_graphics.resize(
-            len(requested_destinations),
-            lambda: GLRobotOutline(outline_color=Colors.DESIRED_ROBOT_LOCATION_OUTLINE),
-        )
-
-        # Visualize path and the desired destination
-        for path_graphic, path in zip(self.path_graphics, paths):
-            path_graphic.set_points(
-                [[point.x_meters, point.y_meters] for point in path.points]
-            )
-
-        for dest_graphic, (dest, final_angle) in zip(
-                self.destination_graphics, requested_destinations
+        robot_trails = [Queue(maxsize=300) for robot in team.team_robots]
+        # for trail in
+        for trail_graphics_head, robot in zip(
+                self.trail_graphics_head,
+                team.team_robots,
         ):
-            dest_graphic.set_position(dest.x_meters, dest.y_meters)
-            dest_graphic.set_orientation(math.degrees(final_angle.radians))
+            trail_graphics_head.set_points(
+                [
+                    [robot.current_state.global_position.x_meters,
+                    robot.current_state.global_position.y_meters,]
+                ]
+            )
+
+
+class RobotTrailHistory():
+    def __init__(self, robot, x_pos:float=0, y_pos: float=0):
+        self.robot = robot
+        self.x_point = x_pos
+        self.y_point = y_pos
+
+

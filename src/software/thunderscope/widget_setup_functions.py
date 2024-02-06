@@ -26,6 +26,7 @@ from software.thunderscope.gl.layers import (
     gl_trail_layer,
 )
 
+
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
 )
@@ -123,7 +124,7 @@ def setup_gl_widget(
         (ValidationProtoSet, validation_layer.validation_set_buffer),
         (SimulatorState, simulator_layer.simulator_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
-        (PathVisualization, trail_layer.path_visualization_buffer),
+        (World, trail_layer.world_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 
