@@ -321,7 +321,10 @@ class GLWidget(QWidget):
         self.gl_view_widget.reset()
         if camera_view == CameraView.ORTHOGRAPHIC:
             self.gl_view_widget.setCameraPosition(
-                pos=pg.Vector(0, 0, 0), distance=self.calc_orthographic_distance(), elevation=90, azimuth=-90
+                pos=pg.Vector(0, 0, 0),
+                distance=self.calc_orthographic_distance(),
+                elevation=90,
+                azimuth=-90,
             )
         elif camera_view == CameraView.LANDSCAPE_HIGH_ANGLE:
             self.gl_view_widget.setCameraPosition(
@@ -361,12 +364,17 @@ class GLWidget(QWidget):
         fov = 60  # Same as default fov of GLViewWidget
         distance = np.tan(np.deg2rad(90 - fov / 2))
 
-        viewport_w_to_h_ratio = self.gl_view_widget.width() / self.gl_view_widget.height()
+        viewport_w_to_h_ratio = (
+            self.gl_view_widget.width() / self.gl_view_widget.height()
+        )
         half_x_length_with_buffer = field.field_x_length / 2 + buffer_size
         half_y_length_with_buffer = field.field_y_length / 2 + buffer_size
 
         # Constrained vertically
-        if viewport_w_to_h_ratio > half_x_length_with_buffer / half_y_length_with_buffer:
+        if (
+            viewport_w_to_h_ratio
+            > half_x_length_with_buffer / half_y_length_with_buffer
+        ):
             distance *= half_y_length_with_buffer * viewport_w_to_h_ratio
         # Constrained horizontally
         else:
