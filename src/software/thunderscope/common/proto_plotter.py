@@ -82,7 +82,7 @@ class ProtoPlotter(QWidget):
         self.legend.setParentItem(self.win.graphicsItem())
         self.window_secs = window_secs
         self.configuration = configuration
-        self.pen_color = None
+        self.color_hue = randint(0, 360)
 
         self.buffers = {
             key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()
@@ -113,24 +113,11 @@ class ProtoPlotter(QWidget):
                     if name not in self.plots:
                         self.data_x[name] = deque([], self.buffer_size)
                         self.data_y[name] = deque([], self.buffer_size)
-                        if not self.pen_color:
-                            self.pen_color = [randint(100, 255) for _ in range(3)]
-                        else:
-                            new_pen_color = [randint(100, 255) for _ in range(3)]
-                            # Ensure that there is sufficient contrast between different plots
-                            while (
-                                sum(
-                                    [
-                                        (new_pen_color[i] - self.pen_color[i]) ** 2
-                                        for i in range(3)
-                                    ]
-                                )
-                                < 10000
-                            ):
-                                new_pen_color = [randint(100, 255) for _ in range(3)]
-                            self.pen_color = new_pen_color
+
+                        # Ensure hue has sufficient contrast
+                        self.color_hue = (self.color_hue + randint(50, 310)) % 360
                         self.plots[name] = self.win.plot(
-                            pen=QtGui.QColor(*self.pen_color),
+                            pen=QtGui.QColor.fromHsl(self.color_hue, randint(75, 100), randint(60, 90)),
                             name=name,
                             disableAutoRange=True,
                             brush=None,
