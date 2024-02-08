@@ -67,6 +67,8 @@ std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
         planner.findTrajectory(robot.position(), destination, robot.velocity(),
                                constraints, obstacles, world.field().fieldBoundary());
 
+    // TODO (NIMA): If there's a dangerous collision ahead, we should consider returning a STOP primitive
+
     if (!traj_path.has_value())
     {
         LOG(WARNING) << "Could not find trajectory path for robot " << robot.id()
