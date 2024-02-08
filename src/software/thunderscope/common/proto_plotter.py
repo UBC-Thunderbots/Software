@@ -115,10 +115,10 @@ class ProtoPlotter(QWidget):
                         self.data_y[name] = deque([], self.buffer_size)
 
                         # Ensure hue has sufficient contrast
-                        self.color_hue = (self.color_hue + randint(50, 310)) % 360
+                        self.color_hue = (self.color_hue + randint(100, 260)) % 360
                         self.plots[name] = self.win.plot(
                             pen=QtGui.QColor.fromHsl(
-                                self.color_hue, 255, 255 // 2
+                                self.color_hue, 255, 255 * 0.8
                             ),
                             name=name,
                             disableAutoRange=True,
