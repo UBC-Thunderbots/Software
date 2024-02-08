@@ -118,7 +118,7 @@ class ProtoPlotter(QWidget):
                         self.color_hue = (self.color_hue + randint(50, 310)) % 360
                         self.plots[name] = self.win.plot(
                             pen=QtGui.QColor.fromHsl(
-                                self.color_hue, randint(75, 100), randint(60, 90)
+                                self.color_hue, 255, 255 // 2
                             ),
                             name=name,
                             disableAutoRange=True,
