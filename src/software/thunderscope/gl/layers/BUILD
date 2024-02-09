@@ -62,6 +62,15 @@ py_library(
 )
 
 py_library(
+    name = "gl_sandbox_world_layer",
+    srcs = ["gl_sandbox_world_layer.py"],
+    deps = [
+        ":gl_world_layer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "gl_simulator_layer",
     srcs = ["gl_simulator_layer.py"],
     deps = [
