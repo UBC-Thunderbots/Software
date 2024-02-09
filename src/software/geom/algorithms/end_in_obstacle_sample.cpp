@@ -1,17 +1,16 @@
 #include "software/geom/algorithms/end_in_obstacle_sample.h"
 
-#include <random>
-
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/point.h"
 
 
-std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> obstacles,
+std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr>& obstacles,
                                          const Point &point,
                                          const Rectangle &navigable_area,
-                                         int initial_count, double rad_step,
-                                         int per_rad_step, double range)
+                                         double radius_step, int samples_per_radius_step,
+                                         double max_search_radius)
 {
+    // first, check if point is inside an obstacle
     bool point_in_obstacle = false;
     for (auto const &obstacle : obstacles)
     {
@@ -22,16 +21,19 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> obstacle
                 point_in_obstacle = true;
             }
 
+            // if point is inside obstacle, perform a second check to see if the closest point outside the first encroached obstacle is inside another obstacle
             Point closest_point            = obstacle->closestPoint(point);
             bool closest_point_in_obstacle = false;
+            // break out of loop if closest point outside first encroached obstacle is outside navigable area
+            if (!contains(navigable_area, closest_point))
+            {
+                closest_point_in_obstacle = true;
+                break;
+            }
             for (auto const &obstacle : obstacles)
             {
+                // break out of loop if closest point outside first encroached obstacle happens to be inside another obstacle
                 if (obstacle->contains(closest_point))
-                {
-                    closest_point_in_obstacle = true;
-                    break;
-                }
-                if (!contains(navigable_area, closest_point))
                 {
                     closest_point_in_obstacle = true;
                     break;
@@ -44,28 +46,30 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> obstacle
             }
             else
             {
+                // if the closest point outside the first encroached obstacle is not inside any other obstacle, then return it
                 return closest_point;
             }
         }
     }
 
+    // if provided point isn't inside an obstacle, just return point as is
     if (!point_in_obstacle)
     {
         return point;
     }
 
-    // sample if original point or closest point outside initial obstacle checked aren't
+    // perform sampling only if the provided point or the closest point outside the first encroached obstacle are not
     // valid
-    double rad        = 0.15;
-    int steps_per_rad = 6;
-    while (rad <= range)
+    double radius        = 0.15;
+    int samples_per_radius = 6;
+    while (radius <= max_search_radius)
     {
-        double increment = 360.0 / steps_per_rad;
-        for (int i = 0; i < steps_per_rad; i++)
+        double increment = 360.0 / samples_per_radius;
+        for (int i = 0; i < samples_per_radius; i++)
         {
             Angle angle        = Angle::fromDegrees(static_cast<float>(i) * increment);
             Vector direction   = Vector::createFromAngle(angle);
-            Point sample_point = point + direction * rad;
+            Point sample_point = point + direction * radius;
             bool sample_point_in_obstacle = false;
             for (auto const &obstacle : obstacles)
             {
@@ -81,8 +85,9 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> obstacle
                 return sample_point;
             }
         }
-        steps_per_rad += per_rad_step;
-        rad += rad_step;
+        // increase the number of samples per radius to prevent density of samples from dropping off
+        samples_per_radius += samples_per_radius_step;
+        radius += radius_step;
     }
     return std::nullopt;
 }
