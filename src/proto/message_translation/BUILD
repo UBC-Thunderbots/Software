@@ -45,6 +45,7 @@ cc_library(
         "//software/geom:circle",
         "//software/geom:point",
         "//software/geom:polygon",
+        "//software/geom:stadium",
         "//software/geom:vector",
     ],
 )

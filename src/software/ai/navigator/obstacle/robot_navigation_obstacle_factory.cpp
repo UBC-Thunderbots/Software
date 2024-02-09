@@ -142,20 +142,17 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             const double goal_obstacle_radius = ROBOT_MAX_RADIUS_METERS - 0.01;
 
             // Top goal post
-            obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(
-                Polygon::fromSegment(Segment(friendly_goal.posXPosYCorner(),
-                                             friendly_goal.negXPosYCorner()),
-                                     0, goal_obstacle_radius)));
+            obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(
+                Segment(friendly_goal.posXPosYCorner(), friendly_goal.negXPosYCorner()),
+                goal_obstacle_radius)));
             // Bottom goal post
-            obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(
-                Polygon::fromSegment(Segment(friendly_goal.posXNegYCorner(),
-                                             friendly_goal.negXNegYCorner()),
-                                     0, goal_obstacle_radius)));
+            obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(
+                Segment(friendly_goal.posXNegYCorner(), friendly_goal.negXNegYCorner()),
+                goal_obstacle_radius)));
             // Left goal wall
-            obstacles.push_back(std::make_shared<GeomObstacle<Polygon>>(
-                Polygon::fromSegment(Segment(friendly_goal.negXPosYCorner(),
-                                             friendly_goal.negXNegYCorner()),
-                                     goal_obstacle_radius)));
+            obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(
+                Segment(friendly_goal.negXPosYCorner(), friendly_goal.negXNegYCorner()),
+                goal_obstacle_radius)));
             break;
         }
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:;
@@ -303,6 +300,12 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromShape(
         rectangle.expand(robot_radius_expansion_amount));
 }
 
+ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Stadium &stadium) const
+{
+    return std::make_shared<GeomObstacle<Stadium>>(
+        Stadium(stadium.segment(), stadium.radius() + robot_radius_expansion_amount));
+}
+
 ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
     const Rectangle &field_rectangle, const Rectangle &field_lines,
     const Rectangle &field_boundary, double additional_expansion_amount) const
@@ -329,6 +332,5 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
 ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
     const Point &placement_point, const Point &ball_point) const
 {
-    return createFromShape(
-        Polygon::fromSegment(Segment(ball_point, placement_point), 0.5));
+    return createFromShape(Stadium(Segment(ball_point, placement_point), 0.5));
 }

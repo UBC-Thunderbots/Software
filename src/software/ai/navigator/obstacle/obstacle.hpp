@@ -99,6 +99,7 @@ class Obstacle
 TbotsProto::Obstacle createObstacleProto(const Polygon& polygon);
 TbotsProto::Obstacle createObstacleProto(const Rectangle& rectangle);
 TbotsProto::Obstacle createObstacleProto(const Circle& circle);
+TbotsProto::Obstacle createObstacleProto(const Stadium& stadium);
 
 /**
  * We use a pointer to Obstacle to support inheritance
