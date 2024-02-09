@@ -102,5 +102,3 @@ void ThreadedProtoUdpListener<ReceiveProtoT>::close()
     // `std::terminate` when we deallocate the thread object and kill our whole program
     io_service_thread.join();
 }
-
-#include "software/networking/threaded_proto_udp_listener.hpp"

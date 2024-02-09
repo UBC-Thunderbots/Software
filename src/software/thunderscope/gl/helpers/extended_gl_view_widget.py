@@ -3,26 +3,34 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
+from software.py_constants import ROBOT_MAX_HEIGHT_METERS
+from software.thunderscope.constants import MULTI_PLANE_POINTS
 
 import numpy as np
+from typing import List
 
 
 class MouseInSceneEvent:
     """Wraps QMouseEvent and includes additional data about the point in the 3D scene
     that was picked by the mouse cursor
+    as well as points in other planes that correspond to the mouse cursor
     """
 
     def __init__(
-        self, mouse_event: QtGui.QMouseEvent, point_in_scene: QtGui.QVector3D
-    ) -> None:
+        self,
+        mouse_event: QtGui.QMouseEvent,
+        point_in_scene: QtGui.QVector3D,
+        multi_plane_points: List[QtGui.QVector3D],
+    ):
         """Initialize the MouseInSceneEvent
-        
+
         :param mouse_event: The QMouseEvent to wrap
-        :param point_in_scene: The point in the 3D scene that was picked
-        
+        :param point_in_scene: The main point in the 3D scene that was picked
+        :param multi_plane_points: Points on multiple planes that correspond to the mouse event
         """
         self.mouse_event = mouse_event
         self.point_in_scene = point_in_scene
+        self.multi_plane_points = multi_plane_points
 
 
 class ExtendedGLViewWidget(GLViewWidget):
@@ -60,17 +68,23 @@ class ExtendedGLViewWidget(GLViewWidget):
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was pressed
-        
+
+        If Shift is pressed along with mouse click, calculate which point was picked in scene
+        Forward this point using the mouse pressed signal
+
+        If Shift is not pressed, let super method handle it
+
         :param event: The event
-        
         """
         if (
             event.buttons() == QtCore.Qt.MouseButton.LeftButton
-            and event.modifiers() == QtCore.Qt.KeyboardModifier.ShiftModifier
+            and event.modifiers() & QtCore.Qt.KeyboardModifier.ShiftModifier
         ):
             self.point_picked = True
             point_in_scene_event = MouseInSceneEvent(
-                event, self.get_point_in_scene(event.position())
+                event,
+                self.get_point_in_scene(event.position()),
+                self.get_multi_plane_points_in_scene(event.position()),
             )
             self.mouse_in_scene_pressed_signal.emit(point_in_scene_event)
         else:
@@ -86,7 +100,9 @@ class ExtendedGLViewWidget(GLViewWidget):
         if self.point_picked or self.detect_mouse_movement_in_scene:
 
             point_in_scene_event = MouseInSceneEvent(
-                event, self.get_point_in_scene(event.position())
+                event,
+                self.get_point_in_scene(event.position()),
+                self.get_multi_plane_points_in_scene(event.position()),
             )
 
             if self.detect_mouse_movement_in_scene:
@@ -109,18 +125,55 @@ class ExtendedGLViewWidget(GLViewWidget):
         if self.point_picked:
             self.point_picked = False
             point_in_scene_event = MouseInSceneEvent(
-                event, self.get_point_in_scene(event.position())
+                event,
+                self.get_point_in_scene(event.position()),
+                self.get_multi_plane_points_in_scene(event.position()),
             )
             self.mouse_in_scene_released_signal.emit(point_in_scene_event)
         else:
             # Only handle GLViewWidget orbit/pan if we're not picking a point in 3D
             super().mouseReleaseEvent(event)
 
-    def get_point_in_scene(self, mouse_pos: QtCore.QPoint) -> QtGui.QVector3D:
-        """Determine the coordinates of the point on the x-y plane in the 3D scene that 
+    def get_multi_plane_points_in_scene(
+        self, mouse_pos: QtCore.QPoint
+    ) -> List[QtGui.QVector3D]:
+        """
+        Determines the coordinates of the points on the x-y planes and a few planes above it
+        in the 3D scene that the mouse is pointing at
+        :param mouse_pos: the coordinates of the mouse relative to the ExtendedGLViewWidget
+        :return: a list of points in the 3D scene representing where the mouse is pointing to on multiple planes
+        """
+        # gets the points on the planes z = ROBOT_MAX_HEIGHT_METERS * (0/n-1, 1/n-1, 2/n-1, ..., n-1/n-1)
+        # for the n planes we want to consider from 0 to the height of the robot,
+        # This is because the robot's height means the mouse click ray may not always intersect with the z = 0 plane
+        # but we still want to detect the click
+        # Eg: for n = 3
+        # (imagine this is the front view of a robot)
+        #
+        #         mouse click ray (only intersects plane 3)
+        #        /
+        # ______/_____________  Plane 3
+        #     |/          |
+        # ____/___________|____ Plane 2
+        #    /|           |
+        # __/_|___________|____ Plane 1
+        return [
+            self.get_point_in_scene(
+                mouse_pos,
+                ROBOT_MAX_HEIGHT_METERS * (float(z_div) / (MULTI_PLANE_POINTS - 1)),
+            )
+            for z_div in range(0, MULTI_PLANE_POINTS)
+        ]
+
+    def get_point_in_scene(
+        self, mouse_pos: QtCore.QPoint, z_height: float = 0
+    ) -> QtGui.QVector3D:
+        """Determine the coordinates of the point on the x-y plane in the 3D scene that
         the mouse is pointing at.
 
         :param mouse_pos: the coordinates of the mouse relative to the ExtendedGLViewWidget
+        :param z_height: the z axis height of the plane that the mouse event should point to
+                            default is 0 (x-y plane)
         :returns: the point in the 3D scene that represents where the mouse is pointing to
 
         """
@@ -149,7 +202,7 @@ class ExtendedGLViewWidget(GLViewWidget):
         ray_origin = self.cameraPosition()
 
         # Point and normal vector of x-y plane
-        plane_point = QtGui.QVector3D(0, 0, 0)
+        plane_point = QtGui.QVector3D(0, 0, z_height)
         plane_normal = QtGui.QVector3D(0, 0, 1)
 
         # Find intersection of ray with plane

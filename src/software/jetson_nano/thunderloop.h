@@ -92,6 +92,11 @@ class Thunderloop
      */
     double getNanoseconds(timespec time);
 
+    /**
+     * Updates ErrorCodes for BAT, CAP, CPU TEMP if over thresholds
+     */
+    void updateErrorCodes();
+
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
@@ -106,6 +111,7 @@ class Thunderloop
     std::optional<TbotsProto::MotorStatus> motor_status_;
     TbotsProto::ThunderloopStatus thunderloop_status_;
     TbotsProto::ChipperKickerStatus chipper_kicker_status_;
+    TbotsProto::PrimitiveExecutorStatus primitive_executor_status_;
     TbotsProto::Timestamp time_sent_;
 
     // Current State
@@ -126,9 +132,6 @@ class Thunderloop
 
     // 500 millisecond timeout on receiving primitives before we stop the robots
     const double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
-
-    // 500 millisecond timeout on receiving world before we stop the robots
-    const double WORLD_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
 
     // Path to the CPU thermal zone temperature file
     const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone1/temp";

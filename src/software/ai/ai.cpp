@@ -12,7 +12,6 @@ Ai::Ai(const TbotsProto::AiConfig& ai_config)
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config)),
-      field_to_path_planner_factory(),
       ai_config_changed(false)
 {
     auto current_override = ai_config_.ai_control_config().override_ai_play();
@@ -46,6 +45,10 @@ void Ai::checkAiConfig()
 {
     if (ai_config_changed)
     {
+        ai_config_changed = false;
+
+        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_});
+
         auto current_override = ai_config_.ai_control_config().override_ai_play();
         if (current_override != TbotsProto::PlayName::UseAiSelection)
         {
@@ -66,39 +69,20 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 {
     checkAiConfig();
 
-    if (ai_config_changed)
-    {
-        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_});
-    }
-
     fsm->process_event(PlaySelectionFSM::Update(
         [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
         world.gameState(), ai_config_));
 
-    // We construct the global path planner once for the field. If the AI Config
-    // changes, there might be an update we need to reconstruct the path planner
-    // for and propagate the parameter change.
-    if (!field_to_path_planner_factory.contains(world.field()) || ai_config_changed)
-    {
-        field_to_path_planner_factory.insert_or_assign(
-            world.field(),
-            GlobalPathPlannerFactory(ai_config_.robot_navigation_obstacle_config(),
-                                     world.field()));
-        ai_config_changed = false;
-    }
-
     if (static_cast<bool>(override_play))
     {
-        return override_play->get(field_to_path_planner_factory.at(world.field()), world,
-                                  inter_play_communication,
+        return override_play->get(world, inter_play_communication,
                                   [this](InterPlayCommunication comm) {
                                       inter_play_communication = std::move(comm);
                                   });
     }
     else
     {
-        return current_play->get(field_to_path_planner_factory.at(world.field()), world,
-                                 inter_play_communication,
+        return current_play->get(world, inter_play_communication,
                                  [this](InterPlayCommunication comm) {
                                      inter_play_communication = std::move(comm);
                                  });

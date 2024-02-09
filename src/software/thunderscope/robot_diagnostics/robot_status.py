@@ -2,6 +2,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
 from proto.import_all_protos import *
 from software.thunderscope.common import proto_parameter_tree_util
+from google.protobuf.message import Message
 
 
 class RobotStatusView(QWidget):
@@ -12,7 +13,7 @@ class RobotStatusView(QWidget):
     tree format
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initializes the robot status widget
         Builds the parameter tree with a default primitive
@@ -42,7 +43,7 @@ class RobotStatusView(QWidget):
 
         self.toggle_visibility()
 
-    def update(self, new_message, *path):
+    def update(self, new_message: Message, *path: str) -> None:
         """
         Updates the tree with new values from a new message if the tree is visible
         :param new_message: the new message to get values from
@@ -65,7 +66,7 @@ class RobotStatusView(QWidget):
                         proto_parameter_tree_util.get_string_val(descriptor, value)
                     )
 
-    def toggle_visibility(self):
+    def toggle_visibility(self) -> None:
         """
         Toggles the visibility of this widget
         """

@@ -110,6 +110,9 @@ int main(int argc, char **argv)
         auto yellow_ssl_wrapper_output =
             ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(runtime_dir +
                                                                  YELLOW_SSL_WRAPPER_PATH);
+        auto common_ssl_wrapper_output =
+            ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(runtime_dir +
+                                                                 SSL_WRAPPER_PATH);
 
         // Robot Status Outputs
         auto blue_robot_status_output = ThreadedProtoUnixSender<TbotsProto::RobotStatus>(
@@ -192,6 +195,7 @@ int main(int argc, char **argv)
                 {
                     blue_ssl_wrapper_output.sendProto(packet);
                     yellow_ssl_wrapper_output.sendProto(packet);
+                    common_ssl_wrapper_output.sendProto(packet);
                 }
 
                 for (const auto packet : er_force_sim->getBlueRobotStatuses())

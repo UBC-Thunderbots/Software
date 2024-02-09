@@ -1,0 +1,27 @@
+ field: <
+  field_length: 9000
+  field_width: 6000
+  goal_width: 1000
+  goal_depth: 300
+  boundary_width: 300
+  penalty_area_depth: 1000
+  penalty_area_width: 2000
+  center_circle_radius: 500
+  line_thickness: 10
+  goal_center_to_penalty_mark: 6000
+  goal_height: 160
+  ball_radius: 21.5
+  max_robot_radius: 90
+>
+models: <
+    straight_two_phase: <
+        acc_slide: -3
+        acc_roll: -0.26
+        k_switch: 0.64
+    > 
+    chip_fixed_loss: <
+        damping_xy_first_hop: 0.75
+        damping_xy_other_hops: 0.95
+        damping_z: 0.5
+    >
+> 

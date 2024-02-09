@@ -140,16 +140,4 @@ namespace TestUtil
         return game_state;
     }
 
-    TbotsProto::MotionControl createMotionControl(const Point &destination)
-    {
-        TbotsProto::MotionControl motion_control;
-        TbotsProto::Path path_proto;
-        *(path_proto.add_points())       = *createPointProto(destination);
-        *(path_proto.add_points())       = *createPointProto(destination);
-        *(motion_control.mutable_path()) = path_proto;
-        *(motion_control.mutable_requested_destination()) =
-            *createPointProto(destination);
-        return motion_control;
-    }
-
 };  // namespace TestUtil

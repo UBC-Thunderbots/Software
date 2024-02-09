@@ -1,10 +1,8 @@
 from pyqtgraph.opengl import *
 
-import numpy as np
+from proto.visualization_pb2 import ObstacleList
 
-from proto.tbots_software_msgs_pb2 import PrimitiveSet
-
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
@@ -16,7 +14,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 class GLObstacleLayer(GLLayer):
     """GLLayer that visualizes obstacles"""
 
-    def __init__(self, name: str, buffer_size: int = 5) -> None:
+    def __init__(self, name: str, buffer_size: int = 1) -> None:
         """Initialize the GLObstacleLayer
 
         :param name: The displayed name of the layer
@@ -25,35 +23,24 @@ class GLObstacleLayer(GLLayer):
 
         """
         super().__init__(name)
+        self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
+        self.obstacles_list_buffer = ThreadSafeBuffer(buffer_size, ObstacleList)
 
         self.poly_obstacle_graphics = ObservableList(self._graphics_changed)
         self.circle_obstacle_graphics = ObservableList(self._graphics_changed)
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
+        obstacles = self.obstacles_list_buffer.get(block=False).obstacles
 
-        primitive_set = self.primitive_set_buffer.get(
-            block=False
-        ).robot_primitives.values()
-
-        obstacles = [
-            obstacle
-            for primitive in primitive_set
-            if primitive.HasField("move")
-            for obstacle in primitive.move.motion_control.static_obstacles
-        ]
-        poly_obstacles = [
-            poly_obstacle
-            for obstacle in obstacles
-            for poly_obstacle in obstacle.polygon
-        ]
-        circle_obstacles = [
-            circle_obstacle
-            for obstacle in obstacles
-            for circle_obstacle in obstacle.circle
-        ]
+        poly_obstacles = []
+        circle_obstacles = []
+        for obstacle in obstacles:
+            if obstacle.HasField("polygon"):
+                poly_obstacles.append(obstacle.polygon)
+            else:
+                circle_obstacles.append(obstacle.circle)
 
         # Ensure we have the same number of graphics as obstacles
         self.poly_obstacle_graphics.resize(
