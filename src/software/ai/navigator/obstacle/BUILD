@@ -26,9 +26,9 @@ cc_library(
 )
 
 cc_library(
-    name = "dynamic_obstacle",
+    name = "trajectory_obstacle",
     hdrs = [
-        "dynamic_obstacle.hpp",
+        "trajectory_obstacle.hpp",
     ],
     deps = [
         ":geom_obstacle",
@@ -43,7 +43,7 @@ cc_library(
     srcs = ["robot_navigation_obstacle_factory.cpp"],
     hdrs = ["robot_navigation_obstacle_factory.h"],
     deps = [
-        ":dynamic_obstacle",
+        ":trajectory_obstacle",
         "//proto:tbots_cc_proto",
         "//software/geom:point",
         "//software/logger",

@@ -7,18 +7,18 @@
 #include "software/geom/algorithms/intersects.h"
 
 template <typename GEOM_TYPE>
-class DynamicObstacle : public GeomObstacle<GEOM_TYPE>
+class TrajectoryObstacle : public GeomObstacle<GEOM_TYPE>
 {
    public:
-    DynamicObstacle() = delete;
+    TrajectoryObstacle() = delete;
 
     /**
-     * Construct a DynamicObstacle with GEOM_TYPE
+     * Construct a TrajectoryObstacle with GEOM_TYPE
      *
      * @param geom GEOM_TYPE to make obstacle with
      * @param traj Trajectory which the obstacle is following
      */
-    explicit DynamicObstacle(const GEOM_TYPE& geom, TrajectoryPath traj);
+    explicit TrajectoryObstacle(const GEOM_TYPE& geom, TrajectoryPath traj);
 
     bool contains(const Point& p, const double t_sec = 0) const override;
     double distance(const Point& p, const double t_sec = 0) const override;
@@ -30,12 +30,12 @@ class DynamicObstacle : public GeomObstacle<GEOM_TYPE>
 
 
 template <typename GEOM_TYPE>
-DynamicObstacle<GEOM_TYPE>::DynamicObstacle(const GEOM_TYPE& geom, TrajectoryPath traj) : GeomObstacle<GEOM_TYPE>(geom), traj_(std::move(traj))
+TrajectoryObstacle<GEOM_TYPE>::TrajectoryObstacle(const GEOM_TYPE& geom, TrajectoryPath traj) : GeomObstacle<GEOM_TYPE>(geom), traj_(std::move(traj))
 {
 }
 
 template <typename GEOM_TYPE>
-bool DynamicObstacle<GEOM_TYPE>::contains(const Point& p, const double t_sec) const
+bool TrajectoryObstacle<GEOM_TYPE>::contains(const Point& p, const double t_sec) const
 {
     if (t_sec == 0)
     {
@@ -51,7 +51,7 @@ bool DynamicObstacle<GEOM_TYPE>::contains(const Point& p, const double t_sec) co
 }
 
 template <typename GEOM_TYPE>
-double DynamicObstacle<GEOM_TYPE>::distance(const Point& p, const double t_sec) const
+double TrajectoryObstacle<GEOM_TYPE>::distance(const Point& p, const double t_sec) const
 {
     if (t_sec == 0)
     {
@@ -67,7 +67,7 @@ double DynamicObstacle<GEOM_TYPE>::distance(const Point& p, const double t_sec) 
 }
 
 template <typename GEOM_TYPE>
-bool DynamicObstacle<GEOM_TYPE>::intersects(const Segment& segment, const double t_sec) const
+bool TrajectoryObstacle<GEOM_TYPE>::intersects(const Segment& segment, const double t_sec) const
 {
     if (t_sec == 0)
     {

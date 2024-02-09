@@ -143,6 +143,7 @@ void MovePrimitive::generateObstacles(
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {
+        // TODO: Add a time horizon to the stadium obstacles based on how long it takes us to stop?! 
         // TODO(NIMA) Enemy robots and almost all friendly obstacles are constant for everyone!
         obstacles.push_back(obstacle_factory.createFromRobotPosition(enemy.position())); // TODO (NIMA): Add constant velocity obstacle?! Or should this be pill shaped
     }
