@@ -88,7 +88,7 @@ TEST(GoalieFSMTest, test_transitions)
     Angle clear_ball_direction = Angle::zero();
 
     TbotsProto::AiConfig ai_config;
-    FSM<GoalieFSM> fsm(DribbleFSM(ai_config.dribble_tactic_config()),
+    FSM<GoalieFSM> fsm(DribbleSkillFSM(ai_config.dribble_skill_config()),
                        GoalieFSM(ai_config.goalie_tactic_config(),
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
@@ -126,10 +126,10 @@ TEST(GoalieFSMTest, test_transitions)
                                         Timestamp::fromSeconds(123));
     world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(123));
 
-    // goalie should transition to DribbleFSM
+    // goalie should transition to DribbleSkillFSM
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickSkillFSM>));
 
     // goalie has ball, at the correct position and orientation to clear the ball
     world = ::TestUtil::setBallPosition(world, clear_ball_origin,
@@ -138,10 +138,10 @@ TEST(GoalieFSMTest, test_transitions)
                                   AngularVelocity::zero()),
                        Timestamp::fromSeconds(123));
 
-    // goalie should stay in PivotKickFSM but be ready to chip
+    // goalie should stay in PivotKickSkillFSM but be ready to chip
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickSkillFSM>));
 
     goalie = ::TestUtil::createRobotAtPos(clear_ball_origin + Vector(-0.2, 0));
     world  = ::TestUtil::setBallPosition(world, clear_ball_origin,
@@ -166,10 +166,10 @@ TEST(GoalieFSMTest, test_transitions)
     world =
         ::TestUtil::setBallVelocity(world, Vector(0, -0.1), Timestamp::fromSeconds(124));
 
-    // goalie should transition to PivotKickFSM
+    // goalie should transition to PivotKickSkillFSM
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickSkillFSM>));
 
     // ball is now moving quickly towards the friendly goal
     world =

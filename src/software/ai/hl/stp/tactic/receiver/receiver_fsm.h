@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+#include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -116,7 +116,7 @@ struct ReceiverFSM
     /**
      * Guard that checks if the ball has been kicked
      *
-     * @param event PivotKickFSM::Update event
+     * @param event ReceiverFSM::Update event
      *
      * @return if the ball has been kicked
      */

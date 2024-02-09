@@ -2,7 +2,8 @@
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
+#include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
@@ -14,17 +15,17 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class DribbleTacticPushEnemyTest : public SimulatedErForceSimPlayTestFixture,
-                                   public ::testing::WithParamInterface<Point>
+class DribbleSkillPushEnemyTest : public SimulatedErForceSimPlayTestFixture,
+                                  public ::testing::WithParamInterface<Point>
 {
    protected:
-    void checkPossession(std::shared_ptr<DribbleTactic> tactic,
-                         std::shared_ptr<World> world_ptr,
-                         ValidationCoroutine::push_type& yield)
+    void checkPossession(
+        std::shared_ptr<TypedAssignedSkillTactic<DribbleSkillFSM>> tactic,
+        std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
     {
         while (!tactic->done())
         {
-            yield("Tactic not done");
+            yield("Skill not done");
         }
         robotReceivedBall(world_ptr, yield);
         auto received_ball_time = world_ptr->getMostRecentTimestamp();
@@ -48,11 +49,12 @@ class DribbleTacticPushEnemyTest : public SimulatedErForceSimPlayTestFixture,
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
 
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<Strategy> strategy =
+        std::make_shared<Strategy>(TbotsProto::AiConfig());
 };
 
 // TODO (#2573): re-enable once fixed
-TEST_P(DribbleTacticPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
+TEST_P(DribbleSkillPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
 {
     Point initial_position = GetParam();
     BallState ball_state(Point(1 + DIST_TO_FRONT_OF_ROBOT_METERS, 2.5), Vector());
@@ -61,8 +63,10 @@ TEST_P(DribbleTacticPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, -2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
-    tactic->updateControlParams(dribble_destination, dribble_orientation);
+    auto tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
+        [&]() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
+    tactic->updateControlParams({dribble_destination, dribble_orientation, false});
     setTactic(1, tactic, {TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -78,7 +82,7 @@ TEST_P(DribbleTacticPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
             Duration::fromSeconds(10));
 }
 
-INSTANTIATE_TEST_CASE_P(CreaseDefenderEnvironment, DribbleTacticPushEnemyTest,
+INSTANTIATE_TEST_CASE_P(CreaseDefenderEnvironment, DribbleSkillPushEnemyTest,
                         ::testing::Values(
                             // Steal ball from behind
                             Point(-2, 2.5),

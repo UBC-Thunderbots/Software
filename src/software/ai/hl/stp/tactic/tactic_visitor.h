@@ -8,7 +8,6 @@
 class ChipTactic;
 class CreaseDefenderTactic;
 class DefenseShadowEnemyTactic;
-class DribbleTactic;
 class GetBehindBallTactic;
 class GoalieTactic;
 class GoalieTestTactic;
@@ -20,13 +19,13 @@ class AttackerTactic;
 class PassDefenderTactic;
 class PenaltyKickTactic;
 class PenaltySetupTactic;
-class PivotKickTactic;
 class ReceiverTactic;
 class ShadowEnemyTactic;
 class StopTactic;
 class StopTestTactic;
 class MoveGoalieToGoalLineTactic;
 class PrepareKickoffMoveTactic;
+class AssignedSkillTactic;
 
 /**
  * Refer to the docs about why we use the Visitor Design Pattern
@@ -46,7 +45,6 @@ class TacticVisitor
     virtual void visit(const ChipTactic &tactic)                 = 0;
     virtual void visit(const CreaseDefenderTactic &tactic)       = 0;
     virtual void visit(const DefenseShadowEnemyTactic &tactic)   = 0;
-    virtual void visit(const DribbleTactic &tactic)              = 0;
     virtual void visit(const GetBehindBallTactic &tactic)        = 0;
     virtual void visit(const GoalieTactic &tactic)               = 0;
     virtual void visit(const GoalieTestTactic &tactic)           = 0;
@@ -58,11 +56,11 @@ class TacticVisitor
     virtual void visit(const PassDefenderTactic &tactic)         = 0;
     virtual void visit(const PenaltyKickTactic &tactic)          = 0;
     virtual void visit(const PenaltySetupTactic &tactic)         = 0;
-    virtual void visit(const PivotKickTactic &tactic)            = 0;
     virtual void visit(const ReceiverTactic &tactic)             = 0;
     virtual void visit(const ShadowEnemyTactic &tactic)          = 0;
     virtual void visit(const StopTactic &tactic)                 = 0;
     virtual void visit(const StopTestTactic &tactic)             = 0;
     virtual void visit(const MoveGoalieToGoalLineTactic &tactic) = 0;
     virtual void visit(const PrepareKickoffMoveTactic &tactic)   = 0;
+    virtual void visit(const AssignedSkillTactic &tactic)        = 0;
 };

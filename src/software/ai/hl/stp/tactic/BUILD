@@ -15,17 +15,16 @@ cc_library(
     hdrs = ["all_tactics.h"],
     deps = [
         ":tactic",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
-        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
@@ -82,16 +81,6 @@ cc_test(
         ":tactic",
         "//shared/test_util:tbots_gtest_main",
         "//software/world",
-    ],
-)
-
-cc_test(
-    name = "fsm_state_test",
-    srcs = ["fsm_state_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/test_util",
     ],
 )
 

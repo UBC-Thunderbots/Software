@@ -1,7 +1,8 @@
 #include "software/ai/hl/stp/play/ball_placement_play.h"
 
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
+#include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
@@ -15,7 +16,9 @@ BallPlacementPlay::BallPlacementPlay(const TbotsProto::AiConfig &config,
 void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
-    auto place_ball_tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto place_ball_tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
+        []() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
@@ -41,8 +44,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        place_ball_tactic->updateControlParams(world.gameState().getBallPlacementPoint(),
-                                               std::nullopt, true);
+        place_ball_tactic->updateControlParams(
+            {world.gameState().getBallPlacementPoint(), std::nullopt, true});
         TacticVector result = {place_ball_tactic};
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());
         yield({result});

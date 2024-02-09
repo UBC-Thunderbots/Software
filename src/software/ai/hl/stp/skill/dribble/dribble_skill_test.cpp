@@ -1,9 +1,9 @@
-#include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
-
 #include <gtest/gtest.h>
 
 #include <utility>
 
+#include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
@@ -15,16 +15,16 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class DribbleTacticTest : public SimulatedErForceSimPlayTestFixture
+class DribbleSkillTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    void checkPossession(std::shared_ptr<DribbleTactic> tactic,
-                         std::shared_ptr<World> world_ptr,
-                         ValidationCoroutine::push_type& yield)
+    void checkPossession(
+        std::shared_ptr<TypedAssignedSkillTactic<DribbleSkillFSM>> tactic,
+        std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
     {
         while (!tactic->done())
         {
-            yield("Tactic not done");
+            yield("Skill not done");
         }
         robotReceivedBall(world_ptr, yield);
         auto received_ball_time = world_ptr->getMostRecentTimestamp();
@@ -47,19 +47,22 @@ class DribbleTacticTest : public SimulatedErForceSimPlayTestFixture
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<Strategy> strategy =
+        std::make_shared<Strategy>(TbotsProto::AiConfig());
     std::set<TbotsProto::MotionConstraint> motion_constraints = {
         TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA};
 };
 
-TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)
+TEST_F(DribbleSkillTest, test_intercept_ball_behind_enemy_robot)
 {
     Point initial_position = Point(-3, 1.5);
     BallState ball_state(Point(3, -2), Vector(-0.5, 1));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
+        [&]() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -75,14 +78,16 @@ TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)
             Duration::fromSeconds(10));
 }
 
-TEST_F(DribbleTacticTest, test_stopped_ball)
+TEST_F(DribbleSkillTest, test_stopped_ball)
 {
     Point initial_position = Point(-3, 1.5);
     BallState ball_state(Point(-1, 1.5), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
+        [&]() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -98,14 +103,16 @@ TEST_F(DribbleTacticTest, test_stopped_ball)
             Duration::fromSeconds(10));
 }
 
-TEST_F(DribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
+TEST_F(DribbleSkillTest, test_ball_bounce_off_of_enemy_robot)
 {
     Point initial_position = Point(-3, 1.5);
     BallState ball_state(Point(0, 0), Vector(2.5, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
+    auto tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
+        [&]() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -121,7 +128,7 @@ TEST_F(DribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
             Duration::fromSeconds(10));
 }
 
-TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest)
+TEST_F(DribbleSkillTest, test_moving_ball_dribble_dest)
 {
     Point initial_position    = Point(-3, 1.5);
     Point dribble_destination = Point(-3, 1);
@@ -129,8 +136,10 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
-    tactic->updateControlParams(dribble_destination, std::nullopt);
+    auto tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
+        [&]() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
+    tactic->updateControlParams({dribble_destination, std::nullopt, false});
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -152,7 +161,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest)
             Duration::fromSeconds(15));
 }
 
-TEST_F(DribbleTacticTest, test_moving_ball_dribble_orientation)
+TEST_F(DribbleSkillTest, test_moving_ball_dribble_orientation)
 {
     Point initial_position    = Point(-3, 1.5);
     Angle dribble_orientation = Angle::quarter();
@@ -160,8 +169,10 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_orientation)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
-    tactic->updateControlParams(std::nullopt, dribble_orientation);
+    auto tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
+        [&]() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
+    tactic->updateControlParams({std::nullopt, dribble_orientation, false});
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -180,7 +191,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_orientation)
             Duration::fromSeconds(10));
 }
 
-TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
+TEST_F(DribbleSkillTest, test_moving_ball_dribble_dest_and_orientation)
 {
     Point initial_position    = Point(-2, 1.5);
     Point dribble_destination = Point(-1, 2);
@@ -189,8 +200,10 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
-    tactic->updateControlParams(dribble_destination, dribble_orientation);
+    auto tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
+        [&]() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
+    tactic->updateControlParams({dribble_destination, dribble_orientation, false});
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -214,7 +227,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
             Duration::fromSeconds(22));
 }
 
-TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
+TEST_F(DribbleSkillTest, test_dribble_dest_and_orientation_around_rectangle)
 {
     Point initial_position    = Point(3, -3);
     Point dribble_destination = Point(4, 2.5);
@@ -222,8 +235,11 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
     BallState ball_state(Point(4, -2.5), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
-    tactic->updateControlParams(dribble_destination, dribble_orientation);
+
+    auto tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
+        [&]() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
+    tactic->updateControlParams({dribble_destination, dribble_orientation, false});
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -247,7 +263,7 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
             Duration::fromSeconds(25));
 }
 
-TEST_F(DribbleTacticTest,
+TEST_F(DribbleSkillTest,
        test_dribble_dest_and_orientation_around_rectangle_with_excessive_dribbling)
 {
     Point dribble_destination = Point(3, 2);
@@ -256,8 +272,11 @@ TEST_F(DribbleTacticTest,
     BallState ball_state(Point(4.2, -2.5), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
-    tactic->updateControlParams(dribble_destination, dribble_orientation, true);
+
+    auto tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
+        [&]() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
+    tactic->updateControlParams({dribble_destination, dribble_orientation, true});
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -277,7 +296,7 @@ TEST_F(DribbleTacticTest,
             Duration::fromSeconds(12));
 }
 
-TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
+TEST_F(DribbleSkillTest, test_running_into_enemy_robot_knocking_ball_away)
 {
     Point initial_position    = Point(-2, 1.5);
     Point dribble_destination = Point(-1, 2);
@@ -290,8 +309,10 @@ TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
         .robot_state = RobotState(Point(1, 1.1), Vector(), Angle::fromDegrees(-30),
                                   AngularVelocity::zero())});
 
-    auto tactic = std::make_shared<DribbleTactic>(ai_config);
-    tactic->updateControlParams(dribble_destination, dribble_orientation);
+    auto tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
+        [&]() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
+    tactic->updateControlParams({dribble_destination, dribble_orientation, false});
     // Don't avoid enemy robots to knock ball away
     setTactic(1, tactic, {});
 

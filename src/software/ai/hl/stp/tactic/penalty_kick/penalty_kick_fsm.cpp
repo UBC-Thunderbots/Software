@@ -127,7 +127,7 @@ void PenaltyKickFSM::shoot(const Update &event,
 }
 
 void PenaltyKickFSM::updateApproachKeeper(
-    const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+    const Update &event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
     Field field                       = event.common.world.field();
     std::optional<Robot> enemy_goalie = event.common.world.enemyTeam().goalie();
@@ -137,26 +137,30 @@ void PenaltyKickFSM::updateApproachKeeper(
         (next_shot_position - event.common.world.ball().position()).orientation();
     Point position = field.enemyGoalCenter() + Vector(-field.defenseAreaXLength(), 0);
 
-    DribbleFSM::ControlParams control_params{
+    DribbleSkillFSM::ControlParams control_params{
         .dribble_destination       = std::optional<Point>(position),
         .final_dribble_orientation = std::optional<Angle>(Angle::zero()),
         .allow_excessive_dribbling = false};
-    processEvent(DribbleFSM::Update(control_params, event.common));
+    processEvent(DribbleSkillFSM::Update(
+        control_params, SkillUpdate(event.common.robot, event.common.world, strategy,
+                                    event.common.set_primitive)));
 }
 
 void PenaltyKickFSM::adjustOrientationForShot(
-    const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+    const Update &event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
     std::optional<Robot> enemy_goalie = event.common.world.enemyTeam().goalie();
     const Point next_shot_position =
         evaluateNextShotPosition(enemy_goalie, event.common.world.field());
     Point final_position = event.common.world.ball().position();
     shot_angle           = (next_shot_position - final_position).orientation();
-    DribbleFSM::ControlParams control_params{
+    DribbleSkillFSM::ControlParams control_params{
         .dribble_destination       = std::optional<Point>(final_position),
         .final_dribble_orientation = std::optional<Angle>(shot_angle),
         .allow_excessive_dribbling = false};
-    processEvent(DribbleFSM::Update(control_params, event.common));
+    processEvent(DribbleSkillFSM::Update(
+        control_params, SkillUpdate(event.common.robot, event.common.world, strategy,
+                                    event.common.set_primitive)));
 }
 
 bool PenaltyKickFSM::takePenaltyShot(const Update &event)

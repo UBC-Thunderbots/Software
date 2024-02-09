@@ -4,7 +4,8 @@
 
 double ShootSkill::getViability(const Robot& robot, const World& world) const
 {
-    if (!(*strategy_)->getBestShot(robot))
+    std::optional<Shot> best_shot = (*strategy_)->getBestShot(robot);
+    if (!best_shot)
     {
         return 0;
     }

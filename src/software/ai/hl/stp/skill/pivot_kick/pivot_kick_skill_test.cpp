@@ -1,9 +1,9 @@
-#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
-
 #include <gtest/gtest.h>
 
 #include <utility>
 
+#include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
@@ -13,17 +13,17 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class PivotKickTacticTest
-    : public SimulatedErForceSimPlayTestFixture,
-      public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
+class PivotKickSkillTest : public SimulatedErForceSimPlayTestFixture,
+                           public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field                      = Field::createField(field_type);
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<Strategy> strategy =
+        std::make_shared<Strategy>(TbotsProto::AiConfig());
 };
 
-TEST_P(PivotKickTacticTest, pivot_kick_test)
+TEST_P(PivotKickSkillTest, pivot_kick_test)
 {
     Vector ball_offset_from_robot = std::get<0>(GetParam());
     Angle angle_to_kick_at        = std::get<1>(GetParam());
@@ -35,9 +35,12 @@ TEST_P(PivotKickTacticTest, pivot_kick_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<PivotKickTactic>(ai_config);
-    tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
-                                {AutoChipOrKickMode::AUTOKICK, 5});
+    auto tactic = std::make_shared<TypedAssignedSkillTactic<PivotKickSkillFSM>>(
+        [&]() { return std::make_unique<FSM<PivotKickSkillFSM>>(DribbleSkillFSM()); },
+        strategy);
+    tactic->updateControlParams({robot_position + ball_offset_from_robot,
+                                 angle_to_kick_at,
+                                 {AutoChipOrKickMode::AUTOKICK, 5}});
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -45,7 +48,7 @@ TEST_P(PivotKickTacticTest, pivot_kick_test)
                                    ValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
-                yield("Tactic did not complete!");
+                yield("Skill did not complete!");
             }
             ballKicked(angle_to_kick_at, world_ptr, yield);
         }};
@@ -58,7 +61,7 @@ TEST_P(PivotKickTacticTest, pivot_kick_test)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    BallLocations, PivotKickTacticTest,
+    BallLocations, PivotKickSkillTest,
     ::testing::Values(
         // place the ball directly to the left of the robot
         std::make_tuple(Vector(0, 0.5), Angle::zero()),

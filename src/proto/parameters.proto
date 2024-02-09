@@ -29,7 +29,7 @@ message ThunderbotsConfig
 message AiConfig
 {
     required AiControlConfig ai_control_config                              = 1;
-    required DribbleTacticConfig dribble_tactic_config                      = 2;
+    required DribbleSkillConfig dribble_skill_config                        = 2;
     required AttackerTacticConfig attacker_tactic_config                    = 3;
     required CornerKickPlayConfig corner_kick_play_config                   = 4;
     required PassingConfig passing_config                                   = 5;
@@ -160,7 +160,7 @@ message GoalieTacticConfig
         [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
-message DribbleTacticConfig
+message DribbleSkillConfig
 {
     // If ball and front of robot are separated by this amount, then we've lost
     // possession (in m)

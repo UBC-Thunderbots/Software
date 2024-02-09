@@ -19,7 +19,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
         PROTO_CREATE_TACTIC_CASE(Attacker, attacker)
         PROTO_CREATE_TACTIC_CASE(Chip, chip)
         PROTO_CREATE_TACTIC_CASE(CreaseDefender, crease_defender)
-        PROTO_CREATE_TACTIC_CASE(Dribble, dribble)
         PROTO_CREATE_TACTIC_CASE(GetBehindBall, get_behind_ball)
         PROTO_CREATE_TACTIC_CASE(Goalie, goalie)
         PROTO_CREATE_TACTIC_CASE(Kick, kick)
@@ -27,7 +26,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
         PROTO_CREATE_TACTIC_CASE(Move, move)
         PROTO_CREATE_TACTIC_CASE(PassDefender, pass_defender)
         PROTO_CREATE_TACTIC_CASE(PenaltyKick, penalty_kick)
-        PROTO_CREATE_TACTIC_CASE(PivotKick, pivot_kick)
         PROTO_CREATE_TACTIC_CASE(Receiver, receiver)
         PROTO_CREATE_TACTIC_CASE(ShadowEnemy, shadow_enemy)
         PROTO_CREATE_TACTIC_CASE(Stop, stop)
@@ -79,26 +77,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tac
                                 tactic_proto.crease_defender_alignment(),
                                 tactic_proto.max_allowed_speed_mode());
 
-    return tactic;
-}
-
-std::shared_ptr<Tactic> createTactic(const TbotsProto::DribbleTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config)
-{
-    auto tactic                              = std::make_shared<DribbleTactic>(ai_config);
-    std::optional<Point> dribble_destination = std::nullopt;
-    std::optional<Angle> final_dribble_orientation = std::nullopt;
-    if (tactic_proto.has_dribble_destination())
-    {
-        dribble_destination = createPoint(tactic_proto.dribble_destination());
-    }
-    if (tactic_proto.has_final_dribble_orientation())
-    {
-        final_dribble_orientation = createAngle(tactic_proto.final_dribble_orientation());
-    }
-
-    tactic->updateControlParams(dribble_destination, final_dribble_orientation,
-                                tactic_proto.allow_excessive_dribbling());
     return tactic;
 }
 
@@ -162,16 +140,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::PenaltyKickTactic &tactic
                                      TbotsProto::AiConfig ai_config)
 {
     auto tactic = std::make_shared<PenaltyKickTactic>(ai_config);
-    return tactic;
-}
-
-std::shared_ptr<Tactic> createTactic(const TbotsProto::PivotKickTactic &tactic_proto,
-                                     TbotsProto::AiConfig ai_config)
-{
-    auto tactic = std::make_shared<PivotKickTactic>(ai_config);
-    tactic->updateControlParams(createPoint(tactic_proto.kick_origin()),
-                                createAngle(tactic_proto.kick_direction()),
-                                createAutoChipOrKick(tactic_proto.auto_chip_or_kick()));
     return tactic;
 }
 

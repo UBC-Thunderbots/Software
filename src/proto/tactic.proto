@@ -18,19 +18,18 @@ message Tactic
         AttackerTactic attacker                             = 1;
         ChipTactic chip                                     = 2;
         CreaseDefenderTactic crease_defender                = 3;
-        DribbleTactic dribble                               = 4;
         GetBehindBallTactic get_behind_ball                 = 5;
         GoalieTactic goalie                                 = 6;
         KickTactic kick                                     = 7;
         MoveGoalieToGoalLineTactic move_goalie_to_goal_line = 8;
         MoveTactic move                                     = 9;
         PenaltyKickTactic penalty_kick                      = 10;
-        PivotKickTactic pivot_kick                          = 11;
         ReceiverTactic receiver                             = 12;
         ShadowEnemyTactic shadow_enemy                      = 13;
         StopTactic stop                                     = 14;
         PassDefenderTactic pass_defender                    = 15;
     }
+    reserved 4, 11;
 }
 
 message AttackerTactic
@@ -69,16 +68,6 @@ message CreaseDefenderTactic
     required CreaseDefenderAlignment crease_defender_alignment = 2;
     // The maximum allowed speed mode
     required MaxAllowedSpeedMode max_allowed_speed_mode = 3;
-}
-
-message DribbleTactic
-{
-    // The destination for dribbling the ball
-    optional Point dribble_destination = 1;
-    // The final orientation to face the ball when finishing dribbling
-    optional Angle final_dribble_orientation = 2;
-    // whether to allow excessive dribbling, i.e. more than 1 metre at a time
-    required bool allow_excessive_dribbling = 3;
 }
 
 message GetBehindBallTactic
@@ -135,16 +124,6 @@ message PassDefenderTactic
 }
 
 message PenaltyKickTactic {}
-
-message PivotKickTactic
-{
-    // The location where the kick will be taken from
-    required Point kick_origin = 1;
-    // The direction the Robot will kick in
-    required Angle kick_direction = 2;
-    // How the robot will chip or kick the ball
-    required AutoChipOrKick auto_chip_or_kick = 3;
-}
 
 message ReceiverTactic
 {
