@@ -4,7 +4,7 @@
 #include "software/geom/point.h"
 
 
-std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr>& obstacles,
+std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacles,
                                          const Point &point,
                                          const Rectangle &navigable_area,
                                          double radius_step, int samples_per_radius_step,
@@ -21,10 +21,12 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr>& obstacl
                 point_in_obstacle = true;
             }
 
-            // if point is inside obstacle, perform a second check to see if the closest point outside the first encroached obstacle is inside another obstacle
+            // if point is inside obstacle, perform a second check to see if the closest
+            // point outside the first encroached obstacle is inside another obstacle
             Point closest_point            = obstacle->closestPoint(point);
             bool closest_point_in_obstacle = false;
-            // break out of loop if closest point outside first encroached obstacle is outside navigable area
+            // break out of loop if closest point outside first encroached obstacle is
+            // outside navigable area
             if (!contains(navigable_area, closest_point))
             {
                 closest_point_in_obstacle = true;
@@ -32,7 +34,8 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr>& obstacl
             }
             for (auto const &obstacle : obstacles)
             {
-                // break out of loop if closest point outside first encroached obstacle happens to be inside another obstacle
+                // break out of loop if closest point outside first encroached obstacle
+                // happens to be inside another obstacle
                 if (obstacle->contains(closest_point))
                 {
                     closest_point_in_obstacle = true;
@@ -46,7 +49,8 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr>& obstacl
             }
             else
             {
-                // if the closest point outside the first encroached obstacle is not inside any other obstacle, then return it
+                // if the closest point outside the first encroached obstacle is not
+                // inside any other obstacle, then return it
                 return closest_point;
             }
         }
@@ -58,9 +62,9 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr>& obstacl
         return point;
     }
 
-    // perform sampling only if the provided point or the closest point outside the first encroached obstacle are not
-    // valid
-    double radius        = 0.15;
+    // perform sampling only if the provided point or the closest point outside the first
+    // encroached obstacle are not valid
+    double radius          = 0.15;
     int samples_per_radius = 6;
     while (radius <= max_search_radius)
     {
@@ -85,7 +89,8 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr>& obstacl
                 return sample_point;
             }
         }
-        // increase the number of samples per radius to prevent density of samples from dropping off
+        // increase the number of samples per radius to prevent density of samples from
+        // dropping off
         samples_per_radius += samples_per_radius_step;
         radius += radius_step;
     }
