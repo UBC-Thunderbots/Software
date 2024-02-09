@@ -1,4 +1,3 @@
-
 from pyqtgraph.opengl import *
 
 import math
@@ -34,15 +33,34 @@ class GLTrailLayer(GLLayer):
             buffer_size, World
         )
         self.trail_graphics_head = ObservableList(self._graphics_changed)
-        TRAIL_DURATION_MILLI = 200
+        self._initQueues = False
+        self.maxTrailLength = 60
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         self.cached_world = self.world_buffer.get(block=False)
-        self.__update_trail_graphics(self.cached_world.friendly_team)
-        # self.__update_trail_graphics(self.cached_world.enemy_team)
 
+        if not self._initQueues and self.cached_world is not None:
+            self.robot_trail_queues = [
+                Queue(maxsize=self.maxTrailLength)
+                for _ in self.cached_world.friendly_team.team_robots
+            ]
+            self._initQueues = True
+
+        if self._initQueues:
+            self.__update_trail_graphics(self.cached_world.friendly_team)
+
+    def __update_trail_points(self, robot_queue, robot):
+        if robot_queue.full():
+            robot_queue.get()
+
+        robot_queue.put(
+            RobotPoint(
+                robot.current_state.global_position.x_meters,
+                robot.current_state.global_position.y_meters,
+            )
+        )
 
     def __update_trail_graphics(self, team: Team) -> None:
         self.trail_graphics_head.resize(
@@ -50,25 +68,25 @@ class GLTrailLayer(GLLayer):
             lambda: GLPolygon(
                 outline_color=Colors.DEFAULT_GRAPHICS_COLOR,
             ),
-            )
-        robot_trails = [Queue(maxsize=300) for robot in team.team_robots]
-        # for trail in
-        for trail_graphics_head, robot in zip(
-                self.trail_graphics_head,
+        )
+        # Update trail points
+        for robot_trail, robot in zip(
+                self.robot_trail_queues,
                 team.team_robots,
         ):
+            self.__update_trail_points(robot_trail, robot)
+
+        # Draws trail graphics
+        for trail_graphics_head, trail_queue in zip(
+                self.trail_graphics_head,
+                self.robot_trail_queues,
+        ):
             trail_graphics_head.set_points(
-                [
-                    [robot.current_state.global_position.x_meters,
-                    robot.current_state.global_position.y_meters,]
-                ]
+                [[point.x_point, point.y_point] for point in list(trail_queue.queue)]
             )
 
 
-class RobotTrailHistory():
-    def __init__(self, robot, x_pos:float=0, y_pos: float=0):
-        self.robot = robot
+class RobotPoint:
+    def __init__(self, x_pos: float = 0, y_pos: float = 0):
         self.x_point = x_pos
         self.y_point = y_pos
-
-
