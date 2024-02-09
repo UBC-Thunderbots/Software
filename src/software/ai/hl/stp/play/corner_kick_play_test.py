@@ -72,7 +72,7 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
         ),
         params=[
             {
-                "ball_initial_pos": tbots_cpp.Point(4.5, -3),
+                "ball_initial_pos": tbots_cpp.Point(4.4, -2.9),
                 "blue_bots": [
                     tbots_cpp.Point(-3, 2.5),
                     tbots_cpp.Point(-3, 1.5),
@@ -83,21 +83,21 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
                 ],
             }
         ],
-        inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[
+        inv_always_validation_sequence_set=[
             [
+                # Ball should always be in the field
                 BallAlwaysStaysInRegion(
                     regions=[tbots_cpp.Field.createSSLDivisionBField().fieldLines()]
                 ),
-                # Ball should always be in the field
+                # Kicker should never double touch the ball
                 KickerAlwaysNotDoubleTouch(),
             ]
         ],
+        inv_eventually_validation_sequence_set=[[]],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [
                 # Corner kick should result in a successful pass to a teammate
-                # TODO: validate that kicker robot does not double touch the ball
                 FriendlyEventuallyHasBallPossession(),
                 # Corner kick should result in a goal
                 FriendlyTeamEventuallyScored(),
@@ -117,7 +117,7 @@ def test_corner_kick_play_top_right(simulated_test_runner):
         ),
         params=[
             {
-                "ball_initial_pos": tbots_cpp.Point(4.5, 3),
+                "ball_initial_pos": tbots_cpp.Point(4.4, 2.9),
                 "blue_bots": [
                     tbots_cpp.Point(-3, 2.5),
                     tbots_cpp.Point(0, 1.5),
@@ -128,21 +128,21 @@ def test_corner_kick_play_top_right(simulated_test_runner):
                 ],
             }
         ],
-        inv_always_validation_sequence_set=[[]],
-        inv_eventually_validation_sequence_set=[
+        inv_always_validation_sequence_set=[
             [
                 # Ball should always be in the field
-                BallEventuallyEntersRegion(
+                BallAlwaysStaysInRegion(
                     regions=[tbots_cpp.Field.createSSLDivisionBField().fieldLines()]
                 ),
+                # Kicker should never double touch the ball
                 KickerAlwaysNotDoubleTouch(),
             ]
         ],
+        inv_eventually_validation_sequence_set=[[]],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [
                 # Corner kick should result in a successful pass to a teammate
-                # TODO: validate that kicker robot does not double touch the ball
                 FriendlyEventuallyHasBallPossession(),
                 # Corner kick should result in a goal
                 FriendlyTeamEventuallyScored(),

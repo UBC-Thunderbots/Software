@@ -36,7 +36,7 @@ class KickerDoubleTouch(Validation):
                 if self.kicker_robot is None:
                     self.kicker_robot = robot
                     self.kick_position = ball_position
-                elif self.kicker_robot == robot and self.other_robot is None:
+                elif self.kicker_robot == robot and self.other_robot is None and (ball_position - self.kick_position).length() > 0.05:
                     return ValidationStatus.FAILING
                 else:
                     self.other_robot = robot
@@ -46,7 +46,7 @@ class KickerDoubleTouch(Validation):
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """Returns the underlying geometry this validation is checking
 
-        :param world: The world msg to create v alidation geometry from
+        :param world: The world msg to create validation geometry from
         :returns: ValidationGeometry containing geometry to visualize
 
         """
