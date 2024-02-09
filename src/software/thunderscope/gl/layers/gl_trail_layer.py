@@ -33,23 +33,40 @@ class GLTrailLayer(GLLayer):
             buffer_size, World
         )
         self.trail_graphics_head = ObservableList(self._graphics_changed)
-        self._initQueues = False
+        self._queuesExist = False
         self.maxTrailLength = 60
-
+        self.friendly_robot_trail_queues = None
+        self.enemy_robot_trail_queues = None
+        self.cached_world = World()
+        # Two queues for future proofing
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         self.cached_world = self.world_buffer.get(block=False)
 
-        if not self._initQueues and self.cached_world is not None:
-            self.robot_trail_queues = [
+        # Ensures queues are created once upon first receival of world buffer
+        if not self._queuesExist and self.cached_world is not None:
+            self.friendly_robot_trail_queues = [
                 Queue(maxsize=self.maxTrailLength)
                 for _ in self.cached_world.friendly_team.team_robots
             ]
-            self._initQueues = True
+            self.enemy_robot_trail_queues = [
+                Queue(maxsize=self.maxTrailLength)
+                for _ in self.cached_world.enemy_team.team_robots
+            ]
+            self._queuesExist = True
 
-        if self._initQueues:
-            self.__update_trail_graphics(self.cached_world.friendly_team)
+        if self._queuesExist:
+            self.__update_trail_graphics(
+                self.cached_world.friendly_team,
+                self.friendly_robot_trail_queues,
+                Colors.DEFAULT_GRAPHICS_COLOR,
+            )
+            self.__update_trail_graphics(
+                self.cached_world.enemy_team,
+                self.enemy_robot_trail_queues,
+                Colors.DEFAULT_GRAPHICS_COLOR,
+            )
 
     def __update_trail_points(self, robot_queue, robot):
         if robot_queue.full():
@@ -62,16 +79,16 @@ class GLTrailLayer(GLLayer):
             )
         )
 
-    def __update_trail_graphics(self, team: Team) -> None:
+    def __update_trail_graphics(self, team: Team, queues, color: Colors) -> None:
         self.trail_graphics_head.resize(
             len(team.team_robots) * 1,
             lambda: GLPolygon(
-                outline_color=Colors.DEFAULT_GRAPHICS_COLOR,
+                outline_color=color,
             ),
         )
         # Update trail points
         for robot_trail, robot in zip(
-                self.robot_trail_queues,
+                queues,
                 team.team_robots,
         ):
             self.__update_trail_points(robot_trail, robot)
@@ -79,7 +96,7 @@ class GLTrailLayer(GLLayer):
         # Draws trail graphics
         for trail_graphics_head, trail_queue in zip(
                 self.trail_graphics_head,
-                self.robot_trail_queues,
+                queues,
         ):
             trail_graphics_head.set_points(
                 [[point.x_point, point.y_point] for point in list(trail_queue.queue)]
