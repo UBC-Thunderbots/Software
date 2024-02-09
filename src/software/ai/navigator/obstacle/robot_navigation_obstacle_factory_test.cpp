@@ -356,7 +356,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_half)
     }
 }
 
-TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rectangle)
+TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_stadium)
 {
     Ball new_ball               = Ball(Point(0, 0), Vector(0, 0), current_time);
     Point placement_point       = Point(1, 0);
@@ -372,62 +372,14 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rectan
     EXPECT_EQ(1, obstacles.size());
     try
     {
-        Polygon expected(
-            {{-0.617, 0.617}, {1.617, 0.617}, {1.617, -0.617}, {-0.617, -0.617}});
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
+        Stadium expected(Point(0, 0), Point(1, 0), 0.617);
+        auto stadium_obstacle = dynamic_cast<GeomObstacle<Stadium>&>(*obstacles[0]);
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, stadium_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
-        // check for 90 degrees between
-        // +---------+ <-+
-        // |<-width->|   | depth
-        // +---------+ <-+
-        std::vector<Point> points = polygon_obstacle.getGeom().getPoints();
-        Vector width              = points[0] - points[1];
-        Vector depth              = points[2] - points[1];
-        EXPECT_NEAR(depth.dot(width), 0, 1e-10);
-        // check that box covers ball placement zone that cannot be entered
-        EXPECT_GE(width.length(), 1 + 2 * ROBOT_MAX_RADIUS_METERS);
     }
 
     catch (std::bad_cast&)
     {
-        ADD_FAILURE() << "Polygon Obstacle was not created";
-    }
-}
-
-TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rotated)
-{
-    Ball new_ball               = Ball(Point(0, 0), Vector(0, 0), current_time);
-    Point placement_point       = Point(1, 1);
-    GameState ball_placement_gs = world.gameState();
-    ball_placement_gs.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
-    ball_placement_gs.setBallPlacementPoint(placement_point);
-    ball_placement_gs.updateBall(new_ball);
-    world.updateBall(new_ball);
-    world.updateGameState(ball_placement_gs);
-    auto obstacles =
-        robot_navigation_obstacle_factory.createDynamicObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
-    EXPECT_EQ(1, obstacles.size());
-    try
-    {
-        Polygon expected({{-0.873, 0}, {1, 1.873}, {1.873, 1}, {0, -0.873}});
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
-                                                   METERS_PER_MILLIMETER));
-        // check for 90 degrees between
-        // +---------+ <-+
-        // |<-width->|   | depth
-        // +---------+ <-+
-        std::vector<Point> points = polygon_obstacle.getGeom().getPoints();
-        Vector width              = points[0] - points[1];
-        Vector depth              = points[2] - points[1];
-        // check that box covers ball placement zone that cannot be entered
-        EXPECT_NEAR(depth.dot(width), 0, 1e-10);
-        EXPECT_GE(width.length(), 1 + 2 * ROBOT_MAX_RADIUS_METERS);
-    }
-    catch (std::bad_cast&)
-    {
-        ADD_FAILURE() << "Polygon Obstacle was not created";
+        ADD_FAILURE() << "Stadium Obstacle was not created";
     }
 }
