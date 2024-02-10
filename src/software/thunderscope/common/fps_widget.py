@@ -1,4 +1,4 @@
-from time import time
+import time
 from PyQt6.QtWidgets import *
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
@@ -74,3 +74,4 @@ class FrameTimeWidget(QWidget):
         """
 
         self.fps_label.setText(display_text)
+        self.last_update_time = time.time()

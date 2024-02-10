@@ -1,5 +1,5 @@
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt import QtCore, QtGui, QtOpenGLWidgets
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
@@ -7,6 +7,7 @@ from pyqtgraph.opengl import *
 import functools
 import textwrap
 import numpy as np
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 from software.thunderscope.constants import *
 
@@ -22,15 +23,15 @@ class GLWidget(QWidget):
     and our AI. GLWidget can also provide replay controls.
     """
 
-    def __init__(self, player: ProtoPlayer = None) -> None:
+    def __init__(self, player: ProtoPlayer = None, bufferswap_counter:FrameTimeCounter=None) -> None:
         """Initialize the GLWidget
 
         :param player: The replay player to optionally display media controls for
-
+        :param bufferswap_counter: a counter that is used to display fps in thunderscope
         """
         super().__init__()
 
-        self.gl_view_widget = ExtendedGLViewWidget()
+        self.gl_view_widget = ExtendedGLViewWidget(bufferswap_counter)
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.gl_view_widget.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
@@ -154,6 +155,7 @@ class GLWidget(QWidget):
         self.layers = []
 
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
+
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed

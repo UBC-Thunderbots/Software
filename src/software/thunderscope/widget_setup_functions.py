@@ -4,6 +4,8 @@ from typing import List, Any
 
 from software.py_constants import *
 from proto.import_all_protos import *
+from software.thunderscope.common.fps_widget import FrameTimeWidget
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.common.proto_plotter import ProtoPlotter
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.robot_log_msg_pb2 import RobotLog
@@ -56,6 +58,7 @@ def setup_gl_widget(
     visualization_buffer_size: int,
     replay: bool = False,
     replay_log: os.PathLike = None,
+    bufferswap_counter:FrameTimeCounter = None
 ) -> Field:
     """Setup the GLWidget with its constituent layers
 
@@ -71,8 +74,10 @@ def setup_gl_widget(
     # Create ProtoPlayer if replay is enabled
     player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
 
+    if bufferswap_counter == None:
+        bufferswap_counter = FrameTimeCounter()
     # Create widget
-    gl_widget = GLWidget(player=player)
+    gl_widget = GLWidget(player=player, bufferswap_counter=bufferswap_counter)
 
     # Create layers
     validation_layer = gl_validation_layer.GLValidationLayer(
@@ -200,6 +205,15 @@ def setup_play_info(proto_unix_io: ProtoUnixIO) -> PlayInfoWidget:
     proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
     return play_info
 
+
+def setup_fps_widget(bufferswap_counter, refresh_func_counter):
+    """ setup fps widget
+    :param bufferswap_counter: a counter at the bufferswap
+    :param refresh_func_counter: a counter at the refresh function
+    :returns: a FPS Widget
+    """
+
+    return FrameTimeWidget(bufferswap_counter, refresh_func_counter)
 
 def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
     """Setup the referee info widget

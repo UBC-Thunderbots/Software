@@ -3,6 +3,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 import numpy as np
 
@@ -42,7 +43,7 @@ class ExtendedGLViewWidget(GLViewWidget):
     # (detect_mouse_movement_in_scene must be enabled for this signal to be emitted)
     mouse_in_scene_moved_signal = QtCore.pyqtSignal(MouseInSceneEvent)
 
-    def __init__(self) -> None:
+    def __init__(self, buffertime_counter: None) -> None:
         """Initialize the ExtendedGLViewWidget"""
         super().__init__()
 
@@ -57,6 +58,19 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         # This must be enabled for the mouse_moved_in_scene_signal to be emitted
         self.detect_mouse_movement_in_scene = False
+
+        # adding a callback for fps purpose
+        self.bufferswap_counter = buffertime_counter
+        if buffertime_counter == None:
+            self.bufferswap_counter = FrameTimeCounter()
+        self.frameSwapped.connect(self.frameswap_callback)
+
+    def frameswap_callback(self):
+        """
+        addding a frameswap callback
+        """
+        # adding a a
+        self.bufferswap_counter.add_one_datapoint()
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was pressed

@@ -1,4 +1,5 @@
 from typing import Callable, Optional, Sequence, Any, Dict
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.constants import TabNames
 
 import PyQt6
@@ -83,7 +84,7 @@ class TScopeQTTab(TScopeTab):
     ]  # Mapping of widget names to refresh functions
 
     def __init__(
-        self, name: str, key: TabNames, widgets: Sequence[TScopeWidget]
+            self, name: str, key: TabNames, widgets: Sequence[TScopeWidget], refresh_func_counter: FrameTimeCounter=None
     ) -> None:
         super().__init__(name, key)
         self.widgets = widgets
@@ -100,6 +101,11 @@ class TScopeQTTab(TScopeTab):
         # all other widgets will be positioned relative to this one
         for widget in self.widgets:
             self.add_one_widget(widget)
+
+        # initialized a frametime counter if none was passed in 
+        self.refresh_func_counter = refresh_func_counter
+        if refresh_func_counter == None:
+            self.refresh_func_counter = FrameTimeCounter()
 
     def add_one_widget(self, data: TScopeWidget) -> None:
         """
@@ -136,6 +142,9 @@ class TScopeQTTab(TScopeTab):
         """
         Refreshes all the widgets belonging to this tab
         """
+        
+        self.refresh_func_counter.add_one_datapoint()
+
         for refresh_func in self.refresh_functions.values():
             refresh_func()
 
