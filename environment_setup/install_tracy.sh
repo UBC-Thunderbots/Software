@@ -5,6 +5,9 @@
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 cd "$CURR_DIR" || exit
 
+# Install dependences
+sudo apt install libglfw3-dev libfreetype-dev libdbus-1-dev
+
 # Install capstone-next
 wget -nc https://github.com/capstone-engine/capstone/archive/refs/tags/5.0.1.zip -O /tmp/capstone.zip
 cd /tmp/

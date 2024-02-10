@@ -10,6 +10,7 @@ cc_library(
             "public/**/*.cpp",
         ]
     ),
+    srcs = ["public/TracyClient.cpp"],
     includes = ["public/tracy"],
     visibility = ["//visibility:public"],
 )
