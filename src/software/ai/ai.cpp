@@ -68,7 +68,7 @@ void Ai::checkAiConfig()
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 {
-    ZoneNamedN(_tracy_ai, "Ai::getPrimitives", true);
+    ZoneNamedN(_tracy_ai, "Ai: Process World", true);
 
     checkAiConfig();
 

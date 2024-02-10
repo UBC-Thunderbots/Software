@@ -5,6 +5,8 @@
 #include "software/logger/logger.h"
 #include "software/util/typename/typename.h"
 
+#include <Tracy.hpp>
+
 Tactic::Tactic(const std::set<RobotCapability> &capability_reqs_)
     : last_execution_robot(std::nullopt), capability_reqs(capability_reqs_)
 {
@@ -29,19 +31,25 @@ std::map<RobotId, std::shared_ptr<Primitive>> Tactic::get(const World &world)
 {
     TbotsProto::RobotNavigationObstacleConfig obstacle_config;
     std::map<RobotId, std::shared_ptr<Primitive>> primitives_map;
-    for (const auto &robot : world.friendlyTeam().getAllRobots())
-    {
-        updatePrimitive(TacticUpdate(robot, world,
-                                     [this](std::shared_ptr<Primitive> new_primitive) {
-                                         primitive = std::move(new_primitive);
-                                     }),
-                        !last_execution_robot.has_value() ||
-                            last_execution_robot.value() != robot.id());
 
-        CHECK(primitive != nullptr)
-            << "Primitive for " << objectTypeName(*this) << " in state " << getFSMState()
-            << " was not set" << std::endl;
-        primitives_map[robot.id()] = std::move(primitive);
+    {
+        ZoneNamedN(_tracy_tactic_set_primitive, "Tactic: Get primitives for each robot", true);
+
+        for (const auto &robot : world.friendlyTeam().getAllRobots())
+        {
+            updatePrimitive(TacticUpdate(robot, world,
+                                         [this](std::shared_ptr<Primitive> new_primitive) {
+                                             primitive = std::move(new_primitive);
+                                         }),
+                            !last_execution_robot.has_value() ||
+                                last_execution_robot.value() != robot.id());
+
+            CHECK(primitive != nullptr)
+                << "Primitive for " << objectTypeName(*this) << " in state " << getFSMState()
+                << " was not set" << std::endl;
+            primitives_map[robot.id()] = std::move(primitive);
+        }
     }
+
     return primitives_map;
 }
