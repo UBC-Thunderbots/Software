@@ -19,11 +19,11 @@ struct SkillUpdate
 };
 
 /**
- * The Update struct is the only event that a tactic fsm should respond to and it is
+ * The Update struct is the only event that a Skill FSM should respond to and it is
  * composed of the following structs:
  *
- * ControlParams - uniquely defined by each tactic to control the FSM
- * SkillUpdate - common struct that contains Robot, World, and SetPrimitiveCallback
+ * ControlParams - uniquely defined by each Skill FSM to control the FSM
+ * SkillUpdate - common struct that contains Robot, World, Strategy, and SetPrimitiveCallback
  */
 #define DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                        \
     struct Update                                                                        \
