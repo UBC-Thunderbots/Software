@@ -22,25 +22,20 @@ from proto.ssl_gc_common_pb2 import Team
         # test panic ball very fast in straight line
         (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 0), tbots_cpp.Point(-4, 0)),
         # test panic ball very_fast in diagonal line
-        # TODO (#2609): failing tests when thunderscope is off
-        # (
-        #     tbots_cpp.Point(0, 0),
-        #     tbots_cpp.Vector(-5.5, 0.25),
-        #     tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
-        #     + tbots_cpp.Vector(0, -0.5),
-        # ),
+        (
+            tbots_cpp.Point(0, 0),
+            tbots_cpp.Vector(-5.5, 0.25),
+            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+            + tbots_cpp.Vector(0, -0.5),
+        ),
         # test ball very fast misses net
         (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 1), tbots_cpp.Point(-4.5, 0)),
-        # test slow ball at sharp angle to friendly goal
-        # TODO (#2609): failing tests when thunderscope is off
         # ball slow inside friendly defense area
-        # (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 0)),
-        # # ball slow inside friendly defense area
-        # (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 2)),
-        # # ball slow inside friendly defense area
-        # (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 2)),
+        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 0)),
         # ball slow inside friendly defense area
-        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(-4, 0),),
+        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 2)),
+        # ball slow inside friendly defense area
+        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(-4, 0)),
         # ball stationary inside friendly defense area
         (
             tbots_cpp.Point(-4, 0.0),
@@ -121,10 +116,10 @@ def test_goalie_blocks_shot(
     #
     # NOTE: The gamecontroller responses are automatically handled by
     # the gamecontroller context manager class
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.FORCE_START, team=Team.BLUE
     )
 

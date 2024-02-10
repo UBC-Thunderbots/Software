@@ -3,7 +3,7 @@ from pyqtgraph.opengl import *
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.py_constants import BALL_MAX_RADIUS_METERS
-from software.thunderscope.constants import Colors
+from software.thunderscope.constants import Colors, DepthValues
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from extlibs.er_force_sim.src.protobuf.world_pb2 import SimulatorState
@@ -24,6 +24,7 @@ class GLSimulatorLayer(GLLayer):
 
         """
         super().__init__(name)
+        self.setDepthValue(DepthValues.FOREGROUND_DEPTH)
 
         self.friendly_colour_yellow = friendly_colour_yellow
         self.simulator_state_buffer = ThreadSafeBuffer(buffer_size, SimulatorState)
@@ -31,6 +32,9 @@ class GLSimulatorLayer(GLLayer):
         self.ball_graphic = GLSphere(
             parent_item=self, radius=BALL_MAX_RADIUS_METERS, color=Colors.SIM_BALL_COLOR
         )
+
+        # Enables transparency
+        self.ball_graphic.setGLOptions("translucent")
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""

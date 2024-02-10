@@ -41,10 +41,10 @@ def test_halt_play(simulated_test_runner):
         ]
 
         # Game Controller Setup
-        simulated_test_runner.gamecontroller.send_ci_input(
+        simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.gamecontroller.send_ci_input(
+        simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.FORCE_START, team=Team.UNKNOWN
         )
 

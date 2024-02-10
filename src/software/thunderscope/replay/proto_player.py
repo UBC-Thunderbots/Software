@@ -10,9 +10,12 @@ from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
+from software.thunderscope.proto_unix_io import ProtoUnixIO
+from google.protobuf.message import DecodeError, Message
+from typing import Callable, Type
 
 
-class ProtoPlayer(object):
+class ProtoPlayer:
 
     """Plays back a proto log folder. All the playback is handled by a worker
     thread running in the background.
@@ -40,7 +43,7 @@ class ProtoPlayer(object):
 
     """
 
-    def __init__(self, log_folder_path, proto_unix_io):
+    def __init__(self, log_folder_path: str, proto_unix_io: ProtoUnixIO) -> None:
         """Creates a proto player that plays back all protos
 
         :param log_folder_path: The path to the log file.
@@ -77,7 +80,7 @@ class ProtoPlayer(object):
             )
 
         # Sort the files by their chunk index
-        def __sort_replay_chunks(file_path):
+        def __sort_replay_chunks(file_path: str):
             head, tail = os.path.split(file_path)
             replay_index, _ = tail.split(".")
             return int(replay_index)
@@ -86,7 +89,10 @@ class ProtoPlayer(object):
 
         # We can get the total runtime of the log from the last entry in the last chunk
         last_chunk_data = ProtoPlayer.load_replay_chunk(self.sorted_chunks[-1])
-        self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-1])
+        try:
+            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-1])
+        except DecodeError:
+            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-2])
         logging.info(
             "Loaded log file with total runtime of {:.2f} seconds".format(self.end_time)
         )
@@ -97,7 +103,7 @@ class ProtoPlayer(object):
         self.thread.start()
 
     @staticmethod
-    def load_replay_chunk(replay_chunk_path):
+    def load_replay_chunk(replay_chunk_path: str) -> list:
         """Reads a replay chunk.
 
         :param replay_chunk_path: The path to the replay chunk.
@@ -120,7 +126,7 @@ class ProtoPlayer(object):
         return cached_data
 
     @staticmethod
-    def unpack_log_entry(log_entry):
+    def unpack_log_entry(log_entry: str) -> (float, Type[Message], Message):
         """Unpacks a log entry into the timestamp and proto.
 
         :param log_entry: The log entry.
@@ -148,7 +154,7 @@ class ProtoPlayer(object):
 
         return float(timestamp), proto_class, proto
 
-    def save_clip(self, filename, start_time, end_time):
+    def save_clip(self, filename: str, start_time: float, end_time: float) -> None:
         """Saves clip
 
         :param filename: The file to save to
@@ -211,7 +217,7 @@ class ProtoPlayer(object):
                     )
                     self.current_entry_index = 0
 
-    def play(self):
+    def play(self) -> None:
         """Plays back the log file."""
 
         # Protection from spamming the play button
@@ -222,14 +228,14 @@ class ProtoPlayer(object):
             self.start_playback_time = time.time()
             self.is_playing = True
 
-    def pause(self):
+    def pause(self) -> None:
         """Pauses the player."""
 
         with self.replay_controls_mutex:
             self.is_playing = False
             self.seek_offset_time = self.current_packet_time
 
-    def toggle_play_pause(self):
+    def toggle_play_pause(self) -> None:
         """Toggles the play/pause state."""
 
         with self.replay_controls_mutex:
@@ -238,7 +244,7 @@ class ProtoPlayer(object):
             else:
                 self.pause()
 
-    def set_playback_speed(self, speed):
+    def set_playback_speed(self, speed: float) -> None:
         """Sets the playback speed.
 
         :param speed: The speed to set the playback to.
@@ -249,7 +255,7 @@ class ProtoPlayer(object):
             self.playback_speed = 1.0 / float(speed)
             self.play()
 
-    def single_step_forward(self):
+    def single_step_forward(self) -> None:
         """Steps the player forward by one log entry
         """
         self.pause()
@@ -277,7 +283,7 @@ class ProtoPlayer(object):
             )
         )
 
-    def seek(self, seek_time):
+    def seek(self, seek_time: float) -> None:
         """Seeks to a specific time. We binary search through the chunks
         to find the chunk that would contain the data at the given time.
 
@@ -294,7 +300,7 @@ class ProtoPlayer(object):
         # Let's binary search through the chunks to find the chunk that starts
         # with a timestamp less than (but closest to) the seek_time we want
         # to seek to.
-        def __bisect_chunks_by_timestamp(chunk):
+        def __bisect_chunks_by_timestamp(chunk: str) -> None:
             chunk = ProtoPlayer.load_replay_chunk(chunk)
             start_timestamp, _, _ = ProtoPlayer.unpack_log_entry(chunk[0])
             return start_timestamp
@@ -306,7 +312,7 @@ class ProtoPlayer(object):
 
         # Let's binary search through the entries in the chunk to find the closest
         # timestamp to seek to
-        def __bisect_entries_by_timestamp(entry):
+        def __bisect_entries_by_timestamp(entry: str) -> float:
             timestamp, _, _ = ProtoPlayer.unpack_log_entry(entry)
             return timestamp
 
@@ -339,7 +345,7 @@ class ProtoPlayer(object):
             )
 
     @staticmethod
-    def binary_search(arr, x, key=lambda x: x):
+    def binary_search(arr: list, x, key: Callable = lambda x: x) -> int:
         """Binary search for an element in an array.
 
         Stolen from: https://www.geeksforgeeks.org/python-program-for-binary-search/
@@ -371,7 +377,7 @@ class ProtoPlayer(object):
 
         return min(abs(low), abs(high))
 
-    def __play_protobufs(self):
+    def __play_protobufs(self) -> None:
         """Plays all protos in the file in chronologoical order. 
 
         Playback controls:
@@ -402,14 +408,19 @@ class ProtoPlayer(object):
 
                 with self.replay_controls_mutex:
 
-                    # Unpack the current entry in the chunk
-                    (
-                        self.current_packet_time,
-                        proto_class,
-                        proto,
-                    ) = ProtoPlayer.unpack_log_entry(
-                        self.current_chunk[self.current_entry_index]
-                    )
+                    try:
+                        # Unpack the current entry in the chunk
+                        (
+                            self.current_packet_time,
+                            proto_class,
+                            proto,
+                        ) = ProtoPlayer.unpack_log_entry(
+                            self.current_chunk[self.current_entry_index]
+                        )
+                    except ValueError:
+                        self.current_entry_index += 1
+                        logging.error("[ProtoPlayer] Error parsing log entry")
+                        continue
                     self.current_entry_index += 1
 
                     # Manage playback speed, if this packet needs to be sent
