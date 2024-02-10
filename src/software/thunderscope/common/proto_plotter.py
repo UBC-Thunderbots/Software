@@ -93,6 +93,9 @@ class ProtoPlotter(QWidget):
         self.update_interval = 1.0 / plot_rate_hz
         self.buffer_size = buffer_size
 
+    def isVisible(self):
+        return self.win.isVisible()
+
     def refresh(self):
         """Refreshes ProtoPlotter and updates data in the respective
         plots.
