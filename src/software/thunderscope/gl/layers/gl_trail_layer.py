@@ -34,11 +34,11 @@ class GLTrailLayer(GLLayer):
         )
         self.trail_graphics_head = ObservableList(self._graphics_changed)
         self._queuesExist = False
-        self.maxTrailLength = 60
+        self.maxTrailLength = 30
         self.friendly_robot_trail_queues = None
-        self.enemy_robot_trail_queues = None
         self.cached_world = World()
         # Two queues for future proofing
+
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
@@ -50,10 +50,6 @@ class GLTrailLayer(GLLayer):
                 Queue(maxsize=self.maxTrailLength)
                 for _ in self.cached_world.friendly_team.team_robots
             ]
-            self.enemy_robot_trail_queues = [
-                Queue(maxsize=self.maxTrailLength)
-                for _ in self.cached_world.enemy_team.team_robots
-            ]
             self._queuesExist = True
 
         if self._queuesExist:
@@ -62,21 +58,13 @@ class GLTrailLayer(GLLayer):
                 self.friendly_robot_trail_queues,
                 Colors.DEFAULT_GRAPHICS_COLOR,
             )
-            self.__update_trail_graphics(
-                self.cached_world.enemy_team,
-                self.enemy_robot_trail_queues,
-                Colors.DEFAULT_GRAPHICS_COLOR,
-            )
 
     def __update_trail_points(self, robot_queue, robot):
         if robot_queue.full():
             robot_queue.get()
 
         robot_queue.put(
-            RobotPoint(
-                robot.current_state.global_position.x_meters,
-                robot.current_state.global_position.y_meters,
-            )
+            robot.current_state.global_position
         )
 
     def __update_trail_graphics(self, team: Team, queues, color: Colors) -> None:
@@ -99,11 +87,5 @@ class GLTrailLayer(GLLayer):
                 queues,
         ):
             trail_graphics_head.set_points(
-                [[point.x_point, point.y_point] for point in list(trail_queue.queue)]
+                [[point.x_meters, point.y_meters] for point in list(trail_queue.queue)]
             )
-
-
-class RobotPoint:
-    def __init__(self, x_pos: float = 0, y_pos: float = 0):
-        self.x_point = x_pos
-        self.y_point = y_pos
