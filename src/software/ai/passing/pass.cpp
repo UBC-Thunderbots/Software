@@ -76,12 +76,13 @@ double Pass::getPassSpeed(const Point& ball_position, const Point& pass_destinat
     // Roll Distance (m) -> d2
     // d2 = D - d1
     //
-    // (cx)^2 = x^2 + 2sd1
-    // d1 = (c^2 - 1)x^2 / 2s
-    // d2 = D + (1 - c^2)x^2 / 2s
+    // (cx)^2 = x^2 + 2s * d1 // using acceleration kinematics formula
+    // d1 = (c^2 - 1)x^2 / 2s // re-arrange
+    // d2 = D + (1 - c^2)x^2 / 2s // using fact from above
     //
-    // vf^2 = (cx)^2 + 2rd2 = (cx)^2 + 2r(D + (1 - c^2)x^2 / 2s)
-    // Simplify to get
+    // vf^2 = (cx)^2 + 2rd2 = (cx)^2 + 2r(D + (1 - c^2)x^2 / 2s) // using final velocity kinematics formula
+    // 
+    // Simplify and rearrange for initial velocity:
     // x = sqrt((vf^2 - 2rD) / (c^2 - rc^2/s + b/s))
     Vector pass_distance          = Vector(pass_destination.x() - ball_position.x(),
                                   pass_destination.y() - ball_position.y());

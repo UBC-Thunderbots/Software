@@ -978,7 +978,7 @@ void Simulator::teleportRobotToFreePosition(SimRobot *robot)
     btVector3 direction =
         (robotPos - m_data->ball->position() / SIMULATOR_SCALE).normalize();
     float distance =
-        2 * (static_cast<float>(BALL_MAX_RADIUS_METERS) + robot->specs().radius());
+        2.0f * (static_cast<float>(BALL_MAX_RADIUS_METERS) + robot->specs().radius());
     bool valid = true;
     do
     {
