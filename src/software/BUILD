@@ -23,6 +23,7 @@ cc_binary(
         "//software/sensor_fusion:threaded_sensor_fusion",
         "//software/util/generic_factory",
         "@boost//:program_options",
+        "@tracy",
     ],
 )
 
