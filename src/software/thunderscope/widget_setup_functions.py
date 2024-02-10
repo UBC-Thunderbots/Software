@@ -68,6 +68,7 @@ def setup_gl_widget(
     :param visualization_buffer_size: How many packets to buffer while rendering
     :param replay: Whether replay mode is currently enabled
     :param replay_log: The file path of the replay log
+    :param bufferswap_counter: a counter used to keep track of the fps. This is used for the fps widget
     :returns: The GLWidget
 
     """

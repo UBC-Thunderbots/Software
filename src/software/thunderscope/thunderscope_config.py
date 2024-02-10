@@ -147,6 +147,8 @@ def configure_base_fullsystem(
     :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime.
     :param extra_widgets: a list of additional widget data to append
+    :param refresh_func_counter: a counter that is used to keep track of the refresh func frametime
+    :param buffer_func_counter: a counter that is used to count the bufferswap frametime callback
     :return: list of widget data for FullSystem
     """
 
@@ -336,7 +338,10 @@ def configure_two_ai_gamecontroller_view(
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[],
+                    buffer_func_counter=yellow_buffer_func_frametime_counter,
+                    refresh_func_counter=yellow_refresh_func_frametime_counter
                 ),
+                refresh_func_counter=yellow_refresh_func_frametime_counter
             ),
             TScopeWebTab(
                 name="Gamecontroller",

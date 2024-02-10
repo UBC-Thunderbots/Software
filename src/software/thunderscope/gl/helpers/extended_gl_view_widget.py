@@ -43,7 +43,7 @@ class ExtendedGLViewWidget(GLViewWidget):
     # (detect_mouse_movement_in_scene must be enabled for this signal to be emitted)
     mouse_in_scene_moved_signal = QtCore.pyqtSignal(MouseInSceneEvent)
 
-    def __init__(self, buffertime_counter: None) -> None:
+    def __init__(self, bufferswap_counter:FrameTimeCounter =  None) -> None:
         """Initialize the ExtendedGLViewWidget"""
         super().__init__()
 
@@ -60,8 +60,8 @@ class ExtendedGLViewWidget(GLViewWidget):
         self.detect_mouse_movement_in_scene = False
 
         # adding a callback for fps purpose
-        self.bufferswap_counter = buffertime_counter
-        if buffertime_counter == None:
+        self.bufferswap_counter = bufferswap_counter
+        if self.bufferswap_counter == None:
             self.bufferswap_counter = FrameTimeCounter()
         self.frameSwapped.connect(self.frameswap_callback)
 

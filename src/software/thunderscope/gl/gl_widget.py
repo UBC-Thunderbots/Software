@@ -1,5 +1,5 @@
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui, QtOpenGLWidgets
+from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
@@ -31,7 +31,7 @@ class GLWidget(QWidget):
         """
         super().__init__()
 
-        self.gl_view_widget = ExtendedGLViewWidget(bufferswap_counter)
+        self.gl_view_widget = ExtendedGLViewWidget(bufferswap_counter=bufferswap_counter)
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.gl_view_widget.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
