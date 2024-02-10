@@ -69,6 +69,7 @@ class GLWidget(QWidget):
             on_camera_view_change=self.set_camera_view,
             on_measure_mode=self.toggle_measure_mode,
             layers_menu=self.layers_menu,
+            toolbars_menu=self.toolbars_menu,
             sandbox_mode=sandbox_mode,
         )
 
@@ -88,13 +89,12 @@ class GLWidget(QWidget):
 
         # Add a menu item for the Gamecontroller toolbar
         [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox("Gamecontroller", self.toolbars_menu)
-        self.toolbars_menu_checkboxes["Gamecontroller"] = toolbar_checkbox
         self.toolbars_menu.addAction(toolbar_action)
 
         # Connect visibility of the toolbar to the menu item
-        self.toolbars_menu_checkboxes["Gamecontroller"].stateChanged.connect(
+        toolbar_checkbox.stateChanged.connect(
             lambda: self.gamecontroller_toolbar.setVisible(
-                self.toolbars_menu_checkboxes["Gamecontroller"].isChecked()
+                toolbar_checkbox.isChecked()
             )
         )
 

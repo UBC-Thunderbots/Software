@@ -5,7 +5,7 @@ from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import CameraView, THUNDERSCOPE_HELP_TEXT
-import software.thunderscope.gl.widgets.toolbar_icons.toolbar_icon_loader as icons
+import software.thunderscope.gl.widgets.toolbar_icons.sandbox_mode.icon_loader as icons
 from software.thunderscope.common.common_widgets import ToggleableButton
 
 
@@ -110,7 +110,7 @@ class GLFieldToolbar(QWidget):
         self.toolbars_menu = QMenu()
         self.toolbars_menu_checkboxes = {}
         self.toolbars_button.setMenu(toolbars_menu)
-        self.toolbars_button.setStyleSheet(tool_button_stylesheet)
+        self.toolbars_button.setStyleSheet(self.get_button_style())
 
         # if sandbox mode, set up the sandbox control buttons
         if sandbox_mode:
