@@ -107,5 +107,5 @@ pybind_extension(
 
 sh_binary(
     name = "tracy",
-    srcs = ["tracy.sh"]
+    srcs = ["tracy.sh"],
 )

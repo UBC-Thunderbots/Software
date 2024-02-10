@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h"
 
-#include <algorithm>
 #include <Tracy.hpp>
+#include <algorithm>
 
 ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),

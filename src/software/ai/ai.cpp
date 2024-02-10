@@ -1,8 +1,8 @@
 #include "software/ai/ai.h"
 
+#include <Tracy.hpp>
 #include <chrono>
 #include <memory>
-#include <Tracy.hpp>
 #include <utility>
 
 #include "software/ai/hl/stp/play/halt_play.h"

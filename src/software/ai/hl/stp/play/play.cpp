@@ -1,12 +1,13 @@
 #include "software/ai/hl/stp/play/play.h"
 
+#include <munkres/munkres.h>
+
+#include <Tracy.hpp>
+
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
-
-#include <munkres/munkres.h>
-#include <Tracy.hpp>
 
 
 Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
@@ -190,7 +191,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
             tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 
-            for (auto &[robot_id, primitive] : new_primitives_to_assign->robot_primitives())
+            for (auto &[robot_id, primitive] :
+                 new_primitives_to_assign->robot_primitives())
             {
                 primitives_to_run->mutable_robot_primitives()->insert(
                     google::protobuf::MapPair(robot_id, primitive));

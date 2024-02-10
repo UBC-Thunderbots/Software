@@ -1,9 +1,9 @@
+#include <Tracy.hpp>
 #include <boost/program_options.hpp>
 #include <chrono>
 #include <filesystem>
 #include <iostream>
 #include <numeric>
-#include <Tracy.hpp>
 
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/parameters.pb.h"

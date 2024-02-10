@@ -3,14 +3,14 @@
 # symbols would slow down the code too much.
 cc_library(
     name = "tracy",
+    srcs = ["public/TracyClient.cpp"],
     hdrs = glob(
         [
             "public/**/*.h",
             "public/**/*.hpp",
             "public/**/*.cpp",
-        ]
+        ],
     ),
-    srcs = ["public/TracyClient.cpp"],
     includes = ["public/tracy"],
     visibility = ["//visibility:public"],
 )
