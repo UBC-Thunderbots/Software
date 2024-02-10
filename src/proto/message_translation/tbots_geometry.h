@@ -7,6 +7,7 @@
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/segment.h"
+#include "software/geom/stadium.h"
 
 /**
  * Internal geometry types to protobuf msg conversions
@@ -23,6 +24,7 @@ std::unique_ptr<TbotsProto::Vector> createVectorProto(const Vector& vector);
 std::unique_ptr<TbotsProto::Polygon> createPolygonProto(const Polygon& polygon);
 std::unique_ptr<TbotsProto::Circle> createCircleProto(const Circle& polygon);
 std::unique_ptr<TbotsProto::Segment> createSegmentProto(const Segment& segment);
+std::unique_ptr<TbotsProto::Stadium> createStadiumProto(const Stadium& stadium);
 
 /**
  * Protobuf msg types to internal geometry types conversions
@@ -39,3 +41,4 @@ Vector createVector(const TbotsProto::Vector& vector);
 Polygon createPolygon(const TbotsProto::Polygon& polygon);
 Circle createCircle(const TbotsProto::Circle& circle);
 Segment createSegment(const TbotsProto::Segment& segment);
+Stadium createStadium(const TbotsProto::Stadium& stadium);

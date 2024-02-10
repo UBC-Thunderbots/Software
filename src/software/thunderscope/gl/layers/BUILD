@@ -31,6 +31,7 @@ py_library(
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_polygon",
+        "//software/thunderscope/gl/graphics:gl_stadium",
         requirement("pyqtgraph"),
     ],
 )
@@ -57,6 +58,15 @@ py_library(
         "//software/thunderscope/gl/graphics:gl_rect",
         "//software/thunderscope/gl/graphics:gl_robot",
         "//software/thunderscope/gl/graphics:gl_sphere",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_sandbox_world_layer",
+    srcs = ["gl_sandbox_world_layer.py"],
+    deps = [
+        ":gl_world_layer",
         requirement("pyqtgraph"),
     ],
 )

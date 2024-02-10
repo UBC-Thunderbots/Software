@@ -3,6 +3,7 @@ from __future__ import annotations
 from proto.import_all_protos import *
 import software.python_bindings as tbots_cpp
 import numpy
+import math
 
 
 def create_world_state(
@@ -31,6 +32,7 @@ def create_world_state(
                 global_position=Point(
                     x_meters=robot_location.x(), y_meters=robot_location.y()
                 ),
+                global_orientation=Angle(radians=math.pi),
             )
         )
 

@@ -5,6 +5,8 @@ from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
 
+SIM_TICK_RATE_MS = 16
+
 
 class ProtoUnixIOTypes(Enum):
     """
@@ -99,6 +101,8 @@ DEFAULT_EMPTY_FIELD_WORLD = World(
 # How long AI vs AI runs before ending in CI
 CI_DURATION_S = 180
 
+MULTI_PLANE_POINTS = 3
+
 ROBOT_RADIUS = 25
 
 BALL_HEIGHT_EFFECT_MULTIPLIER = 3
@@ -155,6 +159,12 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>Number Keys:</code></b> Position camera to preset view<br>
     <b><code>Shift + Left Click:</code></b> Place the ball at the cursor<br>
     <b><code>Shift + Left Click Drag:</code></b> Place the ball at the cursor and kick it<br>
+    <b><code>Ctrl + Shift + Left Double Click:</code></b>
+    <ul style="margin: 0;">
+    <li>If no robot is present at cursor, adds a new friendly robot there</li>
+    <li>If a friendly robot is present at cursor, removes it</li>
+    </ul>
+    <b><code>Ctrl + Shift + Left Click Drag:</code></b> Moves a friendly robot along with the cursor
 
     <h3>Camera Controls</h3><br>
 
