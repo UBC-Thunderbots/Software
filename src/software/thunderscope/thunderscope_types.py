@@ -140,12 +140,23 @@ class TScopeQTTab(TScopeTab):
 
     def refresh(self) -> None:
         """
-        Refreshes all the widgets belonging to this tab
+        Refreshes all the widgets belonging to this tab, and not refresh widget that are not visible.
         """
         
         self.refresh_func_counter.add_one_datapoint()
 
         for refresh_func in self.refresh_functions.values():
+            # only refresh dock that are visible
+            if not self.dock_area.isVisible():
+                return
+
+        for widget_name in self.refresh_functions:
+            # only refresh widget inside the dock that are visible
+            widget = self.widgets_map[widget_name]
+            if not widget.isVisible():
+                continue
+
+            refresh_func = self.refresh_functions[widget_name]
             refresh_func()
 
     def find_widget(self, widget_name: str) -> Optional[TScopeWidget]:
