@@ -63,7 +63,7 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
         {
             obstacles.push_back(createFromFieldRectangle(field.enemyDefenseArea(),
                                                          field.fieldLines(),
-                                                         field.fieldBoundary(), 0.3));
+                                                         field.fieldBoundary(), config.enemy_defense_area_additional_inflation_meters()));
         }
         break;
         case TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA:
@@ -261,6 +261,17 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromBallPosition(
     const Point &ball_position) const
 {
     return createFromShape(Circle(ball_position, BALL_MAX_RADIUS_METERS));
+}
+
+ObstaclePtr RobotNavigationObstacleFactory::createEnemyRobotObstacle(const Robot &enemy_robot) const
+{
+    Vector enemy_robot_velocity = enemy_robot.velocity();
+    if (enemy_robot_velocity.length() < config.dynamic_enemy_robot_obstacle_min_speed_mps())
+    {
+        return createFromRobotPosition(enemy_robot.position());
+    }
+
+    return createFromShape(Stadium(enemy_robot.position(), enemy_robot.position() + enemy_robot_velocity * config.dynamic_enemy_robot_obstacle_horizon_sec(), ROBOT_MAX_RADIUS_METERS));
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromRobotPosition(

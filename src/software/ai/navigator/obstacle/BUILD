@@ -84,5 +84,6 @@ cc_library(
         "//software/geom:circle",
         "//software/geom:polygon",
         "//software/geom:rectangle",
+        "//software/geom:stadium",
     ],
 )

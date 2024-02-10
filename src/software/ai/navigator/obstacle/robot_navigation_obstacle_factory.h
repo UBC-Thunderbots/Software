@@ -103,6 +103,15 @@ class RobotNavigationObstacleFactory
     ObstaclePtr createFromRobotPosition(const Point &robot_position) const;
 
     /**
+     * Create obstacle for enemy robot with additional radius scaling
+     *
+     * @param enemy_robot Enemy robot to create the obstacle for
+     *
+     * @return obstacle around the robot
+     */
+    ObstaclePtr createEnemyRobotObstacle(const Robot& enemy_robot) const;
+
+    /**
      * Create dynamic circle obstacle around robot with additional radius scaling
      *
      * @param robot robot to create the obstacle for
