@@ -115,6 +115,9 @@ ROBOT_FATAL_TIMEOUT_S = 5
 # crash alert occurs
 ROBOT_CRASH_TIMEOUT_S = 5
 
+# FOV in degrees for top-down orthographic view
+ORTHOGRAPHIC_FOV_DEGREES = 1.0
+
 # LogLevel to string conversion map
 LOG_LEVEL_STR_MAP = {
     LogLevel.DEBUG: "DEBUG",
