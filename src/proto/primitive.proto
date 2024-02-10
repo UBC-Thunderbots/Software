@@ -17,12 +17,6 @@ enum BallCollisionType
     AVOID = 1;
 }
 
-message Obstacles
-{
-    repeated Polygon polygon = 1;
-    repeated Circle circle   = 2;
-}
-
 enum MotionConstraint
 {
     // The box around the friendly goal
@@ -47,15 +41,6 @@ enum MotionConstraint
     ENEMY_HALF_WITHOUT_CENTRE_CIRCLE = 9;
     // The friendly goal
     FRIENDLY_GOAL = 10;
-}
-
-message MotionControl
-{
-    Path path                                    = 1;
-    double normalized_path_length                = 2;
-    repeated MotionConstraint motion_constraints = 3;
-    Point requested_destination                  = 4;
-    repeated Obstacles static_obstacles          = 5;
 }
 
 enum DribblerMode
@@ -110,31 +95,55 @@ message PowerControl
 
 message Primitive
 {
+    reserved 5;
     oneof primitive
     {
         MovePrimitive move                    = 1;
         StopPrimitive stop                    = 2;
         DirectControlPrimitive direct_control = 3;
     }
-    double cost = 5;
 }
 
 message MovePrimitive
 {
-    MotionControl motion_control          = 1;
-    float final_speed_m_per_s             = 2;
-    Angle final_angle                     = 3;
-    int32 dribbler_speed_rpm              = 4;
-    float max_speed_m_per_s               = 5;
-    AutoChipOrKick auto_chip_or_kick      = 6;
-    float target_spin_rev_per_s           = 7;
-    BallCollisionType ball_collision_type = 8;
-    // Whether the robot should face the direction of intermediate path points
-    // (if there is any) or just the final destination
-    optional bool should_drive_forward = 9;
+    // Fields deprecated after transitioning to trajectory planning
+    reserved 1, 2, 3, 4, 5, 7, 8, 9;
+
+    AutoChipOrKick auto_chip_or_kick        = 6;
+    TrajectoryPathParams2D xy_traj_params   = 10;
+    TrajectoryParamsAngular1D w_traj_params = 11;
+    DribblerMode dribbler_mode              = 12;
 }
 
 message StopPrimitive {}
+
+message TrajectoryPathParams2D
+{
+    message SubDestination
+    {
+        // Intermediate destination for the trajectory path
+        // to travel to prior to going to the destination.
+        Point sub_destination = 1;
+
+        // The time at which a new trajectory is branched
+        // off of the last trajectory in path to go towards the
+        // sub_destination.
+        float connection_time_s = 2;
+    }
+
+    Point start_position                     = 1;
+    Point destination                        = 2;
+    Vector initial_velocity                  = 3;
+    MaxAllowedSpeedMode max_speed_mode       = 4;
+    repeated SubDestination sub_destinations = 5;
+}
+
+message TrajectoryParamsAngular1D
+{
+    Angle start_angle                = 1;
+    Angle final_angle                = 2;
+    AngularVelocity initial_velocity = 3;
+}
 
 message MotorControl
 {

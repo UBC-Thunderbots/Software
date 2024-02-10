@@ -14,7 +14,8 @@ bool contains(const Circle& container, const Segment& contained)
 
 bool contains(const Circle& container, const Point& contained)
 {
-    return distance(container.origin(), contained) <= container.radius();
+    return distanceSquared(container.origin(), contained) <=
+           (container.radius() * container.radius());
 }
 
 bool contains(const Polygon& container, const Point& contained)
@@ -111,4 +112,10 @@ bool contains(const Rectangle& container, const Point& contained)
     return p.x() >= r.negXNegYCorner().x() && p.y() >= r.negXNegYCorner().y() &&
            p.x() <= r.negXNegYCorner().x() + r.diagonal().x() &&
            p.y() <= r.negXNegYCorner().y() + r.diagonal().y();
+}
+
+bool contains(const Stadium& container, const Point& contained)
+{
+    return distanceSquared(container.segment(), contained) <=
+           std::pow(container.radius(), 2);
 }
