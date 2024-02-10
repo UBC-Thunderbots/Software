@@ -73,7 +73,7 @@ void SkillGraph::scoreSequence(double sequence_score)
         << "Skill sequence being scored with score outside of range [-1, 1]";
 
     // Equation used to calculate the edge weight adjustment:
-    // https://www.desmos.com/3d/04931b4dce
+    // https://www.desmos.com/3d/3d2207d9d3
 
     double adjustment_sigmoid =
         sigmoid(sequence_score, 0, ADJUSTMENT_SIGMOID_WIDTH) - 0.5;
