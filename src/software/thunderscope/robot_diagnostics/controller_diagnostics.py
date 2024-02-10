@@ -57,14 +57,6 @@ class ControllerDiagnostics(object):
         self.dribbler_speed = 0.0
         self.dribbler_enabled = False
 
-    def set_enabled(self, enabled: bool):
-        """
-        Changes the diagnostics input mode for all robots between Xbox and Diagnostics.
-
-        :param enabled: to which state to set controller enabled.
-        """
-        self.enabled = enabled
-
     def __parse_move_event_value(self, value, factor):
         if abs(value) < (DEADZONE_PERCENTAGE * factor):
             return 0
@@ -98,8 +90,7 @@ class ControllerDiagnostics(object):
         #     motor_control.dribbler_speed_rpm = dribbler_speed
         # maybe just use indefinite instead? or have setting to turn on 'smooth scrolling'
         if self.dribbler_enabled:
-            motor_control.dribbler_speed_rpm = self.dribbler_enabled ?
-                                                self.constants.indefinite_dribbler_speed_rpm
+            motor_control.dribbler_speed_rpm = self.dribbler_enabled ? self.constants.indefinite_dribbler_speed_rpm
 
 
         logging.info("Sending motor control: " + motor_control)
@@ -171,7 +162,7 @@ class ControllerDiagnostics(object):
                 elif event.code == ecodes.ecodes["BTN_Y"] and event.value == 1:
                     self.__send_chip_command()
 
-        if self.enabled and event.type in ["ABS_X", "ABS_Y", "ABS_RX"]:
+        if event.type in ["ABS_X", "ABS_Y", "ABS_RX"]:
             self.__send_move_command()
 
 
@@ -181,12 +172,30 @@ class ControllerDiagnostics(object):
         for event in self.controller.read_loop():
             if self.__stop_event_thread.isSet():
                 return
-            self.__process_event(event)
+            if self.enabled:
+                self.__process_event(event)
 
     def close(self):
         logging.info("Closing controller thread")
         self.__stop_event_thread.set()
         self.__event_thread.join()
+
+    def set_enabled(self, enabled: bool):
+        """
+        Changes the diagnostics input mode for all robots between Xbox and Diagnostics.
+
+        :param enabled: to which state to set controller enabled.
+        """
+        self.enabled = enabled
+
+    def set_enabled(self, enabled: bool):
+        """
+        Changes the diagnostics input mode for all robots between Xbox and Diagnostics.
+
+        :param enabled: to which state to set controller enabled.
+        """
+    self.enabled = enabled
+
 
 # {
 #   ('EV_SYN', 0): [('SYN_REPORT', 0), ('SYN_CONFIG', 1), ('SYN_DROPPED', 3), ('?', 21)],

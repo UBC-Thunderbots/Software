@@ -14,21 +14,16 @@ class DiagnosticsWidget(TScopeWidget):
 
         vbox_layout = QVBoxLayout()
 
-        self.__control_mode = ControlMode.DIAGNOSTICS
-
-
         self.diagnostics_control_input_widget = FullSystemConnectWidget(self.diagnostics_input_mode_signal)
         self.drive_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
         self.chicker_widget = ChickerWidget(proto_unix_io)
         self.controller = ControllerDiagnostics(proto_unix_io)
 
-        self.diagnostics_control_input_widget.toggle_control_signal(
+        self.diagnostics_control_input_widget.toggle_control_signal.connect(
             lambda control_mode: self.controller.toggle_input_mode(
-                control_mode
+                control_mode == ControlMode.DIAGNOSTICS
             )
         )
-
-
 
         vbox_layout.addWidget(self.diagnostics_control_input_widget)
         vbox_layout.addWidget(self.drive_dribbler_widget)
@@ -36,6 +31,6 @@ class DiagnosticsWidget(TScopeWidget):
 
         self.setLayout(vbox_layout)
 
-    def __
-
-
+    def update_mode(self, mode: ControlMode):
+        self.drive_dribbler_widget.set_enabled(mode == ControlMode.DIAGNOSTICS)
+        self.controller.set_enabled(mode == ControlMode.XBOX)

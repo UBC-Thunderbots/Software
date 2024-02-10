@@ -180,7 +180,7 @@ class DriveAndDribblerWidget(QWidget):
 
         return group_box
 
-    def toggle_all(self, enable: bool) -> None:
+    def set_enabled(self,  enable: bool) -> None:
         """
         Disables or enables all sliders and buttons depending on boolean parameter
 
