@@ -77,8 +77,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       loop_hz_(loop_hz),
       kick_coeff_(std::stod(redis_client_->getSync(ROBOT_KICK_EXP_COEFF_REDIS_KEY))),
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
-      chip_pulse_width_(
-          std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
+      chip_coeff_(std::stoi(redis_client_->getSync(ROBOT_CHIP_EXP_COEFF_REDIS_KEY))), 
+      chip_constant_(std::stoi(redis_client_->getSync(ROBOT_CHIP_CONSTANT_REDIS_KEY))),  
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
@@ -258,7 +258,7 @@ Thunderloop::~Thunderloop() {}
                 ScopedTimespecTimer timer(&poll_time);
                 power_status_ =
                     power_service_->poll(direct_control_.power_control(), kick_coeff_,
-                                         kick_constant_, chip_pulse_width_);
+                                         kick_constant_, chip_coeff_, chip_constant_);
             }
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));

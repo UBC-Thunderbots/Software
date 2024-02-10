@@ -7,6 +7,7 @@ from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+include "shared/constants.h"
 
 
 class ChickerCommandMode(Enum):
@@ -99,7 +100,7 @@ class ChickerWidget(QWidget):
             self.kick_slider,
             self.kick_label,
         ) = common_widgets.create_slider(
-            "Kick Speed (m/s)", 1, 10, 1
+            "Kick Speed (m/s)", 1, BALL_MAX_SPEED_METERS_PER_SECOND, 1
         )
         vbox_layout.addLayout(self.kick_slider_layout)
 
@@ -108,8 +109,7 @@ class ChickerWidget(QWidget):
             self.chip_slider,
             self.chip_label,
         ) = common_widgets.create_slider(
-            #TODO: REPLACE THESE VALUES ONCE CHIP DISTANCE DATA COLLECTED
-            "Chip Distance (m)", 1, 5, 1
+            "Chip Distance (m)", 0.2, 1, 0.1
         )
         vbox_layout.addLayout(self.chip_slider_layout)
 

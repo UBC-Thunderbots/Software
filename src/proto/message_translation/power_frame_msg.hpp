@@ -124,7 +124,7 @@ TbotsProto_PowerStatus inline createNanoPbPowerStatus(
 
 TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     const TbotsProto::PowerControl& google_control, double kick_coeff, int kick_constant,
-    int chip_pulse_width)
+    double chip_coeff, int chip_constant)
 {
     TbotsProto_PowerPulseControl nanopb_control =
         TbotsProto_PowerPulseControl_init_default;
@@ -132,6 +132,9 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     // Safety bounds
     kick_constant = std::min(kick_constant, MAX_KICK_CONSTANT);
     kick_coeff    = std::min(kick_coeff, MAX_KICK_COEFFICIENT);
+
+    chip_constant = std::min(chip_constant, MAX_CHIP_CONSTANT);
+    chip_coeff    = std::min(chip_coeff, MAX_CHIP_COEFFICIENT);
 
     switch (google_control.chicker().chicker_command_case())
     {
@@ -146,7 +149,10 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
-            nanopb_control.chicker.chicker_command.chip_pulse_width = chip_pulse_width;
+            nanopb_control.chicker.chicker_command.chip_pulse_width = 
+                static_cast<uint32_t>(
+                    chip_constant *
+                    std::exp(chip_coeff * google_control.chicker().chip_distance_meters()));
             break;
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
             nanopb_control.chicker.which_chicker_command =
@@ -169,7 +175,9 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                         .which_auto_chip_or_kick =
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autochip_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
-                        .auto_chip_or_kick.autochip_pulse_width = chip_pulse_width;
+                        .auto_chip_or_kick.autochip_pulse_width = static_cast<uint32_t>(
+                        chip_constant *
+                        std::exp(chip_coeff * google_control.chicker().auto_chip_or_kick().autochip_distance_meters()));
                     break;
 
                 default:

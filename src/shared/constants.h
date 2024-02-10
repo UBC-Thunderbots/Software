@@ -138,6 +138,11 @@ static const unsigned DIV_B_NUM_ROBOTS = 6;
 static const int MAX_KICK_CONSTANT       = 850;
 static const double MAX_KICK_COEFFICIENT = 0.4;
 
+// Chip Distance to Pulse Width Safety Constraint Constants
+// TODO: UPDATE CONSTANTS ONCE MORE CHIP DATA IS TAKEN FOR ROBOTS
+static const int MAX_CHIP_CONSTANT       = 1600;
+static const double MAX_CHIP_COEFFICIENT = 3.0;
+
 // Arduino
 
 // UART baud rate used to communicate between system and arudino
