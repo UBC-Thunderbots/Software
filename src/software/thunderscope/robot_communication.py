@@ -118,6 +118,13 @@ class RobotCommunication(object):
             robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
         }
 
+    def close_for_fullsystem(self) -> None:
+        if self.receive_ssl_wrapper:
+            self.receive_ssl_wrapper.close()
+
+        if self.receive_ssl_referee_proto:
+            self.receive_ssl_referee_proto.close()
+
     def toggle_keyboard_estop(self) -> None:
         """
         If keyboard estop is being used, toggles the estop state
@@ -325,11 +332,7 @@ class RobotCommunication(object):
         """
         self.running = False
 
-        if self.receive_ssl_wrapper:
-            self.receive_ssl_wrapper.close()
-
-        if self.receive_ssl_wrapper:
-            self.receive_ssl_referee_proto.close()
+        self.close_for_fullsystem()
 
         self.receive_robot_log.close()
         self.receive_robot_status.close()
