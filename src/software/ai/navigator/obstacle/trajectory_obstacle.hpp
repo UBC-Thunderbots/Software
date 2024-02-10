@@ -77,7 +77,7 @@ bool TrajectoryObstacle<GEOM_TYPE>::intersects(const Segment& segment, const dou
     {
         // Instead of shifting the obstacle, we will shift the point
         // in the opposite direction of the motion of obstacle
-        // const Vector displacement = traj_.getPosition(t_sec) - traj_.getPosition(0);
-        return ::intersects(this->geom_, segment/* - displacement*/); // TODO (nima): This is being added in Mikhael's PR
+        const Vector displacement = traj_.getPosition(t_sec) - traj_.getPosition(0);
+        return ::intersects(this->geom_, segment - displacement);
     }
 }

@@ -16,6 +16,7 @@ TEST(MoveFSMTest, test_transitions)
         .ball_collision_type    = TbotsProto::BallCollisionType::AVOID,
         .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE,
         .target_spin_rev_per_s  = 0.0};
 
     FSM<MoveFSM> fsm;
@@ -49,6 +50,7 @@ TEST(MoveFSMTest, test_transitions)
         .ball_collision_type    = TbotsProto::BallCollisionType::AVOID,
         .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE,
         .target_spin_rev_per_s  = 0.0};
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));

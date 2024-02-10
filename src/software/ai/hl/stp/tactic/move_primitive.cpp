@@ -6,19 +6,20 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 
-MovePrimitive::MovePrimitive(
-    const Robot &robot, const Point &destination, const Angle &final_angle,
-    const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
-    const TbotsProto::DribblerMode &dribbler_mode,
-    const TbotsProto::BallCollisionType &ball_collision_type,
-    const AutoChipOrKick &auto_chip_or_kick, std::optional<double> cost_override)
+MovePrimitive::MovePrimitive(const Robot &robot, const Point &destination, const Angle &final_angle,
+                             const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
+                             const TbotsProto::ObstacleAvoidanceMode &obstacle_avoidance_mode,
+                             const TbotsProto::DribblerMode &dribbler_mode,
+                             const TbotsProto::BallCollisionType &ball_collision_type,
+                             const AutoChipOrKick &auto_chip_or_kick, std::optional<double> cost_override)
     : robot(robot),
       destination(destination),
       final_angle(final_angle),
       dribbler_mode(dribbler_mode),
       auto_chip_or_kick(auto_chip_or_kick),
       ball_collision_type(ball_collision_type),
-      max_allowed_speed_mode(max_allowed_speed_mode)
+      max_allowed_speed_mode(max_allowed_speed_mode),
+      obstacle_avoidance_mode(obstacle_avoidance_mode)
 {
     if (cost_override.has_value())
     {
@@ -63,6 +64,8 @@ std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
 
     // TODO (#3104): The fieldBounary should be shrunk by the robot radius before being
     //  passed to the planner.
+    // TODO (NIMA): If start is in a static obstacle, then we should find the nearest point out potentially. If we don't then if the robot slightly enters the
+    //              friendly defense area, and the destination is on the other side outside of the osbtacle, the robot will just drive through...
     traj_path =
         planner.findTrajectory(robot.position(), destination, robot.velocity(),
                                constraints, obstacles, world.field().fieldBoundary());
@@ -143,9 +146,21 @@ void MovePrimitive::generateObstacles(
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {
-        // TODO: Add a time horizon to the stadium obstacles based on how long it takes us to stop?!
-        // TODO(NIMA) Enemy robots and almost all friendly obstacles are constant for everyone!
-        obstacles.push_back(obstacle_factory.createEnemyRobotObstacle(enemy));
+        if (obstacle_avoidance_mode == TbotsProto::SAFE)
+        {
+            // Generate a possibly long stadium shape obstacle in the region
+            // where the enemy robot may move in
+            obstacles.push_back(obstacle_factory.createStadiumEnemyRobotObstacle(enemy));
+        }
+        else if (obstacle_avoidance_mode == TbotsProto::AGGRESSIVE)
+        {
+            // Generate a moving obstacle depending on the enemy robot's velocity.
+            // This is considered a more aggressive strategy as it assumes the enemy
+            // robot is moving at a constant speed. The generated obstacle can also be
+            // much smaller than the stadium shape obstacle, allowing the robot to move
+            // more freely.
+            obstacles.push_back(obstacle_factory.createConstVelocityEnemyRobotObstacle(enemy));
+        }
     }
 
     for (const Robot &friendly : world.friendlyTeam().getAllRobots())

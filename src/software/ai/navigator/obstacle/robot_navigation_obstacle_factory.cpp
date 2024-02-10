@@ -1,6 +1,7 @@
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 
 #include "software/ai/navigator/obstacle/trajectory_obstacle.hpp"
+#include "software/ai/navigator/obstacle/const_velocity_obstacle.hpp"
 
 RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
     TbotsProto::RobotNavigationObstacleConfig config)
@@ -263,15 +264,28 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromBallPosition(
     return createFromShape(Circle(ball_position, BALL_MAX_RADIUS_METERS));
 }
 
-ObstaclePtr RobotNavigationObstacleFactory::createEnemyRobotObstacle(const Robot &enemy_robot) const
+ObstaclePtr RobotNavigationObstacleFactory::createStadiumEnemyRobotObstacle(const Robot &enemy_robot) const
 {
     Vector enemy_robot_velocity = enemy_robot.velocity();
+    // Only generate a stadium obstacle if the robot is moving to avoid twitching obstacles due to noisy velocity data
     if (enemy_robot_velocity.length() < config.dynamic_enemy_robot_obstacle_min_speed_mps())
     {
         return createFromRobotPosition(enemy_robot.position());
     }
 
     return createFromShape(Stadium(enemy_robot.position(), enemy_robot.position() + enemy_robot_velocity * config.dynamic_enemy_robot_obstacle_horizon_sec(), ROBOT_MAX_RADIUS_METERS));
+}
+
+ObstaclePtr RobotNavigationObstacleFactory::createConstVelocityEnemyRobotObstacle(const Robot &enemy_robot) const
+{
+    Vector enemy_robot_velocity = enemy_robot.velocity();
+    // Only generate a const velocity obstacle if the robot is moving to avoid twitching obstacles due to noisy velocity data
+    if (enemy_robot_velocity.length() < config.dynamic_enemy_robot_obstacle_min_speed_mps())
+    {
+        return createFromRobotPosition(enemy_robot.position());
+    }
+
+    return createCircleWithConstVelocity(Circle(enemy_robot.position(), ROBOT_MAX_RADIUS_METERS), enemy_robot.velocity());
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromRobotPosition(
@@ -283,13 +297,20 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromRobotPosition(
 ObstaclePtr RobotNavigationObstacleFactory::createFromMovingRobot(
     const Robot &robot, const TrajectoryPath& traj) const
 {
-    return createDynamicCircle(Circle(robot.position(), ROBOT_MAX_RADIUS_METERS), traj);
+    return createCircleWithTrajectory(Circle(robot.position(), ROBOT_MAX_RADIUS_METERS), traj);
 }
 
-ObstaclePtr RobotNavigationObstacleFactory::createDynamicCircle(const Circle &circle, const TrajectoryPath& traj) const
+ObstaclePtr RobotNavigationObstacleFactory::createCircleWithTrajectory(const Circle &circle, const TrajectoryPath& traj) const
 {
     return std::make_shared<TrajectoryObstacle<Circle>>(
         Circle(circle.origin(), circle.radius() + robot_radius_expansion_amount), traj);
+}
+
+ObstaclePtr
+RobotNavigationObstacleFactory::createCircleWithConstVelocity(const Circle &circle, const Vector &velocity) const
+{
+    return std::make_shared<ConstVelocityObstacle<Circle>>(
+            Circle(circle.origin(), circle.radius() + robot_radius_expansion_amount), velocity, config.dynamic_enemy_robot_obstacle_horizon_sec());
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Circle &circle) const

@@ -23,6 +23,7 @@ TEST_F(PrimitiveTest, test_create_move_primitive)
     std::shared_ptr<MovePrimitive> move_primitive = std::make_shared<MovePrimitive>(
         robot, destination, Angle::threeQuarter(),
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::SAFE,
         TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick(), std::optional<double>());
 
@@ -61,6 +62,7 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_sub_destination)
     std::shared_ptr<MovePrimitive> primitive = std::make_shared<MovePrimitive>(
         robot, destination, Angle::threeQuarter(),
         TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+        TbotsProto::ObstacleAvoidanceMode::SAFE,
         TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick(), std::optional<double>());
 
@@ -98,7 +100,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autochip)
 
     std::shared_ptr<MovePrimitive> move_primitive = std::make_shared<MovePrimitive>(
         robot, destination, Angle::threeQuarter(),
-        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, TbotsProto::DribblerMode::OFF,
+        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+        TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick({AutoChipOrKickMode::AUTOCHIP, 2.5}), std::optional<double>());
 
@@ -129,7 +132,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autokick)
 
     std::shared_ptr<MovePrimitive> move_primitive = std::make_shared<MovePrimitive>(
         robot, destination, Angle::threeQuarter(),
-        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, TbotsProto::DribblerMode::OFF,
+        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+        TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick({AutoChipOrKickMode::AUTOKICK, 3.5}), std::optional<double>());
 

@@ -39,8 +39,9 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
         auto pass1 = pass_eval.getBestPassInZones({ranked_zones[i]}).pass;
 
         offensive_positioning_tactics[i]->updateControlParams(
-            pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
+                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
     }
 }
 

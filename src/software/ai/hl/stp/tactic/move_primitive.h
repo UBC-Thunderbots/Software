@@ -28,6 +28,7 @@ class MovePrimitive : public Primitive
      */
     MovePrimitive(const Robot &robot, const Point &destination, const Angle &final_angle,
                   const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
+                  const TbotsProto::ObstacleAvoidanceMode &obstacle_avoidance_mode,
                   const TbotsProto::DribblerMode &dribbler_mode,
                   const TbotsProto::BallCollisionType &ball_collision_type,
                   const AutoChipOrKick &auto_chip_or_kick,
@@ -83,6 +84,7 @@ class MovePrimitive : public Primitive
 
     TbotsProto::BallCollisionType ball_collision_type;
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+    TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode;
 
     std::vector<ObstaclePtr> obstacles;
 

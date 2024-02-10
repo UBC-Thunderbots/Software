@@ -154,6 +154,7 @@ void GoalieFSM::panic(const Update &event)
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
 }
@@ -192,6 +193,7 @@ void GoalieFSM::positionToBlock(const Update &event)
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
 }
@@ -211,7 +213,8 @@ void GoalieFSM::moveToGoalLine(const Update &event)
 {
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, event.common.world.field().friendlyGoalCenter(),
-        Angle::zero(), max_allowed_speed_mode, TbotsProto::DribblerMode::OFF,
+        Angle::zero(), max_allowed_speed_mode,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
 }

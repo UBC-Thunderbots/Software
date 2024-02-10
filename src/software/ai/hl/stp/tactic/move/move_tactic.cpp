@@ -13,6 +13,7 @@ MoveTactic::MoveTactic()
           .ball_collision_type    = TbotsProto::BallCollisionType::AVOID,
           .auto_chip_or_kick      = {AutoChipOrKickMode::OFF, 0},
           .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+          .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::SAFE,
           .target_spin_rev_per_s  = 0.0}
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
@@ -21,11 +22,13 @@ MoveTactic::MoveTactic()
     }
 }
 
-void MoveTactic::updateControlParams(
-    Point destination, Angle final_orientation, double final_speed,
-    TbotsProto::DribblerMode dribbler_mode,
-    TbotsProto::BallCollisionType ball_collision_type, AutoChipOrKick auto_chip_or_kick,
-    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rev_per_s)
+void MoveTactic::updateControlParams(Point destination, Angle final_orientation, double final_speed,
+                                     TbotsProto::DribblerMode dribbler_mode,
+                                     TbotsProto::BallCollisionType ball_collision_type,
+                                     AutoChipOrKick auto_chip_or_kick,
+                                     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+                                     TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode,
+                                     double target_spin_rev_per_s)
 {
     // Update the control parameters stored by this Tactic
     control_params.destination            = destination;
@@ -35,12 +38,13 @@ void MoveTactic::updateControlParams(
     control_params.ball_collision_type    = ball_collision_type;
     control_params.auto_chip_or_kick      = auto_chip_or_kick;
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
+    control_params.obstacle_avoidance_mode = obstacle_avoidance_mode;
     control_params.target_spin_rev_per_s  = target_spin_rev_per_s;
 }
 
-void MoveTactic::updateControlParams(
-    Point destination, Angle final_orientation, double final_speed,
-    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
+void MoveTactic::updateControlParams(Point destination, Angle final_orientation, double final_speed,
+                                     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+                                     TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode)
 {
     // Update the control parameters stored by this Tactic
     control_params.destination            = destination;
@@ -50,6 +54,7 @@ void MoveTactic::updateControlParams(
     control_params.ball_collision_type    = TbotsProto::BallCollisionType::AVOID;
     control_params.auto_chip_or_kick      = {AutoChipOrKickMode::OFF, 0};
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
+    control_params.obstacle_avoidance_mode = obstacle_avoidance_mode;
     control_params.target_spin_rev_per_s  = 0.0;
 }
 

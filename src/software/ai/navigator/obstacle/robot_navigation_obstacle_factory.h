@@ -103,13 +103,23 @@ class RobotNavigationObstacleFactory
     ObstaclePtr createFromRobotPosition(const Point &robot_position) const;
 
     /**
-     * Create obstacle for enemy robot with additional radius scaling
+     * Create a stadium shaped obstacle for enemy robot with additional radius scaling
      *
      * @param enemy_robot Enemy robot to create the obstacle for
      *
      * @return obstacle around the robot
      */
-    ObstaclePtr createEnemyRobotObstacle(const Robot& enemy_robot) const;
+    ObstaclePtr createStadiumEnemyRobotObstacle(const Robot& enemy_robot) const;
+
+
+    /**
+     * Create dynamic circle obstacle for enemy robot with additional radius scaling
+     *
+     * @param enemy_robot Enemy robot to create the obstacle for
+     *
+     * @return obstacle around the robot
+     */
+    ObstaclePtr createConstVelocityEnemyRobotObstacle(const Robot& enemy_robot) const;
 
     /**
      * Create dynamic circle obstacle around robot with additional radius scaling
@@ -146,14 +156,20 @@ class RobotNavigationObstacleFactory
     ObstaclePtr createFromShape(const Stadium &stadium) const;
 
     /**
-     * Generate a dynamic circular obstacle
-     * NOTE: as with all other obstacles created by RobotNavigationObstacleFactory, the
-     * shapes are expanded on all sides to account for the radius of the robot
+     * Generate a trajectory based circular obstacle with additional radius scaling
      *
      * @param circle The circle to make obstacle with
      * @param traj Trajectory which the obstacle is following
      */
-    ObstaclePtr createDynamicCircle(const Circle &circle, const TrajectoryPath& traj) const;
+    ObstaclePtr createCircleWithTrajectory(const Circle &circle, const TrajectoryPath& traj) const;
+
+    /**
+     * Generate a const velocity based circular obstacle with additional radius scaling
+     *
+     * @param circle The circle to make obstacle with
+     * @param velocity The velocity of the obstacle
+     */
+    ObstaclePtr createCircleWithConstVelocity(const Circle &circle, const Vector& velocity) const;
 
     /**
      * Returns an obstacle with the shape of the BallPlacementZone if the state is in

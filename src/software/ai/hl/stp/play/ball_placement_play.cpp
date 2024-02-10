@@ -32,7 +32,10 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             waiting_line_start_point +
             waiting_line_vector.normalize(waiting_line_vector.length() * i /
                                           static_cast<double>(move_tactics.size() - 1));
-        move_tactics.at(i)->updateControlParams(waiting_destination, Angle::zero(), 0.0);
+        move_tactics.at(i)->updateControlParams(waiting_destination, Angle::zero(), 0.0,
+                                                TbotsProto::DribblerMode_INT_MAX_SENTINEL_DO_NOT_USE_,
+                                                TbotsProto::ALLOW, AutoChipOrKick(), TbotsProto::STOP_COMMAND,
+                                                TbotsProto::ObstacleAvoidanceMode::SAFE, 0);
     }
 
     do

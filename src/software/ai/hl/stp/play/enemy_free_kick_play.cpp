@@ -83,17 +83,19 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             // Since the first enemy threat is covered by the shadow_free_kicker, just
             // move to block the net
             move_tactic_main->updateControlParams(
-                world.field().friendlyGoalCenter() +
+                    world.field().friendlyGoalCenter() +
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoalCenter())
-                    .orientation(),
-                0);
+                    (world.ball().position() - world.field().friendlyGoalCenter())
+                            .orientation(),
+                    0, TbotsProto::DribblerMode_INT_MAX_SENTINEL_DO_NOT_USE_, TbotsProto::ALLOW, AutoChipOrKick(),
+                    TbotsProto::STOP_COMMAND, TbotsProto::ObstacleAvoidanceMode::SAFE, 0);
             move_tactic_main->updateControlParams(
-                world.field().friendlyGoalCenter() +
+                    world.field().friendlyGoalCenter() +
                     Vector(0, -2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoalCenter())
-                    .orientation(),
-                0);
+                    (world.ball().position() - world.field().friendlyGoalCenter())
+                            .orientation(),
+                    0, TbotsProto::DribblerMode_INT_MAX_SENTINEL_DO_NOT_USE_, TbotsProto::ALLOW, AutoChipOrKick(),
+                    TbotsProto::STOP_COMMAND, TbotsProto::ObstacleAvoidanceMode::SAFE, 0);
 
             tactics_to_run[0].emplace_back(move_tactic_main);
             tactics_to_run[0].emplace_back(move_tactic_secondary);
@@ -103,11 +105,12 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             // Shadow the second most threatening enemy threat and move one robot to block
             // the net
             move_tactic_main->updateControlParams(
-                world.field().friendlyGoalCenter() +
+                    world.field().friendlyGoalCenter() +
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoalCenter())
-                    .orientation(),
-                0);
+                    (world.ball().position() - world.field().friendlyGoalCenter())
+                            .orientation(),
+                    0, TbotsProto::DribblerMode_INT_MAX_SENTINEL_DO_NOT_USE_, TbotsProto::ALLOW, AutoChipOrKick(),
+                    TbotsProto::STOP_COMMAND, TbotsProto::ObstacleAvoidanceMode::SAFE, 0);
             std::get<0>(shadow_potential_receivers)
                 ->updateControlParams(enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
 

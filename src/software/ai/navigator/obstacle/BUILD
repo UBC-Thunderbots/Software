@@ -26,9 +26,22 @@ cc_library(
 )
 
 cc_library(
-    name = "trajectory_obstacle",
+    name = "trajectory_obstacle", # TODO (NIMA): Test
     hdrs = [
         "trajectory_obstacle.hpp",
+    ],
+    deps = [
+        ":geom_obstacle",
+        "//software/geom:point",
+        "//software/geom:segment",
+        "//software/geom/algorithms",
+    ],
+)
+
+cc_library(
+    name = "const_velocity_obstacle", # TODO (NIMA): Test
+    hdrs = [
+        "const_velocity_obstacle.hpp",
     ],
     deps = [
         ":geom_obstacle",
@@ -44,6 +57,7 @@ cc_library(
     hdrs = ["robot_navigation_obstacle_factory.h"],
     deps = [
         ":trajectory_obstacle",
+        ":const_velocity_obstacle",
         "//proto:tbots_cc_proto",
         "//software/geom:point",
         "//software/logger",

@@ -77,6 +77,7 @@ void CreaseDefenderFSM::blockThreat(
         .ball_collision_type = ball_collision_type,
         .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance},
         .max_allowed_speed_mode = event.control_params.max_allowed_speed_mode,
+        .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         .target_spin_rev_per_s  = 0.0};
 
     // Update the get behind ball fsm

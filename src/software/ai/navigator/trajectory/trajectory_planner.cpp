@@ -271,7 +271,7 @@ double TrajectoryPlanner::getFirstNonCollisionTime(
         bool collision_found = false;
         for (std::size_t obstacle_index = 0; obstacle_index < obstacles.size(); ++obstacle_index)
         {
-            if (obstacles[obstacle_index]->contains(position, time)) // TODO (NIMA): time>0 will likely result in a nullptr exception segfault since Obstacle::traj_ is nullptr
+            if (obstacles[obstacle_index]->contains(position, time))
             {
                 collision_found = true;
                 break;
