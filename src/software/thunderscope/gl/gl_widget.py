@@ -326,7 +326,7 @@ class GLWidget(QWidget):
                 elevation=90,
                 azimuth=-90,
             )
-            self.gl_view_widget.setCameraParams(fov=ORTHOGRAPHIC_FOV_DEGREES);
+            self.gl_view_widget.setCameraParams(fov=ORTHOGRAPHIC_FOV_DEGREES)
         elif camera_view == CameraView.LANDSCAPE_HIGH_ANGLE:
             self.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(0, -0.5, 0), distance=13, elevation=45, azimuth=-90
@@ -367,7 +367,7 @@ class GLWidget(QWidget):
         distance = np.tan(np.deg2rad(90 - ORTHOGRAPHIC_FOV_DEGREES / 2))
 
         viewport_w_to_h = self.gl_view_widget.width() / self.gl_view_widget.height()
-        
+
         half_x_length_with_buffer = field.field_x_length / 2 + buffer_size
         half_y_length_with_buffer = field.field_y_length / 2 + buffer_size
 
