@@ -38,6 +38,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         # the currently selected play (starts as None)
         # self.current_selected_play = GamecontrollerPlays.NONE
 
+        # TODO: change icon to pause
         # Setup Stop button for sending the STOP gamecontroller command
         self.stop_button = self.__setup_icon_button(
             icons.get_stop_icon(self.BUTTON_ICON_COLOR), 
@@ -52,6 +53,7 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.__send_force_start_command
         )
 
+        # TODO: change icon to cross
         # Setup Halt button for sending the HALT gamecontroller command
         self.halt_button = self.__setup_icon_button(
             icons.get_halt_icon(self.BUTTON_ICON_COLOR), 

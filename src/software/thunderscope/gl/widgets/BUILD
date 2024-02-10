@@ -31,3 +31,13 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "gl_field_toolbar",
+    srcs = ["gl_field_toolbar.py"],
+    deps = [
+        "//software/thunderscope/common:common_widgets",
+        "//software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode:icon_loader",
+        requirement("pyqtgraph"),
+    ]
+)

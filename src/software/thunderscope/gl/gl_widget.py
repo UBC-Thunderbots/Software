@@ -5,7 +5,6 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 
 import functools
-import textwrap
 import numpy as np
 
 from software.thunderscope.constants import *
@@ -13,6 +12,7 @@ from software.thunderscope.constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
+from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
@@ -27,14 +27,16 @@ class GLWidget(QWidget):
     """
 
     def __init__(
-        self,
+        self, 
         proto_unix_io: ProtoUnixIO,
         friendly_color_yellow: bool,
-        player: ProtoPlayer = None,
+        player: ProtoPlayer = None, 
+        sandbox_mode: bool = False,
     ) -> None:
         """Initialize the GLWidget
 
         :param player: The replay player to optionally display media controls for
+        :param sandbox_mode: if sandbox mode should be enabled
 
         """
         super().__init__()
@@ -57,98 +59,23 @@ class GLWidget(QWidget):
             self.mouse_in_scene_moved
         )
 
-        # Stylesheet for toolbar buttons
-        tool_button_stylesheet = textwrap.dedent(
-            """
-            QPushButton {
-                color: #969696;
-                background-color: transparent;
-                border-color: transparent;
-                border-width: 4px;
-                border-radius: 4px;
-                height: 16px;
-            }
-            QPushButton:hover {
-                background-color: #363636;
-                border-color: #363636;
-            }
-            """
-        )
-
-        # Setup Layers button for toggling visibility of layers
-        self.layers_button = QPushButton()
-        self.layers_button.setText("Layers")
-        self.layers_button.setStyleSheet(tool_button_stylesheet)
-        self.layers_menu = QMenu()
-        self.layers_menu_actions = {}
-        self.layers_button.setMenu(self.layers_menu)
-        
-        # Set up View button for setting the camera position to standard views
-        self.camera_view_button = QPushButton()
-        self.camera_view_button.setText("View")
-        self.camera_view_button.setStyleSheet(tool_button_stylesheet)
-        self.camera_view_menu = QMenu()
-        self.camera_view_button.setMenu(self.camera_view_menu)
-        self.camera_view_actions = [
-            QtGui.QAction("[1] Orthographic Top Down"),
-            QtGui.QAction("[2] Landscape High Angle"),
-            QtGui.QAction("[3] Left Half High Angle"),
-            QtGui.QAction("[4] Right Half High Angle"),
-        ]
-        self.camera_view_actions[0].triggered.connect(
-            lambda: self.set_camera_view(CameraView.ORTHOGRAPHIC)
-        )
-        self.camera_view_actions[1].triggered.connect(
-            lambda: self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
-        )
-        self.camera_view_actions[2].triggered.connect(
-            lambda: self.set_camera_view(CameraView.LEFT_HALF_HIGH_ANGLE)
-        )
-        self.camera_view_actions[3].triggered.connect(
-            lambda: self.set_camera_view(CameraView.RIGHT_HALF_HIGH_ANGLE)
-        )
-        for camera_view_action in self.camera_view_actions:
-            self.camera_view_menu.addAction(camera_view_action)
-
-        # Setup Measure button for enabling/disabling measure mode
+        # Setup toolbar
         self.measure_mode_enabled = False
         self.measure_layer = None
-        self.measure_button = QPushButton()
-        self.measure_button.setText("Measure")
-        self.measure_button.setStyleSheet(tool_button_stylesheet)
-        self.measure_button.setShortcut("m")
-        self.measure_button.clicked.connect(lambda: self.toggle_measure_mode())
-
-        # Setup Help button
-        self.help_button = QPushButton()
-        self.help_button.setText("Help")
-        self.help_button.setStyleSheet(tool_button_stylesheet)
-        self.help_button.clicked.connect(
-            lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
+        self.layers_menu = QMenu()
+        self.toolbars_menu = QMenu()
+        self.layers_menu_actions = {}
+        self.toolbar = GLFieldToolbar(
+            on_camera_view_change=self.set_camera_view,
+            on_measure_mode=self.toggle_measure_mode,
+            layers_menu=self.layers_menu,
+            sandbox_mode=sandbox_mode,
         )
-
-        # Setup Toolbars button for toggling visibility of toolbars
-        self.setup_toolbars_button()
-        self.toolbars_button.setStyleSheet(tool_button_stylesheet)
-
-        # Setup toolbar
-        self.toolbar = QWidget()
-        self.toolbar.setSizePolicy(
-            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed
-        )
-        self.toolbar.setStyleSheet("background-color: black;" "padding: 0px;")
-        self.toolbar.setLayout(QHBoxLayout())
-        self.toolbar.layout().addWidget(self.layers_button)
-        self.toolbar.layout().addWidget(self.toolbars_button)
-        self.toolbar.layout().addStretch()
-        self.toolbar.layout().addWidget(self.help_button)
-        self.toolbar.layout().addWidget(self.measure_button)
-        self.toolbar.layout().addWidget(self.camera_view_button)
 
         # Setup gamecontroller toolbar
         self.gamecontroller_toolbar = GLGamecontrollerToolbar(
             proto_unix_io, friendly_color_yellow
-        )
+        )        
 
         # Setup layout
         self.layout = QVBoxLayout()
@@ -158,6 +85,11 @@ class GLWidget(QWidget):
         self.layout.addWidget(self.toolbar)
         self.layout.addWidget(self.gl_view_widget)
         self.layout.addWidget(self.gamecontroller_toolbar)
+
+        # Add a menu item for the Gamecontroller toolbar
+        [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox("Gamecontroller", self.toolbars_menu)
+        self.toolbars_menu_checkboxes["Gamecontroller"] = toolbar_checkbox
+        self.toolbars_menu.addAction(toolbar_action)
 
         # Connect visibility of the toolbar to the menu item
         self.toolbars_menu_checkboxes["Gamecontroller"].stateChanged.connect(
@@ -327,6 +259,9 @@ class GLWidget(QWidget):
         if self.isVisible() == False:
             return
 
+        if self.toolbar:
+            self.toolbar.refresh()
+
         for layer in self.layers:
             while layer:
                 if layer.visible():
@@ -376,22 +311,6 @@ class GLWidget(QWidget):
             self.add_layer(self.measure_layer)
         else:
             self.remove_layer(self.measure_layer)
-
-    def setup_toolbars_button(self) -> None:
-        """
-        Sets up the toolbars display toggle menu
-        Where each toolbar's visibility can be toggled
-        """
-        self.toolbars_button = QPushButton()
-        self.toolbars_button.setText("Toolbars")
-        self.toolbars_menu = QMenu()
-        self.toolbars_menu_checkboxes = {}
-        self.toolbars_button.setMenu(self.toolbars_menu)
-
-        # Add each toolbar to the Toolbars menu
-        [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox("Gamecontroller", self.toolbars_menu)
-        self.toolbars_menu_checkboxes["Gamecontroller"] = toolbar_checkbox
-        self.toolbars_menu.addAction(toolbar_action)
 
     def setup_menu_checkbox(self, name: str, parent: QWidget, checked: bool = True):
         """

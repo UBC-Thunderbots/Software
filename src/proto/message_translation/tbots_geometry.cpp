@@ -61,6 +61,15 @@ std::unique_ptr<TbotsProto::Segment> createSegmentProto(const Segment& segment)
     return segment_proto;
 }
 
+std::unique_ptr<TbotsProto::Stadium> createStadiumProto(const Stadium& stadium)
+{
+    auto stadium_proto                  = std::make_unique<TbotsProto::Stadium>();
+    *(stadium_proto->mutable_segment()) = *createSegmentProto(stadium.segment());
+    stadium_proto->set_radius(stadium.radius());
+
+    return stadium_proto;
+}
+
 Point createPoint(const TbotsProto::Point& point)
 {
     return Point(point.x_meters(), point.y_meters());
@@ -101,4 +110,9 @@ Circle createCircle(const TbotsProto::Circle& circle)
 Segment createSegment(const TbotsProto::Segment& segment)
 {
     return Segment(createPoint(segment.start()), createPoint(segment.end()));
+}
+
+Stadium createStadium(const TbotsProto::Stadium& stadium)
+{
+    return Stadium(createSegment(stadium.segment()), stadium.radius());
 }
