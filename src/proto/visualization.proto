@@ -46,6 +46,7 @@ message Obstacle
     {
         Polygon polygon = 1;
         Circle circle   = 2;
+        Stadium stadium = 3;
     }
 }
 
