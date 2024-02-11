@@ -10,6 +10,9 @@ from proto.message_translation.tbots_protobuf import create_world_state
 from software.simulated_tests.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
+from software.simulated_tests.friendly_has_ball_possession import (
+    FriendlyEventuallyHasBallPossession,
+)
 from software.simulated_tests.ball_moves_in_direction import (
     BallAlwaysMovesInDirectionInRegions,
 )
@@ -185,7 +188,7 @@ def setup_pass_and_robots(
             tbots_cpp.Point(0.0, 0.0),
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(0.0, -1.0),
-            [tbots_cpp.Point(3.5, 0.0)],
+            [tbots_cpp.Point(0.0, 3.0)],
             [0, math.pi],
             [],
         ),
@@ -255,7 +258,11 @@ def test_passing_receive_speed(
     simulated_test_runner,
 ):
     # Eventually Validation
-    eventually_validation_sequence_set = [[]]
+    eventually_validation_sequence_set = [
+        [
+            FriendlyEventuallyHasBallPossession(robot_id=1)
+        ]
+    ]
 
     # Validate that the ball is always received by the other robot
     # slower than the max receive speed
@@ -389,7 +396,7 @@ def test_passing_no_backwards_passes(
         [
             BallAlwaysMovesInDirectionInRegions(
                 initial_ball_position=ball_initial_position,
-                direction=True,
+                moving_in_pos_x=True,
                 regions=[
                     tbots_cpp.Rectangle(
                         tbots_cpp.Point(-field.xLength() / 2, field.yLength() / 2),

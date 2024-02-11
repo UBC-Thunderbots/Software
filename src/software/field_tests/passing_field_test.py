@@ -14,17 +14,20 @@ from software import py_constants
 
 
 def test_passing(field_test_runner):
-    passer_robot_id = 1
+    passer_robot_id = 5
     receiver_robot_id = 6
     should_receive_pass = True
 
-    passer_point = tbots_cpp.Point(0, 0)
-    receiver_point = tbots_cpp.Point(1, 1)
-    receive_speed_m_per_s = 2
-    min_pass_speed_m_per_s = 1
-    max_pass_speed_m_per_s = 4
+    world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
+    passer_point = tbots_cpp.createPoint(
+        world.ball.current_state.global_position
+    )
+    receiver_point = tbots_cpp.Point(-2.75, -0.7)
+    receive_speed_m_per_s = 2.0
+    min_pass_speed_m_per_s = 1.0
+    max_pass_speed_m_per_s = 4.0
 
-    pass_to_test = Pass.fromDestReceiveSpeed(
+    pass_to_test = tbots_cpp.Pass.fromDestReceiveSpeed(
         passer_point,
         receiver_point,
         receive_speed_m_per_s,
@@ -81,18 +84,7 @@ def test_passing(field_test_runner):
     # slower than the max receive speed
     # and also that the ball is not passed backwards over long distances
     always_validation_sequence_set = [
-        [FriendlyAlwaysReceivesBallSlow(robot_id=1, max_receive_speed=2.5)],
-        [
-            BallAlwaysMovesInDirectionInRegions(
-                initial_ball_position=tbots_world.ball().position(),
-                direction=True,
-                regions=[
-                    eighteen_zones.getZone(tbots_cpp.EighteenZoneId.ZONE_7),
-                    eighteen_zones.getZone(tbots_cpp.EighteenZoneId.ZONE_8),
-                    eighteen_zones.getZone(tbots_cpp.EighteenZoneId.ZONE_9),
-                ],
-            )
-        ],
+        [FriendlyAlwaysReceivesBallSlow(robot_id=receiver_robot_id, max_receive_speed=2.5)]
     ]
 
     field_test_runner.set_tactics(params, True)

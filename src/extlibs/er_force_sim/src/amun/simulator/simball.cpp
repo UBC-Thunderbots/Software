@@ -36,7 +36,7 @@ SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world)
       m_world(world),
       current_ball_state(STATIONARY),
       set_transition_speed(true),
-      rolling_speed(-1.0)
+      rolling_speed(-1.0f)
 {
     // see http://robocup.mi.fu-berlin.de/buch/rolling.pdf for correct modelling
     m_sphere =
@@ -49,7 +49,8 @@ SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world)
     btTransform startWorldTransform;
     startWorldTransform.setIdentity();
     startWorldTransform.setOrigin(
-        btVector3(0.0f, 0.0f, static_cast<float>(BALL_MAX_RADIUS_METERS)) * SIMULATOR_SCALE);
+        btVector3(0.0f, 0.0f, static_cast<float>(BALL_MAX_RADIUS_METERS)) *
+        SIMULATOR_SCALE);
     m_motionState = new btDefaultMotionState(startWorldTransform);
 
     btRigidBody::btRigidBodyConstructionInfo rbInfo(BALL_MASS_KG, m_motionState, m_sphere,
@@ -137,7 +138,7 @@ void SimBall::begin(bool robot_collision)
                                             SIMULATOR_SCALE * BALL_MASS_KG *
                                             SUB_TIMESTEP);
 
-                m_body->setFriction(0.0);
+                m_body->setFriction(0.0f);
                 set_transition_speed = false;
                 break;
         }
@@ -196,8 +197,9 @@ void SimBall::begin(bool robot_collision)
                             m_move.z() + static_cast<float>(BALL_MAX_RADIUS_METERS));
             force = force - m_body->getWorldTransform().getOrigin() / SIMULATOR_SCALE;
             m_body->activate();
-            m_body->applyCentralImpulse(force * static_cast<float>(BALL_MASS_KG) * 0.1f * SIMULATOR_SCALE);
-            m_body->setDamping(0.99, 0.99);
+            m_body->applyCentralImpulse(force * static_cast<float>(BALL_MASS_KG) * 0.1f *
+                                        SIMULATOR_SCALE);
+            m_body->setDamping(0.99f, 0.99f);
         }
         else
         {
@@ -237,7 +239,7 @@ void SimBall::begin(bool robot_collision)
                 m_body->setAngularVelocity(btVector3(0, 0, 0));
             }
             m_body->activate();
-            m_body->setDamping(0.0, 0.0);
+            m_body->setDamping(0.0f, 0.0f);
             m_move.Clear();  // clear move command
                              // reset is neccessary, as the command is only sent once
                              // without one canceling it
@@ -246,7 +248,7 @@ void SimBall::begin(bool robot_collision)
     else
     {
         // ball is slowed down by rolling friction, not damping!
-        m_body->setDamping(0.0, 0.0);
+        m_body->setDamping(0.0f, 0.0f);
     }
 }
 
@@ -344,9 +346,9 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
                            btVector3 positionOffset)
 {
     // setup ssl-vision ball detection
-    ball->set_confidence(1.0);
-    ball->set_pixel_x(0);
-    ball->set_pixel_y(0);
+    ball->set_confidence(1.0f);
+    ball->set_pixel_x(0.0f);
+    ball->set_pixel_y(0.0f);
 
     btTransform transform;
     m_motionState->getWorldTransform(transform);
@@ -355,7 +357,7 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
         btVector3(cameraPosition.x(), cameraPosition.y(), cameraPosition.z()) *
         SIMULATOR_SCALE;
 
-    float visibility = 1;
+    float visibility = 1.f;
     // the camera uses the mid point of the visible pixels as the mid point of the
     // ball if some parts of the ball aren't visible the position this function
     // adjusts the position accordingly (hopefully)
@@ -374,10 +376,10 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
     // reflects the cameras resolution
     const float PIXEL_PER_AREA = 10.0f;  // i do not know in what unit area is,
                                          // just make it similar to a real game
+    const float BALL_MAX_RADIUS_METERS_FLOAT = static_cast<float>(BALL_MAX_RADIUS_METERS);
 
-    float modZ =
-        std::min(SCALING_LIMIT * cameraPosition.z(),
-                 std::max(0.f, pos.z() - static_cast<float>(BALL_MAX_RADIUS_METERS)));
+    float modZ = std::min(SCALING_LIMIT * cameraPosition.z(),
+                          std::max(0.f, pos.z() - BALL_MAX_RADIUS_METERS_FLOAT));
     float modX = (pos.x() - cameraPosition.x()) *
                      (cameraPosition.z() / (cameraPosition.z() - modZ)) +
                  cameraPosition.x();
@@ -389,10 +391,10 @@ bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, flo
         std::sqrt((cameraPosition.z() - modZ) * (cameraPosition.z() - modZ) +
                   (cameraPosition.x() - pos.x()) * (cameraPosition.x() - pos.x()) +
                   (cameraPosition.y() - pos.y()) * (cameraPosition.y() - pos.y()));
-    float denomSqrt     = (distBallCam * 1000.f) / FOCAL_LENGTH - 1.f;
-    float basePixelArea = (static_cast<float>(BALL_MAX_RADIUS_METERS) *
-                           static_cast<float>(BALL_MAX_RADIUS_METERS) * 1000000 * M_PI) /
-                          (denomSqrt * denomSqrt);
+    float denomSqrt = (distBallCam * 1000.f) / FOCAL_LENGTH - 1.f;
+    float basePixelArea =
+        (BALL_MAX_RADIUS_METERS_FLOAT * BALL_MAX_RADIUS_METERS_FLOAT * 1000000 * M_PI) /
+        (denomSqrt * denomSqrt);
     float area =
         visibility *
         std::max(0.0f, (basePixelArea +

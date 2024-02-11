@@ -172,10 +172,6 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
 template <class ZoneEnum>
 ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 {
-    std::uniform_real_distribution speed_distribution(
-        passing_config_.min_pass_speed_m_per_s(),
-        passing_config_.max_pass_speed_m_per_s());
-
     ZonePassMap<ZoneEnum> passes;
 
     // Randomly sample a pass in each zone
@@ -229,13 +225,14 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
                     pitch_division_->getZone(zone_id), passing_config_);
             };
 
-        auto pass_array = optimizer_.maximize(
+        auto optimized_pass_array = optimizer_.maximize(
             objective_function, generated_passes.at(zone_id).pass.toPassArray(),
             passing_config_.number_of_gradient_descent_steps_per_iter());
 
         // get a pass with the new appropriate speed using the new destination
         auto new_pass = Pass::fromDestReceiveSpeed(
-            world.ball().position(), Point(pass_array[0], pass_array[1]),
+            world.ball().position(),
+            Point(optimized_pass_array[0], optimized_pass_array[1]),
             passing_config_.max_receive_speed(), passing_config_.min_pass_speed_m_per_s(),
             passing_config_.max_pass_speed_m_per_s());
         auto score =

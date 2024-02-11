@@ -80,8 +80,9 @@ double Pass::getPassSpeed(const Point& ball_position, const Point& pass_destinat
     // d1 = (c^2 - 1)x^2 / 2s // re-arrange
     // d2 = D + (1 - c^2)x^2 / 2s // using fact from above
     //
-    // vf^2 = (cx)^2 + 2rd2 = (cx)^2 + 2r(D + (1 - c^2)x^2 / 2s) // using final velocity kinematics formula
-    // 
+    // vf^2 = (cx)^2 + 2rd2 = (cx)^2 + 2r(D + (1 - c^2)x^2 / 2s) // using final velocity
+    // kinematics formula
+    //
     // Simplify and rearrange for initial velocity:
     // x = sqrt((vf^2 - 2rD) / (c^2 - rc^2/s + b/s))
     Vector pass_distance          = Vector(pass_destination.x() - ball_position.x(),
@@ -105,8 +106,8 @@ double Pass::getPassSpeed(const Point& ball_position, const Point& pass_destinat
         pass_speed_calc_constant;
     double pass_speed_m_per_s = sqrt(squared_pass_speed);
 
-    double clamped_pass_speed_m_per_s = std::max(
-        min_pass_speed_m_per_s, std::min(max_pass_speed_m_per_s, pass_speed_m_per_s));
+    double clamped_pass_speed_m_per_s =
+        std::clamp(pass_speed_m_per_s, min_pass_speed_m_per_s, max_pass_speed_m_per_s);
     return clamped_pass_speed_m_per_s;
 }
 

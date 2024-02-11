@@ -8,17 +8,18 @@ from software.simulated_tests.validation import (
 )
 
 
-class BallMoves(Validation):
-    """Checks if ball is moving forward or backward, i.e. in the +x direction"""
+class BallMovesXAxis(Validation):
+    """Checks if ball is moving forward or backward in the +x direction"""
 
-    def __init__(self, initial_ball_position, direction):
+    def __init__(self, initial_ball_position: tbots.Point, moving_in_pos_x: bool):
         """
         Constructs the validation
         :param initial_ball_position: the initial position of the ball
-        :param direction: True if checking for forward, false if backward
+        :param moving_in_pos_x: True if checking for +x direction, false if checking for -x direction
         """
         self.last_ball_position = initial_ball_position
-        self.direction = direction
+        self.moving_in_pos_x = direction
+        self.max_displacement_so_far = None
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if ball is moving forward or backward
@@ -27,20 +28,32 @@ class BallMoves(Validation):
         :returns: FAILING if ball doesn't move in the direction
                   PASSING if ball moves in the direction
         """
-        validation_status = ValidationStatus.FAILING
         current_ball_position = tbots.createPoint(
             world.ball.current_state.global_position
-        )
+        ).x()
 
+        # if max displacement is not set or current ball is moving in the right direction
+        # set it and return PASSING
+        if self.max_displacement_so_far is None or (
+            (self.direction and current_ball_position > self.max_displacement_so_far)
+            or (
+                not self.direction
+                and current_ball_position < self.max_displacement_so_far
+            )
+        ):
+            self.max_displacement_so_far = current_ball_position
+            return ValidationStatus.PASSING
+
+        # if max displacement is set and current ball is in the wrong direction too far
+        # beyond a threshold, return FAILING
         if (
-            self.direction and current_ball_position.x() >= self.last_ball_position.x()
+            self.direction
+            and current_ball_position < self.max_displacement_so_far - 0.1
         ) or (
             not self.direction
-            and current_ball_position.x() <= self.last_ball_position.x()
+            and current_ball_position > self.max_displacement_so_far + 0.1
         ):
-            validation_status = ValidationStatus.PASSING
-        self.last_ball_position = current_ball_position
-        return validation_status
+            return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """
@@ -67,7 +80,7 @@ class BallMoves(Validation):
         )
 
 
-class BallMovesForward(BallMoves):
+class BallMovesForward(BallMovesXAxis):
 
     """Checks if ball is moving forward, i.e. in the +x direction"""
 
@@ -83,11 +96,11 @@ class BallMovesForward(BallMoves):
 ) = create_validation_types(BallMovesForward)
 
 
-class BallMovesInDirectionInRegions(BallMoves):
+class BallMovesInDirectionInRegions(BallMovesXAxis):
     """Checks if ball is moving in a direction in certain regions"""
 
-    def __init__(self, initial_ball_position, direction, regions=[]):
-        super().__init__(initial_ball_position, direction)
+    def __init__(self, initial_ball_position, moving_in_pos_x, regions=[]):
+        super().__init__(initial_ball_position, moving_in_pos_x)
         self.regions = regions
 
     def get_validation_status(self, world) -> ValidationStatus:

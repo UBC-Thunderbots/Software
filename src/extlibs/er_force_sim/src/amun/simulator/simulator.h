@@ -39,7 +39,7 @@
 const float SIMULATOR_SCALE  = 10.0f;
 const float SUB_TIMESTEP     = 1 / 200.f;
 const float COLLISION_MARGIN = 0.04f;
-const float FOCAL_LENGTH  = 390.f;
+const float FOCAL_LENGTH     = 390.f;
 
 
 class QByteArray;
