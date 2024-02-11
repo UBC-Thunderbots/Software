@@ -26,9 +26,7 @@ class GLTrailLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.world_buffer = ThreadSafeBuffer(
-            buffer_size, World
-        )
+        self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.trail_graphics_head = ObservableList(self._graphics_changed)
         self.robot_trail_queues = {}
         self.cached_world = World()
@@ -61,27 +59,19 @@ class GLTrailLayer(GLLayer):
 
     def __update_trail_points(self, robot_queue: deque, robot: Robot):
 
-        robot_queue.append(
-            robot.current_state.global_position
-        )
+        robot_queue.append(robot.current_state.global_position)
 
-    def __update_trail_graphics(self, team: Team, queues_dict: dict, color: Colors) -> None:
-        """Draws trail graphics
+    def __update_trail_graphics(
+        self, team: Team, queues_dict: dict, color: Colors
+    ) -> None:
 
-        :param queues_dict: Robot Queues of past positions
-        """
         self.trail_graphics_head.resize(
-            len(team.team_robots) * 1,
-            lambda: GLPolygon(
-                outline_color=color,
-            ),
+            len(team.team_robots) * 1, lambda: GLPolygon(outline_color=color,),
         )
 
         for trail_graphics_head, trail_queue in zip(
-                self.trail_graphics_head,
-                queues_dict,
+            self.trail_graphics_head, queues_dict,
         ):
             trail_graphics_head.set_points(
-                [[point.x_meters, point.y_meters]
-                 for point in queues_dict[trail_queue]]
+                [[point.x_meters, point.y_meters] for point in queues_dict[trail_queue]]
             )

@@ -125,12 +125,12 @@ py_library(
 )
 
 py_library(
-   name = "gl_trail_layer",
-   srcs = ["gl_trail_layer.py"],
-   deps = [
-       ":gl_layer",
-       "//software/thunderscope/gl/graphics:gl_polygon",
-       "//software/thunderscope/gl/graphics:gl_robot_outline",
-       requirement("pyqtgraph"),
-   ],
+    name = "gl_trail_layer",
+    srcs = ["gl_trail_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
+        "//software/thunderscope/gl/graphics:gl_robot_outline",
+        requirement("pyqtgraph"),
+    ],
 )

@@ -54,4 +54,3 @@ message ObstacleList
 {
     repeated Obstacle obstacles = 1;
 }
-

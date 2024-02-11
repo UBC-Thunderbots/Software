@@ -308,5 +308,6 @@ class DepthValues:
 
 class TrailValues:
     """Constants for Trails Visualization Layer in Thunderscope."""
+
     DEFAULT_TRAIL_LENGTH = 10
     DEFAULT_TRAIL_SAMPLING_RATE = 3
