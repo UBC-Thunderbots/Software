@@ -2,7 +2,7 @@ from pyqtgraph.opengl import *
 
 from collections import deque
 from proto.world_pb2 import World
-from proto.import_all_protos import Team
+from proto.import_all_protos import Team, Robot
 
 from software.thunderscope.constants import Colors, DepthValues, TrailValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -30,57 +30,58 @@ class GLTrailLayer(GLLayer):
             buffer_size, World
         )
         self.trail_graphics_head = ObservableList(self._graphics_changed)
-        self._queuesExist = False
-        self.maxTrailLength = TrailValues.DEFAULT_TRAIL_LENGTH
-        self.trailSampleRate = TrailValues.DEFAULT_TRAIL_SAMPLING_RATE
-        self.robot_trail_queues = None
+        self.robot_trail_queues = {}
         self.cached_world = World()
+
+        self.maxTrailLength = TrailValues.DEFAULT_TRAIL_LENGTH
+        self.refresh_interval = TrailValues.DEFAULT_TRAIL_SAMPLING_RATE
+        self.refresh_count = self.refresh_interval
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         self.cached_world = self.world_buffer.get(block=False)
 
-        # Ensures queues are created once upon first receival of world buffer
-        if not self._queuesExist and self.cached_world is not None:
-            self.robot_trail_queues = [
-                deque([], self.maxTrailLength)
-                for _ in self.cached_world.friendly_team.team_robots
-            ]
-            self._queuesExist = True
+        if self.refresh_count <= 0:
 
-        if self._queuesExist:
+            self.refresh_count = self.refresh_interval
+            for robot in self.cached_world.friendly_team.team_robots:
+                if robot.id in self.robot_trail_queues:
+                    self.__update_trail_points(self.robot_trail_queues[robot.id], robot)
+                else:
+                    self.robot_trail_queues[robot.id] = deque([], self.maxTrailLength)
+
             self.__update_trail_graphics(
                 self.cached_world.friendly_team,
                 self.robot_trail_queues,
                 Colors.DEFAULT_GRAPHICS_COLOR,
             )
 
-    def __update_trail_points(self, robot_queue, robot):
+        self.refresh_count -= 1
+
+    def __update_trail_points(self, robot_queue: deque, robot: Robot):
 
         robot_queue.append(
             robot.current_state.global_position
         )
 
-    def __update_trail_graphics(self, team: Team, queues, color: Colors) -> None:
+    def __update_trail_graphics(self, team: Team, queues_dict: dict, color: Colors) -> None:
+        """Draws trail graphics
+
+        :param queues_dict: Robot Queues of past positions
+        """
         self.trail_graphics_head.resize(
             len(team.team_robots) * 1,
             lambda: GLPolygon(
                 outline_color=color,
             ),
         )
-        # Update trail points
-        for robot_trail, robot in zip(
-                queues,
-                team.team_robots,
-        ):
-            self.__update_trail_points(robot_trail, robot)
 
-        # Draws trail graphics
         for trail_graphics_head, trail_queue in zip(
                 self.trail_graphics_head,
-                queues,
+                queues_dict,
         ):
             trail_graphics_head.set_points(
-                [[point.x_meters, point.y_meters] for point in trail_queue]
+                [[point.x_meters, point.y_meters]
+                 for point in queues_dict[trail_queue]]
             )
