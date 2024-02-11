@@ -1,12 +1,12 @@
 
 #include "software/geom/algorithms/end_in_obstacle_sample.h"
-#include "software/geom/algorithms/closest_point.h"
 
 #include <include/gtest/gtest.h>
 
 #include <random>
 
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/geom/algorithms/closest_point.h"
 #include "software/test_util/test_util.h"
 
 static constexpr double MAX_ALLOWABLE_SAMPLE_ERROR = 0.15;
@@ -44,13 +44,15 @@ TEST_F(TestEndInObstacleSampler, test_end_outside_field_boundary)
         double min_distance = MAX_ALLOWABLE_SAMPLE_ERROR + 1;
         for (auto const &obstacle : obstacles)
         {
-            double point_distance_from_obstacle = distance(end_point.value(), obstacle->closestPoint(end_point.value()));
+            double point_distance_from_obstacle =
+                distance(end_point.value(), obstacle->closestPoint(end_point.value()));
             min_distance = std::min(min_distance, point_distance_from_obstacle);
             // check that the returned point is not inside an obstacle
             ASSERT_FALSE(obstacle->contains(end_point.value()));
         }
         // check that returned point is not too far from the nearest obstacle
-        if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR) {
+        if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR)
+        {
             std::cout << "end_point" << end_point.value() << '\n';
             FAIL() << "Returned point is too far from destination";
         }
@@ -82,13 +84,15 @@ TEST_F(TestEndInObstacleSampler, test_end_in_defense_area)
         double min_distance = MAX_ALLOWABLE_SAMPLE_ERROR + 1;
         for (auto const &obstacle : obstacles)
         {
-            double point_distance_from_obstacle = distance(end_point.value(), obstacle->closestPoint(end_point.value()));
+            double point_distance_from_obstacle =
+                distance(end_point.value(), obstacle->closestPoint(end_point.value()));
             min_distance = std::min(min_distance, point_distance_from_obstacle);
             // check that the returned point is not inside an obstacle
             ASSERT_FALSE(obstacle->contains(end_point.value()));
         }
         // check that returned point is not too far from the nearest obstacle
-        if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR) {
+        if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR)
+        {
             std::cout << "end_point" << end_point.value() << '\n';
             FAIL() << "Returned point is too far from destination";
         }
@@ -172,13 +176,15 @@ TEST_F(TestEndInObstacleSampler, test_sampling_performance)
             double min_distance = MAX_ALLOWABLE_SAMPLE_ERROR + 1;
             for (auto const &obstacle : obstacles)
             {
-                double point_distance_from_obstacle = distance(end_point.value(), obstacle->closestPoint(end_point.value()));
+                double point_distance_from_obstacle = distance(
+                    end_point.value(), obstacle->closestPoint(end_point.value()));
                 min_distance = std::min(min_distance, point_distance_from_obstacle);
                 // check that the returned point is not inside an obstacle
                 ASSERT_FALSE(obstacle->contains(end_point.value()));
             }
             // check that returned point is not too far from the nearest obstacle
-            if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR) {
+            if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR)
+            {
                 FAIL() << "Sampled point is too far from destination";
             }
         }
@@ -188,4 +194,3 @@ TEST_F(TestEndInObstacleSampler, test_sampling_performance)
         }
     }
 }
-

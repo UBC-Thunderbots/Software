@@ -8,8 +8,9 @@ static constexpr double OBSTACLE_AVOIDANCE_BUFFER_CENTIMETERS = 0.01;
 
 std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacles,
                                          const Point &point,
-                                         const Rectangle &navigable_area, int initial_count,
-                                         double radius_step, int samples_per_radius_step,
+                                         const Rectangle &navigable_area,
+                                         int initial_count, double radius_step,
+                                         int samples_per_radius_step,
                                          double max_search_radius)
 {
     // first, check if point is inside an obstacle
@@ -25,8 +26,9 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
 
             // if point is inside obstacle, perform a second check to see if the closest
             // point outside the first encroached obstacle is inside another obstacle
-            Point closest_point            = obstacle->closestPoint(point);
-            closest_point += (closest_point - point).normalize(OBSTACLE_AVOIDANCE_BUFFER_CENTIMETERS);
+            Point closest_point = obstacle->closestPoint(point);
+            closest_point +=
+                (closest_point - point).normalize(OBSTACLE_AVOIDANCE_BUFFER_CENTIMETERS);
             bool closest_point_in_obstacle = false;
             // break out of loop if closest point outside first encroached obstacle is
             // outside navigable area
