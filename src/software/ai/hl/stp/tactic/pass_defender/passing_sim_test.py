@@ -97,7 +97,7 @@ def setup_pass_and_robots(
     # construct a pass generator with a max receive speed set
     pass_generator = tbots_cpp.EighteenZoneIdPassGenerator(
         tbots_cpp.EighteenZonePitchDivision(tbots_cpp.Field.createSSLDivisionBField()),
-        PassingConfig(max_receive_speed=py_constants.MAX_PASS_RECEIVE_SPEED),
+        PassingConfig(),
     )
 
     # generate the best pass on the world 100 times

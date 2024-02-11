@@ -13,7 +13,7 @@ void GetBehindBallFSM::updateMove(const Update& event)
     Vector behind_ball =
         Vector::createFromAngle(event.control_params.chick_direction + Angle::half());
     Point point_behind_ball = event.control_params.ball_location +
-                              behind_ball.normalize(ROBOT_MAX_RADIUS_METERS + 0.04);
+                              behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, point_behind_ball, event.control_params.chick_direction,
@@ -35,25 +35,24 @@ bool GetBehindBallFSM::behindBall(const Update& event)
 
     // We make the region close enough to the ball so that the robot will still be
     // inside it when taking the chip.
-    Point behind_ball_vertex_A = event.control_params.ball_location +
-        behind_ball.normalize(0.02 + ROBOT_MAX_RADIUS_METERS);
+    Point behind_ball_vertex_A = event.control_params.ball_location;
     Point behind_ball_vertex_A1 =
         behind_ball_vertex_A +
-        behind_ball.perpendicular().normalize(0.03 / 2);
+        behind_ball.perpendicular().normalize(size_of_region_behind_ball / 8);
     Point behind_ball_vertex_A2 =
         behind_ball_vertex_A -
-        behind_ball.perpendicular().normalize(0.03 / 2);
+        behind_ball.perpendicular().normalize(size_of_region_behind_ball / 8);
     Point behind_ball_vertex_B =
-        behind_ball_vertex_A + behind_ball.normalize(0.06) +
-        behind_ball.perpendicular().normalize(0.04 / 2);
+        behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
+        behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
     Point behind_ball_vertex_C =
-        behind_ball_vertex_A + behind_ball.normalize(0.06) -
-        behind_ball.perpendicular().normalize(0.04 / 2);
+        behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
+        behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
 
     Polygon behind_ball_region = Polygon({behind_ball_vertex_A2, behind_ball_vertex_A1,
                                           behind_ball_vertex_B, behind_ball_vertex_C});
 
     return contains(behind_ball_region, event.common.robot.position()) &&
            compareAngles(event.common.robot.orientation(),
-                         event.control_params.chick_direction, Angle::fromDegrees(4));
+                         event.control_params.chick_direction, Angle::fromDegrees(5));
 }

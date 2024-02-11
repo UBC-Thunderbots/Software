@@ -39,7 +39,6 @@ class FriendlyReceivesBallSlow(Validation):
             if robot.id == self.robot_id:
                 # tolerance is set to 0.1 to check the speed before the ball touches the robot
                 if tbots.Robot(robot).isNearDribbler(ball_position, 0.05):
-                    print(ball_velocity.length())
                     if ball_velocity.length() - self.max_receive_speed > 0.2:
                         return ValidationStatus.FAILING
         return ValidationStatus.PASSING

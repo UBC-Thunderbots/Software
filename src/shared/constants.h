@@ -148,7 +148,6 @@ static const double MAX_CAPACITOR_VOLTAGE = 250.0 + 50.0;  // +50v headroom
 
 static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND;
-static const double MAX_PASS_RECEIVE_SPEED         = 2.0;
 // How many robots are allowed in each division
 static const unsigned DIV_A_NUM_ROBOTS = 11;
 static const unsigned DIV_B_NUM_ROBOTS = 6;

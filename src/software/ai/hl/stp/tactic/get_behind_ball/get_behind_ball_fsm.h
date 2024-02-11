@@ -39,7 +39,6 @@ struct GetBehindBallFSM
     //                     |
     //                     V
     //             direction of chip/kick
-    // A1 to A2 should be 3cm
 
     /**
      * Action that updates the MovePrimitive
