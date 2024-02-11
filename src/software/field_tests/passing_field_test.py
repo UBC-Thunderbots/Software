@@ -14,15 +14,21 @@ from software import py_constants
 
 
 def test_passing(field_test_runner):
-    passer_robot_id = 5
-    receiver_robot_id = 6
+    passer_robot_id = 3
+    receiver_robot_id = 5
     should_receive_pass = True
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     passer_point = tbots_cpp.createPoint(
         world.ball.current_state.global_position
     )
-    receiver_point = tbots_cpp.Point(-2.75, -0.7)
+    receiver_point = None
+    for robot in world.friendly_team.team_robots:
+        if robot.id == receiver_robot_id:
+            receiver_point = tbots_cpp.createPoint(
+                robot.current_state.global_position
+            )
+    
     receive_speed_m_per_s = 2.0
     min_pass_speed_m_per_s = 1.0
     max_pass_speed_m_per_s = 4.0
