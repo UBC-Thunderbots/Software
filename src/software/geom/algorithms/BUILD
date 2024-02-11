@@ -255,10 +255,11 @@ cc_test(
 )
 
 cc_test(
-    name = "end_in_obstacle_sampler_test",
+    name = "end_in_obstacle_sample_test",
     srcs = ["end_in_obstacle_sample_test.cpp"],
     deps = [
         ":end_in_obstacle_sample",
+        ":algorithms",
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",

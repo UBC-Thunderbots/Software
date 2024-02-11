@@ -1,5 +1,6 @@
 
 #include "software/geom/algorithms/end_in_obstacle_sample.h"
+#include "software/geom/algorithms/closest_point.h"
 
 #include <include/gtest/gtest.h>
 
@@ -8,6 +9,7 @@
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/test_util/test_util.h"
 
+static constexpr double MAX_ALLOWABLE_SAMPLE_ERROR = 0.15;
 
 class TestEndInObstacleSampler : public testing::Test
 {
@@ -39,9 +41,18 @@ TEST_F(TestEndInObstacleSampler, test_end_outside_field_boundary)
 
     if (end_point.has_value())
     {
+        double min_distance = MAX_ALLOWABLE_SAMPLE_ERROR + 1;
         for (auto const &obstacle : obstacles)
         {
+            double point_distance_from_obstacle = distance(end_point.value(), obstacle->closestPoint(end_point.value()));
+            min_distance = std::min(min_distance, point_distance_from_obstacle);
+            // check that the returned point is not inside an obstacle
             ASSERT_FALSE(obstacle->contains(end_point.value()));
+        }
+        // check that returned point is not too far from the nearest obstacle
+        if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR) {
+            std::cout << "end_point" << end_point.value() << '\n';
+            FAIL() << "Returned point is too far from destination";
         }
     }
     else
@@ -68,9 +79,18 @@ TEST_F(TestEndInObstacleSampler, test_end_in_defense_area)
 
     if (end_point.has_value())
     {
+        double min_distance = MAX_ALLOWABLE_SAMPLE_ERROR + 1;
         for (auto const &obstacle : obstacles)
         {
+            double point_distance_from_obstacle = distance(end_point.value(), obstacle->closestPoint(end_point.value()));
+            min_distance = std::min(min_distance, point_distance_from_obstacle);
+            // check that the returned point is not inside an obstacle
             ASSERT_FALSE(obstacle->contains(end_point.value()));
+        }
+        // check that returned point is not too far from the nearest obstacle
+        if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR) {
+            std::cout << "end_point" << end_point.value() << '\n';
+            FAIL() << "Returned point is too far from destination";
         }
     }
     else
@@ -122,6 +142,7 @@ TEST_F(TestEndInObstacleSampler, test_sampling_performance)
     std::uniform_real_distribution<> dist_y(navigable_area.yMin(), navigable_area.yMax());
 
     std::vector<Point> points_in_obstacles;
+    // find a random test group of 40 points inside obstacles to test on
     while (points_in_obstacles.size() < 40)
     {
         Point sample_point(dist_x(gen), dist_y(gen));
@@ -136,24 +157,35 @@ TEST_F(TestEndInObstacleSampler, test_sampling_performance)
         }
         if (point_in_obstacle)
         {
+            // add point to test group if it is inside an obstacle
             points_in_obstacles.push_back(sample_point);
         }
     }
 
+    // test sampling on each point in the test group
     for (auto const &point : points_in_obstacles)
     {
         std::optional<Point> end_point =
             endInObstacleSample(obstacles, point, navigable_area, 6);
-        if (!end_point.has_value())
+        if (end_point.has_value())
+        {
+            double min_distance = MAX_ALLOWABLE_SAMPLE_ERROR + 1;
+            for (auto const &obstacle : obstacles)
+            {
+                double point_distance_from_obstacle = distance(end_point.value(), obstacle->closestPoint(end_point.value()));
+                min_distance = std::min(min_distance, point_distance_from_obstacle);
+                // check that the returned point is not inside an obstacle
+                ASSERT_FALSE(obstacle->contains(end_point.value()));
+            }
+            // check that returned point is not too far from the nearest obstacle
+            if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR) {
+                FAIL() << "Sampled point is too far from destination";
+            }
+        }
+        else
         {
             FAIL();
         }
-        for (auto const &obstacle : obstacles)
-        {
-            if (obstacle->contains(end_point.value()))
-            {
-                FAIL();
-            }
-        }
     }
 }
+
