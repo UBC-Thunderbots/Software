@@ -42,6 +42,7 @@ py_library(
         "//software/thunderscope/robot_diagnostics:chicker",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
+        "//software/thunderscope:thunderscope_types",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
         requirement("pyqtgraph"),

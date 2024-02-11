@@ -3,10 +3,10 @@ import logging
 from evdev import InputDevice, categorize, ecodes, list_devices
 from threading import Event, Thread
 
+from proto.import_all_protos import *
+from software.thunderscope.constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.python_bindings as tbots_cpp
-
-from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 
 XBOX_MAX_RANGE = 32768
 XBOX_BUTTON_MAX_RANGE = 1024
@@ -16,7 +16,8 @@ DEADZONE_PERCENTAGE = 0.30
 DRIBBLER_STEPPER = 100
 POWER_STEPPER = 100
 
-MAX_LINEAR_SPEED_MPS = 2
+MAX_LINEAR_SPEED_METER_PER_S = 2
+MAX_ANGULAR_SPEED_RAD_PER_S = 10.0
 
 
 class ControllerDiagnostics(object):
@@ -31,6 +32,7 @@ class ControllerDiagnostics(object):
             proto_unix_io: ProtoUnixIO,
     ):
         self.enabled = False
+        self.controller = None
 
         # TODO: check if estop gets in the way
 
@@ -40,12 +42,17 @@ class ControllerDiagnostics(object):
             except Exception as e:
                 print("Failed to initialize device with path: " + device + " with exception " + e)
 
+        if self.controller is None:
+            raise RuntimeError("Could not initialize a controller, there are no valid "
+                               "controllers connected")
+
         # TODO add a way to switch between different controllers plugged in
-        logging.info("Initializing controller with device path: " + self.controller.path)
+        logging.info(
+            "Initializing controller " + self.controller.info.__str__() + " and device path location: " + self.controller.path)
         self.proto_unix_io = proto_unix_io
 
         self.__stop_event_thread = Event()
-        self.__event_thread = Thread(target=self.__event_loop)
+        self.__event_thread = Thread(target=self.__event_loop, daemon=True)
         self.__event_thread.start()
 
         self.constants = tbots_cpp.create2021RobotConstants()
@@ -90,8 +97,7 @@ class ControllerDiagnostics(object):
         #     motor_control.dribbler_speed_rpm = dribbler_speed
         # maybe just use indefinite instead? or have setting to turn on 'smooth scrolling'
         if self.dribbler_enabled:
-            motor_control.dribbler_speed_rpm = self.dribbler_enabled ? self.constants.indefinite_dribbler_speed_rpm
-
+            motor_control.dribbler_speed_rpm = self.constants.indefinite_dribbler_speed_rpm
 
         logging.info("Sending motor control: " + motor_control)
 
@@ -109,71 +115,69 @@ class ControllerDiagnostics(object):
     def __send_chip_command(self):
         power_control = PowerControl()
         power_control.geneva_slot = 1
-        power_control.chicker.chip_distance_meters = self.kick_power # not sure if we should use this value
+        power_control.chicker.chip_distance_meters = self.kick_power  # not sure if we should use this value
 
         logging.info("Sending chip power control: " + power_control)
 
         self.proto_unix_io.send_proto(PowerControl, power_control)
 
     def __process_event(self, event):
-        logging.info("Processing event: " + event)
+        logging.info("Processing event: " + str(event))
 
         abs_event = categorize(event)
+        event_t = ecodes.bytype[abs_event.event.type][abs_event.event.code]
+        # TODO: nump python version so we can use pattern matching for this
+        # TODO: make codebase use python logging instead of stdout
+        logging.info("Processing event: " + str(event_t))
+        if event.type == ecodes.EV_ABS:
+            # grab the event type
+            event_t = ecodes.bytype[abs_event.event.type][abs_event.event.code]
+            if event_t == "ABS_X":
+                self.x_vel = (
+                    self.__parse_move_event_value(abs_event.event.value, MAX_LINEAR_SPEED_METER_PER_S))
 
-        match event.type:
-            case ecodes.EV_ABS:
-                # grab the event type
-                event_t = ecodes.bytype[abs_event.event.type][abs_event.event.code]
+            elif event_t == "ABS_Y":
+                self.y_vel = (
+                    self.__parse_move_event_value(abs_event.event.value, MAX_LINEAR_SPEED_METER_PER_S))
 
-                match event_t:
-                    case "ABS_X":
-                        self.x_vel = (
-                            self.__parse_joystick_event_value(abs_event.event.value, MAX_LINEAR_SPEED_MPS))
+            elif event_t == "ABS_RX":
+                self.ang_vel = (
+                    self.__parse_move_event_value(abs_event.event.value, MAX_ANGULAR_SPEED_RAD_PER_S))
 
-                    case "ABS_Y":
-                        self.y_vel = (
-                            self.__parse_move_event_value(abs_event.event.value, MAX_LINEAR_SPEED_MPS))
+            elif event_t == "ABS_HAT0Y":
+                self.dribbler_speed = (
+                    self.__parse_dribbler_event_value(abs_event.event.value))
 
-                    case "ABS_RX":
-                        self.ang_vel = (
-                            self.__parse_move_event_value(abs_event.event.value, MAX_ANGULAR_SPEED_RAD_PER_S))
+            elif event_t == "ABS_HAT0X":
+                self.kick_power = (
+                    self.__parse_kick_event_value(abs_event.event.value))
 
-                    case "ABS_HAT0Y":
-                        self.dribbler_speed = (
-                            self.__parse_dribbler_event_value(abs_event.event.value))
+            elif event_t == "ABS_RZ":
+                self.dribbler_enabled = (
+                    self.__parse_dribbler_enabled_event_value(abs_event.event.value))
 
-                    case "ABS_HAT0X":
-                        self.kick_power = (
-                            self.__parse_kick_event_value(abs_event.event.value))
+            elif event_t == "ABS_Z":
+                self.dribbler_enabled = (
+                    self.__parse_dribbler_enabled_event_value(abs_event.event.value)
+                )
 
-                    case "ABS_RZ":
-                        self.dribbler_enabled = (
-                            self.__parse_dribbler_enabled_event_value(abs_event.event.value))
+        elif event.type == ecodes.EV_KEY:
+            print("event code: " + str(event.code))
+            if event.code == ecodes.ecodes["BTN_A"] and event.value == 1:
+                self.__send_kick_command()
 
-                    case "ABS_Z":
-                        self.dribbler_enabled = (
-                            self.__parse_dribbler_enabled_event_value(abs_event.event.value))
-
-
-
-            case ecodes.EV_KEY:
-                if event.code == ecodes.ecodes["BTN_A"] and event.value == 1:
-                    self.__send_kick_command()
-                elif event.code == ecodes.ecodes["BTN_Y"] and event.value == 1:
-                    self.__send_chip_command()
+            elif event.code == ecodes.ecodes["BTN_Y"] and event.value == 1:
+                self.__send_chip_command()
 
         if event.type in ["ABS_X", "ABS_Y", "ABS_RX"]:
             self.__send_move_command()
-
-
 
     def __event_loop(self):
         logging.info("Starting controller event loop")
         for event in self.controller.read_loop():
             if self.__stop_event_thread.isSet():
                 return
-            if self.enabled:
-                self.__process_event(event)
+            self.__process_event(event)
 
     def close(self):
         logging.info("Closing controller thread")
@@ -194,8 +198,7 @@ class ControllerDiagnostics(object):
 
         :param enabled: to which state to set controller enabled.
         """
-    self.enabled = enabled
-
+        self.enabled = enabled
 
 # {
 #   ('EV_SYN', 0): [('SYN_REPORT', 0), ('SYN_CONFIG', 1), ('SYN_DROPPED', 3), ('?', 21)],

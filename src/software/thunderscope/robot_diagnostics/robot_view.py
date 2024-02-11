@@ -123,7 +123,7 @@ class RobotView(QScrollArea):
     Contains signal to communicate with robot diagnostics when control mode changes
     """
 
-    control_mode_signal = QtCore.pyqtSignal(int, int)
+    toggle_control_mode_signal = QtCore.pyqtSignal(int, int)
 
     def __init__(self, available_control_modes: List[IndividualRobotMode]) -> None:
 
@@ -146,7 +146,7 @@ class RobotView(QScrollArea):
 
         for id in range(MAX_ROBOT_IDS_PER_SIDE):
             robot_view_widget = RobotViewComponent(
-                id, available_control_modes, self.control_mode_signal
+                id, available_control_modes, self.toggle_control_mode_signal
             )
             self.robot_view_widgets.append(robot_view_widget)
             self.layout.addWidget(robot_view_widget)

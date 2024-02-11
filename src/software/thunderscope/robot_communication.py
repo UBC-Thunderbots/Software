@@ -15,25 +15,24 @@ from software.py_constants import *
 from google.protobuf.message import Message
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
-from typing import Type, Optional
+from typing import Type
 from queue import Empty
 
-from software.thunderscope.thunderscope_main import NUM_ROBOTS
+NUM_ROBOTS = 6
 
 
 class RobotCommunication(object):
-
     """ Communicate with the robots """
 
     def __init__(
-        self,
-        current_proto_unix_io: ProtoUnixIO,
-        multicast_channel: str,
-        interface: str,
-        estop_mode: EstopMode,
-        input_device_path: str = None,
-        estop_path: os.PathLike = None,
-        estop_baudrate: int = 115200,
+            self,
+            current_proto_unix_io: ProtoUnixIO,
+            multicast_channel: str,
+            interface: str,
+            estop_mode: EstopMode,
+            input_device_path: str = None,
+            estop_path: os.PathLike = None,
+            estop_baudrate: int = 115200,
     ):
         """Initialize the communication with the robots
 
@@ -114,7 +113,6 @@ class RobotCommunication(object):
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
 
-
     def setup_for_fullsystem(self) -> None:
         """
         Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
@@ -140,7 +138,6 @@ class RobotCommunication(object):
         for key in self.robot_id_individual_mode_dict:
             self.robot_id_individual_mode_dict[key] = IndividualRobotMode.AI
 
-
         # self.robots_connected_to_fullsystem = {
         #     robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
         # }
@@ -163,7 +160,6 @@ class RobotCommunication(object):
                     else f"\x1b[31;20mSTOP \x1b[0m"
                 )
             )
-
 
     def toggle_robot_control_mode(self, robot_id: int, mode: IndividualRobotMode):
         """
@@ -201,7 +197,6 @@ class RobotCommunication(object):
         """
         self.__input_mode = mode
 
-
     def __send_estop_state(self) -> None:
         """
         Constant loop which sends the current estop status proto if estop is not disabled
@@ -234,10 +229,11 @@ class RobotCommunication(object):
         :return: boolean
         """
         return (
-            self.estop_mode != EstopMode.DISABLE_ESTOP
-            and self.estop_is_playing
-            # does python do what i think it does here
-            and (IndividualRobotMode.AI or IndividualRobotMode.MANUAL in self.robot_id_individual_mode_dict.values())
+                self.estop_mode != EstopMode.DISABLE_ESTOP
+                and self.estop_is_playing
+                # does python do what i think it does here
+                and (
+                            IndividualRobotMode.AI or IndividualRobotMode.MANUAL in self.robot_id_individual_mode_dict.values())
         )
 
     def __run_world(self):
@@ -291,19 +287,19 @@ class RobotCommunication(object):
                     power_control=self.power_control_diagnostics_buffer.get(block=False),
                 )
 
-                manually_controlled_robots : dict[int, IndividualRobotMode] = (
+                manually_controlled_robots: dict[int, IndividualRobotMode] = (
                     filter(lambda robot_mode: robot_mode[1] == IndividualRobotMode.MANUAL,
                            self.robot_id_individual_mode_dict)
                 )
                 if len(manually_controlled_robots) > 0:
-                # for all robots connected to diagnostics, set their primitive
+                    # for all robots connected to diagnostics, set their primitive
                     for robot_id in manually_controlled_robots:
                         robot_primitives[robot_id] = Primitive(
                             direct_control=diagnostics_primitive
                         )
 
             # fullsystem is running, so world data is being received
-            ai_controlled_robots : dict[int, IndividualRobotMode] = (
+            ai_controlled_robots: dict[int, IndividualRobotMode] = (
                 filter(lambda robot_mode: robot_mode[1] == IndividualRobotMode.AI,
                        self.robot_id_individual_mode_dict)
             )
@@ -318,7 +314,6 @@ class RobotCommunication(object):
                 for robot_id in fullsystem_primitives.keys():
                     if robot_id in ai_controlled_robots:
                         robot_primitives[robot_id] = fullsystem_primitives[robot_id]
-
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives

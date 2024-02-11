@@ -2,7 +2,7 @@ import argparse
 import numpy
 
 from proto.message_translation import tbots_protobuf
-from software.thunderscope.robot_input_control_manager import RobotInputControlManager
+from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
@@ -293,13 +293,13 @@ if __name__ == "__main__":
                                 )
                             )
                         # TODO: remove this below - don't need to check for input mode (xbox/diag)
-                        diagnostics_widget = tab.find_widget("Diagnostics Widget")
-                        if diagnostics_widget is not None:
-                            diagnostics_widget.toggle_control_signal(
-                                lambda control_mode: robot_communication.toggle_input_mode(
-                                    control_mode
-                                )
-                            )
+                        # diagnostics_widget = tab.find_widget("Diagnostics Widget")
+                        # if diagnostics_widget is not None:
+                        #     diagnostics_widget.toggle_controls_signal.connect(
+                        #         lambda control_mode: robot_communication.toggle_input_mode(
+                        #             control_mode
+                        #         )
+                        #     )
 
 
             if args.run_blue or args.run_yellow:
