@@ -53,12 +53,6 @@ bool GetBehindBallFSM::behindBall(const Update& event)
     Polygon behind_ball_region = Polygon({behind_ball_vertex_A2, behind_ball_vertex_A1,
                                           behind_ball_vertex_B, behind_ball_vertex_C});
 
-    std::cout << behind_ball_region << std::endl;
-    std::cout << event.control_params.ball_location << std::endl;
-    std::cout << event.common.robot.position() << std::endl;
-    std::cout << contains(behind_ball_region, event.common.robot.position()) << std::endl;
-    std::cout << compareAngles(event.common.robot.orientation(),
-                         event.control_params.chick_direction, Angle::fromDegrees(4)) << std::endl;
     return contains(behind_ball_region, event.common.robot.position()) &&
            compareAngles(event.common.robot.orientation(),
                          event.control_params.chick_direction, Angle::fromDegrees(4));
