@@ -36,19 +36,15 @@ bool GetBehindBallFSM::behindBall(const Update& event)
     // We make the region close enough to the ball so that the robot will still be
     // inside it when taking the chip.
     Point behind_ball_vertex_A = event.control_params.ball_location +
-        behind_ball.normalize(0.02 + ROBOT_MAX_RADIUS_METERS);
+                                 behind_ball.normalize(0.02 + ROBOT_MAX_RADIUS_METERS);
     Point behind_ball_vertex_A1 =
-        behind_ball_vertex_A +
-        behind_ball.perpendicular().normalize(0.03 / 2);
+        behind_ball_vertex_A + behind_ball.perpendicular().normalize(0.03 / 2);
     Point behind_ball_vertex_A2 =
-        behind_ball_vertex_A -
-        behind_ball.perpendicular().normalize(0.03 / 2);
-    Point behind_ball_vertex_B =
-        behind_ball_vertex_A + behind_ball.normalize(0.06) +
-        behind_ball.perpendicular().normalize(0.04 / 2);
-    Point behind_ball_vertex_C =
-        behind_ball_vertex_A + behind_ball.normalize(0.06) -
-        behind_ball.perpendicular().normalize(0.04 / 2);
+        behind_ball_vertex_A - behind_ball.perpendicular().normalize(0.03 / 2);
+    Point behind_ball_vertex_B = behind_ball_vertex_A + behind_ball.normalize(0.06) +
+                                 behind_ball.perpendicular().normalize(0.04 / 2);
+    Point behind_ball_vertex_C = behind_ball_vertex_A + behind_ball.normalize(0.06) -
+                                 behind_ball.perpendicular().normalize(0.04 / 2);
 
     Polygon behind_ball_region = Polygon({behind_ball_vertex_A2, behind_ball_vertex_A1,
                                           behind_ball_vertex_B, behind_ball_vertex_C});
