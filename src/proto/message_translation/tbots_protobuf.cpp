@@ -331,6 +331,20 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     return plot_juggler_value_msg;
 }
 
+std::unique_ptr<TbotsProto::DebugShapeList>
+createDebugShapeList(const std::map<std::string, TbotsProto::Shape> &named_shapes)
+{
+    auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapeList>();
+    for (auto const& [name, shape] : named_shapes)
+    {
+        TbotsProto::NamedShape named_shape;
+        named_shape.set_name(name);
+        *(named_shape.mutable_shape()) = shape;
+        (*debug_shape_list_msg->mutable_shapes()->Add()) = named_shape;
+    }
+    return debug_shape_list_msg;
+}
+
 std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
 {
     auto timestamp_msg    = std::make_unique<TbotsProto::Timestamp>();

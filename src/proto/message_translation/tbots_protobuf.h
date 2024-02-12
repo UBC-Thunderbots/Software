@@ -127,6 +127,24 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     const std::map<std::string, double>& values);
 
 /**
+ * Returns a TbotsProto::DebugShapeList proto containing the name
+ * shape pairs of the map.
+ *
+ * Could use LOG(VISUALIZE) to plot these values. Example:
+ *  LOG(VISUALIZE) << *createDebugShapeList({
+ *      {"circle_name", createCircleProto(circle)},
+ *      {"polygon_name", createPolygonProto(polygon)}
+ *  });
+ *
+ * @param named_shapes The map of name shape proto pairs to plot
+ *
+ * @return The unique_ptr to a TbotsProto::DebugShapeList proto containing data with
+ *        specified names and shapes
+ */
+std::unique_ptr<TbotsProto::DebugShapeList> createDebugShapeList(
+    const std::map<std::string, TbotsProto::NamedShape>& named_shapes);
+
+/**
  * Returns a timestamp msg with the time that this function was called
  *
  * @return The unique_ptr to a TbotsProto::Timestamp with the current UTC time

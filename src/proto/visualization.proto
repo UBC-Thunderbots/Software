@@ -54,3 +54,25 @@ message ObstacleList
 {
     repeated Obstacle obstacles = 1;
 }
+
+message Shape
+{
+    oneof shape
+    {
+        Polygon polygon = 1;
+        Circle circle   = 2;
+        Stadium stadium = 3;
+        Segment segment = 4;
+    }
+}
+
+message NamedShape
+{
+    string name = 1;
+    Shape shape = 2;
+}
+
+message DebugShapeList
+{
+    repeated NamedShape shapes = 1;
+}

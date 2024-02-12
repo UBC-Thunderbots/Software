@@ -195,6 +195,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     LOG(VISUALIZE) << obstacle_list;
     LOG(VISUALIZE) << path_visualization;
 
+    LOG(VISUALIZE) << *createDebugShapeList({
+       {"Test", createCircleProto(Circle(Point(1,0), 2.0))},
+    });
+
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
         world.getMostRecentTimestamp().toSeconds());
     primitives_to_run->set_sequence_number(sequence_number++);
