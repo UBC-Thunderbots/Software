@@ -15,7 +15,7 @@
 #include "software/world/team.h"
 
 /**
- * https://rt.wiki.kernel.org/index.php/Squarewave-example
+ * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
  * using clock_nanosleep of librt
  */
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
