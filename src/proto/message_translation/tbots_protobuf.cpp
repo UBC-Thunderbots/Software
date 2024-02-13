@@ -332,14 +332,11 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
 }
 
 std::unique_ptr<TbotsProto::DebugShapeList>
-createDebugShapeList(const std::map<std::string, TbotsProto::Shape> &named_shapes)
+createDebugShapeList(const std::vector<TbotsProto::NamedShape> &named_shapes)
 {
     auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapeList>();
-    for (auto const& [name, shape] : named_shapes)
+    for (auto const& named_shape : named_shapes)
     {
-        TbotsProto::NamedShape named_shape;
-        named_shape.set_name(name);
-        *(named_shape.mutable_shape()) = shape;
         (*debug_shape_list_msg->mutable_shapes()->Add()) = named_shape;
     }
     return debug_shape_list_msg;
@@ -517,4 +514,19 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;
     }
+}
+
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Circle &circle)
+{
+    auto shape_msg = std::make_unique<TbotsProto::Shape>();
+    (*shape_msg->mutable_circle()) = *createCircleProto(circle);
+    return shape_msg;
+}
+
+std::unique_ptr<TbotsProto::NamedShape> createNamedShapeProto(const Circle &circle, const std::string &name)
+{
+    auto shape_msg = std::make_unique<TbotsProto::NamedShape>();
+    (*shape_msg->mutable_shape()) = *createShapeProto(circle);
+    (*shape_msg->mutable_name()) = name;
+    return shape_msg;
 }

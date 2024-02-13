@@ -53,15 +53,15 @@ class GLDebugShapesLayer(GLLayer):
         # Ensure we have the same number of graphics as shapes
         self.poly_shape_graphics.resize(
             len(poly_shapes),
-            lambda: GLPolygon(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR), # TODO (NIMA): Change color
+            lambda: GLPolygon(outline_color=Colors.DEBUG_SHAPES_COLOR), # TODO (NIMA): Change color
         )
         self.circle_shape_graphics.resize(
             len(circle_shapes),
-            lambda: GLCircle(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR),
+            lambda: GLCircle(outline_color=Colors.DEBUG_SHAPES_COLOR),
         )
         self.stadium_shape_graphics.resize(
             len(stadium_shapes),
-            lambda: GLStadium(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR),
+            lambda: GLStadium(outline_color=Colors.DEBUG_SHAPES_COLOR),
         )
 
         for poly_shape_graphic, poly_shape in zip(

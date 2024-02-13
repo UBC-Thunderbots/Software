@@ -143,6 +143,7 @@ gdb --args bazel-bin/{self.full_system}
             NamedValue,
             PlayInfo,
             ObstacleList,
+            DebugShapeList,
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir=self.full_system_runtime_dir,

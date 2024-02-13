@@ -84,6 +84,7 @@ py_library(
         "//software/thunderscope/gl/layers:gl_tactic_layer",
         "//software/thunderscope/gl/layers:gl_validation_layer",
         "//software/thunderscope/gl/layers:gl_world_layer",
+        "//software/thunderscope/gl/layers:gl_debug_shapes_layer",
         "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         "//software/thunderscope/play:playinfo_widget",
