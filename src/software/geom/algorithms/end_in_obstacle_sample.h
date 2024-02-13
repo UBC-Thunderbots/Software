@@ -13,10 +13,14 @@
  * @param obstacles a list of obstacles to test the point against
  * @param point the destination point
  * @param navigable_area the rectangular region which the returned point must be inside of
- * @param initial_count the number of points to sample for the initial radius in the case where sampling is done
- * @param radius_step the distance to increase the radius for each iteration in the case where sampling is done
- * @param samples_per_radius_step the number of samples to add for each iteration in the case where sampling is done
- * @param max_search_radius the max distance from point that we are allowed to sample in the case where sampling is done
+ * @param initial_count the number of points to sample for the initial radius in the case
+ * where sampling is done
+ * @param radius_step the distance to increase the radius for each iteration in the case
+ * where sampling is done
+ * @param samples_per_radius_step the number of samples to add for each iteration in the
+ * case where sampling is done
+ * @param max_search_radius the max distance from point that we are allowed to sample in
+ * the case where sampling is done
  * @return
  */
 std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr>& obstacles,

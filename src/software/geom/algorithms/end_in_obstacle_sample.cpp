@@ -8,13 +8,15 @@ static constexpr double OBSTACLE_AVOIDANCE_BUFFER_CENTIMETERS = 0.01;
 
 std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacles,
                                          const Point &point,
-                                         const Rectangle &navigable_area, int initial_count,
-                                         double radius_step, int samples_per_radius_step,
+                                         const Rectangle &navigable_area,
+                                         int initial_count, double radius_step,
+                                         int samples_per_radius_step,
                                          double max_search_radius)
 {
     // first, check if point is inside an obstacle or outside the navigable area
     bool point_in_obstacle = false;
-    if (contains(navigable_area, point)) {
+    if (contains(navigable_area, point))
+    {
         for (auto const &obstacle : obstacles)
         {
             if (obstacle->contains(point))
@@ -24,10 +26,12 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
                     point_in_obstacle = true;
                 }
 
-                // if point is inside obstacle, perform a second check to see if the closest
-                // point outside the first encroached obstacle is inside another obstacle
-                Point closest_point            = obstacle->closestPoint(point);
-                closest_point += (closest_point - point).normalize(OBSTACLE_AVOIDANCE_BUFFER_CENTIMETERS);
+                // if point is inside obstacle, perform a second check to see if the
+                // closest point outside the first encroached obstacle is inside another
+                // obstacle
+                Point closest_point = obstacle->closestPoint(point);
+                closest_point += (closest_point - point)
+                                     .normalize(OBSTACLE_AVOIDANCE_BUFFER_CENTIMETERS);
                 bool closest_point_in_obstacle = false;
 
                 // break out of loop if closest point outside first encroached obstacle is
@@ -36,8 +40,8 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
                 {
                     for (auto const &obstacle : obstacles)
                     {
-                        // break out of loop if closest point outside first encroached obstacle
-                        // happens to be inside another obstacle
+                        // break out of loop if closest point outside first encroached
+                        // obstacle happens to be inside another obstacle
                         if (obstacle->contains(closest_point))
                         {
                             closest_point_in_obstacle = true;
@@ -45,7 +49,8 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
                         }
                     }
                 }
-                else {
+                else
+                {
                     closest_point_in_obstacle = true;
                     break;
                 }
@@ -62,7 +67,9 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
                 }
             }
         }
-    } else {
+    }
+    else
+    {
         point_in_obstacle = true;
     }
 
@@ -86,7 +93,8 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
             Point sample_point = point + direction * radius;
             bool sample_point_in_obstacle = false;
             // check if candidate sample point is in an obstacle or outside navigable area
-            if (contains(navigable_area, sample_point)) {
+            if (contains(navigable_area, sample_point))
+            {
                 for (auto const &obstacle : obstacles)
                 {
                     if (obstacle->contains(sample_point) ||
@@ -96,7 +104,9 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
                         break;
                     }
                 }
-            } else {
+            }
+            else
+            {
                 sample_point_in_obstacle = true;
             }
 
