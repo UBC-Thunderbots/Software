@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 
 GetBehindBallFSM::GetBehindBallFSM()
@@ -51,6 +52,13 @@ bool GetBehindBallFSM::behindBall(const Update& event)
 
     Polygon behind_ball_region = Polygon({behind_ball_vertex_A2, behind_ball_vertex_A1,
                                           behind_ball_vertex_B, behind_ball_vertex_C});
+
+    // TODO (NIMA): Added for testing
+    LOG(VISUALIZE) << *createDebugShapeList({
+//            *createNamedShapeProto(Circle(Point(1,0), 2.0), "Test"),
+            *createNamedShapeProto(behind_ball_region, "Test")
+//            *createNamedShapeProto(Stadium(Point(-1,0), Point(-3,0), 0.5), "Test")
+    });
 
     return contains(behind_ball_region, event.common.robot.position()) &&
            compareAngles(event.common.robot.orientation(),

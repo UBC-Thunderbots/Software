@@ -34,10 +34,12 @@ class GLDebugShapesLayer(GLLayer):
         self.circle_shape_graphics = ObservableList(self._graphics_changed)
         self.stadium_shape_graphics = ObservableList(self._graphics_changed)
 
+        self.drawn_
+
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         named_shapes = self.debug_shape_list_buffer.get(block=False).shapes
-        # TODO (NIMA): Keep track of last plotted value time
+        # TODO (NIMA): Keep track of last plotted value time. Could distinguish between the protos using their names. Per name it can timeout
         poly_shapes = []
         circle_shapes = []
         stadium_shapes = []

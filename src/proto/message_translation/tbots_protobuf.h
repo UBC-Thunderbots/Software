@@ -144,7 +144,12 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
 std::unique_ptr<TbotsProto::DebugShapeList> createDebugShapeList(const std::vector<TbotsProto::NamedShape> &named_shapes);
 
 std::unique_ptr<TbotsProto::Shape> createShapeProto(const Circle& circle);
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Polygon& circle);
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium& circle);
+
 std::unique_ptr<TbotsProto::NamedShape> createNamedShapeProto(const Circle& circle, const std::string& name = "");
+std::unique_ptr<TbotsProto::NamedShape> createNamedShapeProto(const Polygon& polygon, const std::string& name = "");
+std::unique_ptr<TbotsProto::NamedShape> createNamedShapeProto(const Stadium& stadium, const std::string& name = "");
 
 /**
  * Returns a timestamp msg with the time that this function was called

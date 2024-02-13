@@ -523,10 +523,40 @@ std::unique_ptr<TbotsProto::Shape> createShapeProto(const Circle &circle)
     return shape_msg;
 }
 
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Polygon &polygon)
+{
+    auto shape_msg = std::make_unique<TbotsProto::Shape>();
+    (*shape_msg->mutable_polygon()) = *createPolygonProto(polygon);
+    return shape_msg;
+}
+
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium &stadium)
+{
+    auto shape_msg = std::make_unique<TbotsProto::Shape>();
+    (*shape_msg->mutable_stadium()) = *createStadiumProto(stadium);
+    return shape_msg;
+}
+
 std::unique_ptr<TbotsProto::NamedShape> createNamedShapeProto(const Circle &circle, const std::string &name)
 {
     auto shape_msg = std::make_unique<TbotsProto::NamedShape>();
     (*shape_msg->mutable_shape()) = *createShapeProto(circle);
+    (*shape_msg->mutable_name()) = name;
+    return shape_msg;
+}
+
+std::unique_ptr<TbotsProto::NamedShape> createNamedShapeProto(const Polygon &polygon, const std::string &name)
+{
+    auto shape_msg = std::make_unique<TbotsProto::NamedShape>();
+    (*shape_msg->mutable_shape()) = *createShapeProto(polygon);
+    (*shape_msg->mutable_name()) = name;
+    return shape_msg;
+}
+
+std::unique_ptr<TbotsProto::NamedShape> createNamedShapeProto(const Stadium &stadium, const std::string &name)
+{
+    auto shape_msg = std::make_unique<TbotsProto::NamedShape>();
+    (*shape_msg->mutable_shape()) = *createShapeProto(stadium);
     (*shape_msg->mutable_name()) = name;
     return shape_msg;
 }
