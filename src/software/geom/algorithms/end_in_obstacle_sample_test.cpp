@@ -1,22 +1,39 @@
 
 #include "software/geom/algorithms/end_in_obstacle_sample.h"
+#include "software/geom/algorithms/closest_point.h"
 
 #include <include/gtest/gtest.h>
 
 #include <random>
 
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
-#include "software/geom/algorithms/closest_point.h"
 #include "software/test_util/test_util.h"
 
 static constexpr double MAX_ALLOWABLE_SAMPLE_ERROR = 0.15;
 
-class TestEndInObstacleSampler : public testing::Test
+class EndInObstacleSampleTest : public testing::Test
 {
    public:
-    TestEndInObstacleSampler()
+    EndInObstacleSampleTest()
         : world(TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B)),
           obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()){};
+    static bool isSamplePointValid(Point point, std::vector<ObstaclePtr> obstacles) {
+        double min_distance = MAX_ALLOWABLE_SAMPLE_ERROR + 1;
+        for (auto const &obstacle : obstacles)
+        {
+            double point_distance_from_obstacle = distance(point, obstacle->closestPoint(point));
+            min_distance = std::min(min_distance, point_distance_from_obstacle);
+            // check that the returned point is not inside an obstacle
+            if (obstacle->contains(point)) {
+                return false;
+            }
+        }
+        // check that returned point is not too far from the nearest obstacle
+        if (!obstacles.empty() && min_distance > MAX_ALLOWABLE_SAMPLE_ERROR) {
+            return false;
+        }
+        return true;
+    }
 
    protected:
     World world;
@@ -24,7 +41,7 @@ class TestEndInObstacleSampler : public testing::Test
 };
 
 
-TEST_F(TestEndInObstacleSampler, test_end_outside_field_boundary)
+TEST_F(EndInObstacleSampleTest, test_end_outside_field_boundary)
 {
     Field field              = world.field();
     Rectangle navigable_area = field.fieldLines();
@@ -36,34 +53,15 @@ TEST_F(TestEndInObstacleSampler, test_end_outside_field_boundary)
     obstacles.insert(obstacles.end(), field_boundary.begin(), field_boundary.end());
 
     Point destination(4.9, 2);
-    std::optional<Point> end_point =
+    std::optional<Point> sample_point =
         endInObstacleSample(obstacles, destination, navigable_area);
 
-    if (end_point.has_value())
-    {
-        double min_distance = MAX_ALLOWABLE_SAMPLE_ERROR + 1;
-        for (auto const &obstacle : obstacles)
-        {
-            double point_distance_from_obstacle =
-                distance(end_point.value(), obstacle->closestPoint(end_point.value()));
-            min_distance = std::min(min_distance, point_distance_from_obstacle);
-            // check that the returned point is not inside an obstacle
-            ASSERT_FALSE(obstacle->contains(end_point.value()));
-        }
-        // check that returned point is not too far from the nearest obstacle
-        if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR)
-        {
-            std::cout << "end_point" << end_point.value() << '\n';
-            FAIL() << "Returned point is too far from destination";
-        }
-    }
-    else
-    {
+    if (!sample_point.has_value() || !EndInObstacleSampleTest::isSamplePointValid(sample_point.value(), obstacles)) {
         FAIL();
     }
 }
 
-TEST_F(TestEndInObstacleSampler, test_end_in_defense_area)
+TEST_F(EndInObstacleSampleTest, test_end_in_defense_area)
 {
     Field field              = world.field();
     Rectangle navigable_area = field.fieldBoundary();
@@ -76,34 +74,30 @@ TEST_F(TestEndInObstacleSampler, test_end_in_defense_area)
                      friendly_defense_area.end());
 
     Point destination(-4, 0.5);
-    std::optional<Point> end_point =
+    std::optional<Point> sample_point =
         endInObstacleSample(obstacles, destination, navigable_area);
 
-    if (end_point.has_value())
-    {
-        double min_distance = MAX_ALLOWABLE_SAMPLE_ERROR + 1;
-        for (auto const &obstacle : obstacles)
-        {
-            double point_distance_from_obstacle =
-                distance(end_point.value(), obstacle->closestPoint(end_point.value()));
-            min_distance = std::min(min_distance, point_distance_from_obstacle);
-            // check that the returned point is not inside an obstacle
-            ASSERT_FALSE(obstacle->contains(end_point.value()));
-        }
-        // check that returned point is not too far from the nearest obstacle
-        if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR)
-        {
-            std::cout << "end_point" << end_point.value() << '\n';
-            FAIL() << "Returned point is too far from destination";
-        }
-    }
-    else
-    {
+    if (!sample_point.has_value() || !EndInObstacleSampleTest::isSamplePointValid(sample_point.value(), obstacles)) {
         FAIL();
     }
 }
 
-TEST_F(TestEndInObstacleSampler, test_end_not_in_obstacle)
+TEST_F(EndInObstacleSampleTest, test_end_outside_navigable_area)
+{
+    Field field              = world.field();
+    Rectangle navigable_area = field.fieldBoundary();
+    std::vector<ObstaclePtr> obstacles;
+
+    Point destination(0, 5.2);
+    std::optional<Point> sample_point =
+            endInObstacleSample(obstacles, destination, navigable_area);
+
+    if (!sample_point.has_value() || !EndInObstacleSampleTest::isSamplePointValid(sample_point.value(), obstacles)) {
+        FAIL();
+    }
+}
+
+TEST_F(EndInObstacleSampleTest, test_end_not_in_obstacle)
 {
     Field field              = world.field();
     Rectangle navigable_area = field.fieldLines();
@@ -123,7 +117,7 @@ TEST_F(TestEndInObstacleSampler, test_end_not_in_obstacle)
     }
 }
 
-TEST_F(TestEndInObstacleSampler, test_sampling_performance)
+TEST_F(EndInObstacleSampleTest, test_sampling_performance)
 {
     Field field              = world.field();
     Rectangle navigable_area = field.fieldLines();
@@ -169,28 +163,11 @@ TEST_F(TestEndInObstacleSampler, test_sampling_performance)
     // test sampling on each point in the test group
     for (auto const &point : points_in_obstacles)
     {
-        std::optional<Point> end_point =
+        std::optional<Point> sample_point =
             endInObstacleSample(obstacles, point, navigable_area, 6);
-        if (end_point.has_value())
-        {
-            double min_distance = MAX_ALLOWABLE_SAMPLE_ERROR + 1;
-            for (auto const &obstacle : obstacles)
-            {
-                double point_distance_from_obstacle = distance(
-                    end_point.value(), obstacle->closestPoint(end_point.value()));
-                min_distance = std::min(min_distance, point_distance_from_obstacle);
-                // check that the returned point is not inside an obstacle
-                ASSERT_FALSE(obstacle->contains(end_point.value()));
-            }
-            // check that returned point is not too far from the nearest obstacle
-            if (min_distance > MAX_ALLOWABLE_SAMPLE_ERROR)
-            {
-                FAIL() << "Sampled point is too far from destination";
-            }
-        }
-        else
-        {
+        if (!sample_point.has_value() || !EndInObstacleSampleTest::isSamplePointValid(sample_point.value(), obstacles)) {
             FAIL();
         }
     }
 }
+
