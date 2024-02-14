@@ -161,10 +161,14 @@ print_status_msg "Finished setting up AutoRef"
 print_status_msg "Installing Bazel"
 
 # Adapted from https://docs.bazel.build/versions/main/install-ubuntu.html#install-with-installer-ubuntu
-sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
-sudo chmod +x /tmp/bazel-installer.sh
-sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
-echo "source ${HOME}/.bazel/bin/bazel-complete.bash" >> ~/.bashrc
+# sudo wget -nc https://github.com/bazelbuild/bazel/releases/download/5.0.0/bazel-5.0.0-installer-linux-x86_64.sh -O /tmp/bazel-installer.sh
+# sudo chmod +x /tmp/bazel-installer.sh
+# sudo /tmp/bazel-installer.sh --bin=/usr/bin --base=$HOME/.bazel
+# echo "source ${HOME}/.bazel/bin/bazel-complete.bash" >> ~/.bashrc
+
+sudo wget -nc https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/bazelisk-linux-amd64 -O /tmp/bazelisk-linux-amd64
+sudo chmod +x /tmp/bazelisk-linux-amd64
+sudo mv /tmp/bazelisk-linux-amd64 /usr/bin/bazel
 
 print_status_msg "Done Installing Bazel"
 print_status_msg "Setting Up PlatformIO"
