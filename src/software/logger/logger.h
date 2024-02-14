@@ -86,6 +86,7 @@ class LoggerSingleton
         // arg. Note: log locations are defaulted to the bazel-out folder due to Bazel's
         // hermetic build principles
 
+        // if log dir doesn't exist, create it
         if (!std::filesystem::exists(runtime_dir))
         {
             std::filesystem::create_directory(runtime_dir);
