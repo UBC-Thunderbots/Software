@@ -39,5 +39,5 @@ py_library(
         "//software/thunderscope/common:common_widgets",
         "//software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode:icon_loader",
         requirement("pyqtgraph"),
-    ]
+    ],
 )

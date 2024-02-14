@@ -219,9 +219,10 @@ class GLFieldToolbar(QWidget):
         Sets up the toolbars display toggle menu
         Where each toolbar's visibility can be toggled
         """
-        
 
         # Add each toolbar to the Toolbars menu
-        [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox("Gamecontroller", self.toolbars_menu)
+        [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox(
+            "Gamecontroller", self.toolbars_menu
+        )
         self.toolbars_menu_checkboxes["Gamecontroller"] = toolbar_checkbox
         self.toolbars_menu.addAction(toolbar_action)

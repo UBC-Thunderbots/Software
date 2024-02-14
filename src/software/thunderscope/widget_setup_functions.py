@@ -78,7 +78,7 @@ def setup_gl_widget(
         proto_unix_io=full_system_proto_unix_io,
         friendly_color_yellow=friendly_colour_yellow,
         player=player,
-        sandbox_mode=sandbox_mode
+        sandbox_mode=sandbox_mode,
     )
 
     # Create layers

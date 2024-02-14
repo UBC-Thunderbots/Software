@@ -8,15 +8,17 @@ from typing import Callable
 import software.thunderscope.gl.widgets.toolbar_icons.gamecontroller.icon_loader as icons
 
 
-class GamecontrollerPlays():
+class GamecontrollerPlays:
     """
     The different plays that can be set for each team
     """
+
     NONE = "None"
     DIRECT = "Direct"
     INDIRECT = "Indirect"
     KICKOFF = "Kickoff"
     PENALTY = "Penalty"
+
 
 class GLGamecontrollerToolbar(GLToolbar):
     """
@@ -41,31 +43,31 @@ class GLGamecontrollerToolbar(GLToolbar):
         # TODO: change icon to pause
         # Setup Stop button for sending the STOP gamecontroller command
         self.stop_button = self.__setup_icon_button(
-            icons.get_stop_icon(self.BUTTON_ICON_COLOR), 
-            "Stops gameplay, robots form circle around ball", 
-            self.__send_stop_command
+            icons.get_stop_icon(self.BUTTON_ICON_COLOR),
+            "Stops gameplay, robots form circle around ball",
+            self.__send_stop_command,
         )
 
         # Setup Force Start button for sending the FORCE_START gamecontroller command
         self.force_start_button = self.__setup_icon_button(
-            icons.get_force_start_icon(self.BUTTON_ICON_COLOR), 
-            "Force Start, restarts the game", 
-            self.__send_force_start_command
+            icons.get_force_start_icon(self.BUTTON_ICON_COLOR),
+            "Force Start, restarts the game",
+            self.__send_force_start_command,
         )
 
         # TODO: change icon to cross
         # Setup Halt button for sending the HALT gamecontroller command
         self.halt_button = self.__setup_icon_button(
-            icons.get_halt_icon(self.BUTTON_ICON_COLOR), 
-            "Halt, stops all robots immediately", 
-            self.__send_halt_command
+            icons.get_halt_icon(self.BUTTON_ICON_COLOR),
+            "Halt, stops all robots immediately",
+            self.__send_halt_command,
         )
 
         # Setup Normal Start button for sending the NORMAL_START gamecontroller command
         self.normal_start_button = self.__setup_icon_button(
-            icons.get_normal_start_icon(self.BUTTON_ICON_COLOR), 
-            "Normal Start, resumes game from a set play (disabled when no play selected)", 
-            self.__send_normal_start_command
+            icons.get_normal_start_icon(self.BUTTON_ICON_COLOR),
+            "Normal Start, resumes game from a set play (disabled when no play selected)",
+            self.__send_normal_start_command,
         )
 
         # disable the normal start button when no play is selected
@@ -102,27 +104,27 @@ class GLGamecontrollerToolbar(GLToolbar):
     def __add_plays_menu_item(self, play: GamecontrollerPlays, is_blue: bool) -> None:
         icon = icons.get_blue_icon() if is_blue else icons.get_yellow_icon()
         self.plays_menu.addAction(
-            icon, play,
-            lambda: self.__plays_menu_handler(play, icon, is_blue)
+            icon, play, lambda: self.__plays_menu_handler(play, icon, is_blue)
         )
 
-    def __plays_menu_handler(self, play: GamecontrollerPlays, icon: QtGui.QIcon, is_blue: bool):
+    def __plays_menu_handler(
+        self, play: GamecontrollerPlays, icon: QtGui.QIcon, is_blue: bool
+    ):
         self.plays_menu_button.setIcon(icon)
         self.plays_menu_button.setText(play)
 
         command_type = None
-        if (play == GamecontrollerPlays.DIRECT):
+        if play == GamecontrollerPlays.DIRECT:
             command_type = Command.Type.DIRECT
-        elif (play == GamecontrollerPlays.INDIRECT):
+        elif play == GamecontrollerPlays.INDIRECT:
             command_type = Command.Type.INDIRECT
-        elif (play == GamecontrollerPlays.KICKOFF):
+        elif play == GamecontrollerPlays.KICKOFF:
             command_type = Command.Type.KICKOFF
         else:
             command_type = Command.Type.PENALTY
-        
+
         self.__send_gc_command(
-            command_type,
-            (SslTeam.YELLOW if is_blue else SslTeam.BLUE),
+            command_type, (SslTeam.YELLOW if is_blue else SslTeam.BLUE),
         )
 
         if not self.normal_start_enabled:
@@ -133,14 +135,20 @@ class GLGamecontrollerToolbar(GLToolbar):
         Toggles the enabled / disabled state of the Normal Start button
         """
         self.normal_start_enabled = not self.normal_start_enabled
-        self.normal_start_button.setStyleSheet(self.get_button_style(self.normal_start_enabled))
+        self.normal_start_button.setStyleSheet(
+            self.get_button_style(self.normal_start_enabled)
+        )
         self.normal_start_button.setIcon(
             icons.get_normal_start_icon(
-                self.BUTTON_ICON_COLOR if self.normal_start_enabled else self.DISABLED_BUTTON_ICON_COLOR
+                self.BUTTON_ICON_COLOR
+                if self.normal_start_enabled
+                else self.DISABLED_BUTTON_ICON_COLOR
             )
         )
 
-    def __setup_icon_button(self, icon: QtGui.QPixmap, tooltip: str, callback: Callable[[], None]) -> QPushButton:
+    def __setup_icon_button(
+        self, icon: QtGui.QPixmap, tooltip: str, callback: Callable[[], None]
+    ) -> QPushButton:
         """
         Sets up a button with the given name and callback
 

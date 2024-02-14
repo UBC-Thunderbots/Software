@@ -27,10 +27,10 @@ class GLWidget(QWidget):
     """
 
     def __init__(
-        self, 
+        self,
         proto_unix_io: ProtoUnixIO,
         friendly_color_yellow: bool,
-        player: ProtoPlayer = None, 
+        player: ProtoPlayer = None,
         sandbox_mode: bool = False,
     ) -> None:
         """Initialize the GLWidget
@@ -76,7 +76,7 @@ class GLWidget(QWidget):
         # Setup gamecontroller toolbar
         self.gamecontroller_toolbar = GLGamecontrollerToolbar(
             proto_unix_io, friendly_color_yellow
-        )        
+        )
 
         # Setup layout
         self.layout = QVBoxLayout()
@@ -88,14 +88,14 @@ class GLWidget(QWidget):
         self.layout.addWidget(self.gamecontroller_toolbar)
 
         # Add a menu item for the Gamecontroller toolbar
-        [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox("Gamecontroller", self.toolbars_menu)
+        [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox(
+            "Gamecontroller", self.toolbars_menu
+        )
         self.toolbars_menu.addAction(toolbar_action)
 
         # Connect visibility of the toolbar to the menu item
         toolbar_checkbox.stateChanged.connect(
-            lambda: self.gamecontroller_toolbar.setVisible(
-                toolbar_checkbox.isChecked()
-            )
+            lambda: self.gamecontroller_toolbar.setVisible(toolbar_checkbox.isChecked())
         )
 
         # Setup replay controls if player is provided and the log has some size
@@ -212,7 +212,9 @@ class GLWidget(QWidget):
         self.layers.append(layer)
 
         # Add the layer to the Layer menu
-        [layer_checkbox, layer_action] = self.setup_menu_checkbox(layer.name, self.layers_menu, visible)
+        [layer_checkbox, layer_action] = self.setup_menu_checkbox(
+            layer.name, self.layers_menu, visible
+        )
         self.layers_menu_actions[layer.name] = layer_action
         self.layers_menu.addAction(layer_action)
 
@@ -277,9 +279,12 @@ class GLWidget(QWidget):
         self.gl_view_widget.reset()
         if camera_view == CameraView.ORTHOGRAPHIC:
             self.gl_view_widget.setCameraPosition(
-                pos=pg.Vector(0, 0, 0), distance=1100, elevation=90, azimuth=-90
+                pos=pg.Vector(0, 0, 0),
+                distance=self.calc_orthographic_distance(),
+                elevation=90,
+                azimuth=-90,
             )
-            self.gl_view_widget.setCameraParams(fov=1.0)
+            self.gl_view_widget.setCameraParams(fov=ORTHOGRAPHIC_FOV_DEGREES)
         elif camera_view == CameraView.LANDSCAPE_HIGH_ANGLE:
             self.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(0, -0.5, 0), distance=13, elevation=45, azimuth=-90
@@ -330,3 +335,24 @@ class GLWidget(QWidget):
         layer_action.setDefaultWidget(layer_checkbox)
 
         return [layer_checkbox, layer_action]
+
+    def calc_orthographic_distance(self) -> float:
+        """Calculates the distance of the camera above the field so that the field occupies the entire viewport"""
+
+        field = DEFAULT_EMPTY_FIELD_WORLD.field
+        buffer_size = 0.5
+        distance = np.tan(np.deg2rad(90 - ORTHOGRAPHIC_FOV_DEGREES / 2))
+
+        viewport_w_to_h = self.gl_view_widget.width() / self.gl_view_widget.height()
+
+        half_x_length_with_buffer = field.field_x_length / 2 + buffer_size
+        half_y_length_with_buffer = field.field_y_length / 2 + buffer_size
+
+        # Constrained vertically
+        if viewport_w_to_h > half_x_length_with_buffer / half_y_length_with_buffer:
+            distance *= half_y_length_with_buffer * viewport_w_to_h
+        # Constrained horizontally
+        else:
+            distance *= half_x_length_with_buffer
+
+        return distance
