@@ -81,7 +81,7 @@ TEST(PassTest, passerOrientation_passer_diagonal_to_receiver)
 
 TEST(PassTest, fromPassArray_toPassArray_test)
 {
-    std::array<double, 3> pass_array = {1, 1, 1};
+    std::array<double, 2> pass_array = {1, 1};
     Pass test                        = Pass::fromPassArray(Point(0, 0), pass_array);
 
     EXPECT_EQ(test.toPassArray(), pass_array);
