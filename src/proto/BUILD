@@ -177,6 +177,7 @@ cc_proto_library(
 py_proto_library(
     name = "software_py_proto",
     srcs = [
+        "manual_gc_command.proto",
         "play_info_msg.proto",
         "robot_crash_msg.proto",
         "robot_log_msg.proto",
@@ -197,7 +198,6 @@ py_proto_library(
         "ssl_vision_geometry.proto",
         "ssl_vision_wrapper.proto",
         "ssl_vision_wrapper_tracked.proto",
-        "manual_gc_command.proto"
     ],
     deps = [
         ":tbots_py_proto",
