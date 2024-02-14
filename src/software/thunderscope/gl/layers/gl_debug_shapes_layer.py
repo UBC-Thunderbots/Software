@@ -32,7 +32,7 @@ class GLDebugShapesLayer(GLLayer):
 
         self.poly_shape_graphics = ObservableList(self._graphics_changed)
         self.circle_shape_graphics = ObservableList(self._graphics_changed)
-        self.stadium_shape_graphics = ObservableList(self._graphics_changed)
+        self.stadium_shape_graphics = ObservableList(self._graphics_changed) # TODO (NIMA): Support Point and Segment as well
 
         self.drawn_
 
