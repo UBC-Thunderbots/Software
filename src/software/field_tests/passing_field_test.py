@@ -19,16 +19,12 @@ def test_passing(field_test_runner):
     should_receive_pass = True
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
-    passer_point = tbots_cpp.createPoint(
-        world.ball.current_state.global_position
-    )
+    passer_point = tbots_cpp.createPoint(world.ball.current_state.global_position)
     receiver_point = None
     for robot in world.friendly_team.team_robots:
         if robot.id == receiver_robot_id:
-            receiver_point = tbots_cpp.createPoint(
-                robot.current_state.global_position
-            )
-    
+            receiver_point = tbots_cpp.createPoint(robot.current_state.global_position)
+
     receive_speed_m_per_s = 2.0
     min_pass_speed_m_per_s = 1.0
     max_pass_speed_m_per_s = 4.0
@@ -84,13 +80,17 @@ def test_passing(field_test_runner):
         )
 
     field = tbots_cpp.Field.createSSLDivisionBField()
-    eighteen_zones = tbots_cpp.EighteenZonePitchDivision(field)
+    tbots_cpp.EighteenZonePitchDivision(field)
 
     # Validate that the ball is always received by the other robot
     # slower than the max receive speed
     # and also that the ball is not passed backwards over long distances
     always_validation_sequence_set = [
-        [FriendlyAlwaysReceivesBallSlow(robot_id=receiver_robot_id, max_receive_speed=2.5)]
+        [
+            FriendlyAlwaysReceivesBallSlow(
+                robot_id=receiver_robot_id, max_receive_speed=2.5
+            )
+        ]
     ]
 
     field_test_runner.set_tactics(params, True)

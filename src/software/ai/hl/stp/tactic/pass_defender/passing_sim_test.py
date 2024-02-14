@@ -259,9 +259,7 @@ def test_passing_receive_speed(
 ):
     # Eventually Validation
     eventually_validation_sequence_set = [
-        [
-            FriendlyEventuallyHasBallPossession(robot_id=1)
-        ]
+        [FriendlyEventuallyHasBallPossession(robot_id=1)]
     ]
 
     # Validate that the ball is always received by the other robot

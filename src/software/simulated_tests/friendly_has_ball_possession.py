@@ -7,8 +7,10 @@ from software.simulated_tests.validation import (
     create_validation_types,
 )
 
+
 class FriendlyHasBallPossession(Validation):
-    """Checks if a single friendly robot has possession of the ball."""  
+    """Checks if a single friendly robot has possession of the ball."""
+
     def __init__(self, robot_id: int) -> None:
         """
         Initializes the validation to check for if the robot with the given id has possession
@@ -35,12 +37,15 @@ class FriendlyHasBallPossession(Validation):
         """
         return create_validation_geometry(
             [
-                tbots_cpp.Robot(world.friendly_team.team_robots[self.robot_id]).dribblerArea()
+                tbots_cpp.Robot(
+                    world.friendly_team.team_robots[self.robot_id]
+                ).dribblerArea()
             ]
         )
 
     def __repr__(self):
         return f"Check that friendly robot {self.robot_id} has possession of the ball"
+
 
 (
     FriendlyEventuallyHasBallPossession,
@@ -48,7 +53,6 @@ class FriendlyHasBallPossession(Validation):
     FriendlyAlwaysHasBallPossession,
     FriendlyNeverHasBallPossession,
 ) = create_validation_types(FriendlyHasBallPossession)
-
 
 
 class AnyFriendlyHasBallPossession(FriendlyHasBallPossession):
