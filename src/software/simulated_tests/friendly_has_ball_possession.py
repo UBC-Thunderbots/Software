@@ -9,15 +9,11 @@ from software.simulated_tests.validation import (
 
 class FriendlyHasBallPossession(Validation):
     """Checks if a single friendly robot has possession of the ball."""  
-    def __init__(self, robot_id: int, tolerance: float = 0.01) -> None:
+    def __init__(self, robot_id: int) -> None:
         """
         Initializes the validation to check for if the robot with the given id has possession
-
-        :param robot_id: the robot which should have possession
-        :param tolerance: the tolerance for possessing the ball
         """
         self.robot_id = robot_id
-        self.tolerance = tolerance
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the specified friendly robot has possession of the ball
@@ -29,7 +25,7 @@ class FriendlyHasBallPossession(Validation):
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
         robot = world.friendly_team.team_robots[self.robot_id]
 
-        if tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.tolerance):
+        if tbots_cpp.Robot(robot).isNearDribbler(ball_position, 0.01):
             return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 

@@ -85,10 +85,8 @@ static const double ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED = 9.81
 // these values are set in coordination with other objects the ball will collide with.
 // the resulting coefficient of friction is the product of both objects friction value.
 
-// the simulator sliding friction coefficient of the ball (no use irl)
-static const double BALL_SLIDING_FRICTION_SIM_COEFFICIENT = 1.0;
-// the actual sliding friction coefficient of the ball with the floor (refer to simulator.cpp)
-static const double BALL_SLIDING_FRICTION_COEFFICIENT = 0.35;
+// the sliding friction the ball experiences in Newtons
+static const double BALL_SLIDING_FRICTION_NEWTONS = 1.0;
 // the restitution of the ball
 static const double BALL_RESTITUTION = 1.0;
 // the transition factor where the ball goes from sliding to rolling
@@ -99,7 +97,7 @@ static const double STATIONARY_BALL_SPEED_METERS_PER_SECOND = 0.01;
 static const double BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED = 0.5;
 // the deceleration the ball experiences due to sliding friction in m/s^2
 static const double BALL_SLIDING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED =
-    BALL_SLIDING_FRICTION_COEFFICIENT * ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
+    BALL_SLIDING_FRICTION_NEWTONS / BALL_MASS_KG;
 
 /* Unit Conversion */
 static const double MILLIMETERS_PER_METER = 1000.0;

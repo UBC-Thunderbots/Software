@@ -395,8 +395,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("passerPoint", &Pass::passerPoint)
         .def("receiverPoint", &Pass::receiverPoint)
         .def("speed", &Pass::speed)
-        .def_static("fromDestReceiveSpeed", &Pass::fromDestReceiveSpeed)
-        .def_static("getPassSpeed", &Pass::getPassSpeed);
+        .def_static("fromDestReceiveSpeed", &Pass::fromDestReceiveSpeed);
 
     py::enum_<EighteenZoneId>(m, "EighteenZoneId")
         .value("ZONE_1", EighteenZoneId::ZONE_1)

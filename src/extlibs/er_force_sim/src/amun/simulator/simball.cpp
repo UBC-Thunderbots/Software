@@ -61,7 +61,7 @@ SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world)
     // see simulator.cpp
     // TODO (#2512): Check these values with real life
     m_body->setRestitution(BALL_RESTITUTION);
-    m_body->setFriction(BALL_SLIDING_FRICTION_SIM_COEFFICIENT);
+    m_body->setFriction(BALL_SLIDING_FRICTION_NEWTONS);
 
     // \mu_r = -a / g = 0.0357 (while rolling)
     // rollingFriction in bullet is too unstable to be useful
@@ -99,7 +99,6 @@ void SimBall::begin(bool robot_collision)
         else if ((current_ball_state == SLIDING && should_roll) ||
                  current_ball_state == ROLLING)
         {
-
             current_ball_state = ROLLING;
         }
         else
@@ -111,15 +110,15 @@ void SimBall::begin(bool robot_collision)
         {
             case STATIONARY:
                 m_body->setLinearVelocity(btVector3(0, 0, 0));
-                m_body->setFriction(BALL_SLIDING_FRICTION_SIM_COEFFICIENT);
+                m_body->setFriction(BALL_SLIDING_FRICTION_NEWTONS);
                 set_transition_speed = true;
                 break;
             case ROBOT_COLLISION:
-                m_body->setFriction(BALL_SLIDING_FRICTION_SIM_COEFFICIENT);
+                m_body->setFriction(BALL_SLIDING_FRICTION_NEWTONS);
                 set_transition_speed = true;
                 break;
             case SLIDING:
-                m_body->setFriction(BALL_SLIDING_FRICTION_SIM_COEFFICIENT);
+                m_body->setFriction(BALL_SLIDING_FRICTION_NEWTONS);
                 if (set_transition_speed)
                 {
                     rolling_speed =
