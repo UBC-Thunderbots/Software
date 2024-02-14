@@ -334,7 +334,6 @@ class RobotInfo(QWidget):
             - Battery voltage, and warns if it's too low
             - If this robot has errors
             - If the robot is stopped or running
-            - The primitive and world loss rates
         :param robot_status: The robot status message for this robot
         """
         motor_status = robot_status.motor_status

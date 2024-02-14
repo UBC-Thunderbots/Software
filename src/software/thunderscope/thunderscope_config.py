@@ -52,7 +52,11 @@ def initialize_application() -> None:
     app = pyqtgraph.mkQApp("Thunderscope")
 
     # Setup stylesheet
-    apply_stylesheet(app, theme="dark_blue.xml")
+    extra = {
+        # Make thunderscope more dense
+        "density_scale": "-2",
+    }
+    apply_stylesheet(app, theme="dark_blue.xml", extra=extra)
 
 
 def configure_robot_view_fullsystem(
@@ -123,6 +127,7 @@ def configure_base_fullsystem(
     full_system_proto_unix_io: ProtoUnixIO,
     sim_proto_unix_io: ProtoUnixIO,
     friendly_colour_yellow: bool,
+    sandbox_mode: bool = False,
     replay: bool = False,
     replay_log: os.PathLike = None,
     visualization_buffer_size: int = 5,
@@ -135,6 +140,7 @@ def configure_base_fullsystem(
     :param full_system_proto_unix_io: the proto unix io to configure widgets with
     :param sim_proto_unix_io: the proto unix io for the simulator
     :param friendly_colour_yellow: if this is Yellow FullSystem (True) or Blue (False)
+    :param sandbox_mode: if sandbox mode should be enabled
     :param replay: True if in replay mode, False if not
     :param replay_log: the file path of the replay protos
     :param visualization_buffer_size: The size of the visualization buffer.
@@ -147,6 +153,7 @@ def configure_base_fullsystem(
             name="Field",
             widget=setup_gl_widget(
                 **{
+                    "sandbox_mode": sandbox_mode,
                     "replay": replay,
                     "replay_log": replay_log,
                     "full_system_proto_unix_io": full_system_proto_unix_io,
@@ -167,12 +174,14 @@ def configure_base_fullsystem(
             anchor="Field",
             position="left",
             has_refresh_func=False,
+            stretch=WidgetStretchData(x=3),
         ),
         TScopeWidget(
             name="Logs",
             widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Parameters",
             position="above",
+            stretch=WidgetStretchData(x=3),
         ),
         TScopeWidget(
             name="Error Log",
@@ -291,6 +300,7 @@ def configure_two_ai_gamecontroller_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
+                    sandbox_mode=True,
                     extra_widgets=[],
                 ),
             ),
@@ -304,6 +314,7 @@ def configure_two_ai_gamecontroller_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
+                    sandbox_mode=True,
                     extra_widgets=[],
                 ),
             ),

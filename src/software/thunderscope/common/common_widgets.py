@@ -148,15 +148,7 @@ class ColorProgressBar(QProgressBar):
         super(ColorProgressBar, self).setValue(value * self.decimals)
 
         # clamp percent to make sure it's between 0% and 100%
-        percent = min(
-            1,
-            max(
-                0,
-                int(
-                    (self.value() - self.minimum()) / (self.maximum() - self.minimum())
-                ),
-            ),
-        )
+        percent = self.getPercentage()
 
         if percent < 0.5:
             super(ColorProgressBar, self).setStyleSheet(
@@ -173,14 +165,73 @@ class ColorProgressBar(QProgressBar):
                 "}"
             )
 
+    def getPercentage(self):
+        """
+        Gets the current percentage between 0 and 1 from the current value
+        Compared to the current min and max
+        """
+        return min(
+            1,
+            max(
+                0,
+                int(
+                    (self.value() - self.minimum()) / (self.maximum() - self.minimum())
+                ),
+            ),
+        )
+
     def maximum(self) -> float:
+        """
+        Gets the maximum value of this progress bar as a float
+        """
         return float(super(ColorProgressBar, self).maximum()) / self.decimals
 
     def minimum(self) -> float:
+        """
+        Gets the minimum value of this progress bar as a float
+        """
         return float(super(ColorProgressBar, self).minimum()) / self.decimals
 
     def value(self) -> float:
+        """
+        Gets the current value of this progress bar as a float
+        """
         return float(super(ColorProgressBar, self).value()) / self.decimals
+
+
+class ToggleableButton(QPushButton):
+    """
+    A QPushButton which can be enabled or disabled
+    Indicates with cursor if it is enabled or disabled
+    """
+
+    def __init__(self, enabled: bool):
+        """
+        Creates a new button with the given state
+
+        :param enabled: the starting state of the button
+        """
+        super(ToggleableButton, self).__init__()
+        self.enabled = enabled
+
+    def toggle_enabled(self, enabled: bool):
+        """
+        Toggles the enabled state of the button
+        :param enabled: the new enabled state
+        """
+        self.enabled = enabled
+
+    def enterEvent(self, event) -> None:
+        """
+        Sets the cursor to depending on if the button is enabled
+        to indicate that this widget is clickable or unclickable
+        :param event: the mouse enter event
+        """
+        self.setCursor(
+            QtCore.Qt.CursorShape.PointingHandCursor
+            if self.enabled
+            else QtCore.Qt.CursorShape.ForbiddenCursor
+        )
 
 
 def create_buttons(text: list):

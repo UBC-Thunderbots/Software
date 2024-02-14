@@ -45,8 +45,6 @@ class NetworkSink
 
    private:
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;
-    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::HRVOVisualization>>
-        log_visualize_output;
     int robot_id;
     LogMerger log_merger;
 };

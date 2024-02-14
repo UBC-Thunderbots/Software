@@ -79,10 +79,9 @@ class Polygon : public virtual Shape
 
    protected:
     /**
-     * Returns the line segments that connect a list of points.
-     * @return the line segments
+     * Initializes the segments_ vector
      */
-    static std::vector<Segment> initSegments(std::vector<Point> points);
+    void initSegments();
 
     std::vector<Point> points_;
     std::vector<Segment> segments_;

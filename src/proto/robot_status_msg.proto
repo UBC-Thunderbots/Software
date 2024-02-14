@@ -61,8 +61,7 @@ message DribblerStatus
     // The current speed of the dribbler in RPM
     float dribbler_rpm = 1;
 
-    // Dribbler temperature
-    float dribbler_temperature = 2;
+    reserved 2;
 
     repeated MotorFault motor_faults = 3;
     bool enabled                     = 4;
@@ -75,7 +74,7 @@ enum ErrorCode
     NO_ERROR = 0;
 
     // Level triggered events
-    LOW_CAP            = 1;
+    HIGH_CAP           = 1;
     LOW_BATTERY        = 2;
     HIGH_BOARD_TEMP    = 3;
     DRIBBLER_MOTOR_HOT = 4;
@@ -133,9 +132,11 @@ message NetworkStatus
     // Indicates the time elapsed since the last primitive packet was received in ms
     double ms_since_last_primitive_received = 2;
 
-    // Indicates the percentage of primitive / world packets lost during communication
+    // Indicates the percentage of primitive packets lost during communication
     uint32 primitive_packet_loss_percentage = 3;
-    uint32 world_packet_loss_percentage     = 4;
+
+    // Indicates the percentage of world packets lost during communication
+    uint32 world_packet_loss_percentage = 4;
 }
 
 /* Battery and capacitor voltages */

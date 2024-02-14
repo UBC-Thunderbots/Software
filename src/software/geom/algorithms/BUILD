@@ -4,6 +4,7 @@ cc_library(
     name = "algorithms",
     srcs = [
         "almost_equal.cpp",
+        "axis_aligned_bounding_box.cpp",
         "calculate_block_cone.cpp",
         "closest_point.cpp",
         "collinear.cpp",
@@ -12,7 +13,6 @@ cc_library(
         "distance.cpp",
         "find_open_circles.cpp",
         "furthest_point.cpp",
-        "generate_velocity_obstacle.cpp",
         "intersection.cpp",
         "intersects.cpp",
         "rasterize.cpp",
@@ -21,6 +21,7 @@ cc_library(
     ],
     hdrs = [
         "almost_equal.h",
+        "axis_aligned_bounding_box.h",
         "calculate_block_cone.h",
         "closest_point.h",
         "collinear.h",
@@ -29,7 +30,6 @@ cc_library(
         "distance.h",
         "find_open_circles.h",
         "furthest_point.h",
-        "generate_velocity_obstacle.h",
         "intersection.h",
         "intersects.h",
         "rasterize.h",
@@ -37,7 +37,6 @@ cc_library(
         "voronoi_diagram.h",
     ],
     deps = [
-        "//software/ai/navigator/path_planner/hrvo:velocity_obstacle",
         "//software/geom:angle",
         "//software/geom:circle",
         "//software/geom:geom_constants",
@@ -48,6 +47,7 @@ cc_library(
         "//software/geom:ray",
         "//software/geom:rectangle",
         "//software/geom:segment",
+        "//software/geom:stadium",
         "//software/geom:vector",
         "//software/logger",
     ],
@@ -90,6 +90,18 @@ cc_test(
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_test(
+    name = "axis_aligned_bounding_box_test",
+    srcs = [
+        "axis_aligned_bounding_box_test.cpp",
+    ],
+    deps = [
+        ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
 

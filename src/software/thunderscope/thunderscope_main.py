@@ -17,12 +17,18 @@ from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import CI_DURATION_S
+from software.thunderscope.constants import (
+    CI_DURATION_S,
+    ProtoUnixIOTypes,
+    SIM_TICK_RATE_MS,
+)
 from software.thunderscope.util import *
+
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
+
 
 NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
@@ -192,6 +198,12 @@ if __name__ == "__main__":
         default=False,
         help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
     )
+    parser.add_argument(
+        "--empty",
+        action="store_true",
+        default=False,
+        help="Whether to populate with default robot positions (False) or start with an empty field (True) for AI vs AI",
+    )
 
     # Sanity check that an interface was provided
     args = parser.parse_args()
@@ -224,7 +236,7 @@ if __name__ == "__main__":
         # Setup LOG(VISUALIZE) handling from full system. We set from_log_visualize
         # to true to decode from base64.
         for arg in [
-            {"proto_class": Obstacles},
+            {"proto_class": ObstacleList},
             {"proto_class": PathVisualization},
             {"proto_class": PassVisualization},
             {"proto_class": CostVisualization},
@@ -232,10 +244,6 @@ if __name__ == "__main__":
             {"proto_class": PrimitiveSet},
             {"proto_class": World},
             {"proto_class": PlayInfo},
-        ] + [
-            # TODO (#2655): Add/Remove HRVO layers dynamically based on the HRVOVisualization proto messages
-            {"proto_class": HRVOVisualization, "unix_path": YELLOW_HRVO_PATH}
-            for _ in range(MAX_ROBOT_IDS_PER_SIDE)
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir, from_log_visualize=True, **arg
@@ -368,7 +376,10 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            sync_simulation(tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], NUM_ROBOTS)
+            sync_simulation(
+                tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                0 if args.empty else NUM_ROBOTS,
+            )
 
             if args.ci_mode:
                 async_sim_ticker(

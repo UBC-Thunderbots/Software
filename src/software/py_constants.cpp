@@ -51,8 +51,6 @@ PYBIND11_MODULE(py_constants, m)
     m.attr("SIMULATION_TICK_PATH")     = SIMULATION_TICK_PATH;
     m.attr("YELLOW_WORLD_PATH")        = YELLOW_WORLD_PATH;
     m.attr("BLUE_WORLD_PATH")          = BLUE_WORLD_PATH;
-    m.attr("YELLOW_HRVO_PATH")         = YELLOW_HRVO_PATH;
-    m.attr("BLUE_HRVO_PATH")           = BLUE_HRVO_PATH;
     m.attr("BLUE_PRIMITIVE_SET")       = BLUE_PRIMITIVE_SET;
     m.attr("YELLOW_PRIMITIVE_SET")     = YELLOW_PRIMITIVE_SET;
     m.attr("SIMULATOR_STATE_PATH")     = SIMULATOR_STATE_PATH;
@@ -74,12 +72,10 @@ PYBIND11_MODULE(py_constants, m)
     });
 
     // Ports
-    m.attr("VISION_PORT")             = VISION_PORT;
-    m.attr("PRIMITIVE_PORT")          = PRIMITIVE_PORT;
-    m.attr("ROBOT_STATUS_PORT")       = ROBOT_STATUS_PORT;
-    m.attr("ROBOT_LOGS_PORT")         = ROBOT_LOGS_PORT;
-    m.attr("HRVO_VISUALIZATION_PORT") = HRVO_VISUALIZATION_PORT;
-    m.attr("ROBOT_CRASH_PORT")        = ROBOT_CRASH_PORT;
+    m.attr("PRIMITIVE_PORT")    = PRIMITIVE_PORT;
+    m.attr("ROBOT_STATUS_PORT") = ROBOT_STATUS_PORT;
+    m.attr("ROBOT_LOGS_PORT")   = ROBOT_LOGS_PORT;
+    m.attr("ROBOT_CRASH_PORT")  = ROBOT_CRASH_PORT;
 
     // PlotJuggler
     m.attr("PLOTJUGGLER_GUI_DEFAULT_HOST") = PLOTJUGGLER_GUI_DEFAULT_HOST;
