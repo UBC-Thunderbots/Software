@@ -65,7 +65,7 @@ struct ShootOrPassPlayFSM
      * Which are the best receiving zones except the one currently taken by the receiver
      * robot
      */
-    vector<EighteenZoneId> getBestOffensivePositions(
+    std::vector<EighteenZoneId> getBestOffensivePositions(
         PassEvaluation<EighteenZoneId> pass_eval, const Update& event);
 
     /**

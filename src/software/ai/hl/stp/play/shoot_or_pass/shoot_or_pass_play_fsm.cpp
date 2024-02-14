@@ -98,7 +98,7 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
     lookForPass(event);
 }
 
-vector<EighteenZoneId> ShootOrPassPlayFSM::getBestOffensivePositions(
+std::vector<EighteenZoneId> ShootOrPassPlayFSM::getBestOffensivePositions(
     PassEvaluation<EighteenZoneId> pass_eval, const Update& event)
 {
     auto ranked_zones = pass_eval.rankZonesForReceiving(
