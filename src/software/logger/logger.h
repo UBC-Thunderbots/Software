@@ -1,5 +1,11 @@
 #pragma once
 
+#if __cplusplus > 201703L
+#include <filesystem>
+#else
+#include <experimental/filesystem>
+#endif
+
 #include <g3sinks/LogRotate.h>
 #include <g3sinks/LogRotateWithFilter.h>
 
@@ -79,6 +85,11 @@ class LoggerSingleton
         // Log locations can also be defined by setting the --logging_dir command line
         // arg. Note: log locations are defaulted to the bazel-out folder due to Bazel's
         // hermetic build principles
+
+        if (!std::filesystem::exists(runtime_dir))
+        {
+            std::filesystem::create_directory(runtime_dir);
+        }
 
         auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(runtime_dir),
                                                   &CSVSink::appendToFile);
