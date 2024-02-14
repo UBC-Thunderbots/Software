@@ -19,31 +19,33 @@
     * [Robot Status](#robot-status)
 * [Design Patterns](#design-patterns)
   * [Abstract Classes and Inheritance](#abstract-classes-and-inheritance)
-  * [Singleton Design Pattern](#singleton-design-pattern)
-  * [Factory Design Pattern](#factory-design-pattern)
-  * [Visitor Design Pattern](#visitor-design-pattern)
-  * [Observer Design Pattern](#observer-design-pattern)
+  * [Singleton Pattern](#singleton-pattern)
+  * [Factory Pattern](#factory-pattern)
+  * [Visitor Pattern](#visitor-pattern)
+  * [Observer Pattern](#observer-pattern)
+    * [Threaded Observer](#threaded-observer)
+  * [Publisher-Subscriber Pattern](#publisher-subscriber-pattern)
   * [C++ Templating](#c-templating)
 * [Coroutines](#coroutines)
   * [What Are Coroutines?](#what-are-coroutines)
   * [What Coroutines Do We Use?](#what-coroutines-do-we-use)
   * [How Do We Use Coroutines?](#how-do-we-use-coroutines)
-  * [Best Practices](#couroutine-best-practices)
+  * [Coroutine Best Practices](#coroutine-best-practices)
 * [Finite State Machines](#finite-state-machines)
   * [What Are Finite State Machines?](#what-are-finite-state-machines)
-  * [Boost-Ext SML Library](#boost-ext-sml-library)
+  * [Boost-ext SML Library](#boost-ext-sml-library)
   * [How Do We Use SML?](#how-do-we-use-sml)
   * [SML Best Practices](#sml-best-practices)
 * [Conventions](#conventions)
   * [Coordinates](#coordinates)
   * [Angles](#angles)
-  * [Diagram](#convention-diagram)
+  * [Convention Diagram](#convention-diagram)
 * [Architecture Overview](#architecture-overview)
-  * [Diagram](#architecture-overview-diagram)
-  * [Backend](#backend)
-    * [Diagram](#backend-diagram)
-  * [Sensor Fusion](#sensor-fusion)
-    * [Filters](#filters)
+  * [Fullsystem](#fullsystem)
+    * [Backend](#backend)
+      * [Backend Diagram](#backend-diagram)
+    * [Sensor Fusion](#sensor-fusion)
+      * [Filters](#filters)
   * [AI](#ai)
     * [Strategy](#strategy)
       * [STP Diagram](#stp-diagram)
@@ -53,30 +55,20 @@
       * [Path Manager](#path-manager)
       * [Path Objective](#path-objective)
       * [Path Planner](#path-planner)
-    * [Diagram](#ai-diagram)
-  * [Visualizer](#visualizer)
-    * [Diagram](#visualizer-diagram)
-    * [Draw Functions](#draw-functions)
+    * [AI Diagram](#ai-diagram)
+  * [Thunderscope](#thunderscope)
+    * [Thunderscope GUI](#thunderscope-gui)
     * [3D Visualizer](#3d-visualizer)
       * [Layers](#layers)
+  * [Simulator](#simulator)
+    * [Standalone Simulator](#standalone-simulator)
+    * [Simulated Tests](#simulated-tests)
+      * [Simulated Tests Architecture](#simulated-tests-architecture)
+        * [Validation Functions](#validation-functions)
+      * [Component Connections and Determinism](#component-connections-and-determinism)
+      * [Simulated Tests Diagram](#simulated-tests-diagram)
+  * [Inter-process Communication](#inter-process-communication)
   * [Estop](#estop)
-* [Simulator](#simulator)
-  * [Standalone Simulator](#standalone-simulator)
-  * [Simulated Tests](#simulated-tests)
-    * [Architecture](#simulated-tests-architecture)
-      * [Validation Functions](#validation-functions)
-    * [Component Connections and Determinism](#component-connections-and-determinism)
-    * [Diagram](#simulated-tests-diagram)
-* [GUI](#gui)
-  * [Naming](#naming)
-  * [Editing the GUIs](#editing-the-guis)
-    * [Editing ui files](#editing-ui-files)
-    * [Promoting Widgets](#promoting-widgets)'
-  * [Qt Best Practices](#qt-best-practices)
-    * [Build A Hierarchy](#build-a-hierarchy)
-    * [Create Reusable Widgets](#create-reusable-widgets)
-    * [Miscellaneous Qt Tips](#miscellaneous-qt-tips)
-
 
 # Tools
 A few commonly-used terms and tools to be familiar with:
@@ -89,13 +81,13 @@ A few commonly-used terms and tools to be familiar with:
 
 
 # Important Classes
-These are classes that are either heavily used in our code, or are very important for understanding how the AI works, but are _not_ core components of the AI or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [Sensor Fusion](#sensor-fusion), [AI](#ai), and [Visualizer](#visualizer).
+These are classes that are either heavily used in our code, or are very important for understanding how the AI works, but are _not_ core components of the AI or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [Sensor Fusion](#sensor-fusion), [AI](#ai), and [Thunderscope](#thunderscope).
 
 ## World
 The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current referee commands. Altogether, it's the information we have at any given time that we can use to make decisions.
 
 ### Team
-A team is a collection of [Robots](#robot)
+A team is a collection of [Robots](#robot).
 
 ### Robot
 A Robot class represents the state of a single robot on the field. This includes its position, orientation, velocity, angular velocity, and any other information about its current state.
@@ -120,7 +112,7 @@ There are two types of `Intent`s: `DirectPrimitiveIntent`s and `NavigatingIntent
 ## Dynamic Parameters
 `Dynamic Parameters` are the system we use to change values in our code at runtime. The reason we want to change values at runtime is primarily because we may want to tweak our strategy or aspects of our gameplay very quickly. During games we are only allowed to touch our computers and make changes during halftime or a timeout, so every second counts! Using `Dynamic Parameters` saves us from having to stop the [AI](#ai), change a constant, recompile the code, and restart the [AI](#ai).
 
-Additionally, we can use `Dynamic Parameters` to communicate between the [Visualizer](#visualizer) and the rest of our system. The [Visualizer](#visualizer) can change the values of `DynamicParameters` when buttons or menu items are clicked, and these new values will be picked up by the rest of the code. For example, we can define a `Dynamic Parameter` called `run_ai` that is a boolean value. Then when the `Start [AI](#ai)` button is clicked in the [Visualizer](#visualizer), it sets the value of `run_ai` to `true`. In the "main loop" for the [AI](#ai), it will check if the value of `run_ai` is true before running its logic.
+Additionally, we can use `Dynamic Parameters` to communicate between [Thunderscope](#thunderscope) and the rest of our system. [Thunderscope](#thunderscope) can change the values of `DynamicParameters` when buttons or menu items are clicked, and these new values will be picked up by the rest of the code. For example, we can define a `Dynamic Parameter` called `run_ai` that is a boolean value. Then when the `Start [AI](#ai)` button is clicked in [Thunderscope](#thunderscope), it sets the value of `run_ai` to `true`. In the "main loop" for the [AI](#ai), it will check if the value of `run_ai` is true before running its logic.
 
 Here's a slightly more relevant example of how we used `Dynamic Parameters` during a game in RoboCup 2019. We had a parameter called `enemy_team_can_pass`, which indicates whether or not we think the enemy team can pass. This parameter was used in several places in our defensive logic, and specifically affected how we would shadow enemy robots when we were defending them. If we assumed the enemy team could pass, we would shadow between the robots and the ball to block any passes, otherwise we would shadow between the enemy robot and our net to block shots. During the start of a game, we had `enemy_team_can_pass` set to `false` but the enemy did start to attempt some passes during the game. However, we didn't want to use one of our timeouts to change the value. Luckily later during the half, the enemy team took a time out. Because `Dynamic Parameters` can be changed quick without stopping [AI](#ai), we were quickly able to change `enemy_team_can_pass` to `true` while the enemy team took their timeout. This made our defence much better against that team and didn't take so much time that we had to burn our own timeout. Altogether this is an example of how we use `Dynamic Parameters` to control our [AI](#ai) and other parts of the code.
 
@@ -128,7 +120,7 @@ It is worth noting that constants are still useful, and should still be used whe
 
 
 # Protobuf
-Protobuf or protocol buffers are used to pass messages between components in our system.
+[Protobufs or protocol buffers](https://protobuf.dev/) are used to pass messages between components in our system.
 After building using Bazel, the `.proto` files are generated into `.pb.h` and `.pb.cc` files, which are found in `bazel-out/k8-fastbuild/bin/proto`.
 To include these files in our code, we simply include `proto/<protobuf_filename>.pb.h`
 
@@ -150,7 +142,7 @@ The `TbotsProto::RobotStatus` protobuf message contains information about the st
 * The capacitor charge on the robot
 * The temperature of the dribbler motor
 
-Information about the robot status is communicated and stored as `RobotStatus` protobuf messages. The [Visualizer](#visualizer) displays warnings from incoming `RobotStatus`es so we can take appropriate action. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
+Information about the robot status is communicated and stored as `RobotStatus` protobuf messages. [Thunderscope](#thunderscope) displays warnings from incoming `RobotStatus`es so we can take appropriate action. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
 
 # Design Patterns
 Below are the main design patterns we use in our code, and what they are used for.
@@ -158,7 +150,7 @@ Below are the main design patterns we use in our code, and what they are used fo
 ## Abstract Classes and Inheritance
 Abstract classes let us define interfaces for various components of our code. Then we can implement different objects that obey the interface, and use them interchangeably, with the guarantee that as long as they follow the same interface we can use them in the same way.
 
-Read [https://www.geeksforgeeks.org/inheritance-in-c/] for more information.
+Read https://www.geeksforgeeks.org/inheritance-in-c/ for more information.
 
 Examples of this can be found in many places, including:
 * [Plays](#plays)
@@ -167,40 +159,37 @@ Examples of this can be found in many places, including:
 * Different implementations of the [Backend](#backend)
 
 
-## Singleton Design Pattern
+## Singleton Pattern
 The Singleton pattern is useful for having a single, global instance of an object that can be accessed from anywhere. Though it's generally considered an anti-pattern (aka _bad_), it is useful in specific scenarios.
 
-Read [https://www.tutorialspoint.com/Explain-Cplusplus-Singleton-design-pattern] for more information.
+Read https://refactoring.guru/design-patterns/singleton for more information.
 
 We use the Singleton pattern for our logger. This allows us to create a single logger for the entire system, and code can make calls to the logger from anywhere, rather than us having to pass a `logger` object literally everywhere.
 
 
-## Factory Design Pattern
-The Factory Design Pattern is useful for hiding or abstracting how certain objects are created.
+## Factory Pattern
+The Factory pattern is useful for hiding or abstracting how certain objects are created.
 
-Read [https://www.geeksforgeeks.org/design-patterns-set-2-factory-method/] for more information.
+Read the Refactoring Guru articles on the [Factory Method pattern](https://refactoring.guru/design-patterns/factory-method) and the [Abstract Factory pattern](https://refactoring.guru/design-patterns/abstract-factory) for more information.
 
 Because the Factory needs to know about what objects are available to be created, it can be taken one step further to auto-register these object types. Rather than a developer having to remember to add code to the Factory every time they create a new class, this can be done "automatically" with some clever code. This helps reduce mistakes and saves developers work.
 
-Read [http://derydoca.com/2019/03/c-tutorial-auto-registering-factory/] for more information.
+Read http://derydoca.com/2019/03/c-tutorial-auto-registering-factory/ for more information.
 
 The auto-registering factory is particularly useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
 
 The Factory pattern is also used to create different [Backends](#backend)
 
 
-## Visitor Design Pattern
-The `Visitor Design Pattern` is arguably the most "advanced" design pattern we use. It is used when we need to perform different operations on a group of "similar" objects, for example a bunch of objects that inherit from the same parent class ([Intents](#intents)). We might only know all these objects are an [Intent](#intent), but we don't know specifically which type each one is (eg. `MoveIntent` vs `KickIntent`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
+## Visitor Pattern
+The Visitor pattern is useful when we need to perform different operations on a group of "similar" objects, like objects that inherit from the same parent class (e.g. [Tactic](#tactics)). We might only know all these objects are a [Tactic](#tactic), but we don't know specifically which type each one is (eg. `AttackerTactic` vs `ReceiverTactic`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
 
-Read [https://www.geeksforgeeks.org/visitor-design-pattern/] for more information.
+Read https://refactoring.guru/design-patterns/visitor for more information.
 
-Examples of the Visitor Pattern can be found with the following classes:
-* [Intents](#intents)
-* [Tactics](#tactics)
+An example of where we use the Visitor pattern is in our `MotionConstraintVisitor`. This visitor allows us to update the current set of motion constraints based on the types of tactics that are currently assigned.
 
-
-## Observer Design Pattern
-The Observer Design Pattern is useful for letting components of a system "notify" each other when something happens. Read [https://www.geeksforgeeks.org/observer-pattern-set-1-introduction/] for a general introduction to the pattern.
+## Observer Pattern
+The Observer pattern is useful for letting components of a system "notify" each other when something happens. Read https://refactoring.guru/design-patterns/observer for a general introduction to the pattern.
 
 Our implementation of this pattern consists of two classes, `Observer` and `Subject`. `Observer`s can be registered with a `Subject`, after which new values will be sent from each `Subject` to all of it's registered `Observer`s. Please see the headers of both classes for details. Note that a class can extend both `Observer` and `Subject`, thus receiving and sending out data. In this way we can "chain" multiple classes.
 
@@ -209,13 +198,22 @@ In our system, we need to be able to do multiple things (receive camera data, ru
 
 **WARNING:** If a class extends multiple `ThreadedObserver`s (for example, [AI](#ai) could extend `ThreadedObserver<World>` and `ThreadedObserver<RobotStatus>`), then there will be two threads running, one for each observer. We **do not check** for data race conditions between observers, so it's entirely possible that one `ThreadedObserver` thread could read/write from data at the same time as the other `ThreadedObserver` is reading/writing the same data. Please make sure any data read/written to/from multiple `ThreadedObserver`s is thread-safe.
 
-### Example
 One example of this is [SensorFusion](#sensor-fusion), which extends `Subject<World>` and the [AI](#ai), which extends `ThreadedObserver<World>`. [SensorFusion](#sensor-fusion) runs in one thread and sends data to the [AI](#ai), which receives and processes it another thread.
+
+## Publisher-Subscriber Pattern
+
+The publisher-subscriber pattern ("pub-sub") is a messaging pattern for facilitating communication between different components. It is closely related to the [message queue](https://en.wikipedia.org/wiki/Message_queue) design pattern. 
+
+In this pattern, `Publisher`s send messages without knowing who the recipients (`Subscriber`s) are. `Subscriber`s express interest in specific types of messages by subscribing to relevant topics; when a `Publisher` sends a message of a topic, the messaging system ensures that all interested subscribers receive the message.
+
+Read https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern for an introduction to the pub-sub pattern.
+
+We use the pub-sub pattern to facilitate [inter-process communication](#inter-process-communication) in our system. Through a class called [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py), components can subscribe to receive certain [Protobuf](#protobuf) message types sent out by other processes or system components.
 
 ## C++ Templating
 While debatably not a design pattern depending on who you ask, templating in C++ is a powerful tool that is very useful to understand. [https://www.geeksforgeeks.org/templates-cpp/] gives a great explanantion and example.
 
-We use templating in a few places around the codebase, with the most notable examples being our [Factory Design Patterns](#factory-design-pattern), and our `Gradient Descent` optimizer.
+We use templating in a few places around the codebase, with the most notable examples being our [Factory Design Patterns](#factory-pattern), and our `Gradient Descent` optimizer.
 
 
 # Coroutines
@@ -294,7 +292,7 @@ Once it is time to start the pass, the condition for the loop will become false 
 
 Once we have entered the second stage, we know we don't have to look at the first stage again. Because the coroutine "remembers" where the execution is each time the function is called, we will resume inside the second stage and therefore never execute the first stage again! This makes it much easier to write and read this strategy code, because we can clearly see the 2 stages of the strategy, and we know they will be executed in order.
 
-## Couroutine Best Practices
+## Coroutine Best Practices
 Coroutines are a complex feature, and the boost coroutines we use don't always behave in was we expect. We have done extensive testing on how coroutines are safe (or not safe) to us, and derived some best practices from these examples. See [coroutine_test_exmaples.cpp](coroutine_test_examples.cpp) for the full code and more detailed explanantions.
 
 To summarize, the best practices are as follows:
@@ -396,48 +394,54 @@ Because of our [Coordinate Conventions](#coordinates), this means that an angle 
 ## Convention Diagram
 ![Coordinate Convention Diagram](images/coordinate_and_angle_convention_diagram.svg)
 
-
 # Architecture Overview
-At a high-level our system is made of 4 main components: The [Backend](#backend), the [Sensor Fusion](#sensor-fusion), the [AI](#ai), and the [Visualizer](#visualizer). These 4 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern).
 
-The [Backend](#backend) is responsible for communicating with the outside world (network and radio), [Sensor Fusion](#sensor-fusion) is responsible for processing and filtering raw data, the [AI](#ai) makes the actual gameplay decisions, and the [Visualizer](#visualizer) shows us what's happening and lets us control the [AI](#ai).
+At a high-level, our system is split into several independent processes that [communicate with each other](#inter-process-communication). Our architecture is designed in this manner to promote decoupling of different features, making our system easier to expand, maintain, and test.
 
-Each component is described in more detail in their own sections.
+- [**Thunderscope**](#thunderscope) is main entry point of our system and provides the GUI for our software.
 
-#### Architecture Overview Diagram
-![High Level Architecture Diagram](images/high_level_architecture_diagram.svg)
+- [**Fullsystem**](#fullsystem) is the "backend" that processes data and makes decisions for a [team](#team) of [robots](#robot). It manages [Sensor Fusion](#sensor-fusion), which is responsible for processing and filtering raw data, and the [**AI**](#ai) that makes gameplay decisions.
 
+- The [**Simulator**](#simulator) provides a physics simulation of the [World](#world), enabling testing of our gameplay when we don't have access to a real field. This process is optional and used only for development and testing purposes; in a real match, our system will receive data from [SSL-Vision](#ssl-vision).
 
-# Backend
-The `Backend` is responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into communication using `SensorProto` and [Primitives](#primitives) messages:
+- [**Thunderloop**](/docs/robot-software-architecture.md#thunderloop) is responsible for coordinating communication between our [AI](#ai) computer and the motor and power boards in our robots. It is part our robot software architecture, which is documented [here](/docs/robot-software-architecture.md).
 
-* Upon receiving the following messages from the network (outside world), the `Backend` will store it in a `SensorProto` message and send it to [Sensor Fusion](sensor-fusion):
+# Fullsystem
+
+Fullsystem processes data and makes decisions for a [team](#team) of [robots](#robot). It manages [Sensor Fusion](#sensor-fusion), which is responsible for processing and filtering raw data, and the [AI](#ai) that makes gameplay decisions. 
+
+Data within Fullsystem is shared between components using the [observer pattern](#observer-pattern); for instance, [Sensor Fusion](#sensor-fusion) and the [Backend](#backend) are `Subject`s that the [AI](#ai) observes.
+
+## Backend
+Fullsystem contains a `Backend` responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into communication using `SensorProto` and [Primitives](#primitives) messages:
+
+* Upon receiving the following messages from the network, the `Backend` will store it in a `SensorProto` message and send it to [Sensor Fusion](sensor-fusion):
   * Robot status messages
   * Vision data about where the robots and ball are (typically from [SSL-Vision](#ssl-vision))
   * Referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
 
 * Upon receiving [Primitives](#primitives) from the [AI](#ai), `Backend` will send the primitives to the robots or the [Simulator](#simulator).
 
-The `Backend` was designed to be a simple interface that handles all communication with the "outside world", allowing for different implementations that can be swapped out in order to communicate with different hardware / protocols / programs.
+The `Backend` was designed to be a simple interface that handles all communication with the "outside world", allowing for different implementations that can be swapped out in order to communicate with different hardware/ protocols/programs.
 
 #### Backend Diagram
 ![Backend Diagram](images/backend_diagram.svg)
 
-# Sensor Fusion
+## Sensor Fusion
 `Sensor Fusion` is responsible for processing the raw data contained in SensorProto into a coherent snapshot of the [World](#world) that the [AI](#ai) can use. It invokes filters to update components of [World](#world), and then combines the components to send out the most up-to-date version.
 
-## Filters
+### Filters
 Filters take the raw data from SensorProto and returns an updated version of a component of the [World](#world). For example, the `BallFilter` takes `BallDetection`s and returns an updated `Ball`.
 
-* **Why we need to do this:** Programs that provide data like [SSL-Vision](#ssl-vision) only provide raw data. This means that if there are several orange blobs on the field, [SSL-Vision](#ssl-vision) will tell us the ball is in several different locations. It is up to us to filter this data to determine the "correct" position of the ball. The same idea applies to robot positions and other data we receive.
+> **Why we need to do this:** Programs that provide data like [SSL-Vision](#ssl-vision) only provide raw data. This means that if there are several orange blobs on the field, [SSL-Vision](#ssl-vision) will tell us the ball is in several different locations. It is up to us to filter this data to determine the "correct" position of the ball. The same idea applies to robot positions and other data we receive.
 
 Filters provide a flexible way to modularize the processing of raw data, making it easy to update filters and add new ones. Filters are sometimes stateful. For example, the `BallFilter` "remembers" previous locations of the ball in order to estimate the ball's current velocity.
 
 
 # AI
-The `AI` is where all of our gameplay logic takes place, and is the main "brain" of our system. It uses the information received from [Sensor Fusion](#sensor-fusion) to make decisions, and sends [Primitives](#primitives) to the [Backend](#backend) for the robots to execute. All together this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
+The `AI` is the part of the [Fullsystem](#fullsystem) where all of our gameplay logic takes place, and it is the main "brain" of our system. It uses the information received from [Sensor Fusion](#sensor-fusion) to make decisions, and then sends [Primitives](#primitives) to the [Backend](#backend) for the robots to execute. Altogether, this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
 
-The 2 main components of the `AI` are strategy and navigation.
+The two main components of the `AI` are strategy and navigation.
 
 ## Strategy
 We use a framework called `STP (Skills, Tactics, Plays)` to implement our stratgy. The `STP` framework was originally proposed by Carnegie Mellon University back in 2004. The original paper can be found [here](https://kilthub.cmu.edu/articles/STP_Skills_Tactics_and_Plays_for_Multi-Robot_Control_in_Adversarial_Environments/6561002/1).
@@ -501,43 +505,25 @@ The `Path Planner` is an interface for the responsibility of path planning a sin
 ## [AI](#ai) Diagram
 ![AI Diagram](images/ai_diagram.svg)
 
+# Thunderscope
 
-# Visualizer
-The [Visualizer](#visualizer) is exactly what it sounds like: A visualizion of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
+[`Thunderscope Main`](/src/software/thunderscope/thunderscope_main.py) serves as the main entry point for our entire system. It starts up the [Thunderscope GUI](#thunderscope-gui) and other processes, such as a [Fullsystem](#fullsystem) for each [AI](#ai) team.
 
-The [Visualizer](#visualizer) also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through the [Visualizer](#visualizer), we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
+## Thunderscope GUI
 
-The [Visualizer](#visualizer) is connected to the rest of the system using the [Observer Design Pattern](#observer-design-pattern). It observes Subjects that contain information it wants to display, such as the [World](#world) or [DrawFunctions](#draw-functions).
+[Thunderscope](#thunderscope) is our main visualizer of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and it is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
 
-The [Visualizer](#visualizer) is implemented using [Qt](https://www.qt.io/), a C++ library for creating cross-platform GUIs. The general documentation for [Qt](https://www.qt.io/) can be found [here](https://doc.qt.io/qt-5/index.html). The most important parts for the Visualizer are:
-* [Signals and Slots](https://doc.qt.io/qt-5/signalsandslots.html)
-* [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) (specifically for Widget-based applications)
+Thunderscope also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). The GUI lets us choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
+
+Thunderscope is implemented using [PyQtGraph](https://www.pyqtgraph.org/), a Python graphics and GUI library. PyQtGraph is built upon [PyQt](https://riverbankcomputing.com/software/pyqt/intro), which provides Python bindings for [Qt](https://www.qt.io/), a C++ library for creating cross-platform GUIs. The general documentation for [Qt](https://www.qt.io/) can be found [here](https://doc.qt.io/qt-5/index.html). The most important parts of Qt to understand are:
+
 * [Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html)
-
-The [Visualizer](#visualizer) is made up of the following components:
-* Qt Components
-  * The [QApplication](https://doc.qt.io/qt-5/qapplication.html). This is the Qt component that manages the event loop and all the widgets in the GUI.
-  * The `Visualizer Widget`. This contains all of the graphical components used in the [Visualizer](#visualizer).
-* Non-Qt Components
-  * The `VisualizerWrapper`. The `VisualizerWrapper` contains the [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget`. It runs the [QApplication](https://doc.qt.io/qt-5/qapplication.html) in a separate thread, so that Qt can run its event loop and handle events and rendering without blocking our main thread.
- 
-
-## Visualizer Diagram
-![Visualizer Diagram](images/visualizer_diagram.svg)
-
-## Inter-thread Communication
-The `VisualizerWrapper` needs to communicate with the [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget` running in its separate thread in order to trigger events like drawing when new data is received. In order to do this, the `VisualizerWrapper` and `Visualizer Widget` use our `ThreadsafeBuffer` class to communicate. The `VisualizerWrapper` pushes data into the buffers, and the `Visualizer Widget` pops the data in a `Producer -> Consumer` pattern. This means the `Visualizer Widget` can handle data at its own rate, independent from the `VisualizerWrapper`.
-
-In some rare cases, we use the [Qt MetaObject](https://doc.qt.io/qt-5/moc.html) system to send signals to trigger functions in the Qt thread in a thread-safe way. This is further documented in the code.
-
-## Draw Functions
-Although we want to display information about the [AI](#ai) in the [Visualizer](#visualizer), we cannot send copies of an [AI](#ai) object to the [Visualizer](#visualizer) over the [Observer](#observer-design-pattern) system because the [AI](#ai) is non-copyable. [Draw Functions](#draw_functions) are our solution that allow us to draw information in the [Visualizer](#visualizer) for non-copyable types.
-
-A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
+* [Layouts](https://doc.qt.io/qt-6/layout.html)
+* [Signals and Slots](https://doc.qt.io/qt-5/signalsandslots.html)
 
 ## 3D Visualizer
 
-Our field visualizer uses [PyQtGraph's 3D graphics system](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/index.html) to render 3D graphics with OpenGL. PyQtGraph handles all the necessary calls to OpenGL for us, and as an abstraction, provides a [scenegraph](https://en.wikipedia.org/wiki/Scene_graph) to organize and manipulate entities/objects within the 3D environment (the scene).
+Thunderscope has a field visualizer that uses [PyQtGraph's 3D graphics system](https://pyqtgraph.readthedocs.io/en/latest/api_reference/3dgraphics/index.html) to render 3D graphics with OpenGL. PyQtGraph handles all the necessary calls to OpenGL for us, and as an abstraction, provides a [scenegraph](https://en.wikipedia.org/wiki/Scene_graph) to organize and manipulate entities/objects within the 3D environment (the scene).
 
 `software/thunderscope/gl` is the main directory for the 3D visualizer. The "GL" prefix lets us identify 3D graphics related code and keeps namings consistent with `pyqtgraph.opengl` class names. Inside this directory:
 
@@ -546,15 +532,9 @@ Our field visualizer uses [PyQtGraph's 3D graphics system](https://pyqtgraph.rea
 - `/layers` contains all the [layers](#layers) we use to organize and group together graphics.
 
 ### Layers
-We organize our graphics into "layers" so that we can toggle the visibility of different parts of our visualization. Each layer is responsible for visualizing a specific portion of our AI (e.g. vision data, path planning, passing, etc.). A layer can also handle layer-specific functionality; for instance, `GLWorldLayer` lets the user place or kick the ball using the mouse. The base class for a layer is [`GLLayer`](../src/software/thunderscope/gl/gl_layer.py).
+We organize our graphics into "layers" so that we can toggle the visibility of different parts of our visualization. Each layer is responsible for visualizing a specific portion of our AI (e.g. vision data, path planning, passing, etc.). A layer can also handle layer-specific functionality; for instance, `GLWorldLayer` lets the user place or kick the ball using the mouse. The base class for a layer is [`GLLayer`](../src/software/thunderscope/gl/layers/gl_layer.py).
 
-A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a tree-like structure. In theory, `GLLayers` could also be nested within one another. 
-
-# Estop
-`Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:
-
-* For `WifiBackend`, the `Estop` is a stateful switch connected to an Arduino. The switch state is communicated to the `WifiBackend` regularly. When `Estop` is in a `STOP` state, the `WifiBackend` overrides the [Primitives](#primitives) sent to the robot to an `Estop primitive`. when it is in a `PLAY` state, primitives are communicated normally.
-* For `RadioBackend`, The `Estop` switch is part of the Radio dongle, which is responsible for filtering out messages sent to the robots. 
+A `GLLayer` is in fact a `GLGraphicsItem` that is added to the scenegraph. When we add or remove `GLGraphicsItem`s to a `GLLayer`, we're actually setting the `GLLayer` as the parent of the `GLGraphicsItem`; this is because the scenegraph has a tree-like structure. In theory, `GLLayer`s could also be nested within one another. 
 
 # Simulator
 The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` "simulates" the following components' functionalities:
@@ -613,80 +593,25 @@ Now we have a nice loop from the `Simulator -> Sensor Fusion -> Validation Funct
 ### Simulated Tests Diagram
 Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the [Backend](#backend) replaced by the [Simulator](#simulator) and with [Validation Functions](#validation-functions) in the loop between [Sensor Fusion](#sensor-fusion) and [AI](#ai).
 
-The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and are not run during the tests unless we are debugging.
+[Thunderscope](#thunderscope) and connections to it are marked with dashed lines, since they are optional and are not run during the tests unless we are debugging.
 
 ![Simulated Testing High-level Architecture Diagram](images/simulated_test_high_level_architecture.svg)
 
+# Inter-process Communication
+Since [Thunderscope](#thunderscope) runs in a separate process from [Fullsystem](#fullsystem), we use [Unix domain sockets](https://en.wikipedia.org/wiki/Unix_domain_socket) to facilitate communication between Fullsystem and Thunderscope. Unix sockets [have high throughput and are very performant](https://stackoverflow.com/a/29436429/20199855); we simply bind the unix socket to a file path and pass data between processes, instead of having to deal with TCP/IP overhead just to send and receive data on the same computer.
 
-# GUI
+The data sent between Fullsystem and Thunderscope is serialized using [protobufs](#protobuf). Some data, such as data that goes through our [Backend](#backend) (vision data, game controller commands, [Worlds](#world) from [Sensor Fusion](#sensor-fusion), etc.), is sent using unix senders owned by those parts of the Fullsystem directly. In other higher level components of the Fullsystem (such as FSMs, pass generator, navigator, etc.), we want to delegate away the responsibility of managing unix senders directly and have a lightweight way of sending protobufs to Thunderscope. To avoid needing to dependency inject a "communication" object in places we have visualizable data to send to Thunderscope, we take advantage of the [`g3log`](https://kjellkod.github.io/g3log/) logger already used throughout the codebase to log and send visualizable data.
 
-## Naming
+`g3log` is a fast and thread-safe way to log data with custom handlers called “sinks". Importantly, it gives us a static [singleton](#singleton-pattern) that can be called anywhere. Logging a protobuf will send it to our custom protobuf `g3log` sink, which lazily initializes unix senders based on the type of protobuf that is logged. The sink then sends the protobuf over the socket to listeners.
 
-### Variables
-When creating widgets in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), all widgets should be given a descriptive name. This is because the `.ui` file will eventually be generated into code that we interact with, so we want the variable names to be descriptive and consistent with our naming conventions.
+<details>
+<summary><b>Aside: calling <code>g3log</code> to log protobuf data</b></summary>
+Logging protobufs is done at the <code>VISUALIZE</code> level (e.g. <code>LOG(VISUALIZE) << some_random_proto;</code>). Protobufs need to be converted to strings in order to log them with <code>g3log</code>. We've overloaded the stream (<code><<</code>) operator to automatically pack protobufs into a <code>google::protobuf::Any</code> and serialize them to a string, so you don't need to do the conversion yourself.
+</details><br>
 
-Names should follow our [reglar naming conventions for variables](code-style-guide.md#names-and-variables). Furthermore, they should be named in the form `<purpose>_<widget>`. The purpose is essentially the "normal" variable name that should describe what the variable is. The widget component should be the name of the widget.
+In Thunderscope, the [`ProtoUnixIO`](../src/software/thunderscope/proto_unix_io.py) is responsible for communicating protobufs over unix sockets. `ProtoUnixIO` utilizes a variation of the [publisher-subscriber ("pub-sub")](#publisher-subscriber-pattern) messaging pattern. Through `ProtoUnixIO`, clients can register as a subscriber by providing a type of protobuf to receive and a [`ThreadSafeBuffer`](../src/software/thunderscope/thread_safe_buffer.py) to place incoming those protobuf messages. The `ProtoUnixIO` can then be configured with a unix receiver to receive protobufs over a unix socket and place those messages onto the `ThreadSafeBuffer`s of that proto's subscribers. Classes can also publish protobufs via `ProtoUnixIO` by configuring it with a unix sender.
 
-For example, a `QLabel` for team colour should be named `team_colour_label`. Similarly, the button that starts the [AI](#ai) should be named `start_ai_button`.
-
-![Good Qt Widget Naming](images/qt_widget_naming_example.png)
-
-### Classes
-Only the top-level class for a given GUI should be suffixed with `GUI`. These top-level classes should just aggregate top-level widgets (typically generated from a `.ui` file) and connect callbacks. They should not define additional widgets or features themselves. For example, `FullSystemGUI` connects incoming buffers of data to the `main_widget` generated by a `.ui` file.
-
-## Editing the GUIs
-Qt provides [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), an IDE used for visually creating GUIs and laying out widgets. We use this editor as much as possible since it is easy to learn and use, and saves us having to define the entire GUI in code (which is more complex and makes things generally harder to understand and modify).
-
-Our rule of thumb is that [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) should be used to define all the widgets in the [Visualizer](#visualizer), and define the layout for everything. All logic (including connecting signals and slots, receiving data from buffers, etc.) should be implemented in the code ourselves.
-
-For a very quick tutorial on how to use QtCreator, see [this video](https://www.youtube.com/watch?v=R6zWLfHIYJw)
-
-To summarize, [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) creates and modifies a `.ui` file, which is more-or-less an `XML` describing the GUI application (what components exist, how they are positioned relative to one another, and their attributes). During compilation, this `.ui` file gets generated into code which handles all the setup and layout of the GUI components that have been defined in the `.ui` file. We include the autogenerated code in our [Visualizer](#visualizer) code where we are then able to connect the autogenerated widgets to various functions, and implement the logic we need to.
-
-### Editing `.ui` files
-1. Open QtCreator
-2. Click `File -> Open File or Project`
-3. Select the `.ui` file.
-4. Make your changes (*Don't forget to save. You must save the file for changes to be picked up in compilation*)
-
-### Promoting Widgets
-The most important thing to know about editing the [Visualizer](#visualizer) in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), is how to promote generic widgets to custom widgets. If we want to extend a QtWidget with custom behavior, we need to create our own class that extends the Widget we want to customize. However, we would still prefer to use [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) to declare this widget and how it fits in the GUI layout.
-
-"Promoting" a widget in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) allows us to place a "generic" widget in the layout, and then tell [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) we actually want that widget to be our custom class. To promote a widget:
-1. Right-click the widget you want to promote
-2. Click `Promote To` or `Promoted Widgets`
-3. Choose the custom widget this widget should be promoted to. Create a new promoted class if necessary.
-    1. When creating new promoted classes, make sure to provide the path to the header file relative to the bazel `WORKSPACE` file. This will make the `#include` statements in the generated code use the full path, which is required by `bazel`.
-
-More information about defining custom widgets in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) can be found [here](https://doc.qt.io/qt-5/designer-using-custom-widgets.html).
-
-## Qt Best Practices
-Although this will focus on Qt-specific examples, these principles generally apply to all GUI design and implementation. They are really just Software Engineering principles applied to GUIs.
-
-### Build A Hierarchy
-Qt is designed to handle hierarchy. It has [an extensive and robust system for maintaining Object Trees and parent/child relationships between components](https://doc.qt.io/qt-5/objecttrees.html). Much like regular code, GUIs should be created in a logical hierarchy to make organization and re-use easier.
-
-Make sure to use layouts, and group widgets in a logical way. For example, several widgets that work together to collect a user's mailing address should be grouped. This group may then be part of a larger group of widgets in a popup dialog asking for billing information.
-
-Here is a good example of laying out widgets in a hierarchy:
-
-![Good Qt Widget Layout](images/qt_layout_good_example.png)
-
-Do **not** lay out all your widgets in a single layer like this:
-
-![Bad Qt Widget Layout](images/qt_layout_bad_example.png)
-
-The main point to remember is to use [layouts](https://doc.qt.io/qt-5/layout.html) to group and manage widgets, and to create these groups in a logical way that can be built into a hierarchy. This will make it significantly easier to replace parts of the GUI later, or move components around.
-
-### Create Reusable Widgets
-Much like how we create functions in order to reuse code, [widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) should be created so that they are reusable.
-
-For example, if you create a few widgets that work together to gather user input with a slider and display the current value next to it, you should combine all of this into its own `SliderWithValue` widget. This will make it very easy to make several copies of this widget, or use it somewhere else in a completely different application. Similarly, if you need specialized functionality from any widget (for example, our `ZoomableQGraphicsView`), this should also be implemented as a custom reusable widget.
-
-![Reusable Widget Example](images/qt_reusable_widget_example.png)
-
-Creating widgets that are slightly more generic and reusable are very useful and allow code and graphical modules to be shared and reused between multiple applications.
-
-### Miscellaneous Qt Tips
-* Define minimum and maximum sizes (if it makes sense) to help enforce the correct sizing of elements
-    * Eg. define a minimum width for a textbox based on what it's expected to contain
+# Estop
+The `Estop` allows us to quickly and manually command physical robots to stop what they are doing. It is a physical push button that is connected to the computer via a USB cable. When Thunderscope is launched, a `ThreadedEstopReader` is initialized (within `RobotCommunication`) that is responsible for communicating and reading values from the `Estop` via UART. While running, it will poll the status of the `Estop` to determine whether it is in the `STOP` or `PLAY` state:
+- If the `Estop` is in the `STOP` state, it overrides the [Primitives](#primitives) sent to the robots with `Stop` primitives. On the robot, `Thunderloop` is responsible for handling the primitive message and ensuring that the power & motor boards receive the correct inputs for the robot to stop. 
+- If the `Estop` is in the `PLAY` state, primitives are communicated as normal.

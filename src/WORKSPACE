@@ -210,14 +210,12 @@ http_archive(
     ],
 )
 
-# We use our own fork of Box2D as we have made a few small modifications
-# See the repository readme for details
+# Axis-Aligned Bounding Box tree data structure implementation
 new_git_repository(
-    name = "box2d",
-    build_file = "@//extlibs:box2d.BUILD",
-    commit = "bddb4ec7efc8a6630fcbe7ef913017d88fb9b4b1",
-    remote = "https://github.com/UBC-Thunderbots/Box2D",
-    shallow_since = "1571445859 -0700",
+    name = "aabbcc",
+    build_file = "@//extlibs:aabbcc.BUILD",
+    commit = "0dad69116602623d63844f0923463df747f64ed3",
+    remote = "https://github.com/lohedges/aabbcc",
 )
 
 # tool used to flash firmware with bazel

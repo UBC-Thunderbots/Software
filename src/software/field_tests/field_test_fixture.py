@@ -11,10 +11,10 @@ from software.simulated_tests import validation
 from software.thunderscope.constants import EstopMode
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from software.thunderscope.binary_context_managers import (
-    FullSystem,
-    Gamecontroller,
-)
+from software.py_constants import MILLISECONDS_PER_SECOND
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.logger.logger import createLogger
 

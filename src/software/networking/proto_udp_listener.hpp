@@ -67,16 +67,6 @@ class ProtoUdpListener
                              size_t num_bytes_received);
 
     /**
-     * This function is setup as the callback to handle packets received over the network.
-     * If the callback takes longer than 1s, a warning is logged and the packet is dropped
-     *
-     * @param error The error code obtained when receiving the incoming data
-     * @param num_bytes_received How many bytes of data were received
-     */
-    void receiveData(const boost::system::error_code& error, size_t num_bytes_received);
-
-
-    /**
      * Start listening for data
      */
     void startListen();
@@ -91,6 +81,9 @@ class ProtoUdpListener
 
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT&)> receive_callback;
+
+    // Whether or not the listener is running
+    bool running_ = true;
 };
 
 template <class ReceiveProtoT>
@@ -172,43 +165,11 @@ template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
-    // Mutex and C.V. are required to create two threads, one which runs recieveData and
-    // one which counts down for 1s This effecitvely creates a "timeout" in case we end up
-    // in an infinite blocking loop.
-    std::mutex m;
-    std::condition_variable cv;
-
-    // Spawns a new thread. When receiveData finishes, it will signal the condition
-    // variable.
-    std::thread recv_thread([this, &cv, &error, &num_bytes_received]() {
-        receiveData(error, num_bytes_received);
-        cv.notify_one();
-    });
-
-    // Run thread
-    recv_thread.detach();
-
-    // This scoped block will wait for the condition variable to get signalled. If not
-    // signalled within 1s, log an error and try startListen again
+    if (!running_)
     {
-        using namespace std::chrono_literals;
-        std::unique_lock<std::mutex> lock(m);
-        // Sometimes we hang during the receive callback because the callback function is
-        // defined in python, and passed to the pybinded UDP listener. Timeout of 1s is
-        // set to avoid infinite hanging during robot communication teardown. We are
-        // unsure why this happens
-        if (cv.wait_for(lock, 1s) == std::cv_status::timeout)
-        {
-            LOG(WARNING) << "Timed out, starting listen again" << std::endl;
-            startListen();
-        }
+        return;
     }
-}
 
-template <class ReceiveProtoT>
-void ProtoUdpListener<ReceiveProtoT>::receiveData(const boost::system::error_code& error,
-                                                  size_t num_bytes_received)
-{
     if (!error)
     {
         auto packet_data = ReceiveProtoT();
@@ -223,9 +184,10 @@ void ProtoUdpListener<ReceiveProtoT>::receiveData(const boost::system::error_cod
         // Start listening again to receive the next data
         startListen();
 
-        LOG(WARNING)
-            << "An unknown network error occurred when attempting to receive ReceiveProtoT Data. The boost system error code is "
-            << error << std::endl;
+        LOG(WARNING) << "An unknown network error occurred when attempting to receive "
+                     << TYPENAME(ReceiveProtoT)
+                     << " Data. The boost system error is: " << error.message()
+                     << std::endl;
     }
 
     if (num_bytes_received > MAX_BUFFER_LENGTH)
@@ -240,11 +202,31 @@ void ProtoUdpListener<ReceiveProtoT>::receiveData(const boost::system::error_cod
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::~ProtoUdpListener()
 {
-    socket_.close();
+    close();
 }
 
 template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::close()
 {
-    socket_.close();
+    running_ = false;
+
+    // Shutdown both send and receive on the socket
+    boost::system::error_code error_code;
+    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error_code);
+    if (error_code)
+    {
+        LOG(WARNING)
+            << "An unknown network error occurred when attempting to shutdown UDP socket for "
+            << TYPENAME(ReceiveProtoT)
+            << ". The boost system error is: " << error_code.message() << std::endl;
+    }
+
+    socket_.close(error_code);
+    if (error_code)
+    {
+        LOG(WARNING)
+            << "An unknown network error occurred when attempting to close UDP socket for "
+            << TYPENAME(ReceiveProtoT)
+            << ". The boost system error is: " << error_code.message() << std::endl;
+    }
 }
