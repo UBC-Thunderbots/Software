@@ -170,3 +170,6 @@ static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 static const unsigned CONTROL_LOOP_HZ = 60u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;
+
+// Jetson Nano Constants
+static const double MAX_JETSON_TEMP_C = 97;
