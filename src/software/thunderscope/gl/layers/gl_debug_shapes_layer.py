@@ -12,9 +12,6 @@ from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.graphics.gl_stadium import GLStadium
-
-import numpy as np
-
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
 
@@ -32,7 +29,8 @@ class GLDebugShapesLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.debug_shape_list_buffer = ThreadSafeBuffer(buffer_size, DebugShapesMap)
+        self.debug_shape_map_buffer = ThreadSafeBuffer(buffer_size, DebugShapesMap)
+        self.debug_shape_map = {}
 
         self.poly_shape_graphics = ObservableList(self._graphics_changed)
         self.poly_shape_name_graphics = ObservableList(self._graphics_changed)
@@ -40,27 +38,20 @@ class GLDebugShapesLayer(GLLayer):
         self.circle_shape_graphics = ObservableList(self._graphics_changed)
         self.circle_shape_name_graphics = ObservableList(self._graphics_changed)
 
-        self.stadium_shape_graphics = ObservableList(self._graphics_changed) # TODO (NIMA): Support Point and Segment as well
+        self.stadium_shape_graphics = ObservableList(self._graphics_changed)
         self.stadium_shape_name_graphics = ObservableList(self._graphics_changed)
-
-        # Have a map of debug shape name to the time it was last plotted and its shape protobuf
-        # Every refresh_graphics:
-        #   1. Update the map with all new shapes (loop over threadsafebuffer)
-        #   2. Remove all shapes that have not been updated in the last 0.5 seconds
-        #   3. Plot all shapes in the map
-        self.debug_shape_map = {}
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
 
         # Add all new shapes to the map
-        named_shapes = self.debug_shape_list_buffer.get(block=False, return_cached=False)
+        named_shapes = self.debug_shape_map_buffer.get(block=False, return_cached=False)
         now = time.time()
         while named_shapes is not None:
             for name in named_shapes.named_shapes:
                 self.debug_shape_map[name] = (named_shapes.named_shapes[name], now)
 
-            named_shapes = self.debug_shape_list_buffer.get(block=False, return_cached=False)
+            named_shapes = self.debug_shape_map_buffer.get(block=False, return_cached=False)
 
         # Remove all shapes that have not been updated recently
         poly_named_shapes = []
@@ -78,12 +69,12 @@ class GLDebugShapesLayer(GLLayer):
             elif shape.HasField("circle"):
                 circle_named_shapes.append((name, shape.circle))
             else:
-                logging.warning(f"{shape}s are not supported in the debug shapes layer.")
+                logging.warning(f"{shape}s are not supported in the debug shapes layer!")
 
         # Ensure we have the same number of graphics as shapes
         self.poly_shape_graphics.resize(
             len(poly_named_shapes),
-            lambda: GLPolygon(outline_color=Colors.DEBUG_SHAPES_COLOR),  # TODO (NIMA): Change color
+            lambda: GLPolygon(outline_color=Colors.DEBUG_SHAPES_COLOR),
         )
         self.poly_shape_name_graphics.resize(
             len(poly_named_shapes),

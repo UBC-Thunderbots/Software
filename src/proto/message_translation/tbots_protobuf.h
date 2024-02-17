@@ -132,8 +132,9 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
  *
  * Could use LOG(VISUALIZE) to plot these values. Example:
  *  LOG(VISUALIZE) << *createDebugShapesMap({
- *      {"circle_name", createCircleProto(circle)},
- *      {"polygon_name", createPolygonProto(polygon)}
+ *      {"circle_name", *createShapeProto(circle_object)},
+ *      {"stadium_name", *createShapeProto(stadium_object)},
+ *      {"polygon_name", *createShapeProto(polygon_object)}
  *  });
  *
  * @param named_shapes The map of name shape proto pairs to plot

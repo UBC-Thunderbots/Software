@@ -123,7 +123,7 @@ def setup_gl_widget(
     gl_widget.add_layer(cost_vis_layer, False)
     gl_widget.add_layer(tactic_layer, False)
     gl_widget.add_layer(validation_layer)
-    gl_widget.add_layer(debug_shapes_layer) # TODO (NIMA): Hide  by default)
+    gl_widget.add_layer(debug_shapes_layer, False)
 
     gl_widget.toolbar.pause_button.clicked.connect(world_layer.toggle_play_state)
 
@@ -158,7 +158,7 @@ def setup_gl_widget(
         (ValidationProtoSet, validation_layer.validation_set_buffer),
         (SimulationState, gl_widget.toolbar.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
-        (DebugShapesMap, debug_shapes_layer.debug_shape_list_buffer),
+        (DebugShapesMap, debug_shapes_layer.debug_shape_map_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 

@@ -195,15 +195,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     LOG(VISUALIZE) << obstacle_list;
     LOG(VISUALIZE) << path_visualization;
 
-    // TODO (NIMA): Added for testing
-    static double static_radius = 0.1;
-    static_radius += 0.001;
-    LOG(VISUALIZE) << *createDebugShapesMap({
-        {"circle_name", *createShapeProto(Circle(Point(1,0), static_radius))},
-        {"stadium_name", *createShapeProto(Stadium(Point(-1,0), Point(-3,0), 0.5))},
-        {"polygon_name", *createShapeProto(Polygon({Point(-2, 0), Point(-3, 0), Point(-2.5, 1)}))}
-    });
-
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
         world.getMostRecentTimestamp().toSeconds());
     primitives_to_run->set_sequence_number(sequence_number++);

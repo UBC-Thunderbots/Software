@@ -53,13 +53,6 @@ bool GetBehindBallFSM::behindBall(const Update& event)
     Polygon behind_ball_region = Polygon({behind_ball_vertex_A2, behind_ball_vertex_A1,
                                           behind_ball_vertex_B, behind_ball_vertex_C});
 
-    // TODO (NIMA): Added for testing
-//    LOG(VISUALIZE) << *createDebugShapesMap({
-////            *createNamedShapeProto(Circle(Point(1,0), 2.0), "Test"),
-//            *createNamedShapeProto(behind_ball_region, "Test")
-////            *createNamedShapeProto(Stadium(Point(-1,0), Point(-3,0), 0.5), "Test")
-//    });
-
     return contains(behind_ball_region, event.common.robot.position()) &&
            compareAngles(event.common.robot.orientation(),
                          event.control_params.chick_direction, Angle::fromDegrees(5));
