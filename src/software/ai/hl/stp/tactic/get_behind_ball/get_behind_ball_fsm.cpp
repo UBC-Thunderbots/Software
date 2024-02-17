@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 
-#include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/hl/stp/tactic/move_primitive.h"
 
 
 GetBehindBallFSM::GetBehindBallFSM()

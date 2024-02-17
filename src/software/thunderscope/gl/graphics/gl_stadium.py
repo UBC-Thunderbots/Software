@@ -109,37 +109,19 @@ class GLStadium(GLShape):
         :param stadium: The stadium to copy the parameters from
 
         """
-        x_start_to_end = (
-                stadium.segment.end.x_meters
-                - stadium.segment.start.x_meters
-        )
-        y_start_to_end = (
-                stadium.segment.end.y_meters
-                - stadium.segment.start.y_meters
-        )
-        length = math.sqrt(
-            math.pow(x_start_to_end, 2) + math.pow(y_start_to_end, 2)
-        )
+        x_start_to_end = stadium.segment.end.x_meters - stadium.segment.start.x_meters
+        y_start_to_end = stadium.segment.end.y_meters - stadium.segment.start.y_meters
+        length = math.sqrt(math.pow(x_start_to_end, 2) + math.pow(y_start_to_end, 2))
 
         self.set_parameters(stadium.radius, length)
         # set stadium position to average of its two points
         self.set_position(
-            (
-                    stadium.segment.end.x_meters
-                    + stadium.segment.start.x_meters
-            )
-            / 2,
-            (
-                    stadium.segment.end.y_meters
-                    + stadium.segment.start.y_meters
-            )
-            / 2,
-            )
+            (stadium.segment.end.x_meters + stadium.segment.start.x_meters) / 2,
+            (stadium.segment.end.y_meters + stadium.segment.start.y_meters) / 2,
+        )
 
         # set stadium orientation to angle between positive x and vector from start to end
-        self.set_orientation(
-            math.atan2(y_start_to_end, x_start_to_end) * 180 / math.pi
-        )
+        self.set_orientation(math.atan2(y_start_to_end, x_start_to_end) * 180 / math.pi)
 
     def _update_shape_data(self) -> None:
         """Update the underlying GLLinePlotItem and GLMeshItem representing

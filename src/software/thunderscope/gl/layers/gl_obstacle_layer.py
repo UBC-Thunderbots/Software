@@ -9,7 +9,6 @@ from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.graphics.gl_stadium import GLStadium
 
-import math
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 

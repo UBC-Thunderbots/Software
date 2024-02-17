@@ -331,8 +331,8 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     return plot_juggler_value_msg;
 }
 
-std::unique_ptr<TbotsProto::DebugShapesMap>
-createDebugShapesMap(const std::map<std::string, TbotsProto::Shape> &named_shapes)
+std::unique_ptr<TbotsProto::DebugShapesMap> createDebugShapesMap(
+    const std::map<std::string, TbotsProto::Shape>& named_shapes)
 {
     auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapesMap>();
     for (auto const& [name, shape_proto] : named_shapes)
@@ -516,23 +516,23 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
     }
 }
 
-std::unique_ptr<TbotsProto::Shape> createShapeProto(const Circle &circle)
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Circle& circle)
 {
-    auto shape_msg = std::make_unique<TbotsProto::Shape>();
+    auto shape_msg                 = std::make_unique<TbotsProto::Shape>();
     (*shape_msg->mutable_circle()) = *createCircleProto(circle);
     return shape_msg;
 }
 
-std::unique_ptr<TbotsProto::Shape> createShapeProto(const Polygon &polygon)
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Polygon& polygon)
 {
-    auto shape_msg = std::make_unique<TbotsProto::Shape>();
+    auto shape_msg                  = std::make_unique<TbotsProto::Shape>();
     (*shape_msg->mutable_polygon()) = *createPolygonProto(polygon);
     return shape_msg;
 }
 
-std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium &stadium)
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium& stadium)
 {
-    auto shape_msg = std::make_unique<TbotsProto::Shape>();
+    auto shape_msg                  = std::make_unique<TbotsProto::Shape>();
     (*shape_msg->mutable_stadium()) = *createStadiumProto(stadium);
     return shape_msg;
 }

@@ -51,7 +51,9 @@ class GLDebugShapesLayer(GLLayer):
             for name in named_shapes.named_shapes:
                 self.debug_shape_map[name] = (named_shapes.named_shapes[name], now)
 
-            named_shapes = self.debug_shape_map_buffer.get(block=False, return_cached=False)
+            named_shapes = self.debug_shape_map_buffer.get(
+                block=False, return_cached=False
+            )
 
         # Remove all shapes that have not been updated recently
         poly_named_shapes = []
@@ -69,7 +71,9 @@ class GLDebugShapesLayer(GLLayer):
             elif shape.HasField("circle"):
                 circle_named_shapes.append((name, shape.circle))
             else:
-                logging.warning(f"{shape}s are not supported in the debug shapes layer!")
+                logging.warning(
+                    f"{shape}s are not supported in the debug shapes layer!"
+                )
 
         # Ensure we have the same number of graphics as shapes
         self.poly_shape_graphics.resize(
@@ -117,11 +121,21 @@ class GLDebugShapesLayer(GLLayer):
             )
             poly_shape_text_graphic.setData(
                 text=name,
-                pos=[min(p.x_meters for p in poly_shape.points), min(p.y_meters for p in poly_shape.points) - 0.1, 0],
+                pos=[
+                    min(p.x_meters for p in poly_shape.points),
+                    min(p.y_meters for p in poly_shape.points) - 0.1,
+                    0,
+                ],
             )
 
-        for circle_shape_graphic, circle_shape_text_graphic, (name, circle_shape) in zip(
-            self.circle_shape_graphics, self.circle_shape_name_graphics, circle_named_shapes
+        for (
+            circle_shape_graphic,
+            circle_shape_text_graphic,
+            (name, circle_shape),
+        ) in zip(
+            self.circle_shape_graphics,
+            self.circle_shape_name_graphics,
+            circle_named_shapes,
         ):
             circle_shape_graphic.set_radius(circle_shape.radius)
             circle_shape_graphic.set_position(
@@ -129,17 +143,35 @@ class GLDebugShapesLayer(GLLayer):
             )
             circle_shape_text_graphic.setData(
                 text=name,
-                pos=[circle_shape.origin.x_meters, circle_shape.origin.y_meters - circle_shape.radius - 0.1, 0],
+                pos=[
+                    circle_shape.origin.x_meters,
+                    circle_shape.origin.y_meters - circle_shape.radius - 0.1,
+                    0,
+                ],
             )
 
-        for stadium_shape_graphic, stadium_shape_text_graphic, (name, stadium_shape) in zip(
-            self.stadium_shape_graphics, self.stadium_shape_name_graphics, stadium_named_shapes
+        for (
+            stadium_shape_graphic,
+            stadium_shape_text_graphic,
+            (name, stadium_shape),
+        ) in zip(
+            self.stadium_shape_graphics,
+            self.stadium_shape_name_graphics,
+            stadium_named_shapes,
         ):
             stadium_shape_graphic.update_from_stadium(stadium_shape)
 
             segment = stadium_shape.segment
-            lower_point = segment.start if segment.start.y_meters < segment.end.y_meters else segment.end
+            lower_point = (
+                segment.start
+                if segment.start.y_meters < segment.end.y_meters
+                else segment.end
+            )
             stadium_shape_text_graphic.setData(
                 text=name,
-                pos=[lower_point.x_meters, lower_point.y_meters - stadium_shape.radius - 0.1, 0],
+                pos=[
+                    lower_point.x_meters,
+                    lower_point.y_meters - stadium_shape.radius - 0.1,
+                    0,
+                ],
             )
