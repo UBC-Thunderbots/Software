@@ -61,7 +61,7 @@ class GLTrailLayer(GLLayer):
         self.robot_trail_queues[robot.id].append(robot.current_state.global_position)
 
     def __update_trail_graphics(
-            self, team: Team, queues_dict: dict, color: Colors
+        self, team: Team, queues_dict: dict, color: Colors
     ) -> None:
         """Updates the onscreen visualizations of the past robot positions correlating to the
            given team.
@@ -72,11 +72,11 @@ class GLTrailLayer(GLLayer):
         """
 
         self.trail_graphics_head.resize(
-            len(team.team_robots), lambda: GLPolygon(outline_color=color, ),
+            len(team.team_robots), lambda: GLPolygon(outline_color=color,),
         )
 
         for trail_graphics_head, trail_queue in zip(
-                self.trail_graphics_head, queues_dict,
+            self.trail_graphics_head, queues_dict,
         ):
             trail_graphics_head.set_points(
                 [[point.x_meters, point.y_meters] for point in queues_dict[trail_queue]]
