@@ -66,7 +66,7 @@ class GLTrailLayer(GLLayer):
     ) -> None:
 
         self.trail_graphics_head.resize(
-            len(team.team_robots) * 1, lambda: GLPolygon(outline_color=color,),
+            len(team.team_robots), lambda: GLPolygon(outline_color=color,),
         )
 
         for trail_graphics_head, trail_queue in zip(
