@@ -18,7 +18,7 @@ class BallMovesXAxis(Validation):
         :param moving_in_pos_x: True if checking for +x direction, false if checking for -x direction
         """
         self.last_ball_position = initial_ball_position
-        self.moving_in_pos_x = direction
+        self.moving_in_pos_x = moving_in_pos_x
         self.max_displacement_so_far = None
 
     def get_validation_status(self, world) -> ValidationStatus:
@@ -35,9 +35,9 @@ class BallMovesXAxis(Validation):
         # if max displacement is not set or current ball is moving in the right direction
         # set it and return PASSING
         if self.max_displacement_so_far is None or (
-            (self.direction and current_ball_position > self.max_displacement_so_far)
+            (self.moving_in_pos_x and current_ball_position > self.max_displacement_so_far)
             or (
-                not self.direction
+                not self.moving_in_pos_x
                 and current_ball_position < self.max_displacement_so_far
             )
         ):
@@ -47,10 +47,10 @@ class BallMovesXAxis(Validation):
         # if max displacement is set and current ball is in the wrong direction too far
         # beyond a threshold, return FAILING
         if (
-            self.direction
+            self.moving_in_pos_x
             and current_ball_position < self.max_displacement_so_far - 0.1
         ) or (
-            not self.direction
+            not self.moving_in_pos_x
             and current_ball_position > self.max_displacement_so_far + 0.1
         ):
             return ValidationStatus.FAILING
@@ -76,7 +76,7 @@ class BallMovesXAxis(Validation):
 
     def __repr__(self):
         return (
-            "Check that the ball moves " + "forward" if self.direction else "backward"
+            "Check that the ball moves " + "forward" if self.moving_in_pos_x else "backward"
         )
 
 
@@ -122,7 +122,7 @@ class BallMovesInDirectionInRegions(BallMovesXAxis):
     def __repr__(self):
         return (
             "Check that the ball moves " + "forward"
-            if self.direction
+            if self.moving_in_pos_x
             else "backward"
             + " in regions "
             + ",".join(repr(region) for region in self.regions)
