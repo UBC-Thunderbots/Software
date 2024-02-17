@@ -5,6 +5,7 @@
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/segment.h"
+#include "software/geom/stadium.h"
 
 /**
  * Finds the closest Point on a Line to a Point
@@ -48,3 +49,14 @@ Point closestPoint(const Point &p, const Polygon &polygon);
  */
 Point closestPoint(const Circle &circle, const Point &p);
 Point closestPoint(const Point &p, const Circle &circle);
+
+/**
+ * Finds the Point on stadium closest to point.
+ *
+ * @param stadium The stadium
+ * @param p the point.
+ *
+ * @return the Point on stadium closest to point.
+ */
+Point closestPoint(const Stadium &stadium, const Point &p);
+Point closestPoint(const Point &p, const Stadium &stadium);

@@ -103,3 +103,15 @@ Point closestPoint(const Point &p, const Circle &circle)
 {
     return closestPoint(circle, p);
 }
+
+Point closestPoint(const Stadium &stadium, const Point &p)
+{
+    Point closest_point = closestPoint(stadium.segment(), p);
+    closest_point += (p - closest_point).normalize() * stadium.radius();
+    return closest_point;
+}
+
+Point closestPoint(const Point &p, const Stadium &stadium)
+{
+    return closestPoint(stadium, p);
+}

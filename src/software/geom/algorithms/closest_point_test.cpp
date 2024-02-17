@@ -171,3 +171,16 @@ TEST(GeomUtilTest, test_closest_polygon_concave_inside)
     EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(0.5, 0.8), polygon),
                                                Point(0.5, 0.85), 0.00001));
 }
+TEST(GeomUtilTest, test_closest_stadium_outside_semicircle)
+{
+    Stadium stadium(Point(0, 0), Point(2, 0), 1);
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(4, 0), stadium), Point(3, 0), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_stadium_outside_rectangle)
+{
+    Stadium stadium(Point(0, 0), Point(2, 0), 1);
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(1, 2), stadium), Point(1, 1), 0.00001));
+}
