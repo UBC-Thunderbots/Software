@@ -18,6 +18,8 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 class GLDebugShapesLayer(GLLayer):
     """GLLayer that visualizes shapes"""
 
+    MAX_GRAPHICS_DURATION_SEC = 0.5
+
     def __init__(self, name: str, buffer_size: int = 1) -> None:
         """Initialize the GLDebugShapeLayer
 
@@ -60,7 +62,7 @@ class GLDebugShapesLayer(GLLayer):
         circle_named_shapes = []
         stadium_named_shapes = []
         for name, (shape, last_updated) in list(self.debug_shape_map.items()):
-            if now - last_updated > 0.5:
+            if now - last_updated > self.MAX_GRAPHICS_DURATION_SEC:
                 del self.debug_shape_map[name]
                 continue
 
