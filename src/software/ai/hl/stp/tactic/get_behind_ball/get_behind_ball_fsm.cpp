@@ -54,11 +54,11 @@ bool GetBehindBallFSM::behindBall(const Update& event)
                                           behind_ball_vertex_B, behind_ball_vertex_C});
 
     // TODO (NIMA): Added for testing
-    LOG(VISUALIZE) << *createDebugShapeList({
-//            *createNamedShapeProto(Circle(Point(1,0), 2.0), "Test"),
-            *createNamedShapeProto(behind_ball_region, "Test")
-//            *createNamedShapeProto(Stadium(Point(-1,0), Point(-3,0), 0.5), "Test")
-    });
+//    LOG(VISUALIZE) << *createDebugShapesMap({
+////            *createNamedShapeProto(Circle(Point(1,0), 2.0), "Test"),
+//            *createNamedShapeProto(behind_ball_region, "Test")
+////            *createNamedShapeProto(Stadium(Point(-1,0), Point(-3,0), 0.5), "Test")
+//    });
 
     return contains(behind_ball_region, event.common.robot.position()) &&
            compareAngles(event.common.robot.orientation(),

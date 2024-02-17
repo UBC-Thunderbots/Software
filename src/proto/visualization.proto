@@ -66,13 +66,7 @@ message Shape
     }
 }
 
-message NamedShape
+message DebugShapesMap
 {
-    string name = 1;
-    Shape shape = 2;
-}
-
-message DebugShapeList
-{
-    repeated NamedShape shapes = 1;
+    map<string, Shape> named_shapes = 1;
 }

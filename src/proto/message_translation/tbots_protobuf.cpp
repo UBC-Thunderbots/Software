@@ -331,13 +331,13 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     return plot_juggler_value_msg;
 }
 
-std::unique_ptr<TbotsProto::DebugShapeList>
-createDebugShapeList(const std::vector<TbotsProto::NamedShape> &named_shapes)
+std::unique_ptr<TbotsProto::DebugShapesMap>
+createDebugShapesMap(const std::map<std::string, TbotsProto::Shape> &named_shapes)
 {
-    auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapeList>();
-    for (auto const& named_shape : named_shapes)
+    auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapesMap>();
+    for (auto const& [name, shape_proto] : named_shapes)
     {
-        (*debug_shape_list_msg->mutable_shapes()->Add()) = named_shape;
+        (*debug_shape_list_msg->mutable_named_shapes())[name] = shape_proto;
     }
     return debug_shape_list_msg;
 }
@@ -534,29 +534,5 @@ std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium &stadium)
 {
     auto shape_msg = std::make_unique<TbotsProto::Shape>();
     (*shape_msg->mutable_stadium()) = *createStadiumProto(stadium);
-    return shape_msg;
-}
-
-std::unique_ptr<TbotsProto::NamedShape> createNamedShapeProto(const Circle &circle, const std::string &name)
-{
-    auto shape_msg = std::make_unique<TbotsProto::NamedShape>();
-    (*shape_msg->mutable_shape()) = *createShapeProto(circle);
-    (*shape_msg->mutable_name()) = name;
-    return shape_msg;
-}
-
-std::unique_ptr<TbotsProto::NamedShape> createNamedShapeProto(const Polygon &polygon, const std::string &name)
-{
-    auto shape_msg = std::make_unique<TbotsProto::NamedShape>();
-    (*shape_msg->mutable_shape()) = *createShapeProto(polygon);
-    (*shape_msg->mutable_name()) = name;
-    return shape_msg;
-}
-
-std::unique_ptr<TbotsProto::NamedShape> createNamedShapeProto(const Stadium &stadium, const std::string &name)
-{
-    auto shape_msg = std::make_unique<TbotsProto::NamedShape>();
-    (*shape_msg->mutable_shape()) = *createShapeProto(stadium);
-    (*shape_msg->mutable_name()) = name;
     return shape_msg;
 }
