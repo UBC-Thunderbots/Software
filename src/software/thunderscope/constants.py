@@ -253,7 +253,6 @@ def rgb_to_bw(r: int, g: int, b: int) -> tuple:
 
 
 class Colors(object):
-
     DEFAULT_GRAPHICS_COLOR = QtGui.QColor(255, 255, 255, 128)
     FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 200)
     FIELD_LINE_LIGHTER_COLOR = QtGui.QColor(255, 255, 255, 100)
@@ -308,3 +307,10 @@ class DepthValues:
     FOREGROUND_DEPTH = 0
     ABOVE_FOREGROUND_DEPTH = 1
     OVERLAY_DEPTH = 2
+
+
+class TrailValues:
+    """Constants for Trails Visualization Layer in Thunderscope."""
+
+    DEFAULT_TRAIL_LENGTH = 20
+    DEFAULT_TRAIL_SAMPLING_RATE = 0
