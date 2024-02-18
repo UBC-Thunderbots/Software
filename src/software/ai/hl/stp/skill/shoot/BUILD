@@ -15,7 +15,7 @@ cc_library(
         "shoot_skill_fsm.h",
     ],
     deps = [
-        "//software/ai/hl/stp/skill",
+        "//software/ai/hl/stp/skill:base_skill",
         "//software/ai/hl/stp/skill/pivot_kick:pivot_kick_skill",
         "//software/util/generic_factory",
     ],

@@ -4,25 +4,14 @@
 
 double KeepAwaySkill::getViability(const Robot& robot, const World& world) const
 {
-    return 1;
-}
+    constexpr double NEAR_CREASE_PENALTY_MAX = 0.25;
 
-void KeepAwaySkill::updatePrimitive(const Robot& robot, const World& world,
-                                    const SetPrimitiveCallback& set_primitive)
-{
-    if (!fsm_map_.contains(robot.id()))
-    {
-        reset(robot);
-    }
+    // Penalize viability if we are close to the crease
+    double near_crease_penalty = normalizeValueToRange(
+        distance(robot.position(), world.field().enemyDefenseArea()), 0.0, 1.0,
+        NEAR_CREASE_PENALTY_MAX, 0.0);
 
-    fsm_map_[robot.id()]->process_event(
-        KeepAwaySkillFSM::Update(KeepAwaySkillFSM::ControlParams{},
-                                 SkillUpdate(robot, world, strategy_, set_primitive)));
-}
-
-void KeepAwaySkill::reset(const Robot& robot)
-{
-    fsm_map_[robot.id()] = std::make_unique<FSM<KeepAwaySkillFSM>>(DribbleSkillFSM());
+    return 1 - near_crease_penalty;
 }
 
 // Register this Skill in the GenericFactory

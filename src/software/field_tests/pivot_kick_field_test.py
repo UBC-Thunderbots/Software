@@ -16,6 +16,7 @@ logger = createLogger(__name__)
 
 # TODO: Fix this so that we use another tactic or AssignedSkillTactic
 
+
 def test_pivot_kick(field_test_runner):
 
     id = 5

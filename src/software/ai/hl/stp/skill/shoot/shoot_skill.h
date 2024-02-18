@@ -1,22 +1,12 @@
 #pragma once
 
+#include "software/ai/hl/stp/skill/base_skill.hpp"
 #include "software/ai/hl/stp/skill/shoot/shoot_skill_fsm.h"
-#include "software/ai/hl/stp/skill/skill.h"
 
-class ShootSkill : public Skill
+class ShootSkill : public BaseSkill<ShootSkillFSM, DribbleSkillFSM>
 {
    public:
-    explicit ShootSkill(std::shared_ptr<Strategy> strategy) : Skill(strategy){};
+    explicit ShootSkill(std::shared_ptr<Strategy> strategy) : BaseSkill(strategy){};
 
     double getViability(const Robot& robot, const World& world) const override;
-
-    void updatePrimitive(const Robot& robot, const World& world,
-                         const SetPrimitiveCallback& set_primitive) override;
-
-    void reset(const Robot& robot) override;
-
-    DEFINE_SKILL_DONE_AND_GET_FSM_STATE
-
-   private:
-    std::map<RobotId, std::unique_ptr<FSM<ShootSkillFSM>>> fsm_map_;
 };

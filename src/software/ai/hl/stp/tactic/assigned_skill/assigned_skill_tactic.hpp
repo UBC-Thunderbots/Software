@@ -35,8 +35,8 @@ class TypedAssignedSkillTactic : public AssignedSkillTactic
 {
    public:
     /**
-     * Creates a new TypedAssignedSkillTactic 
-     * 
+     * Creates a new TypedAssignedSkillTactic
+     *
      * @param skill_fsm_factory function that takes no arguments and will return
      * a unique_ptr to a new instance of FSM<TSkillFSM>
      * @param strategy the current Strategy
@@ -56,7 +56,7 @@ class TypedAssignedSkillTactic : public AssignedSkillTactic
 
     /**
      * Updates the control params for the Skill FSM that this tactic is executing
-     * 
+     *
      * @param control_params the new control params to overwrite the current params with
      */
     void updateControlParams(const typename TSkillFSM::ControlParams& control_params);
@@ -89,7 +89,7 @@ void TypedAssignedSkillTactic<TSkillFSM>::updatePrimitive(
     {
         fsm_map[tactic_update.robot.id()] = skill_fsm_factory_();
     }
-    
+
     fsm_map[tactic_update.robot.id()]->process_event(typename TSkillFSM::Update(
         control_params_, SkillUpdate(tactic_update.robot, tactic_update.world, strategy_,
                                      tactic_update.set_primitive)));

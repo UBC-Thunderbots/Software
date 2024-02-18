@@ -23,7 +23,8 @@ struct SkillUpdate
  * composed of the following structs:
  *
  * ControlParams - uniquely defined by each Skill FSM to control the FSM
- * SkillUpdate - common struct that contains Robot, World, Strategy, and SetPrimitiveCallback
+ * SkillUpdate - common struct that contains Robot, World, Strategy, and
+ * SetPrimitiveCallback
  */
 #define DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                        \
     struct Update                                                                        \
@@ -35,18 +36,3 @@ struct SkillUpdate
         ControlParams control_params;                                                    \
         SkillUpdate common;                                                              \
     };
-
-#define DEFINE_SKILL_DONE_AND_GET_FSM_STATE                                              \
-    bool done(const Robot &robot) const override                                         \
-    {                                                                                    \
-        return fsm_map_.contains(robot.id()) &&                                          \
-               fsm_map_.at(robot.id())->is(boost::sml::X);                               \
-    }                                                                                    \
-                                                                                         \
-    std::string getFSMState(RobotId robot_id) const override                             \
-    {                                                                                    \
-        std::string state_str = TYPENAME(*this);                                         \
-        if (fsm_map_.contains(robot_id))                                                 \
-            state_str += "." + getCurrentFullStateName(*fsm_map_.at(robot_id));          \
-        return state_str;                                                                \
-    }

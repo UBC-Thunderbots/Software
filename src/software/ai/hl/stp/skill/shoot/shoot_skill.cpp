@@ -9,25 +9,14 @@ double ShootSkill::getViability(const Robot& robot, const World& world) const
     {
         return 0;
     }
-    return 1;
-}
 
-void ShootSkill::updatePrimitive(const Robot& robot, const World& world,
-                                 const SetPrimitiveCallback& set_primitive)
-{
-    if (!fsm_map_.contains(robot.id()))
-    {
-        reset(robot);
-    }
+    constexpr double SHOT_ANGLE_PENALTY_MAX = 0.25;
 
-    fsm_map_[robot.id()]->process_event(
-        ShootSkillFSM::Update(ShootSkillFSM::ControlParams{},
-                              SkillUpdate(robot, world, strategy_, set_primitive)));
-}
+    double shot_angle_penalty = normalizeValueToRange(
+        best_shot->getOpenAngle().toDegrees(), 0.0, 180.0, SHOT_ANGLE_PENALTY_MAX,
+        0.0);
 
-void ShootSkill::reset(const Robot& robot)
-{
-    fsm_map_[robot.id()] = std::make_unique<FSM<ShootSkillFSM>>(DribbleSkillFSM());
+    return 1 - shot_angle_penalty;
 }
 
 // Register this Skill in the GenericFactory
