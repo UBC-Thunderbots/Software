@@ -48,7 +48,8 @@ void BaseSkill<TSkillFSM, TSkillSubFSMs...>::updatePrimitive(
 template <typename TSkillFSM, typename... TSkillSubFSMs>
 void BaseSkill<TSkillFSM, TSkillSubFSMs...>::reset(const Robot& robot)
 {
-    fsm_map_[robot.id()] = std::make_unique<FSM<TSkillFSM>>(TSkillSubFSMs()...);
+    fsm_map_[robot.id()] =
+        std::make_unique<FSM<TSkillFSM>>(TSkillSubFSMs()..., TSkillFSM());
 }
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>

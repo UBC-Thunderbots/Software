@@ -16,9 +16,8 @@ BallPlacementPlay::BallPlacementPlay(const TbotsProto::AiConfig &config,
 void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
-    auto place_ball_tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
-        []() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
-        strategy);
+    auto place_ball_tactic =
+        std::make_shared<AssignedSkillTactic<DribbleSkillFSM>>(strategy);
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),

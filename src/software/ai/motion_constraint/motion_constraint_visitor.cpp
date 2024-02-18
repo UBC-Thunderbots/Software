@@ -85,7 +85,7 @@ void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
 
 void MotionConstraintVisitor::visit(const PassDefenderTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const AssignedSkillTactic &tactic) {}
+void MotionConstraintVisitor::visit(const SkillTactic &tactic) {}
 
 std::set<TbotsProto::MotionConstraint>
 MotionConstraintVisitor::getUpdatedMotionConstraints(

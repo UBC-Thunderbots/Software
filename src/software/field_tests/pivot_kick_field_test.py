@@ -14,7 +14,7 @@ from proto.message_translation.tbots_protobuf import create_world_state
 
 logger = createLogger(__name__)
 
-# TODO: Fix this so that we use another tactic or AssignedSkillTactic
+# TODO: Fix this so that we use another tactic or SkillTactic
 
 
 def test_pivot_kick(field_test_runner):

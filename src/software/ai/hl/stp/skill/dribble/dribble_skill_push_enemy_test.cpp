@@ -19,9 +19,9 @@ class DribbleSkillPushEnemyTest : public SimulatedErForceSimPlayTestFixture,
                                   public ::testing::WithParamInterface<Point>
 {
    protected:
-    void checkPossession(
-        std::shared_ptr<TypedAssignedSkillTactic<DribbleSkillFSM>> tactic,
-        std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+    void checkPossession(std::shared_ptr<AssignedSkillTactic<DribbleSkillFSM>> tactic,
+                         std::shared_ptr<World> world_ptr,
+                         ValidationCoroutine::push_type& yield)
     {
         while (!tactic->done())
         {
@@ -63,9 +63,7 @@ TEST_P(DribbleSkillPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, -2.5), initial_position});
 
-    auto tactic = std::make_shared<TypedAssignedSkillTactic<DribbleSkillFSM>>(
-        [&]() { return std::make_unique<FSM<DribbleSkillFSM>>(DribbleSkillFSM()); },
-        strategy);
+    auto tactic = std::make_shared<AssignedSkillTactic<DribbleSkillFSM>>(strategy);
     tactic->updateControlParams({dribble_destination, dribble_orientation, false});
     setTactic(1, tactic, {TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
 
