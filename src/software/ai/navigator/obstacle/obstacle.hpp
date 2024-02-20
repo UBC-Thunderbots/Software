@@ -51,6 +51,15 @@ class Obstacle
     virtual bool intersects(const Segment& segment, const double t_sec = 0) const = 0;
 
     /**
+     * Finds the Point closest to the given Point that is outside of the obstacle.
+     *
+     * @param p the point.
+     *
+     * @return the Point on polygon closest to point.
+     */
+    virtual Point closestPoint(const Point& p) const = 0;
+
+    /**
      * Determines what coordinates on the field are blocked by this Obstacle
      *
      * @param resolution_size The minimum size of the grid cells to rasterize the obstacle into
