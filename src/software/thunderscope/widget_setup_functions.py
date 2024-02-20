@@ -25,7 +25,9 @@ from software.thunderscope.gl.layers import (
     gl_simulator_layer,
     gl_tactic_layer,
     gl_cost_vis_layer,
+    gl_trail_layer,
 )
+
 
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
@@ -114,6 +116,7 @@ def setup_gl_widget(
         "Simulator", friendly_colour_yellow, visualization_buffer_size
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
+    trail_layer = gl_trail_layer.GLTrailLayer("Trail", visualization_buffer_size)
 
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
@@ -123,6 +126,7 @@ def setup_gl_widget(
     gl_widget.add_layer(cost_vis_layer, False)
     gl_widget.add_layer(tactic_layer, False)
     gl_widget.add_layer(validation_layer)
+    gl_widget.add_layer(trail_layer, False)
     gl_widget.add_layer(debug_shapes_layer, False)
 
     gl_widget.toolbar.pause_button.clicked.connect(world_layer.toggle_play_state)
@@ -158,6 +162,7 @@ def setup_gl_widget(
         (ValidationProtoSet, validation_layer.validation_set_buffer),
         (SimulationState, gl_widget.toolbar.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
+        (World, trail_layer.world_buffer),
         (DebugShapesMap, debug_shapes_layer.debug_shape_map_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
