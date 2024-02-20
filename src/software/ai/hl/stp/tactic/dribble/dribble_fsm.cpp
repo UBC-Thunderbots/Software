@@ -90,7 +90,8 @@ void DribbleFSM::getPossession(const Update &event)
     Point intercept_position =
         findInterceptionPoint(event.common.robot, event.common.world.ball(),
                               event.common.world.field()) +
-        Vector::createFromAngle(face_ball_orientation).normalize(0.05);
+        Vector::createFromAngle(face_ball_orientation)
+            .normalize(INTERCEPTION_POINT_ADJUSTMENT_M);
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, intercept_position, face_ball_orientation,
