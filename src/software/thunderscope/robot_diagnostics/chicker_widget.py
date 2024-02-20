@@ -7,7 +7,6 @@ from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-include "shared/constants.h"
 
 
 class ChickerCommandMode(Enum):
