@@ -145,9 +145,16 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
 std::unique_ptr<TbotsProto::DebugShapesMap> createDebugShapesMap(
     const std::map<std::string, TbotsProto::Shape>& named_shapes);
 
+/**
+ * Returns a TbotsProto::Shape proto given a shape.
+ *
+ * @param shape The shape to create a TbotsProto::Shape for
+ *
+ * @return The unique_ptr to a TbotsProto::Shape proto containing the shape
+ */
 std::unique_ptr<TbotsProto::Shape> createShapeProto(const Circle& circle);
-std::unique_ptr<TbotsProto::Shape> createShapeProto(const Polygon& circle);
-std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium& circle);
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Polygon& polygon);
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium& stadium);
 
 /**
  * Returns a timestamp msg with the time that this function was called
