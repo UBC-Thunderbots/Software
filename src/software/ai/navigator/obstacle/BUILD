@@ -8,6 +8,7 @@ cc_library(
     ],
     deps = [
         ":obstacle_visitor",
+        "//software/geom/algorithms:algorithms",
         "//proto/message_translation:tbots_protobuf",
     ],
 )
