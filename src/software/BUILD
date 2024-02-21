@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 cc_binary(
     name = "unix_full_system",
@@ -37,6 +38,17 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "network_log_listener_main",
+    srcs = ["network_log_listener_main.cpp"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//shared:constants",
+        "//software/networking:threaded_proto_udp_listener",
+        "@boost//:program_options",
+    ],
+)
+
 cc_library(
     name = "constants",
     hdrs = ["constants.h"],
@@ -67,6 +79,7 @@ pybind_library(
     deps = [
         "//proto:ssl_cc_proto",
         "//proto:tbots_cc_proto",
+        "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:tbots_geometry",
         "//shared:robot_constants",
         "//software/estop:threaded_estop_reader",

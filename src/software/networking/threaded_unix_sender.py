@@ -1,19 +1,27 @@
+from __future__ import annotations
+
 import logging
 import queue
 import socket
 from threading import Thread
+from typing import Generic, TypeVar
 
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
+from google.protobuf.message import EncodeError, Message
 from software.py_constants import UNIX_BUFFER_SIZE
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
+T = TypeVar("T", bound=Message)
 
-class ThreadedUnixSender:
+
+class ThreadedUnixSender(Generic[T]):
 
     MAX_SEND_FAILURES_BEFORE_LOG = 100
 
-    def __init__(self, unix_path, proto_type, max_buffer_size=3):
+    def __init__(
+        self, unix_path: str, proto_type: type[T], max_buffer_size: int = 3
+    ) -> None:
 
         """Send protobufs over unix sockets
 
@@ -37,23 +45,29 @@ class ThreadedUnixSender:
         self.thread.start()
         self.send_failures = 0
 
-    def force_stop(self):
+    def force_stop(self) -> None:
         """Stop handling requests
         """
         self.stop = True
-        self.server.server_close()
+        self.socket.close()
 
-    def __send_protobuf(self):
-        """Send the buffered protobuf
-        """
+    def __send_protobuf(self) -> None:
+        """Send the buffered protobuf"""
         proto = None
 
         while not self.stop:
             proto = self.proto_buffer.get(block=True, return_cached=False)
             if proto is not None:
-                send = proto.SerializeToString()
                 try:
+                    send = proto.SerializeToString()
                     self.socket.sendto(send, self.unix_path)
+                except EncodeError:
+                    logging.error(
+                        "Received an invalid proto of type {}".format(
+                            proto.DESCRIPTOR.full_name
+                        )
+                    )
+                    self.send_failures = 0
                 except Exception:
                     self.send_failures += 1
                     if (
@@ -67,11 +81,10 @@ class ThreadedUnixSender:
                         )
                         self.send_failures = 0
 
-    def send(self, proto):
+    def send(self, proto: T):
         """Buffer a protobuf to be sent by the send thread
 
         :param proto: The protobuf to send
-
         """
         try:
             self.proto_buffer.put(proto)

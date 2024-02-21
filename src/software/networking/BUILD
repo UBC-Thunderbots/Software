@@ -24,9 +24,12 @@ cc_library(
 )
 
 cc_library(
-    name = "proto_udp_sender",
+    name = "udp_sender",
+    srcs = [
+        "udp_sender.cpp",
+    ],
     hdrs = [
-        "proto_udp_sender.hpp",
+        "udp_sender.h",
     ],
     visibility = ["//visibility:private"],
     deps = [
@@ -51,7 +54,7 @@ cc_library(
         "threaded_proto_udp_sender.hpp",
     ],
     deps = [
-        ":proto_udp_sender",
+        ":udp_sender",
         "@boost//:asio",
     ],
 )
@@ -72,14 +75,15 @@ cc_library(
 )
 
 cc_library(
-    name = "proto_unix_sender",
-    hdrs = [
-        "proto_unix_sender.hpp",
+    name = "threaded_udp_sender",
+    srcs = [
+        "threaded_udp_sender.cpp",
     ],
-    visibility = ["//visibility:private"],
+    hdrs = [
+        "threaded_udp_sender.h",
+    ],
     deps = [
-        ":unix_sender",
-        "@boost//:asio",
+        ":udp_sender",
     ],
 )
 
@@ -91,6 +95,7 @@ cc_library(
     visibility = ["//visibility:private"],
     deps = [
         "//software:constants",
+        "//software/util/typename",
         "@boost//:asio",
     ],
 )
@@ -115,7 +120,7 @@ cc_library(
         "threaded_proto_unix_sender.hpp",
     ],
     deps = [
-        ":proto_unix_sender",
+        ":unix_sender",
         "@boost//:asio",
     ],
 )
@@ -152,5 +157,13 @@ py_library(
     deps = [
         "//proto:software_py_proto",
         "//software/logger:py_logger",
+    ],
+)
+
+py_library(
+    name = "ssl_proto_communication",
+    srcs = ["ssl_proto_communication.py"],
+    deps = [
+        "//proto/message_translation:py_tbots_protobuf",
     ],
 )

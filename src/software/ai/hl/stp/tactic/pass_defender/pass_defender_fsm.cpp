@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h"
 
+#include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
 
 bool PassDefenderFSM::passStarted(const Update& event)
@@ -44,12 +45,11 @@ void PassDefenderFSM::blockPass(const Update& event)
 
     // Face the ball and move to position_to_block_from, which should be a location
     // on the field that blocks a passing lane between two enemy robots
-    event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(position_to_block_from), face_ball_orientation, 0,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-        event.common.robot.robotConstants()));
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, position_to_block_from, face_ball_orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
 
 void PassDefenderFSM::interceptBall(const Update& event)
@@ -60,20 +60,23 @@ void PassDefenderFSM::interceptBall(const Update& event)
     if ((ball.position() - robot_position).length() >
         BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
     {
-        // Find the closest point on the line of the ball's current trajectory
-        // that the defender can move to and intercept the pass
-        auto intercept_position = closestPoint(
-            robot_position, Line(ball.position(), ball.position() + ball.velocity()));
+        Point intercept_position = ball.position();
+        if (ball.velocity().length() != 0)
+        {
+            // Find the closest point on the line of the ball's current trajectory
+            // that the defender can move to and intercept the pass
+            intercept_position = closestPoint(
+                robot_position, Line(ball.position(), ball.position() + ball.velocity()));
+        }
 
         auto face_ball_orientation = (ball.position() - robot_position).orientation();
 
         // Move to intercept the pass by positioning defender in front of the
         // ball's current trajectory
-        event.common.set_primitive(createMovePrimitive(
-            CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation, 0,
+        event.common.set_primitive(std::make_unique<MovePrimitive>(
+            event.common.robot, intercept_position, face_ball_orientation,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-            event.common.robot.robotConstants()));
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
     }
 }

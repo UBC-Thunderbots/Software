@@ -30,8 +30,8 @@ class PowerService
      * @param control The power control msg to send
      * @return the latest power status
      */
-    TbotsProto::PowerStatus poll(const TbotsProto::PowerControl& control, int kick_slope,
-                                 int kick_constant, int chip_constant);
+    TbotsProto::PowerStatus poll(const TbotsProto::PowerControl& control,
+                                 double kick_coeff, int kick_constant, int chip_constant);
 
     /**
      * Handler method called every time the timer expires a new read is requested
@@ -54,4 +54,7 @@ class PowerService
         getMarshalledSize(TbotsProto_PowerStatus TbotsProto_PowerStatus_init_default);
     const std::string DEVICE_SERIAL_PORT    = "/dev/ttyUSB0";
     static constexpr unsigned int BAUD_RATE = 460800;
+
+    // Required flag to exit power service cleanly
+    bool is_running = true;
 };

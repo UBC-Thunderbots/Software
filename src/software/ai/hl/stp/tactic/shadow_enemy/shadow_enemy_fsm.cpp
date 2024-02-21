@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
 
+#include "software/ai/hl/stp/tactic/move_primitive.h"
+
 Point ShadowEnemyFSM::findBlockPassPoint(const Point &ball_position,
                                          const Robot &shadowee,
                                          const double &shadow_distance)
@@ -65,12 +67,11 @@ void ShadowEnemyFSM::blockPass(const Update &event)
                                event.control_params.shadow_distance);
     };
 
-    event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(position_to_block), face_ball_orientation, 0,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-        event.common.robot.robotConstants()));
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, position_to_block, face_ball_orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
 
 void ShadowEnemyFSM::blockShot(const Update &event,
@@ -114,10 +115,9 @@ void ShadowEnemyFSM::stealAndChip(const Update &event)
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
 
-    event.common.set_primitive(createMovePrimitive(
-        CREATE_MOTION_CONTROL(ball_position), face_ball_orientation, 0,
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, ball_position, face_ball_orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-        event.common.robot.robotConstants()));
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
 }

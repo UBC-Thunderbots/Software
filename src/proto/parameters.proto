@@ -126,9 +126,8 @@ message PassingConfig
 
 message GoalieTacticConfig
 {
-    // Control the final speed of the goalie to be able to intercept shots better
-    required double goalie_final_speed = 1
-        [default = 0.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
+    reserved 1;
+
     // At what speed of the ball should the goalie panic and stop the ball
     required double ball_speed_panic = 2
         [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 6.0];
@@ -138,6 +137,21 @@ message GoalieTacticConfig
     // How much to deflate the defense area by, larger value means closer to the net
     required double defense_area_deflation = 4
         [default = 0.2, (bounds).min_double_value = 0.1, (bounds).max_double_value = 0.5];
+    // Depth goalie should be at for plays close to the defense area (potential lateral
+    // play, rebounds)
+    required double conservative_depth_meters = 5
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+    // Depth goalie should be at to aggressively narrow the angle the ball has to the
+    // goal as it enters the friendly half
+    required double aggressive_depth_meters = 6
+        [default = 0.7, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+    // Distance in meters to inset the target area for finding chip targets
+    required double chip_target_area_inset_meters = 7
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+    // Minimum distance in meters that a chip target must be away from the front
+    // defense area crease
+    required double min_chip_distance_from_crease_meters = 8
+        [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
 message DribbleTacticConfig
@@ -158,7 +172,7 @@ message DribbleTacticConfig
     // Threshold to determine if the robot has the expected orientation when
     // completing the dribble (in degrees)
     required double final_destination_close_threshold = 3 [
-        default                   = 1.0,
+        default                   = 3.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
@@ -274,20 +288,68 @@ message SensorFusionConfig
     // Number of dropped detections before we consider the ball not to be in the dribbler
     required int32 num_dropped_detections_before_ball_not_in_dribbler = 12
         [default = 3, (bounds).min_int_value = 0, (bounds).max_int_value = 1000];
+
+    // Possession tracker for determining which team has possession of the ball
+    required PossessionTrackerConfig possession_tracker_config = 13;
 }
 
 message DefensePlayConfig
 {
+    message DefenderAssignmentConfig
+    {
+        // The minimum distance in meters between two threats for them to be considered
+        // non-similar
+        required double min_distance_between_threats_meters = 1 [
+            default                   = 0.25,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 10.0
+        ];
+
+        // The minimum difference between two threats in angle to the primary threat for
+        // them to be considered non-similar
+        required double min_angle_between_threats_degrees = 2 [
+            default                   = 10.0,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 360.0
+        ];
+
+        // Multiplier to ensure that goal lanes are scored higher (in threat rating)
+        // than passing lanes
+        required double goal_lane_threat_multiplier = 3 [
+            default                   = 3.0,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 10.0
+        ];
+
+        // Max percent difference between two goal lanes' angles to goal for them to be
+        // considered a dense lane cluster
+        required double goal_lane_density_threshold = 4 [
+            default                   = 0.4,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 100.0
+        ];
+
+        // Bonus added to coverage rating if the goal lane is not part of a dense cluster
+        required double goal_lane_nondense_bonus = 5 [
+            default                   = 0.5,
+            (bounds).min_double_value = 0.0,
+            (bounds).max_double_value = 10.0
+        ];
+    }
+
     // The distance at which a threat is considered "immediate" if there is only 1
     // "immediate" threat the defense play will swarm that robot with shadowers
     required double immediate_threat_distance = 1
         [default = 6.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 9.5];
+
+    // The DefenderAssignmentConfig for tuning defender assignments
+    required DefenderAssignmentConfig defender_assignment_config = 2;
 }
 
 message RobotNavigationObstacleConfig
 {
     required double robot_obstacle_inflation_factor = 1 [
-        default                   = 2.0167,
+        default                   = 1.2,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
@@ -304,4 +366,33 @@ message CostVisualizationConfig
     required bool pass_friendly_capability = 4 [default = false];
     required bool pass_enemy_risk          = 5 [default = false];
     required bool pass_shoot_score         = 6 [default = false];
+}
+
+message PossessionTrackerConfig
+{
+    // Max distance in meters between robot and ball for robot
+    // to be considered near the ball
+    required double distance_near_tolerance_meters = 1
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+
+    // Min distance in meters between robot and ball for robot
+    // to be considered far away from the ball
+    required double distance_far_tolerance_meters = 2 [
+        default                   = 0.5,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
+
+    // Min time in seconds that robot must stay close to ball for
+    // it to be considered near
+    required double time_near_threshold_s = 3
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
+
+    // Min time in seconds that robot must stay away from ball for
+    // it to be considered far away
+    required double time_far_threshold_s = 4 [
+        default                   = 1.5,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
 }

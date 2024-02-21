@@ -2,7 +2,10 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <condition_variable>
+#include <mutex>
 #include <string>
+#include <thread>
 
 #include "software/logger/logger.h"
 #include "software/networking/proto_udp_listener.hpp"
@@ -45,8 +48,13 @@ class ProtoUdpListener
      */
     ProtoUdpListener(boost::asio::io_service& io_service, unsigned short port,
                      std::function<void(ReceiveProtoT&)> receive_callback);
+    /**
+     * Closes the socket associated to the UDP listener
+     */
+    virtual void close();
 
     virtual ~ProtoUdpListener();
+
 
    private:
     /**
@@ -73,6 +81,9 @@ class ProtoUdpListener
 
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT&)> receive_callback;
+
+    // Whether or not the listener is running
+    bool running_ = true;
 };
 
 template <class ReceiveProtoT>
@@ -154,13 +165,17 @@ template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
+    if (!running_)
+    {
+        return;
+    }
+
     if (!error)
     {
         auto packet_data = ReceiveProtoT();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
         receive_callback(packet_data);
-
         // Once we've handled the data, start listening again
         startListen();
     }
@@ -169,9 +184,10 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
         // Start listening again to receive the next data
         startListen();
 
-        LOG(WARNING)
-            << "An unknown network error occurred when attempting to receive ReceiveProtoT Data. The boost system error code is "
-            << error << std::endl;
+        LOG(WARNING) << "An unknown network error occurred when attempting to receive "
+                     << TYPENAME(ReceiveProtoT)
+                     << " Data. The boost system error is: " << error.message()
+                     << std::endl;
     }
 
     if (num_bytes_received > MAX_BUFFER_LENGTH)
@@ -186,5 +202,31 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::~ProtoUdpListener()
 {
-    socket_.close();
+    close();
+}
+
+template <class ReceiveProtoT>
+void ProtoUdpListener<ReceiveProtoT>::close()
+{
+    running_ = false;
+
+    // Shutdown both send and receive on the socket
+    boost::system::error_code error_code;
+    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error_code);
+    if (error_code)
+    {
+        LOG(WARNING)
+            << "An unknown network error occurred when attempting to shutdown UDP socket for "
+            << TYPENAME(ReceiveProtoT)
+            << ". The boost system error is: " << error_code.message() << std::endl;
+    }
+
+    socket_.close(error_code);
+    if (error_code)
+    {
+        LOG(WARNING)
+            << "An unknown network error occurred when attempting to close UDP socket for "
+            << TYPENAME(ReceiveProtoT)
+            << ". The boost system error is: " << error_code.message() << std::endl;
+    }
 }

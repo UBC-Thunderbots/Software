@@ -59,7 +59,7 @@ def generate_diagram(fsm):
         # Remove suffixes from states, guard, action
         src_state = remove_suffix(src_state, "_S")
         dest_state = remove_suffix(dest_state, "_S")
-        guard = remove_suffix(guard, "_G")
+        guard = " && ".join([remove_suffix(g, "_G") for g in guard.split("&&")])
         action = remove_suffix(action, "_A")
 
         # Terminate state is marked with X in transition table.
@@ -105,7 +105,8 @@ if __name__ == "__main__":
 
     ai_dir = os.path.join(root_dir, "src/software/ai")
     for root, dirs, files in os.walk(ai_dir):
-        for file in files:
+        dirs.sort()
+        for file in sorted(files):
 
             if not file.endswith("fsm.h"):
                 continue

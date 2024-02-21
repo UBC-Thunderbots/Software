@@ -2,7 +2,7 @@ import sys
 
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.friendly_team_scored import *
 from software.simulated_tests.ball_enters_region import *
@@ -14,34 +14,34 @@ from proto.ssl_gc_common_pb2 import Team
 def test_offense_play(simulated_test_runner):
 
     # starting point must be Point
-    ball_initial_pos = tbots.Point(-4.4, 2.9)
+    ball_initial_pos = tbots_cpp.Point(-4.4, 2.9)
     # placement point must be Vector2 to work with game controller
-    tbots.Point(-3, -2)
+    tbots_cpp.Point(-3, -2)
 
     # Setup Bots
     blue_bots = [
-        tbots.Point(-4.5, 3.0),
-        tbots.Point(-2, 1.5),
-        tbots.Point(-2, 0.5),
-        tbots.Point(-2, -1.7),
-        tbots.Point(-2, -1.5),
-        tbots.Point(-2, -0.5),
+        tbots_cpp.Point(-4.5, 3.0),
+        tbots_cpp.Point(-2, 1.5),
+        tbots_cpp.Point(-2, 0.5),
+        tbots_cpp.Point(-2, -1.7),
+        tbots_cpp.Point(-2, -1.5),
+        tbots_cpp.Point(-2, -0.5),
     ]
 
     yellow_bots = [
-        tbots.Point(1, 0),
-        tbots.Point(1, 2.5),
-        tbots.Point(1, -2.5),
-        tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+        tbots_cpp.Point(1, 0),
+        tbots_cpp.Point(1, 2.5),
+        tbots_cpp.Point(1, -2.5),
+        tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+        tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
+        tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
     ]
 
     # Game Controller Setup
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.FORCE_START, team=Team.BLUE
     )
 
@@ -62,7 +62,7 @@ def test_offense_play(simulated_test_runner):
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
             ball_location=ball_initial_pos,
-            ball_velocity=tbots.Vector(0, 0),
+            ball_velocity=tbots_cpp.Vector(0, 0),
         ),
     )
 
@@ -75,8 +75,10 @@ def test_offense_play(simulated_test_runner):
     eventually_validation_sequence_set = [[]]
 
     simulated_test_runner.run_test(
-        eventually_validation_sequence_set=eventually_validation_sequence_set,
-        always_validation_sequence_set=always_validation_sequence_set,
+        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        inv_always_validation_sequence_set=always_validation_sequence_set,
+        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        ag_always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=15,
     )
 

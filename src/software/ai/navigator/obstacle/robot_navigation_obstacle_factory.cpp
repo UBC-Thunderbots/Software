@@ -28,6 +28,24 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 }
 
 std::vector<ObstaclePtr>
+RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
+    const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const World &world) const
+{
+    std::vector<ObstaclePtr> static_obstacles =
+        createStaticObstaclesFromMotionConstraints(motion_constraints, world.field());
+    std::vector<ObstaclePtr> dynamic_obstacles =
+        createDynamicObstaclesFromMotionConstraints(motion_constraints, world);
+
+    // Combine two vectors of obstacles into one and return it
+    std::vector<ObstaclePtr> obstacles;
+    obstacles.reserve(static_obstacles.size() + dynamic_obstacles.size());
+    obstacles.insert(obstacles.end(), static_obstacles.begin(), static_obstacles.end());
+    obstacles.insert(obstacles.end(), dynamic_obstacles.begin(), dynamic_obstacles.end());
+    return obstacles;
+}
+
+std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
     const TbotsProto::MotionConstraint &motion_constraint, const Field &field) const
 {
@@ -112,6 +130,29 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             // AVOID_BALL_PLACEMENT_INTERFERENCE is not handled by this obstacle factory
             // since it's a dynamic obstacle
             break;
+        case TbotsProto::MotionConstraint::FRIENDLY_GOAL:
+        {
+            const Rectangle &friendly_goal = field.friendlyGoal();
+
+            // Reduce the size of the goal obstacle slightly to avoid the goalie
+            // appear to be inside the obstacle if it is touching one of the goal
+            // walls (e.g. due to noisy vision).
+            const double goal_obstacle_radius = ROBOT_MAX_RADIUS_METERS - 0.01;
+
+            // Top goal post
+            obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(
+                Segment(friendly_goal.posXPosYCorner(), friendly_goal.negXPosYCorner()),
+                goal_obstacle_radius)));
+            // Bottom goal post
+            obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(
+                Segment(friendly_goal.posXNegYCorner(), friendly_goal.negXNegYCorner()),
+                goal_obstacle_radius)));
+            // Left goal wall
+            obstacles.push_back(std::make_shared<GeomObstacle<Stadium>>(Stadium(
+                Segment(friendly_goal.negXPosYCorner(), friendly_goal.negXNegYCorner()),
+                goal_obstacle_radius)));
+            break;
+        }
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:;
             break;
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MAX_SENTINEL_DO_NOT_USE_:;
@@ -172,6 +213,9 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
                     createFromShape(Circle(world.ball().position(), 0.5)));
             }
             break;
+        case TbotsProto::MotionConstraint::FRIENDLY_GOAL:;
+            // not handled by this obstacle factory since it's a static obstacle
+            break;
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:;
             break;
         case TbotsProto::MotionConstraint::MotionConstraint_INT_MAX_SENTINEL_DO_NOT_USE_:;
@@ -191,6 +235,22 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraints(
     {
         auto new_obstacles =
             createStaticObstaclesFromMotionConstraint(motion_constraint, field);
+        obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
+    }
+
+    return obstacles;
+}
+
+std::vector<ObstaclePtr>
+RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraints(
+    const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const World &world) const
+{
+    std::vector<ObstaclePtr> obstacles;
+    for (auto motion_constraint : motion_constraints)
+    {
+        auto new_obstacles =
+            createDynamicObstaclesFromMotionConstraint(motion_constraint, world);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 
@@ -221,6 +281,19 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Polygon &polyg
         polygon.expand(robot_radius_expansion_amount));
 }
 
+ObstaclePtr RobotNavigationObstacleFactory::createFromShape(
+    const Rectangle &rectangle) const
+{
+    return std::make_shared<GeomObstacle<Rectangle>>(
+        rectangle.expand(robot_radius_expansion_amount));
+}
+
+ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Stadium &stadium) const
+{
+    return std::make_shared<GeomObstacle<Stadium>>(
+        Stadium(stadium.segment(), stadium.radius() + robot_radius_expansion_amount));
+}
+
 ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
     const Rectangle &field_rectangle, const Rectangle &field_lines,
     const Rectangle &field_boundary, double additional_expansion_amount) const
@@ -247,10 +320,5 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromBallPlacement(
     const Point &placement_point, const Point &ball_point) const
 {
-    std::vector<ObstaclePtr> ret;
-    ret.push_back(createFromShape(
-        Polygon::fromSegment(Segment(ball_point, placement_point), 0, 0.5)));
-    ret.push_back(createFromShape(Circle(ball_point, 0.5)));
-    ret.push_back(createFromShape(Circle(placement_point, 0.5)));
-    return ret;
+    return createFromShape(Stadium(Segment(ball_point, placement_point), 0.5));
 }

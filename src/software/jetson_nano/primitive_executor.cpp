@@ -1,10 +1,13 @@
 #include "software/jetson_nano/primitive_executor.h"
 
 #include "proto/message_translation/tbots_geometry.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive.pb.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/visualization.pb.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/logger/logger.h"
 #include "software/physics/velocity_conversion_util.h"
 
 PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
@@ -12,11 +15,9 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
                                      const TeamColour friendly_team_colour,
                                      const RobotId robot_id)
     : current_primitive_(),
-      friendly_team_colour(friendly_team_colour),
+      friendly_team_colour_(friendly_team_colour),
       robot_constants_(robot_constants),
-      hrvo_simulator_(),
       time_step_(time_step),
-      curr_orientation_(Angle::zero()),
       robot_id_(robot_id)
 {
 }
@@ -24,80 +25,80 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
 void PrimitiveExecutor::updatePrimitiveSet(
     const TbotsProto::PrimitiveSet &primitive_set_msg)
 {
-    hrvo_simulator_.updatePrimitiveSet(primitive_set_msg, time_step_);
     auto primitive_set_msg_iter = primitive_set_msg.robot_primitives().find(robot_id_);
     if (primitive_set_msg_iter != primitive_set_msg.robot_primitives().end())
     {
         current_primitive_ = primitive_set_msg_iter->second;
-        return;
+
+        if (current_primitive_.has_move())
+        {
+            trajectory_path_ = createTrajectoryPathFromParams(
+                current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
+
+            angular_trajectory_ = createAngularTrajectoryFromParams(
+                current_primitive_.move().w_traj_params(), angular_velocity_,
+                robot_constants_);
+
+            time_since_trajectory_creation_ =
+                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+        }
     }
 }
 
 void PrimitiveExecutor::setStopPrimitive()
 {
-    current_primitive_ = *createStopPrimitive();
-}
-
-void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
-{
-    World new_world = World(world_msg);
-    hrvo_simulator_.updateWorld(new_world, robot_constants_, time_step_);
-
-    auto this_robot = new_world.friendlyTeam().getRobotById(robot_id_);
-    if (this_robot.has_value())
-    {
-        curr_orientation_ = this_robot->orientation();
-    }
+    current_primitive_ = *createStopPrimitiveProto();
 }
 
 void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
                                        const AngularVelocity &angular_velocity)
 {
-    hrvo_simulator_.updateRobotVelocity(
-        robot_id_, localToGlobalVelocity(local_velocity, curr_orientation_));
+    Vector actual_global_velocity = localToGlobalVelocity(local_velocity, orientation_);
+    velocity_                     = actual_global_velocity;
+    angular_velocity_             = angular_velocity;
 }
 
 Vector PrimitiveExecutor::getTargetLinearVelocity()
 {
-    Vector target_global_velocity = hrvo_simulator_.getRobotVelocity(robot_id_);
-    return globalToLocalVelocity(target_global_velocity, curr_orientation_);
+    Vector local_velocity = globalToLocalVelocity(
+        trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()),
+        orientation_);
+    Point position =
+        trajectory_path_->getPosition(time_since_trajectory_creation_.toSeconds());
+    double distance_to_destination =
+        distance(position, trajectory_path_->getDestination());
+
+    // Dampen velocity as we get closer to the destination to reduce jittering
+    if (distance_to_destination < MAX_DAMPENING_VELOCITY_DISTANCE_M)
+    {
+        local_velocity *= distance_to_destination / MAX_DAMPENING_VELOCITY_DISTANCE_M;
+    }
+    return local_velocity;
 }
 
-AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
-    const TbotsProto::MovePrimitive &move_primitive)
+AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 {
-    const Angle dest_orientation = createAngle(move_primitive.final_angle());
-    const double delta_orientation =
-        dest_orientation.minDiff(curr_orientation_).toRadians();
+    orientation_ =
+        angular_trajectory_->getPosition(time_since_trajectory_creation_.toSeconds());
 
-    // angular velocity given linear deceleration and distance remaining to target
-    // orientation.
-    // Vi = sqrt(0^2 + 2 * a * d)
-    double deceleration_angular_speed = std::sqrt(
-        2 * robot_constants_.robot_max_ang_acceleration_rad_per_s_2 * delta_orientation);
+    AngularVelocity angular_velocity =
+        angular_trajectory_->getVelocity(time_since_trajectory_creation_.toSeconds());
+    Angle orientation_to_destination =
+        orientation_.minDiff(angular_trajectory_->getDestination());
+    if (orientation_to_destination.toDegrees() < 5)
+    {
+        angular_velocity *= orientation_to_destination.toDegrees() / 5;
+    }
 
-    double max_angular_speed =
-        static_cast<double>(robot_constants_.robot_max_ang_speed_rad_per_s);
-    double next_angular_speed = std::min(max_angular_speed, deceleration_angular_speed);
-
-    const double signed_delta_orientation =
-        (dest_orientation - curr_orientation_).clamp().toRadians();
-    auto target_angular_velocity = AngularVelocity::fromRadians(
-        std::copysign(next_angular_speed, signed_delta_orientation));
-
-    // Update estimated orientation for next iteration
-    curr_orientation_ += target_angular_velocity * time_step_.toSeconds();
-
-    return target_angular_velocity;
+    return angular_velocity;
 }
 
 
-std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive()
+std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
+    TbotsProto::PrimitiveExecutorStatus &status)
 {
-    hrvo_simulator_.doStep(time_step_);
-
-    // Visualize the HRVO Simulator for the current robot
-    hrvo_simulator_.visualize(robot_id_, friendly_team_colour);
+    time_since_trajectory_creation_ += time_step_;
+    status.set_running_primitive(true);
 
     switch (current_primitive_.primitive_case())
     {
@@ -107,6 +108,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                                                      TbotsProto::AutoChipOrKick());
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
+            status.set_running_primitive(false);
             return output;
         }
         case TbotsProto::Primitive::kDirectControl:
@@ -116,14 +118,24 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
         case TbotsProto::Primitive::kMove:
         {
-            // Compute the target velocities
-            Vector target_velocity = getTargetLinearVelocity();
-            AngularVelocity target_angular_velocity =
-                getTargetAngularVelocity(current_primitive_.move());
+            if (!trajectory_path_.has_value() || !angular_trajectory_.has_value())
+            {
+                auto prim = createDirectControlPrimitive(Vector(), AngularVelocity(), 0.0,
+                                                         TbotsProto::AutoChipOrKick());
+                auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
+                    prim->direct_control());
+                LOG(INFO)
+                    << "Not moving because trajectory_path_ or angular_trajectory_ is not set";
+                return output;
+            }
+
+            Vector local_velocity            = getTargetLinearVelocity();
+            AngularVelocity angular_velocity = getTargetAngularVelocity();
 
             auto output = createDirectControlPrimitive(
-                target_velocity, target_angular_velocity,
-                current_primitive_.move().dribbler_speed_rpm(),
+                local_velocity, angular_velocity,
+                convertDribblerModeToDribblerSpeed(
+                    current_primitive_.move().dribbler_mode(), robot_constants_),
                 current_primitive_.move().auto_chip_or_kick());
 
             return std::make_unique<TbotsProto::DirectControlPrimitive>(

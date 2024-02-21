@@ -1,11 +1,12 @@
 #include "software/geom/polygon.h"
 
+#include <numeric>
 #include <unordered_set>
 
-Polygon::Polygon(const std::vector<Point>& points)
-    : points_(points), segments_(initSegments(points_))
+Polygon::Polygon(const std::vector<Point>& points) : points_(points)
 {
     // we pre-compute the segments_ in the constructor to improve performance
+    initSegments();
 }
 
 Polygon::Polygon(const std::initializer_list<Point>& points)
@@ -13,16 +14,14 @@ Polygon::Polygon(const std::initializer_list<Point>& points)
 {
 }
 
-std::vector<Segment> Polygon::initSegments(std::vector<Point> points)
+void Polygon::initSegments()
 {
-    std::vector<Segment> segments;
-    for (unsigned i = 0; i < points.size(); i++)
+    for (unsigned i = 0; i < points_.size(); i++)
     {
         // add a segment between consecutive points, but wrap index
         // to draw a segment from the last point to first point.
-        segments.emplace_back(Segment{points[i], points[(i + 1) % points.size()]});
+        segments_.emplace_back(Segment{points_[i], points_[(i + 1) % points_.size()]});
     }
-    return segments;
 }
 
 Point Polygon::centroid() const
@@ -76,48 +75,54 @@ Polygon Polygon::expand(double expansion_amount) const
     return Polygon(expanded_points);
 }
 
-Polygon Polygon::fromSegment(const Segment& segment, const double radius_parallel,
-                             const double radius_normal)
+
+Polygon Polygon::fromSegment(const Segment& segment, const double radius)
 {
-    /*   The Polygon is constructed as follows:
-     *
-     *        start_l                start_r
-     *           +----------+----------+
-     *           |          |          |
-     *           |          | radius_p |
-     *           |          |          |
-     *           +   start  X          +
-     *           |          |          |
-     *           |          |          |
-     *           |          |          |
-     *           |       segment       |
-     *           |          |          |
-     *           |          |          |
-     *           |          | radius_n |
-     *           +   end    X----------+
-     *           |                     |
-     *           |                     |
-     *           |                     |
-     *           +----------+----------+
-     *         end_l                 end_r
+    return fromSegment(segment, radius, radius);
+}
+
+Polygon Polygon::fromSegment(const Segment& segment, const double length_radius,
+                             const double width_radius)
+{
+    /*
+     * The Polygon is constructed as follows:
+     *  start_l                     start_r
+     *    ┌─────────────┬─────────────┐
+     *    │             │  l_radius   │
+     *    │             │             │
+     *    │      Start  ╳             │
+     *    │             │             │
+     *    │             │             │
+     *    │             │             │
+     *    │             │             │
+     *    │          Segment          │
+     *    │             │             │
+     *    │             │             │
+     *    │             │             │
+     *    │             │             │
+     *    │        End  ╳─────────────│
+     *    │               w_radius    │
+     *    │                           │
+     *    └───────────────────────────┘
+     *  end_l                       end_r
      */
 
     Vector start_to_end = segment.getEnd().toVector() - segment.getStart().toVector();
     Vector end_to_start = -start_to_end;
 
     Point end_l =
-        segment.getEnd() + (start_to_end.normalize(radius_parallel) -
-                            start_to_end.perpendicular().normalize(radius_normal));
+        segment.getEnd() + (start_to_end.normalize(length_radius) -
+                            start_to_end.perpendicular().normalize(width_radius));
     Point end_r =
-        segment.getEnd() + (start_to_end.normalize(radius_parallel) +
-                            start_to_end.perpendicular().normalize(radius_normal));
+        segment.getEnd() + (start_to_end.normalize(length_radius) +
+                            start_to_end.perpendicular().normalize(width_radius));
 
     Point start_l =
-        segment.getStart() + (end_to_start.normalize(radius_parallel) +
-                              end_to_start.perpendicular().normalize(radius_normal));
+        segment.getStart() + (end_to_start.normalize(length_radius) +
+                              end_to_start.perpendicular().normalize(width_radius));
     Point start_r =
-        segment.getStart() + (end_to_start.normalize(radius_parallel) -
-                              end_to_start.perpendicular().normalize(radius_normal));
+        segment.getStart() + (end_to_start.normalize(length_radius) -
+                              end_to_start.perpendicular().normalize(width_radius));
 
     return Polygon({
         start_l,
@@ -135,6 +140,13 @@ const std::vector<Segment>& Polygon::getSegments() const
 const std::vector<Point>& Polygon::getPoints() const
 {
     return points_;
+}
+
+double Polygon::perimeter() const
+{
+    return (std::accumulate(
+        segments_.begin(), segments_.end(), 0.0,
+        [](double acc, const Segment& seg) { return acc + seg.length(); }));
 }
 
 bool operator==(const Polygon& poly1, const Polygon& poly2)

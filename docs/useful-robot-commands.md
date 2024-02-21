@@ -8,6 +8,7 @@
    * [Flashing the powerboard](#flashing-the-powerboard)
    * [Setting up nano](#setting-up-nano)
    * [Robot Diagnostics](#robot-diagnostics)
+   * [Robot Auto Test](#robot-auto-test)
 * [On Robot Commands](#on-robot-commands)
    * [Systemd Services](#systemd-services)
    * [Debugging Uart](#debugging-uart)
@@ -42,9 +43,17 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 
 `bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
 
+You could also use the `tbots.py` script to flash
+
+`./tbots.py run run_ansible -f <robot_ids> -pwd <jetson_nano_password>` (Note that this uses robot IDs rather than full robot IP addresses)
+
+Example: Flashing robots 1, 4, and 7
+
+`./tbots.py run run_ansible -f 1 4 7 -pwd <jetson_nano_password>`
+
 ## Flashing the powerboard
 
-This will flash powerloop, the current firmware in `software/power/`, onto the power board. It will prompt the user into setting the powerboard into bootloader mode by holding the reset button and pressing the boot button. Then once the board is flashed, pressing the reset button after to use the new firmware.  
+This will flash powerloop, the current firmware in `software/power/`, onto the power board. It will prompt the user into setting the powerboard into bootloader mode by holding the boot button (left if looking from the back of the robot) and pressing the reset button (right if looking from the back of the robot), then releasing the reset button first, then the boot button. Once the board is flashed, pressing the reset button after to use the new firmware.  
 
 Looking from the back of the robot the reset and boot buttons are on right side of the battery holder on the lowest board with the reset being on the left and the boot on the right. <b>Warning it may kick/chip when pressed.</b>
 
@@ -77,6 +86,15 @@ From Software/src
 `./tbots.py run thunderscope --run_blue --run_diagnostics --interface <network_interface>`
 
 network_interface can be found with `ifconfig` commonly `wlp59s0` for wifi.
+
+## Robot Auto Test
+Runs the robot auto test fixture on a robot through Ansible, which tests the motor board and power board SPI and UART transfer respectively.
+
+From Software/src:
+
+`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook robot_auto_test_playbook.yml --hosts <robot-ip> --ssh_pass <jetson_nano_password>`
+* replace the <robot-ip> with the actual ip address of the jetson nano for the ssh connection.
+* replace the <jetson_nano_password> with the actual password for the jetson nano for the ssh connection.
 
 # On Robot Commands
 

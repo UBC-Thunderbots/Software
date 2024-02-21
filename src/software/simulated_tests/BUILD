@@ -63,13 +63,41 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
+        ":tbots_test_runner",
         "//proto:import_all_protos",
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests:validation",
         "//software/thunderscope",
-        "//software/thunderscope:binary_context_managers",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
+        "//software/thunderscope/replay:proto_logger",
+    ],
+)
+
+py_library(
+    name = "tbots_test_runner",
+    srcs = [
+        "tbots_test_runner.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    deps = [
+        "//proto:import_all_protos",
+        "//software/logger:py_logger",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+        "//software/simulated_tests:validation",
+        "//software/thunderscope",
+        "//software/thunderscope:config",
+        "//software/thunderscope:constants",
+        "//software/thunderscope:time_provider",
+        "//software/thunderscope/binary_context_managers:full_system",
+        "//software/thunderscope/binary_context_managers:game_controller",
+        "//software/thunderscope/binary_context_managers:simulator",
         "//software/thunderscope/replay:proto_logger",
     ],
 )
@@ -77,6 +105,7 @@ py_library(
 py_library(
     name = "validation",
     srcs = [
+        "avoid_collisions.py",
         "ball_enters_region.py",
         "ball_moves_forward.py",
         "ball_speed_threshold.py",
@@ -85,6 +114,7 @@ py_library(
         "friendly_has_ball_possession.py",
         "friendly_team_scored.py",
         "robot_enters_region.py",
+        "robot_enters_region_and_stops.py",
         "robot_speed_threshold.py",
         "validation.py",
     ],

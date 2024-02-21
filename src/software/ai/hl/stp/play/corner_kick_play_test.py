@@ -2,7 +2,7 @@ import sys
 
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.friendly_team_scored import *
@@ -20,22 +20,22 @@ def corner_kick_play_test_setup(ball_initial_pos, blue_bots, simulated_test_runn
     """
 
     yellow_bots = [
-        tbots.Point(1, 0),
-        tbots.Point(1, 2.5),
-        tbots.Point(1, -2.5),
-        tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+        tbots_cpp.Point(1, 0),
+        tbots_cpp.Point(1, 2.5),
+        tbots_cpp.Point(1, -2.5),
+        tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+        tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
+        tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
     ]
 
     # Game Controller Setup
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.NORMAL_START, team=Team.BLUE
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
@@ -56,7 +56,7 @@ def corner_kick_play_test_setup(ball_initial_pos, blue_bots, simulated_test_runn
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
             ball_location=ball_initial_pos,
-            ball_velocity=tbots.Vector(0, 0),
+            ball_velocity=tbots_cpp.Vector(0, 0),
         ),
     )
 
@@ -71,14 +71,14 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
         ),
         params=[
             {
-                "ball_initial_pos": tbots.Point(4.5, -3),
+                "ball_initial_pos": tbots_cpp.Point(4.5, -3),
                 "blue_bots": [
-                    tbots.Point(-3, 2.5),
-                    tbots.Point(-3, 1.5),
-                    tbots.Point(-3, 0.5),
-                    tbots.Point(-3, -0.5),
-                    tbots.Point(-3, -1.5),
-                    tbots.Point(4.6, -3.1),
+                    tbots_cpp.Point(-3, 2.5),
+                    tbots_cpp.Point(-3, 1.5),
+                    tbots_cpp.Point(-3, 0.5),
+                    tbots_cpp.Point(-3, -0.5),
+                    tbots_cpp.Point(-3, -1.5),
+                    tbots_cpp.Point(4.6, -3.1),
                 ],
             }
         ],
@@ -100,14 +100,14 @@ def test_corner_kick_play_top_right(simulated_test_runner):
         ),
         params=[
             {
-                "ball_initial_pos": tbots.Point(4.5, 3),
+                "ball_initial_pos": tbots_cpp.Point(4.5, 3),
                 "blue_bots": [
-                    tbots.Point(-3, 2.5),
-                    tbots.Point(0, 1.5),
-                    tbots.Point(0, 0.5),
-                    tbots.Point(0, -0.5),
-                    tbots.Point(0, -1.5),
-                    tbots.Point(4.6, 3.1),
+                    tbots_cpp.Point(-3, 2.5),
+                    tbots_cpp.Point(0, 1.5),
+                    tbots_cpp.Point(0, 0.5),
+                    tbots_cpp.Point(0, -0.5),
+                    tbots_cpp.Point(0, -1.5),
+                    tbots_cpp.Point(4.6, 3.1),
                 ],
             }
         ],

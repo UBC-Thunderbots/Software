@@ -44,6 +44,13 @@ class Polygon : public virtual Shape
     Polygon expand(double expansion_amount) const;
 
     /**
+     * Returns perimeter length of the polygon
+     *
+     * @return perimeter length of the polygon
+     */
+    double perimeter() const;
+
+    /**
      * Returns the line segments that form this polygon.
      * @return the line segments that form this polygon.
      */
@@ -58,20 +65,19 @@ class Polygon : public virtual Shape
     /**
      * Creates a rectangular polygon that is oriented along the segment.
      * @param segment segment along which to construct the rectangular polygon
-     * @param distance to the nearest perpendicular edge from both the start and end
-     * points
-     * @param distance to the nearest parallel edge from the start and the end points
+     * @param length_radius How much each end of the segment should be elongated by
+     * @param width_radius How wide should the polygon be, measured from the segment
      * @return an oriented polygon along the 2 points that contains both points.
      */
-    static Polygon fromSegment(const Segment& segment, const double radius_parallel,
-                               const double radius_normal);
+    static Polygon fromSegment(const Segment& segment, double length_radius,
+                               double width_radius);
+    static Polygon fromSegment(const Segment& segment, double radius);
 
    protected:
     /**
-     * Returns the line segments that connect a list of points.
-     * @return the line segments
+     * Initializes the segments_ vector
      */
-    static std::vector<Segment> initSegments(std::vector<Point> points);
+    void initSegments();
 
     std::vector<Point> points_;
     std::vector<Segment> segments_;

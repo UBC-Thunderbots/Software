@@ -10,7 +10,7 @@
 #include "software/ai/hl/stp/play/kickoff_friendly_play.h"
 #include "software/ai/hl/stp/play/offense/offense_play.h"
 #include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play.h"
-#include "software/ai/hl/stp/play/penalty_kick_enemy_play.h"
+#include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
 #include "software/ai/hl/stp/play/stop_play.h"
 
 
@@ -95,7 +95,5 @@ void PlaySelectionFSM::setupHaltPlay(const Update& event)
 
 void PlaySelectionFSM::setupOffensePlay(const Update& event)
 {
-    // TODO (2440): We should have smarter logic for analysing the state of play to
-    // configure which robots should do what
     event.set_current_play(std::make_unique<OffensePlay>(ai_config));
 }

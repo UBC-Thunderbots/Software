@@ -1,6 +1,6 @@
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_moves_forward import *
@@ -28,10 +28,10 @@ STOPPING_SPEED = 0.01
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity",
     [
-        (tbots.Point(-3.5, 0), tbots.Vector(2, 0),),
-        (tbots.Point(-3.5, 2), tbots.Vector(3, -2),),
-        (tbots.Point(-3.5, -2), tbots.Vector(3, 2),),
-        (tbots.Point(4.5, 3), tbots.Vector(-3.5, -2),),
+        (tbots_cpp.Point(-3.5, 0), tbots_cpp.Vector(2, 0),),
+        (tbots_cpp.Point(-3.5, 2), tbots_cpp.Vector(3, -2),),
+        (tbots_cpp.Point(-3.5, -2), tbots_cpp.Vector(3, 2),),
+        (tbots_cpp.Point(4.5, 3), tbots_cpp.Vector(-3.5, -2),),
     ],
 )
 def test_simulator_move_ball(
@@ -82,21 +82,21 @@ def test_simulator_move_ball(
 
     # Eventually Validation
     eventually_validation_sequence_set = [
-        [BallEventuallyStopsInRegion([tbots.Circle(ball_expected_position, 0.1)]),]
+        [BallEventuallyStopsInRegion([tbots_cpp.Circle(ball_expected_position, 0.1)]),]
     ]
 
     simulated_test_runner.run_test(
         test_timeout_s=8,
-        eventually_validation_sequence_set=eventually_validation_sequence_set,
-        always_validation_sequence_set=always_validation_sequence_set,
+        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        inv_always_validation_sequence_set=always_validation_sequence_set,
     )
 
 
 def test_ball_robot_collision(simulated_test_runner):
 
-    ball_initial_position = tbots.Field.createSSLDivisionBField().centerPoint()
-    ball_initial_velocity = tbots.Vector(2.5, 0)
-    robot_position = tbots.Point(2.5, 0)
+    ball_initial_position = tbots_cpp.Field.createSSLDivisionBField().centerPoint()
+    ball_initial_velocity = tbots_cpp.Vector(2.5, 0)
+    robot_position = tbots_cpp.Point(2.5, 0)
 
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -159,14 +159,14 @@ def test_ball_robot_collision(simulated_test_runner):
     eventually_validation_sequence_set = [
         [
             BallEventuallyStopsInRegion(
-                [tbots.Circle(robot_position, distance_from_robot)]
+                [tbots_cpp.Circle(robot_position, distance_from_robot)]
             ),
         ]
     ]
 
     simulated_test_runner.run_test(
-        eventually_validation_sequence_set=eventually_validation_sequence_set,
-        always_validation_sequence_set=always_validation_sequence_set,
+        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        inv_always_validation_sequence_set=always_validation_sequence_set,
     )
 
 

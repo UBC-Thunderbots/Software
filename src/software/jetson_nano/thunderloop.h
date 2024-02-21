@@ -1,5 +1,6 @@
 #pragma once
 #include <chrono>
+#include <csignal>
 #include <iostream>
 #include <thread>
 
@@ -44,9 +45,11 @@ class Thunderloop
      *
      *
      * @param robot_constants The robot constants
+     * @param enable_log_merging Whether to merge repeated log message or not
      * @param loop_hz The rate to run the loop
      */
-    Thunderloop(const RobotConstants_t &robot_constants, const int loop_hz);
+    Thunderloop(const RobotConstants_t &robot_constants, bool enable_log_merging,
+                const int loop_hz);
 
     ~Thunderloop();
 
@@ -89,6 +92,11 @@ class Thunderloop
      */
     double getNanoseconds(timespec time);
 
+    /**
+     * Updates ErrorCodes for BAT, CAP, CPU TEMP if over thresholds
+     */
+    void updateErrorCodes();
+
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
@@ -103,6 +111,7 @@ class Thunderloop
     std::optional<TbotsProto::MotorStatus> motor_status_;
     TbotsProto::ThunderloopStatus thunderloop_status_;
     TbotsProto::ChipperKickerStatus chipper_kicker_status_;
+    TbotsProto::PrimitiveExecutorStatus primitive_executor_status_;
     TbotsProto::Timestamp time_sent_;
 
     // Current State
@@ -114,7 +123,7 @@ class Thunderloop
     int loop_hz_;
 
     // Calibrated power service constants
-    int kick_slope_;
+    double kick_coeff_;
     int kick_constant_;
     int chip_pulse_width_;
 
@@ -123,9 +132,6 @@ class Thunderloop
 
     // 500 millisecond timeout on receiving primitives before we stop the robots
     const double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
-
-    // 500 millisecond timeout on receiving world before we stop the robots
-    const double WORLD_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
 
     // Path to the CPU thermal zone temperature file
     const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone1/temp";

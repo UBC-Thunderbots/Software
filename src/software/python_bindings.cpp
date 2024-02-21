@@ -7,10 +7,13 @@
 #include <sstream>
 
 #include "proto/geometry.pb.h"
+#include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/parameters.pb.h"
+#include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
+#include "proto/ssl_autoref_ci.pb.h"
 #include "proto/ssl_gc_referee_message.pb.h"
 #include "proto/ssl_vision_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -64,8 +67,8 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(
-            py::init<std::string, unsigned short, const std::function<void(T)>&, bool>());
+        .def(py::init<std::string, unsigned short, const std::function<void(T)>&, bool>())
+        .def("close", &Class::close);
 }
 
 /**
@@ -120,6 +123,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
         .def("rotate", &Vector::rotate)
         .def("orientation", &Vector::orientation)
+        .def("dot", &Vector::dot)
         // Overloaded
         .def(py::self + py::self)
         .def(py::self += py::self)
@@ -250,6 +254,8 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createVectorProto", &createVectorProto);
     m.def("createSegmentProto", &createSegmentProto);
 
+    m.def("createGeometryData", &createGeometryData);
+
     m.def("contains", py::overload_cast<const Circle&, const Segment&>(&contains));
     m.def("contains", py::overload_cast<const Circle&, const Point&>(&contains));
     m.def("contains", py::overload_cast<const Polygon&, const Point&>(&contains));
@@ -328,6 +334,7 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");
     declareThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>(m, "SSLWrapperPacket");
+    declareThreadedProtoUdpListener<TbotsProto::RobotCrash>(m, "RobotCrash");
 
     // Senders
     declareThreadedProtoUdpSender<TbotsProto::World>(m, "World");
@@ -339,4 +346,10 @@ PYBIND11_MODULE(python_bindings, m)
         m, "ThreadedEstopReader")
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
+
+    py::enum_<EstopState>(m, "EstopStates")
+        .value("STOP", EstopState::STOP)
+        .value("PLAY", EstopState::PLAY)
+        .value("STATUS_ERROR", EstopState::STATUS_ERROR)
+        .export_values();
 }

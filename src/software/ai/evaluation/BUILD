@@ -102,6 +102,31 @@ cc_test(
 )
 
 cc_library(
+    name = "defender_assignment",
+    srcs = ["defender_assignment.cpp"],
+    hdrs = ["defender_assignment.h"],
+    deps = [
+        "//software/ai/evaluation:enemy_threat",
+        "//software/geom:point",
+        "//software/geom:segment",
+        "//software/geom/algorithms",
+        "//software/math:math_functions",
+        "//software/world:field",
+    ],
+)
+
+cc_test(
+    name = "defender_assignment_test",
+    srcs = ["defender_assignment_test.cpp"],
+    deps = [
+        ":defender_assignment",
+        "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_library(
     name = "enemy_threat",
     srcs = ["enemy_threat.cpp"],
     hdrs = ["enemy_threat.h"],
@@ -195,6 +220,9 @@ cc_library(
     deps = [
         ":intercept",
         ":shot",
+        "//software/geom/algorithms",
+        "//software/time:duration",
+        "//software/time:timestamp",
         "//software/world",
     ],
 )

@@ -1,6 +1,7 @@
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
+from software.py_constants import *
 
 
 class FloatSlider(QSlider):
@@ -78,7 +79,7 @@ class ColorProgressBar(QProgressBar):
         self.decimals = 10 ** decimals
 
         super(ColorProgressBar, self).setRange(
-            min_val * self.decimals, max_val * self.decimals
+            int(min_val * self.decimals), int(max_val * self.decimals)
         )
 
         super(ColorProgressBar, self).setStyleSheet(
@@ -133,6 +134,41 @@ class ColorProgressBar(QProgressBar):
 
     def value(self):
         return float(super(ColorProgressBar, self).value()) / self.decimals
+
+
+class ToggleableButton(QPushButton):
+    """
+    A QPushButton which can be enabled or disabled
+    Indicates with cursor if it is enabled or disabled
+    """
+
+    def __init__(self, enabled: bool):
+        """
+        Creates a new button with the given state
+
+        :param enabled: the starting state of the button
+        """
+        super(ToggleableButton, self).__init__()
+        self.enabled = enabled
+
+    def toggle_enabled(self, enabled: bool):
+        """
+        Toggles the enabled state of the button
+        :param enabled: the new enabled state
+        """
+        self.enabled = enabled
+
+    def enterEvent(self, event) -> None:
+        """
+        Sets the cursor to depending on if the button is enabled
+        to indicate that this widget is clickable or unclickable
+        :param event: the mouse enter event
+        """
+        self.setCursor(
+            QtCore.Qt.CursorShape.PointingHandCursor
+            if self.enabled
+            else QtCore.Qt.CursorShape.ForbiddenCursor
+        )
 
 
 def create_buttons(text: list):
@@ -212,11 +248,13 @@ def create_slider_abs(slider, text, min_val, max_val, tick_spacing):
     slider.setTickPosition(QSlider.TickPosition.NoTicks)
     slider.setTickInterval(tick_spacing)
 
-    value_label = QLabel(str(slider.value()))
-    slider_label = QLabel(str(text))
-
     vbox = QVBoxLayout()
-    vbox.addWidget(slider_label)
+
+    if text:
+        slider_label = QLabel(str(text))
+        vbox.addWidget(slider_label)
+
+    value_label = QLabel(str(slider.value()))
     vbox.addWidget(value_label)
     vbox.addWidget(slider)
 
@@ -382,3 +420,21 @@ def draw_robot(painter, rect, start_angle_degree, span_angle_degree):
     painter.drawChord(
         rect, start_angle_degree * convert_degree, span_angle_degree * convert_degree,
     )
+
+
+def display_tooltip(event, tooltip_text):
+    """
+    Checks given event to see if it is an Enter or Leave event
+    Upon Enter, displays a tooltip with the given text
+    Upon Leave, hides the tooltip
+    :param event: event to check
+    :param tooltip_text: the text to display in the tooltip
+    """
+    if str(event.type()) == "Type.Enter":
+        QToolTip.showText(
+            QPoint(int(event.globalPosition().x()), int(event.globalPosition().y()),),
+            tooltip_text,
+            msecShowTime=20 * MILLISECONDS_PER_SECOND,
+        )
+    elif str(event.type()) == "Type.Leave":
+        QToolTip.hideText()

@@ -2,7 +2,8 @@
 #include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "software/ai/navigator/path_planner/hrvo/hrvo_simulator.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
+#include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
 
@@ -34,14 +35,6 @@ class PrimitiveExecutor
     void setStopPrimitive();
 
     /**
-     * Update primitive executor with a new World
-     * @param world_msg Protobuf representation of the current World (World from the
-     * perspective of the team which the robot with this Primitive Executor is a member
-     * of)
-     */
-    void updateWorld(const TbotsProto::World &world_msg);
-
-    /**
      * Update primitive executor with the current velocity of the robot
      *
      * @param local_velocity The current _local_ velocity
@@ -59,10 +52,13 @@ class PrimitiveExecutor
     /**
      * Steps the current primitive and returns a direct control primitive with the
      * target wheel velocities
+     * @param status The status of the primitive executor, set to false if current
+     * primitive is a Stop primitive
      *
      * @returns DirectControlPrimitive The direct control primitive msg
      */
-    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive();
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
+        TbotsProto::PrimitiveExecutorStatus &status);
 
    private:
     /*
@@ -72,24 +68,31 @@ class PrimitiveExecutor
     Vector getTargetLinearVelocity();
 
     /*
-     * Compute the next target angular velocity the robot should be at
-     * assuming max acceleration.
+     * Returns the next target angular velocity the robot
      *
-     * @param move_primitive The MovePrimitive to compute the angular velocity for
-     * @param curr_orientation The current orientation of the robot which is running this
-     * Primitive Executor
      * @returns AngularVelocity The target angular velocity
      */
-    AngularVelocity getTargetAngularVelocity(
-        const TbotsProto::MovePrimitive &move_primitive);
+    AngularVelocity getTargetAngularVelocity();
 
     TbotsProto::Primitive current_primitive_;
-    TeamColour friendly_team_colour;
+    Duration time_since_trajectory_creation_;
+    Vector velocity_;
+    AngularVelocity angular_velocity_;
+    Angle orientation_;
+    TeamColour friendly_team_colour_;
     RobotConstants_t robot_constants_;
-    HRVOSimulator hrvo_simulator_;
+    std::optional<TrajectoryPath> trajectory_path_;
+    std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
 
+    // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
     // time step to be used, in Seconds
     Duration time_step_;
-    Angle curr_orientation_;
     RobotId robot_id_;
+
+    // Estimated delay between a vision frame to AI processing to robot executing
+    static constexpr double VISION_TO_ROBOT_DELAY_S = 0.03;
+
+    // The distance away from the destination at which we start dampening the velocity
+    // to avoid jittering around the destination.
+    static constexpr double MAX_DAMPENING_VELOCITY_DISTANCE_M = 0.05;
 };

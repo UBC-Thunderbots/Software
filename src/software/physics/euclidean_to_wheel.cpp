@@ -86,7 +86,7 @@ WheelSpace_t EuclideanToWheel::rampWheelVelocity(
     const double& time_to_ramp)
 {
     double allowed_acceleration =
-        static_cast<double>(robot_constants_.robot_max_acceleration_m_per_s_2);
+        static_cast<double>(robot_constants_.motor_max_acceleration_m_per_s_2);
     double max_allowable_wheel_velocity =
         static_cast<double>(robot_constants_.robot_max_speed_m_per_s);
 
