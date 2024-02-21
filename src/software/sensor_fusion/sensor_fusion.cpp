@@ -158,7 +158,7 @@ void SensorFusion::updateWorld(
 
         for (const auto &error_code_msg : robot_status_msg.error_code())
         {
-            if (error_code_msg == TbotsProto::ErrorCode::LOW_CAP)
+            if (error_code_msg == TbotsProto::ErrorCode::HIGH_CAP)
             {
                 unavailableCapabilities.insert(RobotCapability::Kick);
                 unavailableCapabilities.insert(RobotCapability::Chip);
