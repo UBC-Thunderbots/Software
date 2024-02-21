@@ -402,8 +402,11 @@ void SensorFusion::resetWorldComponents()
     possession           = TeamPossession::FRIENDLY_TEAM;
 }
 
-void SensorFusion::detectInjuredRobots(const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
+void SensorFusion::detectInjuredRobots(const std::vector<TbotsProto::RobotStatus> &robot_status_msgs)
 {
+
+    /* potential improvement: add short circuit logic when an error is detected */
+
     std::vector<RobotId> injured_robot_ids;
     auto world = getWorld();
 
@@ -411,6 +414,7 @@ void SensorFusion::detectInjuredRobots(const google::protobuf::RepeatedPtrField<
     for (auto &robot_status_msg : robot_status_msgs)
     {
         RobotId robot_id = robot_status_msg.robot_id();
+        bool has_error = false;
 
         // Note: each check is not continuing when the robot is identified as injured
 
@@ -419,8 +423,7 @@ void SensorFusion::detectInjuredRobots(const google::protobuf::RepeatedPtrField<
         {
             if (error_code_msg != TbotsProto::ErrorCode::NO_ERROR)
             {
-                injured_robot_ids.push_back(robot_id);
-                continue;
+                has_error = true;
             }
         }
 
@@ -438,12 +441,10 @@ void SensorFusion::detectInjuredRobots(const google::protobuf::RepeatedPtrField<
             /* currently only substituting for driver overtemperature or its prewarning */
             for(auto motor_fault: motor_faults){
                 if(motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE || motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING){
-                    injured_robot_ids.push_back(robot_id);
-                    continue;
+                    has_error = true;
                 }
             }
         }
-
 
         /* break beam check */
         auto power_status_msg = robot_status_msg.power_status();
@@ -454,9 +455,12 @@ void SensorFusion::detectInjuredRobots(const google::protobuf::RepeatedPtrField<
             
             /* check if the robot has the ball, reference distance 2m */
             if(dist_vector->length() > 2){
-                injured_robot_ids.push_back(robot_id);
-                continue;
+                has_error = true;
             }
+        }
+
+        if(has_error){
+            injured_robot_ids.push_back(robot_id);
         }
     }
 

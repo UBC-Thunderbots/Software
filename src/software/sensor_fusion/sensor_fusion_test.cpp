@@ -876,3 +876,81 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
     result = *sensor_fusion.getWorld();
     EXPECT_EQ(initWorld(), result);
 }
+TEST_F(SensorFusionTest, test_detect_injured_robots_with_no_error){
+    
+    /* create a list of robot status messages */
+    std::vector<TbotsProto::RobotStatus> robot_status_msgs;
+    for(int i = 0; i < 5; i++){
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(i);
+        robot_status_msgs.push_back(*robot_msg);
+    }
+
+    /* call detect error on a list of normal robots */
+    sensor_fusion = SensorFusion(config);
+    sensor_fusion.detectInjuredRobots(robot_status_msgs);
+
+    /* test to see if any robots gets added to injured_robots */
+    ASSERT_TRUE(sensor_fusion.getWorld());
+    auto world = sensor_fusion.getWorld();
+    auto friendly_team = world->friendlyTeam();
+    std::vector<Robot> injured_robots = friendly_team.getInjuredRobots();
+    EXPECT_EQ(injured_robots.size(), 0);
+}
+
+TEST_F(SensorFusionTest, test_detect_one_injured_robot_with_low_cap){
+    std::vector<TbotsProto::RobotStatus> robot_status_msgs;
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(0);
+    robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_CAP);
+    robot_status_msgs.push_back(*robot_msg);
+
+    robot_msg->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    for(int i = 1; i < 5; i++){
+        robot_msg->set_robot_id(i);
+        robot_status_msgs.push_back(*robot_msg);
+    }
+
+    sensor_fusion = SensorFusion(config);
+    sensor_fusion.detectInjuredRobots(robot_status_msgs);
+
+    ASSERT_TRUE(sensor_fusion.getWorld());
+    auto world = sensor_fusion.getWorld();
+    auto friendly_team = world->friendlyTeam();
+    std::vector<Robot> injured_robots = friendly_team.getInjuredRobots();
+    EXPECT_EQ(injured_robots.size(), 1);
+    EXPECT_EQ(injured_robots[0].id(), 0);
+}
+
+TEST_F(SensorFusionTest, test_detect_multiple_injured_robots_with_error_codes){
+    std::vector<TbotsProto::RobotStatus> robot_status_msgs;
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(0);
+    robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_BATTERY);
+    robot_status_msgs.push_back(*robot_msg);
+
+    robot_msg->set_robot_id(1);
+    robot_msg->add_error_code(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
+    robot_status_msgs.push_back(*robot_msg);
+
+    robot_status_msgs.push_back(*robot_status_msg_dribble_motor_hot);
+
+    robot_msg->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    for(int i = 3; i < 5; i++){
+        robot_msg->set_robot_id(i);
+        robot_status_msgs.push_back(*robot_msg);
+    }
+
+    sensor_fusion = SensorFusion(config);
+    sensor_fusion.detectInjuredRobots(robot_status_msgs);
+
+    ASSERT_TRUE(sensor_fusion.getWorld());
+    auto world = sensor_fusion.getWorld();
+    auto friendly_team = world->friendlyTeam();
+    std::vector<Robot> injured_robots = friendly_team.getInjuredRobots();
+    EXPECT_EQ(injured_robots.size(), 3);
+    
+    for(int i = 0; i < 3; i++){
+        EXPECT_EQ(injured_robots[i].id(), i);
+    }
+}
