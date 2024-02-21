@@ -4,13 +4,14 @@ from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
 
-import textwrap
+import functools
 import numpy as np
 
 from software.thunderscope.constants import *
 
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.layers.gl_measure_layer import GLMeasureLayer
+from software.thunderscope.gl.widgets.gl_field_toolbar import GLFieldToolbar
 from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.replay_controls import ReplayControls
 from software.thunderscope.gl.helpers.extended_gl_view_widget import *
@@ -21,10 +22,11 @@ class GLWidget(QWidget):
     and our AI. GLWidget can also provide replay controls.
     """
 
-    def __init__(self, player: ProtoPlayer = None) -> None:
+    def __init__(self, player: ProtoPlayer = None, sandbox_mode: bool = False) -> None:
         """Initialize the GLWidget
 
         :param player: The replay player to optionally display media controls for
+        :param sandbox_mode: if sandbox mode should be enabled
 
         """
         super().__init__()
@@ -47,88 +49,17 @@ class GLWidget(QWidget):
             self.mouse_in_scene_moved
         )
 
-        # Stylesheet for toolbar buttons
-        tool_button_stylesheet = textwrap.dedent(
-            """
-            QPushButton {
-                color: #969696;
-                background-color: transparent;
-                border-color: transparent;
-                border-width: 4px;
-                border-radius: 4px;
-                height: 16px;
-            }
-            QPushButton:hover {
-                background-color: #363636;
-                border-color: #363636;
-            }
-            """
-        )
-
-        # Setup Layers button for toggling visibility of layers
-        self.layers_button = QPushButton()
-        self.layers_button.setText("Layers")
-        self.layers_button.setStyleSheet(tool_button_stylesheet)
-        self.layers_menu = QMenu()
-        self.layers_menu_actions = {}
-        self.layers_button.setMenu(self.layers_menu)
-
-        # Set up View button for setting the camera position to standard views
-        self.camera_view_button = QPushButton()
-        self.camera_view_button.setText("View")
-        self.camera_view_button.setStyleSheet(tool_button_stylesheet)
-        self.camera_view_menu = QMenu()
-        self.camera_view_button.setMenu(self.camera_view_menu)
-        self.camera_view_actions = [
-            QtGui.QAction("[1] Orthographic Top Down"),
-            QtGui.QAction("[2] Landscape High Angle"),
-            QtGui.QAction("[3] Left Half High Angle"),
-            QtGui.QAction("[4] Right Half High Angle"),
-        ]
-        self.camera_view_actions[0].triggered.connect(
-            lambda: self.set_camera_view(CameraView.ORTHOGRAPHIC)
-        )
-        self.camera_view_actions[1].triggered.connect(
-            lambda: self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
-        )
-        self.camera_view_actions[2].triggered.connect(
-            lambda: self.set_camera_view(CameraView.LEFT_HALF_HIGH_ANGLE)
-        )
-        self.camera_view_actions[3].triggered.connect(
-            lambda: self.set_camera_view(CameraView.RIGHT_HALF_HIGH_ANGLE)
-        )
-        for camera_view_action in self.camera_view_actions:
-            self.camera_view_menu.addAction(camera_view_action)
-
-        # Setup Measure button for enabling/disabling measure mode
+        # Setup toolbar
         self.measure_mode_enabled = False
         self.measure_layer = None
-        self.measure_button = QPushButton()
-        self.measure_button.setText("Measure")
-        self.measure_button.setStyleSheet(tool_button_stylesheet)
-        self.measure_button.setShortcut("m")
-        self.measure_button.clicked.connect(lambda: self.toggle_measure_mode())
-
-        # Setup Help button
-        self.help_button = QPushButton()
-        self.help_button.setText("Help")
-        self.help_button.setStyleSheet(tool_button_stylesheet)
-        self.help_button.clicked.connect(
-            lambda: QMessageBox.information(self, "Help", THUNDERSCOPE_HELP_TEXT)
+        self.layers_menu = QMenu()
+        self.layers_menu_actions = {}
+        self.toolbar = GLFieldToolbar(
+            on_camera_view_change=self.set_camera_view,
+            on_measure_mode=self.toggle_measure_mode,
+            layers_menu=self.layers_menu,
+            sandbox_mode=sandbox_mode,
         )
-
-        # Setup toolbar
-        self.toolbar = QWidget()
-        self.toolbar.setSizePolicy(
-            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed
-        )
-        self.toolbar.setStyleSheet("background-color: black;" "padding: 0px;")
-        self.toolbar.setLayout(QHBoxLayout())
-        self.toolbar.layout().addWidget(self.layers_button)
-        self.toolbar.layout().addStretch()
-        self.toolbar.layout().addWidget(self.help_button)
-        self.toolbar.layout().addWidget(self.measure_button)
-        self.toolbar.layout().addWidget(self.camera_view_button)
 
         # Setup layout
         self.layout = QVBoxLayout()
@@ -251,27 +182,31 @@ class GLWidget(QWidget):
         """
         self.layers.append(layer)
 
-        if not visible:
-            layer.hide()
-
         # Add the layer to the Layer menu
-
         # Not using a checkable QAction in order to prevent menu from closing
         # when an action is pressed
         layer_checkbox = QCheckBox(layer.name, self.layers_menu)
         layer_checkbox.setStyleSheet("QCheckBox { padding: 0px 8px; }")
-        layer_checkbox.setChecked(layer.visible())
-        layer_checkbox.stateChanged.connect(
-            lambda: layer.setVisible(layer_checkbox.isChecked())
-        )
-
+        layer_checkbox.setChecked(visible)
         layer_action = QWidgetAction(self.layers_menu)
         layer_action.setDefaultWidget(layer_checkbox)
-
         self.layers_menu_actions[layer.name] = layer_action
         self.layers_menu.addAction(layer_action)
 
-        self.gl_view_widget.addItem(layer)
+        # Add layer and its related layers to the scene
+        while layer:
+            self.gl_view_widget.addItem(layer)
+            layer.setVisible(visible)
+
+            # Connect visibility of all related layers to the same item
+            # in the layer menu
+            layer_checkbox.stateChanged.connect(
+                functools.partial(
+                    lambda l: l.setVisible(layer_checkbox.isChecked()), layer
+                )
+            )
+
+            layer = layer.related_layer
 
     def remove_layer(self, layer: GLLayer) -> None:
         """Remove a layer from this GLWidget
@@ -280,11 +215,15 @@ class GLWidget(QWidget):
 
         """
         self.layers.remove(layer)
-        self.gl_view_widget.removeItem(layer)
 
         # Remove the layer from the Layer menu
         layer_action = self.layers_menu_actions[layer.name]
         self.layers_menu.removeAction(layer_action)
+
+        # Remove layer its related layers from the scene
+        while layer:
+            self.gl_view_widget.removeItem(layer)
+            layer = layer.related_layer
 
     def refresh(self) -> None:
         """Trigger an update on all the layers"""
@@ -297,9 +236,14 @@ class GLWidget(QWidget):
         if self.isVisible() == False:
             return
 
+        if self.toolbar:
+            self.toolbar.refresh()
+
         for layer in self.layers:
-            if layer.visible():
-                layer.refresh_graphics()
+            while layer:
+                if layer.visible():
+                    layer.refresh_graphics()
+                layer = layer.related_layer
 
     def set_camera_view(self, camera_view: CameraView) -> None:
         """Set the camera position to a preset camera view
@@ -310,9 +254,12 @@ class GLWidget(QWidget):
         self.gl_view_widget.reset()
         if camera_view == CameraView.ORTHOGRAPHIC:
             self.gl_view_widget.setCameraPosition(
-                pos=pg.Vector(0, 0, 0), distance=1100, elevation=90, azimuth=-90
+                pos=pg.Vector(0, 0, 0),
+                distance=self.calc_orthographic_distance(),
+                elevation=90,
+                azimuth=-90,
             )
-            self.gl_view_widget.setCameraParams(fov=1.0)
+            self.gl_view_widget.setCameraParams(fov=ORTHOGRAPHIC_FOV_DEGREES)
         elif camera_view == CameraView.LANDSCAPE_HIGH_ANGLE:
             self.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(0, -0.5, 0), distance=13, elevation=45, azimuth=-90
@@ -344,3 +291,24 @@ class GLWidget(QWidget):
             self.add_layer(self.measure_layer)
         else:
             self.remove_layer(self.measure_layer)
+
+    def calc_orthographic_distance(self) -> float:
+        """Calculates the distance of the camera above the field so that the field occupies the entire viewport"""
+
+        field = DEFAULT_EMPTY_FIELD_WORLD.field
+        buffer_size = 0.5
+        distance = np.tan(np.deg2rad(90 - ORTHOGRAPHIC_FOV_DEGREES / 2))
+
+        viewport_w_to_h = self.gl_view_widget.width() / self.gl_view_widget.height()
+
+        half_x_length_with_buffer = field.field_x_length / 2 + buffer_size
+        half_y_length_with_buffer = field.field_y_length / 2 + buffer_size
+
+        # Constrained vertically
+        if viewport_w_to_h > half_x_length_with_buffer / half_y_length_with_buffer:
+            distance *= half_y_length_with_buffer * viewport_w_to_h
+        # Constrained horizontally
+        else:
+            distance *= half_x_length_with_buffer
+
+        return distance

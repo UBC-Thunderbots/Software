@@ -37,6 +37,7 @@ class GLRobotOutline(GLShape):
             fill_color=fill_color,
             line_width=line_width,
         )
+        self._update_shape_data()
 
     @staticmethod
     def get_robot_outline(
@@ -87,5 +88,5 @@ class GLRobotOutline(GLShape):
 
         if self.fill_graphic:
             faces = triangulate.earclip(self.points)
-            meshdata = MeshData(vertexes=vertices, faces=np.array(faces))
+            meshdata = MeshData(vertexes=self.points, faces=np.array(faces))
             self.fill_graphic.setMeshData(meshdata=meshdata)

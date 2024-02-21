@@ -1,11 +1,12 @@
 #include "software/geom/polygon.h"
 
+#include <numeric>
 #include <unordered_set>
 
-Polygon::Polygon(const std::vector<Point>& points)
-    : points_(points), segments_(initSegments(points_))
+Polygon::Polygon(const std::vector<Point>& points) : points_(points)
 {
     // we pre-compute the segments_ in the constructor to improve performance
+    initSegments();
 }
 
 Polygon::Polygon(const std::initializer_list<Point>& points)
@@ -13,16 +14,14 @@ Polygon::Polygon(const std::initializer_list<Point>& points)
 {
 }
 
-std::vector<Segment> Polygon::initSegments(std::vector<Point> points)
+void Polygon::initSegments()
 {
-    std::vector<Segment> segments;
-    for (unsigned i = 0; i < points.size(); i++)
+    for (unsigned i = 0; i < points_.size(); i++)
     {
         // add a segment between consecutive points, but wrap index
         // to draw a segment from the last point to first point.
-        segments.emplace_back(Segment{points[i], points[(i + 1) % points.size()]});
+        segments_.emplace_back(Segment{points_[i], points_[(i + 1) % points_.size()]});
     }
-    return segments;
 }
 
 Point Polygon::centroid() const
@@ -75,6 +74,7 @@ Polygon Polygon::expand(double expansion_amount) const
 
     return Polygon(expanded_points);
 }
+
 
 Polygon Polygon::fromSegment(const Segment& segment, const double radius)
 {
@@ -140,6 +140,13 @@ const std::vector<Segment>& Polygon::getSegments() const
 const std::vector<Point>& Polygon::getPoints() const
 {
     return points_;
+}
+
+double Polygon::perimeter() const
+{
+    return (std::accumulate(
+        segments_.begin(), segments_.end(), 0.0,
+        [](double acc, const Segment& seg) { return acc + seg.length(); }));
 }
 
 bool operator==(const Polygon& poly1, const Polygon& poly2)

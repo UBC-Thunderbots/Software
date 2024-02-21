@@ -185,3 +185,47 @@ TEST(NavigatorObstacleTest, circle_obstacle_intersects)
     EXPECT_TRUE(obstacle->intersects(intersecting_segment));
     EXPECT_FALSE(obstacle->intersects(non_intersecting_segment));
 }
+
+TEST(NavigatorObstacleTest, create_from_stadium)
+{
+    Stadium expected = Stadium(Point(0, 0), Point(6, 2), 2);
+    GeomObstacle<Stadium> stadium_obstacle(expected);
+
+    EXPECT_EQ(expected, stadium_obstacle.getGeom());
+}
+
+TEST(NavigatorObstacleTest, stadium_obstacle_stream_operator_test)
+{
+    Stadium expected = Stadium(Point(0, 0), Point(6, 2), 2);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Stadium>>(expected));
+
+    // we expect that the stream operator string for ObstaclePtr with shape Circle will
+    // contain the stream operator string for Circle
+    std::ostringstream stadium_ss;
+    stadium_ss << expected;
+    EXPECT_TRUE(obstacle->toString().find(stadium_ss.str()) != std::string::npos);
+}
+
+TEST(NavigatorObstacleTest, stadium_obstacle_contains)
+{
+    Stadium stadium(Point(-1, 0), Point(2, 0), 2);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Stadium>>(stadium));
+    Point inside_point(0, -1);
+    Point outside_point(5, 5);
+
+    EXPECT_TRUE(obstacle->contains(inside_point));
+    EXPECT_FALSE(obstacle->contains(outside_point));
+}
+
+TEST(NavigatorObstacleTest, stadium_obstacle_intersects)
+{
+    Stadium stadium(Point(-1, 0), Point(2, 0), 5);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Stadium>>(stadium));
+    Point inside_point(0, -1);
+    Point outside_point(5, 5);
+    Segment intersecting_segment(inside_point, outside_point);
+    Segment non_intersecting_segment(Point(5, 6), outside_point);
+
+    EXPECT_TRUE(obstacle->intersects(intersecting_segment));
+    EXPECT_FALSE(obstacle->intersects(non_intersecting_segment));
+}

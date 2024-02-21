@@ -5,12 +5,10 @@ cc_library(
     testonly = True,
     srcs = [
         "equal_within_tolerance.cpp",
-        "path_planning_test_util.cpp",
         "test_util.cpp",
     ],
     hdrs = [
         "equal_within_tolerance.h",
-        "path_planning_test_util.h",
         "test_util.h",
     ],
     deps = [
@@ -25,6 +23,7 @@ cc_library(
         "//software/geom:geom_constants",
         "//software/geom:point",
         "//software/geom:polygon",
+        "//software/geom:stadium",
         "//software/geom:vector",
         "//software/geom/algorithms",
         "//software/logger",
