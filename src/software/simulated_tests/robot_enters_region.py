@@ -23,7 +23,6 @@ class RobotEntersRegion(Validation):
         :returns: FAILING until a robot enters any of the regions
                   PASSING when a robot enters
         """
-        num_robots = self.num_robots
         for region in self.regions:
             for robot in world.friendly_team.team_robots:
                 if tbots_cpp.contains(
