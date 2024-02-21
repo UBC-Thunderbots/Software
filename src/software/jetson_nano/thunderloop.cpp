@@ -2,6 +2,7 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_crash_msg.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
@@ -14,7 +15,7 @@
 #include "software/world/team.h"
 
 /**
- * https://rt.wiki.kernel.org/index.php/Squarewave-example
+ * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
  * using clock_nanosleep of librt
  */
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
@@ -65,7 +66,7 @@ extern "C"
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
                          const int loop_hz)
-    // TODO (#2495): Set the friendly team colour once we receive World proto
+    // TODO (#2495): Set the friendly team colour
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
       motor_status_(std::nullopt),
@@ -104,7 +105,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
 
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
-        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+        PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
@@ -178,9 +179,7 @@ Thunderloop::~Thunderloop() {}
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
-                auto result       = network_service_->poll(robot_status_);
-                new_primitive_set = std::get<0>(result);
-                new_world         = std::get<1>(result);
+                new_primitive_set = network_service_->poll(robot_status_);
             }
 
             thunderloop_status_.set_network_service_poll_time_ms(
@@ -220,22 +219,6 @@ Thunderloop::~Thunderloop() {}
                     thunderloop_status_.set_primitive_executor_start_time_ms(
                         getMilliseconds(poll_time));
                 }
-            }
-
-            struct timespec time_since_last_vision_received;
-            clock_gettime(CLOCK_MONOTONIC, &current_time);
-            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_received_time,
-                                              &time_since_last_vision_received);
-            network_status_.set_ms_since_last_vision_received(
-                getMilliseconds(time_since_last_vision_received));
-
-            // If the world msg is new, update the internal buffer
-            if (new_world.time_sent().epoch_timestamp_seconds() >
-                world_.time_sent().epoch_timestamp_seconds())
-            {
-                clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
-                primitive_executor_.updateWorld(new_world);
-                world_ = new_world;
             }
 
             if (motor_status_.has_value())
@@ -347,6 +330,8 @@ Thunderloop::~Thunderloop() {}
             redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
                                        std::to_string(power_status_.current_draw()));
             redis_client_->asyncCommit();
+
+            updateErrorCodes();
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
@@ -403,5 +388,25 @@ double Thunderloop::getCpuTemperature()
     {
         LOG(WARNING) << "Could not open CPU temperature file";
         return 0.0;
+    }
+}
+
+void Thunderloop::updateErrorCodes()
+{
+    // Clear existing codes
+    robot_status_.clear_error_code();
+
+    // Updates error status
+    if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
+    }
+    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
+    }
+    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
     }
 }

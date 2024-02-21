@@ -5,6 +5,8 @@ from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
 
+SIM_TICK_RATE_MS = 16
+
 
 class ProtoUnixIOTypes(Enum):
     """
@@ -96,6 +98,11 @@ DEFAULT_EMPTY_FIELD_WORLD = World(
     )
 )
 
+# How long AI vs AI runs before ending in CI
+CI_DURATION_S = 180
+
+MULTI_PLANE_POINTS = 3
+
 ROBOT_RADIUS = 25
 
 BALL_HEIGHT_EFFECT_MULTIPLIER = 3
@@ -111,6 +118,9 @@ ROBOT_FATAL_TIMEOUT_S = 5
 # Max time (in seconds) tolerated between repeated crash protos until
 # crash alert occurs
 ROBOT_CRASH_TIMEOUT_S = 5
+
+# FOV in degrees for top-down orthographic view
+ORTHOGRAPHIC_FOV_DEGREES = 1.0
 
 # LogLevel to string conversion map
 LOG_LEVEL_STR_MAP = {
@@ -129,7 +139,7 @@ ESTOP_PATH_2 = "/dev/ttyUSB0"
 
 # Mapping between RobotStatus Error Codes and their dialog messages
 ERROR_CODE_MESSAGES = {
-    ErrorCode.LOW_CAP: "Low Cap",
+    ErrorCode.HIGH_CAP: "High Cap",
     ErrorCode.LOW_BATTERY: "Low Battery",
     ErrorCode.HIGH_BOARD_TEMP: "High Board Temp",
     ErrorCode.DRIBBLER_MOTOR_HOT: "Dribbler Motor Hot",
@@ -152,6 +162,12 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>Number Keys:</code></b> Position camera to preset view<br>
     <b><code>Shift + Left Click:</code></b> Place the ball at the cursor<br>
     <b><code>Shift + Left Click Drag:</code></b> Place the ball at the cursor and kick it<br>
+    <b><code>Ctrl + Shift + Left Double Click:</code></b>
+    <ul style="margin: 0;">
+    <li>If no robot is present at cursor, adds a new friendly robot there</li>
+    <li>If a friendly robot is present at cursor, removes it</li>
+    </ul>
+    <b><code>Ctrl + Shift + Left Click Drag:</code></b> Moves a friendly robot along with the cursor
 
     <h3>Camera Controls</h3><br>
 
@@ -237,7 +253,6 @@ def rgb_to_bw(r: int, g: int, b: int) -> tuple:
 
 
 class Colors(object):
-
     DEFAULT_GRAPHICS_COLOR = QtGui.QColor(255, 255, 255, 128)
     FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 200)
     FIELD_LINE_LIGHTER_COLOR = QtGui.QColor(255, 255, 255, 100)
@@ -249,9 +264,9 @@ class Colors(object):
     TRANSPARENT = QtGui.QColor(0, 0, 0, 0)
     SPEED_VECTOR_COLOR = QtGui.QColor(255, 0, 255, 100)
 
-    DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 150)
+    DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 255)
     NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
-    NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 165, 0, 255)
+    NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 80, 0, 100)
     PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
     BREAKBEAM_TRIPPED_COLOR = QtGui.QColor(255, 0, 0, 255)
 
@@ -292,3 +307,10 @@ class DepthValues:
     FOREGROUND_DEPTH = 0
     ABOVE_FOREGROUND_DEPTH = 1
     OVERLAY_DEPTH = 2
+
+
+class TrailValues:
+    """Constants for Trails Visualization Layer in Thunderscope."""
+
+    DEFAULT_TRAIL_LENGTH = 20
+    DEFAULT_TRAIL_SAMPLING_RATE = 0

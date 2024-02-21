@@ -67,17 +67,13 @@ TEST(TbotsProtobufTest, circle_msg_test)
         google::protobuf::util::MessageDifferencer::Equals(*circle_msg_1, *circle_msg_2));
 }
 
-TEST(TbotsProtobufTest, velocity_obstacle_msg_test)
+TEST(TbotsProtobufTest, stadium_msg_test)
 {
-    Vector apex  = Vector(3, 3);
-    Vector side1 = Vector(-1, -2);
-    Vector side2 = Vector(1, 2);
+    auto stadium_1     = Stadium(Segment(Point(1, 2), Point(0, -2)), 2);
+    auto stadium_msg_1 = createStadiumProto(stadium_1);
+    auto stadium_2     = createStadium(*stadium_msg_1);
+    auto stadium_msg_2 = createStadiumProto(stadium_2);
 
-    VelocityObstacle velocity_obstacle = VelocityObstacle(apex, side1, side2);
-    auto velocity_obstacle_msg_1       = createVelocityObstacleProto(velocity_obstacle);
-    auto velocity_obstacle_2           = createVelocityObstacle(*velocity_obstacle_msg_1);
-    auto velocity_obstacle_msg_2       = createVelocityObstacleProto(velocity_obstacle_2);
-
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        *velocity_obstacle_msg_1, *velocity_obstacle_msg_2));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(*stadium_msg_1,
+                                                                   *stadium_msg_2));
 }

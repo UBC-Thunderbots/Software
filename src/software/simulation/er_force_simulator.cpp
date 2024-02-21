@@ -21,9 +21,11 @@
 ErForceSimulator::ErForceSimulator(const TbotsProto::FieldType& field_type,
                                    const RobotConstants_t& robot_constants,
                                    std::unique_ptr<RealismConfigErForce>& realism_config,
-                                   const bool ramping)
+                                   const bool ramping,
+                                   double primitive_executor_time_step)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
       blue_team_world_msg(std::make_unique<TbotsProto::World>()),
+      primitive_executor_time_step_s(primitive_executor_time_step),
       frame_number(0),
       euclidean_to_four_wheel(robot_constants),
       robot_constants(robot_constants),
@@ -281,14 +283,14 @@ void ErForceSimulator::setRobots(
         if (side == gameController::Team::BLUE)
         {
             auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                Duration::fromSeconds(primitive_executor_time_step), robot_constants,
+                Duration::fromSeconds(primitive_executor_time_step_s), robot_constants,
                 TeamColour::BLUE, id);
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
             auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                Duration::fromSeconds(primitive_executor_time_step), robot_constants,
+                Duration::fromSeconds(primitive_executor_time_step_s), robot_constants,
                 TeamColour::YELLOW, id);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
@@ -307,9 +309,12 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const TbotsProto::World world_proto = *yellow_team_world_msg;
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
-        setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                          world_proto, local_vel, angular_vel);
+        if (robot_to_vel_pair_map.contains(robot_id))
+        {
+            auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
+            setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
+                              world_proto, local_vel, angular_vel);
+        }
     }
 }
 
@@ -323,11 +328,15 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
 
     blue_team_world_msg                 = std::move(world_msg);
     const TbotsProto::World world_proto = *blue_team_world_msg;
+
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
-        setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                          world_proto, local_vel, angular_vel);
+        if (robot_to_vel_pair_map.contains(robot_id))
+        {
+            auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
+            setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
+                              world_proto, local_vel, angular_vel);
+        }
     }
 }
 
@@ -346,7 +355,6 @@ void ErForceSimulator::setRobotPrimitive(
     {
         auto primitive_executor = robot_primitive_executor_iter->second;
         primitive_executor->updatePrimitiveSet(primitive_set_msg);
-        primitive_executor->updateWorld(world_msg);
         primitive_executor->updateVelocity(local_velocity, angular_velocity);
     }
     else
@@ -389,7 +397,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             direct_control              = getRampedVelocityPrimitive(
                 current_velocity_map.at(robot_id).first,
                 current_velocity_map.at(robot_id).second, *direct_control_no_ramp,
-                primitive_executor_time_step);
+                primitive_executor_time_step_s);
         }
         else
         {
