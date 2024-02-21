@@ -572,7 +572,7 @@ cc_library(
         "tactic_assignment.h",
     ],
     deps = [
-        "//software/ai/navigator/path_planner:global_path_planner_factory",
+        "//software/ai/navigator/trajectory:trajectory_planner",
         "//software/world",
         "//software/world:robot",
         "@munkres_cpp",

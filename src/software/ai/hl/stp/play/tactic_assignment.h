@@ -1,5 +1,5 @@
 #include "proto/primitive.pb.h"
-#include "software/ai/navigator/path_planner/global_path_planner_factory.h"
+#include "software/ai/navigator/trajectory/trajectory_planner.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
 
