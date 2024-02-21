@@ -237,10 +237,10 @@ TEST_F(TacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
     EXPECT_EQ(asst.find(move_tactic_1)->second, robot_0.id());
 }
 
-// // Test the case where it is "obvious" which robots should be assigned to each tactic
-// // Each robot is already close to one of the tactic's destinations, so it is trivial to
-// // see the optimal assignment is for each robot to be assigned to the tactic whose
-// // destination it's closest to
+// Test the case where it is "obvious" which robots should be assigned to each tactic
+// Each robot is already close to one of the tactic's destinations, so it is trivial to
+// see the optimal assignment is for each robot to be assigned to the tactic whose
+// destination it's closest to
 TEST_F(TacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
 {
     Team friendly_team(Duration::fromSeconds(0));
