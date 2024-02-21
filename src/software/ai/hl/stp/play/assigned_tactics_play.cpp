@@ -3,9 +3,9 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
+#include "software/ai/hl/stp/play/tactic_assignment.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
-#include "software/ai/hl/stp/play/tactic_assignment.h"
 
 AssignedTacticsPlay::AssignedTacticsPlay(TbotsProto::AiConfig config)
     : Play(config, false),

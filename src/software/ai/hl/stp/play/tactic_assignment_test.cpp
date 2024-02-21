@@ -237,10 +237,10 @@ TEST_F(TacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
     EXPECT_EQ(asst.find(move_tactic_1)->second, robot_0.id());
 }
 
-// // Test the case where it is "obvious" which robots should be assigned to each tactic
-// // Each robot is already close to one of the tactic's destinations, so it is trivial to
-// // see the optimal assignment is for each robot to be assigned to the tactic whose
-// // destination it's closest to
+// Test the case where it is "obvious" which robots should be assigned to each tactic
+// Each robot is already close to one of the tactic's destinations, so it is trivial to
+// see the optimal assignment is for each robot to be assigned to the tactic whose
+// destination it's closest to
 TEST_F(TacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
 {
     Team friendly_team(Duration::fromSeconds(0));
@@ -488,10 +488,12 @@ TEST_F(TacticAssignmentTest,
 
 //     // Put two robots right in front of the friendly goal
 //     Team friendly_team(Duration::fromSeconds(0));
-//     Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
+//     Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(),
+//     AngularVelocity::zero(),
 //                   Timestamp::fromSeconds(0));
 //     // default is all capabilities, if not specified otherwise
-//     Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
+//     Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(),
+//     AngularVelocity::zero(),
 //                   Timestamp::fromSeconds(0));
 //     friendly_team.updateRobots({robot_0, robot_1});
 
@@ -500,10 +502,11 @@ TEST_F(TacticAssignmentTest,
 
 //     TacticVector tactics = {};
 
-//     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
-//     GlobalPathPlannerFactory path_planner_factory(robot_navigation_obstacle_config, world.field());
-//     auto tup = assignTactics(path_planner_factory, world, tactics, friendly_team.getAllRobots());
-    
+//     auto robot_navigation_obstacle_config =
+//     ai_config.robot_navigation_obstacle_config(); GlobalPathPlannerFactory
+//     path_planner_factory(robot_navigation_obstacle_config, world.field()); auto tup =
+//     assignTactics(path_planner_factory, world, tactics, friendly_team.getAllRobots());
+
 //     auto asst = std::get<2>(tup);
 
 
@@ -518,8 +521,8 @@ TEST_F(TacticAssignmentTest,
 //     friendly_team.assignGoalie(1);
 //     world.updateFriendlyTeamState(friendly_team);
 
-//     tup = assignTactics(path_planner_factory, world, tactics, friendly_team.getAllRobots());    
-//     asst = std::get<2>(tup);
+//     tup = assignTactics(path_planner_factory, world, tactics,
+//     friendly_team.getAllRobots()); asst = std::get<2>(tup);
 
 
 //     EXPECT_EQ(1, asst.size());
@@ -573,10 +576,12 @@ TEST_F(TacticAssignmentTest, test_assigning_stop_tactics_to_unassigned_non_goali
 //     // Regardless of how the play yields the tactics to be assigned,
 //     // the goalie should always be assigned to the goalie assigned to the team
 //     Team friendly_team(Duration::fromSeconds(0));
-//     Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
+//     Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(),
+//     AngularVelocity::zero(),
 //                   Timestamp::fromSeconds(0));
 //     // default is all capabilities, if not specified otherwise
-//     Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
+//     Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(),
+//     AngularVelocity::zero(),
 //                   Timestamp::fromSeconds(0));
 //     friendly_team.updateRobots({robot_0, robot_1});
 
@@ -588,10 +593,11 @@ TEST_F(TacticAssignmentTest, test_assigning_stop_tactics_to_unassigned_non_goali
 
 //     TacticVector request = {move_tactic_0, move_tactic_1};
 
-//     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
-//     GlobalPathPlannerFactory path_planner_factory(robot_navigation_obstacle_config, world.field());
-//     auto tup = assignTactics(path_planner_factory, world, request, friendly_team.getAllRobots());
-    
+//     auto robot_navigation_obstacle_config =
+//     ai_config.robot_navigation_obstacle_config(); GlobalPathPlannerFactory
+//     path_planner_factory(robot_navigation_obstacle_config, world.field()); auto tup =
+//     assignTactics(path_planner_factory, world, request, friendly_team.getAllRobots());
+
 //     auto asst = std::get<2>(tup);
 
 //     EXPECT_EQ(2, asst.size());
@@ -617,8 +623,9 @@ TEST_F(TacticAssignmentTest, test_assigning_stop_tactics_to_unassigned_non_goali
 //     }
 
 //     request = {move_tactic_0, move_tactic_1};
-//     tup    = assignTactics(path_planner_factory, world, request, friendly_team.getAllRobots());
-    
+//     tup    = assignTactics(path_planner_factory, world, request,
+//     friendly_team.getAllRobots());
+
 //     asst = std::get<2>(tup);
 
 //     EXPECT_EQ(2, asst.size());
@@ -644,8 +651,9 @@ TEST_F(TacticAssignmentTest, test_assigning_stop_tactics_to_unassigned_non_goali
 //     }
 
 //     request = {move_tactic_1, move_tactic_0};
-//     tup = assignTactics(path_planner_factory, world, request, friendly_team.getAllRobots());
-    
+//     tup = assignTactics(path_planner_factory, world, request,
+//     friendly_team.getAllRobots());
+
 //     asst = std::get<2>(tup);
 //     EXPECT_EQ(2, asst.size());
 
