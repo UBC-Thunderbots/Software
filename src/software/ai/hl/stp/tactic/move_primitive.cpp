@@ -5,6 +5,7 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
+#include "software/geom/algorithms/end_in_obstacle_sample.h"
 
 MovePrimitive::MovePrimitive(const Robot &robot, const Point &destination, const Angle &final_angle,
                              const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
@@ -54,7 +55,7 @@ std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
 {
     ZoneScopedN("MovePrimitive::generatePrimitiveProtoMessage");
     // Generate obstacle avoiding trajectory
-    generateObstacles(world, motion_constraints, robot_trajectories, obstacle_factory);
+    updateObstacles(world, motion_constraints, robot_trajectories, obstacle_factory);
 
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         max_allowed_speed_mode, robot.robotConstants());
@@ -64,11 +65,31 @@ std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
 
     // TODO (#3104): The fieldBounary should be shrunk by the robot radius before being
     //  passed to the planner.
-    // TODO (NIMA): If start is in a static obstacle, then we should find the nearest point out potentially. If we don't then if the robot slightly enters the
-    //              friendly defense area, and the destination is on the other side outside of the osbtacle, the robot will just drive through...
+    Rectangle navigable_area = world.field().fieldBoundary();
+
+    // If the robot is in a static obstacle, then we should first move to the nearest point out
+    std::optional<Point> updated_start_position = endInObstacleSample(static_obstacles, robot.position(), navigable_area);
+    if (updated_start_position.has_value() && updated_start_position.value() != robot.position())
+    {
+        destination = updated_start_position.value();
+    }
+    else
+    {
+        std::optional<Point> updated_destination = endInObstacleSample(static_obstacles, destination, navigable_area);
+        if (!updated_destination.has_value())
+        {
+            LOG(WARNING) << "Could not move the destination for robot " << robot.id()
+                         << " from " << destination << " to a point outside of the static obstacles. Robot stopping!";
+            return std::make_pair(std::nullopt, std::move(createStopPrimitiveProto()));
+        }
+
+        // Update the destination. Note that this may be the same as the original destination.
+        destination = updated_destination.value();
+    }
+
     traj_path =
         planner.findTrajectory(robot.position(), destination, robot.velocity(),
-                               constraints, obstacles, world.field().fieldBoundary());
+                               constraints, obstacles, navigable_area);
 
     // TODO (NIMA): If there's a dangerous collision ahead, we should consider returning a STOP primitive
 
@@ -136,13 +157,17 @@ std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
     return std::make_pair(traj_path, std::move(primitive_proto));
 }
 
-void MovePrimitive::generateObstacles(
+void MovePrimitive::updateObstacles(
     const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
     obstacles =
-        obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
+        obstacle_factory.createDynamicObstaclesFromMotionConstraints(motion_constraints, world);
+
+    static_obstacles =
+            obstacle_factory.createStaticObstaclesFromMotionConstraints(motion_constraints, world.field());
+    obstacles.insert(obstacles.end(), static_obstacles.begin(), static_obstacles.end());
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {
@@ -176,7 +201,7 @@ void MovePrimitive::generateObstacles(
             else
             {
                 obstacles.push_back(
-                    obstacle_factory.createFromRobotPosition(friendly.position()));
+                        obstacle_factory.createStaticObstacleFromRobotPosition(friendly.position()));
             }
         }
     }

@@ -23,7 +23,7 @@ class TrajectoryPlannerTest : public testing::Test
         // Robot at origin
         Point robot_obstacle_position(0, 0);
         robot_obstacle =
-            obstacle_factory.createFromRobotPosition(robot_obstacle_position);
+                obstacle_factory.createStaticObstacleFromRobotPosition(robot_obstacle_position);
 
         friendly_defense_area_obstacle =
             obstacle_factory.createObstaclesFromMotionConstraints(

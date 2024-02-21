@@ -270,7 +270,7 @@ ObstaclePtr RobotNavigationObstacleFactory::createStadiumEnemyRobotObstacle(cons
     // Only generate a stadium obstacle if the robot is moving to avoid twitching obstacles due to noisy velocity data
     if (enemy_robot_velocity.length() < config.dynamic_enemy_robot_obstacle_min_speed_mps())
     {
-        return createFromRobotPosition(enemy_robot.position());
+        return createStaticObstacleFromRobotPosition(enemy_robot.position());
     }
 
     return createFromShape(Stadium(enemy_robot.position(), enemy_robot.position() + enemy_robot_velocity * config.dynamic_enemy_robot_obstacle_horizon_sec(), ROBOT_MAX_RADIUS_METERS));
@@ -282,13 +282,13 @@ ObstaclePtr RobotNavigationObstacleFactory::createConstVelocityEnemyRobotObstacl
     // Only generate a const velocity obstacle if the robot is moving to avoid twitching obstacles due to noisy velocity data
     if (enemy_robot_velocity.length() < config.dynamic_enemy_robot_obstacle_min_speed_mps())
     {
-        return createFromRobotPosition(enemy_robot.position());
+        return createStaticObstacleFromRobotPosition(enemy_robot.position());
     }
 
     return createCircleWithConstVelocity(Circle(enemy_robot.position(), ROBOT_MAX_RADIUS_METERS), enemy_robot.velocity());
 }
 
-ObstaclePtr RobotNavigationObstacleFactory::createFromRobotPosition(
+ObstaclePtr RobotNavigationObstacleFactory::createStaticObstacleFromRobotPosition(
     const Point &robot_position) const
 {
     return createFromShape(Circle(robot_position, ROBOT_MAX_RADIUS_METERS));

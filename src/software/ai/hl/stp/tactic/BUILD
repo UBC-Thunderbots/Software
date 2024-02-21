@@ -112,6 +112,7 @@ cc_library(
     ],
     deps = [
         ":primitive",
+        "//software/geom/algorithms:end_in_obstacle_sample",
         "//proto/message_translation:tbots_protobuf",
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/navigator/trajectory:trajectory_planner",

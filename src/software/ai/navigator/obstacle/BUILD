@@ -67,10 +67,21 @@ cc_library(
 )
 
 cc_test(
-    name = "obstacle_test",
-    srcs = ["obstacle_test.cpp"],
+    name = "geom_obstacle_test",
+    srcs = ["geom_obstacle_test.cpp"],
     deps = [
-        ":obstacle",
+        ":geom_obstacle",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/geom:point",
+        "//software/geom:rectangle",
+    ],
+)
+
+cc_test(
+    name = "const_velocity_obstacle_test",
+    srcs = ["const_velocity_obstacle_test.cpp"],
+    deps = [
+        ":const_velocity_obstacle",
         "//shared/test_util:tbots_gtest_main",
         "//software/geom:point",
         "//software/geom:rectangle",

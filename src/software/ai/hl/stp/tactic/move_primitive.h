@@ -40,9 +40,10 @@ class MovePrimitive : public Primitive
      * Gets the primitive proto message
      *
      * @param world Current state of the world
-     * @param motion_constraints Motion constraints to consider TODO (NIMA) Update
+     * @param motion_constraints Motion constraints to consider
+     * @param robot_trajectories A map of the all friendly robots' known trajectories
      * @param obstacle_factory Obstacle factory to use for generating obstacles
-     * @return the primitive proto message
+     * @return A pair of the found trajectory (optional) and the primitive proto message
      */
     std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>> generatePrimitiveProtoMessage(
             const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
@@ -69,7 +70,7 @@ class MovePrimitive : public Primitive
      * @param motion_constraints Motion constraints
      * @param obstacle_factory Obstacle factory to use
      */
-    void generateObstacles(
+    void updateObstacles(
         const World &world,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const std::map<RobotId, TrajectoryPath> &robot_trajectories,
@@ -86,7 +87,10 @@ class MovePrimitive : public Primitive
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode;
 
+    // List of all obstacles that the robot should avoid
     std::vector<ObstaclePtr> obstacles;
+    // List of only the static obstacles that the robot should avoid
+    std::vector<ObstaclePtr> static_obstacles;
 
     BangBangTrajectory2D trajectory;
     std::optional<TrajectoryPath> traj_path;

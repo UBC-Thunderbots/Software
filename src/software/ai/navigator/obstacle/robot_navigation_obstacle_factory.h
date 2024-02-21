@@ -100,7 +100,7 @@ class RobotNavigationObstacleFactory
      *
      * @return obstacle around the robot
      */
-    ObstaclePtr createFromRobotPosition(const Point &robot_position) const;
+    ObstaclePtr createStaticObstacleFromRobotPosition(const Point &robot_position) const;
 
     /**
      * Create a stadium shaped obstacle for enemy robot with additional radius scaling
