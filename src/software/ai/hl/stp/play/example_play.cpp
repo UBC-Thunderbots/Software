@@ -25,8 +25,8 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
                     Vector::createFromAngle(angle_between_robots *
                                             static_cast<double>(k + 1)),
                     (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(), 0,
-                    TbotsProto::DribblerMode_INT_MAX_SENTINEL_DO_NOT_USE_, TbotsProto::ALLOW, AutoChipOrKick(),
-                    TbotsProto::STOP_COMMAND, TbotsProto::ObstacleAvoidanceMode::SAFE, 0);
+                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                    TbotsProto::ObstacleAvoidanceMode::SAFE);
         }
 
         // yield the Tactics this Play wants to run, in order of priority

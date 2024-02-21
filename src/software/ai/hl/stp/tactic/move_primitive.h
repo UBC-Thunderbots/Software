@@ -89,8 +89,8 @@ class MovePrimitive : public Primitive
 
     // List of all obstacles that the robot should avoid
     std::vector<ObstaclePtr> obstacles;
-    // List of only the static obstacles that the robot should avoid
-    std::vector<ObstaclePtr> static_obstacles;
+    // List of only the motion constraint obstacles that the robot should avoid
+    std::vector<ObstaclePtr> field_obstacles;
 
     BangBangTrajectory2D trajectory;
     std::optional<TrajectoryPath> traj_path;

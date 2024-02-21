@@ -31,9 +31,8 @@ void ScoringFromContestedPossessionPlay::getNextTactics(TacticCoroutine::push_ty
         {
             // TODO (#2107): implement face ball opposite attacker 0.3m away
             move_tactic->updateControlParams(Point(0, 0), Angle::zero(), 0.0,
-                                             TbotsProto::DribblerMode_INT_MAX_SENTINEL_DO_NOT_USE_, TbotsProto::ALLOW,
-                                             AutoChipOrKick(), TbotsProto::STOP_COMMAND,
-                                             TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0);
+                                             TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                                             TbotsProto::ObstacleAvoidanceMode::SAFE);
             result.emplace_back(move_tactic);
         }
         yield({result});

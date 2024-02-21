@@ -124,9 +124,9 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 // listed above
                 move_tactics.at(defense_position_index)
                         ->updateControlParams(defense_positions.at(defense_position_index),
-                                              Angle::zero(), 0, TbotsProto::DribblerMode_INT_MAX_SENTINEL_DO_NOT_USE_,
-                                              TbotsProto::ALLOW, AutoChipOrKick(), TbotsProto::STOP_COMMAND,
-                                              TbotsProto::ObstacleAvoidanceMode::SAFE, 0);
+                                              Angle::zero(), 0,
+                                              TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                                              TbotsProto::ObstacleAvoidanceMode::SAFE);
                 result[0].emplace_back(move_tactics.at(defense_position_index));
                 defense_position_index++;
             }

@@ -68,23 +68,24 @@ std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
     Rectangle navigable_area = world.field().fieldBoundary();
 
     // If the robot is in a static obstacle, then we should first move to the nearest point out
-    std::optional<Point> updated_start_position = endInObstacleSample(static_obstacles, robot.position(), navigable_area);
+    std::optional<Point> updated_start_position = endInObstacleSample(field_obstacles, robot.position(), navigable_area);
     if (updated_start_position.has_value() && updated_start_position.value() != robot.position())
     {
         destination = updated_start_position.value();
     }
     else
     {
-        std::optional<Point> updated_destination = endInObstacleSample(static_obstacles, destination, navigable_area);
-        if (!updated_destination.has_value())
+        std::optional<Point> updated_destination = endInObstacleSample(field_obstacles, destination, navigable_area);
+        if (updated_destination.has_value())
+        {
+            // Update the destination. Note that this may be the same as the original destination.
+            destination = updated_destination.value();
+        }
+        else
         {
             LOG(WARNING) << "Could not move the destination for robot " << robot.id()
-                         << " from " << destination << " to a point outside of the static obstacles. Robot stopping!";
-            return std::make_pair(std::nullopt, std::move(createStopPrimitiveProto()));
+                         << " from " << destination << " to a point outside of the field obstacles.";
         }
-
-        // Update the destination. Note that this may be the same as the original destination.
-        destination = updated_destination.value();
     }
 
     traj_path =
@@ -162,12 +163,11 @@ void MovePrimitive::updateObstacles(
     const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
-    obstacles =
-        obstacle_factory.createDynamicObstaclesFromMotionConstraints(motion_constraints, world);
+    // Separately store the non-robot + non-ball obstacles
+    field_obstacles =
+        obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
 
-    static_obstacles =
-            obstacle_factory.createStaticObstaclesFromMotionConstraints(motion_constraints, world.field());
-    obstacles.insert(obstacles.end(), static_obstacles.begin(), static_obstacles.end());
+    obstacles = field_obstacles;
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {

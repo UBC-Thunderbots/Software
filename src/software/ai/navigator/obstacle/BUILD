@@ -40,7 +40,7 @@ cc_library(
 )
 
 cc_library(
-    name = "const_velocity_obstacle", # TODO (NIMA): Test
+    name = "const_velocity_obstacle",
     hdrs = [
         "const_velocity_obstacle.hpp",
     ],

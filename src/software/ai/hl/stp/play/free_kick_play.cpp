@@ -72,9 +72,9 @@ void FreeKickPlay::updateAlignToBallTactic(
     align_to_ball_tactic->updateControlParams(
             world.ball().position() -
             ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
-            ball_to_center_vec.orientation(), 0, TbotsProto::DribblerMode_INT_MAX_SENTINEL_DO_NOT_USE_,
-            TbotsProto::ALLOW, AutoChipOrKick(), TbotsProto::STOP_COMMAND,
-            TbotsProto::ObstacleAvoidanceMode::SAFE, 0);
+            ball_to_center_vec.orientation(), 0,
+            TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
 }
 
 void FreeKickPlay::chipAtGoalStage(

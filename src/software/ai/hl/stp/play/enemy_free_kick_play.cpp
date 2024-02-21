@@ -87,15 +87,17 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
                     (world.ball().position() - world.field().friendlyGoalCenter())
                             .orientation(),
-                    0, TbotsProto::DribblerMode_INT_MAX_SENTINEL_DO_NOT_USE_, TbotsProto::ALLOW, AutoChipOrKick(),
-                    TbotsProto::STOP_COMMAND, TbotsProto::ObstacleAvoidanceMode::SAFE, 0);
+                    0,
+                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                    TbotsProto::ObstacleAvoidanceMode::SAFE);
             move_tactic_main->updateControlParams(
                     world.field().friendlyGoalCenter() +
                     Vector(0, -2 * ROBOT_MAX_RADIUS_METERS),
                     (world.ball().position() - world.field().friendlyGoalCenter())
                             .orientation(),
-                    0, TbotsProto::DribblerMode_INT_MAX_SENTINEL_DO_NOT_USE_, TbotsProto::ALLOW, AutoChipOrKick(),
-                    TbotsProto::STOP_COMMAND, TbotsProto::ObstacleAvoidanceMode::SAFE, 0);
+                    0,
+                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                    TbotsProto::ObstacleAvoidanceMode::SAFE);
 
             tactics_to_run[0].emplace_back(move_tactic_main);
             tactics_to_run[0].emplace_back(move_tactic_secondary);
@@ -109,8 +111,9 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
                     (world.ball().position() - world.field().friendlyGoalCenter())
                             .orientation(),
-                    0, TbotsProto::DribblerMode_INT_MAX_SENTINEL_DO_NOT_USE_, TbotsProto::ALLOW, AutoChipOrKick(),
-                    TbotsProto::STOP_COMMAND, TbotsProto::ObstacleAvoidanceMode::SAFE, 0);
+                    0,
+                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                    TbotsProto::ObstacleAvoidanceMode::SAFE);
             std::get<0>(shadow_potential_receivers)
                 ->updateControlParams(enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
 

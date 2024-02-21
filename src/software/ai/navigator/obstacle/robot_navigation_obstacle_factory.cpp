@@ -11,48 +11,12 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 {
 }
 
-std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
-    const TbotsProto::MotionConstraint motion_constraint, const World &world) const
-{
-    std::vector<ObstaclePtr> obstacles;
-    auto static_obstacles =
-        createStaticObstaclesFromMotionConstraint(motion_constraint, world.field());
-    obstacles.insert(obstacles.end(), static_obstacles.begin(), static_obstacles.end());
-
-    auto dynamic_obstacles =
-        createDynamicObstaclesFromMotionConstraint(motion_constraint, world);
-    obstacles.insert(obstacles.end(), dynamic_obstacles.begin(), dynamic_obstacles.end());
-
-    CHECK(dynamic_obstacles.empty() || static_obstacles.empty())
-        << "Motion constraint with value " << static_cast<int>(motion_constraint)
-        << " has both dynamic and static obstacles." << std::endl;
-
-    return obstacles;
-}
-
 std::vector<ObstaclePtr>
-RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
-    const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-    const World &world) const
-{
-    std::vector<ObstaclePtr> static_obstacles =
-        createStaticObstaclesFromMotionConstraints(motion_constraints, world.field());
-    std::vector<ObstaclePtr> dynamic_obstacles =
-        createDynamicObstaclesFromMotionConstraints(motion_constraints, world);
-
-    // Combine two vectors of obstacles into one and return it
-    std::vector<ObstaclePtr> obstacles;
-    obstacles.reserve(static_obstacles.size() + dynamic_obstacles.size());
-    obstacles.insert(obstacles.end(), static_obstacles.begin(), static_obstacles.end());
-    obstacles.insert(obstacles.end(), dynamic_obstacles.begin(), dynamic_obstacles.end());
-    return obstacles;
-}
-
-std::vector<ObstaclePtr>
-RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
-    const TbotsProto::MotionConstraint &motion_constraint, const Field &field) const
+RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
+    const TbotsProto::MotionConstraint &motion_constraint, const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
+    const Field &field = world.field();
 
     switch (motion_constraint)
     {
@@ -126,12 +90,21 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
             break;
         }
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
-            // HALF_METER_AROUND_BALL is not handled by this obstacle factory since it's a
-            // dynamic obstacle
+            // 0.5 represents half a metre radius
+            obstacles.push_back(createFromShape(Circle(world.ball().position(), 0.5)));
             break;
         case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
-            // AVOID_BALL_PLACEMENT_INTERFERENCE is not handled by this obstacle factory
-            // since it's a dynamic obstacle
+            if (world.gameState().getBallPlacementPoint().has_value())
+            {
+                obstacles.push_back(createFromBallPlacement(
+                        world.gameState().getBallPlacementPoint().value(),
+                        world.ball().position()));
+            }
+            else
+            {
+                obstacles.push_back(
+                        createFromShape(Circle(world.ball().position(), 0.5)));
+            }
             break;
         case TbotsProto::MotionConstraint::FRIENDLY_GOAL:
         {
@@ -166,84 +139,7 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
 }
 
 std::vector<ObstaclePtr>
-RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
-    const TbotsProto::MotionConstraint &motion_constraint, const World &world) const
-{
-    std::vector<ObstaclePtr> obstacles;
-
-    switch (motion_constraint)
-    {
-        case TbotsProto::MotionConstraint::CENTER_CIRCLE:
-            // not handled by this obstacle factory since it's a static obstacle
-            break;
-        case TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
-            // not handled by this obstacle factory since it's a static obstacle
-            break;
-        case TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA:
-            // not handled by this obstacle factory since it's a static obstacle
-            break;
-        case TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA:
-            // not handled by this obstacle factory since it's a static obstacle
-            break;
-        case TbotsProto::MotionConstraint::FRIENDLY_HALF:
-            // not handled by this obstacle factory since it's a static obstacle
-            break;
-        case TbotsProto::MotionConstraint::ENEMY_HALF:
-            // not handled by this obstacle factory since it's a static obstacle
-            break;
-        case TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE:
-            // not handled by this obstacle factory since it's a static obstacle
-            break;
-        case TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
-            // not handled by this obstacle factory since it's a static obstacle
-            break;
-        case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
-            // 0.5 represents half a metre radius
-            obstacles.push_back(createFromShape(Circle(world.ball().position(), 0.5)));
-            break;
-        case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
-            if (world.gameState().getBallPlacementPoint().has_value())
-            {
-                obstacles.push_back(createFromBallPlacement(
-                    world.gameState().getBallPlacementPoint().value(),
-                    world.ball().position()));
-            }
-            else
-            {
-                obstacles.push_back(
-                    createFromShape(Circle(world.ball().position(), 0.5)));
-            }
-            break;
-        case TbotsProto::MotionConstraint::FRIENDLY_GOAL:;
-            // not handled by this obstacle factory since it's a static obstacle
-            break;
-        case TbotsProto::MotionConstraint::MotionConstraint_INT_MIN_SENTINEL_DO_NOT_USE_:;
-            break;
-        case TbotsProto::MotionConstraint::MotionConstraint_INT_MAX_SENTINEL_DO_NOT_USE_:;
-            break;
-    }
-
-    return obstacles;
-}
-
-std::vector<ObstaclePtr>
-RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraints(
-    const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-    const Field &field) const
-{
-    std::vector<ObstaclePtr> obstacles;
-    for (auto motion_constraint : motion_constraints)
-    {
-        auto new_obstacles =
-            createStaticObstaclesFromMotionConstraint(motion_constraint, field);
-        obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
-    }
-
-    return obstacles;
-}
-
-std::vector<ObstaclePtr>
-RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraints(
+RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const World &world) const
 {
@@ -251,7 +147,7 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraints(
     for (auto motion_constraint : motion_constraints)
     {
         auto new_obstacles =
-            createDynamicObstaclesFromMotionConstraint(motion_constraint, world);
+                createObstaclesFromMotionConstraint(motion_constraint, world);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 
