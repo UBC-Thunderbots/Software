@@ -128,7 +128,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
     #             regions=[tbots_cpp.Circle(ball_final_pos, 0.65)]),
     #     ]
     # ]
-    
+
     # Non free kick after ball placement, the robot must be 0.05 away from the ball after the placement
     # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
     # drop_ball_eventually_validation_sequence_set = [
@@ -141,6 +141,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
     #             regions=[tbots_cpp.Circle(ball_final_pos, 0.2)]),
     #     ]
     # ]
+
 
 if __name__ == "__main__":
     pytest_main(__file__)
