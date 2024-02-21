@@ -103,7 +103,6 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/trajectory:trajectory_path_with_cost",
-        "@aabbcc",
         "@tracy",  # TODO (NIMA): Remove
     ],
 )

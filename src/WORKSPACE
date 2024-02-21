@@ -217,14 +217,6 @@ http_archive(
     ],
 )
 
-# Axis-Aligned Bounding Box tree data structure implementation
-new_git_repository(
-    name = "aabbcc",
-    build_file = "@//extlibs:aabbcc.BUILD",
-    commit = "0dad69116602623d63844f0923463df747f64ed3",
-    remote = "https://github.com/lohedges/aabbcc",
-)
-
 # tool used to flash firmware with bazel
 git_repository(
     name = "platformio_rules",
