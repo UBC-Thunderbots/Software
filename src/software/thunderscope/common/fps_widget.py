@@ -1,5 +1,6 @@
 import time
 from PyQt6.QtWidgets import *
+import PyQt6.QtCore
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.py_constants import MILLISECONDS_PER_SECOND
 
@@ -25,12 +26,38 @@ class FrameTimeWidget(QWidget):
         self.fps_label = QLabel("some string to be show") 
         self.fps_label.setText("some fps: ")
         self.vertical_layout = QVBoxLayout()
-        self.vertical_layout.addWidget(self.fps_label)
+
+        self.buffertime_table = QTableWidget(3, 2)
+        self.buffertime_table.setHorizontalHeaderLabels(["Frametime (ms)", "FPS"])
+        self.buffertime_table.setVerticalHeaderLabels(["Recent", "Last 30", "All"])
+        self.refresh_function_table = QTableWidget(3,2)
+        self.refresh_function_table.setHorizontalHeaderLabels(["Frametime (ms)", "FPS"])
+        self.refresh_function_table.setVerticalHeaderLabels(["Recent", "Last 30", "All"])
+
+        buffertime_title = QLabel("<b> Buffertime FPS <b>")
+        buffertime_title.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignHCenter)
+        refresh_function_title = QLabel("<b> Refresh Function FPS <b>")
+        refresh_function_title.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignHCenter)
+
+        self.vertical_layout.addWidget(buffertime_title)
+        self.vertical_layout.addWidget(self.buffertime_table)
+        self.vertical_layout.addWidget(refresh_function_title)
+        self.vertical_layout.addWidget(self.refresh_function_table)
 
         self.setLayout(self.vertical_layout)
-
         self.last_update_time = time.time()
         self.update_delta = update_delta # updating every 0.5 seconds
+
+    def update_table(self, table, row, col, text):
+        """
+        table: this table that I am going to be updating
+        row: the row in which data is going to be updated
+        text: the text in which the data is going to be updated
+        Updating what is on the table. This purpose of this section is to reduce Redundancy
+        """
+        text = QTableWidgetItem(text)
+        text.setTextAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignHCenter)
+        table.setItem(row, col, text)
 
     def refresh(self):
         """
@@ -54,24 +81,20 @@ class FrameTimeWidget(QWidget):
         refresh_func_average_last_30_fps = 1/(refresh_func_average_last_30/MILLISECONDS_PER_SECOND)
         refresh_func_fps_all = 1/(refresh_func_frametime_average_all/MILLISECONDS_PER_SECOND)
 
-        display_text = f"""
-        Bufferswap time:
-        frametime: {buffer_frametime} 
-        fps: {buffer_fps:3f}\n
-        last 30: {buffer_frametime_average_last_30} 
-        last 30_fps: {buffer_average_last_30_fps}\n
-        frametime all: {buffer_frametime_average_all}
-        fps_all: {buffer_fps_all}\n  
-        
-        Refresh Function:
-        frametime: {refresh_func_frametime} 
-        fps: {refresh_func_fps:3f}\n
-        last 30: {refresh_func_average_last_30} 
-        last 30_fps: {refresh_func_average_last_30_fps}\n
-        frametime all: {refresh_func_frametime_average_all}
-        fps_all: {refresh_func_fps_all}\n  
 
-        """
+        # update table for buffertime
+        self.update_table(self.buffertime_table, 0, 0, f"{buffer_frametime:.1f}")
+        self.update_table(self.buffertime_table, 0, 1, f"{buffer_fps:.1f}")
+        self.update_table(self.buffertime_table, 1, 0, f"{buffer_frametime_average_last_30:.1f}")
+        self.update_table(self.buffertime_table, 1, 1, f"{buffer_average_last_30_fps:.1f}")
+        self.update_table(self.buffertime_table, 2, 0, f"{buffer_frametime_average_all:.1f}")
+        self.update_table(self.buffertime_table, 2, 1, f"{buffer_fps_all:.1f}")
 
-        self.fps_label.setText(display_text)
+        # update table for refresh function
+        self.update_table(self.refresh_function_table, 0, 0, f"{refresh_func_frametime:.1f}")
+        self.update_table(self.refresh_function_table, 0, 1, f"{refresh_func_fps:.1f}")
+        self.update_table(self.refresh_function_table, 1, 0, f"{refresh_func_frametime_average_all:.1f}")
+        self.update_table(self.refresh_function_table, 1, 1, f"{refresh_func_average_last_30_fps:.1f}")
+        self.update_table(self.refresh_function_table, 2, 0, f"{refresh_func_frametime_average_all:.1f}")
+        self.update_table(self.refresh_function_table, 2, 1, f"{refresh_func_fps_all:.1f}")
         self.last_update_time = time.time()
