@@ -52,6 +52,7 @@ class FrameTimeWidget(QWidget):
         """
         table: this table that I am going to be updating
         row: the row in which data is going to be updated
+        col: the column in which the data is going to be updated
         text: the text in which the data is going to be updated
         Updating what is on the table. This purpose of this section is to reduce Redundancy
         """
