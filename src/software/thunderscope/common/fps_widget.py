@@ -1,6 +1,7 @@
 import time
 from PyQt6.QtWidgets import *
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
+from software.py_constants import MILLISECONDS_PER_SECOND
 
 class FrameTimeWidget(QWidget):
     """
@@ -39,20 +40,19 @@ class FrameTimeWidget(QWidget):
         if time.time() - self.last_update_time < self.update_delta:
             return
 
-        # pull the data from frametime counter, the * 1000 is to display data ms instead of s
-        buffer_frametime = self.buffer_counter.get_last_frametime() * 1000
-        buffer_frametime_average_last_30  = self.buffer_counter.get_average_last_30() * 1000
-        buffer_frametime_average_all = self.buffer_counter.get_average_frametime() * 1000
-        buffer_fps =  1/(buffer_frametime/1000)
-        buffer_average_last_30_fps = 1/(buffer_frametime_average_last_30/1000)
-        buffer_fps_all = 1/(buffer_frametime_average_all/1000)
+        buffer_frametime = self.buffer_counter.get_last_frametime() * MILLISECONDS_PER_SECOND
+        buffer_frametime_average_last_30  = self.buffer_counter.get_average_last_30() * MILLISECONDS_PER_SECOND
+        buffer_frametime_average_all = self.buffer_counter.get_average_frametime() * MILLISECONDS_PER_SECOND
+        buffer_fps =  1/(buffer_frametime/MILLISECONDS_PER_SECOND)
+        buffer_average_last_30_fps = 1/(buffer_frametime_average_last_30/MILLISECONDS_PER_SECOND)
+        buffer_fps_all = 1/(buffer_frametime_average_all/MILLISECONDS_PER_SECOND)
 
-        refresh_func_frametime = self.refresh_counter.get_last_frametime() * 1000
-        refresh_func_average_last_30  = self.refresh_counter.get_average_last_30() * 1000
-        refresh_func_frametime_average_all = self.refresh_counter.get_last_frametime() * 1000
-        refresh_func_fps =  1/(refresh_func_frametime/1000)
-        refresh_func_average_last_30_fps = 1/(refresh_func_average_last_30/1000)
-        refresh_func_fps_all = 1/(refresh_func_frametime_average_all/1000)
+        refresh_func_frametime = self.refresh_counter.get_last_frametime() * MILLISECONDS_PER_SECOND
+        refresh_func_average_last_30  = self.refresh_counter.get_average_last_30() * MILLISECONDS_PER_SECOND
+        refresh_func_frametime_average_all = self.refresh_counter.get_last_frametime() * MILLISECONDS_PER_SECOND
+        refresh_func_fps =  1/(refresh_func_frametime/MILLISECONDS_PER_SECOND)
+        refresh_func_average_last_30_fps = 1/(refresh_func_average_last_30/MILLISECONDS_PER_SECOND)
+        refresh_func_fps_all = 1/(refresh_func_frametime_average_all/MILLISECONDS_PER_SECOND)
 
         display_text = f"""
         Bufferswap time:

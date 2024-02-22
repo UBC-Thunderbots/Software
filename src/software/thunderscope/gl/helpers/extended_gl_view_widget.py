@@ -52,7 +52,10 @@ class ExtendedGLViewWidget(GLViewWidget):
     mouse_in_scene_moved_signal = QtCore.pyqtSignal(MouseInSceneEvent)
 
     def __init__(self, bufferswap_counter:FrameTimeCounter =  None) -> None:
-        """Initialize the ExtendedGLViewWidget"""
+        """
+        Initialize the ExtendedGLViewWidget
+
+        """
         super().__init__()
 
         # Fixes strange bug where mousePos is not initialized

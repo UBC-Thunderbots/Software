@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import *
 
 class FrameTimeCounter():
     """
-    Frametimecounter is basically just a list that stores the time difference between each consecutaive function call.
+    FrameTimeCounver is basically just a list that stores the time difference between each consecutive function call.
     From that, it calcualtes the frametime of each function call.
     """
 

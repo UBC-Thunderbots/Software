@@ -86,6 +86,13 @@ class TScopeQTTab(TScopeTab):
     def __init__(
             self, name: str, key: TabNames, widgets: Sequence[TScopeWidget], refresh_func_counter: FrameTimeCounter=None
     ) -> None:
+        """
+        name: the name of this tab
+        key; the key to identify this tab
+        widgets: a list of widgets that is going to be displayed in the tab
+        refresh_func_counter: a counter that tracks the runtime of the refresh function
+        :Return: None
+        """
         super().__init__(name, key)
         self.widgets = widgets
         self.refresh_functions = {}
