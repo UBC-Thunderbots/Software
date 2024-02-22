@@ -23,41 +23,48 @@ PassStrategy::~PassStrategy()
 
 std::shared_ptr<PassEvaluation<EighteenZoneId>> PassStrategy::getPassEvaluation()
 {
-    std::unique_lock<std::mutex> lock(pass_evaluation_lock_);
-    pass_available_cv_.wait(lock, [&] { return latest_pass_eval_ != nullptr; });
+    return std::make_shared<PassEvaluation<EighteenZoneId>>(
+        pass_generator_.generatePassEvaluation(*current_world_));
+        
+    // std::unique_lock<std::mutex> lock(pass_evaluation_lock_);
+    // pass_available_cv_.wait(lock, [&] { return latest_pass_eval_ != nullptr; });
 
-    return latest_pass_eval_;
+    // return latest_pass_eval_;
 }
 
 void PassStrategy::evaluatePassOptions()
 {
-    {
-        std::unique_lock<std::mutex> lock(world_lock_);
+    // {
+    //     std::unique_lock<std::mutex> lock(world_lock_);
+    //     world_available_cv_.wait(
+    //         lock, [&] { return current_world_.has_value() || end_analysis_; });
+    // }
 
-        world_available_cv_.wait(
-            lock, [&] { return current_world_.has_value() || end_analysis_; });
-    }
+    // while (!end_analysis_)
+    // {
+    //     std::unique_lock<std::mutex> world_lock(world_lock_);
+    //     World world = *current_world_;
+    //     world_lock.unlock();
 
-    while (!end_analysis_)
-    {
-        std::shared_ptr<PassEvaluation<EighteenZoneId>> pass_eval;
-        {
-            const std::lock_guard<std::mutex> lock(world_lock_);
-            pass_eval = std::make_shared<PassEvaluation<EighteenZoneId>>(
-                pass_generator_.generatePassEvaluation(current_world_.value()));
-        }
+    //     std::shared_ptr<PassEvaluation<EighteenZoneId>> pass_eval =
+    //         std::make_shared<PassEvaluation<EighteenZoneId>>(
+    //             pass_generator_.generatePassEvaluation(world));
 
-        {
-            const std::lock_guard<std::mutex> lock(pass_evaluation_lock_);
-            latest_pass_eval_ = pass_eval;
-            pass_available_cv_.notify_one();
-        }
-    }
+    //     {
+    //         const std::lock_guard<std::mutex> lock(pass_evaluation_lock_);
+    //         latest_pass_eval_ = pass_eval;
+    //     }
+
+    //     pass_available_cv_.notify_one();
+    // }
 }
 
 void PassStrategy::updateWorld(const World& world)
 {
-    const std::lock_guard<std::mutex> lock(world_lock_);
     current_world_.emplace(world);
-    world_available_cv_.notify_one();
+    // {
+    //     current_world_.emplace(world);
+    //     const std::lock_guard<std::mutex> lock(world_lock_);
+    // }
+    // world_available_cv_.notify_one();
 }

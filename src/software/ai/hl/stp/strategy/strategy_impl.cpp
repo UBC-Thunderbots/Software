@@ -100,6 +100,8 @@ bool StrategyImpl::hasWorld() const
 void StrategyImpl::updateWorld(const World& world)
 {
     world_.emplace(world);
+    pass_strategy_->updateWorld(world);
+    reset();
 }
 
 bool StrategyImpl::isBetterPassThanCached(const Timestamp& timestamp,
