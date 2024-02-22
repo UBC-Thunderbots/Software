@@ -14,7 +14,7 @@
 #include "software/ai/navigator/obstacle/const_velocity_obstacle.hpp"
 #include "software/ai/navigator/obstacle/trajectory_obstacle.hpp"
 
-class RobotNavigationObstacleFactoryTest : public testing::Test
+class RobotNavigationObstacleFactoryTest : public testing::Test // TODO (NIMA): Update so this passes
 {
    public:
     RobotNavigationObstacleFactoryTest()
