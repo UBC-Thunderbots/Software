@@ -84,7 +84,11 @@ class TScopeQTTab(TScopeTab):
     ]  # Mapping of widget names to refresh functions
 
     def __init__(
-            self, name: str, key: TabNames, widgets: Sequence[TScopeWidget], refresh_func_counter: FrameTimeCounter=None
+        self,
+        name: str,
+        key: TabNames,
+        widgets: Sequence[TScopeWidget],
+        refresh_func_counter: FrameTimeCounter = None,
     ) -> None:
         """
         name: the name of this tab
@@ -109,7 +113,7 @@ class TScopeQTTab(TScopeTab):
         for widget in self.widgets:
             self.add_one_widget(widget)
 
-        # initialized a frametime counter if none was passed in 
+        # initialized a frametime counter if none was passed in
         self.refresh_func_counter = refresh_func_counter
         if refresh_func_counter == None:
             self.refresh_func_counter = FrameTimeCounter()
@@ -149,7 +153,7 @@ class TScopeQTTab(TScopeTab):
         """
         Refreshes all the widgets belonging to this tab, and not refresh widget that are not visible.
         """
-        
+
         self.refresh_func_counter.add_one_datapoint()
 
         for refresh_func in self.refresh_functions.values():

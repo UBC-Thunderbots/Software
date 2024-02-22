@@ -1,7 +1,8 @@
 import time
 from PyQt6.QtWidgets import *
 
-class FrameTimeCounter():
+
+class FrameTimeCounter:
     """
     FrameTimeCounver is basically just a list that stores the time difference between each consecutive function call.
     From that, it calcualtes the frametime of each function call.
@@ -30,7 +31,7 @@ class FrameTimeCounter():
 
         :return: the latest frametime, and -1 if the list is empty
         """
-        
+
         if len(self.datapoints) == 0:
             return -1
 
@@ -53,8 +54,7 @@ class FrameTimeCounter():
 
         :return: the average of the last 30 frametime
         """
-        if (len(self.datapoints) == 0):
+        if len(self.datapoints) == 0:
             return -1
 
         return sum(self.datapoints[-30:]) / 30
-

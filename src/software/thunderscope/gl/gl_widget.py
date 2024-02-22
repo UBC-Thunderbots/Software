@@ -23,7 +23,12 @@ class GLWidget(QWidget):
     and our AI. GLWidget can also provide replay controls.
     """
 
-    def __init__(self, player: ProtoPlayer = None, sandbox_mode: bool = False, bufferswap_counter:FrameTimeCounter=None) -> None:
+    def __init__(
+        self,
+        player: ProtoPlayer = None,
+        sandbox_mode: bool = False,
+        bufferswap_counter: FrameTimeCounter = None,
+    ) -> None:
         """Initialize the GLWidget
 
         :param player: The replay player to optionally display media controls for
@@ -32,7 +37,9 @@ class GLWidget(QWidget):
         """
         super().__init__()
 
-        self.gl_view_widget = ExtendedGLViewWidget(bufferswap_counter=bufferswap_counter)
+        self.gl_view_widget = ExtendedGLViewWidget(
+            bufferswap_counter=bufferswap_counter
+        )
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.gl_view_widget.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
@@ -85,7 +92,6 @@ class GLWidget(QWidget):
         self.layers = []
 
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
-
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed

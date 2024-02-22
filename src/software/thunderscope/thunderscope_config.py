@@ -133,8 +133,8 @@ def configure_base_fullsystem(
     replay_log: os.PathLike = None,
     visualization_buffer_size: int = 5,
     extra_widgets: List[TScopeWidget] = [],
-    refresh_func_counter: FrameTimeCounter=None, 
-    buffer_func_counter: FrameTimeCounter=None
+    refresh_func_counter: FrameTimeCounter = None,
+    buffer_func_counter: FrameTimeCounter = None,
 ) -> list:
     """
     Returns a list of widget data for a FullSystem tab
@@ -212,7 +212,12 @@ def configure_base_fullsystem(
         ),
         TScopeWidget(
             name="FPS Widget",
-            widget=setup_fps_widget(**{"bufferswap_counter": buffer_func_counter, "refresh_func_counter": refresh_func_counter}),
+            widget=setup_fps_widget(
+                **{
+                    "bufferswap_counter": buffer_func_counter,
+                    "refresh_func_counter": refresh_func_counter,
+                }
+            ),
             anchor="Referee Info",
             position="above",
         ),
@@ -329,9 +334,9 @@ def configure_two_ai_gamecontroller_view(
                     sandbox_mode=True,
                     extra_widgets=[],
                     refresh_func_counter=blue_refresh_func_frametime_counter,
-                    buffer_func_counter=blue_buffer_func_frametime_counter
+                    buffer_func_counter=blue_buffer_func_frametime_counter,
                 ),
-                refresh_func_counter=blue_refresh_func_frametime_counter
+                refresh_func_counter=blue_refresh_func_frametime_counter,
             ),
             TScopeQTTab(
                 name="Yellow FullSystem",
@@ -346,9 +351,9 @@ def configure_two_ai_gamecontroller_view(
                     sandbox_mode=True,
                     extra_widgets=[],
                     buffer_func_counter=yellow_buffer_func_frametime_counter,
-                    refresh_func_counter=yellow_refresh_func_frametime_counter
+                    refresh_func_counter=yellow_refresh_func_frametime_counter,
                 ),
-                refresh_func_counter=yellow_refresh_func_frametime_counter
+                refresh_func_counter=yellow_refresh_func_frametime_counter,
             ),
             TScopeWebTab(
                 name="Gamecontroller",

@@ -60,7 +60,7 @@ def setup_gl_widget(
     sandbox_mode: bool = False,
     replay: bool = False,
     replay_log: os.PathLike = None,
-    bufferswap_counter:FrameTimeCounter = None
+    bufferswap_counter: FrameTimeCounter = None,
 ) -> Field:
     """Setup the GLWidget with its constituent layers
 
@@ -81,7 +81,9 @@ def setup_gl_widget(
     if bufferswap_counter == None:
         bufferswap_counter = FrameTimeCounter()
     # Create widget
-    gl_widget = GLWidget(player=player, bufferswap_counter=bufferswap_counter, sandbox_mode=sandbox_mode)
+    gl_widget = GLWidget(
+        player=player, bufferswap_counter=bufferswap_counter, sandbox_mode=sandbox_mode
+    )
 
     # Create layers
     validation_layer = gl_validation_layer.GLValidationLayer(
@@ -248,6 +250,7 @@ def setup_fps_widget(bufferswap_counter, refresh_func_counter):
     """
 
     return FrameTimeWidget(bufferswap_counter, refresh_func_counter)
+
 
 def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
     """Setup the referee info widget
