@@ -88,7 +88,7 @@ class TScopeQTTab(TScopeTab):
     ) -> None:
         """
         name: the name of this tab
-        key; the key to identify this tab
+        key: the key to identify this tab
         widgets: a list of widgets that is going to be displayed in the tab
         refresh_func_counter: a counter that tracks the runtime of the refresh function
         :Return: None
