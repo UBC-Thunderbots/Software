@@ -1,17 +1,25 @@
 #include "software/ai/hl/stp/skill/keep_away/keep_away_skill.h"
 
+#include "software/ai/evaluation/keep_away.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 double KeepAwaySkill::getViability(const Robot& robot, const World& world) const
 {
-    constexpr double NEAR_CREASE_PENALTY_MAX = 0.25;
+    if (world.field().pointInFriendlyHalf(robot.position()) ||
+        contains(world.field().enemyDefenseArea().expand(0.1), robot.position()))
+    {
+        return 0;
+    }
 
-    // Penalize viability if we are close to the crease
-    double near_crease_penalty = normalizeValueToRange(
-        distance(robot.position(), world.field().enemyDefenseArea()), 0.0, 1.0,
-        NEAR_CREASE_PENALTY_MAX, 0.0);
+    if (!shouldKeepAway(robot, world.enemyTeam(),
+                        strategy_->getAiConfig()
+                            .attacker_tactic_config()
+                            .enemy_about_to_steal_ball_radius()))
+    {
+        return 0;
+    }
 
-    return 1 - near_crease_penalty;
+    return 1;
 }
 
 // Register this Skill in the GenericFactory

@@ -178,16 +178,16 @@ struct DribbleSkillFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *GetPossession_S + Update_E[havePossession_G] / startDribble_A = Dribble_S,
-            GetPossession_S + Update_E[!havePossession_G] / getPossession_A,
+            GetPossession_S + Update_E / getPossession_A,
             Dribble_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
             Dribble_S + Update_E[shouldLoseBall_G] / loseBall_A      = LoseBall_S,
-            Dribble_S + Update_E[!dribblingDone_G] / dribble_A,
-            Dribble_S + Update_E[dribblingDone_G] / dribble_A = X,
-            LoseBall_S + Update_E[!lostPossession_G] / loseBall_A,
+            Dribble_S + Update_E[dribblingDone_G] / dribble_A        = X,
+            Dribble_S + Update_E / dribble_A,
             LoseBall_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
-            X + Update_E[lostPossession_G] / getPossession_A          = GetPossession_S,
-            X + Update_E[!dribblingDone_G] / dribble_A                = Dribble_S,
-            X + Update_E / dribble_A                                  = X);
+            LoseBall_S + Update_E / loseBall_A,
+            X + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
+            X + Update_E[!dribblingDone_G] / dribble_A       = Dribble_S,
+            X + Update_E / dribble_A                         = X);
     }
 
    private:

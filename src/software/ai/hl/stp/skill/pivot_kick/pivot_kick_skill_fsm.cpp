@@ -22,6 +22,16 @@ void PivotKickSkillFSM::kickBall(const Update& event)
         TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick));
 }
 
+bool PivotKickSkillFSM::lostPossession(const Update& event)
+{
+    const TbotsProto::DribbleSkillConfig& dribble_skill_config =
+        event.common.strategy->getAiConfig().dribble_skill_config();
+
+    return !event.common.robot.isNearDribbler(
+        event.common.world.ball().position(),
+        dribble_skill_config.lose_ball_possession_threshold());
+};
+
 bool PivotKickSkillFSM::ballKicked(const Update& event)
 {
     if (event.control_params.auto_chip_or_kick.auto_chip_kick_mode ==

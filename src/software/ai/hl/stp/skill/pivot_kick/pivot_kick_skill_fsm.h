@@ -38,6 +38,15 @@ struct PivotKickSkillFSM
     void kickBall(const Update& event);
 
     /**
+     * Guard that checks if the robot has lost possession of the ball
+     *
+     * @param event the Update event
+     *
+     * @return if the ball possession has been lost
+     */
+    bool lostPossession(const Update& event);
+
+    /**
      * Guard that checks if the ball has been kicked
      *
      * @param event the Update event
@@ -56,6 +65,7 @@ struct PivotKickSkillFSM
 
         DEFINE_SML_EVENT(Update)
 
+        DEFINE_SML_GUARD(lostPossession)
         DEFINE_SML_GUARD(ballKicked)
 
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(getPossessionAndPivot, DribbleSkillFSM)
@@ -66,8 +76,10 @@ struct PivotKickSkillFSM
             *StartState_S + Update_E / getPossessionAndPivot_A = DribbleSkillFSM_S,
             DribbleSkillFSM_S + Update_E / getPossessionAndPivot_A,
             DribbleSkillFSM_S = KickState_S,
-            KickState_S + Update_E[!ballKicked_G] / kickBall_A,
             KickState_S + Update_E[ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION                         = X);
+            KickState_S + Update_E[lostPossession_G] / getPossessionAndPivot_A =
+                DribbleSkillFSM_S,
+            KickState_S + Update_E / kickBall_A,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 };

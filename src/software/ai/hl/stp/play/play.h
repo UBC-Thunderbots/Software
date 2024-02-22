@@ -115,8 +115,6 @@ class Play
      */
     virtual void updateTactics(const PlayUpdate& play_update);
 
-    inline virtual void initialize(){};
-
    private:
     /**
      * Assigns the given tactics to as many of the given robots

@@ -25,7 +25,9 @@ class BaseSkill : public Skill
     std::string getFSMState(RobotId robot_id) const override;
 
    protected:
-    explicit BaseSkill(std::shared_ptr<Strategy> strategy) : Skill(strategy){};
+    explicit BaseSkill(std::shared_ptr<Strategy> strategy) : Skill(strategy), fsm_map_()
+    {
+    }
 
    private:
     std::map<RobotId, std::unique_ptr<FSM<TSkillFSM>>> fsm_map_;

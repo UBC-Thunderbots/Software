@@ -98,3 +98,14 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far)
         return keepaway_target_point;
     }
 }
+
+bool shouldKeepAway(const Robot& robot, const Team& enemy_team,
+                    double about_to_steal_radius)
+{
+    Circle about_to_steal_danger_zone(robot.position(), about_to_steal_radius);
+
+    return std::any_of(enemy_team.getAllRobots().begin(), enemy_team.getAllRobots().end(),
+                       [&](const auto& enemy) {
+                           return contains(about_to_steal_danger_zone, enemy.position());
+                       });
+}

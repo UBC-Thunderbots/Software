@@ -7,7 +7,6 @@
 AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
       strategy(strategy),
-      last_execution_robot_changed_(false),
       skill_graph_(strategy),
       current_skill_(nullptr)
 {
@@ -28,15 +27,6 @@ std::string AttackerTactic::getFSMState() const
     return state;
 }
 
-void AttackerTactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
-{
-    if (this->last_execution_robot != last_execution_robot)
-    {
-        last_execution_robot_changed_ = true;
-    }
-    Tactic::setLastExecutionRobot(last_execution_robot);
-}
-
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
     std::shared_ptr<Skill> next_skill =
@@ -44,11 +34,9 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
     if (last_execution_robot == tactic_update.robot.id())
     {
-        if (current_skill_ == nullptr || last_execution_robot_changed_ ||
+        if (current_skill_ == nullptr ||
             current_skill_->done(tactic_update.robot))
         {
-            last_execution_robot_changed_ = false;
-
             current_skill_ = next_skill;
             current_skill_->reset(tactic_update.robot);
             skill_graph_.extendSequence(current_skill_);

@@ -10,12 +10,9 @@ double ShootSkill::getViability(const Robot& robot, const World& world) const
         return 0;
     }
 
-    constexpr double SHOT_ANGLE_PENALTY_MAX = 0.25;
-
-    double shot_angle_penalty = normalizeValueToRange(
-        best_shot->getOpenAngle().toDegrees(), 0.0, 180.0, SHOT_ANGLE_PENALTY_MAX, 0.0);
-
-    return 1 - shot_angle_penalty;
+    double shot_angle_viability =
+        normalizeValueToRange(best_shot->getOpenAngle().toDegrees(), 0.0, 60.0, 0.0, 1.0);
+    return shot_angle_viability;
 }
 
 // Register this Skill in the GenericFactory

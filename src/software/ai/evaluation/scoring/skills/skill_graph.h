@@ -10,8 +10,8 @@
  * connected to every other node. Edge weights represent the success of a transition
  * from one Skill to the next.
  *
- * The SkillGraph records the current sequence of Skills as a walk through the graph,
- * and it extends the sequence by picking the most successful and viable Skill to
+ * The SkillGraph records the current sequence of Skills as a walk through the graph.
+ * It extends the sequence by picking the most successful and viable Skill to
  * transition to from the last executed Skill in the sequence. The current sequence
  * can then be completed and scored based on the success of the Skills executed;
  * this will adjust the weights of the edges traversed over in the sequence, enabling
@@ -69,10 +69,8 @@ class SkillGraph
     /**
      * Adjacency matrix representation of the graph.
      *
-     * A non-zero value at adj_matrix_[i][j] indicates a directed edge from i to j,
-     * where i and j are the IDs of the connected nodes.
-     *
-     * The weight of the edge is indicated by the value at adj_matrix_[i][j].
+     * The value at adj_matrix_[i][j] indicates the weight of the directed edge
+     * from i to j, where i and j are the IDs of the connected nodes.
      */
     std::vector<std::vector<double>> adj_matrix_;
 
@@ -83,7 +81,8 @@ class SkillGraph
      * where i and j are the IDs of the nodes that the edge connects.
      *
      * The first element of the sequence must always be {nodes_.size(),
-     * nodes_.size()}. nodes_.size() represents the ID of a "start" node.
+     * nodes_.size()}. nodes_.size() represents the ID of a "start" node not
+     * explicitly represented by a Skill in the nodes_ list.
      */
     std::vector<std::pair<unsigned int, unsigned int>> sequence_;
 };

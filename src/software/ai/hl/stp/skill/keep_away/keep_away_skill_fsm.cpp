@@ -4,17 +4,18 @@
 
 bool KeepAwaySkillFSM::isPossessionThreatened(const Update& event)
 {
-    TbotsProto::AttackerTacticConfig attacker_tactic_config =
-        event.common.strategy->getAiConfig().attacker_tactic_config();
+    const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
 
-    Circle about_to_steal_danger_zone(
-        event.common.robot.position(),
-        attacker_tactic_config.enemy_about_to_steal_ball_radius());
+    if (!event.common.robot.isNearDribbler(
+            event.common.world.ball().position(),
+            ai_config.dribble_skill_config().lose_ball_possession_threshold()))
+    {
+        return true;
+    }
 
-    auto enemy_robots = event.common.world.enemyTeam().getAllRobots();
-    return std::any_of(enemy_robots.begin(), enemy_robots.end(), [&](const auto& enemy) {
-        return contains(about_to_steal_danger_zone, enemy.position());
-    });
+    return shouldKeepAway(
+        event.common.robot, event.common.world.enemyTeam(),
+        ai_config.attacker_tactic_config().enemy_about_to_steal_ball_radius());
 }
 
 void KeepAwaySkillFSM::keepAway(
