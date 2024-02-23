@@ -130,7 +130,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         }
     }
 
-    if (game_state.isOurBallPlacement())
+    if (game_state.isBallPlacement())
     {
         auto pt = getBallPlacementPoint(packet);
         if (pt)
