@@ -2,7 +2,7 @@
 
 void HaltFSM::updateHalt(const Update& event)
 {
-    event.common.set_primitive(createStopPrimitive());
+    event.common.set_primitive(createStopPrimitiveProto());
 }
 
 bool HaltFSM::haltDone(const Update& event)
