@@ -4,10 +4,7 @@
 # UBC Thunderbots Ubuntu Software Setup
 #
 # This script must be run with sudo! root permissions are required to install
-# packages and copy files to the /etc/udev/rules.d directory. The reason that the script
-# must be run with sudo rather than the individual commands using sudo, is that
-# when running CI within Docker, the sudo command does not exist since
-# everything is automatically run as root.
+# packages and copy files to the /etc/udev/rules.d directory.
 #
 # This script will install all the required libraries and dependencies to build
 # and run the Thunderbots codebase. This includes being able to run the ai and
@@ -32,7 +29,19 @@ print_status_msg "Installing Utilities and Dependencies"
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update
+
+# Detect if running under WSL
+# See https://github.com/microsoft/WSL/issues/4071#issuecomment-1221588337
+if [[ $(grep -i Microsoft /proc/version) ]]; then
+    print_status_msg "WSL Setup"
+
+    sudo apt install unzip
+    sudo apt install libopengl0 -y
+
+    print_status_msg "Done WSL Setup"
+fi
 
 # (sorted alphabetically)
 host_software_packages=(
@@ -49,25 +58,26 @@ host_software_packages=(
     libprotobuf-dev
     libudev-dev
     libusb-1.0-0-dev
+    libxcb-cursor0 # This is used as the Linux platform abstraction by Qt 
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
-    python3       # Python 3
-    python3-dev # Python 3 headers
-    python3-venv # Virtual Environment
+    python3.8       # Python 3
+    python3.8-dev # Python 3 headers
+    python3.8-venv # Virtual Environment
     python3-pip   # Required for bazel to install python dependencies for build targets
     python3-protobuf # This is required for the "NanoPb" library, which does not
                     # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
-    python3-yaml # Load dynamic parameter configuration files
-    qt5-default # A GUI library used by er-force sim
-    tmux        # Used by AI vs AI script
+    python3-yaml 	# Load dynamic parameter configuration files
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
     libffi-dev # needed to use _ctypes in Python3
     libssl-dev # needed to build Python 3 with ssl support
     openssl # possibly also necessary for ssl in Python 3
     sshpass #used to remotely ssh into robots via Ansible
+    unzip # installing tigers autoref
+    xvfb # used for CI to run GUI applications
 )
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
@@ -80,12 +90,17 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(llvm-6.0)
     host_software_packages+=(libclang-6.0-dev)
     host_software_packages+=(libncurses5)
-    sudo apt-get -y install gcc-7 g++-7
-    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
-    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
+    host_software_packages+=(qt5-default)
     
     # This fixes missing headers by notifying the linker
     ldconfig
+fi
+
+if [[ $(lsb_release -rs) == "22.04" ]]; then
+    host_software_packages+=(qtbase5-dev)
+
+    wget -nc https://github.com/UBC-Thunderbots/Software-External-Dependencies/blob/main/85-brltty.rules -O /tmp/85-brltty.rules
+    sudo mv /tmp/85-brltty.rules /usr/lib/udev/rules.d/85-brltty.rules 
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
@@ -113,17 +128,34 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
 fi
 
-if ! sudo /opt/tbotspython/bin/pip3 install protobuf==3.20.1  ; then
-    print_status_msg "Error: Installing protobuf failed"
-    exit 1;
+if [[ $(lsb_release -rs) == "22.04" ]]; then
+    sudo /opt/tbotspython/bin/pip3 install -r ubuntu22_requirements.txt
 fi
 
 print_status_msg "Done Setting Up Virtual Python Environment"
 print_status_msg "Fetching game controller"
 
 sudo chown -R $USER:$USER /opt/tbotspython
-sudo wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
+sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
 sudo chmod +x /opt/tbotspython/gamecontroller
+
+print_status_msg "Setting up TIGERS AutoRef"
+
+print_status_msg "Installing TIGERS dependency: Java 17"
+sudo wget -N https://download.oracle.com/java/17/archive/jdk-17.0.5_linux-x64_bin.deb -O /tmp/jdk-17.0.5.deb
+sudo apt install /tmp/./jdk-17.0.5.deb
+
+print_status_msg "Compiling TIGERS AutoRef"
+sudo wget -N https://github.com/TIGERs-Mannheim/AutoReferee/archive/refs/heads/autoref-ci.zip -O /tmp/autoref-ci.zip
+unzip -q -o -d /tmp/ /tmp/autoref-ci.zip
+touch /tmp/AutoReferee-autoref-ci/.git # a hacky way to make gradle happy when it tries to find a dependency
+/tmp/AutoReferee-autoref-ci/./gradlew installDist -p /tmp/AutoReferee-autoref-ci/ -Dorg.gradle.java.home=/usr/lib/jvm/jdk-17/
+cp -r /tmp/AutoReferee-autoref-ci/build/install/autoReferee/ /opt/tbotspython/autoReferee
+
+sudo chmod +x "$CURR_DIR/../src/software/autoref/run_autoref.sh"
+sudo cp "$CURR_DIR/../src/software/autoref/DIV_B.txt" "/opt/tbotspython/autoReferee/config/geometry/DIV_B.txt"
+
+print_status_msg "Finished setting up AutoRef"
 
 # Install Bazel
 print_status_msg "Installing Bazel"
@@ -142,7 +174,7 @@ print_status_msg "Setting Up PlatformIO"
 # **need to reboot for changes to come into effect**
 
 # downloading platformio udev rules
-if ! curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules; then
+if ! curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/system/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules; then
     print_status_msg "Error: Downloading PlatformIO udev rules failed"
     exit 1
 fi
@@ -159,4 +191,5 @@ if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==6.0.
 fi
 
 print_status_msg "Done PlatformIO Setup"
+
 print_status_msg "Done Software Setup, please reboot for changes to take place"

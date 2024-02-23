@@ -66,6 +66,16 @@ double distance(const Circle &first, const Point &second)
     return distance(second, first);
 }
 
+double distance(const Point &first, const Stadium &second)
+{
+    return std::max(distance(first, second.segment()) - second.radius(), 0.0);
+}
+
+double distance(const Stadium &first, const Point &second)
+{
+    return distance(second, first);
+}
+
 double distanceSquared(const Point &first, const Segment &second)
 {
     Vector seg_vec            = second.toVector();

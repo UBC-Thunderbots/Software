@@ -1,6 +1,6 @@
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 import sys
 import math
 from proto.ssl_gc_common_pb2 import Team

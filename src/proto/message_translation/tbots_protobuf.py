@@ -1,9 +1,17 @@
+from __future__ import annotations
+
 from proto.import_all_protos import *
+import software.python_bindings as tbots_cpp
+import numpy
+import math
 
 
 def create_world_state(
-    yellow_robot_locations, blue_robot_locations, ball_location, ball_velocity
-):
+    yellow_robot_locations: list[tbots_cpp.Point],
+    blue_robot_locations: list[tbots_cpp.Point],
+    ball_location: tbots_cpp.Point,
+    ball_velocity: tbots_cpp.Vector,
+) -> WorldState:
     """Initializes the world from a list of robot locations and ball location/velocity.
 
     NOTE: (index is robot id)
@@ -22,6 +30,7 @@ def create_world_state(
                 global_position=Point(
                     x_meters=robot_location.x(), y_meters=robot_location.y()
                 ),
+                global_orientation=Angle(radians=math.pi),
             )
         )
 
@@ -47,3 +56,21 @@ def create_world_state(
     )
 
     return world_state
+
+
+def create_default_world_state(num_robots: int) -> WorldState:
+    """
+    Create a WorldState proto with num_robots yellow and blue robots evenly spaced in two parallel lines on the field.
+
+    :param num_robots: Number of robots for the yellow and blue teams
+    """
+    return create_world_state(
+        blue_robot_locations=[
+            tbots_cpp.Point(-3, y) for y in numpy.linspace(-2, 2, num_robots)
+        ],
+        yellow_robot_locations=[
+            tbots_cpp.Point(3, y) for y in numpy.linspace(-2, 2, num_robots)
+        ],
+        ball_location=tbots_cpp.Point(0, 0),
+        ball_velocity=tbots_cpp.Vector(0, 0),
+    )

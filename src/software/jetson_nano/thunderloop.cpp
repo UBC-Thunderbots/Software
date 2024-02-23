@@ -1,6 +1,8 @@
 #include "software/jetson_nano/thunderloop.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/robot_crash_msg.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
@@ -13,7 +15,7 @@
 #include "software/world/team.h"
 
 /**
- * https://rt.wiki.kernel.org/index.php/Squarewave-example
+ * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
  * using clock_nanosleep of librt
  */
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
@@ -22,7 +24,11 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 // signal handling is done by csignal which requires a function pointer with C linkage
 extern "C"
 {
-    static MotorService* g_motor_service = NULL;
+    static MotorService* g_motor_service         = NULL;
+    static TbotsProto::RobotStatus* robot_status = NULL;
+    static int channel_id;
+    static std::string network_interface;
+    static int robot_id;
 
     /**
      * Handles process signals
@@ -40,13 +46,27 @@ extern "C"
         std::cerr << "Thunderloop shutting down and motor board reset\n!!!\n"
                   << std::endl;
 
+        TbotsProto::RobotCrash crash_msg;
+        auto dump = g3::internal::stackdump();
+        crash_msg.set_robot_id(robot_id);
+        crash_msg.set_stack_dump(dump);
+        crash_msg.set_exit_signal(g3::signalToStr(signal_num));
+        *(crash_msg.mutable_status()) = *robot_status;
+
+        auto sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotCrash>>(
+            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)) + "%" +
+                network_interface,
+            ROBOT_CRASH_PORT, true);
+        sender->sendProto(crash_msg);
+        std::cerr << "Broadcasting robot crash msg";
+
         exit(signal_num);
     }
 }
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_log_merging,
                          const int loop_hz)
-    // TODO (#2495): Set the friendly team colour once we receive World proto
+    // TODO (#2495): Set the friendly team colour
     : redis_client_(
           std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT)),
       motor_status_(std::nullopt),
@@ -55,7 +75,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       channel_id_(std::stoi(redis_client_->getSync(ROBOT_MULTICAST_CHANNEL_REDIS_KEY))),
       network_interface_(redis_client_->getSync(ROBOT_NETWORK_INTERFACE_REDIS_KEY)),
       loop_hz_(loop_hz),
-      kick_slope_(std::stoi(redis_client_->getSync(ROBOT_KICK_SLOPE_REDIS_KEY))),
+      kick_coeff_(std::stod(redis_client_->getSync(ROBOT_KICK_EXP_COEFF_REDIS_KEY))),
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
@@ -74,23 +94,29 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     std::signal(SIGINT, tbotsExit);
     std::signal(SIGILL, tbotsExit);
 
+    // Initialize values for udp sender in signal handler
+    robot_status      = &robot_status_;
+    channel_id        = channel_id_;
+    network_interface = network_interface_;
+    robot_id          = robot_id_;
+
     LOG(INFO)
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
-        VISION_PORT, PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+        PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
     LOG(INFO)
-        << "THUNDERLOOP: Network Service initialized! Next initializing Motor Service";
+        << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
+
+    power_service_ = std::make_unique<PowerService>();
+    LOG(INFO)
+        << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
     motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
     g_motor_service = motor_service_.get();
     motor_service_->setup();
-    LOG(INFO)
-        << "THUNDERLOOP: Motor Service initialized! Next initializing Power Service";
-
-    power_service_ = std::make_unique<PowerService>();
-    LOG(INFO) << "THUNDERLOOP: Power Service initialized!";
+    LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
               << ", CHANNEL ID: " << channel_id_
@@ -153,9 +179,7 @@ Thunderloop::~Thunderloop() {}
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
-                auto result       = network_service_->poll(robot_status_);
-                new_primitive_set = std::get<0>(result);
-                new_world         = std::get<1>(result);
+                new_primitive_set = network_service_->poll(robot_status_);
             }
 
             thunderloop_status_.set_network_service_poll_time_ms(
@@ -197,22 +221,6 @@ Thunderloop::~Thunderloop() {}
                 }
             }
 
-            struct timespec time_since_last_vision_received;
-            clock_gettime(CLOCK_MONOTONIC, &current_time);
-            ScopedTimespecTimer::timespecDiff(&current_time, &last_world_received_time,
-                                              &time_since_last_vision_received);
-            network_status_.set_ms_since_last_vision_received(
-                getMilliseconds(time_since_last_vision_received));
-
-            // If the world msg is new, update the internal buffer
-            if (new_world.time_sent().epoch_timestamp_seconds() >
-                world_.time_sent().epoch_timestamp_seconds())
-            {
-                clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
-                primitive_executor_.updateWorld(new_world);
-                world_ = new_world;
-            }
-
             if (motor_status_.has_value())
             {
                 auto status = motor_status_.value();
@@ -236,15 +244,10 @@ Thunderloop::~Thunderloop() {}
                 if (nanoseconds_elapsed_since_last_primitive > PACKET_TIMEOUT_NS)
                 {
                     primitive_executor_.setStopPrimitive();
-
-                    // Log milliseconds since last world received if we are timing out
-                    LOG(WARNING)
-                        << "Primitive timeout, overriding with StopPrimitive - Milliseconds since last primitive: "
-                        << static_cast<int>(nanoseconds_elapsed_since_last_primitive) *
-                               MILLISECONDS_PER_NANOSECOND;
                 }
 
-                direct_control_ = *primitive_executor_.stepPrimitive();
+                direct_control_ =
+                    *primitive_executor_.stepPrimitive(primitive_executor_status_);
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(
@@ -254,7 +257,7 @@ Thunderloop::~Thunderloop() {}
             {
                 ScopedTimespecTimer timer(&poll_time);
                 power_status_ =
-                    power_service_->poll(direct_control_.power_control(), kick_slope_,
+                    power_service_->poll(direct_control_.power_control(), kick_coeff_,
                                          kick_constant_, chip_pulse_width_);
             }
             thunderloop_status_.set_power_service_poll_time_ms(
@@ -318,6 +321,8 @@ Thunderloop::~Thunderloop() {}
             *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
             *(robot_status_.mutable_chipper_kicker_status()) = chipper_kicker_status_;
+            *(robot_status_.mutable_primitive_executor_status()) =
+                primitive_executor_status_;
 
             // Update Redis
             redis_client_->setNoCommit(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
@@ -325,6 +330,8 @@ Thunderloop::~Thunderloop() {}
             redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
                                        std::to_string(power_status_.current_draw()));
             redis_client_->asyncCommit();
+
+            updateErrorCodes();
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
@@ -381,5 +388,25 @@ double Thunderloop::getCpuTemperature()
     {
         LOG(WARNING) << "Could not open CPU temperature file";
         return 0.0;
+    }
+}
+
+void Thunderloop::updateErrorCodes()
+{
+    // Clear existing codes
+    robot_status_.clear_error_code();
+
+    // Updates error status
+    if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
+    }
+    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
+    }
+    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
     }
 }

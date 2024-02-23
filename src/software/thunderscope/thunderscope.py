@@ -1,22 +1,19 @@
 import time
-import textwrap
 import shelve
 import logging
 import pathlib
+import os
 
 import pyqtgraph
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 
+from typing import Callable
+
 from software.py_constants import *
+from software.thunderscope.constants import *
 
 from software.thunderscope.thunderscope_config import TScopeConfig
-
-SAVED_LAYOUT_PATH = "/opt/tbotspython/saved_tscope_layout"
-LAYOUT_FILE_EXTENSION = "tscopelayout"
-LAST_OPENED_LAYOUT_PATH = (
-    f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
-)
 
 
 class Thunderscope(object):
@@ -36,8 +33,11 @@ class Thunderscope(object):
     """
 
     def __init__(
-        self, config: TScopeConfig, layout_path=None, refresh_interval_ms=10,
-    ):
+        self,
+        config: TScopeConfig,
+        layout_path: os.PathLike = None,
+        refresh_interval_ms: int = THUNDERSCOPE_REFRESH_INTERVAL_MS,
+    ) -> None:
         """Initialize Thunderscope
 
         :param config: The current Thunderscope UI configuration
@@ -76,7 +76,7 @@ class Thunderscope(object):
             self.tabs.addTab(tab.dock_area, tab.name)
             self.register_refresh_function(tab.refresh)
 
-        self.window = QtGui.QMainWindow()
+        self.window = QMainWindow()
         self.window.setCentralWidget(self.tabs)
         self.window.setWindowIcon(
             QtGui.QIcon("software/thunderscope/thunderscope-logo.png")
@@ -89,6 +89,12 @@ class Thunderscope(object):
             self.load_layout(path)
         except Exception:
             pass
+
+        # Keyboard Estop shortcut
+        # only used when in keyboard estop mode
+        self.keyboard_estop_shortcut = QtGui.QShortcut(
+            QtGui.QKeySequence(" "), self.window
+        )
 
         # Save and Load Prompts
         #
@@ -111,34 +117,10 @@ class Thunderscope(object):
 
         self.show_help = QtGui.QShortcut(QtGui.QKeySequence("h"), self.window)
         self.show_help.activated.connect(
-            lambda: QMessageBox.information(
-                self.window,
-                "Help",
-                textwrap.dedent(
-                    f"""
-                    Keyboard Shortcuts:
-                    
-                    I to identify robots, show their IDs
-                    Cntrl+S: Save Layout
-                    Cntrl+O: Open Layout
-                    Cntrl+R: will remove the file and reset the layout
-                    
-                    Layout file (on save) is located at 
-                            {SAVED_LAYOUT_PATH}
-                    
-                    Mouse Shortcuts:
-                    
-                    Double Click Blue Bar to pop window out
-                    Drag Blue Bar to rearrange docks
-                    Click items in legends to select/deselect
-                    Cntrl-Click and Drag: Move ball and kick
-                    Cntrl-Space: Stop AI vs AI simulation
-                    """
-                ),
-            )
+            lambda: QMessageBox.information(self.window, "Help", THUNDERSCOPE_HELP_TEXT)
         )
 
-    def reset_layout(self):
+    def reset_layout(self) -> None:
         """Reset the layout to the default layout"""
         saved_layout_path = pathlib.Path(LAST_OPENED_LAYOUT_PATH)
         saved_layout_path.unlink(missing_ok=True)
@@ -148,7 +130,7 @@ class Thunderscope(object):
             "Restart thunderscope to reset the layout.",
         )
 
-    def save_layout(self):
+    def save_layout(self) -> None:
         """Open a file dialog to save the layout and any other
         registered state to a file
 
@@ -161,7 +143,7 @@ class Thunderscope(object):
                 f"Could not create folder at '{SAVED_LAYOUT_PATH}' for layout files"
             )
 
-        filename, _ = QtGui.QFileDialog.getSaveFileName(
+        filename, _ = QFileDialog.getSaveFileName(
             self.window,
             "Save layout",
             f"{SAVED_LAYOUT_PATH}/dock_layout_{int(time.time())}.{LAYOUT_FILE_EXTENSION}",
@@ -174,13 +156,19 @@ class Thunderscope(object):
 
         with shelve.open(filename, "c") as shelf:
             for key, val in self.tab_dock_map.items():
-                shelf[key] = val.saveState()
+                try:
+                    shelf[key] = val.saveState()
+                except AttributeError:
+                    pass
 
         with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as shelf:
             for key, val in self.tab_dock_map.items():
-                shelf[key] = val.saveState()
+                try:
+                    shelf[key] = val.saveState()
+                except AttributeError:
+                    pass
 
-    def load_layout(self, filename=None):
+    def load_layout(self, filename: os.PathLike = None) -> None:
         """Open a file dialog to load the layout and state to all widgets
 
         :param filename: The filename to load the layout from. If None, then
@@ -189,7 +177,7 @@ class Thunderscope(object):
         """
 
         if filename is None:
-            filename, _ = QtGui.QFileDialog.getOpenFileName(
+            filename, _ = QFileDialog.getOpenFileName(
                 self.window,
                 "Open layout",
                 f"{SAVED_LAYOUT_PATH}/",
@@ -215,7 +203,7 @@ class Thunderscope(object):
                         default_shelf[key] = val
                     default_shelf.sync()
 
-    def register_refresh_function(self, refresh_func):
+    def register_refresh_function(self, refresh_func: Callable[[], None]) -> None:
         """Register the refresh functions to run at the refresh_interval_ms
         passed into thunderscope.
 
@@ -229,18 +217,18 @@ class Thunderscope(object):
 
         self.refresh_timers.append(refresh_timer)
 
-    def show(self):
+    def show(self) -> None:
         """Show the main window"""
 
         self.window.show()
         self.window.showMaximized()
         pyqtgraph.exec()
 
-    def is_open(self):
+    def is_open(self) -> bool:
         """Returns true if the window is open"""
         return self.window.isVisible()
 
-    def close(self):
+    def close(self) -> None:
         """Close the main window"""
 
         QtCore.QTimer.singleShot(0, self.window.close)
