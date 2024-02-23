@@ -13,27 +13,25 @@ EnemyBallPlacementPlay::EnemyBallPlacementPlay(TbotsProto::AiConfig config)
 {
 }
 
-    /*
-     * Set up 3 crease defenders to sit by crease, and put two robots behind the ball
-     * placement point
-     *
-     *
-     *               placement point
-     *                       +
-     *
-     *     Shadow enemy    o  x  enemy robot
-     *
-     *      move robots      o
-     *
-     * crease defenders  o   o   o
-     *
-     *        goalie         o
-     *                    +-----+
-     */
-
 void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                             const World &world)
 {
+    /*
+     * Set up 2 crease defenders and 3 robots to stay near the ball without interfering
+     *
+     * 
+     *                          placement point
+     *                                +
+     *                              
+     *                     o    x  enemy robot with ball
+     *      move robots      o 
+     *                         o
+     * 
+     *   crease defenders  o   o
+     * 
+     *        goalie         o
+     *                    +-----+
+     */
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders = {
         // TODO-AKHIL: Remove this hard-coded value
@@ -50,25 +48,13 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     std::optional<Point> raw_placement_point = world.gameState().getBallPlacementPoint();
     Point placement_point = raw_placement_point.has_value() ? raw_placement_point.value() : world.ball().position();
-    LOG(DEBUG) << "Placement point initial: " << placement_point;
+    LOG(INFO) << "Placement point: " << placement_point;
 
     do
     {
+        double distance_to_keep = ENEMY_BALL_PLACEMENT_DISTANCE_METERS + 0.2;
 
-        double distance_to_keep = ENEMY_BALL_PLACEMENT_DISTANCE_METERS + 0.5;
-
-        // auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-        //                                         world.enemyTeam(), world.ball(), false);
-
-        // Create tactic vector (starting with Goalie)
         PriorityTacticVector tactics_to_run = {{}};
-
-        if (placement_point == world.ball().position()) {
-            LOG(DEBUG) << "Placement point same as ball position";
-            yield(tactics_to_run);
-        } else {
-            LOG(DEBUG) << "Placement point: " << placement_point; 
-        }
 
         // Create crease defenders
         crease_defenders[0]->updateControlParams(
@@ -79,84 +65,28 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         tactics_to_run[0].emplace_back(crease_defenders[0]);
         tactics_to_run[0].emplace_back(crease_defenders[1]);
 
-        Vector placement_to_ball_unit_vector = (placement_point - world.ball().position()).normalize();
-        Vector down_vector = placement_to_ball_unit_vector.rotate(Angle::fromDegrees(30));
-        Vector up_vector = placement_to_ball_unit_vector.rotate(Angle::fromDegrees(-30));
+        // Create move tactics 
+        Vector positioning_vector = (world.ball().position() - placement_point);
 
-        Point center = world.ball().position() + (distance_to_keep) * placement_to_ball_unit_vector;
-        Point up = world.ball().position() + (distance_to_keep) * up_vector;
-        Point down = world.ball().position() + (distance_to_keep) * down_vector;
+        // If the ball is nearly placed, then adjust move tactics to position between friendly goal and the ball
+        if (positioning_vector.length() < 0.5) {
+            positioning_vector = world.field().friendlyGoalCenter() - world.ball().position();
+        }
+        positioning_vector = positioning_vector.normalize() * distance_to_keep;
 
-        move_tactics[0]->updateControlParams(center, placement_to_ball_unit_vector.orientation(), 0);
-        move_tactics[1]->updateControlParams(up, up_vector.orientation(), 0);
-        move_tactics[2]->updateControlParams(down, down_vector.orientation(), 0);
+        Vector left_vector = positioning_vector.rotate(Angle::fromDegrees(-30));
+        Vector right_vector = positioning_vector.rotate(Angle::fromDegrees(30));
+
+        Point center = world.ball().position() + positioning_vector;
+        Point left = world.ball().position() + left_vector;
+        Point right = world.ball().position() + right_vector;
+
+        move_tactics[0]->updateControlParams(center, positioning_vector.orientation() + Angle::half(), 0);
+        move_tactics[1]->updateControlParams(left, left_vector.orientation() + Angle::half(), 0);
+        move_tactics[2]->updateControlParams(right, right_vector.orientation() + Angle::half(), 0);
         tactics_to_run[0].emplace_back(move_tactics[0]);
         tactics_to_run[0].emplace_back(move_tactics[1]);
         tactics_to_run[0].emplace_back(move_tactics[2]);
-
-        // Vector ball_to_net = placement_to_ball_unit_vector.rotate()
-        //     (world.ball().position() - world.field().friendlyGoalCenter())
-        //         .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
-
-        // Vector placement_to_net = (placement_point - world.field().friendlyGoalCenter())
-        //                               .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
-
-        // // Check to see if the enemy has the ball. Once they do, we change our shadowing
-        // // behaviour
-        // for (const auto &enemy_robot : world.enemyTeam().getAllRobotsExceptGoalie())
-        // {
-        //     if ((enemy_robot.position() - world.ball().position()).length() < 0.25)
-        //     {
-        //         enemy_at_ball = true;
-        //     }
-        // }
-
-        // // If the enemy hasn't reached the ball yet, we use this flag to avoid shadowing
-        // // so that we don't interfere with the enemy robots going to pick up the ball
-        // if (!enemy_at_ball)
-        // {
-        //     move_tactics[0]->updateControlParams(
-        //         world.ball().position() + ball_to_net +
-        //             ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
-        //         ball_to_net.orientation() + Angle::half(), 0);
-        //     move_tactics[1]->updateControlParams(
-        //         world.ball().position() + ball_to_net -
-        //             ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
-        //         ball_to_net.orientation() + Angle::half(), 0);
-        //     tactics_to_run[0].emplace_back(move_tactics[0]);
-        //     tactics_to_run[0].emplace_back(move_tactics[1]);
-        // }
-        // // if no threats, send two robots near placement point
-        // else if (enemy_threats.size() == 0)
-        // {
-        //     move_tactics[0]->updateControlParams(
-        //         placement_point + placement_to_net +
-        //             placement_to_net.perpendicular().normalize(1.25 *
-        //                                                        ROBOT_MAX_RADIUS_METERS),
-        //         placement_to_net.orientation() + Angle::half(), 0);
-        //     move_tactics[1]->updateControlParams(
-        //         placement_point + placement_to_net -
-        //             placement_to_net.perpendicular().normalize(1.25 *
-        //                                                        ROBOT_MAX_RADIUS_METERS),
-        //         placement_to_net.orientation() + Angle::half(), 0);
-        //     tactics_to_run[0].emplace_back(move_tactics[0]);
-        //     tactics_to_run[0].emplace_back(move_tactics[1]);
-        // }
-        // // if there are threats, send one robot to placement point, and one shadows
-        // else
-        // {
-        //     move_tactics[0]->updateControlParams(
-        //         placement_point + placement_to_net,
-        //         placement_to_net.orientation() + Angle::half(), 0);
-        //     // We need a big shadow distance to avoid "bullying" the robot ball placing.
-        //     // Otherwise, we get a penalty
-        //     shadow_enemy->updateControlParams(
-        //         enemy_threats.at(0),
-        //         ROBOT_MAX_RADIUS_METERS * 15);  // Leave 2 robot widths distance (~36cm)
-
-        //     tactics_to_run[0].emplace_back(move_tactics[0]);
-        //     tactics_to_run[0].emplace_back(shadow_enemy);
-        // }
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);
