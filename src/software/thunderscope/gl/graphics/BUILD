@@ -97,3 +97,12 @@ py_library(
         ":gl_painter",
     ],
 )
+
+py_library(
+    name = "gl_stadium",
+    srcs = ["gl_stadium.py"],
+    deps = [
+        requirement("pyqtgraph"),
+        ":gl_shape",
+    ],
+)
