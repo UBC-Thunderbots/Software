@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "proto/primitive.pb.h"
+#include "shared/constants.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/line.h"
 #include "software/geom/point.h"
