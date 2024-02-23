@@ -13,11 +13,6 @@ EnemyBallPlacementPlay::EnemyBallPlacementPlay(TbotsProto::AiConfig config)
 {
 }
 
-void EnemyBallPlacementPlay::ballPlacementWithShadow(
-    TacticCoroutine::push_type &yield, const World &world,
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders,
-    std::array<std::shared_ptr<MoveTactic>, 3> move_tactics, Point placement_point)
-{
     /*
      * Set up 3 crease defenders to sit by crease, and put two robots behind the ball
      * placement point
@@ -35,9 +30,27 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
      *        goalie         o
      *                    +-----+
      */
-    // auto shadow_enemy = std::make_shared<ShadowEnemyTactic>();
 
-    // bool enemy_at_ball = false;
+void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                            const World &world)
+{
+
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders = {
+        // TODO-AKHIL: Remove this hard-coded value
+        std::make_shared<CreaseDefenderTactic>(
+            ai_config.robot_navigation_obstacle_config()),
+        std::make_shared<CreaseDefenderTactic>(
+            ai_config.robot_navigation_obstacle_config())};
+
+    std::array<std::shared_ptr<MoveTactic>, 3> move_tactics = {
+        std::make_shared<MoveTactic>(),
+        std::make_shared<MoveTactic>(),
+        std::make_shared<MoveTactic>(),
+    };
+
+    std::optional<Point> raw_placement_point = world.gameState().getBallPlacementPoint();
+    Point placement_point = raw_placement_point.has_value() ? raw_placement_point.value() : world.ball().position();
+    LOG(DEBUG) << "Placement point initial: " << placement_point;
 
     do
     {
@@ -53,6 +66,8 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         if (placement_point == world.ball().position()) {
             LOG(DEBUG) << "Placement point same as ball position";
             yield(tactics_to_run);
+        } else {
+            LOG(DEBUG) << "Placement point: " << placement_point; 
         }
 
         // Create crease defenders
@@ -72,9 +87,9 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         Point up = world.ball().position() + (distance_to_keep) * up_vector;
         Point down = world.ball().position() + (distance_to_keep) * down_vector;
 
-        move_tactics[0]->updateControlParams(center, placement_to_ball_unit_vector.orientation() + Angle::half(), 0);
-        move_tactics[1]->updateControlParams(up, up_vector.orientation() + Angle::half(), 0);
-        move_tactics[2]->updateControlParams(down, down_vector.orientation() + Angle::half(), 0);
+        move_tactics[0]->updateControlParams(center, placement_to_ball_unit_vector.orientation(), 0);
+        move_tactics[1]->updateControlParams(up, up_vector.orientation(), 0);
+        move_tactics[2]->updateControlParams(down, down_vector.orientation(), 0);
         tactics_to_run[0].emplace_back(move_tactics[0]);
         tactics_to_run[0].emplace_back(move_tactics[1]);
         tactics_to_run[0].emplace_back(move_tactics[2]);
@@ -147,37 +162,6 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         yield(tactics_to_run);
         
     } while (true);
-}
-
-void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                            const World &world)
-{
-    std::optional<Point> placement_point = world.gameState().getBallPlacementPoint();
-
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders = {
-        // TODO-AKHIL: Remove this hard-coded value
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config())};
-
-    std::array<std::shared_ptr<MoveTactic>, 3> move_tactics = {
-        std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>(),
-    };
-
-    if (placement_point.has_value())
-    {
-        ballPlacementWithShadow(yield, world, crease_defenders, move_tactics,
-                                placement_point.value());
-    }
-    // if there is no placement_point, use the ball position
-    else
-    {
-        ballPlacementWithShadow(yield, world, crease_defenders, move_tactics,
-                                world.ball().position());
-    }
 }
 
 static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, TbotsProto::AiConfig>
