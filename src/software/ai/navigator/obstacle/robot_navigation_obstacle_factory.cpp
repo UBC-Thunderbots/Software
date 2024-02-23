@@ -318,5 +318,6 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
 ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
     const Point &placement_point, const Point &ball_point) const
 {
-    return createFromShape(Stadium(Segment(ball_point, placement_point), ENEMY_BALL_PLACEMENT_DISTANCE_METERS));
+    return createFromShape(Stadium(Segment(ball_point, placement_point),
+                                   ENEMY_BALL_PLACEMENT_DISTANCE_METERS));
 }
