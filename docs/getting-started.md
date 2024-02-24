@@ -313,16 +313,18 @@ bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/tm
 
 This will output the file at the _absolute_ path given via the `--callgrind-out-file` argument. This file can then be viewed using `kcachegrind` (example: `kcachegrind /tmp/profile.callgrind`), giving lots of useful information about where time is being spent in the code.
 
-Callgrind requires building with debug symbols; Thus, runtime performance will be much slower, so Callgrind is not appropriate to find bottlenecks in real runtime environments.
+Callgrind requires generating the profile by tracking every single instruction executed by the code. This design adds significant overhead to the runtime performance and significantly slows down the code. Callgrind is appropriate in finding a general sense of bottlenecks in the code but it is difficult to track issues with blocking code and deadlocks.
 
 ### Tracy
 
-Tracy is a lightweight, real-time profiler designed for understanding real-time performance of a system. It offers insights into CPU usage and memory allocations by adding Tracy's markup API.
+Tracy is a lightweight, real-time profiler designed for understanding the performance of a system. It offers insights into CPU usage and memory allocations by adding Tracy's markup API.
 
 To run Tracy:
-1. Run the Tracy profiler: `./tbots.py run tracy`
+1. If you haven't installed Tracy: `./environment_setup/install_tracy.sh`. Tracy is __very_particular__ about its dependencies!
 
-2. Build and run a binary using the `--tracy` flag. Requires Tracy markup symbols to be added to the code:
+2. Run the Tracy profiler: `./tbots.py run tracy`
+
+3. Build and run a binary using the `--tracy` flag. Requires Tracy markup symbols to be added to the code:
 
     1. For `Thunderloop`: `./tbots.py build thunderloop_main --tracy`
 
