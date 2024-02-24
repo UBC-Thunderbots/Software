@@ -611,7 +611,7 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 {
     int ret;
 
-    struct spi_ioc_transfer tr[2];
+    struct spi_ioc_transfer tr[1];
     memset(tr, 0, sizeof(tr));
 
     tr[0].tx_buf        = (unsigned long)tx_;
