@@ -10,7 +10,8 @@ EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_con
           std::make_shared<MoveTactic>(),
           std::make_shared<MoveTactic>(),
           std::make_shared<MoveTactic>(),
-      })
+      }),
+      distance_to_keep(ENEMY_BALL_PLACEMENT_DISTANCE_METERS + 0.2)
 {
 }
 
@@ -26,7 +27,6 @@ void EnemyBallPlacementPlayFSM::setPlacementPoint(const Update& event)
 
 void EnemyBallPlacementPlayFSM::avoid(const Update& event)
 {
-    World world = event.common.world;
     /*
      * Set up 2 crease defenders and 3 robots to stay near the ball without interfering
      *
@@ -45,7 +45,7 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
      */
     PriorityTacticVector tactics_to_run = {{}};
 
-    double distance_to_keep = ENEMY_BALL_PLACEMENT_DISTANCE_METERS + 0.2;
+    World world = event.common.world;
 
     // Create crease defenders
     crease_defenders[0]->updateControlParams(placement_point,

@@ -78,4 +78,5 @@ struct EnemyBallPlacementPlayFSM
     std::array<std::shared_ptr<MoveTactic>, 3> move_tactics;
 
     Point placement_point;
+    double distance_to_keep;
 };
