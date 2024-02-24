@@ -28,7 +28,7 @@ message Tactic
         PivotKickTactic pivot_kick                          = 11;
         ReceiverTactic receiver                             = 12;
         ShadowEnemyTactic shadow_enemy                      = 13;
-        StopTactic stop                                     = 14;
+        HaltTactic stop                                     = 14;
         PassDefenderTactic pass_defender                    = 15;
     }
 }
@@ -165,4 +165,4 @@ message ShadowEnemyTactic
     required double shadow_distance = 2;
 }
 
-message StopTactic {}
+message HaltTactic {}

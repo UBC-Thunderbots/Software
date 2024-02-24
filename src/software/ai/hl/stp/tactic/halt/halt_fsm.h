@@ -2,7 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 
-struct StopFSM
+struct HaltFSM
 {
    public:
     class StopState;
@@ -14,25 +14,25 @@ struct StopFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Constructor for StopFSM struct
+     * Constructor for HaltFSM struct
      */
-    explicit StopFSM() {}
+    explicit HaltFSM() {}
 
     /**
      * Action to set the StopPrimitive
      *
-     * @param event StopFSM::Update
+     * @param event HaltFSM::Update
      */
-    void updateStop(const Update& event);
+    void updateHalt(const Update& event);
 
     /**
      * Guard if the stop is done
      *
-     * @param event StopFSM::Update
+     * @param event HaltFSM::Update
      *
      * @return if the robot has stopped
      */
-    bool stopDone(const Update& event);
+    bool haltDone(const Update& event);
 
     auto operator()()
     {
@@ -40,14 +40,14 @@ struct StopFSM
 
         DEFINE_SML_STATE(StopState)
         DEFINE_SML_EVENT(Update)
-        DEFINE_SML_GUARD(stopDone)
-        DEFINE_SML_ACTION(updateStop)
+        DEFINE_SML_GUARD(haltDone)
+        DEFINE_SML_ACTION(updateHalt)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StopState_S + Update_E[!stopDone_G] / updateStop_A = StopState_S,
-            StopState_S + Update_E[stopDone_G] / updateStop_A   = X,
-            X + Update_E[!stopDone_G] / updateStop_A            = StopState_S,
-            X + Update_E[stopDone_G] / updateStop_A             = X);
+            *StopState_S + Update_E[!haltDone_G] / updateHalt_A = StopState_S,
+            StopState_S + Update_E[haltDone_G] / updateHalt_A   = X,
+            X + Update_E[!haltDone_G] / updateHalt_A            = StopState_S,
+            X + Update_E[haltDone_G] / updateHalt_A             = X);
     }
 };
