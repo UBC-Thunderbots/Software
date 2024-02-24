@@ -2,6 +2,7 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_crash_msg.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
@@ -17,7 +18,7 @@
 #include <Tracy.hpp>
 
 /**
- * https://rt.wiki.kernel.org/index.php/Squarewave-example
+ * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
  * using clock_nanosleep of librt
  */
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
@@ -350,6 +351,8 @@ Thunderloop::~Thunderloop() {}
                                            std::to_string(power_status_.current_draw()));
                 redis_client_->asyncCommit();
             }
+
+            updateErrorCodes();
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
@@ -408,5 +411,25 @@ double Thunderloop::getCpuTemperature()
     {
         LOG(WARNING) << "Could not open CPU temperature file";
         return 0.0;
+    }
+}
+
+void Thunderloop::updateErrorCodes()
+{
+    // Clear existing codes
+    robot_status_.clear_error_code();
+
+    // Updates error status
+    if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
+    }
+    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
+    }
+    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
     }
 }
