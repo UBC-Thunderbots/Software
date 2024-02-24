@@ -297,6 +297,11 @@ To debug from the command line, first you need to build your target with the deb
 ## Profiling 
 
 Profiling is an optimization tool used to identify the time and space used by code, with a detailed breakdown to help identify areas of potential performance improvements. Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence the only way is via command line. Use the following command:
+
+### Callgrind
+
+Callgrind is a profiling tool that is part of the Valgrind suite, designed for analyzing program execution and performance with a focus on functional calls and cache usage. It is useful for determining specific functions in the code that may bottleneck performance.
+
 ```
 bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/ABSOLUTE/PATH/TO/profile.callgrind" //target/to:run
 
@@ -305,6 +310,31 @@ bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/tm
 ```
 
 This will output the file at the _absolute_ path given via the `--callgrind-out-file` argument. This file can then be viewed using `kcachegrind` (example: `kcachegrind /tmp/profile.callgrind`), giving lots of useful information about where time is being spent in the code.
+
+Callgrind requires building with debug symbols; Thus, runtime performance will be much slower, so Callgrind is not appropriate to find bottlenecks in real runtime environments.
+
+### Tracy
+
+Tracy is a lightweight, real-time profiler designed for understanding real-time performance of a system. It offers insights into CPU usage and memory allocations by adding Tracy's markup API.
+
+To run Tracy:
+1. Run the Tracy profiler:
+
+`./tbots.py run tracy`
+
+2. Build and run a binary using the `--tracy` flag. Requires Tracy markup symbols to be added to the code:
+    a. For `Thunderloop`:
+
+`./tbots.py build thunderloop_main --tracy`
+
+    b. For `FullSystem`:
+
+`./tbots.py run thunderscope_main --tracy`
+
+Unlike (Callgrind)[#Callgrind], we can run (and encouraged to run) Tracy with the binary compiled with any and full compiler optimizations. It can provide us a better understanding of the real-time performance of the code.
+
+*Warning: Bewarned from the Tracy 16.10.2023 manual:
+> The captured data is stored in RAM and only written to the disk when the capture finishes. This can result in memory exhaustion when you capture massive amounts of profile data or even in typical usage situations when the capture is performed over a long time. Therefore, the recommended usage pattern is to perform moderate instrumentation of the client code and limit capture time to the strict necessity.
 
 ## Building for Jetson Nano 
 
