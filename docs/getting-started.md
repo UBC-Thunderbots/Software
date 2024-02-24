@@ -323,17 +323,14 @@ To run Tracy:
 `./tbots.py run tracy`
 
 2. Build and run a binary using the `--tracy` flag. Requires Tracy markup symbols to be added to the code:
-    a. For `Thunderloop`:
 
-`./tbots.py build thunderloop_main --tracy`
+    1. For `Thunderloop`: `./tbots.py build thunderloop_main --tracy`
 
-    b. For `FullSystem`:
+    2. For `FullSystem`: `./tbots.py run thunderscope_main --tracy`
 
-`./tbots.py run thunderscope_main --tracy`
+Unlike [Callgrind](Callgrind), we can run (and encouraged to run) Tracy with the binary compiled with any and full compiler optimizations. It can provide us a better understanding of the real-time performance of the code.
 
-Unlike (Callgrind)[#Callgrind], we can run (and encouraged to run) Tracy with the binary compiled with any and full compiler optimizations. It can provide us a better understanding of the real-time performance of the code.
-
-*Warning: Bewarned from the Tracy 16.10.2023 manual:
+Warning: Bewarned from the Tracy 16.10.2023 manual:
 > The captured data is stored in RAM and only written to the disk when the capture finishes. This can result in memory exhaustion when you capture massive amounts of profile data or even in typical usage situations when the capture is performed over a long time. Therefore, the recommended usage pattern is to perform moderate instrumentation of the client code and limit capture time to the strict necessity.
 
 ## Building for Jetson Nano 
