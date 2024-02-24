@@ -11,7 +11,7 @@ EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_con
           std::make_shared<MoveTactic>(),
           std::make_shared<MoveTactic>(),
       }),
-      distance_to_keep(ENEMY_BALL_PLACEMENT_DISTANCE_METERS + 0.2)
+      distance_to_keep(ENEMY_BALL_PLACEMENT_DISTANCE_METERS + 4 * ROBOT_MAX_RADIUS_METERS)
 {
 }
 
