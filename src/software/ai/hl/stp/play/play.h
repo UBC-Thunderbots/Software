@@ -41,8 +41,7 @@ class Play
      * @param requires_goalie Whether this plays requires a goalie
      * @param strategy   to get and store shared calculations
      */
-    explicit Play(bool requires_goalie,
-                  std::shared_ptr<Strategy> strategy);
+    explicit Play(bool requires_goalie, std::shared_ptr<Strategy> strategy);
 
     /**
      * Resets the play, required after a change in the AiConfig.

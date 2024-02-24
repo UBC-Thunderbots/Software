@@ -5,12 +5,13 @@
 #include "software/ai/hl/stp/strategy/strategy.h"
 #include "software/logger/logger.h"
 
-std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto, std::shared_ptr<Strategy> strategy)
+std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
+                                     std::shared_ptr<Strategy> strategy)
 {
 #define PROTO_CREATE_TACTIC_CASE(ONE_OF_CASE_NAME, ONE_OF_VARIABLE_NAME)                 \
     case TbotsProto::Tactic::k##ONE_OF_CASE_NAME:                                        \
     {                                                                                    \
-        return createTactic(tactic_proto.ONE_OF_VARIABLE_NAME(), strategy);             \
+        return createTactic(tactic_proto.ONE_OF_VARIABLE_NAME(), strategy);              \
     }
 
     switch (tactic_proto.tactic_case())

@@ -6,10 +6,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-StopPlay::StopPlay(std::shared_ptr<Strategy> strategy)
-    : Play(true, strategy)
-{
-}
+StopPlay::StopPlay(std::shared_ptr<Strategy> strategy) : Play(true, strategy) {}
 
 void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {

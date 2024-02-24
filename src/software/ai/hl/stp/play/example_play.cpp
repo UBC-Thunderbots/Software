@@ -3,10 +3,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-ExamplePlay::ExamplePlay(std::shared_ptr<Strategy> strategy)
-    : Play(false, strategy)
-{
-}
+ExamplePlay::ExamplePlay(std::shared_ptr<Strategy> strategy) : Play(false, strategy) {}
 
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {

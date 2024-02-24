@@ -25,7 +25,7 @@ struct OffensePlayFSM
      * @param ai_config the play config for this play FSM
      */
     explicit OffensePlayFSM(std::shared_ptr<Strategy> strategy);
-                            
+
 
     /**
      * Guard to check whether the enemy team has possession of the ball

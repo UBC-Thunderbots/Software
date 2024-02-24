@@ -45,4 +45,5 @@ void CreaseDefensePlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, CreaseDefensePlay, std::shared_ptr<Strategy>> factory;
+static TGenericFactory<std::string, Play, CreaseDefensePlay, std::shared_ptr<Strategy>>
+    factory;

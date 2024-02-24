@@ -34,8 +34,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
     if (last_execution_robot == tactic_update.robot.id())
     {
-        if (current_skill_ == nullptr ||
-            current_skill_->done(tactic_update.robot))
+        if (current_skill_ == nullptr || current_skill_->done(tactic_update.robot))
         {
             current_skill_ = next_skill;
             current_skill_->reset(tactic_update.robot);

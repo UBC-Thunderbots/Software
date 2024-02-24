@@ -17,16 +17,14 @@
 PlaySelectionFSM::PlaySelectionFSM(std::shared_ptr<Strategy> strategy)
     : ai_config(strategy->getAiConfig()),
       ball_placement_play(std::make_shared<BallPlacementPlay>(strategy)),
-      enemy_ball_placement_play(
-          std::make_shared<EnemyBallPlacementPlay>(strategy)),
+      enemy_ball_placement_play(std::make_shared<EnemyBallPlacementPlay>(strategy)),
       enemy_free_kick_play(std::make_shared<EnemyFreekickPlay>(strategy)),
       free_kick_play(std::make_shared<FreeKickPlay>(strategy)),
       halt_play(std::make_shared<HaltPlay>(strategy)),
       kickoff_enemy_play(std::make_shared<KickoffEnemyPlay>(strategy)),
       kickoff_friendly_play(std::make_shared<KickoffFriendlyPlay>(strategy)),
       offense_play(std::make_shared<OffensePlay>(strategy)),
-      penalty_kick_enemy_play(
-          std::make_shared<PenaltyKickEnemyPlay>(strategy)),
+      penalty_kick_enemy_play(std::make_shared<PenaltyKickEnemyPlay>(strategy)),
       penalty_kick_play(std::make_shared<PenaltyKickPlay>(strategy)),
       stop_play(std::make_shared<StopPlay>(strategy))
 {

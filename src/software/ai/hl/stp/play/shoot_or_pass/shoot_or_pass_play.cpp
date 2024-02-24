@@ -44,4 +44,5 @@ std::vector<std::string> ShootOrPassPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrPassPlay, std::shared_ptr<Strategy>> factory;
+static TGenericFactory<std::string, Play, ShootOrPassPlay, std::shared_ptr<Strategy>>
+    factory;

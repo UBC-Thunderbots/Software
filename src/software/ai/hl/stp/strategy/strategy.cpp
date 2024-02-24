@@ -16,7 +16,7 @@ const TbotsProto::AiConfig& Strategy::getAiConfig() const
 
 void Strategy::updateAiConfig(const TbotsProto::AiConfig& ai_config)
 {
-    //strategy_->updateAiConfig(ai_config);
+    strategy_->updateAiConfig(ai_config);
 }
 
 void Strategy::updateWorld(const World& world)

@@ -242,4 +242,5 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, FreeKickPlay, std::shared_ptr<Strategy>> factory;
+static TGenericFactory<std::string, Play, FreeKickPlay, std::shared_ptr<Strategy>>
+    factory;

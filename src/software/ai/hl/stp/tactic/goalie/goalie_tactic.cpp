@@ -16,8 +16,7 @@ GoalieTactic::GoalieTactic(std::shared_ptr<Strategy> strategy,
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<GoalieFSM>>(
-            DribbleSkillFSM(),
-            GoalieFSM(strategy, max_allowed_speed_mode));
+            DribbleSkillFSM(), GoalieFSM(strategy, max_allowed_speed_mode));
     }
 }
 
@@ -36,8 +35,7 @@ void GoalieTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<GoalieFSM>>(
-            DribbleSkillFSM(),
-            GoalieFSM(strategy, max_allowed_speed_mode));
+            DribbleSkillFSM(), GoalieFSM(strategy, max_allowed_speed_mode));
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(GoalieFSM::Update(control_params, tactic_update));
