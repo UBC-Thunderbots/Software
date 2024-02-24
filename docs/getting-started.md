@@ -318,9 +318,7 @@ Callgrind requires building with debug symbols; Thus, runtime performance will b
 Tracy is a lightweight, real-time profiler designed for understanding real-time performance of a system. It offers insights into CPU usage and memory allocations by adding Tracy's markup API.
 
 To run Tracy:
-1. Run the Tracy profiler:
-
-`./tbots.py run tracy`
+1. Run the Tracy profiler: `./tbots.py run tracy`
 
 2. Build and run a binary using the `--tracy` flag. Requires Tracy markup symbols to be added to the code:
 
@@ -330,7 +328,7 @@ To run Tracy:
 
 Unlike [Callgrind](Callgrind), we can run (and encouraged to run) Tracy with the binary compiled with any and full compiler optimizations. It can provide us a better understanding of the real-time performance of the code.
 
-Warning: Bewarned from the Tracy 16.10.2023 manual:
+**Warning**: Bewarned from the Tracy 16.10.2023 manual:
 > The captured data is stored in RAM and only written to the disk when the capture finishes. This can result in memory exhaustion when you capture massive amounts of profile data or even in typical usage situations when the capture is performed over a long time. Therefore, the recommended usage pattern is to perform moderate instrumentation of the client code and limit capture time to the strict necessity.
 
 ## Building for Jetson Nano 
