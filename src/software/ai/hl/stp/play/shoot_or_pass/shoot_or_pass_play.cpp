@@ -8,7 +8,7 @@
 ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<Strategy> strategy)
     : Play(true, strategy),
       fsm(std::make_unique<FSM<ShootOrPassPlayFSM>>(
-          ShootOrPassPlayFSM(ai_config, strategy))),
+          ShootOrPassPlayFSM(strategy->getAiConfig(), strategy))),
       control_params{}
 {
 }
@@ -21,14 +21,6 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     {
         yield({{}});
     }
-}
-
-void ShootOrPassPlay::reset()
-{
-    Play::reset();
-
-    fsm = std::make_unique<FSM<ShootOrPassPlayFSM>>(
-        ShootOrPassPlayFSM(ai_config, strategy));
 }
 
 void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)

@@ -32,9 +32,9 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            strategy->getAiConfig().robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config())};
+            strategy->getAiConfig().robot_navigation_obstacle_config())};
 
     auto attacker = std::make_shared<AttackerTactic>(strategy);
 
@@ -142,8 +142,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
-    PassGenerator<EighteenZoneId> pass_generator(pitch_division,
-                                                 ai_config.passing_config());
+    PassGenerator<EighteenZoneId> pass_generator(
+        pitch_division, strategy->getAiConfig().passing_config());
 
     using Zones = std::unordered_set<EighteenZoneId>;
 

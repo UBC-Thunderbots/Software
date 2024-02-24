@@ -21,13 +21,6 @@ void OffensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     }
 }
 
-void OffensePlay::reset()
-{
-    Play::reset();
-
-    fsm = std::make_unique<FSM<OffensePlayFSM>>(OffensePlayFSM(strategy));
-}
-
 void OffensePlay::updateTactics(const PlayUpdate &play_update)
 {
     fsm->process_event(OffensePlayFSM::Update(control_params, play_update));

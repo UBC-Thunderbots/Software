@@ -7,7 +7,8 @@
 
 CreaseDefensePlay::CreaseDefensePlay(std::shared_ptr<Strategy> strategy)
     : Play(true, strategy),
-      fsm(std::make_unique<FSM<CreaseDefensePlayFSM>>(CreaseDefensePlayFSM(ai_config))),
+      fsm(std::make_unique<FSM<CreaseDefensePlayFSM>>(
+          CreaseDefensePlayFSM(strategy->getAiConfig()))),
       control_params{
           .enemy_threat_origin    = Point(),
           .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
@@ -22,13 +23,6 @@ void CreaseDefensePlay::getNextTactics(TacticCoroutine::push_type &yield,
     {
         yield({{}});
     }
-}
-
-void CreaseDefensePlay::reset()
-{
-    Play::reset();
-
-    fsm = std::make_unique<FSM<CreaseDefensePlayFSM>>(CreaseDefensePlayFSM(ai_config));
 }
 
 void CreaseDefensePlay::updateControlParams(

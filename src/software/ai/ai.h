@@ -18,8 +18,8 @@ class Ai final
     Ai() = delete;
 
     /**
-     * Create an AI 
-     * 
+     * Create an AI
+     *
      * @param strategy the Strategy
      */
     explicit Ai(std::shared_ptr<Strategy> strategy);

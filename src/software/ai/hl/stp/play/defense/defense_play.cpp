@@ -7,7 +7,7 @@
 
 DefensePlay::DefensePlay(std::shared_ptr<Strategy> strategy)
     : Play(true, strategy),
-      fsm(std::make_unique<FSM<DefensePlayFSM>>(DefensePlayFSM(ai_config))),
+      fsm(std::make_unique<FSM<DefensePlayFSM>>(DefensePlayFSM(strategy->getAiConfig()))),
       control_params{.max_allowed_speed_mode =
                          TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
 {
@@ -20,13 +20,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     {
         yield({{}});
     }
-}
-
-void DefensePlay::reset()
-{
-    Play::reset();
-
-    fsm = std::make_unique<FSM<DefensePlayFSM>>(DefensePlayFSM(ai_config));
 }
 
 void DefensePlay::updateControlParams(

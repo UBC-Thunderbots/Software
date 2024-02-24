@@ -6,7 +6,7 @@
 PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<Strategy> strategy)
     : Play(true, strategy),
       fsm(std::make_unique<FSM<PenaltyKickEnemyPlayFSM>>(
-          PenaltyKickEnemyPlayFSM(ai_config))),
+          PenaltyKickEnemyPlayFSM(strategy->getAiConfig()))),
       control_params{.goalie_tactic = goalie_tactic}
 {
 }
@@ -16,14 +16,6 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     // This function doesn't get called, it should be removed once coroutines
     // are phased out
-}
-
-void PenaltyKickEnemyPlay::reset()
-{
-    Play::reset();
-
-    fsm = std::make_unique<FSM<PenaltyKickEnemyPlayFSM>>(
-        PenaltyKickEnemyPlayFSM(ai_config));
 }
 
 void PenaltyKickEnemyPlay::updateTactics(const PlayUpdate &play_update)

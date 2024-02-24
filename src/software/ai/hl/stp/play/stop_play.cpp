@@ -47,9 +47,9 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
     goalie_tactic = std::make_shared<GoalieTactic>(strategy, stop_mode);
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            strategy->getAiConfig().robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            strategy->getAiConfig().robot_navigation_obstacle_config()),
     };
 
     do

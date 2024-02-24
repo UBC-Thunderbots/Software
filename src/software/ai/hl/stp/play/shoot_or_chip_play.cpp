@@ -34,9 +34,9 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            strategy->getAiConfig().robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            strategy->getAiConfig().robot_navigation_obstacle_config()),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {

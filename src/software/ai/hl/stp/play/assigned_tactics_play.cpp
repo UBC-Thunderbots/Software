@@ -11,7 +11,7 @@ AssignedTacticsPlay::AssignedTacticsPlay(std::shared_ptr<Strategy> strategy)
     : Play(false, strategy),
       assigned_tactics(),
       override_motion_constraints(),
-      obstacle_factory(ai_config.robot_navigation_obstacle_config())
+      obstacle_factory(strategy->getAiConfig().robot_navigation_obstacle_config())
 {
 }
 

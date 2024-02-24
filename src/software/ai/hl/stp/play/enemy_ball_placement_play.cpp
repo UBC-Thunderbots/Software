@@ -135,11 +135,11 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders = {
         // TODO-AKHIL: Remove this hard-coded value
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            strategy->getAiConfig().robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            strategy->getAiConfig().robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config())};
+            strategy->getAiConfig().robot_navigation_obstacle_config())};
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_tactics = {
         std::make_shared<MoveTactic>(),

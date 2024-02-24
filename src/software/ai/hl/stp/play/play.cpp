@@ -9,29 +9,19 @@
 #include "software/logger/logger.h"
 
 Play::Play(bool requires_goalie, std::shared_ptr<Strategy> strategy)
-    : ai_config(strategy->getAiConfig()),
-      strategy(strategy),
+    : strategy(strategy),
       goalie_tactic(std::make_shared<GoalieTactic>(strategy)),
       stop_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
       world_(std::nullopt),
       should_reset(false),
-      obstacle_factory(ai_config.robot_navigation_obstacle_config())
+      obstacle_factory(strategy->getAiConfig().robot_navigation_obstacle_config())
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
         stop_tactics.push_back(std::make_shared<StopTactic>());
     }
-}
-
-void Play::reset()
-{
-    goalie_tactic = std::make_shared<GoalieTactic>(strategy);
-
-    // Make a new tactic_sequence
-    tactic_sequence =
-        TacticCoroutine::pull_type(boost::bind(&Play::getNextTacticsWrapper, this, _1));
 }
 
 PriorityTacticVector Play::getTactics(const World &world)
@@ -95,12 +85,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     const World &world, const InterPlayCommunication &inter_play_communication,
     const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
-    if (should_reset)
-    {
-        reset();
-        should_reset = false;
-    }
-
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =
         static_cast<unsigned int>(world.friendlyTeam().numRobots());
@@ -392,10 +376,4 @@ std::vector<std::string> Play::getState()
 {
     // by default just return the name of the play
     return {objectTypeName(*this)};
-}
-
-void Play::updateAiConfig(const TbotsProto::AiConfig &new_config)
-{
-    ai_config    = new_config;
-    should_reset = true;
 }

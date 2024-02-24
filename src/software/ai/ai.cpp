@@ -26,7 +26,7 @@ void Ai::overridePlayFromProto(TbotsProto::Play play_proto)
     overridePlay(std::move(createPlay(play_proto, strategy)));
 }
 
-void Ai::updateOverridePlay() 
+void Ai::updateOverridePlay()
 {
     auto current_override =
         strategy->getAiConfig().ai_control_config().override_ai_play();

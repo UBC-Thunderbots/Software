@@ -7,7 +7,7 @@
  * Creates a play given a play proto
  *
  * @param play_proto the play proto
- * @param strategy   the Strategy 
+ * @param strategy   the Strategy
  *
  * @return a pointer to the play
  */

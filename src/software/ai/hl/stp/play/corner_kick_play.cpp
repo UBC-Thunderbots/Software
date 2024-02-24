@@ -70,8 +70,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
-    PassGenerator<EighteenZoneId> pass_generator(pitch_division,
-                                                 ai_config.passing_config());
+    PassGenerator<EighteenZoneId> pass_generator(
+        pitch_division, strategy->getAiConfig().passing_config());
 
     auto pass_eval = pass_generator.generatePassEvaluation(world);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
@@ -144,12 +144,11 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
 
         Duration time_since_commit_stage_start =
             world.getMostRecentTimestamp() - commit_stage_start_time;
-        min_score =
-            1 -
-            std::min(
-                time_since_commit_stage_start.toSeconds() /
-                    ai_config.corner_kick_play_config().max_time_commit_to_pass_seconds(),
-                1.0);
+        min_score = 1 - std::min(time_since_commit_stage_start.toSeconds() /
+                                     strategy->getAiConfig()
+                                         .corner_kick_play_config()
+                                         .max_time_commit_to_pass_seconds(),
+                                 1.0);
     } while (best_pass_and_score_so_far.rating < min_score);
 
     // Commit to a pass
