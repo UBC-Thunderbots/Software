@@ -21,7 +21,7 @@ class FullSystem(object):
         debug_full_system: bool = False,
         friendly_colour_yellow: bool = False,
         should_restart_on_crash: bool = True,
-        run_sudo: bool = False
+        run_sudo: bool = False,
     ) -> None:
         """Run FullSystem
 
@@ -64,10 +64,10 @@ class FullSystem(object):
 
         if self.should_run_under_sudo:
             if not is_cmd_running(
-                    [
-                        "unix_full_system",
-                        "--runtime_dir={}".format(self.full_system_runtime_dir)
-                    ]
+                [
+                    "unix_full_system",
+                    "--runtime_dir={}".format(self.full_system_runtime_dir),
+                ]
             ):
                 logging.info(
                     (
