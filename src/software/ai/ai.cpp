@@ -4,6 +4,7 @@
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
+#include "software/tracy/tracy_constants.h"
 
 
 Ai::Ai(const TbotsProto::AiConfig& ai_config)
@@ -66,7 +67,7 @@ void Ai::checkAiConfig()
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 {
-    FrameMarkStart(Ai::TRACY_AI_FRAME_MARKER);
+    FrameMarkStart(TracyConstants::AI_FRAME_MARKER);
 
     checkAiConfig();
 
@@ -89,7 +90,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
                                  });
     }
 
-    FrameMarkEnd(Ai::TRACY_AI_FRAME_MARKER);
+    FrameMarkEnd(TracyConstants::AI_FRAME_MARKER);
 }
 
 TbotsProto::PlayInfo Ai::getPlayInfo() const
