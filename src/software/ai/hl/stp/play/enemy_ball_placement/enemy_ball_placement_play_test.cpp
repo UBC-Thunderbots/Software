@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/enemy_ball_placement_play.h"
+#include "software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play.h"
 
 #include <gtest/gtest.h>
 
