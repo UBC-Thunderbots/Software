@@ -8,7 +8,22 @@
 #include "software/world/game_state.h"
 
 /**
- * FSM documentation
+ * This FSM implements the enemy ball placement play.
+ * - If the ball placement position does not exist yet, then we wait
+ * - Once the ball placement position exists, we set up 2 crease defenders and 3 robots to
+ * stay near the ball without interfering
+ *
+ *                          placement point
+ *                                +
+ *
+ *                     o    x  enemy robot with ball
+ *      move robots      o
+ *                         o
+ *
+ *   crease defenders  o   o
+ *
+ *        goalie         o
+ *                    +-----+
  */
 
 struct EnemyBallPlacementPlayFSM
@@ -66,8 +81,9 @@ struct EnemyBallPlacementPlayFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *WaitState_S + Update_E[hasPlacementPoint_G] / setPlacementPoint_A = AvoidState_S,
-            WaitState_S + Update_E[!hasPlacementPoint_G]                     = WaitState_S,
+            *WaitState_S + Update_E[hasPlacementPoint_G] / setPlacementPoint_A =
+                AvoidState_S,
+            WaitState_S + Update_E[!hasPlacementPoint_G] = WaitState_S,
 
             AvoidState_S + Update_E / avoid_A = AvoidState_S);
     }

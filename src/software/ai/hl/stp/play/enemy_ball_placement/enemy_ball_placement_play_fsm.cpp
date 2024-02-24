@@ -27,22 +27,6 @@ void EnemyBallPlacementPlayFSM::setPlacementPoint(const Update& event)
 
 void EnemyBallPlacementPlayFSM::avoid(const Update& event)
 {
-    /*
-     * Set up 2 crease defenders and 3 robots to stay near the ball without interfering
-     *
-     *
-     *                          placement point
-     *                                +
-     *
-     *                     o    x  enemy robot with ball
-     *      move robots      o
-     *                         o
-     *
-     *   crease defenders  o   o
-     *
-     *        goalie         o
-     *                    +-----+
-     */
     PriorityTacticVector tactics_to_run = {{}};
 
     World world = event.common.world;
