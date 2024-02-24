@@ -122,10 +122,9 @@ TEST(CreaseDefenderFSMTest, test_transitions)
 {
     TbotsProto::RobotNavigationObstacleConfig config;
     double robot_obstacle_inflation_factor = config.robot_obstacle_inflation_factor();
-    World world                            = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world           = ::TestUtil::createBlankTestingWorld();
     Robot robot                            = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    world =
-        ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(123));
+    ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(123));
     CreaseDefenderFSM::ControlParams control_params{
         .enemy_threat_origin       = Point(2, 3),
         .crease_defender_alignment = TbotsProto::CreaseDefenderAlignment::LEFT,
@@ -140,7 +139,7 @@ TEST(CreaseDefenderFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     auto block_point = CreaseDefenderFSM::findBlockThreatPoint(
-        world.field(), control_params.enemy_threat_origin,
+        world->field(), control_params.enemy_threat_origin,
         control_params.crease_defender_alignment, robot_obstacle_inflation_factor);
 
     ASSERT_TRUE(block_point.has_value());

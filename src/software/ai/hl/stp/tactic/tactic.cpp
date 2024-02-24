@@ -25,13 +25,13 @@ void Tactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
     this->last_execution_robot = last_execution_robot;
 }
 
-std::map<RobotId, std::shared_ptr<Primitive>> Tactic::get(const World &world)
+std::map<RobotId, std::shared_ptr<Primitive>> Tactic::get(const WorldPtr &world_ptr)
 {
     TbotsProto::RobotNavigationObstacleConfig obstacle_config;
     std::map<RobotId, std::shared_ptr<Primitive>> primitives_map;
-    for (const auto &robot : world.friendlyTeam().getAllRobots())
+    for (const auto &robot : world_ptr->friendlyTeam().getAllRobots())
     {
-        updatePrimitive(TacticUpdate(robot, world,
+        updatePrimitive(TacticUpdate(robot, world_ptr,
                                      [this](std::shared_ptr<Primitive> new_primitive) {
                                          primitive = std::move(new_primitive);
                                      }),

@@ -24,11 +24,11 @@ class GroupGoalLanesByDensityTest : public DefenderAssignmentTest
 TEST_F(GetAllDefenderAssignmentsTest, no_threats)
 {
     auto world   = TestUtil::createBlankTestingWorld();
-    auto threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                      world.enemyTeam(), world.ball(), false);
+    auto threats = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                      world->enemyTeam(), world->ball(), false);
 
     auto assignments =
-        getAllDefenderAssignments(threats, world.field(), world.ball(), config);
+        getAllDefenderAssignments(threats, world->field(), world->ball(), config);
 
     // Make sure we got the correct number of assignments
     EXPECT_EQ(assignments.size(), 0);
@@ -39,17 +39,17 @@ TEST_F(GetAllDefenderAssignmentsTest, single_threat)
     Point threat_position(1, 1);
     auto world      = TestUtil::createBlankTestingWorld();
     auto enemy_team = TestUtil::setRobotPositionsHelper(
-        world.enemyTeam(), {threat_position}, Timestamp::fromSeconds(0));
-    world.updateEnemyTeamState(enemy_team);
+        world->enemyTeam(), {threat_position}, Timestamp::fromSeconds(0));
+    world->updateEnemyTeamState(enemy_team);
 
     Point ball_position(-1, -1);
-    world.updateBall(Ball(ball_position, Vector(), Timestamp()));
+    world->updateBall(Ball(ball_position, Vector(), Timestamp()));
 
-    auto threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                      world.enemyTeam(), world.ball(), false);
+    auto threats = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                      world->enemyTeam(), world->ball(), false);
 
     auto assignments =
-        getAllDefenderAssignments(threats, world.field(), world.ball(), config);
+        getAllDefenderAssignments(threats, world->field(), world->ball(), config);
 
     // Make sure we got the correct number of assignments
     EXPECT_EQ(assignments.size(), 1);
@@ -69,11 +69,11 @@ TEST_F(FilterOutSimilarThreatsTest, no_similar_threats)
 
     auto world      = TestUtil::createBlankTestingWorld();
     auto enemy_team = TestUtil::setRobotPositionsHelper(
-        world.enemyTeam(), threat_positions, Timestamp::fromSeconds(0));
-    world.updateEnemyTeamState(enemy_team);
+        world->enemyTeam(), threat_positions, Timestamp::fromSeconds(0));
+    world->updateEnemyTeamState(enemy_team);
 
-    auto threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                      world.enemyTeam(), world.ball(), false);
+    auto threats = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                      world->enemyTeam(), world->ball(), false);
 
     auto filtered_threats = filterOutSimilarThreats(
         threats, config.min_distance_between_threats_meters(),
@@ -92,15 +92,15 @@ TEST_F(FilterOutSimilarThreatsTest, filter_out_closely_positioned_threats)
 
     auto world      = TestUtil::createBlankTestingWorld();
     auto enemy_team = TestUtil::setRobotPositionsHelper(
-        world.enemyTeam(), threat_positions, Timestamp::fromSeconds(0));
-    world.updateEnemyTeamState(enemy_team);
+        world->enemyTeam(), threat_positions, Timestamp::fromSeconds(0));
+    world->updateEnemyTeamState(enemy_team);
 
     // Place ball in front of robot positioned at (0, 0) so that it becomes
     // the primary threat
-    world.updateBall(Ball(Point(0.1, 0), Vector(), Timestamp()));
+    world->updateBall(Ball(Point(0.1, 0), Vector(), Timestamp()));
 
-    auto threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                      world.enemyTeam(), world.ball(), false);
+    auto threats = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                      world->enemyTeam(), world->ball(), false);
 
     auto filtered_threats = filterOutSimilarThreats(
         threats, config.min_distance_between_threats_meters(),
@@ -119,15 +119,15 @@ TEST_F(FilterOutSimilarThreatsTest, filter_out_similarly_angled_threats)
 
     auto world      = TestUtil::createBlankTestingWorld();
     auto enemy_team = TestUtil::setRobotPositionsHelper(
-        world.enemyTeam(), threat_positions, Timestamp::fromSeconds(0));
-    world.updateEnemyTeamState(enemy_team);
+        world->enemyTeam(), threat_positions, Timestamp::fromSeconds(0));
+    world->updateEnemyTeamState(enemy_team);
 
     // Place ball in front of robot positioned at (0, 0) so that it becomes
     // the primary threat
-    world.updateBall(Ball(Point(0.1, 0), Vector(), Timestamp()));
+    world->updateBall(Ball(Point(0.1, 0), Vector(), Timestamp()));
 
-    auto threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                      world.enemyTeam(), world.ball(), false);
+    auto threats = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                      world->enemyTeam(), world->ball(), false);
 
     auto filtered_threats = filterOutSimilarThreats(
         threats, config.min_distance_between_threats_meters(),

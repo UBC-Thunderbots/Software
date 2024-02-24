@@ -6,12 +6,10 @@
 
 TEST(DribbleFSMTest, test_transitions)
 {
-    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    World world = ::TestUtil::createBlankTestingWorld();
-    world =
-        ::TestUtil::setBallPosition(world, Point(0.5, 0), Timestamp::fromSeconds(123));
-    world =
-        ::TestUtil::setBallVelocity(world, Vector(0, -1), Timestamp::fromSeconds(123));
+    Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+    ::TestUtil::setBallPosition(world, Point(0.5, 0), Timestamp::fromSeconds(123));
+    ::TestUtil::setBallVelocity(world, Vector(0, -1), Timestamp::fromSeconds(123));
 
     TbotsProto::DribbleTacticConfig dribble_config;
     FSM<DribbleFSM> fsm{DribbleFSM(dribble_config)};
@@ -45,7 +43,7 @@ TEST(DribbleFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::Dribble>));
 
     // Move ball to destination, but not the robot, so we should try to regain possession
-    world = ::TestUtil::setBallPosition(world, Point(1, -1), Timestamp::fromSeconds(124));
+    ::TestUtil::setBallPosition(world, Point(1, -1), Timestamp::fromSeconds(124));
     fsm.process_event(DribbleFSM::Update(
         {Point(1, -1), std::nullopt, false},
         TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));

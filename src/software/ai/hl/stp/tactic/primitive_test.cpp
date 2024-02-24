@@ -7,11 +7,17 @@
 
 class PrimitiveTest : public testing::Test
 {
+   public:
+    PrimitiveTest()
+    {
+        TestUtil::setFriendlyRobotPositions(world, {Point(0, 0)},
+                                            Timestamp::fromSeconds(0));
+    }
+
    protected:
     RobotConstants_t robot_constants = create2021RobotConstants();
     Robot robot                      = TestUtil::createRobotAtPos(Point(0, 0));
-    World world                      = TestUtil::setFriendlyRobotPositions(
-        TestUtil::createBlankTestingWorld(), {Point(0, 0)}, Timestamp::fromSeconds(0));
+    std::shared_ptr<World> world     = TestUtil::createBlankTestingWorld();
     RobotNavigationObstacleFactory obstacle_factory =
         RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig());
 };
