@@ -5,8 +5,6 @@ OffensePlayFSM::OffensePlayFSM(std::shared_ptr<Strategy> strategy)
       shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(strategy)),
       defense_play(std::make_shared<DefensePlay>(strategy))
 {
-    shoot_or_pass_play->reset();
-    defense_play->reset();
 }
 
 bool OffensePlayFSM::enemyHasPossession(const Update& event)
