@@ -40,6 +40,7 @@ static const uint32_t TMC4671_SPI_SPEED = 1000000;  // 1 Mhz
 static const uint8_t SPI_BITS           = 8;
 static const uint32_t SPI_MODE          = 0x3u;
 static const uint32_t NUM_RETRIES_SPI   = 3;
+static const uint32_t TMC_CMD_MSG_SIZE      = 5;
 
 
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "51";
@@ -440,28 +441,28 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
           encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
         << "Running without encoder calibration can cause serious harm, exiting";
 
-    // Get current wheel electical RPMs (don't account for pole pairs). Values will be
-    // written on next iteration
+    // Get current wheel electical RPM (don't account for pole pairs). We will use these for robot status feedback
+    // We assume the motors have ramped to the expected RPM from the previous iteration.
     double front_right_velocity =
-        static_cast<double>(tmc4671ReadThenWriteValue(
-            FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-            TMC4671_PID_VELOCITY_TARGET, front_right_target_velocity)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+            static_cast<double>(tmc4671ReadThenWriteValue(
+                    FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+                    TMC4671_PID_VELOCITY_TARGET, front_right_target_rpm)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double front_left_velocity =
-        static_cast<double>(tmc4671ReadThenWriteValue(
-            FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-            TMC4671_PID_VELOCITY_TARGET, front_left_target_velocity)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+            static_cast<double>(tmc4671ReadThenWriteValue(
+                    FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+                    TMC4671_PID_VELOCITY_TARGET, front_left_target_rpm)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double back_right_velocity =
-        static_cast<double>(tmc4671ReadThenWriteValue(
-            BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-            TMC4671_PID_VELOCITY_TARGET, back_right_target_velocity)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+            static_cast<double>(tmc4671ReadThenWriteValue(
+                    BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+                    TMC4671_PID_VELOCITY_TARGET, back_right_target_rpm)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double back_left_velocity =
-        static_cast<double>(tmc4671ReadThenWriteValue(
-            BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-            TMC4671_PID_VELOCITY_TARGET, back_left_target_velocity)) *
-        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+            static_cast<double>(tmc4671ReadThenWriteValue(
+                    BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+                    TMC4671_PID_VELOCITY_TARGET, back_left_target_rpm)) *
+            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double dribbler_rpm = static_cast<double>(
         tmc4671ReadThenWriteValue(DRIBBLER_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
                                   TMC4671_PID_VELOCITY_TARGET, dribbler_ramp_rpm_));
@@ -549,20 +550,19 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     target_wheel_velocities = euclidean_to_four_wheel_.rampWheelVelocity(
         prev_wheel_velocities_, target_wheel_velocities, time_elapsed_since_last_poll_s);
 
-    // TODO (#2719): interleave the angular accelerations in here at some point.
     prev_wheel_velocities_ = target_wheel_velocities;
 
     // Calculate speeds accounting for acceleration
-    front_right_target_velocity =
+    front_right_target_rpm =
         static_cast<int>(target_wheel_velocities[FRONT_RIGHT_WHEEL_SPACE_INDEX] *
                          ELECTRICAL_RPM_PER_MECHANICAL_MPS);
-    front_left_target_velocity =
+    front_left_target_rpm =
         static_cast<int>(target_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] *
                          ELECTRICAL_RPM_PER_MECHANICAL_MPS);
-    back_left_target_velocity =
+    back_left_target_rpm =
         static_cast<int>(target_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] *
                          ELECTRICAL_RPM_PER_MECHANICAL_MPS);
-    back_right_target_velocity =
+    back_right_target_rpm =
         static_cast<int>(target_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] *
                          ELECTRICAL_RPM_PER_MECHANICAL_MPS);
 
@@ -632,8 +632,6 @@ void MotorService::readThenWriteSpiTransfer(int fd, const uint8_t* read_tx,
                                             const uint8_t* write_tx,
                                             const uint8_t* read_rx, uint32_t spi_speed)
 {
-    int ret1, ret2;
-
     uint8_t write_rx[5] = {0};
 
     struct spi_ioc_transfer tr[2];
@@ -641,21 +639,21 @@ void MotorService::readThenWriteSpiTransfer(int fd, const uint8_t* read_tx,
 
     tr[0].tx_buf        = (unsigned long)read_tx;
     tr[0].rx_buf        = (unsigned long)read_rx;
-    tr[0].len           = 5;
+    tr[0].len           = TMC_CMD_MSG_SIZE;
     tr[0].delay_usecs   = 0;
     tr[0].speed_hz      = spi_speed;
     tr[0].bits_per_word = 8;
     tr[0].cs_change     = 0;
     tr[1].tx_buf        = (unsigned long)write_tx;
     tr[1].rx_buf        = (unsigned long)write_rx;
-    tr[1].len           = 5;
+    tr[1].len           = TMC_CMD_MSG_SIZE;
     tr[1].delay_usecs   = 0;
     tr[1].speed_hz      = spi_speed;
     tr[1].bits_per_word = 8;
     tr[1].cs_change     = 0;
 
-    ret1 = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
-    ret2 = ioctl(fd, SPI_IOC_MESSAGE(1), &tr[1]);
+    int ret1 = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+    int ret2 = ioctl(fd, SPI_IOC_MESSAGE(1), &tr[1]);
 
     CHECK(ret1 >= 1 && ret2 >= 1)
         << "SPI Transfer to motor failed, not safe to proceed: errno " << strerror(errno);
@@ -1083,7 +1081,7 @@ void MotorService::startController(uint8_t motor, bool dribbler)
     CHECK(0x34363731 == chip_id) << "The TMC4671 of motor "
                                  << static_cast<uint32_t>(motor) << " is not responding";
 
-    LOG(INFO) << "Controller " << std::to_string(motor)
+    LOG(DEBUG) << "Controller " << std::to_string(motor)
               << " online, responded with: " << chip_id;
 
     // Configure common controller params

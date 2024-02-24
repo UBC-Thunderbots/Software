@@ -319,10 +319,10 @@ class MotorService
     // Previous wheel velocities
     WheelSpace_t prev_wheel_velocities_;
 
-    int front_left_target_velocity  = 0;
-    int front_right_target_velocity = 0;
-    int back_left_target_velocity   = 0;
-    int back_right_target_velocity  = 0;
+    int front_left_target_rpm  = 0;
+    int front_right_target_rpm = 0;
+    int back_left_target_rpm   = 0;
+    int back_right_target_rpm  = 0;
 
     // the motor cs id to check for motor faults
     uint8_t motor_fault_detector_;
