@@ -63,6 +63,15 @@ py_library(
 )
 
 py_library(
+    name = "gl_sandbox_world_layer",
+    srcs = ["gl_sandbox_world_layer.py"],
+    deps = [
+        ":gl_world_layer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "gl_simulator_layer",
     srcs = ["gl_simulator_layer.py"],
     deps = [
@@ -111,6 +120,16 @@ py_library(
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_gradient_legend",
         "//software/thunderscope/gl/graphics:gl_heatmap",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_trail_layer",
+    srcs = ["gl_trail_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],
 )

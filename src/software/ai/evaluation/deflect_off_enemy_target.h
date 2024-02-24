@@ -6,4 +6,4 @@
  * enemy
  * to the outside of the field to get another kick/corner
  */
-Point deflectOffEnemyTarget(World world);
+Point deflectOffEnemyTarget(WorldPtr world);

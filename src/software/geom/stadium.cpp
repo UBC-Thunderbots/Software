@@ -39,7 +39,7 @@ double Stadium::radius() const
     return radius_;
 }
 
-Polygon Stadium::inner_rectangle() const
+Polygon Stadium::innerRectangle() const
 {
     Vector normal =
         segment_.toVector().rotate(Angle::fromDegrees(90)).normalize() * radius_;

@@ -58,7 +58,7 @@ class Stadium : public ConvexShape
      * Returns the inner rectangle of this Stadium
      * @return the inner rectangle of this Stadium
      */
-    Polygon inner_rectangle() const;
+    Polygon innerRectangle() const;
 
     /**
      * Returns the area of this Stadium

@@ -6,8 +6,8 @@
 
 TEST(MoveFSMTest, test_transitions)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
-    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+    Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
     MoveFSM::ControlParams control_params{
         .destination            = Point(2, 3),
         .final_orientation      = Angle::half(),

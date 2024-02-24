@@ -9,15 +9,15 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
-    const TbotsProto::MotionConstraint motion_constraint, const World &world) const
+    const TbotsProto::MotionConstraint motion_constraint, const WorldPtr &world_ptr) const
 {
     std::vector<ObstaclePtr> obstacles;
     auto static_obstacles =
-        createStaticObstaclesFromMotionConstraint(motion_constraint, world.field());
+        createStaticObstaclesFromMotionConstraint(motion_constraint, world_ptr->field());
     obstacles.insert(obstacles.end(), static_obstacles.begin(), static_obstacles.end());
 
     auto dynamic_obstacles =
-        createDynamicObstaclesFromMotionConstraint(motion_constraint, world);
+        createDynamicObstaclesFromMotionConstraint(motion_constraint, world_ptr);
     obstacles.insert(obstacles.end(), dynamic_obstacles.begin(), dynamic_obstacles.end());
 
     CHECK(dynamic_obstacles.empty() || static_obstacles.empty())
@@ -30,12 +30,13 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-    const World &world) const
+    const WorldPtr &world_ptr) const
 {
     std::vector<ObstaclePtr> static_obstacles =
-        createStaticObstaclesFromMotionConstraints(motion_constraints, world.field());
+        createStaticObstaclesFromMotionConstraints(motion_constraints,
+                                                   world_ptr->field());
     std::vector<ObstaclePtr> dynamic_obstacles =
-        createDynamicObstaclesFromMotionConstraints(motion_constraints, world);
+        createDynamicObstaclesFromMotionConstraints(motion_constraints, world_ptr);
 
     // Combine two vectors of obstacles into one and return it
     std::vector<ObstaclePtr> obstacles;
@@ -164,7 +165,8 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraint(
 
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
-    const TbotsProto::MotionConstraint &motion_constraint, const World &world) const
+    const TbotsProto::MotionConstraint &motion_constraint,
+    const WorldPtr &world_ptr) const
 {
     std::vector<ObstaclePtr> obstacles;
 
@@ -196,19 +198,20 @@ RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraint(
             break;
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // 0.5 represents half a metre radius
-            obstacles.push_back(createFromShape(Circle(world.ball().position(), 0.5)));
+            obstacles.push_back(
+                createFromShape(Circle(world_ptr->ball().position(), 0.5)));
             break;
         case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
-            if (world.gameState().getBallPlacementPoint().has_value())
+            if (world_ptr->gameState().getBallPlacementPoint().has_value())
             {
                 obstacles.push_back(createFromBallPlacement(
-                    world.gameState().getBallPlacementPoint().value(),
-                    world.ball().position()));
+                    world_ptr->gameState().getBallPlacementPoint().value(),
+                    world_ptr->ball().position()));
             }
             else
             {
                 obstacles.push_back(
-                    createFromShape(Circle(world.ball().position(), 0.5)));
+                    createFromShape(Circle(world_ptr->ball().position(), 0.5)));
             }
             break;
         case TbotsProto::MotionConstraint::FRIENDLY_GOAL:;
@@ -242,13 +245,13 @@ RobotNavigationObstacleFactory::createStaticObstaclesFromMotionConstraints(
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createDynamicObstaclesFromMotionConstraints(
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-    const World &world) const
+    const WorldPtr &world_ptr) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)
     {
         auto new_obstacles =
-            createDynamicObstaclesFromMotionConstraint(motion_constraint, world);
+            createDynamicObstaclesFromMotionConstraint(motion_constraint, world_ptr);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 

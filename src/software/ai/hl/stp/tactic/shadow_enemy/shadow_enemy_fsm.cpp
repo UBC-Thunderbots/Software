@@ -50,7 +50,7 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
 void ShadowEnemyFSM::blockPass(const Update &event)
 {
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
-    auto ball_position                          = event.common.world.ball().position();
+    auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
 
@@ -58,8 +58,9 @@ void ShadowEnemyFSM::blockPass(const Update &event)
     // the possible shot on net
 
     Point position_to_block =
-        ball_position + (event.common.world.field().friendlyGoalCenter() - ball_position)
-                            .normalize(event.control_params.shadow_distance);
+        ball_position +
+        (event.common.world_ptr->field().friendlyGoalCenter() - ball_position)
+            .normalize(event.control_params.shadow_distance);
     if (enemy_threat_opt.has_value())
     {
         position_to_block =
@@ -78,7 +79,7 @@ void ShadowEnemyFSM::blockShot(const Update &event,
                                boost::sml::back::process<MoveFSM::Update> processEvent)
 {
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;
-    auto ball_position                          = event.common.world.ball().position();
+    auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
 
@@ -86,13 +87,14 @@ void ShadowEnemyFSM::blockShot(const Update &event,
     // the possible shot on net
 
     Point position_to_block =
-        ball_position + (event.common.world.field().friendlyGoalCenter() - ball_position)
-                            .normalize(event.control_params.shadow_distance);
+        ball_position +
+        (event.common.world_ptr->field().friendlyGoalCenter() - ball_position)
+            .normalize(event.control_params.shadow_distance);
     if (enemy_threat_opt.has_value())
     {
         position_to_block = findBlockShotPoint(
-            event.common.robot, event.common.world.field(),
-            event.common.world.friendlyTeam(), event.common.world.enemyTeam(),
+            event.common.robot, event.common.world_ptr->field(),
+            event.common.world_ptr->friendlyTeam(), event.common.world_ptr->enemyTeam(),
             enemy_threat_opt.value().robot, event.control_params.shadow_distance);
     };
 
@@ -111,7 +113,7 @@ void ShadowEnemyFSM::blockShot(const Update &event,
 
 void ShadowEnemyFSM::stealAndChip(const Update &event)
 {
-    auto ball_position = event.common.world.ball().position();
+    auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
 

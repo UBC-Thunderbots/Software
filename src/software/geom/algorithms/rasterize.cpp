@@ -250,7 +250,7 @@ std::vector<Point> rasterize(const Stadium& stadium, double resolution_size)
         rasterize(Circle(stadium.segment().getEnd(), stadium.radius()), resolution_size);
 
     // construct rectangle polygon
-    Polygon inner_rectangle = stadium.inner_rectangle();
+    Polygon inner_rectangle = stadium.innerRectangle();
 
     std::vector<Point> rectangle_points = rasterize(inner_rectangle, resolution_size);
 
