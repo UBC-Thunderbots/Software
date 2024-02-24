@@ -3,8 +3,7 @@
 NetworkService::NetworkService(const std::string& ip_address,
                                unsigned short primitive_listener_port,
                                unsigned short robot_status_sender_port, bool multicast)
-    : primitive_tracker(ProtoTracker("primitive set")),
-      world_tracker(ProtoTracker("world"))
+    : primitive_tracker(ProtoTracker("primitive set"))
 {
     sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
         ip_address, robot_status_sender_port, multicast);
@@ -20,9 +19,6 @@ TbotsProto::PrimitiveSet NetworkService::poll(TbotsProto::RobotStatus& robot_sta
 
     robot_status.mutable_network_status()->set_primitive_packet_loss_percentage(
         static_cast<unsigned int>(primitive_tracker.getLossRate() * 100));
-
-    robot_status.mutable_network_status()->set_world_packet_loss_percentage(
-        static_cast<unsigned int>(world_tracker.getLossRate() * 100));
 
     // Rate limit sending of proto based on thunderloop freq
     if (shouldSendNewRobotStatus(robot_status))

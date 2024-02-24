@@ -123,27 +123,13 @@ class RobotView(QScrollArea):
         self.setWidget(self.container)
         self.setWidgetResizable(True)
 
-        self.aaa = 0.0
-        self.bbb = 0.0
-
     def refresh(self) -> None:
         """
         Refresh the view
         Gets a RobotStatus proto and calls the corresponding update method
         Until the buffer is empty
         """
-        # robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
-        val1 = int(self.aaa) % 100
-        val2 = int(self.bbb) % 100
-
-        robot_status = RobotStatus(
-            network_status=NetworkStatus(
-                primitive_packet_loss_percentage=val1, world_packet_loss_percentage=val2
-            )
-        )
-
-        self.aaa += 0.2
-        self.bbb += 0.2
+        robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
 
         while robot_status is not None:
             self.robot_view_widgets[robot_status.robot_id].update(robot_status)

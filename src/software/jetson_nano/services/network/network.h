@@ -71,9 +71,8 @@ class NetworkService
     // Callback function for storing the received primitive_sets
     void primitiveSetCallback(TbotsProto::PrimitiveSet input);
 
-    // ProtoTrackers for tracking recent primitive_set and world packet loss
+    // ProtoTrackers for tracking recent primitive_set packet loss
     ProtoTracker primitive_tracker;
-    ProtoTracker world_tracker;
 
     // track last breakbeam state for sending RobotStatus outside of specified rate
     bool last_breakbeam_state_sent = false;
