@@ -1,12 +1,10 @@
 #include "software/ai/ai.h"
 
 #include <Tracy.hpp>
-#include <chrono>
-#include <memory>
-#include <utility>
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
+
 
 Ai::Ai(const TbotsProto::AiConfig& ai_config)
     : ai_config_(ai_config),
@@ -68,7 +66,7 @@ void Ai::checkAiConfig()
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 {
-    ZoneNamedN(_tracy_ai, "Ai: Process World", true);
+    FrameMarkStart(Ai::TRACY_AI_FRAME_MARKER);
 
     checkAiConfig();
 
@@ -90,6 +88,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
                                      inter_play_communication = std::move(comm);
                                  });
     }
+
+    FrameMarkEnd(Ai::TRACY_AI_FRAME_MARKER);
 }
 
 TbotsProto::PlayInfo Ai::getPlayInfo() const

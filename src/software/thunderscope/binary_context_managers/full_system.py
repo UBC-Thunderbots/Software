@@ -21,6 +21,7 @@ class FullSystem(object):
         debug_full_system: bool = False,
         friendly_colour_yellow: bool = False,
         should_restart_on_crash: bool = True,
+        run_sudo: bool = False
     ) -> None:
         """Run FullSystem
 
@@ -28,6 +29,7 @@ class FullSystem(object):
         :param debug_full_system: Whether to run the full_system in debug mode
         :param friendly_color_yellow: a argument passed into the unix_full_system binary (--friendly_colour_yellow)
         :param should_restart_on_crash: whether or not to restart the program after it has been crashed
+        :param run_sudo: true if we should run full system under sudo
 
         """
         self.full_system_runtime_dir = full_system_runtime_dir
@@ -35,6 +37,7 @@ class FullSystem(object):
         self.friendly_colour_yellow = friendly_colour_yellow
         self.full_system_proc = None
         self.should_restart_on_crash = should_restart_on_crash
+        self.should_run_under_sudo = run_sudo
 
         self.thread = threading.Thread(target=self.__restart__)
 
@@ -59,7 +62,35 @@ class FullSystem(object):
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
         )
 
-        if self.debug_full_system:
+        if self.should_run_under_sudo:
+            if not is_cmd_running(
+                    [
+                        "unix_full_system",
+                        "--runtime_dir={}".format(self.full_system_runtime_dir)
+                    ]
+            ):
+                logging.info(
+                    (
+                        f"""
+Run Fullsystem under sudo ==============
+1. Build the full system:
+
+./tbots.py build unix_full_system -o
+
+2. Run the following binaries from src to run under sudo:
+
+sudo bazel-bin/{self.full_system}
+
+3. Rerun this binary once the fullsystem is running
+"""
+                    )
+                )
+            else:
+                # Wait for the user to exit and restart the binary
+                while True:
+                    time.sleep(1)
+
+        elif self.debug_full_system:
 
             # We don't want to check the exact command because this binary could
             # be debugged from clion or somewhere other than gdb

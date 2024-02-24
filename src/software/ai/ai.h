@@ -75,7 +75,5 @@ class Ai final
     // inter play communication
     InterPlayCommunication inter_play_communication;
 
-    struct TracyLiterals
-    {
-    };
+    static constexpr const char* TRACY_AI_FRAME_MARKER = "AI: Primitive Processing Frame";
 };
