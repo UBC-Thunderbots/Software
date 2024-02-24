@@ -11,7 +11,7 @@
 class DefensePlay : public Play
 {
    public:
-    DefensePlay(const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy);
+    DefensePlay(std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
     void reset() override;

@@ -5,11 +5,10 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-ShootOrPassPlay::ShootOrPassPlay(const TbotsProto::AiConfig &config,
-                                 std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy),
+ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy),
       fsm(std::make_unique<FSM<ShootOrPassPlayFSM>>(
-          ShootOrPassPlayFSM(config, strategy))),
+          ShootOrPassPlayFSM(ai_config, strategy))),
       control_params{}
 {
 }
@@ -45,6 +44,4 @@ std::vector<std::string> ShootOrPassPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrPassPlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
-    factory;
+static TGenericFactory<std::string, Play, ShootOrPassPlay, std::shared_ptr<Strategy>> factory;

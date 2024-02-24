@@ -9,9 +9,8 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyFreekickPlay::EnemyFreekickPlay(const TbotsProto::AiConfig &config,
-                                     std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy)
+EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy)
 {
 }
 
@@ -136,6 +135,4 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreekickPlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
-    factory;
+static TGenericFactory<std::string, Play, EnemyFreekickPlay, std::shared_ptr<Strategy>> factory;

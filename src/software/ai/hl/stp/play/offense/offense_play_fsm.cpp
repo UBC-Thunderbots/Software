@@ -1,10 +1,9 @@
 #include "software/ai/hl/stp/play/offense/offense_play_fsm.h"
 
-OffensePlayFSM::OffensePlayFSM(const TbotsProto::AiConfig& ai_config,
-                               std::shared_ptr<Strategy> strategy)
-    : ai_config(ai_config),
-      shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config, strategy)),
-      defense_play(std::make_shared<DefensePlay>(ai_config, strategy))
+OffensePlayFSM::OffensePlayFSM(std::shared_ptr<Strategy> strategy)
+    : ai_config(strategy->getAiConfig()),
+      shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(strategy)),
+      defense_play(std::make_shared<DefensePlay>(strategy))
 {
     shoot_or_pass_play->reset();
     defense_play->reset();

@@ -42,8 +42,7 @@ struct PlaySelectionFSM
      *
      * @param ai_config the default play config for this play fsm
      */
-    explicit PlaySelectionFSM(const TbotsProto::AiConfig& ai_config,
-                              std::shared_ptr<Strategy> strategy);
+    explicit PlaySelectionFSM(std::shared_ptr<Strategy> strategy);
 
     /**
      * Guards for whether the game state is stopped, halted, playing, or in set up
@@ -132,6 +131,7 @@ struct PlaySelectionFSM
    private:
     std::shared_ptr<Play> current_play;
 
+    TbotsProto::AiConfig ai_config;
     std::shared_ptr<BallPlacementPlay> ball_placement_play;
     std::shared_ptr<EnemyBallPlacementPlay> enemy_ball_placement_play;
     std::shared_ptr<EnemyFreekickPlay> enemy_free_kick_play;

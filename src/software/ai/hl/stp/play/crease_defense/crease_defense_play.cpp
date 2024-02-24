@@ -5,10 +5,9 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-CreaseDefensePlay::CreaseDefensePlay(TbotsProto::AiConfig config,
-                                     std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy),
-      fsm(std::make_unique<FSM<CreaseDefensePlayFSM>>(CreaseDefensePlayFSM(config))),
+CreaseDefensePlay::CreaseDefensePlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy),
+      fsm(std::make_unique<FSM<CreaseDefensePlayFSM>>(CreaseDefensePlayFSM(ai_config))),
       control_params{
           .enemy_threat_origin    = Point(),
           .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
@@ -46,6 +45,4 @@ void CreaseDefensePlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, CreaseDefensePlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
-    factory;
+static TGenericFactory<std::string, Play, CreaseDefensePlay, std::shared_ptr<Strategy>> factory;

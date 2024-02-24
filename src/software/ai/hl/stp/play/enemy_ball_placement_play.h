@@ -11,8 +11,7 @@
 class EnemyBallPlacementPlay : public Play
 {
    public:
-    EnemyBallPlacementPlay(const TbotsProto::AiConfig &config,
-                           std::shared_ptr<Strategy> strategy);
+    EnemyBallPlacementPlay(std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

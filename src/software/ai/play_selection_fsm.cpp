@@ -14,21 +14,21 @@
 #include "software/ai/hl/stp/play/stop_play.h"
 
 
-PlaySelectionFSM::PlaySelectionFSM(const TbotsProto::AiConfig& ai_config,
-                                   std::shared_ptr<Strategy> strategy)
-    : ball_placement_play(std::make_shared<BallPlacementPlay>(ai_config, strategy)),
+PlaySelectionFSM::PlaySelectionFSM(std::shared_ptr<Strategy> strategy)
+    : ai_config(strategy->getAiConfig()),
+      ball_placement_play(std::make_shared<BallPlacementPlay>(strategy)),
       enemy_ball_placement_play(
-          std::make_shared<EnemyBallPlacementPlay>(ai_config, strategy)),
-      enemy_free_kick_play(std::make_shared<EnemyFreekickPlay>(ai_config, strategy)),
-      free_kick_play(std::make_shared<FreeKickPlay>(ai_config, strategy)),
-      halt_play(std::make_shared<HaltPlay>(ai_config, strategy)),
-      kickoff_enemy_play(std::make_shared<KickoffEnemyPlay>(ai_config, strategy)),
-      kickoff_friendly_play(std::make_shared<KickoffFriendlyPlay>(ai_config, strategy)),
-      offense_play(std::make_shared<OffensePlay>(ai_config, strategy)),
+          std::make_shared<EnemyBallPlacementPlay>(strategy)),
+      enemy_free_kick_play(std::make_shared<EnemyFreekickPlay>(strategy)),
+      free_kick_play(std::make_shared<FreeKickPlay>(strategy)),
+      halt_play(std::make_shared<HaltPlay>(strategy)),
+      kickoff_enemy_play(std::make_shared<KickoffEnemyPlay>(strategy)),
+      kickoff_friendly_play(std::make_shared<KickoffFriendlyPlay>(strategy)),
+      offense_play(std::make_shared<OffensePlay>(strategy)),
       penalty_kick_enemy_play(
-          std::make_shared<PenaltyKickEnemyPlay>(ai_config, strategy)),
-      penalty_kick_play(std::make_shared<PenaltyKickPlay>(ai_config, strategy)),
-      stop_play(std::make_shared<StopPlay>(ai_config, strategy))
+          std::make_shared<PenaltyKickEnemyPlay>(strategy)),
+      penalty_kick_play(std::make_shared<PenaltyKickPlay>(strategy)),
+      stop_play(std::make_shared<StopPlay>(strategy))
 {
 }
 

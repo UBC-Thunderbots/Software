@@ -13,7 +13,7 @@
 class StopPlay : public Play
 {
    public:
-    StopPlay(const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy);
+    StopPlay(std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

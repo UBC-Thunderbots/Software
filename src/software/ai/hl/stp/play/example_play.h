@@ -12,8 +12,7 @@
 class ExamplePlay : public Play
 {
    public:
-    explicit ExamplePlay(const TbotsProto::AiConfig &config,
-                         std::shared_ptr<Strategy> strategy);
+    explicit ExamplePlay(std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

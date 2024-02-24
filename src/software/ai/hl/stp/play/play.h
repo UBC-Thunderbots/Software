@@ -41,7 +41,7 @@ class Play
      * @param requires_goalie Whether this plays requires a goalie
      * @param strategy   to get and store shared calculations
      */
-    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie,
+    explicit Play(bool requires_goalie,
                   std::shared_ptr<Strategy> strategy);
 
     /**

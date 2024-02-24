@@ -21,7 +21,7 @@ class Ai final
      * Create an AI with given configurations
      * @param ai_config_ The AI configuration
      */
-    explicit Ai(const TbotsProto::AiConfig& ai_config);
+    explicit Ai(std::shared_ptr<Strategy> strategy);
 
     /**
      * Overrides the play

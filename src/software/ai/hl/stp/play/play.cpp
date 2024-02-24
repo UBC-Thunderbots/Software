@@ -8,11 +8,11 @@
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 
-Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie,
+Play::Play(bool requires_goalie,
            std::shared_ptr<Strategy> strategy)
-    : ai_config(ai_config),
+    : ai_config(strategy->getAiConfig()),
       strategy(strategy),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
+      goalie_tactic(std::make_shared<GoalieTactic>(strategy)),
       stop_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
@@ -28,7 +28,7 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie,
 
 void Play::reset()
 {
-    goalie_tactic = std::make_shared<GoalieTactic>(ai_config);
+    goalie_tactic = std::make_shared<GoalieTactic>(strategy);
 
     // Make a new tactic_sequence
     tactic_sequence =

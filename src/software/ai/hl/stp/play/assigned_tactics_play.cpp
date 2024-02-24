@@ -7,12 +7,11 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-AssignedTacticsPlay::AssignedTacticsPlay(const TbotsProto::AiConfig &config,
-                                         std::shared_ptr<Strategy> strategy)
-    : Play(config, false, strategy),
+AssignedTacticsPlay::AssignedTacticsPlay(std::shared_ptr<Strategy> strategy)
+    : Play(false, strategy),
       assigned_tactics(),
       override_motion_constraints(),
-      obstacle_factory(config.robot_navigation_obstacle_config())
+      obstacle_factory(ai_config.robot_navigation_obstacle_config())
 {
 }
 
@@ -80,6 +79,4 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
 void AssignedTacticsPlay::updateTactics(const PlayUpdate &play_update) {}
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, AssignedTacticsPlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
-    factory;
+static TGenericFactory<std::string, Play, AssignedTacticsPlay, std::shared_ptr<Strategy>> factory;

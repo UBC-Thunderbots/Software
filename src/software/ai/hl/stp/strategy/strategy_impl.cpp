@@ -5,6 +5,7 @@
 StrategyImpl::StrategyImpl(const TbotsProto::AiConfig& ai_config, const Field& field)
     : field_(field)
 {
+    LOG(DEBUG) << "StrategyImpl boot up!";
     updateAiConfig(ai_config);
 }
 
@@ -81,6 +82,7 @@ const TbotsProto::AiConfig& StrategyImpl::getAiConfig() const
 
 void StrategyImpl::updateAiConfig(const TbotsProto::AiConfig& ai_config)
 {
+    LOG(DEBUG) << "[Strategy] Updating AI config";
     ai_config_ = ai_config;
 
     pass_strategy_ = std::make_unique<PassStrategy>(ai_config.passing_config(), field_);
@@ -100,6 +102,7 @@ bool StrategyImpl::hasWorld() const
 void StrategyImpl::updateWorld(const World& world)
 {
     world_.emplace(world);
+    pass_strategy_->updateWorld(static_cast<const World&>(world_.value()));
 }
 
 bool StrategyImpl::isBetterPassThanCached(const Timestamp& timestamp,

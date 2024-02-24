@@ -7,12 +7,12 @@
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 
-Ai::Ai(const TbotsProto::AiConfig& ai_config)
-    : ai_config_(ai_config),
-      strategy(std::make_shared<Strategy>(ai_config)),
-      fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config, strategy})),
+Ai::Ai(std::shared_ptr<Strategy> strategy)
+    : ai_config_(strategy->getAiConfig()),
+      strategy(strategy),
+      fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{strategy})),
       override_play(nullptr),
-      current_play(std::make_shared<HaltPlay>(ai_config, strategy)),
+      current_play(std::make_shared<HaltPlay>(strategy)),
       ai_config_changed(false)
 {
     auto current_override = ai_config_.ai_control_config().override_ai_play();
@@ -70,7 +70,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 
     if (ai_config_changed)
     {
-        strategy->updateAiConfig(ai_config_);
+        //strategy->updateAiConfig(ai_config_);
     }
 
     strategy->updateWorld(world);
@@ -78,7 +78,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
     fsm->process_event(PlaySelectionFSM::Update(
         [this](std::shared_ptr<Play> play) {
             current_play = play;
-            current_play->updateAiConfig(ai_config_);
         },
         world.gameState(), ai_config_));
 

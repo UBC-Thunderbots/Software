@@ -23,7 +23,7 @@ class GoalieTactic : public Tactic
      * @param ai_config The AI configuration
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieTactic(TbotsProto::AiConfig ai_config,
+    explicit GoalieTactic(std::shared_ptr<Strategy> strategy,
                           TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                               TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
@@ -37,6 +37,8 @@ class GoalieTactic : public Tactic
 
    private:
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
+
+    std::shared_ptr<Strategy> strategy;
 
     std::map<RobotId, std::unique_ptr<FSM<GoalieFSM>>> fsm_map;
 

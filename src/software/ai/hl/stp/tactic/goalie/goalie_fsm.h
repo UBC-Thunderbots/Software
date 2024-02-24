@@ -38,9 +38,10 @@ struct GoalieFSM
      * @param goalie_tactic_config The config to fetch parameters from
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieFSM(TbotsProto::GoalieTacticConfig goalie_tactic_config,
+    explicit GoalieFSM(std::shared_ptr<Strategy> strategy,
                        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
-        : goalie_tactic_config(goalie_tactic_config),
+        : strategy(strategy),
+          goalie_tactic_config(strategy->getAiConfig().goalie_tactic_config()),
           max_allowed_speed_mode(max_allowed_speed_mode)
     {
     }
@@ -210,12 +211,9 @@ struct GoalieFSM
     }
 
    private:
+    std::shared_ptr<Strategy> strategy;
     // the goalie tactic config
     TbotsProto::GoalieTacticConfig goalie_tactic_config;
     // The maximum allowed speed mode
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
-
-    // TODO: Remove this once we actually pass Strategy into this tactic
-    std::shared_ptr<Strategy> strategy =
-        std::make_shared<Strategy>(TbotsProto::AiConfig());
 };

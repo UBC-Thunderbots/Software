@@ -147,6 +147,5 @@ struct PenaltyKickFSM
     Angle shot_angle;
 
     // TODO: Remove this once we actually pass Strategy into this tactic
-    std::shared_ptr<Strategy> strategy =
-        std::make_shared<Strategy>(TbotsProto::AiConfig());
+    std::shared_ptr<Strategy> strategy;
 };
