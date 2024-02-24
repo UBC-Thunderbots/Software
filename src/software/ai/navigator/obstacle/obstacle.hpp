@@ -12,9 +12,9 @@
 #include "software/geom/algorithms/axis_aligned_bounding_box.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
-#include "software/geom/algorithms/signed_distance.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/geom/algorithms/rasterize.h"
+#include "software/geom/algorithms/signed_distance.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
 
@@ -44,12 +44,13 @@ class Obstacle
     virtual double distance(const Point& p) const = 0;
 
     /**
-     * Gets the signed distance from the obstacle's perimeter to the point. That is, if point is inside the obstacle
-     * then distance will be negative.
-     * See https://iquilezles.org/articles/distfunctions2d/ for details on the maths
+     * Gets the signed distance from the obstacle's perimeter to the point. That is, if
+     * point is inside the obstacle then distance will be negative. See
+     * https://iquilezles.org/articles/distfunctions2d/ for details on the maths
      *
      * @param point Point to get distance to
-     * @return distance from point to nearest point on perimeter of obstacle. Positive if outside, negative if inside
+     * @return distance from point to nearest point on perimeter of obstacle. Positive if
+     * outside, negative if inside
      */
     virtual double signedDistance(const Point& point) const = 0;
 
@@ -166,8 +167,8 @@ bool GeomObstacle<GEOM_TYPE>::contains(const Point& p) const
     return ::contains(geom_, p);
 }
 
-template <typename  GEOM_TYPE>
-double GeomObstacle<GEOM_TYPE>::signedDistance(const Point &point) const
+template <typename GEOM_TYPE>
+double GeomObstacle<GEOM_TYPE>::signedDistance(const Point& point) const
 {
     return ::signedDistance(geom_, point);
 }

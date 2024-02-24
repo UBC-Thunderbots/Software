@@ -10,8 +10,8 @@
 
 /**
  * Finds the shortest distance between the perimeter of a Rectangle and a Point.
- * If the point is inside the Rectangle then the distance is negative, outside is positive.
- * See https://iquilezles.org/articles/distfunctions2d/ for details on the maths
+ * If the point is inside the Rectangle then the distance is negative, outside is
+ * positive. See https://iquilezles.org/articles/distfunctions2d/ for details on the maths
  *
  * @param first
  * @param second

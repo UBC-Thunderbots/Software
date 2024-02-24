@@ -11,12 +11,12 @@ cc_library(
         "contains.cpp",
         "convex_angle.cpp",
         "distance.cpp",
-        "signed_distance.cpp",
         "find_open_circles.cpp",
         "furthest_point.cpp",
         "intersection.cpp",
         "intersects.cpp",
         "rasterize.cpp",
+        "signed_distance.cpp",
         "step_along_perimeter.cpp",
         "voronoi_diagram.cpp",
     ],
@@ -29,12 +29,12 @@ cc_library(
         "contains.h",
         "convex_angle.h",
         "distance.h",
-        "signed_distance.h",
         "find_open_circles.h",
         "furthest_point.h",
         "intersection.h",
         "intersects.h",
         "rasterize.h",
+        "signed_distance.h",
         "step_along_perimeter.h",
         "voronoi_diagram.h",
     ],
@@ -186,7 +186,7 @@ cc_test(
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",
-    ]
+    ],
 )
 
 cc_test(
