@@ -6,11 +6,11 @@ Table of Contents
     https://github.com/ekalinin/github-markdown-toc
 -->
 
-* [Software Setup](#software-setup)                                                                                                                                                          
-   * [Introduction](#introduction)                                                                                                                                                           
-   * [Installation and Setup](#installation-and-setup)                                                                                                                                       
-      * [Operating systems](#operating-systems)                                                                                                                                              
-      * [Getting the Code](#getting-the-code)                                                                                                                                                
+* [Software Setup](#software-setup)
+   * [Introduction](#introduction)
+   * [Installation and Setup](#installation-and-setup)
+      * [Operating systems](#operating-systems)
+      * [Getting the Code](#getting-the-code)
       * [Installing Software Dependencies](#installing-software-dependencies)
       * [Installing an IDE](#installing-an-ide)
          * [Installing an IDE: CLion](#installing-an-ide-clion)
@@ -28,6 +28,8 @@ Table of Contents
       * [Debugging with CLion](#debugging-with-clion)
       * [Debugging from the Command line](#debugging-from-the-command-line)
    * [Profiling](#profiling)
+      * [Callgrind](#callgrind)
+      * [Tracy](#tracy)
    * [Building for Jetson Nano](#building-for-jetson-nano)
    * [Deploying to Jetson Nano](#deploying-to-jetson-nano)
    * [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
