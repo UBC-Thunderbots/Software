@@ -67,9 +67,9 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
                                                   const Robot& assigned_robot)
 {
     // Check if we can shoot on the enemy goal from the receiver position
-    std::optional<Shot> best_shot_opt = calcBestShotOnGoal(
-        world.field(), world.friendlyTeam(), world.enemyTeam(),
-        assigned_robot.position(), TeamType::ENEMY, {assigned_robot});
+    std::optional<Shot> best_shot_opt =
+        calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                           assigned_robot.position(), TeamType::ENEMY, {assigned_robot});
 
     // The percentage of open net the robot would shoot on
     if (best_shot_opt)
@@ -85,9 +85,9 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
         abs_angle_between_pass_and_shot_vectors =
             convexAngle(robot_to_ball, robot_to_shot_target);
 
-        Angle goal_angle = convexAngle(world.field().friendlyGoalpostPos(),
-                                       assigned_robot.position(),
-                                       world.field().friendlyGoalpostNeg());
+        Angle goal_angle =
+            convexAngle(world.field().friendlyGoalpostPos(), assigned_robot.position(),
+                        world.field().friendlyGoalpostNeg());
 
         double net_percent_open =
             best_shot_opt.value().getOpenAngle().toDegrees() / goal_angle.toDegrees();
@@ -108,7 +108,8 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
 bool ReceiverFSM::onetouchPossible(const Update& event)
 {
     return !event.control_params.disable_one_touch_shot &&
-           (findFeasibleShot(*event.common.world_ptr, event.common.robot) != std::nullopt);
+           (findFeasibleShot(*event.common.world_ptr, event.common.robot) !=
+            std::nullopt);
 }
 
 void ReceiverFSM::updateOnetouch(const Update& event)
