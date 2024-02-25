@@ -13,5 +13,6 @@ class ShootOrChipPlay : public Play
    public:
     ShootOrChipPlay(std::shared_ptr<Strategy> strategy);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
 };

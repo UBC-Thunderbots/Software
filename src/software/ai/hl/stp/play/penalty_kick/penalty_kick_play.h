@@ -15,7 +15,8 @@ class PenaltyKickPlay : public Play
    public:
     PenaltyKickPlay(std::shared_ptr<Strategy> strategy);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
     void updateTactics(const PlayUpdate &play_update) override;
     std::vector<std::string> getState() override;
 

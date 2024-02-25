@@ -10,7 +10,8 @@ HaltTestPlay::HaltTestPlay(const TbotsProto::AiConfig &config,
 {
 }
 
-void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
+void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                  const WorldPtr &world_ptr)
 {
     auto stop_test_tactic_1 = std::make_shared<StopTactic>();
     auto stop_test_tactic_2 = std::make_shared<StopTactic>();

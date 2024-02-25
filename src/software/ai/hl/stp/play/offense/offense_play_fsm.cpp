@@ -9,14 +9,14 @@ OffensePlayFSM::OffensePlayFSM(std::shared_ptr<Strategy> strategy)
 
 bool OffensePlayFSM::enemyHasPossession(const Update& event)
 {
-    TeamPossession possession = event.common.world.getTeamWithPossession();
+    TeamPossession possession = event.common.world_ptr->getTeamWithPossession();
     return (possession == TeamPossession::ENEMY_TEAM);
 }
 
 void OffensePlayFSM::setupOffensiveStrategy(const Update& event)
 {
     unsigned int num_shoot_or_pass, num_defenders;
-    auto num_enemy_robots = event.common.world.enemyTeam().numRobots();
+    auto num_enemy_robots = event.common.world_ptr->enemyTeam().numRobots();
 
     if (event.common.num_tactics > num_enemy_robots)
     {
@@ -54,7 +54,7 @@ void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
     if (num_shoot_or_pass > 0)
     {
         shoot_or_pass_play->updateTactics(PlayUpdate(
-            event.common.world, num_shoot_or_pass,
+            event.common.world_ptr, num_shoot_or_pass,
             [&tactics_to_return](PriorityTacticVector new_tactics) {
                 for (const auto& tactic_vector : new_tactics)
                 {
@@ -70,7 +70,7 @@ void OffensePlayFSM::setTactics(const Update& event, int num_shoot_or_pass,
     if (num_defenders > 0)
     {
         defense_play->updateTactics(PlayUpdate(
-            event.common.world, num_defenders,
+            event.common.world_ptr, num_defenders,
             [&tactics_to_return](PriorityTacticVector new_tactics) {
                 for (const auto& tactic_vector : new_tactics)
                 {

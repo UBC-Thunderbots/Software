@@ -11,7 +11,7 @@
 // This namespace contains all the test parameters
 namespace
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Pass pass({1, 1}, {0.5, 0}, 2.29);
     TbotsProto::AiConfig ai_config;
 

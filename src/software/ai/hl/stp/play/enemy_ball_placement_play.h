@@ -13,7 +13,8 @@ class EnemyBallPlacementPlay : public Play
    public:
     EnemyBallPlacementPlay(std::shared_ptr<Strategy> strategy);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
 
    private:
     /**
@@ -27,7 +28,7 @@ class EnemyBallPlacementPlay : public Play
      * @param placement_point ball placement point
      */
     void ballPlacementWithShadow(
-        TacticCoroutine::push_type &yield, const World &world,
+        TacticCoroutine::push_type &yield, const WorldPtr &world_ptr,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
         std::array<std::shared_ptr<MoveTactic>, 2> move_tactics, Point placement_point);
 };

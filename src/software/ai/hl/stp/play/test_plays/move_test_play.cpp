@@ -9,7 +9,8 @@ MoveTestPlay::MoveTestPlay(const TbotsProto::AiConfig &config,
 {
 }
 
-void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
+void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                  const WorldPtr &world_ptr)
 {
     auto move_test_tactic_friendly_goal = std::make_shared<MoveTactic>();
     auto move_test_tactic_enemy_goal    = std::make_shared<MoveTactic>();
@@ -18,10 +19,10 @@ void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     do
     {
         move_test_tactic_friendly_goal->updateControlParams(
-            world.field().friendlyGoalCenter(), Angle::zero(), 0,
+            world_ptr->field().friendlyGoalCenter(), Angle::zero(), 0,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
         move_test_tactic_enemy_goal->updateControlParams(
-            world.field().enemyGoalCenter(), Angle::zero(), 0,
+            world_ptr->field().enemyGoalCenter(), Angle::zero(), 0,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
         move_test_tactic_center_field->updateControlParams(
             Point(0, 0), Angle::zero(), 0,

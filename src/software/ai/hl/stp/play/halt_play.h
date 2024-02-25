@@ -15,5 +15,6 @@ class HaltPlay : public Play
    public:
     HaltPlay(std::shared_ptr<Strategy> strategy);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
 };

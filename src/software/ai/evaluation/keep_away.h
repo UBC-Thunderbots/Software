@@ -25,7 +25,7 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team);
  * @param best_pass_so_far the best pass so far
  * @return a Point with the qualities described above.
  */
-Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far);
+Point findKeepAwayTargetPoint(const WorldPtr& world_ptr, const Pass& best_pass_so_far);
 
 /**
  * Returns true if the given robot is being threatened by enemy robots near in

@@ -14,7 +14,7 @@ ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<Strategy> strategy)
 }
 
 void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                     const World &world)
+                                     const WorldPtr &world_ptr)
 {
     // This function doesn't get called so it does nothing
     while (true)

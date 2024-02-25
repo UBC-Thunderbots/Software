@@ -11,7 +11,8 @@ OffensePlay::OffensePlay(std::shared_ptr<Strategy> strategy)
 {
 }
 
-void OffensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
+void OffensePlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                 const WorldPtr &world_ptr)
 {
     // This function doesn't get called, it should be removed once coroutines
     // are phased out

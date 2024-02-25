@@ -13,7 +13,8 @@ DefensePlay::DefensePlay(std::shared_ptr<Strategy> strategy)
 {
 }
 
-void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
+void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                 const WorldPtr &world_ptr)
 {
     // This function doesn't get called so it does nothing
     while (true)

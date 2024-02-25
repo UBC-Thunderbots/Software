@@ -88,7 +88,8 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
 
     auto start_tick_time = std::chrono::system_clock::now();
 
-    auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
+    auto primitive_set_msg =
+        ai.getPrimitives(std::make_shared<World>(world_with_updated_game_state));
     LOG(VISUALIZE) << ai.getPlayInfo();
     LOG(VISUALIZE) << *primitive_set_msg;
 

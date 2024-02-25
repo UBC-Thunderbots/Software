@@ -64,19 +64,19 @@ Shot ReceiverFSM::getOneTouchShotPositionAndOrientation(const Robot& robot,
     return Shot(ideal_position, ideal_orientation);
 }
 
-std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
+std::optional<Shot> ReceiverFSM::findFeasibleShot(const WorldPtr& world_ptr,
                                                   const Robot& assigned_robot)
 {
     // Check if we can shoot on the enemy goal from the receiver position
-    std::optional<Shot> best_shot_opt =
-        calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                           assigned_robot.position(), TeamType::ENEMY, {assigned_robot});
+    std::optional<Shot> best_shot_opt = calcBestShotOnGoal(
+        world_ptr->field(), world_ptr->friendlyTeam(), world_ptr->enemyTeam(),
+        assigned_robot.position(), TeamType::ENEMY, {assigned_robot});
 
     // The percentage of open net the robot would shoot on
     if (best_shot_opt)
     {
         // Vector from the ball to the robot
-        Vector robot_to_ball = world.ball().position() - assigned_robot.position();
+        Vector robot_to_ball = world_ptr->ball().position() - assigned_robot.position();
 
         // The angle the robot will have to deflect the ball to shoot
         Angle abs_angle_between_pass_and_shot_vectors;
@@ -86,9 +86,9 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
         abs_angle_between_pass_and_shot_vectors =
             convexAngle(robot_to_ball, robot_to_shot_target);
 
-        Angle goal_angle =
-            convexAngle(world.field().friendlyGoalpostPos(), assigned_robot.position(),
-                        world.field().friendlyGoalpostNeg());
+        Angle goal_angle = convexAngle(world_ptr->field().friendlyGoalpostPos(),
+                                       assigned_robot.position(),
+                                       world_ptr->field().friendlyGoalpostNeg());
 
         double net_percent_open =
             best_shot_opt.value().getOpenAngle().toDegrees() / goal_angle.toDegrees();
@@ -109,14 +109,15 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
 bool ReceiverFSM::onetouchPossible(const Update& event)
 {
     return !event.control_params.disable_one_touch_shot &&
-           (findFeasibleShot(event.common.world, event.common.robot) != std::nullopt);
+           (findFeasibleShot(event.common.world_ptr, event.common.robot) != std::nullopt);
 }
 
 void ReceiverFSM::updateOnetouch(const Update& event)
 {
-    auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
+    auto best_shot = findFeasibleShot(event.common.world_ptr, event.common.robot);
     auto one_touch = getOneTouchShotPositionAndOrientation(
-        event.common.robot, event.common.world.ball(), best_shot->getPointToShootAt());
+        event.common.robot, event.common.world_ptr->ball(),
+        best_shot->getPointToShootAt());
 
     if (best_shot && event.control_params.pass)
     {
@@ -148,7 +149,7 @@ void ReceiverFSM::updateReceive(const Update& event)
 
 void ReceiverFSM::adjustReceive(const Update& event)
 {
-    auto ball      = event.common.world.ball();
+    auto ball      = event.common.world_ptr->ball();
     auto robot_pos = event.common.robot.position();
 
     if ((ball.position() - robot_pos).length() >
@@ -174,7 +175,7 @@ void ReceiverFSM::adjustReceive(const Update& event)
 
 bool ReceiverFSM::passStarted(const Update& event)
 {
-    return event.common.world.ball().hasBallBeenKicked(
+    return event.common.world_ptr->ball().hasBallBeenKicked(
         event.control_params.pass->passerOrientation());
 }
 
@@ -182,24 +183,25 @@ bool ReceiverFSM::passFinished(const Update& event)
 {
     // We tolerate imperfect passes that hit the edges of the robot,
     // so that we can quickly transition out and grab the ball.
-    return event.common.robot.isNearDribbler(event.common.world.ball().position());
+    return event.common.robot.isNearDribbler(event.common.world_ptr->ball().position());
 }
 
 bool ReceiverFSM::strayPass(const Update& event)
 {
-    auto ball_position = event.common.world.ball().position();
+    auto ball_position = event.common.world_ptr->ball().position();
 
     Vector ball_receiver_point_vector(
         event.control_params.pass->receiverPoint().x() - ball_position.x(),
         event.control_params.pass->receiverPoint().y() - ball_position.y());
 
-    auto orientation_difference = event.common.world.ball().velocity().orientation() -
-                                  ball_receiver_point_vector.orientation();
+    auto orientation_difference =
+        event.common.world_ptr->ball().velocity().orientation() -
+        ball_receiver_point_vector.orientation();
 
     // if pass has strayed far from its intended destination (ex it was deflected)
     // we consider the pass finished
     bool stray_pass =
-        event.common.world.ball().velocity().length() > MIN_STRAY_PASS_SPEED &&
+        event.common.world_ptr->ball().velocity().length() > MIN_STRAY_PASS_SPEED &&
         orientation_difference > MIN_STRAY_PASS_ANGLE;
 
     return stray_pass;

@@ -74,7 +74,7 @@ struct ReceiverFSM
      * @param world The world to find a feasible shot on
      * @param assigned_robot The robot that will be performing the one-touch
      */
-    static std::optional<Shot> findFeasibleShot(const World& world,
+    static std::optional<Shot> findFeasibleShot(const WorldPtr& world_ptr,
                                                 const Robot& assigned_robot);
 
     /**

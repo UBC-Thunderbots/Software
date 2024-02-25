@@ -13,7 +13,7 @@ PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<Strategy> strategy)
 }
 
 void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                     const World &world)
+                                     const WorldPtr &world_ptr)
 {
     // This function doesn't get called, it should be removed once coroutines are phased
     // out

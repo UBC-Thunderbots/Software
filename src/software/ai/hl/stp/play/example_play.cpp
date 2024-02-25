@@ -5,7 +5,8 @@
 
 ExamplePlay::ExamplePlay(std::shared_ptr<Strategy> strategy) : Play(false, strategy) {}
 
-void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
+void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                 const WorldPtr &world_ptr)
 {
     std::vector<std::shared_ptr<MoveTactic>> move_tactics(DIV_A_NUM_ROBOTS);
     std::generate(move_tactics.begin(), move_tactics.end(),
@@ -21,7 +22,7 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         for (size_t k = 0; k < move_tactics.size(); k++)
         {
             move_tactics[k]->updateControlParams(
-                world.ball().position() +
+                world_ptr->ball().position() +
                     Vector::createFromAngle(angle_between_robots *
                                             static_cast<double>(k + 1)),
                 (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(), 0);
