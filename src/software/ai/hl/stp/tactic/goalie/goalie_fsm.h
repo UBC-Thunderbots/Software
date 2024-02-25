@@ -85,7 +85,7 @@ struct GoalieFSM
      * @return a point on the field that is a good place to chip to
      */
     static Point findGoodChipTarget(
-        const WorldPtr &world_ptr,
+        const World &world,
         const TbotsProto::GoalieTacticConfig &goalie_tactic_config);
 
     /**

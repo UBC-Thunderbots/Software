@@ -54,9 +54,9 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         auto pitch_division = std::make_shared<const EighteenZonePitchDivision>(
             event.common.world_ptr->field());
 
-        auto pass_eval    = pass_generator.generatePassEvaluation(event.common.world_ptr);
+        auto pass_eval    = pass_generator.generatePassEvaluation(*event.common.world_ptr);
         auto ranked_zones = pass_eval.rankZonesForReceiving(
-            event.common.world_ptr, event.common.world_ptr->ball().position());
+            *event.common.world_ptr, event.common.world_ptr->ball().position());
 
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
@@ -68,7 +68,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
             ai_config.shoot_or_pass_play_config().abs_min_pass_score();
         double pass_score_ramp_down_duration =
             ai_config.shoot_or_pass_play_config().pass_score_ramp_down_duration();
-        pass_eval = pass_generator.generatePassEvaluation(event.common.world_ptr);
+        pass_eval = pass_generator.generatePassEvaluation(*event.common.world_ptr);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
         // update the best pass in the attacker tactic
@@ -102,10 +102,10 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
-    auto pass_eval = pass_generator.generatePassEvaluation(event.common.world_ptr);
+    auto pass_eval = pass_generator.generatePassEvaluation(*event.common.world_ptr);
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
-        event.common.world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
+        *event.common.world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
 
     // if we make it here then we have committed to the pass
     attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
