@@ -35,8 +35,8 @@ class PassGeneratorTest : public testing::Test
      * @param max_iters The maximum number of iterations of the PassGenerator to run
      */
     static void stepPassGenerator(
-        std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator,
-        const World& world, int max_iters)
+        std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator, const World& world,
+        int max_iters)
     {
         for (int i = 0; i < max_iters; i++)
         {
