@@ -85,7 +85,7 @@ Rectangle GoalieFSM::getNoChipRectangle(const Field &field)
 }
 
 Point GoalieFSM::findGoodChipTarget(
-    const World& world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config)
+    const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config)
 {
     // Default chip target is the enemy goal
     Point chip_target = world.field().enemyGoalCenter();
@@ -170,7 +170,7 @@ void GoalieFSM::updatePivotKick(
     Point chip_origin =
         Point(chip_origin_x, event.common.world_ptr->ball().position().y());
 
-    Point chip_target  = findGoodChipTarget(*event.common.world_ptr, goalie_tactic_config);
+    Point chip_target = findGoodChipTarget(*event.common.world_ptr, goalie_tactic_config);
     Vector chip_vector = chip_target - chip_origin;
 
     PivotKickFSM::ControlParams control_params{

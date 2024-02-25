@@ -54,7 +54,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         auto pitch_division = std::make_shared<const EighteenZonePitchDivision>(
             event.common.world_ptr->field());
 
-        auto pass_eval    = pass_generator.generatePassEvaluation(*event.common.world_ptr);
+        auto pass_eval = pass_generator.generatePassEvaluation(*event.common.world_ptr);
         auto ranked_zones = pass_eval.rankZonesForReceiving(
             *event.common.world_ptr, event.common.world_ptr->ball().position());
 

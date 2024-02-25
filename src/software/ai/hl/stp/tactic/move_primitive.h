@@ -44,7 +44,7 @@ class MovePrimitive : public Primitive
      * @return the primitive proto message
      */
     std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
-        const World& world,
+        const World &world,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const RobotNavigationObstacleFactory &obstacle_factory) override;
 
@@ -69,7 +69,7 @@ class MovePrimitive : public Primitive
      * @param obstacle_factory Obstacle factory to use
      */
     void generateObstacles(
-        const World& world,
+        const World &world,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const RobotNavigationObstacleFactory &obstacle_factory);
 

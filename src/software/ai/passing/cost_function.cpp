@@ -15,8 +15,8 @@
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
                 TbotsProto::PassingConfig passing_config)
 {
-    double static_pass_quality = getStaticPositionQuality(
-        world.field(), pass.receiverPoint(), passing_config);
+    double static_pass_quality =
+        getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
 
     double friendly_pass_rating =
         ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
@@ -26,8 +26,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
                           Duration::fromSeconds(passing_config.enemy_reaction_time()),
                           passing_config.enemy_proximity_importance());
 
-    double shoot_pass_rating = ratePassShootScore(
-        world.field(), world.enemyTeam(), pass, passing_config);
+    double shoot_pass_rating =
+        ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 

@@ -23,7 +23,7 @@ class Primitive
      * @return the primitive proto message
      */
     virtual std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
-        const World& world,
+        const World &world,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const RobotNavigationObstacleFactory &obstacle_factory) = 0;
 
