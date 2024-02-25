@@ -6,14 +6,14 @@ using SetPrimitiveCallback = std::function<void(std::shared_ptr<Primitive>)>;
 
 struct SkillUpdate
 {
-    SkillUpdate(const Robot &robot, const World &world,
+    SkillUpdate(const Robot &robot, const WorldPtr &world_ptr,
                 std::shared_ptr<Strategy> strategy,
                 const SetPrimitiveCallback &set_primitive_fun)
-        : robot(robot), world(world), strategy(strategy), set_primitive(set_primitive_fun)
+        : robot(robot), world_ptr(world_ptr), strategy(strategy), set_primitive(set_primitive_fun)
     {
     }
     Robot robot;
-    World world;
+    WorldPtr world_ptr;
     std::shared_ptr<Strategy> strategy;
     SetPrimitiveCallback set_primitive;
 };

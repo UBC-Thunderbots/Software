@@ -28,7 +28,7 @@ bool PivotKickSkillFSM::lostPossession(const Update& event)
         event.common.strategy->getAiConfig().dribble_skill_config();
 
     return !event.common.robot.isNearDribbler(
-        event.common.world.ball().position(),
+        event.common.world_ptr->ball().position(),
         dribble_skill_config.lose_ball_possession_threshold());
 };
 

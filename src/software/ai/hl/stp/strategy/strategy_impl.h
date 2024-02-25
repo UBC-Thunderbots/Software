@@ -48,7 +48,7 @@ class StrategyImpl
     void updateAiConfig(const TbotsProto::AiConfig& ai_config);
 
     bool hasWorld() const;
-    void updateWorld(const World& world);
+    void updateWorld(const WorldPtr &world_ptr);
 
    private:
     bool isBetterPassThanCached(const Timestamp& timestamp, const PassWithRating& pass);
@@ -57,7 +57,7 @@ class StrategyImpl
 
     // World
     Field field_;
-    std::optional<std::reference_wrapper<const World>> world_;
+    WorldPtr world_ptr_;
 
     // Passing
     std::unique_ptr<PassStrategy> pass_strategy_;

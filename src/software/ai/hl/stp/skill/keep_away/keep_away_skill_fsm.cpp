@@ -7,14 +7,14 @@ bool KeepAwaySkillFSM::isPossessionThreatened(const Update& event)
     const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
 
     if (!event.common.robot.isNearDribbler(
-            event.common.world.ball().position(),
+            event.common.world_ptr->ball().position(),
             ai_config.dribble_skill_config().lose_ball_possession_threshold()))
     {
         return true;
     }
 
     return shouldKeepAway(
-        event.common.robot, event.common.world.enemyTeam(),
+        event.common.robot, event.common.world_ptr->enemyTeam(),
         ai_config.attacker_tactic_config().enemy_about_to_steal_ball_radius());
 }
 
@@ -22,10 +22,10 @@ void KeepAwaySkillFSM::keepAway(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
     Pass best_pass             = (*event.common.strategy)->getBestPass().pass;
-    auto keepaway_dribble_dest = findKeepAwayTargetPoint(event.common.world, best_pass);
+    auto keepaway_dribble_dest = findKeepAwayTargetPoint(*event.common.world_ptr, best_pass);
 
-    const Team& enemy_team = event.common.world.enemyTeam();
-    const Ball& ball       = event.common.world.ball();
+    const Team& enemy_team = event.common.world_ptr->enemyTeam();
+    const Ball& ball       = event.common.world_ptr->ball();
 
     auto final_dribble_orientation = best_pass.passerOrientation();
 

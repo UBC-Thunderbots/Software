@@ -17,8 +17,7 @@ Pose StrategyImpl::getBestDribblePose(const Robot& robot)
     }
 
     // TODO(#3082): temporary logic, find best dribble_position
-    const World& world     = world_.value();
-    Vector robot_to_goal   = world.field().enemyGoalCenter() - robot.position();
+    Vector robot_to_goal   = world_ptr_->field().enemyGoalCenter() - robot.position();
     Point dribble_position = robot.position() + robot_to_goal.normalize(0.8);
 
     // cache the dribble position
@@ -31,11 +30,7 @@ Pose StrategyImpl::getBestDribblePose(const Robot& robot)
 PassWithRating StrategyImpl::getBestPass()
 {
     // calculate best pass
-    Timestamp current_time;
-    {
-        const World& world = world_.value();
-        current_time       = world.getMostRecentTimestamp();
-    }
+    Timestamp current_time = world_ptr_->getMostRecentTimestamp();
 
     auto pass_eval          = pass_strategy_->getPassEvaluation();
     const auto& latest_pass = pass_eval->getBestPassOnField();
@@ -55,9 +50,8 @@ std::optional<Shot> StrategyImpl::getBestShot(const Robot& robot)
         return robot_to_best_shot_.at(robot.id());
     }
 
-    const World& world = world_.value();
     robot_to_best_shot_[robot.id()] =
-        calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+        calcBestShotOnGoal(world_ptr_->field(), world_ptr_->friendlyTeam(), world_ptr_->enemyTeam(),
                            robot.position(), TeamType::ENEMY, {robot});
     return robot_to_best_shot_[robot.id()];
 }
@@ -86,9 +80,9 @@ void StrategyImpl::updateAiConfig(const TbotsProto::AiConfig& ai_config)
     ai_config_ = ai_config;
 
     pass_strategy_ = std::make_unique<PassStrategy>(ai_config.passing_config(), field_);
-    if (world_)
+    if (world_ptr_)
     {
-        pass_strategy_->updateWorld(static_cast<const World&>(world_.value()));
+        pass_strategy_->updateWorld(world_ptr_);
     }
 
     reset();
@@ -96,13 +90,13 @@ void StrategyImpl::updateAiConfig(const TbotsProto::AiConfig& ai_config)
 
 bool StrategyImpl::hasWorld() const
 {
-    return world_.has_value();
+    return world_ptr_ != nullptr;
 }
 
-void StrategyImpl::updateWorld(const World& world)
+void StrategyImpl::updateWorld(const WorldPtr& world_ptr)
 {
-    world_.emplace(world);
-    pass_strategy_->updateWorld(static_cast<const World&>(world_.value()));
+    world_ptr_ = world_ptr;
+    pass_strategy_->updateWorld(world_ptr_);
 }
 
 bool StrategyImpl::isBetterPassThanCached(const Timestamp& timestamp,

@@ -19,9 +19,9 @@ void Strategy::updateAiConfig(const TbotsProto::AiConfig& ai_config)
     strategy_->updateAiConfig(ai_config);
 }
 
-void Strategy::updateWorld(const World& world)
+void Strategy::updateWorld(const WorldPtr &world_ptr)
 {
-    strategy_->updateWorld(world);
+    strategy_->updateWorld(world_ptr);
 }
 
 std::shared_ptr<StrategyImpl> Strategy::operator->()

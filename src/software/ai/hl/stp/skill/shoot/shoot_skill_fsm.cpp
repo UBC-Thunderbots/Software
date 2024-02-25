@@ -4,8 +4,8 @@ void ShootSkillFSM::pivotKick(
     const Update& event,
     boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
-    Point ball_position = event.common.world.ball().position();
-    Point kick_target   = event.common.world.field().enemyGoalCenter();
+    Point ball_position = event.common.world_ptr->ball().position();
+    Point kick_target   = event.common.world_ptr->field().enemyGoalCenter();
 
     std::optional<Shot> best_shot =
         (*event.common.strategy)->getBestShot(event.common.robot);

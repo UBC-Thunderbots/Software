@@ -142,7 +142,7 @@ void PenaltyKickFSM::updateApproachKeeper(
         .final_dribble_orientation = std::optional<Angle>(Angle::zero()),
         .allow_excessive_dribbling = false};
     processEvent(DribbleSkillFSM::Update(
-        control_params, SkillUpdate(event.common.robot, event.common.world, strategy,
+        control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
                                     event.common.set_primitive)));
 }
 
@@ -159,7 +159,7 @@ void PenaltyKickFSM::adjustOrientationForShot(
         .final_dribble_orientation = std::optional<Angle>(shot_angle),
         .allow_excessive_dribbling = false};
     processEvent(DribbleSkillFSM::Update(
-        control_params, SkillUpdate(event.common.robot, event.common.world, strategy,
+        control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
                                     event.common.set_primitive)));
 }
 

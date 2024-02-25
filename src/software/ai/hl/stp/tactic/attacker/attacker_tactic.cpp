@@ -30,7 +30,7 @@ std::string AttackerTactic::getFSMState() const
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
     std::shared_ptr<Skill> next_skill =
-        skill_graph_.getNextSkill(tactic_update.robot, tactic_update.world);
+        skill_graph_.getNextSkill(tactic_update.robot, *tactic_update.world_ptr);
 
     if (last_execution_robot == tactic_update.robot.id())
     {
@@ -41,13 +41,13 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
             skill_graph_.extendSequence(current_skill_);
         }
 
-        current_skill_->updatePrimitive(tactic_update.robot, tactic_update.world,
+        current_skill_->updatePrimitive(tactic_update.robot, tactic_update.world_ptr,
                                         tactic_update.set_primitive);
     }
     else
     {
         next_skill->reset(tactic_update.robot);
-        next_skill->updatePrimitive(tactic_update.robot, tactic_update.world,
+        next_skill->updatePrimitive(tactic_update.robot, tactic_update.world_ptr,
                                     tactic_update.set_primitive);
     }
 }

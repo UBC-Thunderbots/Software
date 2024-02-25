@@ -52,7 +52,7 @@ void Ai::updateAiConfig(TbotsProto::AiConfig& ai_config)
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const WorldPtr& world_ptr)
 {
-    strategy->updateWorld(world);
+    strategy->updateWorld(world_ptr);
 
     fsm->process_event(PlaySelectionFSM::Update(
         [this](std::shared_ptr<Play> play) { current_play = play; }, world_ptr->gameState(),

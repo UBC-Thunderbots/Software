@@ -18,7 +18,7 @@ class PassStrategy
 
     std::shared_ptr<PassEvaluation<EighteenZoneId>> getPassEvaluation();
 
-    void updateWorld(const World& world);
+    void updateWorld(const WorldPtr& world_ptr);
 
    private:
     void evaluatePassOptions();
@@ -26,7 +26,7 @@ class PassStrategy
     // World
     std::condition_variable world_available_cv_;
     std::mutex world_lock_;
-    std::optional<const World> current_world_;
+    WorldPtr world_ptr_;
 
     // Passing calculations
     std::condition_variable pass_available_cv_;
