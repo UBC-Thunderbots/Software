@@ -183,7 +183,7 @@ void GoalieFSM::updatePivotKick(
 
     // update the pivotkick fsm
     processEvent(PivotKickSkillFSM::Update(
-        control_params, SkillUpdate(event.common.robot, event.common.world, strategy,
+        control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
                                     event.common.set_primitive)));
 }
 

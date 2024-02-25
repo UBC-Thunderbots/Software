@@ -44,7 +44,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     do
     {
         place_ball_tactic->updateControlParams(
-            world_ptr->gameState().getBallPlacementPoint(), std::nullopt, true);
+            {world_ptr->gameState().getBallPlacementPoint(), std::nullopt, true});
         TacticVector result = {place_ball_tactic};
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());
         yield({result});
