@@ -13,9 +13,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
 
-CornerKickPlay::CornerKickPlay(const TbotsProto::AiConfig &config,
-                               std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy)
+CornerKickPlay::CornerKickPlay(std::shared_ptr<Strategy> strategy) : Play(true, strategy)
 {
 }
 
@@ -46,7 +44,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
     Pass pass = setupPass(yield, world);
 
     // Perform the pass and wait until the receiver is finished
-    auto attacker = std::make_shared<AttackerTactic>(ai_config);
+    auto attacker = std::make_shared<AttackerTactic>(strategy);
     auto receiver = std::make_shared<ReceiverTactic>();
 
     do
@@ -72,8 +70,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
-    PassGenerator<EighteenZoneId> pass_generator(pitch_division,
-                                                 ai_config.passing_config());
+    PassGenerator<EighteenZoneId> pass_generator(
+        pitch_division, strategy->getAiConfig().passing_config());
 
     auto pass_eval = pass_generator.generatePassEvaluation(world);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
@@ -146,12 +144,11 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
 
         Duration time_since_commit_stage_start =
             world.getMostRecentTimestamp() - commit_stage_start_time;
-        min_score =
-            1 -
-            std::min(
-                time_since_commit_stage_start.toSeconds() /
-                    ai_config.corner_kick_play_config().max_time_commit_to_pass_seconds(),
-                1.0);
+        min_score = 1 - std::min(time_since_commit_stage_start.toSeconds() /
+                                     strategy->getAiConfig()
+                                         .corner_kick_play_config()
+                                         .max_time_commit_to_pass_seconds(),
+                                 1.0);
     } while (best_pass_and_score_so_far.rating < min_score);
 
     // Commit to a pass
@@ -175,6 +172,5 @@ void CornerKickPlay::updateAlignToBallTactic(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, CornerKickPlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
+static TGenericFactory<std::string, Play, CornerKickPlay, std::shared_ptr<Strategy>>
     factory;

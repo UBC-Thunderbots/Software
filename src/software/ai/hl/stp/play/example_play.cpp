@@ -3,11 +3,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-ExamplePlay::ExamplePlay(const TbotsProto::AiConfig &config,
-                         std::shared_ptr<Strategy> strategy)
-    : Play(config, false, strategy)
-{
-}
+ExamplePlay::ExamplePlay(std::shared_ptr<Strategy> strategy) : Play(false, strategy) {}
 
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
@@ -42,6 +38,4 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ExamplePlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
-    factory;
+static TGenericFactory<std::string, Play, ExamplePlay, std::shared_ptr<Strategy>> factory;

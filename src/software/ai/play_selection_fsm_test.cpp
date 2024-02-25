@@ -12,14 +12,15 @@ class PlaySelectionFSMTest : public ::testing::Test
 {
    protected:
     TbotsProto::AiConfig ai_config;
+    std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>(ai_config);
     std::shared_ptr<FSM<PlaySelectionFSM>> fsm =
-        std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config});
+        std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config, strategy});
     GameState game_state;
 };
 
 TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick)
 {
-    std::shared_ptr<Play> current_play = std::make_unique<HaltPlay>(ai_config);
+    std::shared_ptr<Play> current_play = std::make_unique<HaltPlay>(ai_config, strategy);
 
     // Start in halt
     fsm->process_event(PlaySelectionFSM::Update(
@@ -66,7 +67,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick)
 
 TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal_conceded)
 {
-    std::shared_ptr<Play> current_play = std::make_unique<HaltPlay>(ai_config);
+    std::shared_ptr<Play> current_play = std::make_unique<HaltPlay>(ai_config, strategy);
 
     // Start in halt
     fsm->process_event(PlaySelectionFSM::Update(
@@ -141,7 +142,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
 TEST_F(PlaySelectionFSMTest,
        test_transition_out_of_penalty_kick_enemy_when_no_goal_conceded)
 {
-    std::shared_ptr<Play> current_play = std::make_unique<HaltPlay>(ai_config);
+    std::shared_ptr<Play> current_play = std::make_unique<HaltPlay>(ai_config, strategy);
 
     // Start in halt
     fsm->process_event(PlaySelectionFSM::Update(

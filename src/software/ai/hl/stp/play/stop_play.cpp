@@ -6,10 +6,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-StopPlay::StopPlay(const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy)
-{
-}
+StopPlay::StopPlay(std::shared_ptr<Strategy> strategy) : Play(true, strategy) {}
 
 void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
@@ -47,12 +44,12 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
         std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
         std::make_shared<MoveTactic>()};
 
-    goalie_tactic = std::make_shared<GoalieTactic>(ai_config, stop_mode);
+    goalie_tactic = std::make_shared<GoalieTactic>(strategy, stop_mode);
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            strategy->getAiConfig().robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            strategy->getAiConfig().robot_navigation_obstacle_config()),
     };
 
     do
@@ -110,6 +107,4 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, StopPlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
-    factory;
+static TGenericFactory<std::string, Play, StopPlay, std::shared_ptr<Strategy>> factory;

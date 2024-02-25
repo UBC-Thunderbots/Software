@@ -3,10 +3,7 @@
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-HaltPlay::HaltPlay(const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy)
-    : Play(config, false, strategy)
-{
-}
+HaltPlay::HaltPlay(std::shared_ptr<Strategy> strategy) : Play(false, strategy) {}
 
 void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
@@ -26,6 +23,4 @@ void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, HaltPlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
-    factory;
+static TGenericFactory<std::string, Play, HaltPlay, std::shared_ptr<Strategy>> factory;

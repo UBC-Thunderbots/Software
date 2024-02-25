@@ -6,9 +6,8 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffFriendlyPlay::KickoffFriendlyPlay(const TbotsProto::AiConfig &config,
-                                         std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy)
+KickoffFriendlyPlay::KickoffFriendlyPlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy)
 {
 }
 
@@ -131,6 +130,5 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffFriendlyPlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
+static TGenericFactory<std::string, Play, KickoffFriendlyPlay, std::shared_ptr<Strategy>>
     factory;

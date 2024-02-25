@@ -4,10 +4,10 @@
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PenaltyKickPlay::PenaltyKickPlay(const TbotsProto::AiConfig &config,
-                                 std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy),
-      fsm(std::make_unique<FSM<PenaltyKickPlayFSM>>(PenaltyKickPlayFSM(config))),
+PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy),
+      fsm(std::make_unique<FSM<PenaltyKickPlayFSM>>(
+          PenaltyKickPlayFSM(strategy->getAiConfig()))),
       control_params{}
 {
 }
@@ -17,13 +17,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     // This function doesn't get called, it should be removed once coroutines are phased
     // out
-}
-
-void PenaltyKickPlay::reset()
-{
-    Play::reset();
-
-    fsm = std::make_unique<FSM<PenaltyKickPlayFSM>>(PenaltyKickPlayFSM(ai_config));
 }
 
 void PenaltyKickPlay::updateTactics(const PlayUpdate &play_update)
@@ -39,6 +32,5 @@ std::vector<std::string> PenaltyKickPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PenaltyKickPlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
+static TGenericFactory<std::string, Play, PenaltyKickPlay, std::shared_ptr<Strategy>>
     factory;

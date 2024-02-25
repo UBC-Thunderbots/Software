@@ -4,7 +4,7 @@
 
 #include "proto/play_info_msg.pb.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/strategy.h"
+#include "software/ai/hl/stp/strategy/strategy.h"
 #include "software/ai/play_selection_fsm.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
@@ -18,10 +18,11 @@ class Ai final
     Ai() = delete;
 
     /**
-     * Create an AI with given configurations
-     * @param ai_config_ The AI configuration
+     * Create an AI
+     *
+     * @param strategy the Strategy
      */
-    explicit Ai(const TbotsProto::AiConfig& ai_config);
+    explicit Ai(std::shared_ptr<Strategy> strategy);
 
     /**
      * Overrides the play
@@ -64,15 +65,17 @@ class Ai final
     void updateAiConfig(TbotsProto::AiConfig& ai_config);
 
    private:
-    void checkAiConfig();
+    /**
+     * Checks the current AiConfig to see if we should override the current play
+     * and either applies or clears the override accordingly
+     */
+    void updateOverridePlay();
 
     TbotsProto::AiConfig ai_config_;
     std::shared_ptr<Strategy> strategy;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
     std::shared_ptr<Play> current_play;
-    TbotsProto::Play current_override_play_proto;
-    bool ai_config_changed;
 
     // inter play communication
     InterPlayCommunication inter_play_communication;

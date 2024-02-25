@@ -13,15 +13,13 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
     Robot robot = ::TestUtil::createRobotAtPos(world.field().friendlyPenaltyMark());
 
     TbotsProto::AiConfig ai_config;
-    FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(),
-                            DribbleFSM(ai_config.dribble_tactic_config()),
-                            GetBehindBallFSM()};
+    FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(), DribbleSkillFSM(), GetBehindBallFSM()};
 
     PenaltyKickFSM::ControlParams control_params{};
 
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM>));
 
     double shot_x_position =
         ((world.field().totalXLength() / 2) - (world.field().totalXLength() * 1.0 / 3));
@@ -31,7 +29,7 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
     world = ::TestUtil::setBallPosition(world, position, Timestamp::fromSeconds(1));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM>));
 
     position = Point(shot_x_position + 0.3, 0);
     robot    = ::TestUtil::createRobotAtPos(position);

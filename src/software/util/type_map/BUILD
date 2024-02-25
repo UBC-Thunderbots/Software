@@ -4,7 +4,7 @@ cc_library(
     name = "type_map",
     hdrs = [
         "type_map.h",
-        "type_map.tpp"
+        "type_map.tpp",
     ],
     deps = [],
 )

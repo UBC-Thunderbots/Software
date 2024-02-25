@@ -4,10 +4,9 @@
 #include "shared/constants.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-OffensePlay::OffensePlay(const TbotsProto::AiConfig config,
-                         std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy),
-      fsm(std::make_unique<FSM<OffensePlayFSM>>(OffensePlayFSM(config, strategy))),
+OffensePlay::OffensePlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy),
+      fsm(std::make_unique<FSM<OffensePlayFSM>>(OffensePlayFSM(strategy))),
       control_params{}
 {
 }
@@ -22,19 +21,10 @@ void OffensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     }
 }
 
-void OffensePlay::reset()
-{
-    Play::reset();
-
-    fsm = std::make_unique<FSM<OffensePlayFSM>>(OffensePlayFSM(ai_config, strategy));
-}
-
 void OffensePlay::updateTactics(const PlayUpdate &play_update)
 {
     fsm->process_event(OffensePlayFSM::Update(control_params, play_update));
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, OffensePlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
-    factory;
+static TGenericFactory<std::string, Play, OffensePlay, std::shared_ptr<Strategy>> factory;

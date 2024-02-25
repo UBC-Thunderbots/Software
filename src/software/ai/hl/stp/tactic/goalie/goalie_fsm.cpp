@@ -159,7 +159,8 @@ void GoalieFSM::panic(const Update &event)
 }
 
 void GoalieFSM::updatePivotKick(
-    const Update &event, boost::sml::back::process<PivotKickFSM::Update> processEvent)
+    const Update &event,
+    boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
     // Ensure that we start our chip away from the no chip zone in front of
     // the goal (prevents accidentally scoring an own goal)
@@ -172,7 +173,7 @@ void GoalieFSM::updatePivotKick(
     Point chip_target  = findGoodChipTarget(event.common.world, goalie_tactic_config);
     Vector chip_vector = chip_target - chip_origin;
 
-    PivotKickFSM::ControlParams control_params{
+    PivotKickSkillFSM::ControlParams control_params{
         .kick_origin    = chip_origin,
         .kick_direction = chip_vector.orientation(),
         .auto_chip_or_kick =
@@ -180,7 +181,9 @@ void GoalieFSM::updatePivotKick(
     };
 
     // update the pivotkick fsm
-    processEvent(PivotKickFSM::Update(control_params, event.common));
+    processEvent(PivotKickSkillFSM::Update(
+        control_params, SkillUpdate(event.common.robot, event.common.world, strategy,
+                                    event.common.set_primitive)));
 }
 
 void GoalieFSM::positionToBlock(const Update &event)

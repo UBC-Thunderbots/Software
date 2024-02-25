@@ -3,8 +3,8 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
-#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
@@ -38,9 +38,10 @@ struct GoalieFSM
      * @param goalie_tactic_config The config to fetch parameters from
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieFSM(TbotsProto::GoalieTacticConfig goalie_tactic_config,
+    explicit GoalieFSM(std::shared_ptr<Strategy> strategy,
                        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
-        : goalie_tactic_config(goalie_tactic_config),
+        : strategy(strategy),
+          goalie_tactic_config(strategy->getAiConfig().goalie_tactic_config()),
           max_allowed_speed_mode(max_allowed_speed_mode)
     {
     }
@@ -137,13 +138,14 @@ struct GoalieFSM
     void moveToGoalLine(const Update &event);
 
     /**
-     * Action that updates the PivotKickFSM
+     * Action that updates the PivotKickSkillFSM
      *
      * @param event GoalieFSM::Update event
-     * @param processEvent processes the PivotKickFSM::Update
+     * @param processEvent processes the PivotKickSkillFSM::Update
      */
-    void updatePivotKick(const Update &event,
-                         boost::sml::back::process<PivotKickFSM::Update> processEvent);
+    void updatePivotKick(
+        const Update &event,
+        boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
 
     /**
      * Action that updates the MovePrimitive to position the goalie in the best spot to
@@ -165,7 +167,7 @@ struct GoalieFSM
         using namespace boost::sml;
 
         DEFINE_SML_STATE(Panic)
-        DEFINE_SML_STATE(PivotKickFSM)
+        DEFINE_SML_STATE(PivotKickSkillFSM)
         DEFINE_SML_STATE(PositionToBlock)
         DEFINE_SML_STATE(MoveToGoalLine)
 
@@ -180,7 +182,7 @@ struct GoalieFSM
         DEFINE_SML_ACTION(panic)
         DEFINE_SML_ACTION(positionToBlock)
         DEFINE_SML_ACTION(moveToGoalLine)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updatePivotKick, PivotKickFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updatePivotKick, PivotKickSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -188,17 +190,18 @@ struct GoalieFSM
                 MoveToGoalLine_S,
             PositionToBlock_S + Update_E[shouldPanic_G] / panic_A = Panic_S,
             PositionToBlock_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
-                PivotKickFSM_S,
+                PivotKickSkillFSM_S,
             PositionToBlock_S + Update_E / positionToBlock_A,
             Panic_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            Panic_S + Update_E[shouldPivotChip_G] / updatePivotKick_A = PivotKickFSM_S,
-            Panic_S + Update_E[panicDone_G] / positionToBlock_A       = PositionToBlock_S,
+            Panic_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
+                PivotKickSkillFSM_S,
+            Panic_S + Update_E[panicDone_G] / positionToBlock_A = PositionToBlock_S,
             Panic_S + Update_E / panic_A,
-            PivotKickFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
+            PivotKickSkillFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            PivotKickFSM_S + Update_E[ballInDefenseArea_G] / updatePivotKick_A,
-            PivotKickFSM_S + Update_E[!ballInDefenseArea_G] / positionToBlock_A =
+            PivotKickSkillFSM_S + Update_E[ballInDefenseArea_G] / updatePivotKick_A,
+            PivotKickSkillFSM_S + Update_E[!ballInDefenseArea_G] / positionToBlock_A =
                 PositionToBlock_S,
             MoveToGoalLine_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
@@ -208,6 +211,7 @@ struct GoalieFSM
     }
 
    private:
+    std::shared_ptr<Strategy> strategy;
     // the goalie tactic config
     TbotsProto::GoalieTacticConfig goalie_tactic_config;
     // The maximum allowed speed mode

@@ -7,22 +7,13 @@
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 
-Ai::Ai(const TbotsProto::AiConfig& ai_config)
-    : ai_config_(ai_config),
-      strategy(std::make_shared<Strategy>()),
-      fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config, strategy})),
+Ai::Ai(std::shared_ptr<Strategy> strategy)
+    : strategy(strategy),
+      fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{strategy})),
       override_play(nullptr),
-      current_play(std::make_shared<HaltPlay>(ai_config)),
-      ai_config_changed(false)
+      current_play(std::make_shared<HaltPlay>(strategy))
 {
-    auto current_override = ai_config_.ai_control_config().override_ai_play();
-    if (current_override != TbotsProto::PlayName::UseAiSelection)
-    {
-        // Override to new play if we're not running Ai Selection
-        TbotsProto::Play play_proto;
-        play_proto.set_name(current_override);
-        overridePlayFromProto(play_proto);
-    }
+    updateOverridePlay();
 }
 
 void Ai::overridePlay(std::unique_ptr<Play> play)
@@ -32,50 +23,40 @@ void Ai::overridePlay(std::unique_ptr<Play> play)
 
 void Ai::overridePlayFromProto(TbotsProto::Play play_proto)
 {
-    current_override_play_proto = play_proto;
-    overridePlay(std::move(createPlay(play_proto, ai_config_, strategy)));
+    overridePlay(std::move(createPlay(play_proto, strategy)));
+}
+
+void Ai::updateOverridePlay()
+{
+    auto current_override =
+        strategy->getAiConfig().ai_control_config().override_ai_play();
+    if (current_override != TbotsProto::PlayName::UseAiSelection)
+    {
+        // Override to new play if we're not running Ai Selection
+        TbotsProto::Play play_proto;
+        play_proto.set_name(current_override);
+        overridePlayFromProto(play_proto);
+    }
+    else
+    {
+        // Clear play override if we're running Ai Selection
+        overridePlay(nullptr);
+    }
 }
 
 void Ai::updateAiConfig(TbotsProto::AiConfig& ai_config)
 {
-    ai_config_        = std::move(ai_config);
-    ai_config_changed = true;
-}
-
-void Ai::checkAiConfig()
-{
-    if (ai_config_changed)
-    {
-        ai_config_changed = false;
-
-        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_});
-
-        auto current_override = ai_config_.ai_control_config().override_ai_play();
-        if (current_override != TbotsProto::PlayName::UseAiSelection)
-        {
-            // Override to new play if we're not running Ai Selection
-            TbotsProto::Play play_proto;
-            play_proto.set_name(current_override);
-            overridePlayFromProto(play_proto);
-        }
-        else
-        {
-            // Clear play override if we're running Ai Selection
-            overridePlay(nullptr);
-        }
-    }
+    strategy->updateAiConfig(ai_config);
+    updateOverridePlay();
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 {
-    checkAiConfig();
+    strategy->updateWorld(world);
 
     fsm->process_event(PlaySelectionFSM::Update(
-        [this](std::shared_ptr<Play> play) {
-            current_play = play;
-            current_play->updateAiConfig(ai_config_);
-        },
-        world.gameState(), ai_config_));
+        [this](std::shared_ptr<Play> play) { current_play = play; }, world.gameState(),
+        strategy->getAiConfig()));
 
     if (static_cast<bool>(override_play))
     {

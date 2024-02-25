@@ -2,11 +2,21 @@
 
 #include <gtest/gtest.h>
 
-struct TestTypeA {};
-struct TestTypeB {};
-struct TestTypeC {};
-struct TestTypeD : public TestTypeA {};
-struct TestTypeE : public TestTypeA, public TestTypeB {};
+struct TestTypeA
+{
+};
+struct TestTypeB
+{
+};
+struct TestTypeC
+{
+};
+struct TestTypeD : public TestTypeA
+{
+};
+struct TestTypeE : public TestTypeA, public TestTypeB
+{
+};
 
 TEST(TypeMapTest, test_several_keys)
 {

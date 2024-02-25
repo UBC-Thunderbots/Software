@@ -29,7 +29,7 @@ message ThunderbotsConfig
 message AiConfig
 {
     required AiControlConfig ai_control_config                              = 1;
-    required DribbleTacticConfig dribble_tactic_config                      = 2;
+    required DribbleSkillConfig dribble_skill_config                        = 2;
     required AttackerTacticConfig attacker_tactic_config                    = 3;
     required CornerKickPlayConfig corner_kick_play_config                   = 4;
     required PassingConfig passing_config                                   = 5;
@@ -55,7 +55,7 @@ message AttackerTacticConfig
     // The radius of the circle around a friendly robot around which
     // we think an enemy is about to steal the ball
     required double enemy_about_to_steal_ball_radius = 1
-        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 4.0];
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 4.0];
 
     // The minimum open angle to the goal that we require before taking a shot
     required double min_open_angle_for_shot_deg = 2 [
@@ -122,6 +122,12 @@ message PassingConfig
         [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
     // Cost visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
+    // How long to cache a pass before we find another pass
+    required double pass_recalculation_commit_time_s = 11 [
+        default                   = 1.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
 }
 
 message GoalieTacticConfig
@@ -154,7 +160,7 @@ message GoalieTacticConfig
         [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
-message DribbleTacticConfig
+message DribbleSkillConfig
 {
     // If ball and front of robot are separated by this amount, then we've lost
     // possession (in m)

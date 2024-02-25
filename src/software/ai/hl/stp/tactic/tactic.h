@@ -43,7 +43,7 @@ class Tactic
      *
      * @param capability_reqs_ The capability requirements for running this tactic
      */
-    explicit Tactic(const std::set<RobotCapability> &capability_reqs_);
+    explicit Tactic(const std::set<RobotCapability> &capability_reqs);
 
     Tactic() = delete;
 
@@ -81,7 +81,7 @@ class Tactic
      * @param last_execution_robot The robot id of the robot that last executed the
      * primitive for this tactic
      */
-    void setLastExecutionRobot(std::optional<RobotId> last_execution_robot);
+    virtual void setLastExecutionRobot(std::optional<RobotId> last_execution_robot);
 
     /**
      * Updates and returns a set of primitives for all friendly robots from this tactic

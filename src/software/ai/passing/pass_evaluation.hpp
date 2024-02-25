@@ -40,6 +40,8 @@ class PassEvaluation
         ZonePassMap<ZoneEnum> best_pass_in_zones,
         TbotsProto::PassingConfig passing_config, Timestamp timestamp);
 
+    PassEvaluation(const PassEvaluation& pass_evaluation);
+
     PassEvaluation() = delete;
 
     /**
@@ -83,6 +85,8 @@ class PassEvaluation
      */
     Timestamp getEvaluationTime() const;
 
+    PassEvaluation& operator=(const PassEvaluation& other);
+
    private:
     // The pitch division this pass evaluation was computed for
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division_;
@@ -105,6 +109,14 @@ PassEvaluation<ZoneEnum>::PassEvaluation(
       best_pass_in_zones_(best_pass_in_zones),
       passing_config_(passing_config),
       timestamp_(timestamp)
+{
+}
+
+template <class ZoneEnum>
+PassEvaluation<ZoneEnum>::PassEvaluation(const PassEvaluation<ZoneEnum>& pass_evaluation)
+    : PassEvaluation<ZoneEnum>(
+          pass_evaluation.pitch_division_, pass_evaluation.best_pass_in_zones_,
+          pass_evaluation.passing_config_, pass_evaluation.timestamp_)
 {
 }
 
@@ -169,4 +181,19 @@ std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::rankZonesForReceiving(
                                   passing_config_);
               });
     return cherry_pick_zones;
+}
+
+template <class ZoneEnum>
+PassEvaluation<ZoneEnum>& PassEvaluation<ZoneEnum>::operator=(
+    const PassEvaluation<ZoneEnum>& other)
+{
+    if (this != &other)
+    {
+        pitch_division_     = other.pitch_division_;
+        best_pass_in_zones_ = other.best_pass_in_zones_;
+        passing_config_     = other.passing_config_;
+        timestamp_          = other.timestamp_;
+    }
+
+    return *this;
 }

@@ -652,7 +652,7 @@ TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignmen
             ai_config.robot_navigation_obstacle_config())};
 
     Pass passer_pass(Point(2, 3), Point(0.5, 0.3), 2);
-    auto attacker = std::make_shared<AttackerTactic>(ai_config);
+    auto attacker = std::make_shared<AttackerTactic>();
     attacker->updateControlParams(passer_pass, true);
     auto receiver = std::make_shared<ReceiverTactic>();
 

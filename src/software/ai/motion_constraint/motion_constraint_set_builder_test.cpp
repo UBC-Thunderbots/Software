@@ -65,9 +65,10 @@ namespace
             std::make_tuple(std::make_shared<ShadowEnemyTactic>(),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),
-            std::make_tuple(std::make_shared<AttackerTactic>(ai_config),
-                            std::set<TbotsProto::MotionConstraint>(),
-                            std::set<TbotsProto::MotionConstraint>()),
+            std::make_tuple(
+                std::make_shared<AttackerTactic>(std::make_shared<Strategy>(ai_config)),
+                std::set<TbotsProto::MotionConstraint>(),
+                std::set<TbotsProto::MotionConstraint>()),
             std::make_tuple(std::make_shared<StopTactic>(),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),

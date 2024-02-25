@@ -6,7 +6,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/ai/hl/stp/strategy.h"
+#include "software/ai/hl/stp/strategy/strategy.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
@@ -37,17 +37,10 @@ class Play
     /**
      * Creates a new Play
      *
-     * @param ai_config The AI configuration
      * @param requires_goalie Whether this plays requires a goalie
      * @param strategy   to get and store shared calculations
      */
-    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie,
-                  std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
-
-    /**
-     * Resets the play, required after a change in the AiConfig.
-     */
-    virtual void reset();
+    explicit Play(bool requires_goalie, std::shared_ptr<Strategy> strategy);
 
     /**
      * Gets Primitives from the Play given the the world, and inter-play communication
@@ -90,11 +83,8 @@ class Play
     void updateAiConfig(const TbotsProto::AiConfig& new_config);
 
    protected:
-    // The Play configuration
-    TbotsProto::AiConfig ai_config;
-
-    std::shared_ptr<Strategy>
-        strategy;  // holds information about coordinating strategy between multiple Plays
+    // Holds information about coordinating strategy between multiple Plays
+    std::shared_ptr<Strategy> strategy;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
@@ -204,6 +194,5 @@ class Play
     uint64_t sequence_number = 0;
 
     bool should_reset;
-
     RobotNavigationObstacleFactory obstacle_factory;
 };

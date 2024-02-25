@@ -14,9 +14,8 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-ShootOrChipPlay::ShootOrChipPlay(const TbotsProto::AiConfig &config,
-                                 std::shared_ptr<Strategy> strategy)
-    : Play(config, true, strategy)
+ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy)
 {
 }
 
@@ -35,9 +34,9 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            strategy->getAiConfig().robot_navigation_obstacle_config()),
         std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+            strategy->getAiConfig().robot_navigation_obstacle_config()),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
@@ -50,7 +49,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
     Point fallback_chip_target =
         world.field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
-    auto attacker = std::make_shared<AttackerTactic>(ai_config);
+    auto attacker = std::make_shared<AttackerTactic>(strategy);
     attacker->updateControlParams(fallback_chip_target);
 
     do
@@ -107,6 +106,5 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrChipPlay, TbotsProto::AiConfig,
-                       std::shared_ptr<Strategy>>
+static TGenericFactory<std::string, Play, ShootOrChipPlay, std::shared_ptr<Strategy>>
     factory;

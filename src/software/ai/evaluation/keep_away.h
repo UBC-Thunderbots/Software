@@ -26,3 +26,18 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team);
  * @return a Point with the qualities described above.
  */
 Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far);
+
+/**
+ * Returns true if the given robot is being threatened by enemy robots near in
+ * proximity to the robot. If true, the robot should move to get far away from
+ * the enemy robots.
+ *
+ * @param robot the robot to check
+ * @param enemy_team the enemy team
+ * @param about_to_steal_radius radius of a circle in meters around the robot
+ * inside which we consider an enemy is about to steal the ball
+ *
+ * @return true if the robot is being threatened by the enemy team
+ */
+bool shouldKeepAway(const Robot& robot, const Team& enemy_team,
+                    double about_to_steal_radius);

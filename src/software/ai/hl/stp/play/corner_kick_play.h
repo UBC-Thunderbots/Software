@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/strategy/strategy.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/pass.h"
 
@@ -11,8 +12,7 @@
 class CornerKickPlay : public Play
 {
    public:
-    CornerKickPlay(const TbotsProto::AiConfig &config,
-                   std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+    CornerKickPlay(std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

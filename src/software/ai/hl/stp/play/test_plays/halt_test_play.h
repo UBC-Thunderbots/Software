@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/strategy/strategy.h"
 
 /**
  * A test Play that halts 3 robots.
@@ -14,8 +15,7 @@
 class HaltTestPlay : public Play
 {
    public:
-    HaltTestPlay(const TbotsProto::AiConfig &config,
-                 std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>());
+    HaltTestPlay(const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

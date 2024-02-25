@@ -15,20 +15,28 @@ cc_library(
     hdrs = ["all_tactics.h"],
     deps = [
         ":tactic",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
-        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
+    ],
+)
+
+cc_library(
+    name = "offense_support_tactic",
+    hdrs = ["offense_support_tactic.h"],
+    deps = [
+        ":tactic",
+        "//software/util/make_enum",
     ],
 )
 
@@ -37,16 +45,23 @@ cc_library(
     srcs = ["tactic.cpp"],
     hdrs = [
         "tactic.h",
-        "tactic_fsm.h",
         "tactic_visitor.h",
     ],
     deps = [
         ":stop_primitive",
+        ":tactic_fsm",
         ":transition_conditions",
-        "//proto/primitive:primitive_msg_factory",
-        "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",
+    ],
+)
+
+cc_library(
+    name = "tactic_fsm",
+    hdrs = ["tactic_fsm.h"],
+    deps = [
+        "//proto/primitive:primitive_msg_factory",
+        "//software/util/sml_fsm",
     ],
 )
 
@@ -69,16 +84,6 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "fsm_state_test",
-    srcs = ["fsm_state_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/test_util",
-    ],
-)
-
 cc_library(
     name = "tactic_factory",
     srcs = ["tactic_factory.cpp"],
@@ -89,6 +94,7 @@ cc_library(
         ":all_tactics",
         "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_protobuf",
+        "//software/ai/hl/stp/strategy",
     ],
 )
 

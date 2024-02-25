@@ -2,9 +2,10 @@
 
 #include <algorithm>
 
-ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
+ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config,
+                                       std::shared_ptr<Strategy> strategy)
     : ai_config(ai_config),
-      attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
+      attacker_tactic(std::make_shared<AttackerTactic>(strategy)),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       pass_generator(
@@ -94,7 +95,6 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
 void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
-    attacker_tactic              = std::make_shared<AttackerTactic>(ai_config);
     receiver_tactic              = std::make_shared<ReceiverTactic>();
     pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
     lookForPass(event);
