@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/stop_primitive.h"
 
 std::unique_ptr<TbotsProto::Primitive> StopPrimitive::generatePrimitiveProtoMessage(
-    const WorldPtr &world_ptr,
+    const World& world,
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
