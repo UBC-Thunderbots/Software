@@ -125,7 +125,8 @@ class Thunderloop
     // Calibrated power service constants
     double kick_coeff_;
     int kick_constant_;
-    int chip_pulse_width_;
+    double chip_coeff_;
+    int chip_constant_;
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
