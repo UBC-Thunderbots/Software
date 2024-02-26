@@ -11,7 +11,8 @@ class AssignedTacticsPlay : public Play
    public:
     AssignedTacticsPlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
     void updateTactics(const PlayUpdate &play_update) override;
 
     /**
@@ -27,11 +28,11 @@ class AssignedTacticsPlay : public Play
             std::map<RobotId, std::set<TbotsProto::MotionConstraint>>());
 
     std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const GlobalPathPlannerFactory &path_planner_factory, const World &world,
-        const InterPlayCommunication &,
+        const WorldPtr &world_ptr, const InterPlayCommunication &,
         const SetInterPlayCommunicationCallback &) override;
 
    private:
     std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics;
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>> override_motion_constraints;
+    RobotNavigationObstacleFactory obstacle_factory;
 };

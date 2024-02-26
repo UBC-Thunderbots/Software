@@ -1,14 +1,15 @@
 from pyqtgraph.opengl import *
 
-import numpy as np
-
-from proto.tbots_software_msgs_pb2 import PrimitiveSet
+from proto.visualization_pb2 import ObstacleList
 
 from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
+from software.thunderscope.gl.graphics.gl_stadium import GLStadium
+
+import math
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -16,7 +17,7 @@ from software.thunderscope.gl.helpers.observable_list import ObservableList
 class GLObstacleLayer(GLLayer):
     """GLLayer that visualizes obstacles"""
 
-    def __init__(self, name: str, buffer_size: int = 5) -> None:
+    def __init__(self, name: str, buffer_size: int = 1) -> None:
         """Initialize the GLObstacleLayer
 
         :param name: The displayed name of the layer
@@ -27,34 +28,26 @@ class GLObstacleLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
+        self.obstacles_list_buffer = ThreadSafeBuffer(buffer_size, ObstacleList)
 
         self.poly_obstacle_graphics = ObservableList(self._graphics_changed)
         self.circle_obstacle_graphics = ObservableList(self._graphics_changed)
+        self.stadium_obstacle_graphics = ObservableList(self._graphics_changed)
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
+        obstacles = self.obstacles_list_buffer.get(block=False).obstacles
 
-        primitive_set = self.primitive_set_buffer.get(
-            block=False
-        ).robot_primitives.values()
-
-        obstacles = [
-            obstacle
-            for primitive in primitive_set
-            if primitive.HasField("move")
-            for obstacle in primitive.move.motion_control.static_obstacles
-        ]
-        poly_obstacles = [
-            poly_obstacle
-            for obstacle in obstacles
-            for poly_obstacle in obstacle.polygon
-        ]
-        circle_obstacles = [
-            circle_obstacle
-            for obstacle in obstacles
-            for circle_obstacle in obstacle.circle
-        ]
+        poly_obstacles = []
+        circle_obstacles = []
+        stadium_obstacles = []
+        for obstacle in obstacles:
+            if obstacle.HasField("polygon"):
+                poly_obstacles.append(obstacle.polygon)
+            elif obstacle.HasField("stadium"):
+                stadium_obstacles.append(obstacle.stadium)
+            else:
+                circle_obstacles.append(obstacle.circle)
 
         # Ensure we have the same number of graphics as obstacles
         self.poly_obstacle_graphics.resize(
@@ -64,6 +57,10 @@ class GLObstacleLayer(GLLayer):
         self.circle_obstacle_graphics.resize(
             len(circle_obstacles),
             lambda: GLCircle(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR),
+        )
+        self.stadium_obstacle_graphics.resize(
+            len(stadium_obstacles),
+            lambda: GLStadium(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
 
         for poly_obstacle_graphic, poly_obstacle in zip(
@@ -83,4 +80,38 @@ class GLObstacleLayer(GLLayer):
             circle_obstacle_graphic.set_radius(circle_obstacle.radius)
             circle_obstacle_graphic.set_position(
                 circle_obstacle.origin.x_meters, circle_obstacle.origin.y_meters,
+            )
+
+        for stadium_obstacle_graphic, stadium_obstacle in zip(
+            self.stadium_obstacle_graphics, stadium_obstacles
+        ):
+            # set basic parameters
+            x_start_to_end = (
+                stadium_obstacle.segment.end.x_meters
+                - stadium_obstacle.segment.start.x_meters
+            )
+            y_start_to_end = (
+                stadium_obstacle.segment.end.y_meters
+                - stadium_obstacle.segment.start.y_meters
+            )
+            length = math.sqrt(
+                math.pow(x_start_to_end, 2) + math.pow(y_start_to_end, 2)
+            )
+            stadium_obstacle_graphic.set_parameters(stadium_obstacle.radius, length)
+            # set stadium position to average of its two points
+            stadium_obstacle_graphic.set_position(
+                (
+                    stadium_obstacle.segment.end.x_meters
+                    + stadium_obstacle.segment.start.x_meters
+                )
+                / 2,
+                (
+                    stadium_obstacle.segment.end.y_meters
+                    + stadium_obstacle.segment.start.y_meters
+                )
+                / 2,
+            )
+            # set stadium orientation to angle between positive x and vector from start to end
+            stadium_obstacle_graphic.set_orientation(
+                math.atan2(y_start_to_end, x_start_to_end) * 180 / math.pi
             )

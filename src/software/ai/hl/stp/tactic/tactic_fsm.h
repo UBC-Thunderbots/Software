@@ -4,35 +4,28 @@
 
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "software/ai/navigator/path_planner/enlsvg_path_planner.h"
+#include "software/ai/hl/stp/tactic/primitive.h"
+#include "software/ai/hl/stp/tactic/stop_primitive.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
 
-using SetPrimitiveCallback = std::function<void(std::unique_ptr<TbotsProto::Primitive>)>;
-using CreateMotionControl =
-    std::function<TbotsProto::MotionControl(const Robot &, const Point &)>;
+using SetPrimitiveCallback = std::function<void(std::shared_ptr<Primitive>)>;
 
 // The tactic update struct is used to update tactics and set the new primitive
 struct TacticUpdate
 {
-    TacticUpdate(const Robot &robot, const World &world,
-                 const SetPrimitiveCallback &set_primitive_fun,
-                 const CreateMotionControl &create_motion_control)
-        : robot(robot),
-          world(world),
-          set_primitive(set_primitive_fun),
-          create_motion_control(create_motion_control)
+    TacticUpdate(const Robot &robot, const WorldPtr &world_ptr,
+                 const SetPrimitiveCallback &set_primitive_fun)
+        : robot(robot), world_ptr(world_ptr), set_primitive(set_primitive_fun)
     {
     }
 
     // updated robot that tactic is assigned to
     Robot robot;
     // updated world
-    World world;
+    WorldPtr world_ptr;
     // callback to return the next primitive
     SetPrimitiveCallback set_primitive;
-    // creator for motion control
-    CreateMotionControl create_motion_control;
 };
 
 /**
@@ -73,8 +66,5 @@ struct TacticUpdate
         return state_str;                                                                \
     }
 
-#define CREATE_MOTION_CONTROL(DESTINATION)                                               \
-    event.common.create_motion_control(event.common.robot, DESTINATION)
-
 #define SET_STOP_PRIMITIVE_ACTION                                                        \
-    [this](auto event) { event.common.set_primitive(createStopPrimitive()); }
+    [this](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>()); }

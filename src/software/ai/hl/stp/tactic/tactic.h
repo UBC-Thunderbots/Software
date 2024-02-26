@@ -1,5 +1,6 @@
 #pragma once
 
+#include "software/ai/hl/stp/tactic/primitive.h"
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
@@ -86,12 +87,10 @@ class Tactic
      * Updates and returns a set of primitives for all friendly robots from this tactic
      *
      * @param world The updated world
-     * @param create_motion_control Function to create a motion control proto
      *
      * @return the next primitive
      */
-    std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const World &world, CreateMotionControl create_motion_control);
+    std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr &world_ptr);
 
     /**
      * Accepts a Tactic Visitor and calls the visit function on itself
@@ -106,7 +105,7 @@ class Tactic
     std::optional<RobotId> last_execution_robot;
 
    private:
-    std::unique_ptr<TbotsProto::Primitive> primitive;
+    std::shared_ptr<Primitive> primitive;
 
     /**
      * Updates the primitive ptr with the new primitive

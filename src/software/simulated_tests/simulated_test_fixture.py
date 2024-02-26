@@ -20,11 +20,9 @@ from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.constants import ProtoUnixIOTypes
-from software.thunderscope.binary_context_managers import (
-    FullSystem,
-    Simulator,
-    Gamecontroller,
-)
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.thunderscope_config import configure_simulated_test_view
 from software.thunderscope.replay.proto_logger import ProtoLogger
 
@@ -553,6 +551,7 @@ def simulated_test_runner():
                 simulator_proto_unix_io,
                 blue_full_system_proto_unix_io,
                 yellow_full_system_proto_unix_io,
+                ProtoUnixIO(),
             )
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,

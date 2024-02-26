@@ -1,22 +1,29 @@
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 
-TbotsProto::Obstacles createObstacleProto(const Polygon &polygon)
+TbotsProto::Obstacle createObstacleProto(const Polygon &polygon)
 {
-    TbotsProto::Obstacles obstacle_proto;
-    *(obstacle_proto.add_polygon()) = *createPolygonProto(polygon);
+    TbotsProto::Obstacle obstacle_proto;
+    *(obstacle_proto.mutable_polygon()) = *createPolygonProto(polygon);
     return obstacle_proto;
 }
 
-TbotsProto::Obstacles createObstacleProto(const Rectangle &rectangle)
+TbotsProto::Obstacle createObstacleProto(const Rectangle &rectangle)
 {
-    TbotsProto::Obstacles obstacle_proto;
-    *(obstacle_proto.add_polygon()) = *createPolygonProto(rectangle);
+    TbotsProto::Obstacle obstacle_proto;
+    *(obstacle_proto.mutable_polygon()) = *createPolygonProto(rectangle);
     return obstacle_proto;
 }
 
-TbotsProto::Obstacles createObstacleProto(const Circle &circle)
+TbotsProto::Obstacle createObstacleProto(const Circle &circle)
 {
-    TbotsProto::Obstacles obstacle_proto;
-    *(obstacle_proto.add_circle()) = *createCircleProto(circle);
+    TbotsProto::Obstacle obstacle_proto;
+    *(obstacle_proto.mutable_circle()) = *createCircleProto(circle);
+    return obstacle_proto;
+}
+
+TbotsProto::Obstacle createObstacleProto(const Stadium &stadium)
+{
+    TbotsProto::Obstacle obstacle_proto;
+    *(obstacle_proto.mutable_stadium()) = *createStadiumProto(stadium);
     return obstacle_proto;
 }

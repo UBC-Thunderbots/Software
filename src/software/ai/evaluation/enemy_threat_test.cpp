@@ -404,15 +404,15 @@ TEST(SortEnemyThreatsTest,
 
 TEST(EnemyThreatTest, no_enemies_on_field)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
-    world = ::TestUtil::setBallPosition(world,
-                                        Point(world.field().friendlyGoalCenter()) +
-                                            Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
-                                        Timestamp::fromSeconds(0));
+    ::TestUtil::setBallPosition(world,
+                                Point(world->field().friendlyGoalCenter()) +
+                                    Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
+                                Timestamp::fromSeconds(0));
 
-    auto result = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                     world.enemyTeam(), world.ball(), false);
+    auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                     world->enemyTeam(), world->ball(), false);
 
     // Make sure we got the correct number of results
     EXPECT_EQ(result.size(), 0);
@@ -421,21 +421,21 @@ TEST(EnemyThreatTest, no_enemies_on_field)
 
 TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot enemy_robot_0 =
-        Robot(0, Point(world.field().friendlyGoalCenter()) + Vector(2, 0), Vector(0, 0),
+        Robot(0, Point(world->field().friendlyGoalCenter()) + Vector(2, 0), Vector(0, 0),
               Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Team enemy_team = Team(Duration::fromSeconds(1));
     enemy_team.updateRobots({enemy_robot_0});
-    world.updateEnemyTeamState(enemy_team);
+    world->updateEnemyTeamState(enemy_team);
 
-    world = ::TestUtil::setBallPosition(world,
-                                        Point(world.field().friendlyGoalCenter()) +
-                                            Vector(2 - DIST_TO_FRONT_OF_ROBOT_METERS, 0),
-                                        Timestamp::fromSeconds(0));
+    ::TestUtil::setBallPosition(world,
+                                Point(world->field().friendlyGoalCenter()) +
+                                    Vector(2 - DIST_TO_FRONT_OF_ROBOT_METERS, 0),
+                                Timestamp::fromSeconds(0));
 
-    auto result = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                     world.enemyTeam(), world.ball(), false);
+    auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                     world->enemyTeam(), world->ball(), false);
 
     // Make sure we got the correct number of results
     EXPECT_EQ(result.size(), 1);
@@ -447,8 +447,8 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
     ASSERT_TRUE(threat.best_shot_angle);
     EXPECT_NEAR(threat.best_shot_angle->toDegrees(), 30, 5);
     ASSERT_TRUE(threat.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat.best_shot_target,
-                                               world.field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        *threat.best_shot_target, world->field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat.num_passes_to_get_possession, 0);
     ASSERT_FALSE(threat.passer);
 }
@@ -482,36 +482,36 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     // get the ball, and doesn't have a great angle on the goal because it's off to
     // the side
 
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
     // Robots are positioned relative to the friendly goal
     Robot enemy_robot_1 =
-        Robot(1, world.field().friendlyGoalCenter() + Vector(1.25, 1.5), Vector(0, 0),
+        Robot(1, world->field().friendlyGoalCenter() + Vector(1.25, 1.5), Vector(0, 0),
               Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot enemy_robot_2 =
-        Robot(2, world.field().friendlyGoalCenter() + Vector(2, -1), Vector(0, 0),
+        Robot(2, world->field().friendlyGoalCenter() + Vector(2, -1), Vector(0, 0),
               Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot enemy_robot_3 =
-        Robot(3, world.field().friendlyGoalCenter() + Vector(0.4, -2), Vector(0, 0),
+        Robot(3, world->field().friendlyGoalCenter() + Vector(0.4, -2), Vector(0, 0),
               Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Team enemy_team = Team(Duration::fromSeconds(1));
     enemy_team.updateRobots({enemy_robot_1, enemy_robot_2, enemy_robot_3});
-    world.updateEnemyTeamState(enemy_team);
+    world->updateEnemyTeamState(enemy_team);
 
     Robot friendly_robot =
-        Robot(0, world.field().friendlyGoalCenter() + Vector(1, 0.5), Vector(0, 0),
+        Robot(0, world->field().friendlyGoalCenter() + Vector(1, 0.5), Vector(0, 0),
               Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Team friendly_team = Team(Duration::fromSeconds(1));
     friendly_team.updateRobots({friendly_robot});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     // Put the ball right in front of enemy 1
-    world = ::TestUtil::setBallPosition(
+    ::TestUtil::setBallPosition(
         world, enemy_robot_1.position() + Vector(-DIST_TO_FRONT_OF_ROBOT_METERS, 0),
         Timestamp::fromSeconds(0));
 
-    auto result = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                     world.enemyTeam(), world.ball(), false);
+    auto result = getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                     world->enemyTeam(), world->ball(), false);
 
     // Make sure we got the correct number of results
     EXPECT_EQ(result.size(), 3);
@@ -523,8 +523,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_0.best_shot_angle);
     EXPECT_NEAR(threat_0.best_shot_angle->toDegrees(), 15, 5);
     ASSERT_TRUE(threat_0.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat_0.best_shot_target,
-                                               world.field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        *threat_0.best_shot_target, world->field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_0.num_passes_to_get_possession, 0);
     ASSERT_FALSE(threat_0.passer);
 
@@ -535,8 +535,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_1.best_shot_angle);
     EXPECT_NEAR(threat_1.best_shot_angle->toDegrees(), 20, 5);
     ASSERT_TRUE(threat_1.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat_1.best_shot_target,
-                                               world.field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        *threat_1.best_shot_target, world->field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_1.num_passes_to_get_possession, 1);
     ASSERT_TRUE(threat_1.passer);
     EXPECT_EQ(threat_1.passer, enemy_robot_1);
@@ -548,8 +548,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_2.best_shot_angle);
     EXPECT_NEAR(threat_2.best_shot_angle->toDegrees(), 5, 5);
     ASSERT_TRUE(threat_2.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat_2.best_shot_target,
-                                               world.field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        *threat_2.best_shot_target, world->field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_2.num_passes_to_get_possession, 1);
     ASSERT_TRUE(threat_2.passer);
     EXPECT_EQ(threat_2.passer, enemy_robot_1);

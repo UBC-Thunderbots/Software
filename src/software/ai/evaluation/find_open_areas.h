@@ -13,7 +13,8 @@
  * @return a vector of circles where the center is a good point to chip to, and the
  *         radius is the distance to the nearest enemy
  */
-std::vector<Circle> findGoodChipTargets(const World& world, const Rectangle& target_area);
+std::vector<Circle> findGoodChipTargets(const WorldPtr& world_ptr,
+                                        const Rectangle& target_area);
 
 /**
  * Finds good points to chip the ball to
@@ -24,4 +25,4 @@ std::vector<Circle> findGoodChipTargets(const World& world, const Rectangle& tar
  * @return a vector of circles where the center is a good point to chip to, and the
  *         radius is the distance to the nearest enemy
  */
-std::vector<Circle> findGoodChipTargets(const World& world);
+std::vector<Circle> findGoodChipTargets(const WorldPtr& world_ptr);

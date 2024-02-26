@@ -31,6 +31,7 @@ py_library(
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_polygon",
+        "//software/thunderscope/gl/graphics:gl_stadium",
         requirement("pyqtgraph"),
     ],
 )
@@ -62,21 +63,20 @@ py_library(
 )
 
 py_library(
-    name = "gl_simulator_layer",
-    srcs = ["gl_simulator_layer.py"],
+    name = "gl_sandbox_world_layer",
+    srcs = ["gl_sandbox_world_layer.py"],
     deps = [
-        ":gl_layer",
-        "//software/thunderscope/gl/graphics:gl_sphere",
+        ":gl_world_layer",
         requirement("pyqtgraph"),
     ],
 )
 
 py_library(
-    name = "gl_hrvo_layer",
-    srcs = ["gl_hrvo_layer.py"],
+    name = "gl_simulator_layer",
+    srcs = ["gl_simulator_layer.py"],
     deps = [
         ":gl_layer",
-        "//software/thunderscope/gl/graphics:gl_polygon",
+        "//software/thunderscope/gl/graphics:gl_sphere",
         requirement("pyqtgraph"),
     ],
 )
@@ -120,6 +120,16 @@ py_library(
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_gradient_legend",
         "//software/thunderscope/gl/graphics:gl_heatmap",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_trail_layer",
+    srcs = ["gl_trail_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],
 )

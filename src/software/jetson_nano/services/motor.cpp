@@ -46,14 +46,6 @@ static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "76";
 static const char* MOTOR_DRIVER_RESET_GPIO                = "168";
 static const char* DRIVER_CONTROL_ENABLE_GPIO             = "194";
 
-
-// All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
-// pairs of the drive motor.
-//
-// TODO (#2720): compute from robot constants (this was computed by hand and is accurate)
-static double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
-static double ELECTRICAL_RPM_PER_MECHANICAL_MPS = 1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
-
 static double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
 static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;
 
@@ -93,6 +85,12 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       dribbler_ramp_rpm_(0),
       tracked_motor_fault_start_time_(std::nullopt),
       num_tracked_motor_resets_(0)
+{
+    motorServiceInit(robot_constants, control_loop_frequency_hz);
+}
+
+void MotorService::motorServiceInit(const RobotConstants_t& robot_constants,
+                                    int control_loop_frequency_hz)
 {
     int ret = 0;
 
@@ -185,11 +183,7 @@ void MotorService::setup()
     // Drive Motor Setup
     for (uint8_t motor = 0; motor < NUM_DRIVE_MOTORS; motor++)
     {
-        startDriver(motor);
-        checkDriverFault(motor);
-        // Start all the controllers as drive motor controllers
-        startController(motor, false);
-        tmc4671_setTargetVelocity(motor, 0);
+        setUpDriveMotor(motor);
     }
 
     // Dribbler Motor Setup
@@ -197,7 +191,6 @@ void MotorService::setup()
     checkDriverFault(DRIBBLER_MOTOR_CHIP_SELECT);
     startController(DRIBBLER_MOTOR_CHIP_SELECT, true);
     tmc4671_setTargetVelocity(DRIBBLER_MOTOR_CHIP_SELECT, 0);
-
     checkEncoderConnections();
 
     // calibrate the encoders
@@ -214,6 +207,15 @@ void MotorService::setup()
     }
 
     is_initialized_ = true;
+}
+
+void MotorService::setUpDriveMotor(uint8_t motor)
+{
+    startDriver(motor);
+    checkDriverFault(motor);
+    // Start all the controllers as drive motor controllers
+    startController(motor, false);
+    tmc4671_setTargetVelocity(motor, 0);
 }
 
 MotorService::MotorFaultIndicator MotorService::checkDriverFault(uint8_t motor)
@@ -763,6 +765,16 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
                                << " at address " << static_cast<uint32_t>(address)
                                << " on motor " << static_cast<uint32_t>(motor)
                                << " received: " << read_value;
+}
+
+void MotorService::writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t value)
+{
+    tmc4671_writeInt(motor, address, value);
+}
+
+int MotorService::readIntFromTMC4671(uint8_t motor, uint8_t address)
+{
+    return tmc4671_readInt(motor, address);
 }
 
 void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
