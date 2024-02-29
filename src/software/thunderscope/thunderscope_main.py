@@ -185,7 +185,10 @@ if __name__ == "__main__":
         help="Show TigersAutoref GUI",
     )
     parser.add_argument(
-        "--sudo", action="store_true", default=False, help="Run unix_full_system under sudo"
+        "--sudo",
+        action="store_true",
+        default=False,
+        help="Run unix_full_system under sudo",
     )
 
     estop_group = parser.add_mutually_exclusive_group()

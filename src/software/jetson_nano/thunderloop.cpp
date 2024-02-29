@@ -1,5 +1,7 @@
 #include "software/jetson_nano/thunderloop.h"
 
+#include <Tracy.hpp>
+
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
@@ -14,8 +16,6 @@
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 #include "software/world/team.h"
-
-#include <Tracy.hpp>
 
 /**
  * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
@@ -268,7 +268,8 @@ Thunderloop::~Thunderloop() {}
             {
                 ScopedTimespecTimer timer(&poll_time);
 
-                ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService", true);
+                ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService",
+                           true);
 
                 power_status_ =
                     power_service_->poll(direct_control_.power_control(), kick_coeff_,
@@ -345,8 +346,9 @@ Thunderloop::~Thunderloop() {}
             {
                 ZoneNamedN(_tracy_redis, "Thunderloop: Commit to REDIS", true);
 
-                redis_client_->setNoCommit(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
-                                           std::to_string(power_status_.battery_voltage()));
+                redis_client_->setNoCommit(
+                    ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
+                    std::to_string(power_status_.battery_voltage()));
                 redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
                                            std::to_string(power_status_.current_draw()));
                 redis_client_->asyncCommit();
