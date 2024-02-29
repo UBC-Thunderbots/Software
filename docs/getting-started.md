@@ -335,6 +335,10 @@ Unlike [Callgrind](Callgrind), we can run (and encouraged to run) Tracy with the
 **Warning**: Bewarned from the Tracy 16.10.2023 manual:
 > The captured data is stored in RAM and only written to the disk when the capture finishes. This can result in memory exhaustion when you capture massive amounts of profile data or even in typical usage situations when the capture is performed over a long time. Therefore, the recommended usage pattern is to perform moderate instrumentation of the client code and limit capture time to the strict necessity.
 
+Tracy also samples call stacks. If the profiled binary is run with root permissions, then Tracy can also inspect the kernel stack trace. By default, Thunderloop is run with root permissions but we can profile `unix_full_system` with elevated permissions by following the on-screen instructions by running:
+
+    `./tbots.py run thunderscope_main --tracy --sudo`
+
 ## Building for Jetson Nano 
 
 To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag and the toolchain will automatically build using the ARM toolchain for Jetson Nano. For example, `bazel build --cpu=jetson_nano //software/geom/...`.
