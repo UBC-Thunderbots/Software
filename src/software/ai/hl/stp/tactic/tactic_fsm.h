@@ -14,17 +14,16 @@ using SetPrimitiveCallback = std::function<void(std::shared_ptr<Primitive>)>;
 // The tactic update struct is used to update tactics and set the new primitive
 struct TacticUpdate
 {
-    TacticUpdate(const Robot &robot, const World &world,
+    TacticUpdate(const Robot &robot, const WorldPtr &world_ptr,
                  const SetPrimitiveCallback &set_primitive_fun)
-        : robot(robot), world(world), set_primitive(set_primitive_fun)
+        : robot(robot), world_ptr(world_ptr), set_primitive(set_primitive_fun)
     {
     }
 
     // updated robot that tactic is assigned to
     Robot robot;
     // updated world
-    // TODO (#3103): Wrap in shared_ptr to avoid unintended copying
-    World world;
+    WorldPtr world_ptr;
     // callback to return the next primitive
     SetPrimitiveCallback set_primitive;
 };

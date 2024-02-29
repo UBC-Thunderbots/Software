@@ -65,7 +65,7 @@ void Ai::checkAiConfig()
     }
 }
 
-std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
+std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const WorldPtr& world_ptr)
 {
     FrameMarkStart(TracyConstants::AI_FRAME_MARKER);
 
@@ -73,18 +73,18 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 
     fsm->process_event(PlaySelectionFSM::Update(
         [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
-        world.gameState(), ai_config_));
+        world_ptr->gameState(), ai_config_));
 
     if (static_cast<bool>(override_play))
     {
-        return override_play->get(world, inter_play_communication,
+        return override_play->get(world_ptr, inter_play_communication,
                                   [this](InterPlayCommunication comm) {
                                       inter_play_communication = std::move(comm);
                                   });
     }
     else
     {
-        return current_play->get(world, inter_play_communication,
+        return current_play->get(world_ptr, inter_play_communication,
                                  [this](InterPlayCommunication comm) {
                                      inter_play_communication = std::move(comm);
                                  });
