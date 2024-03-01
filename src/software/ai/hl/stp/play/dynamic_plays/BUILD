@@ -9,7 +9,10 @@ cc_library(
         "//software/ai/evaluation/scoring/support_tactics:feasibility_scorer",
         "//software/ai/evaluation/scoring/support_tactics:success_scorer",
         "//software/ai/evaluation/scoring/support_tactics:support_tactic_candidate",
-        "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/play",
+        "//software/ai/hl/stp/play/defense:defense_play",
+        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
+        "//software/util/generic_factory",
     ],
+    alwayslink = True,
 )

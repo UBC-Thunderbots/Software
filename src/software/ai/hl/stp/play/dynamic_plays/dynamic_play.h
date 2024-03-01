@@ -6,6 +6,7 @@
 #include "software/ai/evaluation/scoring/support_tactics/support_tactic_candidate.hpp"
 #include "software/ai/hl/stp/play/defense/defense_play.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 
 /**
  * A DynamicPlay is a Play that assigns tactics based on scoring functions
@@ -22,8 +23,7 @@ class DynamicPlay : public Play
      * @param ai_config The AI configuration
      * @param requires_goalie Whether this play requires a goalie
      */
-    explicit DynamicPlay(bool requires_goalie,
-                         std::shared_ptr<Strategy> strategy);
+    explicit DynamicPlay(std::shared_ptr<Strategy> strategy);
 
    protected:
     // TODO (#2359): delete once all plays are not coroutines
@@ -37,8 +37,8 @@ class DynamicPlay : public Play
     std::unique_ptr<DuplicationScorer> support_tactic_duplication_scorer_;
     std::unique_ptr<SuccessScorer> support_tactic_success_scorer_;
 
-    std::shared_ptr<Tactic> attacker_tactic_;
-    std::vector<std::shared_ptr<Tactic>> support_tactics_;
+    std::shared_ptr<AttackerTactic> attacker_tactic_;
+    std::vector<std::shared_ptr<OffenseSupportTactic>> support_tactics_;
 
     std::unique_ptr<DefensePlay> defense_play;
 };

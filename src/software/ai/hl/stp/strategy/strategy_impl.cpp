@@ -149,7 +149,7 @@ bool StrategyImpl::isBetterPassThanCached(const Timestamp& timestamp,
     return is_cache_time_expired || !is_cache_pass_better;
 }
 
-int calcNumIdealDefenders()
+int StrategyImpl::calcNumIdealDefenders()
 {
     // TODO(arun): make a todo
     return 2;

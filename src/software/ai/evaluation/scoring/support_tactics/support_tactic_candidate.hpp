@@ -40,7 +40,7 @@ class SupportTacticCandidate : public Candidate
      * @return a shared pointer to a newly constructed instance of the
      * type of support tactic this candidate represents
      */
-    virtual std::shared_ptr<Tactic> createSupportTactic() = 0;
+    virtual std::shared_ptr<OffenseSupportTactic> createSupportTactic() = 0;
 
    protected:
     explicit SupportTacticCandidate() = default;
@@ -55,8 +55,8 @@ class SupportTacticCandidate : public Candidate
 template <typename TSupportTactic>
 class TypedSupportTacticCandidate : public SupportTacticCandidate
 {
-    static_assert(std::is_base_of<Tactic, TSupportTactic>::value,
-                  "TSupportTactic must derive from Tactic");
+    static_assert(std::is_base_of<OffenseSupportTactic, TSupportTactic>::value,
+                  "TSupportTactic must derive from OffenseSupportTactic");
 
    public:
     explicit TypedSupportTacticCandidate() = default;
@@ -71,7 +71,7 @@ class TypedSupportTacticCandidate : public SupportTacticCandidate
         scorer.update(*this);
     }
 
-    std::shared_ptr<Tactic> createSupportTactic() override
+    std::shared_ptr<OffenseSupportTactic> createSupportTactic() override
     {
         return std::make_shared<TSupportTactic>();
     }

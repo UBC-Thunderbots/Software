@@ -46,5 +46,6 @@ cc_library(
     deps = [
         ":support_tactic_candidate",
         ":support_tactic_scorer",
+        "//software/util/type_map",
     ],
 )

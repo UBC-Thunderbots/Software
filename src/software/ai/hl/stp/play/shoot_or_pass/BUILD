@@ -22,7 +22,7 @@ cc_library(
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
+        "//software/ai/hl/stp/tactic/offense_support_tactics/receiver:receiver_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
         "//software/geom/algorithms",

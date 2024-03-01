@@ -12,7 +12,7 @@ class DuplicationScorer : public SupportTacticScorer
    public:
     explicit DuplicationScorer();
 
-    double score(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) override;
+    double score(const TypedSupportTacticCandidate<ReceiverTactic> &candidate);
 
     /**
      * The javadoc comment for all `update` methods below can be read as:
