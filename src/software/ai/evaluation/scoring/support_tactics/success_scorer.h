@@ -16,8 +16,9 @@ class SuccessScorer : public SupportTacticScorer
     double score(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) override;
 
     // Score update methods for each support tactic
-    void update(const TypedSupportTacticCandidate<OffenseSupportTactic> &candidate) = delete;
-    void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) override {};
+    void update(const TypedSupportTacticCandidate<OffenseSupportTactic> &candidate) =
+        delete;
+    void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) override{};
 
    private:
     TypeMap<double> tactic_scores_;

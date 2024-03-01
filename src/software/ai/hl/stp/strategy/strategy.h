@@ -15,7 +15,7 @@ class Strategy
 
     const TbotsProto::AiConfig& getAiConfig() const;
     void updateAiConfig(const TbotsProto::AiConfig& ai_config);
-    void updateWorld(const WorldPtr &world_ptr);
+    void updateWorld(const WorldPtr& world_ptr);
 
     std::shared_ptr<StrategyImpl> operator->();
 

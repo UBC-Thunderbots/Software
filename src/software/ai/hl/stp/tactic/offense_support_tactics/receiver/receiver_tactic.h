@@ -56,7 +56,10 @@ class ReceiverTactic : public OffenseSupportTactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    OffenseSupportType getOffenseSupportType() const { return OffenseSupportType::PASS_RECEIVER; }
+    OffenseSupportType getOffenseSupportType() const
+    {
+        return OffenseSupportType::PASS_RECEIVER;
+    }
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 

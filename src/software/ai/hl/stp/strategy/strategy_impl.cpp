@@ -11,19 +11,20 @@ StrategyImpl::StrategyImpl(const TbotsProto::AiConfig& ai_config, const Field& f
 
 PossessionStrategy StrategyImpl::getPossessionStrategy(int num_robots)
 {
-    int unassigned_robots = num_robots;
+    int unassigned_robots   = num_robots;
     int num_ideal_defenders = calcNumIdealDefenders();
 
     PossessionStrategy possession_strategy;
 
-    possession_strategy.has_attacker = false; 
+    possession_strategy.has_attacker = false;
 
     if (world_ptr_->getTeamWithPossession() == TeamPossession::FRIENDLY_TEAM)
     {
         possession_strategy.has_attacker = true;
         unassigned_robots -= 1;
 
-        possession_strategy.num_defenders = std::min(num_ideal_defenders, std::max(unassigned_robots, 0));
+        possession_strategy.num_defenders =
+            std::min(num_ideal_defenders, std::max(unassigned_robots, 0));
         unassigned_robots -= possession_strategy.num_defenders;
 
         possession_strategy.num_support = unassigned_robots;
@@ -86,9 +87,9 @@ std::optional<Shot> StrategyImpl::getBestShot(const Robot& robot)
         return robot_to_best_shot_.at(robot.id());
     }
 
-    robot_to_best_shot_[robot.id()] =
-        calcBestShotOnGoal(world_ptr_->field(), world_ptr_->friendlyTeam(), world_ptr_->enemyTeam(),
-                           robot.position(), TeamType::ENEMY, {robot});
+    robot_to_best_shot_[robot.id()] = calcBestShotOnGoal(
+        world_ptr_->field(), world_ptr_->friendlyTeam(), world_ptr_->enemyTeam(),
+        robot.position(), TeamType::ENEMY, {robot});
     return robot_to_best_shot_[robot.id()];
 }
 

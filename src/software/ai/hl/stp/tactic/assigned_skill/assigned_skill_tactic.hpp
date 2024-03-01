@@ -82,6 +82,6 @@ void AssignedSkillTactic<TSkillFSM, TSkillSubFSMs...>::updatePrimitive(
     }
 
     fsm_map[tactic_update.robot.id()]->process_event(typename TSkillFSM::Update(
-        control_params_, SkillUpdate(tactic_update.robot, tactic_update.world_ptr, strategy_,
-                                     tactic_update.set_primitive)));
+        control_params_, SkillUpdate(tactic_update.robot, tactic_update.world_ptr,
+                                     strategy_, tactic_update.set_primitive)));
 }

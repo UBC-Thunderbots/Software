@@ -14,7 +14,8 @@ DynamicPlay::DynamicPlay(std::shared_ptr<Strategy> strategy)
 {
 }
 
-void DynamicPlay::getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr)
+void DynamicPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                 const WorldPtr &world_ptr)
 {
     // This function doesn't get called, it should be removed once coroutines
     // are phased out
@@ -28,22 +29,21 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
 {
     PriorityTacticVector tactics_to_return;
 
-    PossessionStrategy possession_strategy = (*strategy)->getPossessionStrategy(play_update.num_tactics);
+    PossessionStrategy possession_strategy =
+        (*strategy)->getPossessionStrategy(play_update.num_tactics);
 
     // Defense
     defense_play->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-    defense_play->updateTactics(
-                PlayUpdate(play_update.world_ptr, possession_strategy.num_defenders,
-                [&tactics_to_return](PriorityTacticVector new_tactics)
-                {
-                    for (const auto& tactic_vector : new_tactics)
-                    {
-                        tactics_to_return.push_back(tactic_vector);
-                    }
-                },
-                play_update.inter_play_communication,
-                play_update.set_inter_play_communication_fun
-    ));
+    defense_play->updateTactics(PlayUpdate(
+        play_update.world_ptr, possession_strategy.num_defenders,
+        [&tactics_to_return](PriorityTacticVector new_tactics) {
+            for (const auto &tactic_vector : new_tactics)
+            {
+                tactics_to_return.push_back(tactic_vector);
+            }
+        },
+        play_update.inter_play_communication,
+        play_update.set_inter_play_communication_fun));
 
     if (attacker_tactic_->done())
     {
@@ -63,26 +63,30 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
             auto best_candidate = std::max_element(support_tactic_candidates_.begin(),
                                                    support_tactic_candidates_.end());
 
-            std::shared_ptr<OffenseSupportTactic> support_tactic = (*best_candidate)->createSupportTactic();
+            std::shared_ptr<OffenseSupportTactic> support_tactic =
+                (*best_candidate)->createSupportTactic();
             support_tactics_.push_back(support_tactic);
 
             (*best_candidate)->updateScorer(*support_tactic_duplication_scorer_);
         }
 
         std::vector<OffenseSupportType> committed_support;
-        std::transform(support_tactics_.begin(), support_tactics_.end(), std::back_inserter(committed_support),
-                [](const std::shared_ptr<OffenseSupportTactic>& tactic) { return tactic->getOffenseSupportType(); });
+        std::transform(support_tactics_.begin(), support_tactics_.end(),
+                       std::back_inserter(committed_support),
+                       [](const std::shared_ptr<OffenseSupportTactic> &tactic) {
+                           return tactic->getOffenseSupportType();
+                       });
     }
 
     tactics_to_return.push_back({attacker_tactic_});
 
     std::vector support_tactic_vec = std::vector<std::shared_ptr<Tactic>>();
-    std::transform(support_tactics_.begin(), support_tactics_.end(), std::back_inserter(support_tactic_vec),
-            [](const std::shared_ptr<OffenseSupportTactic>& tactic)
-            {
-                std::shared_ptr<Tactic> t = tactic;
-                return t;
-            });
+    std::transform(support_tactics_.begin(), support_tactics_.end(),
+                   std::back_inserter(support_tactic_vec),
+                   [](const std::shared_ptr<OffenseSupportTactic> &tactic) {
+                       std::shared_ptr<Tactic> t = tactic;
+                       return t;
+                   });
     tactics_to_return.push_back(support_tactic_vec);
 
     play_update.set_tactics(tactics_to_return);

@@ -40,6 +40,7 @@ class StrategyImpl
 
     std::optional<Shot> getBestShot(const Robot& robot);
 
+    void commitTactic(std::shared_ptr<OffenseSupportTactic> offense_support_tactic) const;
     std::vector<OffenseSupportType> getCommittedOffenseSupport() const;
 
     /**
@@ -51,7 +52,7 @@ class StrategyImpl
     void updateAiConfig(const TbotsProto::AiConfig& ai_config);
 
     bool hasWorld() const;
-    void updateWorld(const WorldPtr &world_ptr);
+    void updateWorld(const WorldPtr& world_ptr);
 
    private:
     bool isBetterPassThanCached(const Timestamp& timestamp, const PassWithRating& pass);

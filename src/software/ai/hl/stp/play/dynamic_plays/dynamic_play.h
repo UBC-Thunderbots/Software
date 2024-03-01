@@ -27,7 +27,8 @@ class DynamicPlay : public Play
 
    protected:
     // TODO (#2359): delete once all plays are not coroutines
-    void getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
 
     void updateTactics(const PlayUpdate &play_update) override;
 

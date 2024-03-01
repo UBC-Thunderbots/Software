@@ -28,7 +28,7 @@ enum PlayName
     ScoringFromContestedPossessionPlay = 22;
     PassEndurancePlay                  = 23;
     // TODO(arun): temporarily as an override to run in Thunderscope
-    DynamicPlay                        = 24;
+    DynamicPlay = 24;
 }
 
 message Play

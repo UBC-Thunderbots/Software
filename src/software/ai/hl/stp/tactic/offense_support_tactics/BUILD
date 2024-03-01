@@ -5,6 +5,6 @@ cc_library(
     srcs = ["offense_support_tactic.cpp"],
     hdrs = ["offense_support_tactic.h"],
     deps = [
-        "//software/ai/hl/stp/tactic:tactic"
-    ]
+        "//software/ai/hl/stp/tactic",
+    ],
 )

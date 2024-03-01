@@ -4,8 +4,8 @@
 
 class PassSkill : public BaseSkill<PassSkillFSM>
 {
-    public:
-        explicit PassSkill(std::shared_ptr<Strategy> strategy) : BaseSkill(strategy){};
+   public:
+    explicit PassSkill(std::shared_ptr<Strategy> strategy) : BaseSkill(strategy){};
 
-        double getViability(const Robot& robot, const World& world) const override;
+    double getViability(const Robot& robot, const World& world) const override;
 };
