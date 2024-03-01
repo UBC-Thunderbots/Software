@@ -36,12 +36,18 @@ cc_library(
     visibility = ["//visibility:private"],
     deps = [
         ":pass_strategy",
+        ":possession_strategy",
         "//proto:tbots_cc_proto",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:shot",
-        "//software/ai/hl/stp/tactic:offense_support_tactic",
+        "//software/ai/hl/stp/tactic/offense_support_tactics:offense_support_tactic",
         "//software/ai/passing:pass_with_rating",
         "//software/geom:pose",
         "//software/world:field",
     ],
+)
+
+cc_library(
+    name = "possession_strategy",
+    hdrs = ["possession_strategy.h"],
 )

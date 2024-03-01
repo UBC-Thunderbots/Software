@@ -1,7 +1,8 @@
 #pragma once
 
 #include "software/ai/evaluation/shot.h"
-#include "software/ai/hl/stp/tactic/receiver/receiver_fsm.h"
+#include "software/ai/hl/stp/tactic/offense_support_tactics/offense_support_tactic.h"
+#include "software/ai/hl/stp/tactic/offense_support_tactics/receiver/receiver_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
 #include "software/geom/ray.h"
@@ -13,7 +14,7 @@
  * Note that this tactic does not take into account the time the pass should occur at,
  * it simply tries to move to the best position to receive the pass as possible
  */
-class ReceiverTactic : public Tactic
+class ReceiverTactic : public OffenseSupportTactic
 {
    public:
     ReceiverTactic();
@@ -54,6 +55,8 @@ class ReceiverTactic : public Tactic
                                                      const Point& best_shot_target);
 
     void accept(TacticVisitor& visitor) const override;
+
+    OffenseSupportType getOffenseSupportType() const { return OffenseSupportType::PASS_RECEIVER; }
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 

@@ -4,6 +4,7 @@
 #include "software/ai/evaluation/scoring/support_tactics/feasibility_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/success_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/support_tactic_candidate.hpp"
+#include "software/ai/hl/stp/play/defense/defense_play.h"
 #include "software/ai/hl/stp/play/play.h"
 
 /**
@@ -21,12 +22,12 @@ class DynamicPlay : public Play
      * @param ai_config The AI configuration
      * @param requires_goalie Whether this play requires a goalie
      */
-    explicit DynamicPlay(TbotsProto::AiConfig ai_config, bool requires_goalie,
+    explicit DynamicPlay(bool requires_goalie,
                          std::shared_ptr<Strategy> strategy);
 
    protected:
     // TODO (#2359): delete once all plays are not coroutines
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr) override;
 
     void updateTactics(const PlayUpdate &play_update) override;
 
@@ -38,6 +39,8 @@ class DynamicPlay : public Play
 
     std::shared_ptr<Tactic> attacker_tactic_;
     std::vector<std::shared_ptr<Tactic>> support_tactics_;
+
+    std::unique_ptr<DefensePlay> defense_play;
 };
 
 /**

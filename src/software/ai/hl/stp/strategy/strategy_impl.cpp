@@ -9,6 +9,42 @@ StrategyImpl::StrategyImpl(const TbotsProto::AiConfig& ai_config, const Field& f
     updateAiConfig(ai_config);
 }
 
+PossessionStrategy StrategyImpl::getPossessionStrategy(int num_robots)
+{
+    int unassigned_robots = num_robots;
+    int num_ideal_defenders = calcNumIdealDefenders();
+
+    PossessionStrategy possession_strategy;
+
+    possession_strategy.has_attacker = false; 
+
+    if (world_ptr_->getTeamWithPossession() == TeamPossession::FRIENDLY_TEAM)
+    {
+        possession_strategy.has_attacker = true;
+        unassigned_robots -= 1;
+
+        possession_strategy.num_defenders = std::min(num_ideal_defenders, std::max(unassigned_robots, 0));
+        unassigned_robots -= possession_strategy.num_defenders;
+
+        possession_strategy.num_support = unassigned_robots;
+
+        return possession_strategy;
+    }
+
+    possession_strategy.num_defenders = std::min(unassigned_robots, num_ideal_defenders);
+    unassigned_robots -= possession_strategy.num_defenders;
+
+    if (unassigned_robots > 0)
+    {
+        possession_strategy.num_support = 1;
+        unassigned_robots -= 1;
+    }
+
+    possession_strategy.num_defenders += unassigned_robots;
+
+    return possession_strategy;
+}
+
 Pose StrategyImpl::getBestDribblePose(const Robot& robot)
 {
     if (robot_to_best_dribble_location_.contains(robot.id()))
@@ -111,4 +147,10 @@ bool StrategyImpl::isBetterPassThanCached(const Timestamp& timestamp,
         cached_pass_eval_->getBestPassOnField().rating > pass.rating;
 
     return is_cache_time_expired || !is_cache_pass_better;
+}
+
+int calcNumIdealDefenders()
+{
+    // TODO(arun): make a todo
+    return 2;
 }
