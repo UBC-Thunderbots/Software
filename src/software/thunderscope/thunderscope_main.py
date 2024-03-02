@@ -209,7 +209,7 @@ if __name__ == "__main__":
         "--radio",
         action="store_true",
         default=False,
-        help="Whether to use radio (False) or Wi-Fi (True) for robot communication",
+        help="Whether to use radio (False) or Wi-Fi (True) for sending primitives to robots",
     )
 
     # Sanity check that an interface was provided

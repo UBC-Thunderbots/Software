@@ -1,17 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "proto_udp_client",
-    hdrs = [
-        "proto_udp_client.hpp",
-    ],
-    deps = [
-        "//software/logger",
-        "//software/util/typename",
-    ],
-)
-
-cc_library(
     name = "proto_udp_listener",
     hdrs = [
         "proto_udp_listener.hpp",

@@ -10,6 +10,7 @@
 #include "software/jetson_nano/services/network/proto_tracker.h"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
+#include "software/networking/radio/threaded_proto_radio_sender.hpp"
 
 class NetworkService
 {
@@ -63,7 +64,9 @@ class NetworkService
 
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotStatus>> sender;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>
-        listener_primitive_set;
+        udp_listener_primitive_set;
+    std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::PrimitiveSet>>
+        radio_listener_primitive_set;
 
     unsigned int network_ticks     = 0;
     unsigned int thunderloop_ticks = 0;
