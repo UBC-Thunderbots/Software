@@ -4,10 +4,10 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.friendly_team_scored import *
 from software.simulated_tests.friendly_has_ball_possession import *
 from software.simulated_tests.kicker_double_touch import *
+from software.simulated_tests.ball_kicked import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -72,28 +72,28 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
         ),
         params=[
             {
-                "ball_initial_pos": tbots_cpp.Point(4.4, -2.9),
+                "ball_initial_pos": tbots_cpp.Point(-4.4, -2.9),
                 "blue_bots": [
                     tbots_cpp.Point(-3, 2.5),
                     tbots_cpp.Point(-3, 1.5),
                     tbots_cpp.Point(-3, 0.5),
                     tbots_cpp.Point(-3, -0.5),
                     tbots_cpp.Point(-3, -1.5),
-                    tbots_cpp.Point(4.6, -3.1),
+                    tbots_cpp.Point(-4.6, -3.1),
                 ],
             }
         ],
         inv_always_validation_sequence_set=[
             [
-                # Ball should always be in the field
-                BallAlwaysStaysInRegion(
-                    regions=[tbots_cpp.Field.createSSLDivisionBField().fieldLines()]
-                ),
                 # Kicker should never double touch the ball
                 KickerAlwaysNotDoubleTouch(),
             ]
         ],
-        inv_eventually_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=[
+            [
+                # Ball should eventually be kicked
+                BallEventuallyKicked(),
+            ]],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [
@@ -108,7 +108,6 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
 
 
 def test_corner_kick_play_top_right(simulated_test_runner):
-    # TODO- #2781 Validation
     simulated_test_runner.run_test(
         setup=lambda ball_and_bots_pos, runner=simulated_test_runner: corner_kick_play_test_setup(
             ball_and_bots_pos["ball_initial_pos"],
@@ -130,15 +129,15 @@ def test_corner_kick_play_top_right(simulated_test_runner):
         ],
         inv_always_validation_sequence_set=[
             [
-                # Ball should always be in the field
-                BallAlwaysStaysInRegion(
-                    regions=[tbots_cpp.Field.createSSLDivisionBField().fieldLines()]
-                ),
                 # Kicker should never double touch the ball
                 KickerAlwaysNotDoubleTouch(),
             ]
         ],
-        inv_eventually_validation_sequence_set=[[]],
+        inv_eventually_validation_sequence_set=[
+            [
+                # Ball should eventually be kicked
+                BallEventuallyKicked(),
+            ]],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [
