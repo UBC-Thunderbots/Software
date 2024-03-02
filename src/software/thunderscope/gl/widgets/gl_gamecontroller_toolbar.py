@@ -20,6 +20,17 @@ class GamecontrollerPlays:
     PENALTY = "Penalty"
 
 
+class GamecontrollerEvents:
+    """
+    The different event that we can send for each team
+    """
+
+    YELLOW = "Yellow Card"
+    RED = "Red Card"
+    GOAL = "Goal"
+    TIMEOUT = "Start Timeout"
+
+
 class GLGamecontrollerToolbar(GLToolbar):
     """
     A toolbar with controls to send GameController commands from Thunderscope
@@ -40,7 +51,6 @@ class GLGamecontrollerToolbar(GLToolbar):
         # the currently selected play (starts as None)
         # self.current_selected_play = GamecontrollerPlays.NONE
 
-        # TODO: change icon to pause
         # Setup Stop button for sending the STOP gamecontroller command
         self.stop_button = self.__setup_icon_button(
             icons.get_stop_icon(self.BUTTON_ICON_COLOR),
@@ -55,7 +65,6 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.__send_force_start_command,
         )
 
-        # TODO: change icon to cross
         # Setup Halt button for sending the HALT gamecontroller command
         self.halt_button = self.__setup_icon_button(
             icons.get_halt_icon(self.BUTTON_ICON_COLOR),
@@ -70,15 +79,11 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.__send_normal_start_command,
         )
 
-        # disable the normal start button when no play is selected
-        self.normal_start_enabled = True
-        self.__toggle_normal_start_button()
-
         # set up the menu for selecting plays
         self.plays_menu = QMenu()
 
         self.plays_menu_button = QPushButton()
-        self.plays_menu_button.setText(GamecontrollerPlays.NONE)
+        self.plays_menu_button.setText("Plays")
         self.plays_menu_button.setStyleSheet(self.get_button_style())
         self.plays_menu_button.setMenu(self.plays_menu)
 
@@ -87,25 +92,73 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.plays_menu.addSeparator()
         self.__add_plays_menu_items(is_blue=False)
 
+        # set up the menu for selecting actions
+        self.actions_menu = QMenu()
+
+        self.actions_menu_button = QPushButton()
+        self.actions_menu_button.setText("Actions")
+        self.actions_menu_button.setStyleSheet(self.get_button_style())
+        self.actions_menu_button.setMenu(self.plays_menu)
+
+        # # add play items for each team color
+        # self.__add_plays_menu_items(is_blue=True)
+        # self.plays_menu.addSeparator()
+        # self.__add_plays_menu_items(is_blue=False)
+
+        # disable the normal start button when no play is selected
+        self.normal_start_enabled = True
+        self.__toggle_normal_start_button()
+
         self.layout().addWidget(self.stop_button)
         self.layout().addWidget(self.halt_button)
-        self.layout().addWidget(self.normal_start_button)
         self.layout().addWidget(self.force_start_button)
-        self.layout().addSpacing(20)
+        self.__add_seperator(self.layout())
         self.layout().addWidget(self.plays_menu_button)
+        self.layout().addWidget(self.normal_start_button)
+        self.__add_seperator(self.layout())
+        self.__add_event_buttons(self.layout(), is_blue=True)
+        self.__add_seperator(self.layout())
+        self.__add_event_buttons(self.layout(), is_blue=False)
         self.layout().addStretch()
 
-    def __add_plays_menu_items(self, is_blue: bool) -> None:
-        self.__add_plays_menu_item(GamecontrollerPlays.DIRECT, is_blue)
-        self.__add_plays_menu_item(GamecontrollerPlays.INDIRECT, is_blue)
-        self.__add_plays_menu_item(GamecontrollerPlays.KICKOFF, is_blue)
-        self.__add_plays_menu_item(GamecontrollerPlays.PENALTY, is_blue)
+    def __add_seperator(self, layout: QBoxLayout) -> None:
+        """
+        Adds a seperator line with enough spacing to the given layout
 
-    def __add_plays_menu_item(self, play: GamecontrollerPlays, is_blue: bool) -> None:
-        icon = icons.get_blue_icon() if is_blue else icons.get_yellow_icon()
-        self.plays_menu.addAction(
-            icon, play, lambda: self.__plays_menu_handler(play, icon, is_blue)
-        )
+        :param layout: the layout to add the seperator to
+        """
+        layout.addSpacing(10)
+        layout.addWidget(QLabel("|"))
+        layout.addSpacing(10)
+
+    def __add_event_buttons(self, layout: QBoxLayout, is_blue: bool) -> None:
+        layout.addWidget(QLabel("Blue" if is_blue else "Yellow"))
+        
+        # for arg in [
+        #     GamecontrollerEvents.RED,
+        #     GamecontrollerEvents.YELLOW,
+        #     GamecontrollerEvents.GOAL,
+        #     GamecontrollerEvents.TIMEOUT
+        # ]:
+            
+
+
+    def __add_plays_menu_items(self, is_blue: bool) -> None:
+        """
+        Initializes the plays menu with the available plays for the given team
+
+        :param is_blue: if the team to add items for is blue (True) or yellow (False)
+        """
+        for arg in [
+            GamecontrollerPlays.DIRECT,
+            GamecontrollerPlays.INDIRECT,
+            GamecontrollerPlays.KICKOFF,
+            GamecontrollerPlays.PENALTY
+        ]:
+            icon = icons.get_blue_icon() if is_blue else icons.get_yellow_icon()
+            self.plays_menu.addAction(
+                icon, arg, lambda play=arg: self.__plays_menu_handler(play, icon, is_blue)
+            )        
 
     def __plays_menu_handler(
         self, play: GamecontrollerPlays, icon: QtGui.QIcon, is_blue: bool
@@ -185,11 +238,15 @@ class GLGamecontrollerToolbar(GLToolbar):
     def __send_normal_start_command(self) -> None:
         """
         Sends a NORMAL START command for the current friendly team to the gamecontroller
+        And resets the plays menu selection
         """
         if self.normal_start_enabled:
             self.__send_gc_command(Command.Type.NORMAL_START, SslTeam.UNKNOWN)
 
             self.__toggle_normal_start_button()
+
+            self.plays_menu_button.setText("Plays")
+            self.plays_menu_button.setIcon(QtGui.QIcon())
 
     def __send_gc_command(
         self, command: Command.Type, team: Team, ball_pos: Vector2 = None
