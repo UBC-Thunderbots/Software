@@ -7,11 +7,17 @@
 
 class PrimitiveTest : public testing::Test
 {
+   public:
+    PrimitiveTest()
+    {
+        TestUtil::setFriendlyRobotPositions(world, {Point(0, 0)},
+                                            Timestamp::fromSeconds(0));
+    }
+
    protected:
     RobotConstants_t robot_constants = create2021RobotConstants();
     Robot robot                      = TestUtil::createRobotAtPos(Point(0, 0));
-    World world                      = TestUtil::setFriendlyRobotPositions(
-        TestUtil::createBlankTestingWorld(), {Point(0, 0)}, Timestamp::fromSeconds(0));
+    std::shared_ptr<World> world     = TestUtil::createBlankTestingWorld();
     RobotNavigationObstacleFactory obstacle_factory =
         RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig());
 };
@@ -76,11 +82,12 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_sub_destination)
     EXPECT_EQ(generated_destination.x_meters(), destination.x());
     EXPECT_EQ(generated_destination.y_meters(), destination.y());
 
+    ASSERT_EQ(xy_traj_params.sub_destinations().size(), 1);
     // Greater than 0 connection time indicating a sub destination
-    EXPECT_GT(xy_traj_params.connection_time_s(), 0.0);
+    EXPECT_GT(xy_traj_params.sub_destinations(0).connection_time_s(), 0.0);
     // Sub destination should not be the default (0,0)
-    EXPECT_NE(xy_traj_params.sub_destination().x_meters(), 0.0);
-    EXPECT_NE(xy_traj_params.sub_destination().y_meters(), 0.0);
+    EXPECT_NE(xy_traj_params.sub_destinations(0).sub_destination().x_meters(), 0.0);
+    EXPECT_NE(xy_traj_params.sub_destinations(0).sub_destination().y_meters(), 0.0);
 
     EXPECT_EQ(move_primitive.w_traj_params().final_angle().radians(),
               Angle::threeQuarter().toRadians());

@@ -20,8 +20,8 @@ void BallPlacementPlayFSM::kickOffWall(const Update &event)
                              move_tactics.end());
 
     // setup wall kickoff tactic for ball placing robot
-    Point ball_pos            = event.common.world.ball().position();
-    Rectangle field_lines     = event.common.world.field().fieldLines();
+    Point ball_pos            = event.common.world_ptr->ball().position();
+    Rectangle field_lines     = event.common.world_ptr->field().fieldLines();
     AutoChipOrKick auto_chick = {AutoChipOrKickMode::AUTOKICK,
                                  WALL_KICKOFF_VELOCITY_M_PER_S};
 
@@ -35,7 +35,7 @@ void BallPlacementPlayFSM::kickOffWall(const Update &event)
 void BallPlacementPlayFSM::alignPlacement(const Update &event)
 {
     std::optional<Point> placement_point =
-        event.common.world.gameState().getBallPlacementPoint();
+        event.common.world_ptr->gameState().getBallPlacementPoint();
 
     if (placement_point.has_value())
     {
@@ -49,9 +49,9 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
         // find position behind the ball where the ball is aligned directly in front
         // placement point from the placing robot's POV
         Vector alignment_vector =
-            (placement_point.value() - event.common.world.ball().position()).normalize();
+            (placement_point.value() - event.common.world_ptr->ball().position()).normalize();
         Angle setup_angle = alignment_vector.orientation();
-        setup_point       = event.common.world.ball().position() -
+        setup_point       = event.common.world_ptr->ball().position() -
                       2 * alignment_vector * ROBOT_MAX_RADIUS_METERS;
 
         align_placement_tactic->updateControlParams(
@@ -76,19 +76,19 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
 
     Angle final_angle = Angle::zero();
     std::optional<Point> placement_point =
-        event.common.world.gameState().getBallPlacementPoint();
+        event.common.world_ptr->gameState().getBallPlacementPoint();
 
     Vector placement_dribble_vector;
     if (placement_point.has_value())
     {
         placement_dribble_vector =
-            placement_point.value() - event.common.world.ball().position();
+            placement_point.value() - event.common.world_ptr->ball().position();
         final_angle = placement_dribble_vector.orientation();
     }
 
     // setup ball placement tactic for ball placing robot
     place_ball_tactic->updateControlParams(
-        event.common.world.gameState().getBallPlacementPoint(), final_angle, true);
+        event.common.world_ptr->gameState().getBallPlacementPoint(), final_angle, true);
     tactics_to_run[0].emplace_back(place_ball_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -101,9 +101,9 @@ void BallPlacementPlayFSM::startWait(const Update &event)
 
 void BallPlacementPlayFSM::retreat(const Update &event)
 {
-    World world = event.common.world;
+    WorldPtr world_ptr = event.common.world_ptr;
     std::optional<Robot> nearest_robot =
-        world.friendlyTeam().getNearestRobot(world.ball().position());
+            world_ptr->friendlyTeam().getNearestRobot(world_ptr->ball().position());
 
     if (nearest_robot.has_value())
     {
@@ -114,7 +114,7 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
                                  move_tactics.end());
 
-        Point ball_pos = world.ball().position();
+        Point ball_pos = world_ptr->ball().position();
 
         // robot will try to retreat backwards from wherever it is currently facing
         Angle final_orientation  = nearest_robot.value().orientation();
@@ -124,13 +124,13 @@ void BallPlacementPlayFSM::retreat(const Update &event)
 
         // if the initial retreat position is out of the field boundary, have it retreat
         // towards the closest goal
-        if (!contains(world.field().fieldBoundary(), retreat_position))
+        if (!contains(world_ptr->field().fieldBoundary(), retreat_position))
         {
-            bool in_friendly_half = contains(world.field().friendlyHalf(), ball_pos);
-            Point closer_goal     = world.field().friendlyGoalCenter();
+            bool in_friendly_half = contains(world_ptr->field().friendlyHalf(), ball_pos);
+            Point closer_goal     = world_ptr->field().friendlyGoalCenter();
             if (!in_friendly_half)
             {
-                closer_goal = world.field().enemyGoalCenter();
+                closer_goal = world_ptr->field().enemyGoalCenter();
             }
             retreat_direction = (closer_goal - ball_pos).normalize();
             retreat_position  = ball_pos + retreat_direction * (RETREAT_DISTANCE_METERS +
@@ -151,16 +151,16 @@ void BallPlacementPlayFSM::retreat(const Update &event)
 bool BallPlacementPlayFSM::shouldKickOffWall(const Update &event)
 {
     // check if ball is too close to border
-    Point ball_pos        = event.common.world.ball().position();
-    Rectangle field_lines = event.common.world.field().fieldLines();
+    Point ball_pos        = event.common.world_ptr->ball().position();
+    Rectangle field_lines = event.common.world_ptr->field().fieldLines();
     return !contains(field_lines, ball_pos);
 }
 
 bool BallPlacementPlayFSM::alignDone(const Update &event)
 {
     std::optional<Robot> nearest_robot =
-        event.common.world.friendlyTeam().getNearestRobot(
-            event.common.world.ball().position());
+        event.common.world_ptr->friendlyTeam().getNearestRobot(
+            event.common.world_ptr->ball().position());
     if (nearest_robot.has_value())
     {
         return comparePoints(nearest_robot.value().position(), setup_point);
@@ -173,7 +173,7 @@ bool BallPlacementPlayFSM::alignDone(const Update &event)
 
 bool BallPlacementPlayFSM::kickDone(const Update &event)
 {
-    const auto ball_velocity = event.common.world.ball().velocity().length();
+    const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
     const auto ball_is_kicked_m_per_s_threshold =
         this->ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
     return ball_velocity > ball_is_kicked_m_per_s_threshold;
@@ -181,17 +181,17 @@ bool BallPlacementPlayFSM::kickDone(const Update &event)
 
 bool BallPlacementPlayFSM::ballPlaced(const Update &event)
 {
-    Point ball_pos = event.common.world.ball().position();
+    Point ball_pos = event.common.world_ptr->ball().position();
     std::optional<Point> placement_point =
-        event.common.world.gameState().getBallPlacementPoint();
-    std::vector<Robot> robots = event.common.world.friendlyTeam().getAllRobots();
+        event.common.world_ptr->gameState().getBallPlacementPoint();
+    std::vector<Robot> robots = event.common.world_ptr->friendlyTeam().getAllRobots();
 
     // see if the ball is at the placement destination
     if (placement_point.has_value())
     {
         return comparePoints(ball_pos, placement_point.value(),
                              PLACEMENT_DIST_THRESHOLD_METERS) &&
-               event.common.world.ball().velocity().length() <
+               event.common.world_ptr->ball().velocity().length() <
                    this->ai_config.ai_parameter_config()
                        .ball_is_kicked_m_per_s_threshold();
     }
@@ -212,8 +212,8 @@ bool BallPlacementPlayFSM::waitDone(const Update &event)
 
 bool BallPlacementPlayFSM::retreatDone(const Update &event)
 {
-    Point ball_position = event.common.world.ball().position();
-    return distance(ball_position, event.common.world.friendlyTeam()
+    Point ball_position = event.common.world_ptr->ball().position();
+    return distance(ball_position, event.common.world_ptr->friendlyTeam()
                                        .getNearestRobot(ball_position)
                                        ->position()) > RETREAT_DISTANCE_METERS;
 }
@@ -286,10 +286,10 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
     // non goalie and non ball placing robots line up along a line just outside the
     // friendly defense area to wait for ball placement to finish
     Vector waiting_line_vector =
-        event.common.world.field().friendlyDefenseArea().posXPosYCorner() -
-        event.common.world.field().friendlyDefenseArea().posXNegYCorner();
+        event.common.world_ptr->field().friendlyDefenseArea().posXPosYCorner() -
+        event.common.world_ptr->field().friendlyDefenseArea().posXNegYCorner();
     Point waiting_line_start_point =
-        event.common.world.field().friendlyDefenseArea().posXNegYCorner() +
+        event.common.world_ptr->field().friendlyDefenseArea().posXNegYCorner() +
         Vector(ROBOT_MAX_RADIUS_METERS * 3,
                0);  // Path planner can slow down when pathing through objects - buffer
     // zone of radius x 3 should help

@@ -9,7 +9,7 @@ BallPlacementPlay::BallPlacementPlay(TbotsProto::AiConfig config)
 }
 
 void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                       const World &world)
+                                       const WorldPtr &world_ptr)
 {
     // This function doesn't get called so it does nothing, will be removed once
     // coroutines are phased out

@@ -49,7 +49,8 @@ void ThreadedAi::overrideTactics(
 
 void ThreadedAi::onValueReceived(World world)
 {
-    runAiAndSendPrimitives(world);
+    WorldPtr world_ptr = std::make_shared<World>(world);
+    runAiAndSendPrimitives(world_ptr);
 }
 
 void ThreadedAi::onValueReceived(TbotsProto::ThunderbotsConfig config)
@@ -63,12 +64,12 @@ void ThreadedAi::onValueReceived(TbotsProto::ThunderbotsConfig config)
     ai.updateAiConfig(ai_config);
 }
 
-void ThreadedAi::runAiAndSendPrimitives(const World& world)
+void ThreadedAi::runAiAndSendPrimitives(const WorldPtr& world_ptr)
 {
     std::scoped_lock lock(ai_mutex);
     if (ai_control_config.run_ai())
     {
-        auto new_primitives = ai.getPrimitives(world);
+        auto new_primitives = ai.getPrimitives(world_ptr);
 
         TbotsProto::PlayInfo play_info_msg = ai.getPlayInfo();
 

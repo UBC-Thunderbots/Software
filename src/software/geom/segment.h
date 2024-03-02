@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/geom/point.h"
+#include "software/geom/vector.h"
 
 class Segment final
 {
@@ -91,6 +92,27 @@ class Segment final
     Point start;
     Point end;
 };
+
+/**
+ * Adds a vector offset to a segment
+ *
+ * @param segment segment to add offset to
+ * @param vector vector offset to offset segment by
+ *
+ * @return segment with start and end points added to vector
+ */
+Segment operator+(const Segment& segment, const Vector& vector);
+Segment operator+(const Vector& vector, const Segment& segment);
+
+/**
+ * Subtracts a vector offset from a segment
+ *
+ * @param segment segment to subtract offset to
+ * @param vector vector offset to negatively offset segment by
+ *
+ * @return segment with start and end points subtracted by vector
+ */
+Segment operator-(const Segment& segment, const Vector& vector);
 
 template <>
 struct std::hash<Segment>
