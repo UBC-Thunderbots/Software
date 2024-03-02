@@ -1,3 +1,6 @@
+import threading
+
+from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.robot_diagnostics.controller_diagnostics import ControllerDiagnostics
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
@@ -21,8 +24,15 @@ class DiagnosticsWidget(QWidget):
         self.chicker_widget = ChickerWidget(proto_unix_io)
         self.controller = ControllerDiagnostics(proto_unix_io)
 
+
+        self.__control_mode = ControlMode.DIAGNOSTICS
+
         self.diagnostics_control_input_widget.toggle_controls_signal.connect(
             lambda control_mode: self.toggle_control(control_mode)
+        )
+
+        self.run_diagnostics_thread = threading.Thread(
+            target=self.__run_diagnostics_primivitve_set, daemon=True
         )
 
         vbox_layout.addWidget(self.diagnostics_control_input_widget)
@@ -32,10 +42,26 @@ class DiagnosticsWidget(QWidget):
         self.setLayout(vbox_layout)
 
     def refresh(self):
-        self.diagnostics_control_input_widget.refresh()
-        self.drive_dribbler_widget.refresh()
-        self.chicker_widget.refresh()
+        if self.__control_mode == ControlMode.DIAGNOSTICS:
+            self.diagnostics_control_input_widget.refresh()
+            self.drive_dribbler_widget.refresh()
+            self.chicker_widget.refresh()
+
+            self.drive_dribbler_widget.motor_control_diagnostics_buffer.get()
+
+            diagnostics_primitive = DirectControlPrimitive(
+                motor_control=self.drive_dribbler_widget.motor_control,
+                power_control=self.chicker_widget.power_control,
+            )
+
+            # TODO send the diagnostics primitive
+            Primitive(direct_control=diagnostics_primitive)
+
+        elif self.__control_mode == ControlMode.XBOX:
+
+
 
     def toggle_control(self, mode: ControlMode):
+        self.__control_mode = mode
         self.drive_dribbler_widget.set_enabled(mode == ControlMode.DIAGNOSTICS)
         self.controller.set_enabled(mode == ControlMode.XBOX)

@@ -22,23 +22,27 @@ class DriveAndDribblerWidget(QWidget):
 
         self.proto_unix_io = proto_unix_io
 
-        self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
-        self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
-
-        self.proto_unix_io.register_observer(
-            MotorControl, self.motor_control_diagnostics_buffer
-        )
-        self.proto_unix_io.register_observer(
-            PowerControl, self.power_control_diagnostics_buffer
-        )
+        self.motor_control = self.__create_empty_mc_primitive()
 
         # Add widgets to layout
         layout.addWidget(self.setup_direct_velocity("Drive"))
         layout.addWidget(self.setup_dribbler("Dribbler"))
+        # TODO move dribber control to chicker..., makes more sense there
 
         self.enabled = True
 
         self.setLayout(layout)
+
+    def __create_empty_control_primitive(self):
+        motor_control = MotorControl()
+
+        motor_control.dribbler_speed_rpm = 0
+        motor_control.direct_velocity_control.velocity.x_component_meters = 0
+        motor_control.direct_velocity_control.velocity.y_component_meters = 0
+        motor_control.direct_velocity_control.angular_velocity.radians_per_second = 0
+
+        return motor_control
+
 
     def refresh(self) -> None:
         """Refresh the widget and send the a MotorControl message with the current values
@@ -55,6 +59,8 @@ class DriveAndDribblerWidget(QWidget):
         motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
             self.angular_velocity_slider.value()
         )
+
+        # todo update motor control
 
         self.proto_unix_io.send_proto(MotorControl, motor_control)
 
@@ -180,7 +186,7 @@ class DriveAndDribblerWidget(QWidget):
 
         return group_box
 
-    def set_enabled(self,  enable: bool) -> None:
+    def set_enabled(self, enable: bool) -> None:
         """
         Disables or enables all sliders and buttons depending on boolean parameter
 

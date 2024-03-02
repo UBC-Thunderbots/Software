@@ -26,7 +26,6 @@ class ControllerDiagnostics(object):
     interpreting the inputs into usable inputs for robot.
     """
 
-    # TODO add function descriptions
     def __init__(
             self,
             proto_unix_io: ProtoUnixIO,
@@ -34,19 +33,14 @@ class ControllerDiagnostics(object):
         self.enabled = False
         self.controller = None
 
-        # TODO: check if estop gets in the way
-
         for device in list_devices():
-            try:
-                self.controller = InputDevice(device)
-            except Exception as e:
-                print("Failed to initialize device with path: " + device + " with exception " + e)
+            controller = InputDevice(device)
+            if controller is not None:
+                self.controller = controller
 
         if self.controller is None:
-            raise RuntimeError("Could not initialize a controller, there are no valid "
-                               "controllers connected")
+            raise RuntimeError("Could not initialize a controller - connect using USB")
 
-        # TODO add a way to switch between different controllers plugged in
         logging.info(
             "Initializing controller " + self.controller.info.__str__() + " and device path location: " + self.controller.path)
         self.proto_unix_io = proto_unix_io
@@ -177,20 +171,13 @@ class ControllerDiagnostics(object):
         for event in self.controller.read_loop():
             if self.__stop_event_thread.isSet():
                 return
-            self.__process_event(event)
+            if self.enabled:
+                self.__process_event(event)
 
     def close(self):
         logging.info("Closing controller thread")
         self.__stop_event_thread.set()
         self.__event_thread.join()
-
-    def set_enabled(self, enabled: bool):
-        """
-        Changes the diagnostics input mode for all robots between Xbox and Diagnostics.
-
-        :param enabled: to which state to set controller enabled.
-        """
-        self.enabled = enabled
 
     def set_enabled(self, enabled: bool):
         """
