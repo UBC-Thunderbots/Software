@@ -30,7 +30,11 @@ class BallKicked(Validation):
         if not self.kick_position:
             self.kick_position = ball_position
         # quick passing check
-        if self.kicker_robot is not None and self.kick_position and (ball_position - self.kick_position).length() > BALL_MOVED_M:
+        if (
+            self.kicker_robot is not None
+            and self.kick_position
+            and (ball_position - self.kick_position).length() > BALL_MOVED_M
+        ):
             return ValidationStatus.PASSING
         # main check loop
         for robot in world.friendly_team.team_robots:
