@@ -79,7 +79,7 @@ class ExtendedGLViewWidget(GLViewWidget):
 
     def frameswap_callback(self):
         """
-        addding a frameswap callback
+        adding a frameswap callback
         """
         self.bufferswap_counter.add_one_datapoint()
 

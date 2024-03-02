@@ -13,7 +13,9 @@ class FrameTimeCounter:
         """
         Initialized framtime counter
         """
-        self.datapoints = collections.deque(maxlen=100)  # stores the timeframe of every data cycle
+        self.datapoints = collections.deque(
+            maxlen=100
+        )  # stores the timeframe of every data cycle
         self.previous_timestamp = time.time()
 
     def add_one_datapoint(self):

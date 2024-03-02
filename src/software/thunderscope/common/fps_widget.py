@@ -146,5 +146,5 @@ class FrameTimeWidget(QWidget):
         self.update_table(
             self.refresh_function_table, 2, 1, f"{refresh_func_fps_all:.1f}"
         )
-        
+
         self.last_update_time = time.time()
