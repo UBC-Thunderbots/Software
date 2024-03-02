@@ -1,10 +1,10 @@
-from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
-from software.thunderscope.proto_unix_io import ProtoUnixIO
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtGui
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from typing import Callable
+from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.gl.widgets.toolbar_icons.gamecontroller.icon_loader as icons
 
 

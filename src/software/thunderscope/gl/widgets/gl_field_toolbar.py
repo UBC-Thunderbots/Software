@@ -6,6 +6,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import CameraView, THUNDERSCOPE_HELP_TEXT
 import software.thunderscope.gl.widgets.toolbar_icons.sandbox_mode.icon_loader as icons
 from software.thunderscope.common.common_widgets import ToggleableButton
+from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 
 
 class GLFieldToolbar(GLToolbar):

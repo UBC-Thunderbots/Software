@@ -317,14 +317,14 @@ class GLWidget(QWidget):
         """
 
         # Add a menu item for the Gamecontroller toolbar
-        [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox(
+        [toolbar_checkbox, toolbar_action] = self.__setup_menu_checkbox(
             name, self.toolbars_menu
         )
         self.toolbars_menu.addAction(toolbar_action)
 
         # Connect visibility of the toolbar to the menu item
         toolbar_checkbox.stateChanged.connect(
-            lambda: self.toolbar.setVisible(toolbar_checkbox.isChecked())
+            lambda: toolbar.setVisible(toolbar_checkbox.isChecked())
         )
 
     def __setup_menu_checkbox(self, name: str, parent: QWidget, checked: bool = True):
