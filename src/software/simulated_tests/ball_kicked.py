@@ -53,7 +53,7 @@ class BallKicked(Validation):
         )
 
     def __repr__(self):
-        return "Checking that the robot kicking the ball is not touching the ball consecutively"
+        return "Checking that the ball is kicked"
 
 
 (
