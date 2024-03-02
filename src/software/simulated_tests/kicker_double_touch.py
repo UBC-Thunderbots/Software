@@ -42,7 +42,7 @@ class KickerDoubleTouch(Validation):
                 elif (
                     self.kicker_robot == robot
                     and self.other_robot is None
-                    and (ball_position - self.kick_position).length() > 0.05
+                    and (ball_position - self.kick_position).length() > KICKOFF_DOUBLE_TOUCH_M
                 ):
                     return ValidationStatus.FAILING
                 else:
