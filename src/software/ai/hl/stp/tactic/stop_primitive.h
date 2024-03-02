@@ -20,7 +20,7 @@ class StopPrimitive : public Primitive
      * @return the primitive proto message
      */
     std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
-        const World &world,
+        const WorldPtr &world_ptr,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const RobotNavigationObstacleFactory &obstacle_factory) override;
 

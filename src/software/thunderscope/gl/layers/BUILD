@@ -31,6 +31,7 @@ py_library(
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_polygon",
+        "//software/thunderscope/gl/graphics:gl_stadium",
         requirement("pyqtgraph"),
     ],
 )
@@ -119,6 +120,16 @@ py_library(
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_gradient_legend",
         "//software/thunderscope/gl/graphics:gl_heatmap",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_trail_layer",
+    srcs = ["gl_trail_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],
 )

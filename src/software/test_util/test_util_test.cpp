@@ -11,81 +11,80 @@
 
 TEST(TestUtilsTest, create_testing_world)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
-    EXPECT_EQ(Field::createSSLDivisionBField(), world.field());
-    EXPECT_EQ(Team(Duration::fromMilliseconds(1000)), world.friendlyTeam());
-    EXPECT_EQ(Team(Duration::fromMilliseconds(1000)), world.enemyTeam());
-    EXPECT_EQ(Ball(Point(), Vector(), Timestamp::fromSeconds(0)), world.ball());
+    EXPECT_EQ(Field::createSSLDivisionBField(), world->field());
+    EXPECT_EQ(Team(Duration::fromMilliseconds(1000)), world->friendlyTeam());
+    EXPECT_EQ(Team(Duration::fromMilliseconds(1000)), world->enemyTeam());
+    EXPECT_EQ(Ball(Point(), Vector(), Timestamp::fromSeconds(0)), world->ball());
 }
 
 TEST(TestUtilsTest, set_friendly_robot_positions_in_world_with_positive_number_of_robots)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
-    world = ::TestUtil::setFriendlyRobotPositions(
+    ::TestUtil::setFriendlyRobotPositions(
         world, {Point(), Point(-4, 1.2), Point(2.2, -0.1)}, Timestamp::fromSeconds(0));
 
-    EXPECT_EQ(3, world.friendlyTeam().numRobots());
-    EXPECT_EQ(0, world.enemyTeam().numRobots());
-    EXPECT_EQ(Point(), (*world.friendlyTeam().getRobotById(0)).position());
-    EXPECT_EQ(Point(-4, 1.2), (*world.friendlyTeam().getRobotById(1)).position());
-    EXPECT_EQ(Point(2.2, -0.1), (*world.friendlyTeam().getRobotById(2)).position());
-    EXPECT_EQ(std::nullopt, world.friendlyTeam().getRobotById(3));
+    EXPECT_EQ(3, world->friendlyTeam().numRobots());
+    EXPECT_EQ(0, world->enemyTeam().numRobots());
+    EXPECT_EQ(Point(), (*world->friendlyTeam().getRobotById(0)).position());
+    EXPECT_EQ(Point(-4, 1.2), (*world->friendlyTeam().getRobotById(1)).position());
+    EXPECT_EQ(Point(2.2, -0.1), (*world->friendlyTeam().getRobotById(2)).position());
+    EXPECT_EQ(std::nullopt, world->friendlyTeam().getRobotById(3));
 }
 
 TEST(TestUtilsTest, set_enemy_robot_positions_in_world_with_positive_number_of_robots)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
-    world = ::TestUtil::setEnemyRobotPositions(
-        world, {world.field().enemyGoalCenter(), world.field().friendlyCornerPos()},
+    ::TestUtil::setEnemyRobotPositions(
+        world, {world->field().enemyGoalCenter(), world->field().friendlyCornerPos()},
         Timestamp::fromSeconds(0));
 
-    EXPECT_EQ(2, world.enemyTeam().numRobots());
-    EXPECT_EQ(world.field().enemyGoalCenter(),
-              (*world.enemyTeam().getRobotById(0)).position());
-    EXPECT_EQ(world.field().friendlyCornerPos(),
-              (*world.enemyTeam().getRobotById(1)).position());
-    EXPECT_EQ(Vector(), (*world.enemyTeam().getRobotById(0)).velocity());
-    EXPECT_EQ(Angle::zero(), (*world.enemyTeam().getRobotById(0)).orientation());
+    EXPECT_EQ(2, world->enemyTeam().numRobots());
+    EXPECT_EQ(world->field().enemyGoalCenter(),
+              (*world->enemyTeam().getRobotById(0)).position());
+    EXPECT_EQ(world->field().friendlyCornerPos(),
+              (*world->enemyTeam().getRobotById(1)).position());
+    EXPECT_EQ(Vector(), (*world->enemyTeam().getRobotById(0)).velocity());
+    EXPECT_EQ(Angle::zero(), (*world->enemyTeam().getRobotById(0)).orientation());
 }
 
 TEST(TestUtilsTest, set_friendly_robot_positions_in_world_with_zero_robots)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
-    world = ::TestUtil::setFriendlyRobotPositions(world, {}, Timestamp::fromSeconds(0));
+    ::TestUtil::setFriendlyRobotPositions(world, {}, Timestamp::fromSeconds(0));
 
-    EXPECT_EQ(0, world.friendlyTeam().numRobots());
+    EXPECT_EQ(0, world->friendlyTeam().numRobots());
 }
 
 TEST(TestUtilsTest, set_enemy_robot_positions_in_world_with_zero_robots)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
-    world = ::TestUtil::setEnemyRobotPositions(world, {}, Timestamp::fromSeconds(0));
+    ::TestUtil::setEnemyRobotPositions(world, {}, Timestamp::fromSeconds(0));
 
-    EXPECT_EQ(0, world.enemyTeam().numRobots());
+    EXPECT_EQ(0, world->enemyTeam().numRobots());
 }
 
 TEST(TestUtilsTest, set_ball_position_in_world)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
-    world =
-        ::TestUtil::setBallPosition(world, Point(-0.2, 3.11), Timestamp::fromSeconds(0));
-    EXPECT_EQ(Point(-0.2, 3.11), world.ball().position());
-    EXPECT_EQ(Vector(), world.ball().velocity());
+    ::TestUtil::setBallPosition(world, Point(-0.2, 3.11), Timestamp::fromSeconds(0));
+    EXPECT_EQ(Point(-0.2, 3.11), world->ball().position());
+    EXPECT_EQ(Vector(), world->ball().velocity());
 }
 
 TEST(TestUtilsTest, set_ball_velocity_in_world)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
-    world = ::TestUtil::setBallVelocity(world, Vector(0, -2), Timestamp::fromSeconds(0));
-    EXPECT_EQ(Point(), world.ball().position());
-    EXPECT_EQ(Vector(0, -2), world.ball().velocity());
+    ::TestUtil::setBallVelocity(world, Vector(0, -2), Timestamp::fromSeconds(0));
+    EXPECT_EQ(Point(), world->ball().position());
+    EXPECT_EQ(Vector(0, -2), world->ball().velocity());
 }
 
 TEST(TestUtilsTest, test_seconds_since)
