@@ -6,6 +6,7 @@ class PassSkill : public BaseSkill<PassSkillFSM>
 {
    public:
     explicit PassSkill(std::shared_ptr<Strategy> strategy) : BaseSkill(strategy){};
-
-    double getViability(const Robot& robot, const World& world) const override;
 };
+
+// Register this Skill in the GenericFactory
+static TGenericFactory<std::string, Skill, PassSkill, std::shared_ptr<Strategy>> factory;

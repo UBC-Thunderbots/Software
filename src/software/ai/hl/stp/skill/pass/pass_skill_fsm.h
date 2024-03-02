@@ -11,6 +11,8 @@ struct PassSkillFSM
 
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
+    void takePass(const Update& event, boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -25,4 +27,4 @@ struct PassSkillFSM
             *PivotKickSkillFSM_S + Update_E / takePass_A, PivotKickSkillFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
-}
+};
