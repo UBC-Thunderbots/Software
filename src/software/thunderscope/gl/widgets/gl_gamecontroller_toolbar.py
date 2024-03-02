@@ -100,25 +100,18 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.actions_menu_button.setStyleSheet(self.get_button_style())
         self.actions_menu_button.setMenu(self.plays_menu)
 
-        # # add play items for each team color
-        # self.__add_plays_menu_items(is_blue=True)
-        # self.plays_menu.addSeparator()
-        # self.__add_plays_menu_items(is_blue=False)
-
         # disable the normal start button when no play is selected
         self.normal_start_enabled = True
         self.__toggle_normal_start_button()
 
+        self.layout().addWidget(QLabel("<b>Gamecontroller</b>"))
+        self.__add_seperator(self.layout())
         self.layout().addWidget(self.stop_button)
         self.layout().addWidget(self.halt_button)
         self.layout().addWidget(self.force_start_button)
         self.__add_seperator(self.layout())
         self.layout().addWidget(self.plays_menu_button)
         self.layout().addWidget(self.normal_start_button)
-        self.__add_seperator(self.layout())
-        self.__add_event_buttons(self.layout(), is_blue=True)
-        self.__add_seperator(self.layout())
-        self.__add_event_buttons(self.layout(), is_blue=False)
         self.layout().addStretch()
 
     def __add_seperator(self, layout: QBoxLayout) -> None:
@@ -128,20 +121,8 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param layout: the layout to add the seperator to
         """
         layout.addSpacing(10)
-        layout.addWidget(QLabel("|"))
+        layout.addWidget(QLabel("<b>|</b>"))
         layout.addSpacing(10)
-
-    def __add_event_buttons(self, layout: QBoxLayout, is_blue: bool) -> None:
-        layout.addWidget(QLabel("Blue" if is_blue else "Yellow"))
-        
-        # for arg in [
-        #     GamecontrollerEvents.RED,
-        #     GamecontrollerEvents.YELLOW,
-        #     GamecontrollerEvents.GOAL,
-        #     GamecontrollerEvents.TIMEOUT
-        # ]:
-            
-
 
     def __add_plays_menu_items(self, is_blue: bool) -> None:
         """
@@ -163,6 +144,12 @@ class GLGamecontrollerToolbar(GLToolbar):
     def __plays_menu_handler(
         self, play: GamecontrollerPlays, icon: QtGui.QIcon, is_blue: bool
     ):
+        """
+        The handler called when a play is selected. Sends the right gc command
+        based on the play we want. 
+        Updates the UI to indicate the play that was selected
+        Toggles the normal start button so we can start the play
+        """
         self.plays_menu_button.setIcon(icon)
         self.plays_menu_button.setText(play)
 
@@ -249,7 +236,7 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.plays_menu_button.setIcon(QtGui.QIcon())
 
     def __send_gc_command(
-        self, command: Command.Type, team: Team, ball_pos: Vector2 = None
+        self, command: Command.Type, team: Team
     ) -> None:
         """
         Sends the given command to the gamecontroller for the given Team
@@ -260,9 +247,4 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param ball_pos if defined, sets the position of the ball on field
         """
         command = ManualGCCommand(manual_command=Command(type=command, for_team=team))
-
-        # only set it if defined
-        if ball_pos:
-            command.final_ball_placement_point = ball_pos
-
         self.proto_unix_io.send_proto(ManualGCCommand, command)
