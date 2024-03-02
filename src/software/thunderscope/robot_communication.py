@@ -26,6 +26,7 @@ class RobotCommunication(object):
         estop_mode: EstopMode,
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
+        use_radio: bool = False
     ):
         """Initialize the communication with the robots
 
@@ -35,6 +36,7 @@ class RobotCommunication(object):
         :param estop_mode: what estop mode we are running right now, of type EstopMode
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
+        :param use_radio: Whether to use radio for communication to robots
 
         """
         self.receive_ssl_referee_proto = None
@@ -48,6 +50,8 @@ class RobotCommunication(object):
 
         self.estop_path = estop_path
         self.estop_buadrate = estop_baudrate
+
+        self.use_radio = use_radio;
 
         self.running = False
 
@@ -313,9 +317,12 @@ class RobotCommunication(object):
         )
 
         # Create multicast senders
-        self.send_primitive_set = tbots_cpp.PrimitiveSetProtoSender(
-            self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
-        )
+        if self.use_radio:
+            self.send_primitive_set = tbots_cpp.PrimitiveSetProtoRadioSender()
+        else:
+            self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
+                self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
+            )
 
         self.running = True
 

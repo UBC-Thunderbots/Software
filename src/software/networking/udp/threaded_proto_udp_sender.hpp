@@ -22,7 +22,10 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
      * @param multicast If true, joins the multicast group of given ip_address
      */
     ThreadedProtoUdpSender(const std::string& ip_address, unsigned short port,
-                           bool multicast) : ThreadedUdpSender(ip_address, port, multicast) {}
+                           bool multicast)
+        : ThreadedUdpSender(ip_address, port, multicast)
+    {
+    }
 
     /**
      * Sends a protobuf message to the initialized ip address and port

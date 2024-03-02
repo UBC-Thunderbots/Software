@@ -15,7 +15,9 @@ class ThreadedProtoUnixSender : private ThreadedUnixSender
      *
      * @param unix_path The unix socket path to send on
      */
-    ThreadedProtoUnixSender(const std::string& unix_path) : ThreadedUnixSender(unix_path) {}
+    ThreadedProtoUnixSender(const std::string& unix_path) : ThreadedUnixSender(unix_path)
+    {
+    }
 
     /**
      * Sends a protobuf message to the initialized ip address and port

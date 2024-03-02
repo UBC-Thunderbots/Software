@@ -205,6 +205,13 @@ if __name__ == "__main__":
         help="Whether to populate with default robot positions (False) or start with an empty field (True) for AI vs AI",
     )
 
+    parser.add_argument(
+        "--radio",
+        action="store_true",
+        default=False,
+        help="Whether to use radio (False) or Wi-Fi (True) for robot communication",
+    )
+
     # Sanity check that an interface was provided
     args = parser.parse_args()
 
@@ -303,6 +310,7 @@ if __name__ == "__main__":
             interface=args.interface,
             estop_mode=estop_mode,
             estop_path=estop_path,
+            radio=args.radio,
         ) as robot_communication:
 
             if estop_mode == EstopMode.KEYBOARD_ESTOP:

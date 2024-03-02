@@ -90,6 +90,7 @@ pybind_library(
         "//software/geom/algorithms",
         "//software/networking/udp:threaded_proto_udp_listener",
         "//software/networking/udp:threaded_proto_udp_sender",
+        "//software/networking/radio:threaded_proto_radio_sender",
         "//software/uart:boost_uart_communication",
         "//software/world",
         "//software/world:field",

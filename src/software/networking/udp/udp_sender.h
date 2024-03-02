@@ -25,7 +25,7 @@ class UdpSender
     UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
               unsigned short port, bool multicast);
 
-    virtual ~UdpSender();
+    ~UdpSender();
 
     /**
      * Sends a string message to the initialized ip address and port
