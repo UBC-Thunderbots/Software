@@ -17,6 +17,7 @@ class GLGamecontrollerToolbarIconLoader:
     NORMAL_START_ICON = {}
     YELLOW_ICON = None
     BLUE_ICON = None
+    OPEN_WINDOW_ICON = None
 
 
 def get_halt_icon(color: str) -> QtGui.QPixmap:
@@ -105,3 +106,18 @@ def get_blue_icon() -> QtGui.QPixmap:
         )
 
     return GLGamecontrollerToolbarIconLoader.BLUE_ICON
+
+
+def get_open_window_icon(color: str) -> QtGui.QPixmap:
+    """
+    Loads the Blue icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
+    :param color: the color the icon should be initialized with if not already created
+    :return: the icon pixmap
+    """
+    if not GLGamecontrollerToolbarIconLoader.OPEN_WINDOW_ICON:
+        GLGamecontrollerToolbarIconLoader.OPEN_WINDOW_ICON = get_icon(
+            "software/thunderscope/gl/widgets/toolbar_icons/gamecontroller/open_window.svg",
+            color,
+        )
+
+    return GLGamecontrollerToolbarIconLoader.OPEN_WINDOW_ICON

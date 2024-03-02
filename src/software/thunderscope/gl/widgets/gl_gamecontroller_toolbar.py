@@ -3,6 +3,7 @@ from pyqtgraph.Qt import QtGui
 from proto.import_all_protos import *
 from proto.ssl_gc_common_pb2 import Team as SslTeam
 from typing import Callable
+import webbrowser
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.gl.widgets.toolbar_icons.gamecontroller.icon_loader as icons
@@ -36,14 +37,19 @@ class GLGamecontrollerToolbar(GLToolbar):
     A toolbar with controls to send GameController commands from Thunderscope
     """
 
-    def __init__(self, proto_unix_io: ProtoUnixIO, friendly_color_yellow: bool):
+    GAME_CONTROLLER_URL = "http://localhost:8081"
+
+    def __init__(
+        self, parent: QWidget, proto_unix_io: ProtoUnixIO, friendly_color_yellow: bool
+    ):
         """
         Initializes the toolbar and constructs its layout
 
+        :param parent: the parent to overlay this toolbar over
         :param proto_unix_io the ProtoUnixIO object to send the manual gamecontroller commands to
         :param friendly_color_yellow True if yellow is friendly team, False if not
         """
-        super(GLGamecontrollerToolbar, self).__init__()
+        super(GLGamecontrollerToolbar, self).__init__(parent=parent)
 
         self.proto_unix_io = proto_unix_io
         self.friendly_color_yellow = friendly_color_yellow
@@ -92,13 +98,12 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.plays_menu.addSeparator()
         self.__add_plays_menu_items(is_blue=False)
 
-        # set up the menu for selecting actions
-        self.actions_menu = QMenu()
-
-        self.actions_menu_button = QPushButton()
-        self.actions_menu_button.setText("Actions")
-        self.actions_menu_button.setStyleSheet(self.get_button_style())
-        self.actions_menu_button.setMenu(self.plays_menu)
+        self.gc_browser_button = self.__setup_icon_button(
+            icons.get_open_window_icon(self.BUTTON_ICON_COLOR),
+            "Opens the SSL Gamecontroller in a browser window",
+            lambda: webbrowser.open(self.GAME_CONTROLLER_URL, new=0, autoraise=True),
+            display_text="Open GC",
+        )
 
         # disable the normal start button when no play is selected
         self.normal_start_enabled = True
@@ -112,7 +117,15 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.__add_seperator(self.layout())
         self.layout().addWidget(self.plays_menu_button)
         self.layout().addWidget(self.normal_start_button)
+        self.__add_seperator(self.layout())
+        self.layout().addWidget(self.gc_browser_button)
         self.layout().addStretch()
+
+    def refresh(self) -> None:
+        """
+        Refreshes the UI to update toolbar position
+        """
+        self.move(0, self.parentWidget().geometry().bottom() - self.height())
 
     def __add_seperator(self, layout: QBoxLayout) -> None:
         """
@@ -145,7 +158,7 @@ class GLGamecontrollerToolbar(GLToolbar):
 
     def __plays_menu_handler(
         self, play: GamecontrollerPlays, icon: QtGui.QIcon, is_blue: bool
-    ):
+    ) -> None:
         """
         The handler called when a play is selected. Sends the right gc command
         based on the play we want. 
@@ -189,7 +202,11 @@ class GLGamecontrollerToolbar(GLToolbar):
         )
 
     def __setup_icon_button(
-        self, icon: QtGui.QPixmap, tooltip: str, callback: Callable[[], None]
+        self,
+        icon: QtGui.QPixmap,
+        tooltip: str,
+        callback: Callable[[], None],
+        display_text: str = None,
     ) -> QPushButton:
         """
         Sets up a button with the given name and callback
@@ -197,6 +214,7 @@ class GLGamecontrollerToolbar(GLToolbar):
         :param icon: the icon displayed on the button
         :param tooltip: the tooltip displayed when hovering over the button
         :param callback: the callback for the button click
+        :param display_text: optional param if button needs both text and an icon
         :return: the button
         """
         button = QPushButton()
@@ -204,6 +222,9 @@ class GLGamecontrollerToolbar(GLToolbar):
         button.setToolTip(tooltip)
         button.setStyleSheet(self.get_button_style())
         button.clicked.connect(callback)
+
+        if display_text:
+            button.setText(display_text)
         return button
 
     def __send_stop_command(self) -> None:

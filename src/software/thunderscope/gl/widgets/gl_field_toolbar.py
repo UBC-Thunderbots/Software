@@ -19,6 +19,7 @@ class GLFieldToolbar(GLToolbar):
 
     def __init__(
         self,
+        parent: QWidget,
         on_camera_view_change: Callable[[CameraView], None],
         on_measure_mode: Callable[[], None],
         layers_menu: QMenu,
@@ -36,13 +37,14 @@ class GLFieldToolbar(GLToolbar):
         - Measure Mode Toggle
         - Camera View Select menu
 
+        :param parent: the parent to overlay this toolbar over
         :param on_camera_view_change: the callback function for when the camera view is changed
         :param on_measure_mode: the callback function for when measure mode is toggled
         :param layers_menu: the QMenu for the layers menu selection
         :param toolbars_menu: the QMenu for the toolbars menu selection
         :param sandbox_mode: if sandbox mode should be enabled
         """
-        super(GLFieldToolbar, self).__init__()
+        super(GLFieldToolbar, self).__init__(parent=parent)
 
         # Setup Layers button for toggling visibility of layers
         self.layers_button = QPushButton()
@@ -143,9 +145,9 @@ class GLFieldToolbar(GLToolbar):
         self.layout().addWidget(self.measure_button)
         self.layout().addWidget(self.camera_view_button)
 
-    def refresh(self):
+    def refresh(self) -> None:
         """
-        Refreshes the UI for all the toolbar icons
+        Refreshes the UI for all the toolbar icons and updates toolbar position
         """
         # update the pause button state
         simulation_state = self.simulation_state_buffer.get(
@@ -154,7 +156,7 @@ class GLFieldToolbar(GLToolbar):
         if simulation_state:
             self.toggle_pause_button(simulation_state.is_playing)
 
-    def toggle_pause_button(self, is_playing: bool):
+    def toggle_pause_button(self, is_playing: bool) -> None:
         """
         Toggles the state of the pause button by updating its text and icon
         :param is_playing: True if the button is in the Play state, False if its in the Pause state

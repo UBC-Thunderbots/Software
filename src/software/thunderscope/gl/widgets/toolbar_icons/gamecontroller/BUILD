@@ -10,6 +10,7 @@ py_library(
         ":force_start.svg",
         ":halt.svg",
         ":normal_start.svg",
+        ":open_window.svg",
         ":stop.svg",
         ":yellow.svg",
         "//software/thunderscope/gl/widgets:icon_loader",

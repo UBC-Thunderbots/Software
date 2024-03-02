@@ -14,19 +14,21 @@ class GLToolbar(QWidget):
     BUTTON_ICON_COLOR = "white"
     DISABLED_BUTTON_ICON_COLOR = "#969696"
 
-    def __init__(self):
+    def __init__(self, parent: QWidget):
         """
         Sets the base formatting for a toolbar
+
+        :param parent: the parent to overlay this toolbar over
         """
-        super(GLToolbar, self).__init__()
+        super(GLToolbar, self).__init__(parent=parent)
 
         # Setup toolbar
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        self.setStyleSheet("background-color: black;" "padding: 0px;")
+        self.setStyleSheet("background-color: rgba(0,0,0,0);" "padding: 0px;")
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
         self.setLayout(QHBoxLayout())
 
-    def refresh(self):
+    def refresh(self) -> None:
         """
         Refreshes the UI (overridden by child classes)
         """

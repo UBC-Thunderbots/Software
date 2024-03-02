@@ -1,9 +1,5 @@
 from software.thunderscope.widget_setup_functions import *
-from software.thunderscope.constants import (
-    TabNames,
-    ProtoUnixIOTypes,
-    GAME_CONTROLLER_URL,
-)
+from software.thunderscope.constants import TabNames, ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from typing import Sequence, Dict
 from software.thunderscope.thunderscope_types import (
@@ -317,11 +313,6 @@ def configure_two_ai_gamecontroller_view(
                     sandbox_mode=True,
                     extra_widgets=[],
                 ),
-            ),
-            TScopeWebTab(
-                name="Gamecontroller",
-                key=TabNames.GAMECONTROLLER,
-                url=GAME_CONTROLLER_URL,
             ),
         ],
     )

@@ -59,6 +59,13 @@ class GLWidget(QWidget):
             self.mouse_in_scene_moved
         )
 
+        # Setup layout
+        self.layout = QVBoxLayout()
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(2, 2, 2, 2)
+        self.setLayout(self.layout)
+        self.layout.addWidget(self.gl_view_widget)
+
         # Setup toolbar
         self.measure_mode_enabled = False
         self.measure_layer = None
@@ -66,6 +73,7 @@ class GLWidget(QWidget):
         self.toolbars_menu = QMenu()
         self.layers_menu_actions = {}
         self.toolbar = GLFieldToolbar(
+            parent=self.gl_view_widget,
             on_camera_view_change=self.set_camera_view,
             on_measure_mode=self.toggle_measure_mode,
             layers_menu=self.layers_menu,
@@ -75,17 +83,10 @@ class GLWidget(QWidget):
 
         # Setup gamecontroller toolbar
         self.gamecontroller_toolbar = GLGamecontrollerToolbar(
-            proto_unix_io, friendly_color_yellow
+            parent=self.gl_view_widget,
+            proto_unix_io=proto_unix_io,
+            friendly_color_yellow=friendly_color_yellow,
         )
-
-        # Setup layout
-        self.layout = QVBoxLayout()
-        self.layout.setSpacing(0)
-        self.layout.setContentsMargins(2, 2, 2, 2)
-        self.setLayout(self.layout)
-        self.layout.addWidget(self.toolbar)
-        self.layout.addWidget(self.gl_view_widget)
-        self.layout.addWidget(self.gamecontroller_toolbar)
 
         self.__add_toolbar_toggle(self.gamecontroller_toolbar, "Gamecontroller")
 
@@ -254,6 +255,7 @@ class GLWidget(QWidget):
 
         if self.toolbar:
             self.toolbar.refresh()
+            self.gamecontroller_toolbar.refresh()
 
         for layer in self.layers:
             while layer:
