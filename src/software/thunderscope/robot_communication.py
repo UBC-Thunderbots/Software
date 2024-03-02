@@ -26,7 +26,7 @@ class RobotCommunication(object):
         estop_mode: EstopMode,
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
-        enable_radio: bool = False
+        enable_radio: bool = False,
     ):
         """Initialize the communication with the robots
 
@@ -51,7 +51,7 @@ class RobotCommunication(object):
         self.estop_path = estop_path
         self.estop_buadrate = estop_baudrate
 
-        self.enable_radio = enable_radio;
+        self.enable_radio = enable_radio
 
         self.running = False
 
