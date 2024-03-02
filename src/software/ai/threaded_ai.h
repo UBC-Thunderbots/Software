@@ -56,7 +56,7 @@ class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
      *
      * @param world the new world
      */
-    void runAiAndSendPrimitives(const World& world);
+    void runAiAndSendPrimitives(const WorldPtr& world_ptr);
 
     Ai ai;
     TbotsProto::AiConfig ai_config;

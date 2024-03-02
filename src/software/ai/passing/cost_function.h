@@ -22,7 +22,7 @@
  * @return A value in [0,1] representing the quality of the pass, with 1 being an
  *         ideal pass, and 0 being the worst pass possible
  */
-double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
+double ratePass(const WorldPtr& world_ptr, const Pass& pass, const Rectangle& zone,
                 TbotsProto::PassingConfig passing_config);
 
 /**
@@ -155,5 +155,5 @@ double calculateProximityRisk(const Point& point, const Team& enemy_team,
  * The sampled values are sent over protobuf to thunderscope as a CostVisualization
  * message. These values are eventually visualized in thunderscope in the cost_vis widget
  */
-void samplePassesForVisualization(const World& world,
+void samplePassesForVisualization(const WorldPtr& world_ptr,
                                   const TbotsProto::PassingConfig& passing_config);
