@@ -15,7 +15,7 @@ AssignedTacticsPlay::AssignedTacticsPlay(TbotsProto::AiConfig config)
 }
 
 void AssignedTacticsPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                         const World &world)
+                                         const WorldPtr &world_ptr)
 {
     // This function doesn't get called so it does nothing
     while (true)
@@ -33,30 +33,30 @@ void AssignedTacticsPlay::updateControlParams(
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
-    const World &world, const InterPlayCommunication &,
+    const WorldPtr &world_ptr, const InterPlayCommunication &,
     const SetInterPlayCommunicationCallback &)
 {
     obstacle_list.Clear();
     path_visualization.Clear();
 
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
-    for (const auto &robot : world.friendlyTeam().getAllRobots())
+    for (const auto &robot : world_ptr->friendlyTeam().getAllRobots())
     {
         if (assigned_tactics.contains(robot.id()))
         {
             auto tactic = assigned_tactics.at(robot.id());
             tactic_robot_id_assignment.emplace(tactic, robot.id());
             auto motion_constraints =
-                buildMotionConstraintSet(world.gameState(), *goalie_tactic);
+                buildMotionConstraintSet(world_ptr->gameState(), *goalie_tactic);
             if (override_motion_constraints.contains(robot.id()))
             {
                 motion_constraints = override_motion_constraints.at(robot.id());
             }
-            auto primitives = tactic->get(world);
+            auto primitives = tactic->get(world_ptr);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
             auto primitive_proto = primitives[robot.id()]->generatePrimitiveProtoMessage(
-                world, motion_constraints, obstacle_factory);
+                world_ptr, motion_constraints, obstacle_factory);
             primitives_to_run->mutable_robot_primitives()->insert(
                 {robot.id(), *primitive_proto});
             tactic->setLastExecutionRobot(robot.id());
@@ -66,7 +66,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
         }
     }
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
-        world.getMostRecentTimestamp().toSeconds());
+        world_ptr->getMostRecentTimestamp().toSeconds());
 
     // Visualize all obstacles and paths
     LOG(VISUALIZE) << obstacle_list;

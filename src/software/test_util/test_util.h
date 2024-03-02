@@ -37,7 +37,7 @@ namespace TestUtil
      * with 1000 millisecond expiry buffers, and the Ball at the center of the field
      * with no velocity.
      */
-    World createBlankTestingWorld(
+    std::shared_ptr<World> createBlankTestingWorld(
         TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B);
 
     /**
@@ -49,7 +49,7 @@ namespace TestUtil
      * millisecond expiry buffers, and the Ball at the centre of the field with no
      * velocity.
      */
-    World createBlankTestingWorld(TbotsProto::Field field_proto);
+    std::shared_ptr<World> createBlankTestingWorld(TbotsProto::Field field_proto);
 
     /**
      * Returns a new World object with friendly robots in the positions specified
@@ -61,8 +61,9 @@ namespace TestUtil
      * @param robot_positions The positions to place friendly robots in
      * @return A new world object with friendly robots in the given positions
      */
-    World setFriendlyRobotPositions(World world, std::vector<Point> robot_positions,
-                                    const Timestamp &timestamp);
+    void setFriendlyRobotPositions(const std::shared_ptr<World> &world,
+                                   std::vector<Point> robot_positions,
+                                   const Timestamp &timestamp);
 
     /**
      * Returns a new World object with enemy robots in the positions specified
@@ -74,8 +75,9 @@ namespace TestUtil
      * @param robot_positions The positions to place enemy robots in
      * @return A new world object with enemy robots in the given positions
      */
-    World setEnemyRobotPositions(World world, std::vector<Point> robot_positions,
-                                 const Timestamp &timestamp);
+    void setEnemyRobotPositions(const std::shared_ptr<World> &world,
+                                std::vector<Point> robot_positions,
+                                const Timestamp &timestamp);
 
     /**
      * Returns a new World object with the Ball placed in the new position
@@ -85,7 +87,8 @@ namespace TestUtil
      * @param ball_position The new position for the ball
      * @return A new World object with the ball placed in the given position
      */
-    World setBallPosition(World world, Point ball_position, Timestamp timestamp);
+    void setBallPosition(const std::shared_ptr<World> &world, Point ball_position,
+                         Timestamp timestamp);
 
     /**
      * Returns a new World object with the Ball's velocity set to the new velocity
@@ -94,7 +97,8 @@ namespace TestUtil
      * @param ball_velocity The new velocity for the ball
      * @return A new World object with the ball's velocity set to the new velocity
      */
-    World setBallVelocity(World world, Vector ball_velocity, Timestamp timestamp);
+    void setBallVelocity(const std::shared_ptr<World> &world, Vector ball_velocity,
+                         Timestamp timestamp);
 
     /**
      * Returns a robot at the given position with zero velocity,

@@ -84,12 +84,12 @@ std::tuple<Point, Angle> DribbleFSM::calculateNextDribbleDestinationAndOrientati
 
 void DribbleFSM::getPossession(const Update &event)
 {
-    auto ball_position = event.common.world.ball().position();
+    auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
     Point intercept_position =
-        findInterceptionPoint(event.common.robot, event.common.world.ball(),
-                              event.common.world.field()) +
+        findInterceptionPoint(event.common.robot, event.common.world_ptr->ball(),
+                              event.common.world_ptr->field()) +
         Vector::createFromAngle(face_ball_orientation).normalize(0.05);
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
@@ -103,7 +103,7 @@ void DribbleFSM::dribble(const Update &event)
 {
     auto [target_destination, target_orientation] =
         calculateNextDribbleDestinationAndOrientation(
-            event.common.world.ball(), event.common.robot,
+            event.common.world_ptr->ball(), event.common.robot,
             event.control_params.dribble_destination,
             event.control_params.final_dribble_orientation);
 
@@ -116,7 +116,7 @@ void DribbleFSM::dribble(const Update &event)
 
 void DribbleFSM::loseBall(const Update &event)
 {
-    Point ball_position = event.common.world.ball().position();
+    Point ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
     Point away_from_ball_position = robotPositionToFaceBall(
@@ -133,33 +133,33 @@ void DribbleFSM::loseBall(const Update &event)
 void DribbleFSM::startDribble(const Update &event)
 {
     // update continuous_dribbling_start_point once we start dribbling
-    continuous_dribbling_start_point = event.common.world.ball().position();
+    continuous_dribbling_start_point = event.common.world_ptr->ball().position();
     dribble(event);
 }
 
 bool DribbleFSM::havePossession(const Update &event)
 {
-    return event.common.robot.isNearDribbler(event.common.world.ball().position());
+    return event.common.robot.isNearDribbler(event.common.world_ptr->ball().position());
 }
 
 bool DribbleFSM::lostPossession(const Update &event)
 {
     return !event.common.robot.isNearDribbler(
         // avoid cases where ball is exactly on the edge of the robot
-        event.common.world.ball().position(),
+        event.common.world_ptr->ball().position(),
         dribble_tactic_config.lose_ball_possession_threshold());
 };
 
 bool DribbleFSM::dribblingDone(const Update &event)
 {
     return comparePoints(
-               event.common.world.ball().position(),
-               getDribbleBallDestination(event.common.world.ball().position(),
+               event.common.world_ptr->ball().position(),
+               getDribbleBallDestination(event.common.world_ptr->ball().position(),
                                          event.control_params.dribble_destination),
                dribble_tactic_config.ball_close_to_dest_threshold()) &&
            compareAngles(
                event.common.robot.orientation(),
-               getFinalDribbleOrientation(event.common.world.ball().position(),
+               getFinalDribbleOrientation(event.common.world_ptr->ball().position(),
                                           event.common.robot.position(),
                                           event.control_params.final_dribble_orientation),
                Angle::fromDegrees(
@@ -171,7 +171,7 @@ bool DribbleFSM::dribblingDone(const Update &event)
 
 bool DribbleFSM::shouldLoseBall(const Update &event)
 {
-    Point ball_position = event.common.world.ball().position();
+    Point ball_position = event.common.world_ptr->ball().position();
     return (!event.control_params.allow_excessive_dribbling &&
             !comparePoints(ball_position, continuous_dribbling_start_point,
                            dribble_tactic_config.max_continuous_dribbling_distance()));
