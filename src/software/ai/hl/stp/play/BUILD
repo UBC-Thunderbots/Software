@@ -572,10 +572,10 @@ cc_library(
         "tactic_assignment.h",
     ],
     deps = [
+        "//software/ai/hl/stp/tactic",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/world",
         "//software/world:robot",
-        "//software/ai/hl/stp/tactic:tactic",
         "@munkres_cpp",
     ],
 )

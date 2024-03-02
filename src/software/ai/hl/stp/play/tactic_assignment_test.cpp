@@ -81,11 +81,13 @@ TEST_F(TacticAssignmentTest,
     TacticVector tactics = {move_tactic_1, move_tactic_2};
 
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto asst =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto asst = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                              robot_navigation_obstacle_factory, obstacle_list,
+                              path_visualization);
 
     EXPECT_TRUE(allTacticsAssigned(tactics, std::get<2>(asst)));
 }
@@ -110,11 +112,13 @@ TEST_F(TacticAssignmentTest,
     TacticVector tactics = {move_tactic_1, move_tactic_2};
 
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -138,14 +142,16 @@ TEST_F(TacticAssignmentTest,
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
                                        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-    TacticVector tactics = {move_tactic_1};
+    TacticVector tactics                  = {move_tactic_1};
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
-    
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -163,14 +169,16 @@ TEST_F(TacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots)
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
                                        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-    TacticVector tactics = {move_tactic_1};
+    TacticVector tactics                  = {move_tactic_1};
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
 
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -199,11 +207,13 @@ TEST_F(TacticAssignmentTest, test_correct_tactics_removed_when_more_tactics_than
     // move_tactic_2 and "slide over" to make room for robot_1
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
 
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -227,14 +237,16 @@ TEST_F(TacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
     move_tactic_1->updateControlParams(Point(2, -3.2), Angle::zero(), 0,
                                        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-    TacticVector tactics = {move_tactic_1};
+    TacticVector tactics                  = {move_tactic_1};
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
 
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -271,11 +283,13 @@ TEST_F(TacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
     // assigned to the tactic with the destination closest to their position
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
 
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -323,11 +337,13 @@ TEST_F(TacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overlap)
     // move_tactic_2 and "slide over" to make room for robot_1
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
 
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -364,11 +380,13 @@ TEST_F(TacticAssignmentTest, test_assigning_3_robots_to_2_tactics)
     // to assign to the tactics. robot_2 is too far away
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
 
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -394,15 +412,17 @@ TEST_F(TacticAssignmentTest, test_assigning_3_robots_to_3_tactics_all_with_the_s
     auto stop_tactic_2 = std::make_shared<StopTactic>();
     auto stop_tactic_3 = std::make_shared<StopTactic>();
 
-    TacticVector tactics = {stop_tactic_1, stop_tactic_2, stop_tactic_3};
+    TacticVector tactics                  = {stop_tactic_1, stop_tactic_2, stop_tactic_3};
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
 
     // If all costs are equal, the robots and tactics are simply paired in order
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -437,14 +457,16 @@ TEST_F(TacticAssignmentTest, test_assigning_3_robots_to_3_tactics_with_2_of_the_
     move_tactic_1->updateControlParams(Point(0, 0), Angle::zero(), 0,
                                        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-    TacticVector tactics = {stop_tactic_1, move_tactic_1, stop_tactic_2};
+    TacticVector tactics                  = {stop_tactic_1, move_tactic_1, stop_tactic_2};
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
 
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -476,14 +498,16 @@ TEST_F(TacticAssignmentTest,
     move_tactic_1->updateControlParams(Point(0, 0), Angle::zero(), 0,
                                        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-    TacticVector tactics = {move_tactic_1};
+    TacticVector tactics                  = {move_tactic_1};
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
 
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -568,11 +592,13 @@ TEST_F(TacticAssignmentTest, test_assigning_stop_tactics_to_unassigned_non_goali
     std::vector<Robot> expected_robots_assigned = {robot_0, robot_1, robot_2};
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
 
-    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(robot_navigation_obstacle_config);
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+        robot_navigation_obstacle_config);
     TbotsProto::ObstacleList obstacle_list;
     TbotsProto::PathVisualization path_visualization;
-    auto tup =
-        assignTactics(world, tactics, friendly_team.getAllRobots(), robot_navigation_obstacle_factory, obstacle_list, path_visualization);
+    auto tup = assignTactics(world, tactics, friendly_team.getAllRobots(),
+                             robot_navigation_obstacle_factory, obstacle_list,
+                             path_visualization);
 
     auto asst = std::get<2>(tup);
 
@@ -710,13 +736,13 @@ TEST_F(TacticAssignmentTest, test_offense_play_with_substitution)
     OffensePlay play(ai_config);
 
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
-                                                  world.field();
+    world.field();
     InterPlayCommunication comm;
-    auto p_set = play.get(world, comm,
-                          [this](InterPlayCommunication comm) {});
+    auto p_set = play.get(world, comm, [this](InterPlayCommunication comm) {});
 
     auto injured_primitive = p_set->robot_primitives().at(1);
     Point expected_pos(0, world.field().totalYLength() / 2);
-    Point injured_robot_pos = createPoint(injured_primitive.move().xy_traj_params().destination());
+    Point injured_robot_pos =
+        createPoint(injured_primitive.move().xy_traj_params().destination());
     EXPECT_EQ(expected_pos, injured_robot_pos);
 }

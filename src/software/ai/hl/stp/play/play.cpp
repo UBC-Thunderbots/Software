@@ -177,9 +177,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             auto primitives = auto_sub_tactic->get(world);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
-            auto primitive_proto =
-                primitives[robot.id()]->generatePrimitiveProtoMessage(
-                    world, motion_constraints, obstacle_factory);
+            auto primitive_proto = primitives[robot.id()]->generatePrimitiveProtoMessage(
+                world, motion_constraints, obstacle_factory);
             primitives_to_run->mutable_robot_primitives()->insert(
                 google::protobuf::MapPair(robot.id(), *primitive_proto));
             auto_sub_tactic->setLastExecutionRobot(robot.id());
@@ -217,7 +216,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
         auto [remaining_robots, new_primitives_to_assign,
               current_tactic_robot_id_assignment] =
-            assignTactics(world, tactic_vector, robots, obstacle_factory, obstacle_list, path_visualization);
+            assignTactics(world, tactic_vector, robots, obstacle_factory, obstacle_list,
+                          path_visualization);
 
         tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 

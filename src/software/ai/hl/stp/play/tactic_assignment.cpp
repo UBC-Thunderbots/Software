@@ -5,7 +5,10 @@
 std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
            std::map<std::shared_ptr<const Tactic>, RobotId>>
 assignTactics(const World &world, TacticVector tactic_vector,
-                    const std::vector<Robot> &robots_to_assign, RobotNavigationObstacleFactory obstacle_factory, TbotsProto::ObstacleList &obstacle_list, TbotsProto::PathVisualization &path_visualization)
+              const std::vector<Robot> &robots_to_assign,
+              RobotNavigationObstacleFactory obstacle_factory,
+              TbotsProto::ObstacleList &obstacle_list,
+              TbotsProto::PathVisualization &path_visualization)
 {
     std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
     size_t num_tactics     = tactic_vector.size();

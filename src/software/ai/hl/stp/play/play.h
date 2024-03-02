@@ -96,7 +96,6 @@ class Play
     virtual void updateTactics(const PlayUpdate& play_update);
 
    private:
-
     /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority. The Tactic at the beginning of the vector has the highest
