@@ -87,16 +87,7 @@ class GLWidget(QWidget):
         self.layout.addWidget(self.gl_view_widget)
         self.layout.addWidget(self.gamecontroller_toolbar)
 
-        # Add a menu item for the Gamecontroller toolbar
-        [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox(
-            "Gamecontroller", self.toolbars_menu
-        )
-        self.toolbars_menu.addAction(toolbar_action)
-
-        # Connect visibility of the toolbar to the menu item
-        toolbar_checkbox.stateChanged.connect(
-            lambda: self.gamecontroller_toolbar.setVisible(toolbar_checkbox.isChecked())
-        )
+        self.__add_toolbar_toggle(self.gamecontroller_toolbar, "Gamecontroller")
 
         # Setup replay controls if player is provided and the log has some size
         self.player = player
@@ -212,7 +203,7 @@ class GLWidget(QWidget):
         self.layers.append(layer)
 
         # Add the layer to the Layer menu
-        [layer_checkbox, layer_action] = self.setup_menu_checkbox(
+        [layer_checkbox, layer_action] = self.__setup_menu_checkbox(
             layer.name, self.layers_menu, visible
         )
         self.layers_menu_actions[layer.name] = layer_action
@@ -280,7 +271,7 @@ class GLWidget(QWidget):
         if camera_view == CameraView.ORTHOGRAPHIC:
             self.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(0, 0, 0),
-                distance=self.calc_orthographic_distance(),
+                distance=self.__calc_orthographic_distance(),
                 elevation=90,
                 azimuth=-90,
             )
@@ -317,7 +308,26 @@ class GLWidget(QWidget):
         else:
             self.remove_layer(self.measure_layer)
 
-    def setup_menu_checkbox(self, name: str, parent: QWidget, checked: bool = True):
+    def __add_toolbar_toggle(self, toolbar: QWidget, name: str):
+        """
+        Adds a button to the toolbar menu to toggle the given toolbar
+
+        :param toolbar: the toolbar to add the toggle button for
+        :param name: the display name of the toolbar
+        """
+
+        # Add a menu item for the Gamecontroller toolbar
+        [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox(
+            name, self.toolbars_menu
+        )
+        self.toolbars_menu.addAction(toolbar_action)
+
+        # Connect visibility of the toolbar to the menu item
+        toolbar_checkbox.stateChanged.connect(
+            lambda: self.toolbar.setVisible(toolbar_checkbox.isChecked())
+        )
+
+    def __setup_menu_checkbox(self, name: str, parent: QWidget, checked: bool = True):
         """
         Sets up a clickable menu checkbox with the given name
         attached to the given parent
@@ -336,7 +346,7 @@ class GLWidget(QWidget):
 
         return [layer_checkbox, layer_action]
 
-    def calc_orthographic_distance(self) -> float:
+    def __calc_orthographic_distance(self) -> float:
         """Calculates the distance of the camera above the field so that the field occupies the entire viewport"""
 
         field = DEFAULT_EMPTY_FIELD_WORLD.field

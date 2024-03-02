@@ -1,4 +1,3 @@
-import textwrap
 from typing import Callable
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Qt.QtWidgets import *
@@ -9,15 +8,13 @@ import software.thunderscope.gl.widgets.toolbar_icons.sandbox_mode.icon_loader a
 from software.thunderscope.common.common_widgets import ToggleableButton
 
 
-class GLFieldToolbar(QWidget):
+class GLFieldToolbar(GLToolbar):
     """
     Toolbar for the GL Field Widget
 
     Has buttons for measure mode, changing camera views, showing help info
     And for undoing / redoing robot state changes
     """
-
-    BUTTON_ICON_COLOR = "white"
 
     def __init__(
         self,
@@ -132,10 +129,6 @@ class GLFieldToolbar(QWidget):
             self.reset_button.setStyleSheet(self.get_button_style())
 
         # Setup toolbar
-        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        self.setStyleSheet("background-color: black;" "padding: 0px;")
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
-        self.setLayout(QHBoxLayout())
         self.layout().addWidget(self.layers_button)
         self.layout().addWidget(self.toolbars_button)
         self.layout().addStretch()
@@ -172,30 +165,6 @@ class GLFieldToolbar(QWidget):
             else icons.get_play_icon(self.BUTTON_ICON_COLOR)
         )
 
-    def get_button_style(self, is_enabled: bool = True) -> str:
-        """
-        Returns the stylesheet for a QPushButton based on if it's enabled or not
-        :param is_enabled: True if button is enabled, False if not
-        :return: the corresponding stylesheet indicating the button state
-        """
-        # the style for each toolbar button
-        return textwrap.dedent(
-            f"""
-            QPushButton {{
-                background-color: transparent;
-                border-color: transparent;
-                icon-size: 22px;
-                border-width: 4px;
-                border-radius: 4px;
-                height: 16px;
-            }}
-            QPushButton:hover {{
-                background-color: {"#363636" if is_enabled else "transparent"};
-                border-color: {"#363636" if is_enabled else "transparent"};
-            }}
-            """
-        )
-
     def toggle_undo_enabled(self, enabled: bool) -> None:
         """
         Callback function to enable / disable the undo button based on the given state
@@ -213,16 +182,3 @@ class GLFieldToolbar(QWidget):
         self.redo_button.toggle_enabled(enabled)
         self.redo_button.setStyleSheet(self.get_button_style(enabled))
         self.redo_button.repaint()
-
-    def setup_toolbars_button(self) -> None:
-        """
-        Sets up the toolbars display toggle menu
-        Where each toolbar's visibility can be toggled
-        """
-
-        # Add each toolbar to the Toolbars menu
-        [toolbar_checkbox, toolbar_action] = self.setup_menu_checkbox(
-            "Gamecontroller", self.toolbars_menu
-        )
-        self.toolbars_menu_checkboxes["Gamecontroller"] = toolbar_checkbox
-        self.toolbars_menu.addAction(toolbar_action)

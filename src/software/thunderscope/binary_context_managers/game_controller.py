@@ -39,7 +39,8 @@ class Gamecontroller(object):
         self.referee_port = self.next_free_port()
         self.ci_port = self.next_free_port()
 
-        self.manual_gc_command_buffer = ThreadSafeBuffer(
+        # this allows gamecontroller to listen to override commands
+        self.command_override_buffer = ThreadSafeBuffer(
             buffer_size=2, protobuf_type=ManualGCCommand
         )
 
@@ -85,7 +86,7 @@ class Gamecontroller(object):
         """
         Gets any manual gamecontroller commands from the buffer and executes them
         """
-        manual_command = self.manual_gc_command_buffer.get(return_cached=False)
+        manual_command = self.command_override_buffer.get(return_cached=False)
 
         while manual_command is not None:
             self.send_gc_command(
@@ -99,7 +100,7 @@ class Gamecontroller(object):
                 # as opposed to if a value exists (since a default value always exists)
                 if manual_command.HasField("final_ball_placement_point") else None,
             )
-            manual_command = self.manual_gc_command_buffer.get(return_cached=False)
+            manual_command = self.command_override_buffer.get(return_cached=False)
 
     def next_free_port(self, port: int = 40000, max_port: int = 65535) -> None:
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller
@@ -153,10 +154,10 @@ class Gamecontroller(object):
         )
 
         blue_full_system_proto_unix_io.register_observer(
-            ManualGCCommand, self.manual_gc_command_buffer
+            ManualGCCommand, self.command_override_buffer
         )
         yellow_full_system_proto_unix_io.register_observer(
-            ManualGCCommand, self.manual_gc_command_buffer
+            ManualGCCommand, self.command_override_buffer
         )
 
     def send_gc_command(
