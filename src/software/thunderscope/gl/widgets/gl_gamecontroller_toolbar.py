@@ -116,9 +116,9 @@ class GLGamecontrollerToolbar(GLToolbar):
 
     def __add_seperator(self, layout: QBoxLayout) -> None:
         """
-        Adds a seperator line with enough spacing to the given layout
+        Adds a separator line with enough spacing to the given layout
 
-        :param layout: the layout to add the seperator to
+        :param layout: the layout to add the separator to
         """
         layout.addSpacing(10)
         layout.addWidget(QLabel("<b>|</b>"))
@@ -134,12 +134,14 @@ class GLGamecontrollerToolbar(GLToolbar):
             GamecontrollerPlays.DIRECT,
             GamecontrollerPlays.INDIRECT,
             GamecontrollerPlays.KICKOFF,
-            GamecontrollerPlays.PENALTY
+            GamecontrollerPlays.PENALTY,
         ]:
             icon = icons.get_blue_icon() if is_blue else icons.get_yellow_icon()
             self.plays_menu.addAction(
-                icon, arg, lambda play=arg: self.__plays_menu_handler(play, icon, is_blue)
-            )        
+                icon,
+                arg,
+                lambda play=arg: self.__plays_menu_handler(play, icon, is_blue),
+            )
 
     def __plays_menu_handler(
         self, play: GamecontrollerPlays, icon: QtGui.QIcon, is_blue: bool
@@ -235,9 +237,7 @@ class GLGamecontrollerToolbar(GLToolbar):
             self.plays_menu_button.setText("Plays")
             self.plays_menu_button.setIcon(QtGui.QIcon())
 
-    def __send_gc_command(
-        self, command: Command.Type, team: Team
-    ) -> None:
+    def __send_gc_command(self, command: Command.Type, team: Team) -> None:
         """
         Sends the given command to the gamecontroller for the given Team
         If ball_pos is defined, sets the ball position
