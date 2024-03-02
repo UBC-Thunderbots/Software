@@ -18,7 +18,7 @@ class FrameTimeWidget(QWidget):
         self,
         buffer_counter: FrameTimeCounter,
         refresh_counter: FrameTimeCounter,
-        update_delta=0.5,
+        update_delta_sec=0.5,
     ):
         """
         Initialize FrameTimeWidget 
@@ -30,8 +30,6 @@ class FrameTimeWidget(QWidget):
         self.buffer_counter = buffer_counter
         self.refresh_counter = refresh_counter
 
-        self.fps_label = QLabel("some string to be show")
-        self.fps_label.setText("some fps: ")
         self.vertical_layout = QVBoxLayout()
 
         self.buffertime_table = QTableWidget(3, 2)
@@ -42,6 +40,8 @@ class FrameTimeWidget(QWidget):
         self.refresh_function_table.setVerticalHeaderLabels(
             ["Recent", "Last 30", "All"]
         )
+        self.buffertime_table.resizeColumnsToContents()
+        self.refresh_function_table.resizeColumnsToContents()
 
         buffertime_title = QLabel("<b> Buffertime FPS <b>")
         buffertime_title.setAlignment(PyQt6.QtCore.Qt.AlignmentFlag.AlignHCenter)
@@ -55,7 +55,7 @@ class FrameTimeWidget(QWidget):
 
         self.setLayout(self.vertical_layout)
         self.last_update_time = time.time()
-        self.update_delta = update_delta  # updating every 0.5 seconds
+        self.update_delta = update_delta_sec  # updating every 0.5 seconds
 
     def update_table(self, table, row, col, text):
         """
@@ -146,4 +146,5 @@ class FrameTimeWidget(QWidget):
         self.update_table(
             self.refresh_function_table, 2, 1, f"{refresh_func_fps_all:.1f}"
         )
+        
         self.last_update_time = time.time()

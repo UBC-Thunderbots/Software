@@ -1,23 +1,24 @@
 import time
 from PyQt6.QtWidgets import *
+import collections
 
 
 class FrameTimeCounter:
     """
     FrameTimeCounver is basically just a list that stores the time difference between each consecutive function call.
-    From that, it calcualtes the frametime of each function call.
+    From that, it calculates the frametime of each function call.
     """
 
     def __init__(self) -> None:
         """
         Initialized framtime counter
         """
-        self.datapoints = []  # stores the timeframe of every data cycle
+        self.datapoints = collections.deque(maxlen=100)  # stores the timeframe of every data cycle
         self.previous_timestamp = time.time()
 
     def add_one_datapoint(self):
         """
-        Save the time difference between each consecutative function call.
+        Save the time difference between each consecutive function call.
         """
         current_time = time.time()
         time_difference = current_time - self.previous_timestamp
@@ -50,11 +51,11 @@ class FrameTimeCounter:
 
     def get_average_last_30(self):
         """
-        Averaget the last 30 frametime
+        Average the last 30 frametime
 
         :return: the average of the last 30 frametime
         """
         if len(self.datapoints) == 0:
             return -1
 
-        return sum(self.datapoints[-30:]) / 30
+        return sum(list(self.datapoints)[-30:]) / 30

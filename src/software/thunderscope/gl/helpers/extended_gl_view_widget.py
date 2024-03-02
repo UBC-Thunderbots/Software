@@ -54,6 +54,7 @@ class ExtendedGLViewWidget(GLViewWidget):
     def __init__(self, bufferswap_counter: FrameTimeCounter = None) -> None:
         """
         Initialize the ExtendedGLViewWidget
+        bufferswap_counter: a counter that is used to track fps
 
         """
         super().__init__()
@@ -80,7 +81,6 @@ class ExtendedGLViewWidget(GLViewWidget):
         """
         addding a frameswap callback
         """
-        # adding a a
         self.bufferswap_counter.add_one_datapoint()
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
