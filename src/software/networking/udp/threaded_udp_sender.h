@@ -4,7 +4,7 @@
 #include <boost/bind.hpp>
 #include <string>
 
-#include "software/networking/udp_sender.h"
+#include "software/networking/udp/udp_sender.h"
 
 class ThreadedUdpSender
 {

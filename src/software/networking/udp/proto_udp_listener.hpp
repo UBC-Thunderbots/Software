@@ -8,7 +8,7 @@
 #include <thread>
 
 #include "software/logger/logger.h"
-#include "software/networking/proto_udp_listener.hpp"
+#include "software/networking/udp/proto_udp_listener.hpp"
 #include "software/util/typename/typename.h"
 
 template <class ReceiveProtoT>

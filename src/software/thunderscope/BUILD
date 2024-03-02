@@ -31,8 +31,8 @@ py_library(
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:software_py_proto",
         "//proto/message_translation:py_tbots_protobuf",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
+        "//software/networking/unix:threaded_unix_listener_py",
+        "//software/networking/unix:threaded_unix_sender_py",
         "//software/thunderscope:constants",
         "//software/thunderscope:dock_style",
         "//software/thunderscope:proto_unix_io",
@@ -125,8 +125,8 @@ py_library(
     srcs = ["proto_unix_io.py"],
     deps = [
         ":thread_safe_buffer",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
+        "//software/networking/unix:threaded_unix_listener_py",
+        "//software/networking/unix:threaded_unix_sender_py",
     ],
 )
 
