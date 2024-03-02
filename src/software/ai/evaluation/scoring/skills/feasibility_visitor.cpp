@@ -8,11 +8,6 @@ FeasibilityVisitor::FeasibilityVisitor(const Robot& robot, std::shared_ptr<Strat
 {
 }
 
-void FeasibilityVisitor::visit(const DribbleSkill& skill)
-{
-    return 1;
-}
-
 void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
 {
     if (world.field().pointInFriendlyHalf(robot.position()) ||

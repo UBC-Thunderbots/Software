@@ -11,7 +11,6 @@ class FeasibilityVisitor : public SkillVisitor
     public:
         FeasibilityVisitor(const Robot& robot, std::shared_ptr<Strategy> strategy, const World& world);
 
-        void visit(const DribbleSkill& skill) override;
         void visit(const KeepAwaySkill& skill) override;
         void visit(const PassSkill& skill) override;
         void visit(const ShootSkill& skill) override;
