@@ -136,7 +136,7 @@ print_status_msg "Done Setting Up Virtual Python Environment"
 print_status_msg "Fetching game controller"
 
 sudo chown -R $USER:$USER /opt/tbotspython
-sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.15.2/ssl-game-controller_v2.15.2_linux_amd64 -O /opt/tbotspython/gamecontroller
+sudo wget -N https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v3.5.4/ssl-game-controller_v3.5.4_linux_amd64 -O /opt/tbotspython/gamecontroller
 sudo chmod +x /opt/tbotspython/gamecontroller
 
 print_status_msg "Setting up TIGERS AutoRef"
