@@ -357,7 +357,8 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                 // assignment
                 auto [traj_path, primitive_proto] =
                     primitives[robot_id]->generatePrimitiveProtoMessage(
-                        world_ptr, motion_constraints, robot_trajectories, obstacle_factory);
+                        world_ptr, motion_constraints, robot_trajectories,
+                        obstacle_factory);
 
                 if (traj_path.has_value())
                 {

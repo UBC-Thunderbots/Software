@@ -71,7 +71,8 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
         enemy_team.assignGoalie(0);
 
         // Construct the world_ptr with arguments
-        world_ptr = std::make_shared<World>(World(field, ball, friendly_team, enemy_team));
+        world_ptr =
+            std::make_shared<World>(World(field, ball, friendly_team, enemy_team));
     }
 
     Timestamp current_time;
