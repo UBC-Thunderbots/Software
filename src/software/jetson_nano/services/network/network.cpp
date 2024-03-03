@@ -12,7 +12,7 @@ NetworkService::NetworkService(const std::string& ip_address,
         std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(
             ip_address, primitive_listener_port,
             boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast);
-    
+
     radio_listener_primitive_set =
         std::make_unique<ThreadedProtoRadioListener<TbotsProto::PrimitiveSet>>(
             boost::bind(&NetworkService::primitiveSetCallback, this, _1));
