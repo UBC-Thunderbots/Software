@@ -11,6 +11,7 @@ cc_library(
         "//software/logger",
         "//software/networking/udp:threaded_proto_udp_listener",
         "//software/networking/udp:threaded_proto_udp_sender",
+        "//software/networking/radio:threaded_proto_radio_listener",
         "@boost//:asio",
     ],
 )
