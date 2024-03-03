@@ -70,6 +70,7 @@ class MovePrimitive : public Primitive
      *
      * @param world_ptr Current state of the world
      * @param motion_constraints Motion constraints
+     * @param robot_trajectories A map of the friendly robots' known trajectories
      * @param obstacle_factory Obstacle factory to use
      */
     void updateObstacles(const WorldPtr &world_ptr,

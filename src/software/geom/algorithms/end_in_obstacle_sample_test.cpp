@@ -15,7 +15,7 @@ class EndInObstacleSampleTest : public testing::Test
 {
    public:
     EndInObstacleSampleTest()
-        : world(TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B)),
+        : world_ptr(TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B)),
           obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()){};
     static bool isSamplePointValid(Point point, std::vector<ObstaclePtr> obstacles)
     {
@@ -40,20 +40,20 @@ class EndInObstacleSampleTest : public testing::Test
     }
 
    protected:
-    World world;
+    WorldPtr world_ptr;
     RobotNavigationObstacleFactory obstacle_factory;
 };
 
 
 TEST_F(EndInObstacleSampleTest, test_end_outside_field_boundary)
 {
-    Field field              = world.field();
+    Field field              = world_ptr->field();
     Rectangle navigable_area = field.fieldLines();
     std::vector<ObstaclePtr> obstacles;
 
     std::vector<ObstaclePtr> field_boundary =
         obstacle_factory.createStaticObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE, field);
+            TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE, world_ptr);
     obstacles.insert(obstacles.end(), field_boundary.begin(), field_boundary.end());
 
     Point destination(4.9, 2);
@@ -69,13 +69,13 @@ TEST_F(EndInObstacleSampleTest, test_end_outside_field_boundary)
 
 TEST_F(EndInObstacleSampleTest, test_end_in_defense_area)
 {
-    Field field              = world.field();
+    Field field              = world_ptr->field();
     Rectangle navigable_area = field.fieldBoundary();
     std::vector<ObstaclePtr> obstacles;
 
     std::vector<ObstaclePtr> friendly_defense_area =
         obstacle_factory.createStaticObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, field);
+            TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, world_ptr);
     obstacles.insert(obstacles.end(), friendly_defense_area.begin(),
                      friendly_defense_area.end());
 
@@ -92,7 +92,7 @@ TEST_F(EndInObstacleSampleTest, test_end_in_defense_area)
 
 TEST_F(EndInObstacleSampleTest, test_end_outside_navigable_area)
 {
-    Field field              = world.field();
+    Field field              = world_ptr->field();
     Rectangle navigable_area = field.fieldBoundary();
     std::vector<ObstaclePtr> obstacles;
 
@@ -109,7 +109,7 @@ TEST_F(EndInObstacleSampleTest, test_end_outside_navigable_area)
 
 TEST_F(EndInObstacleSampleTest, test_end_not_in_obstacle)
 {
-    Field field              = world.field();
+    Field field              = world_ptr->field();
     Rectangle navigable_area = field.fieldLines();
     std::vector<ObstaclePtr> obstacles;
 
@@ -129,18 +129,18 @@ TEST_F(EndInObstacleSampleTest, test_end_not_in_obstacle)
 
 TEST_F(EndInObstacleSampleTest, test_sampling_performance)
 {
-    Field field              = world.field();
+    Field field              = world_ptr->field();
     Rectangle navigable_area = field.fieldLines();
     std::vector<ObstaclePtr> obstacles;
 
     std::vector<ObstaclePtr> field_boundary =
         obstacle_factory.createStaticObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE, field);
+            TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE, world_ptr);
     obstacles.insert(obstacles.end(), field_boundary.begin(), field_boundary.end());
 
     std::vector<ObstaclePtr> friendly_defense_area =
         obstacle_factory.createStaticObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, field);
+            TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, world_ptr);
     obstacles.insert(obstacles.end(), friendly_defense_area.begin(),
                      friendly_defense_area.end());
 

@@ -24,8 +24,7 @@ class Obstacle
      * Determines whether the given Point is contained within this Obstacle
      *
      * @param p Point to check if contained by obstacle
-     * @param t_sec Time in seconds into the future to check if point is contained. Must
-     * be >= 0
+     * @param t_sec Time in seconds into the future to check if point is contained.
      *
      * @return whether the Point p is contained within this Obstacle
      */
@@ -35,7 +34,7 @@ class Obstacle
      * Gets the minimum distance from the obstacle to the point
      *
      * @param p Point to get distance to
-     * @param t_sec Time in seconds into the future to get distance to. Must be >= 0
+     * @param t_sec Time in seconds into the future to get distance to.
      *
      * @return distance to point
      */
@@ -45,8 +44,7 @@ class Obstacle
      * Determines whether the given Segment intersects this Obstacle
      *
      * @param segment Segment to check if intersects with this Obstacle
-     * @param t_sec Time in seconds into the future to check if segment intersects. Must
-     * be >= 0
+     * @param t_sec Time in seconds into the future to check if segment intersects.
      *
      * @return true if the given Segment intersects this Obstacle
      */
