@@ -88,7 +88,7 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
              connection_time <= sub_trajectory.traj_path.getTotalTime();
              connection_time += SUB_DESTINATION_STEP_INTERVAL_SEC)
         {
-            ZoneScopedN("for traj");
+            ZoneScopedN("for obstacle_traj");
             // Branch off of a copy of the initial trajectory at connection_time
             // to move towards the actual destination.
             TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;

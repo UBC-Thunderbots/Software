@@ -82,7 +82,7 @@ class RobotNavigationObstacleFactory
      *
      * @return moving obstacle around the robot
      */
-     ObstaclePtr createFromMovingRobot( // TODO (NIMA): test
+     ObstaclePtr createFromMovingRobot(
      const Robot &robot, const TrajectoryPath& traj) const;
 
     /**

@@ -1,7 +1,6 @@
 #include "software/ai/navigator/obstacle/geom_obstacle.hpp"
 
 #include <gtest/gtest.h>
-#include <math.h>
 
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersects.h"

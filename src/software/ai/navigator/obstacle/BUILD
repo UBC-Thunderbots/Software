@@ -27,7 +27,7 @@ cc_library(
 )
 
 cc_library(
-    name = "trajectory_obstacle", # TODO (NIMA): Test
+    name = "trajectory_obstacle",
     hdrs = [
         "trajectory_obstacle.hpp",
     ],
@@ -72,8 +72,6 @@ cc_test(
     deps = [
         ":geom_obstacle",
         "//shared/test_util:tbots_gtest_main",
-        "//software/geom:point",
-        "//software/geom:rectangle",
     ],
 )
 
@@ -83,8 +81,15 @@ cc_test(
     deps = [
         ":const_velocity_obstacle",
         "//shared/test_util:tbots_gtest_main",
-        "//software/geom:point",
-        "//software/geom:rectangle",
+    ],
+)
+
+cc_test(
+    name = "trajectory_obstacle_test",
+    srcs = ["trajectory_obstacle_test.cpp"],
+    deps = [
+        ":trajectory_obstacle",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
