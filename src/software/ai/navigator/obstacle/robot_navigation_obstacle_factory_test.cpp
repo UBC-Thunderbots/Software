@@ -12,7 +12,7 @@
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
 #include "software/test_util/test_util.h"
-#include "software/world/robot.h"
+#include "software/world_ptr/robot.h"
 
 class RobotNavigationObstacleFactoryTest : public testing::Test
 {
@@ -42,7 +42,7 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
           ball(Point(1, 2), Vector(-0.3, 0), current_time),
           friendly_team(Duration::fromMilliseconds(1000)),
           enemy_team(Duration::fromMilliseconds(1000)),
-          world(field, ball, friendly_team, enemy_team),
+          world_ptr(std::make_shared<World>(field, ball, friendly_team, enemy_team)),
           robot_navigation_obstacle_factory(robot_navigation_obstacle_config)
     {
         robot_navigation_obstacle_config.set_robot_obstacle_inflation_factor(1.3);
@@ -70,8 +70,8 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
         enemy_team.updateRobots({enemy_robot_0, enemy_robot_1});
         enemy_team.assignGoalie(0);
 
-        // Construct the world with arguments
-        world = World(field, ball, friendly_team, enemy_team);
+        // Construct the world_ptr with arguments
+        world_ptr = std::make_shared<World>(World(field, ball, friendly_team, enemy_team));
     }
 
     Timestamp current_time;
@@ -79,7 +79,7 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
     Ball ball;
     Team friendly_team;
     Team enemy_team;
-    World world;
+    std::shared_ptr<World> world_ptr;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 };
@@ -316,7 +316,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, centre_circle)
 {
     auto obstacles =
         robot_navigation_obstacle_factory.createObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::CENTER_CIRCLE, world);
+            TbotsProto::MotionConstraint::CENTER_CIRCLE, world_ptr);
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -335,7 +335,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, half_metre_around_bal
 {
     auto obstacles =
         robot_navigation_obstacle_factory.createObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL, world);
+            TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL, world_ptr);
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -354,7 +354,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, inflated_enemy_defens
 {
     auto obstacles =
         robot_navigation_obstacle_factory.createObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world);
+            TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world_ptr);
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -373,7 +373,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_defense_area
 {
     auto obstacles =
         robot_navigation_obstacle_factory.createObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, world);
+            TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, world_ptr);
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -392,7 +392,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_defense_area)
 {
     auto obstacles =
         robot_navigation_obstacle_factory.createObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA, world);
+            TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA, world_ptr);
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -411,7 +411,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_half)
 {
     auto obstacles =
         robot_navigation_obstacle_factory.createObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::FRIENDLY_HALF, world);
+            TbotsProto::MotionConstraint::FRIENDLY_HALF, world_ptr);
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -430,7 +430,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_half)
 {
     auto obstacles =
         robot_navigation_obstacle_factory.createObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::ENEMY_HALF, world);
+            TbotsProto::MotionConstraint::ENEMY_HALF, world_ptr);
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -449,15 +449,15 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_stadiu
 {
     Ball new_ball               = Ball(Point(0, 0), Vector(0, 0), current_time);
     Point placement_point       = Point(1, 0);
-    GameState ball_placement_gs = world.gameState();
+    GameState ball_placement_gs = world_ptr->gameState();
     ball_placement_gs.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     ball_placement_gs.setBallPlacementPoint(placement_point);
     ball_placement_gs.updateBall(new_ball);
-    world.updateBall(new_ball);
-    world.updateGameState(ball_placement_gs);
+    world_ptr->updateBall(new_ball);
+    world_ptr->updateGameState(ball_placement_gs);
     auto obstacles =
         robot_navigation_obstacle_factory.createObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
+            TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world_ptr);
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -467,6 +467,33 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_stadiu
                                                    METERS_PER_MILLIMETER));
     }
 
+    catch (std::bad_cast&)
+    {
+        ADD_FAILURE() << "Stadium Obstacle was not created";
+    }
+}
+
+TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rotated)
+{
+    Ball new_ball               = Ball(Point(0, 0), Vector(0, 0), current_time);
+    Point placement_point       = Point(1, 1);
+    GameState ball_placement_gs = world_ptr->gameState();
+    ball_placement_gs.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
+    ball_placement_gs.setBallPlacementPoint(placement_point);
+    ball_placement_gs.updateBall(new_ball);
+    world_ptr->updateBall(new_ball);
+    world_ptr->updateGameState(ball_placement_gs);
+    auto obstacles =
+        robot_navigation_obstacle_factory.createDynamicObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world_ptr);
+    EXPECT_EQ(1, obstacles.size());
+    try
+    {
+        Stadium expected(Point(0, 0), Point(1, 1), 0.617);
+        auto stadium_obstacle = dynamic_cast<GeomObstacle<Stadium>&>(*obstacles[0]);
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, stadium_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
+    }
     catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Stadium Obstacle was not created";

@@ -7,7 +7,7 @@
 PassEndurancePlay::PassEndurancePlay(TbotsProto::AiConfig config) : Play(config, false) {}
 
 void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                       const World &world)
+                                       const WorldPtr &world_ptr)
 {
     std::vector<std::shared_ptr<MoveTactic>> move_tactics(NUM_ROBOTS);
     std::generate(move_tactics.begin(), move_tactics.end(),
@@ -16,7 +16,7 @@ void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
     do
     {
         TacticVector result = {};
-        if (world.gameState().isPlaying())
+        if (world_ptr->gameState().isPlaying())
         {
             // TODO (#2109): replace this example play with an actual implementation of
             // pass endurance
@@ -28,7 +28,7 @@ void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
             for (size_t k = 0; k < move_tactics.size(); k++)
             {
                 move_tactics[k]->updateControlParams(
-                    world.ball().position() +
+                    world_ptr->ball().position() +
                         Vector::createFromAngle(angle_between_robots *
                                                 static_cast<double>(k + 1)),
                     (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(),
@@ -43,7 +43,7 @@ void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
             for (size_t k = 0; k < move_tactics.size(); k++)
             {
                 auto next_position = Point(
-                    world.field().centerPoint().x(),
+                    world_ptr->field().centerPoint().x(),
                     (initial_offset + static_cast<int>(k)) * 4 * ROBOT_MAX_RADIUS_METERS);
                 move_tactics[k]->updateControlParams(
                     next_position, Angle::zero(), 0,

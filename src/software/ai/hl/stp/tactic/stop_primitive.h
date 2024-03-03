@@ -21,7 +21,7 @@ class StopPrimitive : public Primitive
      */
     std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
     generatePrimitiveProtoMessage(
-        const World &world,
+        const WorldPtr &world_ptr,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const std::map<RobotId, TrajectoryPath> &robot_trajectories,
         const RobotNavigationObstacleFactory &obstacle_factory) override;

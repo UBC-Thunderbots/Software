@@ -21,11 +21,12 @@
  * case where sampling is done
  * @param max_search_radius the max distance from point that we are allowed to sample in
  * the case where sampling is done
- * @return
+ * @return if successful, the closest point to the provided point param that is not inside
+ * an obstacle
  */
 std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr>& obstacles,
                                          const Point& point,
                                          const Rectangle& navigable_area,
                                          int initial_count = 6, double radius_step = 0.15,
                                          int samples_per_radius_step = 2,
-                                         double max_search_radius    = 4.0);
+                                         double max_search_radius    = 2.0);

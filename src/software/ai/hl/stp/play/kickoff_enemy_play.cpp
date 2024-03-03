@@ -12,7 +12,7 @@
 KickoffEnemyPlay::KickoffEnemyPlay(TbotsProto::AiConfig config) : Play(config, true) {}
 
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                      const World &world)
+                                      const WorldPtr &world_ptr)
 {
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
@@ -47,19 +47,19 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // 		+--------------------+--------------------+
 
     std::vector<Point> defense_positions = {
-        Point(world.field().friendlyGoalpostNeg().x() +
-                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              -world.field().defenseAreaYLength() / 2.0),
-        Point(world.field().friendlyGoalpostPos().x() +
-                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world.field().defenseAreaYLength() / 2.0),
-        Point(world.field().friendlyGoalCenter().x() +
-                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world.field().friendlyGoalCenter().y()),
-        Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
-              world.field().defenseAreaYLength() / 2.0),
-        Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
-              -world.field().defenseAreaYLength() / 2.0),
+        Point(world_ptr->field().friendlyGoalpostNeg().x() +
+                  world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              -world_ptr->field().defenseAreaYLength() / 2.0),
+        Point(world_ptr->field().friendlyGoalpostPos().x() +
+                  world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              world_ptr->field().defenseAreaYLength() / 2.0),
+        Point(world_ptr->field().friendlyGoalCenter().x() +
+                  world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              world_ptr->field().friendlyGoalCenter().y()),
+        Point(-(world_ptr->field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
+              world_ptr->field().defenseAreaYLength() / 2.0),
+        Point(-(world_ptr->field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
+              -world_ptr->field().defenseAreaYLength() / 2.0),
     };
     // these move tactics will be used to go to those positions
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
@@ -68,7 +68,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::make_shared<MoveTactic>()};
 
     // created an enemy_team for mutation
-    Team enemy_team = world.enemyTeam();
+    Team enemy_team = world_ptr->enemyTeam();
 
     do
     {
@@ -79,8 +79,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // team. Since the center circle is a motion constraint during enemy kickoff, the
         // shadowing robot will navigate to the closest point that it can to shadow, which
         // might not be ideal. (i.e robot won't block a straight shot on net)
-        auto robot = Team::getNearestRobot(world.enemyTeam().getAllRobots(),
-                                           world.field().centerPoint());
+        auto robot = Team::getNearestRobot(world_ptr->enemyTeam().getAllRobots(),
+                                           world_ptr->field().centerPoint());
         if (robot.has_value())
         {
             int robot_id = robot.value().id();
@@ -91,8 +91,9 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
             LOG(WARNING) << "No Robot on the Field!";
         }
 
-        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                                world.enemyTeam(), world.ball(), false);
+        auto enemy_threats =
+            getAllEnemyThreats(world_ptr->field(), world_ptr->friendlyTeam(),
+                               world_ptr->enemyTeam(), world_ptr->ball(), false);
 
         PriorityTacticVector result = {{}};
 
@@ -135,9 +136,9 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // update robot 3 to be directly between the ball and the friendly net
         move_tactics.at(defense_position_index)
             ->updateControlParams(
-                calculateBlockCone(world.field().friendlyGoalpostPos(),
-                                   world.field().friendlyGoalpostNeg(),
-                                   world.field().centerPoint(), ROBOT_MAX_RADIUS_METERS),
+                calculateBlockCone(world_ptr->field().friendlyGoalpostPos(),
+                                   world_ptr->field().friendlyGoalpostNeg(),
+                                   world_ptr->field().centerPoint(), ROBOT_MAX_RADIUS_METERS),
                 Angle::zero(), 0, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
                 TbotsProto::ObstacleAvoidanceMode::SAFE);
         result[0].emplace_back(move_tactics.at(defense_position_index));

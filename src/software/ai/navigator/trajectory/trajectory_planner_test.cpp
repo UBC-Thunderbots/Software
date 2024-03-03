@@ -73,7 +73,7 @@ class TrajectoryPlannerTest : public testing::Test
     }
 
     TrajectoryPlanner traj_planner;
-    World world;
+    std::shared_ptr<World> world;
     RobotNavigationObstacleFactory obstacle_factory;
     ObstaclePtr robot_obstacle;
     ObstaclePtr friendly_defense_area_obstacle;
@@ -97,7 +97,7 @@ TEST_F(TrajectoryPlannerTest, test_traj_avoid_robot_obstacle)
 
     auto traj_path =
         traj_planner.findTrajectory(start_pos, destination, Vector(), constraints,
-                                    obstacles, world.field().fieldBoundary());
+                                    obstacles, world->field().fieldBoundary());
 
     ASSERT_TRUE(traj_path.has_value());
     EXPECT_EQ(traj_path->getPosition(0.0), start_pos);
@@ -115,7 +115,7 @@ TEST_F(TrajectoryPlannerTest, test_traj_avoid_friendly_defense_area)
 
     auto traj_path =
         traj_planner.findTrajectory(start_pos, destination, Vector(), constraints,
-                                    obstacles, world.field().fieldBoundary());
+                                    obstacles, world->field().fieldBoundary());
 
     ASSERT_TRUE(traj_path.has_value());
     EXPECT_EQ(traj_path->getPosition(0.0), start_pos);
@@ -134,7 +134,7 @@ TEST_F(TrajectoryPlannerTest, test_traj_avoid_center_circle)
 
     auto traj_path =
         traj_planner.findTrajectory(start_pos, destination, Vector(), constraints,
-                                    obstacles, world.field().fieldBoundary());
+                                    obstacles, world->field().fieldBoundary());
 
     ASSERT_TRUE(traj_path.has_value());
     EXPECT_EQ(traj_path->getPosition(0.0), start_pos);
@@ -156,7 +156,7 @@ TEST_F(TrajectoryPlannerTest, test_traj_avoid_center_circle_and_enemy_half)
 
     auto traj_path = traj_planner.findTrajectory(start_pos, destination, Vector(),
                                                  stop_cmd_constraints, obstacles,
-                                                 world.field().fieldBoundary());
+                                                 world->field().fieldBoundary());
 
     ASSERT_TRUE(traj_path.has_value());
     EXPECT_EQ(traj_path->getPosition(0.0), start_pos);
@@ -177,7 +177,7 @@ TEST_F(TrajectoryPlannerTest, test_traj_avoid_enemy_half_and_ball_during_friendl
 
     auto traj_path = traj_planner.findTrajectory(start_pos, destination, Vector(),
                                                  stop_cmd_constraints, obstacles,
-                                                 world.field().fieldBoundary());
+                                                 world->field().fieldBoundary());
 
     ASSERT_TRUE(traj_path.has_value());
     EXPECT_EQ(traj_path->getPosition(0.0), start_pos);

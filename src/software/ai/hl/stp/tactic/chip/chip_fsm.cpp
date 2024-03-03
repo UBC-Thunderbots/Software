@@ -27,6 +27,6 @@ void ChipFSM::updateChip(const Update &event)
 
 bool ChipFSM::ballChicked(const Update &event)
 {
-    return event.common.world.ball().hasBallBeenKicked(
+    return event.common.world_ptr->ball().hasBallBeenKicked(
         event.control_params.chip_direction);
 }

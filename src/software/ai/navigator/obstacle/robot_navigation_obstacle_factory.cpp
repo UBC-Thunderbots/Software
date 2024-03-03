@@ -13,10 +13,10 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
-    const TbotsProto::MotionConstraint &motion_constraint, const World &world) const
+    const TbotsProto::MotionConstraint &motion_constraint, const WorldPtr &world_ptr) const
 {
     std::vector<ObstaclePtr> obstacles;
-    const Field &field = world.field();
+    const Field &field = world_ptr->field();
 
     switch (motion_constraint)
     {
@@ -91,19 +91,19 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
         }
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // 0.5 represents half a metre radius
-            obstacles.push_back(createFromShape(Circle(world.ball().position(), 0.5)));
+            obstacles.push_back(createFromShape(Circle(world_ptr->ball().position(), 0.5)));
             break;
         case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
-            if (world.gameState().getBallPlacementPoint().has_value())
+            if (world_ptr->gameState().getBallPlacementPoint().has_value())
             {
                 obstacles.push_back(createFromBallPlacement(
-                    world.gameState().getBallPlacementPoint().value(),
-                    world.ball().position()));
+                    world_ptr->gameState().getBallPlacementPoint().value(),
+                    world_ptr->ball().position()));
             }
             else
             {
                 obstacles.push_back(
-                    createFromShape(Circle(world.ball().position(), 0.5)));
+                    createFromShape(Circle(world_ptr->ball().position(), 0.5)));
             }
             break;
         case TbotsProto::MotionConstraint::FRIENDLY_GOAL:
@@ -141,13 +141,13 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-    const World &world) const
+    const WorldPtr &world_ptr) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)
     {
         auto new_obstacles =
-            createObstaclesFromMotionConstraint(motion_constraint, world);
+            createObstaclesFromMotionConstraint(motion_constraint, world_ptr);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 

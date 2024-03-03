@@ -27,6 +27,6 @@ void KickFSM::updateGetBehindBall(
 
 bool KickFSM::ballChicked(const Update &event)
 {
-    return event.common.world.ball().hasBallBeenKicked(
+    return event.common.world_ptr->ball().hasBallBeenKicked(
         event.control_params.kick_direction);
 }

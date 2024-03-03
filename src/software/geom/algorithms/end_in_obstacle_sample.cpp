@@ -49,6 +49,7 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
                 }
                 else
                 {
+                    closest_point_in_obstacle = true;
                     break;
                 }
 
@@ -85,7 +86,7 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
         double increment = 360.0 / samples_per_radius;
         for (int i = 0; i < samples_per_radius; i++)
         {
-            Angle angle        = Angle::fromDegrees(static_cast<float>(i) * increment);
+            Angle angle        = Angle::fromDegrees(static_cast<double>(i) * increment);
             Vector direction   = Vector::createFromAngle(angle);
             Point sample_point = point + direction * radius;
             bool sample_point_in_obstacle = false;

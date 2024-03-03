@@ -3,8 +3,8 @@
 void AttackerFSM::pivotKick(const Update& event,
                             boost::sml::back::process<PivotKickFSM::Update> processEvent)
 {
-    auto ball_position = event.common.world.ball().position();
-    Point chip_target  = event.common.world.field().enemyGoalCenter();
+    auto ball_position = event.common.world_ptr->ball().position();
+    Point chip_target  = event.common.world_ptr->field().enemyGoalCenter();
     if (event.control_params.chip_target)
     {
         chip_target = event.control_params.chip_target.value();
@@ -47,9 +47,9 @@ void AttackerFSM::keepAway(const Update& event,
     // best pass so far
     DribbleFSM::ControlParams control_params;
 
-    auto best_pass_so_far =
-        Pass(event.common.robot.position(), event.common.world.field().enemyGoalCenter(),
-             BALL_MAX_SPEED_METERS_PER_SECOND);
+    auto best_pass_so_far = Pass(event.common.robot.position(),
+                                 event.common.world_ptr->field().enemyGoalCenter(),
+                                 BALL_MAX_SPEED_METERS_PER_SECOND);
 
     if (event.control_params.best_pass_so_far)
     {
@@ -63,10 +63,10 @@ void AttackerFSM::keepAway(const Update& event,
     }
 
     auto keepaway_dribble_dest =
-        findKeepAwayTargetPoint(event.common.world, best_pass_so_far);
+        findKeepAwayTargetPoint(event.common.world_ptr, best_pass_so_far);
 
-    const auto& enemy_team = event.common.world.enemyTeam();
-    const auto& ball       = event.common.world.ball();
+    const auto& enemy_team = event.common.world_ptr->enemyTeam();
+    const auto& ball       = event.common.world_ptr->ball();
 
     auto final_dribble_orientation = best_pass_so_far.passerOrientation();
 
@@ -93,7 +93,7 @@ bool AttackerFSM::shouldKick(const Update& event)
     Circle about_to_steal_danger_zone(
         event.common.robot.position(),
         attacker_tactic_config.enemy_about_to_steal_ball_radius());
-    for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
+    for (const auto& enemy : event.common.world_ptr->enemyTeam().getAllRobots())
     {
         if (contains(about_to_steal_danger_zone, enemy.position()))
         {

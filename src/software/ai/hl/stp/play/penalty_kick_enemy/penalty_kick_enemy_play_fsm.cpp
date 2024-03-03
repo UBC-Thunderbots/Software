@@ -24,8 +24,8 @@ void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
         double y_offset = 8 * ((double)i - ((double)move_tactics.size() - 1) / 2.0) *
                           ROBOT_MAX_RADIUS_METERS;
         move_tactics.at(i)->updateControlParams(
-            Point(event.common.world.field().enemyPenaltyMark().x() + 1.75, y_offset),
-            event.common.world.field().enemyGoalCenter().toVector().orientation(), 0,
+            Point(event.common.world_ptr->field().enemyPenaltyMark().x() + 1.75, y_offset),
+            event.common.world_ptr->field().enemyGoalCenter().toVector().orientation(), 0,
             TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
             TbotsProto::ObstacleAvoidanceMode::SAFE);
     }
@@ -46,5 +46,5 @@ void PenaltyKickEnemyPlayFSM::defendKick(const Update &event)
 
 bool PenaltyKickEnemyPlayFSM::setupPositionDone(const Update &event)
 {
-    return !event.common.world.gameState().isSetupState();
+    return !event.common.world_ptr->gameState().isSetupState();
 }
