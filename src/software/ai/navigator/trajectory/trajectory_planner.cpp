@@ -1,7 +1,5 @@
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 
-#include <tracy/Tracy.hpp>
-
 #include "software/geom/algorithms/contains.h"
 
 TrajectoryPlanner::TrajectoryPlanner()
@@ -59,7 +57,6 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles,
     const Rectangle &navigable_area)
 {
-    ZoneScopedN("TrajectoryPlanner::findTrajectory");
     if (constraints.getMaxVelocity() <= 0.0 || constraints.getMaxAcceleration() <= 0.0 ||
         constraints.getMaxDeceleration() <= 0.0)
     {
@@ -79,7 +76,6 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     // and store the best trajectory path (min cost)
     for (const Point &sub_dest : getSubDestinations(start, destination, navigable_area))
     {
-        ZoneScopedN("for sub_destinations");
         // Generate a direct trajectory to the sub destination
         TrajectoryPathWithCost sub_trajectory = getDirectTrajectoryWithCost(
             start, sub_dest, initial_velocity, constraints, obstacles);
@@ -88,7 +84,6 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
              connection_time <= sub_trajectory.traj_path.getTotalTime();
              connection_time += SUB_DESTINATION_STEP_INTERVAL_SEC)
         {
-            ZoneScopedN("for obstacle_traj");
             // Branch off of a copy of the initial trajectory at connection_time
             // to move towards the actual destination.
             TrajectoryPath traj_path_to_dest = sub_trajectory.traj_path;
@@ -144,7 +139,6 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
     const std::optional<double> sub_traj_duration_s)
 {
-    ZoneScopedN("TrajectoryPlanner::getTrajectoryWithCost");
     TrajectoryPathWithCost traj_with_cost(trajectory);
 
     const double search_end_time_s =

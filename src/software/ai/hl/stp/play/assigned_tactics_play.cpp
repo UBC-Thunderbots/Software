@@ -60,7 +60,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
 
             if (traj_path.has_value())
             {
-                robot_trajectories.emplace(robot.id(), traj_path.value()); // TODO (NIMA): Robots are never removed!!! But there is no obstacle created for old robots as well since theyre not in world?!
+                robot_trajectories.emplace(robot.id(), traj_path.value());
+            }
+            else
+            {
+                robot_trajectories.erase(robot.id());
             }
 
             primitives_to_run->mutable_robot_primitives()->insert(

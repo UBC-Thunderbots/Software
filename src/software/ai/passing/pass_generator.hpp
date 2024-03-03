@@ -6,7 +6,6 @@
 #include <numeric>
 #include <random>
 #include <thread>
-#include <tracy/Tracy.hpp>
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
@@ -140,7 +139,6 @@ template <class ZoneEnum>
 PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
     const World& world)
 {
-    ZoneScopedN("generatePassEvaluation");
     // Generate sample passes for cost visualization
     if (passing_config_.cost_vis_config().generate_sample_passes())
     {

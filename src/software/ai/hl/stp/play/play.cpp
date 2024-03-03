@@ -2,8 +2,6 @@
 
 #include <munkres/munkres.h>
 
-#include <tracy/Tracy.hpp>
-
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
@@ -85,18 +83,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     const World &world, const InterPlayCommunication &inter_play_communication,
     const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
-    /**
-     * - Get a list of Primitive (dynamic_cast, std::variant, etc) from the tactics
-     * - Filter using Hungarian algorithm
-     * - Based on tactic priority, or robot id, or cost, go through primitives and
-     * generate obstacle aware trajectory.
-     *   - Obstacle factory should use Robot.traj to generate moving obstacles
-     * - Return a list of primitives + a list of trajectories
-     * - Publish trajectories to SensorFusion
-     * - SensorFusion add to Robot
-     */
-    FrameMarkNamed("Play::get");
-    ZoneScopedN("Play::get");
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =
         static_cast<unsigned int>(world.friendlyTeam().numRobots());
@@ -126,7 +112,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     {
         if (goalie_robot.has_value())
         {
-            ZoneScopedN("Assign goalie");
             RobotId goalie_robot_id = goalie_robot.value().id();
             tactic_robot_id_assignment.emplace(goalie_tactic, goalie_robot_id);
 
@@ -145,6 +130,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             if (traj_path.has_value())
             {
                 robot_trajectories.emplace(goalie_robot_id, traj_path.value());
+            }
+            else
+            {
+                robot_trajectories.erase(goalie_robot_id);
             }
 
             primitives_to_run->mutable_robot_primitives()->insert(
@@ -256,7 +245,6 @@ std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
 Play::assignTactics(const World &world, TacticVector tactic_vector,
                     const std::vector<Robot> &robots_to_assign)
 {
-    ZoneScopedN("Play::assignTactics");
     std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
     size_t num_tactics     = tactic_vector.size();
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
@@ -369,10 +357,16 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
                 auto [traj_path, primitive_proto] =
                     primitives[robot_id]->generatePrimitiveProtoMessage(
                         world, motion_constraints, robot_trajectories, obstacle_factory);
+
                 if (traj_path.has_value())
                 {
                     robot_trajectories.emplace(robot_id, traj_path.value());
                 }
+                else
+                {
+                    robot_trajectories.erase(robot_id);
+                }
+
                 primitives_to_run->mutable_robot_primitives()->insert(
                     {robot_id, *primitive_proto});
                 remaining_robots.erase(

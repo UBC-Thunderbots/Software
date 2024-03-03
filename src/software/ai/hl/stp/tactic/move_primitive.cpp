@@ -1,7 +1,5 @@
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 
-#include <tracy/Tracy.hpp>
-
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
@@ -53,7 +51,6 @@ std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
     const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
-    ZoneScopedN("MovePrimitive::generatePrimitiveProtoMessage");
     // Generate obstacle avoiding trajectory
     updateObstacles(world, motion_constraints, robot_trajectories, obstacle_factory);
 
