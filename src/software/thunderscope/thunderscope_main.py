@@ -150,6 +150,12 @@ if __name__ == "__main__":
         help="Which channel to communicate over",
     )
     parser.add_argument(
+        "--enable_radio",
+        action="store_true",
+        default=False,
+        help="Whether to use radio (True) or Wi-Fi (False) for sending primitives to robots",
+    )
+    parser.add_argument(
         "--visualization_buffer_size",
         action="store",
         type=int,
@@ -198,6 +204,7 @@ if __name__ == "__main__":
         default=False,
         help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
     )
+
     parser.add_argument(
         "--empty",
         action="store_true",
@@ -205,16 +212,9 @@ if __name__ == "__main__":
         help="Whether to populate with default robot positions (False) or start with an empty field (True) for AI vs AI",
     )
 
-    parser.add_argument(
-        "--radio",
-        action="store_true",
-        default=False,
-        help="Whether to use radio (True) or Wi-Fi (False) for sending primitives to robots",
-    )
-
-    # Sanity check that an interface was provided
     args = parser.parse_args()
 
+    # Sanity check that an interface was provided
     if args.run_blue or args.run_yellow:
         if args.interface is None:
             parser.error("Must specify interface")
@@ -310,7 +310,7 @@ if __name__ == "__main__":
             interface=args.interface,
             estop_mode=estop_mode,
             estop_path=estop_path,
-            radio=args.radio,
+            enable_radio=args.enable_radio,
         ) as robot_communication:
 
             if estop_mode == EstopMode.KEYBOARD_ESTOP:

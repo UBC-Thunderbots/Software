@@ -28,7 +28,7 @@ class ThreadedProtoRadioListener
 template <class ReceiveProtoT>
 ThreadedProtoRadioListener<ReceiveProtoT>::ThreadedProtoRadioListener(
     std::function<void(ReceiveProtoT)> receive_callback)
-    : udp_listener(receive_callback)
+    : radio_listener_(receive_callback)
 {
 }
 
