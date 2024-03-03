@@ -8,9 +8,9 @@
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/services/network/proto_tracker.h"
+#include "software/networking/radio/threaded_proto_radio_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
-#include "software/networking/radio/threaded_proto_radio_listener.hpp"
 
 class NetworkService
 {
