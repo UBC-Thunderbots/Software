@@ -67,8 +67,7 @@ class TrajectoryPlanner
      * @return The trajectory path with its cost
      */
     TrajectoryPathWithCost getTrajectoryWithCost(
-        const TrajectoryPath &trajectory,
-        const std::vector<ObstaclePtr> &obstacles,
+        const TrajectoryPath &trajectory, const std::vector<ObstaclePtr> &obstacles,
         const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
         const std::optional<double> sub_traj_duration_s);
 
@@ -99,9 +98,8 @@ class TrajectoryPlanner
      * std::numeric_limits<double>::max() and nullptr.
      */
     std::pair<double, ObstaclePtr> getFirstCollisionTime(
-        const TrajectoryPath &traj_path,
-        const std::vector<ObstaclePtr> &obstacles, const double start_time_s,
-        const double search_end_time_s) const;
+        const TrajectoryPath &traj_path, const std::vector<ObstaclePtr> &obstacles,
+        const double start_time_s, const double search_end_time_s) const;
 
     /**
      * Returns the latest time (within the search_end_time_s) at which the trajectory
@@ -144,8 +142,8 @@ class TrajectoryPlanner
     static constexpr std::array<double, 4> SUB_DESTINATION_DISTANCES_METERS = {1.1, 2.3,
                                                                                3};
     static constexpr unsigned int NUM_SUB_DESTINATION_ANGLES                = 16;
-    static constexpr Angle MIN_SUB_DESTINATION_ANGLE       = Angle::fromDegrees(20);
-    static constexpr Angle MAX_SUB_DESTINATION_ANGLE       = Angle::fromDegrees(140);
+    static constexpr Angle MIN_SUB_DESTINATION_ANGLE = Angle::fromDegrees(20);
+    static constexpr Angle MAX_SUB_DESTINATION_ANGLE = Angle::fromDegrees(140);
 
     const double SUB_DESTINATION_STEP_INTERVAL_SEC         = 0.2;
     const double COLLISION_CHECK_STEP_INTERVAL_SEC         = 0.1;

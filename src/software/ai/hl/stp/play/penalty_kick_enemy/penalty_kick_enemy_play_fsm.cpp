@@ -24,10 +24,10 @@ void PenaltyKickEnemyPlayFSM::setupPosition(const Update &event)
         double y_offset = 8 * ((double)i - ((double)move_tactics.size() - 1) / 2.0) *
                           ROBOT_MAX_RADIUS_METERS;
         move_tactics.at(i)->updateControlParams(
-                Point(event.common.world.field().enemyPenaltyMark().x() + 1.75, y_offset),
-                event.common.world.field().enemyGoalCenter().toVector().orientation(), 0,
-                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                TbotsProto::ObstacleAvoidanceMode::SAFE);
+            Point(event.common.world.field().enemyPenaltyMark().x() + 1.75, y_offset),
+            event.common.world.field().enemyGoalCenter().toVector().orientation(), 0,
+            TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
     }
 
     // Move goalie to the goal line

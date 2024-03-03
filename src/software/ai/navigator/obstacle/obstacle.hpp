@@ -21,10 +21,11 @@ class Obstacle
     virtual ~Obstacle() = default;
 
     /**
-    * Determines whether the given Point is contained within this Obstacle
+     * Determines whether the given Point is contained within this Obstacle
      *
      * @param p Point to check if contained by obstacle
-     * @param t_sec Time in seconds into the future to check if point is contained. Must be >= 0
+     * @param t_sec Time in seconds into the future to check if point is contained. Must
+     * be >= 0
      *
      * @return whether the Point p is contained within this Obstacle
      */
@@ -44,7 +45,8 @@ class Obstacle
      * Determines whether the given Segment intersects this Obstacle
      *
      * @param segment Segment to check if intersects with this Obstacle
-     * @param t_sec Time in seconds into the future to check if segment intersects. Must be >= 0
+     * @param t_sec Time in seconds into the future to check if segment intersects. Must
+     * be >= 0
      *
      * @return true if the given Segment intersects this Obstacle
      */
@@ -62,7 +64,8 @@ class Obstacle
     /**
      * Determines what coordinates on the field are blocked by this Obstacle
      *
-     * @param resolution_size The minimum size of the grid cells to rasterize the obstacle into
+     * @param resolution_size The minimum size of the grid cells to rasterize the obstacle
+     * into
      *
      * @return a set of points covered by this Obstacle
      */
@@ -78,7 +81,8 @@ class Obstacle
     /**
      * Create the axis aligned bounding box for this obstacle
      *
-     * @param inflation_radius The radius to inflate the obstacle by before creating the AABB
+     * @param inflation_radius The radius to inflate the obstacle by before creating the
+     * AABB
      *
      * @return Rectangle representing the axis aligned bounding box
      */

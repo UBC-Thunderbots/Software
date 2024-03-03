@@ -4,15 +4,15 @@
 
 #include <iostream>
 
+#include "software/ai/navigator/obstacle/const_velocity_obstacle.hpp"
+#include "software/ai/navigator/obstacle/geom_obstacle.hpp"
+#include "software/ai/navigator/obstacle/trajectory_obstacle.hpp"
 #include "software/geom/circle.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
-#include "software/ai/navigator/obstacle/geom_obstacle.hpp"
-#include "software/ai/navigator/obstacle/const_velocity_obstacle.hpp"
-#include "software/ai/navigator/obstacle/trajectory_obstacle.hpp"
 
 class RobotNavigationObstacleFactoryTest : public testing::Test
 {
@@ -123,7 +123,7 @@ TEST_F(RobotNavigationObstacleFactoryTest, static_robot_obstacle_1)
     Point origin(2.5, 4);
     Circle expected(origin, 0.207);
     ObstaclePtr obstacle =
-            robot_navigation_obstacle_factory.createStaticObstacleFromRobotPosition(origin);
+        robot_navigation_obstacle_factory.createStaticObstacleFromRobotPosition(origin);
 
     try
     {
@@ -145,7 +145,8 @@ TEST_F(RobotNavigationObstacleFactoryTest, static_robot_obstacle_2)
     Circle expected(origin, 0.207);
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
     ObstaclePtr obstacle =
-            robot_navigation_obstacle_factory.createStaticObstacleFromRobotPosition(robot.position());
+        robot_navigation_obstacle_factory.createStaticObstacleFromRobotPosition(
+            robot.position());
 
     try
     {
@@ -163,38 +164,50 @@ TEST_F(RobotNavigationObstacleFactoryTest, stadium_enemy_robot_obstacle)
 {
     Point origin(1.0, 1.0);
     Vector velocity(1.0, 0.0);
-    Robot robot = Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);
+    Robot robot =
+        Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);
     ObstaclePtr obstacle =
-            robot_navigation_obstacle_factory.createStadiumEnemyRobotObstacle(robot);
+        robot_navigation_obstacle_factory.createStadiumEnemyRobotObstacle(robot);
 
     try
     {
         auto circle_obstacle = dynamic_cast<GeomObstacle<Stadium>&>(*obstacle);
-        TestUtil::equalWithinTolerance(Stadium(origin, origin + velocity * config.dynamic_enemy_robot_obstacle_horizon_sec(), ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()), circle_obstacle.getGeom());
+        TestUtil::equalWithinTolerance(
+            Stadium(origin,
+                    origin + velocity * config.dynamic_enemy_robot_obstacle_horizon_sec(),
+                    ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()),
+            circle_obstacle.getGeom());
     }
     catch (std::bad_cast&)
     {
-        ADD_FAILURE() << "GeomObstacle<Circle>Ptr was not created for a stadium enemy robot";
+        ADD_FAILURE()
+            << "GeomObstacle<Circle>Ptr was not created for a stadium enemy robot";
     }
 }
 
 TEST_F(RobotNavigationObstacleFactoryTest, enemy_robot_obstacle_slow)
 {
     Point origin(1.0, 1.0);
-    // Speed just slightly below the minimum speed for the obstacle to be considered dynamic
+    // Speed just slightly below the minimum speed for the obstacle to be considered
+    // dynamic
     Vector velocity(config.dynamic_enemy_robot_obstacle_min_speed_mps() - 0.01, 0.0);
-    Robot robot = Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);
+    Robot robot =
+        Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);
     ObstaclePtr obstacle =
-            robot_navigation_obstacle_factory.createStadiumEnemyRobotObstacle(robot);
+        robot_navigation_obstacle_factory.createStadiumEnemyRobotObstacle(robot);
 
     try
     {
         auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
-        TestUtil::equalWithinTolerance(Circle(origin, ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()), circle_obstacle.getGeom());
+        TestUtil::equalWithinTolerance(
+            Circle(origin,
+                   ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()),
+            circle_obstacle.getGeom());
     }
     catch (std::bad_cast&)
     {
-        ADD_FAILURE() << "GeomObstacle<Circle>Ptr was not created for a stadium enemy robot";
+        ADD_FAILURE()
+            << "GeomObstacle<Circle>Ptr was not created for a stadium enemy robot";
     }
 }
 
@@ -203,18 +216,23 @@ TEST_F(RobotNavigationObstacleFactoryTest, trajectory_robot_obstacle)
     Point origin(1.0, 1.0);
     Point end(5.0, 1.0);
     Vector velocity(1.0, 0.0);
-    Robot robot = Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);
+    Robot robot =
+        Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);
 
     TrajectoryPath trajectory(std::make_shared<BangBangTrajectory2D>(
-            origin, end, velocity, KinematicConstraints(1, 1, 1)), BangBangTrajectory2D::generator);
+                                  origin, end, velocity, KinematicConstraints(1, 1, 1)),
+                              BangBangTrajectory2D::generator);
 
     ObstaclePtr obstacle =
-            robot_navigation_obstacle_factory.createFromMovingRobot(robot, trajectory);
+        robot_navigation_obstacle_factory.createFromMovingRobot(robot, trajectory);
 
     try
     {
         auto circle_obstacle = dynamic_cast<TrajectoryObstacle<Circle>&>(*obstacle);
-        TestUtil::equalWithinTolerance(Circle(origin, ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()), circle_obstacle.getGeom());
+        TestUtil::equalWithinTolerance(
+            Circle(origin,
+                   ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()),
+            circle_obstacle.getGeom());
 
         EXPECT_TRUE(obstacle->contains(origin, 0.0));
         EXPECT_FALSE(obstacle->contains(end, 0.0));
@@ -227,7 +245,8 @@ TEST_F(RobotNavigationObstacleFactoryTest, trajectory_robot_obstacle)
     }
     catch (std::bad_cast&)
     {
-        ADD_FAILURE() << "TrajectoryObstacle<Circle>Ptr was not created for a robot with trajectory";
+        ADD_FAILURE()
+            << "TrajectoryObstacle<Circle>Ptr was not created for a robot with trajectory";
     }
 }
 
@@ -235,21 +254,27 @@ TEST_F(RobotNavigationObstacleFactoryTest, const_velocity_enemy_robot_obstacle)
 {
     Point origin(1.0, 1.0);
     Vector velocity(1.0, 0.0);
-    Robot robot = Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);
+    Robot robot =
+        Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);
     ObstaclePtr obstacle =
-            robot_navigation_obstacle_factory.createConstVelocityEnemyRobotObstacle(robot);
+        robot_navigation_obstacle_factory.createConstVelocityEnemyRobotObstacle(robot);
 
     try
     {
         auto circle_obstacle = dynamic_cast<ConstVelocityObstacle<Circle>&>(*obstacle);
-        TestUtil::equalWithinTolerance(Circle(origin, ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()), circle_obstacle.getGeom());
+        TestUtil::equalWithinTolerance(
+            Circle(origin,
+                   ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()),
+            circle_obstacle.getGeom());
 
         // Verify that the obstacle has moved forward 0.3 seconds into the future
-        TestUtil::equalWithinTolerance(obstacle->distance(Point(1.3, 1.0), 0.3), 0.0, 0.001);
+        TestUtil::equalWithinTolerance(obstacle->distance(Point(1.3, 1.0), 0.3), 0.0,
+                                       0.001);
     }
     catch (std::bad_cast&)
     {
-        ADD_FAILURE() << "ConstVelocityObstacle<Circle>Ptr was not created for a const velocity enemy robot";
+        ADD_FAILURE()
+            << "ConstVelocityObstacle<Circle>Ptr was not created for a const velocity enemy robot";
     }
 }
 
@@ -259,24 +284,31 @@ TEST_F(RobotNavigationObstacleFactoryTest, trajectory_obstacle)
     Point destination(4.0, 1.0);
     Vector velocity(1.0, 0.0);
 
-    auto trajectory = std::make_shared<BangBangTrajectory2D>(origin, destination, velocity, KinematicConstraints(1.0, 1.0, 1.0));
+    auto trajectory = std::make_shared<BangBangTrajectory2D>(
+        origin, destination, velocity, KinematicConstraints(1.0, 1.0, 1.0));
     TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);
 
-    Robot robot = Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);
-    ObstaclePtr obstacle =
-            robot_navigation_obstacle_factory.createCircleWithTrajectory(Circle(origin, ROBOT_MAX_RADIUS_METERS), trajectory_path);
+    Robot robot =
+        Robot(4, origin, velocity, Angle::zero(), AngularVelocity::zero(), current_time);
+    ObstaclePtr obstacle = robot_navigation_obstacle_factory.createCircleWithTrajectory(
+        Circle(origin, ROBOT_MAX_RADIUS_METERS), trajectory_path);
 
     try
     {
         auto circle_obstacle = dynamic_cast<TrajectoryObstacle<Circle>&>(*obstacle);
-        TestUtil::equalWithinTolerance(Circle(origin, ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()), circle_obstacle.getGeom());
+        TestUtil::equalWithinTolerance(
+            Circle(origin,
+                   ROBOT_MAX_RADIUS_METERS * config.robot_obstacle_inflation_factor()),
+            circle_obstacle.getGeom());
 
         // Verify that the obstacle does move in the future
-        EXPECT_FALSE(obstacle->contains(origin - Vector(ROBOT_MAX_RADIUS_METERS, 0.0), 0.5));
+        EXPECT_FALSE(
+            obstacle->contains(origin - Vector(ROBOT_MAX_RADIUS_METERS, 0.0), 0.5));
     }
     catch (std::bad_cast&)
     {
-        ADD_FAILURE() << "TrajectoryObstacle<Circle>Ptr was not created for a trajectory obstacle";
+        ADD_FAILURE()
+            << "TrajectoryObstacle<Circle>Ptr was not created for a trajectory obstacle";
     }
 }
 

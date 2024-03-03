@@ -5,12 +5,13 @@
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/geom/algorithms/end_in_obstacle_sample.h"
 
-MovePrimitive::MovePrimitive(const Robot &robot, const Point &destination, const Angle &final_angle,
-                             const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
-                             const TbotsProto::ObstacleAvoidanceMode &obstacle_avoidance_mode,
-                             const TbotsProto::DribblerMode &dribbler_mode,
-                             const TbotsProto::BallCollisionType &ball_collision_type,
-                             const AutoChipOrKick &auto_chip_or_kick, std::optional<double> cost_override)
+MovePrimitive::MovePrimitive(
+    const Robot &robot, const Point &destination, const Angle &final_angle,
+    const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
+    const TbotsProto::ObstacleAvoidanceMode &obstacle_avoidance_mode,
+    const TbotsProto::DribblerMode &dribbler_mode,
+    const TbotsProto::BallCollisionType &ball_collision_type,
+    const AutoChipOrKick &auto_chip_or_kick, std::optional<double> cost_override)
     : robot(robot),
       destination(destination),
       final_angle(final_angle),
@@ -46,7 +47,8 @@ MovePrimitive::MovePrimitive(const Robot &robot, const Point &destination, const
     }
 }
 
-std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>> MovePrimitive::generatePrimitiveProtoMessage(
+std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
+MovePrimitive::generatePrimitiveProtoMessage(
     const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
@@ -64,32 +66,38 @@ std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
     //  passed to the planner.
     Rectangle navigable_area = world.field().fieldBoundary();
 
-    // If the robot is in a static obstacle, then we should first move to the nearest point out
-    std::optional<Point> updated_start_position = endInObstacleSample(field_obstacles, robot.position(), navigable_area);
-    if (updated_start_position.has_value() && updated_start_position.value() != robot.position())
+    // If the robot is in a static obstacle, then we should first move to the nearest
+    // point out
+    std::optional<Point> updated_start_position =
+        endInObstacleSample(field_obstacles, robot.position(), navigable_area);
+    if (updated_start_position.has_value() &&
+        updated_start_position.value() != robot.position())
     {
         destination = updated_start_position.value();
     }
     else
     {
-        std::optional<Point> updated_destination = endInObstacleSample(field_obstacles, destination, navigable_area);
+        std::optional<Point> updated_destination =
+            endInObstacleSample(field_obstacles, destination, navigable_area);
         if (updated_destination.has_value())
         {
-            // Update the destination. Note that this may be the same as the original destination.
+            // Update the destination. Note that this may be the same as the original
+            // destination.
             destination = updated_destination.value();
         }
         else
         {
             LOG(WARNING) << "Could not move the destination for robot " << robot.id()
-                         << " from " << destination << " to a point outside of the field obstacles.";
+                         << " from " << destination
+                         << " to a point outside of the field obstacles.";
         }
     }
 
-    traj_path =
-        planner.findTrajectory(robot.position(), destination, robot.velocity(),
-                               constraints, obstacles, navigable_area);
+    traj_path = planner.findTrajectory(robot.position(), destination, robot.velocity(),
+                                       constraints, obstacles, navigable_area);
 
-    // TODO (NIMA): If there's a dangerous collision ahead, we should consider returning a STOP primitive
+    // TODO (NIMA): If there's a dangerous collision ahead, we should consider returning a
+    // STOP primitive
 
     if (!traj_path.has_value())
     {
@@ -181,7 +189,8 @@ void MovePrimitive::updateObstacles(
             // robot is moving at a constant speed. The generated obstacle can also be
             // much smaller than the stadium shape obstacle, allowing the robot to move
             // more freely.
-            obstacles.push_back(obstacle_factory.createConstVelocityEnemyRobotObstacle(enemy));
+            obstacles.push_back(
+                obstacle_factory.createConstVelocityEnemyRobotObstacle(enemy));
         }
     }
 
@@ -198,7 +207,8 @@ void MovePrimitive::updateObstacles(
             else
             {
                 obstacles.push_back(
-                        obstacle_factory.createStaticObstacleFromRobotPosition(friendly.position()));
+                    obstacle_factory.createStaticObstacleFromRobotPosition(
+                        friendly.position()));
             }
         }
     }

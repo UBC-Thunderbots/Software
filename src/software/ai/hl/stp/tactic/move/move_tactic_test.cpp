@@ -33,7 +33,9 @@ TEST_F(MoveTacticTest, test_move_across_field)
          field.enemyDefenseArea().negXPosYCorner()});
 
     auto tactic = std::make_shared<MoveTactic>();
-    tactic->updateControlParams(destination, Angle::zero(), 0, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::ObstacleAvoidanceMode::SAFE);
+    tactic->updateControlParams(destination, Angle::zero(), 0,
+                                TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                                TbotsProto::ObstacleAvoidanceMode::SAFE);
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -73,8 +75,7 @@ TEST_F(MoveTacticTest, test_autochip_move)
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(
-        destination, Angle::zero(), 0,
-        TbotsProto::DribblerMode::OFF,
+        destination, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOCHIP, 2.0},
         TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED,
         TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);

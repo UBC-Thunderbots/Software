@@ -58,7 +58,7 @@ cc_library(
     srcs = ["end_in_obstacle_sample.cpp"],
     hdrs = ["end_in_obstacle_sample.h"],
     deps = [
-        "//software/ai/navigator/obstacle"
+        "//software/ai/navigator/obstacle",
     ],
 )
 

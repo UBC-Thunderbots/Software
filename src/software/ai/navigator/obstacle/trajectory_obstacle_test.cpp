@@ -5,15 +5,17 @@
 
 class TrajectoryObstacleTest : public testing::Test
 {
-public:
-    TrajectoryObstacleTest() : obstacle_traj(std::make_shared<BangBangTrajectory2D>(
-            start, end, initial_vel, KinematicConstraints(1, 1, 1)), BangBangTrajectory2D::generator),
-            obstacle(std::make_shared<TrajectoryObstacle<Circle>>(circle, obstacle_traj))
+   public:
+    TrajectoryObstacleTest()
+        : obstacle_traj(std::make_shared<BangBangTrajectory2D>(
+                            start, end, initial_vel, KinematicConstraints(1, 1, 1)),
+                        BangBangTrajectory2D::generator),
+          obstacle(std::make_shared<TrajectoryObstacle<Circle>>(circle, obstacle_traj))
     {
     }
 
-    Point start = Point(0, 0);
-    Point end = Point(4, 0);
+    Point start        = Point(0, 0);
+    Point end          = Point(4, 0);
     Vector initial_vel = Vector(0, 0);
     TrajectoryPath obstacle_traj;
 
@@ -44,7 +46,7 @@ TEST_F(TrajectoryObstacleTest, circle_obstacle_distance)
     EXPECT_EQ(obstacle->distance(Point(-radius - 3, 0), 0.0), 3);
 
     // Half-way along the trajectory
-    double half_way = obstacle_traj.getTotalTime() / 2.0;
+    double half_way      = obstacle_traj.getTotalTime() / 2.0;
     Point half_way_point = obstacle_traj.getPosition(half_way);
     EXPECT_EQ(obstacle->distance(half_way_point + Vector(radius + 3, 0.0), half_way), 3);
     EXPECT_EQ(obstacle->distance(half_way_point + Vector(-radius - 3, 0.0), half_way), 3);
@@ -65,10 +67,11 @@ TEST_F(TrajectoryObstacleTest, circle_obstacle_intersects)
     EXPECT_TRUE(obstacle->intersects(segment_start, 0.0));
     EXPECT_FALSE(obstacle->intersects(segment_end, 0.0));
 
-    // Half-way, the obstacle should have moved and not intersecting start and end segments
-    double half_way = obstacle_traj.getTotalTime() / 2.0;
+    // Half-way, the obstacle should have moved and not intersecting start and end
+    // segments
+    double half_way          = obstacle_traj.getTotalTime() / 2.0;
     Segment half_way_segment = Segment(obstacle_traj.getPosition(half_way) + offset,
-                                             obstacle_traj.getPosition(half_way) - offset);
+                                       obstacle_traj.getPosition(half_way) - offset);
     EXPECT_TRUE(obstacle->intersects(half_way_segment, half_way));
     EXPECT_FALSE(obstacle->intersects(segment_start, half_way));
     EXPECT_FALSE(obstacle->intersects(segment_end, half_way));

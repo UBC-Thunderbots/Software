@@ -1,11 +1,11 @@
 #pragma once
 
 #include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/geom/algorithms/rasterize.h"
-#include "software/geom/algorithms/closest_point.h"
 
 template <typename GEOM_TYPE>
 class GeomObstacle : public Obstacle

@@ -30,7 +30,9 @@ class TrajectoryObstacle : public GeomObstacle<GEOM_TYPE>
 
 
 template <typename GEOM_TYPE>
-TrajectoryObstacle<GEOM_TYPE>::TrajectoryObstacle(const GEOM_TYPE& geom, TrajectoryPath traj) : GeomObstacle<GEOM_TYPE>(geom), traj_(std::move(traj))
+TrajectoryObstacle<GEOM_TYPE>::TrajectoryObstacle(const GEOM_TYPE& geom,
+                                                  TrajectoryPath traj)
+    : GeomObstacle<GEOM_TYPE>(geom), traj_(std::move(traj))
 {
 }
 
@@ -67,7 +69,8 @@ double TrajectoryObstacle<GEOM_TYPE>::distance(const Point& p, const double t_se
 }
 
 template <typename GEOM_TYPE>
-bool TrajectoryObstacle<GEOM_TYPE>::intersects(const Segment& segment, const double t_sec) const
+bool TrajectoryObstacle<GEOM_TYPE>::intersects(const Segment& segment,
+                                               const double t_sec) const
 {
     if (t_sec == 0)
     {

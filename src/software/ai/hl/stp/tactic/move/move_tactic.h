@@ -28,8 +28,8 @@ class MoveTactic : public Tactic
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      * @param target_spin_rev_per_s The target spin while moving in revolutions per second
      */
-    void updateControlParams(Point destination, Angle final_orientation, double final_speed,
-                             TbotsProto::DribblerMode dribbler_mode,
+    void updateControlParams(Point destination, Angle final_orientation,
+                             double final_speed, TbotsProto::DribblerMode dribbler_mode,
                              TbotsProto::BallCollisionType ball_collision_type,
                              AutoChipOrKick auto_chip_or_kick,
                              TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
@@ -46,7 +46,8 @@ class MoveTactic : public Tactic
      * @param final_speed The final speed the robot should have at the destination
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
-    void updateControlParams(Point destination, Angle final_orientation, double final_speed,
+    void updateControlParams(Point destination, Angle final_orientation,
+                             double final_speed,
                              TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
                              TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode);
 

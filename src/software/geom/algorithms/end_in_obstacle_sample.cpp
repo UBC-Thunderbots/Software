@@ -1,8 +1,8 @@
 #include "software/geom/algorithms/end_in_obstacle_sample.h"
 
 #include "software/ai/navigator/obstacle/obstacle.hpp"
-#include "software/geom/point.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/point.h"
 
 static constexpr double OBSTACLE_AVOIDANCE_BUFFER_CENTIMETERS = 0.01;
 

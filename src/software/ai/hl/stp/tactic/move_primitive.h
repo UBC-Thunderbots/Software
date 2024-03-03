@@ -45,10 +45,12 @@ class MovePrimitive : public Primitive
      * @param obstacle_factory Obstacle factory to use for generating obstacles
      * @return A pair of the found trajectory (optional) and the primitive proto message
      */
-    std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>> generatePrimitiveProtoMessage(
-            const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-            const std::map<RobotId, TrajectoryPath> &robot_trajectories,
-            const RobotNavigationObstacleFactory &obstacle_factory) override;
+    std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
+    generatePrimitiveProtoMessage(
+        const World &world,
+        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+        const std::map<RobotId, TrajectoryPath> &robot_trajectories,
+        const RobotNavigationObstacleFactory &obstacle_factory) override;
 
     /**
      * Fill the obstacle list and path visualization with the obstacles and path
@@ -70,11 +72,10 @@ class MovePrimitive : public Primitive
      * @param motion_constraints Motion constraints
      * @param obstacle_factory Obstacle factory to use
      */
-    void updateObstacles(
-        const World &world,
-        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const std::map<RobotId, TrajectoryPath> &robot_trajectories,
-        const RobotNavigationObstacleFactory &obstacle_factory);
+    void updateObstacles(const World &world,
+                         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+                         const std::map<RobotId, TrajectoryPath> &robot_trajectories,
+                         const RobotNavigationObstacleFactory &obstacle_factory);
 
     Robot robot;
     Point destination;

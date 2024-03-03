@@ -23,9 +23,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive)
     std::shared_ptr<MovePrimitive> move_primitive = std::make_shared<MovePrimitive>(
         robot, destination, Angle::threeQuarter(),
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::SAFE,
-        TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::AVOID,
-        AutoChipOrKick(), std::optional<double>());
+        TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::INDEFINITE,
+        TbotsProto::BallCollisionType::AVOID, AutoChipOrKick(), std::optional<double>());
 
     EXPECT_GT(move_primitive->getEstimatedPrimitiveCost(), 0.0);
 
@@ -62,9 +61,8 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_sub_destination)
     std::shared_ptr<MovePrimitive> primitive = std::make_shared<MovePrimitive>(
         robot, destination, Angle::threeQuarter(),
         TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-        TbotsProto::ObstacleAvoidanceMode::SAFE,
-        TbotsProto::DribblerMode::INDEFINITE, TbotsProto::BallCollisionType::AVOID,
-        AutoChipOrKick(), std::optional<double>());
+        TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::INDEFINITE,
+        TbotsProto::BallCollisionType::AVOID, AutoChipOrKick(), std::optional<double>());
 
     EXPECT_GT(primitive->getEstimatedPrimitiveCost(), 0.0);
 

@@ -123,10 +123,10 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 // enemies, we move the rest of the robots to the defense positions
                 // listed above
                 move_tactics.at(defense_position_index)
-                        ->updateControlParams(defense_positions.at(defense_position_index),
-                                              Angle::zero(), 0,
-                                              TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                                              TbotsProto::ObstacleAvoidanceMode::SAFE);
+                    ->updateControlParams(defense_positions.at(defense_position_index),
+                                          Angle::zero(), 0,
+                                          TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                                          TbotsProto::ObstacleAvoidanceMode::SAFE);
                 result[0].emplace_back(move_tactics.at(defense_position_index));
                 defense_position_index++;
             }
@@ -134,12 +134,12 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // update robot 3 to be directly between the ball and the friendly net
         move_tactics.at(defense_position_index)
-                ->updateControlParams(
-                        calculateBlockCone(world.field().friendlyGoalpostPos(),
-                                           world.field().friendlyGoalpostNeg(),
-                                           world.field().centerPoint(), ROBOT_MAX_RADIUS_METERS),
-                        Angle::zero(), 0, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                        TbotsProto::ObstacleAvoidanceMode::SAFE);
+            ->updateControlParams(
+                calculateBlockCone(world.field().friendlyGoalpostPos(),
+                                   world.field().friendlyGoalpostNeg(),
+                                   world.field().centerPoint(), ROBOT_MAX_RADIUS_METERS),
+                Angle::zero(), 0, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
         result[0].emplace_back(move_tactics.at(defense_position_index));
 
         // yield the Tactics this Play wants to run, in order of priority

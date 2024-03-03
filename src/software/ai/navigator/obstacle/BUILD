@@ -8,8 +8,8 @@ cc_library(
     ],
     deps = [
         ":obstacle_visitor",
-        "//software/geom/algorithms:algorithms",
         "//proto/message_translation:tbots_protobuf",
+        "//software/geom/algorithms",
     ],
 )
 
@@ -57,8 +57,8 @@ cc_library(
     srcs = ["robot_navigation_obstacle_factory.cpp"],
     hdrs = ["robot_navigation_obstacle_factory.h"],
     deps = [
-        ":trajectory_obstacle",
         ":const_velocity_obstacle",
+        ":trajectory_obstacle",
         "//proto:tbots_cc_proto",
         "//software/geom:point",
         "//software/logger",

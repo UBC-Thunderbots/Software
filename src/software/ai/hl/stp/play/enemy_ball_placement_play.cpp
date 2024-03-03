@@ -80,17 +80,17 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         if (!enemy_at_ball)
         {
             move_tactics[0]->updateControlParams(
-                    world.ball().position() + ball_to_net +
+                world.ball().position() + ball_to_net +
                     ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
-                    ball_to_net.orientation() + Angle::half(), 0,
-                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                    TbotsProto::ObstacleAvoidanceMode::SAFE);
+                ball_to_net.orientation() + Angle::half(), 0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
             move_tactics[1]->updateControlParams(
-                    world.ball().position() + ball_to_net -
+                world.ball().position() + ball_to_net -
                     ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
-                    ball_to_net.orientation() + Angle::half(), 0,
-                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                    TbotsProto::ObstacleAvoidanceMode::SAFE);
+                ball_to_net.orientation() + Angle::half(), 0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
             tactics_to_run[0].emplace_back(move_tactics[0]);
             tactics_to_run[0].emplace_back(move_tactics[1]);
         }
@@ -98,19 +98,19 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         else if (enemy_threats.size() == 0)
         {
             move_tactics[0]->updateControlParams(
-                    placement_point + placement_to_net +
+                placement_point + placement_to_net +
                     placement_to_net.perpendicular().normalize(1.25 *
                                                                ROBOT_MAX_RADIUS_METERS),
-                    placement_to_net.orientation() + Angle::half(), 0,
-                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                    TbotsProto::ObstacleAvoidanceMode::SAFE);
+                placement_to_net.orientation() + Angle::half(), 0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
             move_tactics[1]->updateControlParams(
-                    placement_point + placement_to_net -
+                placement_point + placement_to_net -
                     placement_to_net.perpendicular().normalize(1.25 *
                                                                ROBOT_MAX_RADIUS_METERS),
-                    placement_to_net.orientation() + Angle::half(), 0,
-                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                    TbotsProto::ObstacleAvoidanceMode::SAFE);
+                placement_to_net.orientation() + Angle::half(), 0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
             tactics_to_run[0].emplace_back(move_tactics[0]);
             tactics_to_run[0].emplace_back(move_tactics[1]);
         }
@@ -118,10 +118,10 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         else
         {
             move_tactics[0]->updateControlParams(
-                    placement_point + placement_to_net,
-                    placement_to_net.orientation() + Angle::half(), 0,
-                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                    TbotsProto::ObstacleAvoidanceMode::SAFE);
+                placement_point + placement_to_net,
+                placement_to_net.orientation() + Angle::half(), 0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
             // We need a big shadow distance to avoid "bullying" the robot ball placing.
             // Otherwise, we get a penalty
             shadow_enemy->updateControlParams(

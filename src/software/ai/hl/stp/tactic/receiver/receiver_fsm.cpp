@@ -122,8 +122,8 @@ void ReceiverFSM::updateOnetouch(const Update& event)
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, one_touch.getPointToShootAt(), one_touch.getOpenAngle(),
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
-            TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                            BALL_MAX_SPEED_METERS_PER_SECOND}));
     }

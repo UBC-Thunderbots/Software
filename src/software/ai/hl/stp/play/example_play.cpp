@@ -21,12 +21,12 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         for (size_t k = 0; k < move_tactics.size(); k++)
         {
             move_tactics[k]->updateControlParams(
-                    world.ball().position() +
+                world.ball().position() +
                     Vector::createFromAngle(angle_between_robots *
                                             static_cast<double>(k + 1)),
-                    (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(), 0,
-                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                    TbotsProto::ObstacleAvoidanceMode::SAFE);
+                (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(), 0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
         }
 
         // yield the Tactics this Play wants to run, in order of priority

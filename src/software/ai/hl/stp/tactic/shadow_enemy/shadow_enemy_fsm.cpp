@@ -98,15 +98,15 @@ void ShadowEnemyFSM::blockShot(const Update &event,
     };
 
     MoveFSM::ControlParams control_params{
-        .destination            = position_to_block,
-        .final_orientation      = face_ball_orientation,
-        .final_speed            = 0.0,
-        .dribbler_mode          = TbotsProto::DribblerMode::OFF,
-        .ball_collision_type    = TbotsProto::BallCollisionType::AVOID,
-        .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        .destination             = position_to_block,
+        .final_orientation       = face_ball_orientation,
+        .final_speed             = 0.0,
+        .dribbler_mode           = TbotsProto::DribblerMode::OFF,
+        .ball_collision_type     = TbotsProto::BallCollisionType::AVOID,
+        .auto_chip_or_kick       = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        .max_allowed_speed_mode  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
-        .target_spin_rev_per_s  = 0.0};
+        .target_spin_rev_per_s   = 0.0};
 
     processEvent(MoveFSM::Update(control_params, event.common));
 }
@@ -120,7 +120,7 @@ void ShadowEnemyFSM::stealAndChip(const Update &event)
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, ball_position, face_ball_orientation,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::SAFE,
-        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::MAX_FORCE,
+        TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
 }

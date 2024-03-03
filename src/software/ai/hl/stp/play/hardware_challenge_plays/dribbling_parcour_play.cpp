@@ -28,9 +28,10 @@ void DribblingParcourPlay::getNextTactics(TacticCoroutine::push_type &yield,
         }
         else
         {
-            move_tactic->updateControlParams(Point(0, 0), Angle::zero(), 0.0,
-                                             TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                                             TbotsProto::ObstacleAvoidanceMode::SAFE);
+            move_tactic->updateControlParams(
+                Point(0, 0), Angle::zero(), 0.0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
             result.emplace_back(move_tactic);
         }
         yield({result});

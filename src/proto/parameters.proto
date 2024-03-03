@@ -355,28 +355,19 @@ message RobotNavigationObstacleConfig
     ];
 
     // The additional inflation amount (in meters) for the enemy defense area
-    required double enemy_defense_area_additional_inflation_meters = 2 [
-        default                   = 0.3,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 1.0
-    ];
+    required double enemy_defense_area_additional_inflation_meters = 2
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     // The minimum velocity of an enemy robot for it to be considered
     // as a dynamic obstacle. Below this speed, the robot is considered
     // to be stationary.
-    required double dynamic_enemy_robot_obstacle_min_speed_mps = 3 [
-        default                   = 0.5,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 3.0
-    ];
+    required double dynamic_enemy_robot_obstacle_min_speed_mps = 3
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
 
     // The maximum time into the future that we will predict the enemy
     // robot's position for obstacle avoidance
-    required double dynamic_enemy_robot_obstacle_horizon_sec = 4 [
-        default                   = 0.4,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 2.0
-    ];
+    required double dynamic_enemy_robot_obstacle_horizon_sec = 4
+        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 }
 
 message CostVisualizationConfig

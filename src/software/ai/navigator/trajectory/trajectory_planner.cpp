@@ -124,18 +124,17 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
 
 TrajectoryPathWithCost TrajectoryPlanner::getDirectTrajectoryWithCost(
     const Point &start, const Point &destination, const Vector &initial_velocity,
-    const KinematicConstraints &constraints,
-    const std::vector<ObstaclePtr> &obstacles)
+    const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles)
 {
     return getTrajectoryWithCost(
         TrajectoryPath(std::make_shared<BangBangTrajectory2D>(
                            start, destination, initial_velocity, constraints),
-                       BangBangTrajectory2D::generator), obstacles, std::nullopt, std::nullopt);
+                       BangBangTrajectory2D::generator),
+        obstacles, std::nullopt, std::nullopt);
 }
 
 TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
-    const TrajectoryPath &trajectory,
-    const std::vector<ObstaclePtr> &obstacles,
+    const TrajectoryPath &trajectory, const std::vector<ObstaclePtr> &obstacles,
     const std::optional<TrajectoryPathWithCost> &sub_traj_with_cost,
     const std::optional<double> sub_traj_duration_s)
 {
@@ -157,16 +156,16 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     }
     else
     {
-        first_non_collision_time = getFirstNonCollisionTime(
-            trajectory, obstacles, search_end_time_s);
+        first_non_collision_time =
+            getFirstNonCollisionTime(trajectory, obstacles, search_end_time_s);
     }
     traj_with_cost.collision_duration_front_s = first_non_collision_time;
 
     /**
      * Find the duration we're within an obstacle before search_end_time_s
      */
-    double last_non_collision_time = getLastNonCollisionTime(
-        trajectory, obstacles, search_end_time_s);
+    double last_non_collision_time =
+        getLastNonCollisionTime(trajectory, obstacles, search_end_time_s);
     traj_with_cost.collision_duration_back_s =
         search_end_time_s - last_non_collision_time;
 
@@ -183,9 +182,8 @@ TrajectoryPathWithCost TrajectoryPlanner::getTrajectoryWithCost(
     }
     else
     {
-        std::pair<double, ObstaclePtr> collision =
-            getFirstCollisionTime(trajectory, obstacles,
-                                  first_non_collision_time, last_non_collision_time);
+        std::pair<double, ObstaclePtr> collision = getFirstCollisionTime(
+            trajectory, obstacles, first_non_collision_time, last_non_collision_time);
         traj_with_cost.first_collision_time_s = collision.first;
         traj_with_cost.colliding_obstacle     = collision.second;
     }
@@ -225,8 +223,8 @@ double TrajectoryPlanner::calculateCost(
 }
 
 double TrajectoryPlanner::getFirstNonCollisionTime(
-    const TrajectoryPath &traj_path,
-    const std::vector<ObstaclePtr> &obstacles, const double search_end_time_s) const
+    const TrajectoryPath &traj_path, const std::vector<ObstaclePtr> &obstacles,
+    const double search_end_time_s) const
 {
     double path_duration = traj_path.getTotalTime();
     for (double time = 0.0; time <= search_end_time_s;
@@ -252,9 +250,8 @@ double TrajectoryPlanner::getFirstNonCollisionTime(
 }
 
 std::pair<double, ObstaclePtr> TrajectoryPlanner::getFirstCollisionTime(
-    const TrajectoryPath &traj_path,
-    const std::vector<ObstaclePtr> &obstacles, const double start_time_s,
-    const double search_end_time_s) const
+    const TrajectoryPath &traj_path, const std::vector<ObstaclePtr> &obstacles,
+    const double start_time_s, const double search_end_time_s) const
 {
     for (double time = start_time_s; time <= search_end_time_s;
          time += COLLISION_CHECK_STEP_INTERVAL_SEC)
@@ -274,8 +271,8 @@ std::pair<double, ObstaclePtr> TrajectoryPlanner::getFirstCollisionTime(
 }
 
 double TrajectoryPlanner::getLastNonCollisionTime(
-    const TrajectoryPath &traj_path,
-    const std::vector<ObstaclePtr> &obstacles, const double search_end_time_s) const
+    const TrajectoryPath &traj_path, const std::vector<ObstaclePtr> &obstacles,
+    const double search_end_time_s) const
 {
     for (double time = search_end_time_s; time >= 0.0;
          time -= COLLISION_CHECK_STEP_INTERVAL_SEC)
