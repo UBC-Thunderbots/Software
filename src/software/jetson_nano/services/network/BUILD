@@ -9,9 +9,9 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
         "//software/logger",
+        "//software/networking/radio:threaded_proto_radio_listener",
         "//software/networking/udp:threaded_proto_udp_listener",
         "//software/networking/udp:threaded_proto_udp_sender",
-        "//software/networking/radio:threaded_proto_radio_listener",
         "@boost//:asio",
     ],
 )
