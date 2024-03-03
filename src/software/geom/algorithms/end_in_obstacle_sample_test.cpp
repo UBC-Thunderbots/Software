@@ -40,14 +40,14 @@ class EndInObstacleSampleTest : public testing::Test
     }
 
    protected:
-    World world;
+    std::shared_ptr<World> world;
     RobotNavigationObstacleFactory obstacle_factory;
 };
 
 
 TEST_F(EndInObstacleSampleTest, test_end_outside_field_boundary)
 {
-    Field field              = world.field();
+    Field field              = world->field();
     Rectangle navigable_area = field.fieldLines();
     std::vector<ObstaclePtr> obstacles;
 
@@ -69,7 +69,7 @@ TEST_F(EndInObstacleSampleTest, test_end_outside_field_boundary)
 
 TEST_F(EndInObstacleSampleTest, test_end_in_defense_area)
 {
-    Field field              = world.field();
+    Field field              = world->field();
     Rectangle navigable_area = field.fieldBoundary();
     std::vector<ObstaclePtr> obstacles;
 
@@ -92,7 +92,7 @@ TEST_F(EndInObstacleSampleTest, test_end_in_defense_area)
 
 TEST_F(EndInObstacleSampleTest, test_end_outside_navigable_area)
 {
-    Field field              = world.field();
+    Field field              = world->field();
     Rectangle navigable_area = field.fieldBoundary();
     std::vector<ObstaclePtr> obstacles;
 
@@ -109,7 +109,7 @@ TEST_F(EndInObstacleSampleTest, test_end_outside_navigable_area)
 
 TEST_F(EndInObstacleSampleTest, test_end_not_in_obstacle)
 {
-    Field field              = world.field();
+    Field field              = world->field();
     Rectangle navigable_area = field.fieldLines();
     std::vector<ObstaclePtr> obstacles;
 
@@ -129,7 +129,7 @@ TEST_F(EndInObstacleSampleTest, test_end_not_in_obstacle)
 
 TEST_F(EndInObstacleSampleTest, test_sampling_performance)
 {
-    Field field              = world.field();
+    Field field              = world->field();
     Rectangle navigable_area = field.fieldLines();
     std::vector<ObstaclePtr> obstacles;
 
