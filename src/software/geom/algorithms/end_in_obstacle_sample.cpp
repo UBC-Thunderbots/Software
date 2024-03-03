@@ -80,7 +80,7 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
     // perform sampling only if the provided point or the closest point outside the first
     // encroached obstacle are not valid
     double radius          = 0.15;
-    int samples_per_radius = 6;
+    int samples_per_radius = initial_count;
     while (radius <= max_search_radius)
     {
         double increment = 360.0 / samples_per_radius;
