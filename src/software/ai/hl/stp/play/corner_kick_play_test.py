@@ -93,7 +93,8 @@ def test_corner_kick_play_bottom_left(simulated_test_runner):
             [
                 # Ball should eventually be kicked
                 BallEventuallyKicked(),
-            ]],
+            ]
+        ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [
@@ -137,7 +138,8 @@ def test_corner_kick_play_top_right(simulated_test_runner):
             [
                 # Ball should eventually be kicked
                 BallEventuallyKicked(),
-            ]],
+            ]
+        ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
             [
