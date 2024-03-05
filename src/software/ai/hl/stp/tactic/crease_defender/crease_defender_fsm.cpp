@@ -35,7 +35,7 @@ void CreaseDefenderFSM::blockThreat(
     // Use a slightly larger inflation factor to avoid the crease defenders from sitting
     // right on the edge of the defense area obstacle.
     auto block_threat_point = findBlockThreatPoint(
-        event.common.world.field(), event.control_params.enemy_threat_origin,
+        event.common.world_ptr->field(), event.control_params.enemy_threat_origin,
         event.control_params.crease_defender_alignment,
         robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5);
     if (block_threat_point)
@@ -52,18 +52,18 @@ void CreaseDefenderFSM::blockThreat(
             .orientation();
 
     // Chip to the enemy half of the field
-    double chip_distance = event.common.world.field().xLength() / 3.0;
+    double chip_distance = event.common.world_ptr->field().xLength() / 3.0;
     // If enemy threat is on the sides, then chip to near the edge of the field
     if (event.control_params.enemy_threat_origin.x() <
-        event.common.world.field().friendlyDefenseArea().xMax())
+        event.common.world_ptr->field().friendlyDefenseArea().xMax())
     {
-        chip_distance = event.common.world.field().yLength() / 3.0 -
-                        event.common.world.field().friendlyDefenseArea().yMax();
+        chip_distance = event.common.world_ptr->field().yLength() / 3.0 -
+                        event.common.world_ptr->field().friendlyDefenseArea().yMax();
     }
 
     TbotsProto::BallCollisionType ball_collision_type =
         TbotsProto::BallCollisionType::ALLOW;
-    if ((event.common.world.ball().position() - destination).length() <
+    if ((event.common.world_ptr->ball().position() - destination).length() <
         (event.common.robot.position() - destination).length())
     {
         ball_collision_type = TbotsProto::BallCollisionType::AVOID;

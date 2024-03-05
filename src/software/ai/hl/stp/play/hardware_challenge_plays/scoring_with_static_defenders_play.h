@@ -12,7 +12,8 @@ class ScoringWithStaticDefendersPlay : public Play
    public:
     ScoringWithStaticDefendersPlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
 
    private:
     // 3 robots for this hardware challenge

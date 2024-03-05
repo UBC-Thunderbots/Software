@@ -53,3 +53,18 @@ bool Segment::operator==(const Segment& other) const
 {
     return start == other.start && end == other.end;
 }
+
+Segment operator+(const Segment& segment, const Vector& vector)
+{
+    return Segment(segment.getStart() + vector, segment.getEnd() + vector);
+}
+
+Segment operator+(const Vector& vector, const Segment& segment)
+{
+    return segment + vector;
+}
+
+Segment operator-(const Segment& segment, const Vector& vector)
+{
+    return Segment(segment.getStart() - vector, segment.getEnd() - vector);
+}

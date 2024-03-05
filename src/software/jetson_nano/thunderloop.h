@@ -92,6 +92,11 @@ class Thunderloop
      */
     double getNanoseconds(timespec time);
 
+    /**
+     * Updates ErrorCodes for BAT, CAP, CPU TEMP if over thresholds
+     */
+    void updateErrorCodes();
+
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;

@@ -13,6 +13,12 @@
 class MotorService
 {
    public:
+    // SPI Chip Selects
+    static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
+    static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
+    static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
+    static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
+
     /**
      * Service that interacts with the motor board.
      * Opens all the required ports and maintains them until destroyed.
@@ -94,7 +100,6 @@ class MotorService
      */
     void setup();
 
-   private:
     /**
      * Holds motor fault information for a particular motor and whether any fault has
      * caused the motor to be disabled.
@@ -122,6 +127,53 @@ class MotorService
         {
         }
     };
+
+    /**
+     * Log the driver fault in a human readable log msg
+     *
+     * @param motor The motor to log the status for
+     *
+     * @return a struct containing the motor faults and whether the motor was disabled due
+     * to the fault
+     */
+    struct MotorFaultIndicator checkDriverFault(uint8_t motor);
+
+    /**
+     * Sets up motor as drive motor controllers
+     *
+     * @param motor drive motor number
+     */
+    void setUpDriveMotor(uint8_t motor);
+
+    /**
+     * Used for testing purposes:
+     *
+     * Wrapper function that writes int to the TMC4671
+     * @param motor drive motor number
+     * @param address motor address
+     * @param value write value
+     */
+    void writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t value);
+
+    /**
+     * Used for testing purposes:
+     *
+     * Wrapper function that reads int from the TMC4671
+     * @param motor drive motor number
+     * @param address motor address
+     * @return read value
+     */
+    int readIntFromTMC4671(uint8_t motor, uint8_t address);
+
+   private:
+    /**
+     * Initializes Motor Service
+     *
+     * @param robot_constants robot constants for motor service
+     * @param control_loop_frequency_hz control loop frequency in Hertz
+     */
+    void motorServiceInit(const RobotConstants_t& robot_constants,
+                          int control_loop_frequency_hz);
 
     /**
      * Calls the configuration functions below in the right sequence
@@ -229,16 +281,6 @@ class MotorService
 
 
     /**
-     * Log the driver fault in a human readable log msg
-     *
-     * @param motor The motor to log the status for
-     *
-     * @return a struct containing the motor faults and whether the motor was disabled due
-     * to the fault
-     */
-    struct MotorFaultIndicator checkDriverFault(uint8_t motor);
-
-    /**
      * Spin each motor of the NUM_DRIVE_MOTORS in open loop mode to check if the encoder
      * is responding as expected. Allows us to do a basic test of whether the encoder is
      * physically connected to the motor board.
@@ -279,6 +321,15 @@ class MotorService
      * @return true if the motor has returned a cached RESET fault, false otherwise
      */
     bool requiresMotorReinit(uint8_t motor);
+
+    // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
+    // pairs of the drive motor.
+    //
+    // TODO (#2720): compute from robot constants (this was computed by hand and is
+    // accurate)
+    static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
+    static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS =
+        1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
 
     // to check if the motors have been calibrated
     bool is_initialized_ = false;
@@ -334,12 +385,6 @@ class MotorService
     std::optional<std::chrono::time_point<std::chrono::system_clock>>
         tracked_motor_fault_start_time_;
     int num_tracked_motor_resets_;
-
-    // SPI Chip Selects
-    static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-    static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
-    static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
-    static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
 
     static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
 

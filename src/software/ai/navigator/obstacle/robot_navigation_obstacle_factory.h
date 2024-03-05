@@ -33,7 +33,8 @@ class RobotNavigationObstacleFactory
      * @return Obstacles representing the given motion constraint
      */
     std::vector<ObstaclePtr> createFromMotionConstraint(
-        const TbotsProto::MotionConstraint motion_constraint, const World &world) const;
+        const TbotsProto::MotionConstraint motion_constraint,
+        const WorldPtr &world_ptr) const;
 
     /**
      * Create obstacles for the given motion constraints
@@ -45,7 +46,7 @@ class RobotNavigationObstacleFactory
      */
     std::vector<ObstaclePtr> createObstaclesFromMotionConstraints(
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const World &world) const;
+        const WorldPtr &world_ptr) const;
 
     /**
      * Create static obstacles for the given motion constraints
@@ -69,7 +70,7 @@ class RobotNavigationObstacleFactory
      */
     std::vector<ObstaclePtr> createDynamicObstaclesFromMotionConstraints(
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const World &world) const;
+        const WorldPtr &world_ptr) const;
 
     /**
      * Create dynamic obstacles for the given motion constraints
@@ -80,7 +81,8 @@ class RobotNavigationObstacleFactory
      * @return Obstacles representing the given motion constraint
      */
     std::vector<ObstaclePtr> createDynamicObstaclesFromMotionConstraint(
-        const TbotsProto::MotionConstraint &motion_constraint, const World &world) const;
+        const TbotsProto::MotionConstraint &motion_constraint,
+        const WorldPtr &world_ptr) const;
 
     /**
      * Create static obstacles for the given motion constraint
@@ -123,6 +125,7 @@ class RobotNavigationObstacleFactory
     ObstaclePtr createFromShape(const Circle &circle) const;
     ObstaclePtr createFromShape(const Polygon &polygon) const;
     ObstaclePtr createFromShape(const Rectangle &rectangle) const;
+    ObstaclePtr createFromShape(const Stadium &stadium) const;
 
     /**
      * Returns an obstacle with the shape of the BallPlacementZone if the state is in

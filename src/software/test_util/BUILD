@@ -23,6 +23,7 @@ cc_library(
         "//software/geom:geom_constants",
         "//software/geom:point",
         "//software/geom:polygon",
+        "//software/geom:stadium",
         "//software/geom:vector",
         "//software/geom/algorithms",
         "//software/logger",
