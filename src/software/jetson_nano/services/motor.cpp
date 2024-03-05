@@ -40,7 +40,7 @@ static const uint32_t TMC4671_SPI_SPEED = 1000000;  // 1 Mhz
 static const uint8_t SPI_BITS           = 8;
 static const uint32_t SPI_MODE          = 0x3u;
 static const uint32_t NUM_RETRIES_SPI   = 3;
-static const uint32_t TMC_CMD_MSG_SIZE      = 5;
+static const uint32_t TMC_CMD_MSG_SIZE  = 5;
 
 
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "51";
@@ -443,28 +443,29 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
           encoder_calibrated_[BACK_RIGHT_MOTOR_CHIP_SELECT])
         << "Running without encoder calibration can cause serious harm, exiting";
 
-    // Get current wheel electical RPM (don't account for pole pairs). We will use these for robot status feedback
-    // We assume the motors have ramped to the expected RPM from the previous iteration.
+    // Get current wheel electical RPM (don't account for pole pairs). We will use these
+    // for robot status feedback We assume the motors have ramped to the expected RPM from
+    // the previous iteration.
     double front_right_velocity =
-            static_cast<double>(tmc4671ReadThenWriteValue(
-                    FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-                    TMC4671_PID_VELOCITY_TARGET, front_right_target_rpm)) *
-            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+        static_cast<double>(tmc4671ReadThenWriteValue(
+            FRONT_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+            TMC4671_PID_VELOCITY_TARGET, front_right_target_rpm)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double front_left_velocity =
-            static_cast<double>(tmc4671ReadThenWriteValue(
-                    FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-                    TMC4671_PID_VELOCITY_TARGET, front_left_target_rpm)) *
-            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+        static_cast<double>(tmc4671ReadThenWriteValue(
+            FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+            TMC4671_PID_VELOCITY_TARGET, front_left_target_rpm)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double back_right_velocity =
-            static_cast<double>(tmc4671ReadThenWriteValue(
-                    BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-                    TMC4671_PID_VELOCITY_TARGET, back_right_target_rpm)) *
-            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+        static_cast<double>(tmc4671ReadThenWriteValue(
+            BACK_RIGHT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+            TMC4671_PID_VELOCITY_TARGET, back_right_target_rpm)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double back_left_velocity =
-            static_cast<double>(tmc4671ReadThenWriteValue(
-                    BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
-                    TMC4671_PID_VELOCITY_TARGET, back_left_target_rpm)) *
-            MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+        static_cast<double>(tmc4671ReadThenWriteValue(
+            BACK_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
+            TMC4671_PID_VELOCITY_TARGET, back_left_target_rpm)) *
+        MECHANICAL_MPS_PER_ELECTRICAL_RPM;
     double dribbler_rpm = static_cast<double>(
         tmc4671ReadThenWriteValue(DRIBBLER_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
                                   TMC4671_PID_VELOCITY_TARGET, dribbler_ramp_rpm_));
@@ -1094,7 +1095,7 @@ void MotorService::startController(uint8_t motor, bool dribbler)
                                  << static_cast<uint32_t>(motor) << " is not responding";
 
     LOG(DEBUG) << "Controller " << std::to_string(motor)
-              << " online, responded with: " << chip_id;
+               << " online, responded with: " << chip_id;
 
     // Configure common controller params
     configurePWM(motor);
