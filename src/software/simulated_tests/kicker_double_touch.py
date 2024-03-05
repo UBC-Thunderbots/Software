@@ -15,6 +15,9 @@ class KickerDoubleTouch(Validation):
     KICKOFF_DOUBLE_TOUCH_M = 0.05
 
     def __init__(self, threshold=0.01):
+        """
+        :param threshold: The distance from the ball to consider a robot touching it
+        """
         self.kicker_robot = None
         self.kick_position = None
         self.other_robot = None
@@ -33,9 +36,7 @@ class KickerDoubleTouch(Validation):
             return ValidationStatus.PASSING
         # main check loop
         for robot in world.friendly_team.team_robots:
-            if not tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.threshold):
-                continue
-            elif tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.threshold):
+            if tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.threshold):
                 if self.kicker_robot is None:
                     self.kicker_robot = robot
                     self.kick_position = ball_position

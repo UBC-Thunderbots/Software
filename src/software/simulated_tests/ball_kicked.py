@@ -15,6 +15,9 @@ class BallKicked(Validation):
     BALL_MOVED_M = 0.02
 
     def __init__(self, threshold=0.01):
+        """
+        :param threshold: The distance from the ball to consider a robot touching it
+        """
         self.kicker_robot = None
         self.kick_position = None
         self.threshold = threshold
@@ -34,9 +37,7 @@ class BallKicked(Validation):
             return ValidationStatus.PASSING
         # main check loop
         for robot in world.friendly_team.team_robots:
-            if not tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.threshold):
-                continue
-            elif tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.threshold):
+            if tbots_cpp.Robot(robot).isNearDribbler(ball_position, self.threshold):
                 if self.kicker_robot is None:
                     self.kicker_robot = robot
         return ValidationStatus.FAILING
