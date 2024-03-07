@@ -424,40 +424,41 @@ void SensorFusion::detectInjuredRobots(const std::vector<TbotsProto::RobotStatus
             if (error_code_msg != TbotsProto::ErrorCode::NO_ERROR)
             {
                 has_error = true;
+                break;
             }
         }
 
         /* checking for motor status in all 4 drive unit */
-        auto motor_status_msgs = robot_status_msg.motor_status();
+        // auto motor_status_msgs = robot_status_msg.motor_status();
 
-        std::vector<TbotsProto::DriveUnit> drive_unit_msgs;
-        drive_unit_msgs.push_back(motor_status_msgs.front_left());
-        drive_unit_msgs.push_back(motor_status_msgs.front_right());
-        drive_unit_msgs.push_back(motor_status_msgs.back_left());
-        drive_unit_msgs.push_back(motor_status_msgs.back_right());
+        // std::vector<TbotsProto::DriveUnit> drive_unit_msgs;
+        // drive_unit_msgs.push_back(motor_status_msgs.front_left());
+        // drive_unit_msgs.push_back(motor_status_msgs.front_right());
+        // drive_unit_msgs.push_back(motor_status_msgs.back_left());
+        // drive_unit_msgs.push_back(motor_status_msgs.back_right());
 
-        for(auto drive_unit_msg: drive_unit_msgs){
-            auto motor_faults = drive_unit_msg.motor_faults();
-            /* currently only substituting for driver overtemperature or its prewarning */
-            for(auto motor_fault: motor_faults){
-                if(motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE || motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING){
-                    has_error = true;
-                }
-            }
-        }
+        // for(auto drive_unit_msg: drive_unit_msgs){
+        //     auto motor_faults = drive_unit_msg.motor_faults();
+        //     /* currently only substituting for driver overtemperature or its prewarning */
+        //     for(auto motor_fault: motor_faults){
+        //         if(motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE || motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING){
+        //             has_error = true;
+        //         }
+        //     }
+        // }
 
-        /* break beam check */
-        auto power_status_msg = robot_status_msg.power_status();
-        if(power_status_msg.breakbeam_tripped()){
-            auto ball = world->ball();
-            auto robot = world->friendlyTeam().getRobotById(robot_id);
-            auto dist_vector = new Vector(ball.position().x()-robot->position().x(), ball.position().y()-robot->position().y());
+        // /* break beam check */
+        // auto power_status_msg = robot_status_msg.power_status();
+        // if(power_status_msg.breakbeam_tripped()){
+        //     auto ball = world->ball();
+        //     auto robot = world->friendlyTeam().getRobotById(robot_id);
+        //     auto dist_vector = new Vector(ball.position().x()-robot->position().x(), ball.position().y()-robot->position().y());
             
-            /* check if the robot has the ball, reference distance 2m */
-            if(dist_vector->length() > 2){
-                has_error = true;
-            }
-        }
+        //     /* check if the robot has the ball, reference distance 2m */
+        //     if(dist_vector->length() > 2){
+        //         has_error = true;
+        //     }
+        // }
 
         if(has_error){
             injured_robot_ids.push_back(robot_id);

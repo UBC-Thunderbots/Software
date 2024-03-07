@@ -882,6 +882,7 @@ TEST_F(SensorFusionTest, test_detect_injured_robots_with_no_error){
     for(int i = 0; i < 5; i++){
         auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
         robot_msg->set_robot_id(i);
+        robot_msg->add_error_code(TbotsProto::NO_ERROR);
         robot_status_msgs.push_back(*robot_msg);
     }
 
@@ -897,17 +898,19 @@ TEST_F(SensorFusionTest, test_detect_injured_robots_with_no_error){
     EXPECT_EQ(injured_robots.size(), 0);
 }
 
-TEST_F(SensorFusionTest, test_detect_one_injured_robot_with_low_cap){
+TEST_F(SensorFusionTest, test_detect_one_injured_robot_with_high_cap){
     std::vector<TbotsProto::RobotStatus> robot_status_msgs;
     auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
     robot_msg->set_robot_id(0);
-    robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_CAP);
+    robot_msg->add_error_code(TbotsProto::ErrorCode::HIGH_CAP);
     robot_status_msgs.push_back(*robot_msg);
 
-    robot_msg->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+    
     for(int i = 1; i < 5; i++){
-        robot_msg->set_robot_id(i);
-        robot_status_msgs.push_back(*robot_msg);
+        auto robot_msg2 = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg2->add_error_code(TbotsProto::ErrorCode::NO_ERROR);
+        robot_msg2->set_robot_id(i);
+        robot_status_msgs.push_back(*robot_msg2);
     }
 
     sensor_fusion = SensorFusion(config);
