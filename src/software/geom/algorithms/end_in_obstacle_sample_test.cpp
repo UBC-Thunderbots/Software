@@ -7,6 +7,7 @@
 
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/test_util/test_util.h"
 
 static constexpr double MAX_ALLOWABLE_SAMPLE_ERROR = 0.15;
