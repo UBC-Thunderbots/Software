@@ -81,6 +81,10 @@ class EstopMode(IntEnum):
     PHYSICAL_ESTOP = 2
 
 
+# the maximum packet / world loss percent indicated by UI
+MAX_ACCEPTABLE_PACKET_LOSS_PERCENT = 30
+
+
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2

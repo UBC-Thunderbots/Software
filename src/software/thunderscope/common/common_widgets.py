@@ -58,15 +58,57 @@ class FloatSlider(QSlider):
         super(FloatSlider, self).setValue(int(value * self.decimals))
 
 
+class ColorQLabel(QLabel):
+    """
+    A QLabel that changes color based on the float value it holds
+    Can provide a custom min and max value
+    The label starts off with no color and becomes more Red as the value increases up till the max value
+    """
+
+    def __init__(self, min_val: float = 0, max_val: float = 100):
+        """
+        Initializes the ColorQLabel with the given min and max bounds
+        Or 0 and 100 as default
+        :param min_val: the minimum value of the label color (no color)
+        :param max_val: the maxmimum value of the label color (100% red)
+        """
+        super(ColorQLabel, self).__init__()
+
+        self.min = min_val
+        self.max = max_val
+
+        self.setText("P%NA")
+        self.__update_background_color(0)
+
+    def set_float_val(self, val: float) -> None:
+        """
+        Sets the current value of the label to the given float value
+        :param val:  the value to 
+        :return: 
+        """
+        self.setText(f"P%{val:02d}")
+        self.__update_background_color(val)
+
+    def __update_background_color(self, val: float) -> None:
+        """
+        Converts the given float to an percentage using the current min-max range
+        Updates the background color's opacity to be that percentage
+        :param val: the float value of the label to update
+        """
+        percent = max(0, min(float(val - self.min) / (self.max - self.min), 1))
+
+        self.setStyleSheet(f"background: rgba(255, 0, 0, {percent})")
+
+
 class ColorProgressBar(QProgressBar):
     """
-    This class extends QSlider to support floats instead of ints
-    Also changes slider color based on percentage filled
+    This class extends QProgressBar to support floats instead of ints
+    Also changes progress bar color based on percentage filled
     """
 
     floatValueChanged = pyqtSignal(float)
 
-    def __init__(self, min_val, max_val, decimals=2):
+    def __init__(self, min_val: float, max_val: float, decimals: int = 2):
         """
         Creates a ColorProgressBar with the specified min, max and decimals
         Sets initial slider color to grey
@@ -88,28 +130,25 @@ class ColorProgressBar(QProgressBar):
 
         self.valueChanged.connect(self.emitFloatValueChanged)
 
-    def emitFloatValueChanged(self):
+    def emitFloatValueChanged(self) -> None:
         """
         Emits a signal with the slider's float value
         """
         self.floatValueChanged.emit(self.value())
 
-    def setValue(self, value):
+    def setValue(self, value: float) -> None:
         """
         Sets the value of the slider to the given float value
         Sets the color of the slider based on the percentage filled
             - 100% to 50% -> Green to Yellow
             - 50% to 0% -> Yellow to Red
-        :param value:
+        :param value: the float value to set
         :return:
         """
         super(ColorProgressBar, self).setValue(value * self.decimals)
 
         # clamp percent to make sure it's between 0% and 100%
-        percent = min(
-            1,
-            max(0, (self.value() - self.minimum()) / (self.maximum() - self.minimum())),
-        )
+        percent = self.getPercentage()
 
         if percent < 0.5:
             super(ColorProgressBar, self).setStyleSheet(
@@ -126,13 +165,37 @@ class ColorProgressBar(QProgressBar):
                 "}"
             )
 
-    def maximum(self):
+    def getPercentage(self):
+        """
+        Gets the current percentage between 0 and 1 from the current value
+        Compared to the current min and max
+        """
+        return min(
+            1,
+            max(
+                0,
+                int(
+                    (self.value() - self.minimum()) / (self.maximum() - self.minimum())
+                ),
+            ),
+        )
+
+    def maximum(self) -> float:
+        """
+        Gets the maximum value of this progress bar as a float
+        """
         return float(super(ColorProgressBar, self).maximum()) / self.decimals
 
-    def minimum(self):
+    def minimum(self) -> float:
+        """
+        Gets the minimum value of this progress bar as a float
+        """
         return float(super(ColorProgressBar, self).minimum()) / self.decimals
 
-    def value(self):
+    def value(self) -> float:
+        """
+        Gets the current value of this progress bar as a float
+        """
         return float(super(ColorProgressBar, self).value()) / self.decimals
 
 
