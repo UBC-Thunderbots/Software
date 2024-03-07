@@ -56,7 +56,7 @@ class TacticAssignmentTest : public ::testing::Test
     }
 
     TbotsProto::AiConfig ai_config;
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 };
 
 TEST_F(TacticAssignmentTest,
@@ -68,7 +68,7 @@ TEST_F(TacticAssignmentTest,
     Robot robot_1(1, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
     auto move_tactic_2 = std::make_shared<MoveTactic>();
@@ -99,7 +99,7 @@ TEST_F(TacticAssignmentTest,
     Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
     auto move_tactic_2 = std::make_shared<MoveTactic>();
@@ -135,7 +135,7 @@ TEST_F(TacticAssignmentTest,
     Robot robot_1(1, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
@@ -162,7 +162,7 @@ TEST_F(TacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots)
 {
     Team friendly_team(Duration::fromSeconds(0));
     friendly_team.updateRobots({});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
@@ -191,7 +191,7 @@ TEST_F(TacticAssignmentTest, test_correct_tactics_removed_when_more_tactics_than
     Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
     auto stop_tactic_1 = std::make_shared<StopTactic>();
@@ -230,7 +230,7 @@ TEST_F(TacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
     Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
@@ -267,7 +267,7 @@ TEST_F(TacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
     Robot robot_1(1, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
     auto move_tactic_2 = std::make_shared<MoveTactic>();
@@ -319,7 +319,7 @@ TEST_F(TacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overlap)
     Robot robot_1(1, Point(-3, 1.5), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
     auto move_tactic_2 = std::make_shared<MoveTactic>();
@@ -364,7 +364,7 @@ TEST_F(TacticAssignmentTest, test_assigning_3_robots_to_2_tactics)
     Robot robot_2(2, Point(0, 5.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
     auto move_tactic_2 = std::make_shared<MoveTactic>();
@@ -406,7 +406,7 @@ TEST_F(TacticAssignmentTest, test_assigning_3_robots_to_3_tactics_all_with_the_s
     Robot robot_2(2, Point(0, 5.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto stop_tactic_1 = std::make_shared<StopTactic>();
     auto stop_tactic_2 = std::make_shared<StopTactic>();
@@ -445,7 +445,7 @@ TEST_F(TacticAssignmentTest, test_assigning_3_robots_to_3_tactics_with_2_of_the_
     Robot robot_2(2, Point(0, 4.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto stop_tactic_1 = std::make_shared<StopTactic>();
     auto move_tactic_1 = std::make_shared<MoveTactic>();
@@ -491,7 +491,7 @@ TEST_F(TacticAssignmentTest,
     Robot robot_1(1, Point(-10, -10), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
@@ -534,13 +534,13 @@ TEST_F(TacticAssignmentTest,
 //     friendly_team.updateRobots({robot_0, robot_1});
 
 //     friendly_team.assignGoalie(0);
-//     world.updateFriendlyTeamState(friendly_team);
+//     world->updateFriendlyTeamState(friendly_team);
 
 //     TacticVector tactics = {};
 
 //     auto robot_navigation_obstacle_config =
 //     ai_config.robot_navigation_obstacle_config(); GlobalPathPlannerFactory
-//     path_planner_factory(robot_navigation_obstacle_config, world.field()); auto tup =
+//     path_planner_factory(robot_navigation_obstacle_config, world->field()); auto tup =
 //     assignTactics(path_planner_factory, world, tactics, friendly_team.getAllRobots());
 
 //     auto asst = std::get<2>(tup);
@@ -555,7 +555,7 @@ TEST_F(TacticAssignmentTest,
 
 //     // Change the goalie and perform the same check in case we have a fluke bug
 //     friendly_team.assignGoalie(1);
-//     world.updateFriendlyTeamState(friendly_team);
+//     world->updateFriendlyTeamState(friendly_team);
 
 //     tup = assignTactics(path_planner_factory, world, tactics,
 //     friendly_team.getAllRobots()); asst = std::get<2>(tup);
@@ -581,7 +581,7 @@ TEST_F(TacticAssignmentTest, test_assigning_stop_tactics_to_unassigned_non_goali
     Robot robot_2(2, Point(6, 7), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
@@ -625,7 +625,7 @@ TEST_F(TacticAssignmentTest, test_assigning_stop_tactics_to_unassigned_non_goali
 //     friendly_team.updateRobots({robot_0, robot_1});
 
 //     friendly_team.assignGoalie(1);
-//     world.updateFriendlyTeamState(friendly_team);
+//     world->updateFriendlyTeamState(friendly_team);
 
 //     auto move_tactic_0 = std::make_shared<MoveTactic>();
 //     auto move_tactic_1 = std::make_shared<MoveTactic>();
@@ -634,7 +634,7 @@ TEST_F(TacticAssignmentTest, test_assigning_stop_tactics_to_unassigned_non_goali
 
 //     auto robot_navigation_obstacle_config =
 //     ai_config.robot_navigation_obstacle_config(); GlobalPathPlannerFactory
-//     path_planner_factory(robot_navigation_obstacle_config, world.field()); auto tup =
+//     path_planner_factory(robot_navigation_obstacle_config, world->field()); auto tup =
 //     assignTactics(path_planner_factory, world, request, friendly_team.getAllRobots());
 
 //     auto asst = std::get<2>(tup);
@@ -731,17 +731,17 @@ TEST_F(TacticAssignmentTest, test_offense_play_with_substitution)
     std::vector<Robot> injured_robots;
     injured_robots.push_back(robot_1);
     friendly_team.setInjuredRobots(injured_robots);
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     OffensePlay play(ai_config);
 
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
-    world.field();
+    world->field();
     InterPlayCommunication comm;
     auto p_set = play.get(world, comm, [this](InterPlayCommunication comm) {});
 
     auto injured_primitive = p_set->robot_primitives().at(1);
-    Point expected_pos(0, world.field().totalYLength() / 2);
+    Point expected_pos(0, world->field().totalYLength() / 2);
     Point injured_robot_pos =
         createPoint(injured_primitive.move().xy_traj_params().destination());
     EXPECT_EQ(expected_pos, injured_robot_pos);

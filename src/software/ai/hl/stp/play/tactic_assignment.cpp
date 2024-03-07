@@ -4,7 +4,7 @@
 
 std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
            std::map<std::shared_ptr<const Tactic>, RobotId>>
-assignTactics(const World &world, TacticVector tactic_vector,
+assignTactics(const WorldPtr &world, TacticVector tactic_vector,
               const std::vector<Robot> &robots_to_assign,
               RobotNavigationObstacleFactory obstacle_factory,
               TbotsProto::ObstacleList &obstacle_list,
@@ -21,11 +21,11 @@ assignTactics(const World &world, TacticVector tactic_vector,
     for (auto tactic : tactic_vector)
     {
         primitive_sets.emplace_back(tactic->get(world));
-        CHECK(primitive_sets.back().size() == world.friendlyTeam().numRobots())
+        CHECK(primitive_sets.back().size() == world->friendlyTeam().numRobots())
             << primitive_sets.back().size() << " primitives from "
             << objectTypeName(*tactic)
             << " is not equal to the number of robots, which is "
-            << world.friendlyTeam().numRobots();
+            << world->friendlyTeam().numRobots();
     }
 
     size_t num_rows = robots_to_assign.size();
@@ -115,7 +115,7 @@ assignTactics(const World &world, TacticVector tactic_vector,
 
                 // Create the list of obstacles
                 auto motion_constraints =
-                    buildMotionConstraintSet(world.gameState(), *tactic_vector.at(col));
+                    buildMotionConstraintSet(world->gameState(), *tactic_vector.at(col));
 
                 // Only generate primitive proto message for the final primitive to robot
                 // assignment

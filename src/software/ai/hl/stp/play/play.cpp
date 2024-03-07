@@ -108,9 +108,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
     tactic_robot_id_assignment.clear();
 
-    std::optional<Robot> goalie_robot = world.friendlyTeam().goalie();
-    std::vector<Robot> robots         = world.friendlyTeam().getAllRobots();
-    std::vector<Robot> injured_robots = world.friendlyTeam().getInjuredRobots();
+    std::optional<Robot> goalie_robot = world_ptr->friendlyTeam().goalie();
+    std::vector<Robot> robots         = world_ptr->friendlyTeam().getAllRobots();
+    std::vector<Robot> injured_robots = world_ptr->friendlyTeam().getInjuredRobots();
 
     if (requires_goalie)
     {
@@ -161,7 +161,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         std::shared_ptr<MoveTactic> auto_sub_tactic = std::make_shared<MoveTactic>();
 
         // move to middle of court and to positive y boundary and stop
-        auto_sub_tactic->updateControlParams(Point(0, world.field().totalYLength() / 2),
+        auto_sub_tactic->updateControlParams(Point(0, world_ptr->field().totalYLength() / 2),
                                              Angle::zero(), 0);
 
         for (auto robot : injured_robots)
@@ -173,12 +173,12 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             robots.erase(std::remove(robots.begin(), robots.end(), robot), robots.end());
 
             auto motion_constraints =
-                buildMotionConstraintSet(world.gameState(), *auto_sub_tactic);
-            auto primitives = auto_sub_tactic->get(world);
+                buildMotionConstraintSet(world_ptr->gameState(), *auto_sub_tactic);
+            auto primitives = auto_sub_tactic->get(world_ptr);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
             auto primitive_proto = primitives[robot.id()]->generatePrimitiveProtoMessage(
-                world, motion_constraints, obstacle_factory);
+                world_ptr, motion_constraints, obstacle_factory);
             primitives_to_run->mutable_robot_primitives()->insert(
                 google::protobuf::MapPair(robot.id(), *primitive_proto));
             auto_sub_tactic->setLastExecutionRobot(robot.id());
@@ -216,7 +216,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
         auto [remaining_robots, new_primitives_to_assign,
               current_tactic_robot_id_assignment] =
-            assignTactics(world, tactic_vector, robots, obstacle_factory, obstacle_list,
+            assignTactics(world_ptr, tactic_vector, robots, obstacle_factory, obstacle_list,
                           path_visualization);
 
         tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);

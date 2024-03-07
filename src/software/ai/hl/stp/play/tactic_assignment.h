@@ -21,7 +21,7 @@ using TacticVector = std::vector<std::shared_ptr<Tactic>>;
  */
 std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
            std::map<std::shared_ptr<const Tactic>, RobotId>>
-assignTactics(const World& world, TacticVector tactic_vector,
+assignTactics(const WorldPtr& world, TacticVector tactic_vector,
               const std::vector<Robot>& robots_to_assign,
               RobotNavigationObstacleFactory obstacle_factory,
               TbotsProto::ObstacleList& obstacle_list,
