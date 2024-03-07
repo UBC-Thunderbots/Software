@@ -223,7 +223,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
-        "//software/ai/navigator/path_planner:global_path_planner_factory",
+        "//software/ai/navigator/trajectory:trajectory_planner",
         "//software/ai/passing:pass_with_rating",
         "//software/util/sml_fsm",
         "@boost//:coroutine2",
@@ -572,7 +572,8 @@ cc_library(
         "tactic_assignment.h",
     ],
     deps = [
-        "//software/ai/navigator/path_planner:global_path_planner_factory",
+        "//software/ai/hl/stp/tactic",
+        "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/world",
         "//software/world:robot",
         "@munkres_cpp",

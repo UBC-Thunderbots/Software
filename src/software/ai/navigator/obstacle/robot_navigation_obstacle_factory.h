@@ -33,7 +33,20 @@ class RobotNavigationObstacleFactory
      * @return Obstacles representing the given motion constraint
      */
     std::vector<ObstaclePtr> createFromMotionConstraint(
-        const TbotsProto::MotionConstraint motion_constraint, const World &world) const;
+        const TbotsProto::MotionConstraint motion_constraint,
+        const WorldPtr &world_ptr) const;
+
+    /**
+     * Create obstacles for the given motion constraints
+     *
+     * @param motion_constraints The motion constraints to create obstacles for
+     * @param field Field we're enforcing motion constraints in
+     *
+     * @return Obstacles representing the given motion constraints
+     */
+    std::vector<ObstaclePtr> createObstaclesFromMotionConstraints(
+        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+        const WorldPtr &world_ptr) const;
 
     /**
      * Create static obstacles for the given motion constraints
@@ -50,13 +63,26 @@ class RobotNavigationObstacleFactory
     /**
      * Create dynamic obstacles for the given motion constraints
      *
+     * @param motion_constraints The motion constraints to create obstacles for
+     * @param field Field we're enforcing motion constraints in
+     *
+     * @return Obstacles representing the given motion constraints
+     */
+    std::vector<ObstaclePtr> createDynamicObstaclesFromMotionConstraints(
+        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+        const WorldPtr &world_ptr) const;
+
+    /**
+     * Create dynamic obstacles for the given motion constraints
+     *
      * @param motion_constraint The motion constraint to create obstacles for
      * @param world World we're enforcing motion constraints in
      *
      * @return Obstacles representing the given motion constraint
      */
     std::vector<ObstaclePtr> createDynamicObstaclesFromMotionConstraint(
-        const TbotsProto::MotionConstraint &motion_constraint, const World &world) const;
+        const TbotsProto::MotionConstraint &motion_constraint,
+        const WorldPtr &world_ptr) const;
 
     /**
      * Create static obstacles for the given motion constraint
@@ -99,6 +125,7 @@ class RobotNavigationObstacleFactory
     ObstaclePtr createFromShape(const Circle &circle) const;
     ObstaclePtr createFromShape(const Polygon &polygon) const;
     ObstaclePtr createFromShape(const Rectangle &rectangle) const;
+    ObstaclePtr createFromShape(const Stadium &stadium) const;
 
     /**
      * Returns an obstacle with the shape of the BallPlacementZone if the state is in

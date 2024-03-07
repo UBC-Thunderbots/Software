@@ -4,7 +4,6 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import IndividualRobotMode, EstopMode
 import software.python_bindings as tbots_cpp
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from queue import Empty
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -38,6 +37,8 @@ class RobotCommunication(object):
         :param estop_baudrate: The baudrate of the estop
 
         """
+        self.receive_ssl_referee_proto = None
+        self.receive_ssl_wrapper = None
         self.sequence_number = 0
         self.last_time = time.time()
         self.current_proto_unix_io = current_proto_unix_io
@@ -50,13 +51,10 @@ class RobotCommunication(object):
 
         self.running = False
 
-        self.world_buffer = ThreadSafeBuffer(1, World)
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
 
         self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
         self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
-
-        self.current_proto_unix_io.register_observer(World, self.world_buffer)
 
         self.robots_connected_to_fullsystem = set()
         self.robots_connected_to_manual = set()
@@ -73,8 +71,9 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
-        self.send_estop_state_thread = threading.Thread(target=self.__send_estop_state)
-        self.run_world_thread = threading.Thread(target=self.__run_world, daemon=True)
+        self.send_estop_state_thread = threading.Thread(
+            target=self.__send_estop_state, daemon=True
+        )
         self.run_primitive_set_thread = threading.Thread(
             target=self.__run_primitive_set, daemon=True
         )
@@ -99,7 +98,7 @@ class RobotCommunication(object):
 
     def setup_for_fullsystem(self) -> None:
         """
-        Sets up a world sender, a listener for SSL vision data, and connects all robots to fullsystem as default
+        Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
         """
         self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
@@ -115,15 +114,16 @@ class RobotCommunication(object):
             True,
         )
 
-        self.send_world = tbots_cpp.WorldProtoSender(
-            self.multicast_channel + "%" + self.interface, VISION_PORT, True
-        )
-
         self.robots_connected_to_fullsystem = {
             robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
         }
 
-        self.run_world_thread.start()
+    def close_for_fullsystem(self) -> None:
+        if self.receive_ssl_wrapper:
+            self.receive_ssl_wrapper.close()
+
+        if self.receive_ssl_referee_proto:
+            self.receive_ssl_referee_proto.close()
 
     def toggle_keyboard_estop(self) -> None:
         """
@@ -199,27 +199,6 @@ class RobotCommunication(object):
             and (self.robots_connected_to_fullsystem or self.robots_connected_to_manual)
         )
 
-    def __run_world(self):
-        """
-        Forward World protos from fullsystem to the robots
-        Blocks if no world is available and does not return a cached world
-        :return:
-        """
-        while self.running:
-            world = None
-            try:
-                world = self.world_buffer.get(
-                    block=True,
-                    timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S,
-                    return_cached=False,
-                )
-            except Empty:
-                # if empty do nothing
-                pass
-            if world and self.__should_send_packet():
-                # send the world proto
-                self.send_world.send_proto(world)
-
     def __run_primitive_set(self) -> None:
         """Forward PrimitiveSet protos from fullsystem to the robots.
 
@@ -242,7 +221,6 @@ class RobotCommunication(object):
             # total primitives for all robots
             robot_primitives = {}
 
-            # fullsystem is running, so world data is being received
             if self.robots_connected_to_fullsystem:
                 # Get the primitives
                 primitive_set = self.primitive_buffer.get(
@@ -308,8 +286,8 @@ class RobotCommunication(object):
             self.current_proto_unix_io.send_proto(type, data)
 
     def __enter__(self) -> "self":
-        """Enter RobotCommunication context manager. Setup multicast listener
-        for RobotStatus and multicast senders for World and PrimitiveSet
+        """Enter RobotCommunication context manager. Setup multicast listeners
+        for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
 
         """
         # Create the multicast listeners
@@ -324,13 +302,6 @@ class RobotCommunication(object):
             self.multicast_channel + "%" + self.interface,
             ROBOT_LOGS_PORT,
             lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
-            True,
-        )
-
-        self.receive_log_visualize = tbots_cpp.HRVOVisualizationProtoListener(
-            self.multicast_channel + "%" + self.interface,
-            HRVO_VISUALIZATION_PORT,
-            lambda data: self.current_proto_unix_io.send_proto(HRVOVisualization, data),
             True,
         )
 
@@ -360,8 +331,9 @@ class RobotCommunication(object):
 
         """
         self.running = False
-        self.receive_ssl_wrapper.close()
+
+        self.close_for_fullsystem()
+
         self.receive_robot_log.close()
         self.receive_robot_status.close()
-        self.run_world_thread.join()
         self.run_primitive_set_thread.join()

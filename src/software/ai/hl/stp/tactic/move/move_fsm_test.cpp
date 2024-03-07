@@ -6,8 +6,8 @@
 
 TEST(MoveFSMTest, test_transitions)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
-    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+    Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
     MoveFSM::ControlParams control_params{
         .destination            = Point(2, 3),
         .final_orientation      = Angle::half(),
@@ -23,17 +23,13 @@ TEST(MoveFSMTest, test_transitions)
 
     // robot far from destination
     fsm.process_event(MoveFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
 
     // robot close to destination
     robot = ::TestUtil::createRobotAtPos(Point(2, 2));
     fsm.process_event(MoveFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
 
     // robot at destination and facing the right way
@@ -41,9 +37,7 @@ TEST(MoveFSMTest, test_transitions)
         RobotState(Point(2, 3), Vector(), Angle::half(), AngularVelocity::zero()),
         Timestamp::fromSeconds(0));
     fsm.process_event(MoveFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     // destination updated so robot needs to move to new destination
@@ -57,8 +51,6 @@ TEST(MoveFSMTest, test_transitions)
         .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         .target_spin_rev_per_s  = 0.0};
     fsm.process_event(MoveFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
 }
