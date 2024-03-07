@@ -52,7 +52,7 @@ TEST_F(EndInObstacleSampleTest, test_end_outside_field_boundary)
     std::vector<ObstaclePtr> obstacles;
 
     std::vector<ObstaclePtr> field_boundary =
-        obstacle_factory.createStaticObstaclesFromMotionConstraint(
+        obstacle_factory.createObstaclesFromMotionConstraint(
             TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE, field);
     obstacles.insert(obstacles.end(), field_boundary.begin(), field_boundary.end());
 
@@ -74,7 +74,7 @@ TEST_F(EndInObstacleSampleTest, test_end_in_defense_area)
     std::vector<ObstaclePtr> obstacles;
 
     std::vector<ObstaclePtr> friendly_defense_area =
-        obstacle_factory.createStaticObstaclesFromMotionConstraint(
+        obstacle_factory.createObstaclesFromMotionConstraint(
             TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, field);
     obstacles.insert(obstacles.end(), friendly_defense_area.begin(),
                      friendly_defense_area.end());
@@ -134,12 +134,12 @@ TEST_F(EndInObstacleSampleTest, test_sampling_performance)
     std::vector<ObstaclePtr> obstacles;
 
     std::vector<ObstaclePtr> field_boundary =
-        obstacle_factory.createStaticObstaclesFromMotionConstraint(
+        obstacle_factory.createObstaclesFromMotionConstraint(
             TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE, field);
     obstacles.insert(obstacles.end(), field_boundary.begin(), field_boundary.end());
 
     std::vector<ObstaclePtr> friendly_defense_area =
-        obstacle_factory.createStaticObstaclesFromMotionConstraint(
+        obstacle_factory.createObstaclesFromMotionConstraint(
             TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, field);
     obstacles.insert(obstacles.end(), friendly_defense_area.begin(),
                      friendly_defense_area.end());
