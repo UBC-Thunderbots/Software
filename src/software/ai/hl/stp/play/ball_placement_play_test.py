@@ -94,7 +94,7 @@ def test_two_ai_ball_placement(simulated_test_runner):
                 BallEventuallyEntersRegion(
                     regions=[tbots_cpp.Circle(ball_final_pos, 0.05)]
                 ),
-            ]
+            ],
         ],
         ag_always_validation_sequence_set=[[]],
         ag_eventually_validation_sequence_set=[
