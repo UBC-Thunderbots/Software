@@ -1,24 +1,26 @@
 #include "software/ai/evaluation/scoring/skills/feasibility_visitor.h"
 
+#include "software/ai/evaluation/keep_away.h"
+
 FeasibilityVisitor::FeasibilityVisitor(const Robot& robot, std::shared_ptr<Strategy> strategy, const World& world)
     : current_feasibility_(0),
       robot_(robot),
-      strategy_(strategy_),
+      strategy_(strategy),
       world_(world)
 {
 }
 
 void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
 {
-    if (world.field().pointInFriendlyHalf(robot.position()) ||
-        contains(world.field().enemyDefenseArea().expand(0.1), robot.position()))
+    if (world_.field().pointInFriendlyHalf(robot_.position()) ||
+        contains(world_.field().enemyDefenseArea().expand(0.1), robot_.position()))
     {
         current_feasibility_ = 0;
         return;
     }
 
-    if (!shouldKeepAway(robot, world.enemyTeam(),
-                strategy->getAiConfig().attacker_tactic_config().enemy_about_to_steal_ball_radius()))
+    if (!shouldKeepAway(robot_, world_.enemyTeam(),
+                strategy_->getAiConfig().attacker_tactic_config().enemy_about_to_steal_ball_radius()))
     {
         current_feasibility_ = 0;
         return;
@@ -29,14 +31,14 @@ void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
 
 void FeasibilityVisitor::visit(const PassSkill& skill)
 {
-    PassWithRating best_pass = (*strategy)->getBestPass();
+    PassWithRating best_pass = (*strategy_)->getBestPass();
 
-    double min_score = (*strategy_)->getAiConfig().shoot_or_pass_play_config().abs_min_score();
+    double min_score = (*strategy_)->getAiConfig().shoot_or_pass_play_config().abs_min_pass_score();
 
-    if (best_pass.score > min_score)
+    if (best_pass.rating > min_score)
     {
         // TODO(arun): should we normalize this?
-        current_feasibility_ = best_pass.score;
+        current_feasibility_ = best_pass.rating;
         return;
     }
 
@@ -46,7 +48,7 @@ void FeasibilityVisitor::visit(const PassSkill& skill)
 
 void FeasibilityVisitor::visit(const ShootSkill& skill)
 {
-    std::optional<Shot> best_shot = (*strategy_)->getBestShot(robot);
+    std::optional<Shot> best_shot = (*strategy_)->getBestShot(robot_);
     if (!best_shot)
     {
         current_feasibility_ = 0;
@@ -60,7 +62,7 @@ void FeasibilityVisitor::visit(const ShootSkill& skill)
 
 double FeasibilityVisitor::getFeasibility(const Skill& skill)
 {
-    skill.accept(this);
+    skill.accept(*this);
 
     return current_feasibility_;
 }

@@ -6,6 +6,7 @@ cc_library(
     srcs = ["feasibility_visitor.cpp"],
     deps = [
         ":skill_visitor",
+        "//software/ai/evaluation:keep_away",
         "//software/ai/hl/stp/skill:skill",
         "//software/ai/hl/stp/strategy:strategy",
         "//software/world:robot",

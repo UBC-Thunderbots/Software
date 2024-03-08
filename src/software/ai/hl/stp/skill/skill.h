@@ -39,7 +39,7 @@ class Skill
 
     virtual std::string getFSMState(RobotId robot_id) const = 0;
 
-    void accept(SkillVisitor& visitor) = 0;
+    virtual void accept(SkillVisitor& visitor) = 0;
 
    protected:
     std::shared_ptr<Strategy> strategy_;

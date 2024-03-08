@@ -6,9 +6,6 @@ cc_library(
         "skill.h",
         "skill_fsm.h",
     ],
-    srcs = [
-        "skill.cpp",
-    ],
     deps = [
         "//software/ai/evaluation/scoring/skills:skill_visitor",
         "//software/ai/hl/stp/strategy:strategy",
