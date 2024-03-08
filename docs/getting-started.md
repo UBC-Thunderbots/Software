@@ -337,7 +337,7 @@ Unlike [Callgrind](Callgrind), we can run (and encouraged to run) Tracy with the
 
 Tracy also samples call stacks. If the profiled binary is run with root permissions, then Tracy can also inspect the kernel stack trace. By default, Thunderloop is run with root permissions but we can profile `unix_full_system` with elevated permissions by following the on-screen instructions by running:
 
-    `./tbots.py run thunderscope_main --tracy --sudo`
+    ./tbots.py run thunderscope_main --tracy --sudo
 
 ## Building for Jetson Nano 
 
