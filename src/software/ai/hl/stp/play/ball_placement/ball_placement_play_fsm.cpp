@@ -49,7 +49,8 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
         // find position behind the ball where the ball is aligned directly in front
         // placement point from the placing robot's POV
         Vector alignment_vector =
-            (placement_point.value() - event.common.world_ptr->ball().position()).normalize();
+            (placement_point.value() - event.common.world_ptr->ball().position())
+                .normalize();
         Angle setup_angle = alignment_vector.orientation();
         setup_point       = event.common.world_ptr->ball().position() -
                       2 * alignment_vector * ROBOT_MAX_RADIUS_METERS;
@@ -103,7 +104,7 @@ void BallPlacementPlayFSM::retreat(const Update &event)
 {
     WorldPtr world_ptr = event.common.world_ptr;
     std::optional<Robot> nearest_robot =
-            world_ptr->friendlyTeam().getNearestRobot(world_ptr->ball().position());
+        world_ptr->friendlyTeam().getNearestRobot(world_ptr->ball().position());
 
     if (nearest_robot.has_value())
     {
