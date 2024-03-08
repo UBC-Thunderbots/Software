@@ -3,6 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play/defense/defense_play.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
 
 /**
  * Play for defending against enemy free kicks
@@ -10,7 +11,7 @@
 
 struct EnemyFreeKickPlayFSM
 {
-    class DefensiveState;
+    class ShadowFreeKicker;
 
     struct ControlParams
     {
@@ -47,6 +48,7 @@ struct EnemyFreeKickPlayFSM
 
         DEFINE_SML_EVENT(Update)
 
+        DEFINE_SML_ACTION(shadowEnemyKicker)
 
         return make_transition_table(
                 // src_state + event [guard] / action = dest_state
@@ -56,6 +58,7 @@ struct EnemyFreeKickPlayFSM
 
 private:
     TbotsProto::AiConfig ai_config;
-    std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
-    std::shared_ptr<DefensePlay> defense_play;
+//    std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
+//    std::shared_ptr<DefensePlay> defense_play;
+    std::shared_ptr<TbotsProto::ShadowEnemyTactic> shadow_defender;
 };

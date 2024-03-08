@@ -15,3 +15,9 @@ EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(TbotsProto::AiConfig config)
 {
 }
 
+void EnemyFreeKickPlayFSM::shadowEnemyKicker(const Update& event)
+{
+
+}
+
+void EnemyFreeKickPlayFSM::
