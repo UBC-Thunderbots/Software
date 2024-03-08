@@ -28,7 +28,7 @@ class FeasibilityVisitor : public SkillVisitor
          * @return a viability score in the range [0, 1] indicating whether the skill
          * is feasible for the given robot to execute
          */
-        double getFeasibility(const Skill& skill);
+        double getFeasibility(Skill& skill);
 
     private:
         double current_feasibility_;

@@ -60,7 +60,7 @@ void FeasibilityVisitor::visit(const ShootSkill& skill)
     current_feasibility_ = shot_angle_viability;
 }
 
-double FeasibilityVisitor::getFeasibility(const Skill& skill)
+double FeasibilityVisitor::getFeasibility(Skill& skill)
 {
     skill.accept(*this);
 
