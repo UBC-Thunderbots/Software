@@ -27,18 +27,21 @@ struct EnemyFreeKickPlayFSM
     explicit EnemyFreeKickPlayFSM(TbotsProto::AiConfig ai_config);
 
     /**
-     * Action to defend the enemy free kick robot
+     * Action to configure the play for defensive gameplay for enemy free kick
      *
      * @param event the FSM event
      */
-    void shadowEnemyKicker(const Update& event);
+    void setupEnemyKickerStrategy(const Update& event);
 
-//    /**
-//     * Action to set up the defenders taking into account the new number of defenders
-//     *
-//     * @param num_defenders The number of defenders
-//     */
-//    void setUpDefenders(unsigned int num_defenders);
+    /**
+     * Helper function to set the tactics for the play depending on the
+     * specified number of attackers and defenders to setup
+     *
+     * @param event the FSM event
+     * @param num_shadow_robots the number of shadowing robots (ShootOrPassPlay)
+     * @param num_defenders the number of defenders (DefensePlay)
+     */
+    void setTactics(const Update& event, int num_shadow_robots, int num_defenders);
 
     auto operator()()
     {
@@ -48,17 +51,16 @@ struct EnemyFreeKickPlayFSM
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_ACTION(shadowEnemyKicker)
+        DEFINE_SML_ACTION(setupEnemyKickerStrategy)
 
         return make_transition_table(
                 // src_state + event [guard] / action = dest_state
-                *ShadowFreeKicker_S + Update_E / shadowEnemyKicker_A = ShadowFreeKicker_S,
+                *ShadowFreeKicker_S + Update_E / setupEnemyKickerStrategy_A = ShadowFreeKicker_S,
                 X + Update_E                                     = X);
     }
 
 private:
     TbotsProto::AiConfig ai_config;
-//    std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
-//    std::shared_ptr<DefensePlay> defense_play;
+    std::shared_ptr<DefensePlay> defense_play;
     std::shared_ptr<TbotsProto::ShadowEnemyTactic> shadow_defender;
 };

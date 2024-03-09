@@ -47,7 +47,7 @@ def test_enemy_free_kick_play(simulated_test_runner):
 
     # Force play override here
     blue_play = Play()
-    blue_play.name = PlayName.OffensePlay
+    blue_play.name = PlayName.EnemyFreekickPlay
 
     yellow_play = Play()
     yellow_play.name = PlayName.HaltPlay
