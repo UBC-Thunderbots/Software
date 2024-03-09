@@ -61,6 +61,8 @@ class SkillGraph
     static constexpr double ADJUSTMENT_RESISTANCE    = 20.0;
     static constexpr double ADJUSTMENT_SCALE         = 0.5;
 
+    std::shared_ptr<Strategy> strategy_;
+
     /**
      * Each node in the graph is represented by a Skill.
      * The ID of a node is the index of the corresponding Skill in nodes_.

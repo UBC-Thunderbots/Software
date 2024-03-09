@@ -21,9 +21,7 @@ cc_library(
 cc_library(
     name = "all_skills",
     deps = [
-        "//software/ai/hl/stp/skill/dribble:dribble_skill",
         "//software/ai/hl/stp/skill/keep_away:keep_away_skill",
-        "//software/ai/hl/stp/skill/pivot_kick:pivot_kick_skill",
         "//software/ai/hl/stp/skill/pass:pass_skill",
         "//software/ai/hl/stp/skill/shoot:shoot_skill",
     ],

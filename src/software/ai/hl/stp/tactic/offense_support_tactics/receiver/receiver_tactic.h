@@ -19,6 +19,8 @@ class ReceiverTactic : public OffenseSupportTactic
    public:
     ReceiverTactic();
 
+    void updateControlParams() override;
+
     /**
      * Updates the control parameters for this ReceiverTactic.
      *

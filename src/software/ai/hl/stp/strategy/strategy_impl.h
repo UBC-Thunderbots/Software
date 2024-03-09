@@ -36,7 +36,7 @@ class StrategyImpl
      *
      * @returns best pass for the robot
      */
-    PassWithRating getBestPass();
+    PassWithRating getBestUncommittedPass();
 
     std::optional<Shot> getBestShot(const Robot& robot);
 
@@ -54,6 +54,9 @@ class StrategyImpl
     bool hasWorld() const;
     void updateWorld(const WorldPtr& world_ptr);
 
+    // Commit methods for when a Tactic commits to a certain action
+    void commit(OffenseSupportType& type);
+
    private:
     bool isBetterPassThanCached(const Timestamp& timestamp, const PassWithRating& pass);
 
@@ -69,7 +72,9 @@ class StrategyImpl
     std::unique_ptr<PassStrategy> pass_strategy_;
     std::shared_ptr<PassEvaluation<EighteenZoneId>> cached_pass_eval_;
     Timestamp cached_pass_time_;
+    std::vector<ZoneEnum> committed_pass_zones_;
 
+    std::vector<OffenseSupportType> committed_support_types_;
     std::unordered_map<RobotId, Pose> robot_to_best_dribble_location_;
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
 };

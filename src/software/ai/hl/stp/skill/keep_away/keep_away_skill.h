@@ -7,7 +7,7 @@
 class KeepAwaySkill : public BaseSkill<KeepAwaySkillFSM, DribbleSkillFSM>
 {
    public:
-    explicit KeepAwaySkill(std::shared_ptr<Strategy> strategy) : BaseSkill(strategy){};
+    explicit KeepAwaySkill(std::shared_ptr<Strategy> strategy);
 
     void accept(SkillVisitor& visitor) override;
 };

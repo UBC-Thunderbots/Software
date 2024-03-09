@@ -4,6 +4,11 @@
 #include "software/ai/evaluation/scoring/skills/skill_visitor.h"
 #include "software/util/generic_factory/generic_factory.h"
 
+KeepAwaySkill::KeepAwaySkill(std::shared_ptr<Strategy> strategy)
+    : BaseSkill(strategy)
+{
+}
+
 void KeepAwaySkill::accept(SkillVisitor &skill_visitor)
 {
     skill_visitor.visit(*this);

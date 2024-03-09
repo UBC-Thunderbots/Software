@@ -2,11 +2,14 @@
 
 #include "software/ai/hl/stp/skill/base_skill.hpp"
 
-class PassSkill : public BaseSkill<PassSkillFSM>
+#include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
+#include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h"
+#include "software/ai/hl/stp/skill/pass/pass_skill_fsm.h"
+
+class PassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, PivotKickSkillFSM>
 {
    public:
-    explicit PassSkill(std::shared_ptr<Strategy> strategy) : BaseSkill(strategy){};
-};
+    explicit PassSkill(std::shared_ptr<Strategy> strategy);
 
-// Register this Skill in the GenericFactory
-static TGenericFactory<std::string, Skill, PassSkill, std::shared_ptr<Strategy>> factory;
+    void accept(SkillVisitor& skill_visitor) override;
+};

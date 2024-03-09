@@ -64,7 +64,7 @@ Pose StrategyImpl::getBestDribblePose(const Robot& robot)
     return robot_to_best_dribble_location_.at(robot.id());
 }
 
-PassWithRating StrategyImpl::getBestPass()
+PassWithRating StrategyImpl::getBestUncommittedPass()
 {
     // calculate best pass
     Timestamp current_time = world_ptr_->getMostRecentTimestamp();
@@ -77,7 +77,17 @@ PassWithRating StrategyImpl::getBestPass()
         cached_pass_time_ = current_time;
     }
 
-    return cached_pass_eval_->getBestPassOnField();
+    for (const ZoneEnum& zone : cached_pass_eval_->rankZonesForReceiving(world_ptr_, world_ptr_->ball().position()))
+    {
+        if (std::find(committed_pass_zones_.begin(), committed_pass_zones_.end(), zone) == committed_pass_zones_.end())
+        {
+            return cached_pass_eval_->getBestPassInZones({zone});
+        }
+    }
+
+    CHECK(true) << "No Pass found? All Zones have a pass committed in them...";
+
+    return Pass();
 }
 
 std::optional<Shot> StrategyImpl::getBestShot(const Robot& robot)
@@ -95,15 +105,15 @@ std::optional<Shot> StrategyImpl::getBestShot(const Robot& robot)
 
 std::vector<OffenseSupportType> StrategyImpl::getCommittedOffenseSupport() const
 {
-    // TODO(#3098): Commit the Support tactics to this StrategyImpl class and return their
-    // types here
-    return std::vector<OffenseSupportType>();
+    return committed_support_types_;
 }
 
 void StrategyImpl::reset()
 {
     robot_to_best_dribble_location_ = {};
     robot_to_best_shot_             = {};
+    committed_passes_               = {};
+    committed_support_types_        = {};
 }
 
 const TbotsProto::AiConfig& StrategyImpl::getAiConfig() const
@@ -154,4 +164,9 @@ int StrategyImpl::calcNumIdealDefenders()
 {
     // TODO(arun): make a todo
     return 2;
+}
+
+void StrategyImpl::commit(OffenseSupportType& offense_support_type)
+{
+    committed_support_types_.push_back(offense_support_type);
 }

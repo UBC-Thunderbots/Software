@@ -70,12 +70,12 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
             (*best_candidate)->updateScorer(*support_tactic_duplication_scorer_);
         }
 
-        std::vector<OffenseSupportType> committed_support;
-        std::transform(support_tactics_.begin(), support_tactics_.end(),
-                       std::back_inserter(committed_support),
-                       [](const std::shared_ptr<OffenseSupportTactic> &tactic) {
-                           return tactic->getOffenseSupportType();
-                       });
+        std::for_each(support_Tactics_.begin(), support_tactics_.end(),
+                [&committed_support](const std::shared_ptr<OffenseSupportTactic> &tactic)
+                {
+                    committed_support->commit();
+                    committed_support->updateControlParams();
+                });
     }
 
     tactics_to_return.push_back({attacker_tactic_});

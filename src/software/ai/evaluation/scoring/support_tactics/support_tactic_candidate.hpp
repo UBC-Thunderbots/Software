@@ -73,6 +73,7 @@ class TypedSupportTacticCandidate : public SupportTacticCandidate
 
     std::shared_ptr<OffenseSupportTactic> createSupportTactic() override
     {
+        // TODO(arun): use generic factory here
         return std::make_shared<TSupportTactic>();
     }
 };
