@@ -7,6 +7,7 @@ from software.py_constants import *
 from proto.import_all_protos import *
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
+from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from typing import Type
 
