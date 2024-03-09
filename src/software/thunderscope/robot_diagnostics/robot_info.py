@@ -118,8 +118,9 @@ class RobotInfo(QWidget):
         self.battery_layout.addWidget(self.stop_primitive_label)
 
         # Primitive loss rate label
-        self.primitive_loss_rate_label = QLabel()
-        self.primitive_loss_rate_label.setText("P%NA")
+        self.primitive_loss_rate_label = common_widgets.ColorQLabel(
+            max_val=MAX_ACCEPTABLE_PACKET_LOSS_PERCENT
+        )
         self.battery_layout.addWidget(self.primitive_loss_rate_label)
 
         self.battery_layout.addWidget(self.battery_progress_bar)
@@ -336,8 +337,8 @@ class RobotInfo(QWidget):
 
         self.__update_stop_primitive(primitive_executor_status.running_primitive)
 
-        self.primitive_loss_rate_label.setText(
-            f"P%{network_status.primitive_packet_loss_percentage:02d}"
+        self.primitive_loss_rate_label.set_float_val(
+            network_status.primitive_packet_loss_percentage
         )
 
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)
