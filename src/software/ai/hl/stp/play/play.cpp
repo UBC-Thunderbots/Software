@@ -161,8 +161,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         std::shared_ptr<MoveTactic> auto_sub_tactic = std::make_shared<MoveTactic>();
 
         // move to middle of court and to positive y boundary and stop
-        auto_sub_tactic->updateControlParams(Point(0, world_ptr->field().totalYLength() / 2),
-                                             Angle::zero(), 0);
+        auto_sub_tactic->updateControlParams(
+            Point(0, world_ptr->field().totalYLength() / 2), Angle::zero(), 0);
 
         for (auto robot : injured_robots)
         {
@@ -216,8 +216,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
         auto [remaining_robots, new_primitives_to_assign,
               current_tactic_robot_id_assignment] =
-            assignTactics(world_ptr, tactic_vector, robots, obstacle_factory, obstacle_list,
-                          path_visualization);
+            assignTactics(world_ptr, tactic_vector, robots, obstacle_factory,
+                          obstacle_list, path_visualization);
 
         tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 
