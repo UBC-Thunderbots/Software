@@ -485,7 +485,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rotate
     world_ptr->updateBall(new_ball);
     world_ptr->updateGameState(ball_placement_gs);
     auto obstacles =
-        robot_navigation_obstacle_factory.createDynamicObstaclesFromMotionConstraint(
+        robot_navigation_obstacle_factory.createObstaclesFromMotionConstraint(
             TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world_ptr);
     EXPECT_EQ(1, obstacles.size());
     try

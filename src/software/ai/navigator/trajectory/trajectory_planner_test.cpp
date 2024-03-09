@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/test_util/test_util.h"
 
 class TrajectoryPlannerTest : public testing::Test
