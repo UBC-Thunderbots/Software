@@ -3,6 +3,7 @@
 #include "shared/2021_robot_constants.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/ai/hl/stp/tactic/stop_primitive.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/test_util/test_util.h"
 
 class PrimitiveTest : public testing::Test
@@ -24,7 +25,7 @@ class PrimitiveTest : public testing::Test
 
 TEST_F(PrimitiveTest, test_create_move_primitive)
 {
-    const Point destination(-5, 1);
+    const Point destination(-4, 1);
 
     std::shared_ptr<MovePrimitive> move_primitive = std::make_shared<MovePrimitive>(
         robot, destination, Angle::threeQuarter(),
@@ -34,9 +35,10 @@ TEST_F(PrimitiveTest, test_create_move_primitive)
 
     EXPECT_GT(move_primitive->getEstimatedPrimitiveCost(), 0.0);
 
-    auto move_primitive_msg =
-        move_primitive->generatePrimitiveProtoMessage(world, {}, obstacle_factory);
+    auto [trajectory_path_opt, move_primitive_msg] =
+        move_primitive->generatePrimitiveProtoMessage(world, {}, {}, obstacle_factory);
 
+    EXPECT_NE(trajectory_path_opt, std::nullopt);
     ASSERT_TRUE(move_primitive_msg->has_move());
     auto generated_destination =
         move_primitive_msg->move().xy_traj_params().destination();
@@ -72,9 +74,12 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_sub_destination)
 
     EXPECT_GT(primitive->getEstimatedPrimitiveCost(), 0.0);
 
-    auto move_primitive_msg = primitive->generatePrimitiveProtoMessage(
-        world, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA}, obstacle_factory);
+    auto [trajectory_path_opt, move_primitive_msg] =
+        primitive->generatePrimitiveProtoMessage(
+            world, {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA}, {},
+            obstacle_factory);
 
+    EXPECT_NE(trajectory_path_opt, std::nullopt);
     ASSERT_TRUE(move_primitive_msg->has_move());
     TbotsProto::MovePrimitive move_primitive          = move_primitive_msg->move();
     TbotsProto::TrajectoryPathParams2D xy_traj_params = move_primitive.xy_traj_params();
@@ -100,7 +105,7 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_sub_destination)
 
 TEST_F(PrimitiveTest, test_create_move_primitive_with_autochip)
 {
-    const Point destination(-5, 1);
+    const Point destination(-4, 1);
 
     std::shared_ptr<MovePrimitive> move_primitive = std::make_shared<MovePrimitive>(
         robot, destination, Angle::threeQuarter(),
@@ -111,9 +116,10 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autochip)
 
     EXPECT_GT(move_primitive->getEstimatedPrimitiveCost(), 0.0);
 
-    auto move_primitive_msg =
-        move_primitive->generatePrimitiveProtoMessage(world, {}, obstacle_factory);
+    auto [trajectory_path_opt, move_primitive_msg] =
+        move_primitive->generatePrimitiveProtoMessage(world, {}, {}, obstacle_factory);
 
+    EXPECT_NE(trajectory_path_opt, std::nullopt);
     ASSERT_TRUE(move_primitive_msg->has_move());
     auto generated_destination =
         move_primitive_msg->move().xy_traj_params().destination();
@@ -132,7 +138,7 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autochip)
 
 TEST_F(PrimitiveTest, test_create_move_primitive_with_autokick)
 {
-    const Point destination(-5, 1);
+    const Point destination(-4, 1);
 
     std::shared_ptr<MovePrimitive> move_primitive = std::make_shared<MovePrimitive>(
         robot, destination, Angle::threeQuarter(),
@@ -143,14 +149,17 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autokick)
 
     EXPECT_GT(move_primitive->getEstimatedPrimitiveCost(), 0.0);
 
-    auto move_primitive_msg =
-        move_primitive->generatePrimitiveProtoMessage(world, {}, obstacle_factory);
+    auto [trajectory_path_opt, move_primitive_msg] =
+        move_primitive->generatePrimitiveProtoMessage(world, {}, {}, obstacle_factory);
 
+    ASSERT_NE(trajectory_path_opt, std::nullopt);
     ASSERT_TRUE(move_primitive_msg->has_move());
     auto generated_destination =
         move_primitive_msg->move().xy_traj_params().destination();
     EXPECT_EQ(generated_destination.x_meters(), destination.x());
     EXPECT_EQ(generated_destination.y_meters(), destination.y());
+    EXPECT_EQ(trajectory_path_opt->getDestination(), destination);
+
     EXPECT_EQ(move_primitive_msg->move().w_traj_params().final_angle().radians(),
               Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive_msg->move().dribbler_mode(), TbotsProto::DribblerMode::OFF);
@@ -162,12 +171,34 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autokick)
               3.5);
 }
 
+TEST_F(PrimitiveTest, test_destination_outside_of_field)
+{
+    // Point outside the navigable area should be moved into the field
+    const Point destination(6, 0);
+
+    std::shared_ptr<MovePrimitive> move_primitive = std::make_shared<MovePrimitive>(
+        robot, destination, Angle::threeQuarter(),
+        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+        TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::AVOID,
+        AutoChipOrKick({AutoChipOrKickMode::AUTOKICK, 3.5}), std::optional<double>());
+
+    auto [trajectory_path_opt, move_primitive_msg] =
+        move_primitive->generatePrimitiveProtoMessage(world, {}, {}, obstacle_factory);
+
+    ASSERT_TRUE(move_primitive_msg->has_move());
+    Point generated_destination =
+        createPoint(move_primitive_msg->move().xy_traj_params().destination());
+    EXPECT_TRUE(contains(world->field().fieldBoundary(), generated_destination));
+}
+
 TEST_F(PrimitiveTest, test_create_stop_primitive)
 {
     StopPrimitive stop_primitive;
     EXPECT_EQ(stop_primitive.getEstimatedPrimitiveCost(), 0.0);
 
-    auto primitive_proto =
-        stop_primitive.generatePrimitiveProtoMessage(world, {}, obstacle_factory);
-    EXPECT_TRUE(primitive_proto->has_stop());
+    auto [trajectory_path_opt, move_primitive_msg] =
+        stop_primitive.generatePrimitiveProtoMessage(world, {}, {}, obstacle_factory);
+    EXPECT_TRUE(move_primitive_msg->has_stop());
+    EXPECT_EQ(trajectory_path_opt, std::nullopt);
 }

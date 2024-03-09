@@ -12,7 +12,7 @@
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
 #include "software/test_util/test_util.h"
-#include "software/world_ptr/robot.h"
+#include "software/world/robot.h"
 
 class RobotNavigationObstacleFactoryTest : public testing::Test
 {
