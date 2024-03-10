@@ -166,7 +166,7 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
     tactic->updateControlParams(
         destination, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
-        TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
     setTactic(0, tactic);
 

@@ -1,6 +1,7 @@
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/distance.h"
 
 TrajectoryPlanner::TrajectoryPlanner()
     : relative_sub_destinations(getRelativeSubDestinations())
@@ -55,7 +56,7 @@ std::vector<Point> TrajectoryPlanner::getSubDestinations(
 std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
     const Point &start, const Point &destination, const Vector &initial_velocity,
     const KinematicConstraints &constraints, const std::vector<ObstaclePtr> &obstacles,
-    const Rectangle &navigable_area)
+    const Rectangle &navigable_area, const std::optional<Point> &prev_sub_destination)
 {
     if (constraints.getMaxVelocity() <= 0.0 || constraints.getMaxAcceleration() <= 0.0 ||
         constraints.getMaxDeceleration() <= 0.0)
@@ -80,6 +81,17 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
         TrajectoryPathWithCost sub_trajectory = getDirectTrajectoryWithCost(
             start, sub_dest, initial_velocity, constraints, obstacles);
 
+        // Prefer sub destinations that are closer to the previous sub destination.
+        // This is used to avoid oscillation between two sub destinations that return a
+        // trajectory with the similar cost.
+        double cost_offset = 0.0;
+        if (prev_sub_destination.has_value() &&
+            distance(sub_dest, prev_sub_destination.value()) <
+                SUB_DESTINATION_CLOSE_BONUS_THRESHOLD_METERS)
+        {
+            cost_offset = SUB_DESTINATION_CLOSE_BONUS_COST;
+        }
+
         for (double connection_time = SUB_DESTINATION_STEP_INTERVAL_SEC;
              connection_time <= sub_trajectory.traj_path.getTotalTime();
              connection_time += SUB_DESTINATION_STEP_INTERVAL_SEC)
@@ -98,6 +110,7 @@ std::optional<TrajectoryPath> TrajectoryPlanner::findTrajectory(
 
             TrajectoryPathWithCost full_traj_with_cost = getTrajectoryWithCost(
                 traj_path_to_dest, obstacles, sub_trajectory, connection_time);
+            full_traj_with_cost.cost += cost_offset;
             if (full_traj_with_cost.cost < best_traj_with_cost.cost)
             {
                 best_traj_with_cost = full_traj_with_cost;

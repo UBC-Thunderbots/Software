@@ -61,7 +61,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
 
             if (traj_path.has_value())
             {
-                robot_trajectories.emplace(robot.id(), traj_path.value());
+                robot_trajectories.insert_or_assign(robot.id(), traj_path.value());
             }
             else
             {

@@ -24,12 +24,15 @@ class TrajectoryPlanner
      * @param constraints Kinematic constraints of the trajectory
      * @param obstacles List of obstacles to avoid
      * @param navigable_area The navigable area of the field
+     * @param prev_sub_destination The previous sub destination of this robot.
+     * nullopt if there is no previous sub destination
      * @return TrajectoryPath which attempts to avoid the obstacles
      */
     std::optional<TrajectoryPath> findTrajectory(
         const Point &start, const Point &destination, const Vector &initial_velocity,
         const KinematicConstraints &constraints,
-        const std::vector<ObstaclePtr> &obstacles, const Rectangle &navigable_area);
+        const std::vector<ObstaclePtr> &obstacles, const Rectangle &navigable_area,
+        const std::optional<Point> &prev_sub_destination = std::nullopt);
 
    private:
     /**
@@ -149,4 +152,7 @@ class TrajectoryPlanner
     const double COLLISION_CHECK_STEP_INTERVAL_SEC         = 0.1;
     const double FORWARD_COLLISION_CHECK_STEP_INTERVAL_SEC = 0.05;
     const double MAX_FUTURE_COLLISION_CHECK_SEC            = 2.0;
+
+    const double SUB_DESTINATION_CLOSE_BONUS_THRESHOLD_METERS = 0.1;
+    const double SUB_DESTINATION_CLOSE_BONUS_COST             = -0.3;
 };

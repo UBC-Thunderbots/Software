@@ -94,8 +94,22 @@ MovePrimitive::generatePrimitiveProtoMessage(
         }
     }
 
+    std::optional<Point> prev_sub_destination;
+    auto prev_trajectory_it = robot_trajectories.find(robot.id());
+    if (prev_trajectory_it != robot_trajectories.end())
+    {
+        const auto &prev_trajectory_path_nodes =
+            prev_trajectory_it->second.getTrajectoryPathNodes();
+        if (!prev_trajectory_path_nodes.empty())
+        {
+            prev_sub_destination =
+                prev_trajectory_path_nodes[0].getTrajectory()->getDestination();
+        }
+    }
+
     traj_path = planner.findTrajectory(robot.position(), destination, robot.velocity(),
-                                       constraints, obstacles, navigable_area);
+                                       constraints, obstacles, navigable_area,
+                                       prev_sub_destination);
 
     if (!traj_path.has_value())
     {

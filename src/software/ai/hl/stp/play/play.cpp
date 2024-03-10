@@ -129,7 +129,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
             if (traj_path.has_value())
             {
-                robot_trajectories.emplace(goalie_robot_id, traj_path.value());
+                robot_trajectories.insert_or_assign(goalie_robot_id, traj_path.value());
             }
             else
             {
@@ -362,7 +362,7 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
 
                 if (traj_path.has_value())
                 {
-                    robot_trajectories.emplace(robot_id, traj_path.value());
+                    robot_trajectories.insert_or_assign(robot_id, traj_path.value());
                 }
                 else
                 {
