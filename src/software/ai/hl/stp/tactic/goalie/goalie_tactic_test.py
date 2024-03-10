@@ -174,9 +174,15 @@ def test_goalie_blocks_shot(
 @pytest.mark.parametrize(
     "ball_position",
     [
-        (tbots_cpp.Point(-3.4, 0)),
-        (tbots_cpp.Point(-3.4, 0.9)),
-        (tbots_cpp.Point(-4.0, 1.1)),
+        (
+            tbots_cpp.Point(-3.45, 0)
+        ),  # ball is just inside the dead zone in the X direction
+        (
+            tbots_cpp.Point(-3.45, 0.9)
+        ),  # ball is just inside the dead zone in the X direction
+        (
+            tbots_cpp.Point(-4.0, 1.05)
+        ),  # ball is just inside the dead zone in the Y direction
     ],
 )
 def test_goalie_clears_from_dead_zone(
@@ -211,13 +217,7 @@ def test_goalie_clears_from_dead_zone(
     )
 
     # Always Validation
-    always_validation_sequence_set = [
-        [
-            # RobotAlwaysStaysInRegion(
-            #     regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()]
-            # ),
-        ]
-    ]
+    always_validation_sequence_set = [[]]
 
     # Eventually Validation
     eventually_validation_sequence_set = [
