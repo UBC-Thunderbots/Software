@@ -114,8 +114,9 @@ Point GoalieFSM::findGoodChipTarget(
 
 bool GoalieFSM::shouldEvacuateCrease(const Update &event)
 {
-    Rectangle friendly_defense_area = event.common.world_ptr->field().friendlyDefenseArea();
-    Ball ball                       = event.common.world_ptr->ball();
+    Rectangle friendly_defense_area =
+        event.common.world_ptr->field().friendlyDefenseArea();
+    Ball ball = event.common.world_ptr->ball();
 
     // calculate inflated crease obstacle
     double robot_radius_expansion_amount =
@@ -134,8 +135,8 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
     double nearest_enemy_distance_to_ball = distance(
         event.common.world_ptr->enemyTeam().getNearestRobot(ball.position())->position(),
         ball.position());
-    double goalie_distance_to_ball =
-        distance(event.common.world_ptr->friendlyTeam().goalie()->position(), ball.position());
+    double goalie_distance_to_ball = distance(
+        event.common.world_ptr->friendlyTeam().goalie()->position(), ball.position());
     bool safe_to_evacuate = nearest_enemy_distance_to_ball * safe_distance_multiplier >
                             goalie_distance_to_ball;
 
@@ -207,8 +208,9 @@ void GoalieFSM::updatePivotKick(
     Point chip_target = findGoodChipTarget(event.common.world_ptr, goalie_tactic_config);
 
     // check if goalie is outside defense area, inside inflated defense area
-    Rectangle friendly_defense_area = event.common.world_ptr->field().friendlyDefenseArea();
-    Ball ball                       = event.common.world_ptr->ball();
+    Rectangle friendly_defense_area =
+        event.common.world_ptr->field().friendlyDefenseArea();
+    Ball ball = event.common.world_ptr->ball();
 
     // calculate inflated crease obstacle
     double robot_radius_expansion_amount =
@@ -286,7 +288,8 @@ void GoalieFSM::retrieveFromDeadZone(
         event.common.world_ptr->field().enemyGoalCenter() - ball_position;
 
     DribbleFSM::ControlParams control_params{
-        .dribble_destination = event.common.world_ptr->field().friendlyDefenseArea().centre(),
+        .dribble_destination =
+            event.common.world_ptr->field().friendlyDefenseArea().centre(),
         .final_dribble_orientation = final_dribble_orientation.orientation(),
         .allow_excessive_dribbling = true,
     };
