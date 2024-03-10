@@ -47,6 +47,7 @@ cc_library(
         "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",
+        "@tracy",
     ],
 )
 
