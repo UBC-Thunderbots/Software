@@ -12,5 +12,6 @@ class ScoringFromContestedPossessionPlay : public Play
    public:
     ScoringFromContestedPossessionPlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
 };

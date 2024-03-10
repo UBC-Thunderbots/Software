@@ -421,7 +421,7 @@ void SimRobot::begin(SimBall *ball, double time)
 
         if (m_sslCommand.kick_angle() == 0)
         {
-            power = qBound(0.05f, m_sslCommand.kick_speed(), m_specs.shot_linear_max());
+            power = qBound(0.05f, m_sslCommand.kick_speed() - ball->speed().length(), m_specs.shot_linear_max());
         }
         else
         {

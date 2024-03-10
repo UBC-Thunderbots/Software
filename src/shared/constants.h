@@ -185,8 +185,8 @@ static const double DISCONNECT_DURATION_MS = 1 * MILLISECONDS_PER_SECOND;
 static const char ARDUINO_VENDOR_ID[ARDUINO_ID_LENGTH]  = "2341";
 static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 
-// Number of times the control loop should tick per trajectory element
-static const unsigned CONTROL_LOOP_HZ = 60u;
+// Number of times thunderloop should tick per second
+static const unsigned THUNDERLOOP_HZ = 300u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;
 
