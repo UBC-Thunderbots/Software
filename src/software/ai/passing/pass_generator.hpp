@@ -186,10 +186,10 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const WorldPtr& worl
         auto pass_destination =
             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_));
 
-        auto pass = Pass::fromDestReceiveSpeed(world_ptr->ball().position(), pass_destination,
-                                               passing_config_.max_receive_speed(),
-                                               passing_config_.min_pass_speed_m_per_s(),
-                                               passing_config_.max_pass_speed_m_per_s());
+        auto pass = Pass::fromDestReceiveSpeed(
+            world_ptr->ball().position(), pass_destination,
+            passing_config_.max_receive_speed(), passing_config_.min_pass_speed_m_per_s(),
+            passing_config_.max_pass_speed_m_per_s());
 
         passes.emplace(zone_id,
                        PassWithRating{pass, ratePass(world_ptr, pass,
@@ -236,8 +236,8 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
             Point(optimized_pass_array[0], optimized_pass_array[1]),
             passing_config_.max_receive_speed(), passing_config_.min_pass_speed_m_per_s(),
             passing_config_.max_pass_speed_m_per_s());
-        auto score =
-            ratePass(world_ptr, new_pass, pitch_division_->getZone(zone_id), passing_config_);
+        auto score = ratePass(world_ptr, new_pass, pitch_division_->getZone(zone_id),
+                              passing_config_);
 
         optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
     }
