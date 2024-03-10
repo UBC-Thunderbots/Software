@@ -13,7 +13,7 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
       stop_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
-      world_(std::nullopt),
+      world_ptr_(std::nullopt),
       obstacle_factory(ai_config.robot_navigation_obstacle_config())
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
@@ -22,13 +22,13 @@ Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
     }
 }
 
-PriorityTacticVector Play::getTactics(const World &world)
+PriorityTacticVector Play::getTactics(const WorldPtr &world_ptr)
 {
     // Update the member variable that stores the world. This will be used by the
     // getNextTacticsWrapper function (inside the coroutine) to pass the World data to
     // the getNextTactics function. This is easier than directly passing the World data
     // into the coroutine
-    world_ = world;
+    world_ptr_ = world_ptr;
     // Check the coroutine status to see if it has any more work to do.
     if (tactic_sequence)
     {
@@ -80,18 +80,18 @@ PriorityTacticVector Play::getTactics(const World &world)
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
-    const World &world, const InterPlayCommunication &inter_play_communication,
+    const WorldPtr &world_ptr, const InterPlayCommunication &inter_play_communication,
     const SetInterPlayCommunicationCallback &set_inter_play_communication_fun)
 {
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =
-        static_cast<unsigned int>(world.friendlyTeam().numRobots());
-    if (requires_goalie && world.friendlyTeam().goalie())
+        static_cast<unsigned int>(world_ptr->friendlyTeam().numRobots());
+    if (requires_goalie && world_ptr->friendlyTeam().goalie())
     {
         num_tactics--;
     }
     updateTactics(PlayUpdate(
-        world, num_tactics,
+        world_ptr, num_tactics,
         [&priority_tactics](PriorityTacticVector new_tactics) {
             priority_tactics = std::move(new_tactics);
         },
@@ -105,8 +105,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
     tactic_robot_id_assignment.clear();
 
-    std::optional<Robot> goalie_robot = world.friendlyTeam().goalie();
-    std::vector<Robot> robots         = world.friendlyTeam().getAllRobots();
+    std::optional<Robot> goalie_robot = world_ptr->friendlyTeam().goalie();
+    std::vector<Robot> robots         = world_ptr->friendlyTeam().getAllRobots();
 
     if (requires_goalie)
     {
@@ -119,13 +119,13 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                          robots.end());
 
             auto motion_constraints =
-                buildMotionConstraintSet(world.gameState(), *goalie_tactic);
-            auto primitives = goalie_tactic->get(world);
+                buildMotionConstraintSet(world_ptr->gameState(), *goalie_tactic);
+            auto primitives = goalie_tactic->get(world_ptr);
             CHECK(primitives.contains(goalie_robot_id))
                 << "Couldn't find a primitive for robot id " << goalie_robot_id;
             auto primitive_proto =
                 primitives[goalie_robot_id]->generatePrimitiveProtoMessage(
-                    world, motion_constraints, obstacle_factory);
+                    world_ptr, motion_constraints, obstacle_factory);
 
             primitives_to_run->mutable_robot_primitives()->insert(
                 {goalie_robot_id, *primitive_proto});
@@ -134,10 +134,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             primitives[goalie_robot_id]->getVisualizationProtos(obstacle_list,
                                                                 path_visualization);
         }
-        else if (world.friendlyTeam().getGoalieId().has_value())
+        else if (world_ptr->friendlyTeam().getGoalieId().has_value())
         {
             LOG(WARNING) << "Robot not found for goalie ID: "
-                         << std::to_string(world.friendlyTeam().getGoalieId().value())
+                         << std::to_string(
+                                world_ptr->friendlyTeam().getGoalieId().value())
                          << std::endl;
         }
         else
@@ -177,7 +178,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
         auto [remaining_robots, new_primitives_to_assign,
               current_tactic_robot_id_assignment] =
-            assignTactics(world, tactic_vector, robots);
+            assignTactics(world_ptr, tactic_vector, robots);
 
         tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 
@@ -196,7 +197,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     LOG(VISUALIZE) << path_visualization;
 
     primitives_to_run->mutable_time_sent()->set_epoch_timestamp_seconds(
-        world.getMostRecentTimestamp().toSeconds());
+        world_ptr->getMostRecentTimestamp().toSeconds());
     primitives_to_run->set_sequence_number(sequence_number++);
 
     return primitives_to_run;
@@ -219,21 +220,21 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     // comes from when implementing Plays. The World is passed as a reference, so when
     // the world member variable is updated the implemented Plays will have access
     // to the updated world as well.
-    if (world_)
+    if (world_ptr_)
     {
-        getNextTactics(yield, world_.value());
+        getNextTactics(yield, world_ptr_.value());
     }
 }
 
 // TODO (#2359): delete once all plays are not coroutines
 void Play::updateTactics(const PlayUpdate &play_update)
 {
-    play_update.set_tactics(getTactics(play_update.world));
+    play_update.set_tactics(getTactics(play_update.world_ptr));
 }
 
 std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
            std::map<std::shared_ptr<const Tactic>, RobotId>>
-Play::assignTactics(const World &world, TacticVector tactic_vector,
+Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                     const std::vector<Robot> &robots_to_assign)
 {
     std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
@@ -246,12 +247,12 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
 
     for (auto tactic : tactic_vector)
     {
-        primitive_sets.emplace_back(tactic->get(world));
-        CHECK(primitive_sets.back().size() == world.friendlyTeam().numRobots())
+        primitive_sets.emplace_back(tactic->get(world_ptr));
+        CHECK(primitive_sets.back().size() == world_ptr->friendlyTeam().numRobots())
             << primitive_sets.back().size() << " primitives from "
             << objectTypeName(*tactic)
             << " is not equal to the number of robots, which is "
-            << world.friendlyTeam().numRobots();
+            << world_ptr->friendlyTeam().numRobots();
     }
 
     size_t num_rows = robots_to_assign.size();
@@ -340,14 +341,14 @@ Play::assignTactics(const World &world, TacticVector tactic_vector,
                     << "Couldn't find a primitive for robot id " << robot_id;
 
                 // Create the list of obstacles
-                auto motion_constraints =
-                    buildMotionConstraintSet(world.gameState(), *tactic_vector.at(col));
+                auto motion_constraints = buildMotionConstraintSet(
+                    world_ptr->gameState(), *tactic_vector.at(col));
 
                 // Only generate primitive proto message for the final primitive to robot
                 // assignment
                 auto primitive_proto =
                     primitives[robot_id]->generatePrimitiveProtoMessage(
-                        world, motion_constraints, obstacle_factory);
+                        world_ptr, motion_constraints, obstacle_factory);
                 primitives_to_run->mutable_robot_primitives()->insert(
                     {robot_id, *primitive_proto});
                 remaining_robots.erase(
