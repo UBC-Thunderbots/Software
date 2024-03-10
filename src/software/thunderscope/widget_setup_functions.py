@@ -4,6 +4,8 @@ from typing import List, Any
 
 from software.py_constants import *
 from proto.import_all_protos import *
+from software.thunderscope.common.fps_widget import FrameTimeWidget
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.common.proto_plotter import ProtoPlotter
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.robot_log_msg_pb2 import RobotLog
@@ -19,11 +21,14 @@ from software.thunderscope.gl.layers import (
     gl_path_layer,
     gl_validation_layer,
     gl_passing_layer,
+    gl_sandbox_world_layer,
     gl_world_layer,
     gl_simulator_layer,
     gl_tactic_layer,
     gl_cost_vis_layer,
+    gl_trail_layer,
 )
+
 
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
@@ -54,8 +59,10 @@ def setup_gl_widget(
     full_system_proto_unix_io: ProtoUnixIO,
     friendly_colour_yellow: bool,
     visualization_buffer_size: int,
+    sandbox_mode: bool = False,
     replay: bool = False,
     replay_log: os.PathLike = None,
+    bufferswap_counter: FrameTimeCounter = None,
 ) -> Field:
     """Setup the GLWidget with its constituent layers
 
@@ -63,16 +70,22 @@ def setup_gl_widget(
     :param full_system_proto_unix_io: The proto unix io object for the full system
     :param friendly_colour_yellow: Whether the friendly colour is yellow
     :param visualization_buffer_size: How many packets to buffer while rendering
+    :param sandbox_mode: if sandbox mode should be enabled
     :param replay: Whether replay mode is currently enabled
     :param replay_log: The file path of the replay log
+    :param bufferswap_counter: a counter used to keep track of the fps. This is used for the fps widget
     :returns: The GLWidget
 
     """
     # Create ProtoPlayer if replay is enabled
     player = ProtoPlayer(replay_log, full_system_proto_unix_io) if replay else None
 
+    if bufferswap_counter == None:
+        bufferswap_counter = FrameTimeCounter()
     # Create widget
-    gl_widget = GLWidget(player=player)
+    gl_widget = GLWidget(
+        player=player, bufferswap_counter=bufferswap_counter, sandbox_mode=sandbox_mode
+    )
 
     # Create layers
     validation_layer = gl_validation_layer.GLValidationLayer(
@@ -88,13 +101,26 @@ def setup_gl_widget(
     cost_vis_layer = gl_cost_vis_layer.GLCostVisLayer(
         "Passing Cost", visualization_buffer_size
     )
-    world_layer = gl_world_layer.GLWorldLayer(
-        "Vision", sim_proto_unix_io, friendly_colour_yellow, visualization_buffer_size
+    world_layer = (
+        gl_sandbox_world_layer.GLSandboxWorldLayer(
+            "Vision",
+            sim_proto_unix_io,
+            friendly_colour_yellow,
+            visualization_buffer_size,
+        )
+        if sandbox_mode
+        else gl_world_layer.GLWorldLayer(
+            "Vision",
+            sim_proto_unix_io,
+            friendly_colour_yellow,
+            visualization_buffer_size,
+        )
     )
     simulator_layer = gl_simulator_layer.GLSimulatorLayer(
         "Simulator", friendly_colour_yellow, visualization_buffer_size
     )
     tactic_layer = gl_tactic_layer.GLTacticLayer("Tactics", visualization_buffer_size)
+    trail_layer = gl_trail_layer.GLTrailLayer("Trail", visualization_buffer_size)
 
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
@@ -104,8 +130,27 @@ def setup_gl_widget(
     gl_widget.add_layer(cost_vis_layer, False)
     gl_widget.add_layer(tactic_layer, False)
     gl_widget.add_layer(validation_layer)
+    gl_widget.add_layer(trail_layer, False)
+
+    gl_widget.toolbar.pause_button.clicked.connect(world_layer.toggle_play_state)
+
+    # connect all sandbox controls if using sandbox mode
+    if sandbox_mode:
+        gl_widget.toolbar.undo_button.clicked.connect(world_layer.undo)
+        gl_widget.toolbar.redo_button.clicked.connect(world_layer.redo)
+        gl_widget.toolbar.reset_button.clicked.connect(world_layer.reset_to_pre_sim)
+        world_layer.undo_toggle_enabled_signal.connect(
+            gl_widget.toolbar.toggle_undo_enabled
+        )
+        world_layer.redo_toggle_enabled_signal.connect(
+            gl_widget.toolbar.toggle_redo_enabled
+        )
 
     # Register observers
+    sim_proto_unix_io.register_observer(
+        SimulationState, gl_widget.toolbar.simulation_state_buffer
+    )
+
     for arg in [
         (World, world_layer.world_buffer),
         (World, cost_vis_layer.world_buffer),
@@ -118,8 +163,9 @@ def setup_gl_widget(
         (World, tactic_layer.world_buffer),
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
-        (SimulatorState, simulator_layer.simulator_state_buffer),
+        (SimulationState, gl_widget.toolbar.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
+        (World, trail_layer.world_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 
@@ -199,6 +245,16 @@ def setup_play_info(proto_unix_io: ProtoUnixIO) -> PlayInfoWidget:
     play_info = PlayInfoWidget()
     proto_unix_io.register_observer(PlayInfo, play_info.playinfo_buffer)
     return play_info
+
+
+def setup_fps_widget(bufferswap_counter, refresh_func_counter):
+    """ setup fps widget
+    :param bufferswap_counter: a counter at the bufferswap
+    :param refresh_func_counter: a counter at the refresh function
+    :returns: a FPS Widget
+    """
+
+    return FrameTimeWidget(bufferswap_counter, refresh_func_counter)
 
 
 def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:

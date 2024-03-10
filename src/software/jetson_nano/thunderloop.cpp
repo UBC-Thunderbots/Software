@@ -1,7 +1,10 @@
 #include "software/jetson_nano/thunderloop.h"
 
+#include <Tracy.hpp>
+
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_crash_msg.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
@@ -9,12 +12,13 @@
 #include "software/jetson_nano/services/motor.h"
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
+#include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 #include "software/world/team.h"
 
 /**
- * https://rt.wiki.kernel.org/index.php/Squarewave-example
+ * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
  * using clock_nanosleep of librt
  */
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
@@ -169,6 +173,9 @@ Thunderloop::~Thunderloop() {}
             // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
             // CLOCK_REALTIME can jump backwards
             clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
+
+            FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
+
             ScopedTimespecTimer iteration_timer(&iteration_time);
 
             // Collect jetson status
@@ -178,6 +185,9 @@ Thunderloop::~Thunderloop() {}
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
+
+                ZoneNamedN(_tracy_network_poll, "Thunderloop: Poll NetworkService", true);
+
                 new_primitive_set = network_service_->poll(robot_status_);
             }
 
@@ -236,6 +246,8 @@ Thunderloop::~Thunderloop() {}
             {
                 ScopedTimespecTimer timer(&poll_time);
 
+                ZoneNamedN(_tracy_step_primitive, "Thunderloop: Step Primitive", true);
+
                 // Handle emergency stop override
                 auto nanoseconds_elapsed_since_last_primitive =
                     getNanoseconds(time_since_last_primitive_received);
@@ -255,6 +267,10 @@ Thunderloop::~Thunderloop() {}
             // Power Service: execute the power control command
             {
                 ScopedTimespecTimer timer(&poll_time);
+
+                ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService",
+                           true);
+
                 power_status_ =
                     power_service_->poll(direct_control_.power_control(), kick_coeff_,
                                          kick_constant_, chip_pulse_width_);
@@ -300,6 +316,9 @@ Thunderloop::~Thunderloop() {}
             // Motor Service: execute the motor control command
             {
                 ScopedTimespecTimer timer(&poll_time);
+
+                ZoneNamedN(_tracy_motor_service, "Thunderloop: Poll MotorService", true);
+
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
                                                      loop_duration_seconds);
             }
@@ -324,11 +343,18 @@ Thunderloop::~Thunderloop() {}
                 primitive_executor_status_;
 
             // Update Redis
-            redis_client_->setNoCommit(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
-                                       std::to_string(power_status_.battery_voltage()));
-            redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
-                                       std::to_string(power_status_.current_draw()));
-            redis_client_->asyncCommit();
+            {
+                ZoneNamedN(_tracy_redis, "Thunderloop: Commit to REDIS", true);
+
+                redis_client_->setNoCommit(
+                    ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
+                    std::to_string(power_status_.battery_voltage()));
+                redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
+                                           std::to_string(power_status_.current_draw()));
+                redis_client_->asyncCommit();
+            }
+
+            updateErrorCodes();
         }
 
         auto loop_duration_ns = getNanoseconds(iteration_time);
@@ -342,6 +368,8 @@ Thunderloop::~Thunderloop() {}
         // Calculate next shot taking into account how long this iteration took
         next_shot.tv_nsec += interval - static_cast<long int>(loop_duration_ns);
         timespecNorm(next_shot);
+
+        FrameMarkEnd(TracyConstants::THUNDERLOOP_FRAME_MARKER);
     }
 }
 
@@ -385,5 +413,25 @@ double Thunderloop::getCpuTemperature()
     {
         LOG(WARNING) << "Could not open CPU temperature file";
         return 0.0;
+    }
+}
+
+void Thunderloop::updateErrorCodes()
+{
+    // Clear existing codes
+    robot_status_.clear_error_code();
+
+    // Updates error status
+    if (power_status_.battery_voltage() <= BATTERY_WARNING_VOLTAGE)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::LOW_BATTERY);
+    }
+    if (power_status_.capacitor_voltage() >= MAX_CAPACITOR_VOLTAGE)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_CAP);
+    }
+    if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
+    {
+        robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
     }
 }

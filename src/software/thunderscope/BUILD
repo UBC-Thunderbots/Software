@@ -72,6 +72,7 @@ py_library(
     ],
     deps = [
         "//software/thunderscope/common:common_widgets",
+        "//software/thunderscope/common:fps_widget",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/common:proto_plotter",
         "//software/thunderscope/gl:gl_widget",
@@ -79,8 +80,10 @@ py_library(
         "//software/thunderscope/gl/layers:gl_obstacle_layer",
         "//software/thunderscope/gl/layers:gl_passing_layer",
         "//software/thunderscope/gl/layers:gl_path_layer",
+        "//software/thunderscope/gl/layers:gl_sandbox_world_layer",
         "//software/thunderscope/gl/layers:gl_simulator_layer",
         "//software/thunderscope/gl/layers:gl_tactic_layer",
+        "//software/thunderscope/gl/layers:gl_trail_layer",
         "//software/thunderscope/gl/layers:gl_validation_layer",
         "//software/thunderscope/gl/layers:gl_world_layer",
         "//software/thunderscope/log:g3log_checkboxes",

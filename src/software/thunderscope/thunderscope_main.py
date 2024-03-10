@@ -17,12 +17,18 @@ from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import CI_DURATION_S
+from software.thunderscope.constants import (
+    CI_DURATION_S,
+    ProtoUnixIOTypes,
+    SIM_TICK_RATE_MS,
+)
 from software.thunderscope.util import *
+
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
+
 
 NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
@@ -178,6 +184,12 @@ if __name__ == "__main__":
         default=False,
         help="Show TigersAutoref GUI",
     )
+    parser.add_argument(
+        "--sudo",
+        action="store_true",
+        default=False,
+        help="Run unix_full_system under sudo",
+    )
 
     estop_group = parser.add_mutually_exclusive_group()
     estop_group.add_argument(
@@ -191,6 +203,12 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
+    )
+    parser.add_argument(
+        "--empty",
+        action="store_true",
+        default=False,
+        help="Whether to populate with default robot positions (False) or start with an empty field (True) for AI vs AI",
     )
 
     # Sanity check that an interface was provided
@@ -318,7 +336,11 @@ if __name__ == "__main__":
                     else args.yellow_full_system_runtime_dir
                 )
                 with ProtoLogger(full_system_runtime_dir,) as logger, FullSystem(
-                    runtime_dir, debug, friendly_colour_yellow
+                    full_system_runtime_dir=runtime_dir,
+                    debug_full_system=debug,
+                    friendly_colour_yellow=friendly_colour_yellow,
+                    should_restart_on_crash=True,
+                    run_sudo=args.sudo,
                 ) as full_system:
 
                     current_proto_unix_io.register_to_observe_everything(logger.buffer)
@@ -364,7 +386,10 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            sync_simulation(tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], NUM_ROBOTS)
+            sync_simulation(
+                tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                0 if args.empty else NUM_ROBOTS,
+            )
 
             if args.ci_mode:
                 async_sim_ticker(
@@ -383,12 +408,17 @@ if __name__ == "__main__":
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
-            args.blue_full_system_runtime_dir, args.debug_blue_full_system, False, False
+            full_system_runtime_dir=args.blue_full_system_runtime_dir,
+            debug_full_system=args.debug_blue_full_system,
+            friendly_colour_yellow=False,
+            should_restart_on_crash=False,
+            run_sudo=args.sudo,
         ) as blue_fs, FullSystem(
-            args.yellow_full_system_runtime_dir,
-            args.debug_yellow_full_system,
-            True,
-            False,
+            full_system_runtime_dir=args.yellow_full_system_runtime_dir,
+            debug_full_system=args.debug_yellow_full_system,
+            friendly_colour_yellow=True,
+            should_restart_on_crash=False,
+            run_sudo=args.sudo,
         ) as yellow_fs, Gamecontroller(
             supress_logs=(not args.verbose), ci_mode=args.enable_autoref
         ) as gamecontroller, (

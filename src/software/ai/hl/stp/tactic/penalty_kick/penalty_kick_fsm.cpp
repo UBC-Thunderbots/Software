@@ -120,7 +120,7 @@ void PenaltyKickFSM::shoot(const Update &event,
                            boost::sml::back::process<KickFSM::Update> processEvent)
 {
     KickFSM::ControlParams control_params{
-        .kick_origin                  = event.common.world.ball().position(),
+        .kick_origin                  = event.common.world_ptr->ball().position(),
         .kick_direction               = shot_angle,
         .kick_speed_meters_per_second = PENALTY_KICK_SHOT_SPEED};
     processEvent(KickFSM::Update(control_params, event.common));
@@ -129,12 +129,12 @@ void PenaltyKickFSM::shoot(const Update &event,
 void PenaltyKickFSM::updateApproachKeeper(
     const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
-    Field field                       = event.common.world.field();
-    std::optional<Robot> enemy_goalie = event.common.world.enemyTeam().goalie();
+    Field field                       = event.common.world_ptr->field();
+    std::optional<Robot> enemy_goalie = event.common.world_ptr->enemyTeam().goalie();
     const Point next_shot_position =
-        evaluateNextShotPosition(enemy_goalie, event.common.world.field());
+        evaluateNextShotPosition(enemy_goalie, event.common.world_ptr->field());
     shot_angle =
-        (next_shot_position - event.common.world.ball().position()).orientation();
+        (next_shot_position - event.common.world_ptr->ball().position()).orientation();
     Point position = field.enemyGoalCenter() + Vector(-field.defenseAreaXLength(), 0);
 
     DribbleFSM::ControlParams control_params{
@@ -147,10 +147,10 @@ void PenaltyKickFSM::updateApproachKeeper(
 void PenaltyKickFSM::adjustOrientationForShot(
     const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
-    std::optional<Robot> enemy_goalie = event.common.world.enemyTeam().goalie();
+    std::optional<Robot> enemy_goalie = event.common.world_ptr->enemyTeam().goalie();
     const Point next_shot_position =
-        evaluateNextShotPosition(enemy_goalie, event.common.world.field());
-    Point final_position = event.common.world.ball().position();
+        evaluateNextShotPosition(enemy_goalie, event.common.world_ptr->field());
+    Point final_position = event.common.world_ptr->ball().position();
     shot_angle           = (next_shot_position - final_position).orientation();
     DribbleFSM::ControlParams control_params{
         .dribble_destination       = std::optional<Point>(final_position),
@@ -161,7 +161,7 @@ void PenaltyKickFSM::adjustOrientationForShot(
 
 bool PenaltyKickFSM::takePenaltyShot(const Update &event)
 {
-    Field field = event.common.world.field();
+    Field field = event.common.world_ptr->field();
 
     // if the complete approach timestamp hasn't been set (because this is the
     // first run), set the initial
@@ -169,20 +169,22 @@ bool PenaltyKickFSM::takePenaltyShot(const Update &event)
     if (!complete_approach.has_value())
     {
         Timestamp future_approach_complete_time =
-            event.common.world.getMostRecentTimestamp() + PENALTY_FINISH_APPROACH_TIMEOUT;
+            event.common.world_ptr->getMostRecentTimestamp() +
+            PENALTY_FINISH_APPROACH_TIMEOUT;
         complete_approach = std::optional<Timestamp>(future_approach_complete_time);
     }
-    std::optional<Robot> enemy_goalie = event.common.world.enemyTeam().goalie();
+    std::optional<Robot> enemy_goalie = event.common.world_ptr->enemyTeam().goalie();
     Timestamp force_shoot_timestamp =
         complete_approach.value() + PENALTY_FORCE_SHOOT_TIMEOUT;
     bool should_shoot =
-        evaluatePenaltyShot(enemy_goalie, field, event.common.world.ball().position(),
+        evaluatePenaltyShot(enemy_goalie, field,
+                            event.common.world_ptr->ball().position(),
                             event.common.robot) ||
-        (event.common.world.getMostRecentTimestamp() >= force_shoot_timestamp);
+        (event.common.world_ptr->getMostRecentTimestamp() >= force_shoot_timestamp);
     return should_shoot;
 }
 
 bool PenaltyKickFSM::timeOutApproach(const Update &event)
 {
-    return event.common.world.getMostRecentTimestamp() > complete_approach;
+    return event.common.world_ptr->getMostRecentTimestamp() > complete_approach;
 }

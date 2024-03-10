@@ -19,7 +19,7 @@ class Thunderloop
 {
    public:
     /**
-     * Thunderloop is a giant loop that runs at CONTROL_LOOP_HZ.
+     * Thunderloop is a giant loop that runs at THUNDERLOOP_HZ.
      * It receives Primitives and World from AI, executes the primitives with
      * the most recent vison data, and polls the services to interact with the hardware
      * peripherals.
@@ -91,6 +91,11 @@ class Thunderloop
      * @return The time in nanoseconds
      */
     double getNanoseconds(timespec time);
+
+    /**
+     * Updates ErrorCodes for BAT, CAP, CPU TEMP if over thresholds
+     */
+    void updateErrorCodes();
 
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;

@@ -78,13 +78,13 @@ TEST(GoalieFSMTest, test_get_intersections_between_ball_velocity_and_full_goal_s
 
 TEST(GoalieFSMTest, test_transitions)
 {
-    Robot goalie = ::TestUtil::createRobotAtPos(Point(-4.5, 0));
-    World world  = ::TestUtil::createBlankTestingWorld();
+    Robot goalie                 = ::TestUtil::createRobotAtPos(Point(-4.5, 0));
+    std::shared_ptr<World> world_ptr = ::TestUtil::createBlankTestingWorld();
 
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(123));
-    world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(123));
+    ::TestUtil::setBallPosition(world_ptr, Point(0, 0), Timestamp::fromSeconds(123));
+    ::TestUtil::setBallVelocity(world_ptr, Vector(0, 0), Timestamp::fromSeconds(123));
     Point clear_ball_origin =
-        Point(GoalieFSM::getNoChipRectangle(world.field()).xMax(), 0);
+        Point(GoalieFSM::getNoChipRectangle(world_ptr->field()).xMax(), 0);
     Angle clear_ball_direction = Angle::zero();
 
     TbotsProto::AiConfig ai_config;
@@ -97,106 +97,98 @@ TEST(GoalieFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is now moving slowly towards the friendly goal
-    world =
-        ::TestUtil::setBallVelocity(world, Vector(-0.1, 0), Timestamp::fromSeconds(123));
+    ::TestUtil::setBallVelocity(world_ptr, Vector(-0.1, 0), Timestamp::fromSeconds(123));
 
     // goalie should remain in PositionToBlock
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::shared_ptr<Primitive>) {})));
+        {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is now moving quickly towards the friendly goal
-    world =
-        ::TestUtil::setBallVelocity(world, Vector(-1, 0), Timestamp::fromSeconds(123));
+    ::TestUtil::setBallVelocity(world_ptr, Vector(-1, 0), Timestamp::fromSeconds(123));
 
     // goalie should transition to Panic
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::shared_ptr<Primitive>) {})));
+        {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::Panic>));
 
     // ball is now out of danger
-    world = ::TestUtil::setBallVelocity(world, Vector(1, 0), Timestamp::fromSeconds(123));
+    ::TestUtil::setBallVelocity(world_ptr, Vector(1, 0), Timestamp::fromSeconds(123));
 
     // process event again to reset goalie to PositionToBlock
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::shared_ptr<Primitive>) {})));
+        {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is now stationary in the "no-chip" rectangle
-    world = ::TestUtil::setBallPosition(world, world.field().friendlyGoalCenter(),
-                                        Timestamp::fromSeconds(123));
-    world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(123));
+    ::TestUtil::setBallPosition(world_ptr, world_ptr->field().friendlyGoalCenter(),
+                                Timestamp::fromSeconds(123));
+    ::TestUtil::setBallVelocity(world_ptr, Vector(0, 0), Timestamp::fromSeconds(123));
 
     // goalie should transition to DribbleFSM
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::shared_ptr<Primitive>) {})));
+        {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
     // goalie has ball, at the correct position and orientation to clear the ball
-    world = ::TestUtil::setBallPosition(world, clear_ball_origin,
-                                        Timestamp::fromSeconds(123));
+    ::TestUtil::setBallPosition(world_ptr, clear_ball_origin, Timestamp::fromSeconds(123));
     goalie.updateState(RobotState(clear_ball_origin, Vector(0, 0), clear_ball_direction,
                                   AngularVelocity::zero()),
                        Timestamp::fromSeconds(123));
 
     // goalie should stay in PivotKickFSM but be ready to chip
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::shared_ptr<Primitive>) {})));
+        {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
     goalie = ::TestUtil::createRobotAtPos(clear_ball_origin + Vector(-0.2, 0));
-    world  = ::TestUtil::setBallPosition(world, clear_ball_origin,
-                                        Timestamp::fromSeconds(123));
+    ::TestUtil::setBallPosition(world_ptr, clear_ball_origin, Timestamp::fromSeconds(123));
     // ball is now chipped
-    world = ::TestUtil::setBallVelocity(world, Vector(1, 0), Timestamp::fromSeconds(123));
-    EXPECT_TRUE(world.ball().hasBallBeenKicked(clear_ball_direction));
+    ::TestUtil::setBallVelocity(world_ptr, Vector(1, 0), Timestamp::fromSeconds(123));
+    EXPECT_TRUE(world_ptr->ball().hasBallBeenKicked(clear_ball_direction));
 
     // ball is out of defense area
-    world = ::TestUtil::setBallPosition(world, Point(-2, 0), Timestamp::fromSeconds(123));
+    ::TestUtil::setBallPosition(world_ptr, Point(-2, 0), Timestamp::fromSeconds(123));
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::shared_ptr<Primitive>) {})));
+        {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
 
     // process event once to reset goalie to PositionToBlock
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::shared_ptr<Primitive>) {})));
+        {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is now moving slowly inside the friendly defense area
-    world =
-        ::TestUtil::setBallPosition(world, Point(-3.5, 1), Timestamp::fromSeconds(124));
-    world =
-        ::TestUtil::setBallVelocity(world, Vector(0, -0.1), Timestamp::fromSeconds(124));
+    ::TestUtil::setBallPosition(world_ptr, Point(-3.5, 1), Timestamp::fromSeconds(124));
+    ::TestUtil::setBallVelocity(world_ptr, Vector(0, -0.1), Timestamp::fromSeconds(124));
 
     // goalie should transition to PivotKickFSM
     fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::shared_ptr<Primitive>) {})));
+        {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(124));
-    world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(124));
+    // ball is stationary at the center of the field
+    ::TestUtil::setBallPosition(world_ptr, Point(0, 0), Timestamp::fromSeconds(124));
+    ::TestUtil::setBallVelocity(world_ptr, Vector(0, 0), Timestamp::fromSeconds(124));
 
     // goalie should return to PositionToBlock
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(
-                goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+                goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     TbotsProto::GoalieTacticConfig goalie_tactic_config;
     goalie_tactic_config.set_safe_distance_multiplier(5.0);
 
-    // ball is far away from the defense area
+    // ball is inside inflated defense area
     Point point_in_dead_zone =
-        Point(world.field().friendlyDefenseArea().xMax() + BALL_MAX_RADIUS_METERS * 2, 0);
-    world = ::TestUtil::setBallPosition(world, point_in_dead_zone,
+        Point(world_ptr->field().friendlyDefenseArea().xMax() + BALL_MAX_RADIUS_METERS, 0);
+    ::TestUtil::setBallPosition(world_ptr, point_in_dead_zone,
                                         Timestamp::fromSeconds(125));
-    world =
-        ::TestUtil::setBallVelocity(world, Vector(0, -0), Timestamp::fromSeconds(125));
+    ::TestUtil::setBallVelocity(world_ptr, Vector(0, -0), Timestamp::fromSeconds(125));
 
     // goalie should enter PivotKickFSM
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(
-                goalie, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
-    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
+                goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 }
