@@ -1,10 +1,6 @@
 #pragma once
 
-#if __cplusplus > 201703L
 #include <filesystem>
-#else
-#include <experimental/filesystem>
-#endif
 
 #include <g3sinks/LogRotate.h>
 #include <g3sinks/LogRotateWithFilter.h>
@@ -89,7 +85,7 @@ class LoggerSingleton
         // if log dir doesn't exist, create it
         if (!std::filesystem::exists(runtime_dir))
         {
-            std::filesystem::create_directory(runtime_dir);
+            std::filesystem::create_directories(runtime_dir);
         }
 
         auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(runtime_dir),
@@ -98,9 +94,12 @@ class LoggerSingleton
         auto colour_cout_sink_handle =
             logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
                                &ColouredCoutSink::displayColouredLog);
-        // Sink for storing a file of all logs
-        auto log_rotate_sink_handle = logWorker->addSink(
-            std::make_unique<LogRotate>(log_name, runtime_dir), &LogRotate::save);
+        // Sink for storing a file of default logs
+        auto default_log_rotate_sink_handle = logWorker->addSink(
+            std::make_unique<LogRotateWithFilter>(
+                std::make_unique<LogRotate>(log_name, runtime_dir),
+                default_level_filter),
+            &LogRotateWithFilter::save);
         // Sink for storing a file of filtered logs
         auto filtered_log_rotate_sink_handle = logWorker->addSink(
             std::make_unique<LogRotateWithFilter>(
@@ -126,6 +125,7 @@ class LoggerSingleton
     }
 
     // levels is this vector are filtered out of the filtered log rotate sink
+    std::vector<LEVELS> default_level_filter = {VISUALIZE, CSV, ROBOT_STATUS, PLOTJUGGLER};
     std::vector<LEVELS> filtered_level_filter = {DEBUG, VISUALIZE,    CSV,
                                                  INFO,  ROBOT_STATUS, PLOTJUGGLER};
     std::vector<LEVELS> text_level_filter = {VISUALIZE, CSV, ROBOT_STATUS, PLOTJUGGLER};
