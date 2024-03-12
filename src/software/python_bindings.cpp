@@ -48,7 +48,7 @@ namespace py = pybind11;
 
 /**
  * Declares a Python binding for a ThreadedProtoUdpSender of type T
- * 
+ *
  * @param m The module to define the sender/receiver in
  * @param The name to insert into the binded class name (ex. {name}ProtoUdpSender)
  */
@@ -65,7 +65,7 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
 
 /**
  * Declares a Python binding for a ThreadedProtoRadioSender of type T
- * 
+ *
  * @param m The module to define the sender/receiver in
  * @param The name to insert into the binded class name (ex. {name}ProtoRadioSender)
  */
@@ -82,7 +82,7 @@ void declareThreadedProtoRadioSender(py::module& m, std::string name)
 
 /**
  * Declares a Python binding for a ThreadedProtoUdpListener of type T
- * 
+ *
  * @param m The module to define the sender/receiver in
  * @param The name to insert into the binded class name (ex. {name}ProtoUdpListener)
  */
