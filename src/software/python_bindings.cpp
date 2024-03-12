@@ -41,14 +41,16 @@
 
 namespace py = pybind11;
 
+// Python doesn't have templating, but we would like to re-use the networking
+// libraries that we have in C++, in python.
+//
+// Adapted from: https://stackoverflow.com/a/47749076
+
 /**
- * Python doesn't have templating, but we would like to re-use the networking
- * libraries that we have in C++, in python.
- *
- * Adapted from: https://stackoverflow.com/a/47749076
- *
+ * Declares a Python binding for a ThreadedProtoUdpSender of type T
+ * 
  * @param m The module to define the sender/receiver in
- * @param The name to insert into the binded class name (ex. {name}ProtoListener)
+ * @param The name to insert into the binded class name (ex. {name}ProtoUdpSender)
  */
 template <typename T>
 void declareThreadedProtoUdpSender(py::module& m, std::string name)
@@ -61,6 +63,12 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
         .def("send_proto", &Class::sendProto);
 }
 
+/**
+ * Declares a Python binding for a ThreadedProtoRadioSender of type T
+ * 
+ * @param m The module to define the sender/receiver in
+ * @param The name to insert into the binded class name (ex. {name}ProtoRadioSender)
+ */
 template <typename T>
 void declareThreadedProtoRadioSender(py::module& m, std::string name)
 {
@@ -72,6 +80,12 @@ void declareThreadedProtoRadioSender(py::module& m, std::string name)
         .def("send_proto", &Class::sendProto);
 }
 
+/**
+ * Declares a Python binding for a ThreadedProtoUdpListener of type T
+ * 
+ * @param m The module to define the sender/receiver in
+ * @param The name to insert into the binded class name (ex. {name}ProtoUdpListener)
+ */
 template <typename T>
 void declareThreadedProtoUdpListener(py::module& m, std::string name)
 {
