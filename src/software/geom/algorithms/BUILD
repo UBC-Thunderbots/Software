@@ -16,6 +16,7 @@ cc_library(
         "intersection.cpp",
         "intersects.cpp",
         "rasterize.cpp",
+        "signed_distance.cpp",
         "step_along_perimeter.cpp",
         "voronoi_diagram.cpp",
     ],
@@ -33,6 +34,7 @@ cc_library(
         "intersection.h",
         "intersects.h",
         "rasterize.h",
+        "signed_distance.h",
         "step_along_perimeter.h",
         "voronoi_diagram.h",
     ],
@@ -180,7 +182,17 @@ cc_test(
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",
-        "//software/geom:rectangle",
+    ],
+)
+
+cc_test(
+    name = "signed_distance_test",
+    srcs = [
+        "signed_distance_test.cpp",
+    ],
+    deps = [
+        ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
