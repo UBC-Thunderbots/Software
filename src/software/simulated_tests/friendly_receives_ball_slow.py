@@ -7,7 +7,6 @@ from software.simulated_tests.validation import (
     create_validation_types,
 )
 
-
 class FriendlyReceivesBallSlow(Validation):
 
     """
@@ -38,7 +37,7 @@ class FriendlyReceivesBallSlow(Validation):
         for robot in world.friendly_team.team_robots:
             if robot.id == self.robot_id:
                 # tolerance is set to 0.1 to check the speed before the ball touches the robot
-                if tbots.Robot(robot).isNearDribbler(ball_position, 0.05):
+                if tbots.Robot(robot).isNearDribbler(ball_position):
                     if ball_velocity.length() - self.max_receive_speed > 0.2:
                         return ValidationStatus.FAILING
         return ValidationStatus.PASSING

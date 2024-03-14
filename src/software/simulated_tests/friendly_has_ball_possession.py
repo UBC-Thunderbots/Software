@@ -7,7 +7,6 @@ from software.simulated_tests.validation import (
     create_validation_types,
 )
 
-
 class FriendlyHasBallPossession(Validation):
     """Checks if a single friendly robot has possession of the ball."""
 
@@ -27,7 +26,7 @@ class FriendlyHasBallPossession(Validation):
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
         robot = world.friendly_team.team_robots[self.robot_id]
 
-        if tbots_cpp.Robot(robot).isNearDribbler(ball_position, 0.01):
+        if tbots_cpp.Robot(robot).isNearDribbler(ball_position):
             return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 

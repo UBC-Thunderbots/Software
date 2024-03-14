@@ -86,6 +86,7 @@ pybind_library(
         "//software/ai/passing:pass",
         "//software/ai/passing:pass_evaluation",
         "//software/ai/passing:pass_generator",
+        "//software:constants",
         "//software/estop:threaded_estop_reader",
         "//software/geom:angle",
         "//software/geom:point",

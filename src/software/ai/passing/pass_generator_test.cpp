@@ -40,7 +40,7 @@ class PassGeneratorTest : public testing::Test
     {
         for (int i = 0; i < max_iters; i++)
         {
-            auto pass_eval = pass_generator->generatePassEvaluation(world);
+            auto pass_eval = pass_generator->generatePassEvaluation(*world);
         }
     }
 
@@ -90,14 +90,14 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     stepPassGenerator(pass_generator, world, 100);
 
     auto [best_pass, score] =
-        pass_generator->generatePassEvaluation(world).getBestPassOnField();
+        pass_generator->generatePassEvaluation(*world).getBestPassOnField();
 
     // After 100 iterations on the same world, we should "converge"
     // to the same pass.
     for (int i = 0; i < 7; i++)
     {
         auto [pass, score] =
-            pass_generator->generatePassEvaluation(world).getBestPassOnField();
+            pass_generator->generatePassEvaluation(*world).getBestPassOnField();
 
         EXPECT_LE((best_pass.receiverPoint() - pass.receiverPoint()).length(), 0.7);
         EXPECT_LE(abs(best_pass.speed() - pass.speed()), 0.7);
@@ -142,7 +142,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     stepPassGenerator(pass_generator, world, 100);
 
     // Find what pass we converged to
-    auto pass_eval = pass_generator->generatePassEvaluation(world);
+    auto pass_eval = pass_generator->generatePassEvaluation(*world);
     auto [converged_pass, converged_score] = pass_eval.getBestPassOnField();
 
     // We expect to have converged to a point near robot 2. The tolerance is fairly
@@ -194,7 +194,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
     stepPassGenerator(pass_generator, world, 100);
 
     // Find what pass we converged to
-    auto pass_evaluation = pass_generator->generatePassEvaluation(world);
+    auto pass_evaluation = pass_generator->generatePassEvaluation(*world);
     auto converged_pass  = pass_evaluation.getBestPassOnField().pass;
 
     // We expect to have converged to a point closer to the robot in the neg_y
@@ -211,7 +211,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
     stepPassGenerator(pass_generator, world, 100);
 
     // Find what pass we converged to
-    pass_evaluation = pass_generator->generatePassEvaluation(world);
+    pass_evaluation = pass_generator->generatePassEvaluation(*world);
     converged_pass  = pass_evaluation.getBestPassOnField().pass;
 
     // We expect to have converged to a point closer to the robot in the pos_y

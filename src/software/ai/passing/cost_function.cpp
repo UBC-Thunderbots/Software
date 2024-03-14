@@ -13,25 +13,25 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/logger/logger.h"
 
-double ratePass(const WorldPtr& world_ptr, const Pass& pass, const Rectangle& zone,
+double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
                 TbotsProto::PassingConfig passing_config)
 {
     double static_pass_quality = getStaticPositionQuality(
-        world_ptr->field(), pass.receiverPoint(), passing_config);
+        world.field(), pass.receiverPoint(), passing_config);
 
     double friendly_pass_rating =
-        ratePassFriendlyCapability(world_ptr->friendlyTeam(), pass, passing_config);
+        ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
     double pass_backwards_rating =
-        ratePassBackwardsQuality(world_ptr->field(), pass, passing_config);
+        ratePassBackwardsQuality(world.field(), pass, passing_config);
 
     double enemy_pass_rating =
-        ratePassEnemyRisk(world_ptr->enemyTeam(), pass,
+        ratePassEnemyRisk(world.enemyTeam(), pass,
                           Duration::fromSeconds(passing_config.enemy_reaction_time()),
                           passing_config.enemy_proximity_importance());
 
     double shoot_pass_rating = ratePassShootScore(
-        world_ptr->field(), world_ptr->enemyTeam(), pass, passing_config);
+        world.field(), world.enemyTeam(), pass, passing_config);
 
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
@@ -354,7 +354,7 @@ double calculateProximityRisk(const Point& point, const Team& enemy_team,
     return point_enemy_proximity_risk;
 }
 
-void samplePassesForVisualization(const WorldPtr& world_ptr,
+void samplePassesForVisualization(const World& world,
                                   const TbotsProto::PassingConfig& passing_config)
 {
     // number of rows and columns are configured in parameters.proto
@@ -362,8 +362,8 @@ void samplePassesForVisualization(const WorldPtr& world_ptr,
     // this is for DivB field, for DivA, it would be num_cols * 3 / 4 as specified in
     // field.cpp
     int num_rows  = num_cols * 2 / 3;
-    double width  = world_ptr->field().xLength() / num_cols;
-    double height = world_ptr->field().yLength() / num_rows;
+    double width  = world.field().xLength() / num_cols;
+    double height = world.field().yLength() / num_rows;
 
     std::vector<double> costs;
     double static_pos_quality_costs;
@@ -375,12 +375,12 @@ void samplePassesForVisualization(const WorldPtr& world_ptr,
     for (int i = 0; i < num_cols; i++)
     {
         // x coordinate of the centre of the column
-        double x = width * i + width / 2 - world_ptr->field().xLength() / 2;
+        double x = width * i + width / 2 - world.field().xLength() / 2;
         for (int j = 0; j < num_rows; j++)
         {
             // y coordinate of the centre of the row
-            double y  = height * j + height / 2 - world_ptr->field().yLength() / 2;
-            auto pass = Pass(world_ptr->ball().position(), Point(x, y),
+            double y  = height * j + height / 2 - world.field().yLength() / 2;
+            auto pass = Pass(world.ball().position(), Point(x, y),
                              passing_config.max_pass_speed_m_per_s());
 
             // default values
@@ -393,21 +393,21 @@ void samplePassesForVisualization(const WorldPtr& world_ptr,
             if (passing_config.cost_vis_config().static_position_quality())
             {
                 static_pos_quality_costs = getStaticPositionQuality(
-                    world_ptr->field(), pass.receiverPoint(), passing_config);
+                    world.field(), pass.receiverPoint(), passing_config);
             }
 
             // ratePassFriendlyCapability
             if (passing_config.cost_vis_config().pass_friendly_capability())
             {
                 pass_friendly_capability_costs = ratePassFriendlyCapability(
-                    world_ptr->friendlyTeam(), pass, passing_config);
+                    world.friendlyTeam(), pass, passing_config);
             }
 
             // ratePassEnemyRisk
             if (passing_config.cost_vis_config().pass_enemy_risk())
             {
                 pass_enemy_risk_costs = ratePassEnemyRisk(
-                    world_ptr->enemyTeam(), pass,
+                    world.enemyTeam(), pass,
                     Duration::fromSeconds(passing_config.enemy_reaction_time()),
                     passing_config.enemy_proximity_importance());
             }
@@ -416,7 +416,7 @@ void samplePassesForVisualization(const WorldPtr& world_ptr,
             if (passing_config.cost_vis_config().pass_shoot_score())
             {
                 pass_shoot_score_costs = ratePassShootScore(
-                    world_ptr->field(), world_ptr->enemyTeam(), pass, passing_config);
+                    world.field(), world.enemyTeam(), pass, passing_config);
             }
 
             costs.push_back(static_pos_quality_costs * pass_friendly_capability_costs *

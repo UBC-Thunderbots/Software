@@ -41,6 +41,7 @@
 #include "software/world/field.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
+#include "software/constants.h"
 
 namespace py = pybind11;
 
@@ -298,7 +299,7 @@ PYBIND11_MODULE(python_bindings, m)
         .def("velocity", &Robot::velocity)
         .def("orientation", &Robot::orientation)
         .def("angularVelocity", &Robot::angularVelocity)
-        .def("isNearDribbler", &Robot::isNearDribbler)
+        .def("isNearDribbler", &Robot::isNearDribbler, py::arg("test_point"), py::arg("TOLERANCE") = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
         .def("dribblerArea", &Robot::dribblerArea);
 
     py::class_<Team>(m, "Team")
