@@ -6,6 +6,7 @@ from pyqtgraph.opengl import *
 
 import functools
 import numpy as np
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 from software.thunderscope.constants import *
 
@@ -22,16 +23,23 @@ class GLWidget(QWidget):
     and our AI. GLWidget can also provide replay controls.
     """
 
-    def __init__(self, player: ProtoPlayer = None, sandbox_mode: bool = False) -> None:
+    def __init__(
+        self,
+        player: ProtoPlayer = None,
+        sandbox_mode: bool = False,
+        bufferswap_counter: FrameTimeCounter = None,
+    ) -> None:
         """Initialize the GLWidget
 
         :param player: The replay player to optionally display media controls for
         :param sandbox_mode: if sandbox mode should be enabled
-
+        :param bufferswap_counter: a counter that is used to display fps in thunderscope
         """
         super().__init__()
 
-        self.gl_view_widget = ExtendedGLViewWidget()
+        self.gl_view_widget = ExtendedGLViewWidget(
+            bufferswap_counter=bufferswap_counter
+        )
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.gl_view_widget.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
