@@ -32,8 +32,7 @@ void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
                         Vector::createFromAngle(angle_between_robots *
                                                 static_cast<double>(k + 1)),
                     (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(),
-                    0, TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                    TbotsProto::ObstacleAvoidanceMode::SAFE);
+                    0);
             }
         }
         else
@@ -45,10 +44,7 @@ void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
                 auto next_position = Point(
                     world_ptr->field().centerPoint().x(),
                     (initial_offset + static_cast<int>(k)) * 4 * ROBOT_MAX_RADIUS_METERS);
-                move_tactics[k]->updateControlParams(
-                    next_position, Angle::zero(), 0,
-                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                    TbotsProto::ObstacleAvoidanceMode::SAFE);
+                move_tactics[k]->updateControlParams(next_position, Angle::zero(), 0);
             }
         }
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());

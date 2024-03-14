@@ -91,15 +91,13 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
                 (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
                     .orientation(),
-                0, TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                TbotsProto::ObstacleAvoidanceMode::SAFE);
-            move_tactic_secondary->updateControlParams(
+                0);
+            move_tactic_main->updateControlParams(
                 world_ptr->field().friendlyGoalCenter() +
                     Vector(0, -2 * ROBOT_MAX_RADIUS_METERS),
                 (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
                     .orientation(),
-                0, TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                TbotsProto::ObstacleAvoidanceMode::SAFE);
+                0);
 
             tactics_to_run[0].emplace_back(move_tactic_main);
             tactics_to_run[0].emplace_back(move_tactic_secondary);
@@ -113,8 +111,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
                 (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
                     .orientation(),
-                0, TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                TbotsProto::ObstacleAvoidanceMode::SAFE);
+                0);
             std::get<0>(shadow_potential_receivers)
                 ->updateControlParams(enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
 

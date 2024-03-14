@@ -67,10 +67,10 @@ double ConstVelocityObstacle<GEOM_TYPE>::distance(const Point& p,
 
 template <typename GEOM_TYPE>
 double ConstVelocityObstacle<GEOM_TYPE>::signedDistance(const Point& p,
-                                                  const double t_sec) const
+                                                        const double t_sec) const
 {
     return ::signedDistance(this->geom_,
-                      p - velocity_ * std::min(t_sec, max_time_horizon_sec_));
+                            p - velocity_ * std::min(t_sec, max_time_horizon_sec_));
 }
 
 template <typename GEOM_TYPE>

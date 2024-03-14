@@ -70,7 +70,8 @@ double TrajectoryObstacle<GEOM_TYPE>::distance(const Point& p, const double t_se
 }
 
 template <typename GEOM_TYPE>
-double TrajectoryObstacle<GEOM_TYPE>::signedDistance(const Point& p, const double t_sec) const
+double TrajectoryObstacle<GEOM_TYPE>::signedDistance(const Point& p,
+                                                     const double t_sec) const
 {
     if (t_sec == 0)
     {

@@ -48,15 +48,12 @@ void PenaltyKickPlayFSM::setupPosition(const Update &event)
                           ROBOT_MAX_RADIUS_METERS;
         penalty_setup_tactics.at(i)->updateControlParams(
             Point(ball_position_x - 1.25, y_offset),
-            event.common.world_ptr->field().enemyGoalCenter().toVector().orientation(), 0,
-            TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-            TbotsProto::ObstacleAvoidanceMode::SAFE);
+            event.common.world_ptr->field().enemyGoalCenter().toVector().orientation(),
+            0);
     }
 
     // Move shooting robot behind the ball
-    penalty_setup_tactics.back()->updateControlParams(
-        behind_ball, shoot_angle, 0.0, TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-        TbotsProto::ObstacleAvoidanceMode::SAFE);
+    penalty_setup_tactics.back()->updateControlParams(behind_ball, shoot_angle, 0.0);
 
     tactics_to_run[0].insert(tactics_to_run[0].end(), penalty_setup_tactics.begin(),
                              penalty_setup_tactics.end());

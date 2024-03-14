@@ -125,9 +125,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 // listed above
                 move_tactics.at(defense_position_index)
                     ->updateControlParams(defense_positions.at(defense_position_index),
-                                          Angle::zero(), 0,
-                                          TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                                          TbotsProto::ObstacleAvoidanceMode::SAFE);
+                                          Angle::zero(), 0);
                 result[0].emplace_back(move_tactics.at(defense_position_index));
                 defense_position_index++;
             }
@@ -141,7 +139,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                    world_ptr->field().centerPoint(),
                                    ROBOT_MAX_RADIUS_METERS),
                 Angle::zero(), 0, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                TbotsProto::ObstacleAvoidanceMode::SAFE);
+                TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
         result[0].emplace_back(move_tactics.at(defense_position_index));
 
         // yield the Tactics this Play wants to run, in order of priority

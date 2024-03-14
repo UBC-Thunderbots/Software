@@ -29,10 +29,7 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
                 auto next_position = Point(
                     world_ptr->field().centerPoint().x(),
                     (initial_offset + static_cast<int>(k)) * 4 * ROBOT_MAX_RADIUS_METERS);
-                move_tactics[k]->updateControlParams(
-                    next_position, Angle::zero(), 0,
-                    TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                    TbotsProto::ObstacleAvoidanceMode::SAFE);
+                move_tactics[k]->updateControlParams(next_position, Angle::zero(), 0);
             }
         }
         else if (world_ptr->gameState().isOurFreeKick())
@@ -50,8 +47,7 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
                         Vector::createFromAngle(angle_between_robots *
                                                 static_cast<double>(k + 1)),
                     (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(),
-                    0, TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
-                    TbotsProto::ObstacleAvoidanceMode::SAFE);
+                    0);
             }
         }
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());

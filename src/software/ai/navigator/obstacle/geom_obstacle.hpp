@@ -61,7 +61,7 @@ double GeomObstacle<GEOM_TYPE>::distance(const Point& p, const double t_sec) con
 }
 
 template <typename GEOM_TYPE>
-double GeomObstacle<GEOM_TYPE>::signedDistance(const Point &p, const double t_sec) const
+double GeomObstacle<GEOM_TYPE>::signedDistance(const Point& p, const double t_sec) const
 {
     return ::signedDistance(geom_, p);
 }

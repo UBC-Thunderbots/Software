@@ -26,15 +26,21 @@ class MoveTactic : public Tactic
      * @param ball_collision_type how to navigate around the ball
      * @param auto_chip_or_kick The command to autochip or autokick
      * @param max_allowed_speed_mode The mode of maximum speed allowed
+     * @param obstacle_avoidance_mode How safe we should be when avoiding obstacles,
+     * particularly enemy robots
      * @param target_spin_rev_per_s The target spin while moving in revolutions per second
      */
-    void updateControlParams(Point destination, Angle final_orientation,
-                             double final_speed, TbotsProto::DribblerMode dribbler_mode,
-                             TbotsProto::BallCollisionType ball_collision_type,
-                             AutoChipOrKick auto_chip_or_kick,
-                             TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
-                             TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode,
-                             double target_spin_rev_per_s);
+    void updateControlParams(
+        Point destination, Angle final_orientation, double final_speed,
+        TbotsProto::DribblerMode dribbler_mode = TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType ball_collision_type =
+            TbotsProto::BallCollisionType::AVOID,
+        AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode =
+            TbotsProto::ObstacleAvoidanceMode::SAFE,
+        double target_spin_rev_per_s = 0.0);
 
     /**
      * Updates the params assuming that the dribbler and chicker and while avoiding the
@@ -45,6 +51,8 @@ class MoveTactic : public Tactic
      * the destination
      * @param final_speed The final speed the robot should have at the destination
      * @param max_allowed_speed_mode The mode of maximum speed allowed
+     * @param obstacle_avoidance_mode How safe we should be when avoiding obstacles,
+     * particularly enemy robots
      */
     void updateControlParams(Point destination, Angle final_orientation,
                              double final_speed,
