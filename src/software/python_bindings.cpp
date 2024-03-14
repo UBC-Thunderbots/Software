@@ -26,6 +26,7 @@
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_evaluation.hpp"
 #include "software/ai/passing/pass_generator.hpp"
+#include "software/constants.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/circle.h"
@@ -41,7 +42,6 @@
 #include "software/world/field.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
-#include "software/constants.h"
 
 namespace py = pybind11;
 
@@ -299,7 +299,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("velocity", &Robot::velocity)
         .def("orientation", &Robot::orientation)
         .def("angularVelocity", &Robot::angularVelocity)
-        .def("isNearDribbler", &Robot::isNearDribbler, py::arg("test_point"), py::arg("TOLERANCE") = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
+        .def("isNearDribbler", &Robot::isNearDribbler, py::arg("test_point"),
+             py::arg("TOLERANCE") = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
         .def("dribblerArea", &Robot::dribblerArea);
 
     py::class_<Team>(m, "Team")

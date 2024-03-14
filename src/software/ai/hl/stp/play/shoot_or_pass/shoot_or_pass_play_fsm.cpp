@@ -54,7 +54,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
     {
         ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
 
-        auto pass_eval    = pass_generator.generatePassEvaluation(*event.common.world_ptr);
+        auto pass_eval = pass_generator.generatePassEvaluation(*event.common.world_ptr);
         auto ranked_zones = pass_eval.rankZonesForReceiving(
             event.common.world_ptr, event.common.world_ptr->ball().position());
 

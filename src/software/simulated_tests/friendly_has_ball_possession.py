@@ -7,6 +7,7 @@ from software.simulated_tests.validation import (
     create_validation_types,
 )
 
+
 class FriendlyHasBallPossession(Validation):
     """Checks if a single friendly robot has possession of the ball."""
 
