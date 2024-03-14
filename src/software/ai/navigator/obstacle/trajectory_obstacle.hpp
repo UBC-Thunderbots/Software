@@ -22,6 +22,7 @@ class TrajectoryObstacle : public GeomObstacle<GEOM_TYPE>
 
     bool contains(const Point& p, const double t_sec = 0) const override;
     double distance(const Point& p, const double t_sec = 0) const override;
+    double signedDistance(const Point& p, const double t_sec = 0) const override;
     bool intersects(const Segment& segment, const double t_sec = 0) const override;
 
    private:
@@ -65,6 +66,22 @@ double TrajectoryObstacle<GEOM_TYPE>::distance(const Point& p, const double t_se
         // in the opposite direction of the motion of obstacle
         const Vector displacement = traj_.getPosition(t_sec) - traj_.getPosition(0);
         return ::distance(this->geom_, p - displacement);
+    }
+}
+
+template <typename GEOM_TYPE>
+double TrajectoryObstacle<GEOM_TYPE>::signedDistance(const Point& p, const double t_sec) const
+{
+    if (t_sec == 0)
+    {
+        return ::signedDistance(this->geom_, p);
+    }
+    else
+    {
+        // Instead of shifting the obstacle, we will shift the point
+        // in the opposite direction of the motion of obstacle
+        const Vector displacement = traj_.getPosition(t_sec) - traj_.getPosition(0);
+        return ::signedDistance(this->geom_, p - displacement);
     }
 }
 

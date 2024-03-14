@@ -26,6 +26,7 @@ class ConstVelocityObstacle : public GeomObstacle<GEOM_TYPE>
 
     bool contains(const Point& p, const double t_sec = 0) const override;
     double distance(const Point& p, const double t_sec = 0) const override;
+    double signedDistance(const Point& p, const double t_sec = 0) const override;
     bool intersects(const Segment& segment, const double t_sec = 0) const override;
 
    private:
@@ -61,6 +62,14 @@ double ConstVelocityObstacle<GEOM_TYPE>::distance(const Point& p,
                                                   const double t_sec) const
 {
     return ::distance(this->geom_,
+                      p - velocity_ * std::min(t_sec, max_time_horizon_sec_));
+}
+
+template <typename GEOM_TYPE>
+double ConstVelocityObstacle<GEOM_TYPE>::signedDistance(const Point& p,
+                                                  const double t_sec) const
+{
+    return ::signedDistance(this->geom_,
                       p - velocity_ * std::min(t_sec, max_time_horizon_sec_));
 }
 

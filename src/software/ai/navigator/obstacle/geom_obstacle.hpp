@@ -22,6 +22,7 @@ class GeomObstacle : public Obstacle
 
     bool contains(const Point& p, const double t_sec = 0) const override;
     double distance(const Point& p, const double t_sec = 0) const override;
+    double signedDistance(const Point& p, const double t_sec = 0) const override;
     bool intersects(const Segment& segment, const double t_sec = 0) const override;
     Point closestPoint(const Point& p) const override;
     TbotsProto::Obstacle createObstacleProto() const override;
@@ -57,6 +58,12 @@ template <typename GEOM_TYPE>
 double GeomObstacle<GEOM_TYPE>::distance(const Point& p, const double t_sec) const
 {
     return ::distance(geom_, p);
+}
+
+template <typename GEOM_TYPE>
+double GeomObstacle<GEOM_TYPE>::signedDistance(const Point &p, const double t_sec) const
+{
+    return ::signedDistance(geom_, p);
 }
 
 template <typename GEOM_TYPE>

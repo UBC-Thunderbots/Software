@@ -8,6 +8,7 @@
 #include "proto/visualization.pb.h"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
 #include "software/geom/algorithms/axis_aligned_bounding_box.h"
+#include "software/geom/algorithms/signed_distance.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
 
@@ -39,6 +40,18 @@ class Obstacle
      * @return distance to point
      */
     virtual double distance(const Point& p, const double t_sec = 0) const = 0;
+
+    /**
+     * Gets the signed distance from the obstacle's perimeter to the point. That is, if
+     * point is inside the obstacle then distance will be negative. See
+     * https://iquilezles.org/articles/distfunctions2d/ for details on the maths
+     *
+     * @param point Point to get distance to
+     * @param t_sec Time in seconds into the future to get distance to.
+     * @return distance from point to nearest point on perimeter of obstacle. Positive if
+     * outside, negative if inside
+     */
+    virtual double signedDistance(const Point& point, const double t_sec = 0) const = 0;
 
     /**
      * Determines whether the given Segment intersects this Obstacle
