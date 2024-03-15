@@ -37,11 +37,11 @@ class BallMovesXAxis(Validation):
         if self.max_displacement_so_far is None or (
             (
                 self.moving_in_pos_x
-                and current_ball_position > self.max_displacement_so_far
+                and current_ball_position > self.max_displacement_so_far - 0.1
             )
             or (
                 not self.moving_in_pos_x
-                and current_ball_position < self.max_displacement_so_far
+                and current_ball_position < self.max_displacement_so_far + 0.1
             )
         ):
             self.max_displacement_so_far = current_ball_position
@@ -49,14 +49,7 @@ class BallMovesXAxis(Validation):
 
         # if max displacement is set and current ball is in the wrong direction too far
         # beyond a threshold, return FAILING
-        if (
-            self.moving_in_pos_x
-            and current_ball_position < self.max_displacement_so_far - 0.1
-        ) or (
-            not self.moving_in_pos_x
-            and current_ball_position > self.max_displacement_so_far + 0.1
-        ):
-            return ValidationStatus.FAILING
+        return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """

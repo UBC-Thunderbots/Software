@@ -46,7 +46,7 @@ def setup_pass_and_robots(
     """
     blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
 
-    simulated_test_runner.clear_world_buffer()
+    # simulated_test_runner.clear_world_buffer()
 
     # Setup the world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(

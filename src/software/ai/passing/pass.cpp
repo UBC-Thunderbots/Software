@@ -69,7 +69,7 @@ double Pass::getPassSpeed(const Point& ball_position, const Point& pass_destinat
     //      - friction transition factor    -> c
     //          - this dictates at what speed friction goes from sliding to rolling
     // We want to find
-    //      - initial starting speed (m/s) -> x
+    //      - initial starting velocity (m/s) -> x
     //
     // Ball decelerates with sliding from x -> cx, then with rolling from cx -> vf
     // Slide Distance (m) -> d1
