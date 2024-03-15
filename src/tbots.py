@@ -68,6 +68,11 @@ if __name__ == "__main__":
         help="Interactively search for a bazel target",
         action="store_true",
     )
+    parser.add_argument(
+        "--tracy",
+        help="Run the binary with the TRACY_ENABLE macro defined",
+        action="store_true",
+    )
 
     # These are shortcut args for commonly used arguments on our tests
     # and full_system. All other arguments are passed through as-is
@@ -161,6 +166,10 @@ if __name__ == "__main__":
             and "--debug_simulator" not in unknown_args
         ):
             command += ["--run_under=gdb"]
+
+    # To run the Tracy profile, enable the TRACY_ENABLE macro
+    if args.tracy:
+        command += ["--cxxopt=-DTRACY_ENABLE"]
 
     # Don't cache test results
     if args.action in "test":
