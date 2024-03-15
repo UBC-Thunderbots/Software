@@ -10,10 +10,12 @@
 #include "shared/constants.h"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
 #include "software/geom/algorithms/axis_aligned_bounding_box.h"
+#include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/geom/algorithms/rasterize.h"
+#include "software/geom/algorithms/signed_distance.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
 
@@ -43,11 +45,31 @@ class Obstacle
     virtual double distance(const Point& p) const = 0;
 
     /**
+     * Gets the signed distance from the obstacle's perimeter to the point. That is, if
+     * point is inside the obstacle then distance will be negative. See
+     * https://iquilezles.org/articles/distfunctions2d/ for details on the maths
+     *
+     * @param point Point to get distance to
+     * @return distance from point to nearest point on perimeter of obstacle. Positive if
+     * outside, negative if inside
+     */
+    virtual double signedDistance(const Point& point) const = 0;
+
+    /**
      * Determines whether the given Segment intersects this Obstacle
      *
      * @return true if the given Segment intersects this Obstacle
      */
     virtual bool intersects(const Segment& segment) const = 0;
+
+    /**
+     * Finds the Point closest to the given Point that is outside of the obstacle.
+     *
+     * @param p the point.
+     *
+     * @return the Point on polygon closest to point.
+     */
+    virtual Point closestPoint(const Point& p) const = 0;
 
     /**
      * Determines what coordinates on the field are blocked by this Obstacle
@@ -105,7 +127,9 @@ class GeomObstacle : public Obstacle
 
     bool contains(const Point& p) const override;
     double distance(const Point& p) const override;
+    double signedDistance(const Point& point) const override;
     bool intersects(const Segment& segment) const override;
+    Point closestPoint(const Point& p) const override;
     TbotsProto::Obstacle createObstacleProto() const override;
     Rectangle axisAlignedBoundingBox(double inflation_radius = 0) const override;
     std::string toString(void) const override;
@@ -122,6 +146,7 @@ class GeomObstacle : public Obstacle
    private:
     GEOM_TYPE geom_;
 };
+
 
 /**
  * We use a pointer to Obstacle to support inheritance
@@ -155,6 +180,12 @@ bool GeomObstacle<GEOM_TYPE>::contains(const Point& p) const
 }
 
 template <typename GEOM_TYPE>
+double GeomObstacle<GEOM_TYPE>::signedDistance(const Point& point) const
+{
+    return ::signedDistance(geom_, point);
+}
+
+template <typename GEOM_TYPE>
 double GeomObstacle<GEOM_TYPE>::distance(const Point& p) const
 {
     return ::distance(geom_, p);
@@ -164,6 +195,12 @@ template <typename GEOM_TYPE>
 bool GeomObstacle<GEOM_TYPE>::intersects(const Segment& segment) const
 {
     return ::intersects(geom_, segment);
+}
+
+template <typename GEOM_TYPE>
+Point GeomObstacle<GEOM_TYPE>::closestPoint(const Point& p) const
+{
+    return ::closestPoint(geom_, p);
 }
 
 template <typename GEOM_TYPE>
