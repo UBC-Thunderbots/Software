@@ -2,39 +2,25 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/ball_placement_play.h"
-#include "software/ai/hl/stp/play/enemy_ball_placement_play.h"
-#include "software/ai/hl/stp/play/enemy_free_kick_play.h"
-#include "software/ai/hl/stp/play/free_kick_play.h"
-#include "software/ai/hl/stp/play/halt_play.h"
-#include "software/ai/hl/stp/play/kickoff_enemy_play.h"
-#include "software/ai/hl/stp/play/kickoff_friendly_play.h"
-#include "software/ai/hl/stp/play/offense/offense_play.h"
-#include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play.h"
-#include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
-#include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/stop_play.h"
+#include "software/ai/hl/stp/play/dynamic_plays/offensive_plays.h"
 
 struct PlaySelectionFSM
 {
     class Halt;
-    class Playing;
     class Stop;
     class SetPlay;
-    class OverridePlay;
+    class OffensivePlay;
+    class DefensivePlay;
 
     struct Update
     {
         Update(const std::function<void(std::shared_ptr<Play>)>& set_current_play,
-               const GameState& game_state, const TbotsProto::AiConfig& ai_config)
-            : set_current_play(set_current_play),
-              game_state(game_state),
-              ai_config(ai_config)
+               const WorldPtr& world_ptr)
+            : set_current_play(set_current_play), world_ptr(world_ptr)
         {
         }
         std::function<void(std::shared_ptr<Play>)> set_current_play;
-        GameState game_state;
-        TbotsProto::AiConfig ai_config;
+        WorldPtr world_ptr;
     };
 
     /**
@@ -57,90 +43,106 @@ struct PlaySelectionFSM
     bool gameStateSetupRestart(const Update& event);
 
     /**
-     * Guards for whether the play is being overridden
+     * Guard to check whether the enemy team has possession of the ball
      *
      * @param event The PlaySelection::Update event
      *
-     * @return whether the play is being overridden
+     * @return whether the enemy team has possession of the ball
      */
-    bool playOverridden(const Update& event);
+    bool enemyHasPossession(const Update& event);
 
     /**
-     * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay, or OffensePlay
+     * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay, 
+     * OffensivePlay, or DefensivePlay
      *
      * @param event The PlaySelection::Update event
-     *
      */
     void setupOverridePlay(Update event);
     void setupSetPlay(const Update& event);
     void setupStopPlay(const Update& event);
     void setupHaltPlay(const Update& event);
-    void setupOffensePlay(const Update& event);
+    void setupOffensivePlay(const Update& event);
+    void setupDefensivePlay(const Update& event);
+
+    /**
+     * Action to evaluate the currently running DynamicPlay
+     *
+     * @param event The PlaySelection::Update event
+     */
+    void evaluateDynamicPlay(const Update& event);
 
     auto operator()()
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(SetPlay)
         DEFINE_SML_STATE(Halt)
-        DEFINE_SML_STATE(Playing)
         DEFINE_SML_STATE(Stop)
+        DEFINE_SML_STATE(SetPlay)
+        DEFINE_SML_STATE(OffensivePlay)
+        DEFINE_SML_STATE(DefensivePlay)
 
         DEFINE_SML_GUARD(gameStateStopped)
         DEFINE_SML_GUARD(gameStateHalted)
         DEFINE_SML_GUARD(gameStatePlaying)
         DEFINE_SML_GUARD(gameStateSetupRestart)
+        DEFINE_SML_GUARD(enemyHasPossession)
 
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_ACTION(setupSetPlay)
         DEFINE_SML_ACTION(setupStopPlay)
         DEFINE_SML_ACTION(setupHaltPlay)
-        DEFINE_SML_ACTION(setupOffensePlay)
+        DEFINE_SML_ACTION(setupOffensivePlay)
+        DEFINE_SML_ACTION(setupDefensivePlay)
+        DEFINE_SML_ACTION(evaluateDynamicPlay)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
 
-            // Check for transitions to other states, if not then default to running the
-            // current play
-            *Halt_S + Update_E[gameStateStopped_G] / setupStopPlay_A    = Stop_S,
-            Halt_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A  = Playing_S,
+            *Halt_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
+            Halt_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
+                         setupOffensivePlay_A = OffensivePlay_S,
+            Halt_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
+                         setupDefensivePlay_A                           = DefensivePlay_S,
             Halt_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
 
-            // Check for transitions to other states, if not then default to running the
-            // current play
-            Stop_S + Update_E[gameStateHalted_G] / setupHaltPlay_A      = Halt_S,
-            Stop_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A  = Playing_S,
+            Stop_S + Update_E[gameStateHalted_G] / setupHaltPlay_A = Halt_S,
+            Stop_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
+                         setupOffensivePlay_A = OffensivePlay_S,
+            Stop_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
+                         setupDefensivePlay_A                           = DefensivePlay_S,
             Stop_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
 
-            // Check for transitions to other states, if not then default to running the
-            // current play
-            Playing_S + Update_E[gameStateHalted_G] / setupHaltPlay_A      = Halt_S,
-            Playing_S + Update_E[gameStateStopped_G] / setupStopPlay_A     = Stop_S,
-            Playing_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            OffensivePlay_S + Update_E[gameStateHalted_G] /
+                                  (evaluateDynamicPlay_A, setupHaltPlay_A) = Halt_S,
+            OffensivePlay_S + Update_E[gameStateStopped_G] /
+                                  (evaluateDynamicPlay_A, setupStopPlay_A) = Stop_S,
+            OffensivePlay_S + Update_E[gameStateSetupRestart_G] /
+                                  (evaluateDynamicPlay_A, setupSetPlay_A) = SetPlay_S,
+            OffensivePlay_S + Update_E[enemyHasPossession_G] /
+                                  (evaluateDynamicPlay_A, setupDefensivePlay_A) =
+                DefensivePlay_S,
 
-            // Check for transitions to other states, if not then default to running the
-            // current play
-            SetPlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A     = Halt_S,
-            SetPlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A    = Stop_S,
-            SetPlay_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A = Playing_S,
+            DefensivePlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A  = Halt_S,
+            DefensivePlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
+            DefensivePlay_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
+                SetPlay_S,
+            DefensivePlay_S + Update_E[!enemyHasPossession_G] / setupOffensivePlay_A =
+                OffensivePlay_S,
+
+            SetPlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A  = Halt_S,
+            SetPlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
+            SetPlay_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
+                            setupOffensivePlay_A = OffensivePlay_S,
+            SetPlay_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
+                            setupDefensivePlay_A = DefensivePlay_S,
 
             X + Update_E = X);
     }
 
    private:
-    std::shared_ptr<Play> current_play;
-
-    TbotsProto::AiConfig ai_config;
-    std::shared_ptr<BallPlacementPlay> ball_placement_play;
-    std::shared_ptr<EnemyBallPlacementPlay> enemy_ball_placement_play;
-    std::shared_ptr<EnemyFreekickPlay> enemy_free_kick_play;
-    std::shared_ptr<FreeKickPlay> free_kick_play;
-    std::shared_ptr<HaltPlay> halt_play;
-    std::shared_ptr<KickoffEnemyPlay> kickoff_enemy_play;
-    std::shared_ptr<KickoffFriendlyPlay> kickoff_friendly_play;
-    std::shared_ptr<OffensePlay> offense_play;
-    std::shared_ptr<PenaltyKickEnemyPlay> penalty_kick_enemy_play;
-    std::shared_ptr<PenaltyKickPlay> penalty_kick_play;
-    std::shared_ptr<StopPlay> stop_play;
+    std::shared_ptr<DynamicPlay> current_dynamic_play_;
+    std::shared_ptr<OffensiveFriendlyThirdPlay> offensive_friendly_third_play_;
+    std::shared_ptr<OffensiveMiddleThirdPlay> offensive_middle_third_play_;
+    std::shared_ptr<OffensiveEnemyThirdPlay> offensive_enemy_third_play_;
 };

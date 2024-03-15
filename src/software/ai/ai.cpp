@@ -55,8 +55,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const WorldPtr& worl
     strategy->updateWorld(world_ptr);
 
     fsm->process_event(PlaySelectionFSM::Update(
-        [this](std::shared_ptr<Play> play) { current_play = play; },
-        world_ptr->gameState(), strategy->getAiConfig()));
+        [this](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
 
     if (static_cast<bool>(override_play))
     {

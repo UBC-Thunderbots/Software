@@ -49,6 +49,15 @@ class TypeMap
     ConstIterator find() const;
 
     /**
+     * Returns whether the key exists in the TypeMap
+     * 
+     * @tparam TKey the type of the key to lookup in the TypeMap
+     * @return true if the key exists in the TypeMap, false otherwise
+     */
+    template <class TKey>
+    bool contains() const;
+
+    /**
      * Associates a value with the type `TKey` in the TypeMap
      *
      * @tparam TKey the type of the key to lookup in the TypeMap

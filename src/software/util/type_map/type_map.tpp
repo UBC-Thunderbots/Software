@@ -46,6 +46,13 @@ TypeMap<TValue>::ConstIterator TypeMap<TValue>::find() const
 
 template <class TValue>
 template <class TKey>
+bool TypeMap<TValue>::contains() const
+{
+    return map_.contains(getTypeId<TKey>());
+}
+
+template <class TValue>
+template <class TKey>
 void TypeMap<TValue>::put(TValue&& value)
 {
     map_[getTypeId<TKey>()] = std::forward<TValue>(value);

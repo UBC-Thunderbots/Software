@@ -2,15 +2,14 @@
 
 #include "software/util/generic_factory/generic_factory.h"
 
-DynamicPlay::DynamicPlay(std::shared_ptr<Strategy> strategy)
+DynamicPlay::DynamicPlay(std::shared_ptr<Strategy> strategy,
+                         std::unique_ptr<FeasibilityScorer> feasibility_scorer)
     : Play(true, strategy),
+      support_tactics_(),
       support_tactic_candidates_(allSupportTacticCandidates()),
-      support_tactic_feasibility_scorer_(std::make_unique<FeasibilityScorer>()),
+      support_tactic_feasibility_scorer_(std::move(feasibility_scorer)),
       support_tactic_duplication_scorer_(std::make_unique<DuplicationScorer>()),
       support_tactic_success_scorer_(std::make_unique<SuccessScorer>()),
-      attacker_tactic_(std::make_shared<AttackerTactic>(strategy)),
-      support_tactics_(),
-      defense_play(std::make_unique<DefensePlay>(strategy))
 {
 }
 
@@ -25,29 +24,18 @@ void DynamicPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
+void DynamicPlay::evaluate()
+{
+    support_tactic_success_scorer_->evaluate();
+    support_tactics_.clear();
+}
+
 void DynamicPlay::updateTactics(const PlayUpdate &play_update)
 {
-    PriorityTacticVector tactics_to_return;
-
-    PossessionStrategy possession_strategy =
-        (*strategy)->getPossessionStrategy(play_update.num_tactics);
-
-    // Defense
-    defense_play->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-    defense_play->updateTactics(PlayUpdate(
-        play_update.world_ptr, possession_strategy.num_defenders,
-        [&tactics_to_return](PriorityTacticVector new_tactics) {
-            for (const auto &tactic_vector : new_tactics)
-            {
-                tactics_to_return.push_back(tactic_vector);
-            }
-        },
-        play_update.inter_play_communication,
-        play_update.set_inter_play_communication_fun));
-
-    if (attacker_tactic_->done())
+    if (support_tactics.empty())
     {
-        support_tactics_.clear();
+        support_tactic_duplication_scorer_->reset();
+        support_tactic_success_scorer_->reset();
 
         unsigned int num_support_tactics = possession_strategy.num_support;
         while (num_support_tactics > support_tactics_.size())
@@ -68,34 +56,15 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
             support_tactics_.push_back(support_tactic);
 
             (*best_candidate)->updateScorer(*support_tactic_duplication_scorer_);
+            (*best_candidate)->updateScorer(*support_tactic_success_scorer_);
+        
+            support_tactic->commit();
+            support_tactic->updateControlParams();
         }
-
-        std::for_each(support_Tactics_.begin(), support_tactics_.end(),
-                [&committed_support](const std::shared_ptr<OffenseSupportTactic> &tactic)
-                {
-                    committed_support->commit();
-                    committed_support->updateControlParams();
-                });
     }
-
-    tactics_to_return.push_back({attacker_tactic_});
-
-    std::vector support_tactic_vec = std::vector<std::shared_ptr<Tactic>>();
-    std::transform(support_tactics_.begin(), support_tactics_.end(),
-                   std::back_inserter(support_tactic_vec),
-                   [](const std::shared_ptr<OffenseSupportTactic> &tactic) {
-                       std::shared_ptr<Tactic> t = tactic;
-                       return t;
-                   });
-    tactics_to_return.push_back(support_tactic_vec);
-
-    play_update.set_tactics(tactics_to_return);
 }
 
 std::vector<std::shared_ptr<SupportTacticCandidate>> allSupportTacticCandidates()
 {
     return {std::make_shared<TypedSupportTacticCandidate<ReceiverTactic>>()};
 }
-
-// Temp: Migrate to OffensePlay
-static TGenericFactory<std::string, Play, DynamicPlay, std::shared_ptr<Strategy>> factory;

@@ -28,6 +28,8 @@ TEST(TypeMapTest, test_several_keys)
     EXPECT_EQ(type_map.getOrDefault<TestTypeB>(), 2);
     EXPECT_EQ(type_map.find<TestTypeA>()->second, 1);
     EXPECT_EQ(type_map.find<TestTypeB>()->second, 2);
+    EXPECT_TRUE(type_map.contains<TestTypeB>());
+    EXPECT_FALSE(type_map.contains<TestTypeC>());
 
     type_map.put<TestTypeA>(3);
     EXPECT_EQ(type_map.getOrDefault<TestTypeA>(), 3);

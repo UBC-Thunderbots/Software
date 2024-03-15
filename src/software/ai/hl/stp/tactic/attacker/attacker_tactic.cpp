@@ -51,3 +51,9 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
                                     tactic_update.set_primitive);
     }
 }
+
+void AttackerTactic::evaluate()
+{
+    skill_graph_->scoreSequence();
+    current_skill_ = nullptr;
+}
