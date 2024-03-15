@@ -10,15 +10,15 @@ TEST(BallPlacementPlayFSMTest, test_transitions)
 {
     int num_tactics = 5;
 
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world_ptr = ::TestUtil::createBlankTestingWorld();
     // ball starts within the field lines
-    world.updateBall(Ball(Point(2, 2), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world_ptr->updateBall(Ball(Point(2, 2), Vector(0, 0), Timestamp::fromSeconds(0)));
 
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::STOP);
     Point ball_placement_point(0, 0);
     game_state.setBallPlacementPoint(ball_placement_point);
-    world.updateGameState(game_state);
+    world_ptr->updateGameState(game_state);
 
     TbotsProto::AiConfig ai_config;
     FSM<BallPlacementPlayFSM> fsm(BallPlacementPlayFSM{ai_config});
@@ -28,8 +28,8 @@ TEST(BallPlacementPlayFSMTest, test_transitions)
     fsm.process_event(BallPlacementPlayFSM::Update(
         BallPlacementPlayFSM::ControlParams{},
         PlayUpdate(
-            world, num_tactics, [](PriorityTacticVector new_tactics) {},
-            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
+                world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
+                InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::AlignPlacementState>));
 }
@@ -39,15 +39,15 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
     int num_tactics = 5;
 
     // default field type is DIV_B
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world_ptr = ::TestUtil::createBlankTestingWorld();
     // ball starts outside the field lines, so FSM will enter KickOfWallState
-    world.updateBall(Ball(Point(-2.0, 3.2), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world_ptr->updateBall(Ball(Point(-2.0, 3.2), Vector(0, 0), Timestamp::fromSeconds(0)));
 
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::STOP);
     Point ball_placement_point(0, 0);
     game_state.setBallPlacementPoint(ball_placement_point);
-    world.updateGameState(game_state);
+    world_ptr->updateGameState(game_state);
 
     TbotsProto::AiConfig ai_config;
     FSM<BallPlacementPlayFSM> fsm(BallPlacementPlayFSM{ai_config});
@@ -57,20 +57,20 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
     fsm.process_event(BallPlacementPlayFSM::Update(
         BallPlacementPlayFSM::ControlParams{},
         PlayUpdate(
-            world, num_tactics, [](PriorityTacticVector new_tactics) {},
-            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
+                world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
+                InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::KickOffWallState>));
 
     // After the ball is kicked off a wall, it ends up somewhere inside the field lines
     // (but still needs to be moved to the ball placement point)
-    world.updateBall(Ball(Point(-1, 2), Vector(1, 1), Timestamp::fromSeconds(1)));
+    world_ptr->updateBall(Ball(Point(-1, 1), Vector(0, 0), Timestamp::fromSeconds(1)));
 
     fsm.process_event(BallPlacementPlayFSM::Update(
         BallPlacementPlayFSM::ControlParams{},
         PlayUpdate(
-            world, num_tactics, [](PriorityTacticVector new_tactics) {},
-            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
+                world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
+                InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::AlignPlacementState>));
 }
