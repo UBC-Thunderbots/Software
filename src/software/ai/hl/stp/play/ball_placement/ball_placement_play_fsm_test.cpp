@@ -28,8 +28,8 @@ TEST(BallPlacementPlayFSMTest, test_transitions)
     fsm.process_event(BallPlacementPlayFSM::Update(
         BallPlacementPlayFSM::ControlParams{},
         PlayUpdate(
-                world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
-                InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
+            world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
+            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::AlignPlacementState>));
 }
@@ -41,7 +41,8 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
     // default field type is DIV_B
     std::shared_ptr<World> world_ptr = ::TestUtil::createBlankTestingWorld();
     // ball starts outside the field lines, so FSM will enter KickOfWallState
-    world_ptr->updateBall(Ball(Point(-2.0, 3.2), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world_ptr->updateBall(
+        Ball(Point(-2.0, 3.2), Vector(0, 0), Timestamp::fromSeconds(0)));
 
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::STOP);
@@ -57,8 +58,8 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
     fsm.process_event(BallPlacementPlayFSM::Update(
         BallPlacementPlayFSM::ControlParams{},
         PlayUpdate(
-                world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
-                InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
+            world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
+            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::KickOffWallState>));
 
@@ -69,8 +70,8 @@ TEST(BallPlacementPlayFSMTest, test_kick_off_wall_transitions)
     fsm.process_event(BallPlacementPlayFSM::Update(
         BallPlacementPlayFSM::ControlParams{},
         PlayUpdate(
-                world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
-                InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
+            world_ptr, num_tactics, [](PriorityTacticVector new_tactics) {},
+            InterPlayCommunication{}, [](InterPlayCommunication comm) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::AlignPlacementState>));
 }
