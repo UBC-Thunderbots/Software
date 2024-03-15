@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/enemy_free_kick_play.h"
+#include "software/ai/hl/stp/play/enemy_free_kick/enemy_free_kick_play.h"
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"

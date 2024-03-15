@@ -16,7 +16,7 @@ public:
                         const WorldPtr &world_ptr) override;
 
 public:
-    OffensePlay(TbotsProto::AiConfig config);
+    EnemyFreekickPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
