@@ -186,7 +186,6 @@ struct BallPlacementPlayFSM
             WaitState_S + Update_E[!waitDone_G]                      = WaitState_S,
             WaitState_S + Update_E[waitDone_G]                       = RetreatState_S,
             RetreatState_S + Update_E[retreatDone_G && ballPlaced_G] = X,
-            RetreatState_S + Update_E[!ballPlaced_G] / placeBall_A   = RetreatState_S,
             RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = RetreatState_S);
     }
 
@@ -201,6 +200,6 @@ struct BallPlacementPlayFSM
     std::chrono::time_point<std::chrono::system_clock> start_time;
     constexpr static double const WALL_KICKOFF_VELOCITY_M_PER_S   = 3.0;
     constexpr static double const RETREAT_DISTANCE_METERS         = 0.6;
-    constexpr static double const PLACEMENT_DIST_THRESHOLD_METERS = 0.05;
+    constexpr static double const PLACEMENT_DIST_THRESHOLD_METERS = 0.15;
     constexpr static double const BALL_IS_PLACED_WAIT_S           = 3.0;
 };

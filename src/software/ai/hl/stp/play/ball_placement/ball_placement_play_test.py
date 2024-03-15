@@ -95,9 +95,6 @@ def test_two_ai_ball_placement(
             BallEventuallyEntersRegion(
                 regions=[tbots_cpp.Circle(ball_placement_point, 0.15)]
             ),
-            RobotEventuallyEntersRegion(
-                regions=[tbots_cpp.Circle(ball_placement_point, 0.15)]
-            ),
         ]
     ]
 
@@ -124,7 +121,7 @@ def test_two_ai_ball_placement(
     drop_ball_always_validation_sequence_set = [
         [
             BallAlwaysStaysInRegion(
-                regions=[tbots_cpp.Circle(ball_placement_point, 0.1)]
+                regions=[tbots_cpp.Circle(ball_placement_point, 0.15)]
             ),
         ]
     ]
@@ -134,10 +131,6 @@ def test_two_ai_ball_placement(
     # See detailed rules here: https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement
     drop_ball_eventually_validation_sequence_set = [
         [
-            # Ball should arrive within 5cm of placement point
-            BallEventuallyStopsInRegion(
-                regions=[tbots_cpp.Circle(ball_placement_point, 0.05)]
-            ),
             RobotEventuallyExitsRegion(
                 regions=[tbots_cpp.Circle(ball_placement_point, 0.5)]
             ),

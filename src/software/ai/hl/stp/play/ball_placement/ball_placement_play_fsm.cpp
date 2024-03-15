@@ -119,9 +119,9 @@ void BallPlacementPlayFSM::retreat(const Update &event)
 
         // robot will try to retreat backwards from wherever it is currently facing
         Angle final_orientation  = nearest_robot.value().orientation();
-        Vector retreat_direction = (nearest_robot->position() - ball_pos).normalize();
+        Vector retreat_direction = (nearest_robot.value().position() - ball_pos).normalize();
         Point retreat_position = ball_pos + retreat_direction * (RETREAT_DISTANCE_METERS +
-                                                                 ROBOT_MAX_RADIUS_METERS);
+                                                                 2 * ROBOT_MAX_RADIUS_METERS);
 
         // if the initial retreat position is out of the field boundary, have it retreat
         // towards the closest goal
@@ -301,6 +301,6 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
             waiting_line_start_point +
             waiting_line_vector.normalize(waiting_line_vector.length() * i /
                                           static_cast<double>(move_tactics.size()));
-        move_tactics.at(i)->updateControlParams(waiting_destination, Angle::zero(), 0.0);
+        move_tactics.at(i)->updateControlParams(waiting_destination, Angle::zero(), 0.0, TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID);
     }
 }
