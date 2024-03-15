@@ -6,11 +6,11 @@ Table of Contents
     https://github.com/ekalinin/github-markdown-toc
 -->
 
-* [Software Setup](#software-setup)                                                                                                                                                          
-   * [Introduction](#introduction)                                                                                                                                                           
-   * [Installation and Setup](#installation-and-setup)                                                                                                                                       
-      * [Operating systems](#operating-systems)                                                                                                                                              
-      * [Getting the Code](#getting-the-code)                                                                                                                                                
+* [Software Setup](#software-setup)
+   * [Introduction](#introduction)
+   * [Installation and Setup](#installation-and-setup)
+      * [Operating systems](#operating-systems)
+      * [Getting the Code](#getting-the-code)
       * [Installing Software Dependencies](#installing-software-dependencies)
       * [Installing an IDE](#installing-an-ide)
          * [Installing an IDE: CLion](#installing-an-ide-clion)
@@ -28,6 +28,8 @@ Table of Contents
       * [Debugging with CLion](#debugging-with-clion)
       * [Debugging from the Command line](#debugging-from-the-command-line)
    * [Profiling](#profiling)
+      * [Callgrind](#callgrind)
+      * [Tracy](#tracy)
    * [Building for Jetson Nano](#building-for-jetson-nano)
    * [Deploying to Jetson Nano](#deploying-to-jetson-nano)
    * [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
@@ -297,6 +299,11 @@ To debug from the command line, first you need to build your target with the deb
 ## Profiling 
 
 Profiling is an optimization tool used to identify the time and space used by code, with a detailed breakdown to help identify areas of potential performance improvements. Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence the only way is via command line. Use the following command:
+
+### Callgrind
+
+Callgrind is a profiling tool that is part of the Valgrind suite, designed for analyzing program execution and performance with a focus on functional calls and cache usage. It is useful for determining specific functions in the code that may bottleneck performance.
+
 ```
 bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/ABSOLUTE/PATH/TO/profile.callgrind" //target/to:run
 
@@ -305,6 +312,32 @@ bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/tm
 ```
 
 This will output the file at the _absolute_ path given via the `--callgrind-out-file` argument. This file can then be viewed using `kcachegrind` (example: `kcachegrind /tmp/profile.callgrind`), giving lots of useful information about where time is being spent in the code.
+
+Callgrind requires generating the profile by tracking every single instruction executed by the code. This design adds significant overhead to the runtime performance and significantly slows down the code. Callgrind is appropriate in finding a general sense of bottlenecks in the code but it is difficult to track issues with blocking code and deadlocks.
+
+### Tracy
+
+Tracy is a lightweight, real-time profiler designed for understanding the performance of a system. It offers insights into CPU usage and memory allocations by adding Tracy's markup API.
+
+To run Tracy:
+1. If you haven't installed Tracy: `./environment_setup/install_tracy.sh`. Tracy is __very_particular__ about its dependencies!
+
+2. Run the Tracy profiler: `./tbots.py run tracy`
+
+3. Build and run a binary using the `--tracy` flag. Requires Tracy markup symbols to be added to the code:
+
+    1. For `Thunderloop`: `./tbots.py build thunderloop_main --tracy`
+
+    2. For `FullSystem`: `./tbots.py run thunderscope_main --tracy`
+
+Unlike [Callgrind](Callgrind), we can run (and encouraged to run) Tracy with the binary compiled with any and full compiler optimizations. It can provide us a better understanding of the real-time performance of the code.
+
+**Warning**: Bewarned from the Tracy 16.10.2023 manual:
+> The captured data is stored in RAM and only written to the disk when the capture finishes. This can result in memory exhaustion when you capture massive amounts of profile data or even in typical usage situations when the capture is performed over a long time. Therefore, the recommended usage pattern is to perform moderate instrumentation of the client code and limit capture time to the strict necessity.
+
+Tracy also samples call stacks. If the profiled binary is run with root permissions, then Tracy can also inspect the kernel stack trace. By default, Thunderloop is run with root permissions but we can profile `unix_full_system` with elevated permissions by following the on-screen instructions by running:
+
+    ./tbots.py run thunderscope_main --tracy --sudo
 
 ## Building for Jetson Nano 
 
@@ -492,5 +525,5 @@ Let's pretend our goalie strategy isn't that great. You have noticed that and su
 
 ## Testing
 
-Testing is an integral part of our development process. If you are writing basically **any** code, it should be tested. If you feel like you can't test your piece of code, it's likely because it was written in a way that makes it difficult to test (which is a strong indicator for other problems, such as too much [coupling](https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29)). _(An exception to this rule is any code that talks **directly** with hardware)_. For some examples of what happens when people don't test their code enough, see [here](http://outfresh.com/knowledge-base/6-famous-software-disasters-due-lack-testing/). How to run tests is explained in the [Building and Running Code](#building-and-running-the-code) section. 
+Testing is an integral part of our development process. If you are writing basically **any** code, it should be tested. If you feel like you can't test your piece of code, it's likely because it was written in a way that makes it difficult to test (which is a strong indicator for other problems, such as too much [coupling](https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29)). _(An exception to this rule is any code that talks **directly** with hardware)_. For some examples of what happens when people don't test their code enough, see [here](https://web.archive.org/web/20201111163333/https://outfresh.com/knowledge-base/6-famous-software-disasters-due-lack-testing/). How to run tests is explained in the [Building and Running Code](#building-and-running-the-code) section. 
 
