@@ -107,8 +107,7 @@ class PassGenerator
      * @param optimized_passes The optimized_passes to update our internal cached
      * passes with.
      */
-    void updatePasses(const World& world,
-                      const ZonePassMap<ZoneEnum>& optimized_passes);
+    void updatePasses(const World& world, const ZonePassMap<ZoneEnum>& optimized_passes);
 
     // All the passes that we are currently trying to optimize in gradient descent
     ZonePassMap<ZoneEnum> current_best_passes_;
@@ -191,10 +190,10 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
                                                passing_config_.min_pass_speed_m_per_s(),
                                                passing_config_.max_pass_speed_m_per_s());
 
-        passes.emplace(zone_id,
-                       PassWithRating{pass, ratePass(world, pass,
-                                                     pitch_division_->getZone(zone_id),
-                                                     passing_config_)});
+        passes.emplace(
+            zone_id,
+            PassWithRating{pass, ratePass(world, pass, pitch_division_->getZone(zone_id),
+                                          passing_config_)});
     }
 
     return passes;
