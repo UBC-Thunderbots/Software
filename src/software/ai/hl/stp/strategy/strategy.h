@@ -1,8 +1,8 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
-#include "software/ai/hl/stp/strategy/strategy_impl.h"
-#include "software/ai/hl/stp/tactic/offense_support_tactics/offense_support_tactic.h"
+#include "software/ai/hl/stp/strategy/strategy_impl.hpp"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/pose.h"
 #include "software/world/robot.h"
 #include "software/world/robot_state.h"
@@ -17,8 +17,8 @@ class Strategy
     void updateAiConfig(const TbotsProto::AiConfig& ai_config);
     void updateWorld(const WorldPtr& world_ptr);
 
-    std::shared_ptr<StrategyImpl> operator->();
+    std::shared_ptr<StrategyImpl<EighteenZoneId>> operator->();
 
    private:
-    std::shared_ptr<StrategyImpl> strategy_;
+    std::shared_ptr<StrategyImpl<EighteenZoneId>> strategy_;
 };
