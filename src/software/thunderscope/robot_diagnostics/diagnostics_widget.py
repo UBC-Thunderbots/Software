@@ -1,6 +1,6 @@
+import logging
 import threading
 
-from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.robot_diagnostics.controller_diagnostics import ControllerDiagnostics
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
@@ -18,6 +18,8 @@ class DiagnosticsWidget(QWidget):
         super(DiagnosticsWidget, self).__init__()
 
         vbox_layout = QVBoxLayout()
+
+        self.proto_unix_io = proto_unix_io
 
         self.diagnostics_control_input_widget = FullSystemConnectWidget(self.diagnostics_input_mode_signal)
         self.drive_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
@@ -43,21 +45,23 @@ class DiagnosticsWidget(QWidget):
 
     def refresh(self):
         if self.__control_mode == ControlMode.DIAGNOSTICS:
+            # refresh the widgets so that they hold the most recent user control values
             self.diagnostics_control_input_widget.refresh()
             self.drive_dribbler_widget.refresh()
             self.chicker_widget.refresh()
 
-            self.drive_dribbler_widget.motor_control_diagnostics_buffer.get()
-
+            #
             diagnostics_primitive = DirectControlPrimitive(
                 motor_control=self.drive_dribbler_widget.motor_control,
                 power_control=self.chicker_widget.power_control,
             )
 
-            # TODO send the diagnostics primitive
-            Primitive(direct_control=diagnostics_primitive)
+            # TODO: send the diagnostics primitive
+            self.proto_unix_io.send_proto(DirectControlPrimitive, diagnostics_primitive)
 
         elif self.__control_mode == ControlMode.XBOX:
+            # TODO: get values from controller widget
+            logging.debug(self.controller.ang_vel)
 
 
 

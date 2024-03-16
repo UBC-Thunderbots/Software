@@ -83,13 +83,18 @@ class RobotCommunication(object):
         )
 
         # robots controlled by full-system
-        self.ai_controlled_robot_ids: list[int] = []
+        # TODO: remove...
+        self.ai_controlled_robots: list[int] = []
 
         # robots controlled by diagnostics
-        self.diagnostic_controlled_robot_ids: list[int] = []
+        # TODO: remove...
+        self.diagnostic_controlled_robots: list[int] = []
+
+        # map of robot id to the individual control mode
+        self.robot_individual_control_mode_dict: dict[int, IndividualRobotMode]
 
         # map of robot id to the number of times to send a estop.
-        # each robot has it's own countdown
+        # each robot has it's own separate countdown
         self.robot_estop_send_countdown_latches: dict[int, int] = {
             rid: 0 for rid in range(NUM_ROBOTS)
         }
@@ -116,8 +121,8 @@ class RobotCommunication(object):
         """
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
         """
-        self.ai_controlled_robot_ids = range(0, NUM_ROBOTS)
-        self.diagnostic_controlled_robot_ids = range(0, NUM_ROBOTS)
+        self.ai_controlled_robots = range(0, NUM_ROBOTS)
+        self.diagnostic_controlled_robots = range(0, NUM_ROBOTS)
 
         self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
@@ -147,7 +152,6 @@ class RobotCommunication(object):
         """
         if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
             self.estop_is_playing = not self.estop_is_playing
-
             print(
                 "Keyboard Estop changed to "
                 + (
@@ -243,6 +247,7 @@ class RobotCommunication(object):
             # total primitives for all robots
             robot_primitives = {}
 
+            # TODO: remove this commented out code
             # diagnostics is running. Only send diagnostics packets if using diagnostics control mode
             # get the manual control primitive
             # diagnostics_primitive = DirectControlPrimitive(
@@ -250,15 +255,12 @@ class RobotCommunication(object):
             #     power_control=self.power_control_diagnostics_buffer.get(block=False),
             # )
 
-            diagnostices_primitive = self.diagnostics_control_buffer.get(block=False)
+            # get the most recent diagnostics primitive
+            diagnostics_primitive = self.diagnostics_control_buffer.get(block=False)
 
-            for robot_id in self.diagnostics_controlled_robot_ids:
-                robot_primitives[robot_id] = Primitive(direct_control=diagnostics_primitive)
-
-            # filter for ai controlled robots
-            ai_controlled_robots = filter(
-                lambda robot_mode: robot_mode[1] == IndividualRobotMode.AI,
-                self.robot_id_individual_mode_dict)
+            for robot_id in self.diagnostic_controlled_robots:
+                if robot_id in self.diagnostic_controlled_robots:
+                    robot_primitives[robot_id] = Primitive(direct_control=diagnostics_primitive)
 
             # Get the primitives
             primitive_set = self.primitive_buffer.get(
