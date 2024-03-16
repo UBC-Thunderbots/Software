@@ -60,7 +60,17 @@ class KickerDoubleTouch(Validation):
 
         """
         return create_validation_geometry(
-            [tbots_cpp.Field.createSSLDivisionBField().fieldLines()]
+            # [tbots_cpp.Field.createSSLDivisionBField().fieldLines()]
+            [
+                tbots_cpp.Circle(
+                    tbots_cpp.Point(
+                        robot.current_state.global_position.x_meters,
+                        robot.current_state.global_position.y_meters,
+                    ),
+                    0.5,
+                )
+                for robot in list(world.friendly_team.team_robots)
+            ]
         )
 
     def __repr__(self):

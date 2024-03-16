@@ -321,21 +321,6 @@ py_test(
     ],
 )
 
-cc_test(
-    name = "corner_kick_play_cpp_test",
-    srcs = ["corner_kick_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:corner_kick_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
 py_test(
     name = "corner_kick_play_test",
     srcs = [
