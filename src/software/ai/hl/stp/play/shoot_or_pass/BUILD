@@ -29,6 +29,7 @@ cc_library(
         "//software/logger",
         "//software/util/generic_factory",
         "@sml",
+        "@tracy",
     ],
     alwayslink = True,
 )
