@@ -4,10 +4,11 @@ package TbotsProto;
 
 enum PlayName
 {
+    reserved 4;
+
     UseAiSelection                     = 1;
     ShootOrChipPlay                    = 2;
     KickoffFriendlyPlay                = 3;
-    OffensePlay                        = 4;
     CornerKickPlay                     = 5;
     ShootOrPassPlay                    = 6;
     BallPlacementPlay                  = 7;
@@ -23,10 +24,6 @@ enum PlayName
     StopPlay                           = 17;
     KickoffEnemyPlay                   = 18;
     AssignedTacticsPlay                = 19;
-    ScoringWithStaticDefendersPlay     = 20;
-    DribblingParcourPlay               = 21;
-    ScoringFromContestedPossessionPlay = 22;
-    PassEndurancePlay                  = 23;
     // TODO(arun): temporarily as an override to run in Thunderscope
     DynamicPlay = 24;
 }

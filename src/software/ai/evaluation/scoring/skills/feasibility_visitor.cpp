@@ -36,7 +36,7 @@ void FeasibilityVisitor::visit(const PassSkill& skill)
     if (std::find(committed_strategy.begin(), committed_strategy.end(), OffenseSupportType::PASS_RECEIVER) == committed_strategy.end())
     {
         current_feasibility_ = 0;
-        return
+        return;
     }
 
     PassWithRating best_pass = (*strategy_)->getBestPass();

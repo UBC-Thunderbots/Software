@@ -1,6 +1,9 @@
 #pragma once
 
 #include "software/ai/hl/stp/strategy/strategy.h"
+#include "software/ai/hl/stp/tactic/primitive.h"
+#include "software/ai/hl/stp/tactic/stop_primitive.h"
+#include "software/util/sml_fsm/sml_fsm.h"
 
 using SetPrimitiveCallback = std::function<void(std::shared_ptr<Primitive>)>;
 
@@ -39,3 +42,6 @@ struct SkillUpdate
         ControlParams control_params;                                                    \
         SkillUpdate common;                                                              \
     };
+
+#define SET_STOP_PRIMITIVE_ACTION                                                        \
+    [this](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>()); }
