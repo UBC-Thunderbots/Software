@@ -39,6 +39,7 @@ cc_library(
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:shot",
         "//software/ai/hl/stp/tactic/offense_support_tactics:offense_support_type",
+        "//software/ai/passing:pass_evaluation",
         "//software/ai/passing:pass_with_rating",
         "//software/geom:pose",
         "//software/world:field",
