@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h"
 
+#include <Tracy.hpp>
 #include <algorithm>
 
 ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
@@ -51,8 +52,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
     // only look for pass if there are more than 1 robots
     if (event.common.num_tactics > 1)
     {
-        auto pitch_division = std::make_shared<const EighteenZonePitchDivision>(
-            event.common.world_ptr->field());
+        ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
 
         auto pass_eval    = pass_generator.generatePassEvaluation(event.common.world_ptr);
         auto ranked_zones = pass_eval.rankZonesForReceiving(

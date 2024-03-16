@@ -392,3 +392,11 @@ git_repository(
 load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_setup")
 
 hedron_compile_commands_setup()
+
+new_git_repository(
+    name = "tracy",
+    build_file = "@//extlibs:tracy.BUILD",
+    commit = "37aff70dfa50cf6307b3fee6074d627dc2929143",
+    remote = "https://github.com/wolfpld/tracy.git",
+    shallow_since = "1697482622 +0200",
+)
