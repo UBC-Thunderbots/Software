@@ -12,7 +12,7 @@
 EnemyFreekickPlay::EnemyFreekickPlay(TbotsProto::AiConfig config) : Play(config, true) {}
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                       const World &world)
+                                       const WorldPtr &world_ptr)
 {
     // Init a Crease Defender Tactic
     auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
@@ -37,8 +37,9 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         PriorityTacticVector tactics_to_run = {{}};
 
         // Get all enemy threats
-        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                                world.enemyTeam(), world.ball(), false);
+        auto enemy_threats =
+            getAllEnemyThreats(world_ptr->field(), world_ptr->friendlyTeam(),
+                               world_ptr->enemyTeam(), world_ptr->ball(), false);
 
         // shadow free kicker should shadow the robot with the ball and if no such enemy
         // exists, then it will default to positioning between the ball and the friendly
@@ -60,18 +61,21 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             if (enemy_threats.at(3).robot.position().y() > 0)
             {
                 crease_defender_tactic->updateControlParams(
-                    world.ball().position(), TbotsProto::CreaseDefenderAlignment::LEFT);
+                    world_ptr->ball().position(),
+                    TbotsProto::CreaseDefenderAlignment::LEFT);
             }
             else
             {
                 crease_defender_tactic->updateControlParams(
-                    world.ball().position(), TbotsProto::CreaseDefenderAlignment::RIGHT);
+                    world_ptr->ball().position(),
+                    TbotsProto::CreaseDefenderAlignment::RIGHT);
             }
         }
         else
         {
             crease_defender_tactic->updateControlParams(
-                world.ball().position(), TbotsProto::CreaseDefenderAlignment::CENTRE);
+                world_ptr->ball().position(),
+                TbotsProto::CreaseDefenderAlignment::CENTRE);
         }
 
         tactics_to_run[0].emplace_back(crease_defender_tactic);
@@ -83,15 +87,15 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             // Since the first enemy threat is covered by the shadow_free_kicker, just
             // move to block the net
             move_tactic_main->updateControlParams(
-                world.field().friendlyGoalCenter() +
+                world_ptr->field().friendlyGoalCenter() +
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoalCenter())
+                (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
                     .orientation(),
                 0);
             move_tactic_main->updateControlParams(
-                world.field().friendlyGoalCenter() +
+                world_ptr->field().friendlyGoalCenter() +
                     Vector(0, -2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoalCenter())
+                (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
                     .orientation(),
                 0);
 
@@ -103,9 +107,9 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             // Shadow the second most threatening enemy threat and move one robot to block
             // the net
             move_tactic_main->updateControlParams(
-                world.field().friendlyGoalCenter() +
+                world_ptr->field().friendlyGoalCenter() +
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoalCenter())
+                (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
                     .orientation(),
                 0);
             std::get<0>(shadow_potential_receivers)

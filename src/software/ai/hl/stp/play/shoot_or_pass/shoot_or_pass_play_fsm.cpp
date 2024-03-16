@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h"
 
+#include <Tracy.hpp>
 #include <algorithm>
 
 ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
@@ -50,10 +51,9 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
     // only look for pass if there are more than 1 robots
     if (event.common.num_tactics > 1)
     {
-        auto pitch_division =
-            std::make_shared<const EighteenZonePitchDivision>(event.common.world.field());
+        ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
 
-        auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
+        auto pass_eval = pass_generator.generatePassEvaluation(event.common.world_ptr);
 
         auto best_pass_score_and_zone = pass_eval.getBestPassAndZoneOnField();
         best_pass_zone                = best_pass_score_and_zone.first;
@@ -68,15 +68,15 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
             ai_config.shoot_or_pass_play_config().abs_min_pass_score();
         double pass_score_ramp_down_duration =
             ai_config.shoot_or_pass_play_config().pass_score_ramp_down_duration();
-        pass_eval = pass_generator.generatePassEvaluation(event.common.world);
+        pass_eval = pass_generator.generatePassEvaluation(event.common.world_ptr);
 
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
         // If we've assigned a robot as the passer in the PassGenerator, we
         // lower our threshold based on how long the PassGenerator has been
         // running since we set it
-        time_since_commit_stage_start =
-            event.common.world.getMostRecentTimestamp() - pass_optimization_start_time;
+        time_since_commit_stage_start = event.common.world_ptr->getMostRecentTimestamp() -
+                                        pass_optimization_start_time;
         min_pass_score_threshold =
             1 - std::min(time_since_commit_stage_start.toSeconds() /
                              pass_score_ramp_down_duration,
@@ -94,7 +94,7 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
     attacker_tactic              = std::make_shared<AttackerTactic>(ai_config);
     receiver_tactic              = std::make_shared<ReceiverTactic>();
-    pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
+    pass_optimization_start_time = event.common.world_ptr->getMostRecentTimestamp();
     lookForPass(event);
 }
 
@@ -102,7 +102,7 @@ std::vector<EighteenZoneId> ShootOrPassPlayFSM::getBestOffensivePositions(
     PassEvaluation<EighteenZoneId> pass_eval, const Update& event)
 {
     auto ranked_zones = pass_eval.rankZonesForReceiving(
-        event.common.world, best_pass_and_score_so_far.pass.receiverPoint());
+        event.common.world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
     ranked_zones.erase(
         std::remove(ranked_zones.begin(), ranked_zones.end(), best_pass_zone),
         ranked_zones.end());
@@ -111,7 +111,7 @@ std::vector<EighteenZoneId> ShootOrPassPlayFSM::getBestOffensivePositions(
 
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
-    auto pass_eval = pass_generator.generatePassEvaluation(event.common.world);
+    auto pass_eval = pass_generator.generatePassEvaluation(event.common.world_ptr);
 
     auto ranked_zones = getBestOffensivePositions(pass_eval, event);
 
@@ -154,9 +154,11 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
-    const auto ball_velocity = event.common.world.ball().velocity().length();
+    const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
     const auto ball_not_kicked_threshold =
         this->ai_config.shoot_or_pass_play_config().ball_not_kicked_threshold();
+
+    std::cout << best_pass_and_score_so_far.rating << std::endl;
 
     return (ball_velocity < ball_not_kicked_threshold) &&
            (best_pass_and_score_so_far.rating > min_pass_score_threshold);
@@ -164,7 +166,7 @@ bool ShootOrPassPlayFSM::passFound(const Update& event)
 
 bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
 {
-    const auto ball_position  = event.common.world.ball().position();
+    const auto ball_position  = event.common.world_ptr->ball().position();
     const auto passer_point   = best_pass_and_score_so_far.pass.passerPoint();
     const auto receiver_point = best_pass_and_score_so_far.pass.receiverPoint();
     const auto short_pass_threshold =
@@ -187,7 +189,7 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     // distance between robot and ball is too far, and it's not in flight,
     // i.e. team might still have possession, but kicker/passer doesn't have control over
     // ball
-    const auto ball_velocity = event.common.world.ball().velocity().length();
+    const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
     const auto ball_shot_threshold =
         this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
     const auto min_distance_to_pass =
@@ -205,14 +207,14 @@ bool ShootOrPassPlayFSM::passCompleted(const Update& event)
 bool ShootOrPassPlayFSM::tookShot(const Update& event)
 {
     const auto ball_velocity_orientation =
-        event.common.world.ball().velocity().orientation();
-    const auto ball_position = event.common.world.ball().position();
-    const auto ball_velocity = event.common.world.ball().velocity().length();
+        event.common.world_ptr->ball().velocity().orientation();
+    const auto ball_position = event.common.world_ptr->ball().position();
+    const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
     const auto ball_shot_threshold =
         this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
 
-    const auto enemy_goal_top_post = event.common.world.field().enemyGoalpostPos();
-    const auto enemy_goal_bot_post = event.common.world.field().enemyGoalpostNeg();
+    const auto enemy_goal_top_post = event.common.world_ptr->field().enemyGoalpostPos();
+    const auto enemy_goal_bot_post = event.common.world_ptr->field().enemyGoalpostNeg();
 
     const auto ball_to_top_post_angle =
         (enemy_goal_top_post.toVector() - ball_position.toVector()).orientation();
