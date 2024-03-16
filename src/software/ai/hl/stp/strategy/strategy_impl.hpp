@@ -58,6 +58,8 @@ class StrategyImpl
     void commit(OffenseSupportType& type);
     std::vector<OffenseSupportType> getCommittedOffenseSupport() const;
 
+    void commit(const Pass& pass);
+
    private:
     bool isBetterPassThanCached(const Timestamp& timestamp, const PassWithRating& pass);
 
@@ -253,4 +255,10 @@ template <class ZoneEnum>
 void StrategyImpl<ZoneEnum>::commit(OffenseSupportType& offense_support_type)
 {
     committed_support_types_.push_back(offense_support_type);
+}
+
+template <class ZoneEnum>
+void StrategyImpl<ZoneEnum>::commit(const Pass& pass)
+{
+    committed_pass_zones_.push_back(ZoneEnum().getZoneId(pass.receiverPoint()));
 }
