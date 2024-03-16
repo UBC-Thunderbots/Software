@@ -6,7 +6,7 @@ void PassSkillFSM::takePass(
 {
     Point ball_position = event.common.world_ptr->ball().position();
 
-    PassWithRating best_pass = (*event.common.strategy)->getBestPass();
+    PassWithRating best_pass = (*event.common.strategy)->getBestUncommittedPass();
 
     processEvent(PivotKickSkillFSM::Update(
         PivotKickSkillFSM::ControlParams{

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "software/ai/hl/stp/play/dynamic_plays/dynamic_play.h"
+#include "software/ai/evaluation/scoring/support_tactics/feasibility_scorers/offensive_enemy_third_feasibility_scorer.h"
+#include "software/ai/evaluation/scoring/support_tactics/feasibility_scorers/offensive_friendly_third_feasibility_scorer.h"
+#include "software/ai/evaluation/scoring/support_tactics/feasibility_scorers/offensive_middle_third_feasibility_scorer.h"
 #include "software/ai/hl/stp/play/defense/defense_play.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 
@@ -12,7 +15,7 @@ class OffensivePlay : public DynamicPlay
    protected:
     explicit OffensivePlay(std::shared_ptr<Strategy> strategy,
                            std::unique_ptr<FeasibilityScorer> feasibility_scorer)
-        : DynamicPlay(strategy, feasibility_scorer),
+        : DynamicPlay(strategy, std::move(feasibility_scorer)),
           attacker_tactic_(std::make_shared<AttackerTactic>(strategy)),
           defense_play_(std::make_unique<DefensePlay>(strategy))
     {
@@ -34,7 +37,7 @@ class OffensiveFriendlyThirdPlay : public OffensivePlay
 {
     explicit OffensiveFriendlyThirdPlay(std::shared_ptr<Strategy> strategy)
         : OffensivePlay(strategy,
-                        std::make_unique<OffensiveFriendlyThirdFeasibilityScorer>())
+                        std::move(std::make_unique<OffensiveFriendlyThirdFeasibilityScorer>()))
     {
     }
 };
@@ -48,7 +51,7 @@ class OffensiveMiddleThirdPlay : public OffensivePlay
 {
     explicit OffensiveMiddleThirdPlay(std::shared_ptr<Strategy> strategy)
         : OffensivePlay(strategy,
-                        std::make_unique<OffensiveMiddleThirdFeasibilityScorer>())
+                        std::move(std::make_unique<OffensiveMiddleThirdFeasibilityScorer>()))
     {
     }
 };
@@ -62,7 +65,7 @@ class OffensiveEnemyThirdPlay : public OffensivePlay
 {
     explicit OffensiveEnemyThirdPlay(std::shared_ptr<Strategy> strategy)
         : OffensivePlay(strategy,
-                        std::make_unique<OffensiveEnemyThirdFeasibilityScorer>())
+                        std::move(std::make_unique<OffensiveEnemyThirdFeasibilityScorer>()))
     {
     }
 };

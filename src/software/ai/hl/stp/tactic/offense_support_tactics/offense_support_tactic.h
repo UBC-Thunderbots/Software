@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/offense/offense_support_type.h"
+#include "software/ai/hl/stp/tactic/offense_support_tactics/offense_support_type.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/strategy/strategy.h"
 

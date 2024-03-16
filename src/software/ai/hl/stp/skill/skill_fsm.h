@@ -1,6 +1,8 @@
 #pragma once
 
 #include "software/ai/hl/stp/strategy/strategy.h"
+#include "proto/primitive/primitive_msg_factory.h"
+#include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/hl/stp/tactic/primitive.h"
 #include "software/ai/hl/stp/tactic/stop_primitive.h"
 #include "software/util/sml_fsm/sml_fsm.h"

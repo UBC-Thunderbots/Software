@@ -11,4 +11,4 @@
  */
 class OffensiveMiddleThirdFeasibilityScorer : public FeasibilityScorer
 {
-}
+};

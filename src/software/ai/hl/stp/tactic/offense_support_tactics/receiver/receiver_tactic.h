@@ -21,7 +21,7 @@ class ReceiverTactic : public OffenseSupportTactic
 
     void updateControlParams() override;
 
-    void commit override;
+    void commit() override;
 
     /**
      * Updates the control parameters for this ReceiverTactic.

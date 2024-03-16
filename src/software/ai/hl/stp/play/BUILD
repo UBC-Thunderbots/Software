@@ -224,7 +224,6 @@ cc_library(
         "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
         "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/play/dynamic_plays:dynamic_play",
-        "//software/ai/hl/stp/play/offense:offense_play",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/penalty_kick_enemy:penalty_kick_enemy_play",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",

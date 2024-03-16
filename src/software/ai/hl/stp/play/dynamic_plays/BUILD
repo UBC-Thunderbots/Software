@@ -24,7 +24,9 @@ cc_library(
     hdrs = ["offensive_plays.h"],
     deps = [
         ":dynamic_play",
-        "//software/ai/evaluation/scoring/support_tactics:feasibility_scorer",
+        "//software/ai/evaluation/scoring/support_tactics/feasibility_scorers:offensive_enemy_third_feasibility_scorer",
+        "//software/ai/evaluation/scoring/support_tactics/feasibility_scorers:offensive_friendly_third_feasibility_scorer",
+        "//software/ai/evaluation/scoring/support_tactics/feasibility_scorers:offensive_middle_third_feasibility_scorer",
         "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
     ],
