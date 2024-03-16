@@ -46,7 +46,7 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
 
 void ShootOrPassPlayFSM::lookForPass(const Update& event)
 {
-    PriorityTacticVector ret_tactics = {{attacker_tactic}, {}};
+    PriorityTacticVector ret_tactics = {{attacker_tactic, receiver_tactic}, {}};
 
     // only look for pass if there are more than 1 robots
     if (event.common.num_tactics > 1)
@@ -72,6 +72,8 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
+        receiver_tactic->updateControlParams(best_pass_and_score_so_far.pass);
+
         // If we've assigned a robot as the passer in the PassGenerator, we
         // lower our threshold based on how long the PassGenerator has been
         // running since we set it
@@ -157,8 +159,6 @@ bool ShootOrPassPlayFSM::passFound(const Update& event)
     const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
     const auto ball_not_kicked_threshold =
         this->ai_config.shoot_or_pass_play_config().ball_not_kicked_threshold();
-
-    std::cout << best_pass_and_score_so_far.rating << std::endl;
 
     return (ball_velocity < ball_not_kicked_threshold) &&
            (best_pass_and_score_so_far.rating > min_pass_score_threshold);

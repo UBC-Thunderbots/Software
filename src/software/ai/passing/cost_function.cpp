@@ -37,13 +37,6 @@ double ratePass(const WorldPtr& world_ptr, const Pass& pass, const Rectangle& zo
     double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
-    std::cout << "STATIC" << static_pass_quality << std::endl;
-    std::cout << "FRIENDLY" << friendly_pass_rating << std::endl;
-    std::cout << "ENEMY" << enemy_pass_rating << std::endl;
-    std::cout << "SHOOT PASS" << shoot_pass_rating << std::endl;
-    std::cout << "IN REG" << in_region_quality << std::endl;
-    std::cout << "PASS SPEED" << pass_speed_quality << std::endl;
-
     return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
            shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
@@ -247,8 +240,6 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
 
     // Get the robot that is closest to where the pass would be received
     Robot best_receiver = friendly_team.getAllRobots()[0];
-
-    std::cout << "ID init: " << best_receiver.id() << std::endl;
     for (const Robot& robot : friendly_team.getAllRobots())
     {
         double distance = (robot.position() - pass.receiverPoint()).length();
@@ -260,16 +251,11 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
         }
     }
 
-    std::cout << "POINT: " << pass.receiverPoint() << std::endl;
-    std::cout << "ID: " << best_receiver.id() << std::endl;
-
     // Figure out what time the robot would have to receive the ball at
     // TODO (#2988): We should generate a more realistic ball trajectory
     Duration ball_travel_time = Duration::fromSeconds(
         (pass.receiverPoint() - pass.passerPoint()).length() / pass.speed());
     Timestamp receive_time = best_receiver.timestamp() + ball_travel_time;
-
-    std::cout << "BALL TRAVEL: " << ball_travel_time << std::endl;
 
     // Figure out how long it would take our robot to get there
     Duration min_robot_travel_time =
@@ -277,15 +263,11 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
     Timestamp earliest_time_to_receive_point =
         best_receiver.timestamp() + min_robot_travel_time;
 
-    std::cout << "Robot TRAVEL: " << min_robot_travel_time << std::endl;
-
     // Figure out what angle the robot would have to be at to receive the ball
     Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
     Duration time_to_receive_angle = best_receiver.getTimeToOrientation(receive_angle);
     Timestamp earliest_time_to_receive_angle =
         best_receiver.timestamp() + time_to_receive_angle;
-
-    std::cout << "ROBOT TURN: " << time_to_receive_angle << std::endl;
 
     // Figure out if rotation or moving will take us longer
     Timestamp latest_time_to_reciever_state =
