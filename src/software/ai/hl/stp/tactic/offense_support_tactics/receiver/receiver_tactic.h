@@ -21,6 +21,8 @@ class ReceiverTactic : public OffenseSupportTactic
 
     void updateControlParams() override;
 
+    void commit override;
+
     /**
      * Updates the control parameters for this ReceiverTactic.
      *
@@ -89,4 +91,6 @@ class ReceiverTactic : public OffenseSupportTactic
     std::optional<Shot> findFeasibleShot();
 
     ReceiverFSM::ControlParams control_params;
+
+    PassWithRating committed_pass_;
 };

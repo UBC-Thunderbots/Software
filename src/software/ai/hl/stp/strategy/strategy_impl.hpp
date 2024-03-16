@@ -2,10 +2,12 @@
 
 #include "proto/parameters.pb.h"
 #include "proto/strategy.pb.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/strategy/pass_strategy.h"
 #include "software/ai/hl/stp/tactic/offense_support_tactics/offense_support_type.h"
 #include "software/ai/passing/pass.h"
+#include "software/ai/passing/pass_evaluation.hpp"
 #include "software/geom/pose.h"
 #include "software/world/field.h"
 
@@ -55,6 +57,8 @@ class StrategyImpl
     // Committed OffenseSupportTypes
     void commit(OffenseSupportType& type);
     std::vector<OffenseSupportType> getCommittedOffenseSupport() const;
+
+    void commit(const Pass& pass);
 
    private:
     bool isBetterPassThanCached(const Timestamp& timestamp, const PassWithRating& pass);
@@ -187,7 +191,7 @@ void StrategyImpl<ZoneEnum>::reset()
 {
     robot_to_best_dribble_location_ = {};
     robot_to_best_shot_             = {};
-    committed_passes_               = {};
+    committed_pass_zones_           = {};
     committed_support_types_        = {};
 }
 
@@ -251,4 +255,10 @@ template <class ZoneEnum>
 void StrategyImpl<ZoneEnum>::commit(OffenseSupportType& offense_support_type)
 {
     committed_support_types_.push_back(offense_support_type);
+}
+
+template <class ZoneEnum>
+void StrategyImpl<ZoneEnum>::commit(const Pass& pass)
+{
+    committed_pass_zones_.push_back(ZoneEnum().getZoneId(pass.receiverPoint()));
 }

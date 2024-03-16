@@ -9,7 +9,7 @@ class OffenseSupportTactic : public Tactic
    public:
     explicit OffenseSupportTactic(const std::set<RobotCapability> &capability_reqs, std::shared_ptr<Strategy> strategy);
 
-    void commit();
+    virtual void commit();
 
     virtual OffenseSupportType getOffenseSupportType() const = 0;
 
