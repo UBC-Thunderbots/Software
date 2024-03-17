@@ -59,10 +59,6 @@ class RobotCommunication(object):
 
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
 
-        # TODO: remove motor and power buffers
-        self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
-        self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
-
         self.diagnostics_primitive_buffer = ThreadSafeBuffer(1, Primitive)
 
         self.current_proto_unix_io.register_observer(
@@ -79,10 +75,6 @@ class RobotCommunication(object):
         self.run_primitive_set_thread = threading.Thread(
             target=self.__run_primitive_set, daemon=True
         )
-
-        # robots controlled by diagnostics
-        # TODO: remove...
-        self.diagnostic_controlled_robots: list[int] = []
 
         # map of robot id to the individual control mode
         self.robot_control_mode_dict: dict[int, IndividualRobotMode] = {
