@@ -16,7 +16,6 @@ from google.protobuf.message import Message
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 from typing import Type
-from queue import Empty
 
 NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
@@ -25,13 +24,13 @@ class RobotCommunication(object):
     """ Communicate with the robots """
 
     def __init__(
-            self,
-            current_proto_unix_io: ProtoUnixIO,
-            multicast_channel: str,
-            interface: str,
-            estop_mode: EstopMode,
-            estop_path: os.PathLike = None,
-            estop_baudrate: int = 115200,
+        self,
+        current_proto_unix_io: ProtoUnixIO,
+        multicast_channel: str,
+        interface: str,
+        estop_mode: EstopMode,
+        estop_path: os.PathLike = None,
+        estop_baudrate: int = 115200,
     ):
         """Initialize the communication with the robots
 
@@ -205,11 +204,13 @@ class RobotCommunication(object):
         :return: boolean
         """
         return (
-                self.estop_mode != EstopMode.DISABLE_ESTOP
-                and self.estop_is_playing
-                and (IndividualRobotMode.AI or
-                     IndividualRobotMode.MANUAL
-                     in self.robot_id_individual_mode_dict.values())
+            self.estop_mode != EstopMode.DISABLE_ESTOP
+            and self.estop_is_playing
+            and (
+                IndividualRobotMode.AI
+                or IndividualRobotMode.MANUAL
+                in self.robot_id_individual_mode_dict.values()
+            )
         )
 
     def __run_primitive_set(self) -> None:
@@ -238,8 +239,11 @@ class RobotCommunication(object):
             diagnostics_primitive = self.diagnostics_primitive_buffer.get(block=False)
 
             # filter for diagnostics controlled robots
-            diagnostics_robots = list(robot_id for robot_id, mode in self.robot_control_mode_dict.items() if
-                                      mode == IndividualRobotMode.MANUAL)
+            diagnostics_robots = list(
+                robot_id
+                for robot_id, mode in self.robot_control_mode_dict.items()
+                if mode == IndividualRobotMode.MANUAL
+            )
 
             # set robot primitives for diagnostics robots
             for robot_id in diagnostics_robots:
@@ -253,15 +257,23 @@ class RobotCommunication(object):
             fullsystem_primitives = dict(primitive_set.robot_primitives)
 
             for robot_id in fullsystem_primitives.keys():
-                if self.robot_control_mode_dict[int(robot_id)] == IndividualRobotMode.AI:
+                if (
+                    self.robot_control_mode_dict[int(robot_id)]
+                    == IndividualRobotMode.AI
+                ):
                     robot_primitives[robot_id] = fullsystem_primitives[robot_id]
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives
-            for robot_id, num_times_to_stop in self.robot_estop_send_countdown_latches.items():
+            for (
+                robot_id,
+                num_times_to_stop,
+            ) in self.robot_estop_send_countdown_latches.items():
                 if num_times_to_stop > 0:
                     robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
-                    self.robot_estop_send_countdown_latches[robot_id] = num_times_to_stop - 1
+                    self.robot_estop_send_countdown_latches[robot_id] = (
+                        num_times_to_stop - 1
+                    )
 
             # initialize total primitive set and send it
             primitive_set = PrimitiveSet(

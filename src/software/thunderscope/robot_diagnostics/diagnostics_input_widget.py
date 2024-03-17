@@ -13,6 +13,7 @@ class ControlMode(IntEnum):
     DIAGNOSTICS = 0
     XBOX = 1
 
+
 # this class name doesnt make sense
 class FullSystemConnectWidget(QWidget):
     """

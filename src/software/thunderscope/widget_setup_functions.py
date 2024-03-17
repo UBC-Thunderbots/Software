@@ -354,9 +354,7 @@ def setup_drive_and_dribbler_widget(
     return drive_and_dribbler_widget
 
 
-def setup_diagnostics_widget(
-        proto_unix_io: ProtoUnixIO,
-) -> DriveAndDribblerWidget:
+def setup_diagnostics_widget(proto_unix_io: ProtoUnixIO,) -> DriveAndDribblerWidget:
     """Setup the drive and dribbler widget
 
     :param proto_unix_io: The proto unix io object

@@ -27,8 +27,7 @@ class ControllerDiagnostics(object):
     """
 
     def __init__(
-            self,
-            proto_unix_io: ProtoUnixIO,
+        self, proto_unix_io: ProtoUnixIO,
     ):
         self.enabled = False
         self.controller = None
@@ -42,7 +41,11 @@ class ControllerDiagnostics(object):
             raise RuntimeError("Could not initialize a controller - connect using USB")
 
         logging.info(
-            "Initializing controller " + self.controller.info.__str__() + " and device path location: " + self.controller.path)
+            "Initializing controller "
+            + self.controller.info.__str__()
+            + " and device path location: "
+            + self.controller.path
+        )
         self.proto_unix_io = proto_unix_io
 
         self.__stop_event_thread = Event()
@@ -83,7 +86,9 @@ class ControllerDiagnostics(object):
 
         motor_control.direct_velocity_control.velocity.x_component_meters = self.x_vel
         motor_control.direct_velocity_control.velocity.y_component_meters = self.y_vel
-        motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.ang_vel
+        motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+            self.ang_vel
+        )
 
         motor_control.dribbler_speed_rpm = 0
 
@@ -91,7 +96,9 @@ class ControllerDiagnostics(object):
         #     motor_control.dribbler_speed_rpm = dribbler_speed
         # maybe just use indefinite instead? or have setting to turn on 'smooth scrolling'
         if self.dribbler_enabled:
-            motor_control.dribbler_speed_rpm = self.constants.indefinite_dribbler_speed_rpm
+            motor_control.dribbler_speed_rpm = (
+                self.constants.indefinite_dribbler_speed_rpm
+            )
 
         logging.info("Sending motor control: " + motor_control)
 
@@ -109,7 +116,9 @@ class ControllerDiagnostics(object):
     def __send_chip_command(self):
         power_control = PowerControl()
         power_control.geneva_slot = 1
-        power_control.chicker.chip_distance_meters = self.kick_power  # not sure if we should use this value
+        power_control.chicker.chip_distance_meters = (
+            self.kick_power
+        )  # not sure if we should use this value
 
         logging.info("Sending chip power control: " + power_control)
 
@@ -127,32 +136,36 @@ class ControllerDiagnostics(object):
             # grab the event type
             event_t = ecodes.bytype[abs_event.event.type][abs_event.event.code]
             if event_t == "ABS_X":
-                self.x_vel = (
-                    self.__parse_move_event_value(abs_event.event.value, MAX_LINEAR_SPEED_METER_PER_S))
+                self.x_vel = self.__parse_move_event_value(
+                    abs_event.event.value, MAX_LINEAR_SPEED_METER_PER_S
+                )
 
             elif event_t == "ABS_Y":
-                self.y_vel = (
-                    self.__parse_move_event_value(abs_event.event.value, MAX_LINEAR_SPEED_METER_PER_S))
+                self.y_vel = self.__parse_move_event_value(
+                    abs_event.event.value, MAX_LINEAR_SPEED_METER_PER_S
+                )
 
             elif event_t == "ABS_RX":
-                self.ang_vel = (
-                    self.__parse_move_event_value(abs_event.event.value, MAX_ANGULAR_SPEED_RAD_PER_S))
+                self.ang_vel = self.__parse_move_event_value(
+                    abs_event.event.value, MAX_ANGULAR_SPEED_RAD_PER_S
+                )
 
             elif event_t == "ABS_HAT0Y":
-                self.dribbler_speed = (
-                    self.__parse_dribbler_event_value(abs_event.event.value))
+                self.dribbler_speed = self.__parse_dribbler_event_value(
+                    abs_event.event.value
+                )
 
             elif event_t == "ABS_HAT0X":
-                self.kick_power = (
-                    self.__parse_kick_event_value(abs_event.event.value))
+                self.kick_power = self.__parse_kick_event_value(abs_event.event.value)
 
             elif event_t == "ABS_RZ":
-                self.dribbler_enabled = (
-                    self.__parse_dribbler_enabled_event_value(abs_event.event.value))
+                self.dribbler_enabled = self.__parse_dribbler_enabled_event_value(
+                    abs_event.event.value
+                )
 
             elif event_t == "ABS_Z":
-                self.dribbler_enabled = (
-                    self.__parse_dribbler_enabled_event_value(abs_event.event.value)
+                self.dribbler_enabled = self.__parse_dribbler_enabled_event_value(
+                    abs_event.event.value
                 )
 
         elif event.type == ecodes.EV_KEY:
@@ -186,6 +199,7 @@ class ControllerDiagnostics(object):
         :param enabled: to which state to set controller enabled.
         """
         self.enabled = enabled
+
 
 # {
 #   ('EV_SYN', 0): [('SYN_REPORT', 0), ('SYN_CONFIG', 1), ('SYN_DROPPED', 3), ('?', 21)],

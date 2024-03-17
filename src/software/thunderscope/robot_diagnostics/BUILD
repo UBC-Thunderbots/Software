@@ -38,13 +38,13 @@ py_library(
     name = "diagnostics_widget",
     srcs = ["diagnostics_widget.py"],
     deps = [
-        "//software/thunderscope/robot_diagnostics:controller",
-        "//software/thunderscope/robot_diagnostics:chicker",
-        "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
-        "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
-        "//software/thunderscope:thunderscope_types",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope:thunderscope_types",
+        "//software/thunderscope/robot_diagnostics:chicker",
+        "//software/thunderscope/robot_diagnostics:controller",
+        "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
+        "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         requirement("pyqtgraph"),
     ],
 )
