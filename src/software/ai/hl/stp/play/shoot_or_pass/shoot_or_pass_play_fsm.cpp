@@ -55,15 +55,22 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
         PassEvaluation<EighteenZoneId> pass_eval =
             pass_generator.generatePassEvaluation(event.common.world_ptr);
-        best_pass_and_score_so_far = pass_eval.getBestPassOnField();
-        auto ranked_zones          = pass_eval.rankZonesForReceiving(
+        best_pass_and_score_so_far               = pass_eval.getBestPassOnField();
+        std::vector<EighteenZoneId> ranked_zones = pass_eval.rankZonesForReceiving(
             event.common.world_ptr, event.common.world_ptr->ball().position());
 
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
 
-        // Wait for a good pass by starting out only looking for "perfect" passes
-        // (with a score of 1) and decreasing this threshold over time
+        // add remaining tactics based on ranked zones
+        updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                          event.common.num_tactics - 1);
+        ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
+                              offensive_positioning_tactics.end());
+
+        // Update minimum pass score threshold. Wait for a good pass by starting out only
+        // looking for "perfect" passes (with a score of 1) and decreasing this threshold
+        // over time
         double abs_min_pass_score =
             ai_config.shoot_or_pass_play_config().abs_min_pass_score();
         double pass_score_ramp_down_duration =
@@ -74,11 +81,6 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
             1 - std::min(time_since_commit_stage_start.toSeconds() /
                              pass_score_ramp_down_duration,
                          1.0 - abs_min_pass_score);
-        updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                          event.common.num_tactics - 1);
-
-        ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
-                              offensive_positioning_tactics.end());
     }
     event.common.set_tactics(ret_tactics);
 }
