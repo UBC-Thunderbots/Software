@@ -1,10 +1,9 @@
 #pragma once
 
-#include <experimental/filesystem>
-
 #include <g3sinks/LogRotate.h>
 #include <g3sinks/LogRotateWithFilter.h>
 
+#include <experimental/filesystem>
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 #include <g3log/logmessage.hpp>
@@ -99,8 +98,7 @@ class LoggerSingleton
         // Sink for storing a file of default logs
         auto default_log_rotate_sink_handle = logWorker->addSink(
             std::make_unique<LogRotateWithFilter>(
-                std::make_unique<LogRotate>(log_name, runtime_dir),
-                default_level_filter),
+                std::make_unique<LogRotate>(log_name, runtime_dir), default_level_filter),
             &LogRotateWithFilter::save);
         // Sink for storing a file of filtered logs
         auto filtered_log_rotate_sink_handle = logWorker->addSink(
@@ -127,7 +125,8 @@ class LoggerSingleton
     }
 
     // levels is this vector are filtered out of the filtered log rotate sink
-    std::vector<LEVELS> default_level_filter = {VISUALIZE, CSV, ROBOT_STATUS, PLOTJUGGLER};
+    std::vector<LEVELS> default_level_filter  = {VISUALIZE, CSV, ROBOT_STATUS,
+                                                PLOTJUGGLER};
     std::vector<LEVELS> filtered_level_filter = {DEBUG, VISUALIZE,    CSV,
                                                  INFO,  ROBOT_STATUS, PLOTJUGGLER};
     std::vector<LEVELS> text_level_filter = {VISUALIZE, CSV, ROBOT_STATUS, PLOTJUGGLER};
