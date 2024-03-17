@@ -358,9 +358,11 @@ def setup_diagnostics_widget(proto_unix_io: ProtoUnixIO,) -> DriveAndDribblerWid
     """Setup the drive and dribbler widget
 
     :param proto_unix_io: The proto unix io object
-    :returns: The drive and dribbler widget
+    :returns: The diagnostics widget that contains
+    the control input switch, drive & dribbler sliders,
+    chicker control and controller handler
 
     """
-    drive_and_dribbler_widget = DiagnosticsWidget(proto_unix_io)
+    diagnostics_widget = DiagnosticsWidget(proto_unix_io)
 
-    return drive_and_dribbler_widget
+    return diagnostics_widget

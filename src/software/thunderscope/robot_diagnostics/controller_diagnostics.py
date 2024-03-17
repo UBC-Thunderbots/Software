@@ -20,7 +20,7 @@ MAX_LINEAR_SPEED_METER_PER_S = 2
 MAX_ANGULAR_SPEED_RAD_PER_S = 10.0
 
 
-class ControllerDiagnostics(object):
+class ControllerInputHandler(object):
     """
     This class is responsible for reading from an Xbox controller device and
     interpreting the inputs into usable inputs for robot.

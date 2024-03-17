@@ -33,6 +33,8 @@ class ChickerWidget(QWidget):
 
         super(ChickerWidget, self).__init__()
 
+        self.power_control = PowerControl()
+
         vbox_layout = QVBoxLayout()
         self.radio_buttons_group = QButtonGroup()
         self.proto_unix_io = proto_unix_io
@@ -180,7 +182,7 @@ class ChickerWidget(QWidget):
             )
 
         # sends proto
-        self.proto_unix_io.send_proto(PowerControl, power_control)
+        self.power_control = power_control
 
         # clears the proto buffer for kick or chip commands
         # so only one kick / chip is sent
@@ -195,8 +197,7 @@ class ChickerWidget(QWidget):
         So sending an empty message overwrites the cache and prevents spamming commands
         If buffer is full, blocks execution until buffer has space
         """
-        power_control = PowerControl()
-        self.proto_unix_io.send_proto(PowerControl, power_control, True)
+        self.power_control = PowerControl()
 
     def change_button_state(self, button: QPushButton, enable: bool) -> None:
         """Change button color and clickable state.

@@ -13,7 +13,7 @@ from software.py_constants import *
 import proto.message_translation.tbots_protobuf as tbots_protobuf
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes, TabKeys
+from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes, TabNames
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
@@ -321,7 +321,7 @@ if __name__ == "__main__":
                     if hasattr(tab, "widgets"):
                         robot_view_widget = tab.find_widget("Robot View")
                         if robot_view_widget is not None:
-                            robot_view_widget.toggle_control_mode_signal.connect(
+                            robot_view_widget.control_mode_signal.connect(
                                 lambda robot_mode, robot_id: robot_communication.toggle_robot_control_mode(
                                     robot_id, robot_mode
                                 )

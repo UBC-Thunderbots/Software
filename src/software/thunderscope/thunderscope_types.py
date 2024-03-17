@@ -1,6 +1,6 @@
 from typing import Callable, Optional, Sequence, Any, Dict
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
-from software.thunderscope.constants import TabKeys
+from software.thunderscope.constants import TabNames
 
 import PyQt6
 from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -60,10 +60,10 @@ class TScopeTab:
     """
 
     name: str  # name of tab
-    key: TabKeys  # key to identify this tab
+    key: TabNames  # key to identify this tab
     dock_area: QWidget  # Dock Area for this tab
 
-    def __init__(self, name: str, key: TabKeys) -> None:
+    def __init__(self, name: str, key: TabNames) -> None:
         self.name = name
         self.key = key
 
@@ -86,7 +86,7 @@ class TScopeQTTab(TScopeTab):
     def __init__(
         self,
         name: str,
-        key: TabKeys,
+        key: TabNames,
         widgets: Sequence[TScopeWidget],
         refresh_func_counter: FrameTimeCounter = None,
     ) -> None:
@@ -186,7 +186,7 @@ class TScopeWebTab(TScopeTab):
 
     url: str  # url of webpage displayed by this tab
 
-    def __init__(self, name: str, key: TabKeys, url: str) -> None:
+    def __init__(self, name: str, key: TabNames, url: str) -> None:
         super().__init__(name, key)
         self.url = url
 

@@ -15,6 +15,11 @@ class DriveAndDribblerWidget(QWidget):
         :param proto_unix_io: the proto_unix_io object
 
         """
+
+        super(DriveAndDribblerWidget, self).__init__()
+
+        self.motor_control = MotorControl()
+
         self.input_a = time.time()
         self.constants = tbots_cpp.create2021RobotConstants()
         QWidget.__init__(self)
@@ -33,15 +38,6 @@ class DriveAndDribblerWidget(QWidget):
 
         self.setLayout(layout)
 
-    def __create_empty_control_primitive(self):
-        motor_control = MotorControl()
-
-        motor_control.dribbler_speed_rpm = 0
-        motor_control.direct_velocity_control.velocity.x_component_meters = 0
-        motor_control.direct_velocity_control.velocity.y_component_meters = 0
-        motor_control.direct_velocity_control.angular_velocity.radians_per_second = 0
-
-        return motor_control
 
     def refresh(self) -> None:
         """Refresh the widget and send the a MotorControl message with the current values
@@ -59,9 +55,7 @@ class DriveAndDribblerWidget(QWidget):
             self.angular_velocity_slider.value()
         )
 
-        # todo update motor control
-
-        self.proto_unix_io.send_proto(MotorControl, motor_control)
+        self.motor_control = motor_control
 
     def value_change(self, value: float) -> str:
         """
