@@ -51,16 +51,17 @@ class DiagnosticsWidget(QWidget):
             self.chicker_widget.refresh()
 
             #
-            diagnostics_primitive = DirectControlPrimitive(
-                motor_control=self.drive_dribbler_widget.motor_control,
-                power_control=self.chicker_widget.power_control,
+            diagnostics_primitive = Primitive(
+                direct_control=DirectControlPrimitive(
+                    motor_control=self.drive_dribbler_widget.motor_control,
+                    power_control=self.chicker_widget.power_control,
+                )
             )
 
-            # TODO: send the diagnostics primitive
-            self.proto_unix_io.send_proto(DirectControlPrimitive, diagnostics_primitive)
+            self.proto_unix_io.send_proto(Primitive, diagnostics_primitive)
 
         elif self.__control_mode == ControlMode.XBOX:
-            # TODO: get values from controller widget
+            # TODO: get values from controller widget, placeholder log for now
             logging.debug(self.controller.ang_vel)
 
 

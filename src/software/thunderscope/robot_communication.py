@@ -18,7 +18,7 @@ from pyqtgraph.Qt import QtCore
 from typing import Type
 from queue import Empty
 
-NUM_ROBOTS = 6
+NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
 
 class RobotCommunication(object):
@@ -59,20 +59,18 @@ class RobotCommunication(object):
 
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
 
+        # TODO: remove motor and power buffers
         self.motor_control_diagnostics_buffer = ThreadSafeBuffer(1, MotorControl)
         self.power_control_diagnostics_buffer = ThreadSafeBuffer(1, PowerControl)
 
-        self.diagnostics_control_buffer = ThreadSafeBuffer(1, DirectControlPrimitive)
+        self.diagnostics_primitive_buffer = ThreadSafeBuffer(1, Primitive)
 
         self.current_proto_unix_io.register_observer(
             PrimitiveSet, self.primitive_buffer
         )
 
         self.current_proto_unix_io.register_observer(
-            MotorControl, self.motor_control_diagnostics_buffer
-        )
-        self.current_proto_unix_io.register_observer(
-            PowerControl, self.power_control_diagnostics_buffer
+            Primitive, self.diagnostics_primitive_buffer
         )
 
         self.send_estop_state_thread = threading.Thread(
@@ -82,19 +80,18 @@ class RobotCommunication(object):
             target=self.__run_primitive_set, daemon=True
         )
 
-        # robots controlled by full-system
-        # TODO: remove...
-        self.ai_controlled_robots: list[int] = []
-
         # robots controlled by diagnostics
         # TODO: remove...
         self.diagnostic_controlled_robots: list[int] = []
 
         # map of robot id to the individual control mode
-        self.robot_individual_control_mode_dict: dict[int, IndividualRobotMode]
+        self.robot_control_mode_dict: dict[int, IndividualRobotMode] = {
+            key: IndividualRobotMode.NONE for key in list(range(0, NUM_ROBOTS))
+        }
 
         # map of robot id to the number of times to send a estop.
         # each robot has it's own separate countdown
+        # TODO come up with better name
         self.robot_estop_send_countdown_latches: dict[int, int] = {
             rid: 0 for rid in range(NUM_ROBOTS)
         }
@@ -121,8 +118,9 @@ class RobotCommunication(object):
         """
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
         """
-        self.ai_controlled_robots = range(0, NUM_ROBOTS)
-        self.diagnostic_controlled_robots = range(0, NUM_ROBOTS)
+        self.robot_control_mode_dict.update(
+            (k, IndividualRobotMode.AI) for k in self.robot_control_mode_dict.keys()
+        )
 
         self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
             SSL_VISION_ADDRESS,
@@ -170,11 +168,8 @@ class RobotCommunication(object):
         :param mode: the mode of input for this robot's primitives
         :param robot_id: the id of the robot whose mode we're changing
         """
-        if mode == IndividualRobotMode.AI and robot_id not in self.ai_controlled_robots:
-            self.ai_controlled_robots.append(robot_id)
-        if mode == IndividualRobotMode.MANUAL:
-            self.ai_controlled_robots.remove(robot_id)
-            self.ai_controlled_robots.remove(robot_id)
+        self.robot_control_mode_dict[robot_id] = mode
+
         if mode == IndividualRobotMode.NONE:
             self.robot_estop_send_countdown_latches[robot_id] = NUM_TIMES_SEND_STOP
 
@@ -247,20 +242,16 @@ class RobotCommunication(object):
             # total primitives for all robots
             robot_primitives = {}
 
-            # TODO: remove this commented out code
-            # diagnostics is running. Only send diagnostics packets if using diagnostics control mode
-            # get the manual control primitive
-            # diagnostics_primitive = DirectControlPrimitive(
-            #     motor_control=self.motor_control_diagnostics_buffer.get(block=False),
-            #     power_control=self.power_control_diagnostics_buffer.get(block=False),
-            # )
-
             # get the most recent diagnostics primitive
-            diagnostics_primitive = self.diagnostics_control_buffer.get(block=False)
+            diagnostics_primitive = self.diagnostics_primitive_buffer.get(block=False)
 
-            for robot_id in self.diagnostic_controlled_robots:
-                if robot_id in self.diagnostic_controlled_robots:
-                    robot_primitives[robot_id] = Primitive(direct_control=diagnostics_primitive)
+            # filter for diagnostics controlled robots
+            diagnostics_robots = list(robot_id for robot_id, mode in self.robot_control_mode_dict.items() if
+                                      mode == IndividualRobotMode.MANUAL)
+
+            # set robot primitives for diagnostics robots
+            for robot_id in diagnostics_robots:
+                robot_primitives[robot_id] = diagnostics_primitive
 
             # Get the primitives
             primitive_set = self.primitive_buffer.get(
@@ -270,7 +261,7 @@ class RobotCommunication(object):
             fullsystem_primitives = dict(primitive_set.robot_primitives)
 
             for robot_id in fullsystem_primitives.keys():
-                if robot_id in self.ai_controlled_robots:
+                if self.robot_control_mode_dict[int(robot_id)] == IndividualRobotMode.AI:
                     robot_primitives[robot_id] = fullsystem_primitives[robot_id]
 
             # sends a final stop primitive to all disconnected robots and removes them from list
@@ -300,7 +291,7 @@ class RobotCommunication(object):
                 self.should_send_stop = False
 
             # sleep if not running fullsystem
-            if not len(ai_controlled_robots):
+            if IndividualRobotMode.AI not in self.robot_control_mode_dict.values():
                 time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
     def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:
