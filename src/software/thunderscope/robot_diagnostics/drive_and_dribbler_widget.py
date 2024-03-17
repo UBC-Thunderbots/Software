@@ -38,7 +38,6 @@ class DriveAndDribblerWidget(QWidget):
 
         self.setLayout(layout)
 
-
     def refresh(self) -> None:
         """Refresh the widget and send the a MotorControl message with the current values
         """

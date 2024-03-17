@@ -35,8 +35,6 @@ class DiagnosticsWidget(QWidget):
             self.diagnostics_input_mode_signal
         )
 
-
-
         self.__control_mode = ControlMode.DIAGNOSTICS
 
         self.diagnostics_control_input_widget.toggle_controls_signal.connect(
