@@ -45,20 +45,6 @@ py_test(
 )
 
 cc_test(
-    name = "ball_placement_play_cpp_test",
-    srcs = ["ball_placement_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_test(
     name = "ball_placement_play_fsm_test",
     srcs = ["ball_placement_play_fsm_test.cpp"],
     deps = [
