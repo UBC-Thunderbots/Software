@@ -94,7 +94,6 @@ class LoggerSingleton
             logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
                                &ColouredCoutSink::displayColouredLog);
 
-        std::cout << "AAAAAAAAA" << std::endl;
         // Sink for storing a file of default logs
         auto default_log_rotate_sink_handle = logWorker->addSink(
             std::make_unique<LogRotateWithFilter>(
