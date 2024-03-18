@@ -103,8 +103,7 @@ class LoggerSingleton
         // Sink for storing a file of filtered logs (only the default log levels)
         auto default_log_rotate_sink_handle = logWorker->addSink(
             std::make_unique<LogRotateWithFilter>(
-                std::make_unique<LogRotate>(log_name + text_suffix, runtime_dir),
-                default_level_filter),
+                std::make_unique<LogRotate>(log_name, runtime_dir), default_level_filter),
             &LogRotateWithFilter::save);
 
         // Sink for visualization
@@ -124,7 +123,6 @@ class LoggerSingleton
     std::vector<LEVELS> default_level_filter  = {VISUALIZE, CSV, ROBOT_STATUS,
                                                 PLOTJUGGLER};
     const std::string filter_suffix           = "_filtered";
-    const std::string text_suffix             = "_text";
     const std::string log_name                = "thunderbots";
     std::unique_ptr<g3::LogWorker> logWorker;
 };
