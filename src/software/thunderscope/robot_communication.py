@@ -77,7 +77,8 @@ class RobotCommunication(object):
 
         # map of robot id to the individual control mode
         self.robot_control_mode_dict: dict[int, IndividualRobotMode] = {
-            robot_id: IndividualRobotMode.NONE for robot_id in list(range(0, NUM_ROBOTS))
+            robot_id: IndividualRobotMode.NONE
+            for robot_id in list(range(0, NUM_ROBOTS))
         }
 
         # map of robot id to the number of times to send a estop.
@@ -110,7 +111,8 @@ class RobotCommunication(object):
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
         """
         self.robot_control_mode_dict.update(
-            (robot_id, IndividualRobotMode.AI) for robot_id in self.robot_control_mode_dict.keys()
+            (robot_id, IndividualRobotMode.AI)
+            for robot_id in self.robot_control_mode_dict.keys()
         )
 
         self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
@@ -313,6 +315,7 @@ class RobotCommunication(object):
 
         """
         # Create the multicast listeners
+        # TODO: log a better error message if the interface not specified
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,

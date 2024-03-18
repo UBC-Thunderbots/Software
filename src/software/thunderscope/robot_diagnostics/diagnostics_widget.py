@@ -1,8 +1,9 @@
 import logging
-import threading
 
 from pyqtgraph.Qt.QtCore import pyqtSignal
 from pyqtgraph.Qt.QtWidgets import QWidget, QVBoxLayout
+from proto.import_all_protos import *
+
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
@@ -28,7 +29,7 @@ class DiagnosticsWidget(QWidget):
 
         self.proto_unix_io = proto_unix_io
 
-        self.controller = ControllerInputHandler(proto_unix_io)
+        self.controller_handler = ControllerInputHandler(proto_unix_io)
         self.drive_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
         self.chicker_widget = ChickerWidget(proto_unix_io)
         self.diagnostics_control_input_widget = FullSystemConnectWidget(
@@ -41,9 +42,9 @@ class DiagnosticsWidget(QWidget):
             lambda control_mode: self.toggle_control(control_mode)
         )
 
-        self.run_diagnostics_thread = threading.Thread(
-            target=self.__run_diagnostics_primivitve_set, daemon=True
-        )
+        # self.run_diagnostics_thread = threading.Thread(
+        #     target=self.__run_diagnostics_primivitve_set, daemon=True
+        # )
 
         vbox_layout.addWidget(self.diagnostics_control_input_widget)
         vbox_layout.addWidget(self.drive_dribbler_widget)
@@ -58,7 +59,7 @@ class DiagnosticsWidget(QWidget):
             self.drive_dribbler_widget.refresh()
             self.chicker_widget.refresh()
 
-            #
+            # TODO: throws error on exit
             diagnostics_primitive = Primitive(
                 direct_control=DirectControlPrimitive(
                     motor_control=self.drive_dribbler_widget.motor_control,
@@ -70,9 +71,10 @@ class DiagnosticsWidget(QWidget):
 
         elif self.__control_mode == ControlMode.XBOX:
             # TODO: get values from controller widget, placeholder log for now
-            logging.debug(self.controller.ang_vel)
+            if self.controller_handler.controller is not None:
+                logging.debug(self.controller_handler.ang_vel)
 
     def toggle_control(self, mode: ControlMode):
         self.__control_mode = mode
         self.drive_dribbler_widget.set_enabled(mode == ControlMode.DIAGNOSTICS)
-        self.controller.set_enabled(mode == ControlMode.XBOX)
+        self.controller_handler.set_enabled(mode == ControlMode.XBOX)

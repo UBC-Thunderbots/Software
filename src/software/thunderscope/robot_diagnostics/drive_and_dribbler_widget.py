@@ -27,7 +27,7 @@ class DriveAndDribblerWidget(QWidget):
 
         self.proto_unix_io = proto_unix_io
 
-        self.motor_control = self.__create_empty_mc_primitive()
+        self.motor_control = MotorControl()
 
         # Add widgets to layout
         layout.addWidget(self.setup_direct_velocity("Drive"))

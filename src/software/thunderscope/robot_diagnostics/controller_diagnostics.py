@@ -26,40 +26,47 @@ class ControllerInputHandler(object):
     interpreting the inputs into usable inputs for robot.
     """
 
+    # TODO: remove proto_unix_io, and set Motor/Power control as class fields
+    # TODO: add class init wrapper for easier handling of controller connection
     def __init__(
         self, proto_unix_io: ProtoUnixIO,
     ):
+        self.proto_unix_io = proto_unix_io
         self.enabled = False
         self.controller = None
 
+        # find an
         for device in list_devices():
             controller = InputDevice(device)
+            # TODO: read the device name and check that it's xbox controller
             if controller is not None:
                 self.controller = controller
 
-        if self.controller is None:
-            raise RuntimeError("Could not initialize a controller - connect using USB")
+        if self.controller is not None:
+            logging.info(
+                "Initializing controller "
+                + self.controller.info.__str__()
+                + " and device path location: "
+                + self.controller.path
+            )
 
-        logging.info(
-            "Initializing controller "
-            + self.controller.info.__str__()
-            + " and device path location: "
-            + self.controller.path
-        )
-        self.proto_unix_io = proto_unix_io
+            self.__stop_event_thread = Event()
+            self.__event_thread = Thread(target=self.__event_loop, daemon=True)
+            self.__event_thread.start()
 
-        self.__stop_event_thread = Event()
-        self.__event_thread = Thread(target=self.__event_loop, daemon=True)
-        self.__event_thread.start()
+            self.constants = tbots_cpp.create2021RobotConstants()
 
-        self.constants = tbots_cpp.create2021RobotConstants()
+            self.x_vel = 0.0
+            self.y_vel = 0.0
+            self.ang_vel = 0.0
+            self.kick_power = 0.0
+            self.dribbler_speed = 0.0
+            self.dribbler_enabled = False
 
-        self.x_vel = 0.0
-        self.y_vel = 0.0
-        self.ang_vel = 0.0
-        self.kick_power = 0.0
-        self.dribbler_speed = 0.0
-        self.dribbler_enabled = False
+        else:
+            logging.info(
+                "Could not initialize a handheld controller device - check USB connections"
+            )
 
     def __parse_move_event_value(self, value, factor):
         if abs(value) < (DEADZONE_PERCENTAGE * factor):
