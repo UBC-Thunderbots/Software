@@ -31,12 +31,12 @@ void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
 
 void FeasibilityVisitor::visit(const PassSkill& skill)
 {
-    const std::vector<OffenseSupportType>& committed_strategy = strategy_->getCommittedOffenseSupport();
+    const std::vector<OffenseSupportType>& committed_strategy = (*strategy_)->getCommittedOffenseSupport();
 
     if (std::find(committed_strategy.begin(), committed_strategy.end(), OffenseSupportType::PASS_RECEIVER) == committed_strategy.end())
     {
         current_feasibility_ = 0;
-        return
+        return;
     }
 
     PassWithRating best_pass = (*strategy_)->getBestPass();
