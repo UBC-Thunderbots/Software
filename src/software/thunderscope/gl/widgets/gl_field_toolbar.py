@@ -138,8 +138,7 @@ class GLFieldToolbar(GLToolbar):
         if sandbox_mode:
             self.layout().addWidget(self.reset_button)
             self.layout().addWidget(self.undo_button)
-        self.layout().addWidget(self.pause_button)
-        if sandbox_mode:
+            self.layout().addWidget(self.pause_button)
             self.layout().addWidget(self.redo_button)
         self.layout().addWidget(self.help_button)
         self.layout().addWidget(self.measure_button)

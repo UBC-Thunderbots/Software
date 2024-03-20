@@ -8,5 +8,5 @@ import "proto/ssl_gc_geometry.proto";
 message ManualGCCommand
 {
     required Command manual_command             = 1;
-    optional Vector2 final_ball_placement_point = 3;
+    optional Vector2 final_ball_placement_point = 2;
 }

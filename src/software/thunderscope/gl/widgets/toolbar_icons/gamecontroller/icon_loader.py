@@ -110,7 +110,7 @@ def get_blue_icon() -> QtGui.QPixmap:
 
 def get_open_window_icon(color: str) -> QtGui.QPixmap:
     """
-    Loads the Blue icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
+    Loads the Open Window icon pixmap as a GLGamecontrollerToolbarIconLoader attribute
     :param color: the color the icon should be initialized with if not already created
     :return: the icon pixmap
     """

@@ -76,7 +76,7 @@ class GLWidget(QWidget):
         self.layers_menu = QMenu()
         self.toolbars_menu = QMenu()
         self.layers_menu_actions = {}
-        self.toolbar = GLFieldToolbar(
+        self.simulation_control_toolbar = GLFieldToolbar(
             parent=self.gl_view_widget,
             on_camera_view_change=self.set_camera_view,
             on_measure_mode=self.toggle_measure_mode,
@@ -257,8 +257,8 @@ class GLWidget(QWidget):
         if self.isVisible() == False:
             return
 
-        if self.toolbar:
-            self.toolbar.refresh()
+        if self.simulation_control_toolbar:
+            self.simulation_control_toolbar.refresh()
             self.gamecontroller_toolbar.refresh()
 
         for layer in self.layers:
