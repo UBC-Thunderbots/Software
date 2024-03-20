@@ -89,7 +89,7 @@ function run_code_spell(){
 	    fi
 	    printf "Loading Codespell dictionary from cache!\n\n"
     else
-        sed "/atleast/d" $CURR_DIR/dictionary/dictionary.txt > $CURR_DIR/dictionary/edited_dictionary.txt #removing spell fixes that include the word 'atleast' from codespell dictionary
+        sed "/atleast/d" $CURR_DIR/dictionary/dictionary.txt > $CURR_DIR/dictionary/edited_dictionary.txt #removing spell fixes that include the word 'atleast' from codespell dictionary 
         rm $CURR_DIR/dictionary/dictionary.txt #remove the original dictionary.txt
     fi
 

@@ -141,15 +141,6 @@ class TbotsTestRunner(TimeProvider):
 
         fs_proto_unix_io.send_proto(Play, play)
 
-    def clear_world_buffer(self):
-        """
-        Clears the world buffer
-        """
-        world = self.world_buffer.get(return_cached=False)
-
-        while world is not None:
-            world = self.world_buffer.get(return_cached=False)
-
     def set_worldState(self, worldstate: WorldState):
         """Sets the worldstate for the given team
 
