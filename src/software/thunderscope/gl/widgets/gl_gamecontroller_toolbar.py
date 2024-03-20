@@ -179,7 +179,7 @@ class GLGamecontrollerToolbar(GLToolbar):
             command_type = Command.Type.PENALTY
 
         self.__send_gc_command(
-            command_type, (SslTeam.YELLOW if is_blue else SslTeam.BLUE),
+            command_type, (SslTeam.BLUE if is_blue else SslTeam.YELLOW),
         )
 
         if not self.normal_start_enabled:
