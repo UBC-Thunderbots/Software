@@ -220,6 +220,13 @@ class Field
     Rectangle friendlyNegativeYQuadrant() const;
 
     /**
+     * Gets the friendly third of the field within field lines
+     * 
+     * @return the friendly third of the field
+     */
+    Rectangle friendlyThird() const;
+
+    /**
      * Gets the enemy half of the field within field lines
      *
      * @return the enemy half of the field
@@ -239,6 +246,13 @@ class Field
      * @return the enemy negative Y quadrant of the field
      */
     Rectangle enemyNegativeYQuadrant() const;
+
+    /**
+     * Gets the enemy third of the field within field lines
+     * 
+     * @return the enemy third of the field
+     */
+    Rectangle enemyThird() const;
 
     /**
      * Gets the area within the field lines as a rectangle. This is the set of locations
@@ -392,6 +406,22 @@ class Field
      * @return true if the point is in the enemy's half of the field, and false otherwise
      */
     bool pointInEnemyHalf(const Point &p) const;
+
+    /**
+     * Returns true if the point is in the friendly third of the field, and false otherwise
+     *
+     * @param point
+     * @return true if the point is in the friendly third of the field, and false otherwise
+     */
+    bool pointInFriendlyThird(const Point &p) const;
+
+    /**
+     * Returns true if the point is in the enemy third of the field, and false otherwise
+     *
+     * @param point
+     * @return true if the point is in the enemy's third of the field, and false otherwise
+     */
+    bool pointInEnemyThird(const Point &p) const;
 
     /**
      * Returns true if the point is in within the provided radius in one of the friendly

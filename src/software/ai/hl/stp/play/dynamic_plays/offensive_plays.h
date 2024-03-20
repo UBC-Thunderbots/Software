@@ -7,19 +7,23 @@
 #include "software/ai/hl/stp/play/defense/defense_play.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 
+/**
+ * OffensivePlays are DynamicPlays that are run when we have possession of the ball.
+ */
 class OffensivePlay : public DynamicPlay
 {
    public:
-    void evaluate() override;
+    void evaluate(double score) override;
     
    protected:
+    /**
+     * Base constructor for OffensivePlay
+     *
+     * @param strategy the Strategy
+     * @param feasibility_scorer the feasibility scorer for the play
+     */
     explicit OffensivePlay(std::shared_ptr<Strategy> strategy,
-                           std::unique_ptr<FeasibilityScorer> feasibility_scorer)
-        : DynamicPlay(strategy, std::move(feasibility_scorer)),
-          attacker_tactic_(std::make_shared<AttackerTactic>(strategy)),
-          defense_play_(std::make_unique<DefensePlay>(strategy))
-    {
-    }
+                           std::unique_ptr<FeasibilityScorer> feasibility_scorer);
 
     void updateTactics(const PlayUpdate &play_update) override;
 
@@ -29,43 +33,46 @@ class OffensivePlay : public DynamicPlay
 };
 
 /**
- * OffensiveFriendlyThirdPlay is a DynamicPlay initiated when we gain possession
+ * OffensiveFriendlyThirdPlay is an OffensivePlay initiated when we gain possession
  * within the friendly third of the field. It prioritizes moving the ball up the field
  * and creating passing opportunities.
  */
 class OffensiveFriendlyThirdPlay : public OffensivePlay
 {
+   public:
     explicit OffensiveFriendlyThirdPlay(std::shared_ptr<Strategy> strategy)
         : OffensivePlay(strategy,
-                        std::move(std::make_unique<OffensiveFriendlyThirdFeasibilityScorer>()))
+                        std::make_unique<OffensiveFriendlyThirdFeasibilityScorer>())
     {
     }
 };
 
 /**
- * OffensiveMiddleThirdPlay is a DynamicPlay initiated when we gain possession
+ * OffensiveMiddleThirdPlay is an OffensivePlay initiated when we gain possession
  * within the middle third of the field. It prioritizes gaining entry into the enemy third
  * and setting up scoring opportunities.
  */
 class OffensiveMiddleThirdPlay : public OffensivePlay
 {
+   public:
     explicit OffensiveMiddleThirdPlay(std::shared_ptr<Strategy> strategy)
         : OffensivePlay(strategy,
-                        std::move(std::make_unique<OffensiveMiddleThirdFeasibilityScorer>()))
+                        std::make_unique<OffensiveMiddleThirdFeasibilityScorer>())
     {
     }
 };
 
 /**
- * OffensiveEnemyThirdPlay is a DynamicPlay initiated when we gain possession
+ * OffensiveEnemyThirdPlay is an OffensivePlay initiated when we gain possession
  * within the enemy third of the field. It prioritizes scoring and creating offensive
  * pressure in the enemy zone.
  */
 class OffensiveEnemyThirdPlay : public OffensivePlay
 {
+   public:
     explicit OffensiveEnemyThirdPlay(std::shared_ptr<Strategy> strategy)
         : OffensivePlay(strategy,
-                        std::move(std::make_unique<OffensiveEnemyThirdFeasibilityScorer>()))
+                        std::make_unique<OffensiveEnemyThirdFeasibilityScorer>())
     {
     }
 };

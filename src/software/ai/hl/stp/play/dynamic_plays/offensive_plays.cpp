@@ -2,23 +2,31 @@
 
 #include "software/util/generic_factory/generic_factory.h"
 
-void OffensivePlay::evaluate()
+OffensivePlay::OffensivePlay(std::shared_ptr<Strategy> strategy,
+                             std::unique_ptr<FeasibilityScorer> feasibility_scorer)
+    : DynamicPlay(strategy, std::move(feasibility_scorer)),
+      attacker_tactic_(std::make_shared<AttackerTactic>(strategy)),
+      defense_play_(std::make_unique<DefensePlay>(strategy))
 {
-    DynamicPlay::evaluate();
-    attacker_tactic_->evaluate();
+}
+
+void OffensivePlay::evaluate(double score)
+{
+    DynamicPlay::evaluate(score);
+    attacker_tactic_->evaluate(score);
 }
 
 void OffensivePlay::updateTactics(const PlayUpdate &play_update)
 {
-    DynamicPlay::updateTactics();
-
     PossessionStrategy possession_strategy =
         (*strategy)->getPossessionStrategy(play_update.num_tactics);
+
+    updateSupportTactics(possession_strategy.supporters);
 
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
     defense_play_->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     defense_play_->updateTactics(PlayUpdate(
-        play_update.world_ptr, possession_strategy.num_defenders,
+        play_update.world_ptr, possession_strategy.defenders,
         [&](PriorityTacticVector new_tactics) { defense_tactics = new_tactics },
         play_update.inter_play_communication,
         play_update.set_inter_play_communication_fun));

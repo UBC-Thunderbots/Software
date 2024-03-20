@@ -10,11 +10,11 @@ class PlayFactoryTest : public testing::Test
     TbotsProto::AiConfig ai_config;
 };
 
-TEST_F(PlayFactoryTest, test_shoot_or_pass_play)
+TEST_F(PlayFactoryTest, test_stop_play)
 {
     TbotsProto::Play play_proto = TbotsProto::Play();
-    play_proto.set_name(TbotsProto::PlayName::ShootOrPassPlay);
+    play_proto.set_name(TbotsProto::PlayName::StopPlay);
     std::unique_ptr<Play> play =
         createPlay(play_proto, std::make_shared<Strategy>(ai_config));
-    EXPECT_EQ(objectTypeName(*play), "ShootOrPassPlay");
+    EXPECT_EQ(objectTypeName(*play), "StopPlay");
 }

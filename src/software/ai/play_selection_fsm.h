@@ -141,6 +141,7 @@ struct PlaySelectionFSM
     }
 
    private:
+    std::shared_ptr<Strategy> strategy_;
     std::shared_ptr<DynamicPlay> current_dynamic_play_;
     std::shared_ptr<OffensiveFriendlyThirdPlay> offensive_friendly_third_play_;
     std::shared_ptr<OffensiveMiddleThirdPlay> offensive_middle_third_play_;

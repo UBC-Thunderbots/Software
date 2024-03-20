@@ -11,7 +11,15 @@ class DuplicationScorer : public SupportTacticScorer
 {
    public:
     explicit DuplicationScorer();
-
+ 
+    /**
+     * The javadoc comment for all `score` methods below can be read as:
+     * Visits the given SupportTacticCandidate to score it
+     *
+     * @param candidate the SupportTacticCandidate to score
+     *
+     * @return the score for the SupportTacticCandidate, in the range [-1.0, 1.0]
+     */
     double score(const TypedSupportTacticCandidate<ReceiverTactic> &candidate);
 
     /**
@@ -22,8 +30,13 @@ class DuplicationScorer : public SupportTacticScorer
      * used
      */
     void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) override;
-
+    
+    /**
+     * Marks all support tactics as unused
+     */
+    void reset() override;
+   
    private:
     // Maps types of tactics to their number of recorded usages
-    TypeMap<int> usage_counter_;
+    TypeMap<unsigned int> usage_counter_;
 };

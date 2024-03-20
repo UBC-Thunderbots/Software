@@ -26,8 +26,8 @@ void ReceiverTactic::commit()
 {
     super::commit();
 
-    committed_pass_ = strategy_->getBestUncommittedPass();
-    strategy_->commit(commit_pass.pass);
+    committed_pass_ = (*strategy_)->getBestUncommittedPass();
+    (*strategy_)->commit(commit_pass.pass);
 }
 
 void ReceiverTactic::updateControlParams(std::optional<Pass> updated_pass,

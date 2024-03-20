@@ -13,11 +13,12 @@
 
 
 PlaySelectionFSM::PlaySelectionFSM(std::shared_ptr<Strategy> strategy)
-    : current_dynamic_play_(nullptr),
+    : strategy_(strategy), 
+      current_dynamic_play_(nullptr),
       offensive_friendly_third_play_(
           std::make_shared<OffensiveFriendlyThirdPlay>(strategy)),
       offensive_middle_third_play_(std::make_shared<OffensiveMiddleThirdPlay>(strategy)),
-      offensive_enemy_third_play_(std::make_shared<OffensiveEnemyThirdPlay>(strategy)),
+      offensive_enemy_third_play_(std::make_shared<OffensiveEnemyThirdPlay>(strategy))
 {
 }
 
@@ -52,73 +53,65 @@ void PlaySelectionFSM::setupSetPlay(const Update& event)
 
     if (game_state.isOurBallPlacement())
     {
-        event.set_current_play(std::make_shared<BallPlacementPlay>(strategy));
+        event.set_current_play(std::make_shared<BallPlacementPlay>(strategy_));
     }
 
     if (game_state.isTheirBallPlacement())
     {
-        event.set_current_play(std::make_shared<EnemyBallPlacementPlay>(strategy));
+        event.set_current_play(std::make_shared<EnemyBallPlacementPlay>(strategy_));
     }
 
     if (game_state.isOurKickoff())
     {
-        event.set_current_play(std::make_shared<KickoffFriendlyPlay>(strategy));
+        event.set_current_play(std::make_shared<KickoffFriendlyPlay>(strategy_));
     }
 
     if (game_state.isTheirKickoff())
     {
-        event.set_current_play(std::make_shared<KickoffEnemyPlay>(strategy));
+        event.set_current_play(std::make_shared<KickoffEnemyPlay>(strategy_));
     }
 
     if (game_state.isOurPenalty())
     {
-        event.set_current_play(std::make_shared<PenaltyKickPlay>(strategy));
+        event.set_current_play(std::make_shared<PenaltyKickPlay>(strategy_));
     }
 
     if (game_state.isTheirPenalty())
     {
-        event.set_current_play(std::make_shared<PenaltyKickEnemyPlay>(strategy));
+        event.set_current_play(std::make_shared<PenaltyKickEnemyPlay>(strategy_));
     }
 
     if (game_state.isOurDirectFree() || game_state.isOurIndirectFree())
     {
-        event.set_current_play(std::make_shared<FreeKickPlay>(strategy));
+        event.set_current_play(std::make_shared<FreeKickPlay>(strategy_));
     }
 
     if (game_state.isTheirDirectFree() || game_state.isTheirIndirectFree())
     {
-        event.set_current_play(std::make_shared<EnemyFreekickPlay>(strategy));
+        event.set_current_play(std::make_shared<EnemyFreekickPlay>(strategy_));
     }
 }
 
 void PlaySelectionFSM::setupStopPlay(const Update& event)
 {
-    event.set_current_play(std::make_shared<StopPlay>(strategy));
+    event.set_current_play(std::make_shared<StopPlay>(strategy_));
 }
 
 void PlaySelectionFSM::setupHaltPlay(const Update& event)
 {
-    event.set_current_play(std::make_shared<HaltPlay>(strategy));
+    event.set_current_play(std::make_shared<HaltPlay>(strategy_));
 }
 
 void PlaySelectionFSM::setupOffensivePlay(const Update& event)
 {
     const Field& field = event.world_ptr->field();
-    const double third = field.xLength() / 3;
-    Rectangle friendly_third(
-        Point(field.friendlyCornerPos().x() + third, field.friendlyCornerPos().y()),
-        field.friendlyCornerNeg());
-    Rectangle enemy_third(
-        Point(field.enemyCornerPos().x() - third, field.enemyCornerPos().y()),
-        field.enemyCornerNeg());
+    const Point ball_position = event.world_ptr->ball().position();
 
-    Point ball_position = event.world_ptr->ball().position();
-
-    if (contains(friendly_third, ball_position))
+    if (field.pointInFriendlyThird(ball_position))
     {
         current_dynamic_play_ = offensive_friendly_third_play_;
     }
-    else if (contains(enemy_third, ball_position))
+    else if (field.pointInEnemyThird(ball_position))
     {
         current_dynamic_play_ = offensive_enemy_third_play_;
     }
@@ -132,13 +125,14 @@ void PlaySelectionFSM::setupOffensivePlay(const Update& event)
 
 void PlaySelectionFSM::setupDefensivePlay(const Update& event)
 {
-    event.set_current_play(std::make_shared<DefensePlay>(strategy));
+    event.set_current_play(std::make_shared<DefensePlay>(strategy_));
 }
 
 void PlaySelectionFSM::evaluateDynamicPlay(const Update& event)
 {
     if (current_dynamic_play_)
     {
-        current_dynamic_play_->evaluate();
+        // TODO: Integrate PlayMonitor and feed score into evaluate
+        current_dynamic_play_->evaluate(1.0);
     }
 }

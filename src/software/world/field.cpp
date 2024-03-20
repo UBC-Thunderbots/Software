@@ -140,6 +140,12 @@ Rectangle Field::friendlyNegativeYQuadrant() const
     return Rectangle(friendlyGoalCenter(), Point(0, friendlyCornerNeg().y()));
 }
 
+Rectangle Field::friendlyThird() const
+{
+    return Rectangle(Point(friendlyCornerPos().x() + (xLength() / 3), friendlyCornerPos().y()),
+                     friendlyCornerNeg());
+}
+
 Rectangle Field::enemyHalf() const
 {
     return Rectangle(Point(0, enemyCornerNeg().y()), enemyCornerPos());
@@ -153,6 +159,12 @@ Rectangle Field::enemyPositiveYQuadrant() const
 Rectangle Field::enemyNegativeYQuadrant() const
 {
     return Rectangle(centerPoint(), enemyCornerNeg());
+}
+
+Rectangle Field::enemyThird() const
+{
+    return Rectangle(Point(enemyCornerPos().x() - (xLength() / 3), enemyCornerPos().y()),
+                     enemyCornerNeg());
 }
 
 const Rectangle &Field::fieldLines() const
@@ -282,6 +294,16 @@ bool Field::pointInFriendlyHalf(const Point &p) const
 bool Field::pointInEnemyHalf(const Point &p) const
 {
     return p.x() >= centerPoint().x();
+}
+
+bool Field::pointInFriendlyThird(const Point &p) const
+{
+    return p.x() <= friendlyGoalCenter().x() + (xLength() / 3);
+}
+
+bool Field::pointInEnemyThird(const Point &p) const
+{
+    return p.x() >= enemyGoalCenter().x() - (xLength() / 3);
 }
 
 bool Field::pointInFriendlyCorner(const Point &p, double radius) const

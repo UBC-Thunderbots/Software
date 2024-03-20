@@ -15,6 +15,6 @@ class OffenseSupportTactic : public Tactic
 
     virtual void updateControlParams() = 0;
 
-   private:
+   protected:
     std::shared_ptr<Strategy> strategy_;
 };

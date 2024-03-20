@@ -52,8 +52,8 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     }
 }
 
-void AttackerTactic::evaluate()
+void AttackerTactic::evaluate(double score)
 {
-    skill_graph_.scoreSequence();
+    skill_graph_.scoreSequence(score);
     current_skill_ = nullptr;
 }

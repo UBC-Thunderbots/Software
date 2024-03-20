@@ -60,7 +60,13 @@ void TypeMap<TValue>::put(TValue&& value)
 
 template <class TValue>
 template <class TKey>
-TValue& TypeMap<TValue>::getOrDefault()
+TValue& TypeMap<TValue>::at()
 {
     return map_[getTypeId<TKey>()];
+}
+
+template <class TValue>
+void TypeMap<TValue>::clear()
+{
+    map_.clear();
 }

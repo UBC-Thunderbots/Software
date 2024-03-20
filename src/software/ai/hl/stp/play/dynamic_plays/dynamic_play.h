@@ -24,8 +24,11 @@ class DynamicPlay : public Play
    public:
     /**
      * Evaluate the DynamicPlay and start a new iteration
+     * 
+     * @param score score between [-1, 1] rating the success of the DynamicPlay
+     * for the current iteration
      */
-    virtual void evaluate();
+    virtual void evaluate(double score);
 
    protected:
     /**
@@ -43,7 +46,13 @@ class DynamicPlay : public Play
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
 
-    virtual void updateTactics(const PlayUpdate &play_update) override;
+    /**
+     * Selects and adds support tactics to the `support_tactics_` vector 
+     * until the vector has at least the specified number of support tactics 
+     *
+     * @param num_supporters the number of support tactics
+     */
+    void updateSupportTactics(unsigned int num_supporters);
 
     std::vector<std::shared_ptr<OffenseSupportTactic>> support_tactics_;
     std::vector<std::shared_ptr<SupportTacticCandidate>> support_tactic_candidates_;

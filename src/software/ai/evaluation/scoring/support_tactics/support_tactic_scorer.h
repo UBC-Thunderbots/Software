@@ -17,11 +17,6 @@ class TypedSupportTacticCandidate;
 class SupportTacticScorer
 {
    public:
-    virtual double score(
-        const TypedSupportTacticCandidate<OffenseSupportTactic> &candidate) = delete;
-    virtual void update(
-        const TypedSupportTacticCandidate<OffenseSupportTactic> &candidate) = delete;
-
     /**
      * The javadoc comment for all `score` methods below can be read as:
      * Visits the given SupportTacticCandidate to score it
@@ -30,14 +25,20 @@ class SupportTacticScorer
      *
      * @return the score for the SupportTacticCandidate, in the range [-1.0, 1.0]
      */
-    virtual double score(
-        const TypedSupportTacticCandidate<ReceiverTactic> &candidate) = 0;
+    double score(const TypedSupportTacticCandidate<OffenseSupportTactic> &candidate) = delete;
+    virtual double score(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) = 0;
 
     /**
      * The javadoc comment for all `update` methods below can be read as:
      * Updates the state of the scorer based on the SupportTacticCandidate it visits
      *
-     * @param candidate the SupportTacticCandidate to visit
+     * @param candidate the SupportTacticCandidate to visits
      */
-    virtual void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) {}
+    void update(const TypedSupportTacticCandidate<OffenseSupportTactic> &candidate) = delete;
+    virtual void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate);
+
+    /**
+     * Reset the state of the scorer
+     */
+    virtual void reset();
 };

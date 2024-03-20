@@ -76,7 +76,12 @@ class TypeMap
      * @return a reference to the value mapped to the given key
      */
     template <class TKey>
-    TValue& getOrDefault();
+    TValue& at();
+
+    /**
+     * Erases all elements from the TypeMap.
+     */
+    void clear();
 
    private:
     InternalMap map_;
