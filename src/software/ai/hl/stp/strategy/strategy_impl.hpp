@@ -14,7 +14,7 @@
 /**
  * Contains shared gameplay-related calculations.
  */
-template <class ZoneEnum>
+template <class PitchDivision, class ZoneEnum>
 class StrategyImpl
 {
    public:
@@ -55,7 +55,7 @@ class StrategyImpl
     void updateWorld(const WorldPtr& world_ptr);
 
     // Committed OffenseSupportTypes
-    void commit(OffenseSupportType& type);
+    void commit(OffenseSupportType type);
     std::vector<OffenseSupportType> getCommittedOffenseSupport() const;
 
     void commit(const Pass& pass);
@@ -73,7 +73,7 @@ class StrategyImpl
 
     // Passing
     std::unique_ptr<PassStrategy> pass_strategy_;
-    std::shared_ptr<PassEvaluation<EighteenZoneId>> cached_pass_eval_;
+    std::shared_ptr<PassEvaluation<ZoneEnum>> cached_pass_eval_;
     Timestamp cached_pass_time_;
     std::vector<ZoneEnum> committed_pass_zones_;
 
@@ -82,16 +82,16 @@ class StrategyImpl
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
 };
 
-template <class ZoneEnum>
-StrategyImpl<ZoneEnum>::StrategyImpl(const TbotsProto::AiConfig& ai_config, const Field& field)
+template <class PitchDivision, class ZoneEnum>
+StrategyImpl<PitchDivision, ZoneEnum>::StrategyImpl(const TbotsProto::AiConfig& ai_config, const Field& field)
     : field_(field)
 {
     LOG(DEBUG) << "StrategyImpl boot up!";
     updateAiConfig(ai_config);
 }
 
-template <class ZoneEnum>
-TbotsProto::PossessionStrategy StrategyImpl<ZoneEnum>::getPossessionStrategy(int num_robots)
+template <class PitchDivision, class ZoneEnum>
+TbotsProto::PossessionStrategy StrategyImpl<PitchDivision, ZoneEnum>::getPossessionStrategy(int num_robots)
 {
     TbotsProto::PossessionStrategy possession_strategy;
 
@@ -119,8 +119,8 @@ TbotsProto::PossessionStrategy StrategyImpl<ZoneEnum>::getPossessionStrategy(int
     return possession_strategy;
 }
 
-template <class ZoneEnum>
-Pose StrategyImpl<ZoneEnum>::getBestDribblePose(const Robot& robot)
+template <class PitchDivision, class ZoneEnum>
+Pose StrategyImpl<PitchDivision, ZoneEnum>::getBestDribblePose(const Robot& robot)
 {
     if (robot_to_best_dribble_location_.contains(robot.id()))
     {
@@ -138,8 +138,8 @@ Pose StrategyImpl<ZoneEnum>::getBestDribblePose(const Robot& robot)
     return robot_to_best_dribble_location_.at(robot.id());
 }
 
-template <class ZoneEnum>
-PassWithRating StrategyImpl<ZoneEnum>::getBestUncommittedPass()
+template <class PitchDivision, class ZoneEnum>
+PassWithRating StrategyImpl<PitchDivision, ZoneEnum>::getBestUncommittedPass()
 {
     // calculate best pass
     Timestamp current_time = world_ptr_->getMostRecentTimestamp();
@@ -152,7 +152,7 @@ PassWithRating StrategyImpl<ZoneEnum>::getBestUncommittedPass()
         cached_pass_time_ = current_time;
     }
 
-    for (const ZoneEnum& zone : cached_pass_eval_->rankZonesForReceiving(world_ptr_, world_ptr_->ball().position()))
+    for (const auto& zone : cached_pass_eval_->rankZonesForReceiving(world_ptr_, world_ptr_->ball().position()))
     {
         if (std::find(committed_pass_zones_.begin(), committed_pass_zones_.end(), zone) == committed_pass_zones_.end())
         {
@@ -162,12 +162,13 @@ PassWithRating StrategyImpl<ZoneEnum>::getBestUncommittedPass()
 
     CHECK(true) << "No Pass found? All Zones have a pass committed in them...";
 
-    PassWithRating default_pass;
-    return default_pass;
+    Pass default_pass = Pass(world_ptr_->ball().position(), world_ptr_->field().friendlyGoalCenter(),
+                             ai_config_.passing_config().min_pass_speed_m_per_s());
+    return PassWithRating{pass: default_pass, rating: 0};
 }
 
-template <class ZoneEnum>
-std::optional<Shot> StrategyImpl<ZoneEnum>::getBestShot(const Robot& robot)
+template <class PitchDivision, class ZoneEnum>
+std::optional<Shot> StrategyImpl<PitchDivision, ZoneEnum>::getBestShot(const Robot& robot)
 {
     if (robot_to_best_shot_.contains(robot.id()))
     {
@@ -180,14 +181,14 @@ std::optional<Shot> StrategyImpl<ZoneEnum>::getBestShot(const Robot& robot)
     return robot_to_best_shot_[robot.id()];
 }
 
-template <class ZoneEnum>
-std::vector<OffenseSupportType> StrategyImpl<ZoneEnum>::getCommittedOffenseSupport() const
+template <class PitchDivision, class ZoneEnum>
+std::vector<OffenseSupportType> StrategyImpl<PitchDivision, ZoneEnum>::getCommittedOffenseSupport() const
 {
     return committed_support_types_;
 }
 
-template <class ZoneEnum>
-void StrategyImpl<ZoneEnum>::reset()
+template <class PitchDivision, class ZoneEnum>
+void StrategyImpl<PitchDivision, ZoneEnum>::reset()
 {
     robot_to_best_dribble_location_ = {};
     robot_to_best_shot_             = {};
@@ -195,14 +196,14 @@ void StrategyImpl<ZoneEnum>::reset()
     committed_support_types_        = {};
 }
 
-template <class ZoneEnum>
-const TbotsProto::AiConfig& StrategyImpl<ZoneEnum>::getAiConfig() const
+template <class PitchDivision, class ZoneEnum>
+const TbotsProto::AiConfig& StrategyImpl<PitchDivision, ZoneEnum>::getAiConfig() const
 {
     return ai_config_;
 }
 
-template <class ZoneEnum>
-void StrategyImpl<ZoneEnum>::updateAiConfig(const TbotsProto::AiConfig& ai_config)
+template <class PitchDivision, class ZoneEnum>
+void StrategyImpl<PitchDivision, ZoneEnum>::updateAiConfig(const TbotsProto::AiConfig& ai_config)
 {
     LOG(DEBUG) << "[Strategy] Updating AI config";
     ai_config_ = ai_config;
@@ -216,21 +217,21 @@ void StrategyImpl<ZoneEnum>::updateAiConfig(const TbotsProto::AiConfig& ai_confi
     reset();
 }
 
-template <class ZoneEnum>
-bool StrategyImpl<ZoneEnum>::hasWorld() const
+template <class PitchDivision, class ZoneEnum>
+bool StrategyImpl<PitchDivision, ZoneEnum>::hasWorld() const
 {
     return world_ptr_ != nullptr;
 }
 
-template <class ZoneEnum>
-void StrategyImpl<ZoneEnum>::updateWorld(const WorldPtr& world_ptr)
+template <class PitchDivision, class ZoneEnum>
+void StrategyImpl<PitchDivision, ZoneEnum>::updateWorld(const WorldPtr& world_ptr)
 {
     world_ptr_ = world_ptr;
     pass_strategy_->updateWorld(world_ptr_);
 }
 
-template <class ZoneEnum>
-bool StrategyImpl<ZoneEnum>::isBetterPassThanCached(const Timestamp& timestamp,
+template <class PitchDivision, class ZoneEnum>
+bool StrategyImpl<PitchDivision, ZoneEnum>::isBetterPassThanCached(const Timestamp& timestamp,
                                           const PassWithRating& pass)
 {
     bool is_cache_time_expired =
@@ -244,21 +245,21 @@ bool StrategyImpl<ZoneEnum>::isBetterPassThanCached(const Timestamp& timestamp,
     return is_cache_time_expired || !is_cache_pass_better;
 }
 
-template <class ZoneEnum>
-int StrategyImpl<ZoneEnum>::calcNumIdealDefenders()
+template <class PitchDivision, class ZoneEnum>
+int StrategyImpl<PitchDivision, ZoneEnum>::calcNumIdealDefenders()
 {
     // TODO(arun): make a todo
     return 2;
 }
 
-template <class ZoneEnum>
-void StrategyImpl<ZoneEnum>::commit(OffenseSupportType& offense_support_type)
+template <class PitchDivision, class ZoneEnum>
+void StrategyImpl<PitchDivision, ZoneEnum>::commit(OffenseSupportType offense_support_type)
 {
     committed_support_types_.push_back(offense_support_type);
 }
 
-template <class ZoneEnum>
-void StrategyImpl<ZoneEnum>::commit(const Pass& pass)
+template <class PitchDivision, class ZoneEnum>
+void StrategyImpl<PitchDivision, ZoneEnum>::commit(const Pass& pass)
 {
-    committed_pass_zones_.push_back(ZoneEnum().getZoneId(pass.receiverPoint()));
+    committed_pass_zones_.push_back(EighteenZonePitchDivision().getZoneId(pass.receiverPoint()));
 }

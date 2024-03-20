@@ -2,6 +2,8 @@
 
 #include "software/ai/hl/stp/skill/skill_fsm.h"
 
+#include <include/boost/sml.hpp>
+
 struct DribbleSkillFSM
 {
     class GetPossession;
