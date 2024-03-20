@@ -6,8 +6,8 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/logger/logger.h"
 
-ReceiverTactic::ReceiverTactic()
-    : OffenseSupportTactic({RobotCapability::Move}),
+ReceiverTactic::ReceiverTactic(std::shared_ptr<Strategy> strategy)
+    : OffenseSupportTactic({RobotCapability::Move}, strategy),
       fsm_map(),
       control_params({ReceiverFSM::ControlParams{.pass                   = std::nullopt,
                                                  .disable_one_touch_shot = false}})
@@ -18,23 +18,27 @@ ReceiverTactic::ReceiverTactic()
     }
 }
 
-void ReceiverTactic::updateControlParams()
+OffenseSupportType ReceiverTactic::getOffenseSupportType() const
 {
+    return OffenseSupportType::PASS_RECEIVER;
 }
 
 void ReceiverTactic::commit()
 {
-    super::commit();
+    OffenseSupportTactic::commit();
 
-    committed_pass_ = strategy_->getBestUncommittedPass();
-    strategy_->commit(commit_pass.pass);
+    PassWithRating best_pass = (*strategy_)->getBestUncommittedPass();
+
+    control_params.pass = best_pass.pass;
+    control_params.disable_one_touch_shot = true;
+
+    (*strategy_)->commit(best_pass.pass);
 }
 
 void ReceiverTactic::updateControlParams(std::optional<Pass> updated_pass,
                                          bool disable_one_touch_shot)
 {
     // Update the control parameters stored by this Tactic
-    control_params.pass                   = updated_pass;
     control_params.disable_one_touch_shot = disable_one_touch_shot;
 }
 

@@ -17,11 +17,9 @@
 class ReceiverTactic : public OffenseSupportTactic
 {
    public:
-    ReceiverTactic();
+    ReceiverTactic(std::shared_ptr<Strategy> strategy);
 
-    void updateControlParams() override;
-
-    void commit override;
+    void commit() override;
 
     /**
      * Updates the control parameters for this ReceiverTactic.
@@ -60,10 +58,7 @@ class ReceiverTactic : public OffenseSupportTactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    OffenseSupportType getOffenseSupportType() const
-    {
-        return OffenseSupportType::PASS_RECEIVER;
-    }
+    OffenseSupportType getOffenseSupportType() const;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
@@ -91,6 +86,4 @@ class ReceiverTactic : public OffenseSupportTactic
     std::optional<Shot> findFeasibleShot();
 
     ReceiverFSM::ControlParams control_params;
-
-    PassWithRating committed_pass_;
 };

@@ -14,7 +14,7 @@
 /**
  * Contains shared gameplay-related calculations.
  */
-template <class ZoneEnum>
+template <class Pitch Division, class ZoneEnum>
 class StrategyImpl
 {
    public:
@@ -55,7 +55,7 @@ class StrategyImpl
     void updateWorld(const WorldPtr& world_ptr);
 
     // Committed OffenseSupportTypes
-    void commit(OffenseSupportType& type);
+    void commit(OffenseSupportType type);
     std::vector<OffenseSupportType> getCommittedOffenseSupport() const;
 
     void commit(const Pass& pass);
@@ -152,7 +152,7 @@ PassWithRating StrategyImpl<ZoneEnum>::getBestUncommittedPass()
         cached_pass_time_ = current_time;
     }
 
-    for (const ZoneEnum& zone : cached_pass_eval_->rankZonesForReceiving(world_ptr_, world_ptr_->ball().position()))
+    for (const auto& zone : cached_pass_eval_->rankZonesForReceiving(world_ptr_, world_ptr_->ball().position()))
     {
         if (std::find(committed_pass_zones_.begin(), committed_pass_zones_.end(), zone) == committed_pass_zones_.end())
         {
@@ -162,8 +162,9 @@ PassWithRating StrategyImpl<ZoneEnum>::getBestUncommittedPass()
 
     CHECK(true) << "No Pass found? All Zones have a pass committed in them...";
 
-    PassWithRating default_pass;
-    return default_pass;
+    Pass default_pass = Pass(world_ptr_->ball().position(), world_ptr_->field().friendlyGoalCenter(),
+                             ai_config_.passing_config().min_pass_speed_m_per_s());
+    return PassWithRating{pass: default_pass, rating: 0};
 }
 
 template <class ZoneEnum>
@@ -252,7 +253,7 @@ int StrategyImpl<ZoneEnum>::calcNumIdealDefenders()
 }
 
 template <class ZoneEnum>
-void StrategyImpl<ZoneEnum>::commit(OffenseSupportType& offense_support_type)
+void StrategyImpl<ZoneEnum>::commit(OffenseSupportType offense_support_type)
 {
     committed_support_types_.push_back(offense_support_type);
 }

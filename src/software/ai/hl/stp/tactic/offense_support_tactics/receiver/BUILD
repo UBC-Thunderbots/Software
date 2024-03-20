@@ -17,6 +17,7 @@ cc_library(
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/offense_support_tactics:offense_support_tactic",
         "//software/ai/passing:pass",
         "//software/logger",
         "//software/world:ball",

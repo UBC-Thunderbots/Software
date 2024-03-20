@@ -17,8 +17,8 @@ class Strategy
     void updateAiConfig(const TbotsProto::AiConfig& ai_config);
     void updateWorld(const WorldPtr& world_ptr);
 
-    std::shared_ptr<StrategyImpl<EighteenZoneId>> operator->();
+    std::shared_ptr<StrategyImpl<EighteenZonePitchDivision>> operator->();
 
    private:
-    std::shared_ptr<StrategyImpl<EighteenZoneId>> strategy_;
+    std::shared_ptr<StrategyImpl<EighteenZonePitchDivision>> strategy_;
 };

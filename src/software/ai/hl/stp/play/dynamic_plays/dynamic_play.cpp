@@ -68,14 +68,9 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
             support_tactics_.push_back(support_tactic);
 
             (*best_candidate)->updateScorer(*support_tactic_duplication_scorer_);
-        }
 
-        std::for_each(support_Tactics_.begin(), support_tactics_.end(),
-                [&committed_support](const std::shared_ptr<OffenseSupportTactic> &tactic)
-                {
-                    committed_support->commit();
-                    committed_support->updateControlParams();
-                });
+            support_tactic->commit();
+        }
     }
 
     tactics_to_return.push_back({attacker_tactic_});

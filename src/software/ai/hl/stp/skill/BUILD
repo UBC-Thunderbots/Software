@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//software/ai/evaluation/scoring/skills:skill_visitor",
         "//software/ai/hl/stp/strategy:strategy",
+        "//software/util/sml_fsm:sml_fsm",
     ],
 )
 
