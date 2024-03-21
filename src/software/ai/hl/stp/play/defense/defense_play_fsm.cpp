@@ -11,11 +11,11 @@ DefensePlayFSM::DefensePlayFSM(TbotsProto::AiConfig ai_config)
 void DefensePlayFSM::defendAgainstThreats(const Update& event)
 {
     auto enemy_threats = getAllEnemyThreats(
-        event.common.world.field(), event.common.world.friendlyTeam(),
-        event.common.world.enemyTeam(), event.common.world.ball(), false);
+        event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
+        event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false);
 
     auto assignments = getAllDefenderAssignments(
-        enemy_threats, event.common.world.field(), event.common.world.ball(),
+        enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
         ai_config.defense_play_config().defender_assignment_config());
 
     if (assignments.size() == 0)
@@ -80,7 +80,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         auto alignment = TbotsProto::CreaseDefenderAlignment::CENTRE;
         if (defenders_with_target_count == 1)
         {
-            if (event.common.world.ball().position().y() > 0)
+            if (event.common.world_ptr->ball().position().y() > 0)
             {
                 alignment = TbotsProto::CreaseDefenderAlignment::LEFT;
             }
@@ -91,7 +91,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         }
         else if (defenders_with_target_count == 2)
         {
-            if (event.common.world.ball().position().y() > 0)
+            if (event.common.world_ptr->ball().position().y() > 0)
             {
                 alignment = TbotsProto::CreaseDefenderAlignment::RIGHT;
             }

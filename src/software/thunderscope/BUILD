@@ -72,6 +72,7 @@ py_library(
     ],
     deps = [
         "//software/thunderscope/common:common_widgets",
+        "//software/thunderscope/common:fps_widget",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/common:proto_plotter",
         "//software/thunderscope/gl:gl_widget",
