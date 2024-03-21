@@ -39,7 +39,7 @@ class MoveTactic : public Tactic
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode =
-            TbotsProto::ObstacleAvoidanceMode::SAFE,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         double target_spin_rev_per_s = 0.0);
 
     /**

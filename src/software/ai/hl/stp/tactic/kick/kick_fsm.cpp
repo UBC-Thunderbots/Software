@@ -8,7 +8,7 @@ void KickFSM::updateKick(const Update &event)
         event.common.robot, event.control_params.kick_origin,
         event.control_params.kick_direction,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::OFF,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                        event.control_params.kick_speed_meters_per_second}));

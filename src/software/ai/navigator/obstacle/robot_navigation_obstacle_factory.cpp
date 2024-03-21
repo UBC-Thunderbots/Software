@@ -92,8 +92,8 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
         }
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // 0.5 represents half a metre radius
-            obstacles.push_back(
-                createFromShape(Circle(world_ptr->ball().position(), 0.5)));
+            obstacles.push_back(createFromShape(Circle(
+                world_ptr->ball().position(), STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M)));
             break;
         case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
             if (world_ptr->gameState().getBallPlacementPoint().has_value())

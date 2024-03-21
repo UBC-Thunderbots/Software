@@ -128,7 +128,7 @@ void DribbleFSM::loseBall(const Update &event)
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, away_from_ball_position, face_ball_orientation,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::OFF,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 0.5}));
 }

@@ -20,7 +20,7 @@ void PivotKickFSM::kickBall(const Update& event)
         event.common.robot, event.control_params.kick_origin,
         event.control_params.kick_direction,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::OFF,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick));
 }
 
