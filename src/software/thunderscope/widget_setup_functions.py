@@ -135,23 +135,28 @@ def setup_gl_widget(
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
 
-    gl_widget.toolbar.pause_button.clicked.connect(world_layer.toggle_play_state)
+    simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
+    simulation_control_toolbar.pause_button.clicked.connect(
+        world_layer.toggle_play_state
+    )
 
     # connect all sandbox controls if using sandbox mode
     if sandbox_mode:
-        gl_widget.toolbar.undo_button.clicked.connect(world_layer.undo)
-        gl_widget.toolbar.redo_button.clicked.connect(world_layer.redo)
-        gl_widget.toolbar.reset_button.clicked.connect(world_layer.reset_to_pre_sim)
+        simulation_control_toolbar.undo_button.clicked.connect(world_layer.undo)
+        simulation_control_toolbar.redo_button.clicked.connect(world_layer.redo)
+        simulation_control_toolbar.reset_button.clicked.connect(
+            world_layer.reset_to_pre_sim
+        )
         world_layer.undo_toggle_enabled_signal.connect(
-            gl_widget.toolbar.toggle_undo_enabled
+            simulation_control_toolbar.toggle_undo_enabled
         )
         world_layer.redo_toggle_enabled_signal.connect(
-            gl_widget.toolbar.toggle_redo_enabled
+            simulation_control_toolbar.toggle_redo_enabled
         )
 
     # Register observers
     sim_proto_unix_io.register_observer(
-        SimulationState, gl_widget.toolbar.simulation_state_buffer
+        SimulationState, simulation_control_toolbar.simulation_state_buffer
     )
 
     for arg in [
@@ -166,7 +171,7 @@ def setup_gl_widget(
         (World, tactic_layer.world_buffer),
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
-        (SimulationState, gl_widget.toolbar.simulation_state_buffer),
+        (SimulationState, simulation_control_toolbar.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (World, trail_layer.world_buffer),
     ]:

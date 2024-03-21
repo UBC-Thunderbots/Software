@@ -110,6 +110,12 @@ class GLWidget(QWidget):
 
         self.set_camera_view(CameraView.LANDSCAPE_HIGH_ANGLE)
 
+    def get_sim_control_toolbar(self):
+        """
+        Returns the simulation control toolbar
+        """
+        return self.simulation_control_toolbar
+
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been pressed
         
