@@ -7,23 +7,6 @@ load("@simulated_tests_deps//:requirements.bzl", "requirement")
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
 
 cc_library(
-    name = "ball_placement_play",
-    srcs = ["ball_placement_play.cpp"],
-    hdrs = ["ball_placement_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "corner_kick_play",
     srcs = ["corner_kick_play.cpp"],
     hdrs = ["corner_kick_play.h"],
@@ -234,7 +217,6 @@ cc_library(
 cc_library(
     name = "all_plays",
     deps = [
-        ":ball_placement_play",
         ":corner_kick_play",
         ":enemy_ball_placement_play",
         ":enemy_free_kick_play",
@@ -245,6 +227,7 @@ cc_library(
         ":kickoff_friendly_play",
         ":shoot_or_chip_play",
         ":stop_play",
+        "//software/ai/hl/stp/play/ball_placement:ball_placement_play",
         "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
         "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
@@ -349,22 +332,6 @@ py_test(
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
         requirement("pytest"),
-    ],
-)
-
-cc_test(
-    name = "enemy_ball_placement_play_cpp_test",
-    srcs = ["enemy_ball_placement_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:enemy_ball_placement_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
     ],
 )
 
@@ -496,34 +463,6 @@ py_test(
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
         requirement("pytest"),
-    ],
-)
-
-py_test(
-    name = "ball_placement_play_test",
-    srcs = [
-        "ball_placement_play_test.py",
-    ],
-    tags = ["exclusive"],
-    deps = [
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
-    ],
-)
-
-cc_test(
-    name = "ball_placement_play_cpp_test",
-    srcs = ["ball_placement_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:ball_placement_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
     ],
 )
 
