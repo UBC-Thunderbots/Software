@@ -3,6 +3,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.opengl import *
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.py_constants import ROBOT_MAX_HEIGHT_METERS
 from software.thunderscope.constants import MULTI_PLANE_POINTS
 
@@ -50,8 +51,12 @@ class ExtendedGLViewWidget(GLViewWidget):
     # (detect_mouse_movement_in_scene must be enabled for this signal to be emitted)
     mouse_in_scene_moved_signal = QtCore.pyqtSignal(MouseInSceneEvent)
 
-    def __init__(self) -> None:
-        """Initialize the ExtendedGLViewWidget"""
+    def __init__(self, bufferswap_counter: FrameTimeCounter = None) -> None:
+        """
+        Initialize the ExtendedGLViewWidget
+        bufferswap_counter: a counter that is used to track fps
+
+        """
         super().__init__()
 
         # Fixes strange bug where mousePos is not initialized
@@ -65,6 +70,18 @@ class ExtendedGLViewWidget(GLViewWidget):
 
         # This must be enabled for the mouse_moved_in_scene_signal to be emitted
         self.detect_mouse_movement_in_scene = False
+
+        # adding a callback for fps purpose
+        self.bufferswap_counter = bufferswap_counter
+        if self.bufferswap_counter == None:
+            self.bufferswap_counter = FrameTimeCounter()
+        self.frameSwapped.connect(self.frameswap_callback)
+
+    def frameswap_callback(self):
+        """
+        adding a frameswap callback
+        """
+        self.bufferswap_counter.add_one_datapoint()
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         """Detect that the mouse was pressed

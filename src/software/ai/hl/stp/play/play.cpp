@@ -2,6 +2,8 @@
 
 #include <munkres/munkres.h>
 
+#include <Tracy.hpp>
+
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/play/tactic_assignment.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
@@ -9,6 +11,7 @@
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/geom/angle.h"
 #include "software/logger/logger.h"
+
 
 Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
     : ai_config(ai_config),
@@ -93,12 +96,17 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     {
         num_tactics--;
     }
-    updateTactics(PlayUpdate(
-        world_ptr, num_tactics,
-        [&priority_tactics](PriorityTacticVector new_tactics) {
-            priority_tactics = std::move(new_tactics);
-        },
-        inter_play_communication, set_inter_play_communication_fun));
+
+    {
+        ZoneNamedN(_tracy_tactics, "Play: Get Tactics from Play", true);
+
+        updateTactics(PlayUpdate(
+            world_ptr, num_tactics,
+            [&priority_tactics](PriorityTacticVector new_tactics) {
+                priority_tactics = std::move(new_tactics);
+            },
+            inter_play_communication, set_inter_play_communication_fun));
+    }
 
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
 
@@ -192,42 +200,48 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     //
     // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
     // algorithm that we use here
-    for (unsigned int i = 0; i < priority_tactics.size(); i++)
     {
-        auto tactic_vector = priority_tactics[i];
-        size_t num_tactics = tactic_vector.size();
+        ZoneNamedN(_tracy_tactic_assignment, "Play: Assign tactics to robots", true);
 
-        if (robots.size() < tactic_vector.size())
+        for (unsigned int i = 0; i < priority_tactics.size(); i++)
         {
-            // We do not have enough robots to assign all the tactics to. We "drop"
-            // (aka don't assign) the tactics at the end of the vector since they are
-            // considered lower priority
-            tactic_vector.resize(robots.size());
-        }
-        else if (i == (priority_tactics.size() - 1))
-        {
-            // If assigning the last tactic vector, then assign rest of robots with
-            // StopTactics
-            for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
+            auto tactic_vector = priority_tactics[i];
+            size_t num_tactics = tactic_vector.size();
+
+            if (robots.size() < tactic_vector.size())
             {
-                tactic_vector.push_back(stop_tactics[ii]);
+                // We do not have enough robots to assign all the tactics to. We "drop"
+                // (aka don't assign) the tactics at the end of the vector since they are
+                // considered lower priority
+                tactic_vector.resize(robots.size());
             }
-        }
+            else if (i == (priority_tactics.size() - 1))
+            {
+                // If assigning the last tactic vector, then assign rest of robots with
+                // StopTactics
+                for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
+                {
+                    tactic_vector.push_back(stop_tactics[ii]);
+                }
+            }
 
         auto [remaining_robots, new_primitives_to_assign,
               current_tactic_robot_id_assignment] =
             assignTactics(world_ptr, tactic_vector, robots, obstacle_factory,
                           obstacle_list, path_visualization);
 
-        tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 
-        for (auto &[robot_id, primitive] : new_primitives_to_assign->robot_primitives())
-        {
-            primitives_to_run->mutable_robot_primitives()->insert(
-                google::protobuf::MapPair(robot_id, primitive));
+            tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
+
+            for (auto &[robot_id, primitive] :
+                 new_primitives_to_assign->robot_primitives())
+            {
+                primitives_to_run->mutable_robot_primitives()->insert(
+                    google::protobuf::MapPair(robot_id, primitive));
+            }
+
+            robots = remaining_robots;
         }
-
-        robots = remaining_robots;
     }
 
     // TODO (#3104): Remove duplicated obstacles from obstacle_list
