@@ -6,13 +6,13 @@ void PassSkillFSM::takePass(
 {
     Point ball_position = event.common.world_ptr->ball().position();
 
-    PassWithRating best_pass = (*event.common.strategy)->getBestUncommittedPass();
+    Pass best_pass = (*event.common.strategy)->getBestCommittedPass();
 
     processEvent(PivotKickSkillFSM::Update(
         PivotKickSkillFSM::ControlParams{
             .kick_origin    = ball_position,
-            .kick_direction = best_pass.pass.passerOrientation(),
+            .kick_direction = best_pass.passerOrientation(),
             .auto_chip_or_kick =
-                AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, best_pass.pass.speed()}},
+                AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, best_pass.speed()}},
         event.common));
 }

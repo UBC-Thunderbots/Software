@@ -35,7 +35,7 @@ class Skill
      *
      * @return true if the robot has finished executing the Skill, false otherwise
      */
-    virtual bool done(const Robot& robot) const = 0;
+    virtual bool done(const RobotId& robot_id) const = 0;
 
     virtual std::string getFSMState(RobotId robot_id) const = 0;
 

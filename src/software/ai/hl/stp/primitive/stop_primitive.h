@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "proto/primitive.pb.h"
-#include "software/ai/hl/stp/tactic/primitive.h"
+#include "software/ai/hl/stp/primitive/primitive.h"
 
 class StopPrimitive : public Primitive
 {

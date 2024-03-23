@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/stop_primitive.h"
+#include "software/ai/hl/stp/primitive/stop_primitive.h"
 
 std::unique_ptr<TbotsProto::Primitive> StopPrimitive::generatePrimitiveProtoMessage(
     const WorldPtr &world_ptr,

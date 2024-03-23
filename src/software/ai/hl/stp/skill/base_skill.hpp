@@ -20,7 +20,7 @@ class BaseSkill : public Skill
 
     void reset(const Robot& robot) override;
 
-    bool done(const Robot& robot) const override;
+    bool done(const RobotId& robot) const override;
 
     std::string getFSMState(RobotId robot_id) const override;
 
@@ -56,9 +56,9 @@ void BaseSkill<TSkillFSM, TSkillSubFSMs...>::reset(const Robot& robot)
 }
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>
-bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::done(const Robot& robot) const
+bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::done(const RobotId& robot) const
 {
-    return fsm_map_.contains(robot.id()) && fsm_map_.at(robot.id())->is(boost::sml::X);
+    return fsm_map_.contains(robot) && fsm_map_.at(robot)->is(boost::sml::X);
 }
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>

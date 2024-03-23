@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/hl/stp/primitive/move_primitive.h"
 
 void ChipFSM::updateGetBehindBall(
     const Update &event, boost::sml::back::process<GetBehindBallFSM::Update> processEvent)

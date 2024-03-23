@@ -12,8 +12,8 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
+        "//software/ai/hl/stp/primitive:move_primitive",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic:move_primitive",
         "//software/geom:triangle",
         "//software/geom/algorithms",
         "//software/logger",

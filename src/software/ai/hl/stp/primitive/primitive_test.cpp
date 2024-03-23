@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "shared/2021_robot_constants.h"
-#include "software/ai/hl/stp/tactic/move_primitive.h"
-#include "software/ai/hl/stp/tactic/stop_primitive.h"
+#include "software/ai/hl/stp/primitive/move_primitive.h"
+#include "software/ai/hl/stp/primitive/stop_primitive.h"
 #include "software/test_util/test_util.h"
 
 class PrimitiveTest : public testing::Test

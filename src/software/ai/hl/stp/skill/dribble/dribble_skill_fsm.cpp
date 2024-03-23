@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
 
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 
 Point DribbleSkillFSM::robotPositionToFaceBall(const Point &ball_position,

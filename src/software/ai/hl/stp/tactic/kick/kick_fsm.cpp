@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/hl/stp/primitive/move_primitive.h"
 
 void KickFSM::updateKick(const Update &event)
 {
