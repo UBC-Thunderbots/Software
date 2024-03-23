@@ -46,17 +46,17 @@ std::shared_ptr<Skill> SkillGraph::getNextSkill(const Robot& robot, const World&
 
     for (unsigned int node_id = 0; node_id < nodes_.size(); ++node_id)
     {
-        double viability_score = FeasibilityVisitor(robot, strategy_, world).getFeasibility(*nodes_[node_id]);
+        double feasibility_score = FeasibilityVisitor(robot, strategy_, world).getFeasibility(*nodes_[node_id]);
 
-        // A skill with a viability score of 0 is considered inviable
+        // A skill with a feasibility score of 0 is considered inviable
         // and cannot be selected for execution
-        if (viability_score == 0)
+        if (feasibility_score == 0)
         {
             continue;
         }
 
         double edge_weight      = adj_matrix_[last_node_id][node_id];
-        double transition_score = edge_weight + viability_score;
+        double transition_score = edge_weight + feasibility_score;
 
         if (transition_score > best_transition_score)
         {

@@ -16,16 +16,16 @@ class FeasibilityVisitor : public SkillVisitor
         void visit(const ShootSkill& skill) override;
 
         /**
-         * Returns a viability score in the range [0, 1] indicating whether the Skill
+         * Returns a feasibility score in the range [0, 1] indicating whether the Skill
          * is feasible for the given robot to execute.
          *
-         * A viability score of 0 means that the Skill is inviable and the robot
+         * A feasibility score of 0 means that the Skill is inviable and the robot
          * cannot execute the Skill.
          *
          * @param robot the robot that will execute the Skill
          * @param world the World
          *
-         * @return a viability score in the range [0, 1] indicating whether the skill
+         * @return a feasibility score in the range [0, 1] indicating whether the skill
          * is feasible for the given robot to execute
          */
         double getFeasibility(Skill& skill);
