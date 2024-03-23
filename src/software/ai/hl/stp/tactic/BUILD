@@ -44,6 +44,7 @@ cc_library(
         "//software/ai/hl/stp/primitive:stop_primitive",
         "//software/util/typename",
         "//software/world",
+        "@tracy",
     ],
 )
 

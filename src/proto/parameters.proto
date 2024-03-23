@@ -39,6 +39,7 @@ message AiConfig
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
+    required AiParameterConfig ai_parameter_config                          = 13;
 }
 
 message AiControlConfig
@@ -48,6 +49,13 @@ message AiControlConfig
 
     // Override the existing play with the Play enum provided
     required PlayName override_ai_play = 2 [default = UseAiSelection];
+}
+
+message AiParameterConfig
+{
+    // threshold to decide if ball hasn't been kicked
+    required double ball_is_kicked_m_per_s_threshold = 1
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 message AttackerTacticConfig
@@ -229,10 +237,6 @@ message ShootOrPassPlayConfig
     // threshold for the distance between passer and receiver
     required double short_pass_threshold = 5
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-
-    // threshold to decide if ball hasn't been kicked
-    required double ball_not_kicked_threshold = 6
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 
