@@ -10,7 +10,6 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//software/ai/evaluation/scoring/skills:skill_visitor",
         "//software/ai/hl/stp/strategy:strategy",
-        "//proto/primitive:primitive_msg_factory",
         "//software/ai/hl/stp/primitive:primitive",
         "//software/ai/hl/stp/primitive:stop_primitive",
         "//software/util/sml_fsm",
