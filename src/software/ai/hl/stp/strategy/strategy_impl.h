@@ -48,7 +48,7 @@ class StrategyImpl
     void updateAiConfig(const TbotsProto::AiConfig& ai_config);
 
     bool hasWorld() const;
-    void updateWorld(const WorldPtr &world_ptr);
+    void updateWorld(const WorldPtr& world_ptr);
 
    private:
     bool isBetterPassThanCached(const Timestamp& timestamp, const PassWithRating& pass);

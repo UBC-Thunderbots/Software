@@ -38,8 +38,8 @@ void PassStrategy::evaluatePassOptions()
         LOG(DEBUG) << "PassStrategy: waiting for World Lock";
         std::unique_lock<std::mutex> lock(world_lock_);
 
-        world_available_cv_.wait(
-            lock, [&] { return world_ptr_ != nullptr || end_analysis_; });
+        world_available_cv_.wait(lock,
+                                 [&] { return world_ptr_ != nullptr || end_analysis_; });
     }
 
     while (!end_analysis_)

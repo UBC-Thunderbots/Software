@@ -32,7 +32,7 @@ class Skill
      * @param world_ptr the world pointer
      * @param set_primitive callback function to set the primitive for the robot
      */
-    virtual void updatePrimitive(const Robot& robot, const WorldPtr &world_ptr,
+    virtual void updatePrimitive(const Robot& robot, const WorldPtr& world_ptr,
                                  const SetPrimitiveCallback& set_primitive) = 0;
 
     /**

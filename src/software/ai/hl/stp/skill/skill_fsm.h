@@ -9,7 +9,10 @@ struct SkillUpdate
     SkillUpdate(const Robot &robot, const WorldPtr &world_ptr,
                 std::shared_ptr<Strategy> strategy,
                 const SetPrimitiveCallback &set_primitive_fun)
-        : robot(robot), world_ptr(world_ptr), strategy(strategy), set_primitive(set_primitive_fun)
+        : robot(robot),
+          world_ptr(world_ptr),
+          strategy(strategy),
+          set_primitive(set_primitive_fun)
     {
     }
     Robot robot;
