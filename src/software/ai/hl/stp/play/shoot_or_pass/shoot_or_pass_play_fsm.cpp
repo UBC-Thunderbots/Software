@@ -107,8 +107,8 @@ std::vector<EighteenZoneId> ShootOrPassPlayFSM::getBestOffensivePositions(
 
     auto pass_start_zone =
         pitch_division->getZoneId(best_pass_and_score_so_far.pass.passerPoint());
-    std::erase_if(ranked_zones, [](EighteenZoneId zone) {
-        return zone == best_pass_zone || zone == pass_start_zone
+    std::erase_if(ranked_zones, [&](EighteenZoneId zone) {
+        return zone == best_pass_zone || zone == pass_start_zone;
     });
     return ranked_zones;
 }
