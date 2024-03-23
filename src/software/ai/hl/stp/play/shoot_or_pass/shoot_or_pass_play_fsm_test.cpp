@@ -74,6 +74,12 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard)
             world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
             [](InterPlayCommunication comm) {})));
 
+    fsm.process_event(ShootOrPassPlayFSM::Update(
+        ShootOrPassPlayFSM::ControlParams{},
+        PlayUpdate(
+            world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            [](InterPlayCommunication comm) {})));
+
     EXPECT_TRUE(fsm.is(boost::sml::state<ShootOrPassPlayFSM::TakePassState>));
 
     world->updateBall(Ball(Point(1, 0), Vector(0, 0), Timestamp::fromSeconds(3)));

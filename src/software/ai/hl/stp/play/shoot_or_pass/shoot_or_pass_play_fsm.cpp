@@ -7,14 +7,15 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
     : ai_config(ai_config),
       attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
+      pitch_division(std::make_shared<const EighteenZonePitchDivision>(
+          Field::createSSLDivisionBField())),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       pass_generator(
-          PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
-                                            Field::createSSLDivisionBField()),
-                                        ai_config.passing_config())),
+          PassGenerator<EighteenZoneId>(pitch_division, ai_config.passing_config())),
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
+      best_pass_zone(pitch_division->getZoneId(Point())),
       time_since_commit_stage_start(Duration::fromSeconds(0)),
       min_pass_score_threshold(0)
 {
@@ -47,24 +48,29 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
 
 void ShootOrPassPlayFSM::lookForPass(const Update& event)
 {
-    PriorityTacticVector ret_tactics = {{attacker_tactic}, {}};
+    PriorityTacticVector ret_tactics = {{attacker_tactic, receiver_tactic}, {}};
 
     // only look for pass if there are more than 1 robots
     if (event.common.num_tactics > 1)
     {
         ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
+
         PassEvaluation<EighteenZoneId> pass_eval =
             pass_generator.generatePassEvaluation(event.common.world_ptr);
-        best_pass_and_score_so_far               = pass_eval.getBestPassOnField();
-        std::vector<EighteenZoneId> ranked_zones = pass_eval.rankZonesForReceiving(
-            event.common.world_ptr, event.common.world_ptr->ball().position());
+
+        auto best_pass_score_and_zone = pass_eval.getBestPassAndZoneOnField();
+        best_pass_zone                = best_pass_score_and_zone.first;
+        best_pass_and_score_so_far    = best_pass_score_and_zone.second;
+
+        auto ranked_zones = getBestOffensivePositions(pass_eval, event);
 
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
+        receiver_tactic->updateControlParams(best_pass_and_score_so_far.pass);
 
         // add remaining tactics based on ranked zones
         updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                          event.common.num_tactics - 1);
+                                          event.common.num_tactics - 2);
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
 
@@ -93,12 +99,25 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
     lookForPass(event);
 }
 
+std::vector<EighteenZoneId> ShootOrPassPlayFSM::getBestOffensivePositions(
+    const PassEvaluation<EighteenZoneId> pass_eval, const Update& event)
+{
+    auto ranked_zones = pass_eval.rankZonesForReceiving(
+        event.common.world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
+
+    auto pass_start_zone =
+        pitch_division->getZoneId(best_pass_and_score_so_far.pass.passerPoint());
+    std::erase_if(ranked_zones, [&](EighteenZoneId zone) {
+        return zone == best_pass_zone || zone == pass_start_zone;
+    });
+    return ranked_zones;
+}
+
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
     auto pass_eval = pass_generator.generatePassEvaluation(event.common.world_ptr);
 
-    auto ranked_zones = pass_eval.rankZonesForReceiving(
-        event.common.world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
+    auto ranked_zones = getBestOffensivePositions(pass_eval, event);
 
     // if we make it here then we have committed to the pass
     attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
