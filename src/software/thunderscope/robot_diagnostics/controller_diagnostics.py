@@ -19,6 +19,7 @@ POWER_STEPPER = 100
 MAX_LINEAR_SPEED_METER_PER_S = 2
 MAX_ANGULAR_SPEED_RAD_PER_S = 10.0
 
+# TODO: change all logging to DEBUG level or remove entirely...
 
 class ControllerInputHandler(object):
     """
@@ -189,6 +190,7 @@ class ControllerInputHandler(object):
     def __event_loop(self):
         logging.info("Starting controller event loop")
         for event in self.controller.read_loop():
+            # TODO: only run loop if self.enabled is set
             if self.__stop_event_thread.isSet():
                 return
             if self.enabled:

@@ -17,6 +17,7 @@ from software.thunderscope.constants import (
     EstopMode,
 )
 
+# TODO: should use MAX_ROBOT_IDS_PER_SIDE instead or DIV_A?!
 NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
 
@@ -162,17 +163,9 @@ class RobotCommunication(object):
         :param robot_id: the id of the robot whose mode we're changing
         """
         self.robot_control_mode_dict[robot_id] = mode
-
+        # TODO: add else case that sets to 0
         if mode == IndividualRobotMode.NONE:
             self.robot_estop_send_countdown_latches[robot_id] = NUM_TIMES_SEND_STOP
-
-    def toggle_input_mode(self, mode: ControlMode):
-        """
-        Changes the diagnostics input mode for all robots between Xbox and Diagnostics.
-
-        :param mode: Control mode to use when sending diagnostics primitives
-        """
-        self.__input_mode = mode
 
     def __send_estop_state(self) -> None:
         """
@@ -260,6 +253,7 @@ class RobotCommunication(object):
 
             for robot_id in fullsystem_primitives.keys():
                 if (
+                    # TODO: cast shouldn't be needed...
                     self.robot_control_mode_dict[int(robot_id)]
                     == IndividualRobotMode.AI
                 ):
