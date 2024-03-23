@@ -21,6 +21,7 @@ MAX_ANGULAR_SPEED_RAD_PER_S = 10.0
 
 # TODO: change all logging to DEBUG level or remove entirely...
 
+
 class ControllerInputHandler(object):
     """
     This class is responsible for reading from an Xbox controller device and
