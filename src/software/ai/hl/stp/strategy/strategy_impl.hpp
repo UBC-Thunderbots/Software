@@ -90,7 +90,6 @@ StrategyImpl<PitchDivision, ZoneEnum>::StrategyImpl(const TbotsProto::AiConfig& 
                                                     const Field& field)
     : field_(field), pitch_division_(field)
 {
-    LOG(DEBUG) << "StrategyImpl boot up!";
     updateAiConfig(ai_config);
 }
 
