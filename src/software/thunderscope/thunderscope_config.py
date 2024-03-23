@@ -190,36 +190,25 @@ def configure_base_fullsystem(
             stretch=WidgetStretchData(x=3),
         ),
         TScopeWidget(
-            name="Logs",
-            widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
-            anchor="Parameters",
-            position="above",
-            stretch=WidgetStretchData(x=3),
-        ),
-        TScopeWidget(
             name="Error Log",
             widget=setup_robot_error_log_view_widget(
                 **{"proto_unix_io": full_system_proto_unix_io}
             ),
-            position="below",
-            anchor="Logs",
+            anchor="Parameters",
+            position="above",
         ),
+           TScopeWidget(
+               name="Logs",
+               widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
+               anchor="Parameters",
+               position="above",
+               stretch=WidgetStretchData(x=3),
+           ),
         TScopeWidget(
             name="Referee Info",
             widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Field",
             position="bottom",
-        ),
-        TScopeWidget(
-            name="FPS Widget",
-            widget=setup_fps_widget(
-                **{
-                    "bufferswap_counter": buffer_func_counter,
-                    "refresh_func_counter": refresh_func_counter,
-                }
-            ),
-            anchor="Referee Info",
-            position="above",
         ),
         TScopeWidget(
             name="Play Info",
@@ -239,6 +228,17 @@ def configure_base_fullsystem(
             in_window=True,
             anchor="Play Info",
             position="right",
+        ),
+        TScopeWidget(
+            name="FPS Widget",
+            widget=setup_fps_widget(
+                **{
+                    "bufferswap_counter": buffer_func_counter,
+                    "refresh_func_counter": refresh_func_counter,
+                }
+            ),
+            anchor="Performance",
+            position="above",
         ),
     ] + extra_widgets
 
