@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h"
 #include "software/ai/hl/stp/skill/skill_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
@@ -86,21 +85,3 @@ void AssignedSkillTactic<TSkillFSM, TSkillSubFSMs...>::updatePrimitive(
         control_params_, SkillUpdate(tactic_update.robot, tactic_update.world_ptr,
                                      strategy_, tactic_update.set_primitive)));
 }
-
-class PlaceBallTactic : public AssignedSkillTactic<DribbleSkillFSM>
-{
-   public:
-    explicit PlaceBallTactic(std::shared_ptr<Strategy> strategy)
-        : AssignedSkillTactic(strategy)
-    {
-    }
-};
-
-class WallKickoffTactic : public AssignedSkillTactic<PivotKickSkillFSM, DribbleSkillFSM>
-{
-   public:
-    explicit WallKickoffTactic(std::shared_ptr<Strategy> strategy)
-        : AssignedSkillTactic(strategy)
-    {
-    }
-};

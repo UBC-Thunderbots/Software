@@ -5,7 +5,7 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
+#include "software/ai/hl/stp/tactic/assigned_skill/named_skill_tactics.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 
