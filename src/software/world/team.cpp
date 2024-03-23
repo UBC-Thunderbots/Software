@@ -76,8 +76,8 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
 void Team::updateState(const Team& new_team_data)
 {
     updateRobots(new_team_data.getAllRobots());
-    this->goalie_id_ = new_team_data.goalie_id_;
-
+    this->goalie_id_     = new_team_data.goalie_id_;
+    this->injured_robots = new_team_data.getInjuredRobots();
     updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
@@ -292,4 +292,14 @@ bool Team::operator==(const Team& other) const
 bool Team::operator!=(const Team& other) const
 {
     return !(*this == other);
+}
+
+void Team::setInjuredRobots(std::vector<Robot> robots)
+{
+    injured_robots = robots;
+}
+
+std::vector<Robot> Team::getInjuredRobots() const
+{
+    return injured_robots;
 }
