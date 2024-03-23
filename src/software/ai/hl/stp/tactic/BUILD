@@ -55,6 +55,9 @@ cc_library(
     deps = [
         "//proto/primitive:primitive_msg_factory",
         "//software/util/sml_fsm",
+        "//software/util/typename",
+        "//software/world",
+        "@tracy",
     ],
 )
 
