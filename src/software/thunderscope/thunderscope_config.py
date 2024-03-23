@@ -197,13 +197,13 @@ def configure_base_fullsystem(
             anchor="Parameters",
             position="above",
         ),
-           TScopeWidget(
-               name="Logs",
-               widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
-               anchor="Parameters",
-               position="above",
-               stretch=WidgetStretchData(x=3),
-           ),
+        TScopeWidget(
+            name="Logs",
+            widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
+            anchor="Parameters",
+            position="above",
+            stretch=WidgetStretchData(x=3),
+        ),
         TScopeWidget(
             name="Referee Info",
             widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
@@ -234,12 +234,12 @@ def configure_base_fullsystem(
             anchor="Performance",
             position="below",
         ),
-       TScopeWidget(
-           name="Play Info",
-           widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
-           anchor="Referee Info",
-           position="above",
-       ),
+        TScopeWidget(
+            name="Play Info",
+            widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
+            anchor="Referee Info",
+            position="above",
+        ),
     ] + extra_widgets
 
 
