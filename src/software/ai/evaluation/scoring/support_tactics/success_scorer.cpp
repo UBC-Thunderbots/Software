@@ -2,9 +2,7 @@
 
 SuccessScorer::SuccessScorer() : tactic_scores_(), usage_counter_() {}
 
-void SuccessScorer::evaluate(double score)
-{
-}
+void SuccessScorer::evaluate(double score) {}
 
 double SuccessScorer::score(const TypedSupportTacticCandidate<ReceiverTactic> &candidate)
 {

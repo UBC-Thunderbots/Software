@@ -2,10 +2,7 @@
 
 #include "software/util/generic_factory/generic_factory.h"
 
-ShootSkill::ShootSkill(std::shared_ptr<Strategy> strategy)
-    : BaseSkill(strategy)
-{
-}
+ShootSkill::ShootSkill(std::shared_ptr<Strategy> strategy) : BaseSkill(strategy) {}
 
 void ShootSkill::accept(SkillVisitor& visitor)
 {

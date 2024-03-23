@@ -1,12 +1,11 @@
 #pragma once
 
-#include "proto/primitive/primitive_types.h"
-#include "software/ai/hl/stp/strategy/strategy.h"
 #include "proto/primitive/primitive_msg_factory.h"
+#include "proto/primitive/primitive_types.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/hl/stp/primitive/primitive.h"
 #include "software/ai/hl/stp/primitive/stop_primitive.h"
-
+#include "software/ai/hl/stp/strategy/strategy.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 
 using SetPrimitiveCallback = std::function<void(std::shared_ptr<Primitive>)>;

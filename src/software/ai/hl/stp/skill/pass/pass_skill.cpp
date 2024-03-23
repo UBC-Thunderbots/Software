@@ -2,10 +2,7 @@
 
 #include "software/util/generic_factory/generic_factory.h"
 
-PassSkill::PassSkill(std::shared_ptr<Strategy> strategy)
-    : BaseSkill(strategy)
-{
-}
+PassSkill::PassSkill(std::shared_ptr<Strategy> strategy) : BaseSkill(strategy) {}
 
 void PassSkill::accept(SkillVisitor& visitor)
 {

@@ -221,7 +221,7 @@ class Field
 
     /**
      * Gets the friendly third of the field within field lines
-     * 
+     *
      * @return the friendly third of the field
      */
     Rectangle friendlyThird() const;
@@ -249,7 +249,7 @@ class Field
 
     /**
      * Gets the enemy third of the field within field lines
-     * 
+     *
      * @return the enemy third of the field
      */
     Rectangle enemyThird() const;
@@ -408,10 +408,12 @@ class Field
     bool pointInEnemyHalf(const Point &p) const;
 
     /**
-     * Returns true if the point is in the friendly third of the field, and false otherwise
+     * Returns true if the point is in the friendly third of the field, and false
+     * otherwise
      *
      * @param point
-     * @return true if the point is in the friendly third of the field, and false otherwise
+     * @return true if the point is in the friendly third of the field, and false
+     * otherwise
      */
     bool pointInFriendlyThird(const Point &p) const;
 

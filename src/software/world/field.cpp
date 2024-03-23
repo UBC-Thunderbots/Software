@@ -142,8 +142,9 @@ Rectangle Field::friendlyNegativeYQuadrant() const
 
 Rectangle Field::friendlyThird() const
 {
-    return Rectangle(Point(friendlyCornerPos().x() + (xLength() / 3), friendlyCornerPos().y()),
-                     friendlyCornerNeg());
+    return Rectangle(
+        Point(friendlyCornerPos().x() + (xLength() / 3), friendlyCornerPos().y()),
+        friendlyCornerNeg());
 }
 
 Rectangle Field::enemyHalf() const

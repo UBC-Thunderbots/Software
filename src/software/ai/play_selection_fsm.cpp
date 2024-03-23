@@ -13,7 +13,7 @@
 
 
 PlaySelectionFSM::PlaySelectionFSM(std::shared_ptr<Strategy> strategy)
-    : strategy_(strategy), 
+    : strategy_(strategy),
       current_dynamic_play_(nullptr),
       offensive_friendly_third_play_(
           std::make_shared<OffensiveFriendlyThirdPlay>(strategy)),
@@ -104,7 +104,7 @@ void PlaySelectionFSM::setupHaltPlay(const Update& event)
 
 void PlaySelectionFSM::setupOffensivePlay(const Update& event)
 {
-    const Field& field = event.world_ptr->field();
+    const Field& field        = event.world_ptr->field();
     const Point ball_position = event.world_ptr->ball().position();
 
     if (field.pointInFriendlyThird(ball_position))

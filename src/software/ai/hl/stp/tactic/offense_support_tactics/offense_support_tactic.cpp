@@ -2,8 +2,7 @@
 
 OffenseSupportTactic::OffenseSupportTactic(
     const std::set<RobotCapability> &capability_reqs, std::shared_ptr<Strategy> strategy)
-    : Tactic(capability_reqs),
-      strategy_(strategy)
+    : Tactic(capability_reqs), strategy_(strategy)
 {
 }
 

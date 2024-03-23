@@ -2,14 +2,15 @@
 
 #include "software/util/generic_factory/generic_factory.h"
 
-SkillGraph::SkillGraph(std::shared_ptr<Strategy> strategy)
-    : strategy_(strategy)
+SkillGraph::SkillGraph(std::shared_ptr<Strategy> strategy) : strategy_(strategy)
 {
-    auto registered_skill_names = GenericFactory<std::string, Skill, std::shared_ptr<Strategy>>::getRegisteredNames();
+    auto registered_skill_names =
+        GenericFactory<std::string, Skill,
+                       std::shared_ptr<Strategy>>::getRegisteredNames();
     std::stringstream all_skills_string;
     for (const std::string& skill_string : registered_skill_names)
     {
-        all_skills_string << skill_string << " "; 
+        all_skills_string << skill_string << " ";
     }
     LOG(INFO) << "[SkillGraph] Registered skills: " << all_skills_string.str();
 
@@ -46,7 +47,8 @@ std::shared_ptr<Skill> SkillGraph::getNextSkill(const Robot& robot, const World&
 
     for (unsigned int node_id = 0; node_id < nodes_.size(); ++node_id)
     {
-        double feasibility_score = FeasibilityVisitor(robot, strategy_, world).getFeasibility(*nodes_[node_id]);
+        double feasibility_score =
+            FeasibilityVisitor(robot, strategy_, world).getFeasibility(*nodes_[node_id]);
 
         // A skill with a feasibility score of 0 is considered inviable
         // and cannot be selected for execution

@@ -29,7 +29,7 @@ void ReceiverTactic::commit()
 
     PassWithRating best_pass = (*strategy_)->getBestUncommittedPass();
 
-    control_params.pass = best_pass.pass;
+    control_params.pass                   = best_pass.pass;
     control_params.disable_one_touch_shot = true;
 
     (*strategy_)->commit(best_pass.pass);

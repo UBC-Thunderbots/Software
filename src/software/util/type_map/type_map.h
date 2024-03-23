@@ -50,7 +50,7 @@ class TypeMap
 
     /**
      * Returns whether the key exists in the TypeMap
-     * 
+     *
      * @tparam TKey the type of the key to lookup in the TypeMap
      * @return true if the key exists in the TypeMap, false otherwise
      */

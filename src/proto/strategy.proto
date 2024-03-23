@@ -5,7 +5,7 @@ package TbotsProto;
 message PossessionStrategy
 {
     int32 goalkeepers = 1;
-    int32 defenders = 2;
-    int32 attackers = 3;
-    int32 supporters = 4;
+    int32 defenders   = 2;
+    int32 attackers   = 3;
+    int32 supporters  = 4;
 };

@@ -47,13 +47,13 @@ void DynamicPlay::updateSupportTactics(unsigned int num_supporters)
         auto best_candidate = *std::max_element(support_tactic_candidates_.begin(),
                                                 support_tactic_candidates_.end());
 
-        std::shared_ptr<OffenseSupportTactic> support_tactic = 
+        std::shared_ptr<OffenseSupportTactic> support_tactic =
             best_candidate->createSupportTactic(strategy);
         support_tactics_.push_back(support_tactic);
 
         best_candidate->updateScorer(*support_tactic_duplication_scorer_);
         best_candidate->updateScorer(*support_tactic_success_scorer_);
-    
+
         support_tactic->commit();
     }
 }

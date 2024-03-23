@@ -4,7 +4,8 @@
 #include "software/ai/passing/pass_with_rating.h"
 
 Strategy::Strategy(const TbotsProto::AiConfig& ai_config, const Field& field)
-    : strategy_(std::make_shared<StrategyImpl<EighteenZonePitchDivision, EighteenZoneId>>(ai_config, field))
+    : strategy_(std::make_shared<StrategyImpl<EighteenZonePitchDivision, EighteenZoneId>>(
+          ai_config, field))
 {
 }
 
@@ -23,7 +24,8 @@ void Strategy::updateWorld(const WorldPtr& world_ptr)
     strategy_->updateWorld(world_ptr);
 }
 
-std::shared_ptr<StrategyImpl<EighteenZonePitchDivision, EighteenZoneId>> Strategy::operator->()
+std::shared_ptr<StrategyImpl<EighteenZonePitchDivision, EighteenZoneId>>
+Strategy::operator->()
 {
     CHECK(strategy_->hasWorld())
         << "[StrategyImpl] Cannot generate next Strategy without a World!";

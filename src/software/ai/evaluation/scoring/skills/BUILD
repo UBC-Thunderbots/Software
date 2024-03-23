@@ -2,16 +2,16 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "feasibility_visitor",
-    hdrs = ["feasibility_visitor.h"],
     srcs = ["feasibility_visitor.cpp"],
+    hdrs = ["feasibility_visitor.h"],
     deps = [
         ":skill_visitor",
         "//software/ai/evaluation:keep_away",
-        "//software/ai/hl/stp/skill:skill",
-        "//software/ai/hl/stp/strategy:strategy",
+        "//software/ai/hl/stp/skill",
+        "//software/ai/hl/stp/strategy",
+        "//software/world",
         "//software/world:robot",
-        "//software/world:world"
-    ]
+    ],
 )
 
 cc_library(

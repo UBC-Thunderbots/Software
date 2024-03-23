@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/hl/stp/skill/skill.h"
 #include "software/ai/evaluation/scoring/skills/feasibility_visitor.h"
+#include "software/ai/hl/stp/skill/skill.h"
 
 /**
  * SkillGraph is used to produce sequences of Skills to execute based on the past

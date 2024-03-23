@@ -1,13 +1,13 @@
 #pragma once
 
+#include "software/ai/evaluation/scoring/skills/skill_visitor.h"
 #include "software/ai/hl/stp/skill/skill_fsm.h"
 #include "software/ai/hl/stp/strategy/strategy.h"
-#include "software/ai/evaluation/scoring/skills/skill_visitor.h"
 
 class Skill
 {
    public:
-    explicit Skill(std::shared_ptr<Strategy> strategy): strategy_(strategy) {};
+    explicit Skill(std::shared_ptr<Strategy> strategy) : strategy_(strategy){};
 
     /**
      * Calls the SetPrimitiveCallback with a primitive for the given robot.

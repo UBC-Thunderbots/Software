@@ -2,11 +2,10 @@
 
 #include "software/ai/evaluation/keep_away.h"
 
-FeasibilityVisitor::FeasibilityVisitor(const Robot& robot, std::shared_ptr<Strategy> strategy, const World& world)
-    : current_feasibility_(0),
-      robot_(robot),
-      strategy_(strategy),
-      world_(world)
+FeasibilityVisitor::FeasibilityVisitor(const Robot& robot,
+                                       std::shared_ptr<Strategy> strategy,
+                                       const World& world)
+    : current_feasibility_(0), robot_(robot), strategy_(strategy), world_(world)
 {
 }
 
@@ -20,7 +19,9 @@ void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
     }
 
     if (!shouldKeepAway(robot_, world_.enemyTeam(),
-                strategy_->getAiConfig().attacker_tactic_config().enemy_about_to_steal_ball_radius()))
+                        strategy_->getAiConfig()
+                            .attacker_tactic_config()
+                            .enemy_about_to_steal_ball_radius()))
     {
         current_feasibility_ = 0;
         return;
@@ -31,9 +32,11 @@ void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
 
 void FeasibilityVisitor::visit(const PassSkill& skill)
 {
-    const std::vector<OffenseSupportType>& committed_strategy = (*strategy_)->getCommittedOffenseSupport();
+    const std::vector<OffenseSupportType>& committed_strategy =
+        (*strategy_)->getCommittedOffenseSupport();
 
-    if (std::find(committed_strategy.begin(), committed_strategy.end(), OffenseSupportType::PASS_RECEIVER) == committed_strategy.end())
+    if (std::find(committed_strategy.begin(), committed_strategy.end(),
+                  OffenseSupportType::PASS_RECEIVER) == committed_strategy.end())
     {
         current_feasibility_ = 0;
         return;
@@ -41,7 +44,8 @@ void FeasibilityVisitor::visit(const PassSkill& skill)
 
     PassWithRating best_pass = (*strategy_)->getBestUncommittedPass();
 
-    double min_score = (*strategy_)->getAiConfig().shoot_or_pass_play_config().abs_min_pass_score();
+    double min_score =
+        (*strategy_)->getAiConfig().shoot_or_pass_play_config().abs_min_pass_score();
 
     if (best_pass.rating > min_score)
     {

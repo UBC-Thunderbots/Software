@@ -15,8 +15,8 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/primitive:move_primitive",
+        "//software/ai/hl/stp/tactic",
         "//software/geom/algorithms",
         "//software/logger",
     ],

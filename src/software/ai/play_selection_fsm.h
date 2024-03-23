@@ -52,7 +52,7 @@ struct PlaySelectionFSM
     bool enemyHasPossession(const Update& event);
 
     /**
-     * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay, 
+     * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay,
      * OffensivePlay, or DefensivePlay
      *
      * @param event The PlaySelection::Update event

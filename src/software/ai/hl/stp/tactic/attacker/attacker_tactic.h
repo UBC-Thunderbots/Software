@@ -22,7 +22,7 @@ class AttackerTactic : public Tactic
 
     /**
      * Evaluate the AttackerTactic and start a new iteration
-     * 
+     *
      * @param score score between [-1, 1] rating the success of the AttackerTactic
      * for the current iteration
      */

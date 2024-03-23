@@ -1,10 +1,10 @@
 #pragma once
 
-#include "software/ai/hl/stp/play/dynamic_plays/dynamic_play.h"
 #include "software/ai/evaluation/scoring/support_tactics/feasibility_scorers/offensive_enemy_third_feasibility_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/feasibility_scorers/offensive_friendly_third_feasibility_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/feasibility_scorers/offensive_middle_third_feasibility_scorer.h"
 #include "software/ai/hl/stp/play/defense/defense_play.h"
+#include "software/ai/hl/stp/play/dynamic_plays/dynamic_play.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 
 /**
@@ -14,7 +14,7 @@ class OffensivePlay : public DynamicPlay
 {
    public:
     void evaluate(double score) override;
-    
+
    protected:
     /**
      * Base constructor for OffensivePlay

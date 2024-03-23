@@ -11,20 +11,20 @@
  * whose parameters and outputs are incrementally adjusted over time based
  * on the Play's success. This enables the Play to "learn" which tactics are
  * most effective for a given gameplay scenario.
- * 
+ *
  * Every time we select and run the DynamicPlay, we call it an iteration of the play.
  * At the start of each iteration, the DynamicPlay chooses which support tactics
- * to run and commits to those tactics for the length of the iteration. 
+ * to run and commits to those tactics for the length of the iteration.
  * When the iteration ends, the DynamicPlay's performance over the iteration
  * is evaluated, and the assessment is used to either encourage or discourage
- * selection of the iteration's chosen support tactics in future iterations. 
+ * selection of the iteration's chosen support tactics in future iterations.
  */
 class DynamicPlay : public Play
 {
    public:
     /**
      * Evaluate the DynamicPlay and start a new iteration
-     * 
+     *
      * @param score score between [-1, 1] rating the success of the DynamicPlay
      * for the current iteration
      */
@@ -47,8 +47,8 @@ class DynamicPlay : public Play
                         const WorldPtr &world_ptr) override;
 
     /**
-     * Selects and adds support tactics to the `support_tactics_` vector 
-     * until the vector has at least the specified number of support tactics 
+     * Selects and adds support tactics to the `support_tactics_` vector
+     * until the vector has at least the specified number of support tactics
      *
      * @param num_supporters the number of support tactics
      */
