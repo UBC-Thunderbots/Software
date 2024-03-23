@@ -133,6 +133,6 @@ void PlaySelectionFSM::evaluateDynamicPlay(const Update& event)
     if (current_dynamic_play_)
     {
         // TODO: Integrate PlayMonitor and feed score into evaluate
-        current_dynamic_play_->evaluate(1.0);
+        current_dynamic_play_->evaluate(0);
     }
 }
