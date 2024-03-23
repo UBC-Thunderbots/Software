@@ -294,7 +294,7 @@ bool Team::operator!=(const Team& other) const
     return !(*this == other);
 }
 
-void Team::setInjuredRobots(const std::vector<Robot>& robots) const
+void Team::setInjuredRobots(const std::vector<Robot>& robots)
 {
     injured_robots = robots;
 }

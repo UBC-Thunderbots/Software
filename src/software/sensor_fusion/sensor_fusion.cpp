@@ -408,8 +408,6 @@ void SensorFusion::detectInjuredRobots(const std::vector<TbotsProto::RobotStatus
     /* potential improvement: add short circuit logic when an error is detected */
 
     std::vector<RobotId> injured_robot_ids;
-    auto world = getWorld();
-
 
     for (auto &robot_status_msg : robot_status_msgs)
     {
@@ -467,8 +465,11 @@ void SensorFusion::detectInjuredRobots(const std::vector<TbotsProto::RobotStatus
 
     std::vector<Robot> injured_robots;
     for(auto id: injured_robot_ids){
-        injured_robots.push_back(world->friendlyTeam().getRobotById(id).value());
+        if(friendly_team.getRobotById(id).has_value()){
+            injured_robots.push_back(friendly_team.getRobotById(id).value());
+        }
     }
 
-    world->friendlyTeam().setInjuredRobots(injured_robots);
+    friendly_team.setInjuredRobots(injured_robots);
+    
 }

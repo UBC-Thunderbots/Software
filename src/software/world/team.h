@@ -243,7 +243,7 @@ class Team
      * @param robot_ids robot ids of injured robots
      */
 
-    void setInjuredRobots(const std::vector<Robot>& robots) const;
+    void setInjuredRobots(const std::vector<Robot>& robots);
 
     /**
      * Returns a list of robot ids for robots that are injured
@@ -284,7 +284,7 @@ class Team
     Timestamp last_update_timestamp_;
 
     // the robots in the team that are injured
-    mutable std::vector<Robot> injured_robots;
+    std::vector<Robot> injured_robots;
 };
 
 enum class TeamType
