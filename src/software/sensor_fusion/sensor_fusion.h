@@ -49,13 +49,14 @@ class SensorFusion
     std::optional<World> getWorld() const;
 
     /**
-     * detect injured robots in the team that needs to be substituted and add it to injuredRobots
-     * 
-     * @param robot_status_msgs The robot statuses from the sensor fusion packet 
+     * detect injured robots in the team that needs to be substituted and add it to
+     * injuredRobots
+     *
+     * @param robot_status_msgs The robot statuses from the sensor fusion packet
      * @return the list of robotids of the injured robots
      */
-    void detectInjuredRobots(const std::vector<TbotsProto::RobotStatus>
-                         &robot_status_msgs);
+    void detectInjuredRobots(
+        const std::vector<TbotsProto::RobotStatus> &robot_status_msgs);
 
     // Number of vision packets to indicate that the vision client most likely reset,
     // determined experimentally with the simulator
