@@ -112,7 +112,7 @@ struct BallPlacementPlayFSM
     bool ballPlaced(const Update& event);
 
     /**
-     * Guard on whether the robot has waited stationary for 5 seconds
+     * Guard on whether the robot has waited sufficiently
      * @param event the BallPlacementPlayFSM Update event
      * @return whether the robot has waited for 5 seconds
      */
