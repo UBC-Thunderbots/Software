@@ -28,6 +28,7 @@ proto_library(
     deps = [
         "@com_google_protobuf//:descriptor_proto",
         "@nanopb//:nanopb_options_proto",
+        "ssl_gc_state.proto"
     ],
 )
 
