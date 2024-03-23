@@ -6,6 +6,7 @@ import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.friendly_team_scored import *
 from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -14,18 +15,18 @@ from proto.ssl_gc_common_pb2 import Team
 def test_enemy_free_kick_play(simulated_test_runner):
 
     # starting point must be Point
-    ball_initial_pos = tbots_cpp.Point(-4.4, 2.9)
+    ball_initial_pos = tbots_cpp.Point(0, 0)
     # placement point must be Vector2 to work with game controller
-    tbots_cpp.Point(-3, -2)
+    #tbots_cpp.Point(-3, -2)
 
     # Setup Bots
     blue_bots = [
-        tbots_cpp.Point(-4.5, 3.0),
-        tbots_cpp.Point(-2, 1.5),
-        tbots_cpp.Point(-2, 0.5),
-        tbots_cpp.Point(-2, -1.7),
-        tbots_cpp.Point(-2, -1.5),
-        tbots_cpp.Point(-2, -0.5),
+        tbots_cpp.Point(-2.75, 2.5),
+        tbots_cpp.Point(-2.75, 1.5),
+        tbots_cpp.Point(-2.75, 0.5),
+        tbots_cpp.Point(-2.75, -0.5),
+        tbots_cpp.Point(-2.75, -1.5),
+        tbots_cpp.Point(4.5, -3.0),
     ]
 
     yellow_bots = [
@@ -42,7 +43,7 @@ def test_enemy_free_kick_play(simulated_test_runner):
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
     simulated_test_runner.gamecontroller.send_gc_command(
-        gc_command=Command.Type.FORCE_START, team=Team.BLUE
+        gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
     # Force play override here
@@ -72,7 +73,14 @@ def test_enemy_free_kick_play(simulated_test_runner):
 
     # Eventually Validation
     # TODO- #2779 Validation
-    eventually_validation_sequence_set = [[]]
+    eventually_validation_sequence_set = [
+        [
+            BallEventuallyEntersRegion(
+                regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
+            ),
+        ]
+    ]
+
 
     simulated_test_runner.run_test(
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,

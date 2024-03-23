@@ -10,11 +10,11 @@ cc_library(
     name = "enemy_free_kick_play",
     srcs = [
         "enemy_free_kick_play_fsm.cpp",
-        "enemy_free_kick_play.cpp"
-            ],
+        "enemy_free_kick_play.cpp",
+        ],
     hdrs = [
         "enemy_free_kick_play_fsm.h",
-        "enemy_free_kick_play.h"
+        "enemy_free_kick_play.h",
         ],
     deps = [
         "//software/ai/hl/stp/play:play",
@@ -28,18 +28,17 @@ cc_library(
         "//software/logger",
         "//software/util/generic_factory",
         "//software/world:game_state",
-#        "//software/ai/hl/stp/play/defense:defense_play",
-#        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_fsm",
-#        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
+        "//software/ai/hl/stp/play/defense:defense_play",
+         "@sml"
     ],
     alwayslink = True,
 )
 
 
 py_test(
-    name = "enemy_free_kick_play_fsm_test",
+    name = "enemy_free_kick_play_test",
     srcs = [
-        "enemy_free_kick_play_fsm_test.py",
+        "enemy_free_kick_play_test.py",
     ],
 
     tags = [

@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play/defense/defense_play.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 
 /**
  * Play for defending against enemy free kicks
@@ -62,5 +63,5 @@ struct EnemyFreeKickPlayFSM
 private:
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<DefensePlay> defense_play;
-    std::shared_ptr<TbotsProto::ShadowEnemyTactic> shadow_defender;
+    std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_defenders;
 };

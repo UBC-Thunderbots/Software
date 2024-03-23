@@ -10,7 +10,8 @@
 #include "software/world/game_state.h"
 
 EnemyFreekickPlay::EnemyFreekickPlay(TbotsProto::AiConfig config)
-        : Play(config, true), fsm{EnemyFreeKickPlayFSM{config}}, control_params{}
+        : Play(config, true),
+        fsm{EnemyFreeKickPlayFSM{config}}, control_params{}
 {
 }
 

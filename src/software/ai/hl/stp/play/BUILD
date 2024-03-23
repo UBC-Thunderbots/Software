@@ -62,25 +62,25 @@ cc_library(
     alwayslink = True,
 )
 
-cc_library(
-    name = "enemy_free_kick_play",
-    srcs = ["enemy_free_kick_play.cpp"],
-    hdrs = ["enemy_free_kick_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-        "//software/world:game_state",
-    ],
-    alwayslink = True,
-)
+#cc_library(
+#    name = "enemy_free_kick_play",
+#    srcs = ["enemy_free_kick_play.cpp"],
+#    hdrs = ["enemy_free_kick_play.h"],
+#    deps = [
+#        ":play",
+#        "//shared:constants",
+#        "//software/ai/evaluation:enemy_threat",
+#        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
+#        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
+#        "//software/ai/hl/stp/tactic/move:move_tactic",
+#        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
+#        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+#        "//software/logger",
+#        "//software/util/generic_factory",
+#        "//software/world:game_state",
+#    ],
+#    alwayslink = True,
+#)
 
 cc_library(
     name = "example_play",
@@ -237,7 +237,6 @@ cc_library(
         ":ball_placement_play",
         ":corner_kick_play",
         ":enemy_ball_placement_play",
-        ":enemy_free_kick_play",
         ":example_play",
         ":free_kick_play",
         ":halt_play",
@@ -255,6 +254,7 @@ cc_library(
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/penalty_kick_enemy:penalty_kick_enemy_play",
         "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
+        "//software/ai/hl/stp/play/enemy_free_kick:enemy_free_kick_play",
     ],
 )
 
@@ -381,21 +381,21 @@ py_test(
     ],
 )
 
-cc_test(
-    name = "enemy_free_kick_play_test",
-    srcs = ["enemy_free_kick_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:enemy_free_kick_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
+#cc_test(
+#    name = "enemy_free_kick_play_test",
+#    srcs = ["enemy_free_kick_play_test.cpp"],
+#    deps = [
+#        "//shared/test_util:tbots_gtest_main",
+#        "//software/ai/hl/stp/play:enemy_free_kick_play",
+#        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
+#        "//software/simulated_tests/non_terminating_validation_functions",
+#        "//software/simulated_tests/terminating_validation_functions",
+#        "//software/simulated_tests/validation:validation_function",
+#        "//software/test_util",
+#        "//software/time:duration",
+#        "//software/world",
+#    ],
+#)
 
 cc_test(
     name = "stop_play_test",
