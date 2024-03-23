@@ -83,7 +83,7 @@ double Pass::getPassSpeed(const Point& ball_position, const Point& pass_destinat
     // vf^2 = (cx)^2 + 2rd2 = (cx)^2 + 2r(D + (1 - c^2)x^2 / 2s) // using final velocity
     // kinematics formula
     //
-    // Simplify and rearrange for initial velocity:
+    // Simplify and rearrange for initial velocity x:
     // x = sqrt((vf^2 - 2rD) / (c^2 - rc^2/s + b/s))
     Vector pass_distance          = Vector(pass_destination.x() - ball_position.x(),
                                   pass_destination.y() - ball_position.y());

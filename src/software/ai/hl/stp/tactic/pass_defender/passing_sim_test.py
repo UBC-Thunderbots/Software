@@ -14,7 +14,7 @@ from software.simulated_tests.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )
 from software.simulated_tests.ball_moves_in_direction import (
-    BallAlwaysMovesInDirectionInRegions,
+    BallMovesForwardInRegions,
 )
 from software.simulated_tests.ball_enters_region import BallEventuallyEntersRegion
 from software import py_constants
@@ -45,8 +45,6 @@ def setup_pass_and_robots(
     :return the best pass we generate
     """
     blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
-
-    # simulated_test_runner.clear_world_buffer()
 
     # Setup the world state
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -183,6 +181,7 @@ def setup_pass_and_robots(
             [],
         ),
         # TODO: Make Interception Better
+        # https://github.com/UBC-Thunderbots/Software/issues/2984 
         # pass between 2 robots above one another (on the y-axis)
         (
             tbots_cpp.Point(0.0, 0.0),
@@ -392,9 +391,8 @@ def test_passing_no_backwards_passes(
     always_validation_sequence_set = [
         [FriendlyAlwaysReceivesBallSlow(robot_id=1, max_receive_speed=2.5)],
         [
-            BallAlwaysMovesInDirectionInRegions(
+            BallMovesForwardInRegions(
                 initial_ball_position=ball_initial_position,
-                moving_in_pos_x=True,
                 regions=[
                     tbots_cpp.Rectangle(
                         tbots_cpp.Point(-field.xLength() / 2, field.yLength() / 2),

@@ -8,41 +8,34 @@ from software.simulated_tests.validation import (
 )
 
 
-class BallMovesXAxis(Validation):
-    """Checks if ball is moving forward or backward in the +x direction"""
+class BallMovesForward(Validation):
+    """Checks if ball is moving forward, i.e. in the +x direction"""
 
-    def __init__(self, initial_ball_position: tbots.Point, moving_in_pos_x: bool):
+    def __init__(self, initial_ball_position: tbots.Point, tolerance: float = 0.1):
         """
         Constructs the validation
         :param initial_ball_position: the initial position of the ball
-        :param moving_in_pos_x: True if checking for +x direction, false if checking for -x direction
+        :param tolerance: the tolerance for determining the ball's direction of movement
+                          to account for noisy world data
         """
         self.last_ball_position = initial_ball_position
-        self.moving_in_pos_x = moving_in_pos_x
         self.max_displacement_so_far = None
+        self.tolerance = tolerance
 
     def get_validation_status(self, world) -> ValidationStatus:
-        """Checks if ball is moving forward or backward
+        """Checks if ball is moving forward
 
         :param world: The world msg to validate
         :returns: FAILING if ball doesn't move in the direction
                   PASSING if ball moves in the direction
         """
-        current_ball_position = tbots.createPoint(
-            world.ball.current_state.global_position
-        ).x()
+        current_ball_position = world.ball.current_state.global_position.x_meters
 
         # if max displacement is not set or current ball is moving in the right direction
         # set it and return PASSING
         if self.max_displacement_so_far is None or (
-            (
-                self.moving_in_pos_x
-                and current_ball_position > self.max_displacement_so_far - 0.1
-            )
-            or (
-                not self.moving_in_pos_x
-                and current_ball_position < self.max_displacement_so_far + 0.1
-            )
+            self.moving_in_pos_x
+            and current_ball_position > self.max_displacement_so_far - self.tolerance
         ):
             self.max_displacement_so_far = current_ball_position
             return ValidationStatus.PASSING
@@ -72,19 +65,8 @@ class BallMovesXAxis(Validation):
 
     def __repr__(self):
         return (
-            "Check that the ball moves " + "forward"
-            if self.moving_in_pos_x
-            else "backward"
+            "Check that the ball moves forward"
         )
-
-
-class BallMovesForward(BallMovesXAxis):
-
-    """Checks if ball is moving forward, i.e. in the +x direction"""
-
-    def __init__(self, initial_ball_position):
-        super().__init__(initial_ball_position, True)
-
 
 (
     BallEventuallyMovesForward,
@@ -94,11 +76,11 @@ class BallMovesForward(BallMovesXAxis):
 ) = create_validation_types(BallMovesForward)
 
 
-class BallMovesInDirectionInRegions(BallMovesXAxis):
+class BallMovesForwardInRegions(BallMovesForward):
     """Checks if ball is moving in a direction in certain regions"""
 
-    def __init__(self, initial_ball_position, moving_in_pos_x, regions=[]):
-        super().__init__(initial_ball_position, moving_in_pos_x)
+    def __init__(self, initial_ball_position, regions=[], tolerance: float = 0.1):
+        super().__init__(initial_ball_position, tolerance=tolerance)
         self.regions = regions
 
     def get_validation_status(self, world) -> ValidationStatus:
@@ -119,17 +101,15 @@ class BallMovesInDirectionInRegions(BallMovesXAxis):
 
     def __repr__(self):
         return (
-            "Check that the ball moves " + "forward"
-            if self.moving_in_pos_x
-            else "backward"
+            "Check that the ball moves forward"
             + " in regions "
             + ",".join(repr(region) for region in self.regions)
         )
 
 
 (
-    BallEventuallyMovesInDirectionInRegions,
-    BallEventuallyStopsMovingInDirectionInRegions,
-    BallAlwaysMovesInDirectionInRegions,
-    BallNeverMovesInDirectionInRegions,
-) = create_validation_types(BallMovesInDirectionInRegions)
+    BallEventuallyMovesForwardInRegions,
+    BallEventuallyStopsMovingForwardInRegions,
+    BallAlwaysMovesForwardInRegions,
+    BallNeverMovesForwardInRegions,
+) = create_validation_types(BallMovesForwardInRegions)

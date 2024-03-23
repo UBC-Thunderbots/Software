@@ -45,9 +45,13 @@ class Pass
     /**
      * Creates a pass from the given destination point and receive speed
      *
-     * @param receiver_point The destination point of the pass
-     * @param receive_speed_m_per_s The speed at which the pass should be received
-     * @return The Pass constructed from the receiver point and speed
+     * @param ball_position the current position of the ball (pass starting point)
+     * @param pass_destination the end point of the pass
+     * @param dest_speed_m_per_s the speed we want the pass to be received at
+     * @param min_pass_speed_m_per_s the minimum speed a pass should be taken at
+     * @param max_pass_speed_m_per_s the maximum speed a pass should be taken at
+     * @return the Pass constructed from the start and end points, received at the intended speed
+                clamped by the min and max pass speeds
      */
     static Pass fromDestReceiveSpeed(const Point& ball_position,
                                      const Point& pass_destination,
@@ -59,8 +63,12 @@ class Pass
      * Determines the speed at which a pass should be executed
      * Such that it reaches its destination at the given destination speed
      * Takes into account friction
+     * Clamps the speed to the given mix and max speed values
      * @param ball_position the current ball position (starting point of the pass)
      * @param pass_destination the destination of the pass
+     * @param receive_speed_m_per_s the speed we want the pass to be received at
+     * @param min_pass_speed_m_per_s the minimum speed a pass should be taken at
+     * @param max_pass_speed_m_per_s the maximum speed a pass should be taken at
      * @return the speed the pass should start with
      */
     static double getPassSpeed(const Point& ball_position, const Point& pass_destination,
