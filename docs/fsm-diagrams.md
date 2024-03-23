@@ -24,6 +24,31 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [BallPlacementPlayFSM](/src/software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StartState
+StartState --> AlignPlacementState : [!shouldKickOffWall]\n<i>alignPlacement</i>
+StartState --> KickOffWallState : [shouldKickOffWall]
+KickOffWallState --> KickOffWallState : [!kickDone && shouldKickOffWall]\n<i>kickOffWall</i>
+KickOffWallState --> KickOffWallState : [kickDone]
+KickOffWallState --> AlignPlacementState : [!kickDone]
+AlignPlacementState --> KickOffWallState : [shouldKickOffWall]
+AlignPlacementState --> AlignPlacementState : [!alignDone]\n<i>alignPlacement</i>
+AlignPlacementState --> PlaceBallState : [alignDone]
+PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
+PlaceBallState --> WaitState : [ballPlaced]\n<i>startWait</i>
+WaitState --> WaitState : [!waitDone]
+WaitState --> RetreatState : [waitDone]
+RetreatState --> Terminate:::terminate : [retreatDone && ballPlaced]
+RetreatState --> RetreatState : [ballPlaced]\n<i>retreat</i>
+
+```
+
 ## [CreaseDefensePlayFSM](/src/software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h)
 
 ```mermaid

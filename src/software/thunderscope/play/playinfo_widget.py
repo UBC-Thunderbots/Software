@@ -21,10 +21,9 @@ class PlayInfoWidget(QWidget):
     HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
     ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
 
-    def __init__(self, minimum_column_width: int = 200, buffer_size: int = 5) -> None:
+    def __init__(self, buffer_size: int = 1) -> None:
         """Shows the current play information including tactic and FSM state
 
-        :param minimum_column_width: minimum width of columns
         :param buffer_size: The buffer size, set higher for smoother plots.
                             Set lower for more realtime plots. Default is arbitrary
 
@@ -35,6 +34,7 @@ class PlayInfoWidget(QWidget):
 
         self.playinfo_buffer = ThreadSafeBuffer(buffer_size, PlayInfo, False)
         self.play_table.verticalHeader().setVisible(False)
+        self.last_playinfo = None
 
         self.vertical_layout = QVBoxLayout()
         self.vertical_layout.addWidget(self.play_table)
@@ -43,7 +43,13 @@ class PlayInfoWidget(QWidget):
     def refresh(self) -> None:
         """Update the play info widget with new play information
         """
-        playinfo = self.playinfo_buffer.get(block=False)
+        playinfo = self.playinfo_buffer.get(block=False, return_cached=False)
+
+        # Updating QTableWidget could be expensive, so we only update if there is new data
+        if playinfo is None or playinfo == self.last_playinfo:
+            return
+
+        self.last_playinfo = playinfo
 
         play_info_dict = MessageToDict(playinfo)
 
