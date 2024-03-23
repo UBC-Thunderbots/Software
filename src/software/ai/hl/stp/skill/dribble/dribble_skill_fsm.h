@@ -1,5 +1,7 @@
 #pragma once
 
+#include <include/boost/sml.hpp>
+
 #include "software/ai/hl/stp/skill/skill_fsm.h"
 
 struct DribbleSkillFSM

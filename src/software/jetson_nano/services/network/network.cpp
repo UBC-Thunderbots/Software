@@ -27,7 +27,7 @@ TbotsProto::PrimitiveSet NetworkService::poll(TbotsProto::RobotStatus& robot_sta
         sender->sendProto(robot_status);
         network_ticks = (network_ticks + 1) % ROBOT_STATUS_BROADCAST_RATE_HZ;
     }
-    thunderloop_ticks = (thunderloop_ticks + 1) % CONTROL_LOOP_HZ;
+    thunderloop_ticks = (thunderloop_ticks + 1) % THUNDERLOOP_HZ;
     return primitive_set_msg;
 }
 

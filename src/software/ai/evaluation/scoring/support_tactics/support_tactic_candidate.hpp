@@ -4,7 +4,7 @@
 
 #include "software/ai/evaluation/scoring/candidate.h"
 #include "software/ai/evaluation/scoring/support_tactics/support_tactic_scorer.h"
-#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/offense_support_tactics/receiver/receiver_tactic.h"
 
 /**
  * A SupportTacticCandidate makes a type of tactic eligible for scoring and
@@ -40,7 +40,8 @@ class SupportTacticCandidate : public Candidate
      * @return a shared pointer to a newly constructed instance of the
      * type of support tactic this candidate represents
      */
-    virtual std::shared_ptr<Tactic> createSupportTactic() = 0;
+    virtual std::shared_ptr<OffenseSupportTactic> createSupportTactic(
+        std::shared_ptr<Strategy> strategy) = 0;
 
    protected:
     explicit SupportTacticCandidate() = default;
@@ -55,8 +56,8 @@ class SupportTacticCandidate : public Candidate
 template <typename TSupportTactic>
 class TypedSupportTacticCandidate : public SupportTacticCandidate
 {
-    static_assert(std::is_base_of<Tactic, TSupportTactic>::value,
-                  "TSupportTactic must derive from Tactic");
+    static_assert(std::is_base_of<OffenseSupportTactic, TSupportTactic>::value,
+                  "TSupportTactic must derive from OffenseSupportTactic");
 
    public:
     explicit TypedSupportTacticCandidate() = default;
@@ -71,8 +72,10 @@ class TypedSupportTacticCandidate : public SupportTacticCandidate
         scorer.update(*this);
     }
 
-    std::shared_ptr<Tactic> createSupportTactic() override
+    std::shared_ptr<OffenseSupportTactic> createSupportTactic(
+        std::shared_ptr<Strategy> strategy) override
     {
-        return std::make_shared<TSupportTactic>();
+        // TODO(arun): use generic factory here
+        return std::make_shared<TSupportTactic>(strategy);
     }
 };

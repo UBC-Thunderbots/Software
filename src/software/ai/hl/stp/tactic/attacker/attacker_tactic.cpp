@@ -27,6 +27,16 @@ std::string AttackerTactic::getFSMState() const
     return state;
 }
 
+bool AttackerTactic::done() const
+{
+    if (last_execution_robot)
+    {
+        return current_skill_->done(*last_execution_robot);
+    }
+
+    return true;
+}
+
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
     std::shared_ptr<Skill> next_skill =
@@ -34,7 +44,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
     if (last_execution_robot == tactic_update.robot.id())
     {
-        if (current_skill_ == nullptr || current_skill_->done(tactic_update.robot))
+        if (current_skill_ == nullptr || current_skill_->done(tactic_update.robot.id()))
         {
             current_skill_ = next_skill;
             current_skill_->reset(tactic_update.robot);
@@ -50,4 +60,10 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
         next_skill->updatePrimitive(tactic_update.robot, tactic_update.world_ptr,
                                     tactic_update.set_primitive);
     }
+}
+
+void AttackerTactic::evaluate(double score)
+{
+    skill_graph_.scoreSequence(score);
+    current_skill_ = nullptr;
 }

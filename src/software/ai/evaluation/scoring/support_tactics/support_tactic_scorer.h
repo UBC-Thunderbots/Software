@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/offense_support_tactics/receiver/receiver_tactic.h"
 
 // We forward-declare TypedSupportTacticCandidate because if we include it, we induce a
 // circular dependency between support_tactic_candidate.h and support_tactic_scorer.hpp.
@@ -25,6 +25,8 @@ class SupportTacticScorer
      *
      * @return the score for the SupportTacticCandidate, in the range [-1.0, 1.0]
      */
+    double score(const TypedSupportTacticCandidate<OffenseSupportTactic> &candidate) =
+        delete;
     virtual double score(
         const TypedSupportTacticCandidate<ReceiverTactic> &candidate) = 0;
 
@@ -32,7 +34,14 @@ class SupportTacticScorer
      * The javadoc comment for all `update` methods below can be read as:
      * Updates the state of the scorer based on the SupportTacticCandidate it visits
      *
-     * @param candidate the SupportTacticCandidate to visit
+     * @param candidate the SupportTacticCandidate to visits
      */
+    void update(const TypedSupportTacticCandidate<OffenseSupportTactic> &candidate) =
+        delete;
     virtual void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) {}
+
+    /**
+     * Reset the state of the scorer
+     */
+    virtual void reset() {}
 };

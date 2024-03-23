@@ -1,5 +1,6 @@
 #pragma once
 
+#include "software/ai/evaluation/scoring/skills/feasibility_visitor.h"
 #include "software/ai/hl/stp/skill/skill.h"
 
 /**
@@ -59,6 +60,8 @@ class SkillGraph
     static constexpr double ADJUSTMENT_SIGMOID_WIDTH = 2.0;
     static constexpr double ADJUSTMENT_RESISTANCE    = 20.0;
     static constexpr double ADJUSTMENT_SCALE         = 0.5;
+
+    std::shared_ptr<Strategy> strategy_;
 
     /**
      * Each node in the graph is represented by a Skill.

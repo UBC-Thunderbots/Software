@@ -2,8 +2,19 @@
 
 #include "software/util/generic_factory/generic_factory.h"
 
-SkillGraph::SkillGraph(std::shared_ptr<Strategy> strategy)
+SkillGraph::SkillGraph(std::shared_ptr<Strategy> strategy) : strategy_(strategy)
 {
+    auto registered_skill_names =
+        GenericFactory<std::string, Skill,
+                       std::shared_ptr<Strategy>>::getRegisteredNames();
+    std::stringstream all_skills_string;
+    for (const std::string& skill_string : registered_skill_names)
+    {
+        all_skills_string << skill_string << " ";
+    }
+    LOG(INFO) << "[SkillGraph] Registered skills: " << all_skills_string.str();
+
+
     auto all_skill_constructors =
         GenericFactory<std::string, Skill,
                        std::shared_ptr<Strategy>>::getRegisteredConstructors();
@@ -36,17 +47,18 @@ std::shared_ptr<Skill> SkillGraph::getNextSkill(const Robot& robot, const World&
 
     for (unsigned int node_id = 0; node_id < nodes_.size(); ++node_id)
     {
-        double viability_score = nodes_[node_id]->getViability(robot, world);
+        double feasibility_score =
+            FeasibilityVisitor(robot, strategy_, world).getFeasibility(*nodes_[node_id]);
 
-        // A skill with a viability score of 0 is considered inviable
+        // A skill with a feasibility score of 0 is considered inviable
         // and cannot be selected for execution
-        if (viability_score == 0)
+        if (feasibility_score == 0)
         {
             continue;
         }
 
         double edge_weight      = adj_matrix_[last_node_id][node_id];
-        double transition_score = edge_weight + viability_score;
+        double transition_score = edge_weight + feasibility_score;
 
         if (transition_score > best_transition_score)
         {

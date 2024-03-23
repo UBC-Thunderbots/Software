@@ -70,3 +70,48 @@ Point closestPoint(const Segment &segment, const Point &p)
 {
     return closestPoint(p, segment);
 }
+
+Point closestPoint(const Polygon &polygon, const Point &p)
+{
+    Point closest_point;
+    double closest_point_dist_sq = std::numeric_limits<double>::max();
+    for (const Segment &segment : polygon.getSegments())
+    {
+        Point curr_closest_point          = closestPoint(segment, p);
+        double curr_closest_point_dist_sq = (curr_closest_point - p).lengthSquared();
+        if (curr_closest_point_dist_sq < closest_point_dist_sq)
+        {
+            closest_point_dist_sq = curr_closest_point_dist_sq;
+            closest_point         = curr_closest_point;
+        }
+    }
+    return closest_point;
+}
+
+Point closestPoint(const Point &p, const Polygon &polygon)
+{
+    return closestPoint(polygon, p);
+}
+
+Point closestPoint(const Circle &circle, const Point &p)
+{
+    Vector v = p - circle.origin();
+    return circle.origin() + v.normalize(circle.radius());
+}
+
+Point closestPoint(const Point &p, const Circle &circle)
+{
+    return closestPoint(circle, p);
+}
+
+Point closestPoint(const Stadium &stadium, const Point &p)
+{
+    Point closest_point = closestPoint(stadium.segment(), p);
+    closest_point += (p - closest_point).normalize() * stadium.radius();
+    return closest_point;
+}
+
+Point closestPoint(const Point &p, const Stadium &stadium)
+{
+    return closestPoint(stadium, p);
+}

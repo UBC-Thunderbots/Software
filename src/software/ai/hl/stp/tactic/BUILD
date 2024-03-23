@@ -16,6 +16,7 @@ cc_library(
     deps = [
         ":tactic",
         "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic",
+        "//software/ai/hl/stp/tactic/assigned_skill:named_skill_tactics",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
@@ -23,20 +24,11 @@ cc_library(
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/offense_support_tactics/receiver:receiver_tactic",
         "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
-        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
-    ],
-)
-
-cc_library(
-    name = "offense_support_tactic",
-    hdrs = ["offense_support_tactic.h"],
-    deps = [
-        ":tactic",
-        "//software/util/make_enum",
     ],
 )
 
@@ -48,11 +40,12 @@ cc_library(
         "tactic_visitor.h",
     ],
     deps = [
-        ":stop_primitive",
         ":tactic_fsm",
         ":transition_conditions",
+        "//software/ai/hl/stp/primitive:stop_primitive",
         "//software/util/typename",
         "//software/world",
+        "@tracy",
     ],
 )
 
@@ -95,53 +88,5 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/hl/stp/strategy",
-    ],
-)
-
-cc_library(
-    name = "primitive",
-    hdrs = [
-        "primitive.h",
-    ],
-    deps = [
-        "//proto:tbots_cc_proto",
-        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
-    ],
-)
-
-cc_library(
-    name = "move_primitive",
-    srcs = ["move_primitive.cpp"],
-    hdrs = [
-        "move_primitive.h",
-    ],
-    deps = [
-        ":primitive",
-        "//proto/message_translation:tbots_protobuf",
-        "//proto/primitive:primitive_msg_factory",
-        "//software/ai/navigator/trajectory:trajectory_planner",
-    ],
-)
-
-cc_library(
-    name = "stop_primitive",
-    srcs = ["stop_primitive.cpp"],
-    hdrs = [
-        "stop_primitive.h",
-    ],
-    deps = [
-        ":primitive",
-        "//proto/message_translation:tbots_protobuf",
-    ],
-)
-
-cc_test(
-    name = "primitive_test",
-    srcs = ["primitive_test.cpp"],
-    deps = [
-        ":move_primitive",
-        ":stop_primitive",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
     ],
 )

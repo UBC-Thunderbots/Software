@@ -1,6 +1,12 @@
 #pragma once
 
+#include "proto/primitive/primitive_msg_factory.h"
+#include "proto/primitive/primitive_types.h"
+#include "proto/tbots_software_msgs.pb.h"
+#include "software/ai/hl/stp/primitive/primitive.h"
+#include "software/ai/hl/stp/primitive/stop_primitive.h"
 #include "software/ai/hl/stp/strategy/strategy.h"
+#include "software/util/sml_fsm/sml_fsm.h"
 
 using SetPrimitiveCallback = std::function<void(std::shared_ptr<Primitive>)>;
 
@@ -9,7 +15,10 @@ struct SkillUpdate
     SkillUpdate(const Robot &robot, const WorldPtr &world_ptr,
                 std::shared_ptr<Strategy> strategy,
                 const SetPrimitiveCallback &set_primitive_fun)
-        : robot(robot), world_ptr(world_ptr), strategy(strategy), set_primitive(set_primitive_fun)
+        : robot(robot),
+          world_ptr(world_ptr),
+          strategy(strategy),
+          set_primitive(set_primitive_fun)
     {
     }
     Robot robot;
@@ -36,3 +45,6 @@ struct SkillUpdate
         ControlParams control_params;                                                    \
         SkillUpdate common;                                                              \
     };
+
+#define SET_STOP_PRIMITIVE_ACTION                                                        \
+    [this](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>()); }

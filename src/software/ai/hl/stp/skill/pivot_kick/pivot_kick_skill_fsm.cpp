@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h"
 
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/hl/stp/primitive/move_primitive.h"
 
 void PivotKickSkillFSM::getPossessionAndPivot(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)

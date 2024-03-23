@@ -19,7 +19,7 @@ class Thunderloop
 {
    public:
     /**
-     * Thunderloop is a giant loop that runs at CONTROL_LOOP_HZ.
+     * Thunderloop is a giant loop that runs at THUNDERLOOP_HZ.
      * It receives Primitives and World from AI, executes the primitives with
      * the most recent vison data, and polls the services to interact with the hardware
      * peripherals.
