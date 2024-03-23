@@ -22,6 +22,7 @@ cc_library(
 cc_library(
     name = "offensive_plays",
     hdrs = ["offensive_plays.h"],
+    srcs = ["offensive_plays.cpp"],
     deps = [
         ":dynamic_play",
         "//software/ai/evaluation/scoring/support_tactics/feasibility_scorers:offensive_enemy_third_feasibility_scorer",

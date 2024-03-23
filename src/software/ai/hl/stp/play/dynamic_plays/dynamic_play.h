@@ -54,7 +54,7 @@ class DynamicPlay : public Play
      */
     void updateSupportTactics(unsigned int num_supporters);
 
-    std::vector<std::shared_ptr<OffenseSupportTactic>> support_tactics_;
+    std::vector<std::shared_ptr<Tactic>> support_tactics_;
     std::vector<std::shared_ptr<SupportTacticCandidate>> support_tactic_candidates_;
 
     std::unique_ptr<FeasibilityScorer> support_tactic_feasibility_scorer_;

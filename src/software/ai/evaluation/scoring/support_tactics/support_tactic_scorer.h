@@ -35,10 +35,10 @@ class SupportTacticScorer
      * @param candidate the SupportTacticCandidate to visits
      */
     void update(const TypedSupportTacticCandidate<OffenseSupportTactic> &candidate) = delete;
-    virtual void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate);
+    virtual void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) {}
 
     /**
      * Reset the state of the scorer
      */
-    virtual void reset();
+    virtual void reset() {}
 };

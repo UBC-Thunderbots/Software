@@ -16,18 +16,24 @@ void OffensivePlay::evaluate(double score)
     attacker_tactic_->evaluate(score);
 }
 
-void OffensivePlay::updateTactics(const PlayUpdate &play_update)
+void OffensivePlay::updateTactics(const PlayUpdate& play_update)
 {
-    PossessionStrategy possession_strategy =
+    TbotsProto::PossessionStrategy possession_strategy =
         (*strategy)->getPossessionStrategy(play_update.num_tactics);
 
-    updateSupportTactics(possession_strategy.supporters);
+    updateSupportTactics(possession_strategy.supporters());
 
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
     defense_play_->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     defense_play_->updateTactics(PlayUpdate(
-        play_update.world_ptr, possession_strategy.defenders,
-        [&](PriorityTacticVector new_tactics) { defense_tactics = new_tactics },
+        play_update.world_ptr, possession_strategy.defenders(),
+        [&](PriorityTacticVector new_tactics) {
+            for (auto& tactic_vec : new_tactics)
+            {
+                defense_tactics.insert(defense_tactics.end(), tactic_vec.begin(),
+                                       tactic_vec.end());
+            }
+        },
         play_update.inter_play_communication,
         play_update.set_inter_play_communication_fun));
 
