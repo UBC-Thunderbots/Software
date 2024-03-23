@@ -31,8 +31,9 @@
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/vector.h"
-#include "software/networking/threaded_proto_udp_listener.hpp"
-#include "software/networking/threaded_proto_udp_sender.hpp"
+#include "software/networking/radio/threaded_proto_radio_sender.hpp"
+#include "software/networking/udp/threaded_proto_udp_listener.hpp"
+#include "software/networking/udp/threaded_proto_udp_sender.hpp"
 #include "software/uart/boost_uart_communication.h"
 #include "software/world/field.h"
 #include "software/world/robot.h"
@@ -40,26 +41,51 @@
 
 namespace py = pybind11;
 
+// Python doesn't have templating, but we would like to re-use the networking
+// libraries that we have in C++, in python.
+//
+// Adapted from: https://stackoverflow.com/a/47749076
+
 /**
- * Python doesn't have templating, but we would like to re-use the networking
- * libraries that we have in C++, in python.
- *
- * Adapted from: https://stackoverflow.com/a/47749076
+ * Declares a Python binding for a ThreadedProtoUdpSender of type T
  *
  * @param m The module to define the sender/receiver in
- * @param The name to insert into the binded class name (ex. {name}ProtoSender)
+ * @param The name to insert into the binded class name (ex. {name}ProtoUdpSender)
  */
 template <typename T>
 void declareThreadedProtoUdpSender(py::module& m, std::string name)
 {
     using Class              = ThreadedProtoUdpSender<T>;
-    std::string pyclass_name = name + "ProtoSender";
+    std::string pyclass_name = name + "ProtoUdpSender";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
         .def(py::init<std::string, int, bool>())
         .def("send_proto", &Class::sendProto);
 }
 
+/**
+ * Declares a Python binding for a ThreadedProtoRadioSender of type T
+ *
+ * @param m The module to define the sender/receiver in
+ * @param The name to insert into the binded class name (ex. {name}ProtoRadioSender)
+ */
+template <typename T>
+void declareThreadedProtoRadioSender(py::module& m, std::string name)
+{
+    using Class              = ThreadedProtoRadioSender<T>;
+    std::string pyclass_name = name + "ProtoRadioSender";
+    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
+                                              py::buffer_protocol(), py::dynamic_attr())
+        .def(py::init<>())
+        .def("send_proto", &Class::sendProto);
+}
+
+/**
+ * Declares a Python binding for a ThreadedProtoUdpListener of type T
+ *
+ * @param m The module to define the sender/receiver in
+ * @param The name to insert into the binded class name (ex. {name}ProtoUdpListener)
+ */
 template <typename T>
 void declareThreadedProtoUdpListener(py::module& m, std::string name)
 {
@@ -335,9 +361,8 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<TbotsProto::RobotCrash>(m, "RobotCrash");
 
     // Senders
-    declareThreadedProtoUdpSender<TbotsProto::World>(m, "World");
-    declareThreadedProtoUdpSender<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
+    declareThreadedProtoRadioSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
 
     // Estop Reader
     py::class_<ThreadedEstopReader, std::unique_ptr<ThreadedEstopReader>>(

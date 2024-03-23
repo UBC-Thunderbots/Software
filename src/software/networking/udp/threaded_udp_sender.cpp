@@ -1,4 +1,4 @@
-#include "software/networking/threaded_udp_sender.h"
+#include "software/networking/udp/threaded_udp_sender.h"
 
 ThreadedUdpSender::ThreadedUdpSender(const std::string& ip_address,
                                      const unsigned short port, bool multicast)

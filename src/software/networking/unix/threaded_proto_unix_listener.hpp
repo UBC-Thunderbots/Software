@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/networking/proto_unix_listener.hpp"
+#include "software/networking/unix/proto_unix_listener.hpp"
 
 /**
  * A threaded listener that receives serialized ReceiveProtoT protos over the network

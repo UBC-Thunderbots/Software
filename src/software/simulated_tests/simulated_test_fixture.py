@@ -11,7 +11,7 @@ from proto.import_all_protos import *
 
 from pyqtgraph.Qt import QtCore, QtGui
 
-from software.networking.threaded_unix_sender import ThreadedUnixSender
+from software.networking.unix.threaded_unix_sender import ThreadedUnixSender
 from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 from software.simulated_tests import validation

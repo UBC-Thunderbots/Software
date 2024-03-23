@@ -24,7 +24,7 @@ from software.thunderscope.gl.graphics.gl_robot import GLRobot
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.thunderscope.gl.graphics.gl_goal import GLGoal
 
-from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 

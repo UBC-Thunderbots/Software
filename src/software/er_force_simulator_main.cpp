@@ -7,8 +7,8 @@
 #include "proto/world.pb.h"
 #include "software/constants.h"
 #include "software/logger/logger.h"
-#include "software/networking/threaded_proto_unix_listener.hpp"
-#include "software/networking/threaded_proto_unix_sender.hpp"
+#include "software/networking/unix/threaded_proto_unix_listener.hpp"
+#include "software/networking/unix/threaded_proto_unix_sender.hpp"
 #include "software/simulation/er_force_simulator.h"
 
 int main(int argc, char **argv)

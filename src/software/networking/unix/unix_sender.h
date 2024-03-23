@@ -15,6 +15,7 @@ class UnixSender
      * @param unix_socket_path The path to the unix socket
      */
     UnixSender(boost::asio::io_service& io_service, const std::string& unix_socket_path);
+
     ~UnixSender();
 
     /**

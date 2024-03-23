@@ -5,7 +5,7 @@
 
 #include "google/protobuf/any.pb.h"
 #include "software/logger/custom_logging_levels.h"
-#include "software/networking/threaded_unix_sender.h"
+#include "software/networking/unix/threaded_unix_sender.h"
 
 static const std::string TYPE_DELIMITER = "!!!";
 
