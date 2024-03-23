@@ -7,7 +7,6 @@ from software.thunderscope.thunderscope_types import (
     TScopeTab,
     TScopeWidget,
     TScopeQTTab,
-    TScopeWebTab,
     WidgetStretchData,
 )
 import pyqtgraph
