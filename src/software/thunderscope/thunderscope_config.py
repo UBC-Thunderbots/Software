@@ -211,12 +211,6 @@ def configure_base_fullsystem(
             position="bottom",
         ),
         TScopeWidget(
-            name="Play Info",
-            widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
-            anchor="Referee Info",
-            position="above",
-        ),
-        TScopeWidget(
             name="Performance",
             widget=setup_performance_plot(
                 **{"proto_unix_io": full_system_proto_unix_io}
@@ -226,8 +220,8 @@ def configure_base_fullsystem(
             # otherwise, it opens in a new window
             # the setup functions returns the widget.win and the refresh function separately
             in_window=True,
-            anchor="Play Info",
-            position="right",
+            anchor="Referee Info",
+            position="below",
         ),
         TScopeWidget(
             name="FPS Widget",
@@ -238,8 +232,14 @@ def configure_base_fullsystem(
                 }
             ),
             anchor="Performance",
-            position="above",
+            position="below",
         ),
+       TScopeWidget(
+           name="Play Info",
+           widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
+           anchor="Referee Info",
+           position="above",
+       ),
     ] + extra_widgets
 
 
