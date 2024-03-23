@@ -78,5 +78,30 @@ void PassDefenderFSM::interceptBall(const Update& event)
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
+        return;
     }
+    // something is wrong when this happens,
+    // in this special case, the robot should move away from the ball
+    // as to not violate the rule about covering more than 80% of the ball
+
+    // to avoid dividing by 0
+    Angle face_ball_orientation;
+    if ((ball.position() - robot_position).length() == 0)
+    {
+        face_ball_orientation = Angle().zero();
+    }
+    else
+    {
+        face_ball_orientation = (ball.position() - robot_position).orientation();
+    }
+
+    // backup by the length of the ball
+    Point backup_position =
+        robot_position + ball.velocity().normalize(ROBOT_MAX_RADIUS_METERS);
+    event.common.set_primitive(createMovePrimitive(
+        CREATE_MOTION_CONTROL(backup_position), face_ball_orientation, 0, false,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants(), std::optional<double>()));
 }
