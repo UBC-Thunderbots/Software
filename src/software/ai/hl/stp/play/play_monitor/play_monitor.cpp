@@ -20,7 +20,7 @@ void PlayMonitor::updateWorld(const World& newWorld)
     world = newWorld;
 }
 
-double PlayMonitor::calculateCurrentPlayScore(const World& finalWorld)
+double PlayMonitor::calculateCurrentPlayScore(const World& finalWorld) const
 {
     // Friendlies scored the ball
     if (contains(finalWorld.field().enemyGoal(), finalWorld.ball().position()))

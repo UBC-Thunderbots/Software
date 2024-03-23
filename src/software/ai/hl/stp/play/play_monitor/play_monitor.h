@@ -22,7 +22,7 @@ class PlayMonitor
     double calculateIntentBallScore();
     double calculateIntentActionScore();
 
-    double calculateCurrentPlayScore(const World& finalWorld);
+    double calculateCurrentPlayScore(const World& finalWorld) const;
 
     World world;
 };
