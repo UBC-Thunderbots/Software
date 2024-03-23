@@ -12,10 +12,7 @@ class AttackerTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    inline bool done() const override
-    {
-        return false;
-    }
+    bool done() const override;
 
     std::string getFSMState() const override;
 

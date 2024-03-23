@@ -8,6 +8,7 @@
 #include "software/ai/hl/stp/tactic/offense_support_tactics/offense_support_type.h"
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_evaluation.hpp"
+#include "software/ai/passing/pass_with_rating.h"
 #include "software/geom/pose.h"
 #include "software/world/field.h"
 
@@ -40,6 +41,7 @@ class StrategyImpl
      * @returns best pass for the robot
      */
     PassWithRating getBestUncommittedPass();
+    Pass getBestCommittedPass();
 
     std::optional<Shot> getBestShot(const Robot& robot);
 
@@ -70,12 +72,13 @@ class StrategyImpl
     // World
     Field field_;
     WorldPtr world_ptr_;
+    PitchDivision pitch_division_;
 
     // Passing
     std::unique_ptr<PassStrategy> pass_strategy_;
     std::shared_ptr<PassEvaluation<ZoneEnum>> cached_pass_eval_;
     Timestamp cached_pass_time_;
-    std::vector<ZoneEnum> committed_pass_zones_;
+    std::vector<Pass> committed_passes_;
 
     std::vector<OffenseSupportType> committed_support_types_;
     std::unordered_map<RobotId, Pose> robot_to_best_dribble_location_;
@@ -84,7 +87,8 @@ class StrategyImpl
 
 template <class PitchDivision, class ZoneEnum>
 StrategyImpl<PitchDivision, ZoneEnum>::StrategyImpl(const TbotsProto::AiConfig& ai_config, const Field& field)
-    : field_(field)
+    : field_(field),
+      pitch_division_(field)
 {
     LOG(DEBUG) << "StrategyImpl boot up!";
     updateAiConfig(ai_config);
@@ -154,7 +158,11 @@ PassWithRating StrategyImpl<PitchDivision, ZoneEnum>::getBestUncommittedPass()
 
     for (const auto& zone : cached_pass_eval_->rankZonesForReceiving(world_ptr_, world_ptr_->ball().position()))
     {
-        if (std::find(committed_pass_zones_.begin(), committed_pass_zones_.end(), zone) == committed_pass_zones_.end())
+        if (std::find_if(committed_passes_.begin(), committed_passes_.end(),
+                    [&](const Pass& p)
+                    {
+                        return pitch_division_.getZoneId(p.receiverPoint()) == zone;
+                    }) == committed_passes_.end())
         {
             return cached_pass_eval_->getBestPassInZones({zone});
         }
@@ -165,6 +173,20 @@ PassWithRating StrategyImpl<PitchDivision, ZoneEnum>::getBestUncommittedPass()
     Pass default_pass = Pass(world_ptr_->ball().position(), world_ptr_->field().friendlyGoalCenter(),
                              ai_config_.passing_config().min_pass_speed_m_per_s());
     return PassWithRating{pass: default_pass, rating: 0};
+}
+
+template <class PitchDivision, class ZoneEnum>
+Pass StrategyImpl<PitchDivision, ZoneEnum>::getBestCommittedPass()
+{
+    if (committed_passes_.empty())
+    {
+        Pass pass = getBestUncommittedPass().pass;
+        committed_passes_.push_back(pass);
+
+        return pass;
+    }
+
+    return committed_passes_[0];
 }
 
 template <class PitchDivision, class ZoneEnum>
@@ -192,7 +214,7 @@ void StrategyImpl<PitchDivision, ZoneEnum>::reset()
 {
     robot_to_best_dribble_location_ = {};
     robot_to_best_shot_             = {};
-    committed_pass_zones_           = {};
+    committed_passes_           = {};
     committed_support_types_        = {};
 }
 
@@ -261,5 +283,5 @@ void StrategyImpl<PitchDivision, ZoneEnum>::commit(OffenseSupportType offense_su
 template <class PitchDivision, class ZoneEnum>
 void StrategyImpl<PitchDivision, ZoneEnum>::commit(const Pass& pass)
 {
-    committed_pass_zones_.push_back(EighteenZonePitchDivision().getZoneId(pass.receiverPoint()));
+    committed_passes_.push_back(pass);
 }

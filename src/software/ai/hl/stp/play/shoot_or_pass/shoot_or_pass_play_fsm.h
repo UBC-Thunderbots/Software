@@ -139,6 +139,7 @@ struct ShootOrPassPlayFSM
 
    private:
     TbotsProto::AiConfig ai_config;
+    std::shared_ptr<Strategy> strategy;
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;

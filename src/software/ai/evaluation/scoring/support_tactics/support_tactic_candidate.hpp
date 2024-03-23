@@ -40,7 +40,7 @@ class SupportTacticCandidate : public Candidate
      * @return a shared pointer to a newly constructed instance of the
      * type of support tactic this candidate represents
      */
-    virtual std::shared_ptr<OffenseSupportTactic> createSupportTactic() = 0;
+    virtual std::shared_ptr<OffenseSupportTactic> createSupportTactic(std::shared_ptr<Strategy> strategy) = 0;
 
    protected:
     explicit SupportTacticCandidate() = default;
@@ -71,9 +71,9 @@ class TypedSupportTacticCandidate : public SupportTacticCandidate
         scorer.update(*this);
     }
 
-    std::shared_ptr<OffenseSupportTactic> createSupportTactic() override
+    std::shared_ptr<OffenseSupportTactic> createSupportTactic(std::shared_ptr<Strategy> strategy) override
     {
         // TODO(arun): use generic factory here
-        return std::make_shared<TSupportTactic>();
+        return std::make_shared<TSupportTactic>(strategy);
     }
 };

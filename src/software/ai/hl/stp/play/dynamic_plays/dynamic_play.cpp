@@ -29,13 +29,13 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
 {
     PriorityTacticVector tactics_to_return;
 
-    PossessionStrategy possession_strategy =
+    TbotsProto::PossessionStrategy possession_strategy =
         (*strategy)->getPossessionStrategy(play_update.num_tactics);
 
     // Defense
     defense_play->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     defense_play->updateTactics(PlayUpdate(
-        play_update.world_ptr, possession_strategy.num_defenders,
+        play_update.world_ptr, possession_strategy.defenders(),
         [&tactics_to_return](PriorityTacticVector new_tactics) {
             for (const auto &tactic_vector : new_tactics)
             {
@@ -45,11 +45,11 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
         play_update.inter_play_communication,
         play_update.set_inter_play_communication_fun));
 
-    if (attacker_tactic_->done())
+    if (attacker_tactic_->done() || support_tactics_.size() != static_cast<std::size_t>(possession_strategy.supporters()))
     {
         support_tactics_.clear();
 
-        unsigned int num_support_tactics = possession_strategy.num_support;
+        unsigned int num_support_tactics = possession_strategy.supporters();
         while (num_support_tactics > support_tactics_.size())
         {
             for (auto &candidate : support_tactic_candidates_)
@@ -64,7 +64,7 @@ void DynamicPlay::updateTactics(const PlayUpdate &play_update)
                                                    support_tactic_candidates_.end());
 
             std::shared_ptr<OffenseSupportTactic> support_tactic =
-                (*best_candidate)->createSupportTactic();
+                (*best_candidate)->createSupportTactic(strategy);
             support_tactics_.push_back(support_tactic);
 
             (*best_candidate)->updateScorer(*support_tactic_duplication_scorer_);

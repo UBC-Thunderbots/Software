@@ -39,7 +39,7 @@ void FeasibilityVisitor::visit(const PassSkill& skill)
         return;
     }
 
-    PassWithRating best_pass = (*strategy_)->getBestPass();
+    PassWithRating best_pass = (*strategy_)->getBestUncommittedPass();
 
     double min_score = (*strategy_)->getAiConfig().shoot_or_pass_play_config().abs_min_pass_score();
 
