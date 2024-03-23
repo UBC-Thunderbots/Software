@@ -61,11 +61,17 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard)
             world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
             [](InterPlayCommunication comm) {})));
 
-    // 2 process events needed so that fsm finds a pass between the 2 robots on the field.
+    // 3 process events needed so that fsm finds a pass between the 2 robots on the field.
     fsm.process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
         PlayUpdate(
-            world, 3, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
+            [](InterPlayCommunication comm) {})));
+
+    fsm.process_event(ShootOrPassPlayFSM::Update(
+        ShootOrPassPlayFSM::ControlParams{},
+        PlayUpdate(
+            world, 2, [](PriorityTacticVector new_tactics) {}, InterPlayCommunication{},
             [](InterPlayCommunication comm) {})));
 
     fsm.process_event(ShootOrPassPlayFSM::Update(

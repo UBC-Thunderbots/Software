@@ -32,7 +32,7 @@ struct ShootOrPassPlayFSM
      *
      * @param ai_config the play config for this play FSM
      */
-    explicit ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config);
 
     /**
      * Updates the offensive positioning tactics
@@ -42,9 +42,9 @@ struct ShootOrPassPlayFSM
      * @param pass_eval The pass evaluation to help find best passes
      * @param num_tactics the number of tactics to return
      */
-    void updateOffensivePositioningTactics(std::vector<EighteenZoneId> ranked_zones,
-                                           PassEvaluation<EighteenZoneId> pass_eval,
-                                           unsigned int num_tactics);
+    void updateOffensivePositioningTactics(
+        const std::vector<EighteenZoneId>& ranked_zones,
+        const PassEvaluation<EighteenZoneId>& pass_eval, unsigned int num_tactics);
 
     /**
      * Action that looks for a pass
