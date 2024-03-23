@@ -5,8 +5,11 @@
 #include <Tracy.hpp>
 
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/hl/stp/play/tactic_assignment.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
+#include "software/geom/angle.h"
 #include "software/logger/logger.h"
 
 
@@ -115,6 +118,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
     std::optional<Robot> goalie_robot = world_ptr->friendlyTeam().goalie();
     std::vector<Robot> robots         = world_ptr->friendlyTeam().getAllRobots();
+    std::vector<Robot> injured_robots = world_ptr->friendlyTeam().getInjuredRobots();
 
     if (requires_goalie)
     {
@@ -155,6 +159,40 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         }
     }
 
+    /* substitute injured robots when the game is in play */
+    if (injured_robots.size() > 0)
+    {
+        unsigned int num_injured = (unsigned int)injured_robots.size();
+        num_tactics -= num_injured;
+
+        // substitution tactic is just a move tactic to a decided location
+        std::shared_ptr<MoveTactic> auto_sub_tactic = std::make_shared<MoveTactic>();
+
+        // move to middle of court and to positive y boundary and stop
+        auto_sub_tactic->updateControlParams(
+            Point(0, world_ptr->field().totalYLength() / 2), Angle::zero(), 0);
+
+        for (auto robot : injured_robots)
+        {
+            // assign robot to auto_sub tactic
+            tactic_robot_id_assignment.emplace(auto_sub_tactic, robot.id());
+
+            // remove substitution robot from robot list
+            robots.erase(std::remove(robots.begin(), robots.end(), robot), robots.end());
+
+            auto motion_constraints =
+                buildMotionConstraintSet(world_ptr->gameState(), *auto_sub_tactic);
+            auto primitives = auto_sub_tactic->get(world_ptr);
+            CHECK(primitives.contains(robot.id()))
+                << "Couldn't find a primitive for robot id " << robot.id();
+            auto primitive_proto = primitives[robot.id()]->generatePrimitiveProtoMessage(
+                world_ptr, motion_constraints, obstacle_factory);
+            primitives_to_run->mutable_robot_primitives()->insert(
+                google::protobuf::MapPair(robot.id(), *primitive_proto));
+            auto_sub_tactic->setLastExecutionRobot(robot.id());
+        }
+    }
+
     // This functions optimizes the assignment of robots to tactics by minimizing
     // the total cost of assignment using the Hungarian algorithm
     // (also known as the Munkres algorithm)
@@ -189,7 +227,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
             auto [remaining_robots, new_primitives_to_assign,
                   current_tactic_robot_id_assignment] =
-                assignTactics(world_ptr, tactic_vector, robots);
+                assignTactics(world_ptr, tactic_vector, robots, obstacle_factory,
+                              obstacle_list, path_visualization);
+
 
             tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 
@@ -245,147 +285,14 @@ void Play::updateTactics(const PlayUpdate &play_update)
     play_update.set_tactics(getTactics(play_update.world_ptr));
 }
 
-std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
-           std::map<std::shared_ptr<const Tactic>, RobotId>>
-Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
-                    const std::vector<Robot> &robots_to_assign)
-{
-    std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
-    size_t num_tactics     = tactic_vector.size();
-    auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
-    auto remaining_robots  = robots_to_assign;
-
-
-    std::vector<std::map<RobotId, std::shared_ptr<Primitive>>> primitive_sets;
-
-    for (auto tactic : tactic_vector)
-    {
-        primitive_sets.emplace_back(tactic->get(world_ptr));
-        CHECK(primitive_sets.back().size() == world_ptr->friendlyTeam().numRobots())
-            << primitive_sets.back().size() << " primitives from "
-            << objectTypeName(*tactic)
-            << " is not equal to the number of robots, which is "
-            << world_ptr->friendlyTeam().numRobots();
-    }
-
-    size_t num_rows = robots_to_assign.size();
-    size_t num_cols = tactic_vector.size();
-
-    // The Matrix constructor will assert if the rows and columns of the matrix are
-    // not >= 1, so we perform that check first and skip over this tactic_vector if
-    // it is empty. This represents the cases where there are either no tactics or no
-    // robots
-    if (num_rows == 0 || num_cols == 0)
-    {
-        return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
-                          std::map<std::shared_ptr<const Tactic>, RobotId>>{
-            remaining_robots, std::move(primitives_to_run),
-            current_tactic_robot_id_assignment};
-    }
-
-    // The rows of the matrix are the "workers" (the robots) and the columns are the
-    // "jobs" (the Tactics).
-    Matrix<double> matrix(num_rows, num_cols);
-
-    // Initialize the matrix with the cost of assigning each Robot to each Tactic
-    for (size_t row = 0; row < num_rows; row++)
-    {
-        for (size_t col = 0; col < num_cols; col++)
-        {
-            Robot robot                    = robots_to_assign.at(row);
-            std::shared_ptr<Tactic> tactic = tactic_vector.at(col);
-            auto primitives                = primitive_sets.at(col);
-            CHECK(primitives.contains(robot.id()))
-                << "Couldn't find a primitive for robot id " << robot.id();
-            double robot_cost_for_tactic =
-                primitives.at(robot.id())->getEstimatedPrimitiveCost();
-
-            std::set<RobotCapability> required_capabilities =
-                tactic->robotCapabilityRequirements();
-            std::set<RobotCapability> robot_capabilities =
-                robot.getAvailableCapabilities();
-            std::set<RobotCapability> missing_capabilities;
-            std::set_difference(
-                required_capabilities.begin(), required_capabilities.end(),
-                robot_capabilities.begin(), robot_capabilities.end(),
-                std::inserter(missing_capabilities, missing_capabilities.begin()));
-
-            if (missing_capabilities.size() > 0)
-            {
-                // We arbitrarily increase the cost, so that robots with missing
-                // capabilities are not assigned
-                matrix(row, col) = robot_cost_for_tactic * 10.0 + 10.0;
-            }
-            else
-            {
-                // capability requirements are satisfied, use real cost
-                matrix(row, col) = robot_cost_for_tactic;
-            }
-        }
-    }
-
-    // Apply the Munkres/Hungarian algorithm to the matrix.
-    Munkres<double> m;
-    m.solve(matrix);
-
-    // The Munkres matrix gets solved such that there will be exactly one 0 in every
-    // row and exactly one 0 in every column. All other values will be -1. The 0's
-    // indicate the "workers" and "jobs" (robots and tactics for us) that are most
-    // optimally paired together
-    //
-    // Example matrices:
-    //        -1, 0,-1,         and            0,-1,
-    //         0,-1,-1,                       -1, 0,
-    //        -1,-1, 0,
-    for (size_t row = 0; row < num_rows; row++)
-    {
-        for (size_t col = 0; col < num_tactics; col++)
-        {
-            auto val = matrix(row, col);
-            if (val == 0)
-            {
-                RobotId robot_id = robots_to_assign.at(row).id();
-                current_tactic_robot_id_assignment.emplace(tactic_vector.at(col),
-                                                           robot_id);
-                tactic_vector.at(col)->setLastExecutionRobot(robot_id);
-
-                auto primitives = primitive_sets.at(col);
-                CHECK(primitives.contains(robot_id))
-                    << "Couldn't find a primitive for robot id " << robot_id;
-
-                // Create the list of obstacles
-                auto motion_constraints = buildMotionConstraintSet(
-                    world_ptr->gameState(), *tactic_vector.at(col));
-
-                // Only generate primitive proto message for the final primitive to robot
-                // assignment
-                auto primitive_proto =
-                    primitives[robot_id]->generatePrimitiveProtoMessage(
-                        world_ptr, motion_constraints, obstacle_factory);
-                primitives_to_run->mutable_robot_primitives()->insert(
-                    {robot_id, *primitive_proto});
-                remaining_robots.erase(
-                    std::remove_if(remaining_robots.begin(), remaining_robots.end(),
-                                   [robots_to_assign, row](const Robot &robot) {
-                                       return robot.id() == robots_to_assign.at(row).id();
-                                   }),
-                    remaining_robots.end());
-
-                primitives[robot_id]->getVisualizationProtos(obstacle_list,
-                                                             path_visualization);
-                break;
-            }
-        }
-    }
-
-    return std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
-                      std::map<std::shared_ptr<const Tactic>, RobotId>>{
-        remaining_robots, std::move(primitives_to_run),
-        current_tactic_robot_id_assignment};
-}
-
 std::vector<std::string> Play::getState()
 {
     // by default just return the name of the play
     return {objectTypeName(*this)};
+}
+
+std::vector<Robot> Play::getInjuredRobots(const World &world)
+{
+    std::vector<Robot> injured_robots;
+    return injured_robots;
 }
