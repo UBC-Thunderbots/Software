@@ -421,7 +421,12 @@ void SimRobot::begin(SimBall *ball, double time)
 
         if (m_sslCommand.kick_angle() == 0)
         {
-            power = qBound(0.05f, m_sslCommand.kick_speed(), m_specs.shot_linear_max());
+            // we subtract the current speed of the ball from the intended kick speed
+            // this ensures the ball leaves the robot at exactly the speed we want
+            power = qBound(
+                0.05f,
+                m_sslCommand.kick_speed() - (ball->speed().length() / SIMULATOR_SCALE),
+                m_specs.shot_linear_max());
         }
         else
         {
@@ -448,7 +453,8 @@ void SimRobot::begin(SimBall *ball, double time)
         const float speedCompensation = getSpeedCompensation();
 
         ball->kick(t * btVector3(0, dirFloor * power + speedCompensation, dirUp * power) *
-                   (1 / time) * SIMULATOR_SCALE * BALL_MASS);
+                   (1.0f / static_cast<float>(time)) * SIMULATOR_SCALE *
+                   static_cast<float>(BALL_MASS_KG));
         // discharge
         m_isCharged = false;
         m_shootTime = 0.0;

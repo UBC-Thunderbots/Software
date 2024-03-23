@@ -22,7 +22,7 @@
  * @return A value in [0,1] representing the quality of the pass, with 1 being an
  *         ideal pass, and 0 being the worst pass possible
  */
-double ratePass(const WorldPtr& world_ptr, const Pass& pass, const Rectangle& zone,
+double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
                 TbotsProto::PassingConfig passing_config);
 
 /**
@@ -69,6 +69,17 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
 double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
                          const Duration& enemy_reaction_time,
                          double enemy_proximity_importance);
+
+/**
+ * Rates pass based on if the pass is backwards towards the friendly half,
+ * and if so, how long the pass is
+ * @param field The field from which we determine the friendly half
+ * @param pass The pass to rate
+ * @param passing_config The passing config used for tuning
+ * @return
+ */
+double ratePassBackwardsQuality(const Field& field, const Pass& pass,
+                                TbotsProto::PassingConfig& passing_config);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted
@@ -155,5 +166,5 @@ double calculateProximityRisk(const Point& point, const Team& enemy_team,
  * The sampled values are sent over protobuf to thunderscope as a CostVisualization
  * message. These values are eventually visualized in thunderscope in the cost_vis widget
  */
-void samplePassesForVisualization(const WorldPtr& world_ptr,
+void samplePassesForVisualization(const World& world,
                                   const TbotsProto::PassingConfig& passing_config);

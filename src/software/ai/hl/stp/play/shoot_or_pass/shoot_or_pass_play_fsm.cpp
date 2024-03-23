@@ -95,7 +95,7 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
-    auto pass_eval = pass_generator.generatePassEvaluation(event.common.world_ptr);
+    auto pass_eval = pass_generator.generatePassEvaluation(*event.common.world_ptr);
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
         event.common.world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
