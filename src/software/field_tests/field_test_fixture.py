@@ -374,7 +374,7 @@ def field_test_runner():
         estop_path=estop_path,
     ) as rc_friendly:
         with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
+            supress_logs=(not args.show_gamecontroller_logs)
         ) as gamecontroller:
             friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
             rc_friendly.setup_for_fullsystem()
