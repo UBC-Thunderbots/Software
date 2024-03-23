@@ -15,6 +15,7 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
+      best_pass_zone(pitch_division->getZoneId(Point())),
       time_since_commit_stage_start(Duration::fromSeconds(0)),
       min_pass_score_threshold(0)
 {
@@ -63,8 +64,6 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
         auto ranked_zones = getBestOffensivePositions(pass_eval, event);
 
-        pass_eval = pass_generator.generatePassEvaluation(event.common.world_ptr);
-
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
         receiver_tactic->updateControlParams(best_pass_and_score_so_far.pass);
@@ -101,17 +100,16 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 }
 
 std::vector<EighteenZoneId> ShootOrPassPlayFSM::getBestOffensivePositions(
-    PassEvaluation<EighteenZoneId> pass_eval, const Update& event)
+    const PassEvaluation<EighteenZoneId> pass_eval, const Update& event)
 {
     auto ranked_zones = pass_eval.rankZonesForReceiving(
         event.common.world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
-    ranked_zones.erase(
-        std::remove(ranked_zones.begin(), ranked_zones.end(), best_pass_zone),
-        ranked_zones.end());
-    ranked_zones.erase(std::remove(
-        ranked_zones.begin(), ranked_zones.end(),
-        pitch_division->getZoneId(best_pass_and_score_so_far.pass.passerPoint())));
 
+    auto pass_start_zone =
+        pitch_division->getZoneId(best_pass_and_score_so_far.pass.passerPoint());
+    std::erase_if(ranked_zones, [](EighteenZoneId zone) {
+        return zone == best_pass_zone || zone == pass_start_zone
+    });
     return ranked_zones;
 }
 

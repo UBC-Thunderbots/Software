@@ -62,14 +62,14 @@ struct ShootOrPassPlayFSM
 
     /**
      * Gets the best offensive position zones
-     * Which are the best receiving zones except the one currently taken by the receiver
-     * robot
+     * Which are the best receiving zones except the one currently taken by the passing
+     * and receiving robots
      *
      * @param pass_eval the PassEvaluation object from which we determine the best zones
      * @param event the event to get the current world information
      */
     std::vector<EighteenZoneId> getBestOffensivePositions(
-        PassEvaluation<EighteenZoneId> pass_eval, const Update& event);
+        const PassEvaluation<EighteenZoneId> pass_eval, const Update& event);
 
     /**
      * Action to take a pass

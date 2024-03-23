@@ -44,17 +44,15 @@ cc_test(
     ],
 )
 
-cc_test(
+py_test(
     name = "shoot_or_pass_play_test",
-    srcs = ["shoot_or_pass_play_test.cpp"],
+    srcs = [
+        "shoot_or_pass_play_test.py",
+    ],
+    tags = ["exclusive"],
     deps = [
-        ":shoot_or_pass_play",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
