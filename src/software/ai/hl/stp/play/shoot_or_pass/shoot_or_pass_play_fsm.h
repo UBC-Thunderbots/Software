@@ -150,6 +150,7 @@ struct ShootOrPassPlayFSM
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
+    std::shared_ptr<const EighteenZonePitchDivision> pitch_division;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
     PassGenerator<EighteenZoneId> pass_generator;
     Timestamp pass_optimization_start_time;

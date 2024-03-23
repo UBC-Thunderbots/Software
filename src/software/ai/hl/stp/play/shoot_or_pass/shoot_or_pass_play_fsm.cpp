@@ -7,11 +7,11 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
     : ai_config(ai_config),
       attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
+      pitch_division(std::make_shared<const EighteenZonePitchDivision>(
+          Field::createSSLDivisionBField())),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       pass_generator(
-          PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
-                                            Field::createSSLDivisionBField()),
-                                        ai_config.passing_config())),
+          PassGenerator<EighteenZoneId>(pitch_division, ai_config.passing_config())),
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
@@ -54,7 +54,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
     {
         ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
 
-        PassEvaluation<EighteenZoneId> pass_eval pass_eval =
+        PassEvaluation<EighteenZoneId> pass_eval =
             pass_generator.generatePassEvaluation(event.common.world_ptr);
 
         auto best_pass_score_and_zone = pass_eval.getBestPassAndZoneOnField();
@@ -63,13 +63,6 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
         auto ranked_zones = getBestOffensivePositions(pass_eval, event);
 
-        // Wait for a good pass by starting out only looking for "perfect" passes
-        // (with a score of 1) and decreasing this threshold over time
-        // This boolean indicates if we're ready to perform a pass
-        double abs_min_pass_score =
-            ai_config.shoot_or_pass_play_config().abs_min_pass_score();
-        double pass_score_ramp_down_duration =
-            ai_config.shoot_or_pass_play_config().pass_score_ramp_down_duration();
         pass_eval = pass_generator.generatePassEvaluation(event.common.world_ptr);
 
         // update the best pass in the attacker tactic
@@ -115,6 +108,10 @@ std::vector<EighteenZoneId> ShootOrPassPlayFSM::getBestOffensivePositions(
     ranked_zones.erase(
         std::remove(ranked_zones.begin(), ranked_zones.end(), best_pass_zone),
         ranked_zones.end());
+    ranked_zones.erase(std::remove(
+        ranked_zones.begin(), ranked_zones.end(),
+        pitch_division->getZoneId(best_pass_and_score_so_far.pass.passerPoint())));
+
     return ranked_zones;
 }
 
