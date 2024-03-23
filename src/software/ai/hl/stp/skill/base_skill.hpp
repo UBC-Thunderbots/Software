@@ -15,7 +15,7 @@ template <typename TSkillFSM, typename... TSkillSubFSMs>
 class BaseSkill : public Skill
 {
    public:
-    void updatePrimitive(const Robot& robot, const WorldPtr &world_ptr,
+    void updatePrimitive(const Robot& robot, const WorldPtr& world_ptr,
                          const SetPrimitiveCallback& set_primitive) override;
 
     void reset(const Robot& robot) override;
@@ -35,16 +35,17 @@ class BaseSkill : public Skill
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>
 void BaseSkill<TSkillFSM, TSkillSubFSMs...>::updatePrimitive(
-    const Robot& robot, const WorldPtr &world_ptr, const SetPrimitiveCallback& set_primitive)
+    const Robot& robot, const WorldPtr& world_ptr,
+    const SetPrimitiveCallback& set_primitive)
 {
     if (!fsm_map_.contains(robot.id()))
     {
         reset(robot);
     }
 
-    fsm_map_[robot.id()]->process_event(
-        typename TSkillFSM::Update(typename TSkillFSM::ControlParams{},
-                                   SkillUpdate(robot, world_ptr, strategy_, set_primitive)));
+    fsm_map_[robot.id()]->process_event(typename TSkillFSM::Update(
+        typename TSkillFSM::ControlParams{},
+        SkillUpdate(robot, world_ptr, strategy_, set_primitive)));
 }
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>

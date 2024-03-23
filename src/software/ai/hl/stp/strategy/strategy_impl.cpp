@@ -50,9 +50,9 @@ std::optional<Shot> StrategyImpl::getBestShot(const Robot& robot)
         return robot_to_best_shot_.at(robot.id());
     }
 
-    robot_to_best_shot_[robot.id()] =
-        calcBestShotOnGoal(world_ptr_->field(), world_ptr_->friendlyTeam(), world_ptr_->enemyTeam(),
-                           robot.position(), TeamType::ENEMY, {robot});
+    robot_to_best_shot_[robot.id()] = calcBestShotOnGoal(
+        world_ptr_->field(), world_ptr_->friendlyTeam(), world_ptr_->enemyTeam(),
+        robot.position(), TeamType::ENEMY, {robot});
     return robot_to_best_shot_[robot.id()];
 }
 
