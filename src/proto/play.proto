@@ -6,23 +6,24 @@ enum PlayName
 {
     reserved 2, 4, 6, 16;
 
-    UseAiSelection         = 1;
-    KickoffFriendlyPlay    = 3;
-    CornerKickPlay         = 5;
-    BallPlacementPlay      = 7;
-    HaltPlay               = 8;
-    EnemyFreekickPlay      = 9;
-    ExamplePlay            = 10;
-    DefensePlay            = 11;
-    EnemyBallPlacementPlay = 12;
-    PenaltyKickEnemyPlay   = 13;
-    PenaltyKickPlay        = 14;
-    FreeKickPlay           = 15;
-    StopPlay               = 17;
-    KickoffEnemyPlay       = 18;
-    AssignedTacticsPlay    = 19;
-    // TODO(arun): temporarily as an override to run in Thunderscope
-    DynamicPlay = 24;
+    UseAiSelection             = 1;
+    KickoffFriendlyPlay        = 3;
+    CornerKickPlay             = 5;
+    BallPlacementPlay          = 7;
+    HaltPlay                   = 8;
+    EnemyFreekickPlay          = 9;
+    ExamplePlay                = 10;
+    DefensePlay                = 11;
+    EnemyBallPlacementPlay     = 12;
+    PenaltyKickEnemyPlay       = 13;
+    PenaltyKickPlay            = 14;
+    FreeKickPlay               = 15;
+    StopPlay                   = 17;
+    KickoffEnemyPlay           = 18;
+    AssignedTacticsPlay        = 19;
+    OffensiveFriendlyThirdPlay = 20;
+    OffensiveMiddleThirdPlay   = 21;
+    OffensiveEnemyThirdPlay    = 22;
 }
 
 message Play
