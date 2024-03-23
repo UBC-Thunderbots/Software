@@ -50,8 +50,8 @@ class Pass
      * @param dest_speed_m_per_s the speed we want the pass to be received at
      * @param min_pass_speed_m_per_s the minimum speed a pass should be taken at
      * @param max_pass_speed_m_per_s the maximum speed a pass should be taken at
-     * @return the Pass constructed from the start and end points, received at the intended speed
-                clamped by the min and max pass speeds
+     * @return the Pass constructed from the start and end points, received at the
+     intended speed clamped by the min and max pass speeds
      */
     static Pass fromDestReceiveSpeed(const Point& ball_position,
                                      const Point& pass_destination,
