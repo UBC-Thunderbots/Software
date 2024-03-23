@@ -190,6 +190,14 @@ def configure_base_fullsystem(
             stretch=WidgetStretchData(x=3),
         ),
         TScopeWidget(
+            name="Error Log",
+            widget=setup_robot_error_log_view_widget(
+                **{"proto_unix_io": full_system_proto_unix_io}
+            ),
+            anchor="Parameters",
+            position="above",
+        ),
+        TScopeWidget(
             name="Logs",
             widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Parameters",
@@ -197,35 +205,10 @@ def configure_base_fullsystem(
             stretch=WidgetStretchData(x=3),
         ),
         TScopeWidget(
-            name="Error Log",
-            widget=setup_robot_error_log_view_widget(
-                **{"proto_unix_io": full_system_proto_unix_io}
-            ),
-            position="below",
-            anchor="Logs",
-        ),
-        TScopeWidget(
             name="Referee Info",
             widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Field",
             position="bottom",
-        ),
-        TScopeWidget(
-            name="FPS Widget",
-            widget=setup_fps_widget(
-                **{
-                    "bufferswap_counter": buffer_func_counter,
-                    "refresh_func_counter": refresh_func_counter,
-                }
-            ),
-            anchor="Referee Info",
-            position="above",
-        ),
-        TScopeWidget(
-            name="Play Info",
-            widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
-            anchor="Referee Info",
-            position="above",
         ),
         TScopeWidget(
             name="Performance",
@@ -237,8 +220,25 @@ def configure_base_fullsystem(
             # otherwise, it opens in a new window
             # the setup functions returns the widget.win and the refresh function separately
             in_window=True,
-            anchor="Play Info",
-            position="right",
+            anchor="Referee Info",
+            position="below",
+        ),
+        TScopeWidget(
+            name="FPS Widget",
+            widget=setup_fps_widget(
+                **{
+                    "bufferswap_counter": buffer_func_counter,
+                    "refresh_func_counter": refresh_func_counter,
+                }
+            ),
+            anchor="Performance",
+            position="below",
+        ),
+        TScopeWidget(
+            name="Play Info",
+            widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
+            anchor="Referee Info",
+            position="above",
         ),
     ] + extra_widgets
 
