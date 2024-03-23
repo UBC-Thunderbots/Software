@@ -28,10 +28,11 @@ message ThunderbotsConfig
 
 message AiConfig
 {
+    reserved 4;
+
     required AiControlConfig ai_control_config                              = 1;
     required DribbleSkillConfig dribble_skill_config                        = 2;
     required AttackerTacticConfig attacker_tactic_config                    = 3;
-    required CornerKickPlayConfig corner_kick_play_config                   = 4;
     required PassingConfig passing_config                                   = 5;
     required GoalieTacticConfig goalie_tactic_config                        = 6;
     required EnemyCapabilityConfig enemy_capability_config                  = 7;
@@ -72,14 +73,6 @@ message AttackerTacticConfig
         (bounds).max_double_value = 90.0
     ];
 }
-
-message CornerKickPlayConfig
-{
-    // The maximum time that we will wait before committing to a pass
-    required double max_time_commit_to_pass_seconds = 1
-        [default = 3.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-}
-
 
 message PassingConfig
 {

@@ -10,8 +10,6 @@
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 
-
-
 Play::Play(bool requires_goalie, std::shared_ptr<Strategy> strategy)
     : strategy(strategy),
       goalie_tactic(std::make_shared<GoalieTactic>(strategy)),

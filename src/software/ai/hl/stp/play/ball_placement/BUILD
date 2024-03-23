@@ -21,7 +21,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/logger",

@@ -5,9 +5,8 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 
 
@@ -31,9 +30,9 @@ struct BallPlacementPlayFSM
     /**
      * Creates a ball placement play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param strategy the Strategy
      */
-    explicit BallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit BallPlacementPlayFSM(std::shared_ptr<Strategy> strategy);
 
     /**
      * Action that has the placing robot kick the ball off the wall to give more space to

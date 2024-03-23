@@ -16,10 +16,12 @@ class BallPlacementPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
+
     void updateTactics(const PlayUpdate &play_update) override;
+
     std::vector<std::string> getState() override;
 
    private:
-    FSM<BallPlacementPlayFSM> fsm;
+    std::unique_ptr<FSM<BallPlacementPlayFSM>> fsm;
     BallPlacementPlayFSM::ControlParams control_params;
 };
