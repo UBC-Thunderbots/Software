@@ -160,14 +160,21 @@ std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::rankZonesForReceiving(
 {
     std::vector<ZoneEnum> cherry_pick_zones = pitch_division_->getAllZoneIds();
 
+    // We cache the ratings of each zone to avoid rateZone being called multiple times
+    // by the std::sort comparator function. This is very important as rateZone is
+    // an expensive function to call.
+    std::map<ZoneEnum, double> cached_ratings;
+    for (const auto& zone : cherry_pick_zones)
+    {
+        cached_ratings[zone] =
+            rateZone(world_ptr->field(), world_ptr->enemyTeam(),
+                     pitch_division_->getZone(zone), pass_position, passing_config_);
+    }
+
     std::sort(cherry_pick_zones.begin(), cherry_pick_zones.end(),
-              [this, &world_ptr, &pass_position](const ZoneEnum& z1, const ZoneEnum& z2) {
-                  return rateZone(world_ptr->field(), world_ptr->enemyTeam(),
-                                  pitch_division_->getZone(z1), pass_position,
-                                  passing_config_) >
-                         rateZone(world_ptr->field(), world_ptr->enemyTeam(),
-                                  pitch_division_->getZone(z2), pass_position,
-                                  passing_config_);
+              [&](const ZoneEnum& z1, const ZoneEnum& z2) {
+                  return cached_ratings[z1] > cached_ratings[z2];
               });
+
     return cherry_pick_zones;
 }
