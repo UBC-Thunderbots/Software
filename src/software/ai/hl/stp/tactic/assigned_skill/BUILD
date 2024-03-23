@@ -16,5 +16,5 @@ cc_library(
     deps = [
         ":assigned_skill_tactic",
         "//software/ai/hl/stp/skill/pivot_kick:pivot_kick_skill",
-    ]
+    ],
 )
