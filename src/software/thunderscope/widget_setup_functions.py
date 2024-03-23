@@ -39,7 +39,7 @@ from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
-    FullSystemConnectWidget,
+    DiagnosticsInputModeWidget,
 )
 from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
@@ -326,18 +326,6 @@ def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
     """
     chicker_widget = ChickerWidget(proto_unix_io)
     return chicker_widget
-
-
-def setup_diagnostics_input_widget() -> FullSystemConnectWidget:
-    """
-    Sets up the diagnostics input widget
-
-    :returns: the diagnostics input widget
-    """
-
-    diagnostics_input_widget = FullSystemConnectWidget()
-
-    return diagnostics_input_widget
 
 
 def setup_drive_and_dribbler_widget(

@@ -7,7 +7,7 @@ from proto.import_all_protos import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
-    FullSystemConnectWidget,
+    DiagnosticsInputModeWidget,
     ControlMode,
 )
 from software.thunderscope.robot_diagnostics.controller_diagnostics import (
@@ -32,7 +32,7 @@ class DiagnosticsWidget(QWidget):
         self.controller_handler = ControllerInputHandler(proto_unix_io)
         self.drive_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
         self.chicker_widget = ChickerWidget(proto_unix_io)
-        self.diagnostics_control_input_widget = FullSystemConnectWidget(
+        self.diagnostics_control_input_widget = DiagnosticsInputModeWidget(
             self.diagnostics_input_mode_signal
         )
 

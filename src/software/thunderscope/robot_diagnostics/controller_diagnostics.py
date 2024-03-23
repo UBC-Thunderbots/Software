@@ -43,7 +43,9 @@ class ControllerInputHandler(object):
             # TODO: read the device name and check that it's xbox controller
             if controller is not None:
                 self.controller = controller
+                break
 
+        # TODO: move to setup function and call it when xbox controller plugged dynamically
         if self.controller is not None:
             logging.info(
                 "Initializing controller "
@@ -108,7 +110,7 @@ class ControllerInputHandler(object):
             motor_control.dribbler_speed_rpm = (
                 self.constants.indefinite_dribbler_speed_rpm
             )
-
+        # TODO: verbose logging is the solution for logging instead of trace level
         logging.info("Sending motor control: " + motor_control)
 
         self.proto_unix_io.send_proto(MotorControl, motor_control)

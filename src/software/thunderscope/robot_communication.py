@@ -18,7 +18,7 @@ from software.thunderscope.constants import (
 )
 
 # TODO: should use MAX_ROBOT_IDS_PER_SIDE instead or DIV_A?!
-NUM_ROBOTS = DIV_B_NUM_ROBOTS
+NUM_ROBOTS = MAX_ROBOT_IDS_PER_SIDE
 
 
 class RobotCommunication(object):
@@ -77,7 +77,7 @@ class RobotCommunication(object):
         )
 
         # map of robot id to the individual control mode
-        self.robot_control_mode_dict: dict[int, IndividualRobotMode] = {
+        self.robot_control_mode_map: dict[int, IndividualRobotMode] = {
             robot_id: IndividualRobotMode.NONE
             for robot_id in list(range(0, NUM_ROBOTS))
         }
@@ -85,7 +85,7 @@ class RobotCommunication(object):
         # map of robot id to the number of times to send a estop.
         # each robot has it's own separate countdown
         # TODO come up with better name
-        self.robot_estop_send_countdown_latches: dict[int, int] = {
+        self.robot_stop_primitive_count_map: dict[int, int] = {
             rid: 0 for rid in range(NUM_ROBOTS)
         }
 
@@ -111,9 +111,9 @@ class RobotCommunication(object):
         """
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
         """
-        self.robot_control_mode_dict.update(
+        self.robot_control_mode_map.update(
             (robot_id, IndividualRobotMode.AI)
-            for robot_id in self.robot_control_mode_dict.keys()
+            for robot_id in self.robot_control_mode_map.keys()
         )
 
         self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
@@ -162,10 +162,12 @@ class RobotCommunication(object):
         :param mode: the mode of input for this robot's primitives
         :param robot_id: the id of the robot whose mode we're changing
         """
-        self.robot_control_mode_dict[robot_id] = mode
+        self.robot_control_mode_map[robot_id] = mode
         # TODO: add else case that sets to 0
         if mode == IndividualRobotMode.NONE:
-            self.robot_estop_send_countdown_latches[robot_id] = NUM_TIMES_SEND_STOP
+            self.robot_stop_primitive_count_map[robot_id] = NUM_TIMES_SEND_STOP
+        else:
+            self.robot_stop_primitive_count_map[robot_id] = 0
 
     def __send_estop_state(self) -> None:
         """
@@ -236,7 +238,7 @@ class RobotCommunication(object):
             # filter for diagnostics controlled robots
             diagnostics_robots = list(
                 robot_id
-                for robot_id, mode in self.robot_control_mode_dict.items()
+                for robot_id, mode in self.robot_control_mode_map.items()
                 if mode == IndividualRobotMode.MANUAL
             )
 
@@ -254,7 +256,7 @@ class RobotCommunication(object):
             for robot_id in fullsystem_primitives.keys():
                 if (
                     # TODO: cast shouldn't be needed...
-                    self.robot_control_mode_dict[int(robot_id)]
+                    self.robot_control_mode_map[int(robot_id)]
                     == IndividualRobotMode.AI
                 ):
                     robot_primitives[robot_id] = fullsystem_primitives[robot_id]
@@ -264,10 +266,10 @@ class RobotCommunication(object):
             for (
                 robot_id,
                 num_times_to_stop,
-            ) in self.robot_estop_send_countdown_latches.items():
+            ) in self.robot_stop_primitive_count_map.items():
                 if num_times_to_stop > 0:
                     robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
-                    self.robot_estop_send_countdown_latches[robot_id] = (
+                    self.robot_stop_primitive_count_map[robot_id] = (
                         num_times_to_stop - 1
                     )
 
@@ -291,7 +293,7 @@ class RobotCommunication(object):
                 self.should_send_stop = False
 
             # sleep if not running fullsystem
-            if IndividualRobotMode.AI not in self.robot_control_mode_dict.values():
+            if IndividualRobotMode.AI not in self.robot_control_mode_map.values():
                 time.sleep(ROBOT_COMMUNICATIONS_TIMEOUT_S)
 
     def __forward_to_proto_unix_io(self, type: Type[Message], data: Message) -> None:

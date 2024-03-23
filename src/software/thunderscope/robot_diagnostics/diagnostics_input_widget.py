@@ -15,7 +15,8 @@ class ControlMode(IntEnum):
 
 
 # this class name doesnt make sense
-class FullSystemConnectWidget(QWidget):
+#
+class DiagnosticsInputModeWidget(QWidget):
     """
     Class to allow the user to switch between Manual, XBox, and Fullsystem control through Thunderscope UI
 
@@ -24,6 +25,7 @@ class FullSystemConnectWidget(QWidget):
     """
 
     # Signal to indicate if manual controls should be disabled based on boolean parameter
+    # TODO: signal logic is flipped...
     toggle_controls_signal = pyqtSignal(bool)
 
     def __init__(self, toggle_controls_signal) -> None:
@@ -31,7 +33,7 @@ class FullSystemConnectWidget(QWidget):
         Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control
         :param toggle_controls_signal The signal to use for handling changes in input mode
         """
-        super(FullSystemConnectWidget, self).__init__()
+        super(DiagnosticsInputModeWidget, self).__init__()
         self.toggle_controls_signal = toggle_controls_signal
         vbox_layout = QVBoxLayout()
         self.connect_options_group = QButtonGroup()

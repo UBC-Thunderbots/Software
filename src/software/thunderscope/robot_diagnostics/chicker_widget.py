@@ -181,7 +181,7 @@ class ChickerWidget(QWidget):
                 power_value
             )
 
-        # sends proto
+        # update the proto to be sent
         self.power_control = power_control
 
         # clears the proto buffer for kick or chip commands

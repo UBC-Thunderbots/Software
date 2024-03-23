@@ -111,6 +111,10 @@ static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
 // The total number of possible robot ids between two teams
 static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
 
+// How many robots are allowed in each division
+static const unsigned DIV_A_NUM_ROBOTS = 11;
+static const unsigned DIV_B_NUM_ROBOTS = 6;
+
 // Battery Constants
 static const unsigned NUM_CELLS_IN_BATTERY    = 3;
 static const unsigned NUM_BATTERIES_IN_SERIES = 2;
@@ -129,9 +133,6 @@ static const double MAX_CAPACITOR_VOLTAGE = 250.0 + 50.0;  // +50v headroom
 
 static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND;
-// How many robots are allowed in each division
-static const unsigned DIV_A_NUM_ROBOTS = 11;
-static const unsigned DIV_B_NUM_ROBOTS = 6;
 
 // Kick Spd to Pulse Width Safety Constraint Constants
 
