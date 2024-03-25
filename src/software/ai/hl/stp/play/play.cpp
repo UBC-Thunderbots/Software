@@ -310,6 +310,16 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                 robot_capabilities.begin(), robot_capabilities.end(),
                 std::inserter(missing_capabilities, missing_capabilities.begin()));
 
+            // If the tactic was previously assigned to this robot, decrease
+            // the cost so that it will likely be assigned to this robot again.
+            // This makes assignments "sticky" and reduces assignment oscillations 
+            // between robots.
+            if (tactic_robot_id_assignment.contains(tactic) &&
+                tactic_robot_id_assignment.at(tactic) == robot.id())
+            {
+                robot_cost_for_tactic *= REPEAT_TACTIC_ASSIGNMENT_MULTIPLIER;
+            }
+
             if (missing_capabilities.size() > 0)
             {
                 // We arbitrarily increase the cost, so that robots with missing
