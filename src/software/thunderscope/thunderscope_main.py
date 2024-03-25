@@ -4,6 +4,8 @@ import logging
 import os
 import sys
 import threading
+
+from software.thunderscope.logging.thunderscope_logging_formatter import ThunderscopeLogger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
@@ -38,7 +40,13 @@ NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
 if __name__ == "__main__":
 
-    logging.getLogger().setLevel(logging.INFO)
+    # Setup logging
+    logger = logging.getLogger("My_app")
+    logger.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    ch.setFormatter(ThunderscopeLoggingFormatter())
+    logger.addHandler(ch)
 
     # Setup parser
     parser = argparse.ArgumentParser(
