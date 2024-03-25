@@ -1,5 +1,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 
+#include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/contains.h"
+
 std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &shot_origin,
                                        const std::vector<Robot> &robot_obstacles,
                                        TeamType goal, double radius)
@@ -86,7 +89,8 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
     Point shot_point = (top_point - bottom_point) / 2 + bottom_point;
 
     return std::make_optional(
-        Shot(shot_point, Angle::fromDegrees(biggest_angle_seg.getDeltaInDegrees())));
+        Shot(shot_origin, shot_point,
+             Angle::fromDegrees(biggest_angle_seg.getDeltaInDegrees())));
 }
 
 std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,
@@ -146,4 +150,45 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
             Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg()), shot_origin,
             obstacles, goal, radius);
     }
+}
+
+std::optional<Shot> findBestShotOnGoal(const Field &field, const Team &friendly_team,
+                                       const Team &enemy_team, const Point &starting_point,
+                                       TeamType goal,
+                                       const std::vector<Robot> &robots_to_ignore,
+                                       double radius)
+{
+    // Number of shot origin points to sample to the left and right of the starting point
+    static constexpr int NUM_SAMPLE_POINTS = 5;
+    // Spacing between sample points in metres
+    static constexpr double SAMPLE_POINTS_SPACING_M = 0.1;
+
+    std::optional<Shot> best_shot = std::nullopt;
+
+    // Vector representing the line on which to sample shot origin points
+    Vector sampling_vector = (field.enemyGoalCenter() - starting_point)
+            .perpendicular()
+            .normalize();
+
+    for (int step = -NUM_SAMPLE_POINTS; step <= NUM_SAMPLE_POINTS; ++step)
+    {
+        Point shot_origin = starting_point +
+                            (sampling_vector * step * SAMPLE_POINTS_SPACING_M);
+
+        if (!contains(field.fieldLines(), shot_origin) ||
+            field.pointInEnemyDefenseArea(shot_origin))
+        {
+            continue;
+        }
+
+        std::optional<Shot> shot = calcBestShotOnGoal(field, friendly_team, enemy_team,
+            shot_origin, goal, robots_to_ignore, radius);
+
+        if (shot && (!best_shot || shot->getOpenAngle() > best_shot->getOpenAngle()))
+        {
+            best_shot = shot;
+        }
+    }
+
+    return best_shot;
 }

@@ -28,7 +28,7 @@ message ThunderbotsConfig
 
 message AiConfig
 {
-    reserved 4;
+    reserved 4, 8;
 
     required AiControlConfig ai_control_config                              = 1;
     required DribbleSkillConfig dribble_skill_config                        = 2;
@@ -36,7 +36,6 @@ message AiConfig
     required PassingConfig passing_config                                   = 5;
     required GoalieTacticConfig goalie_tactic_config                        = 6;
     required EnemyCapabilityConfig enemy_capability_config                  = 7;
-    required ShootOrPassPlayConfig shoot_or_pass_play_config                = 8;
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
@@ -203,35 +202,6 @@ message EnemyCapabilityConfig
     // can pass the ball. This will affect how we defend against the team.
     required bool enemy_team_can_pass = 1 [default = true];
 }
-
-message ShootOrPassPlayConfig
-{
-    // The absolute minimum pass quality we're willing to attempt
-    required double abs_min_pass_score = 1 [
-        default                   = 0.05,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 1.0
-    ];
-
-    // When we're choosing a pass, we start by looking for a pass with a perfect score
-    // of 1, and then over time lower the score we're will to accept. This parameter
-    // how fast we ramp down to abs_min_pass_score. This is in seconds.
-    required double pass_score_ramp_down_duration = 2
-        [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-
-    // threshold to decide if the ball has been kicked by a robot
-    required double ball_shot_threshold = 3
-        [default = 4.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-
-    // threshold to decide if the ball has been kicked by a robot
-    required double min_distance_to_pass = 4
-        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-
-    // threshold for the distance between passer and receiver
-    required double short_pass_threshold = 5
-        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-}
-
 
 message RobotCapabilitiesConfig
 {

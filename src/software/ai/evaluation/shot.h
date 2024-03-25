@@ -8,14 +8,22 @@ class Shot
     Shot() = delete;
 
     /**
-     * Creates a shot with the given target and angle
+     * Creates a shot with the given origin, target, and angle
      *
-     * @param point The target to shoot at
+     * @param origin The origin of the shot
+     * @param target The target to shoot at
      * @param angle The angle formed by the shot origin, and the edges of the two
      * obstacles closest to the shot path
      *
      */
-    explicit Shot(Point point, Angle angle);
+    explicit Shot(Point origin, Point target, Angle angle);
+
+    /**
+     * Returns the origin of the shot.
+     *
+     * @return a point representing the shot origin
+     */
+    const Point &getOrigin() const;
 
     /**
      * Returns a point, the target to shoot at.
@@ -35,10 +43,14 @@ class Shot
 
    private:
     /**
-     * The target of the shot
-     *
+     * The origin of the shot
      */
-    Point point;
+    Point origin;
+
+    /**
+     * The target of the shot
+     */
+    Point target;
 
     /**
      * The angle formed by the shot origin, and the edges of the two obstacles closest to
