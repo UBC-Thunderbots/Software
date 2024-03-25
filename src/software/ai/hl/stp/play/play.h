@@ -177,10 +177,6 @@ class Play
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const WorldPtr& world_ptr) = 0;
 
-    // Multiplier to decrease the tactic assignment cost for robots previously
-    // assigned to the tactic (makes tactic assignment "sticky")
-    static constexpr double REPEAT_TACTIC_ASSIGNMENT_MULTIPLIER = 0.5;
-
     // Stop tactic common to all plays for robots that don't have tactics assigned
     TacticVector stop_tactics;
 

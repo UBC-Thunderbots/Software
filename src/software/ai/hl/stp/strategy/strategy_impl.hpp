@@ -195,7 +195,7 @@ Pass StrategyImpl<PitchDivision, ZoneEnum>::getBestCommittedPass()
 template <class PitchDivision, class ZoneEnum>
 std::optional<Shot> StrategyImpl<PitchDivision, ZoneEnum>::getBestShot(const Robot& robot)
 {
-    if (!best_shot_) 
+    if (!best_shot_)
     {
         best_shot_ = findBestShotOnGoal(
             world_ptr_->field(), world_ptr_->friendlyTeam(), world_ptr_->enemyTeam(),

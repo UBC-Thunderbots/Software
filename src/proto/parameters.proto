@@ -56,6 +56,11 @@ message AiParameterConfig
     // threshold to decide if ball hasn't been kicked
     required double ball_is_kicked_m_per_s_threshold = 1
         [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+
+    // Multiplier to decrease the tactic assignment cost for robots previously
+    // assigned to the tactic (makes tactic assignment "sticky")
+    required double repeat_tactic_assignment_multiplier = 2
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message AttackerTacticConfig

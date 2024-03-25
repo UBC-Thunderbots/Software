@@ -153,8 +153,8 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
 }
 
 std::optional<Shot> findBestShotOnGoal(const Field &field, const Team &friendly_team,
-                                       const Team &enemy_team, const Point &starting_point,
-                                       TeamType goal,
+                                       const Team &enemy_team,
+                                       const Point &starting_point, TeamType goal,
                                        const std::vector<Robot> &robots_to_ignore,
                                        double radius)
 {
@@ -166,14 +166,13 @@ std::optional<Shot> findBestShotOnGoal(const Field &field, const Team &friendly_
     std::optional<Shot> best_shot = std::nullopt;
 
     // Vector representing the line on which to sample shot origin points
-    Vector sampling_vector = (field.enemyGoalCenter() - starting_point)
-            .perpendicular()
-            .normalize();
+    Vector sampling_vector =
+        (field.enemyGoalCenter() - starting_point).perpendicular().normalize();
 
     for (int step = -NUM_SAMPLE_POINTS; step <= NUM_SAMPLE_POINTS; ++step)
     {
-        Point shot_origin = starting_point +
-                            (sampling_vector * step * SAMPLE_POINTS_SPACING_M);
+        Point shot_origin =
+            starting_point + (sampling_vector * step * SAMPLE_POINTS_SPACING_M);
 
         if (!contains(field.fieldLines(), shot_origin) ||
             field.pointInEnemyDefenseArea(shot_origin))
@@ -181,8 +180,9 @@ std::optional<Shot> findBestShotOnGoal(const Field &field, const Team &friendly_
             continue;
         }
 
-        std::optional<Shot> shot = calcBestShotOnGoal(field, friendly_team, enemy_team,
-            shot_origin, goal, robots_to_ignore, radius);
+        std::optional<Shot> shot =
+            calcBestShotOnGoal(field, friendly_team, enemy_team, shot_origin, goal,
+                               robots_to_ignore, radius);
 
         if (shot && (!best_shot || shot->getOpenAngle() > best_shot->getOpenAngle()))
         {
