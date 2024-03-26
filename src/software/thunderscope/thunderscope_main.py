@@ -5,6 +5,14 @@ import os
 import sys
 import threading
 
+from software.thunderscope.logging.thunderscope_logging_formatter import (
+    ThunderscopeLogger,
+)
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from software.thunderscope.thunderscope import Thunderscope
+from software.thunderscope.binary_context_managers import *
+from proto.import_all_protos import *
+import software.python_bindings as tbots_cpp
 from software.py_constants import *
 
 from software.thunderscope.log.thunderscope_std_out_formatter import (
