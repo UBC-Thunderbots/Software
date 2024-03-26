@@ -24,13 +24,13 @@ void PivotKickSkillFSM::kickBall(const Update& event)
 
 bool PivotKickSkillFSM::lostPossession(const Update& event)
 {
-    const TbotsProto::DribbleSkillConfig& dribble_skill_config =
-        event.common.strategy->getAiConfig().dribble_skill_config();
+    const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
 
-    return event.common.world_ptr->ball().velocity().length() < 0.05 &&
+    return event.common.world_ptr->ball().velocity().length() <
+               ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold() &&
            !event.common.robot.isNearDribbler(
                event.common.world_ptr->ball().position(),
-               dribble_skill_config.lose_ball_possession_threshold());
+               ai_config.dribble_skill_config().lose_ball_possession_threshold());
 }
 
 bool PivotKickSkillFSM::ballKicked(const Update& event)

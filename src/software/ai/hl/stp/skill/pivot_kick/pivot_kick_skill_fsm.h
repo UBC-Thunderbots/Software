@@ -74,12 +74,15 @@ struct PivotKickSkillFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *StartState_S + Update_E / getPossessionAndPivot_A = DribbleSkillFSM_S,
+
             DribbleSkillFSM_S + Update_E / getPossessionAndPivot_A,
             DribbleSkillFSM_S = KickState_S,
+
             KickState_S + Update_E[ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             KickState_S + Update_E[lostPossession_G] / getPossessionAndPivot_A =
                 DribbleSkillFSM_S,
             KickState_S + Update_E / kickBall_A,
+
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 };
