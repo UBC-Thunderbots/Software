@@ -5,34 +5,29 @@ import os
 import sys
 import threading
 
-from software.thunderscope.logging.thunderscope_logging_formatter import (
-    ThunderscopeLogger,
-)
+from proto.import_all_protos import *
+import software.python_bindings as tbots_cpp
+import software.thunderscope.thunderscope_config as config
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
-from proto.import_all_protos import *
-import software.python_bindings as tbots_cpp
 from software.py_constants import *
-
-from software.thunderscope.log.thunderscope_std_out_formatter import (
-    ThunderscopeStandardOutputFormatter,
-)
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.constants import EstopMode
 from software.thunderscope.estop_helpers import get_estop_config
-import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import (
-    CI_DURATION_S,
-    ProtoUnixIOTypes,
-)
 from software.thunderscope.util import *
-
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
+from software.thunderscope.log.thunderscope_std_out_formatter import (
+    ThunderscopeStandardOutputFormatter,
+)
+from software.thunderscope.constants import (
+    CI_DURATION_S,
+    ProtoUnixIOTypes,
+)
 
 
 NUM_ROBOTS = DIV_B_NUM_ROBOTS
