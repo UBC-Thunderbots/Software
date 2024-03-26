@@ -111,7 +111,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     obstacle_list.Clear();
     path_visualization.Clear();
 
-    tactic_robot_id_assignment.clear();
+    std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
 
     std::optional<Robot> goalie_robot = world_ptr->friendlyTeam().goalie();
     std::vector<Robot> robots         = world_ptr->friendlyTeam().getAllRobots();
@@ -121,7 +121,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         if (goalie_robot.has_value())
         {
             RobotId goalie_robot_id = goalie_robot.value().id();
-            tactic_robot_id_assignment.emplace(goalie_tactic, goalie_robot_id);
+            current_tactic_robot_id_assignment.emplace(goalie_tactic, goalie_robot_id);
 
             robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
                          robots.end());
@@ -187,11 +187,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 }
             }
 
-            auto [remaining_robots, new_primitives_to_assign,
-                  current_tactic_robot_id_assignment] =
+            auto [remaining_robots, new_primitives_to_assign, assignment] =
                 assignTactics(world_ptr, tactic_vector, robots);
 
-            tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
+            current_tactic_robot_id_assignment.merge(assignment);
 
             for (auto &[robot_id, primitive] :
                  new_primitives_to_assign->robot_primitives())
@@ -203,6 +202,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             robots = remaining_robots;
         }
     }
+
+    tactic_robot_id_assignment = current_tactic_robot_id_assignment;
 
     // TODO (#3104): Remove duplicated obstacles from obstacle_list
     // Visualize all obstacles and paths

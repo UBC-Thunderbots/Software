@@ -159,7 +159,7 @@ std::optional<Shot> findBestShotOnGoal(const Field &field, const Team &friendly_
                                        double radius)
 {
     // Number of shot origin points to sample to the left and right of the starting point
-    static constexpr int NUM_SAMPLE_POINTS = 5;
+    static constexpr int NUM_SAMPLE_POINTS = 6;
     // Spacing between sample points in metres
     static constexpr double SAMPLE_POINTS_SPACING_M = 0.1;
 
