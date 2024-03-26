@@ -21,3 +21,9 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "tscope_stdout_logging",
+    srcs = ["thunderscope_std_out_formatter.py"],
+    deps = [],
+)

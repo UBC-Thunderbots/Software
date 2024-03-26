@@ -6,7 +6,7 @@ import logging
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, GREY = range(8)
 
 
-class ThunderscopeLoggingFormatter(logging.Formatter):
+class ThunderscopeStandardOutputFormatter(logging.Formatter):
     reset_code = "\x1b[0m"
     color_prefix = "\x1b[3%d;"
     bold_code = "1m"

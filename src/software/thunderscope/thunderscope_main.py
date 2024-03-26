@@ -5,24 +5,19 @@ import os
 import sys
 import threading
 
-from software.thunderscope.logging.thunderscope_logging_formatter import ThunderscopeLogger
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.thunderscope import Thunderscope
-from software.thunderscope.binary_context_managers import *
-from proto.import_all_protos import *
-import software.python_bindings as tbots_cpp
 from software.py_constants import *
-import proto.message_translation.tbots_protobuf as tbots_protobuf
+
+from software.thunderscope.log.thunderscope_std_out_formatter import (
+    ThunderscopeStandardOutputFormatter,
+)
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
+from software.thunderscope.constants import EstopMode
 from software.thunderscope.estop_helpers import get_estop_config
-from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
 from software.thunderscope.constants import (
     CI_DURATION_S,
     ProtoUnixIOTypes,
-    SIM_TICK_RATE_MS,
 )
 from software.thunderscope.util import *
 
@@ -40,15 +35,24 @@ NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
 if __name__ == "__main__":
 
+    ###########################################################################
+    #                              Logging                                    #
+    ###########################################################################
+    #
     # Setup logging
-    logger = logging.getLogger("My_app")
+    logger = logging.getLogger("Thunderscope")
     logger.setLevel(logging.DEBUG)
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
-    ch.setFormatter(ThunderscopeLoggingFormatter())
+    ch.setFormatter(ThunderscopeStandardOutputFormatter())
     logger.addHandler(ch)
 
+    ###########################################################################
+    #                              Argument Parsing                           #
+    ###########################################################################
+    #
     # Setup parser
+    # TODO: create set-up func's and move into `thunderscope_config.py`
     parser = argparse.ArgumentParser(
         description="Thunderscope: Run with no arguments to run AI vs AI"
     )
@@ -220,6 +224,8 @@ if __name__ == "__main__":
     )
 
     # Sanity check that an interface was provided
+    # TODO: setting `--disable_communication` still requires an interface to be provided...
+    # refer to robot_communication.py:295 and/or thunderscope::RobotCommunication::__enter__()
     args = parser.parse_args()
 
     if args.run_blue or args.run_yellow:
