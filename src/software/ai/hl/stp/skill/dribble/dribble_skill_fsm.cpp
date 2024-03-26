@@ -83,7 +83,7 @@ std::tuple<Point, Angle> DribbleSkillFSM::calculateNextDribbleDestinationAndOrie
     return std::make_tuple(target_destination, target_orientation);
 }
 
-void DribbleSkillFSM::getPossession(const Update &event)
+void DribbleSkillFSM::getBallControl(const Update &event)
 {
     auto ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
@@ -125,7 +125,7 @@ void DribbleSkillFSM::loseBall(const Update &event)
         (ball_position - event.common.robot.position()).orientation();
     Point away_from_ball_position = robotPositionToFaceBall(
         ball_position, face_ball_orientation,
-        dribble_skill_config.lose_ball_possession_threshold() * 2);
+        dribble_skill_config.lose_ball_control_threshold() * 2);
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, away_from_ball_position, face_ball_orientation,
@@ -141,12 +141,12 @@ void DribbleSkillFSM::startDribble(const Update &event)
     dribble(event);
 }
 
-bool DribbleSkillFSM::havePossession(const Update &event)
+bool DribbleSkillFSM::haveBallControl(const Update &event)
 {
     return event.common.robot.isNearDribbler(event.common.world_ptr->ball().position());
 }
 
-bool DribbleSkillFSM::lostPossession(const Update &event)
+bool DribbleSkillFSM::lostBallControl(const Update &event)
 {
     const TbotsProto::DribbleSkillConfig &dribble_skill_config =
         event.common.strategy->getAiConfig().dribble_skill_config();
@@ -154,7 +154,7 @@ bool DribbleSkillFSM::lostPossession(const Update &event)
     return !event.common.robot.isNearDribbler(
         // avoid cases where ball is exactly on the edge of the robot
         event.common.world_ptr->ball().position(),
-        dribble_skill_config.lose_ball_possession_threshold());
+        dribble_skill_config.lose_ball_control_threshold());
 };
 
 bool DribbleSkillFSM::dribblingDone(const Update &event)
@@ -174,7 +174,7 @@ bool DribbleSkillFSM::dribblingDone(const Update &event)
                                           event.control_params.final_dribble_orientation),
                Angle::fromDegrees(
                    dribble_skill_config.final_destination_close_threshold())) &&
-           havePossession(event) &&
+           haveBallControl(event) &&
            robotStopped(event.common.robot,
                         dribble_skill_config.robot_dribbling_done_speed());
 }

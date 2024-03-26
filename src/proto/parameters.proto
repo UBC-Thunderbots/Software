@@ -168,8 +168,8 @@ message GoalieTacticConfig
 message DribbleSkillConfig
 {
     // If ball and front of robot are separated by this amount, then we've lost
-    // possession (in m)
-    required double lose_ball_possession_threshold = 1 [
+    // control over the ball (in m)
+    required double lose_ball_control_threshold = 1 [
         default                   = 0.04,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 1.0

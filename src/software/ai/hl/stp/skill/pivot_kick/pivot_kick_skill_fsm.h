@@ -21,12 +21,12 @@ struct PivotKickSkillFSM
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Action that updates the DribbleSkillFSM to get possession of the ball and pivot
+     * Action that updates the DribbleSkillFSM to get control of the ball and pivot
      *
      * @param event the Update event
      * @param processEvent processes the DribbleSkillFSM::Update event
      */
-    void getPossessionAndPivot(
+    void getBallControlAndPivot(
         const Update& event,
         boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
@@ -38,13 +38,13 @@ struct PivotKickSkillFSM
     void kickBall(const Update& event);
 
     /**
-     * Guard that checks if the robot has lost possession of the ball
+     * Guard that checks if the robot has lost control of the ball
      *
      * @param event the Update event
      *
-     * @return if the ball possession has been lost
+     * @return if the robot has lost control of the ball
      */
-    bool lostPossession(const Update& event);
+    bool lostBallControl(const Update& event);
 
     /**
      * Guard that checks if the ball has been kicked
@@ -65,21 +65,21 @@ struct PivotKickSkillFSM
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(lostPossession)
+        DEFINE_SML_GUARD(lostBallControl)
         DEFINE_SML_GUARD(ballKicked)
 
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(getPossessionAndPivot, DribbleSkillFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(getBallControlAndPivot, DribbleSkillFSM)
         DEFINE_SML_ACTION(kickBall)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *StartState_S + Update_E / getPossessionAndPivot_A = DribbleSkillFSM_S,
+            *StartState_S + Update_E / getBallControlAndPivot_A = DribbleSkillFSM_S,
 
-            DribbleSkillFSM_S + Update_E / getPossessionAndPivot_A,
+            DribbleSkillFSM_S + Update_E / getBallControlAndPivot_A,
             DribbleSkillFSM_S = KickState_S,
 
             KickState_S + Update_E[ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            KickState_S + Update_E[lostPossession_G] / getPossessionAndPivot_A =
+            KickState_S + Update_E[lostBallControl_G] / getBallControlAndPivot_A =
                 DribbleSkillFSM_S,
             KickState_S + Update_E / kickBall_A,
 
