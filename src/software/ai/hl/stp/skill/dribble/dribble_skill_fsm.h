@@ -151,7 +151,7 @@ struct DribbleSkillFSM
     bool dribblingDone(const Update &event);
 
     /**
-     * Guard that checks if the the robot should lose control of the ball to avoid 
+     * Guard that checks if the the robot should lose control of the ball to avoid
      * excessive dribbling
      *
      * @param event the Update event
@@ -182,14 +182,15 @@ struct DribbleSkillFSM
             *GetBallControl_S + Update_E[haveBallControl_G] / startDribble_A = Dribble_S,
             GetBallControl_S + Update_E / getBallControl_A,
             Dribble_S + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
-            Dribble_S + Update_E[shouldLoseBall_G] / loseBall_A      = LoseBall_S,
-            Dribble_S + Update_E[dribblingDone_G] / dribble_A        = X,
+            Dribble_S + Update_E[shouldLoseBall_G] / loseBall_A        = LoseBall_S,
+            Dribble_S + Update_E[dribblingDone_G] / dribble_A          = X,
             Dribble_S + Update_E / dribble_A,
-            LoseBall_S + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
+            LoseBall_S + Update_E[lostBallControl_G] / getBallControl_A =
+                GetBallControl_S,
             LoseBall_S + Update_E / loseBall_A,
             X + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
-            X + Update_E[!dribblingDone_G] / dribble_A       = Dribble_S,
-            X + Update_E / dribble_A                         = X);
+            X + Update_E[!dribblingDone_G] / dribble_A         = Dribble_S,
+            X + Update_E / dribble_A                           = X);
     }
 
    private:

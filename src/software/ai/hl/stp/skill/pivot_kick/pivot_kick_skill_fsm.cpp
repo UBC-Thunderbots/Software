@@ -30,7 +30,7 @@ bool PivotKickSkillFSM::lostBallControl(const Update& event)
                ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold() &&
            !event.common.robot.isNearDribbler(
                event.common.world_ptr->ball().position(),
-               ai_config.dribble_skill_config().lose_ball_control_threshold());
+               ai_config.dribble_config().lose_ball_control_threshold());
 }
 
 bool PivotKickSkillFSM::ballKicked(const Update& event)

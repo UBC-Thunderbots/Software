@@ -31,7 +31,7 @@ message AiConfig
     reserved 4, 8;
 
     required AiControlConfig ai_control_config                              = 1;
-    required DribbleSkillConfig dribble_skill_config                        = 2;
+    required DribbleConfig dribble_config                                   = 2;
     required AttackerTacticConfig attacker_tactic_config                    = 3;
     required PassingConfig passing_config                                   = 5;
     required GoalieTacticConfig goalie_tactic_config                        = 6;
@@ -40,6 +40,7 @@ message AiConfig
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
     required AiParameterConfig ai_parameter_config                          = 13;
+    required ShotConfig shot_config                                         = 14;
 }
 
 message AiControlConfig
@@ -165,7 +166,14 @@ message GoalieTacticConfig
         [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
-message DribbleSkillConfig
+message ShotConfig
+{
+    // Number of shot origin points to sample when finding the best shot to take 
+    required int32 num_shot_origin_points_to_sample = 1
+        [default = 8, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
+}
+
+message DribbleConfig
 {
     // If ball and front of robot are separated by this amount, then we've lost
     // control over the ball (in m)

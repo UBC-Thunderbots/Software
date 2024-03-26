@@ -86,10 +86,10 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
                                        (goal_post.getStart().x() - shot_origin.x()) +
                                    shot_origin.y());
 
-    Point shot_point = (top_point - bottom_point) / 2 + bottom_point;
+    Point shot_target = (top_point - bottom_point) / 2 + bottom_point;
 
     return std::make_optional(
-        Shot(shot_origin, shot_point,
+        Shot(shot_origin, shot_target,
              Angle::fromDegrees(biggest_angle_seg.getDeltaInDegrees())));
 }
 
@@ -152,27 +152,28 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
     }
 }
 
-std::optional<Shot> findBestShotOnGoal(const Field &field, const Team &friendly_team,
+std::optional<Shot> sampleForBestShotOnGoal(const Field &field, const Team &friendly_team,
                                        const Team &enemy_team,
                                        const Point &starting_point, TeamType goal,
+                                       double max_dribbling_dist,
+                                       int num_sample_points,
                                        const std::vector<Robot> &robots_to_ignore,
                                        double radius)
 {
-    // Number of shot origin points to sample to the left and right of the starting point
-    static constexpr int NUM_SAMPLE_POINTS = 5;
-    // Spacing between sample points in metres
-    static constexpr double SAMPLE_POINTS_SPACING_M = 0.1;
-
     std::optional<Shot> best_shot = std::nullopt;
 
     // Vector representing the line on which to sample shot origin points
     Vector sampling_vector =
         (field.enemyGoalCenter() - starting_point).perpendicular().normalize();
 
-    for (int step = -NUM_SAMPLE_POINTS; step <= NUM_SAMPLE_POINTS; ++step)
+    // Spacing between sample points
+    double sampling_spacing = max_dribbling_dist / (num_sample_points / 2);
+
+    for (double sample_point_offset = -max_dribbling_dist; 
+         sample_point_offset <= max_dribbling_dist; 
+         sample_point_offset += sampling_spacing)
     {
-        Point shot_origin =
-            starting_point + (sampling_vector * step * SAMPLE_POINTS_SPACING_M);
+        Point shot_origin = starting_point + (sampling_vector * sample_point_offset);
 
         if (!contains(field.fieldLines(), shot_origin) ||
             field.pointInEnemyDefenseArea(shot_origin))

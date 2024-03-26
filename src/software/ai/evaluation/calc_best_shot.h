@@ -79,6 +79,8 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
  * @param enemy_team The enemy team
  * @param starting_point The point to begin sampling shot origin points from
  * @param goal The goal to shoot at
+ * @param max_dribbling_dist Maximum allowed distance to dribble the ball in metres
+ * @param num_sample_points The number of shot origin points to sample
  * @param robots_to_ignore The robots to ignore
  * @param radius The radius for the robot obstacles
  *
@@ -86,8 +88,10 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
  * angle interval for the shot (this is the total angle between the obstacles on either
  * side of the shot vector). If no shot can be found, returns std::nullopt
  */
-std::optional<Shot> findBestShotOnGoal(const Field &field, const Team &friendly_team,
+std::optional<Shot> sampleForBestShotOnGoal(const Field &field, const Team &friendly_team,
                                        const Team &enemy_team,
                                        const Point &starting_point, TeamType goal,
+                                       double max_dribbling_dist,
+                                       int num_sample_points,
                                        const std::vector<Robot> &robots_to_ignore = {},
                                        double radius = ROBOT_MAX_RADIUS_METERS);

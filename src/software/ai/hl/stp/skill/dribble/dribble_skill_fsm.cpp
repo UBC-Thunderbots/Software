@@ -117,15 +117,15 @@ void DribbleSkillFSM::dribble(const Update &event)
 
 void DribbleSkillFSM::loseBall(const Update &event)
 {
-    const TbotsProto::DribbleSkillConfig &dribble_skill_config =
-        event.common.strategy->getAiConfig().dribble_skill_config();
+    const TbotsProto::DribbleConfig &dribble_config =
+        event.common.strategy->getAiConfig().dribble_config();
 
     Point ball_position = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
-    Point away_from_ball_position = robotPositionToFaceBall(
-        ball_position, face_ball_orientation,
-        dribble_skill_config.lose_ball_control_threshold() * 2);
+    Point away_from_ball_position =
+        robotPositionToFaceBall(ball_position, face_ball_orientation,
+                                dribble_config.lose_ball_control_threshold() * 2);
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, away_from_ball_position, face_ball_orientation,
@@ -148,44 +148,44 @@ bool DribbleSkillFSM::haveBallControl(const Update &event)
 
 bool DribbleSkillFSM::lostBallControl(const Update &event)
 {
-    const TbotsProto::DribbleSkillConfig &dribble_skill_config =
-        event.common.strategy->getAiConfig().dribble_skill_config();
+    const TbotsProto::DribbleConfig &dribble_config =
+        event.common.strategy->getAiConfig().dribble_config();
 
     return !event.common.robot.isNearDribbler(
         // avoid cases where ball is exactly on the edge of the robot
         event.common.world_ptr->ball().position(),
-        dribble_skill_config.lose_ball_control_threshold());
+        dribble_config.lose_ball_control_threshold());
 };
 
 bool DribbleSkillFSM::dribblingDone(const Update &event)
 {
-    const TbotsProto::DribbleSkillConfig &dribble_skill_config =
-        event.common.strategy->getAiConfig().dribble_skill_config();
+    const TbotsProto::DribbleConfig &dribble_config =
+        event.common.strategy->getAiConfig().dribble_config();
 
     return comparePoints(
                event.common.world_ptr->ball().position(),
                getDribbleBallDestination(event.common.world_ptr->ball().position(),
                                          event.control_params.dribble_destination),
-               dribble_skill_config.ball_close_to_dest_threshold()) &&
+               dribble_config.ball_close_to_dest_threshold()) &&
            compareAngles(
                event.common.robot.orientation(),
                getFinalDribbleOrientation(event.common.world_ptr->ball().position(),
                                           event.common.robot.position(),
                                           event.control_params.final_dribble_orientation),
                Angle::fromDegrees(
-                   dribble_skill_config.final_destination_close_threshold())) &&
+                   dribble_config.final_destination_close_threshold())) &&
            haveBallControl(event) &&
            robotStopped(event.common.robot,
-                        dribble_skill_config.robot_dribbling_done_speed());
+                        dribble_config.robot_dribbling_done_speed());
 }
 
 bool DribbleSkillFSM::shouldLoseBall(const Update &event)
 {
-    const TbotsProto::DribbleSkillConfig &dribble_skill_config =
-        event.common.strategy->getAiConfig().dribble_skill_config();
+    const TbotsProto::DribbleConfig &dribble_config =
+        event.common.strategy->getAiConfig().dribble_config();
 
     Point ball_position = event.common.world_ptr->ball().position();
     return (!event.control_params.allow_excessive_dribbling &&
             !comparePoints(ball_position, continuous_dribbling_start_point,
-                           dribble_skill_config.max_continuous_dribbling_distance()));
+                           dribble_config.max_continuous_dribbling_distance()));
 }
