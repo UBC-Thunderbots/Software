@@ -14,8 +14,8 @@ py_binary(
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
-        "//software/thunderscope/replay:proto_logger",
         "//software/thunderscope/log:tscope_stdout_logging",
+        "//software/thunderscope/replay:proto_logger",
     ],
 )
 
