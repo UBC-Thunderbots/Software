@@ -28,19 +28,19 @@ message ThunderbotsConfig
 
 message AiConfig
 {
-    reserved 4;
+    reserved 4, 8;
 
     required AiControlConfig ai_control_config                              = 1;
-    required DribbleSkillConfig dribble_skill_config                        = 2;
+    required DribbleConfig dribble_config                                   = 2;
     required AttackerTacticConfig attacker_tactic_config                    = 3;
     required PassingConfig passing_config                                   = 5;
     required GoalieTacticConfig goalie_tactic_config                        = 6;
     required EnemyCapabilityConfig enemy_capability_config                  = 7;
-    required ShootOrPassPlayConfig shoot_or_pass_play_config                = 8;
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
     required AiParameterConfig ai_parameter_config                          = 13;
+    required ShotConfig shot_config                                         = 14;
 }
 
 message AiControlConfig
@@ -57,6 +57,11 @@ message AiParameterConfig
     // threshold to decide if ball hasn't been kicked
     required double ball_is_kicked_m_per_s_threshold = 1
         [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+
+    // Multiplier to decrease the tactic assignment cost for robots previously
+    // assigned to the tactic (makes tactic assignment "sticky")
+    required double repeat_tactic_assignment_multiplier = 2
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message AttackerTacticConfig
@@ -161,11 +166,18 @@ message GoalieTacticConfig
         [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
-message DribbleSkillConfig
+message ShotConfig
+{
+    // Number of shot origin points to sample when finding the best shot to take 
+    required int32 num_shot_origin_points_to_sample = 1
+        [default = 8, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
+}
+
+message DribbleConfig
 {
     // If ball and front of robot are separated by this amount, then we've lost
-    // possession (in m)
-    required double lose_ball_possession_threshold = 1 [
+    // control over the ball (in m)
+    required double lose_ball_control_threshold = 1 [
         default                   = 0.04,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 1.0
@@ -203,35 +215,6 @@ message EnemyCapabilityConfig
     // can pass the ball. This will affect how we defend against the team.
     required bool enemy_team_can_pass = 1 [default = true];
 }
-
-message ShootOrPassPlayConfig
-{
-    // The absolute minimum pass quality we're willing to attempt
-    required double abs_min_pass_score = 1 [
-        default                   = 0.05,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 1.0
-    ];
-
-    // When we're choosing a pass, we start by looking for a pass with a perfect score
-    // of 1, and then over time lower the score we're will to accept. This parameter
-    // how fast we ramp down to abs_min_pass_score. This is in seconds.
-    required double pass_score_ramp_down_duration = 2
-        [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-
-    // threshold to decide if the ball has been kicked by a robot
-    required double ball_shot_threshold = 3
-        [default = 4.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-
-    // threshold to decide if the ball has been kicked by a robot
-    required double min_distance_to_pass = 4
-        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-
-    // threshold for the distance between passer and receiver
-    required double short_pass_threshold = 5
-        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-}
-
 
 message RobotCapabilitiesConfig
 {

@@ -8,7 +8,7 @@ bool KeepAwaySkillFSM::isPossessionThreatened(const Update& event)
 
     if (!event.common.robot.isNearDribbler(
             event.common.world_ptr->ball().position(),
-            ai_config.dribble_skill_config().lose_ball_possession_threshold()))
+            ai_config.dribble_config().lose_ball_control_threshold()))
     {
         return true;
     }

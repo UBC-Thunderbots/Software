@@ -2,7 +2,7 @@
 
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 
-void PivotKickSkillFSM::getPossessionAndPivot(
+void PivotKickSkillFSM::getBallControlAndPivot(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
     DribbleSkillFSM::ControlParams control_params{
@@ -22,15 +22,16 @@ void PivotKickSkillFSM::kickBall(const Update& event)
         TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick));
 }
 
-bool PivotKickSkillFSM::lostPossession(const Update& event)
+bool PivotKickSkillFSM::lostBallControl(const Update& event)
 {
-    const TbotsProto::DribbleSkillConfig& dribble_skill_config =
-        event.common.strategy->getAiConfig().dribble_skill_config();
+    const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
 
-    return !event.common.robot.isNearDribbler(
-        event.common.world_ptr->ball().position(),
-        dribble_skill_config.lose_ball_possession_threshold());
-};
+    return event.common.world_ptr->ball().velocity().length() <
+               ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold() &&
+           !event.common.robot.isNearDribbler(
+               event.common.world_ptr->ball().position(),
+               ai_config.dribble_config().lose_ball_control_threshold());
+}
 
 bool PivotKickSkillFSM::ballKicked(const Update& event)
 {

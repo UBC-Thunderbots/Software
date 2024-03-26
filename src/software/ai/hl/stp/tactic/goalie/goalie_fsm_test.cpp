@@ -88,7 +88,7 @@ TEST(GoalieFSMTest, test_transitions)
     Angle clear_ball_direction = Angle::zero();
 
     TbotsProto::AiConfig ai_config;
-    FSM<GoalieFSM> fsm(DribbleSkillFSM(ai_config.dribble_skill_config()),
+    FSM<GoalieFSM> fsm(DribbleSkillFSM(ai_config.dribble_config()),
                        GoalieFSM(ai_config.goalie_tactic_config(),
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 

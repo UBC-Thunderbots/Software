@@ -61,7 +61,7 @@ Shot ReceiverFSM::getOneTouchShotPositionAndOrientation(const Robot& robot,
     Point ideal_position =
         closest_ball_pos - ideal_orientation_vec.normalize(dist_to_ball_in_dribbler);
 
-    return Shot(ideal_position, ideal_orientation);
+    return Shot(closest_ball_pos, ideal_position, ideal_orientation);
 }
 
 std::optional<Shot> ReceiverFSM::findFeasibleShot(const WorldPtr& world_ptr,
