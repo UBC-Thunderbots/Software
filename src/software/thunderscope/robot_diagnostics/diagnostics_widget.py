@@ -109,4 +109,4 @@ class DiagnosticsWidget(QWidget):
     def toggle_control(self, mode: ControlMode):
         self.__control_mode = mode
         self.drive_dribbler_widget.set_enabled(mode == ControlMode.DIAGNOSTICS)
-        self.controller_handler.set_enabled(mode == ControlMode.XBOX)
+        self.controller_handler.set_controller_enabled(mode == ControlMode.XBOX)
