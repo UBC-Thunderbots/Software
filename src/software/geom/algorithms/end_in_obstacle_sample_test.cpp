@@ -15,7 +15,7 @@ class EndInObstacleSampleTest : public testing::Test
 {
    public:
     EndInObstacleSampleTest()
-        : world(TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B)),
+        : world(*TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_B)),
           obstacle_factory(TbotsProto::RobotNavigationObstacleConfig()){};
     static bool isSamplePointValid(Point point, std::vector<ObstaclePtr> obstacles)
     {

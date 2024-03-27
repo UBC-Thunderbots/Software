@@ -48,7 +48,7 @@ TEST(FindKeepAwayPointTest, test_keep_away_no_enemies)
 {
     auto world = TestUtil::createBlankTestingWorld();
     Pass pass(Point(0, 0), Point(1, 1), 5);
-    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
+    auto keep_away_pt = findKeepAwayTargetPoint(*world, pass);
     // gradient should be 0 everywhere
     EXPECT_EQ(keep_away_pt, Point(0, 0));
 }
@@ -63,7 +63,7 @@ TEST(FindKeepAwayPointTest, test_keep_away_point_interception)
     Point ball_point(-1, 0.1);
     world->updateBall(Ball(ball_point, Vector(), Timestamp()));
     Pass pass(ball_point, Point(1, 0.1), 5);
-    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
+    auto keep_away_pt = findKeepAwayTargetPoint(*world, pass);
     Pass new_pass(keep_away_pt, pass.receiverPoint(), pass.speed());
     EXPECT_GT(
         calculateInterceptRisk(world->enemyTeam(), pass, Duration::fromSeconds(0)),
@@ -80,7 +80,7 @@ TEST(FindKeepAwayPointTest, test_keep_away_point_proximity)
     Point ball_point(-0.25, 0.1);
     world->updateBall(Ball(ball_point, Vector(), Timestamp()));
     Pass pass(ball_point, Point(1, 0.1), 5);
-    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
+    auto keep_away_pt = findKeepAwayTargetPoint(*world, pass);
 
     // copypasted from software/ai/evaluation/keep_away.cpp
     static constexpr double PASSER_ENEMY_PROXIMITY_IMPORTANCE = 1.5;
@@ -100,7 +100,7 @@ TEST(FindKeepAwayPointTest, test_keep_away_point_field_lines)
     auto world           = TestUtil::createBlankTestingWorld();
     auto top_left_corner = world->field().fieldLines().negXPosYCorner();
     Pass pass(top_left_corner, Point(0, 0), 5);
-    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
+    auto keep_away_pt = findKeepAwayTargetPoint(*world, pass);
     auto field_center = world->field().fieldLines().centre();
     // the keep away point should be closer to the field center
     EXPECT_LT((keep_away_pt - field_center).length(),
@@ -114,7 +114,7 @@ TEST(FindKeepAwayPointTest, test_keep_away_point_field_lines_2)
     auto top_mid_point   = Point(0, top_left_corner.y());
 
     Pass pass(top_mid_point, Point(0, 0), 5);
-    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
+    auto keep_away_pt = findKeepAwayTargetPoint(*world, pass);
     auto field_center = world->field().fieldLines().centre();
     // the keep away point should be closer to the field center
     EXPECT_LT((keep_away_pt - field_center).length(),

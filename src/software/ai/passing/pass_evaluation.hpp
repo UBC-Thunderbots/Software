@@ -73,7 +73,7 @@ class PassEvaluation
      * @param position The location from where the pass will be taken
      * @return vector of sorted ZoneEnums, with the highest quality zones first
      */
-    std::vector<ZoneEnum> rankZonesForReceiving(const WorldPtr& world_ptr,
+    std::vector<ZoneEnum> rankZonesForReceiving(const World& world,
                                                 const Point& pass_position) const;
 
     /**
@@ -155,7 +155,7 @@ Timestamp PassEvaluation<ZoneEnum>::getEvaluationTime() const
 
 template <class ZoneEnum>
 std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::rankZonesForReceiving(
-    const WorldPtr& world_ptr, const Point& pass_position) const
+    const World& world, const Point& pass_position) const
 {
     std::vector<ZoneEnum> cherry_pick_zones = pitch_division_->getAllZoneIds();
 
@@ -166,8 +166,8 @@ std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::rankZonesForReceiving(
     for (const auto& zone : cherry_pick_zones)
     {
         cached_ratings[zone] =
-            rateZone(world_ptr->field(), world_ptr->enemyTeam(),
-                     pitch_division_->getZone(zone), pass_position, passing_config_);
+            rateZone(world.field(), world.enemyTeam(), pitch_division_->getZone(zone),
+                     pass_position, passing_config_);
     }
 
     std::sort(cherry_pick_zones.begin(), cherry_pick_zones.end(),

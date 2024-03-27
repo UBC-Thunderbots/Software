@@ -69,7 +69,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         {
             enemy_robot_points.emplace_back(robot.position());
         }
-        std::vector<Circle> chip_targets = findGoodChipTargets(world_ptr);
+        std::vector<Circle> chip_targets = findGoodChipTargets(*world_ptr);
         for (unsigned i = 0;
              i < chip_targets.size() && i < move_to_open_area_tactics.size(); i++)
         {

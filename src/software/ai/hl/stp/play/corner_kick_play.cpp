@@ -73,14 +73,14 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
                                                  ai_config.passing_config());
 
-    auto pass_eval = pass_generator.generatePassEvaluation(world_ptr);
+    auto pass_eval = pass_generator.generatePassEvaluation(*world_ptr);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
 
     auto zones_to_cherry_pick =
-        pass_eval.rankZonesForReceiving(world_ptr, world_ptr->ball().position());
+        pass_eval.rankZonesForReceiving(*world_ptr, world_ptr->ball().position());
 
     // These tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -114,7 +114,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic, world_ptr);
-        update_cherry_pickers(pass_generator.generatePassEvaluation(world_ptr));
+        update_cherry_pickers(pass_generator.generatePassEvaluation(*world_ptr));
 
         yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
                 cherry_pick_tactic_3, cherry_pick_tactic_4}});
@@ -131,13 +131,13 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic, world_ptr);
-        update_cherry_pickers(pass_generator.generatePassEvaluation(world_ptr));
+        update_cherry_pickers(pass_generator.generatePassEvaluation(*world_ptr));
 
         yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
                 cherry_pick_tactic_3, cherry_pick_tactic_4}});
 
         best_pass_and_score_so_far =
-            pass_generator.generatePassEvaluation(world_ptr).getBestPassOnField();
+            pass_generator.generatePassEvaluation(*world_ptr).getBestPassOnField();
 
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
