@@ -47,6 +47,8 @@ class DiagnosticsInputModeWidget(QWidget):
         self.diagnostics_control_button = self.connect_options[ControlMode.DIAGNOSTICS]
         self.xbox_control_button = self.connect_options[ControlMode.XBOX]
 
+        self.xbox_control_button.setEnabled(False)
+
         self.diagnostics_control_button.clicked.connect(
             lambda: self.switch_control_mode(ControlMode.DIAGNOSTICS)
         )
@@ -74,5 +76,6 @@ class DiagnosticsInputModeWidget(QWidget):
 
         self.toggle_controls_signal.emit(self.control_mode == ControlMode.DIAGNOSTICS)
 
-    def refresh(self) -> None:
-        pass
+    def refresh(self, enable_xbox=False) -> None:
+        self.xbox_control_button.setEnabled(enable_xbox)
+
