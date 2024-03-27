@@ -163,7 +163,6 @@ class RobotCommunication(object):
         :param robot_id: the id of the robot whose mode we're changing
         """
         self.robot_control_mode_map[robot_id] = mode
-        # TODO: add else case that sets to 0
         if mode == IndividualRobotMode.NONE:
             self.robot_stop_primitive_count_map[robot_id] = NUM_TIMES_SEND_STOP
         else:
@@ -311,7 +310,6 @@ class RobotCommunication(object):
 
         """
         # Create the multicast listeners
-        # TODO: log a better error message if the interface not specified
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
