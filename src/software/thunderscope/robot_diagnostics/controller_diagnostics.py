@@ -1,10 +1,12 @@
 import logging
+import numpy
 from evdev import InputDevice, categorize, ecodes, list_devices
 from threading import Event, Thread
 
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.thunderscope.constants import *
+from software.thunderscope.constants import ControllerConstants
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
@@ -18,8 +20,8 @@ class MoveEventType(Enum):
 
 class ControllerInputHandler(object):
     """
-    This class is responsible for reading from an Xbox controller device and
-    interpreting the inputs into usable inputs for robot.
+    This class is responsible for reading from a handheld controller device and
+    interpreting the inputs into usable inputs for the robot.
     """
 
     # TODO: remove proto_unix_io, and set Motor/Power control as class fields
@@ -47,6 +49,7 @@ class ControllerInputHandler(object):
 
             self.constants = tbots_cpp.create2021RobotConstants()
 
+            # Fields for holding the diagnostics types that get sent
             self.motor_control = MotorControl()
             self.power_control = PowerControl()
 
@@ -96,33 +99,9 @@ class ControllerInputHandler(object):
                 MoveEventType.ROTATIONAL, event_value
             )
 
-    @staticmethod
-    def __parse_move_event_value(event_type: MoveEventType, event_value: int) -> int:
-        factor = (
-            MAX_ANGULAR_SPEED_RAD_PER_S
-            if event_type == MoveEventType.ROTATIONAL
-            else MAX_LINEAR_SPEED_METER_PER_S
-        )
-
-        if abs(event_value) < (DEADZONE_PERCENTAGE * factor):
-            return 0
-        else:
-            return event_value / (XBOX_MAX_RANGE * factor)
-
-    @staticmethod
-    def __parse_dribbler_enabled_event_value(value: int) -> bool:
-        return value > (XBOX_BUTTON_MAX_RANGE / 2)
-
-    @staticmethod
-    def __parse_kick_event_value(value) -> int:
-        new_power = value * POWER_STEPPER
-        if MIN_POWER < new_power < MAX_POWER:
-            return new_power
-        else:
-            return 0
-
     def __process_event(self, event):
-        kick_power = 0
+        kick_power = 0.0
+        dribbler_speed = 0.0
         dribbler_enabled = False
 
         abs_event = categorize(event)
@@ -140,12 +119,18 @@ class ControllerInputHandler(object):
             if event_type in ["ABS_X", "ABS_Y", "ABS_RX"]:
                 self.process_move_event_value(event_type, abs_event.event.value)
 
+        # TODO: can enable smooth scrolling for dribbler by chekcing for "ABS_HAT0Y" event
         if event_type == "ABS_HAT0X":
-            kick_power = self.__parse_kick_event_value(abs_event.event.value)
+            dribbler_speed = self.__parse_kick_event_value(abs_event.event.value)
+
+        if event_type == "ABS_HAT0Y":
+            kick_power = self.__parse_dribble_event_value(abs_event.event.value)
+
         if event_type == "ABS_RZ" or "ABS_Z":
-            dribbler_enabled = self.__parse_dribbler_enabled_event_value(
+            if self.__parse_dribbler_enabled_event_value(
                 abs_event.event.value
-            )
+            ):
+                self.motor_control.dribbler_speed_rpm = dribbler_speed
 
         # TODO: possible to use `event_type` instead of `event.type`
         if event.type == ecodes.EV_KEY:
@@ -155,22 +140,43 @@ class ControllerInputHandler(object):
 
             elif event.code == ecodes.ecodes["BTN_Y"] and event.value == 1:
                 self.power_control.geneva_slot = 1
-                # TODO: not sure if we should use this value
                 self.power_control.chicker.chip_distance_meters = kick_power
 
-        # TODO: move to get primitive call
-        self.motor_control.dribbler_speed_rpm = 0
+    @staticmethod
+    def __parse_move_event_value(event_type: MoveEventType, event_value: float) -> float:
+        factor = (
+            ControllerConstants.MAX_ANGULAR_SPEED_RAD_PER_S
+            if event_type == MoveEventType.ROTATIONAL
+            else ControllerConstants.MAX_LINEAR_SPEED_METER_PER_S
+            if event_type == MoveEventType.LINEAR
+            else 1.0
+        )
 
-        if dribbler_enabled:
-            self.motor_control.dribbler_speed_rpm = (
-                self.constants.indefinite_dribbler_speed_rpm
-            )
+        if abs(event_value) < (ControllerConstants.DEADZONE_PERCENTAGE * factor):
+            return 0
+        else:
+            return numpy.clip(event_value, 0, ControllerConstants.XBOX_MAX_RANGE * factor)
+
+    @staticmethod
+    def __parse_dribbler_enabled_event_value(value: float) -> bool:
+        return value > (ControllerConstants.XBOX_BUTTON_MAX_RANGE / 2.0)
+
+    @staticmethod
+    def __parse_dribble_event_value(value: float) -> float:
+        return numpy.clip(value * ControllerConstants.DRIBBLER_STEPPER,
+                          0,
+                          ControllerConstants.DRIBBLER_INDEFINITE_SPEED)
+
+    @staticmethod
+    def __parse_kick_event_value(value: float) -> float:
+        return numpy.clip(value * ControllerConstants.POWER_STEPPER,
+                          ControllerConstants.MIN_POWER,
+                          ControllerConstants.MAX_POWER)
 
     def __event_loop(self):
-        logging.debug("Starting handheld controller event handling thread")
+        logging.debug("Starting handheld controller event handling loop")
         if self.enabled:
             for event in self.controller.read_loop():
-                # TODO: only run loop if self.enabled is set
                 if self.__stop_event_thread.isSet():
                     return
                 else:
