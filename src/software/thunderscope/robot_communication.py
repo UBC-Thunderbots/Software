@@ -50,8 +50,10 @@ class RobotCommunication(object):
         self.current_proto_unix_io = current_proto_unix_io
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
-        self.estop_mode = estop_mode
 
+        # TODO: move estop state management out of robot_communication,
+        #  separate PR, reuse controller code possibly
+        self.estop_mode = estop_mode
         self.estop_path = estop_path
         self.estop_buadrate = estop_baudrate
 
