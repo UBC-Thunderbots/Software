@@ -15,6 +15,7 @@ logger = createLogger(__name__)
 
 
 # TODO 2908: Support running this test in both simulator or field mode
+# TODO: remove commented out tests
 # this test can be run either in simulation or on the field
 # @pytest.mark.parametrize(
 #     "robot_x_destination, robot_y_destination",
