@@ -20,7 +20,7 @@ class ControllerInputHandler(object):
     # TODO: remove proto_unix_io, and set Motor/Power control as class fields
     # TODO: add class init wrapper for easier handling of controller connection
     def __init__(
-            self, proto_unix_io: ProtoUnixIO,
+        self, proto_unix_io: ProtoUnixIO,
     ):
         self.proto_unix_io = proto_unix_io
         self.enabled = False
@@ -53,7 +53,9 @@ class ControllerInputHandler(object):
             self.power_control = PowerControl()
 
         else:
-            logging.debug("Tried to initialize a handheld controller from list available devices:")
+            logging.debug(
+                "Tried to initialize a handheld controller from list available devices:"
+            )
             logging.debug(list_devices())
             logging.debug(
                 "Could not initialize a handheld controller device - check USB connections"
@@ -62,8 +64,7 @@ class ControllerInputHandler(object):
     def get_latest_primitive_command(self):
         if self.controller_initialized():
             return DirectControlPrimitive(
-                motor_control=self.motor_control,
-                power_control=self.power_control,
+                motor_control=self.motor_control, power_control=self.power_control,
             )
         else:
             return None
@@ -74,8 +75,10 @@ class ControllerInputHandler(object):
     def __setup_controller(self):
         for device in list_devices():
             controller = InputDevice(device)
-            if (controller is not None and
-                    controller.name in ControllerConstants.VALID_CONTROLLER_NAMES):
+            if (
+                controller is not None
+                and controller.name in ControllerConstants.VALID_CONTROLLER_NAMES
+            ):
                 self.controller = controller
                 break
 
@@ -158,17 +161,18 @@ class ControllerInputHandler(object):
             elif event.code == ecodes.ecodes["BTN_Y"] and event.value == 1:
                 self.power_control.geneva_slot = 1
                 # TODO: not sure if we should use this value
-                self.power_control.chicker.chip_distance_meters = (
-                    self.kick_power
-                )
+                self.power_control.chicker.chip_distance_meters = self.kick_power
 
         if event.type in ["ABS_X", "ABS_Y", "ABS_RX"]:
-            (self.motor_control.direct_velocity_control.
-             velocity).x_component_meters = self.x_vel
-            (self.motor_control.direct_velocity_control.
-             velocity).y_component_meters = self.y_vel
-            (self.motor_control.direct_velocity_control.
-             angular_velocity).radians_per_second = self.ang_vel
+            (
+                self.motor_control.direct_velocity_control.velocity
+            ).x_component_meters = self.x_vel
+            (
+                self.motor_control.direct_velocity_control.velocity
+            ).y_component_meters = self.y_vel
+            (
+                self.motor_control.direct_velocity_control.angular_velocity
+            ).radians_per_second = self.ang_vel
 
             self.motor_control.dribbler_speed_rpm = 0
 
@@ -203,6 +207,7 @@ class ControllerInputHandler(object):
         :param enabled: to which state to set controller enabled.
         """
         self.enabled = enabled
+
 
 # {
 #   ('EV_SYN', 0): [('SYN_REPORT', 0), ('SYN_CONFIG', 1), ('SYN_DROPPED', 3), ('?', 21)],

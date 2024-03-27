@@ -67,7 +67,8 @@ class DiagnosticsWidget(QWidget):
         if self.controller_handler.controller is None:
             self.controller_status.set_connected()
             self.controller_handler = ControllerInputHandler(self.proto_unix_io)
-        else: self.controller_status.set_disconnected()
+        else:
+            self.controller_status.set_disconnected()
 
     def refresh(self):
         # check if controller is initialized and set status
@@ -94,12 +95,14 @@ class DiagnosticsWidget(QWidget):
 
         elif self.__control_mode == ControlMode.XBOX:
             # get the values from handheld controller and send values to proto_unix_io
-            diagnostics_primitive = self.controller_handler.get_latest_primitive_command()
+            diagnostics_primitive = (
+                self.controller_handler.get_latest_primitive_command()
+            )
 
             if diagnostics_primitive is not None:
                 logging.debug("Sending diagnostics primitive: " + diagnostics_primitive)
                 self.proto_unix_io.send_proto(Primitive, diagnostics_primitive)
-            else :
+            else:
                 logging.debug("Sending stop primitive")
                 self.proto_unix_io.send_proto(Primitive, StopPrimitive())
 

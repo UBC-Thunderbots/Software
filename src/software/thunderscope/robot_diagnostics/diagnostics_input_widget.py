@@ -78,4 +78,3 @@ class DiagnosticsInputModeWidget(QWidget):
 
     def refresh(self, enable_xbox=False) -> None:
         self.xbox_control_button.setEnabled(enable_xbox)
-

@@ -319,9 +319,10 @@ class TrailValues:
     DEFAULT_TRAIL_LENGTH = 20
     DEFAULT_TRAIL_SAMPLING_RATE = 0
 
+
 class ControllerConstants:
     # TODO: add some more here by testing available ones
-    VALID_CONTROLLER_NAMES = ['Microsoft Xbox One X pad']
+    VALID_CONTROLLER_NAMES = ["Microsoft Xbox One X pad"]
 
     # TODO: added here for reference and to not haver to switch branches, remove later
     MAX_LINEAR_SPEED_MPS = 2.0
@@ -347,4 +348,3 @@ class ControllerConstants:
 
     MAX_LINEAR_SPEED_METER_PER_S = 2
     MAX_ANGULAR_SPEED_RAD_PER_S = 10.0
-

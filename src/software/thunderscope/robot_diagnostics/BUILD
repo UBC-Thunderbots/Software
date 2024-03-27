@@ -52,9 +52,9 @@ py_library(
         "//software/thunderscope:thunderscope_types",
         "//software/thunderscope/robot_diagnostics:chicker",
         "//software/thunderscope/robot_diagnostics:controller",
+        "//software/thunderscope/robot_diagnostics:controller_view",
         "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
-        "//software/thunderscope/robot_diagnostics:controller_view",
         requirement("pyqtgraph"),
     ],
 )
