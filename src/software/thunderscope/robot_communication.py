@@ -355,6 +355,9 @@ class RobotCommunication(object):
 
         self.close_for_fullsystem()
 
+        # TODO: if `--disable_communication` is set, this throws and error on exit
+        # if the close order is changed, then message swaps to
+        # ... shutdown UDP socket for TbotsProto::RobotStatus (<- used to be Log). The boost ...
         self.receive_robot_log.close()
         self.receive_robot_status.close()
         self.run_primitive_set_thread.join()

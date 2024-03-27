@@ -64,11 +64,16 @@ class DiagnosticsWidget(QWidget):
 
     def refresh_controller(self) -> None:
         logging.debug("Attempting to reinitialize handheld controller...")
-        if self.controller_handler.controller is None:
-            self.controller_status.set_connected()
+        if not self.controller_handler.controller_initialized():
             self.controller_handler = ControllerInputHandler(self.proto_unix_io)
+            if self.controller_handler.controller_initialized():
+                logging.debug("Successfully reinitialized handheld controller")
+                self.controller_status.set_connected()
+            else:
+                logging.debug("Failed to reinitialize handheld controller")
+                self.controller_status.set_disconnected()
         else:
-            self.controller_status.set_disconnected()
+            logging.debug("Handheld controller is initialized and connected...")
 
     def refresh(self):
         # check if controller is initialized and set status

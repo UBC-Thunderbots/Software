@@ -27,7 +27,7 @@ class ControllerInputHandler(object):
     # TODO: remove proto_unix_io, and set Motor/Power control as class fields
     # TODO: add class init wrapper for easier handling of controller connection
     def __init__(
-        self, proto_unix_io: ProtoUnixIO,
+            self, proto_unix_io: ProtoUnixIO,
     ):
         self.proto_unix_io = proto_unix_io
         self.enabled = False
@@ -35,11 +35,12 @@ class ControllerInputHandler(object):
 
         self.__setup_controller()
 
-        if self.controller is not None:
+        if self.controller_initialized():
+            self.enabled = True
             logging.debug(
-                "Initializing controller "
-                + self.controller.info.__str__()
-                + " and device path location: "
+                "Initialized handheld controller "
+                + "\"" + self.controller.name + "\""
+                + " and located at path: "
                 + self.controller.path
             )
 
@@ -53,11 +54,13 @@ class ControllerInputHandler(object):
             self.motor_control = MotorControl()
             self.power_control = PowerControl()
 
-        else:
+
+        elif self.controller_initialized():
+
             logging.debug(
                 "Tried to initialize a handheld controller from list available devices:"
             )
-            logging.debug(list_devices())
+            logging.debug(list(map(lambda device: InputDevice(device).name, list_devices())))
             logging.debug(
                 "Could not initialize a handheld controller device - check USB connections"
             )
@@ -71,14 +74,16 @@ class ControllerInputHandler(object):
             return None
 
     def controller_initialized(self):
+        # if self.controller is not None:
+        #     logging.debug(self.controller.read_one())
         return self.controller is not None
 
     def __setup_controller(self):
         for device in list_devices():
             controller = InputDevice(device)
             if (
-                controller is not None
-                and controller.name in ControllerConstants.VALID_CONTROLLER_NAMES
+                    controller is not None
+                    and controller.name in ControllerConstants.VALID_CONTROLLER_NAMES
             ):
                 self.controller = controller
                 break
@@ -95,11 +100,15 @@ class ControllerInputHandler(object):
             )
 
         elif event_type == "ABS_RX":
-            self.motor_control.direct_velocity_control.velocity.radians_per_second = self.__parse_move_event_value(
-                MoveEventType.ROTATIONAL, event_value
+            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+                self.__parse_move_event_value(
+                    MoveEventType.ROTATIONAL, event_value
+                )
             )
 
     def __process_event(self, event):
+        logging.debug(event)
+
         kick_power = 0.0
         dribbler_speed = 0.0
 
@@ -110,7 +119,7 @@ class ControllerInputHandler(object):
             "Processing controller event with type "
             + str(event_type)
             + " and with value "
-            + abs_event.event.value
+            + str(abs_event.event.value)
         )
 
         # TODO: bump python version so we can use pattern matching for this
@@ -127,7 +136,7 @@ class ControllerInputHandler(object):
 
         if event_type == "ABS_RZ" or "ABS_Z":
             if self.__parse_dribbler_enabled_event_value(abs_event.event.value):
-                self.motor_control.dribbler_speed_rpm = dribbler_speed
+                self.motor_control.dribbler_speed_rpm = int(dribbler_speed)
 
         # TODO: possible to use `event_type` instead of `event.type`
         if event.type == ecodes.EV_KEY:
@@ -141,7 +150,7 @@ class ControllerInputHandler(object):
 
     @staticmethod
     def __parse_move_event_value(
-        event_type: MoveEventType, event_value: float
+            event_type: MoveEventType, event_value: float
     ) -> float:
         factor = (
             ControllerConstants.MAX_ANGULAR_SPEED_RAD_PER_S
@@ -181,11 +190,19 @@ class ControllerInputHandler(object):
     def __event_loop(self):
         logging.debug("Starting handheld controller event handling loop")
         if self.enabled:
-            for event in self.controller.read_loop():
-                if self.__stop_event_thread.isSet():
-                    return
-                else:
-                    self.__process_event(event)
+            try:
+                for event in self.controller.read_loop():
+                    if self.__stop_event_thread.isSet():
+                        return
+                    else:
+                        self.__process_event(event)
+            except OSError as ose:
+                logging.debug('Caught an OSError while reading handheld controller event loop!')
+                logging.debug('Error message: ' + str(ose))
+                logging.debug('Check physical handheld controller USB connection')
+            except Exception as e:
+                logging.critical('Caught an unexpected error while reading handheld controller event loop!')
+                logging.critical('Error message: ' + str(e))
 
     def close(self):
         logging.debug("Closing handheld controller event handling thread")
@@ -199,7 +216,6 @@ class ControllerInputHandler(object):
         :param enabled: to which state to set controller enabled.
         """
         self.enabled = enabled
-
 
 # TODO: remove thee after field testing...
 # {

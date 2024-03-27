@@ -324,7 +324,10 @@ class TrailValues:
 class ControllerConstants:
     # TODO: add some more here by testing available ones
     # need to add playstation and older versions of xbox
-    VALID_CONTROLLER_NAMES = ["Microsoft Xbox One X pad"]
+    VALID_CONTROLLER_NAMES = [
+        'Microsoft Xbox One X pad',
+        'Microsoft X-Box 360 pad'
+    ]
 
     XBOX_MAX_RANGE = 32768.0
     XBOX_BUTTON_MAX_RANGE = 1024.0
