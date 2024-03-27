@@ -166,8 +166,8 @@ std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::rankZonesForReceiving(
     for (const auto& zone : cherry_pick_zones)
     {
         cached_ratings[zone] =
-            rateZone(world.field(), world.enemyTeam(),
-                     pitch_division_->getZone(zone), pass_position, passing_config_);
+            rateZone(world.field(), world.enemyTeam(), pitch_division_->getZone(zone),
+                     pass_position, passing_config_);
     }
 
     std::sort(cherry_pick_zones.begin(), cherry_pick_zones.end(),
