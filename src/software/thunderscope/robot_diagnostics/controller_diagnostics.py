@@ -102,7 +102,6 @@ class ControllerInputHandler(object):
     def __process_event(self, event):
         kick_power = 0.0
         dribbler_speed = 0.0
-        dribbler_enabled = False
 
         abs_event = categorize(event)
         event_type = ecodes.bytype[abs_event.event.type][abs_event.event.code]
@@ -127,9 +126,7 @@ class ControllerInputHandler(object):
             kick_power = self.__parse_dribble_event_value(abs_event.event.value)
 
         if event_type == "ABS_RZ" or "ABS_Z":
-            if self.__parse_dribbler_enabled_event_value(
-                abs_event.event.value
-            ):
+            if self.__parse_dribbler_enabled_event_value(abs_event.event.value):
                 self.motor_control.dribbler_speed_rpm = dribbler_speed
 
         # TODO: possible to use `event_type` instead of `event.type`
@@ -143,7 +140,9 @@ class ControllerInputHandler(object):
                 self.power_control.chicker.chip_distance_meters = kick_power
 
     @staticmethod
-    def __parse_move_event_value(event_type: MoveEventType, event_value: float) -> float:
+    def __parse_move_event_value(
+        event_type: MoveEventType, event_value: float
+    ) -> float:
         factor = (
             ControllerConstants.MAX_ANGULAR_SPEED_RAD_PER_S
             if event_type == MoveEventType.ROTATIONAL
@@ -155,7 +154,9 @@ class ControllerInputHandler(object):
         if abs(event_value) < (ControllerConstants.DEADZONE_PERCENTAGE * factor):
             return 0
         else:
-            return numpy.clip(event_value, 0, ControllerConstants.XBOX_MAX_RANGE * factor)
+            return numpy.clip(
+                event_value, 0, ControllerConstants.XBOX_MAX_RANGE * factor
+            )
 
     @staticmethod
     def __parse_dribbler_enabled_event_value(value: float) -> bool:
@@ -163,15 +164,19 @@ class ControllerInputHandler(object):
 
     @staticmethod
     def __parse_dribble_event_value(value: float) -> float:
-        return numpy.clip(value * ControllerConstants.DRIBBLER_STEPPER,
-                          0,
-                          ControllerConstants.DRIBBLER_INDEFINITE_SPEED)
+        return numpy.clip(
+            value * ControllerConstants.DRIBBLER_STEPPER,
+            0,
+            ControllerConstants.DRIBBLER_INDEFINITE_SPEED,
+        )
 
     @staticmethod
     def __parse_kick_event_value(value: float) -> float:
-        return numpy.clip(value * ControllerConstants.POWER_STEPPER,
-                          ControllerConstants.MIN_POWER,
-                          ControllerConstants.MAX_POWER)
+        return numpy.clip(
+            value * ControllerConstants.POWER_STEPPER,
+            ControllerConstants.MIN_POWER,
+            ControllerConstants.MAX_POWER,
+        )
 
     def __event_loop(self):
         logging.debug("Starting handheld controller event handling loop")
