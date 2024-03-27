@@ -318,3 +318,18 @@ class TrailValues:
 
     DEFAULT_TRAIL_LENGTH = 20
     DEFAULT_TRAIL_SAMPLING_RATE = 0
+
+class ControllerConstants:
+    # TODO: added here for reference and to not haver to switch branches, remove later
+    MAX_LINEAR_SPEED_MPS = 2.0
+    MIN_LINEAR_SPEED_MPS = -2.0
+
+    MAX_ANGULAR_SPEED_RAD_PER_S = 20
+    MIN_ANGULAR_SPEED_RAD_PER_S = -20
+
+    MAX_DRIBBLER_RPM = 10000
+    MIN_DRIBBLER_RPM = -10000
+
+    MIN_POWER = 1000
+    MAX_POWER = 20000
+
