@@ -1,12 +1,11 @@
 import logging
-
 from evdev import InputDevice, categorize, ecodes, list_devices
 from threading import Event, Thread
 
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.thunderscope.constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-import software.python_bindings as tbots_cpp
 
 XBOX_MAX_RANGE = 32768
 XBOX_BUTTON_MAX_RANGE = 1024

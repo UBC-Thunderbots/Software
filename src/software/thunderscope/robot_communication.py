@@ -6,11 +6,11 @@ import software.python_bindings as tbots_cpp
 from typing import Type
 from google.protobuf.message import Message
 from pyqtgraph.Qt import QtCore
+from proto.import_all_protos import *
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import *
-from proto.import_all_protos import *
 from software.thunderscope.constants import (
     ROBOT_COMMUNICATIONS_TIMEOUT_S,
     IndividualRobotMode,
