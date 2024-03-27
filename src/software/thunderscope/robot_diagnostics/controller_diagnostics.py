@@ -10,6 +10,7 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 # TODO: change all logging to DEBUG level or remove entirely...
 
+
 class MoveEventType(Enum):
     LINEAR = 1
     ROTATIONAL = 2
@@ -24,7 +25,7 @@ class ControllerInputHandler(object):
     # TODO: remove proto_unix_io, and set Motor/Power control as class fields
     # TODO: add class init wrapper for easier handling of controller connection
     def __init__(
-            self, proto_unix_io: ProtoUnixIO,
+        self, proto_unix_io: ProtoUnixIO,
     ):
         self.proto_unix_io = proto_unix_io
         self.enabled = False
@@ -73,30 +74,35 @@ class ControllerInputHandler(object):
         for device in list_devices():
             controller = InputDevice(device)
             if (
-                    controller is not None
-                    and controller.name in ControllerConstants.VALID_CONTROLLER_NAMES
+                controller is not None
+                and controller.name in ControllerConstants.VALID_CONTROLLER_NAMES
             ):
                 self.controller = controller
                 break
 
     def process_move_event_value(self, event_type, event_value) -> None:
         if event_type == "ABS_X":
-            self.motor_control.direct_velocity_control.velocity.x_component_meters = \
-                self.__parse_move_event_value(MoveEventType.LINEAR, event_value)
+            self.motor_control.direct_velocity_control.velocity.x_component_meters = self.__parse_move_event_value(
+                MoveEventType.LINEAR, event_value
+            )
 
         elif event_type == "ABS_Y":
-            self.motor_control.direct_velocity_control.velocity.y_component_meters = \
-                self.__parse_move_event_value(MoveEventType.LINEAR, event_value)
+            self.motor_control.direct_velocity_control.velocity.y_component_meters = self.__parse_move_event_value(
+                MoveEventType.LINEAR, event_value
+            )
 
         elif event_type == "ABS_RX":
-            self.motor_control.direct_velocity_control.velocity.radians_per_second = \
-                self.__parse_move_event_value(MoveEventType.ROTATIONAL, event_value)
+            self.motor_control.direct_velocity_control.velocity.radians_per_second = self.__parse_move_event_value(
+                MoveEventType.ROTATIONAL, event_value
+            )
 
     @staticmethod
     def __parse_move_event_value(event_type: MoveEventType, event_value: int) -> int:
-        factor = MAX_ANGULAR_SPEED_RAD_PER_S \
-            if event_type == MoveEventType.ROTATIONAL \
+        factor = (
+            MAX_ANGULAR_SPEED_RAD_PER_S
+            if event_type == MoveEventType.ROTATIONAL
             else MAX_LINEAR_SPEED_METER_PER_S
+        )
 
         if abs(event_value) < (DEADZONE_PERCENTAGE * factor):
             return 0
@@ -122,20 +128,20 @@ class ControllerInputHandler(object):
         abs_event = categorize(event)
         event_type = ecodes.bytype[abs_event.event.type][abs_event.event.code]
 
-        logging.debug("Processing controller event with type " + str(event_type) +
-                      " and with value " + abs_event.event.value)
+        logging.debug(
+            "Processing controller event with type "
+            + str(event_type)
+            + " and with value "
+            + abs_event.event.value
+        )
 
         # TODO: bump python version so we can use pattern matching for this
         if event.type == ecodes.EV_ABS:
             if event_type in ["ABS_X", "ABS_Y", "ABS_RX"]:
-                self.process_move_event_value(
-                    event_type, abs_event.event.value
-                )
+                self.process_move_event_value(event_type, abs_event.event.value)
 
         if event_type == "ABS_HAT0X":
-            kick_power = self.__parse_kick_event_value(
-                abs_event.event.value
-            )
+            kick_power = self.__parse_kick_event_value(abs_event.event.value)
         if event_type == "ABS_RZ" or "ABS_Z":
             dribbler_enabled = self.__parse_dribbler_enabled_event_value(
                 abs_event.event.value
@@ -182,6 +188,7 @@ class ControllerInputHandler(object):
         :param enabled: to which state to set controller enabled.
         """
         self.enabled = enabled
+
 
 # TODO: remove thee after field testing...
 # {
