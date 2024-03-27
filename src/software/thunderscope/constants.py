@@ -320,16 +320,31 @@ class TrailValues:
     DEFAULT_TRAIL_SAMPLING_RATE = 0
 
 class ControllerConstants:
+    # TODO: add some more here by testing available ones
+    VALID_CONTROLLER_NAMES = ['Microsoft Xbox One X pad']
+
     # TODO: added here for reference and to not haver to switch branches, remove later
     MAX_LINEAR_SPEED_MPS = 2.0
     MIN_LINEAR_SPEED_MPS = -2.0
 
     MAX_ANGULAR_SPEED_RAD_PER_S = 20
-    MIN_ANGULAR_SPEED_RAD_PER_S = -20
+    # TODO: field test values
+    # MIN_ANGULAR_SPEED_RAD_PER_S = -20
 
     MAX_DRIBBLER_RPM = 10000
     MIN_DRIBBLER_RPM = -10000
 
     MIN_POWER = 1000
     MAX_POWER = 20000
+
+    XBOX_MAX_RANGE = 32768
+    XBOX_BUTTON_MAX_RANGE = 1024
+
+    DEADZONE_PERCENTAGE = 0.30
+
+    DRIBBLER_STEPPER = 100
+    POWER_STEPPER = 100
+
+    MAX_LINEAR_SPEED_METER_PER_S = 2
+    MAX_ANGULAR_SPEED_RAD_PER_S = 10.0
 
