@@ -2,7 +2,7 @@
 
 #include <boost/asio.hpp>
 
-typedef std::function<void(const std::string&, const std::size_t&)> ReceiveCallback;
+typedef std::function<void(const char*, const std::size_t&)> ReceiveCallback;
 
 class UdpListener
 {
@@ -17,7 +17,7 @@ class UdpListener
     private:
         void close();
 
-        void handleReceive(const boost::system::error_code& error, std::size_t bytes_transferred);
+        void handleDataReception(const boost::system::error_code& error, std::size_t bytes_transferred);
 
         void startListen();
 
@@ -25,14 +25,14 @@ class UdpListener
 
         bool running_;
 
-        std::array<char, MAX_BUFFER_LENGTH> raw_received_data;
+        std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
 
         // A UDP socket to receive data on
         boost::asio::ip::udp::socket socket_;
 
         // The endpoint for the sender
-        boost::asio::ip::udp::endpoint sender_endpoint;
+        boost::asio::ip::udp::endpoint sender_endpoint_;
 
         // Callback once a new message is received
-        ReceiveCallback receive_callback;
+        ReceiveCallback receive_callback_;
 };

@@ -6,7 +6,7 @@ UdpListener::UdpListener(boost::asio::io_service& io_service, const std::string&
                          unsigned short port, bool multicast, ReceiveCallback receive_callback)
     : running_(true),
       socket_(io_service),
-      receive_callback(receive_callback)
+      receive_callback_(receive_callback)
 {
     boost::asio::ip::address listen_address = boost::asio::ip::make_address(ip_address);
 
@@ -26,7 +26,7 @@ UdpListener::UdpListener(boost::asio::io_service& io_service, const std::string&
     // If we are using multicast, join the multicast group
     if (multicast)
     {
-        socket_.set_option(listen_address);
+        socket_.set_option(boost::asio::ip::multicast::join_group(listen_address));
     }
 
     startListen();
@@ -35,7 +35,7 @@ UdpListener::UdpListener(boost::asio::io_service& io_service, const std::string&
 UdpListener::UdpListener(boost::asio::io_service& io_service, const unsigned short port, ReceiveCallback receive_callback)
     : running_(true),
       socket_(io_service),
-      receive_callback(receive_callback)
+      receive_callback_(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v6(), port);
     socket_.open(listen_endpoint.protocol());
@@ -70,7 +70,7 @@ void UdpListener::close()
     {
         LOG(WARNING)
             << "An unknown network error occurred when attempting to close UDP socket. The boost system error is: " <<
-            error_code.message() << std::endl;
+            error.message() << std::endl;
     }
 }
 
@@ -96,7 +96,7 @@ void UdpListener::handleDataReception(const boost::system::error_code& error, st
     if (!error)
     {
         // Call the receive callback with the received data
-        receive_callback(std::string(raw_received_data_, num_bytes_received));
+        receive_callback_(raw_received_data_.data(), num_bytes_received);
 
         // Start listening for more data
         startListen();
@@ -106,7 +106,7 @@ void UdpListener::handleDataReception(const boost::system::error_code& error, st
         // Start listening again to receive the next data
         startListen();
 
-        LOG(ERROR) << "UdpListener: Error receiving data: " << error.message() << std::endl;
+        LOG(WARNING) << "UdpListener: Error receiving data: " << error.message() << std::endl;
     }
 
     if (num_bytes_received > MAX_BUFFER_LENGTH)
