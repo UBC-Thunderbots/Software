@@ -209,6 +209,7 @@ class ControllerInputHandler(object):
         self.enabled = enabled
 
 
+# TODO: remove thee after field testing...
 # {
 #   ('EV_SYN', 0): [('SYN_REPORT', 0), ('SYN_CONFIG', 1), ('SYN_DROPPED', 3), ('?', 21)],
 #   ('EV_KEY', 1): [
