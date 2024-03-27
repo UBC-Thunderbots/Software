@@ -1,6 +1,7 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
+#include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
 
 /**
@@ -14,4 +15,10 @@ class BallPlacementPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
+    void updateTactics(const PlayUpdate &play_update) override;
+    std::vector<std::string> getState() override;
+
+   private:
+    FSM<BallPlacementPlayFSM> fsm;
+    BallPlacementPlayFSM::ControlParams control_params;
 };

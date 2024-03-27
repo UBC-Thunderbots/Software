@@ -1,8 +1,9 @@
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h"
 
+#include <Tracy.hpp>
 #include <algorithm>
 
-ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
+ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
     : ai_config(ai_config),
       attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
@@ -20,8 +21,8 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(TbotsProto::AiConfig ai_config)
 }
 
 void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
-    std::vector<EighteenZoneId> ranked_zones, PassEvaluation<EighteenZoneId> pass_eval,
-    unsigned int num_tactics)
+    const std::vector<EighteenZoneId>& ranked_zones,
+    const PassEvaluation<EighteenZoneId>& pass_eval, unsigned int num_tactics)
 {
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -51,43 +52,36 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
     // only look for pass if there are more than 1 robots
     if (event.common.num_tactics > 1)
     {
-        auto pitch_division = std::make_shared<const EighteenZonePitchDivision>(
-            event.common.world_ptr->field());
-
-        auto pass_eval = pass_generator.generatePassEvaluation(*event.common.world_ptr);
-        auto ranked_zones = pass_eval.rankZonesForReceiving(
+        ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
+        PassEvaluation<EighteenZoneId> pass_eval =
+            pass_generator.generatePassEvaluation(*event.common.world_ptr);
+        best_pass_and_score_so_far               = pass_eval.getBestPassOnField();
+        std::vector<EighteenZoneId> ranked_zones = pass_eval.rankZonesForReceiving(
             *event.common.world_ptr, event.common.world_ptr->ball().position());
-
-        best_pass_and_score_so_far = pass_eval.getBestPassOnField();
-
-
-        // Wait for a good pass by starting out only looking for "perfect" passes
-        // (with a score of 1) and decreasing this threshold over time
-        // This boolean indicates if we're ready to perform a pass
-        double abs_min_pass_score =
-            ai_config.shoot_or_pass_play_config().abs_min_pass_score();
-        double pass_score_ramp_down_duration =
-            ai_config.shoot_or_pass_play_config().pass_score_ramp_down_duration();
-        pass_eval = pass_generator.generatePassEvaluation(*event.common.world_ptr);
-        best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
 
-        // If we've assigned a robot as the passer in the PassGenerator, we
-        // lower our threshold based on how long the PassGenerator has been
-        // running since we set it
+        // add remaining tactics based on ranked zones
+        updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                          event.common.num_tactics - 1);
+        ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
+                              offensive_positioning_tactics.end());
+
+        // Update minimum pass score threshold. Wait for a good pass by starting out only
+        // looking for "perfect" passes (with a score of 1) and decreasing this threshold
+        // over time
+        double abs_min_pass_score =
+            ai_config.shoot_or_pass_play_config().abs_min_pass_score();
+        double pass_score_ramp_down_duration =
+            ai_config.shoot_or_pass_play_config().pass_score_ramp_down_duration();
+
         time_since_commit_stage_start = event.common.world_ptr->getMostRecentTimestamp() -
                                         pass_optimization_start_time;
         min_pass_score_threshold =
             1 - std::min(time_since_commit_stage_start.toSeconds() /
                              pass_score_ramp_down_duration,
                          1.0 - abs_min_pass_score);
-        updateOffensivePositioningTactics(ranked_zones, pass_eval,
-                                          event.common.num_tactics - 1);
-
-        ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
-                              offensive_positioning_tactics.end());
     }
     event.common.set_tactics(ret_tactics);
 }
@@ -147,10 +141,10 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
     const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
-    const auto ball_not_kicked_threshold =
-        this->ai_config.shoot_or_pass_play_config().ball_not_kicked_threshold();
+    const auto ball_is_kicked_m_per_s_threshold =
+        this->ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
 
-    return (ball_velocity < ball_not_kicked_threshold) &&
+    return (ball_velocity < ball_is_kicked_m_per_s_threshold) &&
            (best_pass_and_score_so_far.rating > min_pass_score_threshold);
 }
 
