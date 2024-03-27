@@ -18,8 +18,20 @@ cc_library(
     ],
     visibility = ["//visibility:private"],
     deps = [
+        ":udp_listener",
         "//software/logger",
         "//software/util/typename",
+    ],
+)
+
+cc_library(
+    name = "udp_listener",
+    srcs = ["udp_listener.cpp"],
+    hdrs = ["udp_listener.h"],
+    visibility = ["//visibility:private"],
+    deps = [
+        "@boost//:asio",
+        "//software/logger:logger",
     ],
 )
 
