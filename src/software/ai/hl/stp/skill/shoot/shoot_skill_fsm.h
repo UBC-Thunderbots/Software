@@ -5,7 +5,7 @@
 
 struct ShootSkillFSM
 {
-    struct GetPossessionFSM
+    struct GetBallControlFSM
     {
         struct ControlParams
         {
@@ -14,13 +14,13 @@ struct ShootSkillFSM
         DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
         /**
-         * Action that updates the DribbleSkillFSM to get possession of the ball
+         * Action that updates the DribbleSkillFSM to get control of the ball
          * and steady it
          *
          * @param event the Update event
          * @param processEvent processes the DribbleSkillFSM::Update event
          */
-        void getPossession(
+        void getBallControl(
             const Update& event,
             boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
@@ -30,11 +30,11 @@ struct ShootSkillFSM
 
             DEFINE_SML_STATE(DribbleSkillFSM)
             DEFINE_SML_EVENT(Update)
-            DEFINE_SML_SUB_FSM_UPDATE_ACTION(getPossession, DribbleSkillFSM)
+            DEFINE_SML_SUB_FSM_UPDATE_ACTION(getBallControl, DribbleSkillFSM)
 
             return make_transition_table(
                 // src_state + event [guard] / action = dest_state
-                *DribbleSkillFSM_S + Update_E / getPossession_A, DribbleSkillFSM_S = X,
+                *DribbleSkillFSM_S + Update_E / getBallControl_A, DribbleSkillFSM_S = X,
                 X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
         }
     };
@@ -46,14 +46,14 @@ struct ShootSkillFSM
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Action that updates the GetPossessionFSM to get possession of the ball
+     * Action that updates the GetBallControlFSM to get control of the ball
      * and steady it
      *
      * @param event the Update event
-     * @param processEvent processes the GetPossessionFSM::Update event
+     * @param processEvent processes the GetBallControlFSM::Update event
      */
-    void getPossession(const Update& event,
-                       boost::sml::back::process<GetPossessionFSM::Update> processEvent);
+    void getBallControl(const Update& event,
+                       boost::sml::back::process<GetBallControlFSM::Update> processEvent);
 
     /**
      * Action that updates the DribbleSkillFSM to dribble the ball to the
@@ -79,20 +79,20 @@ struct ShootSkillFSM
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetPossessionFSM)
+        DEFINE_SML_STATE(GetBallControlFSM)
         DEFINE_SML_STATE(DribbleSkillFSM)
         DEFINE_SML_STATE(PivotKickSkillFSM)
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(getPossession, GetPossessionFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(getBallControl, GetBallControlFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(dribbleBallToKickOrigin, DribbleSkillFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(pivotKick, PivotKickSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetPossessionFSM_S + Update_E / getPossession_A,
-            GetPossessionFSM_S = DribbleSkillFSM_S,
+            *GetBallControlFSM_S + Update_E / getBallControl_A,
+            GetBallControlFSM_S = DribbleSkillFSM_S,
 
             DribbleSkillFSM_S + Update_E / dribbleBallToKickOrigin_A,
             DribbleSkillFSM_S = PivotKickSkillFSM_S,

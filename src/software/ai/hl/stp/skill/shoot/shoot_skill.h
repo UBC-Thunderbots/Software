@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h"
 #include "software/ai/hl/stp/skill/shoot/shoot_skill_fsm.h"
 
-class ShootSkill : public BaseSkill<ShootSkillFSM, ShootSkillFSM::GetPossessionFSM,
+class ShootSkill : public BaseSkill<ShootSkillFSM, ShootSkillFSM::GetBallControlFSM,
                                     DribbleSkillFSM, PivotKickSkillFSM>
 {
    public:

@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/skill/shoot/shoot_skill_fsm.h"
 
-void ShootSkillFSM::GetPossessionFSM::getPossession(
+void ShootSkillFSM::GetBallControlFSM::getBallControl(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
     Point ball_position = event.common.world_ptr->ball().position();
@@ -15,10 +15,10 @@ void ShootSkillFSM::GetPossessionFSM::getPossession(
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
 }
 
-void ShootSkillFSM::getPossession(
-    const Update& event, boost::sml::back::process<GetPossessionFSM::Update> processEvent)
+void ShootSkillFSM::getBallControl(
+    const Update& event, boost::sml::back::process<GetBallControlFSM::Update> processEvent)
 {
-    processEvent(GetPossessionFSM::Update({}, event.common));
+    processEvent(GetBallControlFSM::Update({}, event.common));
 }
 
 void ShootSkillFSM::dribbleBallToKickOrigin(
