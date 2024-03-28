@@ -114,6 +114,7 @@ class RobotNavigationObstacleFactory
      *
      * @param circle The circle to make obstacle with
      * @param traj Trajectory which the obstacle is following
+     * @return ObstaclePtr to the trajectory based obstacle
      */
     ObstaclePtr createCircleWithTrajectory(const Circle &circle,
                                            const TrajectoryPath &traj) const;
@@ -123,6 +124,7 @@ class RobotNavigationObstacleFactory
      *
      * @param circle The circle to make obstacle with
      * @param velocity The velocity of the obstacle
+     * @return ObstaclePtr to the constant velocity obstacle
      */
     ObstaclePtr createCircleWithConstVelocity(const Circle &circle,
                                               const Vector &velocity) const;
