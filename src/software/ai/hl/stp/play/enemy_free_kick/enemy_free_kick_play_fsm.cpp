@@ -31,6 +31,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, int num_shadow_robots
                                               unsigned int num_defenders)
 {
     PriorityTacticVector tactics_to_return = {{}, {}, {}};
+    Point block_kick_point;
 
 //    this->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
@@ -64,8 +65,6 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, int num_shadow_robots
     {
         return;
     }
-
-    Point block_kick_point;
 
     if (num_shadow_robots > 0)
     {

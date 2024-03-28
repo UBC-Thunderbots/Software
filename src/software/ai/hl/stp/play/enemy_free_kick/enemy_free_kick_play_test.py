@@ -53,6 +53,25 @@ from proto.ssl_gc_common_pb2 import Team
                 ],
                 tbots_cpp.Point(-2, 2)
         ),
+        (
+                [
+                    tbots_cpp.Point(-2.75, 2.5),
+                    tbots_cpp.Point(-2.75, 1.5),
+                    tbots_cpp.Point(-2.75, 0.5),
+                    tbots_cpp.Point(-2.75, -0.5),
+                    tbots_cpp.Point(-2.75, -1.5),
+                    tbots_cpp.Point(-2.75, -3.0),
+                ],
+                [
+                    tbots_cpp.Point(1.8, -2),
+                    tbots_cpp.Point(0, -2.5),
+                    tbots_cpp.Point(2, 0),
+                    tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+                    tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
+                    tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+                ],
+                tbots_cpp.Point(2, -2)
+        ),
     ]
 )
 def test_enemy_free_kick_play(simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos):
@@ -118,7 +137,7 @@ def test_enemy_free_kick_play(simulated_test_runner, blue_bots, yellow_bots, bal
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=15,
+        test_timeout_s=5,
     )
 
 
