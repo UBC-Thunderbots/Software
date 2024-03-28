@@ -33,13 +33,32 @@ class ChickerWidget(QWidget):
 
         super(ChickerWidget, self).__init__()
 
-        vbox_layout = QVBoxLayout()
-        self.radio_buttons_group = QButtonGroup()
         self.proto_unix_io = proto_unix_io
+        self.power_control = PowerControl()
 
-        # Initialising the buttons
+        # initial values
+        self.power_value = 1
 
-        # push button group box
+        vbox_layout = QVBoxLayout()
+        self.setLayout(vbox_layout)
+
+        # Power slider for kicking & chipping
+        (
+            self.power_slider_layout,
+            self.power_slider,
+            self.power_label,
+        ) = common_widgets.create_slider(
+            "Power (m/s) (Chipper power is fixed)", 1, 10, 1
+        )
+        vbox_layout.addLayout(self.power_slider_layout)
+
+        # Initializing kick & chip buttons
+        self.button_clickable_map = {
+            "no_auto": True,
+            "auto_kick": True,
+            "auto_chip": True,
+        }
+        self.radio_buttons_group = QButtonGroup()
         self.push_button_box, self.push_buttons = common_widgets.create_buttons(
             ["Kick", "Chip"]
         )
@@ -48,7 +67,7 @@ class ChickerWidget(QWidget):
 
         vbox_layout.addWidget(self.push_button_box)
 
-        # radio button group box
+        # Initializing auto kick & chip buttons
         self.radio_button_box, self.radio_buttons = common_widgets.create_radio(
             ["No Auto", "Auto Kick", "Auto Chip"], self.radio_buttons_group
         )
@@ -85,32 +104,6 @@ class ChickerWidget(QWidget):
         )
 
         vbox_layout.addWidget(self.radio_button_box)
-
-        # sliders
-        (
-            self.geneva_slider_layout,
-            self.geneva_slider,
-            self.geneva_label,
-        ) = common_widgets.create_slider("Geneva Position", 0, NUM_GENEVA_ANGLES - 1, 1)
-        vbox_layout.addLayout(self.geneva_slider_layout)
-
-        (
-            self.power_slider_layout,
-            self.power_slider,
-            self.power_label,
-        ) = common_widgets.create_slider(
-            "Power (m/s) (Chipper power is fixed)", 1, 10, 1
-        )
-        vbox_layout.addLayout(self.power_slider_layout)
-
-        self.setLayout(vbox_layout)
-
-        # to manage the state of radio buttons - to make sure message is only sent once
-        self.radio_checkable = {"no_auto": True, "auto_kick": True, "auto_chip": True}
-
-        # initial values
-        self.geneva_value = 3
-        self.power_value = 1
 
     def send_command_and_timeout(self, command: ChickerCommandMode) -> None:
         """
@@ -168,12 +161,10 @@ class ChickerWidget(QWidget):
         """
 
         # gets slider values
-        geneva_value = self.geneva_slider.value()
-
         power_value = self.power_slider.value()
 
         power_control = PowerControl()
-        power_control.geneva_slot = geneva_value
+        power_control.geneva_slot = 3
 
         # sends kick, chip, autokick, or autchip primitive
         if command == ChickerCommandMode.KICK:
@@ -187,8 +178,8 @@ class ChickerWidget(QWidget):
                 power_value
             )
 
-        # sends proto
-        self.proto_unix_io.send_proto(PowerControl, power_control)
+        # update the proto to be sent
+        self.power_control = power_control
 
         # clears the proto buffer for kick or chip commands
         # so only one kick / chip is sent
@@ -203,8 +194,7 @@ class ChickerWidget(QWidget):
         So sending an empty message overwrites the cache and prevents spamming commands
         If buffer is full, blocks execution until buffer has space
         """
-        power_control = PowerControl()
-        self.proto_unix_io.send_proto(PowerControl, power_control, True)
+        self.power_control = PowerControl()
 
     def change_button_state(self, button: QPushButton, enable: bool) -> None:
         """Change button color and clickable state.
@@ -223,10 +213,7 @@ class ChickerWidget(QWidget):
 
     def refresh(self) -> None:
 
-        # gets slider values and sets label to that value
-        geneva_value = self.geneva_slider.value()
-        self.geneva_label.setText(Slot.Name(geneva_value))
-
+        # get power value slider value and set the label to that value
         power_value = self.power_slider.value()
         self.power_label.setText(str(power_value))
 

@@ -15,6 +15,11 @@ class DriveAndDribblerWidget(QWidget):
         :param proto_unix_io: the proto_unix_io object
 
         """
+
+        super(DriveAndDribblerWidget, self).__init__()
+
+        self.motor_control = MotorControl()
+
         self.input_a = time.time()
         self.constants = tbots_cpp.create2021RobotConstants()
         QWidget.__init__(self)
@@ -46,7 +51,7 @@ class DriveAndDribblerWidget(QWidget):
             self.angular_velocity_slider.value()
         )
 
-        self.proto_unix_io.send_proto(MotorControl, motor_control)
+        self.motor_control = motor_control
 
     def value_change(self, value: float) -> str:
         """
@@ -170,7 +175,7 @@ class DriveAndDribblerWidget(QWidget):
 
         return group_box
 
-    def toggle_all(self, enable: bool) -> None:
+    def set_enabled(self, enable: bool) -> None:
         """
         Disables or enables all sliders and buttons depending on boolean parameter
 

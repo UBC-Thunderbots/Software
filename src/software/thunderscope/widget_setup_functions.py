@@ -39,8 +39,9 @@ from software.thunderscope.play.playinfo_widget import PlayInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
-    FullSystemConnectWidget,
+    DiagnosticsInputModeWidget,
 )
+from software.thunderscope.robot_diagnostics.diagnostics_widget import DiagnosticsWidget
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
 )
@@ -327,18 +328,6 @@ def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
     return chicker_widget
 
 
-def setup_diagnostics_input_widget() -> FullSystemConnectWidget:
-    """
-    Sets up the diagnostics input widget
-
-    :returns: the diagnostics input widget
-    """
-
-    diagnostics_input_widget = FullSystemConnectWidget()
-
-    return diagnostics_input_widget
-
-
 def setup_drive_and_dribbler_widget(
     proto_unix_io: ProtoUnixIO,
 ) -> DriveAndDribblerWidget:
@@ -351,3 +340,17 @@ def setup_drive_and_dribbler_widget(
     drive_and_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
 
     return drive_and_dribbler_widget
+
+
+def setup_diagnostics_widget(proto_unix_io: ProtoUnixIO,) -> DriveAndDribblerWidget:
+    """Setup the drive and dribbler widget
+
+    :param proto_unix_io: The proto unix io object
+    :returns: The diagnostics widget that contains
+    the control input switch, drive & dribbler sliders,
+    chicker control and controller handler
+
+    """
+    diagnostics_widget = DiagnosticsWidget(proto_unix_io)
+
+    return diagnostics_widget

@@ -13,7 +13,7 @@ from software.py_constants import *
 import proto.message_translation.tbots_protobuf as tbots_protobuf
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
+from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes, TabNames
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
@@ -38,7 +38,7 @@ NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
 if __name__ == "__main__":
 
-    logging.getLogger().setLevel(logging.INFO)
+    logging.getLogger().setLevel(logging.DEBUG)
 
     # Setup parser
     parser = argparse.ArgumentParser(
@@ -320,11 +320,10 @@ if __name__ == "__main__":
                 for tab in tscope_config.tabs:
                     if hasattr(tab, "widgets"):
                         robot_view_widget = tab.find_widget("Robot View")
-
-                        if robot_view_widget:
+                        if robot_view_widget is not None:
                             robot_view_widget.control_mode_signal.connect(
-                                lambda mode, robot_id: robot_communication.toggle_robot_connection(
-                                    mode, robot_id
+                                lambda robot_mode, robot_id: robot_communication.toggle_robot_control_mode(
+                                    robot_id, robot_mode
                                 )
                             )
 
