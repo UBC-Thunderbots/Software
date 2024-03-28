@@ -2,20 +2,20 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/defense/defense_play.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
+//#include "software/ai/hl/stp/play/defense/defense_play.h"
+
+#include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 
 /**
  * Play for defending against enemy free kicks
  */
 
-struct EnemyFreeKickPlayFSM
-{
-    class ShadowFreeKicker;
+struct EnemyFreeKickPlayFSM {
+    class BlockFreeKicker;
 
-    struct ControlParams
-    {
+    struct ControlParams {
+        // The maximum allowed speed mode
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -32,7 +32,7 @@ struct EnemyFreeKickPlayFSM
      *
      * @param event the FSM event
      */
-    void setupEnemyKickerStrategy(const Update& event);
+    void setupEnemyKickerStrategy(const Update &event);
 
     /**
      * Helper function to set the tactics for the play depending on the
@@ -42,13 +42,26 @@ struct EnemyFreeKickPlayFSM
      * @param num_shadow_robots the number of shadowing robots (ShootOrPassPlay)
      * @param num_defenders the number of defenders (DefensePlay)
      */
-    void setTactics(const Update& event, int num_shadow_robots, int num_defenders);
+    void setTactics(const Update &event, int num_shadow_robots, unsigned int num_defenders);
 
-    auto operator()()
-    {
+    /**
+     * Helper function to set up crease defender tactic vector members
+     *
+     * @param num_crease_defenders the number of crease defender tactics to set
+     */
+    void setUpCreaseDefenders(unsigned int num_crease_defenders);
+
+    /**
+     * Helper function to set up pass defender tactic vector members
+     *
+     * @param num_pass_defenders the number of pass defender tactics to set
+     */
+    void setUpPassDefenders(unsigned int num_pass_defenders);
+
+    auto operator()() {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(ShadowFreeKicker)
+        DEFINE_SML_STATE(BlockFreeKicker)
 
         DEFINE_SML_EVENT(Update)
 
@@ -56,12 +69,14 @@ struct EnemyFreeKickPlayFSM
 
         return make_transition_table(
                 // src_state + event [guard] / action = dest_state
-                *ShadowFreeKicker_S + Update_E / setupEnemyKickerStrategy_A = ShadowFreeKicker_S,
-                X + Update_E                                     = X);
+                *BlockFreeKicker_S + Update_E / setupEnemyKickerStrategy_A = BlockFreeKicker_S,
+                X + Update_E = X);
     }
 
 private:
     TbotsProto::AiConfig ai_config;
-    std::shared_ptr<DefensePlay> defense_play;
-    std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_defenders;
+//    std::shared_ptr<DefensePlay> defense_play;
+    std::vector<std::shared_ptr<PassDefenderTactic>> enemy_free_kick_defenders;
+    std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
+    std::vector<std::shared_ptr<PassDefenderTactic>> pass_defenders;
 };

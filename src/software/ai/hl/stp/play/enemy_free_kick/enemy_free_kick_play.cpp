@@ -26,6 +26,12 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
+void EnemyFreekickPlay::updateControlParams(
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
+{
+    control_params.max_allowed_speed_mode = max_allowed_speed_mode;
+}
+
 void EnemyFreekickPlay::updateTactics(const PlayUpdate &play_update)
 {
     fsm.process_event(EnemyFreeKickPlayFSM::Update(control_params, play_update));

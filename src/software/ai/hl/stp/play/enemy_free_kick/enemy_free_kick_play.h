@@ -17,6 +17,14 @@ public:
                         const WorldPtr &world_ptr) override;
     void updateTactics(const PlayUpdate &play_update) override;
 
+    /**
+     * Update control params for this play
+     *
+     * @param max_allowed_speed_mode the mode of maximum speed allowed
+     */
+    void updateControlParams(TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+    TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+
 private:
     FSM<EnemyFreeKickPlayFSM> fsm;
     EnemyFreeKickPlayFSM::ControlParams control_params;
