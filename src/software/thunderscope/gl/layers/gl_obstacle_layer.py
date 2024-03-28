@@ -9,7 +9,6 @@ from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
 from software.thunderscope.gl.graphics.gl_stadium import GLStadium
 
-import math
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -85,33 +84,4 @@ class GLObstacleLayer(GLLayer):
         for stadium_obstacle_graphic, stadium_obstacle in zip(
             self.stadium_obstacle_graphics, stadium_obstacles
         ):
-            # set basic parameters
-            x_start_to_end = (
-                stadium_obstacle.segment.end.x_meters
-                - stadium_obstacle.segment.start.x_meters
-            )
-            y_start_to_end = (
-                stadium_obstacle.segment.end.y_meters
-                - stadium_obstacle.segment.start.y_meters
-            )
-            length = math.sqrt(
-                math.pow(x_start_to_end, 2) + math.pow(y_start_to_end, 2)
-            )
-            stadium_obstacle_graphic.set_parameters(stadium_obstacle.radius, length)
-            # set stadium position to average of its two points
-            stadium_obstacle_graphic.set_position(
-                (
-                    stadium_obstacle.segment.end.x_meters
-                    + stadium_obstacle.segment.start.x_meters
-                )
-                / 2,
-                (
-                    stadium_obstacle.segment.end.y_meters
-                    + stadium_obstacle.segment.start.y_meters
-                )
-                / 2,
-            )
-            # set stadium orientation to angle between positive x and vector from start to end
-            stadium_obstacle_graphic.set_orientation(
-                math.atan2(y_start_to_end, x_start_to_end) * 180 / math.pi
-            )
+            stadium_obstacle_graphic.update_from_stadium(stadium_obstacle)
