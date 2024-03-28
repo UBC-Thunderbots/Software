@@ -167,7 +167,7 @@ message MotorControl
         DirectVelocityControl direct_velocity_control  = 2;
     }
 
-    float dribbler_speed_rpm = 4;
+    int32 dribbler_speed_rpm = 4;
 }
 
 message DirectControlPrimitive
