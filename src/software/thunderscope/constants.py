@@ -320,11 +320,8 @@ class TrailValues:
     DEFAULT_TRAIL_SAMPLING_RATE = 0
 
 
-# TODO: field test values
 class ControllerConstants:
-    # TODO: add some more here by testing available ones
-    # need to add playstation and older versions of xbox
-    VALID_CONTROLLER_NAMES = [
+    VALID_CONTROLLERS = [
         'Microsoft Xbox One X pad',
         'Microsoft X-Box 360 pad'
     ]
@@ -332,10 +329,6 @@ class ControllerConstants:
     XBOX_MAX_RANGE = 32768.0
     XBOX_BUTTON_MAX_RANGE = 1024.0
     DEADZONE_PERCENTAGE = 0.30
-
-    # TODO: added here for reference and to not haver to switch branches, remove later
-    MAX_LINEAR_SPEED_MPS = 2.0
-    MIN_LINEAR_SPEED_MPS = -2.0
 
     MAX_LINEAR_SPEED_METER_PER_S = 2.0
     MAX_ANGULAR_SPEED_RAD_PER_S = 20.0
