@@ -1,3 +1,4 @@
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.widget_setup_functions import *
 from software.thunderscope.constants import (
     TabNames,
@@ -132,6 +133,8 @@ def configure_base_fullsystem(
     replay_log: os.PathLike = None,
     visualization_buffer_size: int = 5,
     extra_widgets: List[TScopeWidget] = [],
+    refresh_func_counter: FrameTimeCounter = None,
+    buffer_func_counter: FrameTimeCounter = None,
 ) -> list:
     """
     Returns a list of widget data for a FullSystem tab
@@ -146,8 +149,17 @@ def configure_base_fullsystem(
     :param visualization_buffer_size: The size of the visualization buffer.
             Increasing this will increase smoothness but will be less realtime.
     :param extra_widgets: a list of additional widget data to append
+    :param refresh_func_counter: a counter that is used to keep track of the refresh func frametime
+    :param buffer_func_counter: a counter that is used to count the bufferswap frametime callback
     :return: list of widget data for FullSystem
     """
+
+    if refresh_func_counter == None:
+        refresh_func_counter = FrameTimeCounter()
+
+    if buffer_func_counter == None:
+        buffer_func_counter = FrameTimeCounter()
+
     return [
         TScopeWidget(
             name="Field",
@@ -160,6 +172,7 @@ def configure_base_fullsystem(
                     "sim_proto_unix_io": sim_proto_unix_io,
                     "friendly_colour_yellow": friendly_colour_yellow,
                     "visualization_buffer_size": visualization_buffer_size,
+                    "bufferswap_counter": buffer_func_counter,
                 }
             ),
         ),
@@ -177,6 +190,14 @@ def configure_base_fullsystem(
             stretch=WidgetStretchData(x=3),
         ),
         TScopeWidget(
+            name="Error Log",
+            widget=setup_robot_error_log_view_widget(
+                **{"proto_unix_io": full_system_proto_unix_io}
+            ),
+            anchor="Parameters",
+            position="above",
+        ),
+        TScopeWidget(
             name="Logs",
             widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Parameters",
@@ -184,24 +205,10 @@ def configure_base_fullsystem(
             stretch=WidgetStretchData(x=3),
         ),
         TScopeWidget(
-            name="Error Log",
-            widget=setup_robot_error_log_view_widget(
-                **{"proto_unix_io": full_system_proto_unix_io}
-            ),
-            position="below",
-            anchor="Logs",
-        ),
-        TScopeWidget(
             name="Referee Info",
             widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Field",
             position="bottom",
-        ),
-        TScopeWidget(
-            name="Play Info",
-            widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
-            anchor="Referee Info",
-            position="above",
         ),
         TScopeWidget(
             name="Performance",
@@ -213,8 +220,25 @@ def configure_base_fullsystem(
             # otherwise, it opens in a new window
             # the setup functions returns the widget.win and the refresh function separately
             in_window=True,
-            anchor="Play Info",
-            position="right",
+            anchor="Referee Info",
+            position="below",
+        ),
+        TScopeWidget(
+            name="FPS Widget",
+            widget=setup_fps_widget(
+                **{
+                    "bufferswap_counter": buffer_func_counter,
+                    "refresh_func_counter": refresh_func_counter,
+                }
+            ),
+            anchor="Performance",
+            position="below",
+        ),
+        TScopeWidget(
+            name="Play Info",
+            widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
+            anchor="Referee Info",
+            position="above",
         ),
     ] + extra_widgets
 
@@ -289,6 +313,13 @@ def configure_two_ai_gamecontroller_view(
     # Must be called before widgets are initialized below
     initialize_application()
 
+    # setup frametime counter
+    blue_refresh_func_frametime_counter = FrameTimeCounter()
+    blue_buffer_func_frametime_counter = FrameTimeCounter()
+
+    yellow_refresh_func_frametime_counter = FrameTimeCounter()
+    yellow_buffer_func_frametime_counter = FrameTimeCounter()
+
     return TScopeConfig(
         proto_unix_io_map=proto_unix_io_map,
         tabs=[
@@ -302,7 +333,10 @@ def configure_two_ai_gamecontroller_view(
                     visualization_buffer_size=visualization_buffer_size,
                     sandbox_mode=True,
                     extra_widgets=[],
+                    refresh_func_counter=blue_refresh_func_frametime_counter,
+                    buffer_func_counter=blue_buffer_func_frametime_counter,
                 ),
+                refresh_func_counter=blue_refresh_func_frametime_counter,
             ),
             TScopeQTTab(
                 name="Yellow FullSystem",
@@ -316,7 +350,10 @@ def configure_two_ai_gamecontroller_view(
                     visualization_buffer_size=visualization_buffer_size,
                     sandbox_mode=True,
                     extra_widgets=[],
+                    buffer_func_counter=yellow_buffer_func_frametime_counter,
+                    refresh_func_counter=yellow_refresh_func_frametime_counter,
                 ),
+                refresh_func_counter=yellow_refresh_func_frametime_counter,
             ),
             TScopeWebTab(
                 name="Gamecontroller",

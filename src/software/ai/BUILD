@@ -22,7 +22,9 @@ cc_library(
         "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/tactic:tactic_factory",
         "//software/time:timestamp",
+        "//software/tracy:tracy_constants",
         "//software/world",
+        "@tracy",
     ],
 )
 
