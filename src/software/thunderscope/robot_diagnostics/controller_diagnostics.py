@@ -12,8 +12,7 @@ from software.thunderscope.constants import ControllerConstants
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 
 
-# TODO:
-# following is logged on controller connection during runtime:
+# TODO: the following is logged on controller connection during runtime:
 # `qt.qpa.input.events: scroll event from unregistered device 17`
 
 
@@ -114,7 +113,7 @@ class ControllerInputHandler(object):
         initializes & starts a new process that runs the event processing loop
         """
 
-        # # TODO (#3165): Use trace level logging here
+        # TODO (#3165): Use trace level logging here
         # logging.debug("Starting controller event loop process")
         if self.__controller_event_loop_handler_process is None:
             self.__controller_event_loop_handler_process = Process(
@@ -122,12 +121,12 @@ class ControllerInputHandler(object):
             )
 
     def close(self):
-        # # TODO (#3165): Use trace level logging here
+        # TODO (#3165): Use trace level logging here
         self.__stop_thread_signal_event.set()
         self.__controller_event_loop_handler_process.join()
 
     def __event_loop(self):
-        # # TODO (#3165): Use trace level logging here
+        # TODO (#3165): Use trace level logging here
         # logging.debug("Starting handheld controller event handling loop")
         try:
             for event in self.controller.read_loop():
@@ -173,7 +172,7 @@ class ControllerInputHandler(object):
         abs_event = categorize(event)
         event_type = ecodes.bytype[abs_event.event.type][abs_event.event.code]
 
-        # # TODO (#3165): Use trace level logging here
+        # TODO (#3165): Use trace level logging here
         # logging.debug(
         #     "Processing controller event with type "
         #     + str(event_type)
