@@ -611,7 +611,7 @@ TEST_F(SSLGeometryTest, test_convert_field_to_proto_and_back)
     const float thickness = 0.005f;
 
     auto field_proto = createGeometryData(field, thickness);
-    auto new_field   = createField(*field_proto);
+    auto new_field   = createFieldProto(*field_proto);
 
     ASSERT_TRUE(new_field);
     EXPECT_EQ(field, new_field.value());

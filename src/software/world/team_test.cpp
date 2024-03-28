@@ -85,7 +85,7 @@ TEST_F(TeamTest, construct_with_protobuf)
     std::vector<Robot> robot_list = {robot_0, robot_1, robot_2};
 
     Team original_team = Team(robot_list);
-    auto proto_team    = createTeam(original_team);
+    auto proto_team    = createTeamProto(original_team);
     Team proto_converted_team(*proto_team);
 
     // Proto representation of Team does not store the robot_expiry_buffer_duration, so we

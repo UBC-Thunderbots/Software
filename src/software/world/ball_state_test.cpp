@@ -64,7 +64,7 @@ TEST(BallStateTest, construct_with_protobuf)
 {
     BallState ball_state_1(Point(1, -2.3), Vector(0, 0.4), 0.1);
     Ball ball(ball_state_1, Timestamp());
-    std::unique_ptr<TbotsProto::BallState> ball_state_proto = createBallState(ball);
+    std::unique_ptr<TbotsProto::BallState> ball_state_proto = createBallStateProto(ball);
     BallState ball_state_2(*ball_state_proto);
 
     EXPECT_TRUE(ball_state_1 == ball_state_2);

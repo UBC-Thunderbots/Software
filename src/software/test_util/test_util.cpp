@@ -21,7 +21,7 @@ namespace TestUtil
 
     std::shared_ptr<World> createBlankTestingWorld(TbotsProto::FieldType field_type)
     {
-        return createBlankTestingWorld(createField(Field::createField(field_type)));
+        return createBlankTestingWorld(createFieldProto(Field::createField(field_type)));
     }
 
     Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_positions,

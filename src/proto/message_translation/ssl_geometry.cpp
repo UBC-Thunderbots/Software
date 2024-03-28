@@ -326,7 +326,7 @@ std::unique_ptr<SSLProto::SSL_GeometryData> createGeometryData(const Field& fiel
     return geometry_data;
 }
 
-std::optional<Field> createField(const SSLProto::SSL_GeometryData& geometry_packet)
+std::optional<Field> createFieldProto(const SSLProto::SSL_GeometryData& geometry_packet)
 {
     SSLProto::SSL_GeometryFieldSize field_data = geometry_packet.field();
 

@@ -218,4 +218,4 @@ std::unique_ptr<SSLProto::SSL_GeometryData> createGeometryData(const Field& fiel
  * @return A Field object representing the field specified with the provided geometry
  *      If packet_geometry is not a valid packet, then will return std::nullopt
  */
-std::optional<Field> createField(const SSLProto::SSL_GeometryData& geometry_packet);
+std::optional<Field> createFieldProto(const SSLProto::SSL_GeometryData& geometry_packet);

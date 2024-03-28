@@ -209,7 +209,7 @@ TEST_F(FieldTest, construct_with_parameters)
 TEST_F(FieldTest, construct_with_protobuf)
 {
     Field original_field = Field::createSSLDivisionAField();
-    auto field_proto     = createField(original_field);
+    auto field_proto     = createFieldProto(original_field);
     Field proto_converted_field(*field_proto);
 
     EXPECT_EQ(original_field, proto_converted_field);
