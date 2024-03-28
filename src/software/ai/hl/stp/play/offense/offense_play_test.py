@@ -6,6 +6,7 @@ import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.friendly_team_scored import *
 from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.friendly_has_ball_possession import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -17,6 +18,7 @@ def test_offense_play(simulated_test_runner):
     ball_initial_pos = tbots_cpp.Point(-4.4, 2.9)
     # placement point must be Vector2 to work with game controller
     tbots_cpp.Point(-3, -2)
+    field = tbots_cpp.Field.createSSLDivisionBField()
 
     # Setup Bots
     blue_bots = [
@@ -67,18 +69,21 @@ def test_offense_play(simulated_test_runner):
     )
 
     # Always Validation
-    # TODO- #2779 Validation
-    always_validation_sequence_set = [[]]
+    inv_always_validation_sequence_set = [
+        [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])]
+    ]
+
+    ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]
 
     # Eventually Validation
-    # TODO- #2779 Validation
-    eventually_validation_sequence_set = [[]]
+    inv_eventually_validation_sequence_set = [[]]
+    ag_eventually_validation_sequence_set = [[FriendlyTeamEventuallyScored()]]
 
     simulated_test_runner.run_test(
-        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        inv_always_validation_sequence_set=always_validation_sequence_set,
-        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
-        ag_always_validation_sequence_set=always_validation_sequence_set,
+        inv_eventually_validation_sequence_set=inv_eventually_validation_sequence_set,
+        inv_always_validation_sequence_set=inv_always_validation_sequence_set,
+        ag_eventually_validation_sequence_set=ag_eventually_validation_sequence_set,
+        ag_always_validation_sequence_set=ag_always_validation_sequence_set,
         test_timeout_s=15,
     )
 
