@@ -1,3 +1,6 @@
+import logging
+from enum import Enum
+
 import pyqtgraph as pg
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore, QtGui
@@ -5,6 +8,11 @@ from pyqtgraph.Qt.QtWidgets import *
 
 import software.thunderscope.common.common_widgets as common_widgets
 from software.py_constants import *
+
+
+class ControllerConnected(Enum):
+    CONNECTED = 1
+    DISCONNECTED = 2
 
 
 class ControllerStatusView(QLabel):
@@ -15,36 +23,26 @@ class ControllerStatusView(QLabel):
     def __init__(self) -> None:
         super().__init__()
 
-        self.state: dict[str, (str, str)] = {
-            "On": (
+        self.state: dict[ControllerConnected, (str, str)] = {
+            ControllerConnected.CONNECTED: (
                 "Handheld Controller is Connected & Initialized",
                 "background-color: green",
             ),
-            "Off": ("No Handheld Controller is Connected...", "background-color: red"),
+            ControllerConnected.DISCONNECTED: (
+                "No Handheld Controller is Connected...", "background-color: red"
+            ),
         }
 
         self.connected = False
-        self.set_view_state("Off")
+        self.set_view_state(ControllerConnected.DISCONNECTED)
 
-    def set_view_state(self, state_discriminator="Off"):
+    def set_view_state(self, state_discriminator=ControllerConnected.DISCONNECTED):
         # bruh python doesn't even have value-types or unions
         # how do you even do anything in this language and still maintain a sanity ffs i legit can't
         self.setText(self.state[state_discriminator][0])
         self.setStyleSheet(self.state[state_discriminator][1])
 
-    def set_connected(self):
-        self.connected = True
-        self.set_view_state("On")
-
-    def set_disconnected(self):
-        self.connected = False
-        self.set_view_state("Off")
-
-    def refresh(self) -> None:
+    def refresh(self, connected=ControllerConnected.DISCONNECTED) -> None:
         """Refresh the label
         """
-
-        if self.connected:
-            self.set_view_state("Ok")
-        else:
-            self.set_view_state("Off")
+        self.set_view_state(connected)

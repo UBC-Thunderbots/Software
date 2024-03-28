@@ -35,8 +35,8 @@ py_library(
 )
 
 py_library(
-    name = "controller_view",
-    srcs = ["controller_view.py"],
+    name = "controller_status_view",
+    srcs = ["controller_status_view.py"],
     deps = [
         "//software/thunderscope:constants",
         requirement("pyqtgraph"),
@@ -52,7 +52,7 @@ py_library(
         "//software/thunderscope:thunderscope_types",
         "//software/thunderscope/robot_diagnostics:chicker",
         "//software/thunderscope/robot_diagnostics:controller",
-        "//software/thunderscope/robot_diagnostics:controller_view",
+        "//software/thunderscope/robot_diagnostics:controller_status_view",
         "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         requirement("pyqtgraph"),

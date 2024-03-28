@@ -1,12 +1,20 @@
 import logging
+from multiprocessing import Process
+
 import numpy
 from evdev import InputDevice, categorize, ecodes, list_devices
-from threading import Event, Thread
+from threading import Event
 
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.thunderscope.constants import *
 from software.thunderscope.constants import ControllerConstants
+from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
+
+
+# TODO:
+# following is logged on controller connection during runtime:
+# `qt.qpa.input.events: scroll event from unregistered device 17`
 
 
 class MoveEventType(Enum):
@@ -21,8 +29,11 @@ class ControllerInputHandler(object):
     """
 
     def __init__(self,):
-        self.enabled = False
         self.controller = None
+        self.__controller_event_loop_handler_process = None
+
+        self.motor_control = MotorControl()
+        self.power_control = PowerControl()
 
         self.__setup_controller()
 
@@ -40,18 +51,9 @@ class ControllerInputHandler(object):
             self.constants = tbots_cpp.create2021RobotConstants()
 
             # event that is used to stop the controller event loop
-            self.__stop_event_thread = Event()
+            self.__stop_thread_signal_event = Event()
 
-            # thread that is responsible for reading controller events
-            self.__event_thread = Thread(target=self.__event_loop, daemon=True)
-
-            # fields for holding the diagnostics types that get sent
-            self.motor_control = MotorControl()
-            self.power_control = PowerControl()
-
-            # start reading controller events
-            self.enabled = True
-            self.__event_thread.start()
+            self.__setup_new_event_listener_process()
 
         elif self.controller_initialized():
             logging.debug(
@@ -67,13 +69,22 @@ class ControllerInputHandler(object):
     def controller_initialized(self) -> bool:
         return self.controller is not None
 
-    def set_controller_enabled(self, enabled: bool):
+    def toggle_controller_listener(self, mode: ControlMode):
         """
         Changes the diagnostics input mode for all robots between Xbox and Diagnostics.
 
-        :param enabled: to which state to set controller enabled.
+        :param mode: current mode of control.
         """
-        self.enabled = enabled
+        if mode == ControlMode.DIAGNOSTICS:
+            logging.debug("Terminating controller event handling process")
+            self.__controller_event_loop_handler_process.terminate()
+            self.__controller_event_loop_handler_process = None
+
+        elif mode == ControlMode.HANDHELD:
+            logging.debug("Setting up new controller event handling process")
+            # self.__setup_event_listener_process()
+            self.__setup_new_event_listener_process()
+            self.__start_event_listener_process()
 
     def get_latest_primitive_command(self):
         if self.controller_initialized():
@@ -93,31 +104,51 @@ class ControllerInputHandler(object):
                 self.controller = controller
                 break
 
+    def __start_event_listener_process(self):
+        # start the process for reading controller events
+        if not self.__controller_event_loop_handler_process.is_alive():
+            self.__controller_event_loop_handler_process.start()
+
+    def __setup_new_event_listener_process(self):
+        """
+        initializes & starts a new process that runs the event processing loop
+        """
+
+        # # TODO (#3165): Use trace level logging here
+        # logging.debug("Starting controller event loop process")
+        if self.__controller_event_loop_handler_process is None:
+            self.__controller_event_loop_handler_process = (
+                Process(target=self.__event_loop, daemon=True)
+            )
+
     def close(self):
-        logging.debug("Closing handheld controller event handling thread")
-        self.__stop_event_thread.set()
-        self.__event_thread.join()
+        # # TODO (#3165): Use trace level logging here
+        self.__stop_thread_signal_event.set()
+        self.__controller_event_loop_handler_process.join()
 
     def __event_loop(self):
-        logging.debug("Starting handheld controller event handling loop")
-        if self.enabled:
-            try:
-                for event in self.controller.read_loop():
-                    if self.__stop_event_thread.isSet():
-                        return
-                    else:
-                        self.__process_event(event)
-            except OSError as ose:
-                logging.debug(
-                    "Caught an OSError while reading handheld controller event loop!"
-                )
-                logging.debug("Error message: " + str(ose))
-                logging.debug("Check physical handheld controller USB connection")
-            except Exception as e:
-                logging.critical(
-                    "Caught an unexpected error while reading handheld controller event loop!"
-                )
-                logging.critical("Error message: " + str(e))
+        # # TODO (#3165): Use trace level logging here
+        # logging.debug("Starting handheld controller event handling loop")
+        try:
+            for event in self.controller.read_loop():
+                if self.__stop_thread_signal_event.isSet():
+                    return
+                else:
+                    self.__process_event(event)
+
+        except OSError as ose:
+            logging.debug(
+                "Caught an OSError while reading handheld controller event loop!"
+            )
+            logging.debug("Error message: " + str(ose))
+            logging.debug("Check physical handheld controller USB connection")
+            return
+        except Exception as e:
+            logging.critical(
+                "Caught an unexpected error while reading handheld controller event loop!"
+            )
+            logging.critical("Error message: " + str(e))
+            return
 
     def __process_move_event_value(self, event_type, event_value) -> None:
         if event_type == "ABS_X":
@@ -126,13 +157,17 @@ class ControllerInputHandler(object):
             )
 
         elif event_type == "ABS_Y":
-            self.motor_control.direct_velocity_control.velocity.y_component_meters = self.__parse_move_event_value(
-                MoveEventType.LINEAR, event_value
+            self.motor_control.direct_velocity_control.velocity.y_component_meters = (
+                self.__parse_move_event_value(
+                    MoveEventType.LINEAR, event_value
+                )
             )
 
         elif event_type == "ABS_RX":
-            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.__parse_move_event_value(
-                MoveEventType.ROTATIONAL, event_value
+            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+                self.__parse_move_event_value(
+                    MoveEventType.ROTATIONAL, event_value
+                )
             )
 
     def __process_event(self, event):

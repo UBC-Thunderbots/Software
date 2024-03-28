@@ -6,7 +6,7 @@ from proto.import_all_protos import *
 
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
-from software.thunderscope.robot_diagnostics.controller_view import ControllerStatusView
+from software.thunderscope.robot_diagnostics.controller_status_view import ControllerStatusView, ControllerConnected
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
     DiagnosticsInputModeWidget,
     ControlMode,
@@ -20,37 +20,31 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 
 
 class DiagnosticsWidget(QWidget):
-    # Signal to indicate if manual controls should be disabled based on boolean parameter
-    diagnostics_input_mode_signal = pyqtSignal(bool)
+    # Signal to indicate if manual controls should be disabled based on enum mode parameter
+    diagnostics_input_mode_signal = pyqtSignal(ControlMode)
 
     def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
         super(DiagnosticsWidget, self).__init__()
 
         self.proto_unix_io = proto_unix_io
+        self.__control_mode = ControlMode.DIAGNOSTICS
 
-        self.controller_handler = ControllerInputHandler(proto_unix_io)
+        # initialize widgets
+        self.controller_status = ControllerStatusView()
+        self.controller_handler = ControllerInputHandler()
         self.drive_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
         self.chicker_widget = ChickerWidget(proto_unix_io)
         self.diagnostics_control_input_widget = DiagnosticsInputModeWidget(
-            self.diagnostics_input_mode_signal,
+            lambda control_mode: self.toggle_control(control_mode),
         )
 
-        self.__control_mode = ControlMode.DIAGNOSTICS
-
-        self.diagnostics_control_input_widget.toggle_controls_signal.connect(
-            lambda control_mode: self.toggle_control(control_mode)
-        )
-
-        # Inlined Controller Status and Refresh Button Widget
-        # Comment for PR:
-        # Easier to have it at this widget level for
-        # communication and logic handling to other widgets
+        # self.diagnostics_control_input_widget.toggle_controls_signal.connect(
+        #     lambda control_mode: self.toggle_control(control_mode)
+        # )
 
         self.controller_refresh_button = QPushButton()
         self.controller_refresh_button.setText("Re-initialize Handheld Controller")
-        self.controller_refresh_button.clicked.connect(self.__refresh_controller)
-
-        self.controller_status = ControllerStatusView()
+        self.controller_refresh_button.clicked.connect(self.__refresh_controller_onclick_handler)
 
         vbox_layout = QVBoxLayout()
 
@@ -62,34 +56,15 @@ class DiagnosticsWidget(QWidget):
 
         self.setLayout(vbox_layout)
 
+        self.check_controller_connection()
+
     def toggle_control(self, mode: ControlMode):
         self.__control_mode = mode
-        self.drive_dribbler_widget.set_enabled(mode == ControlMode.DIAGNOSTICS)
-        self.controller_handler.set_controller_enabled(mode == ControlMode.XBOX)
-
-    def __refresh_controller(self) -> None:
-        logging.debug("Attempting to reinitialize handheld controller...")
-        if not self.controller_handler.controller_initialized():
-            self.controller_handler = ControllerInputHandler(self.proto_unix_io)
-            if self.controller_handler.controller_initialized():
-                logging.debug("Successfully reinitialized handheld controller")
-                self.controller_status.set_connected()
-            else:
-                logging.debug("Failed to reinitialize handheld controller")
-                self.controller_status.set_disconnected()
-        else:
-            logging.debug("Handheld controller is initialized and connected...")
+        self.drive_dribbler_widget.set_enabled(mode)
+        self.controller_handler.toggle_controller_listener(mode)
 
     def refresh(self):
-        # check if controller is initialized and set status
-        if self.controller_handler.controller_initialized():
-            self.controller_status.set_connected()
-        else:
-            self.controller_status.set_disconnected()
-
         if self.__control_mode == ControlMode.DIAGNOSTICS:
-            # get the values from GUI sliders and send values to proto_unix_io
-            self.diagnostics_control_input_widget.refresh()
             self.drive_dribbler_widget.refresh()
             self.chicker_widget.refresh()
 
@@ -102,19 +77,47 @@ class DiagnosticsWidget(QWidget):
 
             self.proto_unix_io.send_proto(Primitive, diagnostics_primitive)
 
-        elif self.__control_mode == ControlMode.XBOX:
-            # get the values from handheld controller and send values to proto_unix_io
+        elif self.__control_mode == ControlMode.HANDHELD:
             diagnostics_primitive = (
                 self.controller_handler.get_latest_primitive_command()
             )
 
             if diagnostics_primitive is not None:
-                logging.debug("Sending diagnostics primitive: " + diagnostics_primitive)
                 self.proto_unix_io.send_proto(Primitive, diagnostics_primitive)
             else:
-                logging.debug("Sending stop primitive")
                 self.proto_unix_io.send_proto(Primitive, StopPrimitive())
 
-    # TODO: ensure this is actually called and closed properly
-    def close(self):
+    def check_controller_connection(self):
+        if self.controller_handler.controller_initialized():
+            # controller is connected
+            logging.debug("Handheld controller is already initialized and connected...")
+            self.controller_status.refresh(ControllerConnected.CONNECTED)
+            self.diagnostics_control_input_widget.refresh(ControlMode.HANDHELD)
+
+        else:
+            # controller is NOT connected, try connecting...
+            self.controller_handler = ControllerInputHandler()
+            if self.controller_handler.controller_initialized():
+                logging.debug("Successfully reinitialized handheld controller")
+                self.controller_status.refresh(ControllerConnected.CONNECTED)
+                self.diagnostics_control_input_widget.refresh(ControlMode.HANDHELD)
+
+            else:
+                logging.debug("Failed to reinitialize handheld controller")
+                self.controller_status.refresh(ControllerConnected.DISCONNECTED)
+                self.diagnostics_control_input_widget.refresh(ControlMode.DIAGNOSTICS)
+
+    def __refresh_controller_onclick_handler(self) -> None:
+        logging.debug("Attempting to reinitialize handheld controller...")
+        self.check_controller_connection()
+
+    # TODO: investigate why these methods aren't called on user hitting close button
+    def closeEvent(self, event):
+        logging.debug("bruh")
         self.controller_handler.close()
+        event.accept()
+
+    def __exit__(self, event):
+        logging.debug("bruh")
+        self.controller_handler.close()
+        event.accept()
