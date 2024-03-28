@@ -39,9 +39,18 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, int num_shadow_robots
      * This MUST be refactored along with DefensePlayFSM in a new PR
      *
      * Otherwise same behaviour as DefensePlayFSM, but:
-     * 1) Standard 0.5m obstacle radius around ball per Free Kick rules
-     * 2) Only 1 pass defender allowed for enemy kicker
-     * 3) Skips additional pass defenders around previously stated free kick pass defender
+     * 1) Standard 0.5m obstacle radius around ball per Free Kick rules,
+     *      this implementation uses 0.6m to better avoid violation area
+     * 2) Only 1 pass defender allowed to guard enemy kicker (Main Pass Defender)
+     * 3) Skips additional pass defenders X meters around previously stated free kick pass defender,
+     *      this is set to a radius of 3m of the Main Pass Defender.
+     *
+     * NOTE: First pass defender is NOT SKIPPED, as I have elected to instead just skip over all redundant
+     *          pass defenders X meters around the main pass defender
+     *
+     * KNOWN BUGS:
+     * - If the Main Pass Defender switches roles, it may cut through the foul region,
+     *      this will be most likely fixed in the new trajectory planner PR
      */
     auto enemy_threats = getAllEnemyThreats(
             event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
