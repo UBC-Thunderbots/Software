@@ -19,9 +19,8 @@ class ControllerInputHandler(object):
     This class is responsible for reading from a handheld controller device and
     interpreting the device inputs into usable inputs for the robots.
     """
-    def __init__(
-            self,
-    ):
+
+    def __init__(self,):
         self.enabled = False
         self.controller = None
 
@@ -31,7 +30,9 @@ class ControllerInputHandler(object):
 
             logging.debug(
                 "Initialized handheld controller "
-                + "\"" + self.controller.name + "\""
+                + '"'
+                + self.controller.name
+                + '"'
                 + " and located at path: "
                 + self.controller.path
             )
@@ -41,7 +42,7 @@ class ControllerInputHandler(object):
             # event that is used to stop the controller event loop
             self.__stop_event_thread = Event()
 
-            # thread that is responisble for reading controller events
+            # thread that is responsible for reading controller events
             self.__event_thread = Thread(target=self.__event_loop, daemon=True)
 
             # fields for holding the diagnostics types that get sent
@@ -56,7 +57,9 @@ class ControllerInputHandler(object):
             logging.debug(
                 "Tried to initialize a handheld controller from list available devices:"
             )
-            logging.debug(list(map(lambda device: InputDevice(device).name, list_devices())))
+            logging.debug(
+                list(map(lambda device: InputDevice(device).name, list_devices()))
+            )
             logging.debug(
                 "Could not initialize a handheld controller device - check USB connections"
             )
@@ -75,8 +78,7 @@ class ControllerInputHandler(object):
     def get_latest_primitive_command(self):
         if self.controller_initialized():
             return DirectControlPrimitive(
-                motor_control=self.motor_control,
-                power_control=self.power_control,
+                motor_control=self.motor_control, power_control=self.power_control,
             )
         else:
             return None
@@ -85,8 +87,8 @@ class ControllerInputHandler(object):
         for device in list_devices():
             controller = InputDevice(device)
             if (
-                    controller is not None
-                    and controller.name in ControllerConstants.VALID_CONTROLLERS
+                controller is not None
+                and controller.name in ControllerConstants.VALID_CONTROLLERS
             ):
                 self.controller = controller
                 break
@@ -106,12 +108,16 @@ class ControllerInputHandler(object):
                     else:
                         self.__process_event(event)
             except OSError as ose:
-                logging.debug('Caught an OSError while reading handheld controller event loop!')
-                logging.debug('Error message: ' + str(ose))
-                logging.debug('Check physical handheld controller USB connection')
+                logging.debug(
+                    "Caught an OSError while reading handheld controller event loop!"
+                )
+                logging.debug("Error message: " + str(ose))
+                logging.debug("Check physical handheld controller USB connection")
             except Exception as e:
-                logging.critical('Caught an unexpected error while reading handheld controller event loop!')
-                logging.critical('Error message: ' + str(e))
+                logging.critical(
+                    "Caught an unexpected error while reading handheld controller event loop!"
+                )
+                logging.critical("Error message: " + str(e))
 
     def __process_move_event_value(self, event_type, event_value) -> None:
         if event_type == "ABS_X":
@@ -125,10 +131,8 @@ class ControllerInputHandler(object):
             )
 
         elif event_type == "ABS_RX":
-            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-                self.__parse_move_event_value(
-                    MoveEventType.ROTATIONAL, event_value
-                )
+            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.__parse_move_event_value(
+                MoveEventType.ROTATIONAL, event_value
             )
 
     def __process_event(self, event):
@@ -177,7 +181,7 @@ class ControllerInputHandler(object):
 
     @staticmethod
     def __parse_move_event_value(
-            event_type: MoveEventType, event_value: float
+        event_type: MoveEventType, event_value: float
     ) -> float:
         factor = (
             ControllerConstants.MAX_ANGULAR_SPEED_RAD_PER_S
@@ -213,6 +217,7 @@ class ControllerInputHandler(object):
             ControllerConstants.MIN_POWER,
             ControllerConstants.MAX_POWER,
         )
+
 
 # TODO: remove thee after field testing...
 # {

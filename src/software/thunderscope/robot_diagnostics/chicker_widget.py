@@ -53,7 +53,11 @@ class ChickerWidget(QWidget):
         vbox_layout.addLayout(self.power_slider_layout)
 
         # Initializing kick & chip buttons
-        self.button_clickable_map = {"no_auto": True, "auto_kick": True, "auto_chip": True}
+        self.button_clickable_map = {
+            "no_auto": True,
+            "auto_kick": True,
+            "auto_chip": True,
+        }
         self.radio_buttons_group = QButtonGroup()
         self.push_button_box, self.push_buttons = common_widgets.create_buttons(
             ["Kick", "Chip"]

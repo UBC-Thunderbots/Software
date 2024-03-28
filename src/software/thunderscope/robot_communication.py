@@ -162,9 +162,7 @@ class RobotCommunication(object):
 
         self.robot_control_mode_map[robot_id] = mode
         self.robot_stop_primitive_count_map[robot_id] = (
-            NUM_TIMES_SEND_STOP
-            if mode == IndividualRobotMode.NONE
-            else 0
+            NUM_TIMES_SEND_STOP if mode == IndividualRobotMode.NONE else 0
         )
 
     def __send_estop_state(self) -> None:
