@@ -25,7 +25,6 @@ class DiagnosticsInputModeWidget(QWidget):
     """
 
     # Signal to indicate if manual controls should be disabled based on boolean parameter
-    # TODO: signal logic is flipped...
     toggle_controls_signal = pyqtSignal(bool)
 
     def __init__(self, toggle_controls_signal) -> None:

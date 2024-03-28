@@ -30,7 +30,6 @@ class DriveAndDribblerWidget(QWidget):
         # Add widgets to layout
         layout.addWidget(self.setup_direct_velocity("Drive"))
         layout.addWidget(self.setup_dribbler("Dribbler"))
-        # TODO move dribber control to chicker..., makes more sense there
 
         self.enabled = True
 

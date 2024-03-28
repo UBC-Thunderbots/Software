@@ -17,7 +17,6 @@ from software.thunderscope.constants import (
     EstopMode,
 )
 
-# TODO: should use MAX_ROBOT_IDS_PER_SIDE instead or DIV_A?!
 NUM_ROBOTS = MAX_ROBOT_IDS_PER_SIDE
 
 
@@ -50,13 +49,6 @@ class RobotCommunication(object):
         self.current_proto_unix_io = current_proto_unix_io
         self.multicast_channel = str(multicast_channel)
         self.interface = interface
-
-        # TODO: move estop state management out of robot_communication,
-        #  separate PR, reuse controller code possibly
-        self.estop_mode = estop_mode
-        self.estop_path = estop_path
-        self.estop_buadrate = estop_baudrate
-
         self.running = False
 
         self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
@@ -79,17 +71,20 @@ class RobotCommunication(object):
         )
 
         # map of robot id to the individual control mode
-        self.robot_control_mode_map: dict[int, IndividualRobotMode] = {
-            robot_id: IndividualRobotMode.NONE
-            for robot_id in list(range(0, NUM_ROBOTS))
-        }
+        self.robot_control_mode_map: dict[int, IndividualRobotMode] = {}
 
-        # map of robot id to the number of times to send a estop.
-        # each robot has it's own separate countdown
-        # TODO come up with better name
-        self.robot_stop_primitive_count_map: dict[int, int] = {
-            rid: 0 for rid in range(NUM_ROBOTS)
-        }
+        # map of robot id to the number of times to send a stop primitive
+        self.robot_stop_primitive_count_map: dict[int, int] = {}
+
+        # load control mode and stop primitive maps with default values
+        for robot_id in range(NUM_ROBOTS):
+            self.robot_control_mode_map[robot_id] = IndividualRobotMode.NONE
+            self.robot_stop_primitive_count_map[robot_id] = 0
+
+        # TODO: (#3174): move estop state management out of robot_communication
+        self.estop_mode = estop_mode
+        self.estop_path = estop_path
+        self.estop_buadrate = estop_baudrate
 
         # initialising the estop
         # tries to access a plugged in estop. if not found, throws an exception
@@ -157,18 +152,20 @@ class RobotCommunication(object):
 
     def toggle_robot_control_mode(self, robot_id: int, mode: IndividualRobotMode):
         """
-        Changes the input mode for a robot between None, Manual, or AI
-        If changing from anything to None, add robot to disconnected map
-        So we can send multiple stop primitives to make sure it stops
+        Changes the input mode for a robot between NONE, MANUAL, or AI
+        If changing from MANUAL OR AI to NONE, add robot id to stop primitive
+        map so that multiple stop primitives are sent - safety number one priority
 
         :param mode: the mode of input for this robot's primitives
         :param robot_id: the id of the robot whose mode we're changing
         """
+
         self.robot_control_mode_map[robot_id] = mode
-        if mode == IndividualRobotMode.NONE:
-            self.robot_stop_primitive_count_map[robot_id] = NUM_TIMES_SEND_STOP
-        else:
-            self.robot_stop_primitive_count_map[robot_id] = 0
+        self.robot_stop_primitive_count_map[robot_id] = (
+            NUM_TIMES_SEND_STOP
+            if mode == IndividualRobotMode.NONE
+            else 0
+        )
 
     def __send_estop_state(self) -> None:
         """
@@ -312,6 +309,9 @@ class RobotCommunication(object):
 
         """
         # Create the multicast listeners
+        # TODO (#3172): `--disable_communication` still requires an interface to be configured
+        # error thrown on string concatenation of `self.interface`,
+        # since it is NoneType object if not passed as argument to tscope...
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
@@ -355,9 +355,7 @@ class RobotCommunication(object):
 
         self.close_for_fullsystem()
 
-        # TODO: if `--disable_communication` is set, this throws and error on exit
-        # if the close order is changed, then message swaps to
-        # ... shutdown UDP socket for TbotsProto::RobotStatus (<- used to be Log). The boost ...
+        # TODO (#3172): if `--disable_communication` is set, this throws a runtime error on exit
         self.receive_robot_log.close()
         self.receive_robot_status.close()
         self.run_primitive_set_thread.join()

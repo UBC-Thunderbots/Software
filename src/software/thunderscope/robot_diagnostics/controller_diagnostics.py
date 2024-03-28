@@ -7,10 +7,6 @@ import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.thunderscope.constants import *
 from software.thunderscope.constants import ControllerConstants
-from software.thunderscope.proto_unix_io import ProtoUnixIO
-
-
-# TODO: change all logging to DEBUG level or remove entirely...
 
 
 class MoveEventType(Enum):
@@ -21,22 +17,18 @@ class MoveEventType(Enum):
 class ControllerInputHandler(object):
     """
     This class is responsible for reading from a handheld controller device and
-    interpreting the inputs into usable inputs for the robot.
+    interpreting the device inputs into usable inputs for the robots.
     """
-
-    # TODO: remove proto_unix_io, and set Motor/Power control as class fields
-    # TODO: add class init wrapper for easier handling of controller connection
     def __init__(
-            self, proto_unix_io: ProtoUnixIO,
+            self,
     ):
-        self.proto_unix_io = proto_unix_io
         self.enabled = False
         self.controller = None
 
         self.__setup_controller()
 
         if self.controller_initialized():
-            self.enabled = True
+
             logging.debug(
                 "Initialized handheld controller "
                 + "\"" + self.controller.name + "\""
@@ -44,19 +36,23 @@ class ControllerInputHandler(object):
                 + self.controller.path
             )
 
-            self.__stop_event_thread = Event()
-            self.__event_thread = Thread(target=self.__event_loop, daemon=True)
-            self.__event_thread.start()
-
             self.constants = tbots_cpp.create2021RobotConstants()
 
-            # Fields for holding the diagnostics types that get sent
+            # event that is used to stop the controller event loop
+            self.__stop_event_thread = Event()
+
+            # thread that is responisble for reading controller events
+            self.__event_thread = Thread(target=self.__event_loop, daemon=True)
+
+            # fields for holding the diagnostics types that get sent
             self.motor_control = MotorControl()
             self.power_control = PowerControl()
 
+            # start reading controller events
+            self.enabled = True
+            self.__event_thread.start()
 
         elif self.controller_initialized():
-
             logging.debug(
                 "Tried to initialize a handheld controller from list available devices:"
             )
@@ -65,30 +61,59 @@ class ControllerInputHandler(object):
                 "Could not initialize a handheld controller device - check USB connections"
             )
 
+    def controller_initialized(self) -> bool:
+        return self.controller is not None
+
+    def set_controller_enabled(self, enabled: bool):
+        """
+        Changes the diagnostics input mode for all robots between Xbox and Diagnostics.
+
+        :param enabled: to which state to set controller enabled.
+        """
+        self.enabled = enabled
+
     def get_latest_primitive_command(self):
         if self.controller_initialized():
             return DirectControlPrimitive(
-                motor_control=self.motor_control, power_control=self.power_control,
+                motor_control=self.motor_control,
+                power_control=self.power_control,
             )
         else:
             return None
-
-    def controller_initialized(self):
-        # if self.controller is not None:
-        #     logging.debug(self.controller.read_one())
-        return self.controller is not None
 
     def __setup_controller(self):
         for device in list_devices():
             controller = InputDevice(device)
             if (
                     controller is not None
-                    and controller.name in ControllerConstants.VALID_CONTROLLER_NAMES
+                    and controller.name in ControllerConstants.VALID_CONTROLLERS
             ):
                 self.controller = controller
                 break
 
-    def process_move_event_value(self, event_type, event_value) -> None:
+    def close(self):
+        logging.debug("Closing handheld controller event handling thread")
+        self.__stop_event_thread.set()
+        self.__event_thread.join()
+
+    def __event_loop(self):
+        logging.debug("Starting handheld controller event handling loop")
+        if self.enabled:
+            try:
+                for event in self.controller.read_loop():
+                    if self.__stop_event_thread.isSet():
+                        return
+                    else:
+                        self.__process_event(event)
+            except OSError as ose:
+                logging.debug('Caught an OSError while reading handheld controller event loop!')
+                logging.debug('Error message: ' + str(ose))
+                logging.debug('Check physical handheld controller USB connection')
+            except Exception as e:
+                logging.critical('Caught an unexpected error while reading handheld controller event loop!')
+                logging.critical('Error message: ' + str(e))
+
+    def __process_move_event_value(self, event_type, event_value) -> None:
         if event_type == "ABS_X":
             self.motor_control.direct_velocity_control.velocity.x_component_meters = self.__parse_move_event_value(
                 MoveEventType.LINEAR, event_value
@@ -107,27 +132,29 @@ class ControllerInputHandler(object):
             )
 
     def __process_event(self, event):
-        logging.debug(event)
-
         kick_power = 0.0
         dribbler_speed = 0.0
 
         abs_event = categorize(event)
         event_type = ecodes.bytype[abs_event.event.type][abs_event.event.code]
 
-        logging.debug(
-            "Processing controller event with type "
-            + str(event_type)
-            + " and with value "
-            + str(abs_event.event.value)
-        )
+        # # TODO (#3165): Use trace level logging here
+        # logging.debug(
+        #     "Processing controller event with type "
+        #     + str(event_type)
+        #     + " and with value "
+        #     + str(abs_event.event.value)
+        # )
 
-        # TODO: bump python version so we can use pattern matching for this
+        # TODO (#3175): new python versions have a pattern matching,
+        #  that could be useful for handling lots of if statements.
+        #  Some documentation for future:
+        #  https://peps.python.org/pep-0636/
+        #  https://docs.python.org/3/reference/compound_stmts.html#match
         if event.type == ecodes.EV_ABS:
             if event_type in ["ABS_X", "ABS_Y", "ABS_RX"]:
-                self.process_move_event_value(event_type, abs_event.event.value)
+                self.__process_move_event_value(event_type, abs_event.event.value)
 
-        # TODO: can enable smooth scrolling for dribbler by chekcing for "ABS_HAT0Y" event
         if event_type == "ABS_HAT0X":
             dribbler_speed = self.__parse_kick_event_value(abs_event.event.value)
 
@@ -136,16 +163,16 @@ class ControllerInputHandler(object):
 
         if event_type == "ABS_RZ" or "ABS_Z":
             if self.__parse_dribbler_enabled_event_value(abs_event.event.value):
-                self.motor_control.dribbler_speed_rpm = int(dribbler_speed)
+                self.motor_control.dribbler_speed_rpm = float(dribbler_speed)
 
-        # TODO: possible to use `event_type` instead of `event.type`
         if event.type == ecodes.EV_KEY:
-            if event.code == ecodes.ecodes["BTN_A"] and event.value == 1:
-                self.power_control.geneva_slot = 1
+            # TODO: try testing event_type instead of checking in `ecodes.ecodes` map
+            if event.code == ecodes.ecodes["BTN_A"] and event.value == 1.0:
+                self.power_control.geneva_slot = 3.0
                 self.power_control.chicker.kick_speed_m_per_s = kick_power
 
-            elif event.code == ecodes.ecodes["BTN_Y"] and event.value == 1:
-                self.power_control.geneva_slot = 1
+            elif event.code == ecodes.ecodes["BTN_Y"] and event.value == 1.0:
+                self.power_control.geneva_slot = 3.0
                 self.power_control.chicker.chip_distance_meters = kick_power
 
     @staticmethod
@@ -186,36 +213,6 @@ class ControllerInputHandler(object):
             ControllerConstants.MIN_POWER,
             ControllerConstants.MAX_POWER,
         )
-
-    def __event_loop(self):
-        logging.debug("Starting handheld controller event handling loop")
-        if self.enabled:
-            try:
-                for event in self.controller.read_loop():
-                    if self.__stop_event_thread.isSet():
-                        return
-                    else:
-                        self.__process_event(event)
-            except OSError as ose:
-                logging.debug('Caught an OSError while reading handheld controller event loop!')
-                logging.debug('Error message: ' + str(ose))
-                logging.debug('Check physical handheld controller USB connection')
-            except Exception as e:
-                logging.critical('Caught an unexpected error while reading handheld controller event loop!')
-                logging.critical('Error message: ' + str(e))
-
-    def close(self):
-        logging.debug("Closing handheld controller event handling thread")
-        self.__stop_event_thread.set()
-        self.__event_thread.join()
-
-    def set_controller_enabled(self, enabled: bool):
-        """
-        Changes the diagnostics input mode for all robots between Xbox and Diagnostics.
-
-        :param enabled: to which state to set controller enabled.
-        """
-        self.enabled = enabled
 
 # TODO: remove thee after field testing...
 # {

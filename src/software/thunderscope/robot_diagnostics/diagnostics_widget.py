@@ -48,7 +48,7 @@ class DiagnosticsWidget(QWidget):
 
         self.controller_refresh_button = QPushButton()
         self.controller_refresh_button.setText("Re-initialize Handheld Controller")
-        self.controller_refresh_button.clicked.connect(self.refresh_controller)
+        self.controller_refresh_button.clicked.connect(self.__refresh_controller)
 
         self.controller_status = ControllerStatusView()
 
@@ -62,7 +62,12 @@ class DiagnosticsWidget(QWidget):
 
         self.setLayout(vbox_layout)
 
-    def refresh_controller(self) -> None:
+    def toggle_control(self, mode: ControlMode):
+        self.__control_mode = mode
+        self.drive_dribbler_widget.set_enabled(mode == ControlMode.DIAGNOSTICS)
+        self.controller_handler.set_controller_enabled(mode == ControlMode.XBOX)
+
+    def __refresh_controller(self) -> None:
         logging.debug("Attempting to reinitialize handheld controller...")
         if not self.controller_handler.controller_initialized():
             self.controller_handler = ControllerInputHandler(self.proto_unix_io)
@@ -88,7 +93,6 @@ class DiagnosticsWidget(QWidget):
             self.drive_dribbler_widget.refresh()
             self.chicker_widget.refresh()
 
-            # TODO: throws error on exit
             diagnostics_primitive = Primitive(
                 direct_control=DirectControlPrimitive(
                     motor_control=self.drive_dribbler_widget.motor_control,
@@ -111,7 +115,6 @@ class DiagnosticsWidget(QWidget):
                 logging.debug("Sending stop primitive")
                 self.proto_unix_io.send_proto(Primitive, StopPrimitive())
 
-    def toggle_control(self, mode: ControlMode):
-        self.__control_mode = mode
-        self.drive_dribbler_widget.set_enabled(mode == ControlMode.DIAGNOSTICS)
-        self.controller_handler.set_controller_enabled(mode == ControlMode.XBOX)
+    # TODO: ensure this is actually called and closed properly
+    def close(self):
+        self.controller_handler.close()

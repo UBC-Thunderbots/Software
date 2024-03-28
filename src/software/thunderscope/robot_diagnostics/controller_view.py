@@ -15,7 +15,6 @@ class ControllerStatusView(QLabel):
     def __init__(self) -> None:
         super().__init__()
 
-        # TODO align text center for status
         self.state: dict[str, (str, str)] = {
             "On": (
                 "Handheld Controller is Connected & Initialized",
