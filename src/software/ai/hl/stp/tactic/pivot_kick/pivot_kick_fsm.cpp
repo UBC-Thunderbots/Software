@@ -19,7 +19,8 @@ void PivotKickFSM::kickBall(const Update& event)
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, event.control_params.kick_origin,
         event.control_params.kick_direction,
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::DribblerMode::OFF,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick));
 }
 

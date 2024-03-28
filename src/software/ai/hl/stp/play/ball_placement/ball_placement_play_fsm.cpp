@@ -58,7 +58,8 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
         align_placement_tactic->updateControlParams(
             setup_point, setup_angle, 0.0, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
 
         tactics_to_run[0].emplace_back(align_placement_tactic);
 
@@ -144,7 +145,8 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         retreat_tactic->updateControlParams(
             retreat_position, final_orientation, 0.0, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
         tactics_to_run[0].emplace_back(retreat_tactic);
 
         event.common.set_tactics(tactics_to_run);
@@ -303,8 +305,9 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
             waiting_line_start_point +
             waiting_line_vector.normalize(waiting_line_vector.length() * i /
                                           static_cast<double>(move_tactics.size()));
-        move_tactics.at(i)->updateControlParams(waiting_destination, Angle::zero(), 0.0,
-                                                TbotsProto::DribblerMode::OFF,
-                                                TbotsProto::BallCollisionType::AVOID);
+        move_tactics.at(i)->updateControlParams(
+            waiting_destination, Angle::zero(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
     }
 }

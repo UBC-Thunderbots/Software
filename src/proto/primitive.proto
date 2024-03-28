@@ -17,6 +17,15 @@ enum BallCollisionType
     AVOID = 1;
 }
 
+enum ObstacleAvoidanceMode
+{
+    // The robot avoids obstacles in a safe manner
+    SAFE = 0;
+    // The robot is more aggressive in reaching its destination
+    // and may be less safe when avoiding obstacles
+    AGGRESSIVE = 1;
+}
+
 enum MotionConstraint
 {
     // The box around the friendly goal

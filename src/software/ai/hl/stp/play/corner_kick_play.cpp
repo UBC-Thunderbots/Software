@@ -97,16 +97,20 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
 
         cherry_pick_tactic_1->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
         cherry_pick_tactic_2->updateControlParams(
             pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
         cherry_pick_tactic_3->updateControlParams(
             pass3.receiverPoint(), pass3.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
         cherry_pick_tactic_4->updateControlParams(
             pass4.receiverPoint(), pass4.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
     };
 
     // Put the robot in roughly the right position to perform the kick
@@ -169,7 +173,9 @@ void CornerKickPlay::updateAlignToBallTactic(
     align_to_ball_tactic->updateControlParams(
         world_ptr->ball().position() -
             (ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2)),
-        ball_to_center_vec.orientation(), 0);
+        ball_to_center_vec.orientation(), 0,
+        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+        TbotsProto::ObstacleAvoidanceMode::SAFE);
 }
 
 // Register this play in the genericFactory

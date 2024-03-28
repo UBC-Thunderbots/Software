@@ -27,6 +27,8 @@ struct MoveFSM
         AutoChipOrKick auto_chip_or_kick;
         // The maximum allowed speed mode
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+        // The obstacle avoidance mode
+        TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode;
         // The target spin while moving in revolutions per second
         double target_spin_rev_per_s;
     };

@@ -1,5 +1,7 @@
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 
+#include "proto/message_translation/tbots_geometry.h"
+
 TbotsProto::Obstacle createObstacleProto(const Polygon &polygon)
 {
     TbotsProto::Obstacle obstacle_proto;

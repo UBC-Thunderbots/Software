@@ -75,7 +75,8 @@ TEST_F(MoveTacticTest, test_autochip_move)
     tactic->updateControlParams(
         destination, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOCHIP, 2.0},
-        TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED);
+        TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED,
+        TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -120,7 +121,8 @@ TEST_F(MoveTacticTest, test_autokick_move)
     tactic->updateControlParams(
         destination, Angle::threeQuarter(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOKICK, 3.0},
-        TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED);
+        TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED,
+        TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
     setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -162,7 +164,8 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
     tactic->updateControlParams(
         destination, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 1.0);
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
     setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -208,7 +211,8 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
     tactic->updateControlParams(
         destination, Angle::half(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, -4.0);
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::SAFE, -4.0);
     setTactic(0, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
