@@ -117,8 +117,8 @@ class ControllerInputHandler(object):
         # # TODO (#3165): Use trace level logging here
         # logging.debug("Starting controller event loop process")
         if self.__controller_event_loop_handler_process is None:
-            self.__controller_event_loop_handler_process = (
-                Process(target=self.__event_loop, daemon=True)
+            self.__controller_event_loop_handler_process = Process(
+                target=self.__event_loop, daemon=True
             )
 
     def close(self):
@@ -157,17 +157,13 @@ class ControllerInputHandler(object):
             )
 
         elif event_type == "ABS_Y":
-            self.motor_control.direct_velocity_control.velocity.y_component_meters = (
-                self.__parse_move_event_value(
-                    MoveEventType.LINEAR, event_value
-                )
+            self.motor_control.direct_velocity_control.velocity.y_component_meters = self.__parse_move_event_value(
+                MoveEventType.LINEAR, event_value
             )
 
         elif event_type == "ABS_RX":
-            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-                self.__parse_move_event_value(
-                    MoveEventType.ROTATIONAL, event_value
-                )
+            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.__parse_move_event_value(
+                MoveEventType.ROTATIONAL, event_value
             )
 
     def __process_event(self, event):

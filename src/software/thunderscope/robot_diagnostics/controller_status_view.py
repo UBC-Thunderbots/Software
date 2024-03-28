@@ -1,4 +1,3 @@
-import logging
 from enum import Enum
 
 import pyqtgraph as pg
@@ -29,7 +28,8 @@ class ControllerStatusView(QLabel):
                 "background-color: green",
             ),
             ControllerConnected.DISCONNECTED: (
-                "No Handheld Controller is Connected...", "background-color: red"
+                "No Handheld Controller is Connected...",
+                "background-color: red",
             ),
         }
 

@@ -6,7 +6,10 @@ from proto.import_all_protos import *
 
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
-from software.thunderscope.robot_diagnostics.controller_status_view import ControllerStatusView, ControllerConnected
+from software.thunderscope.robot_diagnostics.controller_status_view import (
+    ControllerStatusView,
+    ControllerConnected,
+)
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
     DiagnosticsInputModeWidget,
     ControlMode,
@@ -44,7 +47,9 @@ class DiagnosticsWidget(QWidget):
 
         self.controller_refresh_button = QPushButton()
         self.controller_refresh_button.setText("Re-initialize Handheld Controller")
-        self.controller_refresh_button.clicked.connect(self.__refresh_controller_onclick_handler)
+        self.controller_refresh_button.clicked.connect(
+            self.__refresh_controller_onclick_handler
+        )
 
         vbox_layout = QVBoxLayout()
 

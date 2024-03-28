@@ -28,7 +28,9 @@ class DiagnosticsInputModeWidget(QWidget):
 
     # Signal to indicate if manual controls should be disabled based on boolean parameter
 
-    def __init__(self, on_control_mode_switch_callback : Callable[[ControlMode], None]) -> None:
+    def __init__(
+        self, on_control_mode_switch_callback: Callable[[ControlMode], None]
+    ) -> None:
         """
         Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control
         :param on_control_mode_switch_callback The signal to use for handling changes in input mode
