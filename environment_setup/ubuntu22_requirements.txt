@@ -14,3 +14,4 @@ qt-material==2.12
 PyOpenGL==3.1.6
 psutil==5.9.0
 numpy==1.24.4
+evdev==1.7.0
