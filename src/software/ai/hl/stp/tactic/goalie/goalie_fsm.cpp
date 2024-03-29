@@ -2,7 +2,6 @@
 
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
-#include "software/geom/algorithms/closest_point.h"
 #include "software/math/math_functions.h"
 
 Point GoalieFSM::getGoaliePositionToBlock(
@@ -136,7 +135,7 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
         event.common.world_ptr->enemyTeam().getNearestRobot(ball.position())->position(),
         ball.position());
     double goalie_distance_to_ball = distance(
-        event.common.world_ptr->friendlyTeam().goalie()->position(), ball.position());
+        event.common.robot.position(), ball.position());
     bool safe_to_evacuate = nearest_enemy_distance_to_ball * safe_distance_multiplier >
                             goalie_distance_to_ball;
 
