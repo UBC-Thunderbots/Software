@@ -134,8 +134,8 @@ bool GoalieFSM::shouldEvacuateCrease(const Update &event)
     double nearest_enemy_distance_to_ball = distance(
         event.common.world_ptr->enemyTeam().getNearestRobot(ball.position())->position(),
         ball.position());
-    double goalie_distance_to_ball = distance(
-        event.common.robot.position(), ball.position());
+    double goalie_distance_to_ball =
+        distance(event.common.robot.position(), ball.position());
     bool safe_to_evacuate = nearest_enemy_distance_to_ball * safe_distance_multiplier >
                             goalie_distance_to_ball;
 
