@@ -250,9 +250,12 @@ struct GoalieFSM
     }
 
    private:
-    // the goalie tactic config
+    static constexpr double BALL_RETRIEVED_THRESHOLD = 0.2;
+    // The goalie tactic config
     TbotsProto::GoalieTacticConfig goalie_tactic_config;
+    // Configuration values for inflated obstacles
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
     // The maximum allowed speed mode
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+    Rectangle inflated_defense_area;
 };
