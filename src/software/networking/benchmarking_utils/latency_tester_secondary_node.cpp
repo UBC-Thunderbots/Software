@@ -5,8 +5,8 @@ LatencyTesterSecondaryNode::LatencyTesterSecondaryNode(const int listen_channel,
                                                        const int send_channel,
                                                        const unsigned short send_port)
     : LatencyTesterNode(listen_channel, listen_port, send_channel, send_port,
-            std::bind(&LatencyTesterSecondaryNode::onReceive, this, std::placeholders::_1,
-                      std::placeholders::_2))
+                        std::bind(&LatencyTesterSecondaryNode::onReceive, this,
+                                  std::placeholders::_1, std::placeholders::_2))
 {
 }
 

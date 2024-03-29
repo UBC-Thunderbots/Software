@@ -29,8 +29,8 @@ cc_library(
     srcs = ["udp_listener.cpp"],
     hdrs = ["udp_listener.h"],
     deps = [
+        "//software/logger",
         "@boost//:asio",
-        "//software/logger:logger",
     ],
 )
 

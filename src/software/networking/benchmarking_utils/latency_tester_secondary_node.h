@@ -4,9 +4,9 @@
 
 class LatencyTesterSecondaryNode : public LatencyTesterNode
 {
-    public:
-        LatencyTesterSecondaryNode(const int listen_channel, const unsigned short listen_port,
-                const int send_channel, const unsigned short send_port);
+   public:
+    LatencyTesterSecondaryNode(const int listen_channel, const unsigned short listen_port,
+                               const int send_channel, const unsigned short send_port);
 
-        virtual void onReceive(const char* message, const size_t& size) override;
+    virtual void onReceive(const char* message, const size_t& size) override;
 };

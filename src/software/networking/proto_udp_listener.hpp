@@ -65,7 +65,8 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
     const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback,
     bool multicast)
-    : udp_listener_(io_service, ip_address, port, multicast, &ProtoUdpListener::handleRawData)
+    : udp_listener_(io_service, ip_address, port, multicast,
+                    &ProtoUdpListener::handleRawData)
 {
 }
 
@@ -78,12 +79,11 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
 }
 
 template <class ReceiveProtoT>
-void ProtoUdpListener<ReceiveProtoT>::handleRawData(
-    const char* raw_data, const size_t& num_bytes_received)
+void ProtoUdpListener<ReceiveProtoT>::handleRawData(const char* raw_data,
+                                                    const size_t& num_bytes_received)
 {
     auto packet_data = ReceiveProtoT();
-    packet_data.ParseFromArray(raw_data,
-                               static_cast<int>(num_bytes_received));
+    packet_data.ParseFromArray(raw_data, static_cast<int>(num_bytes_received));
     receive_callback(packet_data);
 }
 
