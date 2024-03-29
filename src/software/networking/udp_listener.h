@@ -2,7 +2,7 @@
 
 #include <boost/asio.hpp>
 
-typedef std::function<void(const char*, const std::size_t&)> ReceiveCallback;
+typedef std::function<void(const char*, const size_t&)> ReceiveCallback;
 
 class UdpListener
 {

@@ -18,3 +18,8 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
     ],
 )
+
+cc_library(
+    name = "statistics_functions",
+    hdrs = ["statistics_functions.hpp"],
+)

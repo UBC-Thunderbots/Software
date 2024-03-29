@@ -28,7 +28,6 @@ cc_library(
     name = "udp_listener",
     srcs = ["udp_listener.cpp"],
     hdrs = ["udp_listener.h"],
-    visibility = ["//visibility:private"],
     deps = [
         "@boost//:asio",
         "//software/logger:logger",
@@ -43,7 +42,6 @@ cc_library(
     hdrs = [
         "udp_sender.h",
     ],
-    visibility = ["//visibility:private"],
     deps = [
         "@boost//:asio",
     ],

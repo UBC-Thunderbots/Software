@@ -1,8 +1,12 @@
-#include "software/netowrking/benchmarking_utils/latency_tester_primary_node.h"
+#include "software/networking/benchmarking_utils/latency_tester_primary_node.h"
+
+#include "software/logger/logger.h"
+#include "software/math/statistics_functions.hpp"
+
 
 LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(const int listen_channel, const unsigned short listen_port,
-        const int send_channel, const unsigned short send_port, const int message_size, const std::chrono::milliseconds timeout_duration)
-    : LatencyTesterNode(listen_channel, listen_port, send_channel, send_port),
+        const int send_channel, const unsigned short send_port, const int message_size, const std::chrono::milliseconds& timeout_duration)
+    : LatencyTesterNode(listen_channel, listen_port, send_channel, send_port, std::bind(&LatencyTesterPrimaryNode::onReceive, this, std::placeholders::_1, std::placeholders::_2)),
       response_received_(false),
       num_timeouts_(0),
       timeout_duration_(timeout_duration)
@@ -17,20 +21,17 @@ LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(const int listen_channel, con
 
 void LatencyTesterPrimaryNode::printStatistics()
 {
-    double sum = std::accumulate(latencies_.begin(), latencies_.end(), 0.0);
-    double mean = sum / latencies_.size();
+    double latency_mean = mean<long int>(latencies_);
+    double latency_stdev = stdevSample<long int>(latencies_);
 
-    double sq_sum = std::inner_product(latencies_.begin(), latencies_.end(), latencies_.begin(), 0.0);
-    double stdev = std::sqrt(sq_sum / latencies_.size() - mean * mean);
-
-    LOG(INFO) << "Mean latency: " << mean << " ms";
-    LOG(INFO) << "Standard deviation: " << stdev << " ms";
+    LOG(INFO) << "Mean latency: " << latency_mean << " ms";
+    LOG(INFO) << "Standard deviation: " << latency_stdev << " ms";
     LOG(INFO) << "Number of timeouts: " << num_timeouts_;
 }
 
 void LatencyTesterPrimaryNode::runTest(const int num_messages)
 {
-    LOG(INFO) << "Running test and sending " << num_messages << " messages of size" << send_buffer_.size() << " bytes.;
+    LOG(INFO) << "Running test and sending " << num_messages << " messages of size" << send_buffer_.size() << " bytes.";
 
     for (int i = 0; i < num_messages; i++)
     {
@@ -47,25 +48,25 @@ void LatencyTesterPrimaryNode::sendTransaction()
         response_received_ = false;
     }
 
-    std::cv_status status;
+    bool status = false;
     do 
     {
         last_send_time_ = std::chrono::system_clock::now();
         sendString(send_buffer_);
         {
             std::unique_lock<std::mutex> lock(response_mutex_);
-            status = response_cv_.wait_for(response_mutex_, timeout_duration_, [this] { return response_received_; });
+            status = response_cv_.wait_for(lock, timeout_duration_, [this] { return response_received_; });
         }
 
-        if (status == std::cv_status::timeout)
+        if (!status)
         {
             num_timeouts_++;
             LOG(INFO) << "Timeout, retrying";
         }
-    } while (status == std::cv_status::timeout);
+    } while (!status);
 }
 
-void LatencyTesterPrimaryNode::onReceive(const std::string& message)
+void LatencyTesterPrimaryNode::onReceive(const char*, const size_t&)
 {
     std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
     std::chrono::milliseconds latency = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_send_time_);
