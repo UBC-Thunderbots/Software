@@ -8,51 +8,6 @@ from software.simulated_tests.validation import (
 )
 
 
-class RobotEntersRegion(Validation):
-
-    """Checks if a Robot enters any of the provided regions."""
-
-    def __init__(self, regions=None):
-        self.regions = regions if regions else []
-        self.passing_robot = None
-
-    def get_validation_status(self, world) -> ValidationStatus:
-        """Checks if _any_ robot enters the provided regions
-
-        :param world: The world msg to validate
-        :returns: FAILING until a robot enters any of the regions
-                  PASSING when a robot enters
-        """
-        for region in self.regions:
-            for robot in world.friendly_team.team_robots:
-                if tbots_cpp.contains(
-                    region, tbots_cpp.createPoint(robot.current_state.global_position)
-                ):
-                    self.passing_robot = robot
-                    return ValidationStatus.PASSING
-
-        self.passing_robot = None
-        return ValidationStatus.FAILING
-
-    def get_validation_geometry(self, world) -> ValidationGeometry:
-        """
-        (override) shows regions to enter
-        """
-        return create_validation_geometry(self.regions)
-
-    def __repr__(self):
-        return "Check for robot in regions " + ",".join(
-            repr(region) for region in self.regions
-        )
-
-
-(
-    RobotEventuallyEntersRegion,
-    RobotEventuallyExitsRegion,
-    RobotAlwaysStaysInRegion,
-    RobotNeverEntersRegion,
-) = create_validation_types(RobotEntersRegion)
-
 
 class NumberOfRobotsEntersRegion(Validation):
 
@@ -99,10 +54,21 @@ class NumberOfRobotsEntersRegion(Validation):
             + ",".join(repr(self.regions))
         )
 
-
 (
     NumberOfRobotsEventuallyEntersRegion,
     NumberOfRobotsEventuallyExitsRegion,
     NumberOfRobotsAlwaysStaysInRegion,
     NumberOfRobotsNeverEntersRegion,
 ) = create_validation_types(NumberOfRobotsEntersRegion)
+
+
+class RobotEntersRegion(NumberOfRobotsEntersRegion):
+    def __init__(self, regions):
+        super(RobotEntersRegion, self).__init__(regions, 1)
+
+(
+    RobotEventuallyEntersRegion,
+    RobotEventuallyExitsRegion,
+    RobotAlwaysStaysInRegion,
+    RobotNeverEntersRegion,
+) = create_validation_types(RobotEntersRegion)
