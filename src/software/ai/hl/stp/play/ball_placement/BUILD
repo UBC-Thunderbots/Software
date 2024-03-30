@@ -21,7 +21,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/tactic/assigned_skill:named_skill_tactics",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactics",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/logger",
