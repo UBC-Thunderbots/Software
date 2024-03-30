@@ -49,8 +49,8 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     }
 
     std::optional<Shot> shot = calcBestShotOnGoal(
-        tactic_update.world.field(), tactic_update.world.friendlyTeam(),
-        tactic_update.world.enemyTeam(), tactic_update.world.ball().position(),
+        tactic_update.world_ptr->field(), tactic_update.world_ptr->friendlyTeam(),
+        tactic_update.world_ptr->enemyTeam(), tactic_update.world_ptr->ball().position(),
         TeamType::ENEMY, {tactic_update.robot});
     if (shot && shot->getOpenAngle() <
                     Angle::fromDegrees(

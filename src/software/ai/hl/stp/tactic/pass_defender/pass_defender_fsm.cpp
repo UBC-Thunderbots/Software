@@ -5,12 +5,12 @@
 
 bool PassDefenderFSM::passStarted(const Update& event)
 {
-    auto ball_position = event.common.world.ball().position();
+    auto ball_position = event.common.world_ptr->ball().position();
     Vector ball_receiver_point_vector(
         event.control_params.position_to_block_from.x() - ball_position.x(),
         event.control_params.position_to_block_from.y() - ball_position.y());
 
-    bool pass_started = event.common.world.ball().hasBallBeenKicked(
+    bool pass_started = event.common.world_ptr->ball().hasBallBeenKicked(
         ball_receiver_point_vector.orientation(), MIN_PASS_SPEED,
         MAX_PASS_ANGLE_DIFFERENCE);
 
@@ -19,7 +19,7 @@ bool PassDefenderFSM::passStarted(const Update& event)
         // We want to keep track of the initial trajectory of the pass
         // so that we can later tell whether the ball strays from
         // this trajectory
-        pass_orientation = event.common.world.ball().velocity().orientation();
+        pass_orientation = event.common.world_ptr->ball().velocity().orientation();
     }
 
     return pass_started;
@@ -28,7 +28,7 @@ bool PassDefenderFSM::passStarted(const Update& event)
 bool PassDefenderFSM::ballDeflected(const Update& event)
 {
     auto orientation_difference =
-        event.common.world.ball().velocity().orientation().minDiff(pass_orientation);
+        event.common.world_ptr->ball().velocity().orientation().minDiff(pass_orientation);
 
     // If the ball strays from the initial trajectory of the pass,
     // it was likely deflected off course by another robot or chipped
@@ -39,7 +39,7 @@ bool PassDefenderFSM::ballDeflected(const Update& event)
 void PassDefenderFSM::blockPass(const Update& event)
 {
     auto position_to_block_from = event.control_params.position_to_block_from;
-    auto ball_position          = event.common.world.ball().position();
+    auto ball_position          = event.common.world_ptr->ball().position();
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
 
@@ -54,7 +54,7 @@ void PassDefenderFSM::blockPass(const Update& event)
 
 void PassDefenderFSM::interceptBall(const Update& event)
 {
-    auto ball           = event.common.world.ball();
+    auto ball           = event.common.world_ptr->ball();
     auto robot_position = event.common.robot.position();
 
     if ((ball.position() - robot_position).length() >

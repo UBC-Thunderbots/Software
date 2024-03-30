@@ -63,7 +63,7 @@ class RobotNavigationObstacleFactory
      * Create dynamic obstacles for the given motion constraints
      *
      * @param motion_constraints The motion constraints to create obstacles for
-     * @param field Field we're enforcing motion constraints in
+     * @param world World we're enforcing motion constraints in
      *
      * @return Obstacles representing the given motion constraints
      */

@@ -81,6 +81,10 @@ class EstopMode(IntEnum):
     PHYSICAL_ESTOP = 2
 
 
+# the maximum packet / world loss percent indicated by UI
+MAX_ACCEPTABLE_PACKET_LOSS_PERCENT = 30
+
+
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2
@@ -118,6 +122,9 @@ ROBOT_FATAL_TIMEOUT_S = 5
 # Max time (in seconds) tolerated between repeated crash protos until
 # crash alert occurs
 ROBOT_CRASH_TIMEOUT_S = 5
+
+# FOV in degrees for top-down orthographic view
+ORTHOGRAPHIC_FOV_DEGREES = 1.0
 
 # LogLevel to string conversion map
 LOG_LEVEL_STR_MAP = {
@@ -250,7 +257,6 @@ def rgb_to_bw(r: int, g: int, b: int) -> tuple:
 
 
 class Colors(object):
-
     DEFAULT_GRAPHICS_COLOR = QtGui.QColor(255, 255, 255, 128)
     FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 200)
     FIELD_LINE_LIGHTER_COLOR = QtGui.QColor(255, 255, 255, 100)
@@ -305,3 +311,10 @@ class DepthValues:
     FOREGROUND_DEPTH = 0
     ABOVE_FOREGROUND_DEPTH = 1
     OVERLAY_DEPTH = 2
+
+
+class TrailValues:
+    """Constants for Trails Visualization Layer in Thunderscope."""
+
+    DEFAULT_TRAIL_LENGTH = 20
+    DEFAULT_TRAIL_SAMPLING_RATE = 0

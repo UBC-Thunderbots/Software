@@ -8,6 +8,7 @@
    * [Flashing the powerboard](#flashing-the-powerboard)
    * [Setting up nano](#setting-up-nano)
    * [Robot Diagnostics](#robot-diagnostics)
+   * [Robot Auto Test](#robot-auto-test)
 * [On Robot Commands](#on-robot-commands)
    * [Systemd Services](#systemd-services)
    * [Debugging Uart](#debugging-uart)
@@ -85,6 +86,15 @@ From Software/src
 `./tbots.py run thunderscope --run_blue --run_diagnostics --interface <network_interface>`
 
 network_interface can be found with `ifconfig` commonly `wlp59s0` for wifi.
+
+## Robot Auto Test
+Runs the robot auto test fixture on a robot through Ansible, which tests the motor board and power board SPI and UART transfer respectively.
+
+From Software/src:
+
+`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook robot_auto_test_playbook.yml --hosts <robot-ip> --ssh_pass <jetson_nano_password>`
+* replace the <robot-ip> with the actual ip address of the jetson nano for the ssh connection.
+* replace the <jetson_nano_password> with the actual password for the jetson nano for the ssh connection.
 
 # On Robot Commands
 

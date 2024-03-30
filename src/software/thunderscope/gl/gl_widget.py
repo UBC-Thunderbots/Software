@@ -6,6 +6,7 @@ from pyqtgraph.opengl import *
 
 import functools
 import numpy as np
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 
 from software.thunderscope.constants import *
 
@@ -22,16 +23,23 @@ class GLWidget(QWidget):
     and our AI. GLWidget can also provide replay controls.
     """
 
-    def __init__(self, player: ProtoPlayer = None, sandbox_mode: bool = False) -> None:
+    def __init__(
+        self,
+        player: ProtoPlayer = None,
+        sandbox_mode: bool = False,
+        bufferswap_counter: FrameTimeCounter = None,
+    ) -> None:
         """Initialize the GLWidget
 
         :param player: The replay player to optionally display media controls for
         :param sandbox_mode: if sandbox mode should be enabled
-
+        :param bufferswap_counter: a counter that is used to display fps in thunderscope
         """
         super().__init__()
 
-        self.gl_view_widget = ExtendedGLViewWidget()
+        self.gl_view_widget = ExtendedGLViewWidget(
+            bufferswap_counter=bufferswap_counter
+        )
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.gl_view_widget.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
@@ -254,9 +262,12 @@ class GLWidget(QWidget):
         self.gl_view_widget.reset()
         if camera_view == CameraView.ORTHOGRAPHIC:
             self.gl_view_widget.setCameraPosition(
-                pos=pg.Vector(0, 0, 0), distance=1100, elevation=90, azimuth=-90
+                pos=pg.Vector(0, 0, 0),
+                distance=self.calc_orthographic_distance(),
+                elevation=90,
+                azimuth=-90,
             )
-            self.gl_view_widget.setCameraParams(fov=1.0)
+            self.gl_view_widget.setCameraParams(fov=ORTHOGRAPHIC_FOV_DEGREES)
         elif camera_view == CameraView.LANDSCAPE_HIGH_ANGLE:
             self.gl_view_widget.setCameraPosition(
                 pos=pg.Vector(0, -0.5, 0), distance=13, elevation=45, azimuth=-90
@@ -288,3 +299,24 @@ class GLWidget(QWidget):
             self.add_layer(self.measure_layer)
         else:
             self.remove_layer(self.measure_layer)
+
+    def calc_orthographic_distance(self) -> float:
+        """Calculates the distance of the camera above the field so that the field occupies the entire viewport"""
+
+        field = DEFAULT_EMPTY_FIELD_WORLD.field
+        buffer_size = 0.5
+        distance = np.tan(np.deg2rad(90 - ORTHOGRAPHIC_FOV_DEGREES / 2))
+
+        viewport_w_to_h = self.gl_view_widget.width() / self.gl_view_widget.height()
+
+        half_x_length_with_buffer = field.field_x_length / 2 + buffer_size
+        half_y_length_with_buffer = field.field_y_length / 2 + buffer_size
+
+        # Constrained vertically
+        if viewport_w_to_h > half_x_length_with_buffer / half_y_length_with_buffer:
+            distance *= half_y_length_with_buffer * viewport_w_to_h
+        # Constrained horizontally
+        else:
+            distance *= half_x_length_with_buffer
+
+        return distance

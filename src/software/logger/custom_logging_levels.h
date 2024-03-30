@@ -1,7 +1,7 @@
 #pragma once
 
 
-// See https://github.com/KjellKod/g3log/blob/master/API.markdown#custom-logging-levels
+// See https://github.com/KjellKod/g3log/blob/master/docs/API_custom_formatting.md
 // for adding custom log levels
 
 // A custom level used to specify messages that contain robot statuses, including various

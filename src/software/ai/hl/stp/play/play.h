@@ -52,7 +52,7 @@ class Play
      * @return the PrimitiveSet to execute
      */
     virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const World& world, const InterPlayCommunication& inter_play_communication,
+        const WorldPtr& world_ptr, const InterPlayCommunication& inter_play_communication,
         const SetInterPlayCommunicationCallback& set_inter_play_communication_fun);
 
     /**
@@ -109,7 +109,7 @@ class Play
      */
     std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
                std::map<std::shared_ptr<const Tactic>, RobotId>>
-    assignTactics(const World& world, TacticVector tactic_vector,
+    assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
                   const std::vector<Robot>& robots_to_assign);
 
     /**
@@ -129,7 +129,7 @@ class Play
      * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
      */
-    PriorityTacticVector getTactics(const World& world);
+    PriorityTacticVector getTactics(const WorldPtr& world_ptr);
 
     /**
      * A wrapper function for the getNextTactics function.
@@ -165,7 +165,7 @@ class Play
      * @param world The current state of the world
      */
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
-                                const World& world) = 0;
+                                const WorldPtr& world_ptr) = 0;
 
     // Stop tactic common to all plays for robots that don't have tactics assigned
     TacticVector stop_tactics;
@@ -179,7 +179,7 @@ class Play
 
     // TODO (#2359): remove this
     // The Play's knowledge of the most up-to-date World
-    std::optional<World> world_;
+    std::optional<WorldPtr> world_ptr_;
 
     // TODO (#2359): remove this
     PriorityTacticVector priority_tactics;
