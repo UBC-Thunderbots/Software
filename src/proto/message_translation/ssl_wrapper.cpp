@@ -55,7 +55,7 @@ std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
         yellow_robot_states, blue_robot_states);
 
     auto ssl_geometrydata =
-        createGeometryData(world.field(), DEFAULT_FIELD_LINE_THICKNESS);
+        createGeometryDataProto(world.field(), DEFAULT_FIELD_LINE_THICKNESS);
 
     return createSSLWrapperPacket(std::move(ssl_geometrydata),
                                   std::move(ssl_detectionframe));

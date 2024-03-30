@@ -95,6 +95,7 @@ cc_library(
     visibility = ["//visibility:private"],
     deps = [
         "//software:constants",
+        "//software/util/typename",
         "@boost//:asio",
     ],
 )
@@ -156,5 +157,13 @@ py_library(
     deps = [
         "//proto:software_py_proto",
         "//software/logger:py_logger",
+    ],
+)
+
+py_library(
+    name = "ssl_proto_communication",
+    srcs = ["ssl_proto_communication.py"],
+    deps = [
+        "//proto/message_translation:py_tbots_protobuf",
     ],
 )

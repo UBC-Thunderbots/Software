@@ -2,7 +2,7 @@ import sys
 
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.friendly_team_scored import *
@@ -24,13 +24,13 @@ def free_kick_play_setup(
     """
 
     # Game Controller Setup
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.NORMAL_START, team=Team.BLUE
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.DIRECT, team=Team.BLUE
     )
 
@@ -51,7 +51,7 @@ def free_kick_play_setup(
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
             ball_location=ball_initial_pos,
-            ball_velocity=tbots.Vector(0, 0),
+            ball_velocity=tbots_cpp.Vector(0, 0),
         ),
     )
 
@@ -59,7 +59,11 @@ def free_kick_play_setup(
 # We want to test friendly half, enemy half, and at the border of the field
 @pytest.mark.parametrize(
     "ball_initial_pos",
-    [tbots.Point(1.5, -2.75), tbots.Point(-1.5, -2.75), tbots.Point(1.5, -3)],
+    [
+        tbots_cpp.Point(1.5, -2.75),
+        tbots_cpp.Point(-1.5, -2.75),
+        tbots_cpp.Point(1.5, -3),
+    ],
 )
 def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
     # TODO- #2753 Validation
@@ -75,22 +79,22 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
         params=[
             {
                 "blue_bots": [
-                    tbots.Point(-4.5, 0),
-                    tbots.Point(-3, 1.5),
-                    tbots.Point(-3, 0.5),
-                    tbots.Point(-3, -0.5),
-                    tbots.Point(-3, -1.5),
-                    tbots.Point(4, -2.5),
+                    tbots_cpp.Point(-4.5, 0),
+                    tbots_cpp.Point(-3, 1.5),
+                    tbots_cpp.Point(-3, 0.5),
+                    tbots_cpp.Point(-3, -0.5),
+                    tbots_cpp.Point(-3, -1.5),
+                    tbots_cpp.Point(4, -2.5),
                 ],
                 "yellow_bots": [
-                    tbots.Point(1, 0),
-                    tbots.Point(1, 2.5),
-                    tbots.Point(1, -2.5),
-                    tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-                    tbots.Field.createSSLDivisionBField()
+                    tbots_cpp.Point(1, 0),
+                    tbots_cpp.Point(1, 2.5),
+                    tbots_cpp.Point(1, -2.5),
+                    tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+                    tbots_cpp.Field.createSSLDivisionBField()
                     .enemyDefenseArea()
                     .negXNegYCorner(),
-                    tbots.Field.createSSLDivisionBField()
+                    tbots_cpp.Field.createSSLDivisionBField()
                     .enemyDefenseArea()
                     .negXPosYCorner(),
                 ],
@@ -111,30 +115,30 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
     [
         # not close to our net
         (
-            tbots.Point(0.9, 2.85),
+            tbots_cpp.Point(0.9, 2.85),
             [
-                tbots.Point(1, 3),
-                tbots.Point(-2, -1.25),
-                tbots.Point(-1, -0.25),
-                tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-                tbots.Field.createSSLDivisionBField()
+                tbots_cpp.Point(1, 3),
+                tbots_cpp.Point(-2, -1.25),
+                tbots_cpp.Point(-1, -0.25),
+                tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+                tbots_cpp.Field.createSSLDivisionBField()
                 .enemyDefenseArea()
                 .negXNegYCorner(),
-                tbots.Field.createSSLDivisionBField()
+                tbots_cpp.Field.createSSLDivisionBField()
                 .enemyDefenseArea()
                 .negXPosYCorner(),
             ],
         ),
         # close to our net
         (
-            tbots.Point(-2.4, 1),
+            tbots_cpp.Point(-2.4, 1),
             [
-                tbots.Point(-2.3, 1.05),
-                tbots.Point(-3.5, 2),
-                tbots.Point(-1.2, 0),
-                tbots.Point(-2.3, -1),
-                tbots.Point(-3.8, -2),
-                tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
+                tbots_cpp.Point(-2.3, 1.05),
+                tbots_cpp.Point(-3.5, 2),
+                tbots_cpp.Point(-1.2, 0),
+                tbots_cpp.Point(-2.3, -1),
+                tbots_cpp.Point(-3.8, -2),
+                tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
             ],
         ),
     ],
@@ -142,12 +146,12 @@ def test_free_kick_play_friendly(simulated_test_runner, ball_initial_pos):
 def test_free_kick_play_enemy(simulated_test_runner, ball_initial_pos, yellow_bots):
 
     blue_bots = [
-        tbots.Point(-4.5, 0),
-        tbots.Point(-3, 1.5),
-        tbots.Point(-3, 0.5),
-        tbots.Point(-3, -0.5),
-        tbots.Point(-3, -1.5),
-        tbots.Point(4, -2.5),
+        tbots_cpp.Point(-4.5, 0),
+        tbots_cpp.Point(-3, 1.5),
+        tbots_cpp.Point(-3, 0.5),
+        tbots_cpp.Point(-3, -0.5),
+        tbots_cpp.Point(-3, -1.5),
+        tbots_cpp.Point(4, -2.5),
     ]
     # TODO- #2753 Validation
     simulated_test_runner.run_test(
@@ -161,12 +165,12 @@ def test_free_kick_play_enemy(simulated_test_runner, ball_initial_pos, yellow_bo
         params=[
             {
                 "blue_bots": [
-                    tbots.Point(-4.5, 0),
-                    tbots.Point(-3, 1.5),
-                    tbots.Point(-3, 0.5),
-                    tbots.Point(-3, -0.5),
-                    tbots.Point(-3, -1.5),
-                    tbots.Point(4, -2.5),
+                    tbots_cpp.Point(-4.5, 0),
+                    tbots_cpp.Point(-3, 1.5),
+                    tbots_cpp.Point(-3, 0.5),
+                    tbots_cpp.Point(-3, -0.5),
+                    tbots_cpp.Point(-3, -1.5),
+                    tbots_cpp.Point(4, -2.5),
                 ],
                 "yellow_bots": yellow_bots,
                 "ball_initial_pos": ball_initial_pos,
@@ -183,7 +187,11 @@ def test_free_kick_play_enemy(simulated_test_runner, ball_initial_pos, yellow_bo
 
 @pytest.mark.parametrize(
     "ball_initial_pos",
-    [tbots.Point(1.5, -2.75), tbots.Point(-1.5, -2.75), tbots.Point(1.5, -3)],
+    [
+        tbots_cpp.Point(1.5, -2.75),
+        tbots_cpp.Point(-1.5, -2.75),
+        tbots_cpp.Point(1.5, -3),
+    ],
 )
 def test_free_kick_play_both(simulated_test_runner, ball_initial_pos):
     # TODO- #2753 Validation
@@ -198,20 +206,20 @@ def test_free_kick_play_both(simulated_test_runner, ball_initial_pos):
         params=[
             {
                 "blue_bots": [
-                    tbots.Point(-3, 0.25),
-                    tbots.Point(-3, 1.5),
-                    tbots.Point(-3, 0.5),
-                    tbots.Point(-3, -0.5),
-                    tbots.Point(-3, -1.5),
-                    tbots.Point(-3, -0.25),
+                    tbots_cpp.Point(-3, 0.25),
+                    tbots_cpp.Point(-3, 1.5),
+                    tbots_cpp.Point(-3, 0.5),
+                    tbots_cpp.Point(-3, -0.5),
+                    tbots_cpp.Point(-3, -1.5),
+                    tbots_cpp.Point(-3, -0.25),
                 ],
                 "yellow_bots": [
-                    tbots.Point(3, 0.25),
-                    tbots.Point(3, 1.5),
-                    tbots.Point(3, 0.5),
-                    tbots.Point(3, -0.5),
-                    tbots.Point(3, -1.5),
-                    tbots.Point(3, -0.25),
+                    tbots_cpp.Point(3, 0.25),
+                    tbots_cpp.Point(3, 1.5),
+                    tbots_cpp.Point(3, 0.5),
+                    tbots_cpp.Point(3, -0.5),
+                    tbots_cpp.Point(3, -1.5),
+                    tbots_cpp.Point(3, -0.25),
                 ],
                 "ball_initial_pos": ball_initial_pos,
                 "play_name": PlayName.EnemyFreekickPlay,

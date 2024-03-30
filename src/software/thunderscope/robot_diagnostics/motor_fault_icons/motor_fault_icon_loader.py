@@ -15,7 +15,7 @@ class MotorFaultIconLoader:
     NO_FAULT_ICON = None
 
 
-def get_warning_icon():
+def get_warning_icon() -> QtGui.QPixmap:
     """
     Loads the Motor Warning icon pixmap as a MotorFaultIconLoader attribute
     :return: the icon pixmap
@@ -28,7 +28,7 @@ def get_warning_icon():
     return MotorFaultIconLoader.WARNING_ICON
 
 
-def get_stopped_icon():
+def get_stopped_icon() -> QtGui.QPixmap:
     """
     Loads the Motor Stopped icon pixmap as a MotorFaultIconLoader attribute
     :return: the icon pixmap
@@ -41,7 +41,7 @@ def get_stopped_icon():
     return MotorFaultIconLoader.STOPPED_ICON
 
 
-def get_no_fault_icon():
+def get_no_fault_icon() -> QtGui.QPixmap:
     """
     Loads the Motor No Fault icon pixmap as a MotorFaultIconLoader attribute
     :return: the icon pixmap

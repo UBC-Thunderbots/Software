@@ -24,6 +24,31 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [BallPlacementPlayFSM](/src/software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StartState
+StartState --> AlignPlacementState : [!shouldKickOffWall]\n<i>alignPlacement</i>
+StartState --> KickOffWallState : [shouldKickOffWall]
+KickOffWallState --> KickOffWallState : [!kickDone && shouldKickOffWall]\n<i>kickOffWall</i>
+KickOffWallState --> KickOffWallState : [kickDone]
+KickOffWallState --> AlignPlacementState : [!kickDone]
+AlignPlacementState --> KickOffWallState : [shouldKickOffWall]
+AlignPlacementState --> AlignPlacementState : [!alignDone]\n<i>alignPlacement</i>
+AlignPlacementState --> PlaceBallState : [alignDone]
+PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
+PlaceBallState --> WaitState : [ballPlaced]\n<i>startWait</i>
+WaitState --> WaitState : [!waitDone]
+WaitState --> RetreatState : [waitDone]
+RetreatState --> Terminate:::terminate : [retreatDone && ballPlaced]
+RetreatState --> RetreatState : [ballPlaced]\n<i>retreat</i>
+
+```
+
 ## [CreaseDefensePlayFSM](/src/software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h)
 
 ```mermaid
@@ -315,11 +340,11 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> WaitingForPassState
 WaitingForPassState --> WaitingForPassState : [!passStarted]\n<i>updateReceive</i>
-WaitingForPassState --> OneTouchShotState : [passStarted_G&&onetouchPossible]\n<i>updateOnetouch</i>
-WaitingForPassState --> ReceiveAndDribbleState : [passStarted_G&&!onetouchPossible]\n<i>updateReceive</i>
+WaitingForPassState --> OneTouchShotState : [passStarted && onetouchPossible]\n<i>updateOnetouch</i>
+WaitingForPassState --> ReceiveAndDribbleState : [passStarted && !onetouchPossible]\n<i>updateReceive</i>
 ReceiveAndDribbleState --> ReceiveAndDribbleState : [!passFinished]\n<i>adjustReceive</i>
-OneTouchShotState --> OneTouchShotState : [!passFinished_G&&!strayPass]\n<i>updateOnetouch</i>
-OneTouchShotState --> ReceiveAndDribbleState : [!passFinished_G&&strayPass]\n<i>adjustReceive</i>
+OneTouchShotState --> OneTouchShotState : [!passFinished && !strayPass]\n<i>updateOnetouch</i>
+OneTouchShotState --> ReceiveAndDribbleState : [!passFinished && strayPass]\n<i>adjustReceive</i>
 ReceiveAndDribbleState --> Terminate:::terminate : [passFinished]\n<i>adjustReceive</i>
 OneTouchShotState --> Terminate:::terminate : [passFinished]\n<i>updateOnetouch</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>

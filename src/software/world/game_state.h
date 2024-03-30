@@ -155,7 +155,7 @@ class GameState
     /*
      * Rule queries
      *
-     * See http://wiki.robocup.org/images/7/73/Small_Size_League_-_Rules_2018.pdf
+     * See https://download.tigers-mannheim.de/rules/2018_ssl-rules.pdf
      * for more details
      */
 

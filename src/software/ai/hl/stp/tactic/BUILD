@@ -41,12 +41,13 @@ cc_library(
         "tactic_visitor.h",
     ],
     deps = [
+        ":stop_primitive",
         ":transition_conditions",
         "//proto/primitive:primitive_msg_factory",
-        "//software/ai/navigator/path_planner:enlsvg_path_planner",
         "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",
+        "@tracy",
     ],
 )
 
@@ -89,5 +90,53 @@ cc_library(
         ":all_tactics",
         "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_protobuf",
+    ],
+)
+
+cc_library(
+    name = "primitive",
+    hdrs = [
+        "primitive.h",
+    ],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+    ],
+)
+
+cc_library(
+    name = "move_primitive",
+    srcs = ["move_primitive.cpp"],
+    hdrs = [
+        "move_primitive.h",
+    ],
+    deps = [
+        ":primitive",
+        "//proto/message_translation:tbots_protobuf",
+        "//proto/primitive:primitive_msg_factory",
+        "//software/ai/navigator/trajectory:trajectory_planner",
+    ],
+)
+
+cc_library(
+    name = "stop_primitive",
+    srcs = ["stop_primitive.cpp"],
+    hdrs = [
+        "stop_primitive.h",
+    ],
+    deps = [
+        ":primitive",
+        "//proto/message_translation:tbots_protobuf",
+    ],
+)
+
+cc_test(
+    name = "primitive_test",
+    srcs = ["primitive_test.cpp"],
+    deps = [
+        ":move_primitive",
+        ":stop_primitive",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )

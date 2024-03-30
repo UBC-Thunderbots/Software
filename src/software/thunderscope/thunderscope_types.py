@@ -1,4 +1,5 @@
 from typing import Callable, Optional, Sequence, Any, Dict
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.constants import TabNames
 
 import PyQt6
@@ -16,7 +17,7 @@ class WidgetStretchData:
     x: Optional[int]  # stretch in x direction
     y: Optional[int]  # stretch in y direction
 
-    def __init__(self, x: int = None, y: int = None):
+    def __init__(self, x: int = None, y: int = None) -> None:
         self.x = x
         self.y = y
 
@@ -43,7 +44,7 @@ class TScopeWidget:
         in_window: Optional[bool] = False,
         stretch: Optional[object] = None,
         has_refresh_func: Optional[bool] = True,
-    ):
+    ) -> None:
         self.name = name
         self.widget = widget
         self.anchor = anchor
@@ -62,11 +63,11 @@ class TScopeTab:
     key: TabNames  # key to identify this tab
     dock_area: QWidget  # Dock Area for this tab
 
-    def __init__(self, name: str, key: TabNames):
+    def __init__(self, name: str, key: TabNames) -> None:
         self.name = name
         self.key = key
 
-    def refresh(self):
+    def refresh(self) -> None:
         pass
 
 
@@ -82,7 +83,20 @@ class TScopeQTTab(TScopeTab):
         str, Callable[[], None]
     ]  # Mapping of widget names to refresh functions
 
-    def __init__(self, name: str, key: TabNames, widgets: Sequence[TScopeWidget]):
+    def __init__(
+        self,
+        name: str,
+        key: TabNames,
+        widgets: Sequence[TScopeWidget],
+        refresh_func_counter: FrameTimeCounter = None,
+    ) -> None:
+        """
+        name: the name of this tab
+        key: the key to identify this tab
+        widgets: a list of widgets that is going to be displayed in the tab
+        refresh_func_counter: a counter that tracks the runtime of the refresh function
+        :Return: None
+        """
         super().__init__(name, key)
         self.widgets = widgets
         self.refresh_functions = {}
@@ -92,13 +106,19 @@ class TScopeQTTab(TScopeTab):
 
         # make dock area
         self.dock_area = DockArea()
+        self.dock_area.layout.setContentsMargins(12, 12, 12, 12)
 
         # first widget is initial anchor widget
         # all other widgets will be positioned relative to this one
         for widget in self.widgets:
             self.add_one_widget(widget)
 
-    def add_one_widget(self, data: TScopeWidget):
+        # initialized a frametime counter if none was passed in
+        self.refresh_func_counter = refresh_func_counter
+        if refresh_func_counter == None:
+            self.refresh_func_counter = FrameTimeCounter()
+
+    def add_one_widget(self, data: TScopeWidget) -> None:
         """
         Gets the widget name and object from the given data
         Add widget to a dock and adds dock to this tab's dock area
@@ -129,14 +149,25 @@ class TScopeQTTab(TScopeTab):
         if data.has_refresh_func:
             self.refresh_functions[widget_name] = new_widget.refresh
 
-    def refresh(self):
+    def refresh(self) -> None:
         """
-        Refreshes all the widgets belonging to this tab
+        Refreshes all the widgets belonging to this tab, and not refresh widget that are not visible.
         """
-        for refresh_func in self.refresh_functions.values():
+        if not self.dock_area.isVisible():
+            return
+
+        self.refresh_func_counter.add_one_datapoint()
+
+        for widget_name in self.refresh_functions:
+            # only refresh widget inside the dock that are visible
+            widget = self.widgets_map[widget_name]
+            if not widget.isVisible():
+                continue
+
+            refresh_func = self.refresh_functions[widget_name]
             refresh_func()
 
-    def find_widget(self, widget_name):
+    def find_widget(self, widget_name: str) -> Optional[TScopeWidget]:
         """
         Finds and returns the widget object corresponding to the given name, if exists
         If not, returns None
@@ -155,7 +186,7 @@ class TScopeWebTab(TScopeTab):
 
     url: str  # url of webpage displayed by this tab
 
-    def __init__(self, name: str, key: TabNames, url: str):
+    def __init__(self, name: str, key: TabNames, url: str) -> None:
         super().__init__(name, key)
         self.url = url
 

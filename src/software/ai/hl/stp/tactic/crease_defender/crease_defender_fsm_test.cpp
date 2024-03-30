@@ -122,10 +122,9 @@ TEST(CreaseDefenderFSMTest, test_transitions)
 {
     TbotsProto::RobotNavigationObstacleConfig config;
     double robot_obstacle_inflation_factor = config.robot_obstacle_inflation_factor();
-    World world                            = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world           = ::TestUtil::createBlankTestingWorld();
     Robot robot                            = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    world =
-        ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(123));
+    ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(123));
     CreaseDefenderFSM::ControlParams control_params{
         .enemy_threat_origin       = Point(2, 3),
         .crease_defender_alignment = TbotsProto::CreaseDefenderAlignment::LEFT,
@@ -136,13 +135,11 @@ TEST(CreaseDefenderFSMTest, test_transitions)
 
     // robot far from destination, ball in friendly half
     fsm.process_event(CreaseDefenderFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     auto block_point = CreaseDefenderFSM::findBlockThreatPoint(
-        world.field(), control_params.enemy_threat_origin,
+        world->field(), control_params.enemy_threat_origin,
         control_params.crease_defender_alignment, robot_obstacle_inflation_factor);
 
     ASSERT_TRUE(block_point.has_value());
@@ -154,15 +151,11 @@ TEST(CreaseDefenderFSMTest, test_transitions)
         Timestamp::fromSeconds(123));
     // Set robot to the correct position to block the ball
     fsm.process_event(CreaseDefenderFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
     // Check that the FSM stays done
     fsm.process_event(CreaseDefenderFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     robot.updateState(
@@ -174,8 +167,6 @@ TEST(CreaseDefenderFSMTest, test_transitions)
         Timestamp::fromSeconds(123));
     // change orientation to make the FSM not done
     fsm.process_event(CreaseDefenderFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world, [](std::unique_ptr<TbotsProto::Primitive>) {},
-                            TEST_UTIL_CREATE_MOTION_CONTROL_NO_DEST)));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 }

@@ -140,7 +140,7 @@ std::optional<SSLProto::SSL_FieldCircularArc> findCircularArc(
  *
  * @return A SSLProto::Vector2f message with the same coordinates as the given point
  */
-std::unique_ptr<SSLProto::Vector2f> createVector2f(const Point& point);
+std::unique_ptr<SSLProto::Vector2f> createVector2fProto(const Point& point);
 
 /**
  * Creates an SSLProto::SSL_FieldLineSegment proto message
@@ -157,8 +157,8 @@ std::unique_ptr<SSLProto::Vector2f> createVector2f(const Point& point);
  * @return an SSLProto::SSL_FieldLineSegment representing the given segment with the
  * given thickness
  */
-std::unique_ptr<SSLProto::SSL_FieldLineSegment> createFieldLineSegment(
-    const Segment& segment, float thickness, SSLFieldLines line_type,
+std::unique_ptr<SSLProto::SSL_FieldLineSegment> createFieldLineSegmentProto(
+    const Segment& segment, const float thickness, const SSLFieldLines line_type,
     const SSLProto::SSL_FieldShapeType& shape_type);
 
 /**
@@ -176,8 +176,8 @@ std::unique_ptr<SSLProto::SSL_FieldLineSegment> createFieldLineSegment(
  * @return an SSLProto::SSL_FieldCircularArc representing the given circle with the
  * given thickness
  */
-std::unique_ptr<SSLProto::SSL_FieldCircularArc> createFieldCircularArc(
-    const Circle& circle, float thickness, SSLCircularArcs arc_type,
+std::unique_ptr<SSLProto::SSL_FieldCircularArc> createFieldCircularArcProto(
+    const Circle& circle, const float thickness, const SSLCircularArcs arc_type,
     const SSLProto::SSL_FieldShapeType& shape_type);
 
 /**
@@ -192,8 +192,8 @@ std::unique_ptr<SSLProto::SSL_FieldCircularArc> createFieldCircularArc(
  *
  * @return an SSLProto::SSL_GeometryFieldSize proto message representing the given field
  */
-std::unique_ptr<SSLProto::SSL_GeometryFieldSize> createGeometryFieldSize(
-    const Field& field, float thickness);
+std::unique_ptr<SSLProto::SSL_GeometryFieldSize> createGeometryFieldSizeProto(
+    const Field& field, const float thickness);
 
 /**
  * Creates an SSLProto::SSL_GeometryData proto message from the given field
@@ -207,8 +207,8 @@ std::unique_ptr<SSLProto::SSL_GeometryFieldSize> createGeometryFieldSize(
  *
  * @return an SSLProto::SSL_GeometryData proto message representing the given field
  */
-std::unique_ptr<SSLProto::SSL_GeometryData> createGeometryData(const Field& field,
-                                                               float thickness);
+std::unique_ptr<SSLProto::SSL_GeometryData> createGeometryDataProto(const Field& field,
+                                                                    float thickness);
 
 /**
  * Returns a Field object given geometry data from a protobuf packet

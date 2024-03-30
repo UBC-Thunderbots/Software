@@ -301,7 +301,7 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_duplicate_names)
 TEST_F(SSLGeometryTest, test_create_vector_2f_message)
 {
     Point point(-1.5, 6);
-    auto vector_msg = createVector2f(point);
+    auto vector_msg = createVector2fProto(point);
     ASSERT_TRUE(vector_msg);
     EXPECT_TRUE(equalWithinTolerance(point, *vector_msg, tolerance));
 }
@@ -312,7 +312,7 @@ TEST_F(SSLGeometryTest, test_create_field_line_segment_with_valid_values)
     const float thickness         = 0.005f;
     const SSLFieldLines line_type = SSLFieldLines::POS_Y_FIELD_LINE;
 
-    auto field_line_msg = createFieldLineSegment(
+    auto field_line_msg = createFieldLineSegmentProto(
         segment, thickness, line_type, SSLProto::SSL_FieldShapeType::CenterLine);
 
     ASSERT_TRUE(field_line_msg);
@@ -342,7 +342,7 @@ TEST_F(SSLGeometryTest, test_create_field_circular_arc_with_valid_values)
     const float thickness          = 0.005f;
     const SSLCircularArcs arc_type = SSLCircularArcs::CENTER_CIRCLE;
 
-    auto circular_arc_msg = createFieldCircularArc(
+    auto circular_arc_msg = createFieldCircularArcProto(
         circle, thickness, arc_type, SSLProto::SSL_FieldShapeType::CenterCircle);
 
     ASSERT_TRUE(circular_arc_msg);
@@ -372,7 +372,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = 0.005f;
 
-    auto field_msg = createGeometryFieldSize(field, thickness);
+    auto field_msg = createGeometryFieldSizeProto(field, thickness);
 
     EXPECT_EQ(9000, field_msg->field_length());
     EXPECT_EQ(6000, field_msg->field_width());
@@ -577,7 +577,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_data_with_valid_values)
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = 0.005f;
 
-    auto geometry_data = createGeometryData(field, thickness);
+    auto geometry_data = createGeometryDataProto(field, thickness);
     EXPECT_EQ(0, geometry_data->calib_size());
     EXPECT_TRUE(geometry_data->has_field());
 
@@ -610,7 +610,7 @@ TEST_F(SSLGeometryTest, test_convert_field_to_proto_and_back)
     Field field           = Field::createSSLDivisionBField();
     const float thickness = 0.005f;
 
-    auto field_proto = createGeometryData(field, thickness);
+    auto field_proto = createGeometryDataProto(field, thickness);
     auto new_field   = createFieldProto(*field_proto);
 
     ASSERT_TRUE(new_field);

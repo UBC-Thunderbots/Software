@@ -68,3 +68,4 @@ class MoveTactic : public Tactic
 COPY_TACTIC(PenaltySetupTactic, MoveTactic)
 COPY_TACTIC(MoveGoalieToGoalLineTactic, MoveTactic)
 COPY_TACTIC(PrepareKickoffMoveTactic, MoveTactic)
+COPY_TACTIC(PlaceBallMoveTactic, MoveTactic)

@@ -14,7 +14,7 @@ TEST(NonTerminatingFunctionValidatorTest,
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {};
 
-    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    auto world = ::TestUtil::createBlankTestingWorld();
     world->updateBall(
         Ball(BallState(Point(-0.1, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
     NonTerminatingFunctionValidator function_validator(validation_function, world);
@@ -35,7 +35,7 @@ TEST(NonTerminatingFunctionValidatorTest, test_yielding_error_message)
         yield("This is an error message 2");
     };
 
-    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    auto world = ::TestUtil::createBlankTestingWorld();
     NonTerminatingFunctionValidator function_validator(validation_function, world);
     EXPECT_EQ(function_validator.executeAndCheckForFailures(),
               "This is an error message 1");
@@ -54,7 +54,7 @@ TEST(NonTerminatingFunctionValidatorTest,
         }
     };
 
-    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    auto world = ::TestUtil::createBlankTestingWorld();
     NonTerminatingFunctionValidator function_validator(validation_function, world);
     EXPECT_EQ(function_validator.executeAndCheckForFailures(), "Ball not at (1,1)");
     world->updateBall(
