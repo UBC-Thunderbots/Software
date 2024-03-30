@@ -331,8 +331,8 @@ TEST_F(SSLGeometryTest, test_create_field_line_segment_with_negative_thickness)
     const float thickness         = -0.005f;
     const SSLFieldLines line_type = SSLFieldLines::POS_Y_FIELD_LINE;
 
-    EXPECT_THROW(createFieldLineSegment(segment, thickness, line_type,
-                                        SSLProto::SSL_FieldShapeType::Undefined),
+    EXPECT_THROW(createFieldLineSegmentProto(segment, thickness, line_type,
+                                             SSLProto::SSL_FieldShapeType::Undefined),
                  std::invalid_argument);
 }
 
@@ -362,8 +362,8 @@ TEST_F(SSLGeometryTest, test_create_field_circular_arc_with_negative_thickness)
     const float thickness          = -0.005f;
     const SSLCircularArcs arc_type = SSLCircularArcs::CENTER_CIRCLE;
 
-    EXPECT_THROW(createFieldCircularArc(circle, thickness, arc_type,
-                                        SSLProto::SSL_FieldShapeType::Undefined),
+    EXPECT_THROW(createFieldCircularArcProto(circle, thickness, arc_type,
+                                             SSLProto::SSL_FieldShapeType::Undefined),
                  std::invalid_argument);
 }
 
@@ -569,7 +569,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_negative_thickness)
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = -0.005f;
 
-    EXPECT_THROW(createGeometryFieldSize(field, thickness), std::invalid_argument);
+    EXPECT_THROW(createGeometryFieldSizeProto(field, thickness), std::invalid_argument);
 }
 
 TEST_F(SSLGeometryTest, test_create_geometry_data_with_valid_values)
@@ -602,7 +602,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_data_with_negative_thickness)
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = -0.005f;
 
-    EXPECT_THROW(createGeometryData(field, thickness), std::invalid_argument);
+    EXPECT_THROW(createGeometryDataProto(field, thickness), std::invalid_argument);
 }
 
 TEST_F(SSLGeometryTest, test_convert_field_to_proto_and_back)
