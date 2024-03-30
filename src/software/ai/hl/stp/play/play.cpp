@@ -133,7 +133,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 << "Couldn't find a primitive for robot id " << goalie_robot_id;
             auto primitive_proto =
                 primitives[goalie_robot_id]->generatePrimitiveProtoMessage(
-                    world_ptr, motion_constraints, obstacle_factory);
+                    *world_ptr, motion_constraints, obstacle_factory);
 
             primitives_to_run->mutable_robot_primitives()->insert(
                 {goalie_robot_id, *primitive_proto});
@@ -361,7 +361,7 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                 // assignment
                 auto primitive_proto =
                     primitives[robot_id]->generatePrimitiveProtoMessage(
-                        world_ptr, motion_constraints, obstacle_factory);
+                        *world_ptr, motion_constraints, obstacle_factory);
                 primitives_to_run->mutable_robot_primitives()->insert(
                     {robot_id, *primitive_proto});
                 remaining_robots.erase(
