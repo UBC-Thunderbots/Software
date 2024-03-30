@@ -202,18 +202,6 @@ void GoalieFSM::updatePivotKick(
 
     Point chip_target = findGoodChipTarget(event.common.world_ptr, goalie_tactic_config);
 
-    // check if goalie is outside defense area, inside inflated defense area
-    Rectangle friendly_defense_area =
-        event.common.world_ptr->field().friendlyDefenseArea();
-    Ball ball = event.common.world_ptr->ball();
-
-    // calculate inflated crease obstacle
-    double robot_radius_expansion_amount =
-        ROBOT_MAX_RADIUS_METERS *
-        robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
-    Rectangle inflated_defense_area =
-        friendly_defense_area.expand(robot_radius_expansion_amount);
-
     Vector chip_vector = chip_target - chip_origin;
 
     PivotKickFSM::ControlParams control_params{
@@ -243,9 +231,6 @@ void GoalieFSM::positionToBlock(const Update &event)
 
 bool GoalieFSM::ballInInflatedDefenseArea(const Update &event)
 {
-    double robot_radius_expansion_amount =
-        ROBOT_MAX_RADIUS_METERS *
-        robot_navigation_obstacle_config.robot_obstacle_inflation_factor();
     Rectangle inflated_defense_area =
         event.common.world_ptr->field().friendlyDefenseArea().expand(
             robot_radius_expansion_amount);

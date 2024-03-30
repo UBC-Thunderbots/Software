@@ -172,21 +172,29 @@ def test_goalie_blocks_shot(
 
 
 @pytest.mark.parametrize(
-    "ball_position",
+    "ball_position,should_clear",
     [
         (
-            tbots_cpp.Point(-3.45, 0)
+            tbots_cpp.Point(-3.45, 0),
+            True,
         ),  # ball is just inside the dead zone in the X direction
         (
-            tbots_cpp.Point(-3.45, 0.9)
+            tbots_cpp.Point(-3.45, 0.9),
+            True,
         ),  # ball is just inside the dead zone in the X direction
         (
-            tbots_cpp.Point(-4.0, 1.05)
+            tbots_cpp.Point(-4.0, 1.05),
+            True,
         ),  # ball is just inside the dead zone in the Y direction
+        (
+            tbots_cpp.Point(0, 0),
+            False
+            # ball is just outside the dead zone in the X direction
+        ),
     ],
 )
 def test_goalie_clears_from_dead_zone(
-    ball_position, simulated_test_runner,
+    ball_position, should_clear, simulated_test_runner,
 ):
     # Setup Robot
     simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -217,19 +225,31 @@ def test_goalie_clears_from_dead_zone(
     )
 
     # Always Validation
-    always_validation_sequence_set = [[]]
-
-    # Eventually Validation
-    eventually_validation_sequence_set = [
+    always_validation_sequence_set = [
         [
-            # Goalie should be in the defense area
-            BallEventuallyExitsRegion(
+            BallNeverEntersRegion(
                 regions=[
                     tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
                 ]
-            ),
+            )
         ]
     ]
+    if should_clear:
+        always_validation_sequence_set = [[]]
+
+    # Eventually Validation
+    eventually_validation_sequence_set = [[]]
+    if should_clear:
+        eventually_validation_sequence_set = [
+            [
+                # Goalie should be in the defense area
+                BallEventuallyExitsRegion(
+                    regions=[
+                        tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
+                    ]
+                ),
+            ]
+        ]
 
     simulated_test_runner.run_test(
         test_timeout_s=8,

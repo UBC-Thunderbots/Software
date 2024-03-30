@@ -44,7 +44,10 @@ struct GoalieFSM
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
         : goalie_tactic_config(goalie_tactic_config),
           robot_navigation_obstacle_config(robot_navigation_obstacle_config),
-          max_allowed_speed_mode(max_allowed_speed_mode)
+          max_allowed_speed_mode(max_allowed_speed_mode),
+          robot_radius_expansion_amount(
+              ROBOT_MAX_RADIUS_METERS *
+              robot_navigation_obstacle_config.robot_obstacle_inflation_factor())
     {
     }
 
@@ -257,4 +260,6 @@ struct GoalieFSM
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
     // The maximum allowed speed mode
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+    // Expansion factor for inflated obstacles
+    double robot_radius_expansion_amount;
 };
