@@ -73,7 +73,7 @@ def test_offense_play(simulated_test_runner):
         [BallAlwaysStaysInRegion(regions=[field.fieldBoundary()])]
     ]
 
-    ag_always_validation_sequence_set = [[FriendlyAlwaysHasBallPossession()]]
+    ag_always_validation_sequence_set = [[AnyFriendlyAlwaysHasBallPossession()]]
 
     # Eventually Validation
     inv_eventually_validation_sequence_set = [[]]
