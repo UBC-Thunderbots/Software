@@ -19,21 +19,21 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
 
     # Setup Bots
     blue_bots = [
-        tbots.Point(-3, 2.5),
-        tbots.Point(-3, 1.5),
-        tbots.Point(-3, 0.5),
-        tbots.Point(-3, -0.5),
-        tbots.Point(-3, -1.5),
-        tbots.Point(-3, -2.5),
+        tbots_cpp.Point(-3, 2.5),
+        tbots_cpp.Point(-3, 1.5),
+        tbots_cpp.Point(-3, 0.5),
+        tbots_cpp.Point(-3, -0.5),
+        tbots_cpp.Point(-3, -1.5),
+        tbots_cpp.Point(-3, -2.5),
     ]
 
     yellow_bots = [
-        tbots.Point(1, 0),
-        tbots.Point(1, 2.5),
-        tbots.Point(1, -2.5),
-        tbots.Field.createSSLDivisionBField().enemyGoalCenter(),
-        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-        tbots.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+        tbots_cpp.Point(1, 0),
+        tbots_cpp.Point(1, 2.5),
+        tbots_cpp.Point(1, -2.5),
+        tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+        tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
+        tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
     ]
 
     blue_play = Play()
@@ -72,35 +72,35 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             yellow_robot_locations=yellow_bots,
             blue_robot_locations=blue_bots,
             ball_location=ball_initial_pos,
-            ball_velocity=tbots.Vector(0, 0),
+            ball_velocity=tbots_cpp.Vector(0, 0),
         ),
     )
 
     # Always Validation: Check that robots are within centreCircle + friendlyHalf
     always_validation_sequence_set = [[]]
 
-    if is_friendly_test:
-        # Checks that all robots are in friendly half + center circle
-        always_validation_sequence_set[0].append(
-            NumberOfRobotsAlwaysStaysInRegion(
-                regions=[
-                    tbots.Field.createSSLDivisionBField().friendlyHalf(),
-                    tbots.Field.createSSLDivisionBField().centerCircle(),
-                ],
-                req_robot_cnt=6,
-            )
+    # Checks that all robots are in friendly half + center circle
+    always_validation_sequence_set[0].append(
+        NumberOfRobotsAlwaysStaysInRegion(
+            regions=[
+                tbots_cpp.Field.createSSLDivisionBField().friendlyHalf(),
+                tbots_cpp.Field.createSSLDivisionBField().centerCircle(),
+            ],
+            req_robot_cnt=6,
         )
+    )
 
+    if is_friendly_test:
         # Checks that either 0 or 1 robots are in centerCircle
         always_validation_sequence_set[0].append(
             OrValidation(
                 [
                     NumberOfRobotsAlwaysStaysInRegion(
-                        regions=[tbots.Field.createSSLDivisionBField().centerCircle()],
+                        regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
                         req_robot_cnt=0,
                     ),
                     NumberOfRobotsAlwaysStaysInRegion(
-                        regions=[tbots.Field.createSSLDivisionBField().centerCircle()],
+                        regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
                         req_robot_cnt=1,
                     ),
                 ]
@@ -108,21 +108,10 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
         )
 
     else:
-        # Checks that all robots are in friendly half + center circle
-        always_validation_sequence_set[0].append(
-            NumberOfRobotsAlwaysStaysInRegion(
-                regions=[
-                    tbots.Field.createSSLDivisionBField().friendlyHalf(),
-                    tbots.Field.createSSLDivisionBField().centerCircle(),
-                ],
-                req_robot_cnt=6,
-            )
-        )
-
         # Checks that 0 robots are in centerCircle
         always_validation_sequence_set[0].append(
             NumberOfRobotsAlwaysStaysInRegion(
-                regions=[tbots.Field.createSSLDivisionBField().centerCircle()],
+                regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
                 req_robot_cnt=0,
             )
         )
@@ -133,7 +122,7 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     if is_friendly_test:
         # Checks that ball leaves center point by 0.05 meters within 10 seconds of kickoff
         eventually_validation_sequence_set[0].append(
-            BallEventuallyExitsRegion(regions=[tbots.Circle(ball_initial_pos, 0.05)])
+            BallEventuallyExitsRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)])
         )
 
     simulated_test_runner.run_test(
