@@ -428,7 +428,7 @@ if __name__ == "__main__":
             should_restart_on_crash=False,
             run_sudo=args.sudo,
         ) as yellow_fs, Gamecontroller(
-            supress_logs=(not args.verbose), ci_mode=args.enable_autoref
+            supress_logs=(not args.verbose)
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -449,6 +449,9 @@ if __name__ == "__main__":
             log_path=args.yellow_full_system_runtime_dir,
             time_provider=autoref.time_provider if args.enable_autoref else None,
         ) as yellow_logger:
+
+            tscope.register_refresh_function(gamecontroller.refresh)
+
             autoref_proto_unix_io = ProtoUnixIO()
 
             tscope.proto_unix_io_map[
