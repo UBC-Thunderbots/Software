@@ -16,6 +16,19 @@
  *
  * @param world The world in which to rate the pass
  * @param pass The pass to rate
+ * @param passing_config The passing config used for tuning
+ *
+ * @return A value in [0,1] representing the quality of the pass, with 1 being an
+ *         ideal pass, and 0 being the worst pass possible
+ */
+double ratePass(const World& world, const Pass& pass,
+                TbotsProto::PassingConfig passing_config);
+
+/**
+ * Calculate the quality of a given pass accounting for the zone it's in
+ *
+ * @param world The world in which to rate the pass
+ * @param pass The pass to rate
  * @param zone The zone this pass is constrained to
  * @param passing_config The passing config used for tuning
  *

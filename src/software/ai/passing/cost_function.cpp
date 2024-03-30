@@ -13,7 +13,7 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/logger/logger.h"
 
-double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
+double ratePass(const World& world, const Pass& pass,
                 TbotsProto::PassingConfig passing_config)
 {
     double static_pass_quality =
@@ -33,10 +33,16 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double shoot_pass_rating =
         ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 
+    return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
+           pass_backwards_rating * shoot_pass_rating
+}
+
+double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
+                TbotsProto::PassingConfig passing_config)
+{
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
-    return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-           pass_backwards_rating * shoot_pass_rating * in_region_quality;
+    return ratePass(world, pass, passing_config) * in_region_quality;
 }
 
 double ratePassBackwardsQuality(const Field& field, const Pass& pass,

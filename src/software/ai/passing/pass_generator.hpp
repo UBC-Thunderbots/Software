@@ -7,6 +7,7 @@
 #include <random>
 #include <thread>
 
+#include "base_pass_generator.hpp"
 #include "eighteen_zone_pitch_division.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
@@ -29,7 +30,7 @@ using ZonePassMap = std::unordered_map<ZoneEnum, PassWithRating>;
  * This class is responsible for generating passes for us to perform
  */
 template <class ZoneEnum>
-class PassGenerator
+class PassGenerator: public BasePassGenerator
 {
     static_assert(std::is_enum<ZoneEnum>::value,
                   "PassGenerator: ZoneEnum must be a zone id enum");
@@ -167,6 +168,12 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
 
     return PassEvaluation<ZoneEnum>(pitch_division_, current_best_passes_,
                                     passing_config_, world.getMostRecentTimestamp());
+}
+
+template <class ZoneEnum>
+virtual PassWithRating getBestPass(const World& world)
+{
+    return generatePassEvaluation(world).getBestPassOnField();
 }
 
 template <class ZoneEnum>

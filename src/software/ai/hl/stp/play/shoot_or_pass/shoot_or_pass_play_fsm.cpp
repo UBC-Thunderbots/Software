@@ -55,7 +55,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
         PassEvaluation<EighteenZoneId> pass_eval =
             pass_generator.generatePassEvaluation(*event.common.world_ptr);
-        best_pass_and_score_so_far               = pass_eval.getBestPassOnField();
+        best_pass_and_score_so_far               = pass_generator.getBestPass(*event.common.world_ptr);
         std::vector<EighteenZoneId> ranked_zones = pass_eval.rankZonesForReceiving(
             *event.common.world_ptr, event.common.world_ptr->ball().position());
 
