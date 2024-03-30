@@ -7,7 +7,7 @@ from proto.visualization_pb2 import NamedValue
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtGui, QtCore
 
-from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 

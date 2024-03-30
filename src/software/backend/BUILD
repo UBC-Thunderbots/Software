@@ -26,8 +26,8 @@ cc_library(
         "//shared:constants",
         "//software:constants",
         "//software/logger",
-        "//software/networking:threaded_proto_unix_listener",
-        "//software/networking:threaded_proto_unix_sender",
+        "//software/networking/unix:threaded_proto_unix_listener",
+        "//software/networking/unix:threaded_proto_unix_sender",
         "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"

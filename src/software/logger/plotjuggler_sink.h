@@ -4,7 +4,7 @@
 
 #include "proto/visualization.pb.h"
 #include "software/logger/custom_logging_levels.h"
-#include "software/networking/threaded_udp_sender.h"
+#include "software/networking/udp/threaded_udp_sender.h"
 
 
 /**
