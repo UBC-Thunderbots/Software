@@ -13,7 +13,7 @@ class FriendlyTeamHasScoredGoal(Validation):
     """Checks if a ball enters the enemy goal."""
 
     def __init__(self):
-        self.region = tbots.Field.createSSLDivisionBField().enemyGoal()
+        self.region = tbots_cpp.Field.createSSLDivisionBField().enemyGoal()
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the ball enters the provided regions
@@ -23,8 +23,8 @@ class FriendlyTeamHasScoredGoal(Validation):
                   PASSING when a ball enters
         """
 
-        if tbots.contains(
-            self.region, tbots.createPoint(world.ball.current_state.global_position)
+        if tbots_cpp.contains(
+            self.region, tbots_cpp.createPoint(world.ball.current_state.global_position)
         ):
             return ValidationStatus.PASSING
 

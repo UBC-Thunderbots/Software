@@ -15,7 +15,7 @@ from software.simulated_tests.or_validation import OrValidation
 # TODO 3119 Fix KickoffEnemyPlay
 @pytest.mark.parametrize("is_friendly_test", [True, """False"""])
 def test_kickoff_play(simulated_test_runner, is_friendly_test):
-    ball_initial_pos = tbots.Point(0, 0)
+    ball_initial_pos = tbots_cpp.Point(0, 0)
 
     # Setup Bots
     blue_bots = [
