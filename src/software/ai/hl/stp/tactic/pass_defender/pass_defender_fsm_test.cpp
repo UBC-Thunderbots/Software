@@ -47,7 +47,7 @@ TEST(PassDefenderFSMTest, test_intercept_edge_case)
 {
     // create the world and the robot to test at (0,0)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
-    Robot robot = ::TestUtil::createRobotAtPos(Point(0, 0));
+    Robot robot                  = ::TestUtil::createRobotAtPos(Point(0, 0));
     PassDefenderFSM::ControlParams control_params{.position_to_block_from = Point(-2, 0)};
 
     FSM<PassDefenderFSM> fsm{PassDefenderFSM()};
@@ -64,11 +64,9 @@ TEST(PassDefenderFSMTest, test_intercept_edge_case)
 
     std::shared_ptr<Primitive> primitive;
     fsm.process_event(PassDefenderFSM::Update(
-        control_params, TacticUpdate(
-                            robot, world,
-                            [&primitive](std::shared_ptr<Primitive> x) {
-                                primitive = x;
-                            })));
+        control_params,
+        TacticUpdate(robot, world,
+                     [&primitive](std::shared_ptr<Primitive> x) { primitive = x; })));
     EXPECT_TRUE(primitive != nullptr);
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::InterceptBallState>));
 }
