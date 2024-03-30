@@ -5,10 +5,10 @@
 
 
 LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(
-    const int listen_channel, const unsigned short listen_port, const int send_channel,
+    const std::string& interface, const int listen_channel, const unsigned short listen_port, const int send_channel,
     const unsigned short send_port, const int message_size,
     const std::chrono::milliseconds& timeout_duration)
-    : LatencyTesterNode(listen_channel, listen_port, send_channel, send_port,
+    : LatencyTesterNode(interface, listen_channel, listen_port, send_channel, send_port,
                         std::bind(&LatencyTesterPrimaryNode::onReceive, this,
                                   std::placeholders::_1, std::placeholders::_2)),
       response_received_(false),
@@ -29,6 +29,7 @@ void LatencyTesterPrimaryNode::printStatistics()
     double latency_mean  = mean<long int>(latencies_);
     double latency_stdev = stdevSample<long int>(latencies_);
 
+    LOG(INFO) << "Number of messages sent: " << latencies_.size();
     LOG(INFO) << "Mean latency: " << latency_mean << " ms";
     LOG(INFO) << "Standard deviation: " << latency_stdev << " ms";
     LOG(INFO) << "Number of timeouts: " << num_timeouts_;
@@ -36,11 +37,12 @@ void LatencyTesterPrimaryNode::printStatistics()
 
 void LatencyTesterPrimaryNode::runTest(const int num_messages)
 {
-    LOG(INFO) << "Running test and sending " << num_messages << " messages of size"
+    LOG(INFO) << "Running test and sending " << num_messages << " messages of size "
               << send_buffer_.size() << " bytes.";
 
     for (int i = 0; i < num_messages; i++)
     {
+        LOG(INFO) << "Sending message " << i << " of " << num_messages;
         sendTransaction();
     }
 
@@ -73,7 +75,7 @@ void LatencyTesterPrimaryNode::sendTransaction()
     } while (!status);
 }
 
-void LatencyTesterPrimaryNode::onReceive(const char*, const size_t&)
+void LatencyTesterPrimaryNode::onReceive(const char*, const size_t& size)
 {
     std::chrono::time_point<std::chrono::system_clock> now =
         std::chrono::system_clock::now();
@@ -81,6 +83,7 @@ void LatencyTesterPrimaryNode::onReceive(const char*, const size_t&)
         std::chrono::duration_cast<std::chrono::milliseconds>(now - last_send_time_);
     latencies_.push_back(latency.count());
 
+    LOG(INFO) << "Received response with size: " << size << " bytes";
     std::lock_guard<std::mutex> lock(response_mutex_);
     response_received_ = true;
     response_cv_.notify_one();

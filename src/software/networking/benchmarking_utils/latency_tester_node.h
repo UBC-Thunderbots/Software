@@ -9,9 +9,11 @@
 class LatencyTesterNode
 {
    public:
-    LatencyTesterNode(const int listen_channel, const unsigned short listen_port,
+    LatencyTesterNode(const std::string& interface, const int listen_channel, const unsigned short listen_port,
                       const int send_channel, const unsigned short send_port,
                       ReceiveCallback receive_callback);
+
+    ~LatencyTesterNode();
 
     void sendString(const std::string& message);
 
@@ -19,8 +21,13 @@ class LatencyTesterNode
 
    private:
     boost::asio::io_service io_listener_service_;
-    UdpListener listener_;
+    std::unique_ptr<UdpListener> listener_;
 
     boost::asio::io_service io_sender_service_;
-    UdpSender sender_;
+    std::unique_ptr<UdpSender> sender_;
+
+    // The thread running the io_service in the background. This thread will run for the
+    // entire lifetime of the class
+    std::thread listener_thread_;
+    std::thread sender_thread_;
 };

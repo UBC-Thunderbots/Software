@@ -18,7 +18,7 @@ class ColouredCoutSink
      * @param print_detailed If true, prints the log message as well as other details
      * (level, file line, etc). If false, only prints the message
      */
-    ColouredCoutSink(bool print_detailed);
+    ColouredCoutSink(bool print_detailed, bool enable_merging);
     /**
      * This is a helper function for mapping the FG_Colour enum to its relative
      * Linux xterm foreground color

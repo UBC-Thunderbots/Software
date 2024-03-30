@@ -57,13 +57,13 @@ class LoggerSingleton
      *
      * @param runtime_dir The directory where the log files will be stored.
      */
-    static void initializeLogger(const std::string& runtime_dir)
+    static void initializeLogger(const std::string& runtime_dir, bool use_default_sinks, bool enable_merging)
     {
-        static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton(runtime_dir));
+        static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton(runtime_dir, use_default_sinks, enable_merging));
     }
 
    private:
-    LoggerSingleton(const std::string& runtime_dir)
+    LoggerSingleton(const std::string& runtime_dir, bool use_default_sinks = false, bool enable_merging = true)
     {
         logWorker = g3::LogWorker::createLogWorker();
         // Default locations
@@ -84,7 +84,7 @@ class LoggerSingleton
                                                   &CSVSink::appendToFile);
         // Sink for outputting logs to the terminal
         auto colour_cout_sink_handle =
-            logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
+            logWorker->addSink(std::make_unique<ColouredCoutSink>(true, enable_merging),
                                &ColouredCoutSink::displayColouredLog);
         // Sink for storing a file of all logs
         auto log_rotate_sink_handle = logWorker->addSink(
@@ -102,9 +102,12 @@ class LoggerSingleton
                 text_level_filter),
             &LogRotateWithFilter::save);
 
-        // Sink for visualization
-        auto visualization_handle = logWorker->addSink(
-            std::make_unique<ProtobufSink>(runtime_dir), &ProtobufSink::sendProtobuf);
+        if (!use_default_sinks)
+        {
+            // Sink for visualization
+            auto visualization_handle = logWorker->addSink(
+                std::make_unique<ProtobufSink>(runtime_dir), &ProtobufSink::sendProtobuf);
+        }
 
         // Sink for PlotJuggler plotting
         auto plotjuggler_handle = logWorker->addSink(std::make_unique<PlotJugglerSink>(),

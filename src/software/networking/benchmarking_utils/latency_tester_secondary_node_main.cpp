@@ -1,7 +1,7 @@
+#include "software/networking/benchmarking_utils/latency_tester_secondary_node.h"
+
 #include <boost/program_options.hpp>
 #include <iostream>
-
-#include "software/networking/benchmarking_utils/latency_tester_secondary_node.h"
 
 int main(int argc, char **argv)
 {
@@ -9,6 +9,7 @@ int main(int argc, char **argv)
     {
         bool help = false;
 
+        std::string interface = "";
         int listen_channel         = 1;
         unsigned short listen_port = 43001;
         int send_channel           = 0;
@@ -18,6 +19,11 @@ int main(int argc, char **argv)
     CommandLineArgs args;
     boost::program_options::options_description desc{"Options"};
 
+    desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
+                       "Help screen");
+    desc.add_options()("interface",
+                       boost::program_options::value<std::string>(&args.interface),
+                       "The interface to bind to.");
     desc.add_options()("listen_channel",
                        boost::program_options::value<int>(&args.listen_channel),
                        "The channel to listen on.");
@@ -41,7 +47,12 @@ int main(int argc, char **argv)
     }
     else
     {
-        LatencyTesterSecondaryNode tester(args.listen_channel, args.listen_port,
+        LatencyTesterSecondaryNode tester(args.interface, args.listen_channel, args.listen_port,
                                           args.send_channel, args.send_port);
+
+        while (true)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
     }
 }

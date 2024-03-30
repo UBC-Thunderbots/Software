@@ -21,6 +21,7 @@ cc_binary(
     ],
     deps = [
         ":latency_tester_node",
+        "//software/logger:logger",
         "//software/math:statistics_functions",
         "@boost//:program_options",
     ],

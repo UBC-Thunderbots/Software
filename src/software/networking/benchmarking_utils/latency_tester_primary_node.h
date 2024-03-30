@@ -5,7 +5,7 @@
 class LatencyTesterPrimaryNode : public LatencyTesterNode
 {
    public:
-    LatencyTesterPrimaryNode(const int listen_channel, const unsigned short listen_port,
+    LatencyTesterPrimaryNode(const std::string& interface, const int listen_channel, const unsigned short listen_port,
                              const int send_channel, const unsigned short send_port,
                              const int message_size,
                              const std::chrono::milliseconds& timeout_duration);

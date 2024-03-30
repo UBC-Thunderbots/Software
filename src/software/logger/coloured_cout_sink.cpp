@@ -2,8 +2,8 @@
 
 #include "software/logger/custom_logging_levels.h"
 
-ColouredCoutSink::ColouredCoutSink(bool print_detailed)
-    : print_detailed(print_detailed), log_merger(LogMerger())
+ColouredCoutSink::ColouredCoutSink(bool print_detailed, bool enable_merging)
+    : print_detailed(print_detailed), log_merger(LogMerger(enable_merging))
 {
 }
 

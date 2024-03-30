@@ -1,7 +1,9 @@
+#include "software/logger/logger.h"
+#include "software/networking/benchmarking_utils/latency_tester_primary_node.h"
+
 #include <boost/program_options.hpp>
 #include <iostream>
 
-#include "software/networking/benchmarking_utils/latency_tester_primary_node.h"
 
 int main(int argc, char **argv)
 {
@@ -9,6 +11,8 @@ int main(int argc, char **argv)
     {
         bool help = false;
 
+        std::string interface = "";
+        std::string runtime_dir = "/tmp/tbots";
         int listen_channel         = 0;
         unsigned short listen_port = 43000;
         int send_channel           = 1;
@@ -21,6 +25,14 @@ int main(int argc, char **argv)
     CommandLineArgs args;
     boost::program_options::options_description desc{"Options"};
 
+    desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
+                       "Help screen");
+    desc.add_options()("runtime_dir",
+                       boost::program_options::value<std::string>(&args.runtime_dir),
+                       "The directory to output logs.");
+    desc.add_options()("interface",
+                       boost::program_options::value<std::string>(&args.interface),
+                       "The interface to bind to.");
     desc.add_options()("listen_channel",
                        boost::program_options::value<int>(&args.listen_channel),
                        "The channel to listen on.");
@@ -53,7 +65,9 @@ int main(int argc, char **argv)
     }
     else
     {
-        LatencyTesterPrimaryNode tester(
+        LoggerSingleton::initializeLogger(args.runtime_dir, true, false);
+
+        LatencyTesterPrimaryNode tester(args.interface,
             args.listen_channel, args.listen_port, args.send_channel, args.send_port,
             args.message_size_bytes, std::chrono::milliseconds(args.timeout_duration_ms));
         tester.runTest(args.num_messages);
