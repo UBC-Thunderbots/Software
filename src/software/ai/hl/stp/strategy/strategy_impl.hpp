@@ -160,7 +160,7 @@ PassWithRating StrategyImpl<PitchDivision, ZoneEnum>::getBestUncommittedPass()
     }
 
     for (const auto& zone : cached_pass_eval_->rankZonesForReceiving(
-             world_ptr_, world_ptr_->ball().position()))
+             *world_ptr_, world_ptr_->ball().position()))
     {
         if (std::find_if(committed_passes_.begin(), committed_passes_.end(),
                          [&](const Pass& p) {

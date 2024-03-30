@@ -50,7 +50,7 @@ void PassStrategy::evaluatePassOptions()
         }
 
         pass_eval = std::make_shared<PassEvaluation<EighteenZoneId>>(
-            pass_generator_.generatePassEvaluation(world_ptr));
+            pass_generator_.generatePassEvaluation(*world_ptr));
 
         {
             const std::lock_guard<std::mutex> lock(pass_evaluation_lock_);
