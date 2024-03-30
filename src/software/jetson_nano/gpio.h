@@ -15,7 +15,7 @@ class Gpio
 {
    public:
     /*
-     * Gpio Sysfs Wrapper
+     * GPIO Sysfs Wrapper
      *
      * See https://www.kernel.org/doc/Documentation/gpio/sysfs.txt
      *
