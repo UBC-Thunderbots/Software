@@ -174,7 +174,7 @@ namespace TestUtil
      * @return the new GameState
      */
     GameState createGameStateProto(const RefereeCommand &current_referee_command,
-                              const RefereeCommand &previous_referee_command);
+                                   const RefereeCommand &previous_referee_command);
 
     /** Create Motion Control from destination
      *

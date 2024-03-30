@@ -306,7 +306,7 @@ std::unique_ptr<TbotsProto::Timestamp> createTimestampProto(const Timestamp& tim
 }
 
 std::unique_ptr<TbotsProto::NamedValue> createNamedValueProto(const std::string name,
-                                                         float value)
+                                                              float value)
 {
     auto named_value_msg = std::make_unique<TbotsProto::NamedValue>();
     named_value_msg->set_name(name);
@@ -381,7 +381,8 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualizationProto(
     return pass_visualization_msg;
 }
 
-std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTriggerProto()
+std::unique_ptr<TbotsProto::WorldStateReceivedTrigger>
+createWorldStateReceivedTriggerProto()
 {
     auto world_state_received_trigger_msg =
         std::make_unique<TbotsProto::WorldStateReceivedTrigger>();
