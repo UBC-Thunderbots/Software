@@ -9,7 +9,7 @@ from software.simulated_tests.validation import (
 
 
 
-class NumberOfRobotsEntersRegion(Validation):
+class MinNumberOfRobotsEntersRegion(Validation):
 
     """Checks if a certain number of Robots enters a specific set of regions."""
 
@@ -59,10 +59,10 @@ class NumberOfRobotsEntersRegion(Validation):
     NumberOfRobotsEventuallyExitsRegion,
     NumberOfRobotsAlwaysStaysInRegion,
     NumberOfRobotsNeverEntersRegion,
-) = create_validation_types(NumberOfRobotsEntersRegion)
+) = create_validation_types(MinNumberOfRobotsEntersRegion)
 
 
-class RobotEntersRegion(NumberOfRobotsEntersRegion):
+class RobotEntersRegion(MinNumberOfRobotsEntersRegion):
     def __init__(self, regions):
         super(RobotEntersRegion, self).__init__(regions, 1)
 

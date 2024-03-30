@@ -111,7 +111,6 @@ py_library(
         "ball_speed_threshold.py",
         "ball_stops_in_region.py",
         "excessive_dribbling.py",
-        "friendly_team_has_scored_goal.py",
         "friendly_has_ball_possession.py",
         "friendly_team_scored.py",
         "or_validation.py",
