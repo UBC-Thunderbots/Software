@@ -3,20 +3,12 @@
 #include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h"
 #include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 
-class PlaceBallTactic : public AssignedSkillTactic<DribbleSkillFSM>
+class DribbleSkillTactic : public AssignedSkillTactic<DribbleSkillFSM>
 {
-   public:
-    explicit PlaceBallTactic(std::shared_ptr<Strategy> strategy)
-        : AssignedSkillTactic(strategy)
-    {
-    }
+    using AssignedSkillTactic::AssignedSkillTactic;
 };
 
-class WallKickoffTactic : public AssignedSkillTactic<PivotKickSkillFSM, DribbleSkillFSM>
+class PivotKickSkillTactic : public AssignedSkillTactic<PivotKickSkillFSM, DribbleSkillFSM>
 {
-   public:
-    explicit WallKickoffTactic(std::shared_ptr<Strategy> strategy)
-        : AssignedSkillTactic(strategy)
-    {
-    }
+    using AssignedSkillTactic::AssignedSkillTactic;
 };

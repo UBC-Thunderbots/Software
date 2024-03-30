@@ -2,8 +2,7 @@
 
 #include <utility>
 
-#include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
-#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
+#include "software/ai/hl/stp/tactic/assigned_skill/named_skill_tactics.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
@@ -19,7 +18,7 @@ class DribbleSkillPushEnemyTest : public SimulatedErForceSimPlayTestFixture,
                                   public ::testing::WithParamInterface<Point>
 {
    protected:
-    void checkPossession(std::shared_ptr<AssignedSkillTactic<DribbleSkillFSM>> tactic,
+    void checkPossession(std::shared_ptr<DribbleSkillTactic> tactic,
                          std::shared_ptr<World> world_ptr,
                          ValidationCoroutine::push_type& yield)
     {
@@ -63,7 +62,7 @@ TEST_P(DribbleSkillPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, -2.5), initial_position});
 
-    auto tactic = std::make_shared<AssignedSkillTactic<DribbleSkillFSM>>(strategy);
+    auto tactic = std::make_shared<DribbleSkillTactic>(strategy);
     tactic->updateControlParams({dribble_destination, dribble_orientation, false});
     setTactic(1, tactic, {TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
 

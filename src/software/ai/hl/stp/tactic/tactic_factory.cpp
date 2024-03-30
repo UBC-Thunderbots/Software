@@ -29,6 +29,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
         PROTO_CREATE_TACTIC_CASE(Receiver, receiver)
         PROTO_CREATE_TACTIC_CASE(ShadowEnemy, shadow_enemy)
         PROTO_CREATE_TACTIC_CASE(Stop, stop)
+        PROTO_CREATE_TACTIC_CASE(DribbleSkillTactic, dribble_skill_tactic)
+        PROTO_CREATE_TACTIC_CASE(PivotKickSkillTactic, pivot_kick_skill_tactic)
         case TbotsProto::Tactic::TACTIC_NOT_SET:
         {
             LOG(FATAL) << "Tactic not set";
@@ -175,6 +177,20 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy)
 {
     auto tactic = std::make_shared<StopTactic>();
+    return tactic;
+}
+
+std::shared_ptr<Tactic> createTactic(const TbotsProto::DribbleSkillTactic &tactic_proto,
+                                     std::shared_ptr<Strategy> strategy)
+{
+    auto tactic = std::make_shared<DribbleSkillTactic>(strategy);
+    return tactic;
+}
+
+std::shared_ptr<Tactic> createTactic(const TbotsProto::PivotKickSkillTactic &tactic_proto,
+                                     std::shared_ptr<Strategy> strategy)
+{
+    auto tactic = std::make_shared<PivotKickSkillTactic>(strategy);
     return tactic;
 }
 

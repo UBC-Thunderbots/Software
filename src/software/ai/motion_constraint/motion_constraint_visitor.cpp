@@ -83,17 +83,7 @@ void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
     current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
 }
 
-void MotionConstraintVisitor::visit(const PlaceBallTactic &tactic)
-{
-    current_motion_constraints.clear();
-}
-
 void MotionConstraintVisitor::visit(const PlaceBallMoveTactic &tactic)
-{
-    current_motion_constraints.clear();
-}
-
-void MotionConstraintVisitor::visit(const WallKickoffTactic &tactic)
 {
     current_motion_constraints.clear();
 }

@@ -28,6 +28,8 @@ message Tactic
         ShadowEnemyTactic shadow_enemy                      = 13;
         StopTactic stop                                     = 14;
         PassDefenderTactic pass_defender                    = 15;
+        DribbleSkillTactic dribble_skill_tactic             = 16;
+        PivotKickSkillTactic pivot_kick_skill_tactic        = 17;
     }
     reserved 4, 11;
 }
@@ -145,3 +147,7 @@ message ShadowEnemyTactic
 }
 
 message StopTactic {}
+
+message DribbleSkillTactic {}
+
+message PivotKickSkillTactic {}
