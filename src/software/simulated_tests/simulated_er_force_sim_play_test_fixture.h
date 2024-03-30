@@ -89,8 +89,8 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
 
     GameState game_state;
 
+    std::shared_ptr<Strategy> strategy;
+
     // The AI being tested and used in simulation
     Ai ai;
-
-    std::shared_ptr<Strategy> strategy;
 };
