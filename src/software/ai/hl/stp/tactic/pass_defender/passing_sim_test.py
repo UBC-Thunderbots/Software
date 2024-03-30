@@ -13,9 +13,7 @@ from software.simulated_tests.friendly_receives_ball_slow import (
 from software.simulated_tests.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )
-from software.simulated_tests.ball_moves_in_direction import (
-    BallMovesForwardInRegions,
-)
+from software.simulated_tests.ball_moves_in_direction import BallMovesForwardInRegions
 from software.simulated_tests.ball_enters_region import BallEventuallyEntersRegion
 from software import py_constants
 
@@ -181,7 +179,7 @@ def setup_pass_and_robots(
             [],
         ),
         # TODO: Make Interception Better
-        # https://github.com/UBC-Thunderbots/Software/issues/2984 
+        # https://github.com/UBC-Thunderbots/Software/issues/2984
         # pass between 2 robots above one another (on the y-axis)
         (
             tbots_cpp.Point(0.0, 0.0),

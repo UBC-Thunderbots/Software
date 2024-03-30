@@ -13,8 +13,8 @@ py_library(
     deps = [
         "//proto:import_all_protos",
         "//software/logger:py_logger",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
+        "//software/networking/unix:threaded_unix_listener_py",
+        "//software/networking/unix:threaded_unix_sender_py",
         "//software/simulated_tests:tbots_test_runner",
         "//software/simulated_tests:validation",
         "//software/thunderscope",

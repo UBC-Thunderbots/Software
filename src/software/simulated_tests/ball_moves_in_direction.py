@@ -64,9 +64,8 @@ class BallMovesForward(Validation):
         )
 
     def __repr__(self):
-        return (
-            "Check that the ball moves forward"
-        )
+        return "Check that the ball moves forward"
+
 
 (
     BallEventuallyMovesForward,

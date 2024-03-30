@@ -35,8 +35,8 @@ class PassGeneratorTest : public testing::Test
      * @param max_iters The maximum number of iterations of the PassGenerator to run
      */
     static void stepPassGenerator(
-        std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator,
-        const std::shared_ptr<World>& world, int max_iters)
+        std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator, const World& world,
+        int max_iters)
     {
         for (int i = 0; i < max_iters; i++)
         {
@@ -87,7 +87,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     world->updateEnemyTeamState(enemy_team);
 
     // call generate evaluation 100 times on the given world
-    stepPassGenerator(pass_generator, world, 100);
+    stepPassGenerator(pass_generator, *world, 100);
 
     auto [best_pass, score] =
         pass_generator->generatePassEvaluation(*world).getBestPassOnField();
@@ -139,7 +139,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     world->updateEnemyTeamState(enemy_team);
 
     // call generate evaluation 100 times on the given world
-    stepPassGenerator(pass_generator, world, 100);
+    stepPassGenerator(pass_generator, *world, 100);
 
     // Find what pass we converged to
     auto pass_eval = pass_generator->generatePassEvaluation(*world);
@@ -191,7 +191,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
         Ball(BallState(Point(3, 1), Vector(0, 0)), Timestamp::fromSeconds(0)));
 
     // call generate evaluation 100 times on the given world
-    stepPassGenerator(pass_generator, world, 100);
+    stepPassGenerator(pass_generator, *world, 100);
 
     // Find what pass we converged to
     auto pass_evaluation = pass_generator->generatePassEvaluation(*world);
@@ -208,7 +208,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
         Ball(BallState(Point(3, -1), Vector(0, 0)), Timestamp::fromSeconds(0)));
 
     // call generate evaluation 100 times on the given world
-    stepPassGenerator(pass_generator, world, 100);
+    stepPassGenerator(pass_generator, *world, 100);
 
     // Find what pass we converged to
     pass_evaluation = pass_generator->generatePassEvaluation(*world);

@@ -54,10 +54,10 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
     {
         ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
         PassEvaluation<EighteenZoneId> pass_eval =
-            pass_generator.generatePassEvaluation(event.common.world_ptr);
+            pass_generator.generatePassEvaluation(*event.common.world_ptr);
         best_pass_and_score_so_far               = pass_eval.getBestPassOnField();
         std::vector<EighteenZoneId> ranked_zones = pass_eval.rankZonesForReceiving(
-            event.common.world_ptr, event.common.world_ptr->ball().position());
+            *event.common.world_ptr, event.common.world_ptr->ball().position());
 
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
@@ -75,6 +75,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
             ai_config.shoot_or_pass_play_config().abs_min_pass_score();
         double pass_score_ramp_down_duration =
             ai_config.shoot_or_pass_play_config().pass_score_ramp_down_duration();
+
         time_since_commit_stage_start = event.common.world_ptr->getMostRecentTimestamp() -
                                         pass_optimization_start_time;
         min_pass_score_threshold =
@@ -98,7 +99,7 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
     auto pass_eval = pass_generator.generatePassEvaluation(*event.common.world_ptr);
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
-        event.common.world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
+        *event.common.world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
 
     // if we make it here then we have committed to the pass
     attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
@@ -140,10 +141,10 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
     const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
-    const auto ball_not_kicked_threshold =
-        this->ai_config.shoot_or_pass_play_config().ball_not_kicked_threshold();
+    const auto ball_is_kicked_m_per_s_threshold =
+        this->ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
 
-    return (ball_velocity < ball_not_kicked_threshold) &&
+    return (ball_velocity < ball_is_kicked_m_per_s_threshold) &&
            (best_pass_and_score_so_far.rating > min_pass_score_threshold);
 }
 
