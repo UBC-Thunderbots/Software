@@ -33,8 +33,6 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, int num_shadow_robots
     PriorityTacticVector tactics_to_return = {{}, {}, {}};
     Point block_kick_point;
 
-//    this->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-
     /**
      * Stopgap redesign of DefensePlayFSM to suit the case of EnemyFreeKickPlayFSM.
      * This MUST be refactored along with DefensePlayFSM in a new PR
@@ -66,7 +64,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, int num_shadow_robots
         return;
     }
 
-    if (num_shadow_robots > 0)
+    if (num_shadow_robots > 0 && !enemy_threats.empty())
     {
         enemy_free_kick_defenders = std::vector<std::shared_ptr<PassDefenderTactic>>(num_shadow_robots);
         std::generate(enemy_free_kick_defenders.begin(), enemy_free_kick_defenders.end(),
@@ -97,7 +95,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, int num_shadow_robots
             defender_assignment = assignments.at(i);
 
             while (defender_assignment.type == PASS_DEFENDER
-            && abs(distance(defender_assignment.target, block_kick_point)) <= 3)
+            && distance(defender_assignment.target, block_kick_point) <= 0.5)
             {
                 if (i+assigns_skipped+1 >= assignments.size()) {
                     defender_assignment = assignments.front();
