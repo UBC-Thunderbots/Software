@@ -11,7 +11,7 @@ bool TbotsGtestMain::help                = false;
 bool TbotsGtestMain::enable_visualizer   = false;
 bool TbotsGtestMain::run_sim_in_realtime = false;
 bool TbotsGtestMain::stop_ai_on_start    = false;
-std::string TbotsGtestMain::runtime_dir  = "/tmp/tbots/gtest_logs";
+std::string TbotsGtestMain::runtime_dir  = "/tmp/tbots/yellow_test";
 double TbotsGtestMain::test_speed        = 1.0;
 
 
