@@ -257,5 +257,4 @@ struct GoalieFSM
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
     // The maximum allowed speed mode
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
-    Rectangle inflated_defense_area;
 };

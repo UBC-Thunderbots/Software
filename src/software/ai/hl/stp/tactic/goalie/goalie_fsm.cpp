@@ -286,7 +286,7 @@ void GoalieFSM::retrieveFromDeadZone(
         .dribble_destination =
             event.common.world_ptr->field().friendlyDefenseArea().centre(),
         .final_dribble_orientation = final_dribble_orientation.orientation(),
-        .allow_excessive_dribbling = true,
+        .allow_excessive_dribbling = false,
     };
 
     // update the dribble fsm

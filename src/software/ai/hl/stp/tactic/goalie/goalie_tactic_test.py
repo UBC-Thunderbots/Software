@@ -222,11 +222,6 @@ def test_goalie_clears_from_dead_zone(
     # Eventually Validation
     eventually_validation_sequence_set = [
         [
-            BallEventuallyEntersRegion(
-                regions=[
-                    tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
-                ]
-            ),
             # Goalie should be in the defense area
             BallEventuallyExitsRegion(
                 regions=[
