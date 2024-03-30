@@ -3,8 +3,8 @@ package(default_visibility = ["//visibility:public"])
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 py_library(
-    name = "toolbar_icon_loader",
-    srcs = ["toolbar_icon_loader.py"],
+    name = "icon_loader",
+    srcs = ["icon_loader.py"],
     data = [
         ":help.svg",
         ":measure.svg",
@@ -14,6 +14,7 @@ py_library(
         ":reset.svg",
         ":undo.svg",
         ":view.svg",
+        "//software/thunderscope/gl/widgets:icon_loader",
     ],
     deps = [
         requirement("pyqtgraph"),

@@ -6,8 +6,8 @@
 #include "proto/sensor_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
-#include "software/networking/threaded_proto_unix_listener.hpp"
-#include "software/networking/threaded_proto_unix_sender.hpp"
+#include "software/networking/unix/threaded_proto_unix_listener.hpp"
+#include "software/networking/unix/threaded_proto_unix_sender.hpp"
 
 class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::ThunderbotsConfig>
 {
