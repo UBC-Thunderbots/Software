@@ -1,4 +1,4 @@
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -8,7 +8,7 @@ from software.simulated_tests.validation import (
 )
 
 
-class FriendlyGoalScored(Validation):
+class FriendlyTeamHasScoredGoal(Validation):
 
     """Checks if a ball enters the enemy goal."""
 
@@ -48,4 +48,4 @@ class FriendlyGoalScored(Validation):
     _FriendlyTeamGoalEventuallyRemoved,  # These two don't make much sense
     _FriendlyTeamAlwaysScored,  # These two don't make much sense
     FriendlyTeamNeverScored,
-) = create_validation_types(FriendlyGoalScored)
+) = create_validation_types(FriendlyTeamHasScoredGoal)

@@ -10,12 +10,12 @@ from software.simulated_tests.validation import (
 
 
 class OrValidation(Validation):
-    def __init__(self, validation):
+    def __init__(self, validations):
         """An or extension to the validation function"""
-        self.validation = validation
+        self.validations = validations
 
     def get_validation_status(self, world):
-        for validation in self.validation:
+        for validation in self.validations:
             if validation.get_validation_status(world) == ValidationStatus.PASSING:
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING
@@ -24,7 +24,7 @@ class OrValidation(Validation):
 
         validation_geometry = ValidationGeometry()
 
-        for validation in self.validation:
+        for validation in self.validations:
             individual_geometry = validation.get_validation_geometry(world)
             for polygon in individual_geometry.polygons:
                 validation_geometry.polygons.append(polygon)
@@ -38,9 +38,9 @@ class OrValidation(Validation):
         return validation_geometry
 
     def get_validation_type(self, world):
-        validation_type_initial = self.validation[0].get_validation_type
+        validation_type_initial = self.validations[0].get_validation_type
 
-        for validation in self.validation:
+        for validation in self.validations:
             validation_type = validation.get_validation_type
             if validation_type != validation_type_initial:
                 raise TypeError("type of validation instances is not consistent")
