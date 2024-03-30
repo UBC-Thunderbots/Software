@@ -117,7 +117,6 @@ py_library(
         "or_validation.py",
         "robot_enters_region.py",
         "robot_enters_region_and_stops.py",
-        "robot_halt.py",
         "robot_speed_threshold.py",
         "validation.py",
     ],
