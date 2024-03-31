@@ -62,5 +62,8 @@ double FeasibilityVisitor::getFeasibility(Skill& skill)
 {
     skill.accept(*this);
 
+    LOG_IF(WARNING, current_feasibility_ < 0 || current_feasibility_ > 1)
+        << "Feasibility score outside of range [0, 1]";
+
     return current_feasibility_;
 }
