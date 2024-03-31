@@ -68,6 +68,12 @@ template<class ZoneEnum>
 std::vector<Point>
 ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPositions(const World &world, unsigned int num_positions)
 {
+    // Generate sample passes for cost visualization
+//    if (passing_config_.cost_vis_config().generate_sample_passes())
+//    {
+//        samplePassesForVisualization(world, passing_config_);
+//    }
+
     auto all_zones = pitch_division_->getAllZoneIds();
 
     // We cache the ratings of each zone to avoid rateZone being called multiple times
