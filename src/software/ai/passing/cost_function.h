@@ -42,7 +42,7 @@ double ratePassForReceiving(const World &world, const Pass& pass, const TbotsPro
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
                 const Point& ball_position, TbotsProto::PassingConfig passing_config);
 
-double rateZoneSmart(const Field& field, const Team& enemy_team, const Rectangle& zone,
+double rateZoneSmart(const World& world, const Team& enemy_team, const Rectangle& zone,
                      const Point& ball_position, TbotsProto::PassingConfig passing_config);
 
 /**

@@ -100,16 +100,25 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
     return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
 }
 
-double rateZoneSmart(const Field& field, const Team& enemy_team, const Rectangle& zone,
+double rateZoneSmart(const World& world, const Team& enemy_team, const Rectangle& zone,
                 const Point& ball_position, TbotsProto::PassingConfig passing_config)
 {
     // TODO (#2021) improve and implement tests
     // Zones with their centers in bad positions are not good
     double static_pass_quality =
-            getStaticPositionQuality(field, zone.centre(), passing_config);
+            getStaticPositionQuality(world.field(), zone.centre(), passing_config);
+
+//    // Rate zones that are up the field higher to encourage progress up the field
+//    double pass_up_field_rating = zone.centre().x() / field.xLength();
 
     // Rate zones that are up the field higher to encourage progress up the field
-    double pass_up_field_rating = zone.centre().x() / field.xLength();
+    double pass_up_field_rating = sigmoid(zone.centre().x(), world.ball().position().x() - 1.0, 1.0); // zone.centre().x() / world.field().xLength();
+
+    // We want to encourage passes that are not too far away from the passer
+    // to stop the robots from trying to pass across the field
+    double pass_not_too_far = circleSigmoid(Circle(world.ball().position(), 7.0), zone.centre(), 2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
+    double pass_not_too_close = 1 - circleSigmoid(Circle(world.ball().position(), 1.5), zone.centre(), 2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
+
 
     auto enemy_reaction_time =
             Duration::fromSeconds(passing_config.enemy_reaction_time());
@@ -137,7 +146,7 @@ double rateZoneSmart(const Field& field, const Team& enemy_team, const Rectangle
                      Pass(ball_position, zone.centre(), passing_config.max_pass_speed_m_per_s()),
                      enemy_reaction_time, enemy_proximity_importance)});
 
-    return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
+    return pass_up_field_rating * static_pass_quality * enemy_risk_rating * pass_not_too_far * pass_not_too_close;
 }
 
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,

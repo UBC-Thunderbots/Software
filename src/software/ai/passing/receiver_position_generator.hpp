@@ -77,7 +77,7 @@ ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPositions(const World &worl
     for (const auto& zone : all_zones)
     {
         cached_ratings[zone] =
-                rateZoneSmart(world.field(), world.enemyTeam(), pitch_division_->getZone(zone),
+                rateZoneSmart(world, world.enemyTeam(), pitch_division_->getZone(zone),
                          world.ball().position(), passing_config_);
         if (previous_best_receiving_positions.count(zone) > 0)
         {
@@ -91,6 +91,14 @@ ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPositions(const World &worl
               [&](const ZoneEnum& z1, const ZoneEnum& z2) {
                   return cached_ratings[z1] > cached_ratings[z2];
               });
+
+    std::map<std::string, TbotsProto::Shape> zone_shapes;
+    for (unsigned int i = 0; i < num_positions; i++)
+    {
+        zone_shapes.insert({std::to_string(i + 1),
+                            *createShapeProto(pitch_division_->getZone(all_zones[i]))});
+    }
+    LOG(VISUALIZE) << *createDebugShapesMap(zone_shapes);
 
     std::vector<Point> best_positions;
     for (unsigned int i = 0; i < num_positions; ++i)
