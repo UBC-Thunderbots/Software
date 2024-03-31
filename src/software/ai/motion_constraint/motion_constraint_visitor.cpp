@@ -67,14 +67,6 @@ void MotionConstraintVisitor::visit(const ReceiverTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const AttackerTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const DefenseShadowEnemyTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const MoveTestTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const StopTestTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const GoalieTestTactic &tactic) {}
-
 void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
