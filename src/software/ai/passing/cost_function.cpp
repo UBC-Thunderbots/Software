@@ -41,6 +41,24 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
            shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
 
+double ratePassForReceiving(const World &world, const Pass& pass, const TbotsProto::PassingConfig& passing_config)
+{
+    double static_pass_quality =
+            getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
+
+    double enemy_pass_rating =
+            ratePassEnemyRisk(world.enemyTeam(), pass,
+                              Duration::fromSeconds(passing_config.enemy_reaction_time()),
+                              passing_config.enemy_proximity_importance());
+
+    double shoot_pass_rating =
+            ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
+    const double min_shoot_pass_rating = 0.6; // TODO (NIMA): Make this a dynamic parameter and add it for all cost functions?!
+    shoot_pass_rating = shoot_pass_rating * (1 - min_shoot_pass_rating) + min_shoot_pass_rating;
+
+    return static_pass_quality * enemy_pass_rating * shoot_pass_rating;
+}
+
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
                 const Point& ball_position, TbotsProto::PassingConfig passing_config)
 {
@@ -78,6 +96,46 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
              Pass(ball_position, zone.centre(), passing_config.max_pass_speed_m_per_s()),
              enemy_reaction_time, enemy_proximity_importance)) /
         5.0;
+
+    return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
+}
+
+double rateZoneSmart(const Field& field, const Team& enemy_team, const Rectangle& zone,
+                const Point& ball_position, TbotsProto::PassingConfig passing_config)
+{
+    // TODO (#2021) improve and implement tests
+    // Zones with their centers in bad positions are not good
+    double static_pass_quality =
+            getStaticPositionQuality(field, zone.centre(), passing_config);
+
+    // Rate zones that are up the field higher to encourage progress up the field
+    double pass_up_field_rating = zone.centre().x() / field.xLength();
+
+    auto enemy_reaction_time =
+            Duration::fromSeconds(passing_config.enemy_reaction_time());
+    double enemy_proximity_importance = passing_config.enemy_proximity_importance();
+
+    double enemy_risk_rating =
+            std::max({ratePassEnemyRisk(enemy_team,
+                               Pass(ball_position, zone.negXNegYCorner(),
+                                    passing_config.max_pass_speed_m_per_s()),
+                               enemy_reaction_time, enemy_proximity_importance),
+             ratePassEnemyRisk(enemy_team,
+                               Pass(ball_position, zone.negXPosYCorner(),
+                                    passing_config.max_pass_speed_m_per_s()),
+                               enemy_reaction_time, enemy_proximity_importance),
+             ratePassEnemyRisk(enemy_team,
+                               Pass(ball_position, zone.posXNegYCorner(),
+                                    passing_config.max_pass_speed_m_per_s()),
+                               enemy_reaction_time, enemy_proximity_importance),
+             ratePassEnemyRisk(enemy_team,
+                               Pass(ball_position, zone.posXPosYCorner(),
+                                    passing_config.max_pass_speed_m_per_s()),
+                               enemy_reaction_time, enemy_proximity_importance),
+             ratePassEnemyRisk(
+                     enemy_team,
+                     Pass(ball_position, zone.centre(), passing_config.max_pass_speed_m_per_s()),
+                     enemy_reaction_time, enemy_proximity_importance)});
 
     return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
 }

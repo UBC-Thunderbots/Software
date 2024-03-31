@@ -25,6 +25,8 @@
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
                 TbotsProto::PassingConfig passing_config);
 
+double ratePassForReceiving(const World &world, const Pass& pass, const TbotsProto::PassingConfig& passing_config);
+
 /**
  * Calculate the quality of a given zone
  *
@@ -39,6 +41,9 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
  */
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
                 const Point& ball_position, TbotsProto::PassingConfig passing_config);
+
+double rateZoneSmart(const Field& field, const Team& enemy_team, const Rectangle& zone,
+                     const Point& ball_position, TbotsProto::PassingConfig passing_config);
 
 /**
  * Rate pass based on the probability of scoring once we receive the pass

@@ -93,6 +93,22 @@ cc_test(
 )
 
 cc_library(
+    name = "receiver_position_generator",
+    hdrs = [
+        "receiver_position_generator.hpp",
+    ],
+    deps = [
+        ":field_pitch_division",
+        ":pass",
+        ":pass_with_rating",
+        "//software/geom:point",
+        "//software/geom:rectangle",
+        "//software/util/make_enum",
+        "//software/world",
+    ],
+)
+
+cc_library(
     name = "pass_evaluation",
     hdrs = [
         "pass_evaluation.hpp",
