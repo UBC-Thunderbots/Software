@@ -12,6 +12,7 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
                                             Field::createSSLDivisionBField()),
                                         ai_config.passing_config())),
+      sampling_pass_generator(ai_config.passing_config()),
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
@@ -55,7 +56,9 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
         PassEvaluation<EighteenZoneId> pass_eval =
             pass_generator.generatePassEvaluation(*event.common.world_ptr);
-        best_pass_and_score_so_far               = pass_generator.getBestPass(*event.common.world_ptr);
+        best_pass_and_score_so_far =
+            sampling_pass_generator.getBestPass(*event.common.world_ptr);
+        // best_pass_and_score_so_far                  = pass_eval.getBestPassOnField();
         std::vector<EighteenZoneId> ranked_zones = pass_eval.rankZonesForReceiving(
             *event.common.world_ptr, event.common.world_ptr->ball().position());
 

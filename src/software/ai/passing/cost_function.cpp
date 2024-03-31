@@ -34,7 +34,7 @@ double ratePass(const World& world, const Pass& pass,
         ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 
     return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-           pass_backwards_rating * shoot_pass_rating
+           pass_backwards_rating * shoot_pass_rating;
 }
 
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,

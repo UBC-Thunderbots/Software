@@ -5,7 +5,7 @@
 
 class BasePassGenerator
 {
-    public:
-        virtual ~BasePassGenerator() {}
-        virtual PassWithRating getBestPass(const World& world) = 0;
+   public:
+    virtual ~BasePassGenerator() {}
+    virtual PassWithRating getBestPass(const World& world) = 0;
 };
