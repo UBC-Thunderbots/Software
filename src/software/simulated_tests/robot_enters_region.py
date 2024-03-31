@@ -8,7 +8,6 @@ from software.simulated_tests.validation import (
 )
 
 
-
 class MinNumberOfRobotsEntersRegion(Validation):
 
     """Checks if a certain number of Robots enters a specific set of regions."""
@@ -54,6 +53,7 @@ class MinNumberOfRobotsEntersRegion(Validation):
             + ",".join(repr(self.regions))
         )
 
+
 (
     NumberOfRobotsEventuallyEntersRegion,
     NumberOfRobotsEventuallyExitsRegion,
@@ -65,6 +65,7 @@ class MinNumberOfRobotsEntersRegion(Validation):
 class RobotEntersRegion(MinNumberOfRobotsEntersRegion):
     def __init__(self, regions):
         super(RobotEntersRegion, self).__init__(regions, 1)
+
 
 (
     RobotEventuallyEntersRegion,

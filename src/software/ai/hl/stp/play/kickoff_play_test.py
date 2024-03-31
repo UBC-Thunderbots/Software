@@ -96,11 +96,15 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
             OrValidation(
                 [
                     NumberOfRobotsAlwaysStaysInRegion(
-                        regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
+                        regions=[
+                            tbots_cpp.Field.createSSLDivisionBField().centerCircle()
+                        ],
                         req_robot_cnt=0,
                     ),
                     NumberOfRobotsAlwaysStaysInRegion(
-                        regions=[tbots_cpp.Field.createSSLDivisionBField().centerCircle()],
+                        regions=[
+                            tbots_cpp.Field.createSSLDivisionBField().centerCircle()
+                        ],
                         req_robot_cnt=1,
                     ),
                 ]
@@ -122,7 +126,9 @@ def test_kickoff_play(simulated_test_runner, is_friendly_test):
     if is_friendly_test:
         # Checks that ball leaves center point by 0.05 meters within 10 seconds of kickoff
         eventually_validation_sequence_set[0].append(
-            BallEventuallyExitsRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)])
+            BallEventuallyExitsRegion(
+                regions=[tbots_cpp.Circle(ball_initial_pos, 0.05)]
+            )
         )
 
     simulated_test_runner.run_test(
