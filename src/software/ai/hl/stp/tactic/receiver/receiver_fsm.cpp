@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/offense_support_tactics/receiver/receiver_fsm.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_fsm.h"
 
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/geom/algorithms/convex_angle.h"

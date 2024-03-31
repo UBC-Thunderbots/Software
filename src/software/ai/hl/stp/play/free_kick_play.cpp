@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/offense_support_tactics/receiver/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"

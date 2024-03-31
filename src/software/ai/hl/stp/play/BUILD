@@ -70,7 +70,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/offense_support_tactics/receiver:receiver_tactic",
+        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
         "//software/logger",

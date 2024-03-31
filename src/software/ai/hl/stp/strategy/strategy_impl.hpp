@@ -5,7 +5,6 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/strategy/pass_strategy.h"
-#include "software/ai/hl/stp/tactic/offense_support_tactics/offense_support_type.h"
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_evaluation.hpp"
 #include "software/ai/passing/pass_with_rating.h"
@@ -56,10 +55,6 @@ class StrategyImpl
     bool hasWorld() const;
     void updateWorld(const WorldPtr& world_ptr);
 
-    // Committed OffenseSupportTypes
-    void commit(OffenseSupportType type);
-    std::vector<OffenseSupportType> getCommittedOffenseSupport() const;
-
     void commit(const Pass& pass);
 
    private:
@@ -82,7 +77,6 @@ class StrategyImpl
 
     std::optional<Shot> best_shot_;
 
-    std::vector<OffenseSupportType> committed_support_types_;
     std::unordered_map<RobotId, Pose> robot_to_best_dribble_location_;
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
 };
@@ -272,13 +266,6 @@ int StrategyImpl<PitchDivision, ZoneEnum>::calcNumIdealDefenders()
 {
     // TODO(arun): make a todo
     return 2;
-}
-
-template <class PitchDivision, class ZoneEnum>
-void StrategyImpl<PitchDivision, ZoneEnum>::commit(
-    OffenseSupportType offense_support_type)
-{
-    committed_support_types_.push_back(offense_support_type);
 }
 
 template <class PitchDivision, class ZoneEnum>
