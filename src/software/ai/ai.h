@@ -19,10 +19,10 @@ class Ai final
 
     /**
      * Create an AI
-     *
-     * @param strategy the Strategy
+     * 
+     * @param tbots_proto The AI configuration
      */
-    explicit Ai(std::shared_ptr<Strategy> strategy);
+    explicit Ai(const TbotsProto::AiConfig& ai_config);
 
     /**
      * Overrides the play
@@ -30,6 +30,21 @@ class Ai final
      * @param play play to override with
      */
     void overridePlay(std::unique_ptr<Play> play);
+
+    /**
+     * Overrides the play from the play proto
+     *
+     * @param play_proto the play proto
+     */
+    void overridePlayFromProto(const TbotsProto::Play& play_proto);
+
+    /**
+     * Overrides the play with AssignedTacticsPlay and overrides the tactics
+     *
+     * @param assigned_tactic_play_control_params the control params for AssignedTacticsPlay 
+     */
+    void overrideTactics(
+        const TbotsProto::AssignedTacticPlayControlParams& assigned_tactic_play_control_params);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current
@@ -40,7 +55,7 @@ class Ai final
      * @return the Primitives that should be run by our Robots given the current
      * state of the world.
      */
-    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const WorldPtr& world_ptr);
+    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World& world);
 
     /**
      * Returns information about the currently running plays and tactics, including the
@@ -51,18 +66,11 @@ class Ai final
     TbotsProto::PlayInfo getPlayInfo() const;
 
     /**
-     * Overrides the play from the play proto
-     *
-     * @param play_proto the play proto
-     */
-    void overridePlayFromProto(TbotsProto::Play play_proto);
-
-    /**
      * Update the AiConfig proto
      *
      * @param ai_config The new AiConfig proto
      */
-    void updateAiConfig(TbotsProto::AiConfig& ai_config);
+    void updateAiConfig(const TbotsProto::AiConfig& ai_config);
 
    private:
     /**

@@ -169,6 +169,7 @@ std::optional<Shot> sampleForBestShotOnGoal(const Field &field, const Team &frie
     // Spacing between sample points
     double sampling_spacing = max_dribbling_dist / (num_sample_points / 2);
 
+    // Generate sample shot origin points offset from the starting point
     for (double sample_point_offset = -max_dribbling_dist; 
          sample_point_offset <= max_dribbling_dist; 
          sample_point_offset += sampling_spacing)
@@ -185,6 +186,7 @@ std::optional<Shot> sampleForBestShotOnGoal(const Field &field, const Team &frie
             calcBestShotOnGoal(field, friendly_team, enemy_team, shot_origin, goal,
                                robots_to_ignore, radius);
 
+        // We consider the "best" shot to be the one with the largest open angle
         if (shot && (!best_shot || shot->getOpenAngle() > best_shot->getOpenAngle()))
         {
             best_shot = shot;

@@ -4,17 +4,6 @@
 
 SkillGraph::SkillGraph(std::shared_ptr<Strategy> strategy) : strategy_(strategy)
 {
-    auto registered_skill_names =
-        GenericFactory<std::string, Skill,
-                       std::shared_ptr<Strategy>>::getRegisteredNames();
-    std::stringstream all_skills_string;
-    for (const std::string& skill_string : registered_skill_names)
-    {
-        all_skills_string << skill_string << " ";
-    }
-    LOG(INFO) << "[SkillGraph] Registered skills: " << all_skills_string.str();
-
-
     auto all_skill_constructors =
         GenericFactory<std::string, Skill,
                        std::shared_ptr<Strategy>>::getRegisteredConstructors();
