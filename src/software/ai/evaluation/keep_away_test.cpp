@@ -48,7 +48,7 @@ TEST(FindKeepAwayPointTest, test_keep_away_no_enemies)
 {
     auto world = TestUtil::createBlankTestingWorld();
     Pass pass(Point(0, 0), Point(1, 1), 5);
-    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
+    auto keep_away_pt = findKeepAwayTargetPoint(*world, pass);
     // gradient should be 0 everywhere
     EXPECT_EQ(keep_away_pt, Point(0, 0));
 }
@@ -57,30 +57,30 @@ TEST(FindKeepAwayPointTest, test_keep_away_point_interception)
 {
     auto world          = TestUtil::createBlankTestingWorld();
     auto new_enemy_team = TestUtil::setRobotPositionsHelper(
-        world.enemyTeam(), {Point(0, 0)}, Timestamp::fromSeconds(0));
-    world.updateEnemyTeamState(new_enemy_team);
+        world->enemyTeam(), {Point(0, 0)}, Timestamp::fromSeconds(0));
+    world->updateEnemyTeamState(new_enemy_team);
 
     Point ball_point(-1, 0.1);
-    world.updateBall(Ball(ball_point, Vector(), Timestamp()));
+    world->updateBall(Ball(ball_point, Vector(), Timestamp()));
     Pass pass(ball_point, Point(1, 0.1), 5);
-    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
+    auto keep_away_pt = findKeepAwayTargetPoint(*world, pass);
     Pass new_pass(keep_away_pt, pass.receiverPoint(), pass.speed());
     EXPECT_GT(
-        calculateInterceptRisk(world.enemyTeam(), pass, Duration::fromSeconds(0)),
-        calculateInterceptRisk(world.enemyTeam(), new_pass, Duration::fromSeconds(0)));
+        calculateInterceptRisk(world->enemyTeam(), pass, Duration::fromSeconds(0)),
+        calculateInterceptRisk(world->enemyTeam(), new_pass, Duration::fromSeconds(0)));
 }
 
 TEST(FindKeepAwayPointTest, test_keep_away_point_proximity)
 {
     auto world          = TestUtil::createBlankTestingWorld();
     auto new_enemy_team = TestUtil::setRobotPositionsHelper(
-        world.enemyTeam(), {Point(0, 0)}, Timestamp::fromSeconds(0));
-    world.updateEnemyTeamState(new_enemy_team);
+        world->enemyTeam(), {Point(0, 0)}, Timestamp::fromSeconds(0));
+    world->updateEnemyTeamState(new_enemy_team);
 
     Point ball_point(-0.25, 0.1);
-    world.updateBall(Ball(ball_point, Vector(), Timestamp()));
+    world->updateBall(Ball(ball_point, Vector(), Timestamp()));
     Pass pass(ball_point, Point(1, 0.1), 5);
-    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
+    auto keep_away_pt = findKeepAwayTargetPoint(*world, pass);
 
     // copypasted from software/ai/evaluation/keep_away.cpp
     static constexpr double PASSER_ENEMY_PROXIMITY_IMPORTANCE = 1.5;
@@ -89,19 +89,19 @@ TEST(FindKeepAwayPointTest, test_keep_away_point_proximity)
         // this function is extensively tested as part of the pass cost functions, so
         // I'm fine with it being used to pass/fail a test here even though it is
         // used as part of the keep away cost function
-        calculateProximityRisk(ball_point, world.enemyTeam(),
+        calculateProximityRisk(ball_point, world->enemyTeam(),
                                PASSER_ENEMY_PROXIMITY_IMPORTANCE),
-        calculateProximityRisk(keep_away_pt, world.enemyTeam(),
+        calculateProximityRisk(keep_away_pt, world->enemyTeam(),
                                PASSER_ENEMY_PROXIMITY_IMPORTANCE));
 }
 
 TEST(FindKeepAwayPointTest, test_keep_away_point_field_lines)
 {
     auto world           = TestUtil::createBlankTestingWorld();
-    auto top_left_corner = world.field().fieldLines().negXPosYCorner();
+    auto top_left_corner = world->field().fieldLines().negXPosYCorner();
     Pass pass(top_left_corner, Point(0, 0), 5);
-    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
-    auto field_center = world.field().fieldLines().centre();
+    auto keep_away_pt = findKeepAwayTargetPoint(*world, pass);
+    auto field_center = world->field().fieldLines().centre();
     // the keep away point should be closer to the field center
     EXPECT_LT((keep_away_pt - field_center).length(),
               (top_left_corner - field_center).length());
@@ -110,12 +110,12 @@ TEST(FindKeepAwayPointTest, test_keep_away_point_field_lines)
 TEST(FindKeepAwayPointTest, test_keep_away_point_field_lines_2)
 {
     auto world           = TestUtil::createBlankTestingWorld();
-    auto top_left_corner = world.field().fieldLines().negXPosYCorner();
+    auto top_left_corner = world->field().fieldLines().negXPosYCorner();
     auto top_mid_point   = Point(0, top_left_corner.y());
 
     Pass pass(top_mid_point, Point(0, 0), 5);
-    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
-    auto field_center = world.field().fieldLines().centre();
+    auto keep_away_pt = findKeepAwayTargetPoint(*world, pass);
+    auto field_center = world->field().fieldLines().centre();
     // the keep away point should be closer to the field center
     EXPECT_LT((keep_away_pt - field_center).length(),
               (top_mid_point - field_center).length());

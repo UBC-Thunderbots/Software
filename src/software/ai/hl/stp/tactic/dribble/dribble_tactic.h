@@ -48,3 +48,5 @@ class DribbleTactic : public Tactic
     DribbleFSM::ControlParams control_params;
     TbotsProto::AiConfig ai_config;
 };
+
+COPY_TACTIC(PlaceBallTactic, DribbleTactic)

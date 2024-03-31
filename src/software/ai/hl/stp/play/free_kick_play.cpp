@@ -18,7 +18,8 @@ FreeKickPlay::FreeKickPlay(TbotsProto::AiConfig config)
 {
 }
 
-void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
+void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                  const WorldPtr &world_ptr)
 {
     /**
      * This play is basically:
@@ -39,7 +40,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     auto attacker = std::make_shared<AttackerTactic>(ai_config);
 
     PassWithRating best_pass_and_score_so_far =
-        shootOrFindPassStage(yield, attacker, crease_defender_tactics, world);
+        shootOrFindPassStage(yield, attacker, crease_defender_tactics, world_ptr);
 
     if (attacker->done())
     {
@@ -48,7 +49,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     else if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
     {
         performPassStage(yield, crease_defender_tactics, best_pass_and_score_so_far,
-                         world);
+                         world_ptr);
     }
     else
     {
@@ -56,7 +57,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
                    << " which is below our threshold of" << MIN_ACCEPTABLE_PASS_SCORE
                    << ", so chipping at enemy net";
 
-        chipAtGoalStage(yield, crease_defender_tactics, world);
+        chipAtGoalStage(yield, crease_defender_tactics, world_ptr);
     }
 
 
@@ -64,13 +65,13 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 }
 
 void FreeKickPlay::updateAlignToBallTactic(
-    std::shared_ptr<MoveTactic> align_to_ball_tactic, const World &world)
+    std::shared_ptr<MoveTactic> align_to_ball_tactic, const WorldPtr &world_ptr)
 {
-    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
+    Vector ball_to_center_vec = Vector(0, 0) - world_ptr->ball().position().toVector();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
-        world.ball().position() -
+        world_ptr->ball().position() -
             ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
         ball_to_center_vec.orientation(), 0);
 }
@@ -78,7 +79,7 @@ void FreeKickPlay::updateAlignToBallTactic(
 void FreeKickPlay::chipAtGoalStage(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-    const World &world)
+    const WorldPtr &world_ptr)
 {
     auto chip_tactic = std::make_shared<ChipTactic>();
 
@@ -86,16 +87,16 @@ void FreeKickPlay::chipAtGoalStage(
     // This is exerimentally determined to be a reasonable value
     double fallback_chip_target_x_offset = 1.5;
     Point chip_target =
-        world.field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
+        world_ptr->field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
     do
     {
-        chip_tactic->updateControlParams(world.ball().position(), chip_target);
+        chip_tactic->updateControlParams(world_ptr->ball().position(), chip_target);
         std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
+            ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::LEFT);
         std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
+            ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::RIGHT);
 
         yield({{chip_tactic, std::get<0>(crease_defender_tactics),
@@ -107,7 +108,7 @@ void FreeKickPlay::chipAtGoalStage(
 void FreeKickPlay::performPassStage(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-    PassWithRating best_pass_and_score_so_far, const World &world)
+    PassWithRating best_pass_and_score_so_far, const WorldPtr &world_ptr)
 {
     // Commit to a pass
     Pass pass = best_pass_and_score_so_far.pass;
@@ -124,10 +125,10 @@ void FreeKickPlay::performPassStage(
         receiver->updateControlParams(pass);
 
         std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
+            ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::LEFT);
         std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
+            ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::RIGHT);
         yield({{attacker, receiver, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -137,21 +138,21 @@ void FreeKickPlay::performPassStage(
 PassWithRating FreeKickPlay::shootOrFindPassStage(
     TacticCoroutine::push_type &yield, std::shared_ptr<AttackerTactic> shoot_tactic,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-    const World &world)
+    const WorldPtr &world_ptr)
 {
     auto pitch_division =
-        std::make_shared<const EighteenZonePitchDivision>(world.field());
+        std::make_shared<const EighteenZonePitchDivision>(world_ptr->field());
 
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
                                                  ai_config.passing_config());
 
     using Zones = std::unordered_set<EighteenZoneId>;
 
-    auto pass_eval = pass_generator.generatePassEvaluation(world);
+    auto pass_eval = pass_generator.generatePassEvaluation(*world_ptr);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
-        world, best_pass_and_score_so_far.pass.receiverPoint());
+        *world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
     Zones cherry_pick_region_1 = {ranked_zones[0]};
     Zones cherry_pick_region_2 = {ranked_zones[1]};
 
@@ -167,9 +168,9 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     LOG(DEBUG) << "Aligning to ball";
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic, world);
+        updateAlignToBallTactic(align_to_ball_tactic, world_ptr);
 
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
+        auto pass_eval = pass_generator.generatePassEvaluation(*world_ptr);
 
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
@@ -182,10 +183,10 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
         std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
+            ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::LEFT);
         std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
+            ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::RIGHT);
         yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
                 std::get<0>(crease_defender_tactics),
@@ -195,17 +196,17 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     LOG(DEBUG) << "Finished aligning to ball";
 
     best_pass_and_score_so_far =
-        pass_generator.generatePassEvaluation(world).getBestPassOnField();
+        pass_generator.generatePassEvaluation(*world_ptr).getBestPassOnField();
     // Align the kicker to pass and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
     double min_score                  = 1.0;
-    Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
+    Timestamp commit_stage_start_time = world_ptr->getMostRecentTimestamp();
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic, world);
+        updateAlignToBallTactic(align_to_ball_tactic, world_ptr);
 
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
+        auto pass_eval = pass_generator.generatePassEvaluation(*world_ptr);
 
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
@@ -218,22 +219,22 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
         std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
+            ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::LEFT);
         std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
+            ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::RIGHT);
         yield({{align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
                 cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
 
         best_pass_and_score_so_far =
-            pass_generator.generatePassEvaluation(world).getBestPassOnField();
+            pass_generator.generatePassEvaluation(*world_ptr).getBestPassOnField();
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 
         Duration time_since_commit_stage_start =
-            world.getMostRecentTimestamp() - commit_stage_start_time;
+            world_ptr->getMostRecentTimestamp() - commit_stage_start_time;
         min_score = 1 - std::min(time_since_commit_stage_start.toSeconds() /
                                      MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
                                  1.0);

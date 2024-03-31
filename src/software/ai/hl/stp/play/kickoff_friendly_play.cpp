@@ -11,7 +11,7 @@ KickoffFriendlyPlay::KickoffFriendlyPlay(TbotsProto::AiConfig config) : Play(con
 }
 
 void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                         const World &world)
+                                         const WorldPtr &world_ptr)
 {
     // Since we only have 6 robots at the maximum, the number one priority
     // is the robot doing the kickoff up front. The goalie is the second most
@@ -43,26 +43,28 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // excluding the goalie for part 1 of this play
     std::vector<Point> kickoff_setup_positions = {
         // Robot 1
-        Point(world.field().centerPoint() +
-              Vector(-world.field().centerCircleRadius(), 0)),
+        Point(world_ptr->field().centerPoint() +
+              Vector(-world_ptr->field().centerCircleRadius(), 0)),
         // Robot 2
         // Goalie positions will be handled by the goalie tactic
         // Robot 3
-        Point(world.field().centerPoint() +
-              Vector(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
-                     -1.0 / 3.0 * world.field().yLength())),
+        Point(
+            world_ptr->field().centerPoint() +
+            Vector(-world_ptr->field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
+                   -1.0 / 3.0 * world_ptr->field().yLength())),
         // Robot 4
-        Point(world.field().centerPoint() +
-              Vector(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
-                     1.0 / 3.0 * world.field().yLength())),
+        Point(
+            world_ptr->field().centerPoint() +
+            Vector(-world_ptr->field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
+                   1.0 / 3.0 * world_ptr->field().yLength())),
         // Robot 5
-        Point(world.field().friendlyGoalpostPos().x() +
-                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world.field().friendlyGoalpostPos().y()),
+        Point(world_ptr->field().friendlyGoalpostPos().x() +
+                  world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              world_ptr->field().friendlyGoalpostPos().y()),
         // Robot 6
-        Point(world.field().friendlyGoalpostNeg().x() +
-                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world.field().friendlyGoalpostNeg().y()),
+        Point(world_ptr->field().friendlyGoalpostNeg().x() +
+                  world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              world_ptr->field().friendlyGoalpostNeg().y()),
     };
 
     // move tactics to use to move to positions defined above
@@ -75,10 +77,11 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>();
 
     // Part 1: setup state (move to key positions)
-    while (world.gameState().isSetupState())
+    while (world_ptr->gameState().isSetupState())
     {
-        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                                world.enemyTeam(), world.ball(), false);
+        auto enemy_threats =
+            getAllEnemyThreats(world_ptr->field(), world_ptr->friendlyTeam(),
+                               world_ptr->enemyTeam(), world_ptr->ball(), false);
 
         PriorityTacticVector result = {{}};
 
@@ -99,18 +102,20 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 
     // Part 2: not normal play, currently ready state (chip the ball)
-    while (!world.gameState().isPlaying())
+    while (!world_ptr->gameState().isPlaying())
     {
-        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                                world.enemyTeam(), world.ball(), false);
+        auto enemy_threats =
+            getAllEnemyThreats(world_ptr->field(), world_ptr->friendlyTeam(),
+                               world_ptr->enemyTeam(), world_ptr->ball(), false);
 
         PriorityTacticVector result = {{}};
 
         // TODO (#2612): This needs to be adjusted post field testing, ball needs to land
         // exactly in the middle of the enemy field
         kickoff_chip_tactic->updateControlParams(
-            world.ball().position(),
-            world.field().centerPoint() + Vector(world.field().xLength() / 6, 0));
+            world_ptr->ball().position(),
+            world_ptr->field().centerPoint() +
+                Vector(world_ptr->field().xLength() / 6, 0));
         result[0].emplace_back(kickoff_chip_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from

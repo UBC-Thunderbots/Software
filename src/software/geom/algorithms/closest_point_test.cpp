@@ -96,3 +96,93 @@ TEST(GeomUtilTest, test_closest_lineseg_degenerate)
     EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(1, 0), seg),
                                                Point(1, 1), 0.00001));
 }
+
+
+TEST(GeomUtilTest, test_closest_circle_inside)
+{
+    Circle circle(Point(0, 0), 1);
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(0, 0.5), circle),
+                                               Point(0, 1), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_circle_outside)
+{
+    Circle circle(Point(1, 1), 1);
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(1, 3), circle),
+                                               Point(1, 2), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_circle_point_on_edge)
+{
+    Circle circle(Point(1, 1), 1);
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(2, 1), circle),
+                                               Point(2, 1), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_polygon_inside)
+{
+    Polygon polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(0.9, 0.11), polygon),
+                                               Point(1, 0.11), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_polygon_point_on_edge)
+{
+    Polygon polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(0.5, 1), polygon),
+                                               Point(0.5, 1), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_polygon_outside)
+{
+    Polygon polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(-0.1, 0.5), polygon),
+                                               Point(0, 0.5), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_polygon_outside_end_point)
+{
+    Polygon polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(1.5, 1.5), polygon),
+                                               Point(1, 1), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_polygon_concave_outside)
+{
+    Polygon polygon(
+        {Point(0, 0), Point(1, 0), Point(1, 1), Point(0.5, 0.5), Point(0, 1)});
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(0.1, 1.5), polygon),
+                                               Point(0, 1), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_polygon_concave_inside)
+{
+    Polygon polygon(
+        {Point(0, 0), Point(1, 0), Point(1, 1), Point(0.5, 0.85), Point(0, 1)});
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(0.5, 0.8), polygon),
+                                               Point(0.5, 0.85), 0.00001));
+}
+TEST(GeomUtilTest, test_closest_stadium_outside_semicircle)
+{
+    Stadium stadium(Point(0, 0), Point(2, 0), 1);
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(4, 0), stadium),
+                                               Point(3, 0), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_stadium_outside_rectangle)
+{
+    Stadium stadium(Point(0, 0), Point(2, 0), 1);
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(1, 2), stadium),
+                                               Point(1, 1), 0.00001));
+}

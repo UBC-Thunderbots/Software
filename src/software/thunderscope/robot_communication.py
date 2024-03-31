@@ -26,6 +26,7 @@ class RobotCommunication(object):
         estop_mode: EstopMode,
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
+        enable_radio: bool = False,
     ):
         """Initialize the communication with the robots
 
@@ -35,8 +36,11 @@ class RobotCommunication(object):
         :param estop_mode: what estop mode we are running right now, of type EstopMode
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
+        :param enable_radio: Whether to use radio to send primitives to robots
 
         """
+        self.receive_ssl_referee_proto = None
+        self.receive_ssl_wrapper = None
         self.sequence_number = 0
         self.last_time = time.time()
         self.current_proto_unix_io = current_proto_unix_io
@@ -46,6 +50,8 @@ class RobotCommunication(object):
 
         self.estop_path = estop_path
         self.estop_buadrate = estop_baudrate
+
+        self.enable_radio = enable_radio
 
         self.running = False
 
@@ -115,6 +121,13 @@ class RobotCommunication(object):
         self.robots_connected_to_fullsystem = {
             robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
         }
+
+    def close_for_fullsystem(self) -> None:
+        if self.receive_ssl_wrapper:
+            self.receive_ssl_wrapper.close()
+
+        if self.receive_ssl_referee_proto:
+            self.receive_ssl_referee_proto.close()
 
     def toggle_keyboard_estop(self) -> None:
         """
@@ -304,9 +317,12 @@ class RobotCommunication(object):
         )
 
         # Create multicast senders
-        self.send_primitive_set = tbots_cpp.PrimitiveSetProtoSender(
-            self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
-        )
+        if self.enable_radio:
+            self.send_primitive_set = tbots_cpp.PrimitiveSetProtoRadioSender()
+        else:
+            self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
+                self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
+            )
 
         self.running = True
 
@@ -322,7 +338,9 @@ class RobotCommunication(object):
 
         """
         self.running = False
-        self.receive_ssl_wrapper.close()
+
+        self.close_for_fullsystem()
+
         self.receive_robot_log.close()
         self.receive_robot_status.close()
         self.run_primitive_set_thread.join()

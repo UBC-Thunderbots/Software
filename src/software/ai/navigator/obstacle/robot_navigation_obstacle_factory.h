@@ -63,7 +63,7 @@ class RobotNavigationObstacleFactory
      * Create dynamic obstacles for the given motion constraints
      *
      * @param motion_constraints The motion constraints to create obstacles for
-     * @param field Field we're enforcing motion constraints in
+     * @param world World we're enforcing motion constraints in
      *
      * @return Obstacles representing the given motion constraints
      */
@@ -123,6 +123,7 @@ class RobotNavigationObstacleFactory
     ObstaclePtr createFromShape(const Circle &circle) const;
     ObstaclePtr createFromShape(const Polygon &polygon) const;
     ObstaclePtr createFromShape(const Rectangle &rectangle) const;
+    ObstaclePtr createFromShape(const Stadium &stadium) const;
 
     /**
      * Returns an obstacle with the shape of the BallPlacementZone if the state is in

@@ -5,6 +5,8 @@ from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
 
+SIM_TICK_RATE_MS = 16
+
 
 class ProtoUnixIOTypes(Enum):
     """
@@ -79,6 +81,10 @@ class EstopMode(IntEnum):
     PHYSICAL_ESTOP = 2
 
 
+# the maximum packet / world loss percent indicated by UI
+MAX_ACCEPTABLE_PACKET_LOSS_PERCENT = 30
+
+
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2
@@ -99,6 +105,8 @@ DEFAULT_EMPTY_FIELD_WORLD = World(
 # How long AI vs AI runs before ending in CI
 CI_DURATION_S = 180
 
+MULTI_PLANE_POINTS = 3
+
 ROBOT_RADIUS = 25
 
 BALL_HEIGHT_EFFECT_MULTIPLIER = 3
@@ -115,6 +123,9 @@ ROBOT_FATAL_TIMEOUT_S = 5
 # crash alert occurs
 ROBOT_CRASH_TIMEOUT_S = 5
 
+# FOV in degrees for top-down orthographic view
+ORTHOGRAPHIC_FOV_DEGREES = 1.0
+
 # LogLevel to string conversion map
 LOG_LEVEL_STR_MAP = {
     LogLevel.DEBUG: "DEBUG",
@@ -123,8 +134,6 @@ LOG_LEVEL_STR_MAP = {
     LogLevel.FATAL: "FATAL",
     LogLevel.CONTRACT: "CONTRACT",
 }
-
-GAME_CONTROLLER_URL = "http://localhost:8081"
 
 # Paths to check for estop when running diagnostics
 ESTOP_PATH_1 = "/dev/ttyACM0"
@@ -155,6 +164,12 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>Number Keys:</code></b> Position camera to preset view<br>
     <b><code>Shift + Left Click:</code></b> Place the ball at the cursor<br>
     <b><code>Shift + Left Click Drag:</code></b> Place the ball at the cursor and kick it<br>
+    <b><code>Ctrl + Shift + Left Double Click:</code></b>
+    <ul style="margin: 0;">
+    <li>If no robot is present at cursor, adds a new friendly robot there</li>
+    <li>If a friendly robot is present at cursor, removes it</li>
+    </ul>
+    <b><code>Ctrl + Shift + Left Click Drag:</code></b> Moves a friendly robot along with the cursor
 
     <h3>Camera Controls</h3><br>
 
@@ -240,7 +255,6 @@ def rgb_to_bw(r: int, g: int, b: int) -> tuple:
 
 
 class Colors(object):
-
     DEFAULT_GRAPHICS_COLOR = QtGui.QColor(255, 255, 255, 128)
     FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 200)
     FIELD_LINE_LIGHTER_COLOR = QtGui.QColor(255, 255, 255, 100)
@@ -295,3 +309,10 @@ class DepthValues:
     FOREGROUND_DEPTH = 0
     ABOVE_FOREGROUND_DEPTH = 1
     OVERLAY_DEPTH = 2
+
+
+class TrailValues:
+    """Constants for Trails Visualization Layer in Thunderscope."""
+
+    DEFAULT_TRAIL_LENGTH = 20
+    DEFAULT_TRAIL_SAMPLING_RATE = 0
