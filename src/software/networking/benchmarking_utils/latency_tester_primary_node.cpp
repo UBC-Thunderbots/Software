@@ -26,11 +26,15 @@ LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(
 
 void LatencyTesterPrimaryNode::printStatistics()
 {
+    std::sort(latencies_.begin(), latencies_.end());
+
     double latency_mean  = mean<long int>(latencies_);
     double latency_stdev = stdevSample<long int>(latencies_);
+    long int latency_median = latencies_[latencies_.size() / 2];
 
     LOG(INFO) << "Number of messages sent: " << latencies_.size();
     LOG(INFO) << "Mean latency: " << latency_mean << " ms";
+    LOG(INFO) << "Median latency: " << latency_median << " ms";
     LOG(INFO) << "Standard deviation: " << latency_stdev << " ms";
     LOG(INFO) << "Number of timeouts: " << num_timeouts_;
 }
@@ -86,5 +90,5 @@ void LatencyTesterPrimaryNode::onReceive(const char*, const size_t& size)
     LOG(INFO) << "Received response with size: " << size << " bytes";
     std::lock_guard<std::mutex> lock(response_mutex_);
     response_received_ = true;
-    response_cv_.notify_one();
+    response_cv_.notify_all();
 }
