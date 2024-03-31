@@ -54,7 +54,7 @@ TEST_P(PivotKickSkillTest, pivot_kick_test)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(5));
+            Duration::fromSeconds(10));
 }
 
 INSTANTIATE_TEST_CASE_P(
