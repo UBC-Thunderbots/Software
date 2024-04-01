@@ -33,27 +33,29 @@ class DriveAndDribblerWidget(QWidget):
         layout.addWidget(self.setup_direct_velocity("Drive"))
         layout.addWidget(self.setup_dribbler("Dribbler"))
 
-        self.enabled = True
-
         self.setLayout(layout)
 
-    def refresh(self) -> None:
-        """Refresh the widget and send the a MotorControl message with the current values
+    def refresh(self, mode: ControlMode) -> None:
         """
-        motor_control = MotorControl()
-        motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
+        Refresh the widget's sliders
+        Enable or disable this widgets sliders and buttons based on mode value
+        Collect motor control values and persist in the primitive field
+        """
 
-        motor_control.direct_velocity_control.velocity.x_component_meters = (
+        # Update this widgets accessibility to the user based on the ControlMode parameter
+        self.update_widget_accessibility(mode)
+
+        self.motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
+
+        self.motor_control.direct_velocity_control.velocity.x_component_meters = (
             self.x_velocity_slider.value()
         )
-        motor_control.direct_velocity_control.velocity.y_component_meters = (
+        self.motor_control.direct_velocity_control.velocity.y_component_meters = (
             self.y_velocity_slider.value()
         )
-        motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+        self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
             self.angular_velocity_slider.value()
         )
-
-        self.motor_control = motor_control
 
     def value_change(self, value: float) -> str:
         """
@@ -177,15 +179,15 @@ class DriveAndDribblerWidget(QWidget):
 
         return group_box
 
-    def set_enabled(self, mode: ControlMode) -> None:
+    def update_widget_accessibility(self, mode: ControlMode) -> None:
         """
-        Disables or enables all sliders and buttons depending on boolean parameter
+        Disables or enables all sliders and buttons depending on ControlMode parameter.
+        Sliders are enabled in DIAGNOSTICS mode, and disabled in HANDHELD mode
 
         Updates listener functions and stylesheets accordingly
-        :param enable: boolean parameter, True is enable and False is disable
+        :param mode: ControlMode enum parameter
         """
         if mode == ControlMode.DIAGNOSTICS:
-            # if not self.enabled:
             # disconnect all sliders
             self.disconnect_sliders()
 
@@ -211,8 +213,6 @@ class DriveAndDribblerWidget(QWidget):
             common_widgets.change_button_state(self.stop_and_reset_dribbler, True)
             common_widgets.change_button_state(self.stop_and_reset_direct, True)
 
-            # change enabled field
-            self.enabled = True
         elif mode == ControlMode.HANDHELD:
             # reset slider values and disconnect
             self.reset_all_sliders()
@@ -227,9 +227,6 @@ class DriveAndDribblerWidget(QWidget):
             # disable buttons
             common_widgets.change_button_state(self.stop_and_reset_dribbler, False)
             common_widgets.change_button_state(self.stop_and_reset_direct, False)
-
-            # change enabled field
-            self.enabled = False
 
     def disconnect_sliders(self) -> None:
         """
