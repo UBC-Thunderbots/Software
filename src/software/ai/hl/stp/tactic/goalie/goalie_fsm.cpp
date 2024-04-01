@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 
 #include "software/ai/evaluation/find_open_areas.h"
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/math/math_functions.h"
 
 Point GoalieFSM::getGoaliePositionToBlock(

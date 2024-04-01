@@ -1,109 +1,138 @@
 #include "software/ai/play_selection_fsm.h"
 
-#include "software/ai/hl/stp/play/ball_placement_play.h"
-#include "software/ai/hl/stp/play/corner_kick_play.h"
+#include "software/ai/hl/stp/play/ball_placement/ball_placement_play.h"
 #include "software/ai/hl/stp/play/enemy_ball_placement_play.h"
 #include "software/ai/hl/stp/play/enemy_free_kick_play.h"
 #include "software/ai/hl/stp/play/free_kick_play.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/kickoff_enemy_play.h"
 #include "software/ai/hl/stp/play/kickoff_friendly_play.h"
-#include "software/ai/hl/stp/play/offense/offense_play.h"
 #include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play.h"
 #include "software/ai/hl/stp/play/penalty_kick_enemy/penalty_kick_enemy_play.h"
 #include "software/ai/hl/stp/play/stop_play.h"
 
 
 PlaySelectionFSM::PlaySelectionFSM(std::shared_ptr<Strategy> strategy)
-    : ai_config(strategy->getAiConfig()),
-      ball_placement_play(std::make_shared<BallPlacementPlay>(strategy)),
-      enemy_ball_placement_play(std::make_shared<EnemyBallPlacementPlay>(strategy)),
-      enemy_free_kick_play(std::make_shared<EnemyFreekickPlay>(strategy)),
-      free_kick_play(std::make_shared<FreeKickPlay>(strategy)),
-      halt_play(std::make_shared<HaltPlay>(strategy)),
-      kickoff_enemy_play(std::make_shared<KickoffEnemyPlay>(strategy)),
-      kickoff_friendly_play(std::make_shared<KickoffFriendlyPlay>(strategy)),
-      offense_play(std::make_shared<OffensePlay>(strategy)),
-      penalty_kick_enemy_play(std::make_shared<PenaltyKickEnemyPlay>(strategy)),
-      penalty_kick_play(std::make_shared<PenaltyKickPlay>(strategy)),
-      stop_play(std::make_shared<StopPlay>(strategy))
+    : strategy_(strategy),
+      current_dynamic_play_(nullptr),
+      offensive_friendly_third_play_(
+          std::make_shared<OffensiveFriendlyThirdPlay>(strategy)),
+      offensive_middle_third_play_(std::make_shared<OffensiveMiddleThirdPlay>(strategy)),
+      offensive_enemy_third_play_(std::make_shared<OffensiveEnemyThirdPlay>(strategy))
 {
 }
 
 bool PlaySelectionFSM::gameStateStopped(const Update& event)
 {
-    return event.game_state.isStopped();
+    return event.world_ptr->gameState().isStopped();
 }
 
 bool PlaySelectionFSM::gameStateHalted(const Update& event)
 {
-    return event.game_state.isHalted();
+    return event.world_ptr->gameState().isHalted();
 }
 
 bool PlaySelectionFSM::gameStatePlaying(const Update& event)
 {
-    return event.game_state.isPlaying();
+    return event.world_ptr->gameState().isPlaying();
 }
 
 bool PlaySelectionFSM::gameStateSetupRestart(const Update& event)
 {
-    return event.game_state.isSetupRestart();
+    return event.world_ptr->gameState().isSetupRestart();
+}
+
+bool PlaySelectionFSM::enemyHasPossession(const Update& event)
+{
+    return event.world_ptr->getTeamWithPossession() == TeamPossession::ENEMY_TEAM;
 }
 
 void PlaySelectionFSM::setupSetPlay(const Update& event)
 {
-    if (event.game_state.isOurBallPlacement())
+    const GameState& game_state = event.world_ptr->gameState();
+
+    if (game_state.isOurBallPlacement())
     {
-        event.set_current_play(ball_placement_play);
+        event.set_current_play(std::make_shared<BallPlacementPlay>(strategy_));
     }
 
-    if (event.game_state.isTheirBallPlacement())
+    if (game_state.isTheirBallPlacement())
     {
-        event.set_current_play(enemy_ball_placement_play);
+        event.set_current_play(std::make_shared<EnemyBallPlacementPlay>(strategy_));
     }
 
-    if (event.game_state.isOurKickoff())
+    if (game_state.isOurKickoff())
     {
-        event.set_current_play(kickoff_friendly_play);
+        event.set_current_play(std::make_shared<KickoffFriendlyPlay>(strategy_));
     }
 
-    if (event.game_state.isTheirKickoff())
+    if (game_state.isTheirKickoff())
     {
-        event.set_current_play(kickoff_enemy_play);
+        event.set_current_play(std::make_shared<KickoffEnemyPlay>(strategy_));
     }
 
-    if (event.game_state.isOurPenalty())
+    if (game_state.isOurPenalty())
     {
-        event.set_current_play(penalty_kick_play);
+        event.set_current_play(std::make_shared<PenaltyKickPlay>(strategy_));
     }
 
-    if (event.game_state.isTheirPenalty())
+    if (game_state.isTheirPenalty())
     {
-        event.set_current_play(penalty_kick_enemy_play);
+        event.set_current_play(std::make_shared<PenaltyKickEnemyPlay>(strategy_));
     }
 
-    if (event.game_state.isOurDirectFree() || event.game_state.isOurIndirectFree())
+    if (game_state.isOurDirectFree() || game_state.isOurIndirectFree())
     {
-        event.set_current_play(free_kick_play);
+        event.set_current_play(std::make_shared<FreeKickPlay>(strategy_));
     }
 
-    if (event.game_state.isTheirDirectFree() || event.game_state.isTheirIndirectFree())
+    if (game_state.isTheirDirectFree() || game_state.isTheirIndirectFree())
     {
-        event.set_current_play(enemy_free_kick_play);
+        event.set_current_play(std::make_shared<EnemyFreekickPlay>(strategy_));
     }
 }
 
 void PlaySelectionFSM::setupStopPlay(const Update& event)
 {
-    event.set_current_play(stop_play);
+    event.set_current_play(std::make_shared<StopPlay>(strategy_));
 }
 
 void PlaySelectionFSM::setupHaltPlay(const Update& event)
 {
-    event.set_current_play(halt_play);
+    event.set_current_play(std::make_shared<HaltPlay>(strategy_));
 }
 
-void PlaySelectionFSM::setupOffensePlay(const Update& event)
+void PlaySelectionFSM::setupOffensivePlay(const Update& event)
 {
-    event.set_current_play(offense_play);
+    const Field& field        = event.world_ptr->field();
+    const Point ball_position = event.world_ptr->ball().position();
+
+    if (field.pointInFriendlyThird(ball_position))
+    {
+        current_dynamic_play_ = offensive_friendly_third_play_;
+    }
+    else if (field.pointInEnemyThird(ball_position))
+    {
+        current_dynamic_play_ = offensive_enemy_third_play_;
+    }
+    else
+    {
+        current_dynamic_play_ = offensive_middle_third_play_;
+    }
+
+    event.set_current_play(current_dynamic_play_);
+}
+
+void PlaySelectionFSM::setupDefensivePlay(const Update& event)
+{
+    event.set_current_play(std::make_shared<DefensePlay>(strategy_));
+}
+
+void PlaySelectionFSM::evaluateDynamicPlay(const Update& event)
+{
+    if (current_dynamic_play_)
+    {
+        // TODO: Integrate PlayMonitor and feed score into evaluate
+        current_dynamic_play_->evaluate(0);
+    }
 }

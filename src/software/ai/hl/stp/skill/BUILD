@@ -7,7 +7,12 @@ cc_library(
         "skill_fsm.h",
     ],
     deps = [
+        "//proto/primitive:primitive_msg_factory",
+        "//software/ai/evaluation/scoring/skills:skill_visitor",
+        "//software/ai/hl/stp/primitive",
+        "//software/ai/hl/stp/primitive:stop_primitive",
         "//software/ai/hl/stp/strategy",
+        "//software/util/sml_fsm",
     ],
 )
 
@@ -20,9 +25,8 @@ cc_library(
 cc_library(
     name = "all_skills",
     deps = [
-        "//software/ai/hl/stp/skill/dribble:dribble_skill",
         "//software/ai/hl/stp/skill/keep_away:keep_away_skill",
-        "//software/ai/hl/stp/skill/pivot_kick:pivot_kick_skill",
+        "//software/ai/hl/stp/skill/pass:pass_skill",
         "//software/ai/hl/stp/skill/shoot:shoot_skill",
     ],
 )

@@ -18,6 +18,7 @@ proto_library(
         "robot_crash_msg.proto",
         "robot_log_msg.proto",
         "robot_status_msg.proto",
+        "strategy.proto",
         "tactic.proto",
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",

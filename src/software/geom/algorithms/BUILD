@@ -16,6 +16,7 @@ cc_library(
         "intersection.cpp",
         "intersects.cpp",
         "rasterize.cpp",
+        "signed_distance.cpp",
         "step_along_perimeter.cpp",
         "voronoi_diagram.cpp",
     ],
@@ -33,6 +34,7 @@ cc_library(
         "intersection.h",
         "intersects.h",
         "rasterize.h",
+        "signed_distance.h",
         "step_along_perimeter.h",
         "voronoi_diagram.h",
     ],
@@ -51,6 +53,13 @@ cc_library(
         "//software/geom:vector",
         "//software/logger",
     ],
+)
+
+cc_library(
+    name = "end_in_obstacle_sample",
+    srcs = ["end_in_obstacle_sample.cpp"],
+    hdrs = ["end_in_obstacle_sample.h"],
+    deps = ["//software/ai/navigator/obstacle"],
 )
 
 cc_library(
@@ -173,7 +182,17 @@ cc_test(
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",
-        "//software/geom:rectangle",
+    ],
+)
+
+cc_test(
+    name = "signed_distance_test",
+    srcs = [
+        "signed_distance_test.cpp",
+    ],
+    deps = [
+        ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -244,6 +263,18 @@ cc_test(
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_test(
+    name = "end_in_obstacle_sample_test",
+    srcs = ["end_in_obstacle_sample_test.cpp"],
+    deps = [
+        ":algorithms",
+        ":end_in_obstacle_sample",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
     ],
 )

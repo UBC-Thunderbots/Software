@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
 
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/hl/stp/primitive/move_primitive.h"
 
 Point ShadowEnemyFSM::findBlockPassPoint(const Point &ball_position,
                                          const Robot &shadowee,

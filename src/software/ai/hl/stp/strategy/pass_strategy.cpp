@@ -11,12 +11,10 @@ PassStrategy::PassStrategy(const TbotsProto::PassingConfig& passing_config,
       latest_pass_eval_(nullptr),
       end_analysis_(false)
 {
-    LOG(DEBUG) << "PassStrategy starting...";
 }
 
 PassStrategy::~PassStrategy()
 {
-    LOG(DEBUG) << "PassStrategy exiting...";
     end_analysis_ = true;
 
     world_available_cv_.notify_one();
@@ -64,7 +62,6 @@ void PassStrategy::evaluatePassOptions()
 
 void PassStrategy::updateWorld(const WorldPtr& world_ptr)
 {
-    LOG(DEBUG) << "PassStrategy updating the World";
     const std::lock_guard<std::mutex> lock(world_lock_);
     world_ptr_ = world_ptr;
     world_available_cv_.notify_one();

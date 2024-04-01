@@ -13,8 +13,9 @@ cc_library(
         "dribble_skill_fsm.h",
     ],
     deps = [
+        "//software/ai/hl/stp/primitive:move_primitive",
         "//software/ai/hl/stp/skill",
-        "//software/ai/hl/stp/tactic:move_primitive",
+        "//software/ai/hl/stp/tactic:transition_conditions",
     ],
     alwayslink = True,
 )

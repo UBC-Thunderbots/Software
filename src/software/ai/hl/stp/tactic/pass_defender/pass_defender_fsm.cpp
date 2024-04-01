@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h"
 
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
 
 bool PassDefenderFSM::passStarted(const Update& event)

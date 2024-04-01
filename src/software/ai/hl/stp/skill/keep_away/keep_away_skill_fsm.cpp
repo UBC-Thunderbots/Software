@@ -21,7 +21,7 @@ bool KeepAwaySkillFSM::isPossessionThreatened(const Update& event)
 void KeepAwaySkillFSM::keepAway(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
-    Pass best_pass = (*event.common.strategy)->getBestPass().pass;
+    Pass best_pass = (*event.common.strategy)->getBestUncommittedPass().pass;
     auto keepaway_dribble_dest =
         findKeepAwayTargetPoint(event.common.world_ptr, best_pass);
 
