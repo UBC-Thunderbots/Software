@@ -14,7 +14,7 @@ class ControllerConnectionState(Enum):
     DISCONNECTED = 2
 
 
-class ControllerStatusView(QLabel):
+class HandheldDeviceStatusView(QLabel):
     """Class to show whether a handheld controller is connected to thunderscope and initialized,
     or no controller is connected at all.
     """

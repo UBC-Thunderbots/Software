@@ -25,7 +25,7 @@ py_library(
 
 py_library(
     name = "controller",
-    srcs = ["controller_diagnostics.py"],
+    srcs = ["handheld_device_manager.py"],
     deps = [
         "//proto:software_py_proto",
         "//software/logger:py_logger",
@@ -37,7 +37,7 @@ py_library(
 
 py_library(
     name = "controller_status_view",
-    srcs = ["controller_status_view.py"],
+    srcs = ["handheld_device_status_view.py"],
     deps = [
         "//software/thunderscope:constants",
         requirement("pyqtgraph"),

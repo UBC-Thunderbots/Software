@@ -6,16 +6,16 @@ from software.logger.logger import createLogger
 
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
-from software.thunderscope.robot_diagnostics.controller_status_view import (
-    ControllerStatusView,
+from software.thunderscope.robot_diagnostics.handheld_device_status_view import (
+    HandheldDeviceStatusView,
     ControllerConnectionState,
 )
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
-    DiagnosticsInputModeWidget,
+    DiagnosticsInputToggleWidget,
     ControlMode,
 )
-from software.thunderscope.robot_diagnostics.controller_diagnostics import (
-    ControllerHandler,
+from software.thunderscope.robot_diagnostics.handheld_device_manager import (
+    HandheldDeviceManager,
 )
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget,
@@ -35,15 +35,15 @@ class DiagnosticsWidget(QWidget):
         self.__control_mode = ControlMode.DIAGNOSTICS
 
         # initialize widgets
-        self.controller_status = ControllerStatusView()
+        self.controller_status = HandheldDeviceStatusView()
         self.drive_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
         self.chicker_widget = ChickerWidget(proto_unix_io)
-        self.diagnostics_control_input_widget = DiagnosticsInputModeWidget(
+        self.diagnostics_control_input_widget = DiagnosticsInputToggleWidget(
             lambda control_mode: self.toggle_control(control_mode),
         )
 
         # initialize controller
-        self.controller_handler = ControllerHandler(self.logger)
+        self.controller_handler = HandheldDeviceManager(self.logger)
 
         # initialize controller refresh button
         self.controller_refresh_button = QPushButton()

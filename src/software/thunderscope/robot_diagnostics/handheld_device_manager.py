@@ -8,7 +8,7 @@ import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.thunderscope.constants import *
 from software.thunderscope.constants import ControllerConstants
-from software.thunderscope.robot_diagnostics.controller_status_view import (
+from software.thunderscope.robot_diagnostics.handheld_device_status_view import (
     ControllerConnectionState,
 )
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
@@ -17,13 +17,7 @@ from software.thunderscope.robot_diagnostics.diagnostics_input_widget import Con
 # TODO: the following is logged on controller connection during runtime:
 # `qt.qpa.input.events: scroll event from unregistered device 17`
 
-
-class MoveEventType(Enum):
-    LINEAR = 1
-    ROTATIONAL = 2
-
-
-class ControllerHandler(object):
+class HandheldDeviceManager(object):
     """
     This class is responsible for reading from a handheld controller device and
     interpreting the device inputs into usable inputs for the robots.

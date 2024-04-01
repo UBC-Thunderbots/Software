@@ -6,7 +6,7 @@ from software.py_constants import *
 import software.thunderscope.common.common_widgets as common_widgets
 from enum import IntEnum
 
-from software.thunderscope.robot_diagnostics.controller_status_view import (
+from software.thunderscope.robot_diagnostics.handheld_device_status_view import (
     ControllerConnectionState,
 )
 
@@ -22,7 +22,7 @@ class ControlMode(IntEnum):
 
 # this class name doesnt make sense
 #
-class DiagnosticsInputModeWidget(QWidget):
+class DiagnosticsInputToggleWidget(QWidget):
     """
     Class to allow the user to switch between Manual, XBox, and Fullsystem control through Thunderscope UI
 
@@ -39,7 +39,7 @@ class DiagnosticsInputModeWidget(QWidget):
         Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control
         :param on_control_mode_switch_callback The signal to use for handling changes in input mode
         """
-        super(DiagnosticsInputModeWidget, self).__init__()
+        super(DiagnosticsInputToggleWidget, self).__init__()
         self.on_control_mode_switch_callback = on_control_mode_switch_callback
 
         vbox_layout = QVBoxLayout()
