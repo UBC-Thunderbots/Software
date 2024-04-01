@@ -40,7 +40,6 @@ class DiagnosticsInputToggleWidget(QWidget):
         :param on_control_mode_switch_callback The signal to use for handling changes in input mode
         """
         super(DiagnosticsInputToggleWidget, self).__init__()
-        self.on_control_mode_switch_callback = on_control_mode_switch_callback
 
         vbox_layout = QVBoxLayout()
 

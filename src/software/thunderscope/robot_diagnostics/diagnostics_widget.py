@@ -39,7 +39,7 @@ class DiagnosticsWidget(QWidget):
         self.drive_dribbler_widget = DriveAndDribblerWidget(proto_unix_io)
         self.chicker_widget = ChickerWidget(proto_unix_io)
         self.diagnostics_control_input_widget = DiagnosticsInputToggleWidget(
-            lambda control_mode: self.toggle_control(control_mode),
+            lambda control_mode: self.__toggle_control_and_refresh(control_mode),
         )
 
         # initialize controller
@@ -72,7 +72,7 @@ class DiagnosticsWidget(QWidget):
 
         self.setLayout(vbox_layout)
 
-    def toggle_control(self, mode: ControlMode):
+    def __toggle_control_and_refresh(self, mode: ControlMode):
         self.__control_mode = mode
 
         self.drive_dribbler_widget.refresh(mode)
