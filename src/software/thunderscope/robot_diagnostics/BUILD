@@ -28,9 +28,9 @@ py_library(
     srcs = ["controller_diagnostics.py"],
     deps = [
         "//proto:software_py_proto",
+        "//software/logger:py_logger",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
-        "//software/logger:py_logger",
         requirement("pyqtgraph"),
     ],
 )
@@ -48,6 +48,7 @@ py_library(
     name = "diagnostics_widget",
     srcs = ["diagnostics_widget.py"],
     deps = [
+        "//software/logger:py_logger",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
         "//software/thunderscope:thunderscope_types",
@@ -56,7 +57,6 @@ py_library(
         "//software/thunderscope/robot_diagnostics:controller_status_view",
         "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
         "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
-        "//software/logger:py_logger",
         requirement("pyqtgraph"),
     ],
 )

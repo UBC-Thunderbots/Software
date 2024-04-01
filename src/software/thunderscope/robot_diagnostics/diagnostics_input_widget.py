@@ -6,7 +6,9 @@ from software.py_constants import *
 import software.thunderscope.common.common_widgets as common_widgets
 from enum import IntEnum
 
-from software.thunderscope.robot_diagnostics.controller_status_view import ControllerConnectionState
+from software.thunderscope.robot_diagnostics.controller_status_view import (
+    ControllerConnectionState,
+)
 
 
 class ControlMode(IntEnum):
@@ -66,4 +68,6 @@ class DiagnosticsInputModeWidget(QWidget):
         self.setLayout(vbox_layout)
 
     def refresh(self, status: ControllerConnectionState) -> None:
-        self.handheld_control_button.setEnabled(status == ControllerConnectionState.CONNECTED)
+        self.handheld_control_button.setEnabled(
+            status == ControllerConnectionState.CONNECTED
+        )

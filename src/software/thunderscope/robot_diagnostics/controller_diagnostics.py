@@ -1,16 +1,16 @@
-import logging
 import time
 
 import numpy
 from multiprocessing import Process
 from evdev import InputDevice, categorize, ecodes, list_devices, InputEvent
-from threading import Event
 
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.thunderscope.constants import *
 from software.thunderscope.constants import ControllerConstants
-from software.thunderscope.robot_diagnostics.controller_status_view import ControllerConnectionState
+from software.thunderscope.robot_diagnostics.controller_status_view import (
+    ControllerConnectionState,
+)
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 
 
@@ -55,7 +55,10 @@ class ControllerHandler(object):
 
         self.initialize_controller()
 
-        if self.get_controller_connection_status() == ControllerConnectionState.CONNECTED:
+        if (
+            self.get_controller_connection_status()
+            == ControllerConnectionState.CONNECTED
+        ):
 
             self.logger.debug(
                 "Initialized handheld controller "
@@ -66,7 +69,10 @@ class ControllerHandler(object):
                 + self.controller.path
             )
 
-        elif self.get_controller_connection_status() == ControllerConnectionState.DISCONNECTED:
+        elif (
+            self.get_controller_connection_status()
+            == ControllerConnectionState.DISCONNECTED
+        ):
             self.logger.debug(
                 "Failed to initialize a handheld controller, check USB connection"
             )
@@ -76,9 +82,11 @@ class ControllerHandler(object):
             )
 
     def get_controller_connection_status(self) -> ControllerConnectionState:
-        return ControllerConnectionState.CONNECTED \
-            if self.controller is not None \
+        return (
+            ControllerConnectionState.CONNECTED
+            if self.controller is not None
             else ControllerConnectionState.DISCONNECTED
+        )
 
     def refresh(self, mode: ControlMode):
         """
@@ -118,11 +126,13 @@ class ControllerHandler(object):
         for device in list_devices():
             controller = InputDevice(device)
             if (
-                    controller is not None
-                    and controller.name in ControllerConstants.CONTROLLER_NAME_CODES_MAP
+                controller is not None
+                and controller.name in ControllerConstants.CONTROLLER_NAME_CODES_MAP
             ):
                 self.controller = controller
-                self.controller_codes = ControllerConstants.CONTROLLER_NAME_CODES_MAP[controller.name]
+                self.controller_codes = ControllerConstants.CONTROLLER_NAME_CODES_MAP[
+                    controller.name
+                ]
                 break
 
     def __start_event_listener_process(self):
@@ -161,7 +171,10 @@ class ControllerHandler(object):
                 # even if handheld mode is disabled. This time check ensures that
                 # only the events that have occurred very recently are processed, and
                 # any events that occur before switching to handheld mode are ignored
-                if time.time() - event.timestamp() < ControllerConstants.INPUT_DELAY_THRESHOLD:
+                if (
+                    time.time() - event.timestamp()
+                    < ControllerConstants.INPUT_DELAY_THRESHOLD
+                ):
                     self.__process_event(event)
         except OSError as ose:
             self.logger.debug(
@@ -194,39 +207,32 @@ class ControllerHandler(object):
         )
 
         if event.code == self.controller_codes[InputEventType.MOVE_X]:
-            self.motor_control.direct_velocity_control.velocity.x_component_meters = (
-                self.__parse_move_event_value(
-                    ControllerConstants.MAX_LINEAR_SPEED_METER_PER_S,
-                    event.value
-                )
+            self.motor_control.direct_velocity_control.velocity.x_component_meters = self.__parse_move_event_value(
+                ControllerConstants.MAX_LINEAR_SPEED_METER_PER_S, event.value
             )
 
         if event.code == self.controller_codes[InputEventType.MOVE_Y]:
-            self.motor_control.direct_velocity_control.velocity.y_component_meters = (
-                self.__parse_move_event_value(
-                    ControllerConstants.MAX_LINEAR_SPEED_METER_PER_S,
-                    event.value
-                )
+            self.motor_control.direct_velocity_control.velocity.y_component_meters = self.__parse_move_event_value(
+                ControllerConstants.MAX_LINEAR_SPEED_METER_PER_S, event.value
             )
 
         if event.code == self.controller_codes[InputEventType.ROTATE]:
-            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-                self.__parse_move_event_value(
-                    ControllerConstants.MAX_ANGULAR_SPEED_RAD_PER_S,
-                    event.value
-                )
+            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.__parse_move_event_value(
+                ControllerConstants.MAX_ANGULAR_SPEED_RAD_PER_S, event.value
             )
 
         if event.code == self.controller_codes[InputEventType.KICK_POWER]:
             self.kick_power_accumulator = self.__parse_kick_event_value(event.value)
 
         if event.code == self.controller_codes[InputEventType.DRIBBLER_SPEED]:
-            self.dribbler_speed_accumulator = self.__parse_dribble_event_value(event.value)
+            self.dribbler_speed_accumulator = self.__parse_dribble_event_value(
+                event.value
+            )
 
         # Left and right triggers
         if (
-            event.code == self.controller_codes[InputEventType.DRIBBLER_ENABLE_1] or
-            event.code == self.controller_codes[InputEventType.DRIBBLER_ENABLE_2]
+            event.code == self.controller_codes[InputEventType.DRIBBLER_ENABLE_1]
+            or event.code == self.controller_codes[InputEventType.DRIBBLER_ENABLE_2]
         ):
             dribbler_enabled = self.__parse_dribbler_enabled_event_value(event.value)
             if dribbler_enabled:
@@ -234,25 +240,27 @@ class ControllerHandler(object):
 
         # "A" button
         if (
-            event.code == self.controller_codes[InputEventType.KICK] and
-            event.value == 1
+            event.code == self.controller_codes[InputEventType.KICK]
+            and event.value == 1
         ):
             self.power_control.geneva_slot = 3
             self.power_control.chicker.kick_speed_m_per_s = self.kick_power_accumulator
 
         # "A" button
         if (
-            event.code == self.controller_codes[InputEventType.CHIP] and
-            event.value == 1
+            event.code == self.controller_codes[InputEventType.CHIP]
+            and event.value == 1
         ):
             self.power_control.geneva_slot = 3
-            self.power_control.chicker.chip_distance_meters = self.kick_power_accumulator
+            self.power_control.chicker.chip_distance_meters = (
+                self.kick_power_accumulator
+            )
 
     @staticmethod
-    def __parse_move_event_value(
-            event_value: float, scaling_factor: float
-    ) -> float:
-        if abs(event_value) < (ControllerConstants.DEADZONE_PERCENTAGE * scaling_factor):
+    def __parse_move_event_value(event_value: float, scaling_factor: float) -> float:
+        if abs(event_value) < (
+            ControllerConstants.DEADZONE_PERCENTAGE * scaling_factor
+        ):
             return 0
         else:
             return numpy.clip(

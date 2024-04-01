@@ -45,7 +45,9 @@ class DriveAndDribblerWidget(QWidget):
         # Update this widgets accessibility to the user based on the ControlMode parameter
         self.update_widget_accessibility(mode)
 
-        self.motor_control.dribbler_speed_rpm = int(self.dribbler_speed_rpm_slider.value())
+        self.motor_control.dribbler_speed_rpm = int(
+            self.dribbler_speed_rpm_slider.value()
+        )
 
         self.motor_control.direct_velocity_control.velocity.x_component_meters = (
             self.x_velocity_slider.value()

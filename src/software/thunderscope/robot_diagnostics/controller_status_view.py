@@ -36,7 +36,9 @@ class ControllerStatusView(QLabel):
         self.connected = False
         self.set_view_state(ControllerConnectionState.DISCONNECTED)
 
-    def set_view_state(self, state_discriminator=ControllerConnectionState.DISCONNECTED):
+    def set_view_state(
+        self, state_discriminator=ControllerConnectionState.DISCONNECTED
+    ):
         self.setText(self.state[state_discriminator][0])
         self.setStyleSheet(self.state[state_discriminator][1])
 

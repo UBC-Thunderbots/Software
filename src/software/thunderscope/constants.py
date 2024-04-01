@@ -337,44 +337,36 @@ class ControllerConstants:
         # AbsInfo: value=1242, min=-32768, max=32767, fuzz=16, flat=128, resolution=0
         # Canonical: Left joystick X-axis
         InputEventType.MOVE_X: 0,
-
         # Name: "ABS_Y", Type: EV_ABS
         # AbsInfo: value=425, min=-32768, max=32767, fuzz=16, flat=128, resolution=0
         # Canonical: Left joystick Y-axis
         InputEventType.MOVE_Y: 1,
-
         # Name: "ABS_RX", Type: EV_ABS
         # AbsInfo: value=-418, min=-32768, max=32767, fuzz=16, flat=128, resolution=0
         # Canonical: Right joystick X-axis
         InputEventType.ROTATE: 3,
-
         # Name: "BTN_A", Type: EV_KEY
         # Canonical: "A" Button
         InputEventType.KICK: 304,
-
         # Name: "BTN_Y", Type: EV_KEY
         # Canonical: "Y" Button
         InputEventType.CHIP: 308,
-
         # Name: "ABS_HAT0X", Type: EV_ABS
         # AbsInfo: value=0, min=-1, max=1, fuzz=0, flat=0, resolution=0
         # Canonical: D-pad X-axis
         InputEventType.KICK_POWER: 16,
-
         # Name: "ABS_HAT0Y", Type: EV_ABS
         # AbsInfo: value=0, min=-1, max=1, fuzz=0, flat=0, resolution=0
         # Canonical: D-pad Y-axis
         InputEventType.DRIBBLER_SPEED: 17,
-
         # Name: "ABS_Z", Type: EV_ABS
         # AbsInfo: value=0, min=0, max=1023, fuzz=0, flat=0, resolution=0
         # Canonical: Left trigger
         InputEventType.DRIBBLER_ENABLE_1: 2,
-
         # Name: "ABS_RZ", Type: EV_ABS
         # AbsInfo: value=0, min=0, max=1023, fuzz=0, flat=0, resolution=0
         # Canonical: Right trigger
-        InputEventType.DRIBBLER_ENABLE_2: 5
+        InputEventType.DRIBBLER_ENABLE_2: 5,
     }
 
     CONTROLLER_NAME_CODES_MAP = {
