@@ -17,6 +17,7 @@ from software.thunderscope.robot_diagnostics.diagnostics_input_widget import Con
 # TODO: the following is logged on controller connection during runtime:
 # `qt.qpa.input.events: scroll event from unregistered device 17`
 
+
 class HandheldDeviceManager(object):
     """
     This class is responsible for reading from a handheld controller device and
