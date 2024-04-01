@@ -5,6 +5,7 @@ from software.py_constants import *
 from proto.import_all_protos import *
 from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
+from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
@@ -42,7 +43,7 @@ class ChickerWidget(QWidget):
         vbox_layout = QVBoxLayout()
         self.setLayout(vbox_layout)
 
-        # Power slider for kicking & chipping
+        # Initializing power slider for kicking & chipping
         (
             self.power_slider_layout,
             self.power_slider,
@@ -53,21 +54,25 @@ class ChickerWidget(QWidget):
         vbox_layout.addLayout(self.power_slider_layout)
 
         # Initializing kick & chip buttons
-        self.button_clickable_map = {
-            "no_auto": True,
-            "auto_kick": True,
-            "auto_chip": True,
-        }
-        self.radio_buttons_group = QButtonGroup()
         self.push_button_box, self.push_buttons = common_widgets.create_buttons(
             ["Kick", "Chip"]
         )
         self.kick_button = self.push_buttons[0]
         self.chip_button = self.push_buttons[1]
 
+        # set buttons to be initially enabled
+        # TODO: don't need boolean flags, refactor them out
+        self.kick_chip_buttons_enable = True
+
         vbox_layout.addWidget(self.push_button_box)
 
         # Initializing auto kick & chip buttons
+        self.button_clickable_map = {
+            "no_auto": True,
+            "auto_kick": True,
+            "auto_chip": True,
+        }
+        self.radio_buttons_group = QButtonGroup()
         self.radio_button_box, self.radio_buttons = common_widgets.create_radio(
             ["No Auto", "Auto Kick", "Auto Chip"], self.radio_buttons_group
         )
@@ -75,16 +80,11 @@ class ChickerWidget(QWidget):
         self.auto_kick_button = self.radio_buttons[1]
         self.auto_chip_button = self.radio_buttons[2]
 
-        # set buttons to be initially enabled
-        self.kick_chip_buttons_enable = True
-
-        # indicating that no auto button is selected by default
+        # Set no auto button to be selected by default on launch
         self.no_auto_button.setChecked(True)
         self.no_auto_selected = True
 
-        # adding onclick functions for buttons
-
-        # kick button and chip button connected to send_command_and_timeout with their respective commands
+        # Initialize on-click handlers for kick & chip buttons.
         self.kick_button.clicked.connect(
             lambda: self.send_command_and_timeout(ChickerCommandMode.KICK)
         )
@@ -92,7 +92,7 @@ class ChickerWidget(QWidget):
             lambda: self.send_command_and_timeout(ChickerCommandMode.CHIP)
         )
 
-        # no auto button enables both buttons, while auto kick and auto chip disable both buttons
+        # Initialize on-click handlers for no auto, auto kick and auto chip buttons.
         self.no_auto_button.toggled.connect(
             lambda: self.set_should_enable_buttons(True)
         )
