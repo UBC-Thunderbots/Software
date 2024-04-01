@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package SSLProto;
+
+import "proto/ssl_gc_state.proto";
+import "proto/ssl_gc_geometry.proto";
+
+message ManualGCCommand
+{
+    required Command manual_command             = 1;
+    optional Vector2 final_ball_placement_point = 2;
+}

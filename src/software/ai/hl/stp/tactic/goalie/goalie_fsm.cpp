@@ -85,24 +85,24 @@ Rectangle GoalieFSM::getNoChipRectangle(const Field &field)
 }
 
 Point GoalieFSM::findGoodChipTarget(
-    const WorldPtr &world_ptr, const TbotsProto::GoalieTacticConfig &goalie_tactic_config)
+    const World &world, const TbotsProto::GoalieTacticConfig &goalie_tactic_config)
 {
     // Default chip target is the enemy goal
-    Point chip_target = world_ptr->field().enemyGoalCenter();
+    Point chip_target = world.field().enemyGoalCenter();
 
     // Avoid chipping out of field or towards friendly corners by restraining the
     // chip target to the region in front of the friendly defense area
     Vector inset(goalie_tactic_config.chip_target_area_inset_meters(),
                  -goalie_tactic_config.chip_target_area_inset_meters());
     Vector offset_from_goal_line(
-        world_ptr->field().defenseAreaXLength() +
+        world.field().defenseAreaXLength() +
             goalie_tactic_config.min_chip_distance_from_crease_meters(),
         0);
     Rectangle chip_target_area =
-        Rectangle(world_ptr->field().friendlyCornerPos() + offset_from_goal_line + inset,
-                  world_ptr->field().enemyCornerNeg() - inset);
+        Rectangle(world.field().friendlyCornerPos() + offset_from_goal_line + inset,
+                  world.field().enemyCornerNeg() - inset);
 
-    std::vector<Circle> open_areas = findGoodChipTargets(world_ptr, chip_target_area);
+    std::vector<Circle> open_areas = findGoodChipTargets(world, chip_target_area);
     if (!open_areas.empty())
     {
         chip_target = open_areas[0].origin();
@@ -170,7 +170,7 @@ void GoalieFSM::updatePivotKick(
     Point chip_origin =
         Point(chip_origin_x, event.common.world_ptr->ball().position().y());
 
-    Point chip_target  = findGoodChipTarget(event.common.world_ptr, goalie_tactic_config);
+    Point chip_target = findGoodChipTarget(*event.common.world_ptr, goalie_tactic_config);
     Vector chip_vector = chip_target - chip_origin;
 
     PivotKickFSM::ControlParams control_params{

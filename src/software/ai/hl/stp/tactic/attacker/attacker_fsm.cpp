@@ -63,7 +63,7 @@ void AttackerFSM::keepAway(const Update& event,
     }
 
     auto keepaway_dribble_dest =
-        findKeepAwayTargetPoint(event.common.world_ptr, best_pass_so_far);
+        findKeepAwayTargetPoint(*event.common.world_ptr, best_pass_so_far);
 
     const auto& enemy_team = event.common.world_ptr->enemyTeam();
     const auto& ball       = event.common.world_ptr->ball();
