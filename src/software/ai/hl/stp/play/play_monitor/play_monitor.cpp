@@ -1,13 +1,13 @@
 #include "play_monitor.h"
 
 
-PlayMonitor::PlayMonitor() : world()
+PlayMonitor::PlayMonitor() : startingWorld_()
 {
 }
 
 void PlayMonitor::startMonitoring(const World& initialWorld)
 {
-    world = initialWorld;
+    startingWorld_ = initialWorld;
 }
 
 double PlayMonitor::endMonitoring(const World& finalWorld)
@@ -17,50 +17,34 @@ double PlayMonitor::endMonitoring(const World& finalWorld)
 
 void PlayMonitor::updateWorld(const World& newWorld)
 {
-    world = newWorld;
+    startingWorld_ = newWorld;
 }
 
-double PlayMonitor::calculateCurrentPlayScore(const World& finalWorld) const
+double PlayMonitor::calculateCurrentPlayScore(const World& endingWorld) const
 {
+    const auto attackingTeam = endingWorld.getTeamWithPossession();
     // Friendlies scored the ball
-    if (contains(finalWorld.field().enemyGoal(), finalWorld.ball().position()))
+    if (contains(endingWorld.field().enemyGoal(), endingWorld.ball().position()))
     {
-        return 2.0;
+        return 1.0;
     }
-
-
-    const auto attackingTeam = finalWorld.getTeamWithPossession();
     if (attackingTeam == TeamPossession::FRIENDLY_TEAM)
     {
-        // How far the ball has travelled between updatedWorld and the old world
-        const auto ball_distance_travelled =
-            distance(finalWorld.ball().position(), world.ball().position());
         // How far the ball has travelled along the x axis between updatedWorld and the
         // old world, this indicates that generally the ball has move closer to the enemy
-        // goal. this could probably later be revised later by also considering the y
-        // value, when the ball is in the enemy third - at that point the play should try
-        // to funnel the ball closer to the goal
+        // goal.
+        const auto starting_ball_position= startingWorld_.ball().position().x();
+        const auto final_ball_position= endingWorld.ball().position().x();
         const auto ball_distance_travelled_along_field =
-            finalWorld.ball().position().x() - world.ball().position().x();
-        if (ball_distance_travelled > 4 * BALL_MAX_RADIUS_METERS)
-        {
-            return ball_distance_travelled_along_field / finalWorld.field().xLength();
-        }
+            final_ball_position - starting_ball_position;
+        return ball_distance_travelled_along_field / startingWorld_.field().xLength();
+    }
 
-        // we still have possession, but nothing significant has changed.
+    if (attackingTeam == TeamPossession::ENEMY_TEAM &&
+        contains(startingWorld_.field().enemyHalf(), startingWorld_.ball().position()))
+    {
         return 0.0;
     }
 
-    if (attackingTeam == TeamPossession::ENEMY_TEAM &&
-        contains(world.field().enemyHalf(), world.ball().position()))
-    {
-        return -1.0;
-    }
-    if (attackingTeam == TeamPossession::ENEMY_TEAM &&
-        contains(world.field().enemyHalf(), world.ball().position()))
-    {
-        return -1.0;
-    }
-    LOG(WARNING) << "DribblerMode is invalid" << std::endl;
     return 0.0;
 }

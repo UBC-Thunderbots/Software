@@ -1,5 +1,4 @@
 #pragma once
-#include "play_intent.h"
 #include "shared/constants.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
@@ -19,10 +18,7 @@ class PlayMonitor
     void updateWorld(const World& newWorld);
 
    private:
-    double calculateIntentBallScore();
-    double calculateIntentActionScore();
+    double calculateCurrentPlayScore(const World& end_world) const;
 
-    double calculateCurrentPlayScore(const World& finalWorld) const;
-
-    World world;
+    World startingWorld_;
 };
