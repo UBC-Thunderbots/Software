@@ -1,14 +1,16 @@
 import logging
-from multiprocessing import Process
+import time
 
 import numpy
-from evdev import InputDevice, categorize, ecodes, list_devices
+from multiprocessing import Process
+from evdev import InputDevice, categorize, ecodes, list_devices, InputEvent
 from threading import Event
 
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.thunderscope.constants import *
 from software.thunderscope.constants import ControllerConstants
+from software.thunderscope.robot_diagnostics.controller_status_view import ControllerConnectionState
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 
 
@@ -21,24 +23,41 @@ class MoveEventType(Enum):
     ROTATIONAL = 2
 
 
-class ControllerInputHandler(object):
+class ControllerHandler(object):
     """
     This class is responsible for reading from a handheld controller device and
     interpreting the device inputs into usable inputs for the robots.
     """
 
-    def __init__(self,):
+    def __init__(self, logger):
+        self.logger = logger
         self.controller = None
-        self.__controller_event_loop_handler_process = None
+        self.controller_codes = None
 
+        # Control primitives that are directly updated with
+        # parsed controller inputs on every iteration of the event loop
         self.motor_control = MotorControl()
         self.power_control = PowerControl()
 
-        self.__setup_controller()
+        # These fields are here to temporarily persist the controller's input.
+        # They are read once once certain buttons are pressed on the controller,
+        # and the values are inserted into the control primitives above.
+        self.kick_power_accumulator = 0
+        self.dribbler_speed_accumulator = 0
 
-        if self.controller_initialized():
+        self.constants = tbots_cpp.create2021RobotConstants()
 
-            logging.debug(
+        # event that is used to stop the controller event loop
+        # self.__stop_thread_signal_event = Event()
+
+        # Set-up process that will run the event loop
+        self.__setup_new_event_listener_process()
+
+        self.initialize_controller()
+
+        if self.get_controller_connection_status() == ControllerConnectionState.CONNECTED:
+
+            self.logger.debug(
                 "Initialized handheld controller "
                 + '"'
                 + self.controller.name
@@ -47,60 +66,63 @@ class ControllerInputHandler(object):
                 + self.controller.path
             )
 
-            self.constants = tbots_cpp.create2021RobotConstants()
-
-            # event that is used to stop the controller event loop
-            self.__stop_thread_signal_event = Event()
-
-            self.__setup_new_event_listener_process()
-
-        elif self.controller_initialized():
-            logging.debug(
-                "Tried to initialize a handheld controller from list available devices:"
+        elif self.get_controller_connection_status() == ControllerConnectionState.DISCONNECTED:
+            self.logger.debug(
+                "Failed to initialize a handheld controller, check USB connection"
             )
-            logging.debug(
+            self.logger.debug("Tried the following available devices:")
+            self.logger.debug(
                 list(map(lambda device: InputDevice(device).name, list_devices()))
             )
-            logging.debug(
-                "Could not initialize a handheld controller device - check USB connections"
-            )
 
-    def controller_initialized(self) -> bool:
-        return self.controller is not None
+    def get_controller_connection_status(self) -> ControllerConnectionState:
+        return ControllerConnectionState.CONNECTED \
+            if self.controller is not None \
+            else ControllerConnectionState.DISCONNECTED
 
-    def toggle_controller_listener(self, mode: ControlMode):
+    def refresh(self, mode: ControlMode):
         """
-        Changes the diagnostics input mode for all robots between Xbox and Diagnostics.
-
-        :param mode: current mode of control.
+        Refresh this class.
+        Spawns a new process that listens and processes
+        handheld controller device events if Control.Mode is Diagnostics,
+        Otherwise, terminates the current listener process if it is running,
+        to avoid busy waiting
+        :param mode: The current user requested mode for controlling the robot
         """
         if mode == ControlMode.DIAGNOSTICS:
-            logging.debug("Terminating controller event handling process")
-            self.__controller_event_loop_handler_process.terminate()
-            self.__controller_event_loop_handler_process = None
+            self.logger.debug("Terminating controller event handling process")
+            if self.__controller_event_loop_handler_process.is_alive():
+                # self.__stop_thread_signal_event.set()
+                self.__controller_event_loop_handler_process.terminate()
 
         elif mode == ControlMode.HANDHELD:
-            logging.debug("Setting up new controller event handling process")
-            # self.__setup_event_listener_process()
+            self.logger.debug("Setting up new controller event handling process")
             self.__setup_new_event_listener_process()
             self.__start_event_listener_process()
 
-    def get_latest_primitive_command(self):
-        if self.controller_initialized():
-            return DirectControlPrimitive(
-                motor_control=self.motor_control, power_control=self.power_control,
-            )
-        else:
-            return None
+    def get_latest_primitive_controls(self):
+        primitive = DirectControlPrimitive(
+            motor_control=self.motor_control, power_control=self.power_control
+        )
+        # TODO: pre-emptive bugfix: need to reset controls, epecially power so that
+        #  the control message isn't set to what is essentially auto-kick/chip
+        # self.motor_control = MotorControl()
+        self.power_control = PowerControl()
+        return primitive
 
-    def __setup_controller(self):
+    def initialize_controller(self):
+        """
+        Attempt to initialize a controller.
+        The first controller that is recognized a valid controller will be used
+        """
         for device in list_devices():
             controller = InputDevice(device)
             if (
-                controller is not None
-                and controller.name in ControllerConstants.VALID_CONTROLLERS
+                    controller is not None
+                    and controller.name in ControllerConstants.CONTROLLER_NAME_CODES_MAP
             ):
                 self.controller = controller
+                self.controller_codes = ControllerConstants.CONTROLLER_NAME_CODES_MAP[controller.name]
                 break
 
     def __start_event_listener_process(self):
@@ -110,122 +132,131 @@ class ControllerInputHandler(object):
 
     def __setup_new_event_listener_process(self):
         """
-        initializes & starts a new process that runs the event processing loop
+        initializes a new process that will run the event processing loop
         """
 
-        # TODO (#3165): Use trace level logging here
-        # logging.debug("Starting controller event loop process")
-        if self.__controller_event_loop_handler_process is None:
-            self.__controller_event_loop_handler_process = Process(
-                target=self.__event_loop, daemon=True
-            )
+        # TODO (#3165): Use trace level self.logger here
+        # self.logger.debug("Starting controller event loop process")
+        self.__controller_event_loop_handler_process = Process(
+            target=self.__event_loop, daemon=True
+        )
 
     def close(self):
+        """
+        Shut down the controller event loop
+        :return:
+        """
         # TODO (#3165): Use trace level logging here
-        self.__stop_thread_signal_event.set()
-        self.__controller_event_loop_handler_process.join()
+        # self.logger.debug("Shutdown down controller event loop process")
+        # self.__stop_thread_signal_event.set()
+        self.__controller_event_loop_handler_process.terminate()
 
     def __event_loop(self):
-        # TODO (#3165): Use trace level logging here
-        # logging.debug("Starting handheld controller event handling loop")
+        # TODO (#3165): Use trace level self.logger here
+        self.logger.debug("Starting handheld controller event handling loop")
         try:
             for event in self.controller.read_loop():
-                if self.__stop_thread_signal_event.isSet():
-                    return
-                else:
+                # TODO: is this a useful comment?
+                # All events accumulate into a file and will be read back eventually,
+                # even if handheld mode is disabled. This time check ensures that
+                # only the events that have occurred very recently are processed, and
+                # any events that occur before switching to handheld mode are ignored
+                if time.time() - event.timestamp() < ControllerConstants.INPUT_DELAY_THRESHOLD:
                     self.__process_event(event)
-
         except OSError as ose:
-            logging.debug(
+            self.logger.debug(
                 "Caught an OSError while reading handheld controller event loop!"
             )
-            logging.debug("Error message: " + str(ose))
-            logging.debug("Check physical handheld controller USB connection")
+            self.logger.debug("Error message: " + str(ose))
+            self.logger.debug("Check physical handheld controller USB connection!")
             return
         except Exception as e:
-            logging.critical(
+            self.logger.critical(
                 "Caught an unexpected error while reading handheld controller event loop!"
             )
-            logging.critical("Error message: " + str(e))
+            self.logger.critical("Error message: " + str(e))
             return
 
-    def __process_move_event_value(self, event_type, event_value) -> None:
-        if event_type == "ABS_X":
-            self.motor_control.direct_velocity_control.velocity.x_component_meters = self.__parse_move_event_value(
-                MoveEventType.LINEAR, event_value
+    def __process_event(self, event: InputEvent):
+
+        # abs_event = categorize(event)
+        event_type = ecodes.bytype[event.type][event.code]
+
+        # if event.type == ecodes.EV_ABS or event.type == ecodes.EV_KEY:
+        # TODO (#3165): Use trace level self.logger here
+        self.logger.debug(
+            "Processing controller event with type: "
+            + str(event_type)
+            + ", with code: "
+            + str(event.code)
+            + ", and with value: "
+            + str(event.value)
+        )
+
+        if event.code == self.controller_codes[InputEventType.MOVE_X]:
+            self.motor_control.direct_velocity_control.velocity.x_component_meters = (
+                self.__parse_move_event_value(
+                    ControllerConstants.MAX_LINEAR_SPEED_METER_PER_S,
+                    event.value
+                )
             )
 
-        elif event_type == "ABS_Y":
-            self.motor_control.direct_velocity_control.velocity.y_component_meters = self.__parse_move_event_value(
-                MoveEventType.LINEAR, event_value
+        if event.code == self.controller_codes[InputEventType.MOVE_Y]:
+            self.motor_control.direct_velocity_control.velocity.y_component_meters = (
+                self.__parse_move_event_value(
+                    ControllerConstants.MAX_LINEAR_SPEED_METER_PER_S,
+                    event.value
+                )
             )
 
-        elif event_type == "ABS_RX":
-            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.__parse_move_event_value(
-                MoveEventType.ROTATIONAL, event_value
+        if event.code == self.controller_codes[InputEventType.ROTATE]:
+            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+                self.__parse_move_event_value(
+                    ControllerConstants.MAX_ANGULAR_SPEED_RAD_PER_S,
+                    event.value
+                )
             )
 
-    def __process_event(self, event):
-        kick_power = 0.0
-        dribbler_speed = 0.0
+        if event.code == self.controller_codes[InputEventType.KICK_POWER]:
+            self.kick_power_accumulator = self.__parse_kick_event_value(event.value)
 
-        abs_event = categorize(event)
-        event_type = ecodes.bytype[abs_event.event.type][abs_event.event.code]
+        if event.code == self.controller_codes[InputEventType.DRIBBLER_SPEED]:
+            self.dribbler_speed_accumulator = self.__parse_dribble_event_value(event.value)
 
-        # TODO (#3165): Use trace level logging here
-        # logging.debug(
-        #     "Processing controller event with type "
-        #     + str(event_type)
-        #     + " and with value "
-        #     + str(abs_event.event.value)
-        # )
+        # Left and right triggers
+        if (
+            event.code == self.controller_codes[InputEventType.DRIBBLER_ENABLE_1] or
+            event.code == self.controller_codes[InputEventType.DRIBBLER_ENABLE_2]
+        ):
+            dribbler_enabled = self.__parse_dribbler_enabled_event_value(event.value)
+            if dribbler_enabled:
+                self.motor_control.dribbler_speed_rpm = self.dribbler_speed_accumulator
 
-        # TODO (#3175): new python versions have a pattern matching,
-        #  that could be useful for handling lots of if statements.
-        #  Some documentation for future:
-        #  https://peps.python.org/pep-0636/
-        #  https://docs.python.org/3/reference/compound_stmts.html#match
-        if event.type == ecodes.EV_ABS:
-            if event_type in ["ABS_X", "ABS_Y", "ABS_RX"]:
-                self.__process_move_event_value(event_type, abs_event.event.value)
+        # "A" button
+        if (
+            event.code == self.controller_codes[InputEventType.KICK] and
+            event.value == 1
+        ):
+            self.power_control.geneva_slot = 3
+            self.power_control.chicker.kick_speed_m_per_s = self.kick_power_accumulator
 
-        if event_type == "ABS_HAT0X":
-            dribbler_speed = self.__parse_kick_event_value(abs_event.event.value)
-
-        if event_type == "ABS_HAT0Y":
-            kick_power = self.__parse_dribble_event_value(abs_event.event.value)
-
-        if event_type == "ABS_RZ" or "ABS_Z":
-            if self.__parse_dribbler_enabled_event_value(abs_event.event.value):
-                self.motor_control.dribbler_speed_rpm = float(dribbler_speed)
-
-        if event.type == ecodes.EV_KEY:
-            # TODO: try testing event_type instead of checking in `ecodes.ecodes` map
-            if event.code == ecodes.ecodes["BTN_A"] and event.value == 1.0:
-                self.power_control.geneva_slot = 3.0
-                self.power_control.chicker.kick_speed_m_per_s = kick_power
-
-            elif event.code == ecodes.ecodes["BTN_Y"] and event.value == 1.0:
-                self.power_control.geneva_slot = 3.0
-                self.power_control.chicker.chip_distance_meters = kick_power
+        # "A" button
+        if (
+            event.code == self.controller_codes[InputEventType.CHIP] and
+            event.value == 1
+        ):
+            self.power_control.geneva_slot = 3
+            self.power_control.chicker.chip_distance_meters = self.kick_power_accumulator
 
     @staticmethod
     def __parse_move_event_value(
-        event_type: MoveEventType, event_value: float
+            event_value: float, scaling_factor: float
     ) -> float:
-        factor = (
-            ControllerConstants.MAX_ANGULAR_SPEED_RAD_PER_S
-            if event_type == MoveEventType.ROTATIONAL
-            else ControllerConstants.MAX_LINEAR_SPEED_METER_PER_S
-            if event_type == MoveEventType.LINEAR
-            else 1.0
-        )
-
-        if abs(event_value) < (ControllerConstants.DEADZONE_PERCENTAGE * factor):
+        if abs(event_value) < (ControllerConstants.DEADZONE_PERCENTAGE * scaling_factor):
             return 0
         else:
             return numpy.clip(
-                event_value, 0, ControllerConstants.XBOX_MAX_RANGE * factor
+                event_value, 0, ControllerConstants.XBOX_MAX_RANGE * scaling_factor
             )
 
     @staticmethod
