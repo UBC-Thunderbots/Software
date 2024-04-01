@@ -13,7 +13,7 @@ from software.py_constants import *
 import proto.message_translation.tbots_protobuf as tbots_protobuf
 from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes, TabNames
+from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
