@@ -206,12 +206,20 @@ class ChickerWidget(QWidget):
         """
         if enable:
             button.setStyleSheet("background-color: White")
-            button.setCheckable(True)
+            button.setEnabled(True)
         else:
             button.setStyleSheet("background-color: Grey")
-            button.setCheckable(False)
+            button.setEnabled(False)
 
-    def refresh(self) -> None:
+    def update_widget_accessibility(self, mode: ControlMode):
+        self.auto_kick_button.setEnabled(mode == ControlMode.DIAGNOSTICS)
+        self.auto_chip_button.setEnabled(mode == ControlMode.DIAGNOSTICS)
+        self.set_should_enable_buttons(mode == ControlMode.DIAGNOSTICS)
+
+    def refresh(self, mode: ControlMode) -> None:
+
+        # Update this widgets accessibility to the user based on the ControlMode parameter
+        self.update_widget_accessibility(mode)
 
         # get power value slider value and set the label to that value
         power_value = self.power_slider.value()
