@@ -80,6 +80,8 @@ class StrategyImpl
     Timestamp cached_pass_time_;
     std::vector<Pass> committed_passes_;
 
+    std::optional<Shot> best_shot_;
+
     std::vector<OffenseSupportType> committed_support_types_;
     std::unordered_map<RobotId, Pose> robot_to_best_dribble_location_;
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
@@ -158,7 +160,7 @@ PassWithRating StrategyImpl<PitchDivision, ZoneEnum>::getBestUncommittedPass()
     }
 
     for (const auto& zone : cached_pass_eval_->rankZonesForReceiving(
-             world_ptr_, world_ptr_->ball().position()))
+             *world_ptr_, world_ptr_->ball().position()))
     {
         if (std::find_if(committed_passes_.begin(), committed_passes_.end(),
                          [&](const Pass& p) {
@@ -194,31 +196,24 @@ Pass StrategyImpl<PitchDivision, ZoneEnum>::getBestCommittedPass()
 template <class PitchDivision, class ZoneEnum>
 std::optional<Shot> StrategyImpl<PitchDivision, ZoneEnum>::getBestShot(const Robot& robot)
 {
-    if (robot_to_best_shot_.contains(robot.id()))
+    if (!robot_to_best_shot_.contains(robot.id()))
     {
-        return robot_to_best_shot_.at(robot.id());
+        robot_to_best_shot_[robot.id()] = sampleForBestShotOnGoal(
+            world_ptr_->field(), world_ptr_->friendlyTeam(), world_ptr_->enemyTeam(),
+            world_ptr_->ball().position(), TeamType::ENEMY, 
+            ai_config_.dribble_config().max_continuous_dribbling_distance(),
+            ai_config_.shot_config().num_shot_origin_points_to_sample(),
+            {robot});
     }
 
-    robot_to_best_shot_[robot.id()] = calcBestShotOnGoal(
-        world_ptr_->field(), world_ptr_->friendlyTeam(), world_ptr_->enemyTeam(),
-        robot.position(), TeamType::ENEMY, {robot});
-    return robot_to_best_shot_[robot.id()];
-}
-
-template <class PitchDivision, class ZoneEnum>
-std::vector<OffenseSupportType>
-StrategyImpl<PitchDivision, ZoneEnum>::getCommittedOffenseSupport() const
-{
-    return committed_support_types_;
+    return robot_to_best_shot_.at(robot.id());
 }
 
 template <class PitchDivision, class ZoneEnum>
 void StrategyImpl<PitchDivision, ZoneEnum>::reset()
 {
-    robot_to_best_dribble_location_ = {};
-    robot_to_best_shot_             = {};
-    committed_passes_               = {};
-    committed_support_types_        = {};
+    robot_to_best_dribble_location_.clear();
+    robot_to_best_shot_.clear();
 }
 
 template <class PitchDivision, class ZoneEnum>
@@ -254,6 +249,7 @@ void StrategyImpl<PitchDivision, ZoneEnum>::updateWorld(const WorldPtr& world_pt
 {
     world_ptr_ = world_ptr;
     pass_strategy_->updateWorld(world_ptr_);
+    reset();
 }
 
 template <class PitchDivision, class ZoneEnum>

@@ -40,6 +40,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ShadowEnemyTactic &tactic
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
+std::shared_ptr<Tactic> createTactic(const TbotsProto::ShootSkillTactic &tactic_proto,
+                                     std::shared_ptr<Strategy> strategy);
 
 /**
  * Creates the corresponding C++ struct/class from a proto

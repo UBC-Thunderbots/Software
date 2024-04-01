@@ -1,5 +1,5 @@
 from pyqtgraph.Qt import QtGui
-import os
+from software.thunderscope.gl.widgets.icon_loader import get_icon
 
 
 class GLFieldToolbarIconLoader:
@@ -21,21 +21,6 @@ class GLFieldToolbarIconLoader:
     MEASURE_ICON = None
 
 
-def get_icon(path: os.PathLike, color: str) -> QtGui.QPixmap:
-    """
-    Returns a QPixmap of the icon from the given path, with the given color
-    :param path: the path of the icon file
-    :param color: the color the icon should be
-    :return: a QPixmap of the icon with the right color
-    """
-    img = QtGui.QPixmap(path)
-    qp = QtGui.QPainter(img)
-    qp.setCompositionMode(QtGui.QPainter.CompositionMode.CompositionMode_SourceIn)
-    qp.fillRect(img.rect(), QtGui.QColor(color))
-    qp.end()
-    return QtGui.QIcon(img)
-
-
 def get_undo_icon(color: str) -> QtGui.QPixmap:
     """
     Loads the Undo icon pixmap as a GLFieldToolbarIconLoader attribute
@@ -45,7 +30,8 @@ def get_undo_icon(color: str) -> QtGui.QPixmap:
     """
     if not GLFieldToolbarIconLoader.UNDO_ICON:
         GLFieldToolbarIconLoader.UNDO_ICON = get_icon(
-            "software/thunderscope/gl/widgets/toolbar_icons/undo.svg", color
+            "software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode/undo.svg",
+            color,
         )
 
     return GLFieldToolbarIconLoader.UNDO_ICON
@@ -60,7 +46,8 @@ def get_redo_icon(color: str) -> QtGui.QPixmap:
     """
     if not GLFieldToolbarIconLoader.REDO_ICON:
         GLFieldToolbarIconLoader.REDO_ICON = get_icon(
-            "software/thunderscope/gl/widgets/toolbar_icons/redo.svg", color
+            "software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode/redo.svg",
+            color,
         )
 
     return GLFieldToolbarIconLoader.REDO_ICON
@@ -75,7 +62,8 @@ def get_pause_icon(color: str) -> QtGui.QPixmap:
     """
     if not GLFieldToolbarIconLoader.PAUSE_ICON:
         GLFieldToolbarIconLoader.PAUSE_ICON = get_icon(
-            "software/thunderscope/gl/widgets/toolbar_icons/pause.svg", color
+            "software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode/pause.svg",
+            color,
         )
 
     return GLFieldToolbarIconLoader.PAUSE_ICON
@@ -90,7 +78,8 @@ def get_play_icon(color: str) -> QtGui.QPixmap:
     """
     if not GLFieldToolbarIconLoader.PLAY_ICON:
         GLFieldToolbarIconLoader.PLAY_ICON = get_icon(
-            "software/thunderscope/gl/widgets/toolbar_icons/play.svg", color
+            "software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode/play.svg",
+            color,
         )
 
     return GLFieldToolbarIconLoader.PLAY_ICON
@@ -105,7 +94,8 @@ def get_help_icon(color: str) -> QtGui.QPixmap:
     """
     if not GLFieldToolbarIconLoader.HELP_ICON:
         GLFieldToolbarIconLoader.HELP_ICON = get_icon(
-            "software/thunderscope/gl/widgets/toolbar_icons/help.svg", color
+            "software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode/help.svg",
+            color,
         )
 
     return GLFieldToolbarIconLoader.HELP_ICON
@@ -120,7 +110,8 @@ def get_reset_icon(color: str) -> QtGui.QPixmap:
     """
     if not GLFieldToolbarIconLoader.RESET_ICON:
         GLFieldToolbarIconLoader.RESET_ICON = get_icon(
-            "software/thunderscope/gl/widgets/toolbar_icons/reset.svg", color
+            "software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode/reset.svg",
+            color,
         )
 
     return GLFieldToolbarIconLoader.RESET_ICON
@@ -135,7 +126,8 @@ def get_view_icon(color: str) -> QtGui.QPixmap:
     """
     if not GLFieldToolbarIconLoader.VIEW_ICON:
         GLFieldToolbarIconLoader.VIEW_ICON = get_icon(
-            "software/thunderscope/gl/widgets/toolbar_icons/view.svg", color
+            "software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode/view.svg",
+            color,
         )
 
     return GLFieldToolbarIconLoader.VIEW_ICON
@@ -150,7 +142,8 @@ def get_measure_icon(color: str) -> QtGui.QPixmap:
     """
     if not GLFieldToolbarIconLoader.MEASURE_ICON:
         GLFieldToolbarIconLoader.MEASURE_ICON = get_icon(
-            "software/thunderscope/gl/widgets/toolbar_icons/measure.svg", color
+            "software/thunderscope/gl/widgets/toolbar_icons/sandbox_mode/measure.svg",
+            color,
         )
 
     return GLFieldToolbarIconLoader.MEASURE_ICON

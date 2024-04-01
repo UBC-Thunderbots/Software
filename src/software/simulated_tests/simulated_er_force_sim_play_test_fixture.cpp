@@ -6,8 +6,8 @@
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
     : game_state(),
-      ai(friendly_thunderbots_config.ai_config()),
-      strategy(std::make_shared<Strategy>(friendly_thunderbots_config.ai_config()))
+      strategy(std::make_shared<Strategy>(friendly_thunderbots_config.ai_config())),
+      ai(strategy)
 {
 }
 
@@ -34,8 +34,6 @@ void SimulatedErForceSimPlayTestFixture::setAiPlay(
     friendly_thunderbots_config.mutable_ai_config()
         ->mutable_ai_control_config()
         ->set_override_ai_play(ai_play_name);
-
-    ai = Ai(friendly_thunderbots_config.ai_config());
 }
 
 void SimulatedErForceSimPlayTestFixture::setAiPlay(std::unique_ptr<Play> play)
@@ -54,9 +52,7 @@ void SimulatedErForceSimPlayTestFixture::setTactic(
     std::set<TbotsProto::MotionConstraint> motion_constraints)
 {
     CHECK(static_cast<bool>(tactic)) << "Tactic is invalid" << std::endl;
-    std::unique_ptr<AssignedTacticsPlay> play = std::make_unique<AssignedTacticsPlay>(
-        friendly_thunderbots_config.ai_config(),
-        std::make_shared<Strategy>(friendly_thunderbots_config.ai_config()));
+    std::unique_ptr<AssignedTacticsPlay> play = std::make_unique<AssignedTacticsPlay>(strategy);
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>>
         motion_constraint_override_map;
     motion_constraint_override_map[id] = motion_constraints;
@@ -81,15 +77,16 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
     const World& friendly_world, const World&,
     std::shared_ptr<ErForceSimulator> simulator_to_update)
 {
-    strategy->updateWorld(friendly_world);
 
     auto world_with_updated_game_state = friendly_world;
     world_with_updated_game_state.updateGameState(game_state);
+    std::shared_ptr<World> world_ptr = std::make_shared<World>(world_with_updated_game_state);
 
     auto start_tick_time = std::chrono::system_clock::now();
+    
+    strategy->updateWorld(world_ptr);
 
-    auto primitive_set_msg =
-        ai.getPrimitives(std::make_shared<World>(world_with_updated_game_state));
+    auto primitive_set_msg = ai.getPrimitives(world_ptr);
     LOG(VISUALIZE) << ai.getPlayInfo();
     LOG(VISUALIZE) << *primitive_set_msg;
 

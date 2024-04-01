@@ -28,6 +28,7 @@ message Tactic
         ShadowEnemyTactic shadow_enemy                      = 13;
         StopTactic stop                                     = 14;
         PassDefenderTactic pass_defender                    = 15;
+        ShootSkillTactic shoot_skill                        = 16;
     }
     reserved 4, 11;
 }
@@ -145,3 +146,5 @@ message ShadowEnemyTactic
 }
 
 message StopTactic {}
+
+message ShootSkillTactic {}

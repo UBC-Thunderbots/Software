@@ -111,7 +111,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     obstacle_list.Clear();
     path_visualization.Clear();
 
-    tactic_robot_id_assignment.clear();
+    std::map<std::shared_ptr<const Tactic>, RobotId> current_tactic_robot_id_assignment;
 
     std::optional<Robot> goalie_robot = world_ptr->friendlyTeam().goalie();
     std::vector<Robot> robots         = world_ptr->friendlyTeam().getAllRobots();
@@ -121,7 +121,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
         if (goalie_robot.has_value())
         {
             RobotId goalie_robot_id = goalie_robot.value().id();
-            tactic_robot_id_assignment.emplace(goalie_tactic, goalie_robot_id);
+            current_tactic_robot_id_assignment.emplace(goalie_tactic, goalie_robot_id);
 
             robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
                          robots.end());
@@ -133,7 +133,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 << "Couldn't find a primitive for robot id " << goalie_robot_id;
             auto primitive_proto =
                 primitives[goalie_robot_id]->generatePrimitiveProtoMessage(
-                    world_ptr, motion_constraints, obstacle_factory);
+                    *world_ptr, motion_constraints, obstacle_factory);
 
             primitives_to_run->mutable_robot_primitives()->insert(
                 {goalie_robot_id, *primitive_proto});
@@ -187,11 +187,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 }
             }
 
-            auto [remaining_robots, new_primitives_to_assign,
-                  current_tactic_robot_id_assignment] =
+            auto [remaining_robots, new_primitives_to_assign, assignment] =
                 assignTactics(world_ptr, tactic_vector, robots);
 
-            tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
+            current_tactic_robot_id_assignment.merge(assignment);
 
             for (auto &[robot_id, primitive] :
                  new_primitives_to_assign->robot_primitives())
@@ -203,6 +202,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             robots = remaining_robots;
         }
     }
+
+    tactic_robot_id_assignment = current_tactic_robot_id_assignment;
 
     // TODO (#3104): Remove duplicated obstacles from obstacle_list
     // Visualize all obstacles and paths
@@ -310,6 +311,18 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                 robot_capabilities.begin(), robot_capabilities.end(),
                 std::inserter(missing_capabilities, missing_capabilities.begin()));
 
+            // If the tactic was previously assigned to this robot, decrease
+            // the cost so that it will likely be assigned to this robot again.
+            // This makes assignments "sticky" and reduces assignment oscillations
+            // between robots.
+            if (tactic_robot_id_assignment.contains(tactic) &&
+                tactic_robot_id_assignment.at(tactic) == robot.id())
+            {
+                robot_cost_for_tactic *= strategy->getAiConfig()
+                                             .ai_parameter_config()
+                                             .repeat_tactic_assignment_multiplier();
+            }
+
             if (missing_capabilities.size() > 0)
             {
                 // We arbitrarily increase the cost, so that robots with missing
@@ -361,7 +374,7 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                 // assignment
                 auto primitive_proto =
                     primitives[robot_id]->generatePrimitiveProtoMessage(
-                        world_ptr, motion_constraints, obstacle_factory);
+                        *world_ptr, motion_constraints, obstacle_factory);
                 primitives_to_run->mutable_robot_primitives()->insert(
                     {robot_id, *primitive_proto});
                 remaining_robots.erase(

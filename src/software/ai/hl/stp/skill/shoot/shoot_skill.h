@@ -5,7 +5,8 @@
 #include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h"
 #include "software/ai/hl/stp/skill/shoot/shoot_skill_fsm.h"
 
-class ShootSkill : public BaseSkill<ShootSkillFSM, DribbleSkillFSM, PivotKickSkillFSM>
+class ShootSkill : public BaseSkill<ShootSkillFSM, ShootSkillFSM::GetBallControlFSM,
+                                    DribbleSkillFSM, PivotKickSkillFSM>
 {
    public:
     explicit ShootSkill(std::shared_ptr<Strategy> strategy);

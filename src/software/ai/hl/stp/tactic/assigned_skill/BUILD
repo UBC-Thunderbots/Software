@@ -11,10 +11,10 @@ cc_library(
 )
 
 cc_library(
-    name = "named_skill_tactics",
-    hdrs = ["named_skill_tactics.h"],
+    name = "assigned_skill_tactics",
+    hdrs = ["assigned_skill_tactics.h"],
     deps = [
         ":assigned_skill_tactic",
-        "//software/ai/hl/stp/skill/pivot_kick:pivot_kick_skill",
+        "//software/ai/hl/stp/skill:all_skills",
     ],
 )

@@ -32,34 +32,15 @@ void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
 
 void FeasibilityVisitor::visit(const PassSkill& skill)
 {
-    const std::vector<OffenseSupportType>& committed_strategy =
-        (*strategy_)->getCommittedOffenseSupport();
-
-    if (std::find(committed_strategy.begin(), committed_strategy.end(),
-                  OffenseSupportType::PASS_RECEIVER) == committed_strategy.end())
-    {
-        current_feasibility_ = 0;
-        return;
-    }
-
     PassWithRating best_pass = (*strategy_)->getBestUncommittedPass();
-
-    double min_score =
-        (*strategy_)->getAiConfig().shoot_or_pass_play_config().abs_min_pass_score();
-
-    if (best_pass.rating > min_score)
-    {
-        // TODO(arun): should we normalize this?
-        current_feasibility_ = best_pass.rating;
-        return;
-    }
-
-    current_feasibility_ = 0;
-    return;
+    current_feasibility_ = normalizeValueToRange(best_pass.rating, 0.0, 0.7, 0.0, 1.0);
 }
 
 void FeasibilityVisitor::visit(const ShootSkill& skill)
 {
+    static constexpr double IDEAL_SHOT_OPEN_ANGLE_DEGREES = 60.0;
+    static constexpr double SIGMOID_WIDTH                 = 0.25;
+
     std::optional<Shot> best_shot = (*strategy_)->getBestShot(robot_);
     if (!best_shot)
     {
@@ -67,14 +48,22 @@ void FeasibilityVisitor::visit(const ShootSkill& skill)
         return;
     }
 
-    double shot_angle_viability =
-        normalizeValueToRange(best_shot->getOpenAngle().toDegrees(), 0.0, 60.0, 0.0, 1.0);
-    current_feasibility_ = shot_angle_viability;
+    double shot_origin_feasibility = rectangleSigmoid(
+        world_.field().enemyThird(), best_shot->getOrigin(), SIGMOID_WIDTH);
+
+    double shot_angle_feasibility =
+        normalizeValueToRange(best_shot->getOpenAngle().toDegrees(), 0.0,
+                              IDEAL_SHOT_OPEN_ANGLE_DEGREES, 0.0, 1.0);
+
+    current_feasibility_ = shot_origin_feasibility * shot_angle_feasibility;
 }
 
 double FeasibilityVisitor::getFeasibility(Skill& skill)
 {
     skill.accept(*this);
+
+    LOG_IF(WARNING, current_feasibility_ < 0 || current_feasibility_ > 1)
+        << "Feasibility score outside of range [0, 1]";
 
     return current_feasibility_;
 }
