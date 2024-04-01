@@ -28,7 +28,6 @@ proto_library(
     deps = [
         "@com_google_protobuf//:descriptor_proto",
         "@nanopb//:nanopb_options_proto",
-        ":ssl_proto"
     ],
 )
 
@@ -65,7 +64,6 @@ py_proto_library(
     ],
     deps = [
         "@nanopb//:nanopb_options_py_proto",
-        ":ssl_proto"
     ],
 )
 

@@ -4,7 +4,6 @@ package TbotsProto;
 
 import "proto/geometry.proto";
 import "proto/ball.proto";
-import "proto/ssl_gc_state.proto";
 
 message GameState
 {
@@ -51,6 +50,4 @@ message GameState
     required RefereeCommand command       = 3;
     optional Ball ball                    = 4;
     optional Point ball_placement_point   = 5;
-    repeated SSLProto.RedCard red_cards            = 6;
-    repeated SSLProto.YellowCard yellow_cards      = 7;
 }
