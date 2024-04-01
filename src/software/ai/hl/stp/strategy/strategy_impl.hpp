@@ -75,8 +75,6 @@ class StrategyImpl
     Timestamp cached_pass_time_;
     std::vector<Pass> committed_passes_;
 
-    std::optional<Shot> best_shot_;
-
     std::unordered_map<RobotId, Pose> robot_to_best_dribble_location_;
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
 };
