@@ -184,7 +184,7 @@ TEST_F(PrimitiveTest, test_destination_outside_of_field)
         AutoChipOrKick({AutoChipOrKickMode::AUTOKICK, 3.5}), std::optional<double>());
 
     auto [trajectory_path_opt, move_primitive_msg] =
-        move_primitive->generatePrimitiveProtoMessage(world, {}, {}, obstacle_factory);
+        move_primitive->generatePrimitiveProtoMessage(*world, {}, {}, obstacle_factory);
 
     ASSERT_TRUE(move_primitive_msg->has_move());
     Point generated_destination =
