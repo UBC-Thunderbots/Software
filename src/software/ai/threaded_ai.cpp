@@ -16,6 +16,7 @@ ThreadedAi::ThreadedAi(const TbotsProto::AiConfig& ai_config)
       ai_control_config(ai_config.ai_control_config()),
       ai(strategy)
 {
+    updateOverridePlay();
 }
 
 void ThreadedAi::overridePlay(const TbotsProto::Play& play_proto)
@@ -40,9 +41,11 @@ void ThreadedAi::onValueReceived(World world)
 void ThreadedAi::onValueReceived(TbotsProto::ThunderbotsConfig config)
 {
     std::scoped_lock lock(ai_mutex);
+    
     ai_control_config = config.ai_config().ai_control_config();
     strategy->updateAiConfig(config.ai_config());
-    ai.updateOverridePlay();
+    
+    updateOverridePlay();
 }
 
 void ThreadedAi::runAiAndSendPrimitives(const World& world)
@@ -57,5 +60,23 @@ void ThreadedAi::runAiAndSendPrimitives(const World& world)
 
         Subject<TbotsProto::PlayInfo>::sendValueToObservers(play_info_msg);
         Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*new_primitives);
+    }
+}
+
+void ThreadedAi::updateOverridePlay()
+{
+    auto current_override =
+        strategy->getAiConfig().ai_control_config().override_ai_play();
+    if (current_override != TbotsProto::PlayName::UseAiSelection)
+    {
+        // Override to new play if we're not running Ai Selection
+        TbotsProto::Play play_proto;
+        play_proto.set_name(current_override);
+        ai.overridePlayFromProto(play_proto);
+    }
+    else
+    {
+        // Clear play override if we're running Ai Selection
+        ai.overridePlay(nullptr);
     }
 }

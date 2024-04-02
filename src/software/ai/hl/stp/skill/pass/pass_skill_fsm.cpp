@@ -18,7 +18,7 @@ bool PassSkillFSM::foundPass(const Update& event)
 }
 
 void PassSkillFSM::findPass(
-    const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<KeepAwaySkillFSM::Update> processEvent)
 {
     best_pass_so_far_ = (*event.common.strategy)->getBestCommittedPass();
 
@@ -37,12 +37,7 @@ void PassSkillFSM::findPass(
                                                    pass_score_ramp_down_duration,
                                                1.0 - abs_min_pass_score);
 
-    DribbleSkillFSM::ControlParams control_params = {
-        .dribble_destination       = event.common.world_ptr->ball().position(),
-        .final_dribble_orientation = Angle::zero(),
-        .allow_excessive_dribbling = false};
-
-    processEvent(DribbleSkillFSM::Update(control_params, event.common));
+    processEvent(KeepAwaySkillFSM::Update({}, event.common));
 }
 
 void PassSkillFSM::takePass(
@@ -50,12 +45,13 @@ void PassSkillFSM::takePass(
     boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
     Point ball_position = event.common.world_ptr->ball().position();
+    Point kick_target  = best_pass_so_far_->pass.receiverPoint();
 
-    processEvent(PivotKickSkillFSM::Update(
-        PivotKickSkillFSM::ControlParams{
-            .kick_origin       = ball_position,
-            .kick_direction    = best_pass_so_far_->pass.passerOrientation(),
-            .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                                best_pass_so_far_->pass.speed()}},
-        event.common));
+    PivotKickSkillFSM::ControlParams control_params = {
+        .kick_origin       = ball_position,
+        .kick_direction    = (kick_target - ball_position).orientation(),
+        .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                            best_pass_so_far_->pass.speed()}};
+
+    processEvent(PivotKickSkillFSM::Update(control_params, event.common));
 }

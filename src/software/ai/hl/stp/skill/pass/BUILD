@@ -16,7 +16,7 @@ cc_library(
     ],
     deps = [
         "//software/ai/hl/stp/skill:base_skill",
-        "//software/ai/hl/stp/skill/dribble:dribble_skill",
+        "//software/ai/hl/stp/skill/keep_away:keep_away_skill",
         "//software/ai/hl/stp/skill/pivot_kick:pivot_kick_skill",
         "//software/util/generic_factory",
     ],

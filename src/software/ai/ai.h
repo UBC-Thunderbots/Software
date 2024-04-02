@@ -66,12 +66,6 @@ class Ai final
     TbotsProto::PlayInfo getPlayInfo() const;
 
    private:
-    /**
-     * Checks the current AiConfig to see if we should override the current play
-     * and either applies or clears the override accordingly
-     */
-    void updateOverridePlay();
-
     std::shared_ptr<Strategy> strategy;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;

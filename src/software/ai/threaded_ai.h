@@ -58,6 +58,12 @@ class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
      */
     void runAiAndSendPrimitives(const World& world);
 
+    /**
+     * Checks the current AiConfig to see if we should override the current play
+     * and either applies or clears the override accordingly
+     */
+    void updateOverridePlay();
+
     std::mutex ai_mutex;
     
     std::shared_ptr<Strategy> strategy;
