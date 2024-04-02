@@ -13,8 +13,7 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
-    const TbotsProto::MotionConstraint &motion_constraint,
-    const World &world) const
+    const TbotsProto::MotionConstraint &motion_constraint, const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
     const Field &field = world.field();
@@ -92,20 +91,20 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
         }
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // 0.5 represents half a metre radius
-            obstacles.push_back(createFromShape(Circle(
-                world_ptr->ball().position(), STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M)));
+            obstacles.push_back(createFromShape(
+                Circle(world.ball().position(), STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M)));
             break;
         case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
-            if (world_ptr->gameState().getBallPlacementPoint().has_value())
+            if (world.gameState().getBallPlacementPoint().has_value())
             {
                 obstacles.push_back(createFromBallPlacement(
-                    world_ptr->gameState().getBallPlacementPoint().value(),
-                    world_ptr->ball().position()));
+                    world.gameState().getBallPlacementPoint().value(),
+                    world.ball().position()));
             }
             else
             {
                 obstacles.push_back(
-                    createFromShape(Circle(world_ptr->ball().position(), 0.5)));
+                    createFromShape(Circle(world.ball().position(), 0.5)));
             }
             break;
         case TbotsProto::MotionConstraint::FRIENDLY_GOAL:

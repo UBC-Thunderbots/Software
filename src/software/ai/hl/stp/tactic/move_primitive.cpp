@@ -49,8 +49,7 @@ MovePrimitive::MovePrimitive(
 
 std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
 MovePrimitive::generatePrimitiveProtoMessage(
-    const World &world,
-    const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
@@ -176,14 +175,13 @@ MovePrimitive::generatePrimitiveProtoMessage(
 }
 
 void MovePrimitive::updateObstacles(
-    const World &world,
-    const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
     // Separately store the non-robot + non-ball obstacles
-    field_obstacles = obstacle_factory.createObstaclesFromMotionConstraints(
-        motion_constraints, world);
+    field_obstacles =
+        obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
 
     obstacles = field_obstacles;
 
