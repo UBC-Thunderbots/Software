@@ -58,8 +58,6 @@ class StrategyImpl
     void commitPass(const PassWithRating& pass);
 
    private:
-    bool isBetterPassThanCached(const Timestamp& timestamp, const PassWithRating& pass);
-
     int calcNumIdealDefenders();
 
     TbotsProto::AiConfig ai_config_;
@@ -244,21 +242,6 @@ void StrategyImpl<PitchDivision, ZoneEnum>::updateWorld(const WorldPtr& world_pt
     world_ptr_ = world_ptr;
     pass_strategy_->updateWorld(world_ptr_);
     reset();
-}
-
-template <class PitchDivision, class ZoneEnum>
-bool StrategyImpl<PitchDivision, ZoneEnum>::isBetterPassThanCached(
-    const Timestamp& timestamp, const PassWithRating& pass)
-{
-    bool is_cache_time_expired =
-        (timestamp - cached_pass_time_) <
-        Duration::fromSeconds(
-            ai_config_.passing_config().pass_recalculation_commit_time_s());
-    bool is_cache_pass_better =
-        (cached_pass_eval_ != nullptr) &&
-        cached_pass_eval_->getBestPassOnField().rating > pass.rating;
-
-    return is_cache_time_expired || !is_cache_pass_better;
 }
 
 template <class PitchDivision, class ZoneEnum>
