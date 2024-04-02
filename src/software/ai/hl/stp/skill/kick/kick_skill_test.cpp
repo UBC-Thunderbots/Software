@@ -13,7 +13,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class KickTacticTest : public SimulatedErForceSimPlayTestFixture,
+class KickSkillTest : public SimulatedErForceSimPlayTestFixture,
                        public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
    protected:
@@ -21,7 +21,7 @@ class KickTacticTest : public SimulatedErForceSimPlayTestFixture,
     Field field                      = Field::createField(field_type);
 };
 
-TEST_P(KickTacticTest, kick_test)
+TEST_P(KickSkillTest, kick_test)
 {
     Vector ball_offset_from_robot = std::get<0>(GetParam());
     Angle angle_to_kick_at        = std::get<1>(GetParam());
@@ -33,7 +33,7 @@ TEST_P(KickTacticTest, kick_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<KickTactic>();
+    auto tactic = std::make_shared<KickSkillTactic>();
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
                                 5);
     setTactic(1, tactic);

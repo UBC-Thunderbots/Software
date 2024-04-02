@@ -13,7 +13,7 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
     Robot robot = ::TestUtil::createRobotAtPos(world->field().friendlyPenaltyMark());
 
     TbotsProto::AiConfig ai_config;
-    FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(), DribbleSkillFSM(), GetBehindBallFSM()};
+    FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(), DribbleSkillFSM(), GetBehindBallSkillFSM()};
 
     PenaltyKickFSM::ControlParams control_params{};
 
@@ -36,17 +36,17 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
     ::TestUtil::setBallPosition(world, position, Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
-    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickFSM>)>(
-        boost::sml::state<GetBehindBallFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<KickSkillFSM>));
+    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickSkillFSM>)>(
+        boost::sml::state<GetBehindBallSkillFSM>));
 
     ::TestUtil::setBallPosition(world, position + Vector(0.1, 0),
                                 Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
-    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickFSM>)>(
-        boost::sml::state<KickFSM::KickState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<KickSkillFSM>));
+    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickSkillFSM>)>(
+        boost::sml::state<KickSkillFSM::KickState>));
 
     ::TestUtil::setBallPosition(world, world->field().enemyGoalCenter(),
                                 Timestamp::fromSeconds(4));

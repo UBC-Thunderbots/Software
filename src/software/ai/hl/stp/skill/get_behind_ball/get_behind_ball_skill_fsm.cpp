@@ -1,14 +1,14 @@
-#include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
+#include "software/ai/hl/stp/skill/get_behind_ball/get_behind_ball_skill_fsm.h"
 
 #include "software/ai/hl/stp/primitive/move_primitive.h"
+#include "software/ai/hl/stp/tactic/transition_conditions.h"
 
-
-GetBehindBallFSM::GetBehindBallFSM()
+GetBehindBallSkillFSM::GetBehindBallSkillFSM()
     : size_of_region_behind_ball(3 * ROBOT_MAX_RADIUS_METERS)
 {
 }
 
-void GetBehindBallFSM::updateMove(const Update& event)
+void GetBehindBallSkillFSM::updateMove(const Update& event)
 {
     Vector behind_ball =
         Vector::createFromAngle(event.control_params.chick_direction + Angle::half());
@@ -22,7 +22,7 @@ void GetBehindBallFSM::updateMove(const Update& event)
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
 
-bool GetBehindBallFSM::behindBall(const Update& event)
+bool GetBehindBallSkillFSM::behindBall(const Update& event)
 {
     // A vector in the direction opposite the chip (behind the ball)
     Vector behind_ball =

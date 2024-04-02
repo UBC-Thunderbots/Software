@@ -12,19 +12,19 @@ TEST(ChipFSMTest, test_transitions)
                                           .chip_direction       = Angle::threeQuarter(),
                                           .chip_distance_meters = 1.2};
 
-    FSM<ChipFSM> fsm{GetBehindBallFSM()};
+    FSM<ChipFSM> fsm{GetBehindBallSkillFSM()};
 
-    // Start in GetBehindBallFSM state's GetBehindBallState
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
-    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
-        boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
+    // Start in GetBehindBallSkillFSM state's GetBehindBallState
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallSkillFSM>));
+    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallSkillFSM>)>(
+        boost::sml::state<GetBehindBallSkillFSM::GetBehindBallState>));
 
-    // Transition to GetBehindBallFSM state's GetBehindBallState
+    // Transition to GetBehindBallSkillFSM state's GetBehindBallState
     fsm.process_event(ChipFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
-    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
-        boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallSkillFSM>));
+    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallSkillFSM>)>(
+        boost::sml::state<GetBehindBallSkillFSM::GetBehindBallState>));
 
     // Robot is now behind ball
     robot = Robot(0,

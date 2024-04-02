@@ -3,8 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
-#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
-#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
 #include "software/geom/algorithms/closest_point.h"

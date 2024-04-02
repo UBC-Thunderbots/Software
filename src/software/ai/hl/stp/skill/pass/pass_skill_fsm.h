@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/hl/stp/skill/keep_away/keep_away_skill_fsm.h"
-#include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h"
+#include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
+#include "software/ai/hl/stp/skill/kick/kick_skill_fsm.h"
 #include "software/ai/hl/stp/skill/skill_fsm.h"
 
 struct PassSkillFSM
@@ -15,28 +15,28 @@ struct PassSkillFSM
     bool foundPass(const Update& event);
 
     void findPass(const Update& event,
-                  boost::sml::back::process<KeepAwaySkillFSM::Update> processEvent);
+                  boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
     void takePass(const Update& event,
-                  boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
+                  boost::sml::back::process<KickSkillFSM::Update> processEvent);
 
     auto operator()()
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(KeepAwaySkillFSM)
-        DEFINE_SML_STATE(PivotKickSkillFSM)
+        DEFINE_SML_STATE(DribbleSkillFSM)
+        DEFINE_SML_STATE(KickSkillFSM)
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_GUARD(foundPass)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(findPass, KeepAwaySkillFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(takePass, PivotKickSkillFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(findPass, DribbleSkillFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(takePass, KickSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *KeepAwaySkillFSM_S + Update_E[foundPass_G] / takePass_A = PivotKickSkillFSM_S, 
-            KeepAwaySkillFSM_S + Update_E / findPass_A, 
-            KeepAwaySkillFSM_S = X,
-            PivotKickSkillFSM_S + Update_E / takePass_A, PivotKickSkillFSM_S = X,
+            *DribbleSkillFSM_S + Update_E[foundPass_G] / takePass_A = KickSkillFSM_S, 
+            DribbleSkillFSM_S + Update_E / findPass_A, 
+            DribbleSkillFSM_S = X,
+            KickSkillFSM_S + Update_E / takePass_A, KickSkillFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 
@@ -45,4 +45,5 @@ struct PassSkillFSM
     Timestamp pass_optimization_start_time;
     Duration time_since_commit_stage_start;
     double min_pass_score_threshold_;
+    std::optional<Point> passer_point_; 
 };

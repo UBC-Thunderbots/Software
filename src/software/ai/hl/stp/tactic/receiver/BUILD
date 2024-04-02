@@ -15,7 +15,6 @@ cc_library(
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/skill/dribble:dribble_skill",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/passing:pass",
         "//software/logger",

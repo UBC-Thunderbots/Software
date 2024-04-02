@@ -1,10 +1,10 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/skill/skill_fsm.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/triangle.h"
 
-struct GetBehindBallFSM
+struct GetBehindBallSkillFSM
 {
    public:
     class GetBehindBallState;
@@ -18,9 +18,9 @@ struct GetBehindBallFSM
         Angle chick_direction;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    GetBehindBallFSM();
+    GetBehindBallSkillFSM();
 
     // ASCII art showing the region behind the ball
     // Diagram not to scale
@@ -43,14 +43,14 @@ struct GetBehindBallFSM
     /**
      * Action that updates the MovePrimitive
      *
-     * @param event GetBehindBallFSM::Update event
+     * @param event GetBehindBallSkillFSM::Update event
      */
     void updateMove(const Update& event);
 
     /**
      * Guard that checks if the robot is behind the ball
      *
-     * @param event GetBehindBallFSM::Update event
+     * @param event GetBehindBallSkillFSM::Update event
      *
      * @return if the robot is behind the ball
      */
@@ -62,10 +62,8 @@ struct GetBehindBallFSM
 
         DEFINE_SML_STATE(GetBehindBallState)
         DEFINE_SML_EVENT(Update)
-
         DEFINE_SML_GUARD(behindBall)
         DEFINE_SML_ACTION(updateMove)
-
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state

@@ -1,39 +1,40 @@
 package(default_visibility = ["//visibility:public"])
 
+# We force linking for all Skills so that the static variables required for the
+# "factory" design pattern to work are linked in
+# https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+
 cc_library(
-    name = "kick_tactic",
+    name = "kick_skill",
     srcs = [
-        "kick_fsm.cpp",
-        "kick_tactic.cpp",
+        "kick_skill_fsm.cpp",
     ],
     hdrs = [
-        "kick_fsm.h",
-        "kick_tactic.h",
+        "kick_skill_fsm.h",
     ],
     deps = [
-        "//shared:constants",
         "//software/ai/hl/stp/primitive:move_primitive",
-        "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
-        "//software/logger",
+        "//software/ai/hl/stp/skill",
+        "//software/ai/hl/stp/skill/get_behind_ball:get_behind_ball_skill",
     ],
+    alwayslink = True,
 )
 
 cc_test(
-    name = "kick_fsm_test",
-    srcs = ["kick_fsm_test.cpp"],
+    name = "kick_skill_fsm_test",
+    srcs = ["kick_skill_fsm_test.cpp"],
     deps = [
-        ":kick_tactic",
+        ":kick_skill",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],
 )
 
 cc_test(
-    name = "kick_tactic_test",
-    srcs = ["kick_tactic_test.cpp"],
+    name = "kick_skill_test",
+    srcs = ["kick_skill_test.cpp"],
     deps = [
-        ":kick_tactic",
+        ":kick_skill",
         "//shared/test_util:tbots_gtest_main",
         "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/terminating_validation_functions",

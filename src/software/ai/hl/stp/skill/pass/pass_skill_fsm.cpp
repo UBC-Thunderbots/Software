@@ -18,7 +18,7 @@ bool PassSkillFSM::foundPass(const Update& event)
 }
 
 void PassSkillFSM::findPass(
-    const Update& event, boost::sml::back::process<KeepAwaySkillFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
     best_pass_so_far_ = (*event.common.strategy)->getBestCommittedPass();
 
@@ -36,22 +36,34 @@ void PassSkillFSM::findPass(
     min_pass_score_threshold_ = 1.0 - std::min(time_since_commit_stage_start.toSeconds() /
                                                    pass_score_ramp_down_duration,
                                                1.0 - abs_min_pass_score);
+    
+    Point dribble_destination = event.common.world_ptr->ball().position();
+    Angle dribble_orientation = Angle::zero();
+    if (best_pass_so_far_)
+    {
+        Point receiver_point = best_pass_so_far_->pass.receiverPoint();
+        dribble_orientation = (receiver_point - dribble_destination).orientation();
+    }
 
-    processEvent(KeepAwaySkillFSM::Update({}, event.common));
+    DribbleSkillFSM::ControlParams control_params = {
+        .dribble_destination       = dribble_destination,
+        .final_dribble_orientation = dribble_orientation,
+        .allow_excessive_dribbling = false};
+
+    processEvent(DribbleSkillFSM::Update(control_params, event.common));
 }
 
 void PassSkillFSM::takePass(
     const Update& event,
-    boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
+    boost::sml::back::process<KickSkillFSM::Update> processEvent)
 {
     Point ball_position = event.common.world_ptr->ball().position();
     Point kick_target  = best_pass_so_far_->pass.receiverPoint();
 
-    PivotKickSkillFSM::ControlParams control_params = {
+    KickSkillFSM::ControlParams control_params = {
         .kick_origin       = ball_position,
         .kick_direction    = (kick_target - ball_position).orientation(),
-        .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                            best_pass_so_far_->pass.speed()}};
+        .kick_speed_meters_per_second = best_pass_so_far_->pass.speed()};
 
-    processEvent(PivotKickSkillFSM::Update(control_params, event.common));
+    processEvent(KickSkillFSM::Update(control_params, event.common));
 }
