@@ -32,8 +32,14 @@ void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
 
 void FeasibilityVisitor::visit(const PassSkill& skill)
 {
-    PassWithRating best_pass = (*strategy_)->getBestUncommittedPass();
-    current_feasibility_ = best_pass.rating;
+    std::optional<PassWithRating> best_pass = (*strategy_)->getBestCommittedPass();
+    if (!best_pass)
+    {
+        current_feasibility_ = 0;
+        return;
+    }
+
+    current_feasibility_ = best_pass->rating;
 }
 
 void FeasibilityVisitor::visit(const ShootSkill& skill)

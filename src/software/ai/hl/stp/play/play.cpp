@@ -105,6 +105,16 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             inter_play_communication, set_inter_play_communication_fun));
     }
 
+    // `Tactic::prepare` must be called on every tactic before primitives are computed
+    // to allow for the tactics to setup and coordinate with one another
+    for (TacticVector& tactic_vector : priority_tactics)
+    {
+        for (std::shared_ptr<Tactic> tactic : tactic_vector) 
+        {
+            tactic->prepare();
+        }
+    }
+
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
 
     // Reset the visualization protobufs

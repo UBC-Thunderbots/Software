@@ -12,8 +12,9 @@ ThreadedAi::ThreadedAi(const TbotsProto::AiConfig& ai_config)
     // always want AI to use the latest World
     : FirstInFirstOutThreadedObserver<World>(),
       FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>(),
+      strategy(std::make_shared<Strategy>(ai_config)),
       ai_control_config(ai_config.ai_control_config()),
-      ai(ai_config)
+      ai(strategy)
 {
 }
 
@@ -40,7 +41,8 @@ void ThreadedAi::onValueReceived(TbotsProto::ThunderbotsConfig config)
 {
     std::scoped_lock lock(ai_mutex);
     ai_control_config = config.ai_config().ai_control_config();
-    ai.updateAiConfig(config.ai_config());
+    strategy->updateAiConfig(config.ai_config());
+    ai.updateOverridePlay();
 }
 
 void ThreadedAi::runAiAndSendPrimitives(const World& world)

@@ -73,15 +73,6 @@ class Play
      */
     virtual std::vector<std::string> getState();
 
-    /**
-     * Updates this Play's AI config in case of a parameter change.
-     *
-     * @warning this function is NOT thread-safe
-     *
-     * @param new_config the new AI config to use for this Play
-     */
-    void updateAiConfig(const TbotsProto::AiConfig& new_config);
-
    protected:
     // Holds information about coordinating strategy between multiple Plays
     std::shared_ptr<Strategy> strategy;

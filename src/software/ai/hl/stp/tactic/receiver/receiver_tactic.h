@@ -27,12 +27,16 @@ class ReceiverTactic : public Tactic
     void updateControlParams(std::optional<Pass> updated_pass,
                              bool disable_one_touch_shot = false);
 
+    void prepare() override;
+
     void accept(TacticVisitor& visitor) const override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+
+    std::shared_ptr<Strategy> strategy_;
 
     std::map<RobotId, std::unique_ptr<FSM<ReceiverFSM>>> fsm_map;
     ReceiverFSM::ControlParams control_params;

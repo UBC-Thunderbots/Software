@@ -36,7 +36,7 @@ TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto tactic = std::make_shared<ReceiverTactic>();
+    auto tactic = std::make_shared<ReceiverTactic>(strategy);
     tactic->updateControlParams(pass);
     setTactic(1, tactic);
 
@@ -70,20 +70,19 @@ TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
 INSTANTIATE_TEST_CASE_P(
     PassEnvironmentReceiveAndDribble, ReceiverTacticTest,
     ::testing::Values(
-        // TODO(#2909) : Enable test once the robot can turn faster and hits the ball with
-        //// Robot already at receive point
-        // std::make_tuple(Pass(Point(0.0, 0.5), Point(2, 2), 4),
-        //                RobotStateWithId{
-        //                    1, RobotState(Point(2, 2), Vector(0, 0),
-        //                                  Angle::fromDegrees(0),
-        //                                  Angle::fromDegrees(0))}),
+        // Robot already at receive point
+        std::make_tuple(Pass(Point(0.0, 0.5), Point(2, 2), 4),
+                       RobotStateWithId{
+                           1, RobotState(Point(2, 2), Vector(0, 0),
+                                         Angle::fromDegrees(0),
+                                         Angle::fromDegrees(0))}),
 
-        //// Robot slighty off from receive point: test 1
-        // std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),
-        //                RobotStateWithId{
-        //                    1, RobotState(Point(2, 1.5), Vector(0, 0),
-        //                                  Angle::fromDegrees(0),
-        //                                  Angle::fromDegrees(0))}),
+        // Robot slighty off from receive point: test 1
+        std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),
+                       RobotStateWithId{
+                           1, RobotState(Point(2, 1.5), Vector(0, 0),
+                                         Angle::fromDegrees(0),
+                                         Angle::fromDegrees(0))}),
 
         // Robot slighty off from receive point: test 2
         std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),
@@ -126,7 +125,7 @@ TEST_P(ReceiverTacticTestOneTouch, test_one_touch)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto tactic = std::make_shared<ReceiverTactic>();
+    auto tactic = std::make_shared<ReceiverTactic>(strategy);
     tactic->updateControlParams(pass);
     setTactic(1, tactic);
 
@@ -194,11 +193,10 @@ INSTANTIATE_TEST_CASE_P(
         //                                  Angle::fromDegrees(0),
         //                                  Angle::fromDegrees(0))}),
 
-        // TODO(#2909) : Enable test once the robot can turn faster and hits the ball with
-        // std::make_tuple(Pass(Point(4.0, 1.5), Point(3.0, -1), 4.5),
-        //                 RobotStateWithId{1, RobotState(Point(3.0, -1), Vector(0, 0),
-        //                                                Angle::fromDegrees(180),
-        //                                                Angle::fromDegrees(0))}),
+        std::make_tuple(Pass(Point(4.0, 1.5), Point(3.0, -1), 4.5),
+                        RobotStateWithId{1, RobotState(Point(3.0, -1), Vector(0, 0),
+                                                       Angle::fromDegrees(180),
+                                                       Angle::fromDegrees(0))}),
 
         // TODO (#2577): re-enable once fixed
         //        std::make_tuple(Pass(Point(4.0, -1.5), Point(4, 1), 5),

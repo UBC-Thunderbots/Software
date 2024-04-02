@@ -81,15 +81,13 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
 
     std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
 
-    const std::shared_ptr<Strategy> getStrategy() const;
+    std::shared_ptr<Strategy> strategy;
 
    private:
     void updatePrimitives(const World& friendly_world, const World& enemy_world,
                           std::shared_ptr<ErForceSimulator> simulator_to_update) override;
 
     GameState game_state;
-
-    std::shared_ptr<Strategy> strategy;
 
     // The AI being tested and used in simulation
     Ai ai;

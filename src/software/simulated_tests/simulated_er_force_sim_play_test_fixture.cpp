@@ -5,8 +5,8 @@
 #include "software/test_util/test_util.h"
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
-    : game_state(),
-      strategy(std::make_shared<Strategy>(friendly_thunderbots_config.ai_config())),
+    : strategy(std::make_shared<Strategy>(friendly_thunderbots_config.ai_config())),
+      game_state(),
       ai(strategy)
 {
 }
@@ -80,13 +80,10 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
 
     auto world_with_updated_game_state = friendly_world;
     world_with_updated_game_state.updateGameState(game_state);
-    std::shared_ptr<World> world_ptr = std::make_shared<World>(world_with_updated_game_state);
 
     auto start_tick_time = std::chrono::system_clock::now();
     
-    strategy->updateWorld(world_ptr);
-
-    auto primitive_set_msg = ai.getPrimitives(world_ptr);
+    auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
     LOG(VISUALIZE) << ai.getPlayInfo();
     LOG(VISUALIZE) << *primitive_set_msg;
 
@@ -105,9 +102,4 @@ const TbotsProto::AiConfig SimulatedErForceSimPlayTestFixture::getAiConfig() con
 std::optional<TbotsProto::PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()
 {
     return ai.getPlayInfo();
-}
-
-const std::shared_ptr<Strategy> SimulatedErForceSimPlayTestFixture::getStrategy() const
-{
-    return strategy;
 }

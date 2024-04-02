@@ -9,8 +9,8 @@
 #include "software/tracy/tracy_constants.h"
 
 
-Ai::Ai(const TbotsProto::AiConfig& ai_config)
-    : strategy(std::make_shared<Strategy>(ai_config)),
+Ai::Ai(std::shared_ptr<Strategy> strategy)
+    : strategy(strategy),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{strategy})),
       override_play(nullptr),
       current_play(std::make_shared<HaltPlay>(strategy))
@@ -63,12 +63,6 @@ void Ai::overrideTactics(
     overridePlay(std::move(play));
 
     LOG(VISUALIZE) << getPlayInfo();
-}
-
-void Ai::updateAiConfig(const TbotsProto::AiConfig& ai_config)
-{
-    strategy->updateAiConfig(ai_config);
-    updateOverridePlay();
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)

@@ -55,3 +55,10 @@ std::map<RobotId, std::shared_ptr<Primitive>> Tactic::get(const WorldPtr &world_
 
     return primitives_map;
 }
+
+void Tactic::prepare()
+{
+    // `Tactic::prepare` has no implementation by default.
+    // Subclasses of Tactic should implement `prepare` as necessary in order to
+    // perform setup and coordinate with other tactics via Strategy.
+}

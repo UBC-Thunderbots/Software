@@ -58,7 +58,9 @@ class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
      */
     void runAiAndSendPrimitives(const World& world);
 
-    TbotsProto::AiControlConfig ai_control_config;
     std::mutex ai_mutex;
+    
+    std::shared_ptr<Strategy> strategy;
+    TbotsProto::AiControlConfig ai_control_config;
     Ai ai;
 };
