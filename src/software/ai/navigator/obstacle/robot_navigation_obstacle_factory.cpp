@@ -14,10 +14,10 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
     const TbotsProto::MotionConstraint &motion_constraint,
-    const WorldPtr &world_ptr) const
+    const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
-    const Field &field = world_ptr->field();
+    const Field &field = world.field();
 
     switch (motion_constraint)
     {
@@ -143,13 +143,13 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-    const WorldPtr &world_ptr) const
+    const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)
     {
         auto new_obstacles =
-            createObstaclesFromMotionConstraint(motion_constraint, world_ptr);
+            createObstaclesFromMotionConstraint(motion_constraint, world);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 

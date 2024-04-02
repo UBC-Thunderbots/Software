@@ -39,7 +39,7 @@ class MovePrimitive : public Primitive
     /**
      * Gets the primitive proto message
      *
-     * @param world_ptr Current state of the world
+     * @param world Current state of the world
      * @param motion_constraints Motion constraints to consider
      * @param robot_trajectories A map of the all friendly robots' known trajectories
      * @param obstacle_factory Obstacle factory to use for generating obstacles
@@ -47,7 +47,7 @@ class MovePrimitive : public Primitive
      */
     std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
     generatePrimitiveProtoMessage(
-        const WorldPtr &world_ptr,
+        const World &world,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
         const std::map<RobotId, TrajectoryPath> &robot_trajectories,
         const RobotNavigationObstacleFactory &obstacle_factory) override;
@@ -68,12 +68,12 @@ class MovePrimitive : public Primitive
      * Helper for filling the `obstacles` vector with the obstacles that the primitive
      * should avoid
      *
-     * @param world_ptr Current state of the world
+     * @param world Current state of the world
      * @param motion_constraints Motion constraints
      * @param robot_trajectories A map of the friendly robots' known trajectories
      * @param obstacle_factory Obstacle factory to use
      */
-    void updateObstacles(const WorldPtr &world_ptr,
+    void updateObstacles(const World &world,
                          const std::set<TbotsProto::MotionConstraint> &motion_constraints,
                          const std::map<RobotId, TrajectoryPath> &robot_trajectories,
                          const RobotNavigationObstacleFactory &obstacle_factory);

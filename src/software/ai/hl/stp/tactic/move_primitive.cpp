@@ -49,13 +49,13 @@ MovePrimitive::MovePrimitive(
 
 std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
 MovePrimitive::generatePrimitiveProtoMessage(
-    const WorldPtr &world_ptr,
+    const World &world,
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
     // Generate obstacle avoiding trajectory
-    updateObstacles(world_ptr, motion_constraints, robot_trajectories, obstacle_factory);
+    updateObstacles(world, motion_constraints, robot_trajectories, obstacle_factory);
 
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         max_allowed_speed_mode, robot.robotConstants());
@@ -65,7 +65,7 @@ MovePrimitive::generatePrimitiveProtoMessage(
 
     // TODO (#3104): The fieldBounary should be shrunk by the robot radius before being
     //  passed to the planner.
-    Rectangle navigable_area = world_ptr->field().fieldBoundary();
+    Rectangle navigable_area = world.field().fieldBoundary();
 
     // If the robot is in a static obstacle, then we should first move to the nearest
     // point out
@@ -176,18 +176,18 @@ MovePrimitive::generatePrimitiveProtoMessage(
 }
 
 void MovePrimitive::updateObstacles(
-    const WorldPtr &world_ptr,
+    const World &world,
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
     const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
     // Separately store the non-robot + non-ball obstacles
     field_obstacles = obstacle_factory.createObstaclesFromMotionConstraints(
-        motion_constraints, world_ptr);
+        motion_constraints, world);
 
     obstacles = field_obstacles;
 
-    for (const Robot &enemy : world_ptr->enemyTeam().getAllRobots())
+    for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {
         if (obstacle_avoidance_mode == TbotsProto::SAFE)
         {
@@ -207,7 +207,7 @@ void MovePrimitive::updateObstacles(
         }
     }
 
-    for (const Robot &friendly : world_ptr->friendlyTeam().getAllRobots())
+    for (const Robot &friendly : world.friendlyTeam().getAllRobots())
     {
         if (friendly.id() != robot.id())
         {
@@ -229,7 +229,7 @@ void MovePrimitive::updateObstacles(
     if (ball_collision_type == TbotsProto::AVOID)
     {
         obstacles.push_back(
-            obstacle_factory.createFromBallPosition(world_ptr->ball().position()));
+            obstacle_factory.createFromBallPosition(world.ball().position()));
     }
 }
 

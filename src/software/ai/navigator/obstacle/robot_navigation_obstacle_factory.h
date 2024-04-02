@@ -34,7 +34,7 @@ class RobotNavigationObstacleFactory
      */
     std::vector<ObstaclePtr> createObstaclesFromMotionConstraints(
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const WorldPtr &world_ptr) const;
+        const World &world) const;
 
     /**
      * Create static obstacles for the given motion constraint
@@ -46,7 +46,7 @@ class RobotNavigationObstacleFactory
      */
     std::vector<ObstaclePtr> createObstaclesFromMotionConstraint(
         const TbotsProto::MotionConstraint &motion_constraint,
-        const WorldPtr &world_ptr) const;
+        const World &world) const;
 
     /**
      * Create circle obstacle around robot with additional radius scaling
