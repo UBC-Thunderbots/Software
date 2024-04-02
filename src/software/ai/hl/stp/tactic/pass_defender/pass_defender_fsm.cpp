@@ -48,7 +48,7 @@ void PassDefenderFSM::blockPass(const Update& event)
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, position_to_block_from, face_ball_orientation,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::OFF,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
