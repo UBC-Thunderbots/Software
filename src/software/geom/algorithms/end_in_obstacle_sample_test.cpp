@@ -7,6 +7,7 @@
 
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/test_util/test_util.h"
 
 static constexpr double MAX_ALLOWABLE_SAMPLE_ERROR = 0.15;
@@ -52,8 +53,8 @@ TEST_F(EndInObstacleSampleTest, test_end_outside_field_boundary)
     std::vector<ObstaclePtr> obstacles;
 
     std::vector<ObstaclePtr> field_boundary =
-        obstacle_factory.createStaticObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE, field);
+        obstacle_factory.createObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE, *world);
     obstacles.insert(obstacles.end(), field_boundary.begin(), field_boundary.end());
 
     Point destination(4.9, 2);
@@ -74,8 +75,8 @@ TEST_F(EndInObstacleSampleTest, test_end_in_defense_area)
     std::vector<ObstaclePtr> obstacles;
 
     std::vector<ObstaclePtr> friendly_defense_area =
-        obstacle_factory.createStaticObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, field);
+        obstacle_factory.createObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, *world);
     obstacles.insert(obstacles.end(), friendly_defense_area.begin(),
                      friendly_defense_area.end());
 
@@ -134,13 +135,13 @@ TEST_F(EndInObstacleSampleTest, test_sampling_performance)
     std::vector<ObstaclePtr> obstacles;
 
     std::vector<ObstaclePtr> field_boundary =
-        obstacle_factory.createStaticObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE, field);
+        obstacle_factory.createObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE, *world);
     obstacles.insert(obstacles.end(), field_boundary.begin(), field_boundary.end());
 
     std::vector<ObstaclePtr> friendly_defense_area =
-        obstacle_factory.createStaticObstaclesFromMotionConstraint(
-            TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, field);
+        obstacle_factory.createObstaclesFromMotionConstraint(
+            TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA, *world);
     obstacles.insert(obstacles.end(), friendly_defense_area.begin(),
                      friendly_defense_area.end());
 

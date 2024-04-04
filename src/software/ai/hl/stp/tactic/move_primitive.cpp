@@ -3,10 +3,12 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
+#include "software/geom/algorithms/end_in_obstacle_sample.h"
 
 MovePrimitive::MovePrimitive(
     const Robot &robot, const Point &destination, const Angle &final_angle,
     const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
+    const TbotsProto::ObstacleAvoidanceMode &obstacle_avoidance_mode,
     const TbotsProto::DribblerMode &dribbler_mode,
     const TbotsProto::BallCollisionType &ball_collision_type,
     const AutoChipOrKick &auto_chip_or_kick, std::optional<double> cost_override)
@@ -16,7 +18,8 @@ MovePrimitive::MovePrimitive(
       dribbler_mode(dribbler_mode),
       auto_chip_or_kick(auto_chip_or_kick),
       ball_collision_type(ball_collision_type),
-      max_allowed_speed_mode(max_allowed_speed_mode)
+      max_allowed_speed_mode(max_allowed_speed_mode),
+      obstacle_avoidance_mode(obstacle_avoidance_mode)
 {
     if (cost_override.has_value())
     {
@@ -44,12 +47,14 @@ MovePrimitive::MovePrimitive(
     }
 }
 
-std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMessage(
+std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
+MovePrimitive::generatePrimitiveProtoMessage(
     const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
     // Generate obstacle avoiding trajectory
-    generateObstacles(world, motion_constraints, obstacle_factory);
+    updateObstacles(world, motion_constraints, robot_trajectories, obstacle_factory);
 
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         max_allowed_speed_mode, robot.robotConstants());
@@ -59,15 +64,57 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
 
     // TODO (#3104): The fieldBounary should be shrunk by the robot radius before being
     //  passed to the planner.
-    traj_path =
-        planner.findTrajectory(robot.position(), destination, robot.velocity(),
-                               constraints, obstacles, world.field().fieldBoundary());
+    Rectangle navigable_area = world.field().fieldBoundary();
+
+    // If the robot is in a static obstacle, then we should first move to the nearest
+    // point out
+    std::optional<Point> updated_start_position =
+        endInObstacleSample(field_obstacles, robot.position(), navigable_area);
+    if (updated_start_position.has_value() &&
+        updated_start_position.value() != robot.position())
+    {
+        destination = updated_start_position.value();
+    }
+    else
+    {
+        std::optional<Point> updated_destination =
+            endInObstacleSample(field_obstacles, destination, navigable_area);
+        if (updated_destination.has_value())
+        {
+            // Update the destination. Note that this may be the same as the original
+            // destination.
+            destination = updated_destination.value();
+        }
+        else
+        {
+            LOG(WARNING) << "Could not move the destination for robot " << robot.id()
+                         << " from " << destination
+                         << " to a point outside of the field obstacles.";
+        }
+    }
+
+    std::optional<Point> prev_sub_destination;
+    auto prev_trajectory_it = robot_trajectories.find(robot.id());
+    if (prev_trajectory_it != robot_trajectories.end())
+    {
+        const auto &prev_trajectory_path_nodes =
+            prev_trajectory_it->second.getTrajectoryPathNodes();
+        if (!prev_trajectory_path_nodes.empty())
+        {
+            prev_sub_destination =
+                prev_trajectory_path_nodes[0].getTrajectory()->getDestination();
+        }
+    }
+
+    traj_path = planner.findTrajectory(robot.position(), destination, robot.velocity(),
+                                       constraints, obstacles, navigable_area,
+                                       prev_sub_destination);
 
     if (!traj_path.has_value())
     {
         LOG(WARNING) << "Could not find trajectory path for robot " << robot.id()
                      << " to move to " << destination;
-        return createStopPrimitiveProto();
+        return std::make_pair(std::nullopt, std::move(createStopPrimitiveProto()));
     }
 
     estimated_cost = traj_path->getTotalTime();
@@ -124,27 +171,56 @@ std::unique_ptr<TbotsProto::Primitive> MovePrimitive::generatePrimitiveProtoMess
                 static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
     }
 
-    return primitive_proto;
+    return std::make_pair(traj_path, std::move(primitive_proto));
 }
 
-void MovePrimitive::generateObstacles(
+void MovePrimitive::updateObstacles(
     const World &world, const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+    const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
-    obstacles =
+    // Separately store the non-robot + non-ball obstacles
+    field_obstacles =
         obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
+
+    obstacles = field_obstacles;
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {
-        obstacles.push_back(obstacle_factory.createFromRobotPosition(enemy.position()));
+        if (obstacle_avoidance_mode == TbotsProto::SAFE)
+        {
+            // Generate a possibly long stadium shape obstacle in the region
+            // where the enemy robot may move in
+            obstacles.push_back(obstacle_factory.createStadiumEnemyRobotObstacle(enemy));
+        }
+        else if (obstacle_avoidance_mode == TbotsProto::AGGRESSIVE)
+        {
+            // Generate a moving obstacle depending on the enemy robot's velocity.
+            // This is considered a more aggressive strategy as it assumes the enemy
+            // robot is moving at a constant speed. The generated obstacle can also be
+            // much smaller than the stadium shape obstacle, allowing the robot to move
+            // more freely.
+            obstacles.push_back(
+                obstacle_factory.createConstVelocityEnemyRobotObstacle(enemy));
+        }
     }
 
     for (const Robot &friendly : world.friendlyTeam().getAllRobots())
     {
         if (friendly.id() != robot.id())
         {
-            obstacles.push_back(
-                obstacle_factory.createFromRobotPosition(friendly.position()));
+            auto traj_iter = robot_trajectories.find(friendly.id());
+            if (traj_iter != robot_trajectories.end())
+            {
+                obstacles.push_back(
+                    obstacle_factory.createFromMovingRobot(friendly, traj_iter->second));
+            }
+            else
+            {
+                obstacles.push_back(
+                    obstacle_factory.createStaticObstacleFromRobotPosition(
+                        friendly.position()));
+            }
         }
     }
 
