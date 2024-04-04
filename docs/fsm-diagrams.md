@@ -75,6 +75,19 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [EnemyFreeKickPlayFSM](/src/software/ai/hl/stp/play/enemy_free_kick/enemy_free_kick_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> BlockFreeKicker
+BlockFreeKicker --> BlockFreeKicker : <i>setupEnemyKickerStrategy</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
 ## [OffensePlayFSM](/src/software/ai/hl/stp/play/offense/offense_play_fsm.h)
 
 ```mermaid
