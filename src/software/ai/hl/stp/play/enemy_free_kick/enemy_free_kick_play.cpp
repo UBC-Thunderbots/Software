@@ -10,8 +10,7 @@
 #include "software/world/game_state.h"
 
 EnemyFreeKickPlay::EnemyFreeKickPlay(TbotsProto::AiConfig config)
-        : Play(config, true),
-        fsm{EnemyFreeKickPlayFSM{config}}, control_params{}
+    : Play(config, true), fsm{EnemyFreeKickPlayFSM{config}}, control_params{}
 {
 }
 
@@ -27,7 +26,7 @@ void EnemyFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 void EnemyFreeKickPlay::updateControlParams(
-        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
 }
@@ -38,4 +37,5 @@ void EnemyFreeKickPlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreeKickPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, EnemyFreeKickPlay, TbotsProto::AiConfig>
+    factory;
