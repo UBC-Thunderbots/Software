@@ -22,6 +22,7 @@ from software.thunderscope.gl.layers import (
     gl_passing_layer,
     gl_sandbox_world_layer,
     gl_world_layer,
+    gl_debug_shapes_layer,
     gl_simulator_layer,
     gl_tactic_layer,
     gl_cost_vis_layer,
@@ -99,6 +100,9 @@ def setup_gl_widget(
     obstacle_layer = gl_obstacle_layer.GLObstacleLayer(
         "Obstacles", visualization_buffer_size
     )
+    debug_shapes_layer = gl_debug_shapes_layer.GLDebugShapesLayer(
+        "Debug Shapes", visualization_buffer_size
+    )
     passing_layer = gl_passing_layer.GLPassingLayer(
         "Passing", visualization_buffer_size
     )
@@ -135,6 +139,7 @@ def setup_gl_widget(
     gl_widget.add_layer(tactic_layer, False)
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
+    gl_widget.add_layer(debug_shapes_layer, False)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
     simulation_control_toolbar.pause_button.clicked.connect(
@@ -175,6 +180,7 @@ def setup_gl_widget(
         (SimulationState, simulation_control_toolbar.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (World, trail_layer.world_buffer),
+        (DebugShapesMap, debug_shapes_layer.debug_shape_map_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 

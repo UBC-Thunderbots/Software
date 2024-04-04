@@ -1,17 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-# TODO: This is giving bazel sync error, comment out for now
-    #cc_library(
-    #    name = "proto_radio_client",
-    #    hdrs = [
-    #        "proto_radio_client.hpp",
-    #    ],
-    #    deps = [
-    #        "//software/logger",
-    #        "//software/util/typename",
-    #    ],
-    #)
-
 cc_library(
     name = "proto_radio_listener",
     hdrs = [
