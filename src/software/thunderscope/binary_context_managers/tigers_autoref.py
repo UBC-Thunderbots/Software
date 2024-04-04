@@ -122,7 +122,7 @@ class TigersAutoref(TimeProvider):
         ci_input.detection.append(ssl_wrapper.detection)
 
         field = tbots_cpp.Field.createSSLDivisionBField()
-        ci_input.geometry.CopyFrom(tbots_cpp.createGeometryData(field, 0.3))
+        ci_input.geometry.CopyFrom(tbots_cpp.createGeometryDataProto(field, 0.3))
 
         self.ci_socket.send(ci_input)
 

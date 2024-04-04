@@ -127,6 +127,36 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValueProto(
     const std::map<std::string, double>& values);
 
 /**
+ * Returns a TbotsProto::DebugShapesMap proto containing the name
+ * shape pairs.
+ *
+ * Could use LOG(VISUALIZE) to plot these values. Example:
+ *  LOG(VISUALIZE) << *createDebugShapesMapProto({
+ *      {"circle_name", *createShapeProto(circle_object)},
+ *      {"stadium_name", *createShapeProto(stadium_object)},
+ *      {"polygon_name", *createShapeProto(polygon_object)}
+ *  });
+ *
+ * @param named_shapes The map of name shape proto pairs to plot
+ *
+ * @return The unique_ptr to a TbotsProto::DebugShapesMap proto containing data with
+ *        specified names and shapes
+ */
+std::unique_ptr<TbotsProto::DebugShapesMap> createDebugShapesMapProto(
+    const std::map<std::string, TbotsProto::Shape>& named_shapes);
+
+/**
+ * Returns a TbotsProto::Shape proto given a shape.
+ *
+ * @param shape The shape to create a TbotsProto::Shape for
+ *
+ * @return The unique_ptr to a TbotsProto::Shape proto containing the shape
+ */
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Circle& circle);
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Polygon& polygon);
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium& stadium);
+
+/**
  * Returns a timestamp msg with the time that this function was called
  *
  * @return The unique_ptr to a TbotsProto::Timestamp with the current UTC time
