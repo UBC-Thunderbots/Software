@@ -73,6 +73,9 @@ static const double BALL_MASS_KG = 0.004593;
 static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
 // The max allowed speed of the robot before collisions would incur a foul
 static const double COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND = 0.5;
+// The minimum distance from the ball all robots must be when the stop command is issued
+// https://robocup-ssl.github.io/ssl-rules/sslrules.html#_stop
+static const double STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M = 0.5;
 // The maximum speed attainable by enemy robots
 static const double ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND = 3.0;
 // The maximum acceleration achievable by enemy robots, in metres per seconds squared.
@@ -169,8 +172,8 @@ static const double DISCONNECT_DURATION_MS = 1 * MILLISECONDS_PER_SECOND;
 static const char ARDUINO_VENDOR_ID[ARDUINO_ID_LENGTH]  = "2341";
 static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 
-// Number of times the control loop should tick per trajectory element
-static const unsigned CONTROL_LOOP_HZ = 60u;
+// Number of times thunderloop should tick per second
+static const unsigned THUNDERLOOP_HZ = 300u;
 
 static const unsigned NUM_GENEVA_ANGLES = 5;
 

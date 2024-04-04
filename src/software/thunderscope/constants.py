@@ -81,6 +81,10 @@ class EstopMode(IntEnum):
     PHYSICAL_ESTOP = 2
 
 
+# the maximum packet / world loss percent indicated by UI
+MAX_ACCEPTABLE_PACKET_LOSS_PERCENT = 30
+
+
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2
@@ -130,8 +134,6 @@ LOG_LEVEL_STR_MAP = {
     LogLevel.FATAL: "FATAL",
     LogLevel.CONTRACT: "CONTRACT",
 }
-
-GAME_CONTROLLER_URL = "http://localhost:8081"
 
 # Paths to check for estop when running diagnostics
 ESTOP_PATH_1 = "/dev/ttyACM0"
@@ -267,6 +269,7 @@ class Colors(object):
     DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 255)
     NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
     NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 80, 0, 100)
+    DEBUG_SHAPES_COLOR = QtGui.QColor(190, 50, 235, 255)
     PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
     BREAKBEAM_TRIPPED_COLOR = QtGui.QColor(255, 0, 0, 255)
 

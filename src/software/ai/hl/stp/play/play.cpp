@@ -2,10 +2,13 @@
 
 #include <munkres/munkres.h>
 
+#include <Tracy.hpp>
+
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
+
 
 Play::Play(TbotsProto::AiConfig ai_config, bool requires_goalie)
     : ai_config(ai_config),
@@ -90,12 +93,17 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     {
         num_tactics--;
     }
-    updateTactics(PlayUpdate(
-        world_ptr, num_tactics,
-        [&priority_tactics](PriorityTacticVector new_tactics) {
-            priority_tactics = std::move(new_tactics);
-        },
-        inter_play_communication, set_inter_play_communication_fun));
+
+    {
+        ZoneNamedN(_tracy_tactics, "Play: Get Tactics from Play", true);
+
+        updateTactics(PlayUpdate(
+            world_ptr, num_tactics,
+            [&priority_tactics](PriorityTacticVector new_tactics) {
+                priority_tactics = std::move(new_tactics);
+            },
+            inter_play_communication, set_inter_play_communication_fun));
+    }
 
     auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
 
@@ -123,9 +131,18 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             auto primitives = goalie_tactic->get(world_ptr);
             CHECK(primitives.contains(goalie_robot_id))
                 << "Couldn't find a primitive for robot id " << goalie_robot_id;
-            auto primitive_proto =
+            auto [traj_path, primitive_proto] =
                 primitives[goalie_robot_id]->generatePrimitiveProtoMessage(
-                    world_ptr, motion_constraints, obstacle_factory);
+                    *world_ptr, motion_constraints, robot_trajectories, obstacle_factory);
+
+            if (traj_path.has_value())
+            {
+                robot_trajectories.insert_or_assign(goalie_robot_id, traj_path.value());
+            }
+            else
+            {
+                robot_trajectories.erase(goalie_robot_id);
+            }
 
             primitives_to_run->mutable_robot_primitives()->insert(
                 {goalie_robot_id, *primitive_proto});
@@ -154,41 +171,46 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     //
     // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
     // algorithm that we use here
-    for (unsigned int i = 0; i < priority_tactics.size(); i++)
     {
-        auto tactic_vector = priority_tactics[i];
-        size_t num_tactics = tactic_vector.size();
+        ZoneNamedN(_tracy_tactic_assignment, "Play: Assign tactics to robots", true);
 
-        if (robots.size() < tactic_vector.size())
+        for (unsigned int i = 0; i < priority_tactics.size(); i++)
         {
-            // We do not have enough robots to assign all the tactics to. We "drop"
-            // (aka don't assign) the tactics at the end of the vector since they are
-            // considered lower priority
-            tactic_vector.resize(robots.size());
-        }
-        else if (i == (priority_tactics.size() - 1))
-        {
-            // If assigning the last tactic vector, then assign rest of robots with
-            // StopTactics
-            for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
+            auto tactic_vector = priority_tactics[i];
+            size_t num_tactics = tactic_vector.size();
+
+            if (robots.size() < tactic_vector.size())
             {
-                tactic_vector.push_back(stop_tactics[ii]);
+                // We do not have enough robots to assign all the tactics to. We "drop"
+                // (aka don't assign) the tactics at the end of the vector since they are
+                // considered lower priority
+                tactic_vector.resize(robots.size());
             }
+            else if (i == (priority_tactics.size() - 1))
+            {
+                // If assigning the last tactic vector, then assign rest of robots with
+                // StopTactics
+                for (unsigned int ii = 0; ii < (robots.size() - num_tactics); ii++)
+                {
+                    tactic_vector.push_back(stop_tactics[ii]);
+                }
+            }
+
+            auto [remaining_robots, new_primitives_to_assign,
+                  current_tactic_robot_id_assignment] =
+                assignTactics(world_ptr, tactic_vector, robots);
+
+            tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
+
+            for (auto &[robot_id, primitive] :
+                 new_primitives_to_assign->robot_primitives())
+            {
+                primitives_to_run->mutable_robot_primitives()->insert(
+                    google::protobuf::MapPair(robot_id, primitive));
+            }
+
+            robots = remaining_robots;
         }
-
-        auto [remaining_robots, new_primitives_to_assign,
-              current_tactic_robot_id_assignment] =
-            assignTactics(world_ptr, tactic_vector, robots);
-
-        tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
-
-        for (auto &[robot_id, primitive] : new_primitives_to_assign->robot_primitives())
-        {
-            primitives_to_run->mutable_robot_primitives()->insert(
-                google::protobuf::MapPair(robot_id, primitive));
-        }
-
-        robots = remaining_robots;
     }
 
     // TODO (#3104): Remove duplicated obstacles from obstacle_list
@@ -346,9 +368,20 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
 
                 // Only generate primitive proto message for the final primitive to robot
                 // assignment
-                auto primitive_proto =
+                auto [traj_path, primitive_proto] =
                     primitives[robot_id]->generatePrimitiveProtoMessage(
-                        world_ptr, motion_constraints, obstacle_factory);
+                        *world_ptr, motion_constraints, robot_trajectories,
+                        obstacle_factory);
+
+                if (traj_path.has_value())
+                {
+                    robot_trajectories.insert_or_assign(robot_id, traj_path.value());
+                }
+                else
+                {
+                    robot_trajectories.erase(robot_id);
+                }
+
                 primitives_to_run->mutable_robot_primitives()->insert(
                     {robot_id, *primitive_proto});
                 remaining_robots.erase(

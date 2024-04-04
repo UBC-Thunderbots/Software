@@ -83,15 +83,15 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
         move_tactics.at(0)->updateControlParams(
             ball_defense_point_center,
             (world_ptr->ball().position() - ball_defense_point_center).orientation(), 0,
-            stop_mode);
+            stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
         move_tactics.at(1)->updateControlParams(
             ball_defense_point_left,
             (world_ptr->ball().position() - ball_defense_point_left).orientation(), 0,
-            stop_mode);
+            stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
         move_tactics.at(2)->updateControlParams(
             ball_defense_point_right,
             (world_ptr->ball().position() - ball_defense_point_right).orientation(), 0,
-            stop_mode);
+            stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),

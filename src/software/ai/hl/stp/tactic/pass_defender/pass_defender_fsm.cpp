@@ -47,7 +47,8 @@ void PassDefenderFSM::blockPass(const Update& event)
     // on the field that blocks a passing lane between two enemy robots
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, position_to_block_from, face_ball_orientation,
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::DribblerMode::OFF,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
@@ -76,6 +77,7 @@ void PassDefenderFSM::interceptBall(const Update& event)
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, intercept_position, face_ball_orientation,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
     }

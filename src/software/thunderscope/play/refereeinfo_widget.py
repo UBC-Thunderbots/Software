@@ -18,7 +18,7 @@ class RefereeInfoWidget(QWidget):
     HEADER_SIZE_HINT_WIDTH_EXPANSION = 12
     ITEM_SIZE_HINT_WIDTH_EXPANSION = 11
 
-    def __init__(self, buffer_size: int = 5) -> None:
+    def __init__(self, buffer_size: int = 1) -> None:
         """Shows the referee information 
 
         :param buffer_size: The buffer size, set higher for smoother plots.
@@ -42,7 +42,12 @@ class RefereeInfoWidget(QWidget):
     def refresh(self) -> None:
         """Update the referee info widget with new referee information
         """
-        referee = self.referee_buffer.get(block=False)
+        referee = self.referee_buffer.get(block=False, return_cached=False)
+
+        # Updating QTableWidget could be expensive, so we only update if there is new data
+        if referee is None:
+            return
+
         referee_msg_dict = MessageToDict(referee)
 
         if not referee_msg_dict:
