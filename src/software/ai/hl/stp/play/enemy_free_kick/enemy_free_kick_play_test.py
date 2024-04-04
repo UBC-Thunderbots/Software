@@ -91,7 +91,7 @@ def test_enemy_free_kick_play(simulated_test_runner, blue_bots, yellow_bots, bal
 
         # Force play override here
         blue_play = Play()
-        blue_play.name = PlayName.EnemyFreekickPlay
+        blue_play.name = PlayName.EnemyFreeKickPlay
 
         yellow_play = Play()
         yellow_play.name = PlayName.FreeKickPlay

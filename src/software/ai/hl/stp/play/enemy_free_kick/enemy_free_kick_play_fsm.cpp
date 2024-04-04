@@ -4,7 +4,6 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
-#include "software/world/game_state.h"
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
@@ -13,7 +12,6 @@
 
 EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(TbotsProto::AiConfig ai_config)
 : ai_config(ai_config),
-  enemy_free_kick_defenders({}),
   crease_defenders({}),
   pass_defenders({})
 {
@@ -21,15 +19,12 @@ EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(TbotsProto::AiConfig ai_config)
 
 void EnemyFreeKickPlayFSM::setupEnemyKickerStrategy(const Update& event)
 {
-    unsigned int num_shadow_robots = 1;
-    setTactics(event,
-               num_shadow_robots,
-               event.common.num_tactics - num_shadow_robots);
+    setTactics(event, event.common.num_tactics);
 }
 
-void EnemyFreeKickPlayFSM::setTactics(const Update& event, int num_shadow_robots,
-                                              unsigned int num_defenders)
+void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tactics)
 {
+    unsigned int num_defenders = num_tactics - 1;
     PriorityTacticVector tactics_to_return = {{}, {}, {}};
     Point block_kick_point;
 
@@ -64,21 +59,14 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, int num_shadow_robots
         return;
     }
 
-    if (num_shadow_robots > 0 && !enemy_threats.empty())
+    if (!enemy_threats.empty())
     {
-        enemy_free_kick_defenders = std::vector<std::shared_ptr<PassDefenderTactic>>(num_shadow_robots);
-        std::generate(enemy_free_kick_defenders.begin(), enemy_free_kick_defenders.end(),
-                      [&block_kick_point, &event, &enemy_threats]() {
-                          auto block_free_kicker = std::make_shared<PassDefenderTactic>();
-                          Vector block_direction = Vector::createFromAngle(enemy_threats[0].robot.orientation());
-                          block_kick_point = event.common.world_ptr->ball().position()
-                                  + block_direction.normalize(0.6 + 2 * ROBOT_MAX_RADIUS_METERS);
-                          block_free_kicker->updateControlParams(block_kick_point);
-                          return block_free_kicker;
-                      });
-        tactics_to_return[0].insert(tactics_to_return[0].end(),
-                                    enemy_free_kick_defenders.begin(),
-                                    enemy_free_kick_defenders.end());
+        auto block_free_kicker = std::make_shared<PassDefenderTactic>();
+        Vector block_direction = Vector::createFromAngle(enemy_threats[0].robot.orientation());
+        block_kick_point = event.common.world_ptr->ball().position()
+                           + block_direction.normalize(0.6 + 2 * ROBOT_MAX_RADIUS_METERS);
+        block_free_kicker->updateControlParams(block_kick_point);
+        tactics_to_return[0].push_back(block_free_kicker);
     }
 
     // Choose which defender assignments to assign defenders to based on number

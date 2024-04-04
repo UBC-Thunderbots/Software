@@ -9,14 +9,14 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyFreekickPlay::EnemyFreekickPlay(TbotsProto::AiConfig config)
+EnemyFreeKickPlay::EnemyFreeKickPlay(TbotsProto::AiConfig config)
         : Play(config, true),
         fsm{EnemyFreeKickPlayFSM{config}}, control_params{}
 {
 }
 
-void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                 const WorldPtr &world_ptr)
+void EnemyFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                       const WorldPtr &world_ptr)
 {
     // This function doesn't get called, it should be removed once coroutines
     // are phased out
@@ -26,16 +26,16 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-void EnemyFreekickPlay::updateControlParams(
+void EnemyFreeKickPlay::updateControlParams(
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
 }
 
-void EnemyFreekickPlay::updateTactics(const PlayUpdate &play_update)
+void EnemyFreeKickPlay::updateTactics(const PlayUpdate &play_update)
 {
     fsm.process_event(EnemyFreeKickPlayFSM::Update(control_params, play_update));
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreekickPlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, EnemyFreeKickPlay, TbotsProto::AiConfig> factory;

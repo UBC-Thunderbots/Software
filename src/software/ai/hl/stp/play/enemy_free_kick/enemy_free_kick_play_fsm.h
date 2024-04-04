@@ -39,10 +39,9 @@ struct EnemyFreeKickPlayFSM {
      * specified number of attackers and defenders to setup
      *
      * @param event the FSM event
-     * @param num_shadow_robots the number of shadowing robots (ShootOrPassPlay)
-     * @param num_defenders the number of defenders (DefensePlay)
+     * @param num_tactics the number of tactics available to assign
      */
-    void setTactics(const Update &event, int num_shadow_robots, unsigned int num_defenders);
+    void setTactics(const Update &event, unsigned int num_tactics);
 
     /**
      * Helper function to set up crease defender tactic vector members
@@ -75,8 +74,6 @@ struct EnemyFreeKickPlayFSM {
 
 private:
     TbotsProto::AiConfig ai_config;
-//    std::shared_ptr<DefensePlay> defense_play;
-    std::vector<std::shared_ptr<PassDefenderTactic>> enemy_free_kick_defenders;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
     std::vector<std::shared_ptr<PassDefenderTactic>> pass_defenders;
 };

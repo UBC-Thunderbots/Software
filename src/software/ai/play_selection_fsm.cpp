@@ -79,7 +79,7 @@ void PlaySelectionFSM::setupSetPlay(const Update& event)
 
     if (event.game_state.isTheirDirectFree() || event.game_state.isTheirIndirectFree())
     {
-        event.set_current_play(std::make_unique<EnemyFreekickPlay>(ai_config));
+        event.set_current_play(std::make_unique<EnemyFreeKickPlay>(ai_config));
     }
 }
 

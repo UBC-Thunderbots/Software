@@ -7,11 +7,11 @@
 /**
  * Play for defending against enemy free kicks
  */
-class EnemyFreekickPlay : public Play
+class EnemyFreeKickPlay : public Play
 {
 
 public:
-    EnemyFreekickPlay(TbotsProto::AiConfig config);
+    EnemyFreeKickPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;
