@@ -41,7 +41,8 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
 
         offensive_positioning_tactics[i]->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
     }
 }
 
