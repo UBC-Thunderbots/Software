@@ -54,3 +54,18 @@ message ObstacleList
 {
     repeated Obstacle obstacles = 1;
 }
+
+message Shape
+{
+    oneof shape
+    {
+        Polygon polygon = 1;
+        Circle circle   = 2;
+        Stadium stadium = 3;
+    }
+}
+
+message DebugShapesMap
+{
+    map<string, Shape> named_shapes = 1;
+}

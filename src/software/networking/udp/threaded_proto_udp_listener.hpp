@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/networking/proto_udp_listener.hpp"
+#include "software/networking/udp/proto_udp_listener.hpp"
 
 /**
  * A threaded listener that receives serialized ReceiveProtoT Proto's over the network
