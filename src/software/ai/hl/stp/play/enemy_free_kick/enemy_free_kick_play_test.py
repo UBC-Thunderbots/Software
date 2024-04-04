@@ -6,7 +6,10 @@ import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.friendly_team_scored import *
 from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion, RobotNeverEntersRegion
+from software.simulated_tests.robot_enters_region import (
+    RobotEventuallyEntersRegion,
+    RobotNeverEntersRegion,
+)
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
@@ -29,52 +32,66 @@ from proto.ssl_gc_common_pb2 import Team
                 tbots_cpp.Point(1, 2.5),
                 tbots_cpp.Point(1, -2.5),
                 tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-                tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-                tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+                tbots_cpp.Field.createSSLDivisionBField()
+                .enemyDefenseArea()
+                .negXNegYCorner(),
+                tbots_cpp.Field.createSSLDivisionBField()
+                .enemyDefenseArea()
+                .negXPosYCorner(),
             ],
-            tbots_cpp.Point(0, 0)
+            tbots_cpp.Point(0, 0),
         ),
         (
-                [
-                    tbots_cpp.Point(-2.75, 2.5),
-                    tbots_cpp.Point(-2.75, 1.5),
-                    tbots_cpp.Point(-2.75, 0.5),
-                    tbots_cpp.Point(-2.75, -0.5),
-                    tbots_cpp.Point(-2.75, -1.5),
-                    tbots_cpp.Point(-2.75, -3.0),
-                ],
-                [
-                    tbots_cpp.Point(-1.8, 2),
-                    tbots_cpp.Point(0, 2.5),
-                    tbots_cpp.Point(-2, 0),
-                    tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-                    tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-                    tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
-                ],
-                tbots_cpp.Point(-2, 2)
+            [
+                tbots_cpp.Point(-2.75, 2.5),
+                tbots_cpp.Point(-2.75, 1.5),
+                tbots_cpp.Point(-2.75, 0.5),
+                tbots_cpp.Point(-2.75, -0.5),
+                tbots_cpp.Point(-2.75, -1.5),
+                tbots_cpp.Point(-2.75, -3.0),
+            ],
+            [
+                tbots_cpp.Point(-1.8, 2),
+                tbots_cpp.Point(0, 2.5),
+                tbots_cpp.Point(-2, 0),
+                tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+                tbots_cpp.Field.createSSLDivisionBField()
+                .enemyDefenseArea()
+                .negXNegYCorner(),
+                tbots_cpp.Field.createSSLDivisionBField()
+                .enemyDefenseArea()
+                .negXPosYCorner(),
+            ],
+            tbots_cpp.Point(-2, 2),
         ),
         (
-                [
-                    tbots_cpp.Point(-2.75, 2.5),
-                    tbots_cpp.Point(-2.75, 1.5),
-                    tbots_cpp.Point(-2.75, 0.5),
-                    tbots_cpp.Point(-2.75, -0.5),
-                    tbots_cpp.Point(-2.75, -1.5),
-                    tbots_cpp.Point(-2.75, -3.0),
-                ],
-                [
-                    tbots_cpp.Point(1.8, -2),
-                    tbots_cpp.Point(0, -2.5),
-                    tbots_cpp.Point(2, 0),
-                    tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-                    tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-                    tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
-                ],
-                tbots_cpp.Point(2, -2)
+            [
+                tbots_cpp.Point(-2.75, 2.5),
+                tbots_cpp.Point(-2.75, 1.5),
+                tbots_cpp.Point(-2.75, 0.5),
+                tbots_cpp.Point(-2.75, -0.5),
+                tbots_cpp.Point(-2.75, -1.5),
+                tbots_cpp.Point(-2.75, -3.0),
+            ],
+            [
+                tbots_cpp.Point(1.8, -2),
+                tbots_cpp.Point(0, -2.5),
+                tbots_cpp.Point(2, 0),
+                tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
+                tbots_cpp.Field.createSSLDivisionBField()
+                .enemyDefenseArea()
+                .negXNegYCorner(),
+                tbots_cpp.Field.createSSLDivisionBField()
+                .enemyDefenseArea()
+                .negXPosYCorner(),
+            ],
+            tbots_cpp.Point(2, -2),
         ),
-    ]
+    ],
 )
-def test_enemy_free_kick_play(simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos):
+def test_enemy_free_kick_play(
+    simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos
+):
     # starting point must be Point
     # placement point must be Vector2 to work with game controller
 
@@ -97,7 +114,9 @@ def test_enemy_free_kick_play(simulated_test_runner, blue_bots, yellow_bots, bal
         yellow_play.name = PlayName.FreeKickPlay
 
         simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
 
         # Create world state
         simulated_test_runner.simulator_proto_unix_io.send_proto(
@@ -111,23 +130,13 @@ def test_enemy_free_kick_play(simulated_test_runner, blue_bots, yellow_bots, bal
         )
 
     # Always Validation
-    # TODO- #2779 Validation
     always_validation_sequence_set = [
-        [
-            RobotNeverEntersRegion(
-                regions=[tbots_cpp.Circle(ball_initial_pos, 0.5)]
-            ),
-        ]
+        [RobotNeverEntersRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 0.5)]),]
     ]
 
     # Eventually Validation
-    # TODO- #2779 Validation
     eventually_validation_sequence_set = [
-        [
-            RobotEventuallyEntersRegion(
-                regions=[tbots_cpp.Circle(ball_initial_pos, 1)]
-            ),
-        ]
+        [RobotEventuallyEntersRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 1)]),]
     ]
 
     simulated_test_runner.run_test(

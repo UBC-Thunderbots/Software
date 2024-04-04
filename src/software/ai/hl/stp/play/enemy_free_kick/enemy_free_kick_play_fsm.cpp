@@ -2,18 +2,16 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/util/generic_factory/generic_factory.h"
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 #include "software/geom/algorithms/distance.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(TbotsProto::AiConfig ai_config)
-: ai_config(ai_config),
-  crease_defenders({}),
-  pass_defenders({})
+    : ai_config(ai_config), crease_defenders({}), pass_defenders({})
 {
 }
 
@@ -24,47 +22,32 @@ void EnemyFreeKickPlayFSM::setupEnemyKickerStrategy(const Update& event)
 
 void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tactics)
 {
-    unsigned int num_defenders = num_tactics - 1;
+    // One tactic is always designated as the free kick defender
+    unsigned int num_defenders             = num_tactics - 1;
     PriorityTacticVector tactics_to_return = {{}, {}, {}};
     Point block_kick_point;
 
-    /**
-     * Stopgap redesign of DefensePlayFSM to suit the case of EnemyFreeKickPlayFSM.
-     * This MUST be refactored along with DefensePlayFSM in a new PR
-     *
-     * Otherwise same behaviour as DefensePlayFSM, but:
-     * 1) Standard 0.5m obstacle radius around ball per Free Kick rules,
-     *      this implementation uses 0.6m to better avoid violation area
-     * 2) Only 1 pass defender allowed to guard enemy kicker (Main Pass Defender)
-     * 3) Skips additional pass defenders X meters around previously stated free kick pass defender,
-     *      this is set to a radius of 3m of the Main Pass Defender.
-     *
-     * NOTE: First pass defender is NOT SKIPPED, as I have elected to instead just skip over all redundant
-     *          pass defenders X meters around the main pass defender
-     *
-     * KNOWN BUGS:
-     * - If the Main Pass Defender switches roles, it may cut through the foul region,
-     *      this will be most likely fixed in the new trajectory planner PR
-     */
     auto enemy_threats = getAllEnemyThreats(
-            event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
-            event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false);
+        event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
+        event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball(), false);
 
     auto assignments = getAllDefenderAssignments(
-            enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
-            ai_config.defense_play_config().defender_assignment_config());
+        enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
+        ai_config.defense_play_config().defender_assignment_config());
 
     if (assignments.size() == 0)
     {
         return;
     }
 
+    // Adds designated free kick defender to block the direction the kicker is facing
     if (!enemy_threats.empty())
     {
         auto block_free_kicker = std::make_shared<PassDefenderTactic>();
-        Vector block_direction = Vector::createFromAngle(enemy_threats[0].robot.orientation());
-        block_kick_point = event.common.world_ptr->ball().position()
-                           + block_direction.normalize(0.6 + 2 * ROBOT_MAX_RADIUS_METERS);
+        Vector block_direction =
+            Vector::createFromAngle(enemy_threats[0].robot.orientation());
+        block_kick_point = event.common.world_ptr->ball().position() +
+                           block_direction.normalize(0.6 + 2 * ROBOT_MAX_RADIUS_METERS);
         block_free_kicker->updateControlParams(block_kick_point);
         tactics_to_return[0].push_back(block_free_kicker);
     }
@@ -79,20 +62,20 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
         DefenderAssignment defender_assignment;
         if (i < assignments.size())
         {
-            defender_assignment = assignments.at(i+assigns_skipped);
+            defender_assignment = assignments.at(i + assigns_skipped);
             defender_assignment = assignments.at(i);
 
-            while (defender_assignment.type == PASS_DEFENDER
-            && distance(defender_assignment.target, block_kick_point) <= 0.5)
+            while (defender_assignment.type == PASS_DEFENDER &&
+                   distance(defender_assignment.target, block_kick_point) <= 0.5)
             {
-                if (i+assigns_skipped+1 >= assignments.size()) {
+                if (i + assigns_skipped + 1 >= assignments.size())
+                {
                     defender_assignment = assignments.front();
                     break;
                 }
                 assigns_skipped++;
-                defender_assignment = assignments.at(i+assigns_skipped);
+                defender_assignment = assignments.at(i + assigns_skipped);
             }
-
         }
         else
         {
@@ -132,8 +115,8 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
 
         // Determine the number of crease defenders already assigned to the target
         auto defenders_with_target_count = std::count_if(
-                crease_defender_assignments.begin(), crease_defender_assignments.begin() + i,
-                [&target](const auto& assignment) { return assignment.target == target; });
+            crease_defender_assignments.begin(), crease_defender_assignments.begin() + i,
+            [&target](const auto& assignment) { return assignment.target == target; });
 
         // Pick alignment based on how many crease defenders are already assigned to the
         // target
@@ -162,7 +145,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
         }
 
         crease_defenders.at(i)->updateControlParams(
-                target, alignment, event.control_params.max_allowed_speed_mode);
+            target, alignment, event.control_params.max_allowed_speed_mode);
     }
 
     for (unsigned int i = 0; i < pass_defenders.size(); i++)
@@ -176,7 +159,6 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     tactics_to_return[2].insert(tactics_to_return[2].end(), pass_defenders.begin(),
                                 pass_defenders.end());
     event.common.set_tactics(tactics_to_return);
-
 }
 
 void EnemyFreeKickPlayFSM::setUpCreaseDefenders(unsigned int num_crease_defenders)
@@ -187,10 +169,10 @@ void EnemyFreeKickPlayFSM::setUpCreaseDefenders(unsigned int num_crease_defender
     }
 
     crease_defenders =
-            std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_crease_defenders);
+        std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_crease_defenders);
     std::generate(crease_defenders.begin(), crease_defenders.end(), [this]() {
         return std::make_shared<CreaseDefenderTactic>(
-                ai_config.robot_navigation_obstacle_config());
+            ai_config.robot_navigation_obstacle_config());
     });
 }
 

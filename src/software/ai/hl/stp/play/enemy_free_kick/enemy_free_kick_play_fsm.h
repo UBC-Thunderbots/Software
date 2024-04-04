@@ -10,10 +10,12 @@
  * Play for defending against enemy free kicks
  */
 
-struct EnemyFreeKickPlayFSM {
+struct EnemyFreeKickPlayFSM
+{
     class BlockFreeKicker;
 
-    struct ControlParams {
+    struct ControlParams
+    {
         // The maximum allowed speed mode
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     };
@@ -57,7 +59,8 @@ struct EnemyFreeKickPlayFSM {
      */
     void setUpPassDefenders(unsigned int num_pass_defenders);
 
-    auto operator()() {
+    auto operator()()
+    {
         using namespace boost::sml;
 
         DEFINE_SML_STATE(BlockFreeKicker)
@@ -67,12 +70,13 @@ struct EnemyFreeKickPlayFSM {
         DEFINE_SML_ACTION(setupEnemyKickerStrategy)
 
         return make_transition_table(
-                // src_state + event [guard] / action = dest_state
-                *BlockFreeKicker_S + Update_E / setupEnemyKickerStrategy_A = BlockFreeKicker_S,
-                X + Update_E = X);
+            // src_state + event [guard] / action = dest_state
+            *BlockFreeKicker_S + Update_E / setupEnemyKickerStrategy_A =
+                BlockFreeKicker_S,
+            X + Update_E = X);
     }
 
-private:
+   private:
     TbotsProto::AiConfig ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
     std::vector<std::shared_ptr<PassDefenderTactic>> pass_defenders;

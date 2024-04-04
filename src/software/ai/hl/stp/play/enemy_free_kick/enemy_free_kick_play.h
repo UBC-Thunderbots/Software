@@ -9,8 +9,7 @@
  */
 class EnemyFreeKickPlay : public Play
 {
-
-public:
+   public:
     EnemyFreeKickPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
@@ -23,9 +22,9 @@ public:
      * @param max_allowed_speed_mode the mode of maximum speed allowed
      */
     void updateControlParams(TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
-    TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                 TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-private:
+   private:
     FSM<EnemyFreeKickPlayFSM> fsm;
     EnemyFreeKickPlayFSM::ControlParams control_params;
 };
