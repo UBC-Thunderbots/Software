@@ -55,8 +55,19 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
             auto primitives = tactic->get(world_ptr);
             CHECK(primitives.contains(robot.id()))
                 << "Couldn't find a primitive for robot id " << robot.id();
-            auto primitive_proto = primitives[robot.id()]->generatePrimitiveProtoMessage(
-                *world_ptr, motion_constraints, obstacle_factory);
+            auto [traj_path, primitive_proto] =
+                primitives[robot.id()]->generatePrimitiveProtoMessage(
+                    *world_ptr, motion_constraints, robot_trajectories, obstacle_factory);
+
+            if (traj_path.has_value())
+            {
+                robot_trajectories.insert_or_assign(robot.id(), traj_path.value());
+            }
+            else
+            {
+                robot_trajectories.erase(robot.id());
+            }
+
             primitives_to_run->mutable_robot_primitives()->insert(
                 {robot.id(), *primitive_proto});
             tactic->setLastExecutionRobot(robot.id());

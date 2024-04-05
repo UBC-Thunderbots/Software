@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/test_util/test_util.h"
 
 class TrajectoryPlannerTest : public testing::Test
@@ -22,8 +23,8 @@ class TrajectoryPlannerTest : public testing::Test
 
         // Robot at origin
         Point robot_obstacle_position(0, 0);
-        robot_obstacle =
-            obstacle_factory.createFromRobotPosition(robot_obstacle_position);
+        robot_obstacle = obstacle_factory.createStaticObstacleFromRobotPosition(
+            robot_obstacle_position);
 
         friendly_defense_area_obstacle =
             obstacle_factory.createObstaclesFromMotionConstraints(
