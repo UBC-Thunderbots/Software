@@ -331,7 +331,7 @@ class RobotControlType(Enum):
     DRIBBLER_ENABLE_2 = 9
 
 
-# TODO: come up with less ambiguous/wierd name
+# TODO: come up with less ambiguous/weird name
 class HandheldDeviceConfigKeys(Enum):
     CODE = 1
     MAX_VALUE = 2
@@ -344,59 +344,55 @@ class HandheldDeviceConstants:
         # Canonical: Left joystick X-axis
         RobotControlType.MOVE_X: {
             HandheldDeviceConfigKeys.CODE: 0,
-            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0
+            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0,
         },
         # Name: "ABS_Y", Type: EV_ABS
         # AbsInfo: value=425, min=-32768, max=32767, fuzz=16, flat=128, resolution=0
         # Canonical: Left joystick Y-axis
         RobotControlType.MOVE_Y: {
             HandheldDeviceConfigKeys.CODE: 1,
-            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0
+            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0,
         },
         # Name: "ABS_RX", Type: EV_ABS
         # AbsInfo: value=-418, min=-32768, max=32767, fuzz=16, flat=128, resolution=0
         # Canonical: Right joystick X-axis
         RobotControlType.ROTATE: {
             HandheldDeviceConfigKeys.CODE: 3,
-            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0
+            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0,
         },
         # Name: "BTN_A", Type: EV_KEY
         # Canonical: "A" Button
-        RobotControlType.KICK: {
-            HandheldDeviceConfigKeys.CODE: 304,
-        },
+        RobotControlType.KICK: {HandheldDeviceConfigKeys.CODE: 304,},
         # Name: "BTN_Y", Type: EV_KEY
         # Canonical: "Y" Button
-        RobotControlType.CHIP: {
-            HandheldDeviceConfigKeys.CODE: 308,
-        },
+        RobotControlType.CHIP: {HandheldDeviceConfigKeys.CODE: 308,},
         # Name: "ABS_HAT0X", Type: EV_ABS
         # AbsInfo: value=0, min=-1, max=1, fuzz=0, flat=0, resolution=0
         # Canonical: D-pad X-axis
         RobotControlType.KICK_POWER: {
             HandheldDeviceConfigKeys.CODE: 16,
-            HandheldDeviceConfigKeys.MAX_VALUE: 1.0
+            HandheldDeviceConfigKeys.MAX_VALUE: 1.0,
         },
         # Name: "ABS_HAT0Y", Type: EV_ABS
         # AbsInfo: value=0, min=-1, max=1, fuzz=0, flat=0, resolution=0
         # Canonical: D-pad Y-axis
         RobotControlType.DRIBBLER_SPEED: {
             HandheldDeviceConfigKeys.CODE: 17,
-            HandheldDeviceConfigKeys.MAX_VALUE: 1.0
+            HandheldDeviceConfigKeys.MAX_VALUE: 1.0,
         },
         # Name: "ABS_Z", Type: EV_ABS
         # AbsInfo: value=0, min=0, max=1023, fuzz=0, flat=0, resolution=0
         # Canonical: Left trigger
         RobotControlType.DRIBBLER_ENABLE_1: {
             HandheldDeviceConfigKeys.CODE: 2,
-            HandheldDeviceConfigKeys.MAX_VALUE: 1023.0
+            HandheldDeviceConfigKeys.MAX_VALUE: 1023.0,
         },
         # Name: "ABS_RZ", Type: EV_ABS
         # AbsInfo: value=0, min=0, max=1023, fuzz=0, flat=0, resolution=0
         # Canonical: Right trigger
         RobotControlType.DRIBBLER_ENABLE_2: {
             HandheldDeviceConfigKeys.CODE: 5,
-            HandheldDeviceConfigKeys.MAX_VALUE: 1023.0
+            HandheldDeviceConfigKeys.MAX_VALUE: 1023.0,
         },
     }
 
@@ -404,7 +400,6 @@ class HandheldDeviceConstants:
         "Microsoft Xbox One X pad": XboxConfig,
         "Microsoft X-Box 360 pad": XboxConfig,
     }
-
 
     # TODO remove these two
     XBOX_MAX_RANGE = 32768.0
