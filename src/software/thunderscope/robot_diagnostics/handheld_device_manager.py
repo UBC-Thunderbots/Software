@@ -20,6 +20,8 @@ from software.thunderscope.robot_diagnostics.diagnostics_input_widget import Con
 #   This is fixed in version pyqt 6.6.1
 # `qt.qpa.input.events: scroll event from unregistered device 17`
 
+# TODO: function docs
+
 
 class HandheldDeviceManager(object):
     """
@@ -63,10 +65,9 @@ class HandheldDeviceManager(object):
     def refresh(self, mode: ControlMode):
         """
         Refresh this class.
-        Spawns a new process that listens and processes
-        handheld controller device events if Control.Mode is Diagnostics,
-        Otherwise, terminates the current listener process if it is running,
-        to avoid busy waiting
+        Spawns a new thread that runs the handheld device event
+        processing function if Control.Mode is Diagnostics,
+        otherwise, stops and joins the thread, if it is running
         :param mode: The current user requested mode for controlling the robot
         """
         if mode == ControlMode.DIAGNOSTICS:
@@ -84,7 +85,7 @@ class HandheldDeviceManager(object):
         primitive = DirectControlPrimitive(
             motor_control=self.motor_control, power_control=self.power_control
         )
-        # TODO: pre-emptive bugfix: need to reset controls, epecially power so that
+        # TODO: pre-emptive bugfix: need to reset controls, especially power so that
         #  the control message isn't set to what is essentially auto-kick/chip
         # self.motor_control = MotorControl()
         self.power_control = PowerControl()
@@ -93,7 +94,7 @@ class HandheldDeviceManager(object):
     def initialize_controller(self):
         """
         Attempt to initialize a controller.
-        The first controller that is recognized a valid controller will be used
+        The first controller that is recognized as a valid controller will be used
         """
         for device in list_devices():
             controller = InputDevice(device)
@@ -198,132 +199,118 @@ class HandheldDeviceManager(object):
 
     def __process_event(self, event: InputEvent):
 
-        # abs_event = categorize(event)
-        event_type = ecodes.bytype[event.type][event.code]
-
-        # if event.type == ecodes.EV_ABS or event.type == ecodes.EV_KEY:
         # TODO (#3165): Use trace level self.logger here
         self.logger.debug(
             "Processing controller event with type: "
-            + str(event_type)
+            + str(ecodes.bytype[event.type][event.code])
             + ", with code: "
             + str(event.code)
             + ", and with value: "
             + str(event.value)
         )
 
-        # TODO: need to check type
-
-        if (
-            event.code
-            == self.controller_config[RobotControlType.MOVE_X][
-                HandheldDeviceConfigKeys.CODE
-            ]
-        ):
-            self.logger.debug("type: " + str(event.type))
-            self.logger.debug("move x code: " + str(event.code))
-            self.logger.debug(
-                "config code: "
-                + str(
-                    self.controller_config[RobotControlType.MOVE_X][
-                        HandheldDeviceConfigKeys.CODE
-                    ]
+        if event.type == ecodes.EV_ABS:
+            if (
+                event.code
+                == self.controller_config[RobotControlType.MOVE_X][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+            ):
+                self.motor_control.direct_velocity_control.velocity.x_component_meters = self.__parse_move_event_value(
+                    event_value=event.value,
+                    max_value=self.controller_config[RobotControlType.MOVE_X][
+                        HandheldDeviceConfigKeys.MAX_VALUE
+                    ],
+                    scaling_factor=HandheldDeviceConstants.MAX_LINEAR_SPEED_METER_PER_S,
                 )
-            )
-            self.motor_control.direct_velocity_control.velocity.x_component_meters = self.__parse_move_event_value(
-                event_value=event.value,
-                max_value=self.controller_config[RobotControlType.MOVE_X][
-                    HandheldDeviceConfigKeys.MAX_VALUE
-                ],
-                scaling_factor=HandheldDeviceConstants.MAX_LINEAR_SPEED_METER_PER_S,
-            )
 
-        if (
-            event.code
-            == self.controller_config[RobotControlType.MOVE_Y][
-                HandheldDeviceConfigKeys.CODE
-            ]
-        ):
-            self.motor_control.direct_velocity_control.velocity.y_component_meters = self.__parse_move_event_value(
-                event_value=event.value,
-                max_value=self.controller_config[RobotControlType.MOVE_X][
-                    HandheldDeviceConfigKeys.MAX_VALUE
-                ],
-                scaling_factor=HandheldDeviceConstants.MAX_LINEAR_SPEED_METER_PER_S,
-            )
+            if (
+                event.code
+                == self.controller_config[RobotControlType.MOVE_Y][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+            ):
+                self.motor_control.direct_velocity_control.velocity.y_component_meters = self.__parse_move_event_value(
+                    event_value=event.value,
+                    max_value=self.controller_config[RobotControlType.MOVE_X][
+                        HandheldDeviceConfigKeys.MAX_VALUE
+                    ],
+                    scaling_factor=HandheldDeviceConstants.MAX_LINEAR_SPEED_METER_PER_S,
+                )
 
-        if (
-            event.code
-            == self.controller_config[RobotControlType.ROTATE][
-                HandheldDeviceConfigKeys.CODE
-            ]
-        ):
-            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.__parse_move_event_value(
-                event_value=event.value,
-                max_value=self.controller_config[RobotControlType.ROTATE][
-                    HandheldDeviceConfigKeys.MAX_VALUE
-                ],
-                scaling_factor=HandheldDeviceConstants.MAX_ANGULAR_SPEED_RAD_PER_S,
-            )
+            if (
+                event.code
+                == self.controller_config[RobotControlType.ROTATE][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+            ):
+                self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.__parse_move_event_value(
+                    event_value=event.value,
+                    max_value=self.controller_config[RobotControlType.ROTATE][
+                        HandheldDeviceConfigKeys.MAX_VALUE
+                    ],
+                    scaling_factor=HandheldDeviceConstants.MAX_ANGULAR_SPEED_RAD_PER_S,
+                )
 
-        if (
-            event.code
-            == self.controller_config[RobotControlType.KICK_POWER][
-                HandheldDeviceConfigKeys.CODE
-            ]
-        ):
-            self.kick_power_accumulator = self.__parse_kick_event_value(event.value)
+            if (
+                event.code
+                == self.controller_config[RobotControlType.KICK_POWER][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+            ):
+                self.kick_power_accumulator = self.__parse_kick_event_value(event.value)
 
-        if (
-            event.code
-            == self.controller_config[RobotControlType.DRIBBLER_SPEED][
-                HandheldDeviceConfigKeys.CODE
-            ]
-        ):
-            self.dribbler_speed_accumulator = self.__parse_dribble_event_value(
-                event.value
-            )
+            if (
+                event.code
+                == self.controller_config[RobotControlType.DRIBBLER_SPEED][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+            ):
+                self.dribbler_speed_accumulator = self.__parse_dribbler_event_value(
+                    event.value
+                )
 
-        if (
-            event.code
-            == self.controller_config[RobotControlType.DRIBBLER_ENABLE_1][
-                HandheldDeviceConfigKeys.CODE
-            ]
-            or event.code
-            == self.controller_config[RobotControlType.DRIBBLER_ENABLE_2][
-                HandheldDeviceConfigKeys.CODE
-            ]
-        ):
-            dribbler_enabled = self.__parse_dribbler_enabled_event_value(
-                value=event.value,
-                max_value=self.controller_config[RobotControlType.DRIBBLER_ENABLE_2][
-                    HandheldDeviceConfigKeys.MAX_VALUE
-                ],
-            )
-            if dribbler_enabled:
-                self.motor_control.dribbler_speed_rpm = self.dribbler_speed_accumulator
+            if (
+                event.code
+                == self.controller_config[RobotControlType.DRIBBLER_ENABLE_1][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+                or event.code
+                == self.controller_config[RobotControlType.DRIBBLER_ENABLE_2][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+            ):
+                dribbler_enabled = self.__parse_dribbler_enabled_event_value(
+                    value=event.value,
+                    max_value=self.controller_config[RobotControlType.DRIBBLER_ENABLE_2][
+                        HandheldDeviceConfigKeys.MAX_VALUE
+                    ],
+                )
+                if dribbler_enabled:
+                    self.motor_control.dribbler_speed_rpm = self.dribbler_speed_accumulator
 
-        if (
-            event.code
-            == self.controller_config[RobotControlType.KICK][
-                HandheldDeviceConfigKeys.CODE
-            ]
-            and event.value == 1
-        ):
-            self.power_control.geneva_slot = 3
-            self.power_control.chicker.kick_speed_m_per_s = self.kick_power_accumulator
+        if event.type == ecodes.EV_KEY:
+            if (
+                event.code
+                == self.controller_config[RobotControlType.KICK][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+                and event.value == 1
+            ):
+                self.power_control.geneva_slot = 3
+                self.power_control.chicker.kick_speed_m_per_s = self.kick_power_accumulator
 
-        if (
-            event.code
-            == self.controller_config[RobotControlType.CHIP][
-                HandheldDeviceConfigKeys.CODE
-            ]
-            and event.value == 1
-        ):
-            self.power_control.geneva_slot = 3
-            self.power_control.chicker.chip_distance_meters = (
-                self.kick_power_accumulator
-            )
+            if (
+                event.code
+                == self.controller_config[RobotControlType.CHIP][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+                and event.value == 1
+            ):
+                self.power_control.geneva_slot = 3
+                self.power_control.chicker.chip_distance_meters = (
+                    self.kick_power_accumulator
+                )
 
     @staticmethod
     def __parse_move_event_value(
@@ -341,7 +328,7 @@ class HandheldDeviceManager(object):
         return value > (max_value / 2.0)
 
     @staticmethod
-    def __parse_dribble_event_value(value: float) -> float:
+    def __parse_dribbler_event_value(value: float) -> float:
         return numpy.clip(
             value * HandheldDeviceConstants.DRIBBLER_STEPPER,
             0,
