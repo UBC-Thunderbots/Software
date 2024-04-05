@@ -282,12 +282,14 @@ class HandheldDeviceManager(object):
             ):
                 dribbler_enabled = self.__parse_dribbler_enabled_event_value(
                     value=event.value,
-                    max_value=self.controller_config[RobotControlType.DRIBBLER_ENABLE_2][
-                        HandheldDeviceConfigKeys.MAX_VALUE
-                    ],
+                    max_value=self.controller_config[
+                        RobotControlType.DRIBBLER_ENABLE_2
+                    ][HandheldDeviceConfigKeys.MAX_VALUE],
                 )
                 if dribbler_enabled:
-                    self.motor_control.dribbler_speed_rpm = self.dribbler_speed_accumulator
+                    self.motor_control.dribbler_speed_rpm = (
+                        self.dribbler_speed_accumulator
+                    )
 
         if event.type == ecodes.EV_KEY:
             if (
@@ -298,7 +300,9 @@ class HandheldDeviceManager(object):
                 and event.value == 1
             ):
                 self.power_control.geneva_slot = 3
-                self.power_control.chicker.kick_speed_m_per_s = self.kick_power_accumulator
+                self.power_control.chicker.kick_speed_m_per_s = (
+                    self.kick_power_accumulator
+                )
 
             if (
                 event.code
