@@ -29,7 +29,6 @@ from software.thunderscope.gl.layers import (
     gl_trail_layer,
 )
 
-
 from software.thunderscope.common.proto_configuration_widget import (
     ProtoConfigurationWidget,
 )
@@ -49,6 +48,7 @@ from software.thunderscope.robot_diagnostics.robot_view import RobotView
 from software.thunderscope.robot_diagnostics.robot_error_log import RobotErrorLog
 from software.thunderscope.robot_diagnostics.estop_view import EstopView
 from software.thunderscope.replay.proto_player import ProtoPlayer
+
 
 ################################
 #  FULLSYSTEM RELATED WIDGETS  #
@@ -329,17 +329,6 @@ def setup_estop_view(proto_unix_io) -> EstopView:
 
     proto_unix_io.register_observer(EstopState, estop_view.estop_state_buffer)
     return estop_view
-
-
-def setup_chicker_widget(proto_unix_io: ProtoUnixIO) -> ChickerWidget:
-    """Setup the chicker widget for robot diagnostics
-
-    :param proto_unix_io: The proto unix io object
-    :returns: The chicker widget
-
-    """
-    chicker_widget = ChickerWidget(proto_unix_io)
-    return chicker_widget
 
 
 def setup_diagnostics_widget(proto_unix_io: ProtoUnixIO,) -> DriveAndDribblerWidget:

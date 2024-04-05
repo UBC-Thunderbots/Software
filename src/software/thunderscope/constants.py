@@ -319,8 +319,7 @@ class TrailValues:
     DEFAULT_TRAIL_SAMPLING_RATE = 0
 
 
-# TODO: come up with less ambiguous names
-class InputEventType(Enum):
+class RobotControlType(Enum):
     MOVE_X = 1
     MOVE_Y = 2
     ROTATE = 3
@@ -332,53 +331,86 @@ class InputEventType(Enum):
     DRIBBLER_ENABLE_2 = 9
 
 
-class ControllerConstants:
-    XboxEventCodes = {
+# TODO: come up with less ambiguous/wierd name
+class HandheldDeviceConfigKeys(Enum):
+    CODE = 1
+    MAX_VALUE = 2
+
+
+class HandheldDeviceConstants:
+    XboxConfig = {
         # Name: "ABS_X", Type: EV_ABS
         # AbsInfo: value=1242, min=-32768, max=32767, fuzz=16, flat=128, resolution=0
         # Canonical: Left joystick X-axis
-        InputEventType.MOVE_X: 0,
+        RobotControlType.MOVE_X: {
+            HandheldDeviceConfigKeys.CODE: 0,
+            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0
+        },
         # Name: "ABS_Y", Type: EV_ABS
         # AbsInfo: value=425, min=-32768, max=32767, fuzz=16, flat=128, resolution=0
         # Canonical: Left joystick Y-axis
-        InputEventType.MOVE_Y: 1,
+        RobotControlType.MOVE_Y: {
+            HandheldDeviceConfigKeys.CODE: 1,
+            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0
+        },
         # Name: "ABS_RX", Type: EV_ABS
         # AbsInfo: value=-418, min=-32768, max=32767, fuzz=16, flat=128, resolution=0
         # Canonical: Right joystick X-axis
-        InputEventType.ROTATE: 3,
+        RobotControlType.ROTATE: {
+            HandheldDeviceConfigKeys.CODE: 3,
+            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0
+        },
         # Name: "BTN_A", Type: EV_KEY
         # Canonical: "A" Button
-        InputEventType.KICK: 304,
+        RobotControlType.KICK: {
+            HandheldDeviceConfigKeys.CODE: 304,
+        },
         # Name: "BTN_Y", Type: EV_KEY
         # Canonical: "Y" Button
-        InputEventType.CHIP: 308,
+        RobotControlType.CHIP: {
+            HandheldDeviceConfigKeys.CODE: 308,
+        },
         # Name: "ABS_HAT0X", Type: EV_ABS
         # AbsInfo: value=0, min=-1, max=1, fuzz=0, flat=0, resolution=0
         # Canonical: D-pad X-axis
-        InputEventType.KICK_POWER: 16,
+        RobotControlType.KICK_POWER: {
+            HandheldDeviceConfigKeys.CODE: 16,
+            HandheldDeviceConfigKeys.MAX_VALUE: 1.0
+        },
         # Name: "ABS_HAT0Y", Type: EV_ABS
         # AbsInfo: value=0, min=-1, max=1, fuzz=0, flat=0, resolution=0
         # Canonical: D-pad Y-axis
-        InputEventType.DRIBBLER_SPEED: 17,
+        RobotControlType.DRIBBLER_SPEED: {
+            HandheldDeviceConfigKeys.CODE: 17,
+            HandheldDeviceConfigKeys.MAX_VALUE: 1.0
+        },
         # Name: "ABS_Z", Type: EV_ABS
         # AbsInfo: value=0, min=0, max=1023, fuzz=0, flat=0, resolution=0
         # Canonical: Left trigger
-        InputEventType.DRIBBLER_ENABLE_1: 2,
+        RobotControlType.DRIBBLER_ENABLE_1: {
+            HandheldDeviceConfigKeys.CODE: 2,
+            HandheldDeviceConfigKeys.MAX_VALUE: 1023.0
+        },
         # Name: "ABS_RZ", Type: EV_ABS
         # AbsInfo: value=0, min=0, max=1023, fuzz=0, flat=0, resolution=0
         # Canonical: Right trigger
-        InputEventType.DRIBBLER_ENABLE_2: 5,
+        RobotControlType.DRIBBLER_ENABLE_2: {
+            HandheldDeviceConfigKeys.CODE: 5,
+            HandheldDeviceConfigKeys.MAX_VALUE: 1023.0
+        },
     }
 
-    CONTROLLER_NAME_CODES_MAP = {
-        "Microsoft Xbox One X pad": XboxEventCodes,
-        "Microsoft X-Box 360 pad": XboxEventCodes,
+    CONTROLLER_NAME_CONFIG_MAP = {
+        "Microsoft Xbox One X pad": XboxConfig,
+        "Microsoft X-Box 360 pad": XboxConfig,
     }
 
-    INPUT_DELAY_THRESHOLD = 0.005
 
+    # TODO remove these two
     XBOX_MAX_RANGE = 32768.0
     XBOX_BUTTON_MAX_RANGE = 1024.0
+
+    INPUT_DELAY_THRESHOLD = 0.005
     DEADZONE_PERCENTAGE = 0.30
 
     MAX_LINEAR_SPEED_METER_PER_S = 2.0

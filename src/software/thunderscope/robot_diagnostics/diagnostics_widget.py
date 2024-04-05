@@ -117,9 +117,16 @@ class DiagnosticsWidget(QWidget):
 
     # TODO: investigate why these methods aren't called on user hitting close button
     def closeEvent(self, event):
+        self.logger.info("test")
+        self.controller_handler.close()
+        event.accept()
+
+    def close(self, event):
+        self.logger.info("test")
         self.controller_handler.close()
         event.accept()
 
     def __exit__(self, event):
+        self.logger.info("test")
         self.controller_handler.close()
         event.accept()

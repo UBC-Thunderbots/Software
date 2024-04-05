@@ -1,13 +1,15 @@
 import time
+from threading import Thread, Event
+from typing import Optional
 
+import evdev.ecodes
 import numpy
-from multiprocessing import Process
-from evdev import InputDevice, categorize, ecodes, list_devices, InputEvent
+from evdev import InputDevice, ecodes, list_devices, InputEvent
 
 import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.thunderscope.constants import *
-from software.thunderscope.constants import ControllerConstants
+from software.thunderscope.constants import HandheldDeviceConstants
 from software.thunderscope.robot_diagnostics.handheld_device_status_view import (
     ControllerConnectionState,
 )
@@ -15,6 +17,7 @@ from software.thunderscope.robot_diagnostics.diagnostics_input_widget import Con
 
 
 # TODO: the following is logged on controller connection during runtime:
+#   This is fixed in version pyqt 6.6.1
 # `qt.qpa.input.events: scroll event from unregistered device 17`
 
 
@@ -26,8 +29,8 @@ class HandheldDeviceManager(object):
 
     def __init__(self, logger):
         self.logger = logger
-        self.controller = None
-        self.controller_codes = None
+        self.controller: Optional[InputDevice] = None
+        self.controller_config = None
 
         # Control primitives that are directly updated with
         # parsed controller inputs on every iteration of the event loop
@@ -43,38 +46,12 @@ class HandheldDeviceManager(object):
         self.constants = tbots_cpp.create2021RobotConstants()
 
         # event that is used to stop the controller event loop
-        # self.__stop_thread_signal_event = Event()
+        self.__stop_thread_signal_event = Event()
 
         # Set-up process that will run the event loop
         self.__setup_new_event_listener_process()
 
         self.initialize_controller()
-
-        if (
-            self.get_controller_connection_status()
-            == ControllerConnectionState.CONNECTED
-        ):
-
-            self.logger.debug(
-                "Initialized handheld controller "
-                + '"'
-                + self.controller.name
-                + '"'
-                + " and located at path: "
-                + self.controller.path
-            )
-
-        elif (
-            self.get_controller_connection_status()
-            == ControllerConnectionState.DISCONNECTED
-        ):
-            self.logger.debug(
-                "Failed to initialize a handheld controller, check USB connection"
-            )
-            self.logger.debug("Tried the following available devices:")
-            self.logger.debug(
-                list(map(lambda device: InputDevice(device).name, list_devices()))
-            )
 
     def get_controller_connection_status(self) -> ControllerConnectionState:
         return (
@@ -93,10 +70,10 @@ class HandheldDeviceManager(object):
         :param mode: The current user requested mode for controlling the robot
         """
         if mode == ControlMode.DIAGNOSTICS:
-            self.logger.debug("Terminating controller event handling process")
             if self.__controller_event_loop_handler_process.is_alive():
-                # self.__stop_thread_signal_event.set()
-                self.__controller_event_loop_handler_process.terminate()
+                self.logger.debug("Terminating controller event handling process")
+                self.__stop_thread_signal_event.set()
+                self.__controller_event_loop_handler_process.join()
 
         elif mode == ControlMode.HANDHELD:
             self.logger.debug("Setting up new controller event handling process")
@@ -122,13 +99,33 @@ class HandheldDeviceManager(object):
             controller = InputDevice(device)
             if (
                 controller is not None
-                and controller.name in ControllerConstants.CONTROLLER_NAME_CODES_MAP
+                and controller.name in HandheldDeviceConstants.CONTROLLER_NAME_CONFIG_MAP
             ):
+                self.__stop_thread_signal_event.clear()
                 self.controller = controller
-                self.controller_codes = ControllerConstants.CONTROLLER_NAME_CODES_MAP[
+                self.controller_config = HandheldDeviceConstants.CONTROLLER_NAME_CONFIG_MAP[
                     controller.name
                 ]
                 break
+
+        if self.get_controller_connection_status() == ControllerConnectionState.CONNECTED:
+            self.logger.debug(
+                "Initialized handheld controller "
+                + '"'
+                + self.controller.name
+                + '"'
+                + " and located at path: "
+                + self.controller.path
+            )
+
+        elif self.get_controller_connection_status() == ControllerConnectionState.DISCONNECTED:
+            self.logger.debug(
+                "Failed to initialize a handheld controller, check USB connection"
+            )
+            self.logger.debug("Tried the following available devices:")
+            self.logger.debug(
+                list(map(lambda d: InputDevice(d).name, list_devices()))
+            )
 
     def __start_event_listener_process(self):
         # start the process for reading controller events
@@ -142,7 +139,7 @@ class HandheldDeviceManager(object):
 
         # TODO (#3165): Use trace level self.logger here
         # self.logger.debug("Starting controller event loop process")
-        self.__controller_event_loop_handler_process = Process(
+        self.__controller_event_loop_handler_process = Thread(
             target=self.__event_loop, daemon=True
         )
 
@@ -153,25 +150,30 @@ class HandheldDeviceManager(object):
         """
         # TODO (#3165): Use trace level logging here
         # self.logger.debug("Shutdown down controller event loop process")
-        # self.__stop_thread_signal_event.set()
-        self.__controller_event_loop_handler_process.terminate()
+        self.__stop_thread_signal_event.set()
+        self.__controller_event_loop_handler_process.join()
 
     def __event_loop(self):
         # TODO (#3165): Use trace level self.logger here
         self.logger.debug("Starting handheld controller event handling loop")
         try:
-            for event in self.controller.read_loop():
+            while True:
+                if self.__stop_thread_signal_event.is_set():
+                    return
+                event = self.controller.read_one()
                 # TODO: is this a useful comment?
                 # All events accumulate into a file and will be read back eventually,
-                # even if handheld mode is disabled. This time check ensures that
+                # even if handheld mode is disabled. This time based recency check ensures that
                 # only the events that have occurred very recently are processed, and
-                # any events that occur before switching to handheld mode are ignored
+                # any events that occur before switching to handheld mode are dropped & ignored
                 if (
+                    event is not None and
                     time.time() - event.timestamp()
-                    < ControllerConstants.INPUT_DELAY_THRESHOLD
+                    < HandheldDeviceConstants.INPUT_DELAY_THRESHOLD
                 ):
                     self.__process_event(event)
         except OSError as ose:
+            self.__clear_controller()
             self.logger.debug(
                 "Caught an OSError while reading handheld controller event loop!"
             )
@@ -179,11 +181,15 @@ class HandheldDeviceManager(object):
             self.logger.debug("Check physical handheld controller USB connection!")
             return
         except Exception as e:
+            self.__clear_controller()
             self.logger.critical(
                 "Caught an unexpected error while reading handheld controller event loop!"
             )
             self.logger.critical("Error message: " + str(e))
             return
+
+    def __clear_controller(self):
+        self.controller = None
 
     def __process_event(self, event: InputEvent):
 
@@ -201,49 +207,66 @@ class HandheldDeviceManager(object):
             + str(event.value)
         )
 
-        if event.code == self.controller_codes[InputEventType.MOVE_X]:
-            self.motor_control.direct_velocity_control.velocity.x_component_meters = self.__parse_move_event_value(
-                ControllerConstants.MAX_LINEAR_SPEED_METER_PER_S, event.value
+        # TODO: need to check type
+
+        if event.code == self.controller_config[RobotControlType.MOVE_X][HandheldDeviceConfigKeys.CODE]:
+            self.logger.debug("type: " + str(event.type))
+            self.logger.debug("move x code: " + str(event.code))
+            self.logger.debug("config code: " + str(self.controller_config[RobotControlType.MOVE_X][HandheldDeviceConfigKeys.CODE]))
+            self.motor_control.direct_velocity_control.velocity.x_component_meters = (
+                self.__parse_move_event_value(
+                    event_value=event.value,
+                    max_value=self.controller_config[RobotControlType.MOVE_X][HandheldDeviceConfigKeys.MAX_VALUE],
+                    scaling_factor=HandheldDeviceConstants.MAX_LINEAR_SPEED_METER_PER_S,
+                )
             )
 
-        if event.code == self.controller_codes[InputEventType.MOVE_Y]:
-            self.motor_control.direct_velocity_control.velocity.y_component_meters = self.__parse_move_event_value(
-                ControllerConstants.MAX_LINEAR_SPEED_METER_PER_S, event.value
+        if event.code == self.controller_config[RobotControlType.MOVE_Y][HandheldDeviceConfigKeys.CODE]:
+            self.motor_control.direct_velocity_control.velocity.y_component_meters = (
+                self.__parse_move_event_value(
+                    event_value=event.value,
+                    max_value=self.controller_config[RobotControlType.MOVE_X][HandheldDeviceConfigKeys.MAX_VALUE],
+                    scaling_factor=HandheldDeviceConstants.MAX_LINEAR_SPEED_METER_PER_S
+                )
             )
 
-        if event.code == self.controller_codes[InputEventType.ROTATE]:
-            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.__parse_move_event_value(
-                ControllerConstants.MAX_ANGULAR_SPEED_RAD_PER_S, event.value
+        if event.code == self.controller_config[RobotControlType.ROTATE][HandheldDeviceConfigKeys.CODE]:
+            self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+                self.__parse_move_event_value(
+                    event_value=event.value,
+                    max_value=self.controller_config[RobotControlType.ROTATE][HandheldDeviceConfigKeys.MAX_VALUE],
+                    scaling_factor=HandheldDeviceConstants.MAX_ANGULAR_SPEED_RAD_PER_S
+                )
             )
 
-        if event.code == self.controller_codes[InputEventType.KICK_POWER]:
+        if event.code == self.controller_config[RobotControlType.KICK_POWER][HandheldDeviceConfigKeys.CODE]:
             self.kick_power_accumulator = self.__parse_kick_event_value(event.value)
 
-        if event.code == self.controller_codes[InputEventType.DRIBBLER_SPEED]:
+        if event.code == self.controller_config[RobotControlType.DRIBBLER_SPEED][HandheldDeviceConfigKeys.CODE]:
             self.dribbler_speed_accumulator = self.__parse_dribble_event_value(
                 event.value
             )
 
-        # Left and right triggers
         if (
-            event.code == self.controller_codes[InputEventType.DRIBBLER_ENABLE_1]
-            or event.code == self.controller_codes[InputEventType.DRIBBLER_ENABLE_2]
+            event.code == self.controller_config[RobotControlType.DRIBBLER_ENABLE_1][HandheldDeviceConfigKeys.CODE]
+            or event.code == self.controller_config[RobotControlType.DRIBBLER_ENABLE_2][HandheldDeviceConfigKeys.CODE]
         ):
-            dribbler_enabled = self.__parse_dribbler_enabled_event_value(event.value)
+            dribbler_enabled = self.__parse_dribbler_enabled_event_value(
+                value=event.value,
+                max_value=self.controller_config[RobotControlType.DRIBBLER_ENABLE_2][HandheldDeviceConfigKeys.MAX_VALUE]
+            )
             if dribbler_enabled:
                 self.motor_control.dribbler_speed_rpm = self.dribbler_speed_accumulator
 
-        # "A" button
         if (
-            event.code == self.controller_codes[InputEventType.KICK]
+            event.code == self.controller_config[RobotControlType.KICK][HandheldDeviceConfigKeys.CODE]
             and event.value == 1
         ):
             self.power_control.geneva_slot = 3
             self.power_control.chicker.kick_speed_m_per_s = self.kick_power_accumulator
 
-        # "A" button
         if (
-            event.code == self.controller_codes[InputEventType.CHIP]
+            event.code == self.controller_config[RobotControlType.CHIP][HandheldDeviceConfigKeys.CODE]
             and event.value == 1
         ):
             self.power_control.geneva_slot = 3
@@ -252,34 +275,34 @@ class HandheldDeviceManager(object):
             )
 
     @staticmethod
-    def __parse_move_event_value(event_value: float, scaling_factor: float) -> float:
+    def __parse_move_event_value(event_value: float, max_value: float, scaling_factor: float) -> float:
         if abs(event_value) < (
-            ControllerConstants.DEADZONE_PERCENTAGE * scaling_factor
+            HandheldDeviceConstants.DEADZONE_PERCENTAGE * scaling_factor
         ):
             return 0
         else:
             return numpy.clip(
-                event_value, 0, ControllerConstants.XBOX_MAX_RANGE * scaling_factor
+                event_value, 0, max_value * scaling_factor
             )
 
     @staticmethod
-    def __parse_dribbler_enabled_event_value(value: float) -> bool:
-        return value > (ControllerConstants.XBOX_BUTTON_MAX_RANGE / 2.0)
+    def __parse_dribbler_enabled_event_value(value: float, max_value: float) -> bool:
+        return value > (max_value / 2.0)
 
     @staticmethod
     def __parse_dribble_event_value(value: float) -> float:
         return numpy.clip(
-            value * ControllerConstants.DRIBBLER_STEPPER,
+            value * HandheldDeviceConstants.DRIBBLER_STEPPER,
             0,
-            ControllerConstants.DRIBBLER_INDEFINITE_SPEED,
+            HandheldDeviceConstants.DRIBBLER_INDEFINITE_SPEED,
         )
 
     @staticmethod
     def __parse_kick_event_value(value: float) -> float:
         return numpy.clip(
-            value * ControllerConstants.POWER_STEPPER,
-            ControllerConstants.MIN_POWER,
-            ControllerConstants.MAX_POWER,
+            value * HandheldDeviceConstants.POWER_STEPPER,
+            HandheldDeviceConstants.MIN_POWER,
+            HandheldDeviceConstants.MAX_POWER,
         )
 
 

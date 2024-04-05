@@ -67,6 +67,8 @@ class DiagnosticsInputToggleWidget(QWidget):
         self.setLayout(vbox_layout)
 
     def refresh(self, status: ControllerConnectionState) -> None:
+        if status == ControllerConnectionState.DISCONNECTED:
+            self.diagnostics_control_button.click()
         self.handheld_control_button.setEnabled(
             status == ControllerConnectionState.CONNECTED
         )
