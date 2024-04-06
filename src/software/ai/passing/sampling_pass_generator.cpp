@@ -1,7 +1,7 @@
 #include "software/ai/passing/sampling_pass_generator.h"
 
 SamplingPassGenerator::SamplingPassGenerator(TbotsProto::PassingConfig passing_config)
-    : random_num_gen_(14), passing_config_(passing_config)
+    : random_num_gen_(SEED), passing_config_(passing_config)
 {
 }
 
@@ -9,12 +9,20 @@ PassWithRating SamplingPassGenerator::getBestPass(const World& world)
 {
     auto sampled_pass_points = samplePasses(world);
 
-    std::vector<PassWithRating> sampled_passes_and_ratings;
+    // if there are no friendly robots, return early
+    if (sampled_pass_points.size() == 0)
+    {
+        // default pass with 0 rating
+        return PassWithRating{Pass(Point(), Point(), 0.0), 0};
+    }
 
+    std::vector<PassWithRating> sampled_passes_and_ratings;
+    sampled_passes_and_ratings.reserve(sampled_pass_points.size());
+
+    // get ratings for each pass
     std::transform(
         sampled_pass_points.begin(), sampled_pass_points.end(),
-        sampled_passes_and_ratings.begin(), [&](const Point& point) {
-            std::cout << point << std::endl;
+        sampled_passes_and_ratings.begin(), [&](const Point& point) -> PassWithRating {
             Pass pass = Pass(world.ball().position(), point, 2.0);
 
             return PassWithRating{pass, ratePass(world, pass, passing_config_)};
@@ -25,9 +33,8 @@ PassWithRating SamplingPassGenerator::getBestPass(const World& world)
                   return pass_a.rating > pass_b.rating;
               });
 
-    return sampled_passes_and_ratings.size() == 0
-               ? PassWithRating{Pass(Point(), Point(), 0.0), 0}
-               : sampled_passes_and_ratings.front();
+    // return the highest rated pass
+    return sampled_passes_and_ratings.front();
 }
 
 std::vector<Point> SamplingPassGenerator::samplePasses(const World& world)
@@ -38,6 +45,7 @@ std::vector<Point> SamplingPassGenerator::samplePasses(const World& world)
     {
         auto robot_position = robot.position();
 
+        // get random coordinates based on the normal distribution around the robot
         std::normal_distribution x_normal_distribution{robot_position.x(),
                                                        SAMPLING_SD_METERS};
         std::normal_distribution y_normal_distribution{robot_position.y(),
