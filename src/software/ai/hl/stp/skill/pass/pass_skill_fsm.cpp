@@ -9,9 +9,10 @@ bool PassSkillFSM::foundPass(const Update& event)
 
     // Friendly robot must be in the vicinity of the receiver point
     // in order for pass to be valid
+    std::vector<Robot> friendly_robots =
+        event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
     Point receiver_point = best_pass_so_far_->pass.receiverPoint();
-    std::optional<Robot> nearest_receiver =
-        event.common.world_ptr->friendlyTeam().getNearestRobot(receiver_point);
+    std::optional<Robot> nearest_receiver = Team::getNearestRobot(friendly_robots, receiver_point);
 
     return nearest_receiver && nearest_receiver->getTimeToPosition(receiver_point) <
                                    best_pass_so_far_->pass.estimatePassDuration();
@@ -36,13 +37,13 @@ void PassSkillFSM::findPass(
     min_pass_score_threshold_ = 1.0 - std::min(time_since_commit_stage_start.toSeconds() /
                                                    pass_score_ramp_down_duration,
                                                1.0 - abs_min_pass_score);
-    
+
     Point dribble_destination = event.common.world_ptr->ball().position();
     Angle dribble_orientation = Angle::zero();
     if (best_pass_so_far_)
     {
         Point receiver_point = best_pass_so_far_->pass.receiverPoint();
-        dribble_orientation = (receiver_point - dribble_destination).orientation();
+        dribble_orientation  = (receiver_point - dribble_destination).orientation();
     }
 
     DribbleSkillFSM::ControlParams control_params = {
@@ -58,7 +59,7 @@ void PassSkillFSM::takePass(
     boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
     Point ball_position = event.common.world_ptr->ball().position();
-    Point kick_target  = best_pass_so_far_->pass.receiverPoint();
+    Point kick_target   = best_pass_so_far_->pass.receiverPoint();
 
     PivotKickSkillFSM::ControlParams control_params = {
         .kick_origin       = ball_position,
