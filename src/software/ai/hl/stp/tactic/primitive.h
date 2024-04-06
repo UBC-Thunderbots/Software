@@ -2,6 +2,7 @@
 
 #include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/ai/navigator/trajectory/trajectory_path.h"
 
 /**
  * The primitive actions that a robot can perform
@@ -19,12 +20,16 @@ class Primitive
      *
      * @param world Current state of the world
      * @param motion_constraints Motion constraints to consider
+     * @param robot_trajectories A map of the friendly robots' known trajectories
      * @param obstacle_factory Obstacle factory to use for generating obstacles
-     * @return the primitive proto message
+     * @return A pair of the found trajectory (optional) and the primitive proto message
      */
-    virtual std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
-        const WorldPtr &world_ptr,
+    virtual std::pair<std::optional<TrajectoryPath>,
+                      std::unique_ptr<TbotsProto::Primitive>>
+    generatePrimitiveProtoMessage(
+        const World &world,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+        const std::map<RobotId, TrajectoryPath> &robot_trajectories,
         const RobotNavigationObstacleFactory &obstacle_factory) = 0;
 
     /**

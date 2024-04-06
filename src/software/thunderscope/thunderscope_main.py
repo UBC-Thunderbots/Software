@@ -150,6 +150,12 @@ if __name__ == "__main__":
         help="Which channel to communicate over",
     )
     parser.add_argument(
+        "--enable_radio",
+        action="store_true",
+        default=False,
+        help="Whether to use radio (True) or Wi-Fi (False) for sending primitives to robots",
+    )
+    parser.add_argument(
         "--visualization_buffer_size",
         action="store",
         type=int,
@@ -184,6 +190,12 @@ if __name__ == "__main__":
         default=False,
         help="Show TigersAutoref GUI",
     )
+    parser.add_argument(
+        "--sudo",
+        action="store_true",
+        default=False,
+        help="Run unix_full_system under sudo",
+    )
 
     estop_group = parser.add_mutually_exclusive_group()
     estop_group.add_argument(
@@ -198,6 +210,7 @@ if __name__ == "__main__":
         default=False,
         help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
     )
+
     parser.add_argument(
         "--empty",
         action="store_true",
@@ -205,9 +218,9 @@ if __name__ == "__main__":
         help="Whether to populate with default robot positions (False) or start with an empty field (True) for AI vs AI",
     )
 
-    # Sanity check that an interface was provided
     args = parser.parse_args()
 
+    # Sanity check that an interface was provided
     if args.run_blue or args.run_yellow:
         if args.interface is None:
             parser.error("Must specify interface")
@@ -303,6 +316,7 @@ if __name__ == "__main__":
             interface=args.interface,
             estop_mode=estop_mode,
             estop_path=estop_path,
+            enable_radio=args.enable_radio,
         ) as robot_communication:
 
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
@@ -330,7 +344,11 @@ if __name__ == "__main__":
                     else args.yellow_full_system_runtime_dir
                 )
                 with ProtoLogger(full_system_runtime_dir,) as logger, FullSystem(
-                    runtime_dir, debug, friendly_colour_yellow
+                    full_system_runtime_dir=runtime_dir,
+                    debug_full_system=debug,
+                    friendly_colour_yellow=friendly_colour_yellow,
+                    should_restart_on_crash=True,
+                    run_sudo=args.sudo,
                 ) as full_system:
 
                     current_proto_unix_io.register_to_observe_everything(logger.buffer)
@@ -398,14 +416,19 @@ if __name__ == "__main__":
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
-            args.blue_full_system_runtime_dir, args.debug_blue_full_system, False, False
+            full_system_runtime_dir=args.blue_full_system_runtime_dir,
+            debug_full_system=args.debug_blue_full_system,
+            friendly_colour_yellow=False,
+            should_restart_on_crash=False,
+            run_sudo=args.sudo,
         ) as blue_fs, FullSystem(
-            args.yellow_full_system_runtime_dir,
-            args.debug_yellow_full_system,
-            True,
-            False,
+            full_system_runtime_dir=args.yellow_full_system_runtime_dir,
+            debug_full_system=args.debug_yellow_full_system,
+            friendly_colour_yellow=True,
+            should_restart_on_crash=False,
+            run_sudo=args.sudo,
         ) as yellow_fs, Gamecontroller(
-            supress_logs=(not args.verbose), ci_mode=args.enable_autoref
+            supress_logs=(not args.verbose)
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -426,6 +449,9 @@ if __name__ == "__main__":
             log_path=args.yellow_full_system_runtime_dir,
             time_provider=autoref.time_provider if args.enable_autoref else None,
         ) as yellow_logger:
+
+            tscope.register_refresh_function(gamecontroller.refresh)
+
             autoref_proto_unix_io = ProtoUnixIO()
 
             tscope.proto_unix_io_map[

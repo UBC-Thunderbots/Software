@@ -43,6 +43,7 @@ py_test(
         requirement("pytest"),
     ],
 )
+<<<<<<< HEAD
 
 cc_test(
     name = "offense_play_cpp_test",
@@ -58,3 +59,5 @@ cc_test(
         "//software/world",
     ],
 )
+=======
+>>>>>>> 89ba6b956c3c97fd98481d31d9d0575432105f02

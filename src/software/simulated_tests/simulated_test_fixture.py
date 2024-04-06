@@ -11,7 +11,7 @@ from proto.import_all_protos import *
 
 from pyqtgraph.Qt import QtCore, QtGui
 
-from software.networking.threaded_unix_sender import ThreadedUnixSender
+from software.networking.unix.threaded_unix_sender import ThreadedUnixSender
 from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 from software.simulated_tests import validation
@@ -542,7 +542,7 @@ def simulated_test_runner():
         should_restart_on_crash=False,
     ) as yellow_fs:
         with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True,
+            supress_logs=(not args.show_gamecontroller_logs)
         ) as gamecontroller:
 
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)

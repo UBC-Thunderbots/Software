@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     LOG(INFO) << "Running on the Jetson Nano!";
 
     motor_service_ =
-        std::make_unique<MotorService>(create2021RobotConstants(), CONTROL_LOOP_HZ);
+        std::make_unique<MotorService>(create2021RobotConstants(), THUNDERLOOP_HZ);
 
     // Testing Motor board SPI transfer
     for (uint8_t chip_select : CHIP_SELECT)

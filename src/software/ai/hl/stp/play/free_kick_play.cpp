@@ -148,11 +148,11 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
     using Zones = std::unordered_set<EighteenZoneId>;
 
-    auto pass_eval = pass_generator.generatePassEvaluation(world_ptr);
+    auto pass_eval = pass_generator.generatePassEvaluation(*world_ptr);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
-        world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
+        *world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
     Zones cherry_pick_region_1 = {ranked_zones[0]};
     Zones cherry_pick_region_2 = {ranked_zones[1]};
 
@@ -170,17 +170,19 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     {
         updateAlignToBallTactic(align_to_ball_tactic, world_ptr);
 
-        auto pass_eval = pass_generator.generatePassEvaluation(world_ptr);
+        auto pass_eval = pass_generator.generatePassEvaluation(*world_ptr);
 
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
         cherry_pick_tactic_1->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
         cherry_pick_tactic_2->updateControlParams(
             pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
@@ -196,7 +198,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     LOG(DEBUG) << "Finished aligning to ball";
 
     best_pass_and_score_so_far =
-        pass_generator.generatePassEvaluation(world_ptr).getBestPassOnField();
+        pass_generator.generatePassEvaluation(*world_ptr).getBestPassOnField();
     // Align the kicker to pass and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
@@ -206,17 +208,19 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     {
         updateAlignToBallTactic(align_to_ball_tactic, world_ptr);
 
-        auto pass_eval = pass_generator.generatePassEvaluation(world_ptr);
+        auto pass_eval = pass_generator.generatePassEvaluation(*world_ptr);
 
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
         cherry_pick_tactic_1->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
         cherry_pick_tactic_2->updateControlParams(
             pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
@@ -229,7 +233,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
                 std::get<1>(crease_defender_tactics)}});
 
         best_pass_and_score_so_far =
-            pass_generator.generatePassEvaluation(world_ptr).getBestPassOnField();
+            pass_generator.generatePassEvaluation(*world_ptr).getBestPassOnField();
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 

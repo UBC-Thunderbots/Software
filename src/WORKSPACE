@@ -210,14 +210,6 @@ http_archive(
     ],
 )
 
-# Axis-Aligned Bounding Box tree data structure implementation
-new_git_repository(
-    name = "aabbcc",
-    build_file = "@//extlibs:aabbcc.BUILD",
-    commit = "0dad69116602623d63844f0923463df747f64ed3",
-    remote = "https://github.com/lohedges/aabbcc",
-)
-
 # tool used to flash firmware with bazel
 git_repository(
     name = "platformio_rules",
@@ -392,3 +384,11 @@ git_repository(
 load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_setup")
 
 hedron_compile_commands_setup()
+
+new_git_repository(
+    name = "tracy",
+    build_file = "@//extlibs:tracy.BUILD",
+    commit = "37aff70dfa50cf6307b3fee6074d627dc2929143",
+    remote = "https://github.com/wolfpld/tracy.git",
+    shallow_since = "1697482622 +0200",
+)

@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/test_util/test_util.h"
 
 class TrajectoryPlannerTest : public testing::Test
@@ -22,23 +23,23 @@ class TrajectoryPlannerTest : public testing::Test
 
         // Robot at origin
         Point robot_obstacle_position(0, 0);
-        robot_obstacle =
-            obstacle_factory.createFromRobotPosition(robot_obstacle_position);
+        robot_obstacle = obstacle_factory.createStaticObstacleFromRobotPosition(
+            robot_obstacle_position);
 
         friendly_defense_area_obstacle =
             obstacle_factory.createObstaclesFromMotionConstraints(
-                {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA}, world)[0];
+                {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA}, *world)[0];
 
         enemy_half_obstacle = obstacle_factory.createObstaclesFromMotionConstraints(
-            {TbotsProto::MotionConstraint::ENEMY_HALF}, world)[0];
+            {TbotsProto::MotionConstraint::ENEMY_HALF}, *world)[0];
 
         center_circle_obstacle = obstacle_factory.createObstaclesFromMotionConstraints(
-            {TbotsProto::MotionConstraint::CENTER_CIRCLE}, world)[0];
+            {TbotsProto::MotionConstraint::CENTER_CIRCLE}, *world)[0];
 
         enemy_half_without_center_circle_obstacle =
             obstacle_factory.createObstaclesFromMotionConstraints(
                 {TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE},
-                world)[0];
+                *world)[0];
     }
 
     void verifyNoCollision(const TrajectoryPath& trajectory,

@@ -1,8 +1,7 @@
 from typing import Callable, Optional, Sequence, Any, Dict
+from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.constants import TabNames
 
-import PyQt6
-from PyQt6.QtWebEngineWidgets import QWebEngineView
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.dockarea import *
@@ -83,8 +82,19 @@ class TScopeQTTab(TScopeTab):
     ]  # Mapping of widget names to refresh functions
 
     def __init__(
-        self, name: str, key: TabNames, widgets: Sequence[TScopeWidget]
+        self,
+        name: str,
+        key: TabNames,
+        widgets: Sequence[TScopeWidget],
+        refresh_func_counter: FrameTimeCounter = None,
     ) -> None:
+        """
+        name: the name of this tab
+        key: the key to identify this tab
+        widgets: a list of widgets that is going to be displayed in the tab
+        refresh_func_counter: a counter that tracks the runtime of the refresh function
+        :Return: None
+        """
         super().__init__(name, key)
         self.widgets = widgets
         self.refresh_functions = {}
@@ -100,6 +110,11 @@ class TScopeQTTab(TScopeTab):
         # all other widgets will be positioned relative to this one
         for widget in self.widgets:
             self.add_one_widget(widget)
+
+        # initialized a frametime counter if none was passed in
+        self.refresh_func_counter = refresh_func_counter
+        if refresh_func_counter == None:
+            self.refresh_func_counter = FrameTimeCounter()
 
     def add_one_widget(self, data: TScopeWidget) -> None:
         """
@@ -136,9 +151,10 @@ class TScopeQTTab(TScopeTab):
         """
         Refreshes all the widgets belonging to this tab, and not refresh widget that are not visible.
         """
-        # only refresh dock that are visible
         if not self.dock_area.isVisible():
             return
+
+        self.refresh_func_counter.add_one_datapoint()
 
         for widget_name in self.refresh_functions:
             # only refresh widget inside the dock that are visible
@@ -159,20 +175,3 @@ class TScopeQTTab(TScopeTab):
             return self.widgets_map[widget_name]
         else:
             return None
-
-
-class TScopeWebTab(TScopeTab):
-    """
-    Data that describes a tab that shows a webpage in Thunderscope
-    """
-
-    url: str  # url of webpage displayed by this tab
-
-    def __init__(self, name: str, key: TabNames, url: str) -> None:
-        super().__init__(name, key)
-        self.url = url
-
-        web_view = QWebEngineView()
-        web_view.load(QtCore.QUrl(url))
-
-        self.dock_area = web_view
