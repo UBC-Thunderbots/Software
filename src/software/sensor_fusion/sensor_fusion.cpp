@@ -402,9 +402,9 @@ void SensorFusion::resetWorldComponents()
     possession           = TeamPossession::FRIENDLY_TEAM;
 }
 
-void SensorFusion::detectInjuredRobots(const std::vector<TbotsProto::RobotStatus> &robot_status_msgs)
+void SensorFusion::detectInjuredRobots(
+    const std::vector<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-
     /* potential improvement: add short circuit logic when an error is detected */
 
     std::vector<RobotId> injured_robot_ids;
@@ -412,7 +412,7 @@ void SensorFusion::detectInjuredRobots(const std::vector<TbotsProto::RobotStatus
     for (auto &robot_status_msg : robot_status_msgs)
     {
         RobotId robot_id = robot_status_msg.robot_id();
-        bool has_error = false;
+        bool has_error   = false;
 
         // Note: each check is not continuing when the robot is identified as injured
 
@@ -426,7 +426,8 @@ void SensorFusion::detectInjuredRobots(const std::vector<TbotsProto::RobotStatus
             }
         }
 
-        if(!has_error){
+        if (!has_error)
+        {
             /* checking for motor status in all 4 drive unit */
             auto motor_status_msgs = robot_status_msg.motor_status();
 
@@ -436,11 +437,17 @@ void SensorFusion::detectInjuredRobots(const std::vector<TbotsProto::RobotStatus
             drive_unit_msgs.push_back(motor_status_msgs.back_left());
             drive_unit_msgs.push_back(motor_status_msgs.back_right());
 
-            for(auto drive_unit_msg: drive_unit_msgs){
+            for (auto drive_unit_msg : drive_unit_msgs)
+            {
                 auto motor_faults = drive_unit_msg.motor_faults();
-                /* currently only substituting for driver overtemperature or its prewarning */
-                for(auto motor_fault: motor_faults){
-                    if(motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE || motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING){
+                /* currently only substituting for driver overtemperature or its
+                 * prewarning */
+                for (auto motor_fault : motor_faults)
+                {
+                    if (motor_fault == TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE ||
+                        motor_fault ==
+                            TbotsProto::MotorFault::DRIVER_OVERTEMPERATURE_PREWARNING)
+                    {
                         has_error = true;
                     }
                 }
@@ -448,31 +455,38 @@ void SensorFusion::detectInjuredRobots(const std::vector<TbotsProto::RobotStatus
         }
 
         /* break beam check */
-        if(!has_error && ball.has_value()){
+        if (!has_error && ball.has_value())
+        {
             auto power_status_msg = robot_status_msg.power_status();
-            if(power_status_msg.breakbeam_tripped()){
+            if (power_status_msg.breakbeam_tripped())
+            {
                 auto robot = friendly_team.getRobotById(robot_id);
-                auto dist_vector = new Vector(ball.value().position().x()-robot->position().x(), ball.value().position().y()-robot->position().y());
-                
+                auto dist_vector =
+                    new Vector(ball.value().position().x() - robot->position().x(),
+                               ball.value().position().y() - robot->position().y());
+
                 /* check if the robot has the ball, reference distance 2m */
-                if(dist_vector->length() > 2){
+                if (dist_vector->length() > 2)
+                {
                     has_error = true;
                 }
             }
         }
 
-        if(has_error){
+        if (has_error)
+        {
             injured_robot_ids.push_back(robot_id);
         }
     }
 
     std::vector<Robot> injured_robots;
-    for(auto id: injured_robot_ids){
-        if(friendly_team.getRobotById(id).has_value()){
+    for (auto id : injured_robot_ids)
+    {
+        if (friendly_team.getRobotById(id).has_value())
+        {
             injured_robots.push_back(friendly_team.getRobotById(id).value());
         }
     }
 
     friendly_team.setInjuredRobots(injured_robots);
-    
 }
