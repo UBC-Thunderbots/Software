@@ -101,6 +101,7 @@ void PassDefenderFSM::interceptBall(const Update& event)
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, backup_position, face_ball_orientation,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
