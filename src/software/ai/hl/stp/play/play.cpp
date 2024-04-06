@@ -298,4 +298,3 @@ std::vector<std::string> Play::getState()
     // by default just return the name of the play
     return {objectTypeName(*this)};
 }
-
