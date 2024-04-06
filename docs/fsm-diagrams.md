@@ -75,6 +75,20 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [EnemyBallPlacementPlayFSM](/src/software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> WaitState
+WaitState --> AvoidState : [hasPlacementPoint]\n<i>setPlacementPoint</i>
+WaitState --> WaitState : [!hasPlacementPoint]
+AvoidState --> AvoidState : <i>avoid</i>
+
+```
+
 ## [OffensePlayFSM](/src/software/ai/hl/stp/play/offense/offense_play_fsm.h)
 
 ```mermaid
