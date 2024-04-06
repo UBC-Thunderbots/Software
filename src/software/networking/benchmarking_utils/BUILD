@@ -24,6 +24,7 @@ cc_binary(
         "//software/logger:logger",
         "//software/math:statistics_functions",
         "@boost//:program_options",
+        "@tracy",
     ],
 )
 

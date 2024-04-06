@@ -3,6 +3,8 @@
 #include "software/logger/logger.h"
 #include "software/math/statistics_functions.hpp"
 
+#include <Tracy.hpp>
+
 
 LatencyTesterPrimaryNode::LatencyTesterPrimaryNode(
     const std::string& interface, const int listen_channel, const unsigned short listen_port, const int send_channel,
@@ -47,6 +49,7 @@ void LatencyTesterPrimaryNode::runTest(const int num_messages)
     for (int i = 0; i < num_messages; i++)
     {
         LOG(INFO) << "Sending message " << i << " of " << num_messages;
+        ZoneNamedN(_tracy_tx, "Message Transaction", true);
         sendTransaction();
     }
 
@@ -63,6 +66,7 @@ void LatencyTesterPrimaryNode::sendTransaction()
     bool status = false;
     do
     {
+        ZoneNamedN(_tracy_sending_message, "Sending Message", true);
         last_send_time_ = std::chrono::system_clock::now();
         sendString(send_buffer_);
         {

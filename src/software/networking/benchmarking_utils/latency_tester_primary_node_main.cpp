@@ -70,6 +70,7 @@ int main(int argc, char **argv)
         LatencyTesterPrimaryNode tester(args.interface,
             args.listen_channel, args.listen_port, args.send_channel, args.send_port,
             args.message_size_bytes, std::chrono::milliseconds(args.timeout_duration_ms));
+        std::this_thread::sleep_for(std::chrono::seconds(5));
         tester.runTest(args.num_messages);
     }
 }
