@@ -466,7 +466,7 @@ void SensorFusion::detectInjuredRobots(
                                ball.value().position().y() - robot->position().y());
 
                 /* check if the robot has the ball, reference distance 2m */
-                if (dist_vector->length() > 2)
+                if (dist_vector->length() > break_beam_tolerance)
                 {
                     has_error = true;
                 }

@@ -299,8 +299,3 @@ std::vector<std::string> Play::getState()
     return {objectTypeName(*this)};
 }
 
-std::vector<Robot> Play::getInjuredRobots(const World &world)
-{
-    std::vector<Robot> injured_robots;
-    return injured_robots;
-}

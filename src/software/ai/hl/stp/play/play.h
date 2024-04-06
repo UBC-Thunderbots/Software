@@ -154,8 +154,6 @@ class Play
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const WorldPtr& world_ptr) = 0;
 
-    virtual std::vector<Robot> getInjuredRobots(const World& world);
-
     // Stop tactic common to all plays for robots that don't have tactics assigned
     TacticVector stop_tactics;
 

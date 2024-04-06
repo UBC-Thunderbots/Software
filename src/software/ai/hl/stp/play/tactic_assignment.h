@@ -15,6 +15,9 @@ using TacticVector = std::vector<std::shared_ptr<Tactic>>;
  * @param world The world
  * @param tactic_vector The tactic vector
  * @param robots_to_assign The robots to assign to
+ * @param obstacle_factory obstacle factory
+ * @param obstacle_list list of obstacles on the field
+ * @param path_visualization path visualization object
  *
  * @return the remaining unassigned robots, the new primitives to assign, and robot to
  * tactic assignment
