@@ -178,6 +178,6 @@ class SensorFusion
     // The timestamp, in seconds, of the most recently received vision packet
     double last_t_capture;
 
-    // tolerance for break beam tolerance 
+    // tolerance for break beam tolerance
     const static int break_beam_tolerance = 2;
 };
