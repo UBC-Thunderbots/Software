@@ -2,8 +2,6 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
-//#include "software/ai/hl/stp/play/defense/defense_play.h"
-
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 
 /**
@@ -21,6 +19,8 @@ struct EnemyFreeKickPlayFSM
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+
+    static constexpr double HALF_METER_DISTANCE = 0.5;
 
     /**
      * Creates a enemy free kick play FSM

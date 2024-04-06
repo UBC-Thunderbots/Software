@@ -56,25 +56,21 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     // of tactics available to set after assigning kick off defender
     std::vector<DefenderAssignment> crease_defender_assignments;
     std::vector<DefenderAssignment> pass_defender_assignments;
-    unsigned int assigns_skipped = 0;
+    std::queue<DefenderAssignment> assignments_skipped;
     for (unsigned int i = 0; i < num_defenders; i++)
     {
         DefenderAssignment defender_assignment;
-        if (i < assignments.size())
+        if (i + assignments_skipped.size()  < assignments.size() - 1)
         {
-            defender_assignment = assignments.at(i + assigns_skipped);
-            defender_assignment = assignments.at(i);
+            defender_assignment = assignments.at(i + assignments_skipped.size());
 
+            // Continuously skips pass defenders within half meter of free kick defender
             while (defender_assignment.type == PASS_DEFENDER &&
-                   distance(defender_assignment.target, block_kick_point) <= 0.5)
+                    (i + assignments_skipped.size() < assignments.size() - 1) &&
+                    distance(defender_assignment.target, block_kick_point) <= HALF_METER_DISTANCE)
             {
-                if (i + assigns_skipped + 1 >= assignments.size())
-                {
-                    defender_assignment = assignments.front();
-                    break;
-                }
-                assigns_skipped++;
-                defender_assignment = assignments.at(i + assigns_skipped);
+                assignments_skipped.push(defender_assignment);
+                defender_assignment = assignments.at(i + assignments_skipped.size());
             }
         }
         else
@@ -82,7 +78,14 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
             // If we have more tactics to set than determined defender assignments,
             // assign remaining defenders to the defender assignment with the
             // highest coverage rating
-            defender_assignment = assignments.front();
+            if (!assignments_skipped.empty()) {
+                defender_assignment = assignments_skipped.front();
+                assignments_skipped.pop();
+            }
+            else
+            {
+                defender_assignment = assignments.front();
+            }
         }
 
         if (defender_assignment.type == CREASE_DEFENDER)

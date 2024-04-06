@@ -1,5 +1,3 @@
-import pytest
-
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
