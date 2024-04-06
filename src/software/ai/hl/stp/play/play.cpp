@@ -135,9 +135,18 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             auto primitives = goalie_tactic->get(world_ptr);
             CHECK(primitives.contains(goalie_robot_id))
                 << "Couldn't find a primitive for robot id " << goalie_robot_id;
-            auto primitive_proto =
+            auto [traj_path, primitive_proto] =
                 primitives[goalie_robot_id]->generatePrimitiveProtoMessage(
-                    world_ptr, motion_constraints, obstacle_factory);
+                    *world_ptr, motion_constraints, robot_trajectories, obstacle_factory);
+
+            if (traj_path.has_value())
+            {
+                robot_trajectories.insert_or_assign(goalie_robot_id, traj_path.value());
+            }
+            else
+            {
+                robot_trajectories.erase(goalie_robot_id);
+            }
 
             primitives_to_run->mutable_robot_primitives()->insert(
                 {goalie_robot_id, *primitive_proto});

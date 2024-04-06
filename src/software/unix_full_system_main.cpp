@@ -15,8 +15,8 @@
 #include "software/estop/arduino_util.h"
 #include "software/logger/logger.h"
 #include "software/multithreading/observer_subject_adapter.hpp"
-#include "software/networking/threaded_proto_udp_listener.hpp"
-#include "software/networking/threaded_proto_unix_listener.hpp"
+#include "software/networking/udp/threaded_proto_udp_listener.hpp"
+#include "software/networking/unix/threaded_proto_unix_listener.hpp"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/generic_factory/generic_factory.h"
 

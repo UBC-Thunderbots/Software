@@ -11,7 +11,6 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.robot_log_msg_pb2 import RobotLog
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.dock_style import *
-from software.thunderscope.proto_unix_io import ProtoUnixIO
 from google.protobuf.message import Message
 
 # Import Widgets
@@ -23,6 +22,7 @@ from software.thunderscope.gl.layers import (
     gl_passing_layer,
     gl_sandbox_world_layer,
     gl_world_layer,
+    gl_debug_shapes_layer,
     gl_simulator_layer,
     gl_tactic_layer,
     gl_cost_vis_layer,
@@ -84,7 +84,11 @@ def setup_gl_widget(
         bufferswap_counter = FrameTimeCounter()
     # Create widget
     gl_widget = GLWidget(
-        player=player, bufferswap_counter=bufferswap_counter, sandbox_mode=sandbox_mode
+        proto_unix_io=full_system_proto_unix_io,
+        friendly_color_yellow=friendly_colour_yellow,
+        bufferswap_counter=bufferswap_counter,
+        player=player,
+        sandbox_mode=sandbox_mode,
     )
 
     # Create layers
@@ -94,6 +98,9 @@ def setup_gl_widget(
     path_layer = gl_path_layer.GLPathLayer("Paths", visualization_buffer_size)
     obstacle_layer = gl_obstacle_layer.GLObstacleLayer(
         "Obstacles", visualization_buffer_size
+    )
+    debug_shapes_layer = gl_debug_shapes_layer.GLDebugShapesLayer(
+        "Debug Shapes", visualization_buffer_size
     )
     passing_layer = gl_passing_layer.GLPassingLayer(
         "Passing", visualization_buffer_size
@@ -131,24 +138,30 @@ def setup_gl_widget(
     gl_widget.add_layer(tactic_layer, False)
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
+    gl_widget.add_layer(debug_shapes_layer, False)
 
-    gl_widget.toolbar.pause_button.clicked.connect(world_layer.toggle_play_state)
+    simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
+    simulation_control_toolbar.pause_button.clicked.connect(
+        world_layer.toggle_play_state
+    )
 
     # connect all sandbox controls if using sandbox mode
     if sandbox_mode:
-        gl_widget.toolbar.undo_button.clicked.connect(world_layer.undo)
-        gl_widget.toolbar.redo_button.clicked.connect(world_layer.redo)
-        gl_widget.toolbar.reset_button.clicked.connect(world_layer.reset_to_pre_sim)
+        simulation_control_toolbar.undo_button.clicked.connect(world_layer.undo)
+        simulation_control_toolbar.redo_button.clicked.connect(world_layer.redo)
+        simulation_control_toolbar.reset_button.clicked.connect(
+            world_layer.reset_to_pre_sim
+        )
         world_layer.undo_toggle_enabled_signal.connect(
-            gl_widget.toolbar.toggle_undo_enabled
+            simulation_control_toolbar.toggle_undo_enabled
         )
         world_layer.redo_toggle_enabled_signal.connect(
-            gl_widget.toolbar.toggle_redo_enabled
+            simulation_control_toolbar.toggle_redo_enabled
         )
 
     # Register observers
     sim_proto_unix_io.register_observer(
-        SimulationState, gl_widget.toolbar.simulation_state_buffer
+        SimulationState, simulation_control_toolbar.simulation_state_buffer
     )
 
     for arg in [
@@ -163,9 +176,10 @@ def setup_gl_widget(
         (World, tactic_layer.world_buffer),
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
-        (SimulationState, gl_widget.toolbar.simulation_state_buffer),
+        (SimulationState, simulation_control_toolbar.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (World, trail_layer.world_buffer),
+        (DebugShapesMap, debug_shapes_layer.debug_shape_map_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 

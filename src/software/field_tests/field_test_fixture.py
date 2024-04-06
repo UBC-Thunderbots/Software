@@ -299,6 +299,13 @@ def load_command_line_arguments():
     )
 
     parser.add_argument(
+        "--enable_radio",
+        action="store_true",
+        default=False,
+        help="Whether to use radio (True) or Wi-Fi (False) for sending primitives to robots",
+    )
+
+    parser.add_argument(
         "--estop_baudrate",
         action="store",
         type=int,
@@ -372,9 +379,10 @@ def field_test_runner():
         interface=args.interface,
         estop_mode=estop_mode,
         estop_path=estop_path,
+        enable_radio=args.enable_radio,
     ) as rc_friendly:
         with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True
+            supress_logs=(not args.show_gamecontroller_logs)
         ) as gamecontroller:
             friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
             rc_friendly.setup_for_fullsystem()

@@ -31,8 +31,8 @@ py_library(
         "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
         "//proto:software_py_proto",
         "//proto/message_translation:py_tbots_protobuf",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
+        "//software/networking/unix:threaded_unix_listener_py",
+        "//software/networking/unix:threaded_unix_sender_py",
         "//software/thunderscope:constants",
         "//software/thunderscope:dock_style",
         "//software/thunderscope:proto_unix_io",
@@ -71,12 +71,14 @@ py_library(
         "//software:python_bindings.so",
     ],
     deps = [
+        "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/common:common_widgets",
         "//software/thunderscope/common:fps_widget",
         "//software/thunderscope/common:proto_configuration_widget",
         "//software/thunderscope/common:proto_plotter",
         "//software/thunderscope/gl:gl_widget",
         "//software/thunderscope/gl/layers:gl_cost_vis_layer",
+        "//software/thunderscope/gl/layers:gl_debug_shapes_layer",
         "//software/thunderscope/gl/layers:gl_obstacle_layer",
         "//software/thunderscope/gl/layers:gl_passing_layer",
         "//software/thunderscope/gl/layers:gl_path_layer",
@@ -126,8 +128,8 @@ py_library(
     srcs = ["proto_unix_io.py"],
     deps = [
         ":thread_safe_buffer",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
+        "//software/networking/unix:threaded_unix_listener_py",
+        "//software/networking/unix:threaded_unix_sender_py",
     ],
 )
 
