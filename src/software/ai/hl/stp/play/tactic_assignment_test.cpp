@@ -201,10 +201,6 @@ TEST_F(TacticAssignmentTest, test_correct_tactics_removed_when_more_tactics_than
 
     TacticVector tactics = {move_tactic_1, stop_tactic_1};
 
-    // Both robots are now closest to move_tactic_1's destination. We do NOT want
-    // robot_0 to be assigned to move_tactic_1, because then robot_1 has to move all the
-    // way around to move_tactic_2. What we expect is that robot_0 will be assigned to
-    // move_tactic_2 and "slide over" to make room for robot_1
     auto robot_navigation_obstacle_config = ai_config.robot_navigation_obstacle_config();
 
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
@@ -516,6 +512,7 @@ TEST_F(TacticAssignmentTest,
     EXPECT_EQ(asst.find(move_tactic_1)->second, robot_1.id());
 }
 
+// Issue #3180: Goale Tactic Assignment Failed in Tactic Assignment Test
 // TEST_F(TacticAssignmentTest,
 //        test_assigning_multiple_robots_to_goalie_tactic_goalie_set_on_team)
 // {
@@ -610,6 +607,7 @@ TEST_F(TacticAssignmentTest, test_assigning_stop_tactics_to_unassigned_non_goali
     }
 }
 
+// Issue #3180: Goale Tactic Assignment Failed in Tactic Assignment Test
 // TEST_F(TacticAssignmentTest, test_assignment_with_tiered_assignment)
 // {
 //     // Regardless of how the play yields the tactics to be assigned,
