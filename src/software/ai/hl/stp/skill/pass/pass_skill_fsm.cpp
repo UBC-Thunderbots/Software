@@ -55,15 +55,17 @@ void PassSkillFSM::findPass(
 
 void PassSkillFSM::takePass(
     const Update& event,
-    boost::sml::back::process<KickSkillFSM::Update> processEvent)
+    boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
     Point ball_position = event.common.world_ptr->ball().position();
     Point kick_target  = best_pass_so_far_->pass.receiverPoint();
 
-    KickSkillFSM::ControlParams control_params = {
+    PivotKickSkillFSM::ControlParams control_params = {
         .kick_origin       = ball_position,
         .kick_direction    = (kick_target - ball_position).orientation(),
-        .kick_speed_meters_per_second = best_pass_so_far_->pass.speed()};
+        .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                            BALL_MAX_SPEED_METERS_PER_SECOND - 0.5},
+        .retry_kick        = false};
 
-    processEvent(KickSkillFSM::Update(control_params, event.common));
+    processEvent(PivotKickSkillFSM::Update(control_params, event.common));
 }

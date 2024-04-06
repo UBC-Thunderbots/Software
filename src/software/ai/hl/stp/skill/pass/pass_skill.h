@@ -3,7 +3,7 @@
 #include "software/ai/hl/stp/skill/base_skill.hpp"
 #include "software/ai/hl/stp/skill/pass/pass_skill_fsm.h"
 
-class PassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, KickSkillFSM, GetBehindBallSkillFSM>
+class PassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, PivotKickSkillFSM>
 {
    public:
     explicit PassSkill(std::shared_ptr<Strategy> strategy);

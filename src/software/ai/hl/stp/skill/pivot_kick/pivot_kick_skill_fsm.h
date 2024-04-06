@@ -16,6 +16,8 @@ struct PivotKickSkillFSM
         Angle kick_direction;
         // How the robot will chip or kick the ball
         AutoChipOrKick auto_chip_or_kick;
+        // Whether to reattempt the kick if we lose ball control 
+        bool retry_kick = true;
     };
 
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -55,6 +57,15 @@ struct PivotKickSkillFSM
      */
     bool ballKicked(const Update& event);
 
+    /**
+     * Guard that checks if reattempting a failed kick is allowed
+     *
+     * @param event the Update event
+     *
+     * @return whether kick retries are allowed 
+     */
+    bool retryKickAllowed(const Update& event);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -67,6 +78,7 @@ struct PivotKickSkillFSM
 
         DEFINE_SML_GUARD(lostBallControl)
         DEFINE_SML_GUARD(ballKicked)
+        DEFINE_SML_GUARD(retryKickAllowed)
 
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(getBallControlAndPivot, DribbleSkillFSM)
         DEFINE_SML_ACTION(kickBall)
@@ -79,8 +91,10 @@ struct PivotKickSkillFSM
             DribbleSkillFSM_S = KickState_S,
 
             KickState_S + Update_E[ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            KickState_S + Update_E[lostBallControl_G] / getBallControlAndPivot_A =
-                DribbleSkillFSM_S,
+            KickState_S + Update_E[lostBallControl_G && retryKickAllowed_G] 
+                / getBallControlAndPivot_A = DribbleSkillFSM_S,
+            KickState_S + Update_E[lostBallControl_G && !retryKickAllowed_G] 
+                / SET_STOP_PRIMITIVE_ACTION = X,
             KickState_S + Update_E / kickBall_A,
 
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);

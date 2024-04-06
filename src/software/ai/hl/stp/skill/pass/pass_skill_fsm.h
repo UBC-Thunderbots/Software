@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
-#include "software/ai/hl/stp/skill/kick/kick_skill_fsm.h"
+#include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h"
 #include "software/ai/hl/stp/skill/skill_fsm.h"
 
 struct PassSkillFSM
@@ -18,25 +18,25 @@ struct PassSkillFSM
                   boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
     void takePass(const Update& event,
-                  boost::sml::back::process<KickSkillFSM::Update> processEvent);
+                  boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
 
     auto operator()()
     {
         using namespace boost::sml;
 
         DEFINE_SML_STATE(DribbleSkillFSM)
-        DEFINE_SML_STATE(KickSkillFSM)
+        DEFINE_SML_STATE(PivotKickSkillFSM)
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_GUARD(foundPass)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(findPass, DribbleSkillFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(takePass, KickSkillFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(takePass, PivotKickSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *DribbleSkillFSM_S + Update_E[foundPass_G] / takePass_A = KickSkillFSM_S, 
+            *DribbleSkillFSM_S + Update_E[foundPass_G] / takePass_A = PivotKickSkillFSM_S, 
             DribbleSkillFSM_S + Update_E / findPass_A, 
             DribbleSkillFSM_S = X,
-            KickSkillFSM_S + Update_E / takePass_A, KickSkillFSM_S = X,
+            PivotKickSkillFSM_S + Update_E / takePass_A, PivotKickSkillFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 
