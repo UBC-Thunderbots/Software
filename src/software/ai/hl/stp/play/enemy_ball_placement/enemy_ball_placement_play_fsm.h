@@ -17,7 +17,7 @@
  *                                +
  *
  *                     o    x  enemy robot with ball
- *      move robots      o
+ *        move robots    o
  *                         o
  *
  *   crease defenders  o   o
@@ -38,7 +38,7 @@ struct EnemyBallPlacementPlayFSM
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Creates a enemy ball placement play FSM
+     * Creates an enemy ball placement play FSM
      *
      * @param ai_config the play config for this play FSM
      */
@@ -47,19 +47,19 @@ struct EnemyBallPlacementPlayFSM
     /**
      * Guard that checks if the ball placement point exists
      *
-     * @param ai_config the play config for this play FSM
+     * @param event the EnemyBallPlacementPlayFSM Update event
      */
     bool hasPlacementPoint(const Update& event);
 
     /**
      * Action that initializes the enemy ball placement behaviour
      *
-     * @param ai_config the play config for this play FSM
+     * @param event the EnemyBallPlacementPlayFSM Update event
      */
     void setPlacementPoint(const Update& event);
 
     /**
-     * Action that positions robots to avoid interference
+     * Action that positions robots to avoid ball placement interference
      *
      * @param event the EnemyBallPlacementPlayFSM Update event
      */
