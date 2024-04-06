@@ -234,10 +234,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 }
             }
 
-        auto [remaining_robots, new_primitives_to_assign,
-              current_tactic_robot_id_assignment] =
-            assignTactics(world_ptr, tactic_vector, robots, obstacle_factory,
-                          obstacle_list, path_visualization);
+            auto [remaining_robots, new_primitives_to_assign,
+                  current_tactic_robot_id_assignment] =
+                assignTactics(world_ptr, tactic_vector, robots, obstacle_factory,
+                              obstacle_list, path_visualization);
 
             tactic_robot_id_assignment.merge(current_tactic_robot_id_assignment);
 
