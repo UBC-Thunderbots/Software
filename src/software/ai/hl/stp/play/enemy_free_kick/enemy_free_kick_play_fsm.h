@@ -20,7 +20,7 @@ struct EnemyFreeKickPlayFSM
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    static constexpr double HALF_METER_DISTANCE = 0.5;
+    static constexpr double HALF_METER_DISTANCE = 0.1;
 
     /**
      * Creates a enemy free kick play FSM
