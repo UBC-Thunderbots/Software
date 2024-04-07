@@ -15,6 +15,7 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
+from software.thunderscope.gl.graphics.gl_stadium import GLStadium
 from software.thunderscope.gl.graphics.gl_painter import GLPainter
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
@@ -100,6 +101,7 @@ class GLValidationLayer(GLLayer):
         self.polygon_graphics = ObservableList(self._graphics_changed)
         self.segment_graphics = ObservableList(self._graphics_changed)
         self.circle_graphics = ObservableList(self._graphics_changed)
+        self.stadium_graphics = ObservableList(self._graphics_changed)
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
@@ -169,6 +171,11 @@ class GLValidationLayer(GLLayer):
             for validation in validations
             for circle in validation.geometry.circles
         ]
+        stadiums = [
+            (stadium, validation.status)
+            for validation in validations
+            for stadium in validation.geometry.stadiums
+        ]
 
         # Ensure we have the same number of graphics as validations
         self.polygon_graphics.resize(
@@ -179,6 +186,9 @@ class GLValidationLayer(GLLayer):
         )
         self.circle_graphics.resize(
             len(circles), lambda: GLCircle(),
+        )
+        self.stadium_graphics.resize(
+            len(stadiums), lambda: GLStadium(),
         )
 
         for polygon_graphic, (polygon, validation_status) in zip(
@@ -220,6 +230,17 @@ class GLValidationLayer(GLLayer):
                 self.__get_validation_color(validation_status)
             )
             circle_graphic.set_fill_color(
+                self.__get_validation_color(validation_status)
+            )
+
+        for stadium_graphic, (stadium, validation_status) in zip(
+            self.stadium_graphics, stadiums
+        ):
+            stadium_graphic.update_from_stadium(stadium)
+            stadium_graphic.set_outline_color(
+                self.__get_validation_color(validation_status)
+            )
+            stadium_graphic.set_fill_color(
                 self.__get_validation_color(validation_status)
             )
 

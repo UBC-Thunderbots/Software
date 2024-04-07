@@ -23,6 +23,7 @@ message ValidationGeometry
     repeated Circle circles   = 2;
     repeated Vector vectors   = 3;
     repeated Segment segments = 4;
+    repeated Stadium stadiums = 5;
 }
 
 message ValidationProto
