@@ -32,9 +32,9 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
     WorldPtr world_ptr = event.common.world_ptr;
 
     // Create crease defenders
-    crease_defenders[0]->updateControlParams(placement_point,
+    crease_defenders[0]->updateControlParams(world_ptr->ball().position(),
                                              TbotsProto::CreaseDefenderAlignment::LEFT);
-    crease_defenders[1]->updateControlParams(placement_point,
+    crease_defenders[1]->updateControlParams(world_ptr->ball().position(),
                                              TbotsProto::CreaseDefenderAlignment::RIGHT);
 
     tactics_to_run[0].emplace_back(crease_defenders[0]);
