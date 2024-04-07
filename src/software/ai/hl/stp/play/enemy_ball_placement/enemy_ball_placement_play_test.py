@@ -2,7 +2,7 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
-from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.robot_enters_placement_region import *
 from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
     pytest_main,
@@ -12,20 +12,18 @@ from proto.ssl_gc_common_pb2 import Team
 
 
 def test_two_ai_ball_placement(simulated_test_runner):
-    def setup(*args):
-        # Initial position is from Blue's perspective
-        ball_initial_pos = tbots_cpp.Point(2, 2)
-        # Final point is going to be from yellow's perspective  (since yellow will be the one placing)
-        ball_final_pos = tbots_cpp.Point(-3, -2)
+    ball_initial_pos = tbots_cpp.Point(0, 0)
+    ball_final_pos = tbots_cpp.Point(-1, -1)
 
+    def setup(*args):
         # Setup Bots
         blue_bots = [
-            tbots_cpp.Point(-2.75, 2.5),
-            tbots_cpp.Point(-2.75, 1.5),
-            tbots_cpp.Point(-2.75, 0.5),
-            tbots_cpp.Point(-2.75, -0.5),
-            tbots_cpp.Point(-2.75, -1.5),
-            tbots_cpp.Point(4.6, -3.1),
+            tbots_cpp.Point(-3, 2.5),
+            tbots_cpp.Point(-3, 1.5),
+            tbots_cpp.Point(-3, 0.5),
+            tbots_cpp.Point(-3, -0.5),
+            tbots_cpp.Point(-3, -1.5),
+            tbots_cpp.Point(-3, -2.5),
         ]
 
         yellow_bots = [
@@ -79,16 +77,17 @@ def test_two_ai_ball_placement(simulated_test_runner):
             ),
         )
 
-    # TODO- #2783 Validation
-    # params just have to be a list of length 1 to ensure the test runs at least once
+
+    always_validation_sequence_set = [[RobotNeverEntersPlacementRegion(ball_final_pos)]]
+
     simulated_test_runner.run_test(
         setup=setup,
         params=[0],
-        inv_always_validation_sequence_set=[[]],
+        inv_always_validation_sequence_set=always_validation_sequence_set,
         inv_eventually_validation_sequence_set=[[]],
-        ag_always_validation_sequence_set=[[]],
+        ag_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=[[]],
-        test_timeout_s=7.5,
+        test_timeout_s=15,
     )
 
 
