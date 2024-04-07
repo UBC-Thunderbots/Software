@@ -191,8 +191,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     std::optional<Ball> new_ball;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
                                                 max_valid_x, ignore_invalid_camera_data);
-
-    // LOG(INFO) << ball_detections[0].position << std::endl;
     
     auto yellow_team =
         createTeamDetection({ssl_detection_frame}, TeamColour::YELLOW, min_valid_x,
