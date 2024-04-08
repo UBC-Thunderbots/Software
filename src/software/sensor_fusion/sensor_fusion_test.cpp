@@ -607,10 +607,9 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
     sensor_fusion.processSensorProto(sensor_msg);
     World result = *sensor_fusion.getWorld();
 
-    // ball placement is only set when the Referee command is for friendly team
-    // so result should remain std::nullopt
+    // result should be (0.02, 0.035)
     std::optional<Point> returned_point = result.gameState().getBallPlacementPoint();
-    EXPECT_EQ(std::nullopt, returned_point);
+    EXPECT_EQ(Point(0.02, 0.035), returned_point);
 }
 
 TEST_F(SensorFusionTest, ball_placement_friendly_invalid_point_set_by_referee)
@@ -622,7 +621,7 @@ TEST_F(SensorFusionTest, ball_placement_friendly_invalid_point_set_by_referee)
     // Remove ball placement point
     ball_placement_ref_msg.clear_designated_position();
 
-    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_blue;
+    *(sensor_msg.mutable_ssl_referee_msg()) = ball_placement_ref_msg;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
