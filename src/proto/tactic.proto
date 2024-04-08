@@ -95,6 +95,8 @@ message MoveTactic
     required MaxAllowedSpeedMode max_allowed_speed_mode = 7;
     // The target spin while moving in revolutions per second
     required double target_spin_rev_per_s = 8;
+    // The obstacle avoidance mode to use while moving
+    required ObstacleAvoidanceMode obstacle_avoidance_mode = 9;
 }
 
 message PassDefenderTactic

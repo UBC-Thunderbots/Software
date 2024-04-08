@@ -82,6 +82,9 @@ class Play
 
     std::map<std::shared_ptr<const Tactic>, RobotId> tactic_robot_id_assignment;
 
+    // Cached robot trajectories
+    std::map<RobotId, TrajectoryPath> robot_trajectories;
+
     // List of all obstacles in the world at the current iteration
     // and all robot paths. Used for visualization
     TbotsProto::ObstacleList obstacle_list;

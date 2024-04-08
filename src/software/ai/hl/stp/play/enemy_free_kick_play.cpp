@@ -95,7 +95,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
                     .orientation(),
                 0);
-            move_tactic_main->updateControlParams(
+            move_tactic_secondary->updateControlParams(
                 world_ptr->field().friendlyGoalCenter() +
                     Vector(0, -2 * ROBOT_MAX_RADIUS_METERS),
                 (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
