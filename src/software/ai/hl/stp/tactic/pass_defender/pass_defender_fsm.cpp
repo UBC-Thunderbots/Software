@@ -80,5 +80,28 @@ void PassDefenderFSM::interceptBall(const Update& event)
             TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
+        return;
     }
+
+    // The ball is likely above the robot
+    // to avoid dividing by 0
+    Angle face_ball_orientation;
+    if ((ball.position() - robot_position).length() == 0)
+    {
+        face_ball_orientation = event.common.robot.orientation();
+    }
+    else
+    {
+        face_ball_orientation = (ball.position() - robot_position).orientation();
+    }
+
+    // backup by the length of the ball
+    Point backup_position =
+        robot_position + ball.velocity().normalize(ROBOT_MAX_RADIUS_METERS);
+    event.common.set_primitive(std::make_shared<MovePrimitive>(
+        event.common.robot, backup_position, face_ball_orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
