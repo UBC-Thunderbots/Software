@@ -1,6 +1,7 @@
 #include "software/ai/evaluation/scoring/skills/feasibility_visitor.h"
 
 #include "software/ai/evaluation/keep_away.h"
+#include "software/geom/algorithms/contains.h"
 
 FeasibilityVisitor::FeasibilityVisitor(const Robot& robot,
                                        std::shared_ptr<Strategy> strategy,

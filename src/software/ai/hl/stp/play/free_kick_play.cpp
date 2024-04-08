@@ -180,10 +180,12 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
         cherry_pick_tactic_1->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
         cherry_pick_tactic_2->updateControlParams(
             pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
@@ -216,10 +218,12 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
         cherry_pick_tactic_1->updateControlParams(
             pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
         cherry_pick_tactic_2->updateControlParams(
             pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::SAFE);
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
