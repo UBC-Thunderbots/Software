@@ -2,6 +2,7 @@
 
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
+#include "software/geom/algorithms/contains.h"
 
 Point DribbleSkillFSM::robotPositionToFaceBall(const Point &ball_position,
                                                const Angle &face_ball_angle,

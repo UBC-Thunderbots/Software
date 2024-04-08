@@ -5,6 +5,7 @@
 #include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
+#include "software/geom/ray.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
 
