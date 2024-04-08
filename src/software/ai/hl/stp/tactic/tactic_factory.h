@@ -15,8 +15,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::AttackerTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
-std::shared_ptr<Tactic> createTactic(const TbotsProto::ChipTactic &tactic_proto,
-                                     std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::GoalieTactic &tactic_proto,

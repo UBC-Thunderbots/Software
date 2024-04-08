@@ -17,7 +17,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
     switch (tactic_proto.tactic_case())
     {
         PROTO_CREATE_TACTIC_CASE(Attacker, attacker)
-        PROTO_CREATE_TACTIC_CASE(Chip, chip)
         PROTO_CREATE_TACTIC_CASE(CreaseDefender, crease_defender)
         PROTO_CREATE_TACTIC_CASE(Goalie, goalie)
         PROTO_CREATE_TACTIC_CASE(MoveGoalieToGoalLine, move_goalie_to_goal_line)
@@ -52,16 +51,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::AttackerTactic &tactic_pr
         tactic->updateControlParams(createPoint(tactic_proto.chip_target()));
     }
 
-    return tactic;
-}
-
-std::shared_ptr<Tactic> createTactic(const TbotsProto::ChipTactic &tactic_proto,
-                                     std::shared_ptr<Strategy> strategy)
-{
-    auto tactic = std::make_shared<ChipTactic>();
-    tactic->updateControlParams(createPoint(tactic_proto.chip_origin()),
-                                createAngle(tactic_proto.chip_direction()),
-                                tactic_proto.chip_distance_meters());
     return tactic;
 }
 

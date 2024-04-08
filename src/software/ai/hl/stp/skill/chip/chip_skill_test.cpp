@@ -1,9 +1,8 @@
-#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
-
 #include <gtest/gtest.h>
 
 #include <utility>
 
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactics.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
@@ -13,7 +12,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class ChipTacticTest : public SimulatedErForceSimPlayTestFixture,
+class ChipSkillTest : public SimulatedErForceSimPlayTestFixture,
                        public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
    protected:
@@ -21,7 +20,7 @@ class ChipTacticTest : public SimulatedErForceSimPlayTestFixture,
     Field field                      = Field::createField(field_type);
 };
 
-TEST_P(ChipTacticTest, chip_test)
+TEST_P(ChipSkillTest, chip_test)
 {
     Vector ball_offset_from_robot = std::get<0>(GetParam());
     Angle angle_to_kick_at        = std::get<1>(GetParam());
@@ -33,7 +32,7 @@ TEST_P(ChipTacticTest, chip_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<ChipTactic>();
+    auto tactic = std::make_shared<ChipSkillTactic>();
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
                                 5);
     setTactic(1, tactic);
@@ -56,7 +55,7 @@ TEST_P(ChipTacticTest, chip_test)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    BallLocations, ChipTacticTest,
+    BallLocations, ChipSkillTest,
     ::testing::Values(
         // place the ball directly to the left of the robot
         std::make_tuple(Vector(0, 0.5), Angle::zero()),

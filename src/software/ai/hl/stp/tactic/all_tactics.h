@@ -2,7 +2,6 @@
 
 #include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactics.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
-#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"

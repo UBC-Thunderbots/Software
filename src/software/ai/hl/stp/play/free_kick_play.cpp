@@ -3,7 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
-#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
@@ -11,6 +10,7 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactics.h"
 
 FreeKickPlay::FreeKickPlay(std::shared_ptr<Strategy> strategy)
     : Play(true, strategy), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
@@ -80,17 +80,21 @@ void FreeKickPlay::chipAtGoalStage(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     const WorldPtr &world_ptr)
 {
-    auto chip_tactic = std::make_shared<ChipTactic>();
+    auto chip_tactic = std::make_shared<ChipSkillTactic>(strategy);
 
     // Figure out where the fallback chip target is
     // This is exerimentally determined to be a reasonable value
     double fallback_chip_target_x_offset = 1.5;
     Point chip_target =
         world_ptr->field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
+    Point chip_origin = world_ptr->ball().position();
 
     do
     {
-        chip_tactic->updateControlParams(world_ptr->ball().position(), chip_target);
+        chip_tactic->updateControlParams({
+            chip_origin,
+            (chip_target - chip_origin).orientation(),
+            (chip_target - chip_origin).length()});
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::LEFT);
