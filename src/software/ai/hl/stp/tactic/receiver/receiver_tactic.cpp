@@ -34,7 +34,7 @@ void ReceiverTactic::prepare()
     if (best_pass)
     {
         (*strategy_)->commitPass(*best_pass);
-        updateControlParams(best_pass->pass, true);
+        updateControlParams(best_pass->pass);
     }
 }
 
