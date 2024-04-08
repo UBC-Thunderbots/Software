@@ -9,13 +9,12 @@
 #include "software/tracy/tracy_constants.h"
 
 
-Ai::Ai(const TbotsProto::AiConfig& ai_config)
-    : strategy(std::make_shared<Strategy>(ai_config)),
+Ai::Ai(std::shared_ptr<Strategy> strategy)
+    : strategy(strategy),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{strategy})),
       override_play(nullptr),
       current_play(std::make_shared<HaltPlay>(strategy))
 {
-    updateOverridePlay();
 }
 
 void Ai::overridePlay(std::unique_ptr<Play> play)
@@ -26,24 +25,6 @@ void Ai::overridePlay(std::unique_ptr<Play> play)
 void Ai::overridePlayFromProto(const TbotsProto::Play& play_proto)
 {
     overridePlay(std::move(createPlay(play_proto, strategy)));
-}
-
-void Ai::updateOverridePlay()
-{
-    auto current_override =
-        strategy->getAiConfig().ai_control_config().override_ai_play();
-    if (current_override != TbotsProto::PlayName::UseAiSelection)
-    {
-        // Override to new play if we're not running Ai Selection
-        TbotsProto::Play play_proto;
-        play_proto.set_name(current_override);
-        overridePlayFromProto(play_proto);
-    }
-    else
-    {
-        // Clear play override if we're running Ai Selection
-        overridePlay(nullptr);
-    }
 }
 
 void Ai::overrideTactics(
@@ -63,12 +44,6 @@ void Ai::overrideTactics(
     overridePlay(std::move(play));
 
     LOG(VISUALIZE) << getPlayInfo();
-}
-
-void Ai::updateAiConfig(const TbotsProto::AiConfig& ai_config)
-{
-    strategy->updateAiConfig(ai_config);
-    updateOverridePlay();
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)

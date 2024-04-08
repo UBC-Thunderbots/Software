@@ -3,14 +3,16 @@
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 
 void ChipFSM::updateGetBehindBall(
-    const Update &event, boost::sml::back::process<GetBehindBallFSM::Update> processEvent)
+    const Update &event, boost::sml::back::process<GetBehindBallSkillFSM::Update> processEvent)
 {
-    GetBehindBallFSM::ControlParams control_params{
+    GetBehindBallSkillFSM::ControlParams control_params{
         .ball_location   = event.control_params.chip_origin,
         .chick_direction = event.control_params.chip_direction};
 
     // Update the get behind ball fsm
-    processEvent(GetBehindBallFSM::Update(control_params, event.common));
+    processEvent(GetBehindBallSkillFSM::Update(
+        control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
+                                    event.common.set_primitive)));
 }
 
 void ChipFSM::updateChip(const Update &event)

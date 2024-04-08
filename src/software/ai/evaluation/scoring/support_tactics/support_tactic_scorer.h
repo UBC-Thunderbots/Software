@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/offense_support_tactics/receiver/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 
 // We forward-declare TypedSupportTacticCandidate because if we include it, we induce a
 // circular dependency between support_tactic_candidate.h and support_tactic_scorer.hpp.
@@ -25,8 +25,7 @@ class SupportTacticScorer
      *
      * @return the score for the SupportTacticCandidate, in the range [-1.0, 1.0]
      */
-    double score(const TypedSupportTacticCandidate<OffenseSupportTactic> &candidate) =
-        delete;
+    double score(const TypedSupportTacticCandidate<Tactic> &candidate) = delete;
     virtual double score(
         const TypedSupportTacticCandidate<ReceiverTactic> &candidate) = 0;
 
@@ -36,8 +35,7 @@ class SupportTacticScorer
      *
      * @param candidate the SupportTacticCandidate to visits
      */
-    void update(const TypedSupportTacticCandidate<OffenseSupportTactic> &candidate) =
-        delete;
+    void update(const TypedSupportTacticCandidate<Tactic> &candidate) = delete;
     virtual void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) {}
 
     /**

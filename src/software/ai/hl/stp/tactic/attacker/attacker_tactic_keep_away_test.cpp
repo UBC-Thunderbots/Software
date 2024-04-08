@@ -41,7 +41,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
     ai_config.mutable_attacker_tactic_config()->set_enemy_about_to_steal_ball_radius(
         0.01);
 
-    auto tactic = std::make_shared<AttackerTactic>(getStrategy());
+    auto tactic = std::make_shared<AttackerTactic>(strategy);
 
     // force the keep away state
     tactic->updateControlParams(pass, false);

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/skill/get_behind_ball/get_behind_ball_skill_fsm.h"
+#include "software/ai/hl/stp/skill/skill_fsm.h"
 
-struct KickFSM
+struct KickSkillFSM
 {
    public:
     class KickState;
@@ -18,29 +18,29 @@ struct KickFSM
         double kick_speed_meters_per_second;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Action that updates the MovePrimitive
      *
-     * @param event KickFSM::Update event
+     * @param event KickSkillFSM::Update event
      */
     void updateKick(const Update &event);
 
     /**
-     * Action that updates the GetBehindBallFSM
+     * Action that updates the GetBehindBallSkillFSM
      *
-     * @param event KickFSM::Update event
-     * @param processEvent processes the GetBehindBallFSM::Update
+     * @param event KickSkillFSM::Update event
+     * @param processEvent processes the GetBehindBallSkillFSM::Update
      */
     void updateGetBehindBall(
         const Update &event,
-        boost::sml::back::process<GetBehindBallFSM::Update> processEvent);
+        boost::sml::back::process<GetBehindBallSkillFSM::Update> processEvent);
 
     /**
      * Guard that checks if the ball has been chicked
      *
-     * @param event KickFSM::Update event
+     * @param event KickSkillFSM::Update event
      *
      * @return if the ball has been chicked
      */
@@ -51,18 +51,18 @@ struct KickFSM
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetBehindBallFSM)
+        DEFINE_SML_STATE(GetBehindBallSkillFSM)
         DEFINE_SML_STATE(KickState)
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(ballChicked)
         DEFINE_SML_ACTION(updateKick)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
-            GetBehindBallFSM_S                                    = KickState_S,
+            *GetBehindBallSkillFSM_S + Update_E / updateGetBehindBall_A,
+            GetBehindBallSkillFSM_S                                    = KickState_S,
             KickState_S + Update_E[!ballChicked_G] / updateKick_A = KickState_S,
             KickState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);

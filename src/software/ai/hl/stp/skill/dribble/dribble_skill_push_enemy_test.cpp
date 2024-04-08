@@ -47,9 +47,6 @@ class DribbleSkillPushEnemyTest : public SimulatedErForceSimPlayTestFixture,
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-
-    std::shared_ptr<Strategy> strategy =
-        std::make_shared<Strategy>(TbotsProto::AiConfig());
 };
 
 // TODO (#2573): re-enable once fixed

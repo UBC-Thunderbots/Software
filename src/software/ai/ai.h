@@ -20,9 +20,9 @@ class Ai final
     /**
      * Create an AI
      * 
-     * @param tbots_proto The AI configuration
+     * @param strategy the Strategy
      */
-    explicit Ai(const TbotsProto::AiConfig& ai_config);
+    explicit Ai(std::shared_ptr<Strategy> strategy);
 
     /**
      * Overrides the play
@@ -65,21 +65,7 @@ class Ai final
      */
     TbotsProto::PlayInfo getPlayInfo() const;
 
-    /**
-     * Update the AiConfig proto
-     *
-     * @param ai_config The new AiConfig proto
-     */
-    void updateAiConfig(const TbotsProto::AiConfig& ai_config);
-
    private:
-    /**
-     * Checks the current AiConfig to see if we should override the current play
-     * and either applies or clears the override accordingly
-     */
-    void updateOverridePlay();
-
-    TbotsProto::AiConfig ai_config_;
     std::shared_ptr<Strategy> strategy;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;

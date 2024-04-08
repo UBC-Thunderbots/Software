@@ -8,7 +8,7 @@ ChipTactic::ChipTactic()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<ChipFSM>>(GetBehindBallFSM());
+        fsm_map[id] = std::make_unique<FSM<ChipFSM>>(ChipFSM(), GetBehindBallSkillFSM());
     }
 }
 
@@ -37,7 +37,7 @@ void ChipTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_f
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] =
-            std::make_unique<FSM<ChipFSM>>(GetBehindBallFSM());
+            std::make_unique<FSM<ChipFSM>>(ChipFSM(), GetBehindBallSkillFSM());
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(ChipFSM::Update(control_params, tactic_update));

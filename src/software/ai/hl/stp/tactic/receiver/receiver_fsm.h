@@ -3,8 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
-#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
-#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
 #include "software/geom/algorithms/closest_point.h"
@@ -123,13 +121,23 @@ struct ReceiverFSM
     bool passStarted(const Update& event);
 
     /**
-     * Check if the pass has finished by checking if we the robot has
-     * a ball near its dribbler.
+     * Check if the pass has been received by the robot executing this tactic
      *
      * @param event ReceiverFSM::Update event
-     * @return true if the ball is near a robots mouth
+     * 
+     * @return true if the ball is near the robot's mouth
      */
-    bool passFinished(const Update& event);
+    bool passReceived(const Update& event);
+
+    /**
+     * Check if the pass has been received by any friendly robot other than
+     * the robot executing this tactic
+     *
+     * @param event ReceiverFSM::Update event
+     * 
+     * @return true if the ball is near the mouth of a friendly teammate
+     */
+    bool passReceivedByTeammate(const Update& event);
 
     /**
      * If the pass is in progress and is deviating more than MIN_STRAY_PASS_ANGLE,
@@ -151,7 +159,8 @@ struct ReceiverFSM
 
         DEFINE_SML_GUARD(onetouchPossible)
         DEFINE_SML_GUARD(passStarted)
-        DEFINE_SML_GUARD(passFinished)
+        DEFINE_SML_GUARD(passReceived)
+        DEFINE_SML_GUARD(passReceivedByTeammate)
         DEFINE_SML_GUARD(strayPass)
 
         DEFINE_SML_ACTION(updateOnetouch)
@@ -165,13 +174,14 @@ struct ReceiverFSM
                                         updateOnetouch_A = OneTouchShotState_S,
             WaitingForPassState_S + Update_E[passStarted_G && !onetouchPossible_G] /
                                         updateReceive_A = ReceiveAndDribbleState_S,
-            ReceiveAndDribbleState_S + Update_E[!passFinished_G] / adjustReceive_A,
+            ReceiveAndDribbleState_S + Update_E[passReceived_G] / adjustReceive_A = X,
+            ReceiveAndDribbleState_S + Update_E[passReceivedByTeammate_G] / updateReceive_A = WaitingForPassState_S,
+            ReceiveAndDribbleState_S + Update_E / adjustReceive_A,
             OneTouchShotState_S +
-                Update_E[!passFinished_G && !strayPass_G] / updateOnetouch_A,
-            OneTouchShotState_S + Update_E[!passFinished_G && strayPass_G] /
+                Update_E[!passReceived_G && !strayPass_G] / updateOnetouch_A,
+            OneTouchShotState_S + Update_E[!passReceived_G && strayPass_G] /
                                       adjustReceive_A = ReceiveAndDribbleState_S,
-            ReceiveAndDribbleState_S + Update_E[passFinished_G] / adjustReceive_A = X,
-            OneTouchShotState_S + Update_E[passFinished_G] / updateOnetouch_A     = X,
+            OneTouchShotState_S + Update_E[passReceived_G] / updateOnetouch_A     = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                              = X);
     }
 };

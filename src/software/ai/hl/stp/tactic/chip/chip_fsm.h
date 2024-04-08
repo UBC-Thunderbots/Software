@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
+#include "software/ai/hl/stp/skill/get_behind_ball/get_behind_ball_skill_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 struct ChipFSM
@@ -28,14 +28,14 @@ struct ChipFSM
     void updateChip(const Update &event);
 
     /**
-     * Action that updates the GetBehindBallFSM
+     * Action that updates the GetBehindBallSkillFSM
      *
      * @param event ChipFSM::Update event
-     * @param processEvent processes the GetBehindBallFSM::Update
+     * @param processEvent processes the GetBehindBallSkillFSM::Update
      */
     void updateGetBehindBall(
         const Update &event,
-        boost::sml::back::process<GetBehindBallFSM::Update> processEvent);
+        boost::sml::back::process<GetBehindBallSkillFSM::Update> processEvent);
 
     /**
      * Guard that checks if the ball has been chicked
@@ -51,20 +51,24 @@ struct ChipFSM
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetBehindBallFSM)
+        DEFINE_SML_STATE(GetBehindBallSkillFSM)
         DEFINE_SML_STATE(ChipState)
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(ballChicked)
         DEFINE_SML_ACTION(updateChip)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
-            GetBehindBallFSM_S                                    = ChipState_S,
+            *GetBehindBallSkillFSM_S + Update_E / updateGetBehindBall_A,
+            GetBehindBallSkillFSM_S                                    = ChipState_S,
             ChipState_S + Update_E[!ballChicked_G] / updateChip_A = ChipState_S,
             ChipState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }
+    
+   private:
+    // TODO: Remove this once we actually pass Strategy into this tactic
+    std::shared_ptr<Strategy> strategy;
 };

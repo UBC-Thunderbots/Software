@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/offense_support_tactics/receiver/receiver_fsm.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_fsm.h"
 
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/geom/algorithms/convex_angle.h"
@@ -176,15 +176,26 @@ void ReceiverFSM::adjustReceive(const Update& event)
 
 bool ReceiverFSM::passStarted(const Update& event)
 {
-    return event.common.world_ptr->ball().hasBallBeenKicked(
-        event.control_params.pass->passerOrientation());
+    auto ball           = event.common.world_ptr->ball();
+    auto receiver_point = event.control_params.pass->receiverPoint();
+
+    return ball.hasBallBeenKicked((receiver_point - ball.position()).orientation());
 }
 
-bool ReceiverFSM::passFinished(const Update& event)
+bool ReceiverFSM::passReceived(const Update& event)
 {
-    // We tolerate imperfect passes that hit the edges of the robot,
-    // so that we can quickly transition out and grab the ball.
     return event.common.robot.isNearDribbler(event.common.world_ptr->ball().position());
+}
+
+bool ReceiverFSM::passReceivedByTeammate(const Update& event)
+{
+    auto friendly_robots =
+        event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
+
+    return std::any_of(
+        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
+            return robot.isNearDribbler(event.common.world_ptr->ball().position());
+        });
 }
 
 bool ReceiverFSM::strayPass(const Update& event)

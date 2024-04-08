@@ -22,8 +22,6 @@ void MotionConstraintVisitor::visit(const MoveTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const ChipTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const KickTactic &tactic) {}
-
 void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
 {
     current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
@@ -66,8 +64,6 @@ void MotionConstraintVisitor::visit(const PenaltySetupTactic &tactic)
 void MotionConstraintVisitor::visit(const ReceiverTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const AttackerTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
 {

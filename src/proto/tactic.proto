@@ -18,9 +18,7 @@ message Tactic
         AttackerTactic attacker                             = 1;
         ChipTactic chip                                     = 2;
         CreaseDefenderTactic crease_defender                = 3;
-        GetBehindBallTactic get_behind_ball                 = 5;
         GoalieTactic goalie                                 = 6;
-        KickTactic kick                                     = 7;
         MoveGoalieToGoalLineTactic move_goalie_to_goal_line = 8;
         MoveTactic move                                     = 9;
         PenaltyKickTactic penalty_kick                      = 10;
@@ -30,7 +28,7 @@ message Tactic
         PassDefenderTactic pass_defender                    = 15;
         ShootSkillTactic shoot_skill                        = 16;
     }
-    reserved 4, 11;
+    reserved 4, 5, 11;
 }
 
 message AttackerTactic
@@ -71,29 +69,10 @@ message CreaseDefenderTactic
     required MaxAllowedSpeedMode max_allowed_speed_mode = 3;
 }
 
-message GetBehindBallTactic
-{
-    // The location where the chick will be taken, i.e. where we expect the ball to be
-    // when we chip or kick it
-    required Point ball_location = 1;
-    // The direction the Robot will chick in
-    required Angle chick_direction = 2;
-}
-
 message GoalieTactic
 {
     // The maximum allowed speed mode
     required MaxAllowedSpeedMode max_allowed_speed_mode = 1;
-}
-
-message KickTactic
-{
-    // The location where the kick will be taken from
-    required Point kick_origin = 1;
-    // The direction the Robot will kick in
-    required Angle kick_direction = 2;
-    // How fast the Robot will kick the ball in meters per second
-    required double kick_speed_meters_per_second = 3;
 }
 
 message MoveGoalieToGoalLineTactic {}

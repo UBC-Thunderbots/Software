@@ -13,8 +13,8 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/hl/stp/primitive:move_primitive",
+        "//software/ai/hl/stp/skill/get_behind_ball:get_behind_ball_skill",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         "//software/logger",
     ],
 )

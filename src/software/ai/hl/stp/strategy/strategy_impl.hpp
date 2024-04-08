@@ -5,11 +5,11 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/strategy/pass_strategy.h"
-#include "software/ai/hl/stp/tactic/offense_support_tactics/offense_support_type.h"
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_evaluation.hpp"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/geom/pose.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/world/field.h"
 
 /**
@@ -40,8 +40,8 @@ class StrategyImpl
      *
      * @returns best pass for the robot
      */
-    PassWithRating getBestUncommittedPass();
-    Pass getBestCommittedPass();
+    std::optional<PassWithRating> getBestUncommittedPass();
+    std::optional<PassWithRating> getBestCommittedPass();
 
     std::optional<Shot> getBestShot(const Robot& robot);
 
@@ -56,15 +56,9 @@ class StrategyImpl
     bool hasWorld() const;
     void updateWorld(const WorldPtr& world_ptr);
 
-    // Committed OffenseSupportTypes
-    void commit(OffenseSupportType type);
-    std::vector<OffenseSupportType> getCommittedOffenseSupport() const;
-
-    void commit(const Pass& pass);
+    void commitPass(const PassWithRating& pass);
 
    private:
-    bool isBetterPassThanCached(const Timestamp& timestamp, const PassWithRating& pass);
-
     int calcNumIdealDefenders();
 
     TbotsProto::AiConfig ai_config_;
@@ -76,13 +70,11 @@ class StrategyImpl
 
     // Passing
     std::unique_ptr<PassStrategy> pass_strategy_;
-    std::shared_ptr<PassEvaluation<ZoneEnum>> cached_pass_eval_;
     Timestamp cached_pass_time_;
-    std::vector<Pass> committed_passes_;
+    std::shared_ptr<PassEvaluation<ZoneEnum>> cached_pass_eval_;
+    std::vector<ZoneEnum> cached_ranked_pass_zones_;
+    std::vector<PassWithRating> committed_passes_;
 
-    std::optional<Shot> best_shot_;
-
-    std::vector<OffenseSupportType> committed_support_types_;
     std::unordered_map<RobotId, Pose> robot_to_best_dribble_location_;
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
 };
@@ -146,51 +138,60 @@ Pose StrategyImpl<PitchDivision, ZoneEnum>::getBestDribblePose(const Robot& robo
 }
 
 template <class PitchDivision, class ZoneEnum>
-PassWithRating StrategyImpl<PitchDivision, ZoneEnum>::getBestUncommittedPass()
+std::optional<PassWithRating>
+StrategyImpl<PitchDivision, ZoneEnum>::getBestUncommittedPass()
 {
-    // calculate best pass
     Timestamp current_time = world_ptr_->getMostRecentTimestamp();
 
-    auto pass_eval          = pass_strategy_->getPassEvaluation();
-    const auto& latest_pass = pass_eval->getBestPassOnField();
-    if (isBetterPassThanCached(current_time, latest_pass))
+    if (!cached_pass_eval_ ||
+        (current_time - cached_pass_time_) >
+            Duration::fromSeconds(
+                ai_config_.passing_config().pass_recalculation_commit_time_s()))
     {
-        cached_pass_eval_ = pass_eval;
-        cached_pass_time_ = current_time;
+        cached_pass_time_         = current_time;
+        cached_pass_eval_         = pass_strategy_->getPassEvaluation();
+        cached_ranked_pass_zones_ = cached_pass_eval_->rankZonesForReceiving(
+            *world_ptr_, world_ptr_->ball().position());
     }
 
-    for (const auto& zone : cached_pass_eval_->rankZonesForReceiving(
-             *world_ptr_, world_ptr_->ball().position()))
+    for (ZoneEnum zone : cached_ranked_pass_zones_)
     {
-        if (std::find_if(committed_passes_.begin(), committed_passes_.end(),
-                         [&](const Pass& p) {
-                             return pitch_division_.getZoneId(p.receiverPoint()) == zone;
-                         }) == committed_passes_.end())
+        // Predicate that filters out passes received inside the zone
+        const auto is_pass_outside_zone = [&](const PassWithRating& pass) {
+            return pitch_division_.getZoneId(pass.pass.receiverPoint()) != zone;
+        };
+
+        if (std::all_of(committed_passes_.begin(), committed_passes_.end(),
+                        is_pass_outside_zone))
         {
             return cached_pass_eval_->getBestPassInZones({zone});
         }
     }
 
-    CHECK(true) << "No Pass found? All Zones have a pass committed in them...";
-
-    Pass default_pass =
-        Pass(world_ptr_->ball().position(), world_ptr_->field().friendlyGoalCenter(),
-             ai_config_.passing_config().min_pass_speed_m_per_s());
-    return PassWithRating{pass : default_pass, rating : 0};
+    return std::nullopt;
 }
 
 template <class PitchDivision, class ZoneEnum>
-Pass StrategyImpl<PitchDivision, ZoneEnum>::getBestCommittedPass()
+std::optional<PassWithRating> StrategyImpl<PitchDivision, ZoneEnum>::getBestCommittedPass()
 {
     if (committed_passes_.empty())
     {
-        Pass pass = getBestUncommittedPass().pass;
-        committed_passes_.push_back(pass);
-
-        return pass;
+        return std::nullopt;
     }
 
-    return committed_passes_[0];
+    auto pass_filter = [&](const PassWithRating& pass_with_rating) {
+        return distance(world_ptr_->ball().position(), pass_with_rating.pass.receiverPoint()) >=
+               ai_config_.passing_config().min_pass_distance();
+    };
+
+    std::vector<PassWithRating> filtered_passes;
+    std::copy_if(committed_passes_.begin(), committed_passes_.end(),
+                 std::back_inserter(filtered_passes), pass_filter);
+
+    return *std::max_element(committed_passes_.begin(), committed_passes_.end(),
+                             [](const PassWithRating& p1, const PassWithRating& p2) {
+                                 return p1.rating < p2.rating;
+                             });
 }
 
 template <class PitchDivision, class ZoneEnum>
@@ -200,10 +201,9 @@ std::optional<Shot> StrategyImpl<PitchDivision, ZoneEnum>::getBestShot(const Rob
     {
         robot_to_best_shot_[robot.id()] = sampleForBestShotOnGoal(
             world_ptr_->field(), world_ptr_->friendlyTeam(), world_ptr_->enemyTeam(),
-            world_ptr_->ball().position(), TeamType::ENEMY, 
+            world_ptr_->ball().position(), TeamType::ENEMY,
             ai_config_.dribble_config().max_continuous_dribbling_distance(),
-            ai_config_.shot_config().num_shot_origin_points_to_sample(),
-            {robot});
+            ai_config_.shot_config().num_shot_origin_points_to_sample(), {robot});
     }
 
     return robot_to_best_shot_.at(robot.id());
@@ -212,6 +212,7 @@ std::optional<Shot> StrategyImpl<PitchDivision, ZoneEnum>::getBestShot(const Rob
 template <class PitchDivision, class ZoneEnum>
 void StrategyImpl<PitchDivision, ZoneEnum>::reset()
 {
+    committed_passes_.clear();
     robot_to_best_dribble_location_.clear();
     robot_to_best_shot_.clear();
 }
@@ -253,21 +254,6 @@ void StrategyImpl<PitchDivision, ZoneEnum>::updateWorld(const WorldPtr& world_pt
 }
 
 template <class PitchDivision, class ZoneEnum>
-bool StrategyImpl<PitchDivision, ZoneEnum>::isBetterPassThanCached(
-    const Timestamp& timestamp, const PassWithRating& pass)
-{
-    bool is_cache_time_expired =
-        (timestamp - cached_pass_time_) <
-        Duration::fromSeconds(
-            ai_config_.passing_config().pass_recalculation_commit_time_s());
-    bool is_cache_pass_better =
-        (cached_pass_eval_ != nullptr) &&
-        cached_pass_eval_->getBestPassOnField().rating > pass.rating;
-
-    return is_cache_time_expired || !is_cache_pass_better;
-}
-
-template <class PitchDivision, class ZoneEnum>
 int StrategyImpl<PitchDivision, ZoneEnum>::calcNumIdealDefenders()
 {
     // TODO(arun): make a todo
@@ -275,14 +261,7 @@ int StrategyImpl<PitchDivision, ZoneEnum>::calcNumIdealDefenders()
 }
 
 template <class PitchDivision, class ZoneEnum>
-void StrategyImpl<PitchDivision, ZoneEnum>::commit(
-    OffenseSupportType offense_support_type)
-{
-    committed_support_types_.push_back(offense_support_type);
-}
-
-template <class PitchDivision, class ZoneEnum>
-void StrategyImpl<PitchDivision, ZoneEnum>::commit(const Pass& pass)
+void StrategyImpl<PitchDivision, ZoneEnum>::commitPass(const PassWithRating& pass)
 {
     committed_passes_.push_back(pass);
 }

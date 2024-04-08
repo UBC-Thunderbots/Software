@@ -7,9 +7,7 @@
 // below
 class ChipTactic;
 class CreaseDefenderTactic;
-class GetBehindBallTactic;
 class GoalieTactic;
-class KickTactic;
 class KickoffChipTactic;
 class MoveTactic;
 class AttackerTactic;
@@ -41,9 +39,7 @@ class TacticVisitor
 
     virtual void visit(const ChipTactic &tactic)                 = 0;
     virtual void visit(const CreaseDefenderTactic &tactic)       = 0;
-    virtual void visit(const GetBehindBallTactic &tactic)        = 0;
     virtual void visit(const GoalieTactic &tactic)               = 0;
-    virtual void visit(const KickTactic &tactic)                 = 0;
     virtual void visit(const KickoffChipTactic &tactic)          = 0;
     virtual void visit(const MoveTactic &tactic)                 = 0;
     virtual void visit(const AttackerTactic &tactic)             = 0;

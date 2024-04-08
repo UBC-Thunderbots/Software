@@ -48,3 +48,8 @@ bool PivotKickSkillFSM::ballKicked(const Update& event)
             event.common.world_ptr->ball().position(), ROBOT_MAX_RADIUS_METERS);
     }
 }
+
+bool PivotKickSkillFSM::retryKickAllowed(const Update& event)
+{
+    return event.control_params.retry_kick;
+}
