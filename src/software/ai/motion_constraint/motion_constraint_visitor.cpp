@@ -78,6 +78,16 @@ void MotionConstraintVisitor::visit(const KickoffChipSkillTactic &tactic)
         TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
 }
 
+void MotionConstraintVisitor::visit(const PlaceBallSkillTactic &tactic)
+{
+    current_motion_constraints.clear();
+}
+
+void MotionConstraintVisitor::visit(const WallKickoffSkillTactic &tactic)
+{
+    current_motion_constraints.clear();
+}
+
 std::set<TbotsProto::MotionConstraint>
 MotionConstraintVisitor::getUpdatedMotionConstraints(
     const Tactic &tactic,

@@ -20,6 +20,8 @@ class PrepareKickoffMoveTactic;
 class PlaceBallMoveTactic;
 class SkillTactic;
 class KickoffChipSkillTactic;
+class PlaceBallSkillTactic;
+class WallKickoffSkillTactic;
 
 /**
  * Refer to the docs about why we use the Visitor Design Pattern
@@ -51,4 +53,6 @@ class TacticVisitor
     virtual void visit(const PlaceBallMoveTactic &tactic)        = 0;
     virtual void visit(const SkillTactic &tactic)                = 0;
     virtual void visit(const KickoffChipSkillTactic &tactic)     = 0;
+    virtual void visit(const PlaceBallSkillTactic &tactic)       = 0;
+    virtual void visit(const WallKickoffSkillTactic &tactic)     = 0;
 };
