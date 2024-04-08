@@ -145,6 +145,10 @@ message PassingConfig
     // how fast we ramp down to abs_min_pass_score. This is in seconds.
     required double pass_score_ramp_down_duration = 13
         [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+    // Minimum distance in metres between the passing and receiving points for the
+    // pass to be considered valid
+    required double min_pass_distance = 14
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 }
 
 message GoalieTacticConfig
