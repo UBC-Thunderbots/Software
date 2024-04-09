@@ -60,14 +60,15 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     for (unsigned int i = 0; i < num_defenders; i++)
     {
         DefenderAssignment defender_assignment;
-        if (i + assignments_skipped.size()  < assignments.size() - 1)
+        if (i + assignments_skipped.size() < assignments.size() - 1)
         {
             defender_assignment = assignments.at(i + assignments_skipped.size());
 
             // Continuously skips pass defenders within half meter of free kick defender
             while (defender_assignment.type == PASS_DEFENDER &&
-                    (i + assignments_skipped.size() < assignments.size() - 1) &&
-                    distance(defender_assignment.target, block_kick_point) <= HALF_METER_DISTANCE)
+                   (i + assignments_skipped.size() < assignments.size() - 1) &&
+                   distance(defender_assignment.target, block_kick_point) <=
+                       HALF_METER_DISTANCE)
             {
                 assignments_skipped.push(defender_assignment);
                 defender_assignment = assignments.at(i + assignments_skipped.size());
@@ -75,12 +76,28 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
         }
         else
         {
-            // If we have more tactics to set than determined defender assignments,
-            // assign remaining defenders to the defender assignment with the
-            // highest coverage rating
-            if (!assignments_skipped.empty()) {
+            // If we have more tactics to set than determined defender assignments:
+            // first assign remaining defenders to the previously skipped defender
+            // assignments otherwise, assign a defender to stand between the kicker and
+            // net if spacing permits else default to defender with the highest coverage
+            // rating
+            if (!assignments_skipped.empty())
+            {
                 defender_assignment = assignments_skipped.front();
                 assignments_skipped.pop();
+            }
+            else if (tactics_to_return[0].size() < 2 &&
+                     distance(event.common.world_ptr->field().friendlyGoalCenter(),
+                              block_kick_point) >=
+                         event.common.world_ptr->field().totalYLength() / 2)
+            {
+                auto mid_zone_defender = std::make_shared<PassDefenderTactic>();
+                Point mid_point        = Point(
+                    (event.common.world_ptr->ball().position().toVector() +
+                     event.common.world_ptr->field().friendlyGoalCenter().toVector()) /
+                    2);
+                mid_zone_defender->updateControlParams(mid_point);
+                tactics_to_return[0].push_back(mid_zone_defender);
             }
             else
             {

@@ -28,7 +28,6 @@ class BallMovesFromRest(Validation):
 
         if (self.initial_ball_position - current_ball_position).length() > 0.05:
             validation_status = ValidationStatus.PASSING
-            pass
 
         return validation_status
 
@@ -37,11 +36,7 @@ class BallMovesFromRest(Validation):
         (override) Shows the last ball position line
         """
         return create_validation_geometry(
-            [
-                tbots_cpp.Circle(
-                    self.initial_ball_position, 0.05
-                )
-            ]
+            [tbots_cpp.Circle(self.initial_ball_position, 0.05)]
         )
 
     def __repr__(self):
