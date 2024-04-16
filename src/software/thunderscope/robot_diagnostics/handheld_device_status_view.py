@@ -44,7 +44,9 @@ class HandheldDeviceStatusView(QWidget):
 
         # initialize controller refresh button
         self.handheld_device_reinitialize_button = QPushButton()
-        self.handheld_device_reinitialize_button.setText("Re-initialize Handheld Controller")
+        self.handheld_device_reinitialize_button.setText(
+            "Re-initialize Handheld Controller"
+        )
         self.handheld_device_reinitialize_button.clicked.connect(
             self.reinitialize_controller_signal
         )
@@ -74,8 +76,12 @@ class HandheldDeviceStatusView(QWidget):
     def set_view_state(
         self, connection_state=HandheldDeviceConnectionStatus.DISCONNECTED
     ):
-        self.handheld_device_status.setText(self.status_label_view_map[connection_state][0])
-        self.handheld_device_status.setStyleSheet(self.status_label_view_map[connection_state][1])
+        self.handheld_device_status.setText(
+            self.status_label_view_map[connection_state][0]
+        )
+        self.handheld_device_status.setStyleSheet(
+            self.status_label_view_map[connection_state][1]
+        )
 
     def refresh(self, connected=HandheldDeviceConnectionStatus.DISCONNECTED) -> None:
         """Refresh the label

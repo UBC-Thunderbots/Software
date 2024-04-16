@@ -1,4 +1,4 @@
-from typing import Callable, Type
+from typing import Type
 
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
@@ -28,9 +28,7 @@ class DiagnosticsInputToggleWidget(QWidget):
 
     """
 
-    def __init__(
-        self, diagnostics_input_mode_signal: Type[QtCore.pyqtSignal]
-    ) -> None:
+    def __init__(self, diagnostics_input_mode_signal: Type[QtCore.pyqtSignal]) -> None:
         """
         Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control
         :param on_control_mode_switch_callback The callback to use for handling changes in input mode

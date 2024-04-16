@@ -92,8 +92,7 @@ class HandheldDeviceManager(object):
     def get_latest_primitive_controls(self):
         diagnostics_primitive = Primitive(
             direct_control=DirectControlPrimitive(
-                motor_control=self.motor_control,
-                power_control=self.power_control
+                motor_control=self.motor_control, power_control=self.power_control
             )
         )
         # TODO: pre-emptive bugfix: need to reset controls, especially power so that
@@ -110,9 +109,9 @@ class HandheldDeviceManager(object):
         for device in list_devices():
             controller = InputDevice(device)
             if (
-                    controller is not None
-                    and controller.name
-                    in HandheldDeviceConstants.CONTROLLER_NAME_CONFIG_MAP
+                controller is not None
+                and controller.name
+                in HandheldDeviceConstants.CONTROLLER_NAME_CONFIG_MAP
             ):
                 self.__stop_thread_signal_event.clear()
                 self.controller = controller
@@ -122,8 +121,8 @@ class HandheldDeviceManager(object):
                 break
 
         if (
-                self.get_controller_connection_status()
-                == HandheldDeviceConnectionStatus.CONNECTED
+            self.get_controller_connection_status()
+            == HandheldDeviceConnectionStatus.CONNECTED
         ):
             self.logger.debug(
                 "Initialized handheld controller "
@@ -135,8 +134,8 @@ class HandheldDeviceManager(object):
             )
 
         elif (
-                self.get_controller_connection_status()
-                == HandheldDeviceConnectionStatus.DISCONNECTED
+            self.get_controller_connection_status()
+            == HandheldDeviceConnectionStatus.DISCONNECTED
         ):
             self.logger.debug(
                 "Failed to initialize a handheld controller, check USB connection"
@@ -183,9 +182,9 @@ class HandheldDeviceManager(object):
                 # only the events that have occurred very recently are processed, and
                 # any events that occur before switching to handheld mode are dropped & ignored
                 if (
-                        event is not None
-                        and time.time() - event.timestamp()
-                        < HandheldDeviceConstants.INPUT_DELAY_THRESHOLD
+                    event is not None
+                    and time.time() - event.timestamp()
+                    < HandheldDeviceConstants.INPUT_DELAY_THRESHOLD
                 ):
                     self.__process_event(event)
 
@@ -220,8 +219,7 @@ class HandheldDeviceManager(object):
 
         diagnostics_primitive = Primitive(
             direct_control=DirectControlPrimitive(
-                motor_control=motor_control,
-                power_control=PowerControl()
+                motor_control=motor_control, power_control=PowerControl()
             )
         )
         self.proto_unix_io.send_proto(Primitive, diagnostics_primitive)
@@ -256,8 +254,10 @@ class HandheldDeviceManager(object):
                 + str(event.value)
             )
             if (
-                    event.code
-                    == self.controller_config[RobotControlType.MOVE_X][HandheldDeviceConfigKeys.CODE]
+                event.code
+                == self.controller_config[RobotControlType.MOVE_X][
+                    HandheldDeviceConfigKeys.CODE
+                ]
             ):
                 # self.motor_control.direct_velocity_control.velocity.x_component_meters
                 self.move_x = self.__parse_move_event_value(
@@ -270,8 +270,10 @@ class HandheldDeviceManager(object):
                 self.logger.debug(self.move_x)
 
             if (
-                    event.code
-                    == self.controller_config[RobotControlType.MOVE_Y][HandheldDeviceConfigKeys.CODE]
+                event.code
+                == self.controller_config[RobotControlType.MOVE_Y][
+                    HandheldDeviceConfigKeys.CODE
+                ]
             ):
                 # self.motor_control.direct_velocity_control.velocity.y_component_meters
                 self.move_y = self.__parse_move_event_value(
@@ -283,39 +285,47 @@ class HandheldDeviceManager(object):
                 )
 
             if (
-                    event.code
-                    == self.controller_config[RobotControlType.ROTATE][HandheldDeviceConfigKeys.CODE]
+                event.code
+                == self.controller_config[RobotControlType.ROTATE][
+                    HandheldDeviceConfigKeys.CODE
+                ]
             ):
                 # self.motor_control.direct_velocity_control.angular_velocity.radians_per_second
-                self.ang_vel = (
-                    self.__parse_move_event_value(
-                        event_value=event.value,
-                        max_value=self.controller_config[RobotControlType.ROTATE][
-                            HandheldDeviceConfigKeys.MAX_VALUE
-                        ],
-                        scaling_factor=self.constants.robot_max_ang_speed_rad_per_s,
-                    )
+                self.ang_vel = self.__parse_move_event_value(
+                    event_value=event.value,
+                    max_value=self.controller_config[RobotControlType.ROTATE][
+                        HandheldDeviceConfigKeys.MAX_VALUE
+                    ],
+                    scaling_factor=self.constants.robot_max_ang_speed_rad_per_s,
                 )
 
             elif (
-                    event.code
-                    == self.controller_config[RobotControlType.KICK_POWER][HandheldDeviceConfigKeys.CODE]
+                event.code
+                == self.controller_config[RobotControlType.KICK_POWER][
+                    HandheldDeviceConfigKeys.CODE
+                ]
             ):
                 self.kick_power_accumulator = self.__parse_kick_event_value(event.value)
 
             elif (
-                    event.code
-                    == self.controller_config[RobotControlType.DRIBBLER_SPEED][HandheldDeviceConfigKeys.CODE]
+                event.code
+                == self.controller_config[RobotControlType.DRIBBLER_SPEED][
+                    HandheldDeviceConfigKeys.CODE
+                ]
             ):
                 self.dribbler_speed_accumulator = self.__parse_dribbler_event_value(
                     event.value
                 )
 
             elif (
-                    event.code
-                    == self.controller_config[RobotControlType.DRIBBLER_ENABLE_1][HandheldDeviceConfigKeys.CODE]
-                    or event.code
-                    == self.controller_config[RobotControlType.DRIBBLER_ENABLE_2][HandheldDeviceConfigKeys.CODE]
+                event.code
+                == self.controller_config[RobotControlType.DRIBBLER_ENABLE_1][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+                or event.code
+                == self.controller_config[RobotControlType.DRIBBLER_ENABLE_2][
+                    HandheldDeviceConfigKeys.CODE
+                ]
             ):
                 dribbler_enabled = self.__parse_dribbler_enabled_event_value(
                     value=event.value,
@@ -330,9 +340,11 @@ class HandheldDeviceManager(object):
 
         if event.type == ecodes.EV_KEY:
             if (
-                    event.code
-                    == self.controller_config[RobotControlType.KICK][HandheldDeviceConfigKeys.CODE]
-                    and event.value == 1
+                event.code
+                == self.controller_config[RobotControlType.KICK][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+                and event.value == 1
             ):
                 self.power_control.geneva_slot = 3
                 self.power_control.chicker.kick_speed_m_per_s = (
@@ -340,9 +352,11 @@ class HandheldDeviceManager(object):
                 )
 
             if (
-                    event.code
-                    == self.controller_config[RobotControlType.CHIP][HandheldDeviceConfigKeys.CODE]
-                    and event.value == 1
+                event.code
+                == self.controller_config[RobotControlType.CHIP][
+                    HandheldDeviceConfigKeys.CODE
+                ]
+                and event.value == 1
             ):
                 self.power_control.geneva_slot = 3
                 self.power_control.chicker.chip_distance_meters = (
@@ -351,19 +365,21 @@ class HandheldDeviceManager(object):
 
     @staticmethod
     def __parse_move_event_value(
-            event_value: float, max_value: float, scaling_factor: float
+        event_value: float, max_value: float, scaling_factor: float
     ) -> float:
         # TODO: rename parameters to better names eg max_raw_value and scaling_multiplier
         # TODO can redo logic for better flow probably
         normalized = event_value / max_value * scaling_factor
         if abs(normalized) < (
-                HandheldDeviceConstants.DEADZONE_PERCENTAGE * scaling_factor
+            HandheldDeviceConstants.DEADZONE_PERCENTAGE * scaling_factor
         ):
             return 0
         else:
             return normalized
 
-    def __parse_dribbler_enabled_event_value(self, value: float, max_value: float) -> bool:
+    def __parse_dribbler_enabled_event_value(
+        self, value: float, max_value: float
+    ) -> bool:
         return value > (max_value / 2.0)
 
     def __parse_dribbler_event_value(self, value: float) -> float:
@@ -379,6 +395,7 @@ class HandheldDeviceManager(object):
             HandheldDeviceConstants.MIN_POWER,
             HandheldDeviceConstants.MAX_POWER,
         )
+
 
 # TODO: remove thee after field testing...
 # {

@@ -18,7 +18,8 @@ from software.thunderscope.robot_diagnostics.handheld_device_manager import (
     HandheldDeviceManager,
 )
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
-    DriveAndDribblerWidget, SliderType,
+    DriveAndDribblerWidget,
+    SliderType,
 )
 
 
@@ -40,7 +41,9 @@ class DiagnosticsWidget(QWidget):
         self.__control_mode = ControlMode.DIAGNOSTICS
 
         # initialize widgets
-        self.controller_status = HandheldDeviceStatusView(self.reinitialize_controller_signal)
+        self.controller_status = HandheldDeviceStatusView(
+            self.reinitialize_controller_signal
+        )
         self.drive_dribbler_widget = DriveAndDribblerWidget()
         self.chicker_widget = ChickerWidget(proto_unix_io)
         self.diagnostics_control_input_widget = DiagnosticsInputToggleWidget(
@@ -106,16 +109,13 @@ class DiagnosticsWidget(QWidget):
             # )
 
             self.drive_dribbler_widget.set_slider(
-                SliderType.XVelocitySlider,
-                self.controller_handler.move_x
+                SliderType.XVelocitySlider, self.controller_handler.move_x
             )
             self.drive_dribbler_widget.set_slider(
-                SliderType.YVelocitySlider,
-                self.controller_handler.move_y
+                SliderType.YVelocitySlider, self.controller_handler.move_y
             )
             self.drive_dribbler_widget.set_slider(
-                SliderType.DribblerVelocitySlider,
-                self.controller_handler.ang_vel
+                SliderType.DribblerVelocitySlider, self.controller_handler.ang_vel
             )
 
             # if diagnostics_primitive is not None:

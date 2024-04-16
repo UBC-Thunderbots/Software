@@ -157,7 +157,9 @@ class RobotCommunication(object):
                 )
             )
 
-    def toggle_individual_robot_control_mode(self, robot_id: int, mode: IndividualRobotMode):
+    def toggle_individual_robot_control_mode(
+        self, robot_id: int, mode: IndividualRobotMode
+    ):
         """
         Changes the input mode for a robot between NONE, MANUAL, or AI
         If changing from MANUAL OR AI to NONE, add robot id to stop primitive
@@ -263,7 +265,9 @@ class RobotCommunication(object):
 
             # set fullsystem primitives for fullsystem robots
             for robot_id in fullsystem_robots:
-                robot_primitives_map[robot_id] = fullsystem_primitive_set.robot_primitives[robot_id]
+                robot_primitives_map[
+                    robot_id
+                ] = fullsystem_primitive_set.robot_primitives[robot_id]
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives
