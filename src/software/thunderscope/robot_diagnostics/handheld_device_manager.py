@@ -178,7 +178,6 @@ class HandheldDeviceManager(object):
                 if self.__stop_thread_signal_event.is_set():
                     return
                 event = self.controller.read_one()
-                # TODO: is this a useful comment?
                 # All events accumulate into a file and will be read back eventually,
                 # even if handheld mode is disabled. This time based recency check ensures that
                 # only the events that have occurred very recently are processed, and
@@ -190,18 +189,8 @@ class HandheldDeviceManager(object):
                 ):
                     self.__process_event(event)
 
-                # else:
-                #     self.__initialize_empty_controls()
-                #     diagnostics_primitive = Primitive(
-                #         direct_control=DirectControlPrimitive(
-                #             motor_control=self.motor_control,
-                #             power_control=self.power_control
-                #         )
-                #     )
-                #     self.proto_unix_io.send_proto(Primitive, diagnostics_primitive)
                 self.send_primitive()
-
-                time.sleep(0.005)
+                time.sleep(0.0005)
 
         except OSError as ose:
             self.clear_controller()
@@ -228,7 +217,6 @@ class HandheldDeviceManager(object):
         motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
             self.ang_vel
         )
-        # self.logger.debug(motor_control)
 
         diagnostics_primitive = Primitive(
             direct_control=DirectControlPrimitive(
@@ -279,7 +267,6 @@ class HandheldDeviceManager(object):
                     ],
                     scaling_factor=self.constants.robot_max_speed_m_per_s,
                 )
-                self.ang_vel = 0.0
                 self.logger.debug(self.move_x)
 
             if (
@@ -294,8 +281,6 @@ class HandheldDeviceManager(object):
                     ],
                     scaling_factor=self.constants.robot_max_speed_m_per_s,
                 )
-                self.ang_vel = 0.0
-                self.logger.debug(self.move_y)
 
             if (
                     event.code
@@ -311,17 +296,14 @@ class HandheldDeviceManager(object):
                         scaling_factor=self.constants.robot_max_ang_speed_rad_per_s,
                     )
                 )
-                self.move_x = 0.0
-                self.move_y = 0.0
-                self.logger.debug(self.ang_vel)
 
-            if (
+            elif (
                     event.code
                     == self.controller_config[RobotControlType.KICK_POWER][HandheldDeviceConfigKeys.CODE]
             ):
                 self.kick_power_accumulator = self.__parse_kick_event_value(event.value)
 
-            if (
+            elif (
                     event.code
                     == self.controller_config[RobotControlType.DRIBBLER_SPEED][HandheldDeviceConfigKeys.CODE]
             ):
@@ -329,7 +311,7 @@ class HandheldDeviceManager(object):
                     event.value
                 )
 
-            if (
+            elif (
                     event.code
                     == self.controller_config[RobotControlType.DRIBBLER_ENABLE_1][HandheldDeviceConfigKeys.CODE]
                     or event.code

@@ -14,6 +14,7 @@ from proto.import_all_protos import *
 class SliderType(Enum):
     XVelocitySlider = 0
     YVelocitySlider = 1
+    AngularVelocitySlider = 2
     DribblerVelocitySlider = 2
 
 
@@ -45,13 +46,12 @@ class DriveAndDribblerWidget(QWidget):
         :param value: the new value to set for the given slider type
         :return: None
         """
-        print(value)
         if slider == SliderType.XVelocitySlider:
             self.x_velocity_slider.setValue(value)
         elif slider == SliderType.YVelocitySlider:
-            self.x_velocity_slider.setValue(value)
-        elif slider == SliderType.DribblerVelocitySlider:
-            self.x_velocity_slider.setValue(value)
+            self.y_velocity_slider.setValue(value)
+        elif slider == SliderType.AngularVelocitySlider:
+            self.angular_velocity_slider.setValue(value)
 
     def refresh(self, mode: ControlMode) -> None:
         """
@@ -236,10 +236,10 @@ class DriveAndDribblerWidget(QWidget):
             # self.disconnect_sliders()
 
             # disable all sliders by adding listener to keep slider value the same
-            common_widgets.disable_slider(self.x_velocity_slider)
-            common_widgets.disable_slider(self.y_velocity_slider)
-            common_widgets.disable_slider(self.angular_velocity_slider)
-            common_widgets.disable_slider(self.dribbler_speed_rpm_slider)
+            # common_widgets.disable_slider(self.x_velocity_slider)
+            # common_widgets.disable_slider(self.y_velocity_slider)
+            # common_widgets.disable_slider(self.angular_velocity_slider)
+            # common_widgets.disable_slider(self.dribbler_speed_rpm_slider)
 
             # disable buttons
             common_widgets.disable_button(self.stop_and_reset_dribbler)

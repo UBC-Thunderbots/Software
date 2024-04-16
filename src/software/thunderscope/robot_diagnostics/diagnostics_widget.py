@@ -115,7 +115,7 @@ class DiagnosticsWidget(QWidget):
             )
             self.drive_dribbler_widget.set_slider(
                 SliderType.DribblerVelocitySlider,
-                self.controller_handler.dribbler_speed_accumulator
+                self.controller_handler.ang_vel
             )
 
             # if diagnostics_primitive is not None:
