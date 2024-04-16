@@ -406,20 +406,24 @@ def set_table_data(
     table.setHorizontalHeaderLabels(horizontal_headers)
 
 
-def change_button_state(button, enable):
-    """Change button color and clickable state.
+def enable_button(button):
+    """
+    Disables the given button and sets ui to reflect that visually to the user.
+    :param button: button to change the state of
+    :returns: None
+    """
+    button.setStyleSheet("background-color: White")
+    button.setEnabled(True)
+
+
+def disable_button(button):
+    """Disables the given button and sets ui to reflect that visually to the user.
 
     :param button: button to change the state of
-    :param enable: bool: if True: enable this button, if False: disable
     :returns: None
-
     """
-    if enable:
-        button.setStyleSheet("background-color: White")
-        button.setCheckable(True)
-    else:
-        button.setStyleSheet("background-color: Grey")
-        button.setCheckable(False)
+    button.setStyleSheet("background-color: Grey")
+    button.setEnabled(False)
 
 
 def disable_slider(slider):
