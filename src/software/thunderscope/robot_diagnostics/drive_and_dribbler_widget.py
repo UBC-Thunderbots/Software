@@ -1,3 +1,5 @@
+from enum import Enum
+
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
 import time
@@ -7,15 +9,18 @@ from software.thunderscope.robot_diagnostics.diagnostics_input_widget import Con
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 from proto.import_all_protos import *
-from software.thunderscope.proto_unix_io import ProtoUnixIO
+
+
+class SliderType(Enum):
+    XVelocitySlider = 0
+    YVelocitySlider = 1
+    DribblerVelocitySlider = 2
 
 
 class DriveAndDribblerWidget(QWidget):
-    def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
-        """Initialize the widget to control the robot's motors
-
-        :param proto_unix_io: the proto_unix_io object
-
+    def __init__(self) -> None:
+        """
+        Initialize the widget to control the robot's motors
         """
 
         super(DriveAndDribblerWidget, self).__init__()
@@ -27,13 +32,26 @@ class DriveAndDribblerWidget(QWidget):
         QWidget.__init__(self)
         layout = QVBoxLayout()
 
-        self.proto_unix_io = proto_unix_io
-
         # Add widgets to layout
         layout.addWidget(self.setup_direct_velocity("Drive"))
         layout.addWidget(self.setup_dribbler("Dribbler"))
 
         self.setLayout(layout)
+
+    def set_slider(self, slider: SliderType, value: float):
+        """
+        Sets the x movement slider value
+        :param slider: the type of slider to set
+        :param value: the new value to set for the given slider type
+        :return: None
+        """
+        print(value)
+        if slider == SliderType.XVelocitySlider:
+            self.x_velocity_slider.setValue(value)
+        elif slider == SliderType.YVelocitySlider:
+            self.x_velocity_slider.setValue(value)
+        elif slider == SliderType.DribblerVelocitySlider:
+            self.x_velocity_slider.setValue(value)
 
     def refresh(self, mode: ControlMode) -> None:
         """
@@ -62,19 +80,16 @@ class DriveAndDribblerWidget(QWidget):
     def value_change(self, value: float) -> str:
         """
         Converts the given float value to a string label
-
         :param value: float value to be converted
-
         """
         value = float(value)
         value_str = "%.2f" % value
         return value_str
 
     def setup_direct_velocity(self, title: str) -> QGroupBox:
-        """Create a widget to control the direct velocity of the robot's motors
-
+        """
+        Create a widget to control the direct velocity of the robot's motors
         :param title: the name of the slider
-
         """
 
         group_box = QGroupBox(title)
@@ -212,13 +227,13 @@ class DriveAndDribblerWidget(QWidget):
             )
 
             # enable buttons
-            common_widgets.change_button_state(self.stop_and_reset_dribbler, True)
-            common_widgets.change_button_state(self.stop_and_reset_direct, True)
+            common_widgets.enable_button(self.stop_and_reset_dribbler)
+            common_widgets.enable_button(self.stop_and_reset_direct)
 
         elif mode == ControlMode.HANDHELD:
             # reset slider values and disconnect
             self.reset_all_sliders()
-            self.disconnect_sliders()
+            # self.disconnect_sliders()
 
             # disable all sliders by adding listener to keep slider value the same
             common_widgets.disable_slider(self.x_velocity_slider)
@@ -227,8 +242,8 @@ class DriveAndDribblerWidget(QWidget):
             common_widgets.disable_slider(self.dribbler_speed_rpm_slider)
 
             # disable buttons
-            common_widgets.change_button_state(self.stop_and_reset_dribbler, False)
-            common_widgets.change_button_state(self.stop_and_reset_direct, False)
+            common_widgets.disable_button(self.stop_and_reset_dribbler)
+            common_widgets.disable_button(self.stop_and_reset_direct)
 
     def disconnect_sliders(self) -> None:
         """
