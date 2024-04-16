@@ -329,8 +329,8 @@ if __name__ == "__main__":
                     if hasattr(tab, "widgets"):
                         robot_view_widget = tab.find_widget("Robot View")
                         if robot_view_widget is not None:
-                            robot_view_widget.control_mode_signal.connect(
-                                lambda robot_mode, robot_id: robot_communication.toggle_robot_control_mode(
+                            robot_view_widget.individual_robot_control_mode_signal.connect(
+                                lambda robot_id, robot_mode: robot_communication.toggle_individual_robot_control_mode(
                                     robot_id, robot_mode
                                 )
                             )
