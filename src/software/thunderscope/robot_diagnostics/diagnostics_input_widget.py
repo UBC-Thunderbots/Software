@@ -1,13 +1,13 @@
-from typing import Callable
+from typing import Callable, Type
 
-from pyqtgraph.Qt.QtCore import *
+from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 import software.thunderscope.common.common_widgets as common_widgets
 from enum import IntEnum
 
 from software.thunderscope.robot_diagnostics.handheld_device_status_view import (
-    ControllerConnectionState,
+    HandheldDeviceConnectionStatus,
 )
 
 
@@ -20,8 +20,6 @@ class ControlMode(IntEnum):
     HANDHELD = 1
 
 
-# this class name doesnt make sense
-#
 class DiagnosticsInputToggleWidget(QWidget):
     """
     Class to allow the user to switch between Manual, XBox, and Fullsystem control through Thunderscope UI
@@ -30,16 +28,16 @@ class DiagnosticsInputToggleWidget(QWidget):
 
     """
 
-    # Signal to indicate if manual controls should be disabled based on boolean parameter
-
     def __init__(
-        self, on_control_mode_switch_callback: Callable[[ControlMode], None]
+        self, diagnostics_input_mode_signal: Type[QtCore.pyqtSignal]
     ) -> None:
         """
         Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control
-        :param on_control_mode_switch_callback The signal to use for handling changes in input mode
+        :param on_control_mode_switch_callback The callback to use for handling changes in input mode
         """
         super(DiagnosticsInputToggleWidget, self).__init__()
+
+        self.diagnostics_input_mode_signal = diagnostics_input_mode_signal
 
         vbox_layout = QVBoxLayout()
 
@@ -53,10 +51,10 @@ class DiagnosticsInputToggleWidget(QWidget):
         self.handheld_control_button = self.connect_options[ControlMode.HANDHELD]
 
         self.diagnostics_control_button.clicked.connect(
-            lambda: on_control_mode_switch_callback(ControlMode.DIAGNOSTICS)
+            lambda: self.diagnostics_input_mode_signal.emit(ControlMode.DIAGNOSTICS)
         )
         self.handheld_control_button.clicked.connect(
-            lambda: on_control_mode_switch_callback(ControlMode.HANDHELD)
+            lambda: self.diagnostics_input_mode_signal.emit(ControlMode.HANDHELD)
         )
 
         self.handheld_control_button.setEnabled(False)
@@ -66,9 +64,7 @@ class DiagnosticsInputToggleWidget(QWidget):
 
         self.setLayout(vbox_layout)
 
-    def refresh(self, status: ControllerConnectionState) -> None:
-        if status == ControllerConnectionState.DISCONNECTED:
-            self.diagnostics_control_button.click()
+    def refresh(self, status: HandheldDeviceConnectionStatus) -> None:
         self.handheld_control_button.setEnabled(
-            status == ControllerConnectionState.CONNECTED
+            status == HandheldDeviceConnectionStatus.CONNECTED
         )
