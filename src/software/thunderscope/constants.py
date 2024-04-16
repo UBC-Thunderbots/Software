@@ -391,12 +391,14 @@ class HandheldDeviceConstants:
 
     CONTROLLER_NAME_CONFIG_MAP = {
         "Microsoft Xbox One X pad": XboxConfig,
+        "Microsoft X-Box One S pad": XboxConfig,
         "Microsoft X-Box 360 pad": XboxConfig,
     }
 
-    INPUT_DELAY_THRESHOLD = 0.005
-    DEADZONE_PERCENTAGE = 0.30
+    INPUT_DELAY_THRESHOLD = 0.01
+    DEADZONE_PERCENTAGE = 0.03
 
+    # TODO: remove, not needed
     MAX_LINEAR_SPEED_METER_PER_S = 2.0
     MAX_ANGULAR_SPEED_RAD_PER_S = 20.0
 
