@@ -54,12 +54,12 @@ class RobotCommunication(object):
         self.running = False
         self.enable_radio = enable_radio
 
-        self.primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
+        self.fullsystem_primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
 
         self.diagnostics_primitive_buffer = ThreadSafeBuffer(1, Primitive)
 
         self.current_proto_unix_io.register_observer(
-            PrimitiveSet, self.primitive_buffer
+            PrimitiveSet, self.fullsystem_primitive_buffer
         )
 
         self.current_proto_unix_io.register_observer(
@@ -73,16 +73,20 @@ class RobotCommunication(object):
             target=self.__run_primitive_set, daemon=True
         )
 
-        # map of robot id to the individual control mode
+        # dynamic map of robot id to the individual control mode
         self.robot_control_mode_map: dict[int, IndividualRobotMode] = {}
 
-        # map of robot id to the number of times to send a stop primitive
-        self.robot_stop_primitive_count_map: dict[int, int] = {}
+        # static map of robot id to stop primitive
+        self.robot_stop_primitives_map: dict[int, StopPrimitive] = {}
+
+        # dynamic map of robot id to the number of times to send a stop primitive
+        self.robot_stop_primitive_send_count_map: dict[int, int] = {}
 
         # load control mode and stop primitive maps with default values
         for robot_id in range(NUM_ROBOTS):
             self.robot_control_mode_map[robot_id] = IndividualRobotMode.NONE
-            self.robot_stop_primitive_count_map[robot_id] = 0
+            self.robot_stop_primitives_map[robot_id] = Primitive(stop=StopPrimitive())
+            self.robot_stop_primitive_send_count_map[robot_id] = 0
 
         # TODO: (#3174): move estop state management out of robot_communication
         self.estop_mode = estop_mode
@@ -153,7 +157,7 @@ class RobotCommunication(object):
                 )
             )
 
-    def toggle_robot_control_mode(self, robot_id: int, mode: IndividualRobotMode):
+    def toggle_individual_robot_control_mode(self, robot_id: int, mode: IndividualRobotMode):
         """
         Changes the input mode for a robot between NONE, MANUAL, or AI
         If changing from MANUAL OR AI to NONE, add robot id to stop primitive
@@ -164,7 +168,7 @@ class RobotCommunication(object):
         """
 
         self.robot_control_mode_map[robot_id] = mode
-        self.robot_stop_primitive_count_map[robot_id] = (
+        self.robot_stop_primitive_send_count_map[robot_id] = (
             NUM_TIMES_SEND_STOP if mode == IndividualRobotMode.NONE else 0
         )
 
@@ -228,8 +232,8 @@ class RobotCommunication(object):
 
         """
         while self.running:
-            # total primitives for all robots
-            robot_primitives = {}
+            # map of robot id to diagnostics/fullsystem primitive map
+            robot_primitives_map = {}
 
             # get the most recent diagnostics primitive
             diagnostics_primitive = self.diagnostics_primitive_buffer.get(block=False)
@@ -241,34 +245,35 @@ class RobotCommunication(object):
                 if mode == IndividualRobotMode.MANUAL
             )
 
-            # set robot primitives for diagnostics robots
+            # set diagnostics primitives for diagnostics robots
             for robot_id in diagnostics_robots:
-                robot_primitives[robot_id] = diagnostics_primitive
+                robot_primitives_map[robot_id] = diagnostics_primitive
 
-            # Get the primitives
-            primitive_set = self.primitive_buffer.get(
+            # get the most recent fullsystem primitives
+            fullsystem_primitive_set = self.fullsystem_primitive_buffer.get(
                 block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
             )
 
-            fullsystem_primitives = dict(primitive_set.robot_primitives)
+            # filter for fullsystem controlled robots
+            fullsystem_robots = list(
+                robot_id
+                for robot_id, mode in self.robot_control_mode_map.items()
+                if mode == IndividualRobotMode.AI
+            )
 
-            for robot_id in fullsystem_primitives.keys():
-                if (
-                    # TODO: cast shouldn't be needed...
-                    self.robot_control_mode_map[int(robot_id)]
-                    == IndividualRobotMode.AI
-                ):
-                    robot_primitives[robot_id] = fullsystem_primitives[robot_id]
+            # set fullsystem primitives for fullsystem robots
+            for robot_id in fullsystem_robots:
+                robot_primitives_map[robot_id] = fullsystem_primitive_set.robot_primitives[robot_id]
 
             # sends a final stop primitive to all disconnected robots and removes them from list
             # in order to prevent robots acting on cached old primitives
             for (
                 robot_id,
                 num_times_to_stop,
-            ) in self.robot_stop_primitive_count_map.items():
+            ) in self.robot_stop_primitive_send_count_map.items():
                 if num_times_to_stop > 0:
-                    robot_primitives[robot_id] = Primitive(stop=StopPrimitive())
-                    self.robot_stop_primitive_count_map[robot_id] = (
+                    robot_primitives_map[robot_id] = Primitive(stop=StopPrimitive())
+                    self.robot_stop_primitive_send_count_map[robot_id] = (
                         num_times_to_stop - 1
                     )
 
@@ -276,12 +281,9 @@ class RobotCommunication(object):
             primitive_set = PrimitiveSet(
                 time_sent=Timestamp(epoch_timestamp_seconds=time.time()),
                 stay_away_from_ball=False,
-                robot_primitives=robot_primitives
-                if not self.should_send_stop
-                else {
-                    robot_id: Primitive(stop=StopPrimitive())
-                    for robot_id in robot_primitives.keys()
-                },
+                robot_primitives=self.robot_stop_primitives_map
+                if self.should_send_stop
+                else robot_primitives_map,
                 sequence_number=self.sequence_number,
             )
 
