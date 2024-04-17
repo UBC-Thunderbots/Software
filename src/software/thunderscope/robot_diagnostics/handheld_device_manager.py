@@ -288,7 +288,7 @@ class HandheldDeviceManager(object):
                 == self.controller_config.secondary_dribbler_enable.event_code
             ):
                 dribbler_enabled = self.__parse_dribbler_enabled_event_value(
-                    value=event.value,
+                    event_value=event.value,
                     max_value=self.controller_config.primary_dribbler_enable.max_value,
                 )
                 if dribbler_enabled:
@@ -320,15 +320,15 @@ class HandheldDeviceManager(object):
         event_value: float, max_value: float, normalizing_multiplier: float
     ) -> float:
         relative_value = event_value / max_value
-        if abs(relative_value) < (HandheldDeviceConstants.DEADZONE_PERCENTAGE):
+        if abs(relative_value) < HandheldDeviceConstants.DEADZONE_PERCENTAGE:
             return 0
         else:
             return relative_value * normalizing_multiplier
 
     def __parse_dribbler_enabled_event_value(
-        self, value: float, max_value: float
+        self, event_value: float, max_value: float
     ) -> bool:
-        return value > (max_value / 2.0)
+        return event_value / max_value > 0.5
 
     def __parse_dribbler_event_value(self, value: float) -> float:
         return numpy.clip(
