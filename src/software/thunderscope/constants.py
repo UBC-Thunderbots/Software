@@ -400,7 +400,7 @@ class HandheldDeviceConstants:
     }
 
     INPUT_DELAY_THRESHOLD = 0.01
-    DEADZONE_PERCENTAGE = 0.03
+    DEADZONE_PERCENTAGE = 0.10
 
     # TODO: remove, not needed
     MAX_LINEAR_SPEED_METER_PER_S = 2.0
