@@ -383,10 +383,10 @@ class HandheldDeviceConstants:
         ),
         # Name: "BTN_A", Type: EV_KEY
         # Canonical: "A" Button
-        kick=HDIEField(304),
+        kick=HDIEField(304, None),
         # Name: "BTN_Y", Type: EV_KEY
         # Canonical: "Y" Button
-        chip=HDIEField(308),
+        chip=HDIEField(308, None),
         # Name: "ABS_HAT0X", Type: EV_ABS
         # Canonical: D-pad X-axis
         chicker_power=HDIEField(
