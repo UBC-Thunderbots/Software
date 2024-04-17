@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from typing import Optional
+
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
 from enum import Enum, IntEnum
@@ -337,62 +340,83 @@ class HandheldDeviceConfigKeys(Enum):
     MAX_VALUE = 2
 
 
+# nomenclature: HDIE stands for Handheld-Device-Input-Event
+
+@dataclass
+class HDIEField:
+    event_code: int
+    max_value: Optional[float]
+
+
+@dataclass
+class HDIEConfig:
+    move_x:                     HDIEField
+    move_y:                     HDIEField
+    move_rot:                   HDIEField
+    kick:                       HDIEField
+    chip:                       HDIEField
+    chicker_power:              HDIEField
+    dribbler_speed:             HDIEField
+    primary_dribbler_enable:    HDIEField
+    secondary_dribbler_enable:  HDIEField
+
+
 class HandheldDeviceConstants:
-    XboxConfig = {
+    NewXboxConfig = HDIEConfig(
         # Name: "ABS_X", Type: EV_ABS
         # Canonical: Left joystick X-axis
-        RobotControlType.MOVE_X: {
-            HandheldDeviceConfigKeys.CODE: 0,
-            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0,
-        },
+        move_x=HDIEField(
+            event_code=0,
+            max_value=32767.0
+        ),
         # Name: "ABS_Y", Type: EV_ABS
         # Canonical: Left joystick Y-axis
-        RobotControlType.MOVE_Y: {
-            HandheldDeviceConfigKeys.CODE: 1,
-            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0,
-        },
+        move_y=HDIEField(
+            event_code=1,
+            max_value=32767.0
+        ),
         # Name: "ABS_RX", Type: EV_ABS
         # Canonical: Right joystick X-axis
-        RobotControlType.ROTATE: {
-            HandheldDeviceConfigKeys.CODE: 3,
-            HandheldDeviceConfigKeys.MAX_VALUE: 32767.0,
-        },
+        move_rot=HDIEField(
+            event_code=3,
+            max_value=32767.0
+        ),
         # Name: "BTN_A", Type: EV_KEY
         # Canonical: "A" Button
-        RobotControlType.KICK: {HandheldDeviceConfigKeys.CODE: 304,},
+        kick=HDIEField(304),
         # Name: "BTN_Y", Type: EV_KEY
         # Canonical: "Y" Button
-        RobotControlType.CHIP: {HandheldDeviceConfigKeys.CODE: 308,},
+        chip=HDIEField(308),
         # Name: "ABS_HAT0X", Type: EV_ABS
         # Canonical: D-pad X-axis
-        RobotControlType.KICK_POWER: {
-            HandheldDeviceConfigKeys.CODE: 16,
-            HandheldDeviceConfigKeys.MAX_VALUE: 1.0,
-        },
+        chicker_power=HDIEField(
+            event_code=16,
+            max_value=1.0
+        ),
         # Name: "ABS_HAT0Y", Type: EV_ABS
         # Canonical: D-pad Y-axis
-        RobotControlType.DRIBBLER_SPEED: {
-            HandheldDeviceConfigKeys.CODE: 17,
-            HandheldDeviceConfigKeys.MAX_VALUE: 1.0,
-        },
+        dribbler_speed=HDIEField(
+            event_code=17,
+            max_value=1.0
+        ),
         # Name: "ABS_Z", Type: EV_ABS
         # Canonical: Left trigger
-        RobotControlType.DRIBBLER_ENABLE_1: {
-            HandheldDeviceConfigKeys.CODE: 2,
-            HandheldDeviceConfigKeys.MAX_VALUE: 1023.0,
-        },
+        primary_dribbler_enable=HDIEField(
+            event_code=2,
+            max_value=1023.0
+        ),
         # Name: "ABS_RZ", Type: EV_ABS
         # Canonical: Right trigger
-        RobotControlType.DRIBBLER_ENABLE_2: {
-            HandheldDeviceConfigKeys.CODE: 5,
-            HandheldDeviceConfigKeys.MAX_VALUE: 1023.0,
-        },
-    }
+        secondary_dribbler_enable=HDIEField(
+            event_code=5,
+            max_value=1023.0
+        )
+    )
 
     CONTROLLER_NAME_CONFIG_MAP = {
-        "Microsoft Xbox One X pad": XboxConfig,
-        "Microsoft X-Box One S pad": XboxConfig,
-        "Microsoft X-Box 360 pad": XboxConfig,
+        "Microsoft Xbox One X pad":     NewXboxConfig,
+        "Microsoft X-Box One S pad":    NewXboxConfig,
+        "Microsoft X-Box 360 pad":      NewXboxConfig,
     }
 
     INPUT_DELAY_THRESHOLD = 0.01
