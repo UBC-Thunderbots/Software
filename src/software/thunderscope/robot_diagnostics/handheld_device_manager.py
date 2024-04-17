@@ -249,9 +249,7 @@ class HandheldDeviceManager(object):
                 + ", and with value: "
                 + str(event.value)
             )
-            if (
-                event.code == self.controller_config.move_x.event_code
-            ):
+            if event.code == self.controller_config.move_x.event_code:
                 # self.motor_control.direct_velocity_control.velocity.x_component_meters
                 self.move_x = self.__parse_move_event_value(
                     event_value=event.value,
@@ -260,9 +258,7 @@ class HandheldDeviceManager(object):
                 )
                 self.logger.debug(self.move_x)
 
-            if (
-                event.code == self.controller_config.move_y.event_code
-            ):
+            if event.code == self.controller_config.move_y.event_code:
                 # self.motor_control.direct_velocity_control.velocity.y_component_meters
                 self.move_y = self.__parse_move_event_value(
                     event_value=event.value,
@@ -270,9 +266,7 @@ class HandheldDeviceManager(object):
                     normalizing_multiplier=self.constants.robot_max_speed_m_per_s,
                 )
 
-            if (
-                event.code == self.controller_config.move_rot.event_code
-            ):
+            if event.code == self.controller_config.move_rot.event_code:
                 # self.motor_control.direct_velocity_control.angular_velocity.radians_per_second
                 self.ang_vel = self.__parse_move_event_value(
                     event_value=event.value,
@@ -280,21 +274,16 @@ class HandheldDeviceManager(object):
                     normalizing_multiplier=self.constants.robot_max_ang_speed_rad_per_s,
                 )
 
-            elif (
-                event.code == self.controller_config.chicker_power.event_code
-            ):
+            elif event.code == self.controller_config.chicker_power.event_code:
                 self.kick_power_accumulator = self.__parse_kick_event_value(event.value)
 
-            elif (
-                event.code == self.controller_config.dribbler_speed.event_code
-            ):
+            elif event.code == self.controller_config.dribbler_speed.event_code:
                 self.dribbler_speed_accumulator = self.__parse_dribbler_event_value(
                     event.value
                 )
 
             elif (
-                event.code
-                == self.controller_config.primary_dribbler_enable.event_code
+                event.code == self.controller_config.primary_dribbler_enable.event_code
                 or event.code
                 == self.controller_config.secondary_dribbler_enable.event_code
             ):
@@ -309,8 +298,7 @@ class HandheldDeviceManager(object):
 
         if event.type == ecodes.EV_KEY:
             if (
-                event.code
-                == self.controller_config.kick.event_code
+                event.code == self.controller_config.kick.event_code
                 and event.value == 1
             ):
                 self.power_control.geneva_slot = 3
@@ -319,8 +307,7 @@ class HandheldDeviceManager(object):
                 )
 
             if (
-                event.code
-                == self.controller_config.chip.event_code
+                event.code == self.controller_config.chip.event_code
                 and event.value == 1
             ):
                 self.power_control.geneva_slot = 3
@@ -333,9 +320,7 @@ class HandheldDeviceManager(object):
         event_value: float, max_value: float, normalizing_multiplier: float
     ) -> float:
         relative_value = event_value / max_value
-        if abs(relative_value) < (
-            HandheldDeviceConstants.DEADZONE_PERCENTAGE
-        ):
+        if abs(relative_value) < (HandheldDeviceConstants.DEADZONE_PERCENTAGE):
             return 0
         else:
             return relative_value * normalizing_multiplier

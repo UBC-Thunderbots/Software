@@ -342,6 +342,7 @@ class HandheldDeviceConfigKeys(Enum):
 
 # nomenclature: HDIE stands for Handheld-Device-Input-Event
 
+
 @dataclass
 class HDIEField:
     event_code: int
@@ -350,37 +351,28 @@ class HDIEField:
 
 @dataclass
 class HDIEConfig:
-    move_x:                     HDIEField
-    move_y:                     HDIEField
-    move_rot:                   HDIEField
-    kick:                       HDIEField
-    chip:                       HDIEField
-    chicker_power:              HDIEField
-    dribbler_speed:             HDIEField
-    primary_dribbler_enable:    HDIEField
-    secondary_dribbler_enable:  HDIEField
+    move_x: HDIEField
+    move_y: HDIEField
+    move_rot: HDIEField
+    kick: HDIEField
+    chip: HDIEField
+    chicker_power: HDIEField
+    dribbler_speed: HDIEField
+    primary_dribbler_enable: HDIEField
+    secondary_dribbler_enable: HDIEField
 
 
 class HandheldDeviceConstants:
     NewXboxConfig = HDIEConfig(
         # Name: "ABS_X", Type: EV_ABS
         # Canonical: Left joystick X-axis
-        move_x=HDIEField(
-            event_code=0,
-            max_value=32767.0
-        ),
+        move_x=HDIEField(event_code=0, max_value=32767.0),
         # Name: "ABS_Y", Type: EV_ABS
         # Canonical: Left joystick Y-axis
-        move_y=HDIEField(
-            event_code=1,
-            max_value=32767.0
-        ),
+        move_y=HDIEField(event_code=1, max_value=32767.0),
         # Name: "ABS_RX", Type: EV_ABS
         # Canonical: Right joystick X-axis
-        move_rot=HDIEField(
-            event_code=3,
-            max_value=32767.0
-        ),
+        move_rot=HDIEField(event_code=3, max_value=32767.0),
         # Name: "BTN_A", Type: EV_KEY
         # Canonical: "A" Button
         kick=HDIEField(304, None),
@@ -389,34 +381,22 @@ class HandheldDeviceConstants:
         chip=HDIEField(308, None),
         # Name: "ABS_HAT0X", Type: EV_ABS
         # Canonical: D-pad X-axis
-        chicker_power=HDIEField(
-            event_code=16,
-            max_value=1.0
-        ),
+        chicker_power=HDIEField(event_code=16, max_value=1.0),
         # Name: "ABS_HAT0Y", Type: EV_ABS
         # Canonical: D-pad Y-axis
-        dribbler_speed=HDIEField(
-            event_code=17,
-            max_value=1.0
-        ),
+        dribbler_speed=HDIEField(event_code=17, max_value=1.0),
         # Name: "ABS_Z", Type: EV_ABS
         # Canonical: Left trigger
-        primary_dribbler_enable=HDIEField(
-            event_code=2,
-            max_value=1023.0
-        ),
+        primary_dribbler_enable=HDIEField(event_code=2, max_value=1023.0),
         # Name: "ABS_RZ", Type: EV_ABS
         # Canonical: Right trigger
-        secondary_dribbler_enable=HDIEField(
-            event_code=5,
-            max_value=1023.0
-        )
+        secondary_dribbler_enable=HDIEField(event_code=5, max_value=1023.0),
     )
 
     CONTROLLER_NAME_CONFIG_MAP = {
-        "Microsoft Xbox One X pad":     NewXboxConfig,
-        "Microsoft X-Box One S pad":    NewXboxConfig,
-        "Microsoft X-Box 360 pad":      NewXboxConfig,
+        "Microsoft Xbox One X pad": NewXboxConfig,
+        "Microsoft X-Box One S pad": NewXboxConfig,
+        "Microsoft X-Box 360 pad": NewXboxConfig,
     }
 
     INPUT_DELAY_THRESHOLD = 0.01
