@@ -7,6 +7,7 @@ from typing import Type
 from google.protobuf.message import Message
 from pyqtgraph.Qt import QtCore
 from proto.import_all_protos import *
+from software.logger.logger import create_logger
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
@@ -54,12 +55,14 @@ class RobotCommunication(object):
         self.running = False
         self.enable_radio = enable_radio
 
-        self.fullsystem_primitive_buffer = ThreadSafeBuffer(1, PrimitiveSet)
+        self.logger = create_logger("RobotCommunication")
+
+        self.fullsystem_primitive_set_buffer = ThreadSafeBuffer(1, PrimitiveSet)
 
         self.diagnostics_primitive_buffer = ThreadSafeBuffer(1, Primitive)
 
         self.current_proto_unix_io.register_observer(
-            PrimitiveSet, self.fullsystem_primitive_buffer
+            PrimitiveSet, self.fullsystem_primitive_set_buffer
         )
 
         self.current_proto_unix_io.register_observer(
@@ -148,7 +151,7 @@ class RobotCommunication(object):
         """
         if self.estop_mode == EstopMode.KEYBOARD_ESTOP:
             self.estop_is_playing = not self.estop_is_playing
-            print(
+            self.logger.debug(
                 "Keyboard Estop changed to "
                 + (
                     f"\x1b[32mPLAY \x1b[0m"
@@ -252,7 +255,7 @@ class RobotCommunication(object):
                 robot_primitives_map[robot_id] = diagnostics_primitive
 
             # get the most recent fullsystem primitives
-            fullsystem_primitive_set = self.fullsystem_primitive_buffer.get(
+            fullsystem_primitive_set = self.fullsystem_primitive_set_buffer.get(
                 block=True, timeout=ROBOT_COMMUNICATIONS_TIMEOUT_S
             )
 
