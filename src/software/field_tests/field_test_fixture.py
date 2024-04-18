@@ -16,7 +16,7 @@ from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.replay.proto_logger import ProtoLogger
-from software.logger.logger import createLogger
+from software.logger.logger import create_logger
 
 
 from software.thunderscope.thunderscope_config import configure_field_test_view
@@ -25,7 +25,7 @@ from software.thunderscope.robot_communication import RobotCommunication
 from software.thunderscope.estop_helpers import get_estop_config
 from software.py_constants import *
 
-logger = createLogger(__name__)
+logger = create_logger(__name__)
 
 WORLD_BUFFER_TIMEOUT = 5.0
 PROCESS_BUFFER_DELAY_S = 0.01
