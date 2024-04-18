@@ -406,9 +406,14 @@ class HandheldDeviceConstants:
     MAX_LINEAR_SPEED_METER_PER_S = 2.0
     MAX_ANGULAR_SPEED_RAD_PER_S = 20.0
 
-    DRIBBLER_STEPPER = 100.0
-    DRIBBLER_INDEFINITE_SPEED = -10000.0
+    DRIBBLER_SPEED_STEPPER = 1000.0
+    # This is actually considered to be an "indefinite" speed in the robots software backend
+    DRIBBLER_MAX_SPEED = -10000.0
 
-    POWER_STEPPER = 100.0
-    MIN_POWER = 1000.0
-    MAX_POWER = 20000.0
+    KICK_POWER_STEPPER = 1000.0
+    MIN_KICK_POWER = 1000.0
+    MAX_KICK_POWER = 20000.0
+
+    CHIP_DISTANCE_STEPPER = 100.0
+    MIN_CHIP_POWER = 0.5
+    MAX_CHIP_POWER = 3.0
