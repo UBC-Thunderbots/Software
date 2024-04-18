@@ -30,10 +30,10 @@ class HandheldDeviceManager(object):
     """
 
     def __init__(
-            self,
-            proto_unix_io: ProtoUnixIO,
-            logger: Logger,
-            handheld_device_disconnected_signal: Type[QtCore.pyqtSignal]
+        self,
+        proto_unix_io: ProtoUnixIO,
+        logger: Logger,
+        handheld_device_disconnected_signal: Type[QtCore.pyqtSignal],
     ):
         self.proto_unix_io = proto_unix_io
         self.logger = logger
@@ -68,7 +68,9 @@ class HandheldDeviceManager(object):
         # default values for motor control
         self.motor_control.direct_velocity_control.velocity.x_component_meters = 0.0
         self.motor_control.direct_velocity_control.velocity.y_component_meters = 0.0
-        self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = 0.0
+        self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+            0.0
+        )
         self.motor_control.dribbler_speed_rpm = 0
 
         # default values for power control
@@ -87,9 +89,9 @@ class HandheldDeviceManager(object):
         for device in list_devices():
             controller = InputDevice(device)
             if (
-                    controller is not None
-                    and controller.name
-                    in HandheldDeviceConstants.CONTROLLER_NAME_CONFIG_MAP
+                controller is not None
+                and controller.name
+                in HandheldDeviceConstants.CONTROLLER_NAME_CONFIG_MAP
             ):
                 self.__stop_thread_signal_event.clear()
                 self.controller = controller
@@ -99,19 +101,23 @@ class HandheldDeviceManager(object):
                 break
 
         if (
-                self.__get_handheld_device_connection_status()
-                == HandheldDeviceConnectionStatus.CONNECTED
+            self.__get_handheld_device_connection_status()
+            == HandheldDeviceConnectionStatus.CONNECTED
         ):
-            self.handheld_device_disconnected_signal.emit(HandheldDeviceConnectionStatus.CONNECTED)
-            self.logger.debug('Successfully initialized handheld!')
-            self.logger.debug('Device name: \"' + self.controller.name + '\"')
-            self.logger.debug('Device path: ' + self.controller.path)
+            self.handheld_device_disconnected_signal.emit(
+                HandheldDeviceConnectionStatus.CONNECTED
+            )
+            self.logger.debug("Successfully initialized handheld!")
+            self.logger.debug('Device name: "' + self.controller.name + '"')
+            self.logger.debug("Device path: " + self.controller.path)
 
         elif (
-                self.__get_handheld_device_connection_status()
-                == HandheldDeviceConnectionStatus.DISCONNECTED
+            self.__get_handheld_device_connection_status()
+            == HandheldDeviceConnectionStatus.DISCONNECTED
         ):
-            self.handheld_device_disconnected_signal.emit(HandheldDeviceConnectionStatus.DISCONNECTED)
+            self.handheld_device_disconnected_signal.emit(
+                HandheldDeviceConnectionStatus.DISCONNECTED
+            )
             self.logger.debug(
                 "Failed to initialize a handheld controller, check USB connection"
             )
@@ -128,8 +134,7 @@ class HandheldDeviceManager(object):
     def get_latest_primitive_controls(self):
         diagnostics_primitive = Primitive(
             direct_control=DirectControlPrimitive(
-                motor_control=self.motor_control,
-                power_control=self.power_control
+                motor_control=self.motor_control, power_control=self.power_control
             )
         )
         # TODO: pre-emptive bugfix: need to reset controls, especially power so that
@@ -159,13 +164,17 @@ class HandheldDeviceManager(object):
 
     def __clear_controller(self):
         self.logger.debug(
-            f"shutting down handler thread, is_alive = {self.__controller_event_loop_handler_thread.is_alive()}")
+            f"shutting down handler thread, is_alive = {self.__controller_event_loop_handler_thread.is_alive()}"
+        )
         self.__shutdown_handheld_device_event_loop_handler_thread()
         self.logger.debug(
-            f"after shutdown handler thread, is_alive = {self.__controller_event_loop_handler_thread.is_alive()}")
+            f"after shutdown handler thread, is_alive = {self.__controller_event_loop_handler_thread.is_alive()}"
+        )
         self.controller = None
         self.controller_config = None
-        self.handheld_device_disconnected_signal.emit(HandheldDeviceConnectionStatus.DISCONNECTED)
+        self.handheld_device_disconnected_signal.emit(
+            HandheldDeviceConnectionStatus.DISCONNECTED
+        )
 
     def close(self):
         self.__shutdown_handheld_device_event_loop_handler_thread()
@@ -211,9 +220,9 @@ class HandheldDeviceManager(object):
                 # only the events that have occurred very recently are processed, and
                 # any events that occur before switching to handheld mode are dropped & ignored
                 if (
-                        event is not None
-                        and time.time() - event.timestamp()
-                        < HandheldDeviceConstants.INPUT_DELAY_THRESHOLD
+                    event is not None
+                    and time.time() - event.timestamp()
+                    < HandheldDeviceConstants.INPUT_DELAY_THRESHOLD
                 ):
                     self.__process_event(event)
 
@@ -271,7 +280,9 @@ class HandheldDeviceManager(object):
 
             elif event.code == self.controller_config.chicker_power.event_code:
                 self.kick_power_accumulator = self.__parse_kick_event_value(event.value)
-                self.chip_distance_accumulator = self.__parse_chip_event_value(event.value)
+                self.chip_distance_accumulator = self.__parse_chip_event_value(
+                    event.value
+                )
 
             elif event.code == self.controller_config.dribbler_speed.event_code:
                 self.dribbler_speed_accumulator = self.__parse_dribbler_speed_event_value(
@@ -279,9 +290,9 @@ class HandheldDeviceManager(object):
                 )
 
             elif (
-                    event.code == self.controller_config.primary_dribbler_enable.event_code
-                    or event.code
-                    == self.controller_config.secondary_dribbler_enable.event_code
+                event.code == self.controller_config.primary_dribbler_enable.event_code
+                or event.code
+                == self.controller_config.secondary_dribbler_enable.event_code
             ):
                 dribbler_enabled = self.__parse_dribbler_enabled_event_value(
                     event_value=event.value,
@@ -294,8 +305,8 @@ class HandheldDeviceManager(object):
 
         if event.type == ecodes.EV_KEY:
             if (
-                    event.code == self.controller_config.kick.event_code
-                    and event.value == 1
+                event.code == self.controller_config.kick.event_code
+                and event.value == 1
             ):
                 self.power_control.geneva_slot = 3
                 self.power_control.chicker.kick_speed_m_per_s = (
@@ -303,8 +314,8 @@ class HandheldDeviceManager(object):
                 )
 
             if (
-                    event.code == self.controller_config.chip.event_code
-                    and event.value == 1
+                event.code == self.controller_config.chip.event_code
+                and event.value == 1
             ):
                 self.power_control.geneva_slot = 3
                 self.power_control.chicker.chip_distance_meters = (
@@ -313,7 +324,7 @@ class HandheldDeviceManager(object):
 
     @staticmethod
     def __parse_move_event_value(
-            event_value: float, max_value: float, normalizing_multiplier: float
+        event_value: float, max_value: float, normalizing_multiplier: float
     ) -> float:
         relative_value = event_value / max_value
         if abs(relative_value) < HandheldDeviceConstants.DEADZONE_PERCENTAGE:
@@ -322,20 +333,22 @@ class HandheldDeviceManager(object):
             return relative_value * normalizing_multiplier
 
     def __parse_dribbler_enabled_event_value(
-            self, event_value: float, max_value: float
+        self, event_value: float, max_value: float
     ) -> bool:
         return (event_value / max_value) > 0.5
 
     def __parse_dribbler_speed_event_value(self, value: float) -> float:
         return numpy.clip(
-            a=self.motor_control.dribbler_speed_rpm + value * HandheldDeviceConstants.DRIBBLER_SPEED_STEPPER,
+            a=self.motor_control.dribbler_speed_rpm
+            + value * HandheldDeviceConstants.DRIBBLER_SPEED_STEPPER,
             a_min=0,
             a_max=HandheldDeviceConstants.DRIBBLER_MAX_SPEED,
         )
 
     def __parse_kick_event_value(self, value: float) -> float:
         return numpy.clip(
-            a=self.power_control.chicker.kick_speed_m_per_s + value * HandheldDeviceConstants.KICK_POWER_STEPPER,
+            a=self.power_control.chicker.kick_speed_m_per_s
+            + value * HandheldDeviceConstants.KICK_POWER_STEPPER,
             a_min=HandheldDeviceConstants.MIN_KICK_POWER,
             a_max=HandheldDeviceConstants.MAX_KICK_POWER,
         )
@@ -346,6 +359,7 @@ class HandheldDeviceManager(object):
             a_min=HandheldDeviceConstants.MIN_CHIP_POWER,
             a_max=HandheldDeviceConstants.MAX_CHIP_POWER,
         )
+
 
 # TODO: remove thee after field testing...
 # {

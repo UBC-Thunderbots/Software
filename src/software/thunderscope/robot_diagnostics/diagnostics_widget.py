@@ -31,7 +31,9 @@ class DiagnosticsWidget(QWidget):
     reinitialize_handheld_device_signal = pyqtSignal()
 
     # signal to indicate that controller was disconnected
-    handheld_device_connection_status_signal = pyqtSignal(HandheldDeviceConnectionStatus)
+    handheld_device_connection_status_signal = pyqtSignal(
+        HandheldDeviceConnectionStatus
+    )
 
     def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
         super(DiagnosticsWidget, self).__init__()
@@ -63,13 +65,15 @@ class DiagnosticsWidget(QWidget):
         self.reinitialize_handheld_device_signal.connect(self.__reinitialize_controller)
 
         # connect handheld device connection status toggle signal with handler
-        self.handheld_device_connection_status_signal.connect(self.__toggle_handheld_device_connection_status)
+        self.handheld_device_connection_status_signal.connect(
+            self.__toggle_handheld_device_connection_status
+        )
 
         # initialize controller
         self.controller_handler = HandheldDeviceManager(
             self.proto_unix_io,  # TODO: proto shouldn't be passed down
             self.logger,
-            self.handheld_device_connection_status_signal
+            self.handheld_device_connection_status_signal,
         )
 
         # layout for the entire diagnostics tab
@@ -86,7 +90,9 @@ class DiagnosticsWidget(QWidget):
         self.__control_mode = mode
         self.controller_handler.refresh(self.__control_mode)
 
-    def __toggle_handheld_device_connection_status(self, status: HandheldDeviceConnectionStatus):
+    def __toggle_handheld_device_connection_status(
+        self, status: HandheldDeviceConnectionStatus
+    ):
         self.__handheld_device_status = status
 
     def refresh(self):
@@ -132,8 +138,7 @@ class DiagnosticsWidget(QWidget):
                 diagnostics_primitive.direct_control.motor_control.direct_velocity_control.velocity.y_component_meters
             )
             self.drive_dribbler_widget.set_angular_velocity_slider(
-                diagnostics_primitive.direct_control.motor_control.direct_velocity_control.angular_velocity.
-                radians_per_second
+                diagnostics_primitive.direct_control.motor_control.direct_velocity_control.angular_velocity.radians_per_second
             )
 
             self.drive_dribbler_widget.set_dribbler_velocity_slider(

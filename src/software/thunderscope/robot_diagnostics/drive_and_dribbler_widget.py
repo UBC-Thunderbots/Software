@@ -137,7 +137,9 @@ class DriveAndDribblerWidget(QWidget):
             self.y_velocity_slider, self.y_velocity_label, self.__value_change_handler
         )
         common_widgets.enable_slider(
-            self.angular_velocity_slider, self.angular_velocity_label, self.__value_change_handler
+            self.angular_velocity_slider,
+            self.angular_velocity_label,
+            self.__value_change_handler,
         )
 
         self.stop_and_reset_direct = common_widgets.create_push_button("Stop and Reset")
@@ -211,12 +213,12 @@ class DriveAndDribblerWidget(QWidget):
             common_widgets.enable_slider(
                 self.x_velocity_slider,
                 self.x_velocity_label,
-                self.__value_change_handler
+                self.__value_change_handler,
             )
             common_widgets.enable_slider(
                 self.y_velocity_slider,
                 self.y_velocity_label,
-                self.__value_change_handler
+                self.__value_change_handler,
             )
             common_widgets.enable_slider(
                 self.angular_velocity_slider,

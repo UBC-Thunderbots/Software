@@ -156,8 +156,8 @@ py_library(
         "//software:py_constants.so",
     ],
     deps = [
-        "//software/thunderscope:constants",
         "//software/logger:py_logger",
+        "//software/thunderscope:constants",
     ],
 )
 

@@ -40,7 +40,6 @@ class HandheldDeviceStatusView(QWidget):
             ),
         }
 
-
         # initialize controller refresh button
         self.handheld_device_reinitialize_button = QPushButton()
         self.handheld_device_reinitialize_button.setText(
