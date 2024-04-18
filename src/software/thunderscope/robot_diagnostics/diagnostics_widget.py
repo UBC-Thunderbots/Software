@@ -18,8 +18,7 @@ from software.thunderscope.robot_diagnostics.handheld_device_manager import (
     HandheldDeviceManager,
 )
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
-    DriveAndDribblerWidget,
-    SliderType,
+    DriveAndDribblerWidget
 )
 
 

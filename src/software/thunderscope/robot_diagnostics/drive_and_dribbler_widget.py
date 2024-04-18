@@ -1,22 +1,12 @@
-from enum import Enum
-
+import time
 from pyqtgraph.Qt.QtCore import Qt
 from pyqtgraph.Qt.QtWidgets import *
-import time
-import software.python_bindings as tbots_cpp
+from proto.import_all_protos import *
 
+import software.python_bindings as tbots_cpp
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
-from proto.import_all_protos import *
-
-
-class SliderType(Enum):
-    XVelocitySlider = 0
-    YVelocitySlider = 1
-    AngularVelocitySlider = 2
-    DribblerVelocitySlider = 2
-
 
 class DriveAndDribblerWidget(QWidget):
     def __init__(self) -> None:
