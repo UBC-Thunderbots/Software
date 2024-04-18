@@ -209,7 +209,7 @@ class RobotInfo(QWidget):
 
         control_mode_menu.currentIndexChanged.connect(
             lambda mode, robot_id=self.robot_id: self.individual_robot_control_mode_signal.emit(
-                robot_id, mode
+                robot_id, IndividualRobotMode(mode)
             )
         )
 
