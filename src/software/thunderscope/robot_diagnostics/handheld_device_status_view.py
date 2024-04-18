@@ -40,7 +40,6 @@ class HandheldDeviceStatusView(QWidget):
             ),
         }
 
-        self.group_box = QGroupBox()
 
         # initialize controller refresh button
         self.handheld_device_reinitialize_button = QPushButton()
@@ -60,14 +59,14 @@ class HandheldDeviceStatusView(QWidget):
         # set layout and spacing
         self.hbox_layout.addWidget(self.handheld_device_status)
         self.hbox_layout.addWidget(self.handheld_device_reinitialize_button)
-        # self.hbox_layout.setStretch(0, 4)
-        # self.hbox_layout.setStretch(1, 1)
+        self.hbox_layout.setStretch(0, 4)
+        self.hbox_layout.setStretch(1, 1)
 
         # set groupbox to contain layout with status and button
-        self.group_box.setLayout(self.hbox_layout)
+        # self.group_box.setLayout(self.hbox_layout)
 
         # add box to whole widget layout
-        self.vbox_layout.addWidget(self.group_box)
+        # self.vbox_layout.addWidget(self.group_box)
 
         # set the layout for the whole widget
         self.setLayout(self.hbox_layout)
