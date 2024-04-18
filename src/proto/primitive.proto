@@ -92,6 +92,7 @@ message PowerControl
         };
     }
 
+    // TODO: Remove this message type - unused & obsolete
     message GenevaControl
     {
         float angle_deg          = 1;
