@@ -1,10 +1,6 @@
-#include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#pragma once
 
-#include <fstream>
-#include <iostream>
+#include <unistd.h>
 
 #include "software/util/make_enum/make_enum.h"
 
@@ -14,16 +10,21 @@ MAKE_ENUM(GpioDirection, INPUT, OUTPUT);
 class Gpio
 {
    public:
-    /*
-     * GPIO Sysfs Wrapper
+    /**
+     * Communicate with GPIO pins via the new GPIO character device interface:
+     * https://www.kernel.org/doc/html/next/userspace-api/gpio/chardev.html
      *
-     * See https://www.kernel.org/doc/Documentation/gpio/sysfs.txt
-     *
-     * @param gpio The gpio to setup
-     * @param direction The direction to configure this gpio in
-     * @param initial_state The initial GpioState of the pin
+     * @param gpio_number The gpio number
+     * @param direction The direction of the gpio
+     * @param state The initial state of the gpio
+     * @param char_dev_path The path to the gpio character device
      */
-    Gpio(std::string gpio_number, GpioDirection direction, GpioState initial_state);
+    Gpio(int gpio_number, GpioDirection direction, GpioState state, std::string char_dev_path="/dev/gpiochip0");
+
+    /**
+     * Destructor
+     */
+    virtual ~Gpio();
 
     /**
      * Set the value to the provided state
@@ -38,5 +39,13 @@ class Gpio
     GpioState getValue(void);
 
    private:
-    std::string gpio_number_;
+    /**
+     * Parse the GpioState enum to a number representation
+     *
+     * @param state The state
+     * @return The number representation of the state
+     */
+    uint8_t parseGpioState(GpioState state);
+
+    int gpio_fd;  // File descriptor for the gpio
 };

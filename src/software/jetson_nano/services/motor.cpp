@@ -43,10 +43,10 @@ static const uint32_t NUM_RETRIES_SPI   = 3;
 static const uint32_t TMC_CMD_MSG_SIZE  = 5;
 
 
-static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = "16";
-static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = "19";
-static const char* MOTOR_DRIVER_RESET_GPIO                = "12";
-static const char* DRIVER_CONTROL_ENABLE_GPIO             = "22";
+static int SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = 16;
+static int SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = 19;
+static int MOTOR_DRIVER_RESET_GPIO                = 12;
+static int DRIVER_CONTROL_ENABLE_GPIO             = 22;
 
 static double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
 static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;

@@ -1,87 +1,110 @@
 #include "software/jetson_nano/gpio.h"
 
-#include <fcntl.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include <fstream>
-#include <iostream>
-#include <string>
-
 #include "software/logger/logger.h"
 
-Gpio::Gpio(std::string gpio_number, GpioDirection direction, GpioState initial_state)
+#include <linux/gpio.h>
+
+Gpio::Gpio(int gpio_number, GpioDirection direction, GpioState initial_state, std::string char_dev_path)
 {
-    // Setup the provided GPIO pin
-    gpio_number_ = gpio_number;
+    int fd = open(char_dev_path.c_str(), O_RDONLY);
+    if (fd < 0)
+    {
+        LOG(FATAL) << "Could not open GPIO chip device";
+    }
 
-    auto export_gpio_fs = std::ofstream("/sys/class/gpio/export");
-    export_gpio_fs << gpio_number;
-    export_gpio_fs.close();
-
-    auto set_direction_fs =
-        std::ofstream("/sys/class/gpio/gpio" + gpio_number + "/direction");
+    struct gpiohandle_request req;
+    req.lineoffsets[0] = gpio_number;
+    req.lines = 1;
 
     switch (direction)
     {
         case GpioDirection::OUTPUT:
         {
-            set_direction_fs << "out";
+            req.flags = GPIOHANDLE_REQUEST_OUTPUT;
             break;
         }
         case GpioDirection::INPUT:
         {
-            set_direction_fs << "in";
+            req.flags = GPIOHANDLE_REQUEST_INPUT;
             break;
         }
+        default:
+        {
+            LOG(FATAL) << "Invalid GPIO direction: " << direction;
+        } 
     }
 
-    set_direction_fs.close();
-    setValue(initial_state);
+    req.default_values[0] = parseGpioState(initial_state);
 
-    LOG(DEBUG) << "GPIO " << gpio_number_ << " online";
+    int ret = ioctl(fd, GPIO_GET_LINEHANDLE_IOCTL, &req);
+    if (ret < 0)
+    {
+        LOG(FATAL) << "Could not get GPIO line handle for GPIO " << gpio_number;
+    }
+    close(fd);
+
+    gpio_fd = req.fd;
+
+    LOG(DEBUG) << "GPIO " << gpio_number << " online";
 }
 
 void Gpio::setValue(GpioState state)
 {
-    std::ofstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
+    struct gpiohandle_data data;
+    data.values[0] = parseGpioState(state);
 
-    CHECK(gpio_fs.is_open()) << "Could not set GPIO pin " << gpio_number_;
-
-    switch (state)
+    int ret = ioctl(gpio_fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
+    if (ret < 0)
     {
-        case GpioState::HIGH:
-        {
-            gpio_fs << "1";
-            break;
-        }
-        case GpioState::LOW:
-        {
-            gpio_fs << "0";
-            break;
-        }
+        LOG(FATAL) << "Could not set GPIO value";
     }
+}
 
-    if (gpio_fs.is_open())
-    {
-        gpio_fs.close();
-    }
+Gpio::~Gpio()
+{
+    close(gpio_fd);
 }
 
 GpioState Gpio::getValue()
 {
-    std::ifstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
-    std::string level;
+    struct gpiohandle_data data;
+    int ret = ioctl(gpio_fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL, &data);
 
-    CHECK(gpio_fs.is_open()) << "Could not read GPIO pin";
-    std::getline(gpio_fs, level);
+    if (ret < 0)
+    {
+        LOG(FATAL) << "Could not get GPIO value";
+    }
 
-    if (level.compare("0") == 0)
+    switch (data.values[0])
     {
-        return GpioState::LOW;
+        case 0:
+        {
+            return GpioState::LOW;
+        }
+        case 1:
+        {
+            return GpioState::HIGH;
+        }
     }
-    else
+
+    LOG(FATAL) << "Unable to parse GPIO value";
+    return GpioState::LOW;
+}
+
+uint8_t Gpio::parseGpioState(GpioState gpio_state)
+{
+    switch (gpio_state)
     {
-        return GpioState::HIGH;
+        case GpioState::LOW:
+        {
+            return 0;
+        }
+        case GpioState::HIGH:
+        {
+            return 1;
+        }
     }
+
+    LOG(FATAL) << "Invalid GPIO state: " << gpio_state;
+    return -1;
 }
