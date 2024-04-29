@@ -246,16 +246,21 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> PositionToBlock
 PositionToBlock --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+PositionToBlock --> DribbleFSM : [shouldEvacuateCrease]\n<i>retrieveFromDeadZone</i>
 PositionToBlock --> Panic : [shouldPanic]\n<i>panic</i>
 PositionToBlock --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
 PositionToBlock --> PositionToBlock : <i>positionToBlock</i>
+DribbleFSM --> PivotKickFSM : [retrieveDone]\n<i>updatePivotKick</i>
+DribbleFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+DribbleFSM --> DribbleFSM : [ballInInflatedDefenseArea]\n<i>retrieveFromDeadZone</i>
+DribbleFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
 Panic --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
 Panic --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
 Panic --> PositionToBlock : [panicDone]\n<i>positionToBlock</i>
 Panic --> Panic : <i>panic</i>
 PivotKickFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
-PivotKickFSM --> PivotKickFSM : [ballInDefenseArea]\n<i>updatePivotKick</i>
-PivotKickFSM --> PositionToBlock : [!ballInDefenseArea]\n<i>positionToBlock</i>
+PivotKickFSM --> PivotKickFSM : [ballInInflatedDefenseArea]\n<i>updatePivotKick</i>
+PivotKickFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
 MoveToGoalLine --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
 MoveToGoalLine --> PositionToBlock : [!shouldMoveToGoalLine]\n<i>positionToBlock</i>
 Terminate:::terminate --> Terminate:::terminate
