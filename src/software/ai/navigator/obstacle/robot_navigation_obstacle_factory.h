@@ -3,7 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "proto/primitive.pb.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
-#include "software/geom/line.h"
+#include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/logger/logger.h"
@@ -25,21 +25,10 @@ class RobotNavigationObstacleFactory
     RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig config);
 
     /**
-     * Create static or dynamic obstacles for the given motion constraint
-     *
-     * @param motion_constraint The motion constraint to create obstacle for
-     * @param world World we're enforcing motion constraints in
-     *
-     * @return Obstacles representing the given motion constraint
-     */
-    std::vector<ObstaclePtr> createFromMotionConstraint(
-        const TbotsProto::MotionConstraint motion_constraint, const World &world) const;
-
-    /**
      * Create obstacles for the given motion constraints
      *
      * @param motion_constraints The motion constraints to create obstacles for
-     * @param field Field we're enforcing motion constraints in
+     * @param world World we're enforcing motion constraints in
      *
      * @return Obstacles representing the given motion constraints
      */
@@ -48,50 +37,15 @@ class RobotNavigationObstacleFactory
         const World &world) const;
 
     /**
-     * Create static obstacles for the given motion constraints
-     *
-     * @param motion_constraints The motion constraints to create obstacles for
-     * @param field Field we're enforcing motion constraints in
-     *
-     * @return Obstacles representing the given motion constraints
-     */
-    std::vector<ObstaclePtr> createStaticObstaclesFromMotionConstraints(
-        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const Field &field) const;
-
-    /**
-     * Create dynamic obstacles for the given motion constraints
-     *
-     * @param motion_constraints The motion constraints to create obstacles for
-     * @param world World we're enforcing motion constraints in
-     *
-     * @return Obstacles representing the given motion constraints
-     */
-    std::vector<ObstaclePtr> createDynamicObstaclesFromMotionConstraints(
-        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const World &world) const;
-
-    /**
-     * Create dynamic obstacles for the given motion constraints
-     *
-     * @param motion_constraint The motion constraint to create obstacles for
-     * @param world World we're enforcing motion constraints in
-     *
-     * @return Obstacles representing the given motion constraint
-     */
-    std::vector<ObstaclePtr> createDynamicObstaclesFromMotionConstraint(
-        const TbotsProto::MotionConstraint &motion_constraint, const World &world) const;
-
-    /**
      * Create static obstacles for the given motion constraint
      *
      * @param motion_constraint The motion constraint to create obstacles for
-     * @param field Field we're enforcing motion constraints in
+     * @param world World we're enforcing motion constraints in
      *
      * @return Obstacles representing the given motion constraint
      */
-    std::vector<ObstaclePtr> createStaticObstaclesFromMotionConstraint(
-        const TbotsProto::MotionConstraint &motion_constraint, const Field &field) const;
+    std::vector<ObstaclePtr> createObstaclesFromMotionConstraint(
+        const TbotsProto::MotionConstraint &motion_constraint, const World &world) const;
 
     /**
      * Create circle obstacle around robot with additional radius scaling
@@ -100,7 +54,36 @@ class RobotNavigationObstacleFactory
      *
      * @return obstacle around the robot
      */
-    ObstaclePtr createFromRobotPosition(const Point &robot_position) const;
+    ObstaclePtr createStaticObstacleFromRobotPosition(const Point &robot_position) const;
+
+    /**
+     * Create a stadium shaped obstacle for enemy robot with additional radius scaling
+     *
+     * @param enemy_robot Enemy robot to create the obstacle for
+     *
+     * @return obstacle around the robot
+     */
+    ObstaclePtr createStadiumEnemyRobotObstacle(const Robot &enemy_robot) const;
+
+    /**
+     * Create dynamic circle obstacle for enemy robot with additional radius scaling
+     *
+     * @param enemy_robot Enemy robot to create the obstacle for
+     *
+     * @return obstacle around the robot
+     */
+    ObstaclePtr createConstVelocityEnemyRobotObstacle(const Robot &enemy_robot) const;
+
+    /**
+     * Create dynamic circle obstacle around robot with additional radius scaling
+     *
+     * @param robot robot to create the obstacle for
+     * @param traj Trajectory which the obstacle is following
+     *
+     * @return moving obstacle around the robot
+     */
+    ObstaclePtr createFromMovingRobot(const Robot &robot,
+                                      const TrajectoryPath &traj) const;
 
     /**
      * Create circle obstacle around ball
@@ -124,6 +107,26 @@ class RobotNavigationObstacleFactory
     ObstaclePtr createFromShape(const Polygon &polygon) const;
     ObstaclePtr createFromShape(const Rectangle &rectangle) const;
     ObstaclePtr createFromShape(const Stadium &stadium) const;
+
+    /**
+     * Generate a trajectory based circular obstacle with additional radius scaling
+     *
+     * @param circle The circle to make obstacle with
+     * @param traj Trajectory which the obstacle is following
+     * @return ObstaclePtr to the trajectory based obstacle
+     */
+    ObstaclePtr createCircleWithTrajectory(const Circle &circle,
+                                           const TrajectoryPath &traj) const;
+
+    /**
+     * Generate a const velocity based circular obstacle with additional radius scaling
+     *
+     * @param circle The circle to make obstacle with
+     * @param velocity The velocity of the obstacle
+     * @return ObstaclePtr to the constant velocity obstacle
+     */
+    ObstaclePtr createCircleWithConstVelocity(const Circle &circle,
+                                              const Vector &velocity) const;
 
     /**
      * Returns an obstacle with the shape of the BallPlacementZone if the state is in

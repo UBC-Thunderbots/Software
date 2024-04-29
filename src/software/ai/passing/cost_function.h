@@ -45,6 +45,9 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
 double rateZoneSmart(const World& world, const Team& enemy_team, const Rectangle& zone,
                      const Point& ball_position, TbotsProto::PassingConfig passing_config);
 
+double rateReceivingPosition(const World& world, const Pass& pass,
+                             const TbotsProto::PassingConfig& passing_config);
+
 /**
  * Rate pass based on the probability of scoring once we receive the pass
  *

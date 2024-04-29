@@ -149,6 +149,33 @@ double rateZoneSmart(const World& world, const Team& enemy_team, const Rectangle
     return pass_up_field_rating * static_pass_quality * enemy_risk_rating * pass_not_too_far * pass_not_too_close;
 }
 
+double rateReceivingPosition(const World& world, const Pass& pass,
+                             const TbotsProto::PassingConfig& passing_config)
+{
+    // Zones with their centers in bad positions are not good
+    double static_recv_quality =
+            getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
+
+    // Rate zones that are up the field higher to encourage progress up the field
+    double pass_up_field_rating = sigmoid(pass.receiverPoint().x(), pass.passerPoint().x() - 1.0, 1.0);
+
+    // We want to encourage passes that are not too far away from the passer
+    // to stop the robots from trying to pass across the field
+    double pass_not_too_far = circleSigmoid(Circle(pass.passerPoint(), 7.0), pass.receiverPoint(), 2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
+    double pass_not_too_close = 1 - circleSigmoid(Circle(pass.passerPoint(), 1.5), pass.receiverPoint(), 2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
+
+
+    auto enemy_reaction_time =
+            Duration::fromSeconds(passing_config.enemy_reaction_time());
+    double enemy_proximity_importance = passing_config.enemy_proximity_importance();
+    double enemy_risk_rating = ratePassEnemyRisk(world.enemyTeam(),
+                                                 Pass(pass.passerPoint(), pass.receiverPoint(),
+                                                      passing_config.max_pass_speed_m_per_s()), // TODO (NIMA): Use dynamic receiving speed
+                                                 enemy_reaction_time, enemy_proximity_importance);
+
+    return static_recv_quality * pass_up_field_rating * pass_not_too_far * pass_not_too_close * enemy_risk_rating;
+}
+
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
                           TbotsProto::PassingConfig passing_config)
 {
