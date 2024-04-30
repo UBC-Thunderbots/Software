@@ -65,7 +65,17 @@ message Shape
     }
 }
 
-message DebugShapesMap
+message DebugShapes
 {
-    map<string, Shape> named_shapes = 1;
+    message DebugShape
+    {
+        Shape shape = 1;
+        // Unique ID to identify the shape
+        string unique_id = 2;
+        // Text to display next to the shape
+        string debug_text = 3;
+    }
+
+    // Unique ID to a named shape
+    repeated DebugShape debug_shapes = 1;
 }

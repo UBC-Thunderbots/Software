@@ -64,6 +64,8 @@ class ReceiverPositionGenerator
     std::map<ZoneEnum, PassWithRating> best_receiving_positions;
     std::map<ZoneEnum, Point> prev_best_receiving_positions;
 
+    std::vector<TbotsProto::DebugShapes::DebugShape> debug_shapes; // TODO (NIMA): Added for debugging
+
     // A random number generator for use across the class
     std::mt19937 random_num_gen_;
 };
@@ -83,6 +85,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     const World &world, unsigned int num_positions)
 {
     best_receiving_positions.clear();
+    debug_shapes.clear();
 
     for (const auto &[zone, prev_best_receiving_position] : prev_best_receiving_positions)
     {
@@ -91,7 +94,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
         best_receiving_positions.insert_or_assign(
             zone,
             PassWithRating{pass, rateReceivingPosition(world, pass, passing_config_) *
-                                     1.1});  // TODO (NIMA): Make this a parameter
+                                     1.5});  // TODO (NIMA): Make this a parameter
     }
 
     auto all_zones = pitch_division_->getAllZoneIds();
@@ -116,10 +119,10 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     };
     std::sort(all_zones.begin(), all_zones.end(), zone_comparator);
 
-    std::vector<ZoneEnum> top_zones(num_positions);
+    std::vector<ZoneEnum> top_zones;
     top_zones.push_back(all_zones[0]);
     Angle prev_pass_angle = best_receiving_positions.find(all_zones[0])->second.pass.passerOrientation();
-    for (unsigned int i = 1; i < num_positions; i++)
+    for (unsigned int i = 1; i < all_zones.size() && top_zones.size() < num_positions; i++)
     {
         // Only add zones that are not too close to the previous zone
         // to encourage spreading out the receivers
@@ -132,8 +135,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     }
 
     // Sample more passes from the top zones and update ranking
-    updateBestReceiverPositions(world, top_zones,
-                                20);  // TODO (NIMA): Make this a parameter
+    updateBestReceiverPositions(world, top_zones, 20);  // TODO (NIMA): Make this a parameter
     std::sort(top_zones.begin(), top_zones.end(), zone_comparator);
 
     // Get the top best receiving positions and update the previous best
@@ -147,14 +149,15 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
         prev_best_receiving_positions.insert_or_assign(zone, best_position);
     }
 
+    CHECK(best_positions.size() == num_positions) << "Number of best positions=" << best_positions.size() << " should be equal to num_positions=" << num_positions << " top_zones.size()=" << top_zones.size();
+
     // Visualize the best zones
-    std::map<std::string, TbotsProto::Shape> zone_shapes;
-    for (const auto zone : top_zones)
+    for (unsigned int i = 0; i < top_zones.size(); i++)
     {
-        zone_shapes.insert(
-            {toString(zone), *createShapeProto(pitch_division_->getZone(zone))});
+        debug_shapes.push_back(*createDebugShape(pitch_division_->getZone(top_zones[i]), std::to_string(i+1), std::to_string(i+1)));
+        debug_shapes.push_back(*createDebugShape(Circle(best_receiving_positions.find(top_zones[i])->second.pass.receiverPoint(), 0.15), std::to_string(i+1) + "p", std::to_string(i+1) + "p"));
     }
-    LOG(VISUALIZE) << *createDebugShapesMap(zone_shapes);
+    LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
 
     return best_positions;
 }
@@ -186,6 +189,8 @@ void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
                 world.ball().position(),
                 Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
                 5.0);  // TODO (NIMA): Pass speed should be dynamic!!
+
+            debug_shapes.push_back(*createDebugShape(Circle(pass.receiverPoint(), 0.03), std::to_string(debug_shapes.size()) + "s", std::to_string(debug_shapes.size()) + "s"));
 
             double rating = ratePassForReceiving(world, pass, passing_config_);
             if (rating > best_pass_for_receiving.rating)

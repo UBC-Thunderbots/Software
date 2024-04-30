@@ -186,7 +186,7 @@ def setup_gl_widget(
         # (SimulationState, cost_vis_layer.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (World, trail_layer.world_buffer),
-        (DebugShapesMap, debug_shapes_layer.debug_shape_map_buffer),
+        (DebugShapes, debug_shapes_layer.debug_shapes_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 

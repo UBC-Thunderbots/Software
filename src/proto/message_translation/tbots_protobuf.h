@@ -126,12 +126,23 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
 std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     const std::map<std::string, double>& values);
 
+template<class Shape>
+std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(const Shape& shape, const std::string& unique_id, const std::string& debug_text)
+{
+//    static_assert(std::is_base_of<Shape, Circle>::value || std::is_base_of<Shape, Polygon>::value || std::is_base_of<Shape, Stadium>::value, "Shape must be a Circle, Polygon, or Stadium");
+
+    auto debug_shape = std::make_unique<TbotsProto::DebugShapes::DebugShape>();
+    (*debug_shape->mutable_shape()) = *createShapeProto(shape);
+    debug_shape->set_unique_id(unique_id);
+    debug_shape->set_debug_text(debug_text);
+    return debug_shape;
+};
+
 /**
- * Returns a TbotsProto::DebugShapesMap proto containing the name
- * shape pairs.
+ * Returns a TbotsProto::DebugShapes proto containing the debug shapes
  *
  * Could use LOG(VISUALIZE) to plot these values. Example:
- *  LOG(VISUALIZE) << *createDebugShapesMap({
+ *  LOG(VISUALIZE) << *createDebugShapes({
  *      {"circle_name", *createShapeProto(circle_object)},
  *      {"stadium_name", *createShapeProto(stadium_object)},
  *      {"polygon_name", *createShapeProto(polygon_object)}
@@ -139,11 +150,11 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
  *
  * @param named_shapes The map of name shape proto pairs to plot
  *
- * @return The unique_ptr to a TbotsProto::DebugShapesMap proto containing data with
+ * @return The unique_ptr to a TbotsProto::DebugShapes proto containing data with
  *        specified names and shapes
  */
-std::unique_ptr<TbotsProto::DebugShapesMap> createDebugShapesMap(
-    const std::map<std::string, TbotsProto::Shape>& named_shapes);
+std::unique_ptr<TbotsProto::DebugShapes> createDebugShapes(
+    const std::vector<TbotsProto::DebugShapes::DebugShape>& debug_shapes);
 
 /**
  * Returns a TbotsProto::Shape proto given a shape.

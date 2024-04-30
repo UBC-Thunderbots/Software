@@ -331,14 +331,11 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     return plot_juggler_value_msg;
 }
 
-std::unique_ptr<TbotsProto::DebugShapesMap> createDebugShapesMap(
-    const std::map<std::string, TbotsProto::Shape>& named_shapes)
+std::unique_ptr<TbotsProto::DebugShapes> createDebugShapes(
+        const std::vector<TbotsProto::DebugShapes::DebugShape>& debug_shapes)
 {
-    auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapesMap>();
-    for (auto const& [name, shape_proto] : named_shapes)
-    {
-        (*debug_shape_list_msg->mutable_named_shapes())[name] = shape_proto;
-    }
+    auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapes>();
+    (*debug_shape_list_msg->mutable_debug_shapes()) = {debug_shapes.begin(), debug_shapes.end()};
     return debug_shape_list_msg;
 }
 

@@ -110,7 +110,6 @@ class GLCostVisLayer(GLLayer):
             block=False
         )
         if not simulation_state.is_playing:
-            print("Simulation is not playing")
             return
 
         self.cached_world = self.world_buffer.get(block=False)
