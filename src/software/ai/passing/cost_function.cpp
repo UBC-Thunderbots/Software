@@ -182,7 +182,6 @@ double rateReceivingPosition(const World& world, const Pass& pass,
         1 - circleSigmoid(Circle(pass.passerPoint(), 1.5), pass.receiverPoint(),
                           2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
 
-
     auto enemy_reaction_time =
         Duration::fromSeconds(passing_config.enemy_reaction_time());
     double enemy_proximity_importance = passing_config.enemy_proximity_importance();
@@ -193,8 +192,11 @@ double rateReceivingPosition(const World& world, const Pass& pass,
                  .max_pass_speed_m_per_s()),  // TODO (NIMA): Use dynamic receiving speed
         enemy_reaction_time, enemy_proximity_importance);
 
+    double pass_shoot_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass,
+                                                  passing_config);
+
     return static_recv_quality * pass_up_field_rating * pass_not_too_far *
-           pass_not_too_close * enemy_risk_rating;
+           pass_not_too_close * enemy_risk_rating * pass_shoot_rating;
 }
 
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,

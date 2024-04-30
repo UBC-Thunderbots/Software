@@ -101,21 +101,33 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     updateBestReceiverPositions(world, all_zones,
                                 5);  // TODO (NIMA): Make this a parameter
 
+    // TODO:
+    //  1. Have receivers spread out,
+    //  2. tune parameters like prev pass rating,
+    //  3. best receiving position is sometimes close to the receiver tactic,
+    //  4. make enemy interception area wider
+    //  5. RatePassShootScore should have less effect on the score, specially compared to enemy interception
+    //  6. RatePassShootScore sometimes blocks large circles of the field. Should probably only draw lines
+
     // Sort the zones based on initial ratings
+    auto zone_comparator = [&](const ZoneEnum &z1, const ZoneEnum &z2) {
+        return best_receiving_positions.find(z1)->second.rating >
+               best_receiving_positions.find(z2)->second.rating;
+    };
+
     std::vector<ZoneEnum> top_zones(num_positions);
     std::partial_sort_copy(all_zones.begin(), all_zones.end(), top_zones.begin(),
-                           top_zones.end(), [&](const ZoneEnum &z1, const ZoneEnum &z2) {
-                               return best_receiving_positions.find(z1)->second.rating >
-                                      best_receiving_positions.find(z2)->second.rating;
-                           });
+                           top_zones.end(), zone_comparator);
 
+    // Sample more passes from the top zones and update ranking
     updateBestReceiverPositions(world, top_zones,
                                 20);  // TODO (NIMA): Make this a parameter
+    std::sort(top_zones.begin(), top_zones.end(), zone_comparator);
 
-    // Get the top num_positions best receiving positions and update the previous best
+    // Get the top best receiving positions and update the previous best
     std::vector<Point> best_positions;
     prev_best_receiving_positions.clear();
-    for (const auto zone : top_zones)
+    for (const auto zone : top_zones) // TODO (NIMA): DOnt add more than num_positions!!!!!!!!!!
     {
         Point best_position =
             best_receiving_positions.find(zone)->second.pass.receiverPoint();
