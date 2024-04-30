@@ -443,13 +443,13 @@ if __name__ == "__main__":
             if args.enable_autoref
             else contextlib.nullcontext()
         ) as autoref:
-        #     ProtoLogger(
-        #     log_path=args.blue_full_system_runtime_dir,
-        #     time_provider=autoref.time_provider if args.enable_autoref else None,
-        # ) as blue_logger, ProtoLogger(
-        #     log_path=args.yellow_full_system_runtime_dir,
-        #     time_provider=autoref.time_provider if args.enable_autoref else None,
-        # ) as yellow_logger:
+            #     ProtoLogger(
+            #     log_path=args.blue_full_system_runtime_dir,
+            #     time_provider=autoref.time_provider if args.enable_autoref else None,
+            # ) as blue_logger, ProtoLogger(
+            #     log_path=args.yellow_full_system_runtime_dir,
+            #     time_provider=autoref.time_provider if args.enable_autoref else None,
+            # ) as yellow_logger:
 
             tscope.register_refresh_function(gamecontroller.refresh)
 

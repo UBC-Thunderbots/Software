@@ -12,10 +12,10 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
                                             Field::createSSLDivisionBField()),
                                         ai_config.passing_config())),
-      receiver_position_generator(
-              ReceiverPositionGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
-                                                                Field::createSSLDivisionBField()),
-                                                        ai_config.passing_config())),
+      receiver_position_generator(ReceiverPositionGenerator<EighteenZoneId>(
+          std::make_shared<const EighteenZonePitchDivision>(
+              Field::createSSLDivisionBField()),
+          ai_config.passing_config())),
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
@@ -25,8 +25,7 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
 }
 
 void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
-    const WorldPtr world,
-    const std::vector<EighteenZoneId>& ranked_zones,
+    const WorldPtr world, const std::vector<EighteenZoneId>& ranked_zones,
     const PassEvaluation<EighteenZoneId>& pass_eval, unsigned int num_tactics)
 {
     // These two tactics will set robots to roam around the field, trying to put
@@ -40,10 +39,12 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
                       []() { return std::make_shared<MoveTactic>(); });
     }
 
-    std::vector<Point> best_receiving_positions = receiver_position_generator.getBestReceivingPositions(*world, num_tactics);
+    std::vector<Point> best_receiving_positions =
+        receiver_position_generator.getBestReceivingPositions(*world, num_tactics);
     for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
     {
-        Angle receiver_orientation = (world->ball().position() - best_receiving_positions[i]).orientation();
+        Angle receiver_orientation =
+            (world->ball().position() - best_receiving_positions[i]).orientation();
         offensive_positioning_tactics[i]->updateControlParams(
             best_receiving_positions[i], receiver_orientation, 0.0,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
@@ -119,8 +120,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
         if (event.common.num_tactics > 2)
         {
-            updateOffensivePositioningTactics(event.common.world_ptr, ranked_zones, pass_eval,
-                                              event.common.num_tactics - 2);
+            updateOffensivePositioningTactics(event.common.world_ptr, ranked_zones,
+                                              pass_eval, event.common.num_tactics - 2);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());
@@ -133,8 +134,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
         PriorityTacticVector ret_tactics = {{receiver_tactic}, {}};
         if (event.common.num_tactics > 1)
         {
-            updateOffensivePositioningTactics(event.common.world_ptr, ranked_zones, pass_eval,
-                                              event.common.num_tactics - 1);
+            updateOffensivePositioningTactics(event.common.world_ptr, ranked_zones,
+                                              pass_eval, event.common.num_tactics - 1);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());

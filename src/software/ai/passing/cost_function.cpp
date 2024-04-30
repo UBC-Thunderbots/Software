@@ -41,20 +41,24 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
            shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
 
-double ratePassForReceiving(const World &world, const Pass& pass, const TbotsProto::PassingConfig& passing_config)
+double ratePassForReceiving(const World& world, const Pass& pass,
+                            const TbotsProto::PassingConfig& passing_config)
 {
     double static_pass_quality =
-            getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
+        getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
 
     double enemy_pass_rating =
-            ratePassEnemyRisk(world.enemyTeam(), pass,
-                              Duration::fromSeconds(passing_config.enemy_reaction_time()),
-                              passing_config.enemy_proximity_importance());
+        ratePassEnemyRisk(world.enemyTeam(), pass,
+                          Duration::fromSeconds(passing_config.enemy_reaction_time()),
+                          passing_config.enemy_proximity_importance());
 
     double shoot_pass_rating =
-            ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
-    const double min_shoot_pass_rating = 0.6; // TODO (NIMA): Make this a dynamic parameter and add it for all cost functions?!
-    shoot_pass_rating = shoot_pass_rating * (1 - min_shoot_pass_rating) + min_shoot_pass_rating;
+        ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
+    const double min_shoot_pass_rating =
+        0.6;  // TODO (NIMA): Make this a dynamic parameter and add it for all cost
+              // functions?!
+    shoot_pass_rating =
+        shoot_pass_rating * (1 - min_shoot_pass_rating) + min_shoot_pass_rating;
 
     return static_pass_quality * enemy_pass_rating * shoot_pass_rating;
 }
@@ -101,79 +105,96 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
 }
 
 double rateZoneSmart(const World& world, const Team& enemy_team, const Rectangle& zone,
-                const Point& ball_position, TbotsProto::PassingConfig passing_config)
+                     const Point& ball_position, TbotsProto::PassingConfig passing_config)
 {
     // TODO (#2021) improve and implement tests
     // Zones with their centers in bad positions are not good
     double static_pass_quality =
-            getStaticPositionQuality(world.field(), zone.centre(), passing_config);
+        getStaticPositionQuality(world.field(), zone.centre(), passing_config);
 
-//    // Rate zones that are up the field higher to encourage progress up the field
-//    double pass_up_field_rating = zone.centre().x() / field.xLength();
+    //    // Rate zones that are up the field higher to encourage progress up the field
+    //    double pass_up_field_rating = zone.centre().x() / field.xLength();
 
     // Rate zones that are up the field higher to encourage progress up the field
-    double pass_up_field_rating = sigmoid(zone.centre().x(), world.ball().position().x() - 1.0, 1.0); // zone.centre().x() / world.field().xLength();
+    double pass_up_field_rating =
+        sigmoid(zone.centre().x(), world.ball().position().x() - 1.0,
+                1.0);  // zone.centre().x() / world.field().xLength();
 
     // We want to encourage passes that are not too far away from the passer
     // to stop the robots from trying to pass across the field
-    double pass_not_too_far = circleSigmoid(Circle(world.ball().position(), 7.0), zone.centre(), 2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
-    double pass_not_too_close = 1 - circleSigmoid(Circle(world.ball().position(), 1.5), zone.centre(), 2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
+    double pass_not_too_far =
+        circleSigmoid(Circle(world.ball().position(), 7.0), zone.centre(),
+                      2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
+    double pass_not_too_close =
+        1 - circleSigmoid(Circle(world.ball().position(), 1.5), zone.centre(),
+                          2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
 
 
     auto enemy_reaction_time =
-            Duration::fromSeconds(passing_config.enemy_reaction_time());
+        Duration::fromSeconds(passing_config.enemy_reaction_time());
     double enemy_proximity_importance = passing_config.enemy_proximity_importance();
 
     double enemy_risk_rating =
-            std::max({ratePassEnemyRisk(enemy_team,
-                               Pass(ball_position, zone.negXNegYCorner(),
-                                    passing_config.max_pass_speed_m_per_s()),
-                               enemy_reaction_time, enemy_proximity_importance),
-             ratePassEnemyRisk(enemy_team,
-                               Pass(ball_position, zone.negXPosYCorner(),
-                                    passing_config.max_pass_speed_m_per_s()),
-                               enemy_reaction_time, enemy_proximity_importance),
-             ratePassEnemyRisk(enemy_team,
-                               Pass(ball_position, zone.posXNegYCorner(),
-                                    passing_config.max_pass_speed_m_per_s()),
-                               enemy_reaction_time, enemy_proximity_importance),
-             ratePassEnemyRisk(enemy_team,
-                               Pass(ball_position, zone.posXPosYCorner(),
-                                    passing_config.max_pass_speed_m_per_s()),
-                               enemy_reaction_time, enemy_proximity_importance),
-             ratePassEnemyRisk(
-                     enemy_team,
-                     Pass(ball_position, zone.centre(), passing_config.max_pass_speed_m_per_s()),
-                     enemy_reaction_time, enemy_proximity_importance)});
+        std::max({ratePassEnemyRisk(enemy_team,
+                                    Pass(ball_position, zone.negXNegYCorner(),
+                                         passing_config.max_pass_speed_m_per_s()),
+                                    enemy_reaction_time, enemy_proximity_importance),
+                  ratePassEnemyRisk(enemy_team,
+                                    Pass(ball_position, zone.negXPosYCorner(),
+                                         passing_config.max_pass_speed_m_per_s()),
+                                    enemy_reaction_time, enemy_proximity_importance),
+                  ratePassEnemyRisk(enemy_team,
+                                    Pass(ball_position, zone.posXNegYCorner(),
+                                         passing_config.max_pass_speed_m_per_s()),
+                                    enemy_reaction_time, enemy_proximity_importance),
+                  ratePassEnemyRisk(enemy_team,
+                                    Pass(ball_position, zone.posXPosYCorner(),
+                                         passing_config.max_pass_speed_m_per_s()),
+                                    enemy_reaction_time, enemy_proximity_importance),
+                  ratePassEnemyRisk(enemy_team,
+                                    Pass(ball_position, zone.centre(),
+                                         passing_config.max_pass_speed_m_per_s()),
+                                    enemy_reaction_time, enemy_proximity_importance)});
 
-    return pass_up_field_rating * static_pass_quality * enemy_risk_rating * pass_not_too_far * pass_not_too_close;
+    return pass_up_field_rating * static_pass_quality * enemy_risk_rating *
+           pass_not_too_far * pass_not_too_close;
 }
 
 double rateReceivingPosition(const World& world, const Pass& pass,
                              const TbotsProto::PassingConfig& passing_config)
 {
+    // TODO (NIMA): Update this comments to not include zones
     // Zones with their centers in bad positions are not good
     double static_recv_quality =
-            getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
+        getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
 
-    // Rate zones that are up the field higher to encourage progress up the field
-    double pass_up_field_rating = sigmoid(pass.receiverPoint().x(), pass.passerPoint().x() - 1.0, 1.0);
+    // Rate receiving positions up the field higher and discourage passes back to
+    // friendly half if the passer is in the enemy half
+    double pass_up_field_rating =
+        sigmoid(pass.receiverPoint().x(), std::min(0.0, pass.passerPoint().x() - 1.0), 4.0);
 
     // We want to encourage passes that are not too far away from the passer
     // to stop the robots from trying to pass across the field
-    double pass_not_too_far = circleSigmoid(Circle(pass.passerPoint(), 7.0), pass.receiverPoint(), 2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
-    double pass_not_too_close = 1 - circleSigmoid(Circle(pass.passerPoint(), 1.5), pass.receiverPoint(), 2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
+    double pass_not_too_far =
+        circleSigmoid(Circle(pass.passerPoint(), 7.0), pass.receiverPoint(),
+                      2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
+    double pass_not_too_close =
+        1 - circleSigmoid(Circle(pass.passerPoint(), 1.5), pass.receiverPoint(),
+                          2.0);  // TODO (NIMA): Add to config: UP TO 5 METERS
 
 
     auto enemy_reaction_time =
-            Duration::fromSeconds(passing_config.enemy_reaction_time());
+        Duration::fromSeconds(passing_config.enemy_reaction_time());
     double enemy_proximity_importance = passing_config.enemy_proximity_importance();
-    double enemy_risk_rating = ratePassEnemyRisk(world.enemyTeam(),
-                                                 Pass(pass.passerPoint(), pass.receiverPoint(),
-                                                      passing_config.max_pass_speed_m_per_s()), // TODO (NIMA): Use dynamic receiving speed
-                                                 enemy_reaction_time, enemy_proximity_importance);
+    double enemy_risk_rating          = ratePassEnemyRisk(
+        world.enemyTeam(),
+        Pass(pass.passerPoint(), pass.receiverPoint(),
+             passing_config
+                 .max_pass_speed_m_per_s()),  // TODO (NIMA): Use dynamic receiving speed
+        enemy_reaction_time, enemy_proximity_importance);
 
-    return static_recv_quality * pass_up_field_rating * pass_not_too_far * pass_not_too_close * enemy_risk_rating;
+    return static_recv_quality * pass_up_field_rating * pass_not_too_far *
+           pass_not_too_close * enemy_risk_rating;
 }
 
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
@@ -450,6 +471,7 @@ void samplePassesForVisualization(const World& world,
     double pass_friendly_capability_costs;
     double pass_enemy_risk_costs;
     double pass_shoot_score_costs;
+    double receiver_position_costs;
 
     // We loop column wise (in the same order as how zones are defined)
     for (int i = 0; i < num_cols; i++)
@@ -468,6 +490,7 @@ void samplePassesForVisualization(const World& world,
             pass_friendly_capability_costs = 1;
             pass_enemy_risk_costs          = 1;
             pass_shoot_score_costs         = 1;
+            receiver_position_costs        = 1;
 
             // getStaticPositionQuality
             if (passing_config.cost_vis_config().static_position_quality())
@@ -499,8 +522,15 @@ void samplePassesForVisualization(const World& world,
                     world.field(), world.enemyTeam(), pass, passing_config);
             }
 
+            // rateReceivingPosition
+            if (passing_config.cost_vis_config().receiver_position_score())
+            {
+                receiver_position_costs = rateReceivingPosition(
+                    world, pass, passing_config);
+            }
+
             costs.push_back(static_pos_quality_costs * pass_friendly_capability_costs *
-                            pass_enemy_risk_costs * pass_shoot_score_costs);
+                            pass_enemy_risk_costs * pass_shoot_score_costs * receiver_position_costs);
         }
     }
 

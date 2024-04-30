@@ -44,8 +44,7 @@ struct ShootOrPassPlayFSM
      * @param num_tactics the number of tactics to return
      */
     void updateOffensivePositioningTactics(
-        const WorldPtr world,
-        const std::vector<EighteenZoneId>& ranked_zones,
+        const WorldPtr world, const std::vector<EighteenZoneId>& ranked_zones,
         const PassEvaluation<EighteenZoneId>& pass_eval, unsigned int num_tactics);
 
     /**
