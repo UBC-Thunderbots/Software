@@ -50,7 +50,7 @@ private:
      * @param num_samples_per_zone
      */
     void
-    samplePassesInZones(const World &world, std::vector<ZoneEnum> zones_to_sample, unsigned int num_samples_per_zone);
+    updateBestReceiverPositions(const World &world, const std::vector<ZoneEnum> &zones_to_sample, unsigned int num_samples_per_zone);
 
     // Pitch division
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division_;
@@ -91,7 +91,7 @@ ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPositions(const World &worl
 
     // Begin by sampling a few passes per zone to get an initial estimate of the best
     // receiving zones
-    samplePassesInZones(world, all_zones, 5); // TODO (NIMA): Make this a parameter
+    updateBestReceiverPositions(world, all_zones, 5); // TODO (NIMA): Make this a parameter
 
     // Sort the zones based on initial ratings
     std::vector<ZoneEnum> top_zones(num_positions);
@@ -101,12 +101,12 @@ ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPositions(const World &worl
                                return best_receiving_positions.find(z1)->second.rating > best_receiving_positions.find(z2)->second.rating;
                            });
 
-    samplePassesInZones(world, top_zones, 20); // TODO (NIMA): Make this a parameter
+    updateBestReceiverPositions(world, top_zones, 20); // TODO (NIMA): Make this a parameter
 
     // Get the top num_positions best receiving positions and update the previous best
     std::vector<Point> best_positions;
     prev_best_receiving_positions.clear();
-    for (const auto &zone: top_zones) {
+    for (const auto zone: top_zones) {
         Point best_position = best_receiving_positions.find(zone)->second.pass.receiverPoint();
         best_positions.push_back(best_position);
         prev_best_receiving_positions.insert_or_assign(zone, best_position);
@@ -114,9 +114,9 @@ ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPositions(const World &worl
 
     // Visualize the best zones
     std::map<std::string, TbotsProto::Shape> zone_shapes;
-    for (unsigned int i = 0; i < num_positions; i++) {
-        zone_shapes.insert({std::to_string(i + 1),
-                            *createShapeProto(pitch_division_->getZone(all_zones[i]))});
+    for (const auto zone: top_zones) {
+        zone_shapes.insert({toString(zone),
+                            *createShapeProto(pitch_division_->getZone(zone))});
     }
     LOG(VISUALIZE) << *createDebugShapesMap(zone_shapes);
 
@@ -124,22 +124,20 @@ ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPositions(const World &worl
 }
 
 template<class ZoneEnum>
-void ReceiverPositionGenerator<ZoneEnum>::samplePassesInZones(const World &world, std::vector<ZoneEnum> zones_to_sample,
-                                                              unsigned int num_samples_per_zone)
+void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(const World &world, const std::vector<ZoneEnum> &zones_to_sample,
+                                                                      unsigned int num_samples_per_zone)
 {
     for (const auto &zone_id: zones_to_sample) {
         auto zone = pitch_division_->getZone(zone_id);
         std::uniform_real_distribution x_distribution(zone.xMin(), zone.xMax());
         std::uniform_real_distribution y_distribution(zone.yMin(), zone.yMax());
 
-        Point best_receiving_position;
-        double best_receiving_position_rating = -1;
+        PassWithRating best_pass_for_receiving{Pass(Point(0, 0), Point(0, 0), 0), -1.0};
 
         // Check if we have already sampled some passes for this zone
         const auto &best_sampled_pass_iter = best_receiving_positions.find(zone_id);
         if (best_sampled_pass_iter != best_receiving_positions.end()) {
-            best_receiving_position = best_sampled_pass_iter->second.pass.receiverPoint();
-            best_receiving_position_rating = best_sampled_pass_iter->second.rating;
+            best_pass_for_receiving = best_sampled_pass_iter->second;
         }
 
         // Sample passes in the zone
@@ -150,10 +148,11 @@ void ReceiverPositionGenerator<ZoneEnum>::samplePassesInZones(const World &world
                          5.0); // TODO (NIMA): Pass speed should be dynamic!!
 
             double rating = ratePassForReceiving(world, pass, passing_config_);
-            if (rating > best_receiving_position_rating) {
-                best_receiving_position = pass.receiverPoint();
-                best_receiving_position_rating = rating;
+            if (rating > best_pass_for_receiving.rating) {
+                best_pass_for_receiving = PassWithRating{pass, rating};
             }
         }
+
+        best_receiving_positions.insert_or_assign(zone_id, best_pass_for_receiving);
     }
 }
