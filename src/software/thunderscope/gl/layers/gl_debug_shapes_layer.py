@@ -5,6 +5,7 @@ from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 
 from proto.visualization_pb2 import DebugShapesMap
+from proto.world_pb2 import SimulationState
 
 from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
@@ -31,6 +32,8 @@ class GLDebugShapesLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
+        self.simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
+
         self.debug_shape_map_buffer = ThreadSafeBuffer(buffer_size, DebugShapesMap)
         self.debug_shape_map = {}
 
@@ -45,6 +48,13 @@ class GLDebugShapesLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
+        # TODO (NIMA): Smarter approach would probably be to not call refresh
+        #  on any of the layers if paused
+        simulation_state = self.simulation_state_buffer.get(
+            block=False
+        )
+        if not simulation_state.is_playing:
+            return
 
         # Add all new shapes to the map
         named_shapes = self.debug_shape_map_buffer.get(block=False, return_cached=False)

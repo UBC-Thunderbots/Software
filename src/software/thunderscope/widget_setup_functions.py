@@ -163,6 +163,12 @@ def setup_gl_widget(
     sim_proto_unix_io.register_observer(
         SimulationState, simulation_control_toolbar.simulation_state_buffer
     )
+    sim_proto_unix_io.register_observer(
+        SimulationState, debug_shapes_layer.simulation_state_buffer
+    )
+    sim_proto_unix_io.register_observer(
+        SimulationState, cost_vis_layer.simulation_state_buffer
+    )
 
     for arg in [
         (World, world_layer.world_buffer),
@@ -177,6 +183,7 @@ def setup_gl_widget(
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
         (SimulationState, simulation_control_toolbar.simulation_state_buffer),
+        # (SimulationState, cost_vis_layer.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (World, trail_layer.world_buffer),
         (DebugShapesMap, debug_shapes_layer.debug_shape_map_buffer),
