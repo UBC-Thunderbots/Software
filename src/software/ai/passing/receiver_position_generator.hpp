@@ -114,10 +114,22 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
         return best_receiving_positions.find(z1)->second.rating >
                best_receiving_positions.find(z2)->second.rating;
     };
+    std::sort(all_zones.begin(), all_zones.end(), zone_comparator);
 
     std::vector<ZoneEnum> top_zones(num_positions);
-    std::partial_sort_copy(all_zones.begin(), all_zones.end(), top_zones.begin(),
-                           top_zones.end(), zone_comparator);
+    top_zones.push_back(all_zones[0]);
+    Angle prev_pass_angle = best_receiving_positions.find(all_zones[0])->second.pass.passerOrientation();
+    for (unsigned int i = 1; i < num_positions; i++)
+    {
+        // Only add zones that are not too close to the previous zone
+        // to encourage spreading out the receivers
+        Angle curr_pass_angle = best_receiving_positions.find(all_zones[i - 1])->second.pass.passerOrientation();
+        if (curr_pass_angle.minDiff(prev_pass_angle) > Angle::fromDegrees(20)) // TODO (NIMA): Make this a parameter
+        {
+            top_zones.push_back(all_zones[i]);
+            prev_pass_angle = curr_pass_angle;
+        }
+    }
 
     // Sample more passes from the top zones and update ranking
     updateBestReceiverPositions(world, top_zones,
