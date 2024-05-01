@@ -4,7 +4,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/strategy/strategy.h"
+#include "software/ai/strategy.h"
 
 /**
  * Play for defending against enemy free kicks

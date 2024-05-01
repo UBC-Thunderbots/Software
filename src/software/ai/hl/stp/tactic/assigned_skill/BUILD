@@ -5,8 +5,8 @@ cc_library(
     hdrs = ["assigned_skill_tactic.hpp"],
     deps = [
         "//software/ai/hl/stp/skill",
-        "//software/ai/hl/stp/strategy",
         "//software/ai/hl/stp/tactic",
+        "//software/ai:strategy",
     ],
 )
 

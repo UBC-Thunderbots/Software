@@ -2,7 +2,7 @@
 
 #include "software/ai/evaluation/scoring/skills/skill_visitor.h"
 #include "software/ai/hl/stp/skill/skill.h"
-#include "software/ai/hl/stp/strategy/strategy.h"
+#include "software/ai/strategy.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
 

@@ -20,11 +20,11 @@ cc_library(
         "//software/ai/hl/stp/play:assigned_tactics_play",
         "//software/ai/hl/stp/play:halt_play",
         "//software/ai/hl/stp/play:play_factory",
-        "//software/ai/hl/stp/strategy",
         "//software/ai/hl/stp/tactic:tactic_factory",
         "//software/time:timestamp",
         "//software/tracy:tracy_constants",
         "//software/world",
+        ":strategy",
         "@tracy",
     ],
 )
@@ -51,5 +51,20 @@ cc_test(
         "//software/ai",
         "//software/test_util",
         "//software/world",
+    ],
+)
+
+cc_library(
+    name = "strategy",
+    srcs = ["strategy.cpp"],
+    hdrs = ["strategy.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software/ai/evaluation:calc_best_shot",
+        "//software/ai/evaluation:shot",
+        "//software/ai/passing:threaded_pass_generator",
+        "//software/ai/passing:eighteen_zone_pitch_division",
+        "//software/geom:pose",
+        "//software/world:field",
     ],
 )

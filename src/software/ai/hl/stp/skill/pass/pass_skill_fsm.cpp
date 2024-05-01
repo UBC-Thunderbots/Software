@@ -22,7 +22,7 @@ bool PassSkillFSM::foundPass(const Update& event)
 void PassSkillFSM::findPass(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
-    best_pass_so_far_ = (*event.common.strategy)->getBestCommittedPass();
+    best_pass_so_far_ = event.common.strategy->getBestCommittedPass();
 
     const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
 

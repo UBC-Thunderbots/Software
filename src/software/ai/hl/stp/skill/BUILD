@@ -11,7 +11,7 @@ cc_library(
         "//software/ai/evaluation/scoring/skills:skill_visitor",
         "//software/ai/hl/stp/primitive",
         "//software/ai/hl/stp/primitive:stop_primitive",
-        "//software/ai/hl/stp/strategy",
+        "//software/ai:strategy",
         "//software/util/sml_fsm",
     ],
 )

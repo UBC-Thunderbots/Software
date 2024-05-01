@@ -8,7 +8,7 @@ cc_library(
         ":skill_visitor",
         "//software/ai/evaluation:keep_away",
         "//software/ai/hl/stp/skill",
-        "//software/ai/hl/stp/strategy",
+        "//software/ai:strategy",
         "//software/world",
         "//software/world:robot",
     ],

@@ -19,7 +19,7 @@ void OffensivePlay::evaluate(double score)
 void OffensivePlay::updateTactics(const PlayUpdate& play_update)
 {
     TbotsProto::PossessionStrategy possession_strategy =
-        (*strategy)->getPossessionStrategy(play_update.num_tactics);
+        strategy->getPossessionStrategy(play_update.num_tactics);
 
     updateSupportTactics(possession_strategy.supporters());
 

@@ -6,3 +6,8 @@ bool operator==(const PassWithRating &lhs, const PassWithRating &rhs)
            lhs.pass.receiverPoint() == rhs.pass.receiverPoint() &&
            lhs.pass.speed() == rhs.pass.speed();
 }
+
+bool operator<(const PassWithRating &lhs, const struct PassWithRating &rhs)
+{
+    return lhs.rating < rhs.rating;
+}

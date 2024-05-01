@@ -4,7 +4,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/strategy/strategy.h"
+#include "software/ai/strategy.h"
 
 /**
  * A Play that stops all the robots on the field. This is primarily used to obey the

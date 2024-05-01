@@ -147,3 +147,9 @@ cc_test(
         "//software/world",
     ],
 )
+
+cc_library(
+    name = "threaded_pass_generator",
+    hdrs = ["threaded_pass_generator.hpp"],
+    deps = [":pass_generator"],
+)

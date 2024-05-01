@@ -2,7 +2,7 @@
 
 #include "software/ai/evaluation/scoring/skills/skill_visitor.h"
 #include "software/ai/hl/stp/skill/skill_fsm.h"
-#include "software/ai/hl/stp/strategy/strategy.h"
+#include "software/ai/strategy.h"
 
 class Skill
 {

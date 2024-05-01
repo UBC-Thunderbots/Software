@@ -5,7 +5,7 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/penalty_kick/penalty_kick_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/strategy/strategy.h"
+#include "software/ai/strategy.h"
 
 /**
  * Play for shooting penalty kicks
