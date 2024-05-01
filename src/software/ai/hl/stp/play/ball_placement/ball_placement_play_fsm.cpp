@@ -2,8 +2,8 @@
 
 BallPlacementPlayFSM::BallPlacementPlayFSM(std::shared_ptr<Strategy> strategy)
     : ai_config(strategy->getAiConfig()),
-      pivot_kick_tactic(std::make_shared<PivotKickSkillTactic>(strategy)),
-      place_ball_tactic(std::make_shared<DribbleSkillTactic>(strategy)),
+      pivot_kick_tactic(std::make_shared<WallKickoffSkillTactic>(strategy)),
+      place_ball_tactic(std::make_shared<PlaceBallSkillTactic>(strategy)),
       align_placement_tactic(std::make_shared<PlaceBallMoveTactic>()),
       retreat_tactic(std::make_shared<MoveTactic>()),
       move_tactics(std::vector<std::shared_ptr<PlaceBallMoveTactic>>())

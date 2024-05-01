@@ -35,11 +35,8 @@ namespace
                                  TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
                                  TbotsProto::MotionConstraint::FRIENDLY_HALF}),
                             std::set<TbotsProto::MotionConstraint>()),
-            std::make_tuple(std::make_shared<ChipTactic>(),
-                            std::set<TbotsProto::MotionConstraint>(),
-                            std::set<TbotsProto::MotionConstraint>()),
             std::make_tuple(
-                std::make_shared<KickoffChipTactic>(),
+                std::make_shared<KickoffChipSkillTactic>(),
                 std::set<TbotsProto::MotionConstraint>(
                     {TbotsProto::MotionConstraint::CENTER_CIRCLE,
                      TbotsProto::MotionConstraint::ENEMY_HALF,

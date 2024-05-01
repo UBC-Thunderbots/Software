@@ -1,9 +1,9 @@
 #pragma once
 
 #include "software/ai/hl/stp/skill/get_behind_ball/get_behind_ball_skill_fsm.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/skill/skill_fsm.h"
 
-struct ChipFSM
+struct ChipSkillFSM
 {
    public:
     class ChipState;
@@ -18,19 +18,19 @@ struct ChipFSM
         double chip_distance_meters;
     };
 
-    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Action that updates the MovePrimitive
      *
-     * @param event ChipFSM::Update event
+     * @param event ChipSkillFSM::Update event
      */
     void updateChip(const Update &event);
 
     /**
      * Action that updates the GetBehindBallSkillFSM
      *
-     * @param event ChipFSM::Update event
+     * @param event ChipSkillFSM::Update event
      * @param processEvent processes the GetBehindBallSkillFSM::Update
      */
     void updateGetBehindBall(
@@ -40,7 +40,7 @@ struct ChipFSM
     /**
      * Guard that checks if the ball has been chicked
      *
-     * @param event ChipFSM::Update event
+     * @param event ChipSkillFSM::Update event
      *
      * @return if the ball has been chicked
      */
@@ -67,8 +67,4 @@ struct ChipFSM
             ChipState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }
-    
-   private:
-    // TODO: Remove this once we actually pass Strategy into this tactic
-    std::shared_ptr<Strategy> strategy;
 };

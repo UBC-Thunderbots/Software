@@ -66,7 +66,6 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
         "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
@@ -76,6 +75,7 @@ cc_library(
         "//software/logger",
         "//software/util/generic_factory",
         "//software/world:ball",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactics",
     ],
     alwayslink = True,
 )
@@ -106,10 +106,10 @@ cc_library(
         ":play",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
         "//software/util/generic_factory",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactics",
     ],
     alwayslink = True,
 )

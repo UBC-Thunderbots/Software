@@ -43,6 +43,16 @@ struct PlaySelectionFSM
     bool gameStateSetupRestart(const Update& event);
 
     /**
+     * Guard to check whether the current game state is a free kick for the
+     * friendly team
+     *
+     * @param event The PlaySelection::Update event
+     *
+     * @return whether the current game state is a free kick for the friendly team
+     */
+    bool isFriendlyFreeKick(const Update& event);
+
+    /**
      * Guard to check whether the enemy team has possession of the ball
      *
      * @param event The PlaySelection::Update event
@@ -85,6 +95,7 @@ struct PlaySelectionFSM
         DEFINE_SML_GUARD(gameStateHalted)
         DEFINE_SML_GUARD(gameStatePlaying)
         DEFINE_SML_GUARD(gameStateSetupRestart)
+        DEFINE_SML_GUARD(isFriendlyFreeKick)
         DEFINE_SML_GUARD(enemyHasPossession)
 
         DEFINE_SML_EVENT(Update)
@@ -103,20 +114,27 @@ struct PlaySelectionFSM
             Halt_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
                          setupOffensivePlay_A = OffensivePlay_S,
             Halt_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
-                         setupDefensivePlay_A                           = DefensivePlay_S,
+                         setupDefensivePlay_A = DefensivePlay_S,
+            Halt_S + Update_E[gameStateSetupRestart_G && isFriendlyFreeKick_G] /
+                         setupOffensivePlay_A                           = OffensivePlay_S,
             Halt_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
 
             Stop_S + Update_E[gameStateHalted_G] / setupHaltPlay_A = Halt_S,
             Stop_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
                          setupOffensivePlay_A = OffensivePlay_S,
             Stop_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
-                         setupDefensivePlay_A                           = DefensivePlay_S,
+                         setupDefensivePlay_A = DefensivePlay_S,
+            Stop_S + Update_E[gameStateSetupRestart_G && isFriendlyFreeKick_G] /
+                         setupOffensivePlay_A                           = OffensivePlay_S,
             Stop_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
 
             OffensivePlay_S + Update_E[gameStateHalted_G] /
                                   (evaluateDynamicPlay_A, setupHaltPlay_A) = Halt_S,
             OffensivePlay_S + Update_E[gameStateStopped_G] /
                                   (evaluateDynamicPlay_A, setupStopPlay_A) = Stop_S,
+            OffensivePlay_S + Update_E[gameStateSetupRestart_G && isFriendlyFreeKick_G] /
+                                  (evaluateDynamicPlay_A, setupOffensivePlay_A) =
+                OffensivePlay_S,
             OffensivePlay_S + Update_E[gameStateSetupRestart_G] /
                                   (evaluateDynamicPlay_A, setupSetPlay_A) = SetPlay_S,
             OffensivePlay_S + Update_E[enemyHasPossession_G] /
@@ -125,6 +143,9 @@ struct PlaySelectionFSM
 
             DefensivePlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A  = Halt_S,
             DefensivePlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
+            DefensivePlay_S + Update_E[gameStateSetupRestart_G && isFriendlyFreeKick_G] /
+                                  (evaluateDynamicPlay_A, setupOffensivePlay_A) =
+                OffensivePlay_S,
             DefensivePlay_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
                 SetPlay_S,
             DefensivePlay_S + Update_E[!enemyHasPossession_G] / setupOffensivePlay_A =

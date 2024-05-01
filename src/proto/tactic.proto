@@ -16,7 +16,6 @@ message Tactic
     oneof tactic
     {
         AttackerTactic attacker                             = 1;
-        ChipTactic chip                                     = 2;
         CreaseDefenderTactic crease_defender                = 3;
         GoalieTactic goalie                                 = 6;
         MoveGoalieToGoalLineTactic move_goalie_to_goal_line = 8;
@@ -28,7 +27,7 @@ message Tactic
         PassDefenderTactic pass_defender                    = 15;
         ShootSkillTactic shoot_skill                        = 16;
     }
-    reserved 4, 5, 11;
+    reserved 2, 4, 5, 7, 11;
 }
 
 message AttackerTactic
@@ -40,16 +39,6 @@ message AttackerTactic
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     optional Point chip_target = 3;
-}
-
-message ChipTactic
-{
-    // The location where the chip will be taken from
-    required Point chip_origin = 1;
-    // The direction the Robot will chip in
-    required Angle chip_direction = 2;
-    // The distance the robot will chip to
-    required double chip_distance_meters = 3;
 }
 
 enum CreaseDefenderAlignment

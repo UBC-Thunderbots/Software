@@ -12,7 +12,8 @@ bool PassSkillFSM::foundPass(const Update& event)
     std::vector<Robot> friendly_robots =
         event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
     Point receiver_point = best_pass_so_far_->pass.receiverPoint();
-    std::optional<Robot> nearest_receiver = Team::getNearestRobot(friendly_robots, receiver_point);
+    std::optional<Robot> nearest_receiver =
+        Team::getNearestRobot(friendly_robots, receiver_point);
 
     return nearest_receiver && nearest_receiver->getTimeToPosition(receiver_point) <
                                    best_pass_so_far_->pass.estimatePassDuration();
@@ -65,7 +66,8 @@ void PassSkillFSM::takePass(
         .kick_origin       = ball_position,
         .kick_direction    = (kick_target - ball_position).orientation(),
         .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                            BALL_MAX_SPEED_METERS_PER_SECOND - 0.5},
+                                            std::min(best_pass_so_far_->pass.speed(),
+                                                     BALL_MAX_SPEED_METERS_PER_SECOND)},
         .retry_kick        = false};
 
     processEvent(PivotKickSkillFSM::Update(control_params, event.common));

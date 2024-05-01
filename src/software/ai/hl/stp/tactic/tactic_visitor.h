@@ -5,10 +5,8 @@
 // because tactic.h includes tactic_visitor.h, and each individual library includes
 // tactic.h. Note: every subclass of this visitor must include all of the classes listed
 // below
-class ChipTactic;
 class CreaseDefenderTactic;
 class GoalieTactic;
-class KickoffChipTactic;
 class MoveTactic;
 class AttackerTactic;
 class PassDefenderTactic;
@@ -21,6 +19,9 @@ class MoveGoalieToGoalLineTactic;
 class PrepareKickoffMoveTactic;
 class PlaceBallMoveTactic;
 class SkillTactic;
+class KickoffChipSkillTactic;
+class PlaceBallSkillTactic;
+class WallKickoffSkillTactic;
 
 /**
  * Refer to the docs about why we use the Visitor Design Pattern
@@ -37,10 +38,8 @@ class TacticVisitor
      * @param tactic The tactic to visit
      */
 
-    virtual void visit(const ChipTactic &tactic)                 = 0;
     virtual void visit(const CreaseDefenderTactic &tactic)       = 0;
     virtual void visit(const GoalieTactic &tactic)               = 0;
-    virtual void visit(const KickoffChipTactic &tactic)          = 0;
     virtual void visit(const MoveTactic &tactic)                 = 0;
     virtual void visit(const AttackerTactic &tactic)             = 0;
     virtual void visit(const PassDefenderTactic &tactic)         = 0;
@@ -53,4 +52,7 @@ class TacticVisitor
     virtual void visit(const PrepareKickoffMoveTactic &tactic)   = 0;
     virtual void visit(const PlaceBallMoveTactic &tactic)        = 0;
     virtual void visit(const SkillTactic &tactic)                = 0;
+    virtual void visit(const KickoffChipSkillTactic &tactic)     = 0;
+    virtual void visit(const PlaceBallSkillTactic &tactic)       = 0;
+    virtual void visit(const WallKickoffSkillTactic &tactic)     = 0;
 };
