@@ -99,9 +99,6 @@ from proto.ssl_gc_common_pb2 import Team
 def test_enemy_free_kick_play(
     simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos
 ):
-    # starting point must be Point
-    # placement point must be Vector2 to work with game controller
-
     # Setup Bots
     def setup(*args):
 

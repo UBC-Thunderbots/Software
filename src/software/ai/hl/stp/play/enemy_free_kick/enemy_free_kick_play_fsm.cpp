@@ -46,11 +46,10 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
         auto block_free_kicker = std::make_shared<PassDefenderTactic>();
         Vector block_direction =
             Vector::createFromAngle(enemy_threats[0].robot.orientation());
-        block_kick_point = event.common.world_ptr->ball().position() +
-                           block_direction.normalize(
-                                   STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M +
-                                   2 * ROBOT_MAX_RADIUS_METERS
-                                   );
+        block_kick_point =
+            event.common.world_ptr->ball().position() +
+            block_direction.normalize(STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M +
+                                      2 * ROBOT_MAX_RADIUS_METERS);
         block_free_kicker->updateControlParams(block_kick_point);
         tactics_to_return[0].push_back(block_free_kicker);
     }

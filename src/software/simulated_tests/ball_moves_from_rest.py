@@ -9,13 +9,14 @@ from software.simulated_tests.validation import (
 
 
 class BallMovesFromRest(Validation):
-    """Checks if ball has moved 0.05m from initial position"""
+    """Checks if ball has moved threshold meters from initial position"""
 
-    def __init__(self, position):
+    def __init__(self, position, threshold=0.05):
         self.initial_ball_position = position
+        self.threshold = threshold
 
     def get_validation_status(self, world) -> ValidationStatus:
-        """CChecks if ball has moved 0.05m from initial position
+        """Checks if ball has moved threshold meters from initial position. Default is 0.05m.
 
         :param world: The world msg to validate
         :returns: FAILING if ball doesn't move according to RoboCup rules
@@ -26,7 +27,9 @@ class BallMovesFromRest(Validation):
             world.ball.current_state.global_position
         )
 
-        if (self.initial_ball_position - current_ball_position).length() > 0.05:
+        if (
+            self.initial_ball_position - current_ball_position
+        ).length() > self.threshold:
             validation_status = ValidationStatus.PASSING
 
         return validation_status
