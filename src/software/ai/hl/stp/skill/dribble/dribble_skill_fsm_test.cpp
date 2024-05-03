@@ -6,7 +6,7 @@
 
 TEST(DribbleSkillFSMTest, test_transitions)
 {
-    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
+    Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     ::TestUtil::setBallPosition(world, Point(0.5, 0), Timestamp::fromSeconds(123));
     ::TestUtil::setBallVelocity(world, Vector(0, -1), Timestamp::fromSeconds(123));

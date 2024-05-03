@@ -183,7 +183,7 @@ message GoalieTacticConfig
 
 message ShotConfig
 {
-    // Number of shot origin points to sample when finding the best shot to take 
+    // Number of shot origin points to sample when finding the best shot to take
     required int32 num_shot_origin_points_to_sample = 1
         [default = 8, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
 }

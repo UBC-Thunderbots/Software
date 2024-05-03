@@ -30,7 +30,7 @@ void ReceiverTactic::updateControlParams(std::optional<Pass> updated_pass,
 void ReceiverTactic::prepare()
 {
     std::optional<PassWithRating> best_pass = (*strategy_)->getBestUncommittedPass();
-    
+
     if (best_pass)
     {
         (*strategy_)->commitPass(*best_pass);

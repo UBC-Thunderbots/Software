@@ -16,9 +16,9 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/primitive:move_primitive",
         "//software/ai/hl/stp/skill",
+        "//software/ai/hl/stp/tactic:transition_conditions",
         "//software/geom:triangle",
         "//software/geom/algorithms",
-        "//software/ai/hl/stp/tactic:transition_conditions",
     ],
     alwayslink = True,
 )

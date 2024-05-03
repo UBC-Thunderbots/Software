@@ -2,7 +2,6 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 import sys
-import math
 from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
@@ -20,7 +19,7 @@ def test_shoot_skill(field_test_runner):
             for robot in world.friendly_team.team_robots
         ]
     )
-    
+
     id = world.friendly_team.team_robots[0].id
     print(f"Running test on robot {id}")
 
@@ -33,6 +32,7 @@ def test_shoot_skill(field_test_runner):
         eventually_validation_sequence_set=[[]],
         test_timeout_s=20,
     )
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity

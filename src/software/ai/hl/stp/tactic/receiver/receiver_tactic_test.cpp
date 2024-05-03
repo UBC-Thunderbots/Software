@@ -72,17 +72,15 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(
         // Robot already at receive point
         std::make_tuple(Pass(Point(0.0, 0.5), Point(2, 2), 4),
-                       RobotStateWithId{
-                           1, RobotState(Point(2, 2), Vector(0, 0),
-                                         Angle::fromDegrees(0),
-                                         Angle::fromDegrees(0))}),
+                        RobotStateWithId{
+                            1, RobotState(Point(2, 2), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
         // Robot slighty off from receive point: test 1
         std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),
-                       RobotStateWithId{
-                           1, RobotState(Point(2, 1.5), Vector(0, 0),
-                                         Angle::fromDegrees(0),
-                                         Angle::fromDegrees(0))}),
+                        RobotStateWithId{
+                            1, RobotState(Point(2, 1.5), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
         // Robot slighty off from receive point: test 2
         std::make_tuple(Pass(Point(0.0, 0.4), Point(2, 2), 4),

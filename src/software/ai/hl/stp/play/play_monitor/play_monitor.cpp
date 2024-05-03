@@ -1,9 +1,7 @@
 #include "play_monitor.h"
 
 
-PlayMonitor::PlayMonitor() : startingWorld_()
-{
-}
+PlayMonitor::PlayMonitor() : startingWorld_() {}
 
 void PlayMonitor::startMonitoring(const World& initialWorld)
 {
@@ -33,8 +31,8 @@ double PlayMonitor::calculateCurrentPlayScore(const World& endingWorld) const
         // How far the ball has travelled along the x axis between updatedWorld and the
         // old world, this indicates that generally the ball has move closer to the enemy
         // goal.
-        const auto starting_ball_position= startingWorld_.ball().position().x();
-        const auto final_ball_position= endingWorld.ball().position().x();
+        const auto starting_ball_position = startingWorld_.ball().position().x();
+        const auto final_ball_position    = endingWorld.ball().position().x();
         const auto ball_distance_travelled_along_field =
             final_ball_position - starting_ball_position;
         return ball_distance_travelled_along_field / startingWorld_.field().xLength();

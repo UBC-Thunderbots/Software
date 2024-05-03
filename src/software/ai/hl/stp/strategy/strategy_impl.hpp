@@ -8,8 +8,8 @@
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_evaluation.hpp"
 #include "software/ai/passing/pass_with_rating.h"
-#include "software/geom/pose.h"
 #include "software/geom/algorithms/distance.h"
+#include "software/geom/pose.h"
 #include "software/world/field.h"
 
 /**
@@ -172,7 +172,8 @@ StrategyImpl<PitchDivision, ZoneEnum>::getBestUncommittedPass()
 }
 
 template <class PitchDivision, class ZoneEnum>
-std::optional<PassWithRating> StrategyImpl<PitchDivision, ZoneEnum>::getBestCommittedPass()
+std::optional<PassWithRating>
+StrategyImpl<PitchDivision, ZoneEnum>::getBestCommittedPass()
 {
     if (committed_passes_.empty())
     {
@@ -180,7 +181,8 @@ std::optional<PassWithRating> StrategyImpl<PitchDivision, ZoneEnum>::getBestComm
     }
 
     auto pass_filter = [&](const PassWithRating& pass_with_rating) {
-        return distance(world_ptr_->ball().position(), pass_with_rating.pass.receiverPoint()) >=
+        return distance(world_ptr_->ball().position(),
+                        pass_with_rating.pass.receiverPoint()) >=
                ai_config_.passing_config().min_pass_distance();
     };
 

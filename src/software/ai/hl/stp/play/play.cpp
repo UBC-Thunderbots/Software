@@ -107,9 +107,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
     // `Tactic::prepare` must be called on every tactic before primitives are computed
     // to allow for the tactics to setup and coordinate with one another
-    for (TacticVector& tactic_vector : priority_tactics)
+    for (TacticVector &tactic_vector : priority_tactics)
     {
-        for (std::shared_ptr<Tactic> tactic : tactic_vector) 
+        for (std::shared_ptr<Tactic> tactic : tactic_vector)
         {
             tactic->prepare();
         }

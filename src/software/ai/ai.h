@@ -19,7 +19,7 @@ class Ai final
 
     /**
      * Create an AI
-     * 
+     *
      * @param strategy the Strategy
      */
     explicit Ai(std::shared_ptr<Strategy> strategy);
@@ -41,10 +41,11 @@ class Ai final
     /**
      * Overrides the play with AssignedTacticsPlay and overrides the tactics
      *
-     * @param assigned_tactic_play_control_params the control params for AssignedTacticsPlay 
+     * @param assigned_tactic_play_control_params the control params for
+     * AssignedTacticsPlay
      */
-    void overrideTactics(
-        const TbotsProto::AssignedTacticPlayControlParams& assigned_tactic_play_control_params);
+    void overrideTactics(const TbotsProto::AssignedTacticPlayControlParams&
+                             assigned_tactic_play_control_params);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current

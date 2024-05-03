@@ -5,8 +5,8 @@
 #include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
-#include "software/geom/ray.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/geom/ray.h"
 #include "software/logger/logger.h"
 
 struct ReceiverFSM
@@ -125,7 +125,7 @@ struct ReceiverFSM
      * Check if the pass has been received by the robot executing this tactic
      *
      * @param event ReceiverFSM::Update event
-     * 
+     *
      * @return true if the ball is near the robot's mouth
      */
     bool passReceived(const Update& event);
@@ -135,7 +135,7 @@ struct ReceiverFSM
      * the robot executing this tactic
      *
      * @param event ReceiverFSM::Update event
-     * 
+     *
      * @return true if the ball is near the mouth of a friendly teammate
      */
     bool passReceivedByTeammate(const Update& event);
@@ -176,13 +176,14 @@ struct ReceiverFSM
             WaitingForPassState_S + Update_E[passStarted_G && !onetouchPossible_G] /
                                         updateReceive_A = ReceiveAndDribbleState_S,
             ReceiveAndDribbleState_S + Update_E[passReceived_G] / adjustReceive_A = X,
-            ReceiveAndDribbleState_S + Update_E[passReceivedByTeammate_G] / updateReceive_A = WaitingForPassState_S,
+            ReceiveAndDribbleState_S + Update_E[passReceivedByTeammate_G] /
+                                           updateReceive_A = WaitingForPassState_S,
             ReceiveAndDribbleState_S + Update_E / adjustReceive_A,
             OneTouchShotState_S +
                 Update_E[!passReceived_G && !strayPass_G] / updateOnetouch_A,
             OneTouchShotState_S + Update_E[!passReceived_G && strayPass_G] /
                                       adjustReceive_A = ReceiveAndDribbleState_S,
-            OneTouchShotState_S + Update_E[passReceived_G] / updateOnetouch_A     = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION                              = X);
+            OneTouchShotState_S + Update_E[passReceived_G] / updateOnetouch_A = X,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }
 };

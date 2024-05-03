@@ -52,7 +52,8 @@ void SimulatedErForceSimPlayTestFixture::setTactic(
     std::set<TbotsProto::MotionConstraint> motion_constraints)
 {
     CHECK(static_cast<bool>(tactic)) << "Tactic is invalid" << std::endl;
-    std::unique_ptr<AssignedTacticsPlay> play = std::make_unique<AssignedTacticsPlay>(strategy);
+    std::unique_ptr<AssignedTacticsPlay> play =
+        std::make_unique<AssignedTacticsPlay>(strategy);
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>>
         motion_constraint_override_map;
     motion_constraint_override_map[id] = motion_constraints;
@@ -77,12 +78,11 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
     const World& friendly_world, const World&,
     std::shared_ptr<ErForceSimulator> simulator_to_update)
 {
-
     auto world_with_updated_game_state = friendly_world;
     world_with_updated_game_state.updateGameState(game_state);
 
     auto start_tick_time = std::chrono::system_clock::now();
-    
+
     auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
     LOG(VISUALIZE) << ai.getPlayInfo();
     LOG(VISUALIZE) << *primitive_set_msg;

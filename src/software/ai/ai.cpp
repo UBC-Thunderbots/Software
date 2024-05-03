@@ -2,8 +2,8 @@
 
 #include <Tracy.hpp>
 
-#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/assigned_tactics_play.h"
+#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/tactic_factory.h"
 #include "software/tracy/tracy_constants.h"
@@ -27,8 +27,8 @@ void Ai::overridePlayFromProto(const TbotsProto::Play& play_proto)
     overridePlay(std::move(createPlay(play_proto, strategy)));
 }
 
-void Ai::overrideTactics(
-    const TbotsProto::AssignedTacticPlayControlParams& assigned_tactic_play_control_params)
+void Ai::overrideTactics(const TbotsProto::AssignedTacticPlayControlParams&
+                             assigned_tactic_play_control_params)
 {
     auto play = std::make_unique<AssignedTacticsPlay>(strategy);
     std::map<RobotId, std::shared_ptr<Tactic>> tactic_assignment_map;
@@ -49,9 +49,9 @@ void Ai::overrideTactics(
 std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
 {
     FrameMarkStart(TracyConstants::AI_FRAME_MARKER);
-    
-    WorldPtr world_ptr = std::make_shared<const World>(world); 
-    
+
+    WorldPtr world_ptr = std::make_shared<const World>(world);
+
     strategy->updateWorld(world_ptr);
 
     fsm->process_event(PlaySelectionFSM::Update(

@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactics.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
@@ -10,7 +11,6 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
-#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactics.h"
 
 FreeKickPlay::FreeKickPlay(std::shared_ptr<Strategy> strategy)
     : Play(true, strategy), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
@@ -91,10 +91,9 @@ void FreeKickPlay::chipAtGoalStage(
 
     do
     {
-        chip_tactic->updateControlParams({
-            chip_origin,
-            (chip_target - chip_origin).orientation(),
-            (chip_target - chip_origin).length()});
+        chip_tactic->updateControlParams({chip_origin,
+                                          (chip_target - chip_origin).orientation(),
+                                          (chip_target - chip_origin).length()});
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::LEFT);

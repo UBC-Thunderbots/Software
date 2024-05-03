@@ -4,7 +4,6 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
-
 #include "software/multithreading/thread_safe_buffer.hpp"
 
 ThreadedAi::ThreadedAi(const TbotsProto::AiConfig& ai_config)
@@ -25,8 +24,8 @@ void ThreadedAi::overridePlay(const TbotsProto::Play& play_proto)
     ai.overridePlayFromProto(play_proto);
 }
 
-void ThreadedAi::overrideTactics(
-    const TbotsProto::AssignedTacticPlayControlParams& assigned_tactic_play_control_params)
+void ThreadedAi::overrideTactics(const TbotsProto::AssignedTacticPlayControlParams&
+                                     assigned_tactic_play_control_params)
 {
     std::scoped_lock lock(ai_mutex);
     ai.overrideTactics(assigned_tactic_play_control_params);
@@ -41,10 +40,10 @@ void ThreadedAi::onValueReceived(World world)
 void ThreadedAi::onValueReceived(TbotsProto::ThunderbotsConfig config)
 {
     std::scoped_lock lock(ai_mutex);
-    
+
     ai_control_config = config.ai_config().ai_control_config();
     strategy->updateAiConfig(config.ai_config());
-    
+
     updateOverridePlay();
 }
 

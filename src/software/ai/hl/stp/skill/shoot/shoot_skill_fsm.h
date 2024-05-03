@@ -52,8 +52,9 @@ struct ShootSkillFSM
      * @param event the Update event
      * @param processEvent processes the GetBallControlFSM::Update event
      */
-    void getBallControl(const Update& event,
-                       boost::sml::back::process<GetBallControlFSM::Update> processEvent);
+    void getBallControl(
+        const Update& event,
+        boost::sml::back::process<GetBallControlFSM::Update> processEvent);
 
     /**
      * Action that updates the DribbleSkillFSM to dribble the ball to the

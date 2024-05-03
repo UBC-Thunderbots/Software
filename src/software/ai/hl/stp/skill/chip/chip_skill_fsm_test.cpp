@@ -8,9 +8,9 @@ TEST(ChipSkillFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    ChipSkillFSM::ControlParams control_params{.chip_origin          = Point(-2, 1.5),
-                                          .chip_direction       = Angle::threeQuarter(),
-                                          .chip_distance_meters = 1.2};
+    ChipSkillFSM::ControlParams control_params{.chip_origin    = Point(-2, 1.5),
+                                               .chip_direction = Angle::threeQuarter(),
+                                               .chip_distance_meters = 1.2};
 
     FSM<ChipSkillFSM> fsm{GetBehindBallSkillFSM()};
 
