@@ -183,10 +183,11 @@ class Team
      * Returns a vector of all the robots on this team excluding the specified robots
      *
      * @param robots_to_ignore the robots to exclude from the returned vector
-     * 
+     *
      * @return a vector of all the robots on this team excluding the specified robots
      */
-    std::vector<Robot> getAllRobotsExcept(const std::vector<Robot> &robots_to_ignore) const;
+    std::vector<Robot> getAllRobotsExcept(
+        const std::vector<Robot>& robots_to_ignore) const;
 
     /**
      * Finds the robot on a team that is closest to the reference point

@@ -13,7 +13,7 @@
 #include "software/world/world.h"
 
 class ChipSkillTest : public SimulatedErForceSimPlayTestFixture,
-                       public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
+                      public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;

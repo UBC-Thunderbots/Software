@@ -44,8 +44,8 @@ class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
      *
      * @param assigned_tactic_play_control_params
      */
-    void overrideTactics(
-        const TbotsProto::AssignedTacticPlayControlParams& assigned_tactic_play_control_params);
+    void overrideTactics(const TbotsProto::AssignedTacticPlayControlParams&
+                             assigned_tactic_play_control_params);
 
    private:
     void onValueReceived(World world) override;
@@ -65,7 +65,7 @@ class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
     void updateOverridePlay();
 
     std::mutex ai_mutex;
-    
+
     std::shared_ptr<Strategy> strategy;
     TbotsProto::AiControlConfig ai_control_config;
     Ai ai;

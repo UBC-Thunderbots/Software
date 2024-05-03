@@ -39,8 +39,10 @@ void PassSkillFSM::findPass(
                                                    pass_score_ramp_down_duration,
                                                1.0 - abs_min_pass_score);
 
+    Point enemy_goal_center   = event.common.world_ptr->field().enemyGoalCenter();
     Point dribble_destination = event.common.world_ptr->ball().position();
-    Angle dribble_orientation = Angle::zero();
+    Angle dribble_orientation = (enemy_goal_center - dribble_destination).orientation();
+
     if (best_pass_so_far_)
     {
         Point receiver_point = best_pass_so_far_->pass.receiverPoint();
@@ -62,12 +64,24 @@ void PassSkillFSM::takePass(
     Point ball_position = event.common.world_ptr->ball().position();
     Point kick_target   = best_pass_so_far_->pass.receiverPoint();
 
+    AutoChipOrKick auto_chip_or_kick;
+
+    if (event.control_params.should_chip)
+    {
+        auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                                           distance(ball_position, kick_target)};
+    }
+    else
+    {
+        auto_chip_or_kick = AutoChipOrKick{
+            AutoChipOrKickMode::AUTOKICK,
+            std::min(best_pass_so_far_->pass.speed(), BALL_MAX_SPEED_METERS_PER_SECOND)};
+    }
+
     PivotKickSkillFSM::ControlParams control_params = {
         .kick_origin       = ball_position,
         .kick_direction    = (kick_target - ball_position).orientation(),
-        .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                            std::min(best_pass_so_far_->pass.speed(),
-                                                     BALL_MAX_SPEED_METERS_PER_SECOND)},
+        .auto_chip_or_kick = auto_chip_or_kick,
         .retry_kick        = false};
 
     processEvent(PivotKickSkillFSM::Update(control_params, event.common));

@@ -95,13 +95,14 @@ class Tactic
     /**
      * Prepares the tactic for updating and returning the next set of primitives.
      * NOTE: This method should be called on all active tactics before `get`.
-     * 
-     * This allows all the tactics to perform some setup and coordinate with each other 
+     *
+     * This allows all the tactics to perform some setup and coordinate with each other
      * via Strategy before computing primitives. We require running this preparation step
-     * before `get` because the order in which `get` is called on each tactic is undetermined.
-     * 
+     * before `get` because the order in which `get` is called on each tactic is
+     * undetermined.
+     *
      * The work that `prepare` does will vary between tactics and its implementation
-     * is not important to the caller of `prepare`. 
+     * is not important to the caller of `prepare`.
      */
     virtual void prepare();
 

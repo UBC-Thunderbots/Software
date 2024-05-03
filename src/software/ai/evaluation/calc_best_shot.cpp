@@ -152,13 +152,10 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
     }
 }
 
-std::optional<Shot> sampleForBestShotOnGoal(const Field &field, const Team &friendly_team,
-                                       const Team &enemy_team,
-                                       const Point &starting_point, TeamType goal,
-                                       double max_dribbling_dist,
-                                       int num_sample_points,
-                                       const std::vector<Robot> &robots_to_ignore,
-                                       double radius)
+std::optional<Shot> sampleForBestShotOnGoal(
+    const Field &field, const Team &friendly_team, const Team &enemy_team,
+    const Point &starting_point, TeamType goal, double max_dribbling_dist,
+    int num_sample_points, const std::vector<Robot> &robots_to_ignore, double radius)
 {
     std::optional<Shot> best_shot = std::nullopt;
 
@@ -170,8 +167,8 @@ std::optional<Shot> sampleForBestShotOnGoal(const Field &field, const Team &frie
     double sampling_spacing = max_dribbling_dist / (num_sample_points / 2);
 
     // Generate sample shot origin points offset from the starting point
-    for (double sample_point_offset = -max_dribbling_dist; 
-         sample_point_offset <= max_dribbling_dist; 
+    for (double sample_point_offset = -max_dribbling_dist;
+         sample_point_offset <= max_dribbling_dist;
          sample_point_offset += sampling_spacing)
     {
         Point shot_origin = starting_point + (sampling_vector * sample_point_offset);

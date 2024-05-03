@@ -1,9 +1,9 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/ai/hl/stp/skill/chip/chip_skill_fsm.h"
 #include "software/ai/hl/stp/skill/kick/kick_skill_fsm.h"
 #include "software/ai/hl/stp/skill/shoot/shoot_skill_fsm.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 
 class ChipSkillTactic : public AssignedSkillTactic<ChipSkillFSM, GetBehindBallSkillFSM>
 {
@@ -24,15 +24,17 @@ class KickSkillTactic : public AssignedSkillTactic<KickSkillFSM, GetBehindBallSk
     using AssignedSkillTactic::AssignedSkillTactic;
 };
 
-class PivotKickSkillTactic : public AssignedSkillTactic<PivotKickSkillFSM, DribbleSkillFSM>
+class PivotKickSkillTactic
+    : public AssignedSkillTactic<PivotKickSkillFSM, DribbleSkillFSM>
 {
     using AssignedSkillTactic::AssignedSkillTactic;
 };
 
 COPY_TACTIC(WallKickoffSkillTactic, PivotKickSkillTactic)
 
-class ShootSkillTactic : public AssignedSkillTactic<ShootSkillFSM, ShootSkillFSM::GetBallControlFSM,
-                                                    DribbleSkillFSM, PivotKickSkillFSM>
+class ShootSkillTactic
+    : public AssignedSkillTactic<ShootSkillFSM, ShootSkillFSM::GetBallControlFSM,
+                                 DribbleSkillFSM, PivotKickSkillFSM>
 {
     using AssignedSkillTactic::AssignedSkillTactic;
 };

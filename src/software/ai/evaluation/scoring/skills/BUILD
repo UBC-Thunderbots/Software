@@ -6,9 +6,9 @@ cc_library(
     hdrs = ["feasibility_visitor.h"],
     deps = [
         ":skill_visitor",
+        "//software/ai:strategy",
         "//software/ai/evaluation:keep_away",
         "//software/ai/hl/stp/skill",
-        "//software/ai:strategy",
         "//software/world",
         "//software/world:robot",
     ],

@@ -88,10 +88,8 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
  * angle interval for the shot (this is the total angle between the obstacles on either
  * side of the shot vector). If no shot can be found, returns std::nullopt
  */
-std::optional<Shot> sampleForBestShotOnGoal(const Field &field, const Team &friendly_team,
-                                       const Team &enemy_team,
-                                       const Point &starting_point, TeamType goal,
-                                       double max_dribbling_dist,
-                                       int num_sample_points,
-                                       const std::vector<Robot> &robots_to_ignore = {},
-                                       double radius = ROBOT_MAX_RADIUS_METERS);
+std::optional<Shot> sampleForBestShotOnGoal(
+    const Field &field, const Team &friendly_team, const Team &enemy_team,
+    const Point &starting_point, TeamType goal, double max_dribbling_dist,
+    int num_sample_points, const std::vector<Robot> &robots_to_ignore = {},
+    double radius = ROBOT_MAX_RADIUS_METERS);

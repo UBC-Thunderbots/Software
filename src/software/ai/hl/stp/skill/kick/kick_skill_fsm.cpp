@@ -15,7 +15,8 @@ void KickSkillFSM::updateKick(const Update &event)
 }
 
 void KickSkillFSM::updateGetBehindBall(
-    const Update &event, boost::sml::back::process<GetBehindBallSkillFSM::Update> processEvent)
+    const Update &event,
+    boost::sml::back::process<GetBehindBallSkillFSM::Update> processEvent)
 {
     GetBehindBallSkillFSM::ControlParams control_params{
         .ball_location   = event.control_params.kick_origin,

@@ -8,7 +8,7 @@
 /**
  * This class wraps a `PassGenerator` and uses it to generate pass evaluations on
  * a separate thread.
- * 
+ *
  * @tparam ZoneEnum the enum used to identify pitch division zones
  */
 template <class ZoneEnum>
@@ -39,7 +39,7 @@ class ThreadedPassGenerator
 
     /**
      * Update the World provided to the pass generator to compute pass evaluations on.
-     * 
+     *
      * @param world_ptr the World to provide to the pass generator
      */
     void updateWorld(const WorldPtr& world_ptr);
@@ -48,7 +48,7 @@ class ThreadedPassGenerator
     /**
      * Continually generates pass evaluations and updates `latest_pass_eval_`
      * with the latest generated pass evaluation.
-     * 
+     *
      * This function will keep running until the `end_analysis_` flag is true.
      */
     void evaluatePassOptions();
@@ -58,14 +58,14 @@ class ThreadedPassGenerator
 
     // The pass generator used to compute pass evaluations
     PassGenerator<ZoneEnum> pass_generator_;
-    
+
     // The latest generated pass evaluation
     std::shared_ptr<PassEvaluation<ZoneEnum>> latest_pass_eval_;
-    
+
     // Synchronization primitives for `latest_pass_eval_`
     std::mutex pass_eval_mutex_;
     std::condition_variable pass_eval_cv_;
-    
+
     // World provided to the pass generator
     WorldPtr world_ptr_;
 
@@ -79,8 +79,8 @@ class ThreadedPassGenerator
 
 template <class ZoneEnum>
 ThreadedPassGenerator<ZoneEnum>::ThreadedPassGenerator(
-        std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
-        TbotsProto::PassingConfig passing_config)
+    std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
+    TbotsProto::PassingConfig passing_config)
     : pass_generator_thread_(&ThreadedPassGenerator::evaluatePassOptions, this),
       pass_generator_(pitch_division, passing_config),
       latest_pass_eval_(nullptr),
@@ -98,7 +98,8 @@ ThreadedPassGenerator<ZoneEnum>::~ThreadedPassGenerator()
 }
 
 template <class ZoneEnum>
-std::shared_ptr<PassEvaluation<ZoneEnum>> ThreadedPassGenerator<ZoneEnum>::getPassEvaluation()
+std::shared_ptr<PassEvaluation<ZoneEnum>>
+ThreadedPassGenerator<ZoneEnum>::getPassEvaluation()
 {
     std::unique_lock<std::mutex> lock(pass_eval_mutex_);
     pass_eval_cv_.wait(lock, [&] { return latest_pass_eval_ != nullptr; });

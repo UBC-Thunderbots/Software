@@ -1,11 +1,11 @@
 #include "software/ai/strategy.h"
 
-Strategy::Strategy(const TbotsProto::AiConfig& ai_config) 
-    : ai_config_(ai_config), 
-      pitch_division_(std::make_shared<EighteenZonePitchDivision>(
-        Field::createSSLDivisionBField())),
+Strategy::Strategy(const TbotsProto::AiConfig& ai_config)
+    : ai_config_(ai_config),
+      pitch_division_(
+          std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField())),
       pass_generator_(std::make_unique<ThreadedPassGenerator<EighteenZoneId>>(
-        pitch_division_, ai_config_.passing_config()))
+          pitch_division_, ai_config_.passing_config()))
 {
 }
 
@@ -145,7 +145,7 @@ void Strategy::updateAiConfig(const TbotsProto::AiConfig& ai_config)
 void Strategy::updateWorld(const WorldPtr& world_ptr)
 {
     world_ptr_ = world_ptr;
-    
+
     pass_generator_->updateWorld(world_ptr_);
 
     committed_passes_.clear();

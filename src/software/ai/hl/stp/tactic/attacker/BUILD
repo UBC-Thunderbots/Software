@@ -6,10 +6,10 @@ cc_library(
     hdrs = ["attacker_tactic.h"],
     deps = [
         "//shared:constants",
+        "//software/ai:strategy",
         "//software/ai/evaluation/scoring/skills:skill_graph",
         "//software/ai/hl/stp/skill",
         "//software/ai/hl/stp/tactic",
-        "//software/ai:strategy",
         "//software/logger",
         "//software/world:ball",
     ],

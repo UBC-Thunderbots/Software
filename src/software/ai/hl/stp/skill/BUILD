@@ -8,10 +8,10 @@ cc_library(
     ],
     deps = [
         "//proto/primitive:primitive_msg_factory",
+        "//software/ai:strategy",
         "//software/ai/evaluation/scoring/skills:skill_visitor",
         "//software/ai/hl/stp/primitive",
         "//software/ai/hl/stp/primitive:stop_primitive",
-        "//software/ai:strategy",
         "//software/util/sml_fsm",
     ],
 )

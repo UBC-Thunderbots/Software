@@ -16,7 +16,8 @@ void ShootSkillFSM::GetBallControlFSM::getBallControl(
 }
 
 void ShootSkillFSM::getBallControl(
-    const Update& event, boost::sml::back::process<GetBallControlFSM::Update> processEvent)
+    const Update& event,
+    boost::sml::back::process<GetBallControlFSM::Update> processEvent)
 {
     processEvent(GetBallControlFSM::Update({}, event.common));
 }

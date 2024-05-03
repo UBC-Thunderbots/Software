@@ -15,6 +15,7 @@ cc_library(
     # PlayFactory. This addresses the issue explained here:
     # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
     deps = [
+        ":strategy",
         "//proto:play_info_msg_cc_proto",
         "//software/ai/hl/stp/play:all_plays",
         "//software/ai/hl/stp/play:assigned_tactics_play",
@@ -24,7 +25,6 @@ cc_library(
         "//software/time:timestamp",
         "//software/tracy:tracy_constants",
         "//software/world",
-        ":strategy",
         "@tracy",
     ],
 )
@@ -62,8 +62,8 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:shot",
-        "//software/ai/passing:threaded_pass_generator",
         "//software/ai/passing:eighteen_zone_pitch_division",
+        "//software/ai/passing:threaded_pass_generator",
         "//software/geom:pose",
         "//software/world:field",
     ],

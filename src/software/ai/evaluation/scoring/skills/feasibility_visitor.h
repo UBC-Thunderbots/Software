@@ -13,7 +13,8 @@ class FeasibilityVisitor : public SkillVisitor
                        const World& world);
 
     void visit(const KeepAwaySkill& skill) override;
-    void visit(const PassSkill& skill) override;
+    void visit(const KickPassSkill& skill) override;
+    void visit(const ChipPassSkill& skill) override;
     void visit(const ShootSkill& skill) override;
 
     /**

@@ -7,11 +7,13 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "pass_skill",
     srcs = [
-        "pass_skill.cpp",
+        "chip_pass_skill.cpp",
+        "kick_pass_skill.cpp",
         "pass_skill_fsm.cpp",
     ],
     hdrs = [
-        "pass_skill.h",
+        "chip_pass_skill.h",
+        "kick_pass_skill.h",
         "pass_skill_fsm.h",
     ],
     deps = [

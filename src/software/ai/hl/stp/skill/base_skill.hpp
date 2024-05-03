@@ -15,8 +15,8 @@ template <typename TSkillFSM, typename... TSkillSubFSMs>
 class BaseSkill : public Skill
 {
    public:
-    void updatePrimitive(const Robot& robot, const WorldPtr& world_ptr,
-                         const SetPrimitiveCallback& set_primitive) override;
+    virtual void updatePrimitive(const Robot& robot, const WorldPtr& world_ptr,
+                                 const SetPrimitiveCallback& set_primitive) override;
 
     void reset(const Robot& robot) override;
 
@@ -25,12 +25,13 @@ class BaseSkill : public Skill
     std::string getFSMState(RobotId robot_id) const override;
 
    protected:
-    explicit BaseSkill(std::shared_ptr<Strategy> strategy) : Skill(strategy), fsm_map_()
+    explicit BaseSkill(std::shared_ptr<Strategy> strategy)
+        : Skill(strategy), fsm_map_(), control_params_()
     {
     }
 
-   private:
     std::map<RobotId, std::unique_ptr<FSM<TSkillFSM>>> fsm_map_;
+    typename TSkillFSM::ControlParams control_params_;
 };
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>
@@ -44,8 +45,7 @@ void BaseSkill<TSkillFSM, TSkillSubFSMs...>::updatePrimitive(
     }
 
     fsm_map_[robot.id()]->process_event(typename TSkillFSM::Update(
-        typename TSkillFSM::ControlParams{},
-        SkillUpdate(robot, world_ptr, strategy_, set_primitive)));
+        control_params_, SkillUpdate(robot, world_ptr, strategy_, set_primitive)));
 }
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>

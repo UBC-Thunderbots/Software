@@ -16,7 +16,7 @@ struct PivotKickSkillFSM
         Angle kick_direction;
         // How the robot will chip or kick the ball
         AutoChipOrKick auto_chip_or_kick;
-        // Whether to reattempt the kick if we lose ball control 
+        // Whether to reattempt the kick if we lose ball control
         bool retry_kick = true;
     };
 
@@ -62,7 +62,7 @@ struct PivotKickSkillFSM
      *
      * @param event the Update event
      *
-     * @return whether kick retries are allowed 
+     * @return whether kick retries are allowed
      */
     bool retryKickAllowed(const Update& event);
 
@@ -91,10 +91,10 @@ struct PivotKickSkillFSM
             DribbleSkillFSM_S = KickState_S,
 
             KickState_S + Update_E[ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            KickState_S + Update_E[lostBallControl_G && retryKickAllowed_G] 
-                / getBallControlAndPivot_A = DribbleSkillFSM_S,
-            KickState_S + Update_E[lostBallControl_G && !retryKickAllowed_G] 
-                / SET_STOP_PRIMITIVE_ACTION = X,
+            KickState_S + Update_E[lostBallControl_G && retryKickAllowed_G] /
+                              getBallControlAndPivot_A = DribbleSkillFSM_S,
+            KickState_S + Update_E[lostBallControl_G && !retryKickAllowed_G] /
+                              SET_STOP_PRIMITIVE_ACTION = X,
             KickState_S + Update_E / kickBall_A,
 
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
