@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iomanip>
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
 #include "software/ai/passing/cost_function.h"
@@ -190,9 +191,11 @@ void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
                 Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
                 5.0);  // TODO (NIMA): Pass speed should be dynamic!!
 
-            debug_shapes.push_back(*createDebugShape(Circle(pass.receiverPoint(), 0.03), std::to_string(debug_shapes.size()) + "s", std::to_string(debug_shapes.size()) + "s"));
-
             double rating = ratePassForReceiving(world, pass, passing_config_);
+
+            std::stringstream stream;
+            stream << std::fixed << std::setprecision(3) << rating;
+            debug_shapes.push_back(*createDebugShape(Circle(pass.receiverPoint(), 0.03), std::to_string(debug_shapes.size()) + "s", stream.str()));
             if (rating > best_pass_for_receiving.rating)
             {
                 best_pass_for_receiving = PassWithRating{pass, rating};

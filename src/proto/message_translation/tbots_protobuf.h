@@ -127,7 +127,7 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     const std::map<std::string, double>& values);
 
 template<class Shape>
-std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(const Shape& shape, const std::string& unique_id, const std::string& debug_text)
+std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(const Shape& shape, const std::string& unique_id, const std::string& debug_text="")
 {
 //    static_assert(std::is_base_of<Shape, Circle>::value || std::is_base_of<Shape, Polygon>::value || std::is_base_of<Shape, Stadium>::value, "Shape must be a Circle, Polygon, or Stadium");
 
