@@ -1,6 +1,7 @@
 # Common Robot Commands
 
 # Table of Contents
+* [Common Debugging Steps](#common-debugging-steps)
 * [Off Robot Commands](#off-robot-commands)
    * [Wifi Disclaimer](#wifi-disclaimer)
    * [Miscellaneous Ansible Tasks & Options](#miscellaneous-ansible-tasks--options)
@@ -13,6 +14,55 @@
    * [Systemd Services](#systemd-services)
    * [Debugging Uart](#debugging-uart)
    * [Redis](#redis)
+
+# Common Debugging Steps
+```mermaid
+---
+title: Robot Debugging Steps
+---
+flowchart TD
+    ssh(Can you SSH into robot? 
+        `ssh robot@192.168.0.20RobotID` OR
+        `ssh robot@RobotName.local`)
+    ssh ---> |Yes| tloop_status
+    ssh --> |No - Second Try| monitor("`Connect Jetson to an external monitor and check wifi connection _or_ SSH using an ethernet cable`")
+    ssh --> |No - First Try| restart(Restart robot)
+    restart --> ssh
+
+    diagnostics("`Run Diagnostics while connected to '**tbots**' wifi`") --> robot_view
+    robot_view(Robot is shown as connected in 'Robot View' widget?) --> |Yes| check_motors(All motors move?)
+    style diagnostics stroke:#f66,stroke-width:2px,stroke-dasharray: 5 5
+
+    check_motors -->|Yes| field_test(Running AI?)
+    field_test -->|No| done(Done)
+    style done stroke:#30fa02,stroke-width:2px,stroke-dasharray: 5 5
+    field_test -->|Yes| field_test_moves(Does robot move during field test?)
+    field_test_moves --> |No| check_shell("`Check that the correct shell is placed on the robot`")
+    check_shell
+    field_test_moves --> |Yes| done
+
+    robot_view --> |No| ssh
+    check_motors -->|No| rip
+    rip(Check with a lead)
+                  
+    subgraph ssh_graph [Commands running on the robot]
+    tloop_status(Check if Thunderloop is running? 
+                               `service thunderloop status`)
+    tloop_status --> |Inactive| tloop_restart(Restart Thunderloop service
+                                              `service thunderloop restart`)
+    tloop_status --> |Running| tloop_logs(Check Thunderloop logs for errors
+                                          `journalctl -fu thunderloop -n 300`)
+    tloop_logs --> |No Errors| check_redis(Does `redis-cli get /network_interface`
+                                           return 'eno1'?)
+    tloop_logs --> |Contains Errors| rip2("`Fix errors or check errors with a lead`")
+    check_redis --> |No| update_redis(Update constant
+                                      `redis-cli set /network_interface 'eno1'`)
+    check_redis --> |Yes| rip3(Check with a lead)
+    update_redis --> tloop_restart
+    tloop_restart --> tloop_status
+    end
+```
+
 
 # Off Robot Commands
 
