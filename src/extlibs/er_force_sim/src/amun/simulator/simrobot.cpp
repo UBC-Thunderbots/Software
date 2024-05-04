@@ -412,10 +412,11 @@ void SimRobot::begin(SimBall *ball, double time)
     if (m_isCharged && m_sslCommand.has_kick_speed() && m_sslCommand.kick_speed() > 0 &&
         canKickBall(ball))
     {
-        float power          = 0.0;
-        const float angle    = m_sslCommand.kick_angle() / 180 * M_PI;
-        const float dirFloor = std::cos(angle);
-        const float dirUp    = std::sin(angle);
+        float power                         = 0.0;
+        const float angle                   = m_sslCommand.kick_angle() / 180 * M_PI;
+        const float dirFloor                = std::cos(angle);
+        const float dirUp                   = std::sin(angle);
+        const float kickSpeedBoundThreshold = 1.0;
 
         stopDribbling();
 
@@ -425,7 +426,9 @@ void SimRobot::begin(SimBall *ball, double time)
             // this ensures the ball leaves the robot at exactly the speed we want
             power = qBound(
                 0.05f,
-                m_sslCommand.kick_speed() - (ball->speed().length() / SIMULATOR_SCALE),
+                ball->speed().length() < kickSpeedBoundThreshold ?
+                    m_sslCommand.kick_speed() - (ball->speed().length() / SIMULATOR_SCALE) :
+                    m_sslCommand.kick_speed(),
                 m_specs.shot_linear_max());
         }
         else
