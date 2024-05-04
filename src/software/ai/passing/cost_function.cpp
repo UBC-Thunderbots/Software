@@ -527,7 +527,7 @@ void samplePassesForVisualization(const World& world,
             // rateReceivingPosition
             if (passing_config.cost_vis_config().receiver_position_score())
             {
-                receiver_position_costs = rateReceivingPosition(
+                receiver_position_costs = ratePassForReceiving(
                     world, pass, passing_config);
             }
 
