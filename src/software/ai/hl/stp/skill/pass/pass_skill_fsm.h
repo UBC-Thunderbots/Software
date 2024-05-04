@@ -8,6 +8,8 @@ struct PassSkillFSM
 {
     struct ControlParams
     {
+        // Whether the robot should chip (true) or kick (false) the ball to make the pass
+        bool should_chip;
     };
 
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS

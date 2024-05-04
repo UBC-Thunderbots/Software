@@ -31,9 +31,21 @@ void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
     current_feasibility_ = 1;
 }
 
-void FeasibilityVisitor::visit(const PassSkill& skill)
+void FeasibilityVisitor::visit(const KickPassSkill& skill)
 {
-    std::optional<PassWithRating> best_pass = (*strategy_)->getBestCommittedPass();
+    std::optional<PassWithRating> best_pass = strategy_->getBestCommittedPass();
+    if (!best_pass)
+    {
+        current_feasibility_ = 0;
+        return;
+    }
+
+    current_feasibility_ = best_pass->rating;
+}
+
+void FeasibilityVisitor::visit(const ChipPassSkill& skill)
+{
+    std::optional<PassWithRating> best_pass = strategy_->getBestCommittedPass();
     if (!best_pass)
     {
         current_feasibility_ = 0;
@@ -48,7 +60,7 @@ void FeasibilityVisitor::visit(const ShootSkill& skill)
     static constexpr double IDEAL_SHOT_OPEN_ANGLE_DEGREES = 60.0;
     static constexpr double SIGMOID_WIDTH                 = 0.25;
 
-    std::optional<Shot> best_shot = (*strategy_)->getBestShot(robot_);
+    std::optional<Shot> best_shot = strategy_->getBestShot(robot_);
     if (!best_shot)
     {
         current_feasibility_ = 0;

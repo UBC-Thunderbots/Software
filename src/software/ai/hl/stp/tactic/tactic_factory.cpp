@@ -2,7 +2,7 @@
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/ai/hl/stp/strategy/strategy.h"
+#include "software/ai/strategy.h"
 #include "software/logger/logger.h"
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,

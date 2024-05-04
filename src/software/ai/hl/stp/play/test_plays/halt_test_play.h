@@ -2,7 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/strategy/strategy.h"
+#include "software/ai/strategy.h"
 
 /**
  * A test Play that halts 3 robots.

@@ -4,10 +4,10 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/strategy/strategy.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/pass_generator.hpp"
+#include "software/ai/strategy.h"
 
 /**
  * A Play for Direct Free kicks
