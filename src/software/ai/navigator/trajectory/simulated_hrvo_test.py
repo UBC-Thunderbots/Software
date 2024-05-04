@@ -564,6 +564,7 @@ def get_move_update_control_params(
             auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
             max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
             target_spin_rev_per_s=0.0,
+            obstacle_avoidance_mode=ObstacleAvoidanceMode.AGGRESSIVE,
         )
     )
 

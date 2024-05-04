@@ -1,17 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "proto_radio_client",
-    hdrs = [
-        "proto_radio_client.hpp",
-    ],
-    deps = [
-        "//software/logger",
-        "//software/util/typename",
-    ],
-)
-
-cc_library(
     name = "proto_radio_listener",
     hdrs = [
         "proto_radio_listener.hpp",
