@@ -40,7 +40,7 @@ class FriendlyTeamScored(Validation):
         return create_validation_geometry([self.region])
 
     def __repr__(self):
-        return "Checking ball in " + ",".join(repr(self.region))
+        return "Checking ball in " + repr(self.region)
 
 
 (

@@ -15,7 +15,7 @@ class FriendlyHasBallPossession(Validation):
         """
         Initializes the validation to check for if the robot with the given id has possession
         """
-        self.robot_id = robot_id
+        self.robot_to_check = robot_id
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if the specified friendly robot has possession of the ball
@@ -25,9 +25,8 @@ class FriendlyHasBallPossession(Validation):
                   PASSING when the specified friendly robot has possession of the ball
         """
         ball_position = tbots_cpp.createPoint(world.ball.current_state.global_position)
-        robot = world.friendly_team.team_robots[self.robot_id]
 
-        if tbots_cpp.Robot(robot).isNearDribbler(ball_position):
+        if tbots_cpp.Robot(self.robot_to_check).isNearDribbler(ball_position):
             return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 
@@ -61,9 +60,9 @@ class AnyFriendlyHasBallPossession(FriendlyHasBallPossession):
 
     def __init__(self) -> None:
         """
-        Initializes the validation with no specific robot id (will be set later)
+        Initializes the validation with no specific robot (will be set later)
         """
-        self.robot_id = None
+        self.robot_to_check = None
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if any friendly robot has possession of the ball
@@ -72,8 +71,8 @@ class AnyFriendlyHasBallPossession(FriendlyHasBallPossession):
         :returns: FAILING when no friendly robot has possession of the ball
                   PASSING when any friendly robot has possession of the ball
         """
-        for robot, index in world.friendly_team.team_robots:
-            self.robot_id = index
+        for robot in world.friendly_team.team_robots:
+            self.robot_to_check = robot
             if super().get_validation_status(world) == ValidationStatus.PASSING:
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING
