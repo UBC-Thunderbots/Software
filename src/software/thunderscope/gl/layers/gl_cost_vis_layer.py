@@ -41,7 +41,7 @@ class GLCostVisOverlayLayer(GLLayer):
             self.legend_graphic = GLGradientLegend(
                 parent_item=self,
                 size=(10, 100),
-                offset=(16, -16),
+                offset=(16, -40),
                 gradient=self.cost_vis_layer.color_map_gradient,
                 title="Passing",
             )

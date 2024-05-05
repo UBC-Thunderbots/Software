@@ -143,12 +143,12 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     if (shot_opt && shot_opt.value().getOpenAngle().abs() > Angle::fromDegrees(0))
     {
         open_angle_to_goal = shot_opt.value().getOpenAngle();
+        shot_target = shot_opt.value().getPointToShootAt();
     }
 
     // Figure out what the maximum open angle of the goal could be from the receiver pos.
     Angle goal_angle = convexAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
-                                   field.enemyGoalpostPos())
-                           .abs();
+                                   field.enemyGoalpostPos());
     double net_percent_open = 0;
     if (goal_angle > Angle::zero())
     {
@@ -175,7 +175,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
         (shot_target - pass.receiverPoint()).orientation());
     double required_rotation_for_shot_score =
         1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
-                    ideal_max_rotation_to_shoot_degrees, 4);
+                    ideal_max_rotation_to_shoot_degrees, 4); // 150) * 0.8; // TODO (NIMA): Add to config: lowerst 0.8
 
     return shot_openness_score * required_rotation_for_shot_score;
 }
@@ -415,7 +415,7 @@ void samplePassesForVisualization(const World& world,
             // y coordinate of the centre of the row
             double y  = height * j + height / 2 - world.field().yLength() / 2;
             auto pass = Pass(world.ball().position(), Point(x, y),
-                             passing_config.max_pass_speed_m_per_s());
+                             5.0); // TODO (NIMA): Replace this
 
             // default values
             static_pos_quality_costs       = 1;

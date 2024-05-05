@@ -201,6 +201,7 @@ void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
                 best_pass_for_receiving = PassWithRating{pass, rating};
             }
         }
+        debug_shapes.push_back(*createDebugShape(Circle(best_pass_for_receiving.pass.receiverPoint(), 0.05), std::to_string(debug_shapes.size()) + "s"));
 
         best_receiving_positions.insert_or_assign(zone_id, best_pass_for_receiving);
     }
