@@ -24,9 +24,9 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
 {
 }
 
-void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
-    const WorldPtr world, const std::vector<EighteenZoneId>& ranked_zones,
-    const PassEvaluation<EighteenZoneId>& pass_eval, unsigned int num_tactics)
+void ShootOrPassPlayFSM::updateOffensivePositioningTactics(const WorldPtr world,
+                                                           const PassEvaluation<EighteenZoneId> &pass_eval,
+                                                           unsigned int num_tactics)
 {
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -63,14 +63,12 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         PassEvaluation<EighteenZoneId> pass_eval =
             pass_generator.generatePassEvaluation(*event.common.world_ptr);
         best_pass_and_score_so_far               = pass_eval.getBestPassOnField();
-        std::vector<EighteenZoneId> ranked_zones = pass_eval.rankZonesForReceiving(
-            *event.common.world_ptr, event.common.world_ptr->ball().position());
 
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
 
         // add remaining tactics based on ranked zones
-        updateOffensivePositioningTactics(event.common.world_ptr, ranked_zones, pass_eval,
+        updateOffensivePositioningTactics(event.common.world_ptr, pass_eval,
                                           event.common.num_tactics - 1);
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
@@ -105,9 +103,6 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 {
     auto pass_eval = pass_generator.generatePassEvaluation(*event.common.world_ptr);
 
-    auto ranked_zones = pass_eval.rankZonesForReceiving(
-        *event.common.world_ptr, best_pass_and_score_so_far.pass.receiverPoint());
-
     // if we make it here then we have committed to the pass
     attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
     receiver_tactic->updateControlParams(best_pass_and_score_so_far.pass);
@@ -120,7 +115,7 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
         if (event.common.num_tactics > 2)
         {
-            updateOffensivePositioningTactics(event.common.world_ptr, ranked_zones,
+            updateOffensivePositioningTactics(event.common.world_ptr,
                                               pass_eval, event.common.num_tactics - 2);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
@@ -134,7 +129,7 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
         PriorityTacticVector ret_tactics = {{receiver_tactic}, {}};
         if (event.common.num_tactics > 1)
         {
-            updateOffensivePositioningTactics(event.common.world_ptr, ranked_zones,
+            updateOffensivePositioningTactics(event.common.world_ptr,
                                               pass_eval, event.common.num_tactics - 1);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),

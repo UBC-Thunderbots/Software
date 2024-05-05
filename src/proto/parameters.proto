@@ -114,7 +114,7 @@ message PassingConfig
     ];
     // The minimum pass speed (in m/s)
     required double min_pass_speed_m_per_s = 6
-        [default = 4.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+        [default = 3.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
     // The maximum pass speed (in m/s)
     required double max_pass_speed_m_per_s = 7 [
         default                   = 6.0,
@@ -124,7 +124,7 @@ message PassingConfig
     // How long we think the enemy will take to recognize we're passing and start
     // moving to intercept
     required double enemy_reaction_time = 8
-        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
+        [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
     // The number of steps of gradient descent to perform in each iteration
     required int32 number_of_gradient_descent_steps_per_iter = 9
         [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];

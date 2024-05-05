@@ -43,9 +43,9 @@ struct ShootOrPassPlayFSM
      * @param pass_eval The pass evaluation to help find best passes
      * @param num_tactics the number of tactics to return
      */
-    void updateOffensivePositioningTactics(
-        const WorldPtr world, const std::vector<EighteenZoneId>& ranked_zones,
-        const PassEvaluation<EighteenZoneId>& pass_eval, unsigned int num_tactics);
+    void updateOffensivePositioningTactics(const WorldPtr world,
+                                           const PassEvaluation<EighteenZoneId> &pass_eval,
+                                           unsigned int num_tactics);
 
     /**
      * Action that looks for a pass
