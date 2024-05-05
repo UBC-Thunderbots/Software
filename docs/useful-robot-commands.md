@@ -52,11 +52,12 @@ flowchart TD
                                               `service thunderloop restart`)
     tloop_status --> |Running| tloop_logs(Check Thunderloop logs for errors
                                           `journalctl -fu thunderloop -n 300`)
-    tloop_logs --> |No Errors| check_redis(Does `redis-cli get /network_interface`
-                                           return 'eno1'?)
+    tloop_logs --> |No Errors| check_redis(Does `redis-cli get /network_interface` return 'wlan0', 
+    and does `redis-cli get /channel_id` return '0'?)
     tloop_logs --> |Contains Errors| rip2("`Fix errors or check errors with a lead`")
-    check_redis --> |No| update_redis(Update constant
-                                      `redis-cli set /network_interface 'eno1'`)
+    check_redis --> |No| update_redis(Update Redis constants by running:
+                                      `redis-cli set /network_interface 'wlan0'`
+                                      `redis-cli set /channel_id '0'`)
     check_redis --> |Yes| rip3(Check with a lead)
     update_redis --> tloop_restart
     tloop_restart --> tloop_status
