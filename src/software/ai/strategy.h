@@ -14,7 +14,7 @@
  * Strategy contains shared gameplay-related calculations.
  *
  * By indirectly calling gameplay evaluation functions via Strategy, we can cache
- * their results in the Strategy class to avoid repeated expensive recalculations.
+ * their results in the Strategy class to avoid expensive recalculations.
  */
 class Strategy
 {
