@@ -138,7 +138,7 @@ if __name__ == "__main__":
         command += ["-c", "dbg"]
 
     # Trigger an optimized build. Note that Thunderloop should always be
-    # compiled with optimizations for best formance
+    # compiled with optimizations for best performance
     if args.optimized_build or args.flash_robots:
         command += ["--copt=-O3"]
 
