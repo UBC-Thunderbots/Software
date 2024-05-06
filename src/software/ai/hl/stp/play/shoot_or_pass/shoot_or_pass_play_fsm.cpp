@@ -60,6 +60,8 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         best_pass_and_score_so_far =
             sampling_pass_generator.getBestPass(*event.common.world_ptr);
         // best_pass_and_score_so_far                  = pass_eval.getBestPassOnField();
+        std::cout << best_pass_and_score_so_far.pass << std::endl;
+        std::cout << best_pass_and_score_so_far.rating << std::endl;
         std::vector<EighteenZoneId> ranked_zones = pass_eval.rankZonesForReceiving(
             *event.common.world_ptr, event.common.world_ptr->ball().position());
 

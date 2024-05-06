@@ -146,6 +146,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "sampling_pass_generator_test",
+    srcs = ["sampling_pass_generator_test.cpp"],
+    deps = [
+        ":sampling_pass_generator",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/math:math_functions",
+        "//software/test_util",
+    ],
+)
+
 cc_library(
     name = "pass_generator",
     hdrs = [
