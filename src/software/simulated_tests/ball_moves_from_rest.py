@@ -12,6 +12,10 @@ class BallMovesFromRest(Validation):
     """Checks if ball has moved threshold meters from initial position"""
 
     def __init__(self, position, threshold=0.05):
+        """
+        :param position: initial position of the ball
+        :param threshold: distance for which ball is considered to have moved
+        """
         self.initial_ball_position = position
         self.threshold = threshold
 
