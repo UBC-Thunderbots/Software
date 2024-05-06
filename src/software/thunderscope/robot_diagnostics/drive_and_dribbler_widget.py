@@ -8,6 +8,7 @@ from software.thunderscope.robot_diagnostics.diagnostics_input_widget import Con
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 
+
 class DriveAndDribblerWidget(QWidget):
     def __init__(self) -> None:
         """
@@ -24,8 +25,8 @@ class DriveAndDribblerWidget(QWidget):
         layout = QVBoxLayout()
 
         # Add widgets to layout
-        layout.addWidget(self.__setup_direct_velocity("Drive"))
-        layout.addWidget(self.__setup_dribbler("Dribbler"))
+        layout.addWidget(self.__setup_direct_velocity())
+        layout.addWidget(self.__setup_dribbler())
 
         self.setLayout(layout)
 
@@ -72,17 +73,15 @@ class DriveAndDribblerWidget(QWidget):
         Converts the given float value to a string label
         :param value: float value to be converted
         """
-        value = float(value)
-        value_str = "%.2f" % value
-        return value_str
+        return "%.2f" % float(value)
 
-    def __setup_direct_velocity(self, title: str) -> QGroupBox:
+    def __setup_direct_velocity(self) -> QGroupBox:
         """
         Create a widget to control the direct velocity of the robot's motors
         :param title: the name of the slider
         """
 
-        group_box = QGroupBox(title)
+        group_box = QGroupBox("Drive")
         dbox = QVBoxLayout()
 
         (
@@ -121,10 +120,14 @@ class DriveAndDribblerWidget(QWidget):
 
         # add listener functions for sliders to update label with slider value
         common_widgets.enable_slider(
-            self.x_velocity_slider, self.x_velocity_label, self.__value_change_handler
+            self.x_velocity_slider,
+            self.x_velocity_label,
+            self.__value_change_handler
         )
         common_widgets.enable_slider(
-            self.y_velocity_slider, self.y_velocity_label, self.__value_change_handler
+            self.y_velocity_slider,
+            self.y_velocity_label,
+            self.__value_change_handler
         )
         common_widgets.enable_slider(
             self.angular_velocity_slider,
@@ -146,14 +149,14 @@ class DriveAndDribblerWidget(QWidget):
 
         return group_box
 
-    def __setup_dribbler(self, title: str) -> QGroupBox:
+    def __setup_dribbler(self) -> QGroupBox:
         """Create a widget to control the dribbler RPM
 
         :param title: the name of the slider
 
         """
 
-        group_box = QGroupBox(title)
+        group_box = QGroupBox("Dribbler")
         dbox = QVBoxLayout()
 
         (
@@ -228,13 +231,13 @@ class DriveAndDribblerWidget(QWidget):
         elif mode == ControlMode.HANDHELD:
             # reset slider values and disconnect
             self.__reset_all_sliders()
-            self.__disconnect_sliders()
+            # self.__disconnect_sliders()
 
             # disable all sliders by adding listener to keep slider value the same
-            common_widgets.disable_slider(self.x_velocity_slider)
-            common_widgets.disable_slider(self.y_velocity_slider)
-            common_widgets.disable_slider(self.angular_velocity_slider)
-            common_widgets.disable_slider(self.dribbler_speed_rpm_slider)
+            # common_widgets.disable_slider(self.x_velocity_slider)
+            # common_widgets.disable_slider(self.y_velocity_slider)
+            # common_widgets.disable_slider(self.angular_velocity_slider)
+            # common_widgets.disable_slider(self.dribbler_speed_rpm_slider)
 
             # disable buttons
             common_widgets.disable_button(self.stop_and_reset_dribbler)

@@ -540,8 +540,8 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         TbotsProto::MotorControl_DirectVelocityControl direct_velocity =
             motor.direct_velocity_control();
         EuclideanSpace_t target_euclidean_velocity = {
-            -direct_velocity.velocity().y_component_meters(),
             direct_velocity.velocity().x_component_meters(),
+            direct_velocity.velocity().y_component_meters(),
             direct_velocity.angular_velocity().radians_per_second()};
 
         target_wheel_velocities =

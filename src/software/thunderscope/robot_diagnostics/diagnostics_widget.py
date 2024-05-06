@@ -1,3 +1,5 @@
+from typing import Union, Literal, Tuple
+
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
@@ -21,8 +23,28 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget
 )
 
+# All possible states that the diagnostics control mode and handheld device connection status can be in.
+DiagnosticsControlState = Union[
+    Tuple[Literal[ControlMode.DIAGNOSTICS], Literal[HandheldDeviceConnectionStatus.CONNECTED]],
+    Tuple[Literal[ControlMode.DIAGNOSTICS], Literal[HandheldDeviceConnectionStatus.DISCONNECTED]],
+    Tuple[Literal[ControlMode.HANDHELD], Literal[HandheldDeviceConnectionStatus.CONNECTED]]
+]
+
+Bruh = Union[Tuple[int, None]]
+
 
 class DiagnosticsWidget(QWidget):
+    """
+    The DiagnosticsWidget contains all widgets related to diagnostics:
+        - HandheldDeviceStatusWidget
+        - DiagnosticsInputWidget
+        - DriveAndDribblerWidget
+        - ChickerWidget
+
+    This widget is also responsible for controlling the diagnostics inout,
+    either from the DriverAndDribblerWidget or the HandheldDeviceManager,
+    depending on the user selected choice from the DiagnosticsWidget UI
+    """
     # signal to indicate if manual controls should be disabled based on enum mode parameter
     diagnostics_input_mode_signal = pyqtSignal(ControlMode)
 
@@ -41,10 +63,18 @@ class DiagnosticsWidget(QWidget):
 
         self.proto_unix_io = proto_unix_io
 
+        # default start with diagnostics-disconnected
+        self.__state: DiagnosticsControlState = (
+            ControlMode.HANDHELD,
+            HandheldDeviceConnectionStatus.DISCONNECTED
+        )
+
         # default start with diagnostics input
+        # TODO: remove
         self.__control_mode = ControlMode.DIAGNOSTICS
 
         # default start with disconnected controller
+        # TODO: remove
         self.__handheld_device_status = HandheldDeviceConnectionStatus.DISCONNECTED
 
         # initialize widgets
@@ -58,18 +88,20 @@ class DiagnosticsWidget(QWidget):
         )
 
         # connect input mode signal with handler
-        self.diagnostics_input_mode_signal.connect(self.__toggle_control)
+        self.diagnostics_input_mode_signal.connect(self.__control_mode_update_handler)
 
         # connect handheld device reinitialization signal with handler
-        self.reinitialize_handheld_device_signal.connect(self.__reinitialize_controller)
+        self.reinitialize_handheld_device_signal.connect(
+            lambda: self.handheld_device_handler.reinitialize_controller()
+        )
 
         # connect handheld device connection status toggle signal with handler
         self.handheld_device_connection_status_signal.connect(
-            self.__toggle_handheld_device_connection_status
+            self.__handheld_device_connection_status_update_handler
         )
 
         # initialize controller
-        self.controller_handler = HandheldDeviceManager(
+        self.handheld_device_handler = HandheldDeviceManager(
             self.proto_unix_io,  # TODO: proto shouldn't be passed down
             self.logger,
             self.handheld_device_connection_status_signal,
@@ -85,13 +117,27 @@ class DiagnosticsWidget(QWidget):
 
         self.setLayout(vbox_layout)
 
-    def __toggle_control(self, mode: ControlMode):
-        self.__control_mode = mode
-        self.controller_handler.refresh(self.__control_mode)
+    def bruh(self) -> Bruh:
+        return (
+            ControlMode.HANDHELD,
+            HandheldDeviceConnectionStatus.DISCONNECTED
+        )
 
-    def __toggle_handheld_device_connection_status(
+    def __control_mode_update_handler(self, mode: ControlMode) -> None:
+        """
+        Handler for managing a control mode update
+        :param mode: The new mode that is being used
+        """
+        self.__control_mode = mode
+        self.handheld_device_handler.refresh(self.__control_mode)
+
+    def __handheld_device_connection_status_update_handler(
         self, status: HandheldDeviceConnectionStatus
     ):
+        """
+        Handler for propagating
+        :param status: The new mode that is being used
+        """
         self.__handheld_device_status = status
 
     def refresh(self):
@@ -114,6 +160,7 @@ class DiagnosticsWidget(QWidget):
             diagnostics_primitive = Primitive(
                 direct_control=DirectControlPrimitive(
                     motor_control=self.drive_dribbler_widget.motor_control,
+                    # TODO remove proto unix io from chicker widget
                     power_control=self.chicker_widget.power_control,
                 )
             )
@@ -123,12 +170,10 @@ class DiagnosticsWidget(QWidget):
         elif self.__control_mode == ControlMode.HANDHELD:
             # get latest diagnostics primitive
             diagnostics_primitive = (
-                self.controller_handler.get_latest_primitive_controls()
+                self.handheld_device_handler.get_latest_primitive_controls()
             )
 
-            # send it
-
-            # update ui visually
+            # update drive and dribbler visually.
             # TODO update dribbler speed and kick power, flash kick and chip buttons
             self.drive_dribbler_widget.set_x_velocity_slider(
                 diagnostics_primitive.direct_control.motor_control.direct_velocity_control.velocity.x_component_meters
@@ -144,23 +189,21 @@ class DiagnosticsWidget(QWidget):
                 diagnostics_primitive.direct_control.motor_control.dribbler_speed_rpm
             )
 
+            # send handheld diagnostics primitive
             self.proto_unix_io.send_proto(Primitive, diagnostics_primitive)
-
-    def __reinitialize_controller(self) -> None:
-        self.controller_handler.reinitialize_controller()
 
     # TODO: investigate why these methods aren't called on user hitting close button
     def closeEvent(self, event):
         self.logger.info("test")
-        self.controller_handler.close()
+        self.handheld_device_handler.close()
         event.accept()
 
     def close(self, event):
         self.logger.info("test")
-        self.controller_handler.close()
+        self.handheld_device_handler.close()
         event.accept()
 
     def __exit__(self, event):
         self.logger.info("test")
-        self.controller_handler.close()
+        self.handheld_device_handler.close()
         event.accept()

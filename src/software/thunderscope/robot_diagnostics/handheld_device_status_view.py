@@ -18,12 +18,14 @@ class HandheldDeviceConnectionStatus(Enum):
 
 
 class HandheldDeviceStatusView(QWidget):
-    """Class to show whether a handheld controller is connected to thunderscope and initialized,
-    or no controller is connected at all.
-    """
-
     def __init__(self, reinitialize_controller_signal: Type[QtCore.pyqtSignal]) -> None:
-        super().__init__()
+        """
+        Initialize the HandheldDeviceStatusView widget.
+        This widget sjows the user the current state of the connection with a handheld device,
+        as well as a button that attempts to reinitialize a controller object when clicked
+        :param reinitialize_controller_signal: The signal to use for the reinitialize button
+        """
+        super(HandheldDeviceStatusView, self).__init__()
 
         self.reinitialize_controller_signal = reinitialize_controller_signal
 
@@ -49,31 +51,21 @@ class HandheldDeviceStatusView(QWidget):
             self.reinitialize_controller_signal
         )
 
-        # layout for the whole widget
-        self.vbox_layout = QVBoxLayout()
+        hbox_layout = QHBoxLayout()
 
-        # layout for controller button & status
-        self.hbox_layout = QHBoxLayout()
+        hbox_layout.addWidget(self.handheld_device_status)
+        hbox_layout.addWidget(self.handheld_device_reinitialize_button)
+        hbox_layout.setStretch(0, 4)
+        hbox_layout.setStretch(1, 1)
 
-        # set layout and spacing
-        self.hbox_layout.addWidget(self.handheld_device_status)
-        self.hbox_layout.addWidget(self.handheld_device_reinitialize_button)
-        self.hbox_layout.setStretch(0, 4)
-        self.hbox_layout.setStretch(1, 1)
-
-        # set groupbox to contain layout with status and button
-        # self.group_box.setLayout(self.hbox_layout)
-
-        # add box to whole widget layout
-        # self.vbox_layout.addWidget(self.group_box)
-
-        # set the layout for the whole widget
-        self.setLayout(self.hbox_layout)
         self.set_view_state(HandheldDeviceConnectionStatus.DISCONNECTED)
+        self.setLayout(hbox_layout)
 
-    def set_view_state(
-        self, connection_state=HandheldDeviceConnectionStatus.DISCONNECTED
-    ):
+    def set_view_state(self, connection_state: HandheldDeviceConnectionStatus) -> None:
+        """
+        Sets the label to display the correct status depending on the connection state
+        :param connection_state: The state to use
+        """
         self.handheld_device_status.setText(
             self.status_label_view_map[connection_state][0]
         )
@@ -81,7 +73,10 @@ class HandheldDeviceStatusView(QWidget):
             self.status_label_view_map[connection_state][1]
         )
 
-    def refresh(self, connected=HandheldDeviceConnectionStatus.DISCONNECTED) -> None:
-        """Refresh the label
+    def refresh(self, connection_state=HandheldDeviceConnectionStatus.DISCONNECTED) -> None:
         """
-        self.set_view_state(connected)
+        Refreshes this widget.
+        The status label will reflect to the user the current state of the controller connection
+        :param connection_state: The new state of the controller connection
+        """
+        self.set_view_state(connection_state)
