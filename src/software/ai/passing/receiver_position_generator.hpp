@@ -14,7 +14,7 @@
 
 
 // The random seed to initialize the random number generator
-static const int SEED = 1010;
+static const int RECEIVER_POSITION_GENERATOR_SEED = 1010;
 
 /**
  * This class is responsible for generating passes for us to perform
@@ -77,7 +77,7 @@ ReceiverPositionGenerator<ZoneEnum>::ReceiverPositionGenerator(
     TbotsProto::PassingConfig passing_config)
     : pitch_division_(pitch_division),
       passing_config_(passing_config),
-      random_num_gen_(SEED)
+      random_num_gen_(RECEIVER_POSITION_GENERATOR_SEED)
 {
 }
 

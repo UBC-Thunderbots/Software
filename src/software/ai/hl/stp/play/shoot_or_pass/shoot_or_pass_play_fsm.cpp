@@ -154,6 +154,18 @@ bool ShootOrPassPlayFSM::passFound(const Update& event)
 
 bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
 {
+    if (!attacker_tactic->done())
+    {
+        best_pass_and_score_so_far.rating = ratePass(*event.common.world_ptr,
+                                                    best_pass_and_score_so_far.pass,
+                                                    ai_config.passing_config());
+        double abs_min_pass_score =
+            ai_config.shoot_or_pass_play_config().abs_min_pass_score();
+        if (best_pass_and_score_so_far.rating < abs_min_pass_score)
+        {
+            return true;
+        }
+    }
     const auto ball_position  = event.common.world_ptr->ball().position();
     const auto passer_point   = best_pass_and_score_so_far.pass.passerPoint();
     const auto receiver_point = best_pass_and_score_so_far.pass.receiverPoint();

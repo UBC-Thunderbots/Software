@@ -1,7 +1,7 @@
 #include "software/ai/passing/sampling_pass_generator.h"
 
 SamplingPassGenerator::SamplingPassGenerator(TbotsProto::PassingConfig passing_config)
-    : random_num_gen_(SEED), passing_config_(passing_config)
+    : random_num_gen_(time(nullptr)), passing_config_(passing_config)
 {
 }
 
@@ -22,19 +22,22 @@ PassWithRating SamplingPassGenerator::getBestPass(const World& world)
     // get ratings for each pass
     std::transform(
         sampled_pass_points.begin(), sampled_pass_points.end(),
-        sampled_passes_and_ratings.begin(), [&](const Point& point) -> PassWithRating {
-            Pass pass = Pass(world.ball().position(), point, 2.0);
+        std::back_inserter(sampled_passes_and_ratings), [&](const Point& point) -> PassWithRating {
+            Pass pass = Pass(world.ball().position(), point, 5.0);
 
-            return PassWithRating{pass, ratePass(world, pass, passing_config_)};
+            auto rating = ratePass(world, pass, passing_config_);
+            return PassWithRating{pass, rating};
         });
 
-    std::sort(sampled_passes_and_ratings.begin(), sampled_passes_and_ratings.end(),
-              [](PassWithRating& pass_a, PassWithRating& pass_b) {
-                  return pass_a.rating > pass_b.rating;
-              });
-
     // return the highest rated pass
-    return sampled_passes_and_ratings.front();
+    auto max_pass = *std::max_element(sampled_passes_and_ratings.begin(), sampled_passes_and_ratings.end(),
+        [](PassWithRating& pass_a, PassWithRating& pass_b) 
+        {
+            return pass_a.rating < pass_b.rating;
+        }
+    );
+
+    return max_pass;
 }
 
 std::vector<Point> SamplingPassGenerator::samplePasses(const World& world)
@@ -44,6 +47,7 @@ std::vector<Point> SamplingPassGenerator::samplePasses(const World& world)
     for (const Robot& robot : world.friendlyTeam().getAllRobots())
     {
         auto robot_position = robot.position();
+        all_sampled_passes.push_back(robot_position);
 
         // get random coordinates based on the normal distribution around the robot
         std::normal_distribution x_normal_distribution{robot_position.x(),
@@ -53,8 +57,10 @@ std::vector<Point> SamplingPassGenerator::samplePasses(const World& world)
 
         for (int i = 0; i < NUM_POINTS_TO_SAMPLE_PER_ROBOT; i++)
         {
-            all_sampled_passes.push_back(Point(x_normal_distribution(random_num_gen_),
-                                               y_normal_distribution(random_num_gen_)));
+            std::cout << "AB" << std::endl;
+            auto point = Point(x_normal_distribution(random_num_gen_),
+                                               y_normal_distribution(random_num_gen_));
+            all_sampled_passes.push_back(point);
         }
     }
 
