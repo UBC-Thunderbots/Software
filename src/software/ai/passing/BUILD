@@ -11,6 +11,7 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:time_to_travel",
+        "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/logger",
         "//software/math:math_functions",
         "//software/util/make_enum",
@@ -34,6 +35,7 @@ cc_library(
     srcs = ["pass.cpp"],
     hdrs = ["pass.h"],
     deps = [
+        "//shared:constants",
         "//software/time:timestamp",
         "//software/world:field",
     ],
@@ -137,11 +139,36 @@ cc_test(
 )
 
 cc_library(
+    name = "base_pass_generator",
+    hdrs = [
+        "base_pass_generator.h",
+    ],
+    deps = [
+        "//software/world",
+    ],
+)
+
+cc_library(
+    name = "sampling_pass_generator",
+    srcs = [
+        "sampling_pass_generator.cpp",
+    ],
+    hdrs = ["sampling_pass_generator.h"],
+    deps = [
+        ":base_pass_generator",
+        ":cost_functions",
+        ":pass_with_rating",
+        "//software/world",
+    ],
+)
+
+cc_library(
     name = "pass_generator",
     hdrs = [
         "pass_generator.hpp",
     ],
     deps = [
+        ":base_pass_generator",
         ":cost_functions",
         ":eighteen_zone_pitch_division",
         ":pass",

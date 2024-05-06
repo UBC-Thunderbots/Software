@@ -10,6 +10,7 @@
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.hpp"
 #include "software/ai/passing/receiver_position_generator.hpp"
+#include "software/ai/passing/sampling_pass_generator.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
@@ -143,6 +144,7 @@ struct ShootOrPassPlayFSM
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
     PassGenerator<EighteenZoneId> pass_generator;
     ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator;
+    SamplingPassGenerator sampling_pass_generator;
     Timestamp pass_optimization_start_time;
     PassWithRating best_pass_and_score_so_far;
     Duration time_since_commit_stage_start;

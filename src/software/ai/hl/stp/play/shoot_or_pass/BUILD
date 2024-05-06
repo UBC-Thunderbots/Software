@@ -26,6 +26,7 @@ cc_library(
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
         "//software/ai/passing:receiver_position_generator",
+        "//software/ai/passing:sampling_pass_generator",
         "//software/geom/algorithms",
         "//software/logger",
         "//software/util/generic_factory",

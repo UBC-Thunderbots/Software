@@ -7,12 +7,13 @@
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/time_to_travel.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/logger/logger.h"
 
-double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
+double ratePass(const World& world, const Pass& pass,
                 TbotsProto::PassingConfig passing_config)
 {
     double static_pass_quality =
@@ -20,6 +21,9 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double friendly_pass_rating =
         ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
+
+    double pass_backwards_rating =
+        ratePassBackwardsQuality(world.field(), pass, passing_config);
 
     double enemy_pass_rating =
         ratePassEnemyRisk(world.enemyTeam(), pass,
@@ -29,16 +33,32 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double shoot_pass_rating =
         ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 
+    return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
+           pass_backwards_rating * shoot_pass_rating;
+}
+
+double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
+                TbotsProto::PassingConfig passing_config)
+{
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
-    // Place strict limits on the ball speed
-    double min_pass_speed     = passing_config.min_pass_speed_m_per_s();
-    double max_pass_speed     = passing_config.max_pass_speed_m_per_s();
-    double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
-                                (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
+    return ratePass(world, pass, passing_config) * in_region_quality;
+}
 
-    return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-           shoot_pass_rating * pass_speed_quality * in_region_quality;
+double ratePassBackwardsQuality(const Field& field, const Pass& pass,
+                                TbotsProto::PassingConfig& passing_config)
+{
+    if (field.pointInFriendlyHalf(pass.receiverPoint()) &&
+        field.pointInEnemyHalf(pass.passerPoint()))
+    {
+        double pass_distance = (pass.receiverPoint() - pass.passerPoint()).length();
+        if (pass_distance > passing_config.backwards_pass_distance())
+        {
+            return 0;
+        }
+    }
+
+    return 1;
 }
 
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,

@@ -114,7 +114,7 @@ message PassingConfig
     ];
     // The minimum pass speed (in m/s)
     required double min_pass_speed_m_per_s = 6
-        [default = 3.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+        [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
     // The maximum pass speed (in m/s)
     required double max_pass_speed_m_per_s = 7 [
         default                   = 6.0,
@@ -130,6 +130,11 @@ message PassingConfig
         [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
     // Cost visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
+    // The max speed at which a pass should be received
+    required double max_receive_speed = 11
+        [default = 2.0, (bounds).min_double_value = 1.0, (bounds).max_double_value = 4.0];
+    required double backwards_pass_distance = 13
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 }
 
 message GoalieTacticConfig
