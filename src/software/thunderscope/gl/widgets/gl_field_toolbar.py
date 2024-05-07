@@ -1,3 +1,4 @@
+import os
 import textwrap
 from typing import Callable
 from pyqtgraph.Qt import QtGui, QtCore
@@ -103,7 +104,7 @@ class GLFieldToolbar(GLToolbar):
         self.pause_button.setStyleSheet(self.get_button_style())
         self.toggle_pause_button(True)
         # buffer for the simulator pause / play state
-        self.simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
+        self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
 
         # Setup Toolbars button for toggling visibility of toolbars
         self.toolbars_button = QPushButton()
@@ -114,28 +115,21 @@ class GLFieldToolbar(GLToolbar):
         self.toolbars_button.setStyleSheet(self.get_button_style())
 
         # Setup simulation speed button and menu
-        self.simulation_speed_combo_box = QComboBox(self)
-        for item in ["2", "1", "0.5", "0.2", "0.1", "0.05"]:
-            self.simulation_speed_combo_box.addItem(item)
-        # Default to 1x which is at index 2
-        self.simulation_speed_combo_box.setCurrentIndex(1)
-        self.simulation_speed_combo_box.setStyleSheet(textwrap.dedent(
-            f"""
-            QComboBox {{
-                color: #969696;
-                background-color: transparent;
-                border-color: transparent;
-                icon-size: 22px;
-                border-width: 4px;
-                border-radius: 4px;
-                height: 16px;
-            }}
-            QComboBox:hover {{
-                background-color: {"#363636"};
-                border-color: {"#363636"};
-            }}
-            """
-        ))
+        self.sim_speed_menu = QMenu()
+        self.sim_speed_button = QPushButton()
+        self.sim_speed_button.setText("Speed: 1.00x")
+        self.sim_speed_button.setStyleSheet(self.get_button_style())
+        self.sim_speed_button.setMenu(self.sim_speed_menu)
+
+        # Speed callback should be updated by the parent widget which
+        # handles simulation controls
+        self.speed_callback = None
+        self.simulation_speeds = ["2", "1", "0.5", "0.2", "0.1", "0.05"]
+        for speed in self.simulation_speeds:
+            self.sim_speed_menu.addAction(
+                speed,
+                lambda new_speed=speed: self.speed_callback(float(new_speed)),
+            )
 
         # if sandbox mode, set up the sandbox control buttons
         if sandbox_mode:
@@ -161,7 +155,7 @@ class GLFieldToolbar(GLToolbar):
         self.layout().addWidget(self.toolbars_button)
         self.layout().addStretch()
         if sandbox_mode:
-            self.layout().addWidget(self.simulation_speed_combo_box)
+            self.layout().addWidget(self.sim_speed_button)
             self.layout().addWidget(self.reset_button)
             self.layout().addWidget(self.undo_button)
             self.layout().addWidget(self.pause_button)
@@ -180,6 +174,7 @@ class GLFieldToolbar(GLToolbar):
         )
         if simulation_state:
             self.toggle_pause_button(simulation_state.is_playing)
+            self.update_simulation_speed(simulation_state.simulation_speed)
 
     def toggle_pause_button(self, is_playing: bool) -> None:
         """
@@ -198,7 +193,7 @@ class GLFieldToolbar(GLToolbar):
         Updates the simulation speed label
         :param speed: the speed of the simulation
         """
-        self.simulation_speed_label.setText(f"Speed: {speed:.2f}x")
+        self.sim_speed_button.setText(f"Speed: {speed:.2f}x")
 
     def toggle_undo_enabled(self, enabled: bool) -> None:
         """
@@ -217,3 +212,10 @@ class GLFieldToolbar(GLToolbar):
         self.redo_button.toggle_enabled(enabled)
         self.redo_button.setStyleSheet(self.get_button_style(enabled))
         self.redo_button.repaint()
+
+    def set_speed_callback(self, callback: Callable[[float], None]) -> None:
+        """
+        Sets the callback function for updating the simulation speed
+        :param callback: the callback function to update the simulation speed
+        """
+        self.speed_callback = callback

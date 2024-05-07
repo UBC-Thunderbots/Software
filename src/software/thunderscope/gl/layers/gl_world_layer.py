@@ -62,6 +62,7 @@ class GLWorldLayer(GLLayer):
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
+        self.simulation_state_buffer = ThreadSafeBuffer(buffer_size, SimulationState)
         self.cached_world = World()
         # fields to store the team from the cached world state as a dict
         self._cached_friendly_team = {}
@@ -162,16 +163,19 @@ class GLWorldLayer(GLLayer):
 
         self.simulator_io.send_proto(SimulationState, simulator_state)
 
+        print(f"{self} toggled play state: {simulator_state=}")
+
         return self.is_playing
 
-    def set_simulation_speed(self, speed: str) -> None:
+    def set_simulation_speed(self, speed: float) -> None:
         """
         Sets the speed of the simulator
         :param speed: the new speed to set
         """
-        self.simulation_speed = float(speed)
+        self.simulation_speed = speed
         simulator_state = SimulationState(is_playing=self.is_playing, simulation_speed=self.simulation_speed)
         self.simulator_io.send_proto(SimulationState, simulator_state)
+        print(f"{self} updated sim speed: {simulator_state=}")
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
@@ -302,6 +306,12 @@ class GLWorldLayer(GLLayer):
 
         self.__update_robot_status_graphics()
         self.__update_speed_line_graphics()
+
+        # Update internal simulation state
+        simulation_state = self.simulation_state_buffer.get(block=False, return_cached=False)
+        if simulation_state:
+            self.is_playing = simulation_state.is_playing
+            self.simulation_speed = simulation_state.simulation_speed
 
     def _update_robots_graphics(self) -> None:
         """

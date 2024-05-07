@@ -291,7 +291,7 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         return curr_play_state
 
-    def set_simulation_speed(self, speed: str) -> None:
+    def set_simulation_speed(self, speed: float) -> None:
         """
         Sets the speed of the simulator
         :param speed: the new speed to set

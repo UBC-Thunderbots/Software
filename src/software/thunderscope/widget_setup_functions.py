@@ -141,12 +141,7 @@ def setup_gl_widget(
     gl_widget.add_layer(debug_shapes_layer, True)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
-    simulation_control_toolbar.pause_button.clicked.connect(
-        world_layer.toggle_play_state
-    )
-    simulation_control_toolbar.simulation_speed_combo_box.currentTextChanged.connect(
-        world_layer.set_simulation_speed
-    )
+    simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
 
     # connect all sandbox controls if using sandbox mode
     if sandbox_mode:
@@ -161,17 +156,21 @@ def setup_gl_widget(
         world_layer.redo_toggle_enabled_signal.connect(
             simulation_control_toolbar.toggle_redo_enabled
         )
-
-    # Register observers
-    sim_proto_unix_io.register_observer(
-        SimulationState, simulation_control_toolbar.simulation_state_buffer
-    )
-    sim_proto_unix_io.register_observer(
-        SimulationState, debug_shapes_layer.simulation_state_buffer
-    )
-    sim_proto_unix_io.register_observer(
-        SimulationState, cost_vis_layer.simulation_state_buffer
-    )
+        simulation_control_toolbar.pause_button.clicked.connect(
+            world_layer.toggle_play_state
+        )
+        sim_proto_unix_io.register_observer(
+            SimulationState, simulation_control_toolbar.simulation_state_buffer
+        )
+        sim_proto_unix_io.register_observer(
+            SimulationState, world_layer.simulation_state_buffer
+        )
+        sim_proto_unix_io.register_observer(
+            SimulationState, debug_shapes_layer.simulation_state_buffer
+        )
+        sim_proto_unix_io.register_observer(
+            SimulationState, cost_vis_layer.simulation_state_buffer
+        )
 
     for arg in [
         (World, world_layer.world_buffer),
