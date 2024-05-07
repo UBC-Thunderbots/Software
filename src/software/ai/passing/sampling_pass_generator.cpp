@@ -57,7 +57,6 @@ std::vector<Point> SamplingPassGenerator::samplePasses(const World& world)
 
         for (int i = 0; i < NUM_POINTS_TO_SAMPLE_PER_ROBOT; i++)
         {
-            std::cout << "AB" << std::endl;
             auto point = Point(x_normal_distribution(random_num_gen_),
                                                y_normal_distribution(random_num_gen_));
             all_sampled_passes.push_back(point);

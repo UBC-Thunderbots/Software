@@ -27,7 +27,7 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
 
 void ShootOrPassPlayFSM::updateOffensivePositioningTactics(const WorldPtr world,
                                                            const PassEvaluation<EighteenZoneId> &pass_eval,
-                                                           unsigned int num_tactics)
+                                                           unsigned int num_tactics, const std::vector<Point>& existing_receiver_positions)
 {
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -41,7 +41,7 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(const WorldPtr world,
     }
 
     std::vector<Point> best_receiving_positions =
-        receiver_position_generator.getBestReceivingPositions(*world, num_tactics);
+        receiver_position_generator.getBestReceivingPositions(*world, num_tactics, existing_receiver_positions);
     for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
     {
         Angle receiver_orientation =
@@ -71,7 +71,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
         // add remaining tactics based on ranked zones
         updateOffensivePositioningTactics(event.common.world_ptr, pass_eval,
-                                          event.common.num_tactics - 1);
+                                          event.common.num_tactics - 1, {});
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
 
@@ -111,6 +111,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
     event.common.set_inter_play_communication_fun(
         InterPlayCommunication{.last_committed_pass = best_pass_and_score_so_far});
 
+    std::vector<Point> existing_receiver_positions = {best_pass_and_score_so_far.pass.receiverPoint()};
+
     if (!attacker_tactic->done())
     {
         PriorityTacticVector ret_tactics = {{attacker_tactic, receiver_tactic}, {}};
@@ -118,7 +120,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
         if (event.common.num_tactics > 2)
         {
             updateOffensivePositioningTactics(event.common.world_ptr,
-                                              pass_eval, event.common.num_tactics - 2);
+                                              pass_eval, event.common.num_tactics - 2,
+                                              existing_receiver_positions);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());
@@ -132,7 +135,7 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
         if (event.common.num_tactics > 1)
         {
             updateOffensivePositioningTactics(event.common.world_ptr,
-                                              pass_eval, event.common.num_tactics - 1);
+                                              pass_eval, event.common.num_tactics - 1, existing_receiver_positions);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());

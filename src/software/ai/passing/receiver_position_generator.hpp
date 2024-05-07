@@ -40,7 +40,8 @@ class ReceiverPositionGenerator
      * @return
      */
     std::vector<Point> getBestReceivingPositions(const World &world,
-                                                 unsigned int num_positions);
+                                                 unsigned int num_positions,
+                                                 const std::vector<Point> &existing_receiver_positions = {});
 
 
    private:
@@ -83,7 +84,7 @@ ReceiverPositionGenerator<ZoneEnum>::ReceiverPositionGenerator(
 
 template <class ZoneEnum>
 std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPositions(
-    const World &world, unsigned int num_positions)
+        const World &world, unsigned int num_positions, const std::vector<Point> &existing_receiver_positions)
 {
     best_receiving_positions.clear();
     debug_shapes.clear();
@@ -106,10 +107,6 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
                                 5);  // TODO (NIMA): Make this a parameter
 
     // TODO:
-    //  1. Have receivers spread out,
-    //  2. tune parameters like prev pass rating,
-    //  3. best receiving position is sometimes close to the receiver tactic,
-    //  4. make enemy interception area wider
     //  5. RatePassShootScore should have less effect on the score, specially compared to enemy interception
     //  6. RatePassShootScore sometimes blocks large circles of the field. Should probably only draw lines
 
@@ -121,18 +118,34 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     std::sort(all_zones.begin(), all_zones.end(), zone_comparator);
 
     std::vector<ZoneEnum> top_zones;
-    top_zones.push_back(all_zones[0]);
-    Angle prev_pass_angle = best_receiving_positions.find(all_zones[0])->second.pass.passerOrientation();
-    for (unsigned int i = 1; i < all_zones.size() && top_zones.size() < num_positions; i++)
+    for (unsigned int i = 0; i < all_zones.size() && top_zones.size() < num_positions; i++)
     {
-        // Only add zones that are not too close to the previous zone
+        // Only add zones that are not too close to the previous top receiver positions
         // to encourage spreading out the receivers
-        Angle curr_pass_angle = best_receiving_positions.find(all_zones[i - 1])->second.pass.passerOrientation();
-        if (curr_pass_angle.minDiff(prev_pass_angle) > Angle::fromDegrees(20)) // TODO (NIMA): Make this a parameter
+        static constexpr Angle MIN_ANGLE_DIFF = Angle::fromDegrees(20); // TODO (NIMA): Make this a parameter
+        Angle curr_pass_angle = best_receiving_positions.find(all_zones[i])->second.pass.passerOrientation();
+        bool no_prev_receivers_close = std::none_of(top_zones.begin(), top_zones.end(), [&](const ZoneEnum &zone)
+        {
+            return curr_pass_angle.minDiff(best_receiving_positions.find(zone)->second.pass.passerOrientation()) < MIN_ANGLE_DIFF;
+        });
+        no_prev_receivers_close = no_prev_receivers_close &&
+                                  std::none_of(existing_receiver_positions.begin(), existing_receiver_positions.end(),
+                                               [&](const Point &existing_receiver_position)
+                                               {
+                                                   return curr_pass_angle.minDiff((world.ball().position() -
+                                                                                   existing_receiver_position).orientation()) <
+                                                          MIN_ANGLE_DIFF;
+                                               });
+
+        if (no_prev_receivers_close)
         {
             top_zones.push_back(all_zones[i]);
-            prev_pass_angle = curr_pass_angle;
         }
+    }
+
+    if (top_zones.size() < num_positions) {
+        LOG(WARNING)
+            << "Not enough receiver positions were found. Consider reducing pass"; // TODO (NIMA): Update to include the 20deg parameter
     }
 
     // Sample more passes from the top zones and update ranking

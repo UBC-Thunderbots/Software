@@ -70,12 +70,11 @@ void AttackerFSM::keepAway(const Update& event,
 
     auto final_dribble_orientation = best_pass_so_far.passerOrientation();
 
-    if (enemy_team.numRobots() > 0)
+    // there is a robot on the enemy team close to us, face away from the nearest one
+    auto nearest_enemy_robot = enemy_team.getNearestRobot(event.common.robot.position());
+    if (nearest_enemy_robot.has_value() && distance(ball.position(), nearest_enemy_robot->position()) < 0.4) // TODO (NIMA): tune this distance
     {
-        // there is a robot on the enemy team, face away from the nearest one
-        auto nearest_enemy_robot =
-            *enemy_team.getNearestRobot(event.common.robot.position());
-        auto dribble_orientation_vec = ball.position() - nearest_enemy_robot.position();
+        auto dribble_orientation_vec = ball.position() - nearest_enemy_robot->position();
         final_dribble_orientation    = dribble_orientation_vec.orientation();
     }
 
