@@ -14,7 +14,7 @@ void AttackerFSM::pivotKick(const Update& event,
         .kick_origin       = ball_position,
         .kick_direction    = (chip_target - ball_position).orientation(),
         .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
-                                            (chip_target - ball_position).length()}};
+                                            (chip_target - ball_position).length()}}; // TODO (NIMA): We should not randomly chip the ball away, specially towards enemy net
 
     if (event.control_params.shot)
     {

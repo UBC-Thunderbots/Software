@@ -203,20 +203,15 @@ void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
                 world.ball().position(),
                 Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
                 5.0);  // TODO (NIMA): Pass speed should be dynamic!!
-
             double rating = rateReceivingPosition(world, pass, passing_config_);
-
-//            std::stringstream stream;
-//            stream << std::fixed << std::setprecision(3) << rating;
-//            debug_shapes.push_back(*createDebugShape(Circle(pass.receiverPoint(), 0.03), std::to_string(debug_shapes.size()) + "s", stream.str()));
             if (rating > best_pass_for_receiving.rating)
             {
                 best_pass_for_receiving = PassWithRating{pass, rating};
             }
         }
-        std::stringstream stream;
-        stream << std::fixed << std::setprecision(3) << best_pass_for_receiving.rating;
-        debug_shapes.push_back(*createDebugShape(Circle(best_pass_for_receiving.pass.receiverPoint(), 0.05), std::to_string(debug_shapes.size()) + "s", stream.str()));
+//        std::stringstream stream;
+//        stream << std::fixed << std::setprecision(3) << best_pass_for_receiving.rating;
+//        debug_shapes.push_back(*createDebugShape(Circle(best_pass_for_receiving.pass.receiverPoint(), 0.05), std::to_string(debug_shapes.size()) + "s", stream.str()));
 
         best_receiving_positions.insert_or_assign(zone_id, best_pass_for_receiving);
     }

@@ -118,7 +118,7 @@ class GLFieldToolbar(GLToolbar):
         for item in ["2", "1", "0.5", "0.2", "0.1", "0.05"]:
             self.simulation_speed_combo_box.addItem(item)
         # Default to 1x which is at index 2
-        self.simulation_speed_combo_box.setCurrentIndex(2)
+        self.simulation_speed_combo_box.setCurrentIndex(1)
         self.simulation_speed_combo_box.setStyleSheet(textwrap.dedent(
             f"""
             QComboBox {{

@@ -39,13 +39,13 @@ struct ShootOrPassPlayFSM
     /**
      * Updates the offensive positioning tactics
      *
-     *
-     * @param the ranked zones to look for offensive positions in
-     * @param pass_eval The pass evaluation to help find best passes
-     * @param num_tactics the number of tactics to return
+     * @param world the world
+     * @param num_tactics the number of tactics to assign
+     * @param existing_receiver_positions A set of positions of existing receiver positions that
+     * should be taken into account when assigning additional offensive tactics.
      */
-    void updateOffensivePositioningTactics(const WorldPtr world, const PassEvaluation<EighteenZoneId> &pass_eval,
-                                           unsigned int num_tactics, const std::vector<Point>& existing_receiver_positions);
+    void updateOffensivePositioningTactics(const WorldPtr world, unsigned int num_tactics,
+                                           const std::vector<Point> &existing_receiver_positions);
 
     /**
      * Action that looks for a pass

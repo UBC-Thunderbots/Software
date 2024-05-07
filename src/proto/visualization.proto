@@ -30,7 +30,9 @@ message PassWithRating
 
 message PassVisualization
 {
-    repeated PassWithRating best_passes = 1;
+    reserved 1;
+    Pass best_pass = 2;
+    bool pass_committed           = 3;
 }
 
 message CostVisualization

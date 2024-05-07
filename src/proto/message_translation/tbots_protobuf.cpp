@@ -369,25 +369,20 @@ BallState createBallState(const TbotsProto::BallState ball_state)
 }
 
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
-    const std::vector<PassWithRating>& passes_with_rating)
+    const Pass& pass, const bool pass_committed)
 {
     auto pass_visualization_msg = std::make_unique<TbotsProto::PassVisualization>();
 
-    for (const auto& pass_with_rating : passes_with_rating)
-    {
-        auto pass_msg = std::make_unique<TbotsProto::Pass>();
-        *(pass_msg->mutable_passer_point()) =
-            *createPointProto(pass_with_rating.pass.passerPoint());
-        *(pass_msg->mutable_receiver_point()) =
-            *createPointProto(pass_with_rating.pass.receiverPoint());
-        pass_msg->set_pass_speed_m_per_s(pass_with_rating.pass.speed());
+    TbotsProto::Pass pass_msg;
+    *(pass_msg.mutable_passer_point()) =
+        *createPointProto(pass.passerPoint());
+    *(pass_msg.mutable_receiver_point()) =
+        *createPointProto(pass.receiverPoint());
+    pass_msg.set_pass_speed_m_per_s(pass.speed());
 
-        auto pass_with_rating_msg = std::make_unique<TbotsProto::PassWithRating>();
-        pass_with_rating_msg->set_rating(pass_with_rating.rating);
-        *(pass_with_rating_msg->mutable_pass_()) = *pass_msg;
+    pass_visualization_msg->set_pass_committed(pass_committed);
+    *(pass_visualization_msg->mutable_best_pass()) = pass_msg;
 
-        *(pass_visualization_msg->add_best_passes()) = *pass_with_rating_msg;
-    }
     return pass_visualization_msg;
 }
 

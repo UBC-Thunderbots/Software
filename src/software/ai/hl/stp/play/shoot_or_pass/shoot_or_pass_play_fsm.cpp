@@ -25,9 +25,8 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
 {
 }
 
-void ShootOrPassPlayFSM::updateOffensivePositioningTactics(const WorldPtr world,
-                                                           const PassEvaluation<EighteenZoneId> &pass_eval,
-                                                           unsigned int num_tactics, const std::vector<Point>& existing_receiver_positions)
+void ShootOrPassPlayFSM::updateOffensivePositioningTactics(const WorldPtr world, unsigned int num_tactics,
+                                                           const std::vector<Point> &existing_receiver_positions)
 {
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -61,8 +60,6 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
     if (event.common.num_tactics > 1)
     {
         ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
-        PassEvaluation<EighteenZoneId> pass_eval =
-            pass_generator.generatePassEvaluation(*event.common.world_ptr);
         best_pass_and_score_so_far =
             sampling_pass_generator.getBestPass(*event.common.world_ptr);
 
@@ -70,7 +67,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
 
         // add remaining tactics based on ranked zones
-        updateOffensivePositioningTactics(event.common.world_ptr, pass_eval,
+        updateOffensivePositioningTactics(event.common.world_ptr,
                                           event.common.num_tactics - 1, {});
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
@@ -103,8 +100,6 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 
 void ShootOrPassPlayFSM::takePass(const Update& event)
 {
-    auto pass_eval = pass_generator.generatePassEvaluation(*event.common.world_ptr);
-
     // if we make it here then we have committed to the pass
     attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
     receiver_tactic->updateControlParams(best_pass_and_score_so_far.pass);
@@ -119,8 +114,7 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
         if (event.common.num_tactics > 2)
         {
-            updateOffensivePositioningTactics(event.common.world_ptr,
-                                              pass_eval, event.common.num_tactics - 2,
+            updateOffensivePositioningTactics(event.common.world_ptr, event.common.num_tactics - 2,
                                               existing_receiver_positions);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
@@ -134,8 +128,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
         PriorityTacticVector ret_tactics = {{receiver_tactic}, {}};
         if (event.common.num_tactics > 1)
         {
-            updateOffensivePositioningTactics(event.common.world_ptr,
-                                              pass_eval, event.common.num_tactics - 1, existing_receiver_positions);
+            updateOffensivePositioningTactics(event.common.world_ptr, event.common.num_tactics - 1,
+                                              existing_receiver_positions);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());
@@ -166,6 +160,7 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
             ai_config.shoot_or_pass_play_config().abs_min_pass_score();
         if (best_pass_and_score_so_far.rating < abs_min_pass_score)
         {
+            LOG(DEBUG) << "Aborting pass because pass score is too low";
             return true;
         }
     }
@@ -178,6 +173,8 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     const auto pass_area_polygon =
         Polygon::fromSegment(Segment(passer_point, receiver_point), 0.5);
 
+    LOG(VISUALIZE) << *createDebugShapes({*createDebugShape(pass_area_polygon, "pass_area_polygon")}); // TODO (NIMA): Added for debugging
+
     // calculate a polygon that contains the receiver and passer point, and checks if the
     // ball is inside it. if the ball isn't being passed to the receiver then we should
     // abort
@@ -185,6 +182,7 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     {
         if (!contains(pass_area_polygon, ball_position))
         {
+            LOG(DEBUG) << "Aborting pass because ball is not in pass area";
             return true;
         }
     }
@@ -197,6 +195,12 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
         this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
     const auto min_distance_to_pass =
         this->ai_config.shoot_or_pass_play_config().min_distance_to_pass();
+
+    if ((ball_velocity < ball_shot_threshold) &&
+        ((ball_position - passer_point).length() > min_distance_to_pass))
+    {
+        LOG(DEBUG) << "Aborting pass because ball is moving too slow";
+    }
 
     return (ball_velocity < ball_shot_threshold) &&
            ((ball_position - passer_point).length() > min_distance_to_pass);

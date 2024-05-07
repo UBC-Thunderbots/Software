@@ -193,12 +193,13 @@ BallState createBallState(const TbotsProto::BallState ball_state);
 /**
  * Returns a pass visualization given a vector of the best passes
  *
- * @param A vector of passes across their fields  with their ratings
+ * @param pass The pass with rating to visualize
+ * @param pass_committed Whether the pass has been committed
  *
  * @return The unique_ptr to a PassVisualization proto
  */
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
-    const std::vector<PassWithRating>& passes_with_rating);
+    const Pass& pass, bool pass_committed);
 
 /**
  * Returns the WorldStateReceivedTrigger given the world state received trigger

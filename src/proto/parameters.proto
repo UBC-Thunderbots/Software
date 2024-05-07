@@ -231,11 +231,11 @@ message ShootOrPassPlayConfig
 
     // threshold to decide if the ball has been kicked by a robot
     required double ball_shot_threshold = 3
-        [default = 4.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+        [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 
     // threshold to decide if the ball has been kicked by a robot
     required double min_distance_to_pass = 4
-        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+        [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     // threshold for the distance between passer and receiver
     required double short_pass_threshold = 5

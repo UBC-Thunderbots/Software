@@ -4,6 +4,13 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
                                        const std::vector<Robot> &robot_obstacles,
                                        TeamType goal, double radius)
 {
+    // Don't return a shot if the ball is behind the net
+    if ((goal == TeamType::FRIENDLY && shot_origin.x() < goal_post.getStart().x()) ||
+        (goal == TeamType::ENEMY && shot_origin.x() > goal_post.getStart().x())) // TODO (NIMA): is goal_post.getStart() the right point to check?
+    {
+        return std::nullopt;
+    }
+
     size_t max_num_obstacles = robot_obstacles.size();
 
     Angle pos_post_angle = (goal_post.getStart() - shot_origin).orientation();

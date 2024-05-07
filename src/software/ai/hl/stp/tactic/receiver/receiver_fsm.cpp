@@ -115,12 +115,13 @@ bool ReceiverFSM::onetouchPossible(const Update& event)
 void ReceiverFSM::updateOnetouch(const Update& event)
 {
     auto best_shot = findFeasibleShot(*event.common.world_ptr, event.common.robot);
-    auto one_touch = getOneTouchShotPositionAndOrientation(
-        event.common.robot, event.common.world_ptr->ball(),
-        best_shot->getPointToShootAt());
 
-    if (best_shot && event.control_params.pass)
+    if (best_shot.has_value() && event.control_params.pass)
     {
+        auto one_touch = getOneTouchShotPositionAndOrientation(
+                event.common.robot, event.common.world_ptr->ball(),
+                best_shot->getPointToShootAt());
+
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, one_touch.getPointToShootAt(), one_touch.getOpenAngle(),
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
