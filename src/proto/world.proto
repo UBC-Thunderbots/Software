@@ -57,7 +57,9 @@ message SimulatorTick
 message SimulationState
 {
     required bool is_playing = 1 [default = true];
+    required float simulation_speed = 2 [default = 1.0];
 }
+
 message Pass
 {
     // The location of the passer

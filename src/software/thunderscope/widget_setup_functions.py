@@ -144,6 +144,9 @@ def setup_gl_widget(
     simulation_control_toolbar.pause_button.clicked.connect(
         world_layer.toggle_play_state
     )
+    simulation_control_toolbar.simulation_speed_combo_box.currentTextChanged.connect(
+        world_layer.set_simulation_speed
+    )
 
     # connect all sandbox controls if using sandbox mode
     if sandbox_mode:
@@ -183,7 +186,6 @@ def setup_gl_widget(
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
         (SimulationState, simulation_control_toolbar.simulation_state_buffer),
-        # (SimulationState, cost_vis_layer.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (World, trail_layer.world_buffer),
         (DebugShapes, debug_shapes_layer.debug_shapes_buffer),

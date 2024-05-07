@@ -81,6 +81,7 @@ class GLWorldLayer(GLLayer):
         self.display_robot_ids = True
         self.display_speed_lines = True
         self.is_playing = True
+        self.simulation_speed = 1.0
 
         self.ball_velocity_vector = None
         self.point_in_scene_picked = None
@@ -156,12 +157,21 @@ class GLWorldLayer(GLLayer):
         Calls all callback functions with the new play state
         :return: the current play state
         """
-        simulator_state = SimulationState(is_playing=not self.is_playing)
+        simulator_state = SimulationState(is_playing=not self.is_playing, simulation_speed=self.simulation_speed)
         self.is_playing = not self.is_playing
 
         self.simulator_io.send_proto(SimulationState, simulator_state)
 
         return self.is_playing
+
+    def set_simulation_speed(self, speed: str) -> None:
+        """
+        Sets the speed of the simulator
+        :param speed: the new speed to set
+        """
+        self.simulation_speed = float(speed)
+        simulator_state = SimulationState(is_playing=self.is_playing, simulation_speed=self.simulation_speed)
+        self.simulator_io.send_proto(SimulationState, simulator_state)
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released

@@ -1,3 +1,4 @@
+import textwrap
 from typing import Callable
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Qt.QtWidgets import *
@@ -112,6 +113,30 @@ class GLFieldToolbar(GLToolbar):
         self.toolbars_button.setMenu(toolbars_menu)
         self.toolbars_button.setStyleSheet(self.get_button_style())
 
+        # Setup simulation speed button and menu
+        self.simulation_speed_combo_box = QComboBox(self)
+        for item in ["2", "1", "0.5", "0.2", "0.1", "0.05"]:
+            self.simulation_speed_combo_box.addItem(item)
+        # Default to 1x which is at index 2
+        self.simulation_speed_combo_box.setCurrentIndex(2)
+        self.simulation_speed_combo_box.setStyleSheet(textwrap.dedent(
+            f"""
+            QComboBox {{
+                color: #969696;
+                background-color: transparent;
+                border-color: transparent;
+                icon-size: 22px;
+                border-width: 4px;
+                border-radius: 4px;
+                height: 16px;
+            }}
+            QComboBox:hover {{
+                background-color: {"#363636"};
+                border-color: {"#363636"};
+            }}
+            """
+        ))
+
         # if sandbox mode, set up the sandbox control buttons
         if sandbox_mode:
             # Setup Undo button
@@ -136,6 +161,7 @@ class GLFieldToolbar(GLToolbar):
         self.layout().addWidget(self.toolbars_button)
         self.layout().addStretch()
         if sandbox_mode:
+            self.layout().addWidget(self.simulation_speed_combo_box)
             self.layout().addWidget(self.reset_button)
             self.layout().addWidget(self.undo_button)
             self.layout().addWidget(self.pause_button)
@@ -166,6 +192,13 @@ class GLFieldToolbar(GLToolbar):
             if is_playing
             else icons.get_play_icon(self.BUTTON_ICON_COLOR)
         )
+
+    def update_simulation_speed(self, speed: float) -> None:
+        """
+        Updates the simulation speed label
+        :param speed: the speed of the simulation
+        """
+        self.simulation_speed_label.setText(f"Speed: {speed:.2f}x")
 
     def toggle_undo_enabled(self, enabled: bool) -> None:
         """
