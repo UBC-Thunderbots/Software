@@ -78,6 +78,7 @@ py_library(
         "//software/thunderscope/common:proto_plotter",
         "//software/thunderscope/gl:gl_widget",
         "//software/thunderscope/gl/layers:gl_cost_vis_layer",
+        "//software/thunderscope/gl/layers:gl_debug_shapes_layer",
         "//software/thunderscope/gl/layers:gl_obstacle_layer",
         "//software/thunderscope/gl/layers:gl_passing_layer",
         "//software/thunderscope/gl/layers:gl_path_layer",
