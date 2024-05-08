@@ -38,9 +38,6 @@ double ratePass(const World& world, const Pass& pass,
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
                 TbotsProto::PassingConfig passing_config);
 
-double ratePassForReceiving(const World& world, const Pass& pass,
-                            const TbotsProto::PassingConfig& passing_config);
-
 /**
  * Calculate the quality of a given zone
  *
@@ -56,10 +53,16 @@ double ratePassForReceiving(const World& world, const Pass& pass,
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
                 const Point& ball_position, TbotsProto::PassingConfig passing_config);
 
-double rateZoneSmart(const World& world, const Team& enemy_team, const Rectangle& zone,
-                     const Point& ball_position,
-                     TbotsProto::PassingConfig passing_config);
-
+/**
+ * Rate a pass based on the quality of the receiving position
+ *
+ * @param world The world in which to rate the pass
+ * @param pass The pass to rate
+ * @param passing_config The passing config used for tuning
+ * @return A value in [0,1] representing the quality of the pass receiving
+ * position, with 1 being indicating that the receiving position is ideal, and 0
+ * indicating that the pass will likely not be received.
+ */
 double rateReceivingPosition(const World& world, const Pass& pass,
                              const TbotsProto::PassingConfig& passing_config);
 

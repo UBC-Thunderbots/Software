@@ -102,12 +102,9 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
     return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
 }
 
-/**  WRONG FUNCTION!!!!!!!!!!!!!! **/
 double rateReceivingPosition(const World& world, const Pass& pass,
                              const TbotsProto::PassingConfig& passing_config)
 {
-    // TODO (NIMA): Update this comments to not include zones
-    // Zones with their centers in bad positions are not good
     double static_recv_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
 
@@ -129,10 +126,7 @@ double rateReceivingPosition(const World& world, const Pass& pass,
         Duration::fromSeconds(passing_config.enemy_reaction_time());
     double enemy_proximity_importance = passing_config.enemy_proximity_importance();
     double enemy_risk_rating          = ratePassEnemyRisk(
-        world.enemyTeam(),
-        Pass(pass.passerPoint(), pass.receiverPoint(),
-             passing_config
-                 .max_pass_speed_m_per_s()),  // TODO (NIMA): Use dynamic receiving speed
+        world.enemyTeam(), pass,
         enemy_reaction_time, enemy_proximity_importance);
 
     double pass_shoot_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass,
@@ -425,8 +419,7 @@ void samplePassesForVisualization(const World& world,
         {
             // y coordinate of the centre of the row
             double y  = height * j + height / 2 - world.field().yLength() / 2;
-            auto pass = Pass(world.ball().position(), Point(x, y),
-                             5.0); // TODO (NIMA): Replace this
+            auto pass = Pass::fromDestReceiveSpeed(world.ball().position(), Point(x, y), passing_config);
 
             // default values
             static_pos_quality_costs       = 1;

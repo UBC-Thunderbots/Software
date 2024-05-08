@@ -7,6 +7,7 @@
 #include "shared/constants.h"
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
+#include "proto/parameters.pb.h"
 
 // The number of parameters (representing a pass) that we optimize
 // (receive_location_x, receive_location_y)
@@ -58,6 +59,19 @@ class Pass
                                      double dest_speed_m_per_s,
                                      double min_pass_speed_m_per_s,
                                      double max_pass_speed_m_per_s);
+
+    /**
+     * Creates a pass from the given destination point and receive speed
+     *
+     * @param ball_position the current position of the ball (pass starting point)
+     * @param pass_destination the end point of the pass
+     * @param passing_config the speed we want the pass to be received at
+     * @return the Pass constructed from the start and end points, received at the
+     * intended speed clamped by the min and max pass speeds
+     */
+    static Pass fromDestReceiveSpeed(const Point& ball_position,
+                                     const Point& pass_destination,
+                                     const TbotsProto::PassingConfig& passing_config);
 
     /**
      * Determines the speed at which a pass should be executed

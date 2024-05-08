@@ -103,7 +103,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     for (const auto &[zone, prev_best_receiving_position] : prev_best_receiving_positions)
     {
         // TODO (NIMA): Pass speed should be dynamic!!
-        Pass pass(pass_origin, prev_best_receiving_position, 5.0);
+        Pass pass = Pass::fromDestReceiveSpeed(pass_origin, prev_best_receiving_position, passing_config_);
         best_receiving_positions.insert_or_assign(
             zone,
             PassWithRating{pass, rateReceivingPosition(world, pass, passing_config_) *
@@ -216,10 +216,10 @@ void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
         // Sample passes in the zone
         for (unsigned int i = 0; i < num_samples_per_zone; ++i)
         {
-            auto pass = Pass(
+            auto pass = Pass::fromDestReceiveSpeed(
                 pass_origin,
                 Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
-                5.0);  // TODO (NIMA): Pass speed should be dynamic!!
+                passing_config_);  // TODO (NIMA): Pass speed should be dynamic!!
             double rating = rateReceivingPosition(world, pass, passing_config_);
             if (rating > best_pass_for_receiving.rating)
             {

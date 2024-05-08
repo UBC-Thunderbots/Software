@@ -157,7 +157,6 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
             ai_config.shoot_or_pass_play_config().abs_min_pass_score();
         if (best_pass_and_score_so_far.rating < abs_min_pass_score)
         {
-            LOG(DEBUG) << "Aborting pass because pass score is too low";
             return true;
         }
     }
@@ -179,7 +178,6 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     {
         if (!contains(pass_area_polygon, ball_position))
         {
-            LOG(DEBUG) << "Aborting pass because ball is not in pass area";
             return true;
         }
     }
@@ -192,12 +190,6 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
         this->ai_config.shoot_or_pass_play_config().ball_shot_threshold();
     const auto min_distance_to_pass =
         this->ai_config.shoot_or_pass_play_config().min_distance_to_pass();
-
-    if ((ball_velocity < ball_shot_threshold) &&
-        ((ball_position - passer_point).length() > min_distance_to_pass))
-    {
-        LOG(DEBUG) << "Aborting pass because ball is moving too slow";
-    }
 
     return (ball_velocity < ball_shot_threshold) &&
            ((ball_position - passer_point).length() > min_distance_to_pass);

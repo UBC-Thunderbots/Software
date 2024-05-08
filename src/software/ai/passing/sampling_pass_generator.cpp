@@ -25,7 +25,7 @@ PassWithRating SamplingPassGenerator::getBestPass(const World& world) // TODO (N
     std::transform(
         sampled_pass_points.begin(), sampled_pass_points.end(),
         std::back_inserter(sampled_passes_and_ratings), [&](const Point& point) -> PassWithRating {
-            Pass pass = Pass(world.ball().position(), point, 5.0);
+            Pass pass = Pass::fromDestReceiveSpeed(world.ball().position(), point, passing_config_);
 
             double rating = ratePass(world, pass, passing_config_);
             return PassWithRating{pass, rating};
