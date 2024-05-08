@@ -1,7 +1,3 @@
-import pytest
-
-import software.python_bindings as tbots
-from proto.validation_pb2 import *
 from software.simulated_tests.validation import (
     Validation,
     create_validation_geometry,
