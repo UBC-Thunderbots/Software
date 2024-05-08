@@ -72,7 +72,7 @@ void AttackerFSM::keepAway(const Update& event,
 
     // there is a robot on the enemy team close to us, face away from the nearest one
     auto nearest_enemy_robot = enemy_team.getNearestRobot(event.common.robot.position());
-    if (nearest_enemy_robot.has_value() && distance(ball.position(), nearest_enemy_robot->position()) < 0.4) // TODO (NIMA): tune this distance
+    if (nearest_enemy_robot.has_value() && distance(ball.position(), nearest_enemy_robot->position()) < attacker_tactic_config.enemy_about_to_steal_ball_radius())
     {
         auto dribble_orientation_vec = ball.position() - nearest_enemy_robot->position();
         final_dribble_orientation    = dribble_orientation_vec.orientation();
@@ -88,17 +88,5 @@ void AttackerFSM::keepAway(const Update& event,
 
 bool AttackerFSM::shouldKick(const Update& event)
 {
-    // check for enemy threat
-    Circle about_to_steal_danger_zone(
-        event.common.robot.position(),
-        attacker_tactic_config.enemy_about_to_steal_ball_radius()); // TODO (NIMA): This is set to 0.1, it is impossible for enemy to be this close... And why are we shooting?
-    for (const auto& enemy : event.common.world_ptr->enemyTeam().getAllRobots())
-    {
-        if (contains(about_to_steal_danger_zone, enemy.position()))
-        {
-            return true;
-        }
-    }
-    // otherwise check for shot or pass committed
     return event.control_params.pass_committed || event.control_params.shot;
 }
