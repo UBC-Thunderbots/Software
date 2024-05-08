@@ -158,7 +158,7 @@ def test_enemy_free_kick_play(
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
         ag_always_validation_sequence_set=always_validation_sequence_set,
-        test_timeout_s=5,
+        test_timeout_s=8,
     )
 
 

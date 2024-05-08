@@ -43,7 +43,7 @@ class BallMovesFromRest(Validation):
         (override) Shows the last ball position line
         """
         return create_validation_geometry(
-            [tbots_cpp.Circle(self.initial_ball_position, 0.05)]
+            [tbots_cpp.Circle(self.initial_ball_position, self.threshold)]
         )
 
     def __repr__(self):
