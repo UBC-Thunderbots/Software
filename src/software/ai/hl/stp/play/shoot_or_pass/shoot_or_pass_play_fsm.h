@@ -43,9 +43,11 @@ struct ShootOrPassPlayFSM
      * @param num_tactics the number of tactics to assign
      * @param existing_receiver_positions A set of positions of existing receiver positions that
      * should be taken into account when assigning additional offensive tactics.
+     * @apram pass_origin_override An optional point that the pass origin should be overridden to
      */
     void updateOffensivePositioningTactics(const WorldPtr world, unsigned int num_tactics,
-                                           const std::vector<Point> &existing_receiver_positions);
+                                           const std::vector<Point> &existing_receiver_positions,
+                                           const std::optional<Point> &pass_origin_override = std::nullopt);
 
     /**
      * Action that looks for a pass

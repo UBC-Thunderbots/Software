@@ -88,8 +88,6 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
         double min_one_touch_open_angle = receiver_tactic_config.min_open_angle_for_one_touch_deg();
         double max_one_touch_deflection_angle = receiver_tactic_config.max_deflection_for_one_touch_deg();
 
-
-
         // If we have a shot with a sufficiently large enough opening, and the
         // deflection angle that is reasonable, we should one-touch kick the ball
         // towards the enemy net

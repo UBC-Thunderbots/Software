@@ -26,7 +26,8 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
 }
 
 void ShootOrPassPlayFSM::updateOffensivePositioningTactics(const WorldPtr world, unsigned int num_tactics,
-                                                           const std::vector<Point> &existing_receiver_positions)
+                                                           const std::vector<Point> &existing_receiver_positions,
+                                                           const std::optional<Point> &pass_origin_override)
 {
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -40,7 +41,7 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(const WorldPtr world,
     }
 
     std::vector<Point> best_receiving_positions =
-        receiver_position_generator.getBestReceivingPositions(*world, num_tactics, existing_receiver_positions);
+        receiver_position_generator.getBestReceivingPositions(*world, num_tactics, existing_receiver_positions, pass_origin_override);
     for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
     {
         Angle receiver_orientation =
@@ -129,7 +130,7 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
         if (event.common.num_tactics > 1)
         {
             updateOffensivePositioningTactics(event.common.world_ptr, event.common.num_tactics - 1,
-                                              existing_receiver_positions);
+                                              existing_receiver_positions, best_pass_and_score_so_far.pass.receiverPoint());
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());

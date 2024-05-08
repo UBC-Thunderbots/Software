@@ -163,8 +163,6 @@ class GLWorldLayer(GLLayer):
 
         self.simulator_io.send_proto(SimulationState, simulator_state)
 
-        print(f"{self} toggled play state: {simulator_state=}")
-
         return self.is_playing
 
     def set_simulation_speed(self, speed: float) -> None:
@@ -175,7 +173,6 @@ class GLWorldLayer(GLLayer):
         self.simulation_speed = speed
         simulator_state = SimulationState(is_playing=self.is_playing, simulation_speed=self.simulation_speed)
         self.simulator_io.send_proto(SimulationState, simulator_state)
-        print(f"{self} updated sim speed: {simulator_state=}")
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
