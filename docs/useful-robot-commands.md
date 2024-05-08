@@ -21,9 +21,10 @@
 title: Robot Debugging Steps
 ---
 flowchart TD
-    ssh(Can you SSH into robot? 
-        `ssh robot@192.168.0.20RobotID` OR
-        `ssh robot@RobotName.local`)
+    ssh(Can you SSH into the robot? 
+        `ssh robot@192.168.0.20RobotID` OR `ssh robot@robot_name.local`
+        E.g. `ssh robot@192.168.0.203` or `ssh robot@robert.local` 
+        for a robot called robert with robot id 3)
     ssh ---> |Yes| tloop_status
     ssh --> |No - Second Try| monitor("`Connect Jetson to an external monitor and check wifi connection _or_ SSH using an ethernet cable`")
     ssh --> |No - First Try| restart(Restart robot)
