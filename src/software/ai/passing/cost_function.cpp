@@ -392,8 +392,41 @@ double calculateProximityRisk(const Point& point, const Team& enemy_team,
     return point_enemy_proximity_risk;
 }
 
+double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
+{
+    // the default values for these passing parameters
+    // TODO: cleanup passing parameters as part of #1987
+    static constexpr double PASSER_ENEMY_PROXIMITY_IMPORTANCE   = 1.5;
+    static constexpr double RECEIVER_ENEMY_PROXIMITY_IMPORTANCE = 0.;
+    static const auto ENEMY_REACTION_TIME = Duration::fromSeconds(0);
+
+    return ratePassEnemyRisk(enemy_team, pass, ENEMY_REACTION_TIME,
+                             RECEIVER_ENEMY_PROXIMITY_IMPORTANCE) *
+           (1 - calculateProximityRisk(pass.passerPoint(), enemy_team,
+                                       PASSER_ENEMY_PROXIMITY_IMPORTANCE));
+}
+
+// TODO (NIMA): Visualize best pass point (i.e. keep away point
+double ratePasserPosition(const World &world, const Pass& pass, const Rectangle& dribbling_bounds)
+{
+    static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.5;
+
+    // the width of both the field boundary sigmoid and the circular search region sigmoid
+    static constexpr auto SIGMOID_WIDTH = 0.1;
+
+    // the region to which the optimization is (effectively) constrained to
+    Circle keepaway_search_region(world.ball().position(), KEEPAWAY_SEARCH_CIRCLE_RADIUS);
+
+    return ratePasserPointForKeepAway(pass, world.enemyTeam()) *
+           // constrain the optimization to a circular area around the ball
+           circleSigmoid(keepaway_search_region, pass.passerPoint(), SIGMOID_WIDTH) *
+           // don't try to dribble the ball off the field
+           rectangleSigmoid(dribbling_bounds, pass.passerPoint(), SIGMOID_WIDTH);
+}
+
 void samplePassesForVisualization(const World& world,
-                                  const TbotsProto::PassingConfig& passing_config)
+                                  const TbotsProto::PassingConfig& passing_config,
+                                  const std::optional<Pass>& best_pass_so_far)
 {
     // number of rows and columns are configured in parameters.proto
     int num_cols = passing_config.cost_vis_config().num_cols();
@@ -419,7 +452,8 @@ void samplePassesForVisualization(const World& world,
         {
             // y coordinate of the centre of the row
             double y  = height * j + height / 2 - world.field().yLength() / 2;
-            auto pass = Pass::fromDestReceiveSpeed(world.ball().position(), Point(x, y), passing_config);
+            Point curr_point(x, y);
+            auto pass = Pass::fromDestReceiveSpeed(world.ball().position(), curr_point, passing_config);
 
             // default values
             static_pos_quality_costs       = 1;
@@ -463,6 +497,14 @@ void samplePassesForVisualization(const World& world,
             {
                 receiver_position_costs = rateReceivingPosition(
                     world, pass, passing_config);
+            }
+
+            // ratePasserPosition
+            if (passing_config.cost_vis_config().passer_position_score() && best_pass_so_far.has_value())
+            {
+                Pass updated_best_pass = Pass::fromDestReceiveSpeed(curr_point, best_pass_so_far->receiverPoint(), passing_config);
+                receiver_position_costs = ratePasserPosition(
+                    world, updated_best_pass, world.field().fieldBoundary());
             }
 
             costs.push_back(static_pos_quality_costs * pass_friendly_capability_costs *

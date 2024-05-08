@@ -12,7 +12,7 @@ PassWithRating SamplingPassGenerator::getBestPass(const World& world) // TODO (N
     auto sampled_pass_points = samplePasses(world);
 
     // if there are no friendly robots, return early
-    if (sampled_pass_points.size() == 0)
+    if (sampled_pass_points.empty())
     {
         // default pass with 0 rating
         return PassWithRating{Pass(Point(), Point(), 0.0), 0};
@@ -32,8 +32,8 @@ PassWithRating SamplingPassGenerator::getBestPass(const World& world) // TODO (N
         });
 
     // return the highest rated pass
-    auto max_pass = *std::max_element(sampled_passes_and_ratings.begin(), sampled_passes_and_ratings.end(),
-        [](PassWithRating& pass_a, PassWithRating& pass_b) 
+    auto best_pass = *std::max_element(sampled_passes_and_ratings.begin(), sampled_passes_and_ratings.end(),
+                                       [](PassWithRating& pass_a, PassWithRating& pass_b)
         {
             return pass_a.rating < pass_b.rating;
         }
@@ -47,11 +47,17 @@ PassWithRating SamplingPassGenerator::getBestPass(const World& world) // TODO (N
         debug_shapes.push_back(*createDebugShape(Circle(pass_with_rating.pass.receiverPoint(), 0.02), std::to_string(debug_shapes.size()) + "sp", stream.str()));
     }
     std::stringstream stream;
-    stream << "BP:" << std::fixed << std::setprecision(3) << max_pass.rating;
-    debug_shapes.push_back(*createDebugShape(Circle(max_pass.pass.receiverPoint(), 0.05), std::to_string(debug_shapes.size()) + "sp", stream.str()));
+    stream << "BP:" << std::fixed << std::setprecision(3) << best_pass.rating;
+    debug_shapes.push_back(*createDebugShape(Circle(best_pass.pass.receiverPoint(), 0.05), std::to_string(debug_shapes.size()) + "sp", stream.str()));
     LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
 
-    return max_pass;
+    // Generate sample passes for cost visualization
+    if (passing_config_.cost_vis_config().generate_sample_passes())
+    {
+        samplePassesForVisualization(world, passing_config_, best_pass.pass);
+    }
+
+    return best_pass;
 }
 
 std::vector<Point> SamplingPassGenerator::samplePasses(const World& world)

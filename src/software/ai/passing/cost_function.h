@@ -182,6 +182,25 @@ double calculateProximityRisk(const Point& point, const Team& enemy_team,
                               double enemy_proximity_importance);
 
 /**
+ * Calculate the quality a passer position for a given pass
+ *
+ * @param world The world in which to rate the pass
+ * @param pass Pass to rate the passer position for
+ * @param dribbling_bounds The bounds of the area the robot can dribble in
+ * @return A value in [0,1] representing the quality of the passer position, with 1
+ *        being an ideal position to pass from, and 0 being a poor position to pass from.
+ */
+double ratePasserPosition(const World &world, const Pass& pass, const Rectangle& dribbling_bounds);
+
+/**
+ * Calculate the quality of a given passer position given enemy threads
+ * @param pass
+ * @param enemy_team
+ * @return
+ */
+double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team);
+
+/**
  * Sample passes at different points on the field and rate them, similar to ratePass, to
  * be visualized in thunderscope
  *
@@ -191,6 +210,12 @@ double calculateProximityRisk(const Point& point, const Team& enemy_team,
  *
  * The sampled values are sent over protobuf to thunderscope as a CostVisualization
  * message. These values are eventually visualized in thunderscope in the cost_vis widget
+ *
+ * @param world The world in which to sample passes
+ * @param passing_config The passing config used for tuning
+ * @param best_pass_so_far The best pass so far used for sampling best passer position
+ *
  */
 void samplePassesForVisualization(const World& world,
-                                  const TbotsProto::PassingConfig& passing_config);
+                                  const TbotsProto::PassingConfig& passing_config,
+                                  const std::optional<Pass>& best_pass_so_far = std::nullopt);

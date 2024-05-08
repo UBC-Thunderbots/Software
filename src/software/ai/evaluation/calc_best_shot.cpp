@@ -6,7 +6,7 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
 {
     // Don't return a shot if the ball is behind the net
     if ((goal == TeamType::FRIENDLY && shot_origin.x() < goal_post.getStart().x()) ||
-        (goal == TeamType::ENEMY && shot_origin.x() > goal_post.getStart().x())) // TODO (NIMA): is goal_post.getStart() the right point to check?
+        (goal == TeamType::ENEMY && shot_origin.x() > goal_post.getStart().x()))
     {
         return std::nullopt;
     }
