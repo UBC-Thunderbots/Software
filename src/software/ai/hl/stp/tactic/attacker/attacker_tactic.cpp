@@ -28,9 +28,6 @@ void AttackerTactic::updateControlParams(const Pass& best_pass_so_far,
     // Update the control parameters stored by this Tactic
     this->best_pass_so_far = best_pass_so_far;
     this->pass_committed   = pass_committed;
-
-    // Visualize the current best pass
-    LOG(VISUALIZE) << *createPassVisualization(best_pass_so_far, pass_committed); // TODO (NIMA): Move to FSM and also visualize shot line
 }
 
 void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
@@ -71,4 +68,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
     fsm_map.at(tactic_update.robot.id())
         ->process_event(AttackerFSM::Update(control_params, tactic_update));
+
+    // Visualize the current best pass
+    LOG(VISUALIZE) << *createAttackerVisualization(best_pass_so_far, pass_committed, shot, tactic_update.world_ptr->ball().position(), chip_target); // TODO (NIMA): Move to FSM and also visualize shot line
 }

@@ -19,6 +19,7 @@ cc_library(
         "//software/ai/passing:pass_with_rating",
         "//software/geom:angle",
         "//software/geom:point",
+        "//software/ai/evaluation:shot",
         "//software/geom:vector",
         "//software/world",
     ],

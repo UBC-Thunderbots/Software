@@ -9,6 +9,7 @@
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/world/world.h"
+#include "software/ai/evaluation/shot.h"
 
 /**
  * Returns a TbotsProto::World proto given a World.
@@ -193,13 +194,16 @@ BallState createBallState(const TbotsProto::BallState ball_state);
 /**
  * Returns a pass visualization given a vector of the best passes
  *
- * @param pass The pass with rating to visualize
- * @param pass_committed Whether the pass has been committed
+ * @param A vector of passes across their fields  with their ratings
  *
  * @return The unique_ptr to a PassVisualization proto
  */
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
-    const Pass& pass, bool pass_committed);
+        const std::vector<PassWithRating>& passes_with_rating);
+
+// TODO (NIMA): docs
+std::unique_ptr<TbotsProto::AttackerVisualization> createAttackerVisualization(
+        const std::optional<Pass>& pass, const bool pass_committed, const std::optional<Shot>& shot, const std::optional<Point>& balls_position, const std::optional<Point>& chip_target);
 
 /**
  * Returns the WorldStateReceivedTrigger given the world state received trigger
