@@ -32,8 +32,6 @@ class GLDebugShapesLayer(GLLayer):
         super().__init__(name)
         self.setDepthValue(DepthValues.BACKGROUND_DEPTH)
 
-        self.simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
-
         self.debug_shapes_buffer = ThreadSafeBuffer(buffer_size, DebugShapes)
         self.debug_shape_map = {}
 
@@ -48,14 +46,6 @@ class GLDebugShapesLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-        # TODO (NIMA): Smarter approach would probably be to not call refresh
-        #  on any of the layers if paused
-        simulation_state = self.simulation_state_buffer.get(
-            block=False
-        )
-        if not simulation_state.is_playing:
-            return
-
         # Add all new shapes to the map
         debug_shapes_proto = self.debug_shapes_buffer.get(block=False, return_cached=False)
         now = time.time()

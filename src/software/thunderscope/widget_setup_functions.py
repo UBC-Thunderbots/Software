@@ -166,10 +166,7 @@ def setup_gl_widget(
             SimulationState, world_layer.simulation_state_buffer
         )
         sim_proto_unix_io.register_observer(
-            SimulationState, debug_shapes_layer.simulation_state_buffer
-        )
-        sim_proto_unix_io.register_observer(
-            SimulationState, cost_vis_layer.simulation_state_buffer
+            SimulationState, gl_widget.simulation_state_buffer
         )
 
     for arg in [

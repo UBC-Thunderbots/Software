@@ -88,8 +88,6 @@ class GLCostVisLayer(GLLayer):
         self.setDepthValue(DepthValues.BENEATH_BACKGROUND_DEPTH)
         self.related_layer = GLCostVisOverlayLayer(self)
 
-        self.simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
-
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.cost_visualization_buffer = ThreadSafeBuffer(
             buffer_size, CostVisualization
@@ -105,13 +103,6 @@ class GLCostVisLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
-        simulation_state = self.simulation_state_buffer.get(
-            block=False
-        )
-        if not simulation_state.is_playing:
-            return
-
         self.cached_world = self.world_buffer.get(block=False)
         field = self.cached_world.field
 
