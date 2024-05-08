@@ -89,6 +89,12 @@ template <class ZoneEnum>
 std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPositions(
         const World &world, unsigned int num_positions, const std::vector<Point> &existing_receiver_positions, const std::optional<Point> &pass_origin_override)
 {
+    if (num_positions > world.friendlyTeam().numRobots() - existing_receiver_positions.size())
+    {
+        LOG(WARNING) << "Not enough friendly robots to assign " << num_positions << " receiver positions. Assigning " << world.friendlyTeam().numRobots() - existing_receiver_positions.size() << " receiver positions instead";
+        num_positions = static_cast<unsigned int>(world.friendlyTeam().numRobots() - existing_receiver_positions.size());
+    }
+
     best_receiving_positions.clear();
     debug_shapes.clear();
 
@@ -148,9 +154,17 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
         }
     }
 
-    if (top_zones.size() != num_positions) {
+    // If we did not find enough receiver positions, add the remaining zones
+    if (top_zones.size() < num_positions) {
         LOG(WARNING)
             << "Not enough receiver positions were found. Expected to find " << num_positions << " receiver positions, but only found " << top_zones.size() << ". Consider reducing pass"; // TODO (NIMA): Update to include the 20deg parameter
+        for (unsigned int i = 0; i < all_zones.size() && top_zones.size() < num_positions; i++)
+        {
+            if (std::find(top_zones.begin(), top_zones.end(), all_zones[i]) == top_zones.end())
+            {
+                top_zones.push_back(all_zones[i]);
+            }
+        }
     }
 
     // Sample more passes from the top zones and update ranking

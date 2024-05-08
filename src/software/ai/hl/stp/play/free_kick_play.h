@@ -4,7 +4,8 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/passing/pass_generator.hpp"
+#include "software/ai/passing/sampling_pass_generator.h"
+#include "software/ai/passing/receiver_position_generator.hpp"
 
 /**
  * A Play for Direct Free kicks
@@ -74,4 +75,7 @@ class FreeKickPlay : public Play
      */
     void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
                                  const WorldPtr &world_ptr);
+
+    SamplingPassGenerator pass_generator;
+    ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator;
 };
