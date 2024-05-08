@@ -6,7 +6,7 @@
 ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
     : ai_config(ai_config),
       attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
-      receiver_tactic(std::make_shared<ReceiverTactic>()),
+      receiver_tactic(std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config())),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       pass_generator(
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
@@ -93,7 +93,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
     attacker_tactic              = std::make_shared<AttackerTactic>(ai_config);
-    receiver_tactic              = std::make_shared<ReceiverTactic>();
+    receiver_tactic              = std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config());
     pass_optimization_start_time = event.common.world_ptr->getMostRecentTimestamp();
     lookForPass(event);
 }

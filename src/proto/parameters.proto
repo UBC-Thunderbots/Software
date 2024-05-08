@@ -40,6 +40,7 @@ message AiConfig
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
     required AiParameterConfig ai_parameter_config                          = 13;
+    required ReceiverTacticConfig receiver_tactic_config                    = 14;
 }
 
 message AiControlConfig
@@ -68,7 +69,29 @@ message AttackerTacticConfig
     // The minimum open angle to the goal that we require before taking a shot
     required double min_open_angle_for_shot_deg = 2 [
         default                   = 6.0,
-        (bounds).min_double_value = 0.0,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 90.0
+    ];
+}
+
+message ReceiverTacticConfig
+{
+    // Whether one touch kicks should be disabled or not
+    required bool disable_one_touch_kick = 1 [default = false];
+
+    // The minimum open angle to the goal that we require before taking a one touch kick
+    required double min_open_angle_for_one_touch_deg = 2 [
+        default                   = 6.0,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 90.0
+    ];
+
+    // TODO (#2570): try to make it as big as possible when tuning
+    // The maximum deflection angle that we will attempt a one-touch kick towards the
+    // enemy goal with
+    required double max_deflection_for_one_touch_deg = 3 [
+        default                   = 45.0,
+        (bounds).min_double_value = 10.0,
         (bounds).max_double_value = 90.0
     ];
 }

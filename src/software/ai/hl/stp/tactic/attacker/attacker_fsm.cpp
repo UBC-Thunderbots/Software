@@ -91,7 +91,7 @@ bool AttackerFSM::shouldKick(const Update& event)
     // check for enemy threat
     Circle about_to_steal_danger_zone(
         event.common.robot.position(),
-        attacker_tactic_config.enemy_about_to_steal_ball_radius());
+        attacker_tactic_config.enemy_about_to_steal_ball_radius()); // TODO (NIMA): This is set to 0.1, it is impossible for enemy to be this close... And why are we shooting?
     for (const auto& enemy : event.common.world_ptr->enemyTeam().getAllRobots())
     {
         if (contains(about_to_steal_danger_zone, enemy.position()))

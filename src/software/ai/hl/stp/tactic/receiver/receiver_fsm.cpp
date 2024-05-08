@@ -74,29 +74,27 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
     // The percentage of open net the robot would shoot on
     if (best_shot_opt)
     {
+        // TODO (NIMA): Consider visualizing the one touch shot triangle
         // Vector from the ball to the robot
         Vector robot_to_ball = world.ball().position() - assigned_robot.position();
 
         // The angle the robot will have to deflect the ball to shoot
-        Angle abs_angle_between_pass_and_shot_vectors;
-
         Vector robot_to_shot_target =
             best_shot_opt.value().getPointToShootAt() - assigned_robot.position();
-        abs_angle_between_pass_and_shot_vectors =
-            convexAngle(robot_to_ball, robot_to_shot_target);
+        double abs_angle_deg_between_pass_and_shot_vectors =
+            convexAngle(robot_to_ball, robot_to_shot_target).toDegrees();
 
-        Angle goal_angle =
-            convexAngle(world.field().friendlyGoalpostPos(), assigned_robot.position(),
-                        world.field().friendlyGoalpostNeg());
+        double shot_open_angle = best_shot_opt.value().getOpenAngle().toDegrees();
+        double min_one_touch_open_angle = receiver_tactic_config.min_open_angle_for_one_touch_deg();
+        double max_one_touch_deflection_angle = receiver_tactic_config.max_deflection_for_one_touch_deg();
 
-        double net_percent_open =
-            best_shot_opt.value().getOpenAngle().toDegrees() / goal_angle.toDegrees();
+
 
         // If we have a shot with a sufficiently large enough opening, and the
         // deflection angle that is reasonable, we should one-touch kick the ball
         // towards the enemy net
-        if (net_percent_open > MIN_SHOT_NET_PERCENT_OPEN && // TODO (NIMA): use degrees instead of %
-            abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
+        if (shot_open_angle > min_one_touch_open_angle && // TODO (NIMA): use degrees instead of %
+          abs_angle_deg_between_pass_and_shot_vectors < max_one_touch_deflection_angle)
         {
             return best_shot_opt;
         }

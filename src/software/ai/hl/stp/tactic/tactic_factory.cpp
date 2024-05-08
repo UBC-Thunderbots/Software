@@ -178,7 +178,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::PivotKickTactic &tactic_p
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ReceiverTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    auto tactic              = std::make_shared<ReceiverTactic>();
+    auto tactic              = std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config());
     std::optional<Pass> pass = std::nullopt;
     if (tactic_proto.has_pass())
     {
