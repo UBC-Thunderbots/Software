@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
+
 void AttackerFSM::pivotKick(const Update& event,
                             boost::sml::back::process<PivotKickFSM::Update> processEvent)
 {
@@ -38,6 +40,9 @@ void AttackerFSM::pivotKick(const Update& event,
                                event.control_params.best_pass_so_far->speed()}};
     }
     processEvent(PivotKickFSM::Update(control_params, event.common));
+
+    // Visualize the current state
+    visualizeControlParams(event);
 }
 
 void AttackerFSM::keepAway(const Update& event,
@@ -85,6 +90,17 @@ void AttackerFSM::keepAway(const Update& event,
 
 
     processEvent(DribbleFSM::Update(control_params, event.common));
+
+    // Visualize the current state
+    if (event.control_params.shot.has_value() ||
+        event.control_params.best_pass_so_far.has_value() ||
+        event.control_params.chip_target.has_value())
+    {
+        LOG(VISUALIZE) << *createAttackerVisualization(
+            event.control_params.best_pass_so_far, event.control_params.pass_committed,
+            event.control_params.shot, event.common.world_ptr->ball().position(),
+            event.control_params.chip_target);
+    }
 }
 
 bool AttackerFSM::shouldKick(const Update& event)
@@ -102,4 +118,17 @@ bool AttackerFSM::shouldKick(const Update& event)
     }
     // otherwise check for shot or pass committed
     return event.control_params.pass_committed || event.control_params.shot;
+}
+
+void AttackerFSM::visualizeControlParams(const Update& event)
+{
+    if (event.control_params.shot.has_value() ||
+        event.control_params.best_pass_so_far.has_value() ||
+        event.control_params.chip_target.has_value())
+    {
+        LOG(VISUALIZE) << *createAttackerVisualization(
+            event.control_params.best_pass_so_far, event.control_params.pass_committed,
+            event.control_params.shot, event.common.world_ptr->ball().position(),
+            event.control_params.chip_target);
+    }
 }

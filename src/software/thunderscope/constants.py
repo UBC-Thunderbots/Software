@@ -153,6 +153,8 @@ LAST_OPENED_LAYOUT_PATH = (
     f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
 )
 
+SIMULATION_SPEEDS = [2, 1, 0.5, 0.2, 0.1, 0.05]
+
 THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     f"""
     <h3>General Controls</h3><br>
@@ -161,6 +163,8 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>M:</code></b> Toggle measure mode<br>
     <b><code>S:</code></b> Toggle visibility of robot/ball speed visualization<br>
     <b><code>Ctrl + Space:</code></b> Stop AI vs AI simulation<br>
+    <b><code>Ctrl + Up:</code></b> Increment simulation speed<br>
+    <b><code>Ctrl + Down:</code></b> Decrement simulation speed<br>
     <b><code>Number Keys:</code></b> Position camera to preset view<br>
     <b><code>Shift + Left Click:</code></b> Place the ball at the cursor<br>
     <b><code>Shift + Left Click Drag:</code></b> Place the ball at the cursor and kick it<br>
@@ -271,6 +275,10 @@ class Colors(object):
     NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 80, 0, 100)
     DEBUG_SHAPES_COLOR = QtGui.QColor(190, 50, 235, 255)
     PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
+    UNCOMMITTED_PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
+    COMMITTED_PASS_VISUALIZATION_COLOR = QtGui.QColor(0, 255, 255, 255)
+    SHOT_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 255)
+    CHIP_TARGET_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 255)
     BREAKBEAM_TRIPPED_COLOR = QtGui.QColor(255, 0, 0, 255)
 
     VALIDATION_PASSED_COLOR = QtGui.QColor(0, 200, 0, 255)

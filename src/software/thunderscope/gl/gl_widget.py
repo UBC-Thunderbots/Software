@@ -20,6 +20,8 @@ from software.thunderscope.gl.helpers.extended_gl_view_widget import *
 from software.thunderscope.gl.widgets.gl_gamecontroller_toolbar import (
     GLGamecontrollerToolbar,
 )
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+from proto.world_pb2 import SimulationState
 
 
 class GLWidget(QWidget):
@@ -48,6 +50,8 @@ class GLWidget(QWidget):
         )
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.gl_view_widget.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+
+        self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
 
         # Connect event handlers
         self.gl_view_widget.mouse_in_scene_pressed_signal.connect(
@@ -267,11 +271,14 @@ class GLWidget(QWidget):
             self.simulation_control_toolbar.refresh()
             self.gamecontroller_toolbar.refresh()
 
-        for layer in self.layers:
-            while layer:
-                if layer.visible():
-                    layer.refresh_graphics()
-                layer = layer.related_layer
+        simulation_state = self.simulation_state_buffer.get(block=False)
+        # Don't refresh the layers if the simulation is paused
+        if simulation_state.is_playing:
+            for layer in self.layers:
+                while layer:
+                    if layer.visible():
+                        layer.refresh_graphics()
+                    layer = layer.related_layer
 
     def set_camera_view(self, camera_view: CameraView) -> None:
         """Set the camera position to a preset camera view

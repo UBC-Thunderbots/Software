@@ -63,6 +63,12 @@ struct AttackerFSM
      */
     bool shouldKick(const Update& event);
 
+    /**
+     * Log visualize the given control parameters if it has a value
+     *
+     * @param event AttackerFSM::Update event
+     */
+    static void visualizeControlParams(const Update& event);
 
     auto operator()()
     {

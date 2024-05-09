@@ -170,11 +170,12 @@ gdb --args bazel-bin/{self.full_system}
         for proto_class in [
             PathVisualization,
             PassVisualization,
+            AttackerVisualization,
             CostVisualization,
             NamedValue,
             PlayInfo,
             ObstacleList,
-            DebugShapesMap,
+            DebugShapes,
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir=self.full_system_runtime_dir,

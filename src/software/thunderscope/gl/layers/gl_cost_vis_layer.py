@@ -41,7 +41,7 @@ class GLCostVisOverlayLayer(GLLayer):
             self.legend_graphic = GLGradientLegend(
                 parent_item=self,
                 size=(10, 100),
-                offset=(16, -16),
+                offset=(16, -40),
                 gradient=self.cost_vis_layer.color_map_gradient,
                 title="Passing",
             )
@@ -94,7 +94,7 @@ class GLCostVisLayer(GLLayer):
         )
         self.cached_world = World()
         self.cached_cost_vis = CostVisualization()
-        self.timeout = time.time() + GLCostVisLayer.COST_VISUALIZATION_TIMEOUT_S
+        self.timeout = 0.0
 
         self.color_map = pg.colormap.get("CET-L1")
         self.color_map_gradient = self.color_map.getGradient()
@@ -103,7 +103,6 @@ class GLCostVisLayer(GLLayer):
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
-
         self.cached_world = self.world_buffer.get(block=False)
         field = self.cached_world.field
 

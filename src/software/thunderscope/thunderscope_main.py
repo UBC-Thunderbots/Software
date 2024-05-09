@@ -252,6 +252,7 @@ if __name__ == "__main__":
             {"proto_class": ObstacleList},
             {"proto_class": PathVisualization},
             {"proto_class": PassVisualization},
+            {"proto_class": AttackerVisualization},
             {"proto_class": CostVisualization},
             {"proto_class": NamedValue},
             {"proto_class": PrimitiveSet},
