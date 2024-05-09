@@ -1,5 +1,7 @@
-#include <iomanip>
 #include "software/ai/passing/sampling_pass_generator.h"
+
+#include <iomanip>
+
 #include "software/logger/logger.h"
 
 SamplingPassGenerator::SamplingPassGenerator(TbotsProto::PassingConfig passing_config)
@@ -7,7 +9,9 @@ SamplingPassGenerator::SamplingPassGenerator(TbotsProto::PassingConfig passing_c
 {
 }
 
-PassWithRating SamplingPassGenerator::getBestPass(const World& world) // TODO (NIMA): We should only sample around offensive robots without the ball and maybe crease defenders
+PassWithRating SamplingPassGenerator::getBestPass(
+    const World& world)  // TODO (NIMA): We should only sample around offensive robots
+                         // without the ball and maybe crease defenders
 {
     auto sampled_pass_points = samplePasses(world);
 
@@ -22,33 +26,38 @@ PassWithRating SamplingPassGenerator::getBestPass(const World& world) // TODO (N
     sampled_passes_and_ratings.reserve(sampled_pass_points.size());
 
     // get ratings for each pass
-    std::transform(
-        sampled_pass_points.begin(), sampled_pass_points.end(),
-        std::back_inserter(sampled_passes_and_ratings), [&](const Point& point) -> PassWithRating {
-            Pass pass = Pass::fromDestReceiveSpeed(world.ball().position(), point, passing_config_);
+    std::transform(sampled_pass_points.begin(), sampled_pass_points.end(),
+                   std::back_inserter(sampled_passes_and_ratings),
+                   [&](const Point& point) -> PassWithRating {
+                       Pass pass = Pass::fromDestReceiveSpeed(world.ball().position(),
+                                                              point, passing_config_);
 
-            double rating = ratePass(world, pass, passing_config_);
-            return PassWithRating{pass, rating};
-        });
+                       double rating = ratePass(world, pass, passing_config_);
+                       return PassWithRating{pass, rating};
+                   });
 
     // return the highest rated pass
-    auto best_pass = *std::max_element(sampled_passes_and_ratings.begin(), sampled_passes_and_ratings.end(),
-                                       [](PassWithRating& pass_a, PassWithRating& pass_b)
-        {
+    auto best_pass = *std::max_element(
+        sampled_passes_and_ratings.begin(), sampled_passes_and_ratings.end(),
+        [](PassWithRating& pass_a, PassWithRating& pass_b) {
             return pass_a.rating < pass_b.rating;
-        }
-    );
+        });
 
-    std::vector<TbotsProto::DebugShapes::DebugShape> debug_shapes; // TODO (NIMA): Added for debugging
+    std::vector<TbotsProto::DebugShapes::DebugShape>
+        debug_shapes;  // TODO (NIMA): Added for debugging
     for (const auto& pass_with_rating : sampled_passes_and_ratings)
     {
         std::stringstream stream;
         stream << std::fixed << std::setprecision(3) << pass_with_rating.rating;
-        debug_shapes.push_back(*createDebugShape(Circle(pass_with_rating.pass.receiverPoint(), 0.02), std::to_string(debug_shapes.size()) + "sp", stream.str()));
+        debug_shapes.push_back(
+            *createDebugShape(Circle(pass_with_rating.pass.receiverPoint(), 0.02),
+                              std::to_string(debug_shapes.size()) + "sp", stream.str()));
     }
     std::stringstream stream;
     stream << "BP:" << std::fixed << std::setprecision(3) << best_pass.rating;
-    debug_shapes.push_back(*createDebugShape(Circle(best_pass.pass.receiverPoint(), 0.05), std::to_string(debug_shapes.size()) + "sp", stream.str()));
+    debug_shapes.push_back(*createDebugShape(Circle(best_pass.pass.receiverPoint(), 0.05),
+                                             std::to_string(debug_shapes.size()) + "sp",
+                                             stream.str()));
     LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
 
     // Generate sample passes for cost visualization
@@ -78,7 +87,7 @@ std::vector<Point> SamplingPassGenerator::samplePasses(const World& world)
         for (int i = 0; i < NUM_POINTS_TO_SAMPLE_PER_ROBOT; i++)
         {
             auto point = Point(x_normal_distribution(random_num_gen_),
-                                               y_normal_distribution(random_num_gen_));
+                               y_normal_distribution(random_num_gen_));
             all_sampled_passes.push_back(point);
         }
     }

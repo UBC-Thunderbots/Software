@@ -35,10 +35,10 @@ message PassVisualization
 
 message AttackerVisualization
 {
-    optional Pass pass_ = 1;  // needs the _ because pass is a keyword in python
-    bool pass_committed           = 2;
-    optional Shot shot                            = 3;
-    optional Point chip_target                    = 4;
+    optional Pass pass_        = 1;  // needs the _ because pass is a keyword in python
+    bool pass_committed        = 2;
+    optional Shot shot         = 3;
+    optional Point chip_target = 4;
 }
 
 message CostVisualization

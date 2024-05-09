@@ -4,10 +4,10 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
-#include "proto/parameters.pb.h"
 
 // The number of parameters (representing a pass) that we optimize
 // (receive_location_x, receive_location_y)

@@ -332,10 +332,11 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
 }
 
 std::unique_ptr<TbotsProto::DebugShapes> createDebugShapes(
-        const std::vector<TbotsProto::DebugShapes::DebugShape>& debug_shapes)
+    const std::vector<TbotsProto::DebugShapes::DebugShape>& debug_shapes)
 {
     auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapes>();
-    (*debug_shape_list_msg->mutable_debug_shapes()) = {debug_shapes.begin(), debug_shapes.end()};
+    (*debug_shape_list_msg->mutable_debug_shapes()) = {debug_shapes.begin(),
+                                                       debug_shapes.end()};
     return debug_shape_list_msg;
 }
 
@@ -369,7 +370,7 @@ BallState createBallState(const TbotsProto::BallState ball_state)
 }
 
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
-        const std::vector<PassWithRating>& passes_with_rating)
+    const std::vector<PassWithRating>& passes_with_rating)
 {
     auto pass_visualization_msg = std::make_unique<TbotsProto::PassVisualization>();
 
@@ -377,9 +378,9 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     {
         auto pass_msg = std::make_unique<TbotsProto::Pass>();
         *(pass_msg->mutable_passer_point()) =
-                *createPointProto(pass_with_rating.pass.passerPoint());
+            *createPointProto(pass_with_rating.pass.passerPoint());
         *(pass_msg->mutable_receiver_point()) =
-                *createPointProto(pass_with_rating.pass.receiverPoint());
+            *createPointProto(pass_with_rating.pass.receiverPoint());
         pass_msg->set_pass_speed_m_per_s(pass_with_rating.pass.speed());
 
         auto pass_with_rating_msg = std::make_unique<TbotsProto::PassWithRating>();
@@ -392,32 +393,36 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
 }
 
 std::unique_ptr<TbotsProto::AttackerVisualization> createAttackerVisualization(
-    const std::optional<Pass>& pass, const bool pass_committed, const std::optional<Shot>& shot, const std::optional<Point>& balls_position, const std::optional<Point>& chip_target)
+    const std::optional<Pass>& pass, const bool pass_committed,
+    const std::optional<Shot>& shot, const std::optional<Point>& balls_position,
+    const std::optional<Point>& chip_target)
 {
     auto pass_visualization_msg = std::make_unique<TbotsProto::AttackerVisualization>();
 
-    if (pass.has_value()) {
+    if (pass.has_value())
+    {
         TbotsProto::Pass pass_msg;
-        *(pass_msg.mutable_passer_point()) =
-                *createPointProto(pass->passerPoint());
-        *(pass_msg.mutable_receiver_point()) =
-                *createPointProto(pass->receiverPoint());
+        *(pass_msg.mutable_passer_point())   = *createPointProto(pass->passerPoint());
+        *(pass_msg.mutable_receiver_point()) = *createPointProto(pass->receiverPoint());
         pass_msg.set_pass_speed_m_per_s(pass->speed());
         *(pass_visualization_msg->mutable_pass_()) = pass_msg;
     }
 
     pass_visualization_msg->set_pass_committed(pass_committed);
 
-    if (shot.has_value() && balls_position.has_value()) {
+    if (shot.has_value() && balls_position.has_value())
+    {
         TbotsProto::Shot shot_msg;
         *(shot_msg.mutable_shot_origin()) = *createPointProto(balls_position.value());
         *(shot_msg.mutable_shot_target()) = *createPointProto(shot->getPointToShootAt());
-        *(shot_msg.mutable_open_angle()) = *createAngleProto(shot->getOpenAngle());
+        *(shot_msg.mutable_open_angle())  = *createAngleProto(shot->getOpenAngle());
         *(pass_visualization_msg->mutable_shot()) = shot_msg;
     }
 
-    if (chip_target.has_value()) {
-        *(pass_visualization_msg->mutable_chip_target()) = *createPointProto(chip_target.value());
+    if (chip_target.has_value())
+    {
+        *(pass_visualization_msg->mutable_chip_target()) =
+            *createPointProto(chip_target.value());
     }
 
     return pass_visualization_msg;

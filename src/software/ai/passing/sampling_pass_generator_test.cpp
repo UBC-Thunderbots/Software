@@ -13,8 +13,11 @@
 class SamplingPassGeneratorTest : public testing::Test
 {
    public:
-    SamplingPassGeneratorTest() : passing_config(), sampling_pass_generator(passing_config) {}
-   
+    SamplingPassGeneratorTest()
+        : passing_config(), sampling_pass_generator(passing_config)
+    {
+    }
+
    protected:
     virtual void SetUp()
     {
@@ -34,12 +37,11 @@ TEST_F(SamplingPassGeneratorTest, getBestPass_2_friendlies)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
-    friendly_team.updateRobots({
-        Robot(1, {-1, 0}, {0, 0}, Angle::fromDegrees(0),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(2, {1, 0}, {0, 0}, Angle::fromDegrees(180),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0))
-    });
+    friendly_team.updateRobots(
+        {Robot(1, {-1, 0}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0)),
+         Robot(2, {1, 0}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0))});
     world->updateFriendlyTeamState(friendly_team);
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
     world->updateBall(ball);
@@ -54,22 +56,21 @@ TEST_F(SamplingPassGeneratorTest, getBestPass_2_friendlies)
     std::cout << best_pass.pass << std::endl;
     std::cout << best_pass.rating << std::endl;
     EXPECT_GE(best_pass.rating, 0.0);
-    EXPECT_EQ(best_pass.pass.receiverPoint().x(), -1);     
-    EXPECT_EQ(best_pass.pass.receiverPoint().y(), 0);      
+    EXPECT_EQ(best_pass.pass.receiverPoint().x(), -1);
+    EXPECT_EQ(best_pass.pass.receiverPoint().y(), 0);
 }
 
 TEST_F(SamplingPassGeneratorTest, getBestPass_3_friendlies_1_blocked)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
-    friendly_team.updateRobots({
-        Robot(1, {-2, 0}, {0, 0}, Angle::fromDegrees(0),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(2, {2, 0}, {0, 0}, Angle::fromDegrees(180),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(3, {-2, 1}, {0, 0}, Angle::fromDegrees(180),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0))
-    });
+    friendly_team.updateRobots(
+        {Robot(1, {-2, 0}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0)),
+         Robot(2, {2, 0}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0)),
+         Robot(3, {-2, 1}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0))});
     world->updateFriendlyTeamState(friendly_team);
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
     world->updateBall(ball);
@@ -84,6 +85,6 @@ TEST_F(SamplingPassGeneratorTest, getBestPass_3_friendlies_1_blocked)
     std::cout << best_pass.pass << std::endl;
     std::cout << best_pass.rating << std::endl;
     EXPECT_GE(best_pass.rating, 0.0);
-    EXPECT_EQ(best_pass.pass.receiverPoint().x(), -2);     
-    EXPECT_EQ(best_pass.pass.receiverPoint().y(), 0);      
+    EXPECT_EQ(best_pass.pass.receiverPoint().x(), -2);
+    EXPECT_EQ(best_pass.pass.receiverPoint().y(), 0);
 }

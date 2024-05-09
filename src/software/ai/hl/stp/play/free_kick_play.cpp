@@ -8,19 +8,20 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/ai/passing/sampling_pass_generator.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
-#include "software/ai/passing/sampling_pass_generator.h"
 
 FreeKickPlay::FreeKickPlay(TbotsProto::AiConfig config)
-    : Play(config, true), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)),
+    : Play(config, true),
+      MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)),
       pass_generator(config.passing_config()),
       receiver_position_generator(ReceiverPositionGenerator<EighteenZoneId>(
-              std::make_shared<const EighteenZonePitchDivision>(
-                      Field::createSSLDivisionBField()),
-              config.passing_config()))
+          std::make_shared<const EighteenZonePitchDivision>(
+              Field::createSSLDivisionBField()),
+          config.passing_config()))
 {
 }
 
@@ -147,7 +148,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     const WorldPtr &world_ptr)
 {
     PassWithRating pass_with_rating = pass_generator.getBestPass(*world_ptr);
-    std::vector<Point> best_receiving_positions = receiver_position_generator.getBestReceivingPositions(*world_ptr, 2);
+    std::vector<Point> best_receiving_positions =
+        receiver_position_generator.getBestReceivingPositions(*world_ptr, 2);
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -163,8 +165,10 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     {
         updateAlignToBallTactic(align_to_ball_tactic, world_ptr);
 
-        Angle pass1_receiver_orientation = (world_ptr->ball().position() - best_receiving_positions[0]).orientation();
-        Angle pass2_receiver_orientation = (world_ptr->ball().position() - best_receiving_positions[1]).orientation();
+        Angle pass1_receiver_orientation =
+            (world_ptr->ball().position() - best_receiving_positions[0]).orientation();
+        Angle pass2_receiver_orientation =
+            (world_ptr->ball().position() - best_receiving_positions[1]).orientation();
 
         cherry_pick_tactic_1->updateControlParams(
             best_receiving_positions[0], pass1_receiver_orientation, 0.0,
@@ -185,7 +189,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
                 std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
 
-        best_receiving_positions = receiver_position_generator.getBestReceivingPositions(*world_ptr, 2);
+        best_receiving_positions =
+            receiver_position_generator.getBestReceivingPositions(*world_ptr, 2);
     } while (!align_to_ball_tactic->done());
 
     LOG(DEBUG) << "Finished aligning to ball";
@@ -200,8 +205,10 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     {
         updateAlignToBallTactic(align_to_ball_tactic, world_ptr);
 
-        Angle pass1_receiver_orientation = (world_ptr->ball().position() - best_receiving_positions[0]).orientation();
-        Angle pass2_receiver_orientation = (world_ptr->ball().position() - best_receiving_positions[1]).orientation();
+        Angle pass1_receiver_orientation =
+            (world_ptr->ball().position() - best_receiving_positions[0]).orientation();
+        Angle pass2_receiver_orientation =
+            (world_ptr->ball().position() - best_receiving_positions[1]).orientation();
 
         cherry_pick_tactic_1->updateControlParams(
             best_receiving_positions[0], pass1_receiver_orientation, 0.0,
@@ -232,7 +239,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
                                      MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
                                  1.0);
 
-        best_receiving_positions = receiver_position_generator.getBestReceivingPositions(*world_ptr, 2);
+        best_receiving_positions =
+            receiver_position_generator.getBestReceivingPositions(*world_ptr, 2);
     } while (pass_with_rating.rating < min_score);
     return pass_with_rating;
 }

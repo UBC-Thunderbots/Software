@@ -6,11 +6,14 @@
 ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
     : ai_config(ai_config),
       attacker_tactic(std::make_shared<AttackerTactic>(ai_config)),
-      receiver_tactic(std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config())),
+      receiver_tactic(
+          std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config())),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       receiver_position_generator(ReceiverPositionGenerator<EighteenZoneId>(
           std::make_shared<const EighteenZonePitchDivision>(
-              Field::createSSLDivisionBField()), // TODO (NIMA): Not good practice to hard code the field type. should use the field from the world
+              Field::createSSLDivisionBField()),  // TODO (NIMA): Not good practice to
+                                                  // hard code the field type. should use
+                                                  // the field from the world
           ai_config.passing_config())),
       sampling_pass_generator(ai_config.passing_config()),
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
@@ -21,9 +24,10 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
 {
 }
 
-void ShootOrPassPlayFSM::updateOffensivePositioningTactics(const WorldPtr world, unsigned int num_tactics,
-                                                           const std::vector<Point> &existing_receiver_positions,
-                                                           const std::optional<Point> &pass_origin_override)
+void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
+    const WorldPtr world, unsigned int num_tactics,
+    const std::vector<Point>& existing_receiver_positions,
+    const std::optional<Point>& pass_origin_override)
 {
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -37,7 +41,8 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(const WorldPtr world,
     }
 
     std::vector<Point> best_receiving_positions =
-        receiver_position_generator.getBestReceivingPositions(*world, num_tactics, existing_receiver_positions, pass_origin_override);
+        receiver_position_generator.getBestReceivingPositions(
+            *world, num_tactics, existing_receiver_positions, pass_origin_override);
     for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
     {
         Angle receiver_orientation =
@@ -89,8 +94,9 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
 void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
-    attacker_tactic              = std::make_shared<AttackerTactic>(ai_config);
-    receiver_tactic              = std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config());
+    attacker_tactic = std::make_shared<AttackerTactic>(ai_config);
+    receiver_tactic =
+        std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config());
     pass_optimization_start_time = event.common.world_ptr->getMostRecentTimestamp();
     lookForPass(event);
 }
@@ -103,7 +109,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
     event.common.set_inter_play_communication_fun(
         InterPlayCommunication{.last_committed_pass = best_pass_and_score_so_far});
 
-    std::vector<Point> existing_receiver_positions = {best_pass_and_score_so_far.pass.receiverPoint()};
+    std::vector<Point> existing_receiver_positions = {
+        best_pass_and_score_so_far.pass.receiverPoint()};
 
     if (!attacker_tactic->done())
     {
@@ -111,7 +118,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
         if (event.common.num_tactics > 2)
         {
-            updateOffensivePositioningTactics(event.common.world_ptr, event.common.num_tactics - 2,
+            updateOffensivePositioningTactics(event.common.world_ptr,
+                                              event.common.num_tactics - 2,
                                               existing_receiver_positions);
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
@@ -125,8 +133,10 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
         PriorityTacticVector ret_tactics = {{receiver_tactic}, {}};
         if (event.common.num_tactics > 1)
         {
-            updateOffensivePositioningTactics(event.common.world_ptr, event.common.num_tactics - 1,
-                                              existing_receiver_positions, best_pass_and_score_so_far.pass.receiverPoint());
+            updateOffensivePositioningTactics(
+                event.common.world_ptr, event.common.num_tactics - 1,
+                existing_receiver_positions,
+                best_pass_and_score_so_far.pass.receiverPoint());
             ret_tactics[1].insert(ret_tactics[1].end(),
                                   offensive_positioning_tactics.begin(),
                                   offensive_positioning_tactics.end());
@@ -150,9 +160,9 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
 {
     if (!attacker_tactic->done())
     {
-        best_pass_and_score_so_far.rating = ratePass(*event.common.world_ptr,
-                                                    best_pass_and_score_so_far.pass,
-                                                    ai_config.passing_config());
+        best_pass_and_score_so_far.rating =
+            ratePass(*event.common.world_ptr, best_pass_and_score_so_far.pass,
+                     ai_config.passing_config());
         double abs_min_pass_score =
             ai_config.shoot_or_pass_play_config().abs_min_pass_score();
         if (best_pass_and_score_so_far.rating < abs_min_pass_score)
@@ -169,7 +179,8 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     const auto pass_area_polygon =
         Polygon::fromSegment(Segment(passer_point, receiver_point), 0.5);
 
-    LOG(VISUALIZE) << *createDebugShapes({*createDebugShape(pass_area_polygon, "pass_area_polygon")}); // TODO (NIMA): Added for debugging
+    LOG(VISUALIZE) << *createDebugShapes({*createDebugShape(
+        pass_area_polygon, "pass_area_polygon")});  // TODO (NIMA): Added for debugging
 
     // calculate a polygon that contains the receiver and passer point, and checks if the
     // ball is inside it. if the ball isn't being passed to the receiver then we should

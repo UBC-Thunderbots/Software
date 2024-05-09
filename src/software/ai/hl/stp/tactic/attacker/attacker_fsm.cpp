@@ -1,49 +1,58 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
+
 #include "proto/message_translation/tbots_protobuf.h"
 
 void AttackerFSM::pivotKick(const Update& event,
                             boost::sml::back::process<PivotKickFSM::Update> processEvent)
 {
     auto ball_position = event.common.world_ptr->ball().position();
-    Point chip_target = event.common.world_ptr->field().enemyGoalCenter();
-    if (event.control_params.chip_target) {
+    Point chip_target  = event.common.world_ptr->field().enemyGoalCenter();
+    if (event.control_params.chip_target)
+    {
         chip_target = event.control_params.chip_target.value();
     }
     // default to chipping the ball away
     PivotKickFSM::ControlParams control_params{
-            .kick_origin       = ball_position,
-            .kick_direction    = (chip_target - ball_position).orientation(),
-            .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
-                                                (chip_target -
-                                                 ball_position).length()}}; // TODO (NIMA): We should not randomly chip the ball away, specially towards enemy net
+        .kick_origin    = ball_position,
+        .kick_direction = (chip_target - ball_position).orientation(),
+        .auto_chip_or_kick =
+            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                           (chip_target - ball_position)
+                               .length()}};  // TODO (NIMA): We should not randomly chip
+                                             // the ball away, specially towards enemy net
 
-    if (event.control_params.shot) {
+    if (event.control_params.shot)
+    {
         // shoot on net
         control_params = PivotKickFSM::ControlParams{
-                .kick_origin = ball_position,
-                .kick_direction =
+            .kick_origin = ball_position,
+            .kick_direction =
                 (event.control_params.shot->getPointToShootAt() - ball_position)
-                        .orientation(),
-                .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                                    BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}};
-    } else if (event.control_params.pass_committed) {
+                    .orientation(),
+            .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                                BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}};
+    }
+    else if (event.control_params.pass_committed)
+    {
         // we have committed to passing, execute the pass
         control_params = PivotKickFSM::ControlParams{
-                .kick_origin    = event.control_params.best_pass_so_far->passerPoint(),
-                .kick_direction = event.control_params.best_pass_so_far->passerOrientation(),
-                .auto_chip_or_kick =
+            .kick_origin    = event.control_params.best_pass_so_far->passerPoint(),
+            .kick_direction = event.control_params.best_pass_so_far->passerOrientation(),
+            .auto_chip_or_kick =
                 AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                                event.control_params.best_pass_so_far->speed()}};
     }
     processEvent(PivotKickFSM::Update(control_params, event.common));
 
     // Visualize the current state
-    if (event.control_params.shot.has_value() || event.control_params.best_pass_so_far.has_value() ||
-        event.control_params.chip_target.has_value()) {
-        LOG(VISUALIZE)
-            << *createAttackerVisualization(event.control_params.best_pass_so_far, event.control_params.pass_committed,
-                                            event.control_params.shot, event.common.world_ptr->ball().position(),
-                                            event.control_params.chip_target);
+    if (event.control_params.shot.has_value() ||
+        event.control_params.best_pass_so_far.has_value() ||
+        event.control_params.chip_target.has_value())
+    {
+        LOG(VISUALIZE) << *createAttackerVisualization(
+            event.control_params.best_pass_so_far, event.control_params.pass_committed,
+            event.control_params.shot, event.common.world_ptr->ball().position(),
+            event.control_params.chip_target);
     }
 }
 
@@ -79,7 +88,9 @@ void AttackerFSM::keepAway(const Update& event,
 
     // there is a robot on the enemy team close to us, face away from the nearest one
     auto nearest_enemy_robot = enemy_team.getNearestRobot(event.common.robot.position());
-    if (nearest_enemy_robot.has_value() && distance(ball.position(), nearest_enemy_robot->position()) < attacker_tactic_config.enemy_about_to_steal_ball_radius())
+    if (nearest_enemy_robot.has_value() &&
+        distance(ball.position(), nearest_enemy_robot->position()) <
+            attacker_tactic_config.enemy_about_to_steal_ball_radius())
     {
         auto dribble_orientation_vec = ball.position() - nearest_enemy_robot->position();
         final_dribble_orientation    = dribble_orientation_vec.orientation();
@@ -93,12 +104,14 @@ void AttackerFSM::keepAway(const Update& event,
     processEvent(DribbleFSM::Update(control_params, event.common));
 
     // Visualize the current state
-    if (event.control_params.shot.has_value() || event.control_params.best_pass_so_far.has_value() || event.control_params.chip_target.has_value())
+    if (event.control_params.shot.has_value() ||
+        event.control_params.best_pass_so_far.has_value() ||
+        event.control_params.chip_target.has_value())
     {
-        LOG(VISUALIZE)
-            << *createAttackerVisualization(event.control_params.best_pass_so_far, event.control_params.pass_committed,
-                                            event.control_params.shot, event.common.world_ptr->ball().position(),
-                                            event.control_params.chip_target);
+        LOG(VISUALIZE) << *createAttackerVisualization(
+            event.control_params.best_pass_so_far, event.control_params.pass_committed,
+            event.control_params.shot, event.common.world_ptr->ball().position(),
+            event.control_params.chip_target);
     }
 }
 

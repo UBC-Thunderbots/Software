@@ -409,7 +409,7 @@ message RobotNavigationObstacleConfig
 message CostVisualizationConfig
 {
     // Whether we should generate sample passes for the cost visualization
-    required bool generate_sample_passes = 1 [default = true]; // TODO (NIMA): Revert
+    required bool generate_sample_passes = 1 [default = true];  // TODO (NIMA): Revert
     required int32 num_cols              = 2
         [default = 45, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
     // cost functions
@@ -418,7 +418,7 @@ message CostVisualizationConfig
     required bool pass_enemy_risk          = 5 [default = false];
     required bool pass_shoot_score         = 6 [default = false];
     required bool passer_position_score    = 7 [default = false];
-    required bool receiver_position_score  = 8 [default = true]; // TODO (NIMA): Revert
+    required bool receiver_position_score  = 8 [default = true];  // TODO (NIMA): Revert
 }
 
 message PossessionTrackerConfig

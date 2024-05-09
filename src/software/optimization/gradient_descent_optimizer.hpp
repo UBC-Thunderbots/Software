@@ -246,7 +246,8 @@ std::array<double, NUM_PARAMS> GradientDescentOptimizer<NUM_PARAMS>::followGradi
         // given to this function
         for (unsigned int i = 0; i < NUM_PARAMS; i++)
         {
-            // TODO (NIMA): Shouldn't we store the best value separately so we can return it? Since the last parameter might not be the best.
+            // TODO (NIMA): Shouldn't we store the best value separately so we can return
+            // it? Since the last parameter might not be the best.
             params.at(i) = gradient_movement_func(
                 params.at(i),
                 param_weights.at(i) * bias_corrected_past_gradient_averages.at(i) /

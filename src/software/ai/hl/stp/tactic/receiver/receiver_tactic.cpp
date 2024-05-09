@@ -11,7 +11,7 @@ ReceiverTactic::ReceiverTactic(const TbotsProto::ReceiverTacticConfig& receiver_
       fsm_map(),
       control_params({ReceiverFSM::ControlParams{.pass                   = std::nullopt,
                                                  .disable_one_touch_shot = false}}),
-        receiver_config(receiver_config)
+      receiver_config(receiver_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {

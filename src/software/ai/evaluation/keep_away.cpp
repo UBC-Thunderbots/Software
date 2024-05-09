@@ -30,7 +30,10 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far)
     // the position rating function we want to maximize
     const auto keepaway_point_cost = [&](const std::array<double, 2>& passer_pt_array) {
         Point passer_pt(std::get<0>(passer_pt_array), std::get<1>(passer_pt_array));
-        return ratePasserPosition(world, Pass(passer_pt, best_pass_so_far.receiverPoint(), best_pass_so_far.speed()), reduced_field_bounds);
+        return ratePasserPosition(
+            world,
+            Pass(passer_pt, best_pass_so_far.receiverPoint(), best_pass_so_far.speed()),
+            reduced_field_bounds);
     };
     GradientDescentOptimizer<2> optimizer{PARAM_WEIGHTS};
     auto passer_pt_array = optimizer.maximize(

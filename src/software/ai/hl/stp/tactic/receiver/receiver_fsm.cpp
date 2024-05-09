@@ -85,14 +85,16 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
             convexAngle(robot_to_ball, robot_to_shot_target).toDegrees();
 
         double shot_open_angle = best_shot_opt.value().getOpenAngle().toDegrees();
-        double min_one_touch_open_angle = receiver_tactic_config.min_open_angle_for_one_touch_deg();
-        double max_one_touch_deflection_angle = receiver_tactic_config.max_deflection_for_one_touch_deg();
+        double min_one_touch_open_angle =
+            receiver_tactic_config.min_open_angle_for_one_touch_deg();
+        double max_one_touch_deflection_angle =
+            receiver_tactic_config.max_deflection_for_one_touch_deg();
 
         // If we have a shot with a sufficiently large enough opening, and the
         // deflection angle that is reasonable, we should one-touch kick the ball
         // towards the enemy net
         if (shot_open_angle > min_one_touch_open_angle &&
-          abs_angle_deg_between_pass_and_shot_vectors < max_one_touch_deflection_angle)
+            abs_angle_deg_between_pass_and_shot_vectors < max_one_touch_deflection_angle)
         {
             return best_shot_opt;
         }
@@ -116,8 +118,8 @@ void ReceiverFSM::updateOnetouch(const Update& event)
     if (best_shot.has_value() && event.control_params.pass)
     {
         auto one_touch = getOneTouchShotPositionAndOrientation(
-                event.common.robot, event.common.world_ptr->ball(),
-                best_shot->getPointToShootAt());
+            event.common.robot, event.common.world_ptr->ball(),
+            best_shot->getPointToShootAt());
 
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, one_touch.getPointToShootAt(), one_touch.getOpenAngle(),

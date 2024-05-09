@@ -63,8 +63,8 @@ py_library(
     srcs = ["gl_attacker_layer.py"],
     deps = [
         ":gl_layer",
-        "//software/thunderscope/gl/graphics:gl_polygon",
         "//software/thunderscope/gl/graphics:gl_circle",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],
 )

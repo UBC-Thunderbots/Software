@@ -5,11 +5,11 @@
 #include "proto/vision.pb.h"
 #include "proto/visualization.pb.h"
 #include "proto/world.pb.h"
+#include "software/ai/evaluation/shot.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/world/world.h"
-#include "software/ai/evaluation/shot.h"
 
 /**
  * Returns a TbotsProto::World proto given a World.
@@ -127,10 +127,13 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
 std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     const std::map<std::string, double>& values);
 
-template<class Shape>
-std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(const Shape& shape, const std::string& unique_id, const std::string& debug_text="")
+template <class Shape>
+std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(
+    const Shape& shape, const std::string& unique_id, const std::string& debug_text = "")
 {
-//    static_assert(std::is_base_of<Shape, Circle>::value || std::is_base_of<Shape, Polygon>::value || std::is_base_of<Shape, Stadium>::value, "Shape must be a Circle, Polygon, or Stadium");
+    //    static_assert(std::is_base_of<Shape, Circle>::value || std::is_base_of<Shape,
+    //    Polygon>::value || std::is_base_of<Shape, Stadium>::value, "Shape must be a
+    //    Circle, Polygon, or Stadium");
 
     auto debug_shape = std::make_unique<TbotsProto::DebugShapes::DebugShape>();
     (*debug_shape->mutable_shape()) = *createShapeProto(shape);
@@ -199,11 +202,13 @@ BallState createBallState(const TbotsProto::BallState ball_state);
  * @return The unique_ptr to a PassVisualization proto
  */
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
-        const std::vector<PassWithRating>& passes_with_rating);
+    const std::vector<PassWithRating>& passes_with_rating);
 
 // TODO (NIMA): docs
 std::unique_ptr<TbotsProto::AttackerVisualization> createAttackerVisualization(
-        const std::optional<Pass>& pass, const bool pass_committed, const std::optional<Shot>& shot, const std::optional<Point>& balls_position, const std::optional<Point>& chip_target);
+    const std::optional<Pass>& pass, const bool pass_committed,
+    const std::optional<Shot>& shot, const std::optional<Point>& balls_position,
+    const std::optional<Point>& chip_target);
 
 /**
  * Returns the WorldStateReceivedTrigger given the world state received trigger

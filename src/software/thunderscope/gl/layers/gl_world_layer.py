@@ -158,7 +158,9 @@ class GLWorldLayer(GLLayer):
         Calls all callback functions with the new play state
         :return: the current play state
         """
-        simulator_state = SimulationState(is_playing=not self.is_playing, simulation_speed=self.simulation_speed)
+        simulator_state = SimulationState(
+            is_playing=not self.is_playing, simulation_speed=self.simulation_speed
+        )
         self.is_playing = not self.is_playing
 
         self.simulator_io.send_proto(SimulationState, simulator_state)
@@ -171,7 +173,9 @@ class GLWorldLayer(GLLayer):
         :param speed: the new speed to set
         """
         self.simulation_speed = speed
-        simulator_state = SimulationState(is_playing=self.is_playing, simulation_speed=self.simulation_speed)
+        simulator_state = SimulationState(
+            is_playing=self.is_playing, simulation_speed=self.simulation_speed
+        )
         self.simulator_io.send_proto(SimulationState, simulator_state)
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
@@ -305,7 +309,9 @@ class GLWorldLayer(GLLayer):
         self.__update_speed_line_graphics()
 
         # Update internal simulation state
-        simulation_state = self.simulation_state_buffer.get(block=False, return_cached=False)
+        simulation_state = self.simulation_state_buffer.get(
+            block=False, return_cached=False
+        )
         if simulation_state:
             self.is_playing = simulation_state.is_playing
             self.simulation_speed = simulation_state.simulation_speed

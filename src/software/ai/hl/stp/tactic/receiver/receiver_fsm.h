@@ -18,7 +18,7 @@ struct ReceiverFSM
      * @param attacker_tactic_config The config to fetch parameters from
      */
     explicit ReceiverFSM(TbotsProto::ReceiverTacticConfig receiver_tactic_config)
-    : receiver_tactic_config(receiver_tactic_config)
+        : receiver_tactic_config(receiver_tactic_config)
     {
     }
 
@@ -37,8 +37,8 @@ struct ReceiverFSM
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    static constexpr double MIN_PASS_START_SPEED      = 0.02;
-    static constexpr double BALL_MIN_MOVEMENT_SPEED   = 0.04;
+    static constexpr double MIN_PASS_START_SPEED    = 0.02;
+    static constexpr double BALL_MIN_MOVEMENT_SPEED = 0.04;
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray (i.e it won't make it to the receiver)
@@ -76,8 +76,7 @@ struct ReceiverFSM
      * @param world The world to find a feasible shot on
      * @param assigned_robot The robot that will be performing the one-touch
      */
-    std::optional<Shot> findFeasibleShot(const World& world,
-                                         const Robot& assigned_robot);
+    std::optional<Shot> findFeasibleShot(const World& world, const Robot& assigned_robot);
 
     /**
      * Checks if a one touch shot is possible
@@ -177,7 +176,7 @@ struct ReceiverFSM
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                              = X);
     }
 
-private:
+   private:
     // the receiver tactic config
     TbotsProto::ReceiverTacticConfig receiver_tactic_config;
 };

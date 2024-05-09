@@ -1,5 +1,3 @@
-import os
-import textwrap
 from typing import Callable
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Qt.QtWidgets import *
@@ -127,8 +125,7 @@ class GLFieldToolbar(GLToolbar):
         self.simulation_speeds = ["2", "1", "0.5", "0.2", "0.1", "0.05"]
         for speed in self.simulation_speeds:
             self.sim_speed_menu.addAction(
-                speed,
-                lambda new_speed=speed: self.speed_callback(float(new_speed)),
+                speed, lambda new_speed=speed: self.speed_callback(float(new_speed)),
             )
 
         # if sandbox mode, set up the sandbox control buttons

@@ -68,7 +68,10 @@ class GLPassingLayer(GLLayer):
         self.pass_graphics.resize(
             1,
             lambda: GLPolygon(
-                outline_color=Colors.COMMITTED_PASS_VISUALIZATION_COLOR if pass_vis.pass_committed else Colors.UNCOMMITTED_PASS_VISUALIZATION_COLOR),
+                outline_color=Colors.COMMITTED_PASS_VISUALIZATION_COLOR
+                if pass_vis.pass_committed
+                else Colors.UNCOMMITTED_PASS_VISUALIZATION_COLOR
+            ),
         )
 
         self.pass_graphics[0].set_points(

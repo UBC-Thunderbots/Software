@@ -46,7 +46,9 @@ class GLDebugShapesLayer(GLLayer):
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
         # Add all new shapes to the map
-        debug_shapes_proto = self.debug_shapes_buffer.get(block=False, return_cached=False)
+        debug_shapes_proto = self.debug_shapes_buffer.get(
+            block=False, return_cached=False
+        )
         now = time.time()
         while debug_shapes_proto is not None:
             for debug_shape in debug_shapes_proto.debug_shapes:
@@ -60,7 +62,9 @@ class GLDebugShapesLayer(GLLayer):
         poly_named_shapes = []
         circle_named_shapes = []
         stadium_named_shapes = []
-        for unique_id, (debug_shape, last_updated) in list(self.debug_shape_map.items()):
+        for unique_id, (debug_shape, last_updated) in list(
+            self.debug_shape_map.items()
+        ):
             if now - last_updated > self.MAX_GRAPHICS_DURATION_SEC:
                 del self.debug_shape_map[unique_id]
                 continue

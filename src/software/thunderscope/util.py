@@ -113,7 +113,10 @@ def realtime_sim_ticker(
             tick = SimulatorTick(milliseconds=tick_rate_ms)
             sim_proto_unix_io.send_proto(SimulatorTick, tick)
 
-        time.sleep((tick_rate_ms * SECONDS_PER_MILLISECOND) / simulation_state_message.simulation_speed)
+        time.sleep(
+            (tick_rate_ms * SECONDS_PER_MILLISECOND)
+            / simulation_state_message.simulation_speed
+        )
 
 
 def sync_simulation(sim_proto_unix_io: ProtoUnixIO, num_robots: int) -> None:

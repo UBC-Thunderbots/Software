@@ -190,7 +190,8 @@ double calculateProximityRisk(const Point& point, const Team& enemy_team,
  * @return A value in [0,1] representing the quality of the passer position, with 1
  *        being an ideal position to pass from, and 0 being a poor position to pass from.
  */
-double ratePasserPosition(const World &world, const Pass& pass, const Rectangle& dribbling_bounds);
+double ratePasserPosition(const World& world, const Pass& pass,
+                          const Rectangle& dribbling_bounds);
 
 /**
  * Calculate the quality of a given passer position given enemy threads
@@ -216,6 +217,6 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team);
  * @param best_pass_so_far The best pass so far used for sampling best passer position
  *
  */
-void samplePassesForVisualization(const World& world,
-                                  const TbotsProto::PassingConfig& passing_config,
-                                  const std::optional<Pass>& best_pass_so_far = std::nullopt);
+void samplePassesForVisualization(
+    const World& world, const TbotsProto::PassingConfig& passing_config,
+    const std::optional<Pass>& best_pass_so_far = std::nullopt);

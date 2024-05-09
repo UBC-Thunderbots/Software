@@ -59,9 +59,10 @@ namespace
                                  TbotsProto::MotionConstraint::FRIENDLY_HALF,
                                  TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL}),
                             std::set<TbotsProto::MotionConstraint>()),
-            std::make_tuple(std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config()),
-                            std::set<TbotsProto::MotionConstraint>(),
-                            std::set<TbotsProto::MotionConstraint>()),
+            std::make_tuple(
+                std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config()),
+                std::set<TbotsProto::MotionConstraint>(),
+                std::set<TbotsProto::MotionConstraint>()),
             std::make_tuple(std::make_shared<ShadowEnemyTactic>(),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),
