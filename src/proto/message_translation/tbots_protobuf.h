@@ -127,6 +127,20 @@ std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
 std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     const std::map<std::string, double>& values);
 
+/**
+ * Returns a TbotsProto::DebugShapes::DebugShape proto for a given shape,
+ * unique id, and an optional debug text.
+ *
+ * @tparam Shape A shape which has a matching createShapeProto function
+ *
+ * @param shape The shape to create the protobuf for
+ * @param unique_id A unique string used to differentiate this shape
+ * from others. Note that this ID should remain the same for the same shape
+ * to avoid it from being plotted multiple times.
+ * @param debug_text An optional string to display on the shape
+ *
+ * @return The unique_ptr to a TbotsProto::DebugShapes::DebugShape proto
+ */
 template <class Shape>
 std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(
     const Shape& shape, const std::string& unique_id, const std::string& debug_text = "")
@@ -143,12 +157,12 @@ std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(
  *
  * Could use LOG(VISUALIZE) to plot these values. Example:
  *  LOG(VISUALIZE) << *createDebugShapes({
- *      {"circle_name", *createShapeProto(circle_object)}, TODO (NIMA)
- *      {"stadium_name", *createShapeProto(stadium_object)},
- *      {"polygon_name", *createShapeProto(polygon_object)}
+ *       *createDebugShape(circle, unique_id1, optional_text),
+ *       *createDebugShape(polygon, unique_id2, optional_text),
+ *       *createDebugShape(stadium, unique_id3, optional_text)
  *  });
  *
- * @param named_shapes The map of name shape proto pairs to plot
+ * @param debug_shapes A list of debug shapes proto to plot
  *
  * @return The unique_ptr to a TbotsProto::DebugShapes proto containing data with
  *        specified names and shapes
