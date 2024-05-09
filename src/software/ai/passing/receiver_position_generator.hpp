@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iomanip>
+#include <random>
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
@@ -69,8 +70,8 @@ class ReceiverPositionGenerator
     std::map<ZoneEnum, PassWithRating> best_receiving_positions;
     std::map<ZoneEnum, Point> prev_best_receiving_positions;
 
-    std::vector<TbotsProto::DebugShapes::DebugShape>
-        debug_shapes;  // TODO (NIMA): Added for debugging
+    // TODO (NIMA): Added for debugging
+    std::vector<TbotsProto::DebugShapes::DebugShape> debug_shapes;
 
     // A random number generator for use across the class
     std::mt19937 random_num_gen_;

@@ -13,6 +13,7 @@ from software.thunderscope.constants import (
     SPEED_SEGMENT_SCALE,
     DEFAULT_EMPTY_FIELD_WORLD,
     is_field_message_empty,
+    SIMULATION_SPEEDS,
 )
 
 from typing import Dict, Tuple
@@ -75,6 +76,8 @@ class GLWorldLayer(GLLayer):
             Qt.Key.Key_I,
             Qt.Key.Key_Space,
             Qt.Key.Key_Shift,
+            Qt.Key.Key_Up,
+            Qt.Key.Key_Down,
         ]
         for key in self.accepted_keys:
             self.key_pressed[key] = False
@@ -151,6 +154,32 @@ class GLWorldLayer(GLLayer):
             and self.key_pressed[QtCore.Qt.Key.Key_Space]
         ):
             self.toggle_play_state()
+
+        if (
+            self.key_pressed[QtCore.Qt.Key.Key_Control]
+            and self.key_pressed[QtCore.Qt.Key.Key_Up]
+        ):
+            self.increment_sim_speed()
+
+        if (
+            self.key_pressed[QtCore.Qt.Key.Key_Control]
+            and self.key_pressed[QtCore.Qt.Key.Key_Down]
+        ):
+            self.decrement_sim_speed()
+
+    def increment_sim_speed(self) -> None:
+        """Increment the simulation speed to the next fastest speed, if there's one"""
+        curr_sim_speed_index = SIMULATION_SPEEDS.index(self.simulation_speed)
+        new_simulation_speed = SIMULATION_SPEEDS[max(0, curr_sim_speed_index - 1)]
+        self.set_simulation_speed(new_simulation_speed)
+
+    def decrement_sim_speed(self) -> None:
+        """Decrement the simulation speed to the previous fastest speed, if there's one"""
+        curr_sim_speed_index = SIMULATION_SPEEDS.index(self.simulation_speed)
+        new_simulation_speed = SIMULATION_SPEEDS[
+            min(len(SIMULATION_SPEEDS) - 1, curr_sim_speed_index + 1)
+        ]
+        self.set_simulation_speed(new_simulation_speed)
 
     def toggle_play_state(self) -> bool:
         """

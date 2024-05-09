@@ -3,7 +3,11 @@ from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.constants import CameraView, THUNDERSCOPE_HELP_TEXT
+from software.thunderscope.constants import (
+    CameraView,
+    THUNDERSCOPE_HELP_TEXT,
+    SIMULATION_SPEEDS,
+)
 import software.thunderscope.gl.widgets.toolbar_icons.sandbox_mode.icon_loader as icons
 from software.thunderscope.common.common_widgets import ToggleableButton
 from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
@@ -118,14 +122,15 @@ class GLFieldToolbar(GLToolbar):
         self.sim_speed_button.setText("Speed: 1.00x")
         self.sim_speed_button.setStyleSheet(self.get_button_style())
         self.sim_speed_button.setMenu(self.sim_speed_menu)
+        self.sim_speed_button.setToolTip("Simulation Speed")
 
         # Speed callback should be updated by the parent widget which
         # handles simulation controls
         self.speed_callback = None
-        self.simulation_speeds = ["2", "1", "0.5", "0.2", "0.1", "0.05"]
+        self.simulation_speeds = SIMULATION_SPEEDS
         for speed in self.simulation_speeds:
             self.sim_speed_menu.addAction(
-                speed, lambda new_speed=speed: self.speed_callback(float(new_speed)),
+                str(speed), lambda new_speed=speed: self.speed_callback(new_speed),
             )
 
         # if sandbox mode, set up the sandbox control buttons
