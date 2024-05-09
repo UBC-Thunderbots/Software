@@ -5,7 +5,6 @@ from pyqtgraph.Qt import QtGui
 from pyqtgraph.opengl import *
 
 from proto.visualization_pb2 import DebugShapes
-from proto.world_pb2 import SimulationState
 
 from software.thunderscope.constants import Colors, DepthValues
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer

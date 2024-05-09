@@ -4,7 +4,6 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/logger/logger.h"
 #include "software/world/ball.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
@@ -68,7 +67,4 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
     fsm_map.at(tactic_update.robot.id())
         ->process_event(AttackerFSM::Update(control_params, tactic_update));
-
-    // Visualize the current best pass
-    LOG(VISUALIZE) << *createAttackerVisualization(best_pass_so_far, pass_committed, shot, tactic_update.world_ptr->ball().position(), chip_target); // TODO (NIMA): Move to FSM and also visualize shot line
 }

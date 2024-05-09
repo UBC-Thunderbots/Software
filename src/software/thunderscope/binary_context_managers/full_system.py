@@ -170,6 +170,7 @@ gdb --args bazel-bin/{self.full_system}
         for proto_class in [
             PathVisualization,
             PassVisualization,
+            AttackerVisualization,
             CostVisualization,
             NamedValue,
             PlayInfo,

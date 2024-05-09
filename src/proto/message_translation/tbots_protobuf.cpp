@@ -403,6 +403,7 @@ std::unique_ptr<TbotsProto::AttackerVisualization> createAttackerVisualization(
         *(pass_msg.mutable_receiver_point()) =
                 *createPointProto(pass->receiverPoint());
         pass_msg.set_pass_speed_m_per_s(pass->speed());
+        *(pass_visualization_msg->mutable_pass_()) = pass_msg;
     }
 
     pass_visualization_msg->set_pass_committed(pass_committed);

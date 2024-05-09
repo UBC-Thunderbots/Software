@@ -81,6 +81,7 @@ py_library(
         "//software/thunderscope/gl/layers:gl_debug_shapes_layer",
         "//software/thunderscope/gl/layers:gl_obstacle_layer",
         "//software/thunderscope/gl/layers:gl_passing_layer",
+        "//software/thunderscope/gl/layers:gl_attacker_layer",
         "//software/thunderscope/gl/layers:gl_path_layer",
         "//software/thunderscope/gl/layers:gl_sandbox_world_layer",
         "//software/thunderscope/gl/layers:gl_simulator_layer",
