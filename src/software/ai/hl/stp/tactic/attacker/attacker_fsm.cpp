@@ -45,15 +45,7 @@ void AttackerFSM::pivotKick(const Update& event,
     processEvent(PivotKickFSM::Update(control_params, event.common));
 
     // Visualize the current state
-    if (event.control_params.shot.has_value() ||
-        event.control_params.best_pass_so_far.has_value() ||
-        event.control_params.chip_target.has_value())
-    {
-        LOG(VISUALIZE) << *createAttackerVisualization(
-            event.control_params.best_pass_so_far, event.control_params.pass_committed,
-            event.control_params.shot, event.common.world_ptr->ball().position(),
-            event.control_params.chip_target);
-    }
+    visualizeControlParams(event);
 }
 
 void AttackerFSM::keepAway(const Update& event,
@@ -118,4 +110,17 @@ void AttackerFSM::keepAway(const Update& event,
 bool AttackerFSM::shouldKick(const Update& event)
 {
     return event.control_params.pass_committed || event.control_params.shot;
+}
+
+void AttackerFSM::visualizeControlParams(const Update& event)
+{
+    if (event.control_params.shot.has_value() ||
+        event.control_params.best_pass_so_far.has_value() ||
+        event.control_params.chip_target.has_value())
+    {
+        LOG(VISUALIZE) << *createAttackerVisualization(
+            event.control_params.best_pass_so_far, event.control_params.pass_committed,
+            event.control_params.shot, event.common.world_ptr->ball().position(),
+            event.control_params.chip_target);
+    }
 }

@@ -45,7 +45,7 @@ class GLAttackerLayer(GLLayer):
         """Update graphics in this layer"""
         attacker_vis_proto = self.attacker_vis_buffer.get(
             block=False, return_cached=False
-        )  # TODO (NIMA) , return_cached=False)
+        )
 
         now = time.time()
         if attacker_vis_proto is None:

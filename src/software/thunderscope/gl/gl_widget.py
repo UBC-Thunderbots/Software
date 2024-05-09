@@ -272,6 +272,7 @@ class GLWidget(QWidget):
             self.gamecontroller_toolbar.refresh()
 
         simulation_state = self.simulation_state_buffer.get(block=False)
+        # Don't refresh the layers if the simulation is paused
         if simulation_state.is_playing:
             for layer in self.layers:
                 while layer:
