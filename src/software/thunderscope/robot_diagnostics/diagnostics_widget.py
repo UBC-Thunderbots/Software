@@ -64,8 +64,8 @@ class DiagnosticsWidget(QWidget):
         self.handheld_device_status_widget = HandheldDeviceStatusView(
             self.reinitialize_handheld_device_signal
         )
-        self.drive_dribbler_widget = DriveAndDribblerWidget()
-        self.chicker_widget = ChickerWidget(proto_unix_io)
+        self.drive_dribbler_widget = DriveAndDribblerWidget(self.proto_unix_io)
+        self.chicker_widget = ChickerWidget(self.proto_unix_io)
         self.diagnostics_control_input_widget = DiagnosticsInputToggleWidget(
             self.diagnostics_input_mode_signal
         )
@@ -85,8 +85,8 @@ class DiagnosticsWidget(QWidget):
 
         # initialize controller
         self.handheld_device_handler = HandheldDeviceManager(
-            self.proto_unix_io,  # TODO: proto shouldn't be passed down
             self.logger,
+            self.proto_unix_io,
             self.handheld_device_connection_status_signal,
         )
 
@@ -134,40 +134,26 @@ class DiagnosticsWidget(QWidget):
         self.chicker_widget.refresh(self.__control_mode)
 
         if self.__control_mode == ControlMode.DIAGNOSTICS:
-            diagnostics_primitive = Primitive(
-                direct_control=DirectControlPrimitive(
-                    motor_control=self.drive_dribbler_widget.motor_control,
-                    # TODO remove proto unix io from chicker widget
-                    power_control=self.chicker_widget.power_control,
-                )
-            )
-            # self.logger.debug(self.drive_dribbler_widget.motor_control)
-            self.proto_unix_io.send_proto(Primitive, diagnostics_primitive)
+            self.logger.debug(self.chicker_widget.power_control)
 
         elif self.__control_mode == ControlMode.HANDHELD:
-            # get latest diagnostics primitive
-            diagnostics_primitive = (
-                self.handheld_device_handler.get_latest_primitive_controls()
-            )
+            self.logger.debug(self.handheld_device_handler.power_control)
 
             # update drive and dribbler visually.
-            # TODO update dribbler speed and kick power, flash kick and chip buttons
+            # TODO kick power, flash kick and chip buttons
             self.drive_dribbler_widget.set_x_velocity_slider(
-                diagnostics_primitive.direct_control.motor_control.direct_velocity_control.velocity.x_component_meters
+                self.handheld_device_handler.motor_control.direct_velocity_control.velocity.x_component_meters
             )
             self.drive_dribbler_widget.set_y_velocity_slider(
-                diagnostics_primitive.direct_control.motor_control.direct_velocity_control.velocity.y_component_meters
+                self.handheld_device_handler.motor_control.direct_velocity_control.velocity.y_component_meters
             )
             self.drive_dribbler_widget.set_angular_velocity_slider(
-                diagnostics_primitive.direct_control.motor_control.direct_velocity_control.angular_velocity.radians_per_second
+                self.handheld_device_handler.motor_control.direct_velocity_control.angular_velocity.radians_per_second
             )
 
             self.drive_dribbler_widget.set_dribbler_velocity_slider(
-                diagnostics_primitive.direct_control.motor_control.dribbler_speed_rpm
+                self.handheld_device_handler.motor_control.dribbler_speed_rpm
             )
-
-            # send handheld diagnostics primitive
-            self.proto_unix_io.send_proto(Primitive, diagnostics_primitive)
 
     # TODO: investigate why these methods aren't called on user hitting close button
     def closeEvent(self, event):

@@ -4,18 +4,25 @@ from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 
 import software.python_bindings as tbots_cpp
+
+from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.common import common_widgets
 
 
 class DriveAndDribblerWidget(QWidget):
-    def __init__(self) -> None:
+    def __init__(
+            self,
+            proto_unix_io: ProtoUnixIO
+    ) -> None:
         """
         Initialize the widget to control the robot's motors
         """
 
         super(DriveAndDribblerWidget, self).__init__()
+
+        self.proto_unix_io = proto_unix_io
 
         self.motor_control = MotorControl()
 
@@ -68,6 +75,9 @@ class DriveAndDribblerWidget(QWidget):
             self.angular_velocity_slider.value()
         )
 
+        if mode == ControlMode.DIAGNOSTICS:
+            self.proto_unix_io.send_proto(MotorControl, self.motor_control)
+
     def __value_change_handler(self, value: float) -> str:
         """
         Converts the given float value to a string label
@@ -78,7 +88,6 @@ class DriveAndDribblerWidget(QWidget):
     def __setup_direct_velocity(self) -> QGroupBox:
         """
         Create a widget to control the direct velocity of the robot's motors
-        :param title: the name of the slider
         """
 
         group_box = QGroupBox("Drive")
@@ -150,12 +159,9 @@ class DriveAndDribblerWidget(QWidget):
         return group_box
 
     def __setup_dribbler(self) -> QGroupBox:
-        """Create a widget to control the dribbler RPM
-
-        :param title: the name of the slider
-
         """
-
+        Create a widget to control the dribbler RPM
+        """
         group_box = QGroupBox("Dribbler")
         dbox = QVBoxLayout()
 

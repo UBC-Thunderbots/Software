@@ -59,14 +59,19 @@ class RobotCommunication(object):
 
         self.fullsystem_primitive_set_buffer = ThreadSafeBuffer(1, PrimitiveSet)
 
-        self.diagnostics_primitive_buffer = ThreadSafeBuffer(1, Primitive)
+        self.motor_control_primitive_buffer = ThreadSafeBuffer(1, MotorControl)
+        self.power_control_primitive_buffer = ThreadSafeBuffer(1, PowerControl)
 
         self.current_proto_unix_io.register_observer(
             PrimitiveSet, self.fullsystem_primitive_set_buffer
         )
 
         self.current_proto_unix_io.register_observer(
-            Primitive, self.diagnostics_primitive_buffer
+            MotorControl, self.motor_control_primitive_buffer
+        )
+
+        self.current_proto_unix_io.register_observer(
+            PowerControl, self.power_control_primitive_buffer
         )
 
         self.send_estop_state_thread = threading.Thread(
@@ -241,7 +246,15 @@ class RobotCommunication(object):
             robot_primitives_map = {}
 
             # get the most recent diagnostics primitive
-            diagnostics_primitive = self.diagnostics_primitive_buffer.get(block=False)
+            motor_control = self.motor_control_primitive_buffer.get(block=False)
+            power_control = self.power_control_primitive_buffer.get(block=False)
+
+            diagnostics_primitive = Primitive(
+                direct_control=DirectControlPrimitive(
+                    motor_control=motor_control,
+                    power_control=power_control,
+                )
+            )
 
             # filter for diagnostics controlled robots
             diagnostics_robots = list(

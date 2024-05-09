@@ -18,7 +18,10 @@ class ChickerCommandMode(Enum):
 
 
 class ChickerWidget(QWidget):
-    def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
+    def __init__(
+            self,
+            proto_unix_io
+    ) -> None:
         """Handles the robot diagnostics input to create a PowerControl message
         to be sent to the robots.
 
@@ -35,23 +38,32 @@ class ChickerWidget(QWidget):
         super(ChickerWidget, self).__init__()
 
         self.proto_unix_io = proto_unix_io
-        self.power_control = PowerControl()
 
         # initial values
-        self.power_value = 1
+        self.__initialize_default_power_control_values()
 
         vbox_layout = QVBoxLayout()
         self.setLayout(vbox_layout)
 
-        # Initializing power slider for kicking & chipping
+        # Initializing power slider for kicking
         (
-            self.power_slider_layout,
-            self.power_slider,
-            self.power_label,
+            self.kick_power_slider_layout,
+            self.kick_power_slider,
+            self.kick_power_label,
         ) = common_widgets.create_slider(
-            "Power (m/s) (Chipper power is fixed)", 1, 10, 1
+            "Power (m/s)", 1, 10, 1
         )
-        vbox_layout.addLayout(self.power_slider_layout)
+        vbox_layout.addLayout(self.kick_power_slider_layout)
+
+        # Initializing distance slider for chipping
+        (
+            self.chip_distance_slider_layout,
+            self.chip_distance_slider,
+            self.chip_distance_label,
+        ) = common_widgets.create_slider(
+            "Chip Distance (m)", 1, 10, 1
+        )
+        vbox_layout.addLayout(self.kick_power_slider_layout)
 
         # Initializing kick & chip buttons
         self.push_button_box, self.push_buttons = common_widgets.create_buttons(
@@ -61,7 +73,6 @@ class ChickerWidget(QWidget):
         self.chip_button = self.push_buttons[1]
 
         # set buttons to be initially enabled
-        # TODO: don't need boolean flags, refactor them out
         self.kick_chip_buttons_enable = True
 
         vbox_layout.addWidget(self.push_button_box)
@@ -137,7 +148,7 @@ class ChickerWidget(QWidget):
 
             # clears the proto buffer when buttons are re-enabled
             # just to start fresh and clear any unwanted protos
-            self.clear_proto_buffer()
+            self.__initialize_default_power_control_values()
 
     def set_should_enable_buttons(self, enable: bool) -> None:
         """
@@ -161,32 +172,31 @@ class ChickerWidget(QWidget):
         """
 
         # gets slider values
-        power_value = self.power_slider.value()
+        kick_power_value = self.kick_power_slider.value()
+        chip_distance_value = self.chip_distance_slider.value()
 
-        power_control = PowerControl()
-        power_control.geneva_slot = 3
-
-        # sends kick, chip, autokick, or autchip primitive
+        # sends kick, chip, autokick, or autochip primitive
         if command == ChickerCommandMode.KICK:
-            power_control.chicker.kick_speed_m_per_s = power_value
+            self.power_control.chicker.kick_speed_m_per_s = kick_power_value
         elif command == ChickerCommandMode.CHIP:
-            power_control.chicker.chip_distance_meters = power_value
+            self.power_control.chicker.chip_distance_meters = chip_distance_value
         elif command == ChickerCommandMode.AUTOKICK:
-            power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = power_value
+            self.power_control.chicker.auto_chip_or_kick.autokick_speed_m_per_s = (
+                kick_power_value
+            )
         elif command == ChickerCommandMode.AUTOCHIP:
-            power_control.chicker.auto_chip_or_kick.autochip_distance_meters = (
-                power_value
+            self.power_control.chicker.auto_chip_or_kick.autochip_distance_meters = (
+                chip_distance_value
             )
 
-        # update the proto to be sent
-        self.power_control = power_control
+        self.proto_unix_io.send_proto(PowerControl, self.power_control)
 
         # clears the proto buffer for kick or chip commands
         # so only one kick / chip is sent
         if command == ChickerCommandMode.KICK or command == ChickerCommandMode.CHIP:
-            self.clear_proto_buffer()
+            self.__initialize_default_power_control_values()
 
-    def clear_proto_buffer(self) -> None:
+    def __initialize_default_power_control_values(self) -> None:
         """
         Sends an empty proto to the proto unix io buffer
         This is due to a bug in robot_communication where if a new PowerControl message is not sent,
@@ -195,16 +205,16 @@ class ChickerWidget(QWidget):
         If buffer is full, blocks execution until buffer has space
         """
         self.power_control = PowerControl()
+        self.power_control.geneva_slot = 3
 
-    def change_button_state(self, button: QPushButton, enable: bool) -> None:
+    def refresh_button_state(self, button: QPushButton) -> None:
         """Change button color and clickable state.
 
         :param button: button to change the state of
-        :param enable: bool: if True: enable this button, if False: disable
         :returns: None
 
         """
-        if enable:
+        if self.kick_chip_buttons_enable:
             button.setStyleSheet("background-color: White")
             button.setEnabled(True)
         else:
@@ -221,13 +231,17 @@ class ChickerWidget(QWidget):
         # Update this widgets accessibility to the user based on the ControlMode parameter
         self.update_widget_accessibility(mode)
 
-        # get power value slider value and set the label to that value
-        power_value = self.power_slider.value()
-        self.power_label.setText(str(power_value))
+        # get kick power value slider value and set the label to that value
+        kick_power_value = self.kick_power_slider.value()
+        self.kick_power_label.setText(str(kick_power_value))
 
-        # refreshes button state based on enable boolean
-        self.change_button_state(self.kick_button, self.kick_chip_buttons_enable)
-        self.change_button_state(self.chip_button, self.kick_chip_buttons_enable)
+        # get chip distance value slider value and set the label to that value
+        chip_distance_value = self.chip_distance_slider.value()
+        self.chip_distance_label.setText(str(chip_distance_value))
+
+        # refresh button state to reflect to user current status
+        self.refresh_button_state(self.kick_button)
+        self.refresh_button_state(self.chip_button)
 
         # If auto is enabled, we want to populate the autochip or kick message
         if self.auto_kick_button.isChecked():
