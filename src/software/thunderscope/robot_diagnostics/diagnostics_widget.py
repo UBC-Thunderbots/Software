@@ -23,15 +23,6 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
     DriveAndDribblerWidget
 )
 
-# All possible states that the diagnostics control mode and handheld device connection status can be in.
-DiagnosticsControlState = Union[
-    Tuple[Literal[ControlMode.DIAGNOSTICS], Literal[HandheldDeviceConnectionStatus.CONNECTED]],
-    Tuple[Literal[ControlMode.DIAGNOSTICS], Literal[HandheldDeviceConnectionStatus.DISCONNECTED]],
-    Tuple[Literal[ControlMode.HANDHELD], Literal[HandheldDeviceConnectionStatus.CONNECTED]]
-]
-
-Bruh = Union[Tuple[int, None]]
-
 
 class DiagnosticsWidget(QWidget):
     """
@@ -63,18 +54,10 @@ class DiagnosticsWidget(QWidget):
 
         self.proto_unix_io = proto_unix_io
 
-        # default start with diagnostics-disconnected
-        self.__state: DiagnosticsControlState = (
-            ControlMode.HANDHELD,
-            HandheldDeviceConnectionStatus.DISCONNECTED
-        )
-
         # default start with diagnostics input
-        # TODO: remove
         self.__control_mode = ControlMode.DIAGNOSTICS
 
         # default start with disconnected controller
-        # TODO: remove
         self.__handheld_device_status = HandheldDeviceConnectionStatus.DISCONNECTED
 
         # initialize widgets
@@ -116,12 +99,6 @@ class DiagnosticsWidget(QWidget):
         vbox_layout.addWidget(self.chicker_widget)
 
         self.setLayout(vbox_layout)
-
-    def bruh(self) -> Bruh:
-        return (
-            ControlMode.HANDHELD,
-            HandheldDeviceConnectionStatus.DISCONNECTED
-        )
 
     def __control_mode_update_handler(self, mode: ControlMode) -> None:
         """

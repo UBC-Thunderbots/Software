@@ -83,6 +83,7 @@ class HandheldDeviceManager(object):
         """
         Reinitialize controller
         """
+        self.__clear_controller()
         self.__initialize_controller()
 
     def __initialize_controller(self) -> None:
@@ -144,8 +145,6 @@ class HandheldDeviceManager(object):
                 motor_control=self.motor_control, power_control=self.power_control
             )
         )
-        # TODO: pre-emptive bugfix: need to reset controls, especially power so that
-        #  the control message isn't set to what is essentially auto-kick/chip
         self.power_control.chicker.chip_distance_meters = 0.0
         self.power_control.chicker.kick_speed_m_per_s = 0.0
 
