@@ -74,7 +74,7 @@ double rateReceivingPosition(const World& world, const Pass& pass,
  * @param pass The pass to rate
  * @param passing_config The passing config used for tuning
  *
- * @return A value in [0,1], with 0 indicating that it's impossible to score off of
+ * @return A value in [min_pass_shoot_score,1], with min_pass_shoot_score indicating that it's impossible to score off of
  *         the pass, and 1 indicating that it is guaranteed to be able to score off of
  *         the pass
  */
@@ -97,15 +97,17 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
                          double enemy_proximity_importance);
 
 /**
- * Rates pass based on if the pass is backwards towards the friendly half,
- * and if so, how long the pass is
- * @param field The field from which we determine the friendly half
+ * Rate the pass based on if it moves the ball up the field or not
+ * Passes moving the ball up the field are rated higher
+ *
  * @param pass The pass to rate
  * @param passing_config The passing config used for tuning
- * @return
+ * @return A value in [0,1] indicating the quality of the pass, where
+ *        1 indicates the pass is ideal and 0 indicates the pass is as
+ *        it passes back toward our friendly half.
  */
-double ratePassBackwardsQuality(const Field& field, const Pass& pass,
-                                TbotsProto::PassingConfig& passing_config);
+double ratePassForwardQuality(const Pass& pass,
+                              const TbotsProto::PassingConfig& passing_config);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted
@@ -194,12 +196,21 @@ double ratePasserPosition(const World& world, const Pass& pass,
                           const Rectangle& dribbling_bounds);
 
 /**
- * Calculate the quality of a given passer position given enemy threads
+ * Calculate the quality of a given passer position given enemy threads TODO (NIMA)
  * @param pass
  * @param enemy_team
  * @return
  */
 double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team);
+
+/**
+ * TODO (NIMA)
+ * @param rating
+ * @param min
+ * @param max
+ * @return
+ */
+double scaleRating(double rating, double min, double max);
 
 /**
  * Sample passes at different points on the field and rate them, similar to ratePass, to

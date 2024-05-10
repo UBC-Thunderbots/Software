@@ -74,8 +74,6 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
     // The percentage of open net the robot would shoot on
     if (best_shot_opt)
     {
-        // TODO (NIMA): Consider visualizing the one touch shot triangle
-        // Vector from the ball to the robot
         Vector robot_to_ball = world.ball().position() - assigned_robot.position();
 
         // The angle the robot will have to deflect the ball to shoot

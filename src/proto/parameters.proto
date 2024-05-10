@@ -152,12 +152,23 @@ message PassingConfig
     required int32 number_of_gradient_descent_steps_per_iter = 9
         [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
     // Cost visualization parameters
-    required CostVisualizationConfig cost_vis_config = 10;
+    required CostVisualizationConfig cost_vis_config = 10; // TODO (NIMA): Have this at the bottom. Does order or numbering matter in rendered order?
     // The max speed at which a pass should be received
     required double max_receive_speed = 11
         [default = 2.0, (bounds).min_double_value = 1.0, (bounds).max_double_value = 4.0];
-    required double backwards_pass_distance = 13
-        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+    // The distance in meters along the x-axis from the passer that we prefer the receiver to be
+    // when receiving a pass. Note that this is a soft limit and the receiver may be further back.
+    required double backwards_pass_distance_meters = 13
+        [default = -1.0, (bounds).min_double_value = -10.0, (bounds).max_double_value = 5.0];
+    // The max distance in meters that the receiver can be from the passer when receiving a pass.
+    required double receiver_ideal_max_distance_meters = 14
+        [default = 7.0, (bounds).min_double_value = 0.1, (bounds).max_double_value = 20.0];
+    // The min distance in meters that the receiver can be from the passer when receiving a pass.
+    required double receiver_ideal_min_distance_meters = 15
+        [default = 2.0, (bounds).min_double_value = 0.1, (bounds).max_double_value = 20.0];
+    // The min score that ratePassShootScore return.
+    required double min_pass_shoot_score = 16
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message GoalieTacticConfig
