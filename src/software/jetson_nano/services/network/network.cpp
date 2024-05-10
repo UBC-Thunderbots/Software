@@ -29,6 +29,14 @@ TbotsProto::PrimitiveSet NetworkService::poll(TbotsProto::RobotStatus& robot_sta
     if (shouldSendNewRobotStatus(robot_status))
     {
         last_breakbeam_state_sent = robot_status.power_status().breakbeam_tripped();
+        /**
+         * TODO: Send return RobotStatus msg to Thunderscope
+         *      1) Traverse deque containing all received primitive_sets
+         *      2) If the last_handled_primitive_set for current robot_status is stored in the deque:
+         *         - delete all earlier sets
+         *         - stop & calculate the processing counter
+         *         - store the new omit_thunderloop_processing_time_sent = time_sent + processing duration
+         */
         sender->sendProto(robot_status);
         network_ticks = (network_ticks + 1) % ROBOT_STATUS_BROADCAST_RATE_HZ;
     }
@@ -61,6 +69,8 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
     std::scoped_lock<std::mutex> lock(primitive_set_mutex);
     const uint64_t seq_num = input.sequence_number();
 
+    logNewPrimitiveSet(input);
+
     primitive_tracker.send(seq_num);
     if (primitive_tracker.isLastValid())
     {
@@ -73,4 +83,27 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
         LOG(WARNING) << "Primitive set loss rate is " << primitive_set_loss_rate * 100
                      << "%";
     }
+}
+
+void NetworkService::logNewPrimitiveSet(TbotsProto::PrimitiveSet input)
+{
+    /* TODO: THIS TRACKS THE RECEIVED PRIMITIVES
+     *  - make sure it is in the lock
+     *  - log the new PRIMITIVE SET PROTO within a deque if it is valid (see primitive_tracker.send())
+     *  - update the timestamp on each primitive set to the current epoch time
+     */
+
+    if (primitive_set_rtt.size() >= 50) {
+        LOG(WARNING) << "Too many primitive sets logged for RTT, halting log process";
+        return
+    }
+
+    if (!primitive_set_rtt.empty()
+            && input.sequence_number() <= primitive_set_rtt.back().sequence_number())
+    {
+        // If the proto is older than the last received proto, then ignore it
+        return;
+    }
+
+    primitive_set_rtt.emplace_back(input);
 }

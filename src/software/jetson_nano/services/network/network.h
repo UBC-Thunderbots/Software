@@ -51,6 +51,13 @@ class NetworkService
      */
     bool shouldSendNewRobotStatus(const TbotsProto::RobotStatus& robot_status) const;
 
+    /**
+     * Tracks the given primitive set for calculating RTT if valid
+     *
+     * @param input A potential primitive set to be logged
+     */
+    void logNewPrimitiveSet(TbotsProto::PrimitiveSet input);
+
     // Constants
     static constexpr float PROTO_LOSS_WARNING_THRESHOLD          = 0.1f;
     static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
@@ -79,4 +86,6 @@ class NetworkService
 
     // track last breakbeam state for sending RobotStatus outside of specified rate
     bool last_breakbeam_state_sent = false;
+
+    std::deque<TbotsProto::PrimitiveSet> primitive_set_rtt;
 };
