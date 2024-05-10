@@ -61,7 +61,7 @@ Pass Pass::fromDestReceiveSpeed(const Point& ball_position, const Point& pass_de
                                 const TbotsProto::PassingConfig& passing_config)
 {
     return Pass::fromDestReceiveSpeed(
-        ball_position, pass_destination, passing_config.max_receive_speed(),
+        ball_position, pass_destination, passing_config.max_receive_speed_m_per_s(),
         passing_config.min_pass_speed_m_per_s(), passing_config.max_pass_speed_m_per_s());
 }
 

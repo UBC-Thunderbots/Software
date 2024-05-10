@@ -8,10 +8,6 @@
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/world/world.h"
 
-// number of points around each receiver to sample for potential passes
-static const int NUM_POINTS_TO_SAMPLE_PER_ROBOT = 5;
-// the standard deviation (in meters) of the normal sampling distribution
-static const double SAMPLING_SD_METERS = 0.2;
 // the random seed used to initialize the random number generator
 static const int SEED = 14;
 

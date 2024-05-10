@@ -74,9 +74,9 @@ double rateReceivingPosition(const World& world, const Pass& pass,
  * @param pass The pass to rate
  * @param passing_config The passing config used for tuning
  *
- * @return A value in [min_pass_shoot_score,1], with min_pass_shoot_score indicating that it's impossible to score off of
- *         the pass, and 1 indicating that it is guaranteed to be able to score off of
- *         the pass
+ * @return A value in [min_pass_shoot_score,1], with min_pass_shoot_score indicating that
+ * it's impossible to score off of the pass, and 1 indicating that it is guaranteed to be
+ * able to score off of the pass
  */
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
                           TbotsProto::PassingConfig passing_config);

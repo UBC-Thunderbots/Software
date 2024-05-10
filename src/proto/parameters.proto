@@ -106,6 +106,38 @@ message CornerKickPlayConfig
 
 message PassingConfig
 {
+    // Note that the order the fields are defined here is the order that
+    // they are displayed in Thunderscope's Parameters widget, and the order
+    // is independent of the field's numbering.
+
+    /*****  Pass generation parameters *****/
+    // The number of passes to sample per robot.
+    required uint32 pass_gen_num_samples_per_robot = 17
+        [default = 5, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
+    // The standard deviation (in meters) of the normal sampling distribution
+    // used to generate passes around robots.
+    required double pass_gen_rand_sample_std_dev_meters = 18 [
+        default                   = 0.2,
+        (bounds).min_double_value = 0.01,
+        (bounds).max_double_value = 3.0
+    ];
+    // The minimum pass speed (in m/s)
+    required double min_pass_speed_m_per_s = 6
+        [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+    // The maximum pass speed (in m/s)
+    required double max_pass_speed_m_per_s = 7 [
+        default                   = 6.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
+    // The max speed at which a pass should be received
+    required double max_receive_speed_m_per_s = 11
+        [default = 2.0, (bounds).min_double_value = 1.0, (bounds).max_double_value = 4.0];
+    // The number of steps of gradient descent to perform in each iteration
+    required int32 number_of_gradient_descent_steps_per_iter = 9
+        [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
+
+    /*****  Cost function parameters *****/
     // The offset from the sides of the field to place the rectangular
     // sigmoid we use to determine what areas to pass to
     required double static_field_position_quality_x_offset = 1
@@ -125,7 +157,7 @@ message PassingConfig
         default                   = 0.5,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
-    ];
+    ];  // TODO (NIMA): ignored
     // The maximum angle that we have to rotate after receiving a pass to
     // shoot that we think would likely result in a goal. Note that we may
     // try to take shots that require us to rotate more then this, it's more
@@ -134,41 +166,45 @@ message PassingConfig
         default                   = 60.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 180.0
-    ];
-    // The minimum pass speed (in m/s)
-    required double min_pass_speed_m_per_s = 6
-        [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-    // The maximum pass speed (in m/s)
-    required double max_pass_speed_m_per_s = 7 [
-        default                   = 6.0,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 10.0
-    ];
+    ];  // TODO (NIMA): ignored
     // How long we think the enemy will take to recognize we're passing and start
     // moving to intercept
-    required double enemy_reaction_time = 8
-        [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
-    // The number of steps of gradient descent to perform in each iteration
-    required int32 number_of_gradient_descent_steps_per_iter = 9
-        [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
-    // Cost visualization parameters
-    required CostVisualizationConfig cost_vis_config = 10; // TODO (NIMA): Have this at the bottom. Does order or numbering matter in rendered order?
-    // The max speed at which a pass should be received
-    required double max_receive_speed = 11
-        [default = 2.0, (bounds).min_double_value = 1.0, (bounds).max_double_value = 4.0];
-    // The distance in meters along the x-axis from the passer that we prefer the receiver to be
-    // when receiving a pass. Note that this is a soft limit and the receiver may be further back.
-    required double backwards_pass_distance_meters = 13
-        [default = -1.0, (bounds).min_double_value = -10.0, (bounds).max_double_value = 5.0];
-    // The max distance in meters that the receiver can be from the passer when receiving a pass.
-    required double receiver_ideal_max_distance_meters = 14
-        [default = 7.0, (bounds).min_double_value = 0.1, (bounds).max_double_value = 20.0];
-    // The min distance in meters that the receiver can be from the passer when receiving a pass.
-    required double receiver_ideal_min_distance_meters = 15
-        [default = 2.0, (bounds).min_double_value = 0.1, (bounds).max_double_value = 20.0];
+    required double enemy_reaction_time = 8 [
+        default                   = 0.2,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 3.0
+    ];  // TODO (NIMA): ignored
+    // The distance in meters along the x-axis from the passer that we prefer the receiver
+    // to be when receiving a pass. Note that this is a soft limit and the receiver may be
+    // further back.
+    required double backwards_pass_distance_meters = 13 [
+        default                   = -1.0,
+        (bounds).min_double_value = -10.0,
+        (bounds).max_double_value = 5.0
+    ];
+    // The max distance in meters that the receiver can be from the passer when receiving
+    // a pass.
+    required double receiver_ideal_max_distance_meters = 14 [
+        default                   = 7.0,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 20.0
+    ];
+    // The min distance in meters that the receiver can be from the passer when receiving
+    // a pass.
+    required double receiver_ideal_min_distance_meters = 15 [
+        default                   = 2.0,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 20.0
+    ];
     // The min score that ratePassShootScore return.
     required double min_pass_shoot_score = 16
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    /*****  Visualization parameters *****/
+    // Cost function visualization parameters
+    required CostVisualizationConfig cost_vis_config =
+        10;  // TODO (NIMA): Have this at the bottom. Does order or numbering matter in
+             // rendered order?
 }
 
 message GoalieTacticConfig

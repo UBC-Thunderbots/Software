@@ -79,12 +79,15 @@ std::vector<Point> SamplingPassGenerator::samplePasses(const World& world)
         all_sampled_passes.push_back(robot_position);
 
         // get random coordinates based on the normal distribution around the robot
+        const double sampling_std_dev =
+            passing_config_.pass_gen_rand_sample_std_dev_meters();
         std::normal_distribution x_normal_distribution{robot_position.x(),
-                                                       SAMPLING_SD_METERS};
+                                                       sampling_std_dev};
         std::normal_distribution y_normal_distribution{robot_position.y(),
-                                                       SAMPLING_SD_METERS};
+                                                       sampling_std_dev};
 
-        for (int i = 0; i < NUM_POINTS_TO_SAMPLE_PER_ROBOT; i++)
+        for (unsigned int i = 0; i < passing_config_.pass_gen_num_samples_per_robot();
+             i++)
         {
             auto point = Point(x_normal_distribution(random_num_gen_),
                                y_normal_distribution(random_num_gen_));
