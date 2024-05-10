@@ -425,7 +425,7 @@ static bool isPowerStable()
     if (!dmesg_log_file.is_open())
     {
         LOG(WARNING) << "Cannot dmesg log file. Do you have permission?";
-        return false;
+        return true;
     }
 
     std::string line;
@@ -433,11 +433,11 @@ static bool isPowerStable()
     {
         if (line.find("soctherm: OC ALARM 0x00000001") != std::string::npos)
         {
-            return true;
+            return false;
         }
     }
 
-    return false;
+    return true;
 }
 
 void Thunderloop::updateErrorCodes()
