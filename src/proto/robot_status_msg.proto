@@ -78,6 +78,7 @@ enum ErrorCode
     LOW_BATTERY        = 2;
     HIGH_BOARD_TEMP    = 3;
     DRIBBLER_MOTOR_HOT = 4;
+    UNSTABLE_POWER_SUPPLY = 5;
 }
 
 enum MotorFault
