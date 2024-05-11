@@ -14,7 +14,10 @@ from software.simulated_tests.friendly_has_ball_possession import (
     FriendlyEventuallyHasBallPossession,
 )
 from software.simulated_tests.ball_moves_in_direction import BallMovesForwardInRegions
-from software.simulated_tests.ball_enters_region import BallEventuallyEntersRegion
+from software.simulated_tests.ball_enters_region import (
+    BallEventuallyExitsRegion,
+    BallEventuallyEntersRegion,
+)
 from software import py_constants
 
 
@@ -256,7 +259,12 @@ def test_passing_receive_speed(
 ):
     # Eventually Validation
     eventually_validation_sequence_set = [
-        [FriendlyEventuallyHasBallPossession(robot_id=1)]
+        [
+            BallEventuallyExitsRegion(
+                regions=[tbots_cpp.Circle(ball_initial_position, 0.4)]
+            ),
+            FriendlyEventuallyHasBallPossession(tolerance=0.05),
+        ]
     ]
 
     # Validate that the ball is always received by the other robot
