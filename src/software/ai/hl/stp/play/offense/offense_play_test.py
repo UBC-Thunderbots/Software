@@ -18,7 +18,7 @@ def test_offense_play(simulated_test_runner):
         ball_initial_pos = start_point
         # placement point must be Vector2 to work with game controller
         tbots_cpp.Point(-3, -2)
-        field = tbots_cpp.Field.createSSLDivisionBField()
+        tbots_cpp.Field.createSSLDivisionBField()
 
         # Setup Bots
         blue_bots = [
@@ -35,8 +35,12 @@ def test_offense_play(simulated_test_runner):
             tbots_cpp.Point(1, 2.5),
             tbots_cpp.Point(1, -2.5),
             tbots_cpp.Field.createSSLDivisionBField().enemyGoalCenter(),
-            tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXNegYCorner(),
-            tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea().negXPosYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXNegYCorner(),
+            tbots_cpp.Field.createSSLDivisionBField()
+            .enemyDefenseArea()
+            .negXPosYCorner(),
         ]
 
         # Game Controller Setup
@@ -55,7 +59,9 @@ def test_offense_play(simulated_test_runner):
         yellow_play.name = PlayName.HaltPlay
 
         simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
-        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(Play, yellow_play)
+        simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+            Play, yellow_play
+        )
 
         # Create world state
         simulated_test_runner.simulator_proto_unix_io.send_proto(
