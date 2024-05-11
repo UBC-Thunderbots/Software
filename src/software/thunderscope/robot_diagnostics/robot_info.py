@@ -128,6 +128,7 @@ class RobotInfo(QWidget):
         )
 
         self.battery_layout.addWidget(self.primitive_loss_rate_label)
+        self.battery_layout.addWidget(self.primitive_rtt_label)
 
         self.battery_layout.addWidget(self.battery_progress_bar)
         self.battery_layout.addWidget(self.battery_label)
@@ -349,7 +350,7 @@ class RobotInfo(QWidget):
         )
 
         self.primitive_rtt_label.set_float_val(
-            int((time.time() - omit_thunderloop_processing_time_sent) * 1000)
+            int((time.time() - omit_thunderloop_processing_time_sent.epoch_timestamp_seconds) * MILLISECONDS_PER_SECOND)
         )
 
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)

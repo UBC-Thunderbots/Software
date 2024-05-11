@@ -1,3 +1,5 @@
+import time
+
 import pyqtgraph as pg
 from google.protobuf import text_format
 from typing import List
@@ -75,6 +77,7 @@ class RobotViewComponent(QWidget):
 
         :param robot_status: the new message data to update the widget with
         """
+
         self.robot_info.update(robot_status)
         if self.robot_status:
             self.robot_status.update(robot_status)
