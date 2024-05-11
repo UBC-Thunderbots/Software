@@ -67,6 +67,13 @@ class NetworkService
      */
     void updatePrimitiveSetLog(TbotsProto::RobotStatus& robot_status);
 
+    /**
+     * Getter for the current epoch time in seconds as a double
+     *
+     * @return current epoch time in seconds as a double
+     */
+    double getCurrentEpochTimeInSeconds();
+
     // Constants
     static constexpr float PROTO_LOSS_WARNING_THRESHOLD          = 0.1f;
     static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
@@ -96,5 +103,6 @@ class NetworkService
     // track last breakbeam state for sending RobotStatus outside of specified rate
     bool last_breakbeam_state_sent = false;
 
-    std::deque<TbotsProto::PrimitiveSet> primitive_set_rtt;
+    // Primitive Set Sequence Number and Time received by Thunderloop
+    std::deque<std::pair<uint64_t, double>> primitive_set_pairs_rtt;
 };

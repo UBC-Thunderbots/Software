@@ -18,5 +18,4 @@ message PrimitiveSet
 
     uint64 sequence_number = 4;
 
-    Timestamp time_received_thunderscope = 5;
 }
