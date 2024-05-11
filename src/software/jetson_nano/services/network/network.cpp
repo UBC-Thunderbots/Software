@@ -29,14 +29,7 @@ TbotsProto::PrimitiveSet NetworkService::poll(TbotsProto::RobotStatus& robot_sta
     if (shouldSendNewRobotStatus(robot_status))
     {
         last_breakbeam_state_sent = robot_status.power_status().breakbeam_tripped();
-        /**
-         * TODO: Send return RobotStatus msg to Thunderscope
-         *      1) Traverse deque containing all received primitive_sets
-         *      2) If the last_handled_primitive_set for current robot_status is stored in the deque:
-         *         - delete all earlier sets
-         *         - stop & calculate the processing counter
-         *         - store the new omit_thunderloop_processing_time_sent = time_sent + processing duration
-         */
+        updatePrimitiveSetLog(robot_status);
         sender->sendProto(robot_status);
         network_ticks = (network_ticks + 1) % ROBOT_STATUS_BROADCAST_RATE_HZ;
     }
@@ -93,9 +86,10 @@ void NetworkService::logNewPrimitiveSet(TbotsProto::PrimitiveSet input)
      *  - update the timestamp on each primitive set to the current epoch time
      */
 
-    if (primitive_set_rtt.size() >= 50) {
-        LOG(WARNING) << "Too many primitive sets logged for RTT, halting log process";
-        return
+    if (primitive_set_rtt.size() >= 50)
+    {
+        LOG(WARNING) << "Too many primitive sets logged for round-trip calculations, halting log process";
+        return;
     }
 
     if (!primitive_set_rtt.empty()
@@ -104,6 +98,37 @@ void NetworkService::logNewPrimitiveSet(TbotsProto::PrimitiveSet input)
         // If the proto is older than the last received proto, then ignore it
         return;
     }
-
+    input.mutable_time_received_thunderscope()->set_epoch_timestamp_seconds(
+            std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count());
     primitive_set_rtt.emplace_back(input);
+}
+
+void NetworkService::updatePrimitiveSetLog(TbotsProto::RobotStatus &robot_status)
+{
+    /**
+     * TODO: Send return RobotStatus msg to Thunderscope
+     *      1) Traverse deque containing all received primitive_sets
+     *      2) If the last_handled_primitive_set for current robot_status is stored in the deque:
+     *         - delete all earlier sets
+     *         - stop & calculate the processing counter
+     *         - store the new omit_thunderloop_processing_time_sent = time_sent + processing duration
+     */
+    for (int i = 0; i < primitive_set_rtt.size(); i++)
+    {
+        if (primitive_set_rtt[i].sequence_number() == robot_status.last_handled_primitive_set())
+        {
+            double received_epoch_time_seconds =
+                    primitive_set_rtt[i].time_received_thunderscope().epoch_timestamp_seconds();
+            double current_epoch_time_seconds =
+                    std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+            robot_status.mutable_omit_thunderloop_processing_time_sent()->set_epoch_timestamp_seconds(
+                    Timestamp::fromTimestampProto(robot_status.time_sent()).toSeconds()
+                    + current_epoch_time_seconds - received_epoch_time_seconds
+                    );
+            for (int x = 0; x <= i; x++) {
+                primitive_set_rtt.pop_front();
+            }
+        }
+    }
 }

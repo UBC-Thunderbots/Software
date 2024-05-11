@@ -11,6 +11,8 @@
 #include "software/networking/radio/threaded_proto_radio_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
+#include "software/time/duration.h"
+#include "software/time/timestamp.h"
 
 class NetworkService
 {
@@ -52,11 +54,18 @@ class NetworkService
     bool shouldSendNewRobotStatus(const TbotsProto::RobotStatus& robot_status) const;
 
     /**
-     * Tracks the given primitive set for calculating RTT if valid
+     * Tracks the given primitive set for calculating round-trip time if valid
      *
      * @param input A potential primitive set to be logged
      */
     void logNewPrimitiveSet(TbotsProto::PrimitiveSet input);
+
+    /**
+     * Updates the cached primitive sets for Thunderscope to calculate round-trip time
+     *
+     * @param robot_status The robot status to compare to within the cache
+     */
+    void updatePrimitiveSetLog(TbotsProto::RobotStatus& robot_status);
 
     // Constants
     static constexpr float PROTO_LOSS_WARNING_THRESHOLD          = 0.1f;

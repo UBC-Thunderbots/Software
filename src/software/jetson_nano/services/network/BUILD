@@ -12,6 +12,8 @@ cc_library(
         "//software/networking/radio:threaded_proto_radio_listener",
         "//software/networking/udp:threaded_proto_udp_listener",
         "//software/networking/udp:threaded_proto_udp_sender",
+        "//software/time:duration",
+        "//software/time:timestamp",
         "@boost//:asio",
     ],
 )
