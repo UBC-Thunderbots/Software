@@ -138,7 +138,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                    world_ptr->field().friendlyGoalpostNeg(),
                                    world_ptr->field().centerPoint(),
                                    ROBOT_MAX_RADIUS_METERS),
-                Angle::zero(), 0, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                Angle::zero(), 0, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
         result[0].emplace_back(move_tactics.at(defense_position_index));
 
         // yield the Tactics this Play wants to run, in order of priority

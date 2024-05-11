@@ -111,6 +111,36 @@ Point GoalieFSM::findGoodChipTarget(
     return chip_target;
 }
 
+bool GoalieFSM::shouldEvacuateCrease(const Update &event)
+{
+    Rectangle friendly_defense_area =
+        event.common.world_ptr->field().friendlyDefenseArea();
+    Ball ball = event.common.world_ptr->ball();
+
+    bool ball_in_dead_zone = !contains(friendly_defense_area, ball.position()) &&
+                             ballInInflatedDefenseArea(event);
+
+    // goalie should only evacuate crease if there are no enemy robots nearby
+    double safe_distance_multiplier = goalie_tactic_config.safe_distance_multiplier();
+    std::optional<Robot> nearest_enemy_robot =
+        event.common.world_ptr->enemyTeam().getNearestRobot(ball.position());
+    bool safe_to_evacuate = true;
+    if (nearest_enemy_robot.has_value())
+    {
+        double nearest_enemy_distance_to_ball =
+            distance(nearest_enemy_robot.value().position(), ball.position());
+        double goalie_distance_to_ball =
+            distance(event.common.robot.position(), ball.position());
+        safe_to_evacuate = nearest_enemy_distance_to_ball * safe_distance_multiplier >
+                           goalie_distance_to_ball;
+    }
+
+    double ball_velocity_threshold = goalie_tactic_config.ball_speed_panic();
+    bool ball_is_stagnant          = ball.velocity().length() < ball_velocity_threshold;
+
+    return ball_in_dead_zone && ball_is_stagnant && safe_to_evacuate;
+}
+
 bool GoalieFSM::shouldPanic(const Update &event)
 {
     double ball_speed_panic = goalie_tactic_config.ball_speed_panic();
@@ -154,7 +184,8 @@ void GoalieFSM::panic(const Update &event)
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
 }
 
@@ -194,14 +225,18 @@ void GoalieFSM::positionToBlock(const Update &event)
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
 }
 
-bool GoalieFSM::ballInDefenseArea(const Update &event)
+bool GoalieFSM::ballInInflatedDefenseArea(const Update &event)
 {
-    return contains(event.common.world_ptr->field().friendlyDefenseArea(),
-                    event.common.world_ptr->ball().position());
+    Rectangle inflated_defense_area =
+        event.common.world_ptr->field().friendlyDefenseArea().expand(
+            robot_radius_expansion_amount);
+
+    return contains(inflated_defense_area, event.common.world_ptr->ball().position());
 }
 
 bool GoalieFSM::shouldMoveToGoalLine(const Update &event)
@@ -213,7 +248,34 @@ void GoalieFSM::moveToGoalLine(const Update &event)
 {
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, event.common.world_ptr->field().friendlyGoalCenter(),
-        Angle::zero(), max_allowed_speed_mode, TbotsProto::DribblerMode::OFF,
+        Angle::zero(), max_allowed_speed_mode,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}));
+}
+
+bool GoalieFSM::retrieveDone(const Update &event)
+{
+    Point ball_position = event.common.world_ptr->ball().position();
+    Point retrieve_destination =
+        event.common.world_ptr->field().friendlyDefenseArea().centre();
+    return comparePoints(ball_position, retrieve_destination, BALL_RETRIEVED_THRESHOLD);
+}
+
+void GoalieFSM::retrieveFromDeadZone(
+    const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+{
+    Point ball_position = event.common.world_ptr->ball().position();
+    Vector final_dribble_orientation =
+        event.common.world_ptr->field().enemyGoalCenter() - ball_position;
+
+    DribbleFSM::ControlParams control_params{
+        .dribble_destination =
+            event.common.world_ptr->field().friendlyDefenseArea().centre(),
+        .final_dribble_orientation = final_dribble_orientation.orientation(),
+        .allow_excessive_dribbling = false,
+    };
+
+    // update the dribble fsm
+    processEvent(DribbleFSM::Update(control_params, event.common));
 }
