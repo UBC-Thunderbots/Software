@@ -19,7 +19,7 @@ message RobotStatus
     Timestamp time_sent                               = 10;
     uint64 last_handled_primitive_set                 = 11;
     PrimitiveExecutorStatus primitive_executor_status = 12;
-    Timestamp omit_thunderloop_processing_time_sent   = 13; //this is the time that the primitive set is sent without thunderloop computation time
+    Timestamp omit_thunderloop_processing_time_sent   = 13;
 }
 
 message PrimitiveExecutorStatus

@@ -84,6 +84,8 @@ class EstopMode(IntEnum):
 # the maximum packet / world loss percent indicated by UI
 MAX_ACCEPTABLE_PACKET_LOSS_PERCENT = 30
 
+# maximum acceptable round trip time value in milliseconds
+MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME = 100
 
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2

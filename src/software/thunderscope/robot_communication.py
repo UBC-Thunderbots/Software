@@ -339,7 +339,7 @@ class RobotCommunication(object):
     #     this means taking the diff of the current time and the omit_thunderloop_processing_time_sent
     #   - Must update the visualized widget component
     def __receive_robot_status(self, robot_status) -> None:
-        print(time.time() - robot_status.time_sent)
+        print(int((time.time() - robot_status.omit_thunderloop_processing_time_sent) * 1000))
         self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
     def __exit__(self, type, value, traceback) -> None:

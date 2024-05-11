@@ -121,6 +121,12 @@ class RobotInfo(QWidget):
         self.primitive_loss_rate_label = common_widgets.ColorQLabel(
             max_val=MAX_ACCEPTABLE_PACKET_LOSS_PERCENT
         )
+
+        # Primitive round-trip time label
+        self.primitive_rtt_label = common_widgets.ColorQLabel(
+            max_val=MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME
+        )
+
         self.battery_layout.addWidget(self.primitive_loss_rate_label)
 
         self.battery_layout.addWidget(self.battery_progress_bar)
@@ -334,11 +340,16 @@ class RobotInfo(QWidget):
         power_status = robot_status.power_status
         network_status = robot_status.network_status
         primitive_executor_status = robot_status.primitive_executor_status
+        omit_thunderloop_processing_time_sent = robot_status.omit_thunderloop_processing_time_sent
 
         self.__update_stop_primitive(primitive_executor_status.running_primitive)
 
         self.primitive_loss_rate_label.set_float_val(
             network_status.primitive_packet_loss_percentage
+        )
+
+        self.primitive_rtt_label.set_float_val(
+            int((time.time() - omit_thunderloop_processing_time_sent) * 1000)
         )
 
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)
