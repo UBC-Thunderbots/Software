@@ -13,6 +13,12 @@ class MinNumberOfRobotsEntersRegion(Validation):
     """Checks if a certain number of Robots enters a specific set of regions."""
 
     def __init__(self, regions, req_robot_cnt):
+        """
+       Initializes the validation class with a set of regions and required count of robots
+
+       :param regions: the regions that will be checked for robot count
+       :param req_robot_cnt: the minimum number of unique robots that must be in the given regions
+       """
         self.regions = regions
         self.req_robot_cnt = req_robot_cnt
         # map to keep track of robot positions
@@ -63,7 +69,14 @@ class MinNumberOfRobotsEntersRegion(Validation):
 
 
 class RobotEntersRegion(MinNumberOfRobotsEntersRegion):
+
+    """Checks if at least one robot is contained within the given regions"""
+
     def __init__(self, regions):
+        """Initializes the validation class with a set of regions
+
+        :param regions: the regions that will be checked to contain at least one robot
+        """
         super(RobotEntersRegion, self).__init__(regions, 1)
 
 
