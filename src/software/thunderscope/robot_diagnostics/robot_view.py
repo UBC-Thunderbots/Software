@@ -134,6 +134,10 @@ class RobotView(QScrollArea):
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
 
+        # proto = RobotStatus()
+        # proto.robot_id = 3
+        # proto.omit_thunderloop_processing_time_sent.epoch_timestamp_seconds = time.time() - 0.005
+
         while robot_status is not None:
             self.robot_view_widgets[robot_status.robot_id].update(robot_status)
             robot_status = self.robot_status_buffer.get(
