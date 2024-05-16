@@ -300,7 +300,7 @@ class RobotCommunication(object):
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
-            lambda data: self.__receive_robot_status(data),
+            lambda data: self.__forward_to_proto_unix_io(RobotStatus, data),
             True,
         )
 
@@ -338,9 +338,9 @@ class RobotCommunication(object):
     #   - Must retrieve the time_sent field of the proto,
     #     this means taking the diff of the current time and the omit_thunderloop_processing_time_sent
     #   - Must update the visualized widget component
-    def __receive_robot_status(self, robot_status) -> None:
-        print(int((time.time() - robot_status.omit_thunderloop_processing_time_sent) * 1000))
-        self.__forward_to_proto_unix_io(RobotStatus, robot_status)
+    # def __receive_robot_status(self, type: Type[Message], data: Message) -> None:
+    #     print(int((time.time() - data.omit_thunderloop_processing_time_sent) * 1000))
+    #     self.__forward_to_proto_unix_io(type, data)
 
     def __exit__(self, type, value, traceback) -> None:
         """Exit RobotCommunication context manager
