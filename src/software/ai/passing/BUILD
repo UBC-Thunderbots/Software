@@ -11,6 +11,7 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:time_to_travel",
+        "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/logger",
         "//software/math:math_functions",
         "//software/util/make_enum",
@@ -34,6 +35,7 @@ cc_library(
     srcs = ["pass.cpp"],
     hdrs = ["pass.h"],
     deps = [
+        "//shared:constants",
         "//software/time:timestamp",
         "//software/world:field",
     ],
@@ -93,6 +95,24 @@ cc_test(
 )
 
 cc_library(
+    name = "receiver_position_generator",
+    hdrs = [
+        "receiver_position_generator.hpp",
+    ],
+    deps = [
+        ":field_pitch_division",
+        ":pass",
+        ":pass_with_rating",
+        ":pass_evaluation",
+        "//software/optimization:gradient_descent",
+        "//software/geom:point",
+        "//software/geom:rectangle",
+        "//software/util/make_enum",
+        "//software/world",
+    ],
+)
+
+cc_library(
     name = "pass_evaluation",
     hdrs = [
         "pass_evaluation.hpp",
@@ -121,11 +141,47 @@ cc_test(
 )
 
 cc_library(
+    name = "base_pass_generator",
+    hdrs = [
+        "base_pass_generator.h",
+    ],
+    deps = [
+        "//software/world",
+    ],
+)
+
+cc_library(
+    name = "sampling_pass_generator",
+    srcs = [
+        "sampling_pass_generator.cpp",
+    ],
+    hdrs = ["sampling_pass_generator.h"],
+    deps = [
+        ":base_pass_generator",
+        ":cost_functions",
+        ":pass_with_rating",
+        "//software/world",
+    ],
+)
+
+cc_test(
+    name = "sampling_pass_generator_test",
+    srcs = ["sampling_pass_generator_test.cpp"],
+    deps = [
+        ":sampling_pass_generator",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/math:math_functions",
+        "//software/test_util",
+    ],
+)
+
+cc_library(
     name = "pass_generator",
     hdrs = [
         "pass_generator.hpp",
     ],
     deps = [
+        ":base_pass_generator",
         ":cost_functions",
         ":eighteen_zone_pitch_division",
         ":pass",

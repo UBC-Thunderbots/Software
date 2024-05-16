@@ -3,6 +3,7 @@ from typing import Callable, NoReturn
 from proto.import_all_protos import *
 from proto.message_translation import tbots_protobuf
 import software.python_bindings as tbots_cpp
+from software.py_constants import SECONDS_PER_MILLISECOND
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
@@ -101,7 +102,7 @@ def realtime_sim_ticker(
     :param sim_proto_unix_io:   ProtoUnixIO for the Simulation
     :param tscope:              Thunderscope instance that is tied to the simulation ticking
     """
-    simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
+    simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
     sim_proto_unix_io.register_observer(SimulationState, simulation_state_buffer)
 
     # Tick simulation if Thundersocpe is open
@@ -112,7 +113,10 @@ def realtime_sim_ticker(
             tick = SimulatorTick(milliseconds=tick_rate_ms)
             sim_proto_unix_io.send_proto(SimulatorTick, tick)
 
-        time.sleep(tick_rate_ms / 1000)
+        time.sleep(
+            (tick_rate_ms * SECONDS_PER_MILLISECOND)
+            / simulation_state_message.simulation_speed
+        )
 
 
 def sync_simulation(sim_proto_unix_io: ProtoUnixIO, num_robots: int) -> None:

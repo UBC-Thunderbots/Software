@@ -41,6 +41,7 @@ message AiConfig
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
     required AiParameterConfig ai_parameter_config                          = 13;
     required ShotConfig shot_config                                         = 14;
+    required ReceiverTacticConfig receiver_tactic_config                    = 15;
 }
 
 message AiControlConfig
@@ -69,18 +70,72 @@ message AttackerTacticConfig
     // The radius of the circle around a friendly robot around which
     // we think an enemy is about to steal the ball
     required double enemy_about_to_steal_ball_radius = 1
-        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 4.0];
+        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 4.0];
 
     // The minimum open angle to the goal that we require before taking a shot
     required double min_open_angle_for_shot_deg = 2 [
         default                   = 6.0,
-        (bounds).min_double_value = 0.0,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 90.0
+    ];
+}
+
+message ReceiverTacticConfig
+{
+    // Whether one touch kicks should be disabled or not
+    required bool disable_one_touch_kick = 1 [default = false];
+
+    // The minimum open angle to the goal that we require before taking a one touch kick
+    required double min_open_angle_for_one_touch_deg = 2 [
+        default                   = 6.0,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 90.0
+    ];
+
+    // TODO (#2570): try to make it as big as possible when tuning
+    // The maximum deflection angle that we will attempt a one-touch kick towards the
+    // enemy goal with
+    required double max_deflection_for_one_touch_deg = 3 [
+        default                   = 45.0,
+        (bounds).min_double_value = 10.0,
         (bounds).max_double_value = 90.0
     ];
 }
 
 message PassingConfig
 {
+    // Note that the order the fields are defined here is the order that
+    // they are displayed in Thunderscope's Parameters widget, and the order
+    // is independent of the field's numbering.
+
+    /*****  Pass generation parameters *****/
+    // The number of passes to sample per robot.
+    required uint32 pass_gen_num_samples_per_robot = 17
+        [default = 5, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
+    // The standard deviation (in meters) of the normal sampling distribution
+    // used to generate passes around robots.
+    required double pass_gen_rand_sample_std_dev_meters = 18 [
+        default                   = 0.2,
+        (bounds).min_double_value = 0.01,
+        (bounds).max_double_value = 3.0
+    ];
+    // The minimum pass speed (in m/s)
+    required double min_pass_speed_m_per_s = 6
+        [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+    // The maximum pass speed (in m/s)
+    required double max_pass_speed_m_per_s = 7 [
+        default                   = 6.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
+    // The max speed at which a pass should be received
+    required double max_receive_speed_m_per_s = 11
+        [default = 2.0, (bounds).min_double_value = 1.0, (bounds).max_double_value = 4.0];
+    // The number of steps of gradient descent to perform in each iteration
+    required int32 number_of_gradient_descent_steps_per_iter = 9
+        [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
+
+    /*****  Cost function parameters *****/
     // The offset from the sides of the field to place the rectangular
     // sigmoid we use to determine what areas to pass to
     required double static_field_position_quality_x_offset = 1
@@ -100,7 +155,7 @@ message PassingConfig
         default                   = 0.5,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
-    ];
+    ];  // TODO (NIMA): ignored
     // The maximum angle that we have to rotate after receiving a pass to
     // shoot that we think would likely result in a goal. Note that we may
     // try to take shots that require us to rotate more then this, it's more
@@ -109,33 +164,43 @@ message PassingConfig
         default                   = 60.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 180.0
-    ];
-    // The minimum pass speed (in m/s)
-    required double min_pass_speed_m_per_s = 6
-        [default = 4.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-    // The maximum pass speed (in m/s)
-    required double max_pass_speed_m_per_s = 7 [
-        default                   = 6.0,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 10.0
-    ];
+    ];  // TODO (NIMA): ignored
     // How long we think the enemy will take to recognize we're passing and start
     // moving to intercept
-    required double enemy_reaction_time = 8
-        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
-    // The number of steps of gradient descent to perform in each iteration
-    required int32 number_of_gradient_descent_steps_per_iter = 9
-        [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
-    // Cost visualization parameters
-    required CostVisualizationConfig cost_vis_config = 10;
-    // How long to cache a pass before we find another pass
-    required double pass_recalculation_commit_time_s = 11 [
-        default                   = 1.0,
+    required double enemy_reaction_time = 8 [
+        default                   = 0.2,
         (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 10.0
+        (bounds).max_double_value = 3.0
+    ];  // TODO (NIMA): ignored
+    // The distance in meters along the x-axis from the passer that we prefer the receiver
+    // to be when receiving a pass. Note that this is a soft limit and the receiver may be
+    // further back.
+    required double backwards_pass_distance_meters = 13 [
+        default                   = -1.0,
+        (bounds).min_double_value = -10.0,
+        (bounds).max_double_value = 5.0
     ];
+    // The max distance in meters that the receiver can be from the passer when receiving
+    // a pass.
+    required double receiver_ideal_max_distance_meters = 14 [
+        default                   = 7.0,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 20.0
+    ];
+    // The min distance in meters that the receiver can be from the passer when receiving
+    // a pass.
+    required double receiver_ideal_min_distance_meters = 15 [
+        default                   = 2.0,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 20.0
+    ];
+    // The min score that ratePassShootScore return.
+    required double min_pass_shoot_score = 16
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    /*****  PassSkill parameters *****/
     // The absolute minimum pass quality we're willing to attempt
-    required double abs_min_pass_score = 12 [
+    required double abs_min_pass_score = 20 [
         default                   = 0.05,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 1.0
@@ -143,12 +208,12 @@ message PassingConfig
     // When we're choosing a pass, we start by looking for a pass with a perfect score
     // of 1, and then over time lower the score we're will to accept. This parameter
     // how fast we ramp down to abs_min_pass_score. This is in seconds.
-    required double pass_score_ramp_down_duration = 13
+    required double pass_score_ramp_down_duration = 21
         [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-    // Minimum distance in metres between the passing and receiving points for the
-    // pass to be considered valid
-    required double min_pass_distance = 14
-        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+
+    /*****  Visualization parameters *****/
+    // Cost function visualization parameters
+    required CostVisualizationConfig cost_vis_config = 10;
 }
 
 message GoalieTacticConfig
@@ -178,6 +243,10 @@ message GoalieTacticConfig
     // Minimum distance in meters that a chip target must be away from the front
     // defense area crease
     required double min_chip_distance_from_crease_meters = 8
+        [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Distance threshold multiplier used for calculating whether or not an enemy robot
+    // is a safe distance away
+    required double safe_distance_multiplier = 9
         [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
@@ -382,6 +451,8 @@ message CostVisualizationConfig
     required bool pass_friendly_capability = 4 [default = false];
     required bool pass_enemy_risk          = 5 [default = false];
     required bool pass_shoot_score         = 6 [default = false];
+    required bool passer_position_score    = 7 [default = false];
+    required bool receiver_position_score  = 8 [default = false];
 }
 
 message PossessionTrackerConfig

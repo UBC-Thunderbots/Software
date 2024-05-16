@@ -2,10 +2,10 @@
 
 Strategy::Strategy(const TbotsProto::AiConfig& ai_config)
     : ai_config_(ai_config),
-      pitch_division_(
-          std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField())),
-      pass_generator_(std::make_unique<ThreadedPassGenerator<EighteenZoneId>>(
-          pitch_division_, ai_config_.passing_config()))
+      sampling_pass_generator_(ai_config_.passing_config()),
+      receiver_position_generator_(
+          std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField()),
+          ai_config_.passing_config())
 {
 }
 
@@ -38,80 +38,26 @@ TbotsProto::PossessionStrategy Strategy::getPossessionStrategy(int num_robots)
     return possession_strategy;
 }
 
-Pose Strategy::getBestDribblePose(const Robot& robot)
+PassWithRating Strategy::getBestPass()
 {
-    if (robot_to_best_dribble_location_.contains(robot.id()))
+    if (!best_pass_) 
     {
-        return robot_to_best_dribble_location_.at(robot.id());
+        best_pass_ = sampling_pass_generator_.getBestPass(*world_ptr_); 
     }
 
-    // TODO(#3082): temporary logic, find best dribble_position
-    Vector robot_to_goal   = world_ptr_->field().enemyGoalCenter() - robot.position();
-    Point dribble_position = robot.position() + robot_to_goal.normalize(0.8);
-
-    // cache the dribble position
-    robot_to_best_dribble_location_[robot.id()] =
-        Pose(dribble_position, robot_to_goal.orientation());
-
-    return robot_to_best_dribble_location_.at(robot.id());
+    return sampling_pass_generator_.getBestPass(*world_ptr_);
 }
 
-std::optional<PassWithRating> Strategy::getBestUncommittedPass()
+std::vector<Point> Strategy::getBestReceivingPositions()
 {
-    Timestamp current_time = world_ptr_->getMostRecentTimestamp();
-
-    if (!cached_pass_eval_ ||
-        (current_time - cached_pass_time_) >
-            Duration::fromSeconds(
-                ai_config_.passing_config().pass_recalculation_commit_time_s()))
+    if (receiver_positions_.empty()) 
     {
-        cached_pass_time_         = current_time;
-        cached_pass_eval_         = pass_generator_->getPassEvaluation();
-        cached_ranked_pass_zones_ = cached_pass_eval_->rankZonesForReceiving(
-            *world_ptr_, world_ptr_->ball().position());
+        receiver_positions_ = receiver_position_generator_.getBestReceivingPositions(
+            *world_ptr_, std::max(0, static_cast<int>(world_ptr_->friendlyTeam().numRobots()) - 1), 
+            {getBestPass().pass.receiverPoint()});
     }
 
-    for (EighteenZoneId zone : cached_ranked_pass_zones_)
-    {
-        // Predicate that filters out passes received inside the zone
-        const auto is_pass_outside_zone = [&](const PassWithRating& pass) {
-            return pitch_division_->getZoneId(pass.pass.receiverPoint()) != zone;
-        };
-
-        if (std::all_of(committed_passes_.begin(), committed_passes_.end(),
-                        is_pass_outside_zone))
-        {
-            return cached_pass_eval_->getBestPassInZones({zone});
-        }
-    }
-
-    return std::nullopt;
-}
-
-std::optional<PassWithRating> Strategy::getBestCommittedPass()
-{
-    if (committed_passes_.empty())
-    {
-        return std::nullopt;
-    }
-
-    // Predicate that filters out passes that are too short
-    auto pass_filter = [&](const PassWithRating& pass_with_rating) {
-        return distance(world_ptr_->ball().position(),
-                        pass_with_rating.pass.receiverPoint()) >=
-               ai_config_.passing_config().min_pass_distance();
-    };
-
-    std::vector<PassWithRating> filtered_passes;
-    std::copy_if(committed_passes_.begin(), committed_passes_.end(),
-                 std::back_inserter(filtered_passes), pass_filter);
-
-    return *std::max_element(committed_passes_.begin(), committed_passes_.end());
-}
-
-void Strategy::commitPass(const PassWithRating& pass)
-{
-    committed_passes_.push_back(pass);
+    return receiver_positions_;
 }
 
 std::optional<Shot> Strategy::getBestShot(const Robot& robot)
@@ -137,18 +83,18 @@ void Strategy::updateAiConfig(const TbotsProto::AiConfig& ai_config)
 {
     ai_config_ = ai_config;
 
-    // The pass generator must be recreated with the new passing config
-    pass_generator_ = std::make_unique<ThreadedPassGenerator<EighteenZoneId>>(
-        pitch_division_, ai_config_.passing_config());
+    // Pass generators must be recreated with the new passing config
+    sampling_pass_generator_ = SamplingPassGenerator(ai_config_.passing_config());
+    receiver_position_generator_ = ReceiverPositionGenerator<EighteenZoneId>(
+          std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField()),
+          ai_config_.passing_config());
 }
 
 void Strategy::updateWorld(const WorldPtr& world_ptr)
 {
     world_ptr_ = world_ptr;
 
-    pass_generator_->updateWorld(world_ptr_);
-
-    committed_passes_.clear();
-    robot_to_best_dribble_location_.clear();
+    best_pass_.reset();
+    receiver_positions_.clear();
     robot_to_best_shot_.clear();
 }

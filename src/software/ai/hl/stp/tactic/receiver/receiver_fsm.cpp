@@ -75,29 +75,28 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
     // The percentage of open net the robot would shoot on
     if (best_shot_opt)
     {
-        // Vector from the ball to the robot
+        TbotsProto::ReceiverTacticConfig receiver_tactic_config = 
+            strategy_->getAiConfig().receiver_tactic_config();
+
         Vector robot_to_ball = world.ball().position() - assigned_robot.position();
 
         // The angle the robot will have to deflect the ball to shoot
-        Angle abs_angle_between_pass_and_shot_vectors;
-
         Vector robot_to_shot_target =
             best_shot_opt.value().getPointToShootAt() - assigned_robot.position();
-        abs_angle_between_pass_and_shot_vectors =
-            convexAngle(robot_to_ball, robot_to_shot_target);
+        double abs_angle_deg_between_pass_and_shot_vectors =
+            convexAngle(robot_to_ball, robot_to_shot_target).toDegrees();
 
-        Angle goal_angle =
-            convexAngle(world.field().friendlyGoalpostPos(), assigned_robot.position(),
-                        world.field().friendlyGoalpostNeg());
-
-        double net_percent_open =
-            best_shot_opt.value().getOpenAngle().toDegrees() / goal_angle.toDegrees();
+        double shot_open_angle = best_shot_opt.value().getOpenAngle().toDegrees();
+        double min_one_touch_open_angle =
+            receiver_tactic_config.min_open_angle_for_one_touch_deg();
+        double max_one_touch_deflection_angle =
+            receiver_tactic_config.max_deflection_for_one_touch_deg();
 
         // If we have a shot with a sufficiently large enough opening, and the
         // deflection angle that is reasonable, we should one-touch kick the ball
         // towards the enemy net
-        if (net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
-            abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
+        if (shot_open_angle > min_one_touch_open_angle &&
+            abs_angle_deg_between_pass_and_shot_vectors < max_one_touch_deflection_angle)
         {
             return best_shot_opt;
         }
@@ -109,6 +108,7 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
 bool ReceiverFSM::onetouchPossible(const Update& event)
 {
     return !event.control_params.disable_one_touch_shot &&
+           !strategy_->getAiConfig().receiver_tactic_config().disable_one_touch_kick() &&
            (findFeasibleShot(*event.common.world_ptr, event.common.robot) !=
             std::nullopt);
 }
@@ -116,12 +116,13 @@ bool ReceiverFSM::onetouchPossible(const Update& event)
 void ReceiverFSM::updateOnetouch(const Update& event)
 {
     auto best_shot = findFeasibleShot(*event.common.world_ptr, event.common.robot);
-    auto one_touch = getOneTouchShotPositionAndOrientation(
-        event.common.robot, event.common.world_ptr->ball(),
-        best_shot->getPointToShootAt());
 
-    if (best_shot && event.control_params.pass)
+    if (best_shot.has_value() && event.control_params.pass)
     {
+        auto one_touch = getOneTouchShotPositionAndOrientation(
+            event.common.robot, event.common.world_ptr->ball(),
+            best_shot->getPointToShootAt());
+
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, one_touch.getPointToShootAt(), one_touch.getOpenAngle(),
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,

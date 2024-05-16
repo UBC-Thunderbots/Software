@@ -291,6 +291,13 @@ class GLSandboxWorldLayer(GLWorldLayer):
 
         return curr_play_state
 
+    def set_simulation_speed(self, speed: float) -> None:
+        """
+        Sets the speed of the simulator
+        :param speed: the new speed to set
+        """
+        super().set_simulation_speed(speed)
+
     def reset_to_pre_sim(self) -> None:
         """
         Resets all robot positions to what they were before the simulator ran

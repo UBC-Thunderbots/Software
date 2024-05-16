@@ -15,7 +15,7 @@
 class ReceiverTactic : public Tactic
 {
    public:
-    ReceiverTactic(std::shared_ptr<Strategy> strategy);
+    explicit ReceiverTactic(std::shared_ptr<Strategy> strategy);
 
     /**
      * Updates the control parameters for this ReceiverTactic.
@@ -26,8 +26,6 @@ class ReceiverTactic : public Tactic
      */
     void updateControlParams(std::optional<Pass> updated_pass,
                              bool disable_one_touch_shot = false);
-
-    void prepare() override;
 
     void accept(TacticVisitor& visitor) const override;
 

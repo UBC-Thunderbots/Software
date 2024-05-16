@@ -6,7 +6,7 @@
 #include "software/ai/passing/pass_generator.hpp"
 
 /**
- * This class wraps a `PassGenerator` and uses it to generate pass evaluations on
+ * This class wraps a `BasePassGenerator` and uses it to generate passes on
  * a separate thread.
  *
  * @tparam ZoneEnum the enum used to identify pitch division zones

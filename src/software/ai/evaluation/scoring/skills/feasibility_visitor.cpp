@@ -26,16 +26,11 @@ void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
 
 void FeasibilityVisitor::visit(const KickPassSkill& skill)
 {
-    std::optional<PassWithRating> best_pass = strategy_->getBestCommittedPass();
-    if (!best_pass)
-    {
-        current_feasibility_ = 0;
-        return;
-    }
+    PassWithRating best_pass = strategy_->getBestPass();
+    
+    current_feasibility_ = best_pass.rating * 0.9;
 
-    current_feasibility_ = best_pass->rating * 0.9;
-
-    Segment passing_lane(best_pass->pass.passerPoint(), best_pass->pass.receiverPoint());
+    Segment passing_lane(best_pass.pass.passerPoint(), best_pass.pass.receiverPoint());
     if (std::all_of(world_.enemyTeam().getAllRobots().begin(), 
                     world_.enemyTeam().getAllRobots().end(), 
                     [&](auto enemy) { return distance(enemy.position(), passing_lane) >= 0.15; }))
@@ -46,16 +41,11 @@ void FeasibilityVisitor::visit(const KickPassSkill& skill)
 
 void FeasibilityVisitor::visit(const ChipPassSkill& skill)
 {
-    std::optional<PassWithRating> best_pass = strategy_->getBestCommittedPass();
-    if (!best_pass)
-    {
-        current_feasibility_ = 0;
-        return;
-    }
+    PassWithRating best_pass = strategy_->getBestPass();
     
-    current_feasibility_ = best_pass->rating * 0.9;
+    current_feasibility_ = best_pass.rating * 0.9;
 
-    Segment passing_lane(best_pass->pass.passerPoint(), best_pass->pass.receiverPoint());
+    Segment passing_lane(best_pass.pass.passerPoint(), best_pass.pass.receiverPoint());
     if (std::any_of(world_.enemyTeam().getAllRobots().begin(), 
                     world_.enemyTeam().getAllRobots().end(), 
                     [&](auto enemy) { return distance(enemy.position(), passing_lane) < 0.15; }))

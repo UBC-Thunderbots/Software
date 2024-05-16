@@ -15,7 +15,7 @@ ReceiverTactic::ReceiverTactic(std::shared_ptr<Strategy> strategy)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM());
+        fsm_map[id] = std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM(strategy_));
     }
 }
 
@@ -27,17 +27,6 @@ void ReceiverTactic::updateControlParams(std::optional<Pass> updated_pass,
     control_params.disable_one_touch_shot = disable_one_touch_shot;
 }
 
-void ReceiverTactic::prepare()
-{
-    std::optional<PassWithRating> best_pass = strategy_->getBestUncommittedPass();
-
-    if (best_pass)
-    {
-        strategy_->commitPass(*best_pass);
-        updateControlParams(best_pass->pass);
-    }
-}
-
 void ReceiverTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
@@ -45,11 +34,14 @@ void ReceiverTactic::accept(TacticVisitor& visitor) const
 
 void ReceiverTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
+    updateControlParams(strategy_->getBestPass().pass);
+
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] =
-            std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM());
+            std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM(strategy_));
     }
+
     fsm_map.at(tactic_update.robot.id())
         ->process_event(ReceiverFSM::Update(control_params, tactic_update));
 }

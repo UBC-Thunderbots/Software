@@ -5,7 +5,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/threaded_pass_generator.hpp"
+#include "software/ai/passing/receiver_position_generator.hpp"
+#include "software/ai/passing/sampling_pass_generator.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/pose.h"
 #include "software/world/field.h"
@@ -33,38 +34,18 @@ class Strategy
     TbotsProto::PossessionStrategy getPossessionStrategy(int num_robots);
 
     /**
-     * Get the best dribble pose for the given robot.
-     *
-     * @param robot robot to find best dribble location for
-     *
-     * @returns the best dribble pose
+     * Gets the best pass on the field.
+     * 
+     * @returns the best pass
      */
-    Pose getBestDribblePose(const Robot& robot);
+    PassWithRating getBestPass();
 
     /**
-     * Gets the best uncommitted pass on the entire field.
-     *
-     * Uncommitted passes are guaranteed to be located in a different zone
-     * than any of the currently committed passes.
-     *
-     * @returns the best uncommitted pass, if one exists
+     * Gets the best receiving positions on the field.
+     * 
+     * @return the best receiving positions
      */
-    std::optional<PassWithRating> getBestUncommittedPass();
-
-    /**
-     * Gets the best committed pass.
-     *
-     * @returns the best committed pass, if one exists
-     */
-    std::optional<PassWithRating> getBestCommittedPass();
-
-    /**
-     * Commits a pass, designating it as having a robot assigned to its
-     * receiver point.
-     *
-     * @param pass the pass to commit
-     */
-    void commitPass(const PassWithRating& pass);
+    std::vector<Point> getBestReceivingPositions();
 
     /**
      * Gets the best shot on goal for the given robot.
@@ -99,18 +80,12 @@ class Strategy
    private:
     TbotsProto::AiConfig ai_config_;
 
-    // World
     WorldPtr world_ptr_;
-    std::shared_ptr<EighteenZonePitchDivision> pitch_division_;
 
-    // Passing
-    std::unique_ptr<ThreadedPassGenerator<EighteenZoneId>> pass_generator_;
-    std::shared_ptr<PassEvaluation<EighteenZoneId>> cached_pass_eval_;
-    Timestamp cached_pass_time_;
+    SamplingPassGenerator sampling_pass_generator_;
+    ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator_;
 
-    std::vector<EighteenZoneId> cached_ranked_pass_zones_;
-    std::vector<PassWithRating> committed_passes_;
-
-    std::unordered_map<RobotId, Pose> robot_to_best_dribble_location_;
+    std::optional<PassWithRating> best_pass_;
+    std::vector<Point> receiver_positions_;
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
 };
