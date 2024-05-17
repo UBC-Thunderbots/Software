@@ -338,9 +338,9 @@ class RobotCommunication(object):
     #   - Must retrieve the time_sent field of the proto,
     #     this means taking the diff of the current time and the omit_thunderloop_processing_time_sent
     #   - Must update the visualized widget component
-    # def __receive_robot_status(self, type: Type[Message], data: Message) -> None:
-    #     print(int((time.time() - data.omit_thunderloop_processing_time_sent) * 1000))
-    #     self.__forward_to_proto_unix_io(type, data)
+    # def __receive_robot_status(self, robot_status: Message) -> None:
+    #     print((time.time() - robot_status.omit_thunderloop_processing_time_sent.epoch_timestamp_seconds) * 1000)
+    #     self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
     def __exit__(self, type, value, traceback) -> None:
         """Exit RobotCommunication context manager

@@ -93,13 +93,16 @@ void NetworkService::logNewPrimitiveSet(TbotsProto::PrimitiveSet input)
     }
 
     if (!primitive_set_pairs_rtt.empty()
-            && input.sequence_number() <= primitive_set_pairs_rtt.back().first)
+            && input.sequence_number() <= std::get<0>(primitive_set_pairs_rtt.back()))
     {
         // If the proto is older than the last received proto, then ignore it
         return;
     }
     primitive_set_pairs_rtt.emplace_back(
-            std::pair(input.sequence_number(), getCurrentEpochTimeInSeconds()));
+            std::tuple(input.sequence_number(),
+                       getCurrentEpochTimeInSeconds(),
+                       input.time_sent().epoch_timestamp_seconds())
+                       );
 }
 
 void NetworkService::updatePrimitiveSetLog(TbotsProto::RobotStatus &robot_status)
@@ -114,16 +117,16 @@ void NetworkService::updatePrimitiveSetLog(TbotsProto::RobotStatus &robot_status
      */
 
     uint64_t seq_num = robot_status.last_handled_primitive_set();
-    while (seq_num <= primitive_set_pairs_rtt.back().first)
+    while (seq_num <= std::get<0>(primitive_set_pairs_rtt.back()))
     {
-        if (primitive_set_pairs_rtt.front().first == seq_num)
+        if (std::get<0>(primitive_set_pairs_rtt.front()) == seq_num)
         {
-            double received_epoch_time_seconds = primitive_set_pairs_rtt.front().second;
-            double current_epoch_time_seconds = getCurrentEpochTimeInSeconds();
+            double received_epoch_time_seconds = std::get<1>(primitive_set_pairs_rtt.front());
+            double processing_time_seconds = getCurrentEpochTimeInSeconds() - received_epoch_time_seconds;
 
             robot_status.mutable_omit_thunderloop_processing_time_sent()->set_epoch_timestamp_seconds(
-                    Timestamp::fromTimestampProto(robot_status.time_sent()).toSeconds()
-                    + current_epoch_time_seconds - received_epoch_time_seconds
+                    std::get<2>(primitive_set_pairs_rtt.front())
+                    + processing_time_seconds
             );
             return;
         }
@@ -134,6 +137,6 @@ void NetworkService::updatePrimitiveSetLog(TbotsProto::RobotStatus &robot_status
 
 double NetworkService::getCurrentEpochTimeInSeconds()
 {
-    return std::chrono::duration<double, std::chrono::seconds::period>
-            (std::chrono::system_clock::now().time_since_epoch()).count();
+    return std::chrono::duration<double>
+            (std::chrono::steady_clock::now().time_since_epoch()).count();
 }

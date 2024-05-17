@@ -103,6 +103,6 @@ class NetworkService
     // track last breakbeam state for sending RobotStatus outside of specified rate
     bool last_breakbeam_state_sent = false;
 
-    // Primitive Set Sequence Number and Time received by Thunderloop
-    std::deque<std::pair<uint64_t, double>> primitive_set_pairs_rtt;
+    // Primitive Set Sequence Number and Time received by Thunderloop, Time sent from Thunderscope
+    std::deque<std::tuple<uint64_t, double, double>> primitive_set_pairs_rtt;
 };
