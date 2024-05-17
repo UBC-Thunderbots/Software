@@ -85,7 +85,10 @@ class EstopMode(IntEnum):
 MAX_ACCEPTABLE_PACKET_LOSS_PERCENT = 30
 
 # maximum acceptable round trip time value in milliseconds
-MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME = 100
+MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME = 200
+
+# maximum cache length of the round-trip time deque
+MAX_LENGTH_PRIMITIVE_SET_STORE = 3
 
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2

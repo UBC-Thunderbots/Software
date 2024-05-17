@@ -273,8 +273,6 @@ class RobotCommunication(object):
             self.sequence_number += 1
 
             if self.__should_send_packet() or self.should_send_stop:
-                # TODO: RTT HERE
-                #   - I believe we don't have to perform any actions here since timestamp is already declared
                 self.send_primitive_set.send_proto(primitive_set)
                 self.should_send_stop = False
 

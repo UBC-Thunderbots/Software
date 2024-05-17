@@ -10,7 +10,7 @@ from software.thunderscope.constants import *
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
 from typing import Type, List
-
+from collections import deque
 
 class BreakbeamLabel(QLabel):
     """
@@ -122,10 +122,12 @@ class RobotInfo(QWidget):
             max_val=MAX_ACCEPTABLE_PACKET_LOSS_PERCENT
         )
 
-        # Primitive round-trip time label
+        # Primitive round-trip time label and queue
         self.primitive_rtt_label = common_widgets.ColorQLabel(
-            max_val=MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME
+            max_val=MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
+            text="MS"
         )
+        self.previous_primitive_rtt_values = deque(maxlen=MAX_LENGTH_PRIMITIVE_SET_STORE)
 
         self.battery_layout.addWidget(self.primitive_loss_rate_label)
         self.battery_layout.addWidget(self.primitive_rtt_label)
@@ -350,7 +352,10 @@ class RobotInfo(QWidget):
         )
 
         self.primitive_rtt_label.set_float_val(
-            int((time.time() - omit_thunderloop_processing_time_sent.epoch_timestamp_seconds) * MILLISECONDS_PER_SECOND)
+            self.__calculate_average_round_trip_time(
+                ((time.time() - omit_thunderloop_processing_time_sent.epoch_timestamp_seconds)
+                    * MILLISECONDS_PER_SECOND)
+            )
         )
 
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)
@@ -363,3 +368,11 @@ class RobotInfo(QWidget):
         )
 
         self.battery_progress_bar.setValue(power_status.battery_voltage)
+
+    def __calculate_average_round_trip_time(self, new_time: float) -> int:
+        self.previous_primitive_rtt_values.append(new_time)
+        average_rtt_time_milliseconds = 0
+        for value in self.previous_primitive_rtt_values:
+            average_rtt_time_milliseconds += value
+        return int(average_rtt_time_milliseconds/len(self.previous_primitive_rtt_values))
+

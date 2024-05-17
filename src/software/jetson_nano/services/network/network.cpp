@@ -86,19 +86,19 @@ void NetworkService::logNewPrimitiveSet(TbotsProto::PrimitiveSet input)
      *  - update the timestamp on each primitive set to the current epoch time
      */
 
-    if (primitive_set_pairs_rtt.size() >= 50)
+    if (primitive_set_tuple_rtt.size() >= 50)
     {
         LOG(WARNING) << "Too many primitive sets logged for round-trip calculations, halting log process";
         return;
     }
 
-    if (!primitive_set_pairs_rtt.empty()
-            && input.sequence_number() <= std::get<0>(primitive_set_pairs_rtt.back()))
+    if (!primitive_set_tuple_rtt.empty()
+            && input.sequence_number() <= std::get<0>(primitive_set_tuple_rtt.back()))
     {
         // If the proto is older than the last received proto, then ignore it
         return;
     }
-    primitive_set_pairs_rtt.emplace_back(
+    primitive_set_tuple_rtt.emplace_back(
             std::tuple(input.sequence_number(),
                        getCurrentEpochTimeInSeconds(),
                        input.time_sent().epoch_timestamp_seconds())
@@ -117,20 +117,20 @@ void NetworkService::updatePrimitiveSetLog(TbotsProto::RobotStatus &robot_status
      */
 
     uint64_t seq_num = robot_status.last_handled_primitive_set();
-    while (seq_num <= std::get<0>(primitive_set_pairs_rtt.back()))
+    while (seq_num <= std::get<0>(primitive_set_tuple_rtt.back()))
     {
-        if (std::get<0>(primitive_set_pairs_rtt.front()) == seq_num)
+        if (std::get<0>(primitive_set_tuple_rtt.front()) == seq_num)
         {
-            double received_epoch_time_seconds = std::get<1>(primitive_set_pairs_rtt.front());
+            double received_epoch_time_seconds = std::get<1>(primitive_set_tuple_rtt.front());
             double processing_time_seconds = getCurrentEpochTimeInSeconds() - received_epoch_time_seconds;
 
             robot_status.mutable_omit_thunderloop_processing_time_sent()->set_epoch_timestamp_seconds(
-                    std::get<2>(primitive_set_pairs_rtt.front())
+                    std::get<2>(primitive_set_tuple_rtt.front())
                     + processing_time_seconds
             );
             return;
         }
-        primitive_set_pairs_rtt.pop_front();
+        primitive_set_tuple_rtt.pop_front();
     }
     LOG(WARNING) << "No primitives available for round-trip calculations";
 }
