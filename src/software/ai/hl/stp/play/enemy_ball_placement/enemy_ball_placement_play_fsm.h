@@ -95,4 +95,5 @@ struct EnemyBallPlacementPlayFSM
 
     Point placement_point;
     double distance_to_keep;
+    double nearly_placed_threshold; // Threshold for the ball to be considered nearly placed
 };

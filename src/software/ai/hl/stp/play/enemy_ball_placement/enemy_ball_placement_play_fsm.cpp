@@ -11,7 +11,8 @@ EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_con
           std::make_shared<MoveTactic>(),
           std::make_shared<MoveTactic>(),
       }),
-      distance_to_keep(ENEMY_BALL_PLACEMENT_DISTANCE_METERS + 4 * ROBOT_MAX_RADIUS_METERS)
+      distance_to_keep(ENEMY_BALL_PLACEMENT_DISTANCE_METERS + 4 * ROBOT_MAX_RADIUS_METERS),
+      nearly_placed_threshold(0.5)
 {
 }
 
@@ -45,7 +46,7 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
 
     // If the ball is nearly placed, then adjust move tactics to position between
     // friendly goal and the ball
-    if (positioning_vector.length() < 0.5)
+    if (positioning_vector.length() < nearly_placed_threshold)
     {
         positioning_vector = world_ptr->field().friendlyGoalCenter() - world_ptr->ball().position();
     }
