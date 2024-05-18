@@ -142,7 +142,7 @@ class ProtoLogger:
         except Exception:
             logging.exception("Exception detected in ProtoLogger")
 
-    @staticmethod 
+    @staticmethod
     def write_to_logfile(log_file, data):
         log_file.write(data)
 

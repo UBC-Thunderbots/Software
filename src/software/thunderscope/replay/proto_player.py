@@ -11,7 +11,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from datetime  import datetime
+from datetime import datetime
 from google.protobuf.message import DecodeError, Message
 from typing import Callable, Type
 
@@ -165,23 +165,31 @@ class ProtoPlayer:
                 print("we may not be able to replay this file!")
 
         # sort the message as the protobuf may not be in chronological order!
-        messages_that_has_timestamp = sorted(messages_that_has_timestamp, key=lambda x: x.time_sent.epoch_timestamp_seconds)
+        messages_that_has_timestamp = sorted(
+            messages_that_has_timestamp,
+            key=lambda x: x.time_sent.epoch_timestamp_seconds,
+        )
 
-        smallest_timestamp = messages_that_has_timestamp[0].time_sent.epoch_timestamp_seconds
+        smallest_timestamp = messages_that_has_timestamp[
+            0
+        ].time_sent.epoch_timestamp_seconds
         # creating a log file
-        with gzip.open(os.path.join(self.log_folder_path, "0.replay"), "wb") as log_file:
+        with gzip.open(
+            os.path.join(self.log_folder_path, "0.replay"), "wb"
+        ) as log_file:
             # creating a logfile
             for message in messages_that_has_timestamp:
                 # reset timestamp to be relative to when the game is started
-                current_time = message.time_sent.epoch_timestamp_seconds - smallest_timestamp
+                current_time = (
+                    message.time_sent.epoch_timestamp_seconds - smallest_timestamp
+                )
 
                 log_entry = ProtoLogger.create_log_entry(message, current_time)
-                data = bytes(log_entry, encoding='utf-8')
+                data = bytes(log_entry, encoding="utf-8")
 
                 ProtoLogger.write_to_logfile(log_file, data)
 
         self.sorted_chunks = self.sort_and_get_replay_files(self.log_folder_path)
-
 
     def is_from_field_test(self):
         """
@@ -207,7 +215,7 @@ class ProtoPlayer:
 
             # we have an exception here because the log entries may not all be valid!
             # there may have been a file corruption somewhere causing error!
-            except DecodeError: 
+            except DecodeError:
                 pass
 
         return is_from_field_test
