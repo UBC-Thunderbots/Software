@@ -10,6 +10,7 @@ from software.simulated_tests.simulated_test_fixture import (
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
+
 @pytest.mark.parametrize(
     "ball_start_point, ball_placement_point",
     [
@@ -19,9 +20,9 @@ from proto.ssl_gc_common_pb2 import Team
         (tbots_cpp.Point(-4.1, 2.8), tbots_cpp.Point(-4.1, -2.8))
     ],
 )
-
-def test_two_ai_ball_placement(simulated_test_runner, ball_start_point, ball_placement_point):
-
+def test_two_ai_ball_placement(
+    simulated_test_runner, ball_start_point, ball_placement_point
+):
     def setup(*args):
         # Setup Bots
         blue_bots = [
@@ -81,7 +82,9 @@ def test_two_ai_ball_placement(simulated_test_runner, ball_start_point, ball_pla
             ),
         )
 
-    always_validation_sequence_set = [[RobotNeverEntersPlacementRegion(ball_placement_point)]]
+    always_validation_sequence_set = [
+        [RobotNeverEntersPlacementRegion(ball_placement_point)]
+    ]
 
     simulated_test_runner.run_test(
         setup=setup,

@@ -240,12 +240,11 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<Stadium>(m, "Stadium")
         .def(py::init<Segment, double>())
-        .def("__repr__",
-             [](const Stadium& s) {
-                 std::stringstream stream;
-                 stream << s;
-                 return stream.str();
-             });
+        .def("__repr__", [](const Stadium& s) {
+            std::stringstream stream;
+            stream << s;
+            return stream.str();
+        });
 
     py::class_<RobotConstants>(m, "RobotConstants")
         .def_readwrite("max_force_dribbler_speed_rpm",
