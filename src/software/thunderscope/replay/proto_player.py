@@ -11,6 +11,7 @@ from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from datetime  import datetime
 from google.protobuf.message import DecodeError, Message
 from typing import Callable, Type
 
@@ -70,12 +71,35 @@ class ProtoPlayer:
         self.current_chunk_index = 0
         self.current_entry_index = 0
 
+        self.sorted_chunks = self.sort_and_get_replay_files(self.log_folder_path)
+        if self.is_from_field_test():
+            print("Processing replay files")
+            self.convert_field_test_replayfiles()
+
+        # We can get the total runtime of the log from the last entry in the last chunk
+        self.end_time = self.find_actual_endtime()
+
+        logging.info(
+            "Loaded log file with total runtime of {:.2f} seconds".format(self.end_time)
+        )
+
+        # Start playing thread
+        self.seek(0.0)
+        self.thread = threading.Thread(target=self.__play_protobufs, daemon=True)
+        self.thread.start()
+
+    def sort_and_get_replay_files(self, log_folder_path):
+        """
+        Sorting the replay files 
+
+        :return: the sorted replay files
+        """
         # Load up all replay files in the log folder
-        replay_files = glob.glob(self.log_folder_path + f"/*.{REPLAY_FILE_EXTENSION}")
+        replay_files = glob.glob(log_folder_path + f"/*.{REPLAY_FILE_EXTENSION}")
 
         if len(replay_files) == 0:
             raise ValueError(
-                f'No replay files found in "{self.log_folder_path}", make sure that an absolute path '
+                f'No replay files found in "{log_folder_path}", make sure that an absolute path '
                 f"to the folder containing the replay files is provided."
             )
 
@@ -85,22 +109,130 @@ class ProtoPlayer:
             replay_index, _ = tail.split(".")
             return int(replay_index)
 
-        self.sorted_chunks = sorted(replay_files, key=__sort_replay_chunks)
+        return sorted(replay_files, key=__sort_replay_chunks)
 
-        # We can get the total runtime of the log from the last entry in the last chunk
-        last_chunk_data = ProtoPlayer.load_replay_chunk(self.sorted_chunks[-1])
+    @staticmethod
+    def is_valid_protobuf(message):
+        """
+        True if the time send is greater than 2023 unix timestamp, and the protobuf have the timestamp field
+
+        :return: True if the time send is greater than 2023 unix timestamp, and the protobuf have the timestamp field
+        """
+        unixtimestamp_2023 = datetime(year=2023, month=1, day=1).timestamp()
+
         try:
-            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-1])
-        except DecodeError:
-            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-2])
-        logging.info(
-            "Loaded log file with total runtime of {:.2f} seconds".format(self.end_time)
-        )
+            if message.time_sent.epoch_timestamp_seconds > unixtimestamp_2023:
+                # has the time send field and is greater than 2023 unix timestamp
+                return True
 
-        # Start playing thread
-        self.seek(0.0)
-        self.thread = threading.Thread(target=self.__play_protobufs, daemon=True)
-        self.thread.start()
+            # return false where the timestamp is way to small!
+            return False
+
+        # does not contain the time_sent field, so we have a type error
+        except AttributeError:
+            return False
+
+    def convert_field_test_replayfiles(self):
+        """
+        This is a four step operation!
+
+        1. load all the replay files and their protobuf into memory while discarding protobufs
+        that does not meet requirements given by the self.is_valid_protobuf function
+        2. delete the protobufs that are in the self.log_folder
+        3. reindex the timestamp so it starts from 0 and write the new replay file to self.log_folder
+        4. resort all the chunks
+        """
+        messages_that_has_timestamp = []
+
+        # load all the protobufs into memory
+        for file in os.listdir(self.log_folder_path):
+            path_to_file = os.path.join(self.log_folder_path, file)
+            entries = ProtoPlayer.load_replay_chunk(path_to_file)
+
+            for entry in entries:
+                _, _, message = ProtoPlayer.unpack_log_entry(entry)
+
+                if ProtoPlayer.is_valid_protobuf(message):
+                    messages_that_has_timestamp.append(message)
+
+        # deleting all the replay files since we are writing new replay files
+        for file in os.listdir(self.log_folder_path):
+            path_to_file = os.path.join(self.log_folder_path, file)
+            try:
+                os.remove(path_to_file)
+            except OSError:
+                print("cannot delete file: {}".format(file))
+                print("we may not be able to replay this file!")
+
+        # sort the message as the protobuf may not be in chronological order!
+        messages_that_has_timestamp = sorted(messages_that_has_timestamp, key=lambda x: x.time_sent.epoch_timestamp_seconds)
+
+        smallest_timestamp = messages_that_has_timestamp[0].time_sent.epoch_timestamp_seconds
+        # creating a log file
+        with gzip.open(os.path.join(self.log_folder_path, "0.replay"), "wb") as log_file:
+            # creating a logfile
+            for message in messages_that_has_timestamp:
+                # reset timestamp to be relative to when the game is started
+                current_time = message.time_sent.epoch_timestamp_seconds - smallest_timestamp
+
+                log_entry = ProtoLogger.create_log_entry(message, current_time)
+                data = bytes(log_entry, encoding='utf-8')
+
+                ProtoLogger.write_to_logfile(log_file, data)
+
+        self.sorted_chunks = self.sort_and_get_replay_files(self.log_folder_path)
+
+
+    def is_from_field_test(self):
+        """
+        Checking to see if they are 
+        This is done so by checking if the last 10 time stamp is greater than the unix timestamp for 2023.
+        We know that field testing replay files timestamp is the actual unix timestamp, not the timestamp relative 
+        to when the user opens thunderscope
+
+        :return: True if the replay files came from field test, False if the replay files came 
+        from simulated test
+        """
+        unixtimestamp_2023 = datetime(year=2023, month=1, day=1).timestamp()
+
+        is_from_field_test = False
+        loaded_chunk = ProtoPlayer.load_replay_chunk(self.sorted_chunks[-1])
+
+        # iterating over the last 10 log entries that are valid
+        for log_entry in loaded_chunk[-10:]:
+            try:
+                timestamp, _, _ = ProtoPlayer.unpack_log_entry(log_entry)
+                if timestamp > unixtimestamp_2023:
+                    is_from_field_test = True
+
+            # we have an exception here because the log entries may not all be valid!
+            # there may have been a file corruption somewhere causing error!
+            except DecodeError: 
+                pass
+
+        return is_from_field_test
+
+    def find_actual_endtime(self):
+        """
+        Finding the last end time.
+        Note that the end time may not necessarily be the last message in the last chunks since there may be 
+        file corrptions. We also assume a chronological order in the chunks data!
+        
+        :return: the last end time, if noe end time are found, return 0.0s
+        """
+        # reverse iterating over the chunks (file)
+        for i in reversed(range(len(self.sorted_chunks))):
+            last_chunk_data = ProtoPlayer.load_replay_chunk(self.sorted_chunks[i])
+
+            # reverse iterating the protobufs message in each and every file
+            for j in reversed(range(len(last_chunk_data))):
+                try:
+                    end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[j])
+                    return end_time
+                except Exception:
+                    pass
+
+        return 0.0
 
     @staticmethod
     def load_replay_chunk(replay_chunk_path: str) -> list:
