@@ -14,9 +14,9 @@ from proto.ssl_gc_common_pb2 import Team
     "ball_start_point, ball_placement_point",
     [
         # test normal ball placement
-        (tbots_cpp.Point(-2, 2), tbots_cpp.Point(2, -2.8)),
-        # test edge case where stadium goes through goal area
-        (tbots_cpp.Point(-4, 2.8), tbots_cpp.Point(-4, -2.8))
+        # (tbots_cpp.Point(0, 0), tbots_cpp.Point(-2, 1)),
+        # test edge case where stadium goes through defense area
+        (tbots_cpp.Point(-4.1, 2.8), tbots_cpp.Point(-4.1, -2.8))
     ],
 )
 
@@ -25,12 +25,12 @@ def test_two_ai_ball_placement(simulated_test_runner, ball_start_point, ball_pla
     def setup(*args):
         # Setup Bots
         blue_bots = [
-            tbots_cpp.Point(-3, 2.5),
-            tbots_cpp.Point(-3, 1.5),
-            tbots_cpp.Point(-3, 0.5),
-            tbots_cpp.Point(-3, -0.5),
-            tbots_cpp.Point(-3, -1.5),
-            tbots_cpp.Point(-3, -2.5),
+            tbots_cpp.Point(-4.5, 0),
+            tbots_cpp.Point(-4, 0.5),
+            tbots_cpp.Point(-4, -0.5),
+            tbots_cpp.Point(-2, 1),
+            tbots_cpp.Point(-2, 0),
+            tbots_cpp.Point(-2, -1),
         ]
 
         yellow_bots = [

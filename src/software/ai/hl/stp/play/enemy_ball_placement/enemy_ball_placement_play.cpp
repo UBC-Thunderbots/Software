@@ -3,7 +3,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 EnemyBallPlacementPlay::EnemyBallPlacementPlay(TbotsProto::AiConfig config)
-    : Play(config, true), fsm{EnemyBallPlacementPlayFSM{config}}, control_params{}
+    : Play(config, false), fsm{EnemyBallPlacementPlayFSM{config}}, control_params{}
 {
 }
 
