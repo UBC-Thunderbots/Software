@@ -16,7 +16,7 @@ EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_con
       }),
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
       distance_to_keep(ENEMY_BALL_PLACEMENT_DISTANCE_METERS +
-                       2 * ROBOT_MAX_RADIUS_METERS),
+                       4 * ROBOT_MAX_RADIUS_METERS),
       nearly_placed_threshold(0.5)
 {
 }
@@ -60,8 +60,22 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
                        lateral_positioning_vector * distance_to_keep;
             Point p2 = placement_point + longitudinal_positioning_vector -
                        lateral_positioning_vector * distance_to_keep;
-            Point destination =
-                distance(p1, Point(0, 0)) < distance(p2, Point(0, 0)) ? p1 : p2;
+            Point destination;
+            Rectangle fieldBoundary = world_ptr->field().fieldBoundary();
+            if (!contains(fieldBoundary, p1))
+            {
+                destination = p2;
+            }
+            else if (!contains(fieldBoundary, p2))
+            {
+                destination = p1;
+            }
+            else
+            {
+                destination =
+                    distance(p1, robot.position()) < distance(p2, robot.position()) ? p1
+                                                                                    : p2;
+            }
             move_tactics[idx]->updateControlParams(destination, robot.orientation(), 0);
         }
         else
