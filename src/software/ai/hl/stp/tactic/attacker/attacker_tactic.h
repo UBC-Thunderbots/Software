@@ -16,10 +16,6 @@ class AttackerTactic : public Tactic
 
     std::string getFSMState() const override;
 
-    // TODO: Remove these
-    void updateControlParams(const Pass& best_pass_so_far, bool pass_committed) {}
-    void updateControlParams(std::optional<Point> chip_target) {}
-
     /**
      * Evaluate the AttackerTactic and start a new iteration
      *

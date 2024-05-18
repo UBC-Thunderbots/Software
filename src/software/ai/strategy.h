@@ -41,11 +41,11 @@ class Strategy
     PassWithRating getBestPass();
 
     /**
-     * Gets the best receiving positions on the field.
+     * Gets the best receiving position on the field.
      * 
-     * @return the best receiving positions
+     * @return the best receiving position
      */
-    std::vector<Point> getBestReceivingPositions();
+    Point getBestReceivingPosition();
 
     /**
      * Gets the best shot on goal for the given robot.
@@ -88,4 +88,6 @@ class Strategy
     std::optional<PassWithRating> best_pass_;
     std::vector<Point> receiver_positions_;
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
+
+    size_t receiver_positions_index_;
 };

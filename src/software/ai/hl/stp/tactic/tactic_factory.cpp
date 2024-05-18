@@ -40,17 +40,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::AttackerTactic &tactic_pr
                                      std::shared_ptr<Strategy> strategy)
 {
     auto tactic = std::make_shared<AttackerTactic>(strategy);
-
-    if (tactic_proto.has_best_pass_so_far())
-    {
-        tactic->updateControlParams(createPass(tactic_proto.best_pass_so_far()),
-                                    tactic_proto.pass_committed());
-    }
-    if (tactic_proto.has_chip_target())
-    {
-        tactic->updateControlParams(createPoint(tactic_proto.chip_target()));
-    }
-
     return tactic;
 }
 

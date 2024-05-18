@@ -48,16 +48,19 @@ PassWithRating Strategy::getBestPass()
     return sampling_pass_generator_.getBestPass(*world_ptr_);
 }
 
-std::vector<Point> Strategy::getBestReceivingPositions()
+Point Strategy::getBestReceivingPosition()
 {
+    std::vector<Point> existing_receiver_positions;
+
     if (receiver_positions_.empty()) 
     {
         receiver_positions_ = receiver_position_generator_.getBestReceivingPositions(
-            *world_ptr_, std::max(0, static_cast<int>(world_ptr_->friendlyTeam().numRobots()) - 1), 
-            {getBestPass().pass.receiverPoint()});
+            *world_ptr_, static_cast<int>(world_ptr_->friendlyTeam().numRobots()), 
+            existing_receiver_positions);
+        receiver_positions_index_ = 0;
     }
 
-    return receiver_positions_;
+    return receiver_positions_[receiver_positions_index_++];
 }
 
 std::optional<Shot> Strategy::getBestShot(const Robot& robot)

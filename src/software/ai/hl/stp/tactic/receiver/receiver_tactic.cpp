@@ -34,7 +34,8 @@ void ReceiverTactic::accept(TacticVisitor& visitor) const
 
 void ReceiverTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
-    updateControlParams(strategy_->getBestPass().pass);
+    updateControlParams(Pass(tactic_update.world_ptr->ball().position(), 
+                        strategy_->getBestReceivingPosition(), 1));
 
     if (reset_fsm)
     {

@@ -33,8 +33,13 @@ void PassSkillFSM::findPass(
     double pass_score_ramp_down_duration =
         ai_config.passing_config().pass_score_ramp_down_duration();
 
+    if (!pass_optimization_start_time)
+    {
+        pass_optimization_start_time = event.common.world_ptr->getMostRecentTimestamp();
+    }
+
     time_since_commit_stage_start =
-        event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time;
+        event.common.world_ptr->getMostRecentTimestamp() - *pass_optimization_start_time;
     min_pass_score_threshold_ = 1.0 - std::min(time_since_commit_stage_start.toSeconds() /
                                                    pass_score_ramp_down_duration,
                                                1.0 - abs_min_pass_score);
@@ -55,6 +60,11 @@ void PassSkillFSM::findPass(
         .allow_excessive_dribbling = false};
 
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
+
+    LOG(VISUALIZE) << *createAttackerVisualization(
+        best_pass_so_far_->pass, true,
+        std::nullopt, event.common.world_ptr->ball().position(),
+        std::nullopt);
 }
 
 void PassSkillFSM::takePass(
@@ -85,4 +95,9 @@ void PassSkillFSM::takePass(
         .retry_kick        = false};
 
     processEvent(PivotKickSkillFSM::Update(control_params, event.common));
+
+    LOG(VISUALIZE) << *createAttackerVisualization(
+        best_pass_so_far_->pass, true,
+        std::nullopt, event.common.world_ptr->ball().position(),
+        std::nullopt);
 }
