@@ -95,17 +95,7 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
                 Circle(world.ball().position(), STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M)));
             break;
         case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
-            if (world.gameState().getBallPlacementPoint().has_value())
-            {
-                obstacles.push_back(createFromBallPlacement(
-                    world.gameState().getBallPlacementPoint().value(),
-                    world.ball().position()));
-            }
-            else
-            {
-                obstacles.push_back(
-                    createFromShape(Circle(world.ball().position(), 0.5)));
-            }
+            // Disabled because EnemyBallPlacementPlay handles interference avoidance
             break;
         case TbotsProto::MotionConstraint::FRIENDLY_GOAL:
         {
