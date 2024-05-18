@@ -136,11 +136,11 @@ class ProtoPlayer:
         """
         This is a four step operation!
 
-        1. load all the replay files and their protobuf into memory while discarding protobufs
-        that does not meet requirements given by the self.is_valid_protobuf function
-        2. delete the protobufs that are in the self.log_folder
-        3. reindex the timestamp so it starts from 0 and write the new replay file to self.log_folder
-        4. resort all the chunks
+        1. load all the replay files and their protobuf into memory while discarding protobufs.
+        that does not meet requirements given by the self.is_valid_protobuf function.
+        2. delete the protobufs that are in the self.log_folder.
+        3. reindex the timestamp so it starts from 0 and write the new replay file to self.log_folder.
+        4. resort all the chunks.
         """
         messages_that_has_timestamp = []
 
@@ -188,7 +188,7 @@ class ProtoPlayer:
         Checking to see if they are 
         This is done so by checking if the last 10 time stamp is greater than the unix timestamp for 2023.
         We know that field testing replay files timestamp is the actual unix timestamp, not the timestamp relative 
-        to when the user opens thunderscope
+        to when the user opens Thunderscope
 
         :return: True if the replay files came from field test, False if the replay files came 
         from simulated test
@@ -216,7 +216,7 @@ class ProtoPlayer:
         """
         Finding the last end time.
         Note that the end time may not necessarily be the last message in the last chunks since there may be 
-        file corrptions. We also assume a chronological order in the chunks data!
+        file corruptions. We also assume a chronological order in the chunks data!
         
         :return: the last end time, if noe end time are found, return 0.0s
         """
