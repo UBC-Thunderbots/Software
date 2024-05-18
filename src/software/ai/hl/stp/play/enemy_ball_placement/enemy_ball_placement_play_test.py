@@ -17,7 +17,7 @@ from proto.ssl_gc_common_pb2 import Team
         # test normal ball placement
         (tbots_cpp.Point(0, 0), tbots_cpp.Point(-2, 1)),
         # test edge case where stadium goes through defense area
-        (tbots_cpp.Point(-4.1, 2.8), tbots_cpp.Point(-4.1, -2.8))
+        (tbots_cpp.Point(-4.1, 2.8), tbots_cpp.Point(-4.1, -2.8)),
     ],
 )
 def test_two_ai_ball_placement(
