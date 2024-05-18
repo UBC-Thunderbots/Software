@@ -85,7 +85,10 @@ direction LR
 [*] --> WaitState
 WaitState --> AvoidState : [hasPlacementPoint]\n<i>setPlacementPoint</i>
 WaitState --> WaitState : [!hasPlacementPoint]
-AvoidState --> AvoidState : <i>avoid</i>
+AvoidState --> AvoidState : [!isNearlyPlaced]\n<i>avoid</i>
+AvoidState --> DefenseState : [isNearlyPlaced]
+DefenseState --> DefenseState : [isNearlyPlaced]\n<i>enterDefensiveFormation</i>
+DefenseState --> AvoidState : [!isNearlyPlaced]
 
 ```
 
