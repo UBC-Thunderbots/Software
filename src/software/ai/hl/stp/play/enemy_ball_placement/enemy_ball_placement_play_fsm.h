@@ -18,8 +18,8 @@
  * then we focus on avoiding ball placement interference If our robot R is in the ball
  * placement stadium, then it will move perpendicular to the segment connecting * and +,
  * to either p1 or p2, whichever one is within the field boundaries and closest to R
- *      _____
- *     /     \
+ *
+ *     /‾‾‾‾‾\
  *     |  +  |        placement point
  *     |     |
  *     |     |
