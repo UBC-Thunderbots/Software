@@ -10,10 +10,17 @@ from software.simulated_tests.simulated_test_fixture import (
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 
+@pytest.mark.parametrize(
+    "ball_start_point, ball_placement_point",
+    [
+        # test normal ball placement
+        (tbots_cpp.Point(-2, 2), tbots_cpp.Point(2, -2.8)),
+        # test edge case where stadium goes through goal area
+        (tbots_cpp.Point(-4, 2.8), tbots_cpp.Point(-4, -2.8))
+    ],
+)
 
-def test_two_ai_ball_placement(simulated_test_runner):
-    ball_initial_pos = tbots_cpp.Point(0, 0)
-    ball_final_pos = tbots_cpp.Point(-1, -1)
+def test_two_ai_ball_placement(simulated_test_runner, ball_start_point, ball_placement_point):
 
     def setup(*args):
         # Setup Bots
@@ -43,14 +50,11 @@ def test_two_ai_ball_placement(simulated_test_runner):
         simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.STOP, team=Team.UNKNOWN
         )
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
-        )
         # Pass in placement point here - not required for all play tests
         simulated_test_runner.gamecontroller.send_gc_command(
             gc_command=Command.Type.BALL_PLACEMENT,
             team=Team.YELLOW,
-            final_ball_placement_point=ball_final_pos,
+            final_ball_placement_point=ball_placement_point,
         )
 
         # Force play override here
@@ -72,13 +76,12 @@ def test_two_ai_ball_placement(simulated_test_runner):
             create_world_state(
                 yellow_robot_locations=yellow_bots,
                 blue_robot_locations=blue_bots,
-                ball_location=ball_initial_pos,
+                ball_location=ball_start_point,
                 ball_velocity=tbots_cpp.Vector(0, 0),
             ),
         )
 
-
-    always_validation_sequence_set = [[RobotNeverEntersPlacementRegion(ball_final_pos)]]
+    always_validation_sequence_set = [[RobotNeverEntersPlacementRegion(ball_placement_point)]]
 
     simulated_test_runner.run_test(
         setup=setup,

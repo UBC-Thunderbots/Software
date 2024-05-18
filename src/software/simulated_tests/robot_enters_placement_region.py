@@ -16,6 +16,7 @@ class RobotEntersPlacementRegion(Validation):
     def __init__(self, placement_point):
         self.placement_point = placement_point
         self.first_enter_time = None
+        self.stay_in_region_threshold = 2 # By SSL rules, only staying in the stadium for over 2 seconds counts
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if robots enter the ball placement region
@@ -34,8 +35,7 @@ class RobotEntersPlacementRegion(Validation):
                 if not self.first_enter_time:
                     self.first_enter_time = time.time()
                 else:
-                    # By SSL rules, only staying in the stadium for over 2 seconds counts
-                    if time.time() - self.first_enter_time > 2:
+                    if time.time() - self.first_enter_time > self.stay_in_region_threshold:
                         return ValidationStatus.PASSING
                 break
         else:
