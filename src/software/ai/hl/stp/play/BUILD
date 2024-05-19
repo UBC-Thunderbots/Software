@@ -201,6 +201,7 @@ cc_library(
         "play_fsm.h",
     ],
     deps = [
+        "//software/ai/hl/stp/play:tactic_assignment",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
@@ -473,6 +474,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
+        "//software/ai/hl/stp/play:tactic_assignment",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
         "//software/util/generic_factory",
@@ -500,5 +502,34 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:play_factory",
+    ],
+)
+
+cc_library(
+    name = "tactic_assignment",
+    srcs = ["tactic_assignment.cpp"],
+    hdrs = [
+        "tactic_assignment.h",
+    ],
+    deps = [
+        "//software/ai/hl/stp/tactic",
+        "//software/ai/motion_constraint:motion_constraint_set_builder",
+        "//software/world",
+        "//software/world:robot",
+        "@munkres_cpp",
+    ],
+)
+
+cc_test(
+    name = "tactic_assignment_test",
+    srcs = ["tactic_assignment_test.cpp"],
+    deps = [
+        "//software/ai/hl/stp/play",
+        "//software/ai/hl/stp/play:tactic_assignment",
+        "//software/ai/hl/stp/play/offense:offense_play",
+        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
+        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/test_util",
     ],
 )

@@ -48,6 +48,16 @@ class SensorFusion
      */
     std::optional<World> getWorld() const;
 
+    /**
+     * detect injured robots in the team that needs to be substituted and add it to
+     * injuredRobots
+     *
+     * @param robot_status_msgs The robot statuses from the sensor fusion packet
+     * @return the list of robotids of the injured robots
+     */
+    void detectInjuredRobots(
+        const std::vector<TbotsProto::RobotStatus> &robot_status_msgs);
+
     // Number of vision packets to indicate that the vision client most likely reset,
     // determined experimentally with the simulator
     static constexpr unsigned int VISION_PACKET_RESET_COUNT_THRESHOLD = 5;
@@ -167,4 +177,7 @@ class SensorFusion
 
     // The timestamp, in seconds, of the most recently received vision packet
     double last_t_capture;
+
+    // tolerance for break beam tolerance
+    const static int break_beam_tolerance = 2;
 };
