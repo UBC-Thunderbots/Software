@@ -66,7 +66,8 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
         {
             defender_assignment = assignments.at(i + assignments_skipped.size());
 
-            // Continuously skips pass defenders within threshold meters of free kick defender
+            // Continuously skips pass defenders within threshold meters of free kick
+            // defender
             while (defender_assignment.type == PASS_DEFENDER &&
                    (i + assignments_skipped.size() < assignments.size() - 1) &&
                    distance(defender_assignment.target, block_kick_point) <=
