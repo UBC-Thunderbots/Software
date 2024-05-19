@@ -39,6 +39,7 @@ message AiConfig
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
+    required AiParameterConfig ai_parameter_config                          = 13;
 }
 
 message AiControlConfig
@@ -48,6 +49,13 @@ message AiControlConfig
 
     // Override the existing play with the Play enum provided
     required PlayName override_ai_play = 2 [default = UseAiSelection];
+}
+
+message AiParameterConfig
+{
+    // threshold to decide if ball hasn't been kicked
+    required double ball_is_kicked_m_per_s_threshold = 1
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 message AttackerTacticConfig
@@ -126,9 +134,8 @@ message PassingConfig
 
 message GoalieTacticConfig
 {
-    // Control the final speed of the goalie to be able to intercept shots better
-    required double goalie_final_speed = 1
-        [default = 0.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
+    reserved 1;
+
     // At what speed of the ball should the goalie panic and stop the ball
     required double ball_speed_panic = 2
         [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 6.0];
@@ -153,6 +160,10 @@ message GoalieTacticConfig
     // defense area crease
     required double min_chip_distance_from_crease_meters = 8
         [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Distance threshold multiplier used for calculating whether or not an enemy robot
+    // is a safe distance away
+    required double safe_distance_multiplier = 9
+        [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
 message DribbleTacticConfig
@@ -173,7 +184,7 @@ message DribbleTacticConfig
     // Threshold to determine if the robot has the expected orientation when
     // completing the dribble (in degrees)
     required double final_destination_close_threshold = 3 [
-        default                   = 1.0,
+        default                   = 3.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
@@ -224,10 +235,6 @@ message ShootOrPassPlayConfig
     // threshold for the distance between passer and receiver
     required double short_pass_threshold = 5
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-
-    // threshold to decide if ball hasn't been kicked
-    required double ball_not_kicked_threshold = 6
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 
@@ -350,10 +357,25 @@ message DefensePlayConfig
 message RobotNavigationObstacleConfig
 {
     required double robot_obstacle_inflation_factor = 1 [
-        default                   = 2.0167,
+        default                   = 1.2,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
+
+    // The additional inflation amount (in meters) for the enemy defense area
+    required double enemy_defense_area_additional_inflation_meters = 2
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // The minimum velocity of an enemy robot for it to be considered
+    // as a dynamic obstacle. Below this speed, the robot is considered
+    // to be stationary.
+    required double dynamic_enemy_robot_obstacle_min_speed_mps = 3
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
+
+    // The maximum time into the future that we will predict the enemy
+    // robot's position for obstacle avoidance
+    required double dynamic_enemy_robot_obstacle_horizon_sec = 4
+        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 }
 
 message CostVisualizationConfig

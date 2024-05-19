@@ -2,7 +2,7 @@
 
 void StopFSM::updateStop(const Update& event)
 {
-    event.common.set_primitive(createStopPrimitive());
+    event.common.set_primitive(std::make_unique<StopPrimitive>());
 }
 
 bool StopFSM::stopDone(const Update& event)

@@ -25,10 +25,54 @@ if __name__ == "__main__":
     parser.add_argument("action", choices=["build", "run", "test"])
     parser.add_argument("search_query")
     parser.add_argument("-h", "--help", action="store_true")
-    parser.add_argument("-p", "--print_command", action="store_true")
+    parser.add_argument(
+        "-p",
+        "--print_command",
+        action="store_true",
+        help="Print the generated Bazel command",
+    )
+    parser.add_argument(
+        "-o",
+        "--optimized_build",
+        action="store_true",
+        help="Compile binaries with -O3 optimizations",
+    )
     parser.add_argument("-d", "--debug_build", action="store_true")
-    parser.add_argument("-ds", "--select_debug_binaries", action="store")
-    parser.add_argument("-i", "--interactive", action="store_true")
+    parser.add_argument(
+        "-ds",
+        "--select_debug_binaries",
+        choices=["sim", "blue", "yellow"],
+        nargs="+",
+        help="Select all binaries which are running separately in debug mode",
+        action="store",
+    )
+    parser.add_argument(
+        "-f",
+        "--flash_robots",
+        nargs="+",
+        type=int,
+        help="A list of space seperated integers representing the robot IDs "
+        "that should be flashed by the deploy_nano Ansible playbook",
+        action="store",
+    )
+    parser.add_argument(
+        "-pwd",
+        "--pwd",
+        type=str,
+        help="Password used by Ansible when SSHing into the robots",
+        action="store",
+    )
+    parser.add_argument(
+        "-i",
+        "--interactive",
+        help="Interactively search for a bazel target",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--tracy",
+        help="Run the binary with the TRACY_ENABLE macro defined",
+        action="store_true",
+    )
 
     # These are shortcut args for commonly used arguments on our tests
     # and full_system. All other arguments are passed through as-is
@@ -37,6 +81,12 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--enable_visualizer", action="store_true")
     parser.add_argument("-s", "--stop_ai_on_start", action="store_true")
     args, unknown_args = parser.parse_known_args()
+
+    if bool(args.flash_robots) ^ bool(args.pwd):
+        print(
+            "If you want to flash robots, both the robot IDs and password must be provided"
+        )
+        sys.exit(1)
 
     # If help was requested, print the help for the tbots script
     # and propagate the help to the underlying binary/test to
@@ -87,6 +137,15 @@ if __name__ == "__main__":
     if args.debug_build or args.select_debug_binaries:
         command += ["-c", "dbg"]
 
+    # Trigger an optimized build. Note that Thunderloop should always be
+    # compiled with optimizations for best formance
+    if args.optimized_build or args.flash_robots:
+        command += ["--copt=-O3"]
+
+    # Used for when flashing Jetsons
+    if args.flash_robots:
+        command += ["--cpu=jetson_nano"]
+
     # Select debug binaries to run
     if args.select_debug_binaries:
         if "sim" in args.select_debug_binaries:
@@ -108,6 +167,10 @@ if __name__ == "__main__":
         ):
             command += ["--run_under=gdb"]
 
+    # To run the Tracy profile, enable the TRACY_ENABLE macro
+    if args.tracy:
+        command += ["--cxxopt=-DTRACY_ENABLE"]
+
     # Don't cache test results
     if args.action in "test":
         command += ["--cache_test_results=false"]
@@ -122,6 +185,11 @@ if __name__ == "__main__":
         bazel_arguments += ["--enable_visualizer"]
     if args.enable_thunderscope:
         bazel_arguments += ["--enable_thunderscope"]
+    if args.flash_robots:
+        bazel_arguments += ["-pb deploy_nano.yml"]
+        bazel_arguments += ["--hosts"]
+        bazel_arguments += [f"192.168.0.20{id}" for id in args.flash_robots]
+        bazel_arguments += ["-pwd", args.pwd]
 
     if args.action in "test":
         command += ['--test_arg="' + arg + '"' for arg in bazel_arguments]

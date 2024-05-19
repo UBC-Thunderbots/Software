@@ -14,7 +14,7 @@ EnemyBallPlacementPlay::EnemyBallPlacementPlay(TbotsProto::AiConfig config)
 }
 
 void EnemyBallPlacementPlay::ballPlacementWithShadow(
-    TacticCoroutine::push_type &yield, const World &world,
+    TacticCoroutine::push_type &yield, const WorldPtr &world_ptr,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
     std::array<std::shared_ptr<MoveTactic>, 2> move_tactics, Point placement_point)
 {
@@ -41,8 +41,9 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
 
     do
     {
-        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                                world.enemyTeam(), world.ball(), false);
+        auto enemy_threats =
+            getAllEnemyThreats(world_ptr->field(), world_ptr->friendlyTeam(),
+                               world_ptr->enemyTeam(), world_ptr->ball(), false);
 
         // Create tactic vector (starting with Goalie)
         PriorityTacticVector tactics_to_run = {{}};
@@ -59,17 +60,18 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         tactics_to_run[0].emplace_back(crease_defenders[2]);
 
         Vector ball_to_net =
-            (world.ball().position() - world.field().friendlyGoalCenter())
+            (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
                 .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
 
-        Vector placement_to_net = (placement_point - world.field().friendlyGoalCenter())
-                                      .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
+        Vector placement_to_net =
+            (placement_point - world_ptr->field().friendlyGoalCenter())
+                .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
 
         // Check to see if the enemy has the ball. Once they do, we change our shadowing
         // behaviour
-        for (const auto &enemy_robot : world.enemyTeam().getAllRobotsExceptGoalie())
+        for (const auto &enemy_robot : world_ptr->enemyTeam().getAllRobotsExceptGoalie())
         {
-            if ((enemy_robot.position() - world.ball().position()).length() < 0.25)
+            if ((enemy_robot.position() - world_ptr->ball().position()).length() < 0.25)
             {
                 enemy_at_ball = true;
             }
@@ -80,13 +82,17 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         if (!enemy_at_ball)
         {
             move_tactics[0]->updateControlParams(
-                world.ball().position() + ball_to_net +
+                world_ptr->ball().position() + ball_to_net +
                     ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
-                ball_to_net.orientation() + Angle::half(), 0);
+                ball_to_net.orientation() + Angle::half(), 0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
             move_tactics[1]->updateControlParams(
-                world.ball().position() + ball_to_net -
+                world_ptr->ball().position() + ball_to_net -
                     ball_to_net.perpendicular().normalize(1.25 * ROBOT_MAX_RADIUS_METERS),
-                ball_to_net.orientation() + Angle::half(), 0);
+                ball_to_net.orientation() + Angle::half(), 0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
             tactics_to_run[0].emplace_back(move_tactics[0]);
             tactics_to_run[0].emplace_back(move_tactics[1]);
         }
@@ -97,12 +103,16 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
                 placement_point + placement_to_net +
                     placement_to_net.perpendicular().normalize(1.25 *
                                                                ROBOT_MAX_RADIUS_METERS),
-                placement_to_net.orientation() + Angle::half(), 0);
+                placement_to_net.orientation() + Angle::half(), 0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
             move_tactics[1]->updateControlParams(
                 placement_point + placement_to_net -
                     placement_to_net.perpendicular().normalize(1.25 *
                                                                ROBOT_MAX_RADIUS_METERS),
-                placement_to_net.orientation() + Angle::half(), 0);
+                placement_to_net.orientation() + Angle::half(), 0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
             tactics_to_run[0].emplace_back(move_tactics[0]);
             tactics_to_run[0].emplace_back(move_tactics[1]);
         }
@@ -111,7 +121,9 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         {
             move_tactics[0]->updateControlParams(
                 placement_point + placement_to_net,
-                placement_to_net.orientation() + Angle::half(), 0);
+                placement_to_net.orientation() + Angle::half(), 0,
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
+                TbotsProto::ObstacleAvoidanceMode::SAFE);
             // We need a big shadow distance to avoid "bullying" the robot ball placing.
             // Otherwise, we get a penalty
             shadow_enemy->updateControlParams(
@@ -128,9 +140,9 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
 }
 
 void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                            const World &world)
+                                            const WorldPtr &world_ptr)
 {
-    std::optional<Point> placement_point = world.gameState().getBallPlacementPoint();
+    std::optional<Point> placement_point = world_ptr->gameState().getBallPlacementPoint();
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders = {
         // TODO-AKHIL: Remove this hard-coded value
@@ -148,14 +160,14 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     if (placement_point.has_value())
     {
-        ballPlacementWithShadow(yield, world, crease_defenders, move_tactics,
+        ballPlacementWithShadow(yield, world_ptr, crease_defenders, move_tactics,
                                 placement_point.value());
     }
     // if there is no placement_point, use the ball position
     else
     {
-        ballPlacementWithShadow(yield, world, crease_defenders, move_tactics,
-                                world.ball().position());
+        ballPlacementWithShadow(yield, world_ptr, crease_defenders, move_tactics,
+                                world_ptr->ball().position());
     }
 }
 

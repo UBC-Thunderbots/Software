@@ -24,6 +24,31 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [BallPlacementPlayFSM](/src/software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> StartState
+StartState --> AlignPlacementState : [!shouldKickOffWall]\n<i>alignPlacement</i>
+StartState --> KickOffWallState : [shouldKickOffWall]
+KickOffWallState --> KickOffWallState : [!kickDone && shouldKickOffWall]\n<i>kickOffWall</i>
+KickOffWallState --> KickOffWallState : [kickDone]
+KickOffWallState --> AlignPlacementState : [!kickDone]
+AlignPlacementState --> KickOffWallState : [shouldKickOffWall]
+AlignPlacementState --> AlignPlacementState : [!alignDone]\n<i>alignPlacement</i>
+AlignPlacementState --> PlaceBallState : [alignDone]
+PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
+PlaceBallState --> WaitState : [ballPlaced]\n<i>startWait</i>
+WaitState --> WaitState : [!waitDone]
+WaitState --> RetreatState : [waitDone]
+RetreatState --> Terminate:::terminate : [retreatDone && ballPlaced]
+RetreatState --> RetreatState : [ballPlaced]\n<i>retreat</i>
+
+```
+
 ## [CreaseDefensePlayFSM](/src/software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h)
 
 ```mermaid
@@ -231,16 +256,21 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> PositionToBlock
 PositionToBlock --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+PositionToBlock --> DribbleFSM : [shouldEvacuateCrease]\n<i>retrieveFromDeadZone</i>
 PositionToBlock --> Panic : [shouldPanic]\n<i>panic</i>
 PositionToBlock --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
 PositionToBlock --> PositionToBlock : <i>positionToBlock</i>
+DribbleFSM --> PivotKickFSM : [retrieveDone]\n<i>updatePivotKick</i>
+DribbleFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
+DribbleFSM --> DribbleFSM : [ballInInflatedDefenseArea]\n<i>retrieveFromDeadZone</i>
+DribbleFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
 Panic --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
 Panic --> PivotKickFSM : [shouldPivotChip]\n<i>updatePivotKick</i>
 Panic --> PositionToBlock : [panicDone]\n<i>positionToBlock</i>
 Panic --> Panic : <i>panic</i>
 PivotKickFSM --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
-PivotKickFSM --> PivotKickFSM : [ballInDefenseArea]\n<i>updatePivotKick</i>
-PivotKickFSM --> PositionToBlock : [!ballInDefenseArea]\n<i>positionToBlock</i>
+PivotKickFSM --> PivotKickFSM : [ballInInflatedDefenseArea]\n<i>updatePivotKick</i>
+PivotKickFSM --> PositionToBlock : [!ballInInflatedDefenseArea]\n<i>positionToBlock</i>
 MoveToGoalLine --> MoveToGoalLine : [shouldMoveToGoalLine]\n<i>moveToGoalLine</i>
 MoveToGoalLine --> PositionToBlock : [!shouldMoveToGoalLine]\n<i>positionToBlock</i>
 Terminate:::terminate --> Terminate:::terminate
@@ -338,11 +368,11 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> WaitingForPassState
 WaitingForPassState --> WaitingForPassState : [!passStarted]\n<i>updateReceive</i>
-WaitingForPassState --> OneTouchShotState : [passStarted_G&&onetouchPossible]\n<i>updateOnetouch</i>
-WaitingForPassState --> ReceiveAndDribbleState : [passStarted_G&&!onetouchPossible]\n<i>updateReceive</i>
+WaitingForPassState --> OneTouchShotState : [passStarted && onetouchPossible]\n<i>updateOnetouch</i>
+WaitingForPassState --> ReceiveAndDribbleState : [passStarted && !onetouchPossible]\n<i>updateReceive</i>
 ReceiveAndDribbleState --> ReceiveAndDribbleState : [!passFinished]\n<i>adjustReceive</i>
-OneTouchShotState --> OneTouchShotState : [!passFinished_G&&!strayPass]\n<i>updateOnetouch</i>
-OneTouchShotState --> ReceiveAndDribbleState : [!passFinished_G&&strayPass]\n<i>adjustReceive</i>
+OneTouchShotState --> OneTouchShotState : [!passFinished && !strayPass]\n<i>updateOnetouch</i>
+OneTouchShotState --> ReceiveAndDribbleState : [!passFinished && strayPass]\n<i>adjustReceive</i>
 ReceiveAndDribbleState --> Terminate:::terminate : [passFinished]\n<i>adjustReceive</i>
 OneTouchShotState --> Terminate:::terminate : [passFinished]\n<i>updateOnetouch</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>

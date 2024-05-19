@@ -25,16 +25,16 @@ void FreeKickPlayFSM::setupPosition(const Update &event)
     if (ranked_zones.empty())
     {
         ranked_zones =
-            pass_generator.generatePassEvaluation(event.common.world)
-                .rankZonesForReceiving(event.common.world,
+            pass_generator.generatePassEvaluation(*event.common.world_ptr)
+                .rankZonesForReceiving(*event.common.world_ptr,
                                        best_pass_and_score_so_far.pass.receiverPoint());
     }
     PriorityTacticVector tactics_to_run = {{}};
 
-    updateAlignToBallTactic(event.common.world);
+    updateAlignToBallTactic(event.common.world_ptr);
     tactics_to_run[0].emplace_back(align_to_ball_tactic);
 
-    updateOffensivePositioningTactics(event.common.world);
+    updateOffensivePositioningTactics(event.common.world_ptr);
     tactics_to_run[0].insert(tactics_to_run[0].end(),
                              offensive_positioning_tactics.begin(),
                              offensive_positioning_tactics.end());
@@ -51,11 +51,11 @@ bool FreeKickPlayFSM::setupDone(const Update &event)
     return align_to_ball_tactic->done();
 }
 
-void FreeKickPlayFSM::updateOffensivePositioningTactics(const World &world)
+void FreeKickPlayFSM::updateOffensivePositioningTactics(const WorldPtr &world_ptr)
 {
     using Zones = std::unordered_set<EighteenZoneId>;
 
-    auto pass_eval = pass_generator.generatePassEvaluation(world);
+    auto pass_eval = pass_generator.generatePassEvaluation(*world_ptr);
 
     for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
     {
@@ -63,16 +63,15 @@ void FreeKickPlayFSM::updateOffensivePositioningTactics(const World &world)
         auto pass  = pass_eval.getBestPassInZones(zone).pass;
 
         offensive_positioning_tactics[i]->updateControlParams(
-            pass.receiverPoint(), pass.receiverOrientation(), 0.0,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            pass.receiverPoint(), pass.receiverOrientation(), 0.0);
     }
 }
 
-void FreeKickPlayFSM::updateAlignToBallTactic(const World &world)
+void FreeKickPlayFSM::updateAlignToBallTactic(const WorldPtr &world_ptr)
 {
     // We want the kicker to get into position behind the ball facing the enemy net
-    Point ball_pos                = world.ball().position();
-    Vector ball_to_enemy_goal_vec = world.field().enemyGoalCenter() - ball_pos;
+    Point ball_pos                = world_ptr->ball().position();
+    Vector ball_to_enemy_goal_vec = world_ptr->field().enemyGoalCenter() - ball_pos;
     align_to_ball_tactic->updateControlParams(
         ball_pos - ball_to_enemy_goal_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
         ball_to_enemy_goal_vec.orientation(), 0);
@@ -81,9 +80,9 @@ void FreeKickPlayFSM::updateAlignToBallTactic(const World &world)
 bool FreeKickPlayFSM::shotFound(const Update &event)
 {
     shot =
-        calcBestShotOnGoal(event.common.world.field(), event.common.world.friendlyTeam(),
-                           event.common.world.enemyTeam(),
-                           event.common.world.ball().position(), TeamType::ENEMY);
+        calcBestShotOnGoal(event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
+                           event.common.world_ptr->enemyTeam(),
+                           event.common.world_ptr->ball().position(), TeamType::ENEMY);
     return shot && shot->getOpenAngle() > Angle::fromDegrees(MIN_OPEN_ANGLE_FOR_SHOT);
 }
 
@@ -92,7 +91,7 @@ void FreeKickPlayFSM::shootBall(const Update &event)
     LOG(DEBUG) << "Shooting ball...";
     PriorityTacticVector tactics_to_run = {{}};
 
-    Point ball_pos = event.common.world.ball().position();
+    Point ball_pos = event.common.world_ptr->ball().position();
 
     shoot_tactic->updateControlParams(
         ball_pos, (shot->getPointToShootAt() - ball_pos).orientation(),
@@ -104,19 +103,19 @@ void FreeKickPlayFSM::shootBall(const Update &event)
 
 void FreeKickPlayFSM::startLookingForPass(const FreeKickPlayFSM::Update &event)
 {
-    pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
+    pass_optimization_start_time = event.common.world_ptr->getMostRecentTimestamp();
     // Generate the best zones for receiving a pass
     // Only generate the zones once to avoid oscillatory behaviour
     ranked_zones =
-        pass_generator.generatePassEvaluation(event.common.world)
-            .rankZonesForReceiving(event.common.world,
+        pass_generator.generatePassEvaluation(*event.common.world_ptr)
+            .rankZonesForReceiving(*event.common.world_ptr,
                                    best_pass_and_score_so_far.pass.receiverPoint());
 }
 
 bool FreeKickPlayFSM::timeExpired(const FreeKickPlayFSM::Update &event)
 {
     Duration time_since_pass_optimization_start =
-        event.common.world.getMostRecentTimestamp() - pass_optimization_start_time;
+        event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time;
     return time_since_pass_optimization_start > MAX_TIME_TO_COMMIT_TO_PASS;
 }
 
@@ -126,10 +125,10 @@ void FreeKickPlayFSM::chipBall(const Update &event)
     PriorityTacticVector tactics_to_run = {{}};
 
     double fallback_chip_target_x_offset = 1.5;
-    Point chip_target                    = event.common.world.field().enemyGoalCenter() -
+    Point chip_target                    = event.common.world_ptr->field().enemyGoalCenter() -
                         Vector(fallback_chip_target_x_offset, 0);
 
-    chip_tactic->updateControlParams(event.common.world.ball().position(), chip_target);
+    chip_tactic->updateControlParams(event.common.world_ptr->ball().position(), chip_target);
     tactics_to_run[0].emplace_back(chip_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -140,24 +139,24 @@ void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
     PriorityTacticVector tactics_to_run = {{}};
 
     // Keep the kicker aligned to the ball
-    updateAlignToBallTactic(event.common.world);
+    updateAlignToBallTactic(event.common.world_ptr);
     tactics_to_run[0].emplace_back(align_to_ball_tactic);
 
     // Set robots to roam around the field to try to receive a pass
-    updateOffensivePositioningTactics(event.common.world);
+    updateOffensivePositioningTactics(event.common.world_ptr);
     tactics_to_run[0].insert(tactics_to_run[0].end(),
                              offensive_positioning_tactics.begin(),
                              offensive_positioning_tactics.end());
     event.common.set_tactics(tactics_to_run);
 
     best_pass_and_score_so_far =
-        pass_generator.generatePassEvaluation(event.common.world).getBestPassOnField();
+        pass_generator.generatePassEvaluation(*event.common.world_ptr).getBestPassOnField();
 }
 
 bool FreeKickPlayFSM::passFound(const Update &event)
 {
     Duration time_since_pass_optimization_start =
-        event.common.world.getMostRecentTimestamp() - pass_optimization_start_time;
+        event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time;
 
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time

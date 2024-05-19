@@ -8,7 +8,7 @@ FreeKickPlay::FreeKickPlay(TbotsProto::AiConfig config)
 {
 }
 
-void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
+void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const WorldPtr &world_ptr)
 {
     // This function doesn't get called and it will be removed once coroutines are phased
     // out

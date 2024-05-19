@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package TbotsProto;
 
-import "proto/vision.proto";
 import "proto/primitive.proto";
 import "proto/tbots_timestamp_msg.proto";
 

@@ -8,7 +8,7 @@
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/navigator/path_planner/global_path_planner_factory.h"
+#include "software/ai/navigator/trajectory/trajectory_planner.h"
 
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
 using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
@@ -42,10 +42,8 @@ class Play
     explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
 
     /**
-     * Gets Primitives from the Play given the path planner factory, the world, and
-     * inter-play communication
+     * Gets Primitives from the Play given the the world, and inter-play communication
      *
-     * @param path_planner_factory The path planner factory
      * @param world The updated world
      * @param inter_play_communication The inter-play communication struct
      * @param set_inter_play_communication_fun The callback to set the inter-play
@@ -54,8 +52,7 @@ class Play
      * @return the PrimitiveSet to execute
      */
     virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const GlobalPathPlannerFactory& path_planner_factory, const World& world,
-        const InterPlayCommunication& inter_play_communication,
+        const WorldPtr& world_ptr, const InterPlayCommunication& inter_play_communication,
         const SetInterPlayCommunicationCallback& set_inter_play_communication_fun);
 
     /**
@@ -84,6 +81,14 @@ class Play
 
     std::map<std::shared_ptr<const Tactic>, RobotId> tactic_robot_id_assignment;
 
+    // Cached robot trajectories
+    std::map<RobotId, TrajectoryPath> robot_trajectories;
+
+    // List of all obstacles in the world at the current iteration
+    // and all robot paths. Used for visualization
+    TbotsProto::ObstacleList obstacle_list;
+    TbotsProto::PathVisualization path_visualization;
+
     // TODO (#2359): make pure virtual once all plays are not coroutines
     /**
      * Updates the priority tactic vector with new tactics
@@ -92,22 +97,6 @@ class Play
      * updating the tactics
      */
     virtual void updateTactics(const PlayUpdate& play_update);
-
-    /**
-     * Gets Primitives from a Tactic given the path planner factory, the world, and the
-     * tactic
-     *
-     * @param path_planner_factory The path planner factory
-     * @param world The updated world
-     * @param tactic the Tactic
-     * @param motion_constraints the motion constraints to use
-     *
-     * @return the PrimitiveSet to execute
-     */
-    static std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitivesFromTactic(
-        const GlobalPathPlannerFactory& path_planner_factory, const World& world,
-        std::shared_ptr<Tactic> tactic,
-        std::set<TbotsProto::MotionConstraint> motion_constraints);
 
    private:
     /**
@@ -121,11 +110,10 @@ class Play
      * @return the remaining unassigned robots, the new primitives to assign, and robot to
      * tactic assignment
      */
-    static std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
-                      std::map<std::shared_ptr<const Tactic>, RobotId>>
-    assignTactics(const GlobalPathPlannerFactory& path_planner_factory,
-                  const World& world, TacticVector tactic_vector,
-                  const std::vector<Robot> robots_to_assign);
+    std::tuple<std::vector<Robot>, std::unique_ptr<TbotsProto::PrimitiveSet>,
+               std::map<std::shared_ptr<const Tactic>, RobotId>>
+    assignTactics(const WorldPtr& world_ptr, TacticVector tactic_vector,
+                  const std::vector<Robot>& robots_to_assign);
 
     /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
@@ -144,7 +132,7 @@ class Play
      * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
      */
-    PriorityTacticVector getTactics(const World& world);
+    PriorityTacticVector getTactics(const WorldPtr& world_ptr);
 
     /**
      * A wrapper function for the getNextTactics function.
@@ -180,12 +168,12 @@ class Play
      * @param world The current state of the world
      */
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
-                                const World& world) = 0;
+                                const WorldPtr& world_ptr) = 0;
 
     // Stop tactic common to all plays for robots that don't have tactics assigned
     TacticVector stop_tactics;
 
-    // Whether this plays requires a goalie
+    // Whether this play requires a goalie
     const bool requires_goalie;
 
     // TODO (#2359): remove this
@@ -194,10 +182,12 @@ class Play
 
     // TODO (#2359): remove this
     // The Play's knowledge of the most up-to-date World
-    std::optional<World> world_;
+    std::optional<WorldPtr> world_ptr_;
 
     // TODO (#2359): remove this
     PriorityTacticVector priority_tactics;
 
     uint64_t sequence_number = 0;
+
+    RobotNavigationObstacleFactory obstacle_factory;
 };

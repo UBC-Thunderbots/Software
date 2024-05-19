@@ -29,3 +29,22 @@ cc_library(
         "@boost//:filesystem",
     ],
 )
+
+cc_binary(
+    name = "robot_auto_test",
+    srcs = ["robot_auto_test.cpp"],
+    linkopts = [
+        "-lpthread",
+        "-lrt",
+    ],
+    deps = [
+        ":motor",
+        ":power",
+        "//proto/message_translation:tbots_geometry",
+        "//proto/primitive:primitive_msg_factory",
+        "//shared:robot_constants",
+        "//software/jetson_nano:primitive_executor",
+        "//software/logger",
+        "@trinamic",
+    ],
+)

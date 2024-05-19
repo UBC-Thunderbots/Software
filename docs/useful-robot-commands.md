@@ -1,6 +1,7 @@
 # Common Robot Commands
 
 # Table of Contents
+* [Common Debugging Steps](#common-debugging-steps)
 * [Off Robot Commands](#off-robot-commands)
    * [Wifi Disclaimer](#wifi-disclaimer)
    * [Miscellaneous Ansible Tasks & Options](#miscellaneous-ansible-tasks--options)
@@ -8,10 +9,62 @@
    * [Flashing the powerboard](#flashing-the-powerboard)
    * [Setting up nano](#setting-up-nano)
    * [Robot Diagnostics](#robot-diagnostics)
+   * [Robot Auto Test](#robot-auto-test)
 * [On Robot Commands](#on-robot-commands)
    * [Systemd Services](#systemd-services)
    * [Debugging Uart](#debugging-uart)
    * [Redis](#redis)
+
+# Common Debugging Steps
+```mermaid
+---
+title: Robot Debugging Steps
+---
+flowchart TD
+    ssh(Can you SSH into the robot? 
+        `ssh robot@192.168.0.20RobotID` OR `ssh robot@robot_name.local`
+        E.g. `ssh robot@192.168.0.203` or `ssh robot@robert.local` 
+        for a robot called robert with robot id 3)
+    ssh ---> |Yes| tloop_status
+    ssh --> |No - Second Try| monitor("`Connect Jetson to an external monitor and check wifi connection _or_ SSH using an ethernet cable`")
+    ssh --> |No - First Try| restart(Restart robot)
+    restart --> ssh
+
+    diagnostics("`Run Diagnostics while connected to '**tbots**' wifi`") --> robot_view
+    robot_view(Robot is shown as connected in 'Robot View' widget?) --> |Yes| check_motors(All motors move?)
+    style diagnostics stroke:#f66,stroke-width:2px,stroke-dasharray: 5 5
+
+    check_motors -->|Yes| field_test(Running AI?)
+    field_test -->|No| done(Done)
+    style done stroke:#30fa02,stroke-width:2px,stroke-dasharray: 5 5
+    field_test -->|Yes| field_test_moves(Does robot move during field test?)
+    field_test_moves --> |No| check_shell("`Check that the correct shell is placed on the robot`")
+    check_shell
+    field_test_moves --> |Yes| done
+
+    robot_view --> |No| ssh
+    check_motors -->|No| rip
+    rip(Check with a lead)
+                  
+    subgraph ssh_graph [Commands running on the robot]
+    tloop_status(Check if Thunderloop is running? 
+                               `service thunderloop status`)
+    tloop_status --> |Inactive| tloop_restart(Restart Thunderloop service
+                                              `service thunderloop restart`)
+    tloop_status --> |Running| tloop_logs(Check Thunderloop logs for errors
+                                          `journalctl -fu thunderloop -n 300`)
+    tloop_logs --> |No Errors| check_redis(Does `redis-cli get /network_interface` return 'wlan0', 
+    and does `redis-cli get /channel_id` return '0'?)
+    tloop_logs --> |Contains Errors| rip2("`Fix errors or check errors with a lead`")
+    check_redis --> |No| update_redis(Update Redis constants by running:
+                                      `redis-cli set /network_interface 'wlan0'`
+                                      `redis-cli set /channel_id '0'`)
+    check_redis --> |Yes| rip3(Check with a lead)
+    update_redis --> tloop_restart
+    tloop_restart --> tloop_status
+    end
+```
+
 
 # Off Robot Commands
 
@@ -42,9 +95,17 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 
 `bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
 
+You could also use the `tbots.py` script to flash
+
+`./tbots.py run run_ansible -f <robot_ids> -pwd <jetson_nano_password>` (Note that this uses robot IDs rather than full robot IP addresses)
+
+Example: Flashing robots 1, 4, and 7
+
+`./tbots.py run run_ansible -f 1 4 7 -pwd <jetson_nano_password>`
+
 ## Flashing the powerboard
 
-This will flash powerloop, the current firmware in `software/power/`, onto the power board. It will prompt the user into setting the powerboard into bootloader mode by holding the reset button and pressing the boot button. Then once the board is flashed, pressing the reset button after to use the new firmware.  
+This will flash powerloop, the current firmware in `software/power/`, onto the power board. It will prompt the user into setting the powerboard into bootloader mode by holding the boot button (left if looking from the back of the robot) and pressing the reset button (right if looking from the back of the robot), then releasing the reset button first, then the boot button. Once the board is flashed, pressing the reset button after to use the new firmware.  
 
 Looking from the back of the robot the reset and boot buttons are on right side of the battery holder on the lowest board with the reset being on the left and the boot on the right. <b>Warning it may kick/chip when pressed.</b>
 
@@ -77,6 +138,15 @@ From Software/src
 `./tbots.py run thunderscope --run_blue --run_diagnostics --interface <network_interface>`
 
 network_interface can be found with `ifconfig` commonly `wlp59s0` for wifi.
+
+## Robot Auto Test
+Runs the robot auto test fixture on a robot through Ansible, which tests the motor board and power board SPI and UART transfer respectively.
+
+From Software/src:
+
+`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook robot_auto_test_playbook.yml --hosts <robot-ip> --ssh_pass <jetson_nano_password>`
+* replace the <robot-ip> with the actual ip address of the jetson nano for the ssh connection.
+* replace the <jetson_nano_password> with the actual password for the jetson nano for the ssh connection.
 
 # On Robot Commands
 

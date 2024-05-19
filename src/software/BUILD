@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 cc_binary(
     name = "unix_full_system",
@@ -16,12 +17,13 @@ cc_binary(
         "//software/estop:arduino_util",
         "//software/logger",
         "//software/multithreading:observer_subject_adapter",
-        "//software/networking:threaded_proto_udp_listener",
-        "//software/networking:threaded_proto_udp_sender",
-        "//software/networking:threaded_proto_unix_listener",
+        "//software/networking/udp:threaded_proto_udp_listener",
+        "//software/networking/udp:threaded_proto_udp_sender",
+        "//software/networking/unix:threaded_proto_unix_listener",
         "//software/sensor_fusion:threaded_sensor_fusion",
         "//software/util/generic_factory",
         "@boost//:program_options",
+        "@tracy",
     ],
 )
 
@@ -30,8 +32,8 @@ cc_binary(
     srcs = ["er_force_simulator_main.cpp"],
     deps = [
         "//software:constants",
-        "//software/networking:threaded_proto_unix_listener",
-        "//software/networking:threaded_proto_unix_sender",
+        "//software/networking/unix:threaded_proto_unix_listener",
+        "//software/networking/unix:threaded_proto_unix_sender",
         "//software/simulation:er_force_simulator",
         "@boost//:program_options",
     ],
@@ -43,7 +45,7 @@ cc_binary(
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:constants",
-        "//software/networking:threaded_proto_udp_listener",
+        "//software/networking/udp:threaded_proto_udp_listener",
         "@boost//:program_options",
     ],
 )
@@ -78,6 +80,7 @@ pybind_library(
     deps = [
         "//proto:ssl_cc_proto",
         "//proto:tbots_cc_proto",
+        "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:tbots_geometry",
         "//shared:robot_constants",
         "//software/estop:threaded_estop_reader",
@@ -86,8 +89,9 @@ pybind_library(
         "//software/geom:segment",
         "//software/geom:vector",
         "//software/geom/algorithms",
-        "//software/networking:threaded_proto_udp_listener",
-        "//software/networking:threaded_proto_udp_sender",
+        "//software/networking/radio:threaded_proto_radio_sender",
+        "//software/networking/udp:threaded_proto_udp_listener",
+        "//software/networking/udp:threaded_proto_udp_sender",
         "//software/uart:boost_uart_communication",
         "//software/world",
         "//software/world:field",

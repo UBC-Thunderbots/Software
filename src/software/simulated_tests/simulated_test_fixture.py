@@ -6,12 +6,12 @@ import sys
 import os
 
 import pytest
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
 from pyqtgraph.Qt import QtCore, QtGui
 
-from software.networking.threaded_unix_sender import ThreadedUnixSender
+from software.networking.unix.threaded_unix_sender import ThreadedUnixSender
 from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 from software.simulated_tests import validation
@@ -20,11 +20,9 @@ from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.constants import ProtoUnixIOTypes
-from software.thunderscope.binary_context_managers import (
-    FullSystem,
-    Simulator,
-    Gamecontroller,
-)
+from software.thunderscope.binary_context_managers.full_system import FullSystem
+from software.thunderscope.binary_context_managers.simulator import Simulator
+from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.thunderscope_config import configure_simulated_test_view
 from software.thunderscope.replay.proto_logger import ProtoLogger
 
@@ -144,6 +142,8 @@ class SimulatedTestRunner(TbotsTestRunner):
         eventually_validation_failure_msg = "Test Timed Out"
 
         while time_elapsed_s < test_timeout_s:
+            # get time before we execute the loop
+            processing_start_time = time.time()
 
             # Check for new CI commands at this time step
             for (delay, cmd, team) in ci_cmd_with_delay:
@@ -163,14 +163,20 @@ class SimulatedTestRunner(TbotsTestRunner):
             self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
             time_elapsed_s += tick_duration_s
 
-            if self.thunderscope:
-                time.sleep(tick_duration_s)
-
             while True:
                 try:
                     world = self.world_buffer.get(
                         block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
                     )
+
+                    # We block until the timeout for the new primitives from AI. if not found still,
+                    # the SSL Wrapper packet is resent in a loop until we actually get a primitive set from AI
+                    # Otherwise, if the AI misses the first SSL Wrapper packet and doesn't start
+                    # the simulated test will continue to tick forward, causes syncing issues with the AI
+                    self.primitive_set_buffer.get(
+                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
+                    )
+
                     break
                 except queue.Empty as empty:
                     # If we timeout, that means full_system missed the last
@@ -186,11 +192,13 @@ class SimulatedTestRunner(TbotsTestRunner):
                     self.blue_full_system_proto_unix_io.send_proto(
                         RobotStatus, robot_status
                     )
-                    # We need this blocking get call to synchronize the running speed of world and primitives
-                    # Otherwise, we end up with behaviour that doesn't simulate what would happen in the real world
-                    self.primitive_set_buffer.get(
-                        block=True, timeout=WORLD_BUFFER_TIMEOUT, return_cached=False
-                    )
+
+            # get the time difference after we get the primitive (after any blocking that happened)
+            processing_time = time.time() - processing_start_time
+
+            # if the time we have blocked is less than a tick, sleep for the remaining time (for Thunderscope only)
+            if self.thunderscope and tick_duration_s > processing_time:
+                time.sleep(tick_duration_s - processing_time)
 
             # Validate
             (
@@ -534,7 +542,7 @@ def simulated_test_runner():
         should_restart_on_crash=False,
     ) as yellow_fs:
         with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs), ci_mode=True,
+            supress_logs=(not args.show_gamecontroller_logs)
         ) as gamecontroller:
 
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
@@ -543,6 +551,7 @@ def simulated_test_runner():
                 simulator_proto_unix_io,
                 blue_full_system_proto_unix_io,
                 yellow_full_system_proto_unix_io,
+                ProtoUnixIO(),
             )
             gamecontroller.setup_proto_unix_io(
                 blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,

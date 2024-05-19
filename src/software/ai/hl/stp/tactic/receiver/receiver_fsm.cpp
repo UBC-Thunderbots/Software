@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/tactic/receiver/receiver_fsm.h"
 
+#include "software/ai/hl/stp/tactic/move_primitive.h"
+
 Angle ReceiverFSM::getOneTouchShotDirection(const Ray& shot, const Ball& ball)
 {
     Vector shot_vector = shot.toUnitVector();
@@ -106,29 +108,30 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
 bool ReceiverFSM::onetouchPossible(const Update& event)
 {
     return !event.control_params.disable_one_touch_shot &&
-           (findFeasibleShot(event.common.world, event.common.robot) != std::nullopt);
+           (findFeasibleShot(*event.common.world_ptr, event.common.robot) !=
+            std::nullopt);
 }
 
 void ReceiverFSM::updateOnetouch(const Update& event)
 {
-    auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
+    auto best_shot = findFeasibleShot(*event.common.world_ptr, event.common.robot);
     auto one_touch = getOneTouchShotPositionAndOrientation(
-        event.common.robot, event.common.world.ball(), best_shot->getPointToShootAt());
+        event.common.robot, event.common.world_ptr->ball(),
+        best_shot->getPointToShootAt());
 
     if (best_shot && event.control_params.pass)
     {
-        event.common.set_primitive(createMovePrimitive(
-            CREATE_MOTION_CONTROL(one_touch.getPointToShootAt()),
-            one_touch.getOpenAngle(), 0, false, TbotsProto::DribblerMode::OFF,
+        event.common.set_primitive(std::make_unique<MovePrimitive>(
+            event.common.robot, one_touch.getPointToShootAt(), one_touch.getOpenAngle(),
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                           BALL_MAX_SPEED_METERS_PER_SECOND},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-            event.common.robot.robotConstants()));
+                           BALL_MAX_SPEED_METERS_PER_SECOND}));
     }
     else
     {
-        event.common.set_primitive(createStopPrimitive());
+        event.common.set_primitive(std::make_unique<StopPrimitive>());
     }
 }
 
@@ -136,19 +139,19 @@ void ReceiverFSM::updateReceive(const Update& event)
 {
     if (event.control_params.pass)
     {
-        event.common.set_primitive(createMovePrimitive(
-            CREATE_MOTION_CONTROL(event.control_params.pass->receiverPoint()),
-            event.control_params.pass->receiverOrientation(), 0, false,
+        event.common.set_primitive(std::make_unique<MovePrimitive>(
+            event.common.robot, event.control_params.pass->receiverPoint(),
+            event.control_params.pass->receiverOrientation(),
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-            event.common.robot.robotConstants(), std::optional<double>()));
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
     }
 }
 
 void ReceiverFSM::adjustReceive(const Update& event)
 {
-    auto ball      = event.common.world.ball();
+    auto ball      = event.common.world_ptr->ball();
     auto robot_pos = event.common.robot.position();
 
     if ((ball.position() - robot_pos).length() >
@@ -164,18 +167,18 @@ void ReceiverFSM::adjustReceive(const Update& event)
 
         Angle ball_receive_orientation = (ball.position() - robot_pos).orientation();
 
-        event.common.set_primitive(createMovePrimitive(
-            CREATE_MOTION_CONTROL(ball_receive_pos), ball_receive_orientation, 0, false,
+        event.common.set_primitive(std::make_unique<MovePrimitive>(
+            event.common.robot, ball_receive_pos, ball_receive_orientation,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-            event.common.robot.robotConstants(), std::optional<double>()));
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
     }
 }
 
 bool ReceiverFSM::passStarted(const Update& event)
 {
-    return event.common.world.ball().hasBallBeenKicked(
+    return event.common.world_ptr->ball().hasBallBeenKicked(
         event.control_params.pass->passerOrientation());
 }
 
@@ -183,24 +186,25 @@ bool ReceiverFSM::passFinished(const Update& event)
 {
     // We tolerate imperfect passes that hit the edges of the robot,
     // so that we can quickly transition out and grab the ball.
-    return event.common.robot.isNearDribbler(event.common.world.ball().position());
+    return event.common.robot.isNearDribbler(event.common.world_ptr->ball().position());
 }
 
 bool ReceiverFSM::strayPass(const Update& event)
 {
-    auto ball_position = event.common.world.ball().position();
+    auto ball_position = event.common.world_ptr->ball().position();
 
     Vector ball_receiver_point_vector(
         event.control_params.pass->receiverPoint().x() - ball_position.x(),
         event.control_params.pass->receiverPoint().y() - ball_position.y());
 
-    auto orientation_difference = event.common.world.ball().velocity().orientation() -
-                                  ball_receiver_point_vector.orientation();
+    auto orientation_difference =
+        event.common.world_ptr->ball().velocity().orientation() -
+        ball_receiver_point_vector.orientation();
 
     // if pass has strayed far from its intended destination (ex it was deflected)
     // we consider the pass finished
     bool stray_pass =
-        event.common.world.ball().velocity().length() > MIN_STRAY_PASS_SPEED &&
+        event.common.world_ptr->ball().velocity().length() > MIN_STRAY_PASS_SPEED &&
         orientation_difference > MIN_STRAY_PASS_ANGLE;
 
     return stray_pass;

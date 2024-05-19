@@ -99,9 +99,9 @@ protobuf_deps()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
-    commit = "9f9fb8b2f0213989247c9d5c0e814a8451d18d7f",
+    commit = "7332c6cf2afb2642f53bc23f9b4d9c1817318685",
     remote = "https://github.com/nelhage/rules_boost",
-    shallow_since = "1570056263 -0700",
+    shallow_since = "1606097530 -0500",
 )
 
 git_repository(
@@ -127,9 +127,9 @@ boost_deps()
 new_git_repository(
     name = "eigen",
     build_file = "@//extlibs:eigen.BUILD",
-    commit = "937c3d73cbf55b6edc658decf7931b90ede1daef",
+    commit = "6d829e766ff1b1ab867d93631163cbc63ed5798f",
     remote = "https://chromium.googlesource.com/external/gitlab.com/libeigen/eigen.git",
-    shallow_since = "1642460459 -0600",
+    shallow_since = "1694679508 +0000",
 )
 
 # nanopb: lightweight protobuf library used on the STM32. The build file in the
@@ -208,16 +208,6 @@ http_archive(
     urls = [
         "http://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz",
     ],
-)
-
-# We use our own fork of Box2D as we have made a few small modifications
-# See the repository readme for details
-new_git_repository(
-    name = "box2d",
-    build_file = "@//extlibs:box2d.BUILD",
-    commit = "bddb4ec7efc8a6630fcbe7ef913017d88fb9b4b1",
-    remote = "https://github.com/UBC-Thunderbots/Box2D",
-    shallow_since = "1571445859 -0700",
 )
 
 # tool used to flash firmware with bazel
@@ -339,9 +329,9 @@ bind(
 
 http_archive(
     name = "pybind11_bazel",
-    sha256 = "fec6281e4109115c5157ca720b8fe20c8f655f773172290b03f57353c11869c2",
-    strip_prefix = "pybind11_bazel-72cbbf1fbc830e487e3012862b7b720001b70672",
-    urls = ["https://github.com/pybind/pybind11_bazel/archive/72cbbf1fbc830e487e3012862b7b720001b70672.zip"],
+    sha256 = "9c2919136d7c3b4a4c4a4c0ac5eb97c101c5f59c417e4f1abe70c370b1590b73",
+    strip_prefix = "pybind11_bazel-2e5f4a6beece3b92d2f87744f305eb52b6852aa9",
+    urls = ["https://github.com/pybind/pybind11_bazel/archive/2e5f4a6beece3b92d2f87744f305eb52b6852aa9.zip"],
 )
 
 # We still require the pybind library.
@@ -394,3 +384,11 @@ git_repository(
 load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_setup")
 
 hedron_compile_commands_setup()
+
+new_git_repository(
+    name = "tracy",
+    build_file = "@//extlibs:tracy.BUILD",
+    commit = "37aff70dfa50cf6307b3fee6074d627dc2929143",
+    remote = "https://github.com/wolfpld/tracy.git",
+    shallow_since = "1697482622 +0200",
+)

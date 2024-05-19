@@ -18,11 +18,13 @@ Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
 }
 
 Robot::Robot(RobotId id, const RobotState &initial_state, const Timestamp &timestamp,
-             const std::set<RobotCapability> &unavailable_capabilities)
+             const std::set<RobotCapability> &unavailable_capabilities,
+             const RobotConstants_t &robot_constants)
     : id_(id),
       current_state_(initial_state),
       timestamp_(timestamp),
-      unavailable_capabilities_(unavailable_capabilities)
+      unavailable_capabilities_(unavailable_capabilities),
+      robot_constants_(robot_constants)
 {
 }
 
@@ -30,7 +32,7 @@ Robot::Robot(const TbotsProto::Robot &robot_proto)
     : id_(robot_proto.id()),
       current_state_(RobotState(robot_proto.current_state())),
       timestamp_(Timestamp::fromTimestampProto(robot_proto.timestamp())),
-      robot_constants_(create2021RobotConstants())
+      robot_constants_(DEFAULT_ROBOT_CONSTANTS)
 {
     for (const auto &unavailable_capability : robot_proto.unavailable_capabilities())
     {

@@ -1,18 +1,17 @@
 #include "software/ai/ai.h"
 
-#include <chrono>
-#include <memory>
-#include <utility>
+#include <Tracy.hpp>
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
+#include "software/tracy/tracy_constants.h"
+
 
 Ai::Ai(const TbotsProto::AiConfig& ai_config)
     : ai_config_(ai_config),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config)),
-      field_to_path_planner_factory(),
       ai_config_changed(false)
 {
     auto current_override = ai_config_.ai_control_config().override_ai_play();
@@ -46,6 +45,10 @@ void Ai::checkAiConfig()
 {
     if (ai_config_changed)
     {
+        ai_config_changed = false;
+
+        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_});
+
         auto current_override = ai_config_.ai_control_config().override_ai_play();
         if (current_override != TbotsProto::PlayName::UseAiSelection)
         {
@@ -62,47 +65,35 @@ void Ai::checkAiConfig()
     }
 }
 
-std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const World& world)
+std::unique_ptr<TbotsProto::PrimitiveSet> Ai::getPrimitives(const WorldPtr& world_ptr)
 {
-    checkAiConfig();
+    FrameMarkStart(TracyConstants::AI_FRAME_MARKER);
 
-    if (ai_config_changed)
-    {
-        fsm = std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config_});
-    }
+    checkAiConfig();
 
     fsm->process_event(PlaySelectionFSM::Update(
         [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
-        world.gameState(), ai_config_));
+        world_ptr->gameState(), ai_config_));
 
-    // We construct the global path planner once for the field. If the AI Config
-    // changes, there might be an update we need to reconstruct the path planner
-    // for and propagate the parameter change.
-    if (!field_to_path_planner_factory.contains(world.field()) || ai_config_changed)
-    {
-        field_to_path_planner_factory.insert_or_assign(
-            world.field(),
-            GlobalPathPlannerFactory(ai_config_.robot_navigation_obstacle_config(),
-                                     world.field()));
-        ai_config_changed = false;
-    }
-
+    std::unique_ptr<TbotsProto::PrimitiveSet> primitive_set;
     if (static_cast<bool>(override_play))
     {
-        return override_play->get(field_to_path_planner_factory.at(world.field()), world,
-                                  inter_play_communication,
-                                  [this](InterPlayCommunication comm) {
-                                      inter_play_communication = std::move(comm);
-                                  });
+        primitive_set = override_play->get(world_ptr, inter_play_communication,
+                                           [this](InterPlayCommunication comm) {
+                                               inter_play_communication = std::move(comm);
+                                           });
     }
     else
     {
-        return current_play->get(field_to_path_planner_factory.at(world.field()), world,
-                                 inter_play_communication,
-                                 [this](InterPlayCommunication comm) {
-                                     inter_play_communication = std::move(comm);
-                                 });
+        primitive_set = current_play->get(world_ptr, inter_play_communication,
+                                          [this](InterPlayCommunication comm) {
+                                              inter_play_communication = std::move(comm);
+                                          });
     }
+
+    FrameMarkEnd(TracyConstants::AI_FRAME_MARKER);
+
+    return primitive_set;
 }
 
 TbotsProto::PlayInfo Ai::getPlayInfo() const

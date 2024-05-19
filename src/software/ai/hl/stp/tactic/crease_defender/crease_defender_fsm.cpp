@@ -31,11 +31,13 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 void CreaseDefenderFSM::blockThreat(
     const Update& event, boost::sml::back::process<MoveFSM::Update> processEvent)
 {
-    Point destination       = event.common.robot.position();
+    Point destination = event.common.robot.position();
+    // Use a slightly larger inflation factor to avoid the crease defenders from sitting
+    // right on the edge of the defense area obstacle.
     auto block_threat_point = findBlockThreatPoint(
-        event.common.world.field(), event.control_params.enemy_threat_origin,
+        event.common.world_ptr->field(), event.control_params.enemy_threat_origin,
         event.control_params.crease_defender_alignment,
-        robot_navigation_obstacle_config.robot_obstacle_inflation_factor());
+        robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5);
     if (block_threat_point)
     {
         destination = block_threat_point.value();
@@ -50,18 +52,18 @@ void CreaseDefenderFSM::blockThreat(
             .orientation();
 
     // Chip to the enemy half of the field
-    double chip_distance = event.common.world.field().xLength() / 3.0;
+    double chip_distance = event.common.world_ptr->field().xLength() / 3.0;
     // If enemy threat is on the sides, then chip to near the edge of the field
     if (event.control_params.enemy_threat_origin.x() <
-        event.common.world.field().friendlyDefenseArea().xMax())
+        event.common.world_ptr->field().friendlyDefenseArea().xMax())
     {
-        chip_distance = event.common.world.field().yLength() / 3.0 -
-                        event.common.world.field().friendlyDefenseArea().yMax();
+        chip_distance = event.common.world_ptr->field().yLength() / 3.0 -
+                        event.common.world_ptr->field().friendlyDefenseArea().yMax();
     }
 
     TbotsProto::BallCollisionType ball_collision_type =
         TbotsProto::BallCollisionType::ALLOW;
-    if ((event.common.world.ball().position() - destination).length() <
+    if ((event.common.world_ptr->ball().position() - destination).length() <
         (event.common.robot.position() - destination).length())
     {
         ball_collision_type = TbotsProto::BallCollisionType::AVOID;
@@ -74,8 +76,9 @@ void CreaseDefenderFSM::blockThreat(
         .dribbler_mode       = TbotsProto::DribblerMode::OFF,
         .ball_collision_type = ball_collision_type,
         .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance},
-        .max_allowed_speed_mode = event.control_params.max_allowed_speed_mode,
-        .target_spin_rev_per_s  = 0.0};
+        .max_allowed_speed_mode  = event.control_params.max_allowed_speed_mode,
+        .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+        .target_spin_rev_per_s   = 0.0};
 
     // Update the get behind ball fsm
     processEvent(MoveFSM::Update(control_params, event.common));

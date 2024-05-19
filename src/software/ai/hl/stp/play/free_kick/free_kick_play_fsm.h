@@ -66,14 +66,14 @@ struct FreeKickPlayFSM
      *
      * @param world the latest world
      */
-    void updateOffensivePositioningTactics(const World& world);
+    void updateOffensivePositioningTactics(const WorldPtr& world_ptr);
 
     /**
      * Updates the kicker to align to the ball
      *
      * @param world the latest world
      */
-    void updateAlignToBallTactic(const World& world);
+    void updateAlignToBallTactic(const WorldPtr& world_ptr);
 
     /**
      * Action that starts the process of looking for a pass

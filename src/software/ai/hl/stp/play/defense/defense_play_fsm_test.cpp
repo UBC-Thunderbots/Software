@@ -8,7 +8,7 @@
 
 TEST(DefensePlayFSMTest, test_transitions)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
 
     TbotsProto::AiConfig ai_config;
 

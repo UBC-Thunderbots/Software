@@ -17,7 +17,8 @@ class PassGeneratorTest : public testing::Test
         passing_config.set_min_pass_speed_m_per_s(3.5);
         passing_config.set_max_pass_speed_m_per_s(5.5);
 
-        pitch_division = std::make_shared<const EighteenZonePitchDivision>(world.field());
+        pitch_division =
+            std::make_shared<const EighteenZonePitchDivision>(world->field());
         pass_generator = std::make_shared<PassGenerator<EighteenZoneId>>(pitch_division,
                                                                          passing_config);
     }
@@ -43,7 +44,7 @@ class PassGeneratorTest : public testing::Test
         }
     }
 
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     TbotsProto::PassingConfig passing_config;
     std::shared_ptr<const FieldPitchDivision<EighteenZoneId>> pitch_division;
     std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator;
@@ -54,28 +55,28 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     // Test that we can converge to a stable pass in a scenario where there is a
     // fairly clear best pass.
 
-    world.updateBall(
+    world->updateBall(
         Ball(BallState(Point(2, 2), Vector(0, 0)), Timestamp::fromSeconds(0)));
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(3, {1, 0}, {0.5, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({
-        Robot(0, world.field().enemyGoalpostNeg(), {0, 0}, Angle::zero(),
+        Robot(0, world->field().enemyGoalpostNeg(), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(1, world.field().enemyGoalpostNeg() - Vector(0.1, 0), {0, 0}, Angle::zero(),
+        Robot(1, world->field().enemyGoalpostNeg() - Vector(0.1, 0), {0, 0},
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(2, world->field().enemyGoalpostNeg() - Vector(0.2, 0), {0, 0},
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(3, world->field().enemyGoalpostPos(), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(2, world.field().enemyGoalpostNeg() - Vector(0.2, 0), {0, 0}, Angle::zero(),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(3, world.field().enemyGoalpostPos(), {0, 0}, Angle::zero(),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(4, world.field().enemyGoalpostPos() - Vector(0.1, 0), {0, 0}, Angle::zero(),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(5, world.field().enemyGoalpostPos() - Vector(0.2, 0), {0, 0}, Angle::zero(),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(4, world->field().enemyGoalpostPos() - Vector(0.1, 0), {0, 0},
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(5, world->field().enemyGoalpostPos() - Vector(0.2, 0), {0, 0},
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
         Robot(6, {-1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
         Robot(7, {-1, 0.5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -83,20 +84,20 @@ TEST_F(PassGeneratorTest, check_pass_converges)
         Robot(8, {-1, -0.5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    world.updateEnemyTeamState(enemy_team);
+    world->updateEnemyTeamState(enemy_team);
 
     // call generate evaluation 100 times on the given world
-    stepPassGenerator(pass_generator, world, 100);
+    stepPassGenerator(pass_generator, *world, 100);
 
     auto [best_pass, score] =
-        pass_generator->generatePassEvaluation(world).getBestPassOnField();
+        pass_generator->generatePassEvaluation(*world).getBestPassOnField();
 
     // After 100 iterations on the same world, we should "converge"
     // to the same pass.
     for (int i = 0; i < 7; i++)
     {
         auto [pass, score] =
-            pass_generator->generatePassEvaluation(world).getBestPassOnField();
+            pass_generator->generatePassEvaluation(*world).getBestPassOnField();
 
         EXPECT_LE((best_pass.receiverPoint() - pass.receiverPoint()).length(), 0.7);
         EXPECT_LE(abs(best_pass.speed() - pass.speed()), 0.7);
@@ -109,7 +110,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
 {
     // Test that we do not converge to a pass from the passer robot to itself
 
-    world.updateBall(Ball(BallState({3.5, 0}, {0, 0}), Timestamp::fromSeconds(0)));
+    world->updateBall(Ball(BallState({3.5, 0}, {0, 0}), Timestamp::fromSeconds(0)));
 
     // The passer robot
     Robot passer = Robot(0, {3.7, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -121,7 +122,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
                            Timestamp::fromSeconds(0));
 
     Team friendly_team({passer, receiver}, Duration::fromSeconds(10));
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     // We put a few enemies in to force the pass generator to make a decision,
     // otherwise most of the field would be a valid point to pass to
@@ -135,13 +136,13 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
                   Timestamp::fromSeconds(0)),
         },
         Duration::fromSeconds(10));
-    world.updateEnemyTeamState(enemy_team);
+    world->updateEnemyTeamState(enemy_team);
 
     // call generate evaluation 100 times on the given world
-    stepPassGenerator(pass_generator, world, 100);
+    stepPassGenerator(pass_generator, *world, 100);
 
     // Find what pass we converged to
-    auto pass_eval = pass_generator->generatePassEvaluation(world);
+    auto pass_eval = pass_generator->generatePassEvaluation(*world);
     auto [converged_pass, converged_score] = pass_eval.getBestPassOnField();
 
     // We expect to have converged to a point near robot 2. The tolerance is fairly
@@ -162,7 +163,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
     Robot neg_y_friendly = Robot(1, {2, -2}, {0, 0}, Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
     friendly_team.updateRobots({pos_y_friendly, neg_y_friendly});
-    world.updateFriendlyTeamState(friendly_team);
+    world->updateFriendlyTeamState(friendly_team);
 
     // Put a line of enemies along the +x axis, "separating" the two friendly robots
     Team enemy_team(Duration::fromSeconds(10));
@@ -184,16 +185,16 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
         Robot(7, {3.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    world.updateEnemyTeamState(enemy_team);
+    world->updateEnemyTeamState(enemy_team);
 
-    world.updateBall(
+    world->updateBall(
         Ball(BallState(Point(3, 1), Vector(0, 0)), Timestamp::fromSeconds(0)));
 
     // call generate evaluation 100 times on the given world
-    stepPassGenerator(pass_generator, world, 100);
+    stepPassGenerator(pass_generator, *world, 100);
 
     // Find what pass we converged to
-    auto pass_evaluation = pass_generator->generatePassEvaluation(world);
+    auto pass_evaluation = pass_generator->generatePassEvaluation(*world);
     auto converged_pass  = pass_evaluation.getBestPassOnField().pass;
 
     // We expect to have converged to a point closer to the robot in the neg_y
@@ -203,14 +204,14 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
 
     // Set the passer point so that the only reasonable pass is to the robot
     // on the -y side
-    world.updateBall(
+    world->updateBall(
         Ball(BallState(Point(3, -1), Vector(0, 0)), Timestamp::fromSeconds(0)));
 
     // call generate evaluation 100 times on the given world
-    stepPassGenerator(pass_generator, world, 100);
+    stepPassGenerator(pass_generator, *world, 100);
 
     // Find what pass we converged to
-    pass_evaluation = pass_generator->generatePassEvaluation(world);
+    pass_evaluation = pass_generator->generatePassEvaluation(*world);
     converged_pass  = pass_evaluation.getBestPassOnField().pass;
 
     // We expect to have converged to a point closer to the robot in the pos_y

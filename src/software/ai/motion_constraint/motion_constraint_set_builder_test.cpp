@@ -11,7 +11,7 @@
 // This namespace contains all the test parameters
 namespace
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Pass pass({1, 1}, {0.5, 0}, 2.29);
     TbotsProto::AiConfig ai_config;
 
@@ -87,29 +87,35 @@ namespace
     auto stoppage_or_them_motion_constraints = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
          TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
+         TbotsProto::MotionConstraint::FRIENDLY_GOAL,
          TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     auto gamestart_or_us_motion_constraints = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+         TbotsProto::MotionConstraint::FRIENDLY_GOAL,
          TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     auto kickoff_motion_constraints = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+         TbotsProto::MotionConstraint::FRIENDLY_GOAL,
          TbotsProto::MotionConstraint::CENTER_CIRCLE,
          TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
          TbotsProto::MotionConstraint::ENEMY_HALF});
 
     auto our_penalty_motion_constraints = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+         TbotsProto::MotionConstraint::FRIENDLY_GOAL,
          TbotsProto::MotionConstraint::ENEMY_HALF});
 
     auto them_penalty_motion_constraints = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
+         TbotsProto::MotionConstraint::FRIENDLY_GOAL,
          TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
          TbotsProto::MotionConstraint::FRIENDLY_HALF});
 
     auto them_ball_placement = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
+         TbotsProto::MotionConstraint::FRIENDLY_GOAL,
          TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
          TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE});
 }  // namespace

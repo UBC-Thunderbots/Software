@@ -5,6 +5,8 @@
 #include "proto/vision.pb.h"
 #include "proto/visualization.pb.h"
 #include "proto/world.pb.h"
+#include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
+#include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/world/world.h"
 
@@ -125,6 +127,36 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     const std::map<std::string, double>& values);
 
 /**
+ * Returns a TbotsProto::DebugShapesMap proto containing the name
+ * shape pairs.
+ *
+ * Could use LOG(VISUALIZE) to plot these values. Example:
+ *  LOG(VISUALIZE) << *createDebugShapesMap({
+ *      {"circle_name", *createShapeProto(circle_object)},
+ *      {"stadium_name", *createShapeProto(stadium_object)},
+ *      {"polygon_name", *createShapeProto(polygon_object)}
+ *  });
+ *
+ * @param named_shapes The map of name shape proto pairs to plot
+ *
+ * @return The unique_ptr to a TbotsProto::DebugShapesMap proto containing data with
+ *        specified names and shapes
+ */
+std::unique_ptr<TbotsProto::DebugShapesMap> createDebugShapesMap(
+    const std::map<std::string, TbotsProto::Shape>& named_shapes);
+
+/**
+ * Returns a TbotsProto::Shape proto given a shape.
+ *
+ * @param shape The shape to create a TbotsProto::Shape for
+ *
+ * @return The unique_ptr to a TbotsProto::Shape proto containing the shape
+ */
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Circle& circle);
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Polygon& polygon);
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium& stadium);
+
+/**
  * Returns a timestamp msg with the time that this function was called
  *
  * @return The unique_ptr to a TbotsProto::Timestamp with the current UTC time
@@ -177,3 +209,51 @@ std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedT
  */
 std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
     const std::vector<double>& costs, int num_rows, int num_cols);
+
+/**
+ * Generate a 2D Trajectory Path given 2D trajectory parameters
+ *
+ * @param params 2D Trajectory Path
+ * @param initial_velocity Initial velocity to use for the trajectory
+ * @param robot_constants Constants to use for the trajectory
+ * @return TrajectoryPath, or std::nullopt if the trajectory path could not be created
+ * from the given parameters
+ */
+std::optional<TrajectoryPath> createTrajectoryPathFromParams(
+    const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
+    const RobotConstants& robot_constants);
+
+/**
+ * Generate an angular trajectory Path given angular trajectory proto parameters
+ *
+ * @param params angular Trajectory Path
+ * @param initial_velocity Initial velocity to use for the trajectory
+ * @param robot_constants Constants to use for the trajectory
+ * @return Generate angular trajectory
+ */
+BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
+    const TbotsProto::TrajectoryParamsAngular1D& params,
+    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants);
+
+/**
+ * Convert dribbler mode to dribbler speed
+ *
+ * @param dribbler_mode The DribblerMode
+ * @param robot_constants The robot constants
+ *
+ * @return the dribbler speed in RPM
+ */
+double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
+                                          RobotConstants_t robot_constants);
+
+/**
+ * Convert max allowed speed mode to max allowed speed
+ *
+ * @param max_allowed_speed_mode The MaxAllowedSpeedMode
+ * @param robot_constants The robot constants
+ *
+ * @return the max allowed speed in m/s
+ */
+double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+    RobotConstants_t robot_constants);

@@ -1,4 +1,4 @@
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -23,7 +23,7 @@ class BallMovesForward(Validation):
                   PASSING if ball moves forward
         """
         validation_status = ValidationStatus.FAILING
-        current_ball_position = tbots.createPoint(
+        current_ball_position = tbots_cpp.createPoint(
             world.ball.current_state.global_position
         )
 
@@ -38,14 +38,14 @@ class BallMovesForward(Validation):
         """
         return create_validation_geometry(
             [
-                tbots.Rectangle(
-                    tbots.Point(
+                tbots_cpp.Rectangle(
+                    tbots_cpp.Point(
                         self.last_ball_position.x(),
-                        tbots.Field(world.field).fieldBoundary().yMin(),
+                        tbots_cpp.Field(world.field).fieldBoundary().yMin(),
                     ),
-                    tbots.Point(
+                    tbots_cpp.Point(
                         self.last_ball_position.x() + 0.01,
-                        tbots.Field(world.field).fieldBoundary().yMax(),
+                        tbots_cpp.Field(world.field).fieldBoundary().yMax(),
                     ),
                 )
             ]
@@ -57,7 +57,7 @@ class BallMovesForward(Validation):
 
 (
     BallEventuallyMovesForward,
-    BallEventuallyStopsMovingForward,
+    BallStopsMovingForward,
     BallAlwaysMovesForward,
     BallNeverMovesForward,
 ) = create_validation_types(BallMovesForward)

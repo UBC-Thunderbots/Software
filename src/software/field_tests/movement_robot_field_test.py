@@ -1,6 +1,6 @@
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 import sys
 from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
@@ -10,6 +10,7 @@ from software.simulated_tests.simulated_test_fixture import *
 from software.logger.logger import createLogger
 from software.simulated_tests.robot_enters_region import RobotEventuallyEntersRegion
 from proto.message_translation.tbots_protobuf import create_world_state
+import math
 
 logger = createLogger(__name__)
 
@@ -38,14 +39,15 @@ logger = createLogger(__name__)
 #     move_tactic.ball_collision_type = BallCollisionType.AVOID
 #     move_tactic.auto_chip_or_kick.CopyFrom(AutoChipOrKick(autokick_speed_m_per_s=0.0))
 #     move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
+#     move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
 #     move_tactic.target_spin_rev_per_s = 0.0
 #
 #     # setup world state
 #     initial_worldstate = create_world_state(
 #         yellow_robot_locations=[],
-#         blue_robot_locations=[tbots.Point(robot_starting_x, robot_starting_y)],
-#         ball_location=tbots.Point(1, 1),
-#         ball_velocity=tbots.Point(0, 0),
+#         blue_robot_locations=[tbots_cpp.Point(robot_starting_x, robot_starting_y)],
+#         ball_location=tbots_cpp.Point(1, 1),
+#         ball_velocity=tbots_cpp.Point(0, 0),
 #     )
 #     simulated_test_runner.set_worldState(initial_worldstate)
 #
@@ -59,8 +61,8 @@ logger = createLogger(__name__)
 #         [
 #             RobotEventuallyEntersRegion(
 #                 regions=[
-#                     tbots.Circle(
-#                         tbots.Point(robot_x_destination, robot_y_destination), 0.2
+#                     tbots_cpp.Circle(
+#                         tbots_cpp.Point(robot_x_destination, robot_y_destination), 0.2
 #                     )
 #                 ]
 #             ),
@@ -77,12 +79,23 @@ logger = createLogger(__name__)
 # this test can only be run on the field
 def test_basic_rotation(field_test_runner):
     test_angles = [0, 45, 90, 180, 270, 0]
-    id = 5
 
-    # current position
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
-    robot = [robot for robot in world.friendly_team.team_robots if robot.id == id][0]
+    if len(world.friendly_team.team_robots) == 0:
+        raise Exception("The first world received had no robots in it!")
 
+    print("Here are the robots:")
+    print(
+        [
+            robot.current_state.global_position
+            for robot in world.friendly_team.team_robots
+        ]
+    )
+
+    id = world.friendly_team.team_robots[0].id
+    print(f"Running test on robot {id}")
+
+    robot = world.friendly_team.team_robots[0]
     rob_pos_p = robot.current_state.global_position
     logger.info("staying in pos {rob_pos_p}")
 
@@ -97,6 +110,7 @@ def test_basic_rotation(field_test_runner):
             AutoChipOrKick(autokick_speed_m_per_s=0.0)
         )
         move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
+        move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
         move_tactic.target_spin_rev_per_s = 0.0
 
         # Setup Tactic
@@ -121,6 +135,91 @@ def test_basic_rotation(field_test_runner):
         logger.info(f"robot set to {angle} orientation")
 
         time.sleep(2)
+
+
+def test_one_robots_square(field_test_runner):
+    world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
+    if len(world.friendly_team.team_robots) == 0:
+        raise Exception("The first world received had no robots in it!")
+
+    print("Here are the robots:")
+    print(
+        [
+            robot.current_state.global_position
+            for robot in world.friendly_team.team_robots
+        ]
+    )
+
+    id = world.friendly_team.team_robots[0].id
+    print(f"Running test on robot {id}")
+
+    point1 = Point(x_meters=-0.3, y_meters=0.6)
+    point2 = Point(x_meters=-0.3, y_meters=-0.6)
+    point3 = Point(x_meters=-1.5, y_meters=-0.6)
+    point4 = Point(x_meters=-1.5, y_meters=0.6)
+
+    tactic_0 = MoveTactic(
+        destination=point1,
+        final_speed=0.0,
+        dribbler_mode=DribblerMode.OFF,
+        final_orientation=Angle(radians=-math.pi / 2),
+        ball_collision_type=BallCollisionType.AVOID,
+        auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
+        max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+        target_spin_rev_per_s=0.0,
+    )
+    tactic_1 = MoveTactic(
+        destination=point2,
+        final_speed=0.0,
+        dribbler_mode=DribblerMode.OFF,
+        final_orientation=Angle(radians=-math.pi / 2),
+        ball_collision_type=BallCollisionType.AVOID,
+        auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
+        max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+        target_spin_rev_per_s=0.0,
+    )
+    tactic_2 = MoveTactic(
+        destination=point3,
+        final_speed=0.0,
+        dribbler_mode=DribblerMode.OFF,
+        final_orientation=Angle(radians=-math.pi / 2),
+        ball_collision_type=BallCollisionType.AVOID,
+        auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
+        max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+        target_spin_rev_per_s=0.0,
+    )
+    tactic_3 = MoveTactic(
+        destination=point4,
+        final_speed=0.0,
+        dribbler_mode=DribblerMode.OFF,
+        final_orientation=Angle(radians=-math.pi / 2),
+        ball_collision_type=BallCollisionType.AVOID,
+        auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
+        max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
+        target_spin_rev_per_s=0.0,
+    )
+    tactics = [tactic_0, tactic_1, tactic_2, tactic_3]
+
+    for tactic in tactics:
+        print(f"Going to {tactic.destination}")
+        params = AssignedTacticPlayControlParams()
+        params.assigned_tactics[id].move.CopyFrom(tactic)
+
+        field_test_runner.set_tactics(params, True)
+        field_test_runner.run_test(
+            always_validation_sequence_set=[[]],
+            eventually_validation_sequence_set=[[]],
+            test_timeout_s=4,
+        )
+
+    # Send a stop tactic after the test finishes
+    stop_tactic = StopTactic()
+    params = AssignedTacticPlayControlParams()
+    params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
 
 
 if __name__ == "__main__":

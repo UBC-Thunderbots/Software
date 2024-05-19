@@ -1,6 +1,6 @@
 import pytest
 
-import software.python_bindings as tbots
+import software.python_bindings as tbots_cpp
 from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_moves_forward import *
@@ -20,81 +20,76 @@ from proto.ssl_gc_common_pb2 import Team
     "ball_initial_position,ball_initial_velocity,robot_initial_position",
     [
         # test panic ball very fast in straight line
-        (tbots.Point(0, 0), tbots.Vector(-5, 0), tbots.Point(-4, 0)),
+        (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 0), tbots_cpp.Point(-4, 0)),
         # test panic ball very_fast in diagonal line
-        # TODO (#2609): failing tests when thunderscope is off
-        # (
-        #     tbots.Point(0, 0),
-        #     tbots.Vector(-5.5, 0.25),
-        #     tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
-        #     + tbots.Vector(0, -0.5),
-        # ),
+        (
+            tbots_cpp.Point(0, 0),
+            tbots_cpp.Vector(-5.5, 0.25),
+            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+            + tbots_cpp.Vector(0, -0.5),
+        ),
         # test ball very fast misses net
-        (tbots.Point(0, 0), tbots.Vector(-5, 1), tbots.Point(-4.5, 0)),
-        # test slow ball at sharp angle to friendly goal
-        # TODO (#2609): failing tests when thunderscope is off
+        (tbots_cpp.Point(0, 0), tbots_cpp.Vector(-5, 1), tbots_cpp.Point(-4.5, 0)),
         # ball slow inside friendly defense area
-        # (tbots.Point(-4, 0.8), tbots.Vector(-0.2, 0), tbots.Point(0, 0)),
-        # # ball slow inside friendly defense area
-        # (tbots.Point(-4, 0.8), tbots.Vector(-0.2, 0), tbots.Point(0, 2)),
-        # # ball slow inside friendly defense area
-        # (tbots.Point(-4, 0.8), tbots.Vector(-0.2, 0), tbots.Point(0, 2)),
+        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 0)),
         # ball slow inside friendly defense area
-        (tbots.Point(-4, 0.8), tbots.Vector(-0.2, 0), tbots.Point(-4, 0),),
+        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(0, 2)),
+        # ball slow inside friendly defense area
+        (tbots_cpp.Point(-4, 0.8), tbots_cpp.Vector(-0.2, 0), tbots_cpp.Point(-4, 0)),
         # ball stationary inside friendly defense area
         (
-            tbots.Point(-4, 0.0),
-            tbots.Vector(0.0, 0),
-            tbots.Field.createSSLDivisionBField().friendlyGoalpostPos(),
+            tbots_cpp.Point(-4, 0.0),
+            tbots_cpp.Vector(0.0, 0),
+            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalpostPos(),
         ),
         # ball stationary inside no-chip rectangle
         (
-            tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots.Vector(0.1, 0.1),
-            tbots.Vector(-0.2, 0),
-            tbots.Point(-4, -1),
+            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+            + tbots_cpp.Vector(0.1, 0.1),
+            tbots_cpp.Vector(-0.2, 0),
+            tbots_cpp.Point(-4, -1),
         ),
         # ball fast inside no-chip rectangle but no intersection with goal
         (
-            tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots.Vector(0.1, 0),
-            tbots.Vector(0, -0.5),
-            tbots.Point(-3.5, 1),
+            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+            + tbots_cpp.Vector(0.1, 0),
+            tbots_cpp.Vector(0, -0.5),
+            tbots_cpp.Point(-3.5, 1),
         ),
         # ball moving out from inside defense area
         (
-            tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots.Vector(0.5, 0),
-            tbots.Vector(0.5, 0),
-            tbots.Point(-3.5, 0),
+            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+            + tbots_cpp.Vector(0.5, 0),
+            tbots_cpp.Vector(0.5, 0),
+            tbots_cpp.Point(-3.5, 0),
         ),
         # ball slow inside no-chip rectangle
         (
-            tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots.Vector(0.1, 0),
-            tbots.Vector(0.1, -0.1),
-            tbots.Point(-3.5, 1),
+            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+            + tbots_cpp.Vector(0.1, 0),
+            tbots_cpp.Vector(0.1, -0.1),
+            tbots_cpp.Point(-3.5, 1),
         ),
         # ball moving into goal from inside defense area
         (
-            tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots.Vector(0.5, 0),
-            tbots.Vector(-0.5, 0),
-            tbots.Point(-3.5, 0),
+            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+            + tbots_cpp.Vector(0.5, 0),
+            tbots_cpp.Vector(-0.5, 0),
+            tbots_cpp.Point(-3.5, 0),
         ),
         # ball moving up and out of defense area
         (
-            tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots.Vector(0.3, 0),
-            tbots.Vector(0, 1),
-            tbots.Point(-3.5, 0),
+            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+            + tbots_cpp.Vector(0.3, 0),
+            tbots_cpp.Vector(0, 1),
+            tbots_cpp.Point(-3.5, 0),
         ),
         # ball moving down and out goal from defense area
         (
-            tbots.Field.createSSLDivisionBField().friendlyGoalCenter()
-            + tbots.Vector(0.3, 0),
-            tbots.Vector(0, -0.7),
-            tbots.Point(-3.5, 0),
+            tbots_cpp.Field.createSSLDivisionBField().friendlyGoalCenter()
+            + tbots_cpp.Vector(0.3, 0),
+            tbots_cpp.Vector(0, -0.7),
+            tbots_cpp.Point(-3.5, 0),
         ),
     ],
 )
@@ -121,10 +116,10 @@ def test_goalie_blocks_shot(
     #
     # NOTE: The gamecontroller responses are automatically handled by
     # the gamecontroller context manager class
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.STOP, team=Team.UNKNOWN
     )
-    simulated_test_runner.gamecontroller.send_ci_input(
+    simulated_test_runner.gamecontroller.send_gc_command(
         gc_command=Command.Type.FORCE_START, team=Team.BLUE
     )
 
@@ -147,10 +142,10 @@ def test_goalie_blocks_shot(
     always_validation_sequence_set = [
         [
             RobotNeverEntersRegion(
-                regions=[tbots.Field.createSSLDivisionBField().enemyDefenseArea()]
+                regions=[tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea()]
             ),
             BallNeverEntersRegion(
-                regions=[tbots.Field.createSSLDivisionBField().friendlyGoal()]
+                regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
             ),
             NeverExcessivelyDribbles(),
         ]
@@ -161,12 +156,103 @@ def test_goalie_blocks_shot(
         [
             # Goalie should be in the defense area
             RobotEventuallyEntersRegion(
-                regions=[tbots.Field.createSSLDivisionBField().friendlyDefenseArea()]
+                regions=[
+                    tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
+                ]
             ),
         ]
     ]
 
     simulated_test_runner.run_test(
+        inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        inv_always_validation_sequence_set=always_validation_sequence_set,
+        ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+        ag_always_validation_sequence_set=always_validation_sequence_set,
+    )
+
+
+@pytest.mark.parametrize(
+    "ball_position,should_clear",
+    [
+        (
+            tbots_cpp.Point(-3.45, 0),
+            True,
+        ),  # ball is just inside the dead zone in the X direction
+        (
+            tbots_cpp.Point(-3.45, 0.9),
+            True,
+        ),  # ball is just inside the dead zone in the X direction
+        (
+            tbots_cpp.Point(-4.0, 1.05),
+            True,
+        ),  # ball is just inside the dead zone in the Y direction
+        (
+            tbots_cpp.Point(0, 0),
+            False
+            # ball is just outside the dead zone in the X direction
+        ),
+    ],
+)
+def test_goalie_clears_from_dead_zone(
+    ball_position, should_clear, simulated_test_runner,
+):
+    # Setup Robot
+    simulated_test_runner.simulator_proto_unix_io.send_proto(
+        WorldState,
+        create_world_state(
+            [],
+            blue_robot_locations=[
+                tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea().centre()
+            ],
+            ball_location=ball_position,
+            ball_velocity=tbots_cpp.Vector(0, 0),
+        ),
+    )
+
+    # Setup Tactic
+    params = AssignedTacticPlayControlParams()
+    params.assigned_tactics[0].goalie.CopyFrom(
+        GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
+    )
+    simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
+        AssignedTacticPlayControlParams, params
+    )
+
+    # Setup no tactics on the enemy side
+    params = AssignedTacticPlayControlParams()
+    simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+        AssignedTacticPlayControlParams, params
+    )
+
+    # Always Validation
+    always_validation_sequence_set = [
+        [
+            BallNeverEntersRegion(
+                regions=[
+                    tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
+                ]
+            )
+        ]
+    ]
+    if should_clear:
+        always_validation_sequence_set = [[]]
+
+    # Eventually Validation
+    eventually_validation_sequence_set = [[]]
+    if should_clear:
+        eventually_validation_sequence_set = [
+            [
+                # Goalie should be in the defense area
+                BallEventuallyExitsRegion(
+                    regions=[
+                        tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea()
+                    ]
+                ),
+            ]
+        ]
+
+    simulated_test_runner.run_test(
+        test_timeout_s=8,
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,

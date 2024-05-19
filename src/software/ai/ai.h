@@ -38,7 +38,7 @@ class Ai final
      * @return the Primitives that should be run by our Robots given the current
      * state of the world.
      */
-    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World& world);
+    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const WorldPtr& world_ptr);
 
     /**
      * Returns information about the currently running plays and tactics, including the
@@ -69,7 +69,6 @@ class Ai final
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
     std::unique_ptr<Play> current_play;
-    std::map<Field, GlobalPathPlannerFactory> field_to_path_planner_factory;
     TbotsProto::Play current_override_play_proto;
     bool ai_config_changed;
 
