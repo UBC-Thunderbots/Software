@@ -15,9 +15,9 @@ EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_con
           std::make_shared<AvoidInterferenceTactic>(),
       }),
       move_tactics({
-        std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>(),
-        std::make_shared<MoveTactic>(),
+          std::make_shared<MoveTactic>(),
+          std::make_shared<MoveTactic>(),
+          std::make_shared<MoveTactic>(),
       }),
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
       distance_to_keep(ENEMY_BALL_PLACEMENT_DISTANCE_METERS +
@@ -81,12 +81,13 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
                     distance(p1, robot.position()) < distance(p2, robot.position()) ? p1
                                                                                     : p2;
             }
-            avoid_interference_tactics[idx]->updateControlParams(destination, robot.orientation(), 0);
+            avoid_interference_tactics[idx]->updateControlParams(destination,
+                                                                 robot.orientation(), 0);
         }
         else
         {
-            avoid_interference_tactics[idx]->updateControlParams(robot.position(), robot.orientation(),
-                                                   0);
+            avoid_interference_tactics[idx]->updateControlParams(robot.position(),
+                                                                 robot.orientation(), 0);
         }
         tactics_to_run[0].emplace_back(avoid_interference_tactics[idx++]);
     }
