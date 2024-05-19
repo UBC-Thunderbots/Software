@@ -129,8 +129,9 @@ struct EnemyBallPlacementPlayFSM
 
    private:
     TbotsProto::AiConfig ai_config;
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defender_tactics;
-    std::array<std::shared_ptr<MoveTactic>, 6> move_tactics;
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics;
+    std::array<std::shared_ptr<AvoidInterferenceTactic>, 6> avoid_interference_tactics;
+    std::array<std::shared_ptr<MoveTactic>, 3> move_tactics;
     std::shared_ptr<GoalieTactic> goalie_tactic;
 
     Point placement_point;

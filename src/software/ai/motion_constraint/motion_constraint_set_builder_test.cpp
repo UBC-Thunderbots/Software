@@ -116,6 +116,7 @@ namespace
     auto them_ball_placement = std::set<TbotsProto::MotionConstraint>(
         {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
          TbotsProto::MotionConstraint::FRIENDLY_GOAL,
+         TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
          TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE});
 }  // namespace
 

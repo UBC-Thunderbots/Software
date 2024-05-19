@@ -25,11 +25,7 @@ std::set<TbotsProto::MotionConstraint> buildMotionConstraintSetFromGameState(
     const GameState &game_state)
 {
     std::set<TbotsProto::MotionConstraint> motion_constraints;
-    // Robots are allowed to enter the defense area during ball placement
-    if (!game_state.isTheirBallPlacement())
-    {
-        motion_constraints.insert(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
-    }
+    motion_constraints.insert(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
 
     if (game_state.stayAwayFromBall())
     {
