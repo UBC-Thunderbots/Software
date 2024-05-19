@@ -81,11 +81,11 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
                     distance(p1, robot.position()) < distance(p2, robot.position()) ? p1
                                                                                     : p2;
             }
-            avoid_interference_tactics[idx]->updateControlParams(destination, robot.orientation(), 0);
+            avoid_interference_tactics[idx]->updateControlParams(destination, (ball_pos - robot.position()).orientation(), 0);
         }
         else
         {
-            avoid_interference_tactics[idx]->updateControlParams(robot.position(), robot.orientation(),
+            avoid_interference_tactics[idx]->updateControlParams(robot.position(), (ball_pos - robot.position()).orientation(),
                                                    0);
         }
         tactics_to_run[0].emplace_back(avoid_interference_tactics[idx++]);
