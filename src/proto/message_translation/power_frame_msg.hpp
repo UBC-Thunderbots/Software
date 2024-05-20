@@ -138,7 +138,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         case TbotsProto::PowerControl::ChickerControl::kKickSpeedMPerS:
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_kick_pulse_width_tag;
-            // TODO (#3193): refactor kick pulse width calculation out into seperate function
+            // TODO (#3193): refactor kick pulse width calculation out into seperate
+            // function
             nanopb_control.chicker.chicker_command.kick_pulse_width =
                 static_cast<uint32_t>(
                     kick_constant *

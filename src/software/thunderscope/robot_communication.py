@@ -253,8 +253,7 @@ class RobotCommunication(object):
 
             diagnostics_primitive = Primitive(
                 direct_control=DirectControlPrimitive(
-                    motor_control=motor_control,
-                    power_control=power_control,
+                    motor_control=motor_control, power_control=power_control,
                 )
             )
 

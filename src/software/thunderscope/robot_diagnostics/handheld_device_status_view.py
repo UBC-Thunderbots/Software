@@ -18,7 +18,9 @@ class HandheldDeviceConnectionStatus(Enum):
 
 
 class HandheldDeviceStatusView(QWidget):
-    def __init__(self, reinitialize_handheld_device_signal: Type[QtCore.pyqtSignal]) -> None:
+    def __init__(
+        self, reinitialize_handheld_device_signal: Type[QtCore.pyqtSignal]
+    ) -> None:
         """
         Initialize the HandheldDeviceStatusView widget.
         This widget shows the user the current state of the connection with a handheld device,
@@ -81,7 +83,9 @@ class HandheldDeviceStatusView(QWidget):
             self.status_label_view_map[connection_state][1]
         )
 
-    def refresh(self, connection_state=HandheldDeviceConnectionStatus.DISCONNECTED) -> None:
+    def refresh(
+        self, connection_state=HandheldDeviceConnectionStatus.DISCONNECTED
+    ) -> None:
         """
         Refreshes this widget.
         The status label will reflect to the user the current state of the handheld device connection

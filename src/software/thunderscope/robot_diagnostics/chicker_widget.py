@@ -18,10 +18,7 @@ class ChickerCommandMode(Enum):
 
 
 class ChickerWidget(QWidget):
-    def __init__(
-            self,
-            proto_unix_io
-    ) -> None:
+    def __init__(self, proto_unix_io) -> None:
         """Handles the robot diagnostics input to create a PowerControl message
         to be sent to the robots.
 
@@ -57,7 +54,7 @@ class ChickerWidget(QWidget):
             "Power (m/s)",
             HandheldDeviceConstants.MIN_KICK_POWER,
             HandheldDeviceConstants.MAX_KICK_POWER,
-            HandheldDeviceConstants.KICK_POWER_STEPPER
+            HandheldDeviceConstants.KICK_POWER_STEPPER,
         )
 
         kick_chip_sliders_hbox_layout.addLayout(self.kick_power_slider_layout)
@@ -72,7 +69,7 @@ class ChickerWidget(QWidget):
             1,
             HandheldDeviceConstants.MIN_CHIP_POWER,
             HandheldDeviceConstants.MAX_CHIP_POWER,
-            HandheldDeviceConstants.CHIP_DISTANCE_STEPPER
+            HandheldDeviceConstants.CHIP_DISTANCE_STEPPER,
         )
 
         kick_chip_sliders_hbox_layout.addLayout(self.chip_distance_slider_layout)
@@ -84,9 +81,10 @@ class ChickerWidget(QWidget):
         chicker_widget_vbox_layout.addWidget(kick_chip_sliders_box)
 
         # Initializing kick & chip buttons
-        self.kick_chip_buttons_box, self.kick_chip_buttons = common_widgets.create_buttons(
-            ["Kick", "Chip"]
-        )
+        (
+            self.kick_chip_buttons_box,
+            self.kick_chip_buttons,
+        ) = common_widgets.create_buttons(["Kick", "Chip"])
 
         self.kick_chip_buttons_box.setTitle("Single Kick and Chip")
         self.kick_chip_buttons_box.layout().setContentsMargins(0, 0, 0, 0)
@@ -106,7 +104,10 @@ class ChickerWidget(QWidget):
             "auto_chip": True,
         }
         self.radio_buttons_group = QButtonGroup()
-        self.auto_kick_chip_buttons_box, self.auto_kick_chip_buttons = common_widgets.create_radio(
+        (
+            self.auto_kick_chip_buttons_box,
+            self.auto_kick_chip_buttons,
+        ) = common_widgets.create_radio(
             ["No Auto", "Auto Kick", "Auto Chip"], self.radio_buttons_group
         )
         self.auto_kick_chip_buttons_box.setTitle("Auto Kick and Chip")

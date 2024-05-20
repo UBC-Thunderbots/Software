@@ -66,12 +66,11 @@ class HandheldDeviceManager(object):
         control proto to the default/minimum default value
         """
         self.motor_control = MotorControl()
-        self.motor_control.direct_velocity_control.velocity\
-            .x_component_meters = 0.0
-        self.motor_control.direct_velocity_control.velocity\
-            .y_component_meters = 0.0
-        self.motor_control.direct_velocity_control.angular_velocity\
-            .radians_per_second = 0.0
+        self.motor_control.direct_velocity_control.velocity.x_component_meters = 0.0
+        self.motor_control.direct_velocity_control.velocity.y_component_meters = 0.0
+        self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+            0.0
+        )
         self.motor_control.dribbler_speed_rpm = 0
 
     def __initialize_default_power_control_values(self) -> None:
@@ -169,7 +168,9 @@ class HandheldDeviceManager(object):
                 self.__shutdown_event_listener_thread()
         elif mode == ControlMode.HANDHELD:
             if not self.__handheld_device_event_loop_thread.is_alive():
-                self.logger.debug("Setting up new handheld device event handling process")
+                self.logger.debug(
+                    "Setting up new handheld device event handling process"
+                )
                 self.__setup_new_event_listener_thread()
                 self.__start_event_listener_thread()
 
@@ -279,30 +280,24 @@ class HandheldDeviceManager(object):
 
         if event.type == ecodes.EV_ABS:
             if event.code == self.handheld_device_config.move_x.event_code:
-                self.motor_control.direct_velocity_control.velocity.x_component_meters = (
-                    self.__interpret_move_event_value(
-                        event.value,
-                        self.handheld_device_config.move_x.max_value,
-                        self.constants.robot_max_speed_m_per_s,
-                    )
+                self.motor_control.direct_velocity_control.velocity.x_component_meters = self.__interpret_move_event_value(
+                    event.value,
+                    self.handheld_device_config.move_x.max_value,
+                    self.constants.robot_max_speed_m_per_s,
                 )
 
             if event.code == self.handheld_device_config.move_y.event_code:
-                self.motor_control.direct_velocity_control.velocity.y_component_meters = (
-                    self.__interpret_move_event_value(
-                        -event.value,
-                        self.handheld_device_config.move_y.max_value,
-                        self.constants.robot_max_speed_m_per_s,
-                    )
+                self.motor_control.direct_velocity_control.velocity.y_component_meters = self.__interpret_move_event_value(
+                    -event.value,
+                    self.handheld_device_config.move_y.max_value,
+                    self.constants.robot_max_speed_m_per_s,
                 )
 
             if event.code == self.handheld_device_config.move_rot.event_code:
-                self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
-                    self.__interpret_move_event_value(
-                        -event.value,
-                        self.handheld_device_config.move_rot.max_value,
-                        self.constants.robot_max_ang_speed_rad_per_s,
-                    )
+                self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.__interpret_move_event_value(
+                    -event.value,
+                    self.handheld_device_config.move_rot.max_value,
+                    self.constants.robot_max_ang_speed_rad_per_s,
                 )
 
             elif event.code == self.handheld_device_config.chicker_power.event_code:
@@ -319,8 +314,10 @@ class HandheldDeviceManager(object):
                 )
 
             elif (
-                    event.code == self.handheld_device_config.primary_dribbler_enable.event_code or
-                    event.code == self.handheld_device_config.secondary_dribbler_enable.event_code
+                event.code
+                == self.handheld_device_config.primary_dribbler_enable.event_code
+                or event.code
+                == self.handheld_device_config.secondary_dribbler_enable.event_code
             ):
                 self.dribbler_running = self.__interpret_dribbler_enabled_event_value(
                     event.value,
@@ -368,7 +365,7 @@ class HandheldDeviceManager(object):
 
     @staticmethod
     def __interpret_dribbler_enabled_event_value(
-            event_value: float, max_value: float
+        event_value: float, max_value: float
     ) -> bool:
         """
         Interpret the event_value that corresponds to controlling whether the dribbler is enabled

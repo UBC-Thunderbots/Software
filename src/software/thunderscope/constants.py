@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
@@ -342,11 +341,13 @@ class HandheldDeviceConfigKeys(Enum):
 
 # nomenclature:
 
+
 @dataclass
 class DeviceKeyEvent:
     """
     This dataclass holds the code for a "EV_KEY" input event
     """
+
     event_code: int
 
 
@@ -356,6 +357,7 @@ class DeviceAbsEvent:
     This dataclass holds the code and max value for an "EV_ABS" input event
 
     """
+
     event_code: int
     max_value: float
 

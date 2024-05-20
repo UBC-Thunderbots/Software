@@ -12,10 +12,7 @@ from software.thunderscope.common import common_widgets
 
 
 class DriveAndDribblerWidget(QWidget):
-    def __init__(
-            self,
-            proto_unix_io: ProtoUnixIO
-    ) -> None:
+    def __init__(self, proto_unix_io: ProtoUnixIO) -> None:
         """
         Initialize the widget to control the robot's motors
         """
@@ -131,14 +128,10 @@ class DriveAndDribblerWidget(QWidget):
 
         # add listener functions for sliders to update label with slider value
         common_widgets.enable_slider(
-            self.x_velocity_slider,
-            self.x_velocity_label,
-            self.__value_change_handler
+            self.x_velocity_slider, self.x_velocity_label, self.__value_change_handler
         )
         common_widgets.enable_slider(
-            self.y_velocity_slider,
-            self.y_velocity_label,
-            self.__value_change_handler
+            self.y_velocity_slider, self.y_velocity_label, self.__value_change_handler
         )
         common_widgets.enable_slider(
             self.angular_velocity_slider,

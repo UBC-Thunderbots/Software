@@ -1,5 +1,3 @@
-from typing import Union, Literal, Tuple
-
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt.QtCore import *
@@ -20,7 +18,7 @@ from software.thunderscope.robot_diagnostics.handheld_device_manager import (
     HandheldDeviceManager,
 )
 from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
-    DriveAndDribblerWidget
+    DriveAndDribblerWidget,
 )
 
 
@@ -36,6 +34,7 @@ class DiagnosticsWidget(QScrollArea):
     either from the DriverAndDribblerWidget or the HandheldDeviceManager,
     depending on the user selected choice from the DiagnosticsWidget UI
     """
+
     # signal to indicate if manual controls should be disabled based on enum mode parameter
     diagnostics_input_mode_signal = pyqtSignal(ControlMode)
 
@@ -116,7 +115,7 @@ class DiagnosticsWidget(QScrollArea):
         self.handheld_device_handler.refresh(self.__control_mode)
 
     def __handheld_device_connection_status_update_handler(
-            self, status: HandheldDeviceConnectionStatus
+        self, status: HandheldDeviceConnectionStatus
     ):
         """
         Handler for propagating
