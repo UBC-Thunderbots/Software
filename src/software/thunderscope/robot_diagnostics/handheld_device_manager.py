@@ -36,29 +36,29 @@ class HandheldDeviceManager(object):
         self.handheld_device_disconnected_signal = handheld_device_disconnected_signal
 
         self.handheld_device: Optional[InputDevice] = None
-        self.handheld_device_config: Optional[HDIEConfig] = None
+        self.handheld_device_config: Optional[DeviceConfig] = None
 
         # initialize proto fields for motor and power control; set default values
         self.__initialize_default_motor_control_values()
         self.__initialize_default_power_control_values()
 
-        # These fields are here to temporarily persist the controller's input.
-        # They are read once certain buttons are pressed on the controller,
-        # and the values are inserted into the control primitives above.
-        self.kick_power_accumulator: float = 0.0
-        self.chip_distance_accumulator: float = 0.0
+        # The following fields are here to temporarily persist device input.
+        # They are read once certain buttons are pressed on the handheld device,
+        # and the values are set for the control primitives above.
+        self.kick_power_accumulator: float = HandheldDeviceConstants.MIN_KICK_POWER
+        self.chip_distance_accumulator: float = HandheldDeviceConstants.MIN_CHIP_POWER
         self.dribbler_speed_accumulator: int = 0
         self.dribbler_running: bool = False
 
         self.constants = tbots_cpp.create2021RobotConstants()
 
-        # event that is used to stop the controller event loop
+        # event that is used to stop the handheld device event loop
         self.__stop_thread_signal_event = Event()
 
         # Set-up process that will run the event loop
         self.__setup_new_event_listener_thread()
 
-        self.__initialize_controller()
+        self.__initialize_handheld_device()
 
     def __initialize_default_motor_control_values(self) -> None:
         """
@@ -84,32 +84,32 @@ class HandheldDeviceManager(object):
         self.power_control = PowerControl()
         self.power_control.geneva_slot = 3
 
-    def reinitialize_controller(self) -> None:
+    def reinitialize_handheld_device(self) -> None:
         """
-        Reinitialize controller
+        Reinitialize handheld_device
         """
-        self.__clear_controller()
-        self.__initialize_controller()
+        self.__clear_handheld_device()
+        self.__initialize_handheld_device()
 
-    def __initialize_controller(self) -> None:
+    def __initialize_handheld_device(self) -> None:
         """
         Attempt to initialize a a connection to a handheld device,
         which may or may not be successful.
-        The first controller that is recognized as a valid controller will be used.
+        The first handheld device that is recognized as a valid will be used.
         Valid handheld devices are any devices whose name has a matching HDIEConfig
         defined in constants.py
         """
         for device in list_devices():
-            controller = InputDevice(device)
+            handheld_device = InputDevice(device)
             if (
-                controller is not None
-                and controller.name
-                in HandheldDeviceConstants.CONTROLLER_NAME_CONFIG_MAP
+                handheld_device is not None
+                and handheld_device.name
+                in HandheldDeviceConstants.HANDHELD_DEVICE_NAME_CONFIG_MAP
             ):
                 self.__stop_thread_signal_event.clear()
-                self.handheld_device = controller
-                self.handheld_device_config: HDIEConfig = HandheldDeviceConstants.CONTROLLER_NAME_CONFIG_MAP[
-                    controller.name
+                self.handheld_device = handheld_device
+                self.handheld_device_config: DeviceConfig = HandheldDeviceConstants.HANDHELD_DEVICE_NAME_CONFIG_MAP[
+                    handheld_device.name
                 ]
                 break
 
@@ -132,15 +132,15 @@ class HandheldDeviceManager(object):
                 HandheldDeviceConnectionStatus.DISCONNECTED
             )
             self.logger.debug(
-                "Failed to initialize a handheld controller, check USB connection"
+                "Failed to initialize a handheld device, check USB connection"
             )
             self.logger.debug("Tried the following available devices:")
             self.logger.debug(list(map(lambda d: InputDevice(d).name, list_devices())))
 
     def __get_handheld_device_connection_status(self) -> HandheldDeviceConnectionStatus:
         """
-        Get and return the latest connection status, based on the `controller` field
-        :return: the current status of the handheld device conneciton
+        Get and return the latest connection status, based on the `handheld device` field
+        :return: the current status of the handheld device connection
         """
         return (
             HandheldDeviceConnectionStatus.CONNECTED
@@ -164,21 +164,21 @@ class HandheldDeviceManager(object):
         :param mode: The current user requested mode for controlling the robot
         """
         if mode == ControlMode.DIAGNOSTICS:
-            if self.__controller_event_loop_handler_thread.is_alive():
-                self.logger.debug("Terminating controller event handling process")
+            if self.__handheld_device_event_loop_thread.is_alive():
+                self.logger.debug("Terminating handheld device event handling process")
                 self.__shutdown_event_listener_thread()
         elif mode == ControlMode.HANDHELD:
-            if not self.__controller_event_loop_handler_thread.is_alive():
-                self.logger.debug("Setting up new controller event handling process")
+            if not self.__handheld_device_event_loop_thread.is_alive():
+                self.logger.debug("Setting up new handheld device event handling process")
                 self.__setup_new_event_listener_thread()
                 self.__start_event_listener_thread()
 
             self.proto_unix_io.send_proto(MotorControl, self.motor_control)
             self.proto_unix_io.send_proto(PowerControl, self.power_control)
 
-    def __clear_controller(self) -> None:
+    def __clear_handheld_device(self) -> None:
         """
-        Clears controller & config field by setting to null,
+        Clears handheld device & config field by setting to null,
         and emits a disconnected notification signal.
         """
         self.handheld_device = None
@@ -187,37 +187,31 @@ class HandheldDeviceManager(object):
             HandheldDeviceConnectionStatus.DISCONNECTED
         )
 
-    def close(self) -> None:
-        """
-        Shuts down the thread running the event processing loop.
-        """
-        self.__shutdown_event_listener_thread()
-
     def __shutdown_event_listener_thread(self) -> None:
         """
         Shut down the event processing loop by setting the stop event flag,
         and then joins the handling thread, if it is alive.
         """
         # TODO (#3165): Use trace level logging here
-        # self.logger.debug("Shutdown down controller event loop process")
+        # self.logger.debug("Shutdown down handheld device event loop process")
         self.__stop_thread_signal_event.set()
-        if self.__controller_event_loop_handler_thread.is_alive():
-            self.__controller_event_loop_handler_thread.join()
+        if self.__handheld_device_event_loop_thread.is_alive():
+            self.__handheld_device_event_loop_thread.join()
         self.__stop_thread_signal_event.clear()
 
     def __start_event_listener_thread(self) -> None:
         """
         Starts the thread that runs the event processing loop.
         """
-        self.__controller_event_loop_handler_thread.start()
+        self.__handheld_device_event_loop_thread.start()
 
     def __setup_new_event_listener_thread(self):
         """
         Initializes a new thread that will run the event processing loop
         """
         # TODO (#3165): Use trace level self.logger here
-        # self.logger.debug("Initializing new controller event loop thread")
-        self.__controller_event_loop_handler_thread = Thread(
+        # self.logger.debug("Initializing new handheld device event loop thread")
+        self.__handheld_device_event_loop_thread = Thread(
             target=self.__event_loop, daemon=True
         )
 
@@ -230,7 +224,7 @@ class HandheldDeviceManager(object):
         cause the manager to revert to a disconnected handheld device state.
         """
         # TODO (#3165): Use trace level self.logger here
-        # self.logger.debug("Starting handheld controller event handling loop")
+        # self.logger.debug("Starting handheld handheld device event handling loop")
         try:
             while True:
                 if self.__stop_thread_signal_event.is_set():
@@ -251,17 +245,17 @@ class HandheldDeviceManager(object):
                 time.sleep(0.0005)
 
         except OSError as ose:
-            self.__clear_controller()
+            self.__clear_handheld_device()
             self.logger.debug(
-                "Caught an OSError while reading handheld controller event loop!"
+                "Caught an OSError while reading handheld handheld device event loop!"
             )
             self.logger.debug("Error message: " + str(ose))
-            self.logger.debug("Check physical handheld controller USB connection!")
+            self.logger.debug("Check physical handheld handheld device USB connection!")
             return
         except Exception as e:
-            self.__clear_controller()
+            self.__clear_handheld_device()
             self.logger.critical(
-                "Caught an unexpected error while reading handheld controller event loop!"
+                "Caught an unexpected error while reading handheld handheld device event loop!"
             )
             self.logger.critical("Error message: " + str(e))
             return
@@ -275,7 +269,7 @@ class HandheldDeviceManager(object):
 
         # TODO (#3165): Use trace level self.logger here
         # self.logger.debug(
-        #     "Processing controller event with type: "
+        #     "Processing handheld device event with type: "
         #     + str(ecodes.bytype[event.type][event.code])
         #     + ", with code: "
         #     + str(event.code)
@@ -285,24 +279,30 @@ class HandheldDeviceManager(object):
 
         if event.type == ecodes.EV_ABS:
             if event.code == self.handheld_device_config.move_x.event_code:
-                self.__interpret_move_event_value(
-                    event.value,
-                    self.handheld_device_config.move_x.max_value,
-                    self.constants.robot_max_speed_m_per_s,
+                self.motor_control.direct_velocity_control.velocity.x_component_meters = (
+                    self.__interpret_move_event_value(
+                        event.value,
+                        self.handheld_device_config.move_x.max_value,
+                        self.constants.robot_max_speed_m_per_s,
+                    )
                 )
 
             if event.code == self.handheld_device_config.move_y.event_code:
-                self.motor_control.direct_velocity_control.velocity.y_component_meters = self.__interpret_move_event_value(
-                    -event.value,
-                    self.handheld_device_config.move_y.max_value,
-                    self.constants.robot_max_speed_m_per_s,
+                self.motor_control.direct_velocity_control.velocity.y_component_meters = (
+                    self.__interpret_move_event_value(
+                        -event.value,
+                        self.handheld_device_config.move_y.max_value,
+                        self.constants.robot_max_speed_m_per_s,
+                    )
                 )
 
             if event.code == self.handheld_device_config.move_rot.event_code:
-                self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = self.__interpret_move_event_value(
-                    event.value,
-                    self.handheld_device_config.move_rot.max_value,
-                    self.constants.robot_max_ang_speed_rad_per_s,
+                self.motor_control.direct_velocity_control.angular_velocity.radians_per_second = (
+                    self.__interpret_move_event_value(
+                        -event.value,
+                        self.handheld_device_config.move_rot.max_value,
+                        self.constants.robot_max_ang_speed_rad_per_s,
+                    )
                 )
 
             elif event.code == self.handheld_device_config.chicker_power.event_code:
@@ -398,59 +398,21 @@ class HandheldDeviceManager(object):
         :return: the interpreted value to be used for the kick power on the robot
         """
         return numpy.clip(
-            a=self.power_control.chicker.kick_speed_m_per_s
+            a=self.kick_power_accumulator
             + event_value * HandheldDeviceConstants.KICK_POWER_STEPPER,
             a_min=HandheldDeviceConstants.MIN_KICK_POWER,
             a_max=HandheldDeviceConstants.MAX_KICK_POWER,
         )
 
-    def __interpret_chip_event_value(self, value: float) -> float:
+    def __interpret_chip_event_value(self, event_value: float) -> float:
         """
         Interprets the event value that corresponds to controlling the chip distance.
         :param value: the value for the current event being interpreted
         :return: the interpreted value to be used for the chip distance on the robot
         """
         return numpy.clip(
-            a=self.power_control.chicker.chip_distance_meters
-            + value * HandheldDeviceConstants.CHIP_DISTANCE_STEPPER,
+            a=self.chip_distance_accumulator
+            + event_value * HandheldDeviceConstants.CHIP_DISTANCE_STEPPER,
             a_min=HandheldDeviceConstants.MIN_CHIP_POWER,
             a_max=HandheldDeviceConstants.MAX_CHIP_POWER,
         )
-
-
-# TODO: remove thee after field testing...
-# {
-#   ('EV_SYN', 0): [('SYN_REPORT', 0), ('SYN_CONFIG', 1), ('SYN_DROPPED', 3), ('?', 21)],
-#   ('EV_KEY', 1): [
-#     ('KEY_RECORD', 167),
-#     (['BTN_A', 'BTN_GAMEPAD', 'BTN_SOUTH'], 304),
-#     (['BTN_B', 'BTN_EAST'], 305),
-#     (['BTN_NORTH', 'BTN_X'], 307),
-#     (['BTN_WEST', 'BTN_Y'], 308),
-#     ('BTN_TL', 310),
-#     ('BTN_TR', 311),
-#     ('BTN_SELECT', 314),
-#     ('BTN_START', 315),
-#     ('BTN_MODE', 316),
-#     ('BTN_THUMBL', 317),
-#     ('BTN_THUMBR', 318)
-#   ],
-#   ('EV_ABS', 3): [
-#     (('ABS_X', 0), AbsInfo(value=1242, min=-32768, max=32767, fuzz=16, flat=128, resolution=0)),
-#     (('ABS_Y', 1), AbsInfo(value=425, min=-32768, max=32767, fuzz=16, flat=128, resolution=0)),
-#     (('ABS_Z', 2), AbsInfo(value=0, min=0, max=1023, fuzz=0, flat=0, resolution=0)),
-#     (('ABS_RX', 3), AbsInfo(value=-418, min=-32768, max=32767, fuzz=16, flat=128, resolution=0)),
-#     (('ABS_RY', 4), AbsInfo(value=-485, min=-32768, max=32767, fuzz=16, flat=128, resolution=0)),
-#     (('ABS_RZ', 5), AbsInfo(value=0, min=0, max=1023, fuzz=0, flat=0, resolution=0)),
-#     (('ABS_HAT0X', 16), AbsInfo(value=0, min=-1, max=1, fuzz=0, flat=0, resolution=0)),
-#     (('ABS_HAT0Y', 17), AbsInfo(value=0, min=-1, max=1, fuzz=0, flat=0, resolution=0))
-#   ],
-#   ('EV_FF', 21): [
-#     (['FF_EFFECT_MIN', 'FF_RUMBLE'], 80),
-#     ('FF_PERIODIC', 81),
-#     (['FF_SQUARE', 'FF_WAVEFORM_MIN'], 88),
-#     ('FF_TRIANGLE', 89),
-#     ('FF_SINE', 90),
-#     (['FF_GAIN', 'FF_MAX_EFFECTS'], 96)
-#   ]
-# }

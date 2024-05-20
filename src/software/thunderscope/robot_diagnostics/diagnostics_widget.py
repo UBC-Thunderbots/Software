@@ -24,7 +24,7 @@ from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
 )
 
 
-class DiagnosticsWidget(QWidget):
+class DiagnosticsWidget(QScrollArea):
     """
     The DiagnosticsWidget contains all widgets related to diagnostics:
         - HandheldDeviceStatusWidget
@@ -39,10 +39,10 @@ class DiagnosticsWidget(QWidget):
     # signal to indicate if manual controls should be disabled based on enum mode parameter
     diagnostics_input_mode_signal = pyqtSignal(ControlMode)
 
-    # signal to indicate that controller should be reinitialized
+    # signal to indicate that handheld device should be reinitialized
     reinitialize_handheld_device_signal = pyqtSignal()
 
-    # signal to indicate that controller was disconnected
+    # signal to indicate that handheld device was disconnected
     handheld_device_connection_status_signal = pyqtSignal(
         HandheldDeviceConnectionStatus
     )
@@ -75,7 +75,7 @@ class DiagnosticsWidget(QWidget):
 
         # connect handheld device reinitialization signal with handler
         self.reinitialize_handheld_device_signal.connect(
-            lambda: self.handheld_device_handler.reinitialize_controller()
+            lambda: self.handheld_device_handler.reinitialize_handheld_device()
         )
 
         # connect handheld device connection status toggle signal with handler
@@ -91,14 +91,21 @@ class DiagnosticsWidget(QWidget):
         )
 
         # layout for the entire diagnostics tab
-        vbox_layout = QVBoxLayout()
+        diagnostics_widget_vbox_layout = QVBoxLayout()
 
-        vbox_layout.addWidget(self.handheld_device_status_widget)
-        vbox_layout.addWidget(self.diagnostics_control_input_widget)
-        vbox_layout.addWidget(self.drive_dribbler_widget)
-        vbox_layout.addWidget(self.chicker_widget)
+        diagnostics_widget_vbox_layout.addWidget(self.handheld_device_status_widget)
+        diagnostics_widget_vbox_layout.addWidget(self.diagnostics_control_input_widget)
+        diagnostics_widget_vbox_layout.addWidget(self.drive_dribbler_widget)
+        diagnostics_widget_vbox_layout.addWidget(self.chicker_widget)
 
-        self.setLayout(vbox_layout)
+        # for a QScrollArea, widgets cannot be added to it directly
+        # doing so causes no scrolling to happen, and all the components get smaller
+        # instead, widgets are added to the layout which is set for a container
+        # the container is set as the current QScrollArea's widget
+        self.container = QFrame(self)
+        self.container.setLayout(diagnostics_widget_vbox_layout)
+        self.setWidget(self.container)
+        self.setWidgetResizable(True)
 
     def __control_mode_update_handler(self, mode: ControlMode) -> None:
         """
@@ -109,7 +116,7 @@ class DiagnosticsWidget(QWidget):
         self.handheld_device_handler.refresh(self.__control_mode)
 
     def __handheld_device_connection_status_update_handler(
-        self, status: HandheldDeviceConnectionStatus
+            self, status: HandheldDeviceConnectionStatus
     ):
         """
         Handler for propagating
@@ -119,8 +126,9 @@ class DiagnosticsWidget(QWidget):
 
     def refresh(self):
         """
-        Refreshes sub-widgets so that they display the most recent values, as well as
-        the most recent values are available for use.
+        Refreshes sub-widgets so that they display the most recent status values.
+        If in handheld mode, then also visually updates driver, dribbler and chicker sliders
+        to the values currently being set by the handheld device.
         """
 
         # update controller status view with most recent controller status
@@ -133,40 +141,26 @@ class DiagnosticsWidget(QWidget):
         self.drive_dribbler_widget.refresh(self.__control_mode)
         self.chicker_widget.refresh(self.__control_mode)
 
-        if self.__control_mode == ControlMode.DIAGNOSTICS:
-            self.logger.debug(self.chicker_widget.power_control)
+        if self.__control_mode == ControlMode.HANDHELD:
+            # visually update driver, dribbler, kick power and chip distance sliders,
+            # based on the controller values
+            motor_control = self.handheld_device_handler.motor_control
+            kick_power = self.handheld_device_handler.kick_power_accumulator
+            chip_distance = self.handheld_device_handler.chip_distance_accumulator
 
-        elif self.__control_mode == ControlMode.HANDHELD:
-            self.logger.debug(self.handheld_device_handler.power_control)
-
-            # update drive and dribbler visually.
-            # TODO kick power, flash kick and chip buttons
             self.drive_dribbler_widget.set_x_velocity_slider(
-                self.handheld_device_handler.motor_control.direct_velocity_control.velocity.x_component_meters
+                motor_control.direct_velocity_control.velocity.x_component_meters
             )
             self.drive_dribbler_widget.set_y_velocity_slider(
-                self.handheld_device_handler.motor_control.direct_velocity_control.velocity.y_component_meters
+                motor_control.direct_velocity_control.velocity.y_component_meters
             )
             self.drive_dribbler_widget.set_angular_velocity_slider(
-                self.handheld_device_handler.motor_control.direct_velocity_control.angular_velocity.radians_per_second
+                motor_control.direct_velocity_control.angular_velocity.radians_per_second
             )
 
             self.drive_dribbler_widget.set_dribbler_velocity_slider(
-                self.handheld_device_handler.motor_control.dribbler_speed_rpm
+                motor_control.dribbler_speed_rpm
             )
 
-    # TODO: investigate why these methods aren't called on user hitting close button
-    def closeEvent(self, event):
-        self.logger.info("test")
-        self.handheld_device_handler.close()
-        event.accept()
-
-    def close(self, event):
-        self.logger.info("test")
-        self.handheld_device_handler.close()
-        event.accept()
-
-    def __exit__(self, event):
-        self.logger.info("test")
-        self.handheld_device_handler.close()
-        event.accept()
+            self.chicker_widget.set_kick_power_slider_value(kick_power)
+            self.chicker_widget.set_chip_distance_slider_value(chip_distance)

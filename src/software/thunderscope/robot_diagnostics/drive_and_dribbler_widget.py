@@ -93,6 +93,8 @@ class DriveAndDribblerWidget(QWidget):
         group_box = QGroupBox("Drive")
         dbox = QVBoxLayout()
 
+        dbox.setContentsMargins(0, 0, 0, 0)
+
         (
             x_layout,
             self.x_velocity_slider,
@@ -164,6 +166,8 @@ class DriveAndDribblerWidget(QWidget):
         """
         group_box = QGroupBox("Dribbler")
         dbox = QVBoxLayout()
+
+        dbox.setContentsMargins(0, 0, 0, 0)
 
         (
             dribbler_layout,

@@ -123,6 +123,8 @@ class RobotCommunication(object):
         """
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
         """
+
+        # set all robots to AI control in the control mode map
         self.robot_control_mode_map.update(
             (robot_id, IndividualRobotMode.AI)
             for robot_id in self.robot_control_mode_map.keys()

@@ -92,13 +92,14 @@ message PowerControl
         };
     }
 
-    // TODO: Remove this message type - unused & obsolete
+    // TODO (3194): Remove this message type
     message GenevaControl
     {
         float angle_deg          = 1;
         float rotation_speed_rpm = 2;
     }
 
+    // TODO (3194): Remove this message type
     ChickerControl chicker  = 1;
     Geneva.Slot geneva_slot = 2;
 }

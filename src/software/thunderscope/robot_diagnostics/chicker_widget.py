@@ -5,8 +5,8 @@ from software.py_constants import *
 from proto.import_all_protos import *
 from enum import Enum
 import software.thunderscope.common.common_widgets as common_widgets
+from software.thunderscope.constants import HandheldDeviceConstants
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import ControlMode
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
 
@@ -37,13 +37,16 @@ class ChickerWidget(QWidget):
 
         super(ChickerWidget, self).__init__()
 
-        self.proto_unix_io = proto_unix_io
+        self.proto_unix_io: ProtoUnixIO = proto_unix_io
 
         # initial values
         self.__initialize_default_power_control_values()
 
-        vbox_layout = QVBoxLayout()
-        self.setLayout(vbox_layout)
+        chicker_widget_vbox_layout = QVBoxLayout()
+        self.setLayout(chicker_widget_vbox_layout)
+
+        kick_chip_sliders_hbox_layout = QHBoxLayout()
+        kick_chip_sliders_hbox_layout.setContentsMargins(0, 0, 0, 0)
 
         # Initializing power slider for kicking
         (
@@ -51,31 +54,50 @@ class ChickerWidget(QWidget):
             self.kick_power_slider,
             self.kick_power_label,
         ) = common_widgets.create_slider(
-            "Power (m/s)", 1, 10, 1
+            "Power (m/s)",
+            HandheldDeviceConstants.MIN_KICK_POWER,
+            HandheldDeviceConstants.MAX_KICK_POWER,
+            HandheldDeviceConstants.KICK_POWER_STEPPER
         )
-        vbox_layout.addLayout(self.kick_power_slider_layout)
+
+        kick_chip_sliders_hbox_layout.addLayout(self.kick_power_slider_layout)
 
         # Initializing distance slider for chipping
         (
             self.chip_distance_slider_layout,
             self.chip_distance_slider,
             self.chip_distance_label,
-        ) = common_widgets.create_slider(
-            "Chip Distance (m)", 1, 10, 1
+        ) = common_widgets.create_float_slider(
+            "Chip Distance (m)",
+            1,
+            HandheldDeviceConstants.MIN_CHIP_POWER,
+            HandheldDeviceConstants.MAX_CHIP_POWER,
+            HandheldDeviceConstants.CHIP_DISTANCE_STEPPER
         )
-        vbox_layout.addLayout(self.kick_power_slider_layout)
+
+        kick_chip_sliders_hbox_layout.addLayout(self.chip_distance_slider_layout)
+
+        kick_chip_sliders_box = QGroupBox()
+        kick_chip_sliders_box.setLayout(kick_chip_sliders_hbox_layout)
+        kick_chip_sliders_box.setTitle("Kick Power and Chip Distance")
+
+        chicker_widget_vbox_layout.addWidget(kick_chip_sliders_box)
 
         # Initializing kick & chip buttons
-        self.push_button_box, self.push_buttons = common_widgets.create_buttons(
+        self.kick_chip_buttons_box, self.kick_chip_buttons = common_widgets.create_buttons(
             ["Kick", "Chip"]
         )
-        self.kick_button = self.push_buttons[0]
-        self.chip_button = self.push_buttons[1]
+
+        self.kick_chip_buttons_box.setTitle("Single Kick and Chip")
+        self.kick_chip_buttons_box.layout().setContentsMargins(0, 0, 0, 0)
+
+        self.kick_button = self.kick_chip_buttons[0]
+        self.chip_button = self.kick_chip_buttons[1]
 
         # set buttons to be initially enabled
         self.kick_chip_buttons_enable = True
 
-        vbox_layout.addWidget(self.push_button_box)
+        chicker_widget_vbox_layout.addWidget(self.kick_chip_buttons_box)
 
         # Initializing auto kick & chip buttons
         self.button_clickable_map = {
@@ -84,12 +106,15 @@ class ChickerWidget(QWidget):
             "auto_chip": True,
         }
         self.radio_buttons_group = QButtonGroup()
-        self.radio_button_box, self.radio_buttons = common_widgets.create_radio(
+        self.auto_kick_chip_buttons_box, self.auto_kick_chip_buttons = common_widgets.create_radio(
             ["No Auto", "Auto Kick", "Auto Chip"], self.radio_buttons_group
         )
-        self.no_auto_button = self.radio_buttons[0]
-        self.auto_kick_button = self.radio_buttons[1]
-        self.auto_chip_button = self.radio_buttons[2]
+        self.auto_kick_chip_buttons_box.setTitle("Auto Kick and Chip")
+        self.auto_kick_chip_buttons_box.layout().setContentsMargins(0, 0, 0, 0)
+
+        self.no_auto_button = self.auto_kick_chip_buttons[0]
+        self.auto_kick_button = self.auto_kick_chip_buttons[1]
+        self.auto_chip_button = self.auto_kick_chip_buttons[2]
 
         # Set no auto button to be selected by default on launch
         self.no_auto_button.setChecked(True)
@@ -114,7 +139,21 @@ class ChickerWidget(QWidget):
             lambda: self.set_should_enable_buttons(False)
         )
 
-        vbox_layout.addWidget(self.radio_button_box)
+        chicker_widget_vbox_layout.addWidget(self.auto_kick_chip_buttons_box)
+
+    def set_kick_power_slider_value(self, value: float) -> None:
+        """
+        Set the kick power slider to a specific value.
+        :param value: The value to set for the slider
+        """
+        self.kick_power_slider.setValue(value)
+
+    def set_chip_distance_slider_value(self, value: float) -> None:
+        """
+        Set the chip distance slider to a specific value.
+        :param value: the value to set for the slider
+        """
+        self.chip_distance_slider.setValue(value)
 
     def send_command_and_timeout(self, command: ChickerCommandMode) -> None:
         """
@@ -206,6 +245,7 @@ class ChickerWidget(QWidget):
         """
         self.power_control = PowerControl()
         self.power_control.geneva_slot = 3
+        self.proto_unix_io.send_proto(PowerControl, self.power_control, True)
 
     def refresh_button_state(self, button: QPushButton) -> None:
         """Change button color and clickable state.

@@ -18,48 +18,56 @@ class HandheldDeviceConnectionStatus(Enum):
 
 
 class HandheldDeviceStatusView(QWidget):
-    def __init__(self, reinitialize_controller_signal: Type[QtCore.pyqtSignal]) -> None:
+    def __init__(self, reinitialize_handheld_device_signal: Type[QtCore.pyqtSignal]) -> None:
         """
         Initialize the HandheldDeviceStatusView widget.
-        This widget sjows the user the current state of the connection with a handheld device,
-        as well as a button that attempts to reinitialize a controller object when clicked
-        :param reinitialize_controller_signal: The signal to use for the reinitialize button
+        This widget shows the user the current state of the connection with a handheld device,
+        as well as a button that attempts to reinitialize a handheld device object when clicked
+        :param reinitialize_handheld_device_signal: The signal to use for the reinitialize button
         """
         super(HandheldDeviceStatusView, self).__init__()
 
-        self.reinitialize_controller_signal = reinitialize_controller_signal
+        self.reinitialize_handheld_device_signal = reinitialize_handheld_device_signal
 
         self.handheld_device_status = QLabel()
+        self.handheld_device_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.status_label_view_map: dict[HandheldDeviceConnectionStatus, (str, str)] = {
             HandheldDeviceConnectionStatus.CONNECTED: (
-                "Handheld Controller is Connected & Initialized",
+                "Handheld Device is Connected",
                 "background-color: green",
             ),
             HandheldDeviceConnectionStatus.DISCONNECTED: (
-                "No Handheld Controller is Connected...",
+                "Handheld Device is Disconnected...",
                 "background-color: red",
             ),
         }
 
-        # initialize controller refresh button
+        # initialize device refresh button
         self.handheld_device_reinitialize_button = QPushButton()
         self.handheld_device_reinitialize_button.setText(
-            "Re-initialize Handheld Controller"
+            "Re-initialize Handheld Device"
         )
         self.handheld_device_reinitialize_button.clicked.connect(
-            self.reinitialize_controller_signal
+            self.reinitialize_handheld_device_signal
         )
 
+        box = QGroupBox()
         hbox_layout = QHBoxLayout()
+        hbox_layout.setContentsMargins(0, 0, 0, 0)
+        box.setTitle("Handheld Device Status and Re-initialization")
+        widget_layout = QVBoxLayout()
 
         hbox_layout.addWidget(self.handheld_device_status)
         hbox_layout.addWidget(self.handheld_device_reinitialize_button)
         hbox_layout.setStretch(0, 4)
         hbox_layout.setStretch(1, 1)
 
+        box.setLayout(hbox_layout)
+        widget_layout.addWidget(box)
+
         self.set_view_state(HandheldDeviceConnectionStatus.DISCONNECTED)
-        self.setLayout(hbox_layout)
+        self.setLayout(widget_layout)
 
     def set_view_state(self, connection_state: HandheldDeviceConnectionStatus) -> None:
         """
@@ -76,7 +84,7 @@ class HandheldDeviceStatusView(QWidget):
     def refresh(self, connection_state=HandheldDeviceConnectionStatus.DISCONNECTED) -> None:
         """
         Refreshes this widget.
-        The status label will reflect to the user the current state of the controller connection
-        :param connection_state: The new state of the controller connection
+        The status label will reflect to the user the current state of the handheld device connection
+        :param connection_state: The new state of the handheld device connection
         """
         self.set_view_state(connection_state)

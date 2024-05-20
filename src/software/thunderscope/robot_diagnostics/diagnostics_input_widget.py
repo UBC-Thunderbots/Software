@@ -39,13 +39,16 @@ class DiagnosticsInputToggleWidget(QWidget):
 
         self.diagnostics_input_mode_signal = diagnostics_input_mode_signal
 
-        vbox_layout = QVBoxLayout()
+        diagnostics_input_widget_vbox_layout = QVBoxLayout()
 
         self.connect_options_group = QButtonGroup()
 
         self.connect_options_box, self.connect_options = common_widgets.create_radio(
             ["Diagnostics Control", "Handheld Control"], self.connect_options_group
         )
+
+        self.connect_options_box.layout().setContentsMargins(0, 0, 0, 0)
+        self.connect_options_box.setTitle("Diagnostics Input")
 
         self.diagnostics_control_button = self.connect_options[ControlMode.DIAGNOSTICS]
         self.handheld_control_button = self.connect_options[ControlMode.HANDHELD]
@@ -61,16 +64,16 @@ class DiagnosticsInputToggleWidget(QWidget):
         self.handheld_control_button.setEnabled(False)
         self.diagnostics_control_button.setChecked(True)
 
-        vbox_layout.addWidget(self.connect_options_box)
+        diagnostics_input_widget_vbox_layout.addWidget(self.connect_options_box)
 
-        self.setLayout(vbox_layout)
+        self.setLayout(diagnostics_input_widget_vbox_layout)
 
     def refresh(self, status: HandheldDeviceConnectionStatus) -> None:
         """
         Refresh this widget.
-        If the controller is connected:
+        If the handheld device is connected:
             - enables the handheld button
-        If the controller is disconnected:
+        If the handheld device is disconnected:
             - disables the handheld control button
             - sets the diagnostics button to checked
             - emits diagnostics input change signal
