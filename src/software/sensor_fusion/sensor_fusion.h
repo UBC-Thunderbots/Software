@@ -48,6 +48,19 @@ class SensorFusion
      */
     std::optional<World> getWorld() const;
 
+    /**
+     * This function controls the behavior of how the ball is being updated. If this
+     * returns True, we use the position of the robot that triggers the breakbeam instead
+     * of the one given by the ssl vision system.
+     *
+     * @return True if we were to use the position of the robot instead of the ssl camera
+     * system. False otherwise
+     */
+    bool shouldUseRobotBallPositionInsteadOfSSL(
+        const SSLProto::SSL_DetectionFrame &frame,
+        const std::vector<BallDetection> &ball_detection);
+
+
     // Number of vision packets to indicate that the vision client most likely reset,
     // determined experimentally with the simulator
     static constexpr unsigned int VISION_PACKET_RESET_COUNT_THRESHOLD = 5;
@@ -55,9 +68,11 @@ class SensorFusion
     // started, determined experimentally with the simulator
     static constexpr double VISION_PACKET_RESET_TIME_THRESHOLD = 0.5;
 
-    bool shouldUseRobotBallPositionInsteadOfSSL(
-        const SSLProto::SSL_DetectionFrame &frame,
-        const std::vector<BallDetection> &ball_detection);
+    // This is used for detecting if the breakbeam is at fault. The idea is that distance
+    // between the robot that has the ball is greater than the distance below, then we
+    // know that the breakbeam has a problem see for more:
+    // https://github.com/UBC-Thunderbots/Software/issues/3197
+    static constexpr float DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION = 0.5f;
 
    private:
     /**
