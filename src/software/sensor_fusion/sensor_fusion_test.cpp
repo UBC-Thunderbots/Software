@@ -935,8 +935,8 @@ TEST_F(SensorFusionTest, breakbeam_not_fail_update_test)
 TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
 {
     // The following code test this thing: if the breakbeam is triggered and the position
-    // of the robot and the ball given by the ssl vision system is too far away to make sense
-    // , we expect shouldUseRobotBallPositionInsteadOfSSL to return False
+    // of the robot and the ball given by the ssl vision system is too far away to make
+    // sense , we expect shouldUseRobotBallPositionInsteadOfSSL to return False
     SensorProto sensor_msg;
 
     // creating ssl vision

@@ -200,7 +200,7 @@ bool SensorFusion::shouldUseRobotBallPositionInsteadOfSSL(
 {
     // the following if statements essentially ensures that we could caculate the
     // distance. Essentially unwarpping all the std::optional<T> that are required to
-    // calcualte the distance
+    // calculate the distance
     if (!friendly_robot_id_with_ball_in_dribbler.has_value())
     {
         return false;
@@ -227,7 +227,7 @@ bool SensorFusion::shouldUseRobotBallPositionInsteadOfSSL(
     }
 
     // In other words, this is only true if we have the position of the ball, breakbeam
-    // robot, and the distance between what the ssl says and where the robots are acutally
+    // robot, and the distance between what the ssl says and where the robots are actually
     // at is less that a threshold distance set by
     // DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION
     return true;
