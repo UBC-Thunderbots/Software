@@ -243,7 +243,7 @@ class HandheldDeviceManager(object):
                     self.__process_event(event)
                     self.__send_proto_command_latest_primitive_controls()
 
-                time.sleep(0.0005)
+                time.sleep(HandheldDeviceConstants.EVENT_LOOP_SLEEP_DURATION)
 
         except OSError as ose:
             self.__clear_handheld_device()
@@ -373,7 +373,9 @@ class HandheldDeviceManager(object):
         :param max_value: max value for this type of event event type
         :return: The interpreted value that can be set a value for a field in robot control
         """
-        return (event_value / max_value) > 0.5
+        return (
+            event_value / max_value
+        ) > HandheldDeviceConstants.BUTTON_PRESSED_THRESHOLD
 
     def __interpret_dribbler_speed_event_value(self, event_value: float) -> int:
         """
