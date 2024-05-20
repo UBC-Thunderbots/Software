@@ -876,15 +876,11 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
     EXPECT_EQ(initWorld(), result);
 }
 
-TEST_F(SensorFusionTest, test_should_use_robot_position_instead_of_something_else)
+TEST_F(SensorFusionTest, breakbeam_not_fail_update_test)
 {
-    /* we essentially have to test the following. We first have to initialize the game
-     * state. At first the robot has the dribbler and the ssl reads that the ball is close
-     * to the robot. so we expect true. The second test would be like that expect that the
-     * ball from ssl deviates a lot from the robot so we expect that function to return
-     * false
-     */
-
+    // The following code test this thing: if the breakbeam is triggered and the position
+    // of the robot and the ball given by the ssl vision system is less than a certain
+    // threshold, we expect shouldUseRobotBallPositionInsteadOfSSL to return True
     SensorProto sensor_msg;
 
     // creating ssl vision
@@ -936,15 +932,11 @@ TEST_F(SensorFusionTest, test_should_use_robot_position_instead_of_something_els
     EXPECT_TRUE(state);
 }
 
-TEST_F(SensorFusionTest, another_test)
+TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
 {
-    /* we essentially have to test the following. We first have to initialize the game
-     * state. At first the robot has the dribbler and the ssl reads that the ball is close
-     * to the robot. so we expect true. The second test would be like that expect that the
-     * ball from ssl deviates a lot from the robot so we expect that function to return
-     * false
-     */
-
+    // The following code test this thing: if the breakbeam is triggered and the position
+    // of the robot and the ball given by the ssl vision system is too far away to make sense
+    // , we expect shouldUseRobotBallPositionInsteadOfSSL to return False
     SensorProto sensor_msg;
 
     // creating ssl vision
@@ -962,7 +954,6 @@ TEST_F(SensorFusionTest, another_test)
     RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::fromRadians(2),
                            AngularVelocity::zero());
     RobotStateWithId robot_id = {2, robot_state};
-    // blue_robot_states.push_back(robot_id);
     yellow_robot_states.push_back(robot_id);
 
     std::unique_ptr<SSLProto::SSL_DetectionFrame> frame =
