@@ -66,12 +66,12 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
             Point p2 = placement_point + longitudinal_positioning_vector -
                        lateral_positioning_vector * distance_to_keep;
             Point destination;
-            Rectangle fieldBoundary = world_ptr->field().fieldBoundary();
-            if (!contains(fieldBoundary, p1))
+            Rectangle fieldLines = world_ptr->field().fieldLines();
+            if (!contains(fieldLines, p1))
             {
                 destination = p2;
             }
-            else if (!contains(fieldBoundary, p2))
+            else if (!contains(fieldLines, p2))
             {
                 destination = p1;
             }
