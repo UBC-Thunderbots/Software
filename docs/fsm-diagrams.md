@@ -82,8 +82,8 @@ Terminate:::terminate --> Terminate:::terminate
 stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
-[*] --> BlockFreeKicker
-BlockFreeKicker --> BlockFreeKicker : <i>setupEnemyKickerStrategy</i>
+[*] --> BlockEnemyKickerState
+BlockEnemyKickerState --> BlockEnemyKickerState : <i>blockEnemyKicker</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
