@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <csignal>
+
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_wrapper.h"
@@ -874,4 +876,124 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
     ASSERT_TRUE(sensor_fusion.getWorld());
     result = *sensor_fusion.getWorld();
     EXPECT_EQ(initWorld(), result);
+}
+
+TEST_F(SensorFusionTest, test_should_use_robot_position_instead_of_something_else)
+{
+    /* we essentially have to test the following. We first have to initialize the game
+     * state. At first the robot has the dribbler and the ssl reads that the ball is close
+     * to the robot. so we expect true. The second test would be like that expect that the
+     * ball from ssl deviates a lot from the robot so we expect that function to return
+     * false
+     */
+
+    SensorProto sensor_msg;
+
+    // creating ssl vision
+    const uint32_t camera_id    = 0;
+    const uint32_t frame_number = 40391;
+    Timestamp time              = Timestamp::fromSeconds(12.1);
+
+    Point position(0, 0);
+    Vector velocity(0, 0);
+    ball_state = BallState{position, velocity};
+
+    yellow_robot_states.clear();
+    blue_robot_states.clear();
+
+    RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::fromRadians(2),
+                           AngularVelocity::zero());
+    RobotStateWithId robot_id = {2, robot_state};
+    // blue_robot_states.push_back(robot_id);
+    yellow_robot_states.push_back(robot_id);
+
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame =
+        createSSLDetectionFrame(camera_id, time, frame_number, {ball_state},
+                                yellow_robot_states, blue_robot_states);
+
+    // creating robot status
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(2);
+
+    auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+    power_status_msg->set_breakbeam_tripped(true);
+    *(robot_msg->mutable_power_status()) = *power_status_msg;
+
+    // create ssl wrapper packet
+    auto gemotry_data = initSSLDivBGeomData();
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(gemotry_data), std::move(frame));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    // actually tesing the ball detection
+    std::vector<BallDetection> ball_detection =
+        createBallDetections({*(ssl_wrapper_packet->mutable_detection())});
+
+    bool state = sensor_fusion.shouldUseRobotBallPositionInsteadOfSSL(
+        *(ssl_wrapper_packet->mutable_detection()), ball_detection);
+
+    EXPECT_TRUE(state);
+}
+
+TEST_F(SensorFusionTest, another_test)
+{
+    /* we essentially have to test the following. We first have to initialize the game
+     * state. At first the robot has the dribbler and the ssl reads that the ball is close
+     * to the robot. so we expect true. The second test would be like that expect that the
+     * ball from ssl deviates a lot from the robot so we expect that function to return
+     * false
+     */
+
+    SensorProto sensor_msg;
+
+    // creating ssl vision
+    const uint32_t camera_id    = 0;
+    const uint32_t frame_number = 40391;
+    Timestamp time              = Timestamp::fromSeconds(12.1);
+
+    Point position(1.0, 1.0);
+    Vector velocity(0, 0);
+    ball_state = BallState{position, velocity};
+
+    yellow_robot_states.clear();
+    blue_robot_states.clear();
+
+    RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::fromRadians(2),
+                           AngularVelocity::zero());
+    RobotStateWithId robot_id = {2, robot_state};
+    // blue_robot_states.push_back(robot_id);
+    yellow_robot_states.push_back(robot_id);
+
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame =
+        createSSLDetectionFrame(camera_id, time, frame_number, {ball_state},
+                                yellow_robot_states, blue_robot_states);
+
+    // creating robot status
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(2);
+
+    auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+    power_status_msg->set_breakbeam_tripped(true);
+    *(robot_msg->mutable_power_status()) = *power_status_msg;
+
+    // create ssl wrapper packet
+    auto gemotry_data = initSSLDivBGeomData();
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(gemotry_data), std::move(frame));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    // actually tesing the ball detection
+    std::vector<BallDetection> ball_detection =
+        createBallDetections({*(ssl_wrapper_packet->mutable_detection())});
+
+    bool state = sensor_fusion.shouldUseRobotBallPositionInsteadOfSSL(
+        *(ssl_wrapper_packet->mutable_detection()), ball_detection);
+
+    EXPECT_FALSE(state);
 }

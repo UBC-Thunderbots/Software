@@ -55,6 +55,10 @@ class SensorFusion
     // started, determined experimentally with the simulator
     static constexpr double VISION_PACKET_RESET_TIME_THRESHOLD = 0.5;
 
+    bool shouldUseRobotBallPositionInsteadOfSSL(
+        const SSLProto::SSL_DetectionFrame &frame,
+        const std::vector<BallDetection> &ball_detection);
+
    private:
     /**
      * Updates relevant components of world based on a new data
@@ -137,9 +141,6 @@ class SensorFusion
      * @return whether the team has control over the ball
      */
     static bool teamHasBall(const Team &team, const Ball &ball);
-
-    bool shouldUseRobotBallPositionInsteadOfSSL(
-        const SSLProto::SSL_DetectionFrame &frame, const std::vector<BallDetection> &ball_detection);
 
     void updateBallPositionUsingSensorData(
         const SSLProto::SSL_DetectionFrame &ssl_detection_frame);

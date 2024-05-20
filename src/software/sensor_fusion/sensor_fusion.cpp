@@ -249,7 +249,7 @@ bool SensorFusion::shouldUseRobotBallPositionInsteadOfSSL(
     const std::vector<BallDetection> &ball_detection)
 {
     // as off current, this would always return true
-    constexpr float distance_threshold = 10.00f;
+    constexpr float distance_threshold = 0.5f;
 
     if (!friendly_robot_id_with_ball_in_dribbler.has_value())
     {
@@ -334,7 +334,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
     if (shouldUseRobotBallPositionInsteadOfSSL(ssl_detection_frame, ball_detections))
     {
-        //LOG(INFO) << "Yay";
+        // LOG(INFO) << "Yay";
         updateBallPositionUsingSensorData(ssl_detection_frame);
     }
     else
