@@ -10,7 +10,7 @@
 
 struct EnemyFreeKickPlayFSM
 {
-    class BlockFreeKicker;
+    class BlockEnemyKickerState;
 
     struct ControlParams
     {
@@ -20,7 +20,7 @@ struct EnemyFreeKickPlayFSM
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    static constexpr double THRESHOLD_DISTANCE_METERS = 0.1;
+    static constexpr double TOO_CLOSE_THRESHOLD_METERS = 0.1;
 
     /**
      * Creates a enemy free kick play FSM
@@ -34,7 +34,7 @@ struct EnemyFreeKickPlayFSM
      *
      * @param event the FSM event
      */
-    void setupEnemyKickerStrategy(const Update &event);
+    void blockEnemyKicker(const Update &event);
 
     /**
      * Helper function to set the tactics for the play depending on the
@@ -63,16 +63,16 @@ struct EnemyFreeKickPlayFSM
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(BlockFreeKicker)
+        DEFINE_SML_STATE(BlockEnemyKickerState)
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_ACTION(setupEnemyKickerStrategy)
+        DEFINE_SML_ACTION(blockEnemyKicker)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *BlockFreeKicker_S + Update_E / setupEnemyKickerStrategy_A =
-                BlockFreeKicker_S,
+            *BlockEnemyKickerState_S + Update_E / blockEnemyKicker_A =
+                BlockEnemyKickerState_S,
             X + Update_E = X);
     }
 
