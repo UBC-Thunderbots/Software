@@ -27,7 +27,7 @@ class Gamecontroller(object):
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, supress_logs: bool = False) -> None:
+    def __init__(self, supress_logs: bool = False, gamecontroller_port=None) -> None:
         """Run Gamecontroller
 
         :param supress_logs: Whether to suppress the logs
@@ -37,8 +37,15 @@ class Gamecontroller(object):
         # We need to find 2 free ports to use for the gamecontroller
         # so that we can run multiple gamecontroller instances in parallel
         self.referee_port = self.next_free_port()
-        self.ci_port = self.next_free_port()
+        
+        self.ci_port = gamecontroller_port
+        if gamecontroller_port is None: 
+            self.ci_port = self.next_free_port()
 
+        if not self.is_valid_port(self.ci_port):
+            raise Exception("Port: {} is not available!".format(self.ci_port))
+
+        print("I am using: {} port".format(self.ci_port))
         # this allows gamecontroller to listen to override commands
         self.command_override_buffer = ThreadSafeBuffer(
             buffer_size=2, protobuf_type=ManualGCCommand
@@ -55,6 +62,7 @@ class Gamecontroller(object):
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
+        print(f"command: {command}")
         if self.supress_logs:
             with open(os.devnull, "w") as fp:
                 self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
@@ -102,6 +110,20 @@ class Gamecontroller(object):
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
 
+    def is_valid_port(self, port):
+        """
+        :param port: the port we are checking
+        :return: True if the port is available, False otherwise
+        """
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        try:
+            sock.bind(("", port))
+            sock.close()
+            return True
+        except OSError:
+            return False
+
     def next_free_port(self, port: int = 40000, max_port: int = 65535) -> None:
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller
         so that we can run multiple gamecontroller instances in parallel.
@@ -111,15 +133,10 @@ class Gamecontroller(object):
         :return: The next free port
 
         """
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
         while port <= max_port:
-            try:
-                sock.bind(("", port))
-                sock.close()
+            if self.is_valid_port(port):
                 return port
-            except OSError:
-                port += 1
+            port += 1
 
         raise IOError("no free ports")
 
