@@ -38,8 +38,6 @@ NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
 if __name__ == "__main__":
 
-    logging.getLogger().setLevel(logging.DEBUG)
-
     # Setup parser
     parser = argparse.ArgumentParser(
         description="Thunderscope: Run with no arguments to run AI vs AI"

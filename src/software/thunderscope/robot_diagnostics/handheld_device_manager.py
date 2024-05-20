@@ -351,7 +351,7 @@ class HandheldDeviceManager(object):
         event_value: float, max_value: float, normalizing_multiplier: float
     ) -> float:
         """
-        Parse the event_value that corresponds to movement control
+        Interpret the event_value that corresponds to movement control
         :param event_value: the value for the current event being interpreted
         :param max_value: max value for this type of event event type
         :param normalizing_multiplier: multiplier for converting between
