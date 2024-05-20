@@ -313,6 +313,8 @@ def load_command_line_arguments():
         help="Estop Baudrate",
     )
 
+    parser.add_argument('--gamecontroller_port', type=int, default=None, help='The port number for the game controller.')
+
     parser.add_argument(
         "--run_yellow",
         action="store_true",
@@ -348,6 +350,7 @@ def field_test_runner():
     blue_full_system_proto_unix_io = ProtoUnixIO()
     args = load_command_line_arguments()
 
+
     # Grab the current test name to store the proto log for the test case
     current_test = os.environ.get("PYTEST_CURRENT_TEST").split(":")[-1].split(" ")[0]
     current_test = current_test.replace("]", "")
@@ -382,7 +385,8 @@ def field_test_runner():
         enable_radio=args.enable_radio,
     ) as rc_friendly:
         with Gamecontroller(
-            supress_logs=(not args.show_gamecontroller_logs)
+            supress_logs=(not args.show_gamecontroller_logs),
+            gamecontroller_port=args.gamecontroller_port
         ) as gamecontroller:
             friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
             rc_friendly.setup_for_fullsystem()

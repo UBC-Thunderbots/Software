@@ -39,7 +39,7 @@ class Gamecontroller(object):
         self.referee_port = self.next_free_port()
         
         self.ci_port = gamecontroller_port
-        if gamecontroller_port is None: 
+        if self.ci_port is None: 
             self.ci_port = self.next_free_port()
 
         if not self.is_valid_port(self.ci_port):
