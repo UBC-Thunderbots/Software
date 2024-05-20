@@ -45,7 +45,6 @@ class Gamecontroller(object):
         if not self.is_valid_port(self.ci_port):
             raise Exception("Port: {} is not available!".format(self.ci_port))
 
-        print("I am using: {} port".format(self.ci_port))
         # this allows gamecontroller to listen to override commands
         self.command_override_buffer = ThreadSafeBuffer(
             buffer_size=2, protobuf_type=ManualGCCommand
@@ -112,6 +111,8 @@ class Gamecontroller(object):
 
     def is_valid_port(self, port):
         """
+        Check if a port is available 
+
         :param port: the port we are checking
         :return: True if the port is available, False otherwise
         """
