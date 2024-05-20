@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <csignal>
-
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_wrapper.h"

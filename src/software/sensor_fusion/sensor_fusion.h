@@ -142,9 +142,6 @@ class SensorFusion
      */
     static bool teamHasBall(const Team &team, const Ball &ball);
 
-    void updateBallPositionUsingSensorData(
-        const SSLProto::SSL_DetectionFrame &ssl_detection_frame);
-
     TbotsProto::SensorFusionConfig sensor_fusion_config;
     std::optional<Field> field;
     std::optional<Ball> ball;
