@@ -1,5 +1,7 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include <cmath>
+
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
@@ -180,6 +182,105 @@ void SensorFusion::updateWorld(
     }
 }
 
+void SensorFusion::updateBallPositionUsingSensorData(
+
+    const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
+{
+    std::optional<Robot> robot_with_ball_in_dribbler =
+        friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
+
+    std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
+        .position = robot_with_ball_in_dribbler->position() +
+                    Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
+                        // MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT of the ball should be
+                        // inside the robot
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                                   BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
+        .distance_from_ground = 0,
+        .timestamp            = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
+        .confidence           = 1}};
+
+    std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
+
+    if (new_ball)
+    {
+        updateBall(*new_ball);
+    }
+}
+
+// static std::optional<SSLProto::SSL_DetectionBall> findMaxConfidenceBall(
+//     const SSLProto::SSL_DetectionFrame &frame)
+//{
+//     if (frame.balls_size() <= 0)
+//     {
+//         return std::nullopt;
+//     }
+//
+//     SSLProto::SSL_DetectionBall max_confidence_ball = frame.balls(0);
+//     for (auto &current_ball : frame.balls())
+//     {
+//         if (current_ball.confidence() > max_confidence_ball.confidence())
+//         {
+//             max_confidence_ball = current_ball;
+//         }
+//     }
+//
+//     return max_confidence_ball;
+// }
+
+float computeDistanceBetweenBallAndRobot(const Robot &robot, const Ball &ball)
+{
+    Point robot_position = robot.position();
+    Point ball_position  = ball.position();
+    // LOG(INFO) << ball_position.x() << "," << ball_position.y() << "|"
+    //           << robot_position.x() << "," << robot_position.y();
+
+    double x_difference = ball_position.x() - robot_position.x();
+    double y_difference = ball_position.y() - robot_position.y();
+
+    // using the classic distance formula
+    return static_cast<float>(
+        std::sqrt(x_difference * x_difference + y_difference * y_difference));
+}
+
+
+bool SensorFusion::shouldUseRobotBallPositionInsteadOfSSL(
+    const SSLProto::SSL_DetectionFrame &ssl_detection_frame,
+    const std::vector<BallDetection> &ball_detection)
+{
+    // as off current, this would always return true
+    constexpr float distance_threshold = 10.00f;
+
+    if (!friendly_robot_id_with_ball_in_dribbler.has_value())
+    {
+        return false;
+    }
+
+    std::optional<Robot> robot_with_ball_in_dribbler =
+        friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
+    if (!robot_with_ball_in_dribbler.has_value())
+    {
+        return false;
+    }
+
+    std::optional<Ball> ball = createBall(ball_detection);
+    if (!ball.has_value())
+    {
+        return false;
+    }
+
+    float distance = computeDistanceBetweenBallAndRobot(
+        robot_with_ball_in_dribbler.value(), ball.value());
+    // LOG(INFO) << "distance: " << distance;
+
+    if (distance > distance_threshold)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
     double min_valid_x              = sensor_fusion_config.min_valid_x();
@@ -231,32 +332,10 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         ball_in_dribbler_timeout                = 0;
     }
 
-    if (friendly_robot_id_with_ball_in_dribbler.has_value())
+    if (shouldUseRobotBallPositionInsteadOfSSL(ssl_detection_frame, ball_detections))
     {
-        std::optional<Robot> robot_with_ball_in_dribbler =
-            friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
-
-        if (robot_with_ball_in_dribbler.has_value())
-        {
-            std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
-                .position =
-                    robot_with_ball_in_dribbler->position() +
-                    Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                        // MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT of the ball should be
-                        // inside the robot
-                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                   BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
-                .distance_from_ground = 0,
-                .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-                .confidence = 1}};
-
-            std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
-
-            if (new_ball)
-            {
-                updateBall(*new_ball);
-            }
-        }
+        //LOG(INFO) << "Yay";
+        updateBallPositionUsingSensorData(ssl_detection_frame);
     }
     else
     {
