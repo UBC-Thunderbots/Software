@@ -61,7 +61,6 @@ class Gamecontroller(object):
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
-        print(f"command: {command}")
         if self.supress_logs:
             with open(os.devnull, "w") as fp:
                 self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
