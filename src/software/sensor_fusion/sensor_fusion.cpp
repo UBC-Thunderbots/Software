@@ -198,7 +198,7 @@ bool SensorFusion::shouldUseRobotBallPositionInsteadOfSSL(
     const SSLProto::SSL_DetectionFrame &ssl_detection_frame,
     const std::vector<BallDetection> &ball_detection)
 {
-    // the following if statements essentially ensures that we could caculate the
+    // the following if statements essentially ensures that we could calculate the
     // distance. Essentially unwarpping all the std::optional<T> that are required to
     // calculate the distance
     if (!friendly_robot_id_with_ball_in_dribbler.has_value())
