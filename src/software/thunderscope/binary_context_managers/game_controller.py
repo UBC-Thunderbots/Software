@@ -40,10 +40,9 @@ class Gamecontroller(object):
         
         self.ci_port = gamecontroller_port
         if self.ci_port is None: 
-            self.ci_port = self.next_free_port()
-
-        if not self.is_valid_port(self.ci_port):
-            raise Exception("Port: {} is not available!".format(self.ci_port))
+            self.ci_port = self.next_free_port(40000)
+        else:
+            self.ci_port = self.next_free_port(self.ci_port)
 
         # this allows gamecontroller to listen to override commands
         self.command_override_buffer = ThreadSafeBuffer(
@@ -124,7 +123,7 @@ class Gamecontroller(object):
         except OSError:
             return False
 
-    def next_free_port(self, port: int = 40000, max_port: int = 65535) -> None:
+    def next_free_port(self, start_port: int = 40000, max_port: int = 65535) -> None:
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller
         so that we can run multiple gamecontroller instances in parallel.
 
@@ -133,10 +132,10 @@ class Gamecontroller(object):
         :return: The next free port
 
         """
-        while port <= max_port:
-            if self.is_valid_port(port):
-                return port
-            port += 1
+        while start_port <= max_port:
+            if self.is_valid_port(start_port):
+                return start_port
+            start_port += 1
 
         raise IOError("no free ports")
 
