@@ -37,9 +37,9 @@ class Gamecontroller(object):
         # We need to find 2 free ports to use for the gamecontroller
         # so that we can run multiple gamecontroller instances in parallel
         self.referee_port = self.next_free_port()
-        
+
         self.ci_port = gamecontroller_port
-        if self.ci_port is None: 
+        if self.ci_port is None:
             self.ci_port = self.next_free_port(40000)
         else:
             self.ci_port = self.next_free_port(self.ci_port)

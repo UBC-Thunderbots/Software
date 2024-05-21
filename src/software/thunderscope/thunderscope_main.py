@@ -217,8 +217,13 @@ if __name__ == "__main__":
         default=False,
         help="Whether to populate with default robot positions (False) or start with an empty field (True) for AI vs AI",
     )
-    
-    parser.add_argument('--gamecontroller_port', type=int, default=None, help='The port number for the game controller.')
+
+    parser.add_argument(
+        "--gamecontroller_port",
+        type=int,
+        default=None,
+        help="The port number for the game controller.",
+    )
 
     args = parser.parse_args()
 
@@ -226,7 +231,6 @@ if __name__ == "__main__":
     if args.run_blue or args.run_yellow:
         if args.interface is None:
             parser.error("Must specify interface")
-
 
     ###########################################################################
     #                      Visualize CPP Tests                                #
@@ -432,7 +436,7 @@ if __name__ == "__main__":
             run_sudo=args.sudo,
         ) as yellow_fs, Gamecontroller(
             supress_logs=(not args.verbose),
-            gamecontroller_port=args.gamecontroller_port
+            gamecontroller_port=args.gamecontroller_port,
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
