@@ -226,7 +226,7 @@ class ProtoPlayer:
         Note that the end time may not necessarily be the last message in the last chunks since there may be 
         file corruptions. We also assume a chronological order in the chunks data!
         
-        :return: the last end time, if noe end time are found, return 0.0s
+        :return: the last end time, if no end time are found, return 0.0s
         """
         # reverse iterating over the chunks (file)
         for i in reversed(range(len(self.sorted_chunks))):
