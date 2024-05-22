@@ -143,13 +143,7 @@ class ProtoLogger:
             logging.exception("Exception detected in ProtoLogger")
 
     @staticmethod
-    def write_to_logfile(log_file: gzip.GzipFile, data:bytes):
-        """
-        Writing to log file
-        
-        :param log_file: the log file being written 
-        :param data: the binary data that is going to be written
-        """
+    def write_to_logfile(log_file, data):
         log_file.write(data)
 
     @staticmethod

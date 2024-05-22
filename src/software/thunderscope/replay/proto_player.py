@@ -220,7 +220,7 @@ class ProtoPlayer:
 
         return is_from_field_test
 
-    def find_actual_endtime(self) -> float:
+    def find_actual_endtime(self):
         """
         Finding the last end time.
         Note that the end time may not necessarily be the last message in the last chunks since there may be 
