@@ -9,9 +9,9 @@ SamplingPassGenerator::SamplingPassGenerator(TbotsProto::PassingConfig passing_c
 {
 }
 
-PassWithRating SamplingPassGenerator::getBestPass(
-    const World& world)  // TODO (NIMA): We should only sample around offensive robots
-                         // without the ball and maybe crease defenders
+PassWithRating SamplingPassGenerator::getBestPass(const World& world) override
+// TODO (NIMA): We should only sample around offensive robots
+// without the ball and maybe crease defenders
 {
     auto sampled_pass_points = samplePasses(world);
 
@@ -49,15 +49,15 @@ PassWithRating SamplingPassGenerator::getBestPass(
     {
         std::stringstream stream;
         stream << std::fixed << std::setprecision(3) << pass_with_rating.rating;
-        debug_shapes.push_back(
-            *createDebugShape(Circle(pass_with_rating.pass.receiverPoint(), 0.02),
-                              std::to_string(debug_shapes.size()) + "sp", stream.str()));
+        debug_shapes.push_back(*createDebugShape(
+            Circle(pass_with_rating.pass.receiverPoint(), DEBUG_SAMPLED_POINT_SIZE),
+            std::to_string(debug_shapes.size()) + "sp", stream.str()));
     }
     std::stringstream stream;
     stream << "BP:" << std::fixed << std::setprecision(3) << best_pass.rating;
-    debug_shapes.push_back(*createDebugShape(Circle(best_pass.pass.receiverPoint(), 0.05),
-                                             std::to_string(debug_shapes.size()) + "sp",
-                                             stream.str()));
+    debug_shapes.push_back(*createDebugShape(
+        Circle(best_pass.pass.receiverPoint(), DEBUG_BEST_SAMPLED_POINT_SIZE),
+        std::to_string(debug_shapes.size()) + "sp", stream.str()));
     LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
 
     // Generate sample passes for cost visualization
