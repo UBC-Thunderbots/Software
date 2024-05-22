@@ -35,14 +35,8 @@ class SslSocket(object):
         :param port the port to bind to
         """
         # bind to all local interfaces, TCP
-        try:
-            # bind to all local interfaces, TCP
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.connect(("", port))
-        except ConnectionRefusedError:
-            raise ConnectionRefusedError(
-                f"SSL Socket connection refused on port {port}. Is binary already running in a separate process?"
-            )
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.connect(("", port))
 
     def send(self, proto: protobuf_message.Message) -> None:
         """
