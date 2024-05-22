@@ -107,7 +107,7 @@ class Gamecontroller(object):
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
 
-    def is_valid_port(self, port):
+    def is_valid_port(self, port:int) -> bool:
         """
         Check if a port is available 
 
@@ -123,11 +123,11 @@ class Gamecontroller(object):
         except OSError:
             return False
 
-    def next_free_port(self, start_port: int = 40000, max_port: int = 65535) -> None:
+    def next_free_port(self, start_port: int = 40000, max_port: int = 65535) -> int:
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller
         so that we can run multiple gamecontroller instances in parallel.
 
-        :param port: The port to start looking from
+        :param start_port: The port to start looking from
         :param max_port: The maximum port to look up to
         :return: The next free port
 
