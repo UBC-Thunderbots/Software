@@ -117,9 +117,29 @@ TEST_F(SamplingPassGeneratorTest, getBestPass_3_friendlies_2_blocked)
     world->updateEnemyTeamState(enemy_team);
 
     PassWithRating best_pass = sampling_pass_generator.getBestPass(*world);
-    std::cout << best_pass.pass << std::endl;
-    std::cout << best_pass.rating << std::endl;
     // since both robots are blocked, chosen pass will be pretty bad
     // so just check that it's not 0
     EXPECT_GE(best_pass.rating, 0);
+    EXPECT_LE(best_pass.rating, 0.4);
+}
+
+TEST_F(SamplingPassGeneratorTest, getBestPass_1_friendly_1_enemy)
+{
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots(
+        {Robot(1, {2, 0}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0))});
+    world->updateFriendlyTeamState(friendly_team);
+    Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
+    world->updateBall(ball);
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({Robot(0, {-2, 0}, {0, 0}, Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0))});
+    world->updateEnemyTeamState(enemy_team);
+
+    PassWithRating best_pass = sampling_pass_generator.getBestPass(*world);
+    // since friendly can't pass anywhere, pass will be pretty bad
+    EXPECT_GE(best_pass.rating, 0);
+    EXPECT_LE(best_pass.rating, 0.4);
 }

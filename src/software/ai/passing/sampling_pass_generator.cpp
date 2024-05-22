@@ -9,7 +9,7 @@ SamplingPassGenerator::SamplingPassGenerator(TbotsProto::PassingConfig passing_c
 {
 }
 
-PassWithRating SamplingPassGenerator::getBestPass(const World& world) override
+PassWithRating SamplingPassGenerator::getBestPass(const World& world)
 // TODO (NIMA): We should only sample around offensive robots
 // without the ball and maybe crease defenders
 {

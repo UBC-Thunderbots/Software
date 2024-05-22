@@ -69,7 +69,7 @@ class PassGenerator : public BasePassGenerator
      */
     PassEvaluation<ZoneEnum> generatePassEvaluation(const World& world);
 
-    virtual PassWithRating getBestPass(const World& world);
+    virtual PassWithRating getBestPass(const World& world) override;
 
    private:
     // Weights used to normalize the parameters that we pass to GradientDescent

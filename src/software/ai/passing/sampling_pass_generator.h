@@ -11,9 +11,9 @@
 // the random seed used to initialize the random number generator
 static constexpr int SEED = 14;
 // the size of the circle used to visualize a sampled point while debugging
-static constexpr float DEBUG_SAMPLED_POINT_SIZE = 0.02;
+static constexpr float DEBUG_SAMPLED_POINT_SIZE = 0.02f;
 // used to visualize the best pass chosen
-static constexpr float DEBUG_BEST_SAMPLED_POINT_SIZE = 0.05;
+static constexpr float DEBUG_BEST_SAMPLED_POINT_SIZE = 0.05f;
 
 /**
  * This class is responsible for generating passes using a sampling method
