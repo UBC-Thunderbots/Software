@@ -27,6 +27,7 @@ from software.thunderscope.util import *
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 
 
@@ -224,8 +225,16 @@ if __name__ == "__main__":
         default=None,
         help="The port number for the game controller.",
     )
+     
+    parser.add_argument("--sslvision_multicast_address", type=str, default=None, help="the multicast address for ssl vision")
+
+    parser.add_argument("--sslreferee_multicast_address", type=str, default=None, help="the multicast address for referee (game controller likely)")
+
 
     args = parser.parse_args()
+    
+    print(args.sslvision_multicast_address)
+    print(args.sslreferee_multicast_address)
 
     # Sanity check that an interface was provided
     if args.run_blue or args.run_yellow:
@@ -437,6 +446,7 @@ if __name__ == "__main__":
         ) as yellow_fs, Gamecontroller(
             supress_logs=(not args.verbose),
             gamecontroller_port=args.gamecontroller_port,
+            referee_addresse=args.sslreferee_multicast_address
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
