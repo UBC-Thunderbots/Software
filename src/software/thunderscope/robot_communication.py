@@ -27,6 +27,8 @@ class RobotCommunication(object):
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
         enable_radio: bool = False,
+        referee_address: str = None, 
+        sslvision_address: str = None, 
     ):
         """Initialize the communication with the robots
 
@@ -100,19 +102,27 @@ class RobotCommunication(object):
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
 
+        self.ssl_vision_address = sslvision_address
+        if self.ssl_vision_address is None:
+            self.ssl_vision_address = SSL_VISION_ADDRESS
+
+        self.referee_address = referee_address
+        if self.ssl_vision_address is None:
+            self.ssl_vision_address = SSL_REFEREE_ADDRESS
+
     def setup_for_fullsystem(self) -> None:
         """
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
         """
         self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
-            SSL_VISION_ADDRESS,
+            self.ssl_vision_address,
             SSL_VISION_PORT,
             lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
             True,
         )
 
         self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
-            SSL_REFEREE_ADDRESS,
+            self.referee_address,
             SSL_REFEREE_PORT,
             lambda data: self.current_proto_unix_io.send_proto(Referee, data),
             True,

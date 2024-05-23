@@ -232,9 +232,6 @@ if __name__ == "__main__":
 
 
     args = parser.parse_args()
-    
-    print(args.sslvision_multicast_address)
-    print(args.sslreferee_multicast_address)
 
     # Sanity check that an interface was provided
     if args.run_blue or args.run_yellow:

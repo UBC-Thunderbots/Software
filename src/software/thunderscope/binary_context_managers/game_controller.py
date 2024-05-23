@@ -43,7 +43,6 @@ class Gamecontroller(object):
         self.REFEREE_IP = referee_addresse
         if referee_addresse is None: 
             self.REFEREE_IP = "224.5.23.1"
-        print(self.REFEREE_IP)
 
         self.ci_port = gamecontroller_port
         if self.ci_port is None:
@@ -67,7 +66,6 @@ class Gamecontroller(object):
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
-        print(command)
         if self.supress_logs:
             with open(os.devnull, "w") as fp:
                 self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
