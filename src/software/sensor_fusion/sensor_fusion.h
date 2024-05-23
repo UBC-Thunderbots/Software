@@ -56,7 +56,7 @@ class SensorFusion
      * @return True if we were to use the position of the robot instead of the ssl camera
      * system. False otherwise
      */
-    bool shouldUseRobotBallPositionInsteadOfSSL(
+    bool shouldUseRobotBallPositionInsteadOfVision(
         const SSLProto::SSL_DetectionFrame &frame,
         const std::vector<BallDetection> &ball_detection);
 
@@ -72,7 +72,7 @@ class SensorFusion
     // between the robot that has the ball is greater than the distance below, then we
     // know that the breakbeam has a problem see for more:
     // https://github.com/UBC-Thunderbots/Software/issues/3197
-    static constexpr float DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION = 0.5f;
+    static constexpr double DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION = 0.5;
 
    private:
     /**
