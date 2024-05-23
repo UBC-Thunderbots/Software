@@ -6,6 +6,8 @@
 
 struct PassSkillFSM
 {
+    class PassTakenState;
+
     struct ControlParams
     {
         // Whether the robot should chip (true) or kick (false) the ball to make the pass
@@ -15,6 +17,8 @@ struct PassSkillFSM
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     bool foundPass(const Update& event);
+
+    void commitPass(const Update& event);
 
     void findPass(const Update& event,
                   boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
@@ -28,16 +32,21 @@ struct PassSkillFSM
 
         DEFINE_SML_STATE(DribbleSkillFSM)
         DEFINE_SML_STATE(PivotKickSkillFSM)
+        DEFINE_SML_STATE(PassTakenState)
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_GUARD(foundPass)
+        DEFINE_SML_ACTION(commitPass)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(findPass, DribbleSkillFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(takePass, PivotKickSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *DribbleSkillFSM_S + Update_E[foundPass_G] / takePass_A = PivotKickSkillFSM_S,
-            DribbleSkillFSM_S + Update_E / findPass_A, DribbleSkillFSM_S = X,
-            PivotKickSkillFSM_S + Update_E / takePass_A, PivotKickSkillFSM_S = X,
+            *DribbleSkillFSM_S + Update_E[foundPass_G] / (commitPass_A, takePass_A) =
+                PivotKickSkillFSM_S,
+            DribbleSkillFSM_S + Update_E / findPass_A,
+            PivotKickSkillFSM_S + Update_E / (commitPass_A, takePass_A), 
+            PivotKickSkillFSM_S = PassTakenState_S,
+            PassTakenState_S + Update_E / (commitPass_A, SET_STOP_PRIMITIVE_ACTION) = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 

@@ -19,6 +19,11 @@ bool PassSkillFSM::foundPass(const Update& event)
                                    best_pass_so_far_->pass.estimatePassDuration();
 }
 
+void PassSkillFSM::commitPass(const Update& event)
+{
+    event.common.strategy->commitPass(best_pass_so_far_->pass);
+}
+
 void PassSkillFSM::findPass(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {

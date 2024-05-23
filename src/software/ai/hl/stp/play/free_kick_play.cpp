@@ -120,8 +120,6 @@ void FreeKickPlay::performPassStage(
     PassWithRating best_pass_and_score_so_far, const WorldPtr &world_ptr)
 {
     // Commit to a pass
-    Pass pass = best_pass_and_score_so_far.pass;
-
     LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
     LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
 
@@ -130,8 +128,6 @@ void FreeKickPlay::performPassStage(
     auto receiver = std::make_shared<ReceiverTactic>(strategy);
     do
     {
-        receiver->updateControlParams(pass);
-
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::LEFT);

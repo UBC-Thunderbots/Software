@@ -90,7 +90,7 @@ class Tactic
      *
      * @return the next primitive
      */
-    std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr &world_ptr);
+    virtual std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr &world_ptr);
 
     /**
      * Accepts a Tactic Visitor and calls the visit function on itself

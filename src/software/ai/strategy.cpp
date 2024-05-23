@@ -9,58 +9,51 @@ Strategy::Strategy(const TbotsProto::AiConfig& ai_config)
 {
 }
 
-TbotsProto::PossessionStrategy Strategy::getPossessionStrategy(int num_robots)
-{
-    TbotsProto::PossessionStrategy possession_strategy;
-
-    int unassigned_robots   = num_robots;
-    int num_ideal_defenders = 2;
-
-    if (world_ptr_->getTeamWithPossession() == TeamPossession::FRIENDLY_TEAM)
-    {
-        possession_strategy.set_attackers(1);
-        unassigned_robots -= 1;
-
-        possession_strategy.set_defenders(
-            std::min(num_ideal_defenders, std::max(unassigned_robots, 0)));
-        unassigned_robots -= possession_strategy.defenders();
-
-        possession_strategy.set_supporters(unassigned_robots);
-
-        return possession_strategy;
-    }
-
-    possession_strategy.set_defenders(std::min(num_ideal_defenders, unassigned_robots));
-    unassigned_robots -= possession_strategy.defenders();
-
-    possession_strategy.set_supporters(std::max(unassigned_robots, 0));
-
-    return possession_strategy;
-}
-
 PassWithRating Strategy::getBestPass()
 {
-    if (!best_pass_) 
+    if (!best_pass_)
     {
-        best_pass_ = sampling_pass_generator_.getBestPass(*world_ptr_); 
+        best_pass_ = sampling_pass_generator_.getBestPass(*world_ptr_);
     }
 
-    return sampling_pass_generator_.getBestPass(*world_ptr_);
+    return *best_pass_;
 }
 
-Point Strategy::getBestReceivingPosition()
+std::optional<Pass> Strategy::getNextCommittedPass()
 {
-    std::vector<Point> existing_receiver_positions;
-
-    if (receiver_positions_.empty()) 
+    if (committed_passes_index_ >= committed_passes_.size())
     {
-        receiver_positions_ = receiver_position_generator_.getBestReceivingPositions(
-            *world_ptr_, static_cast<int>(world_ptr_->friendlyTeam().numRobots()), 
-            existing_receiver_positions);
-        receiver_positions_index_ = 0;
+        return std::nullopt;
     }
 
-    return receiver_positions_[receiver_positions_index_++];
+    return committed_passes_.at(committed_passes_index_++);
+}
+
+void Strategy::commitPass(Pass pass)
+{
+    committed_passes_.push_back(pass);
+}
+
+Point Strategy::getNextBestReceivingPosition()
+{
+    if (receiving_positions_.empty())
+    {
+        std::vector<Point> existing_receiver_positions;
+        std::transform(committed_passes_.begin(), committed_passes_.end(),
+                       std::back_inserter(existing_receiver_positions),
+                       [](const Pass& pass) { return pass.receiverPoint(); });
+
+        unsigned int num_positions_to_generate = static_cast<unsigned int>(
+            world_ptr_->friendlyTeam().numRobots() - existing_receiver_positions.size());
+
+        receiving_positions_ = receiver_position_generator_.getBestReceivingPositions(
+            *world_ptr_, num_positions_to_generate, existing_receiver_positions);
+    }
+
+    CHECK(receiving_positions_index_ < receiving_positions_.size())
+        << "No more receiving positions to return";
+
+    return receiving_positions_.at(receiving_positions_index_++);
 }
 
 std::optional<Shot> Strategy::getBestShot(const Robot& robot)
@@ -87,10 +80,10 @@ void Strategy::updateAiConfig(const TbotsProto::AiConfig& ai_config)
     ai_config_ = ai_config;
 
     // Pass generators must be recreated with the new passing config
-    sampling_pass_generator_ = SamplingPassGenerator(ai_config_.passing_config());
+    sampling_pass_generator_     = SamplingPassGenerator(ai_config_.passing_config());
     receiver_position_generator_ = ReceiverPositionGenerator<EighteenZoneId>(
-          std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField()),
-          ai_config_.passing_config());
+        std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField()),
+        ai_config_.passing_config());
 }
 
 void Strategy::updateWorld(const WorldPtr& world_ptr)
@@ -98,6 +91,12 @@ void Strategy::updateWorld(const WorldPtr& world_ptr)
     world_ptr_ = world_ptr;
 
     best_pass_.reset();
-    receiver_positions_.clear();
+
+    committed_passes_.clear();
+    committed_passes_index_ = 0;
+
+    receiving_positions_.clear();
+    receiving_positions_index_ = 0;
+
     robot_to_best_shot_.clear();
 }

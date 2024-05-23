@@ -47,11 +47,6 @@ void ShootSkillFSM::dribbleBallToKickOrigin(
         .allow_excessive_dribbling = false};
 
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
-
-    LOG(VISUALIZE) << *createAttackerVisualization(
-        std::nullopt, false,
-        best_shot_, event.common.world_ptr->ball().position(),
-        std::nullopt);
 }
 
 void ShootSkillFSM::pivotKick(
@@ -68,9 +63,4 @@ void ShootSkillFSM::pivotKick(
             .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                                                 BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}},
         event.common));
-
-    LOG(VISUALIZE) << *createAttackerVisualization(
-        std::nullopt, false,
-        best_shot_, event.common.world_ptr->ball().position(),
-        std::nullopt);
 }

@@ -106,13 +106,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ReceiverTactic &tactic_pr
                                      std::shared_ptr<Strategy> strategy)
 {
     auto tactic              = std::make_shared<ReceiverTactic>(strategy);
-    std::optional<Pass> pass = std::nullopt;
-    if (tactic_proto.has_pass())
-    {
-        pass = createPass(tactic_proto.pass());
-    }
-
-    tactic->updateControlParams(pass, tactic_proto.disable_one_touch_shot());
     return tactic;
 }
 

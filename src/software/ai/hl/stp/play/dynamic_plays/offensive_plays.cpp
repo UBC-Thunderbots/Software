@@ -18,15 +18,13 @@ void OffensivePlay::evaluate(double score)
 
 void OffensivePlay::updateTactics(const PlayUpdate& play_update)
 {
-    TbotsProto::PossessionStrategy possession_strategy =
-        strategy->getPossessionStrategy(play_update.num_tactics);
-
-    updateSupportTactics(possession_strategy.supporters());
-
+    int num_defenders = std::min(play_update.num_tactics - 1, 2u);
+    int num_supporters = play_update.num_tactics - num_defenders - 1;
+    
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
     defense_play_->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     defense_play_->updateTactics(PlayUpdate(
-        play_update.world_ptr, possession_strategy.defenders(),
+        play_update.world_ptr, num_defenders,
         [&](PriorityTacticVector new_tactics) {
             for (auto& tactic_vec : new_tactics)
             {
@@ -36,6 +34,8 @@ void OffensivePlay::updateTactics(const PlayUpdate& play_update)
         },
         play_update.inter_play_communication,
         play_update.set_inter_play_communication_fun));
+    
+    updateSupportTactics(num_supporters);
 
     play_update.set_tactics({{attacker_tactic_}, defense_tactics, support_tactics_});
 }

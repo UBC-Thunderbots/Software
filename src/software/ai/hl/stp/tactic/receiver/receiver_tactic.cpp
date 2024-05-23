@@ -19,24 +19,22 @@ ReceiverTactic::ReceiverTactic(std::shared_ptr<Strategy> strategy)
     }
 }
 
-void ReceiverTactic::updateControlParams(std::optional<Pass> updated_pass,
-                                         bool disable_one_touch_shot)
-{
-    // Update the control parameters stored by this Tactic
-    control_params.pass                   = updated_pass;
-    control_params.disable_one_touch_shot = disable_one_touch_shot;
-}
-
 void ReceiverTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
 
+std::map<RobotId, std::shared_ptr<Primitive>> ReceiverTactic::get(
+    const WorldPtr& world_ptr)
+{
+    control_params.pass = strategy_->getNextCommittedPass().value_or(
+        Pass(world_ptr->ball().position(), strategy_->getNextBestReceivingPosition(), 1));
+
+    return Tactic::get(world_ptr);
+}
+
 void ReceiverTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
-    updateControlParams(Pass(tactic_update.world_ptr->ball().position(), 
-                        strategy_->getBestReceivingPosition(), 1));
-
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] =

@@ -17,17 +17,9 @@ class ReceiverTactic : public Tactic
    public:
     explicit ReceiverTactic(std::shared_ptr<Strategy> strategy);
 
-    /**
-     * Updates the control parameters for this ReceiverTactic.
-     *
-     * @param updated_pass The pass this tactic should try to receive
-     * @param disable_one_touch_shot If set to true, the receiver will not perform a
-     * one-touch The robot will simply receive and dribble.
-     */
-    void updateControlParams(std::optional<Pass> updated_pass,
-                             bool disable_one_touch_shot = false);
-
     void accept(TacticVisitor& visitor) const override;
+
+    std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr &world_ptr) override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 

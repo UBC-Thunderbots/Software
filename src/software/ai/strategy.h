@@ -1,7 +1,6 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
-#include "proto/strategy.pb.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
@@ -28,24 +27,35 @@ class Strategy
     Strategy(const TbotsProto::AiConfig& ai_config);
 
     /**
-     * Get the possession strategy detailing the number of attackers,
-     * supporters, and defenders to assign.
-     */
-    TbotsProto::PossessionStrategy getPossessionStrategy(int num_robots);
-
-    /**
      * Gets the best pass on the field.
      * 
-     * @returns the best pass
+     * @return the best pass
      */
     PassWithRating getBestPass();
 
     /**
-     * Gets the best receiving position on the field.
+     * Gets the next committed pass that has not yet been returned by this method
+     * since the last World update.
      * 
-     * @return the best receiving position
+     * @return the next committed pass, or std::nullopt if there are no more 
+     * committed passes to return
      */
-    Point getBestReceivingPosition();
+    std::optional<Pass> getNextCommittedPass();
+
+    /**
+     * Commits a pass.
+     * 
+     * @param pass the pass to commit
+     */
+    void commitPass(Pass pass);
+    
+    /**
+     * Gets the next best receiving position on the field that has not yet been 
+     * returned by this method since the last World update.
+     * 
+     * @return the next best receiving position
+     */
+    Point getNextBestReceivingPosition();
 
     /**
      * Gets the best shot on goal for the given robot.
@@ -86,8 +96,11 @@ class Strategy
     ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator_;
 
     std::optional<PassWithRating> best_pass_;
-    std::vector<Point> receiver_positions_;
-    std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
+    std::vector<Pass> committed_passes_;
+    size_t committed_passes_index_;
 
-    size_t receiver_positions_index_;
+    std::vector<Point> receiving_positions_;
+    size_t receiving_positions_index_;
+
+    std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
 };
