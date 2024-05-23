@@ -1,12 +1,23 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "network_utils",
+    hdrs = [
+        "network_utils.h",
+    ],
+    srcs = [
+        "network_utils.cpp",
+    ],
+)
+
+cc_library(
     name = "proto_udp_listener",
     hdrs = [
         "proto_udp_listener.hpp",
     ],
     visibility = ["//visibility:private"],
     deps = [
+        ":network_utils",
         "//software/logger",
         "//software/util/typename",
     ],
@@ -57,5 +68,12 @@ cc_library(
     ],
     deps = [
         ":udp_sender",
+    ],
+)
+
+cc_library(
+    name = "udp_network_factory",
+    hdrs = [
+        "udp_network_factory.hpp",
     ],
 )

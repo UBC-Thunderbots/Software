@@ -8,6 +8,7 @@
 #include <thread>
 
 #include "software/logger/logger.h"
+#include "software/networking/udp/network_utils.h"
 #include "software/networking/udp/proto_udp_listener.hpp"
 #include "software/util/typename/typename.h"
 
@@ -31,7 +32,7 @@ class ProtoUdpListener
      * @param multicast If true, joins the multicast group of given ip_address
      */
     ProtoUdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
-                     unsigned short port,
+                     unsigned short port, const std::string& listen_interface,
                      std::function<void(ReceiveProtoT&)> receive_callback,
                      bool multicast);
 
@@ -66,6 +67,8 @@ class ProtoUdpListener
     void handleDataReception(const boost::system::error_code& error,
                              size_t num_bytes_received);
 
+    void setupMulticast();
+
     /**
      * Start listening for data
      */
@@ -89,12 +92,16 @@ class ProtoUdpListener
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
-    const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback,
-    bool multicast)
+    const unsigned short port, const std::string& listen_interface,
+    std::function<void(ReceiveProtoT&)> receive_callback, bool multicast)
     : socket_(io_service), receive_callback(receive_callback)
 {
-    boost::asio::ip::udp::endpoint listen_endpoint(
-        boost::asio::ip::make_address(ip_address), port);
+    boost::asio::ip::address boost_ip = boost::asio::ip::make_address(ip_address);
+    if (isIpv6(ip_address))
+    {
+        boost_ip = boost::asio::ip::make_address(ip_address + "%" + listen_interface);
+    }
+    boost::asio::ip::udp::endpoint listen_endpoint(boost_ip, port);
     socket_.open(listen_endpoint.protocol());
     socket_.set_option(boost::asio::socket_base::reuse_address(true));
     try
@@ -113,6 +120,7 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
 
     if (multicast)
     {
+        setupMulticast(boost_ip, listen_interface);
         // Join the multicast group.
         socket_.set_option(boost::asio::ip::multicast::join_group(
             boost::asio::ip::address::from_string(ip_address)));
@@ -197,6 +205,17 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
             << "which means that the receive buffer is full and data loss has potentially occurred. "
             << "Consider increasing MAX_BUFFER_LENGTH";
     }
+}
+
+template <class ReceiveProtoT>
+ProtoUdpListener<ReceiveProtoT>::setupMulticast(boost::asio::ip::address ip_address,
+        const std::string& listen_interface)
+{
+    if (ip_address.is_v4())
+    {
+
+    }
+    socket_.set_option(boost::asio::ip::multicast::join_group(ip_address));
 }
 
 template <class ReceiveProtoT>
