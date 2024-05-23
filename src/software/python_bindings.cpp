@@ -103,6 +103,12 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
 }
 
 
+/**
+ * Declares a Python binding for a PassGenerator of type T
+ *
+ * @param m The module to define the sender/receiver in
+ * @param The name to insert into the binded class name (ex. {name}PassGenerator)
+ */
 template <typename T>
 void declarePassGenerator(py::module& m, std::string name)
 {

@@ -35,7 +35,7 @@ class BallMovesForward(Validation):
         # set it and return PASSING
         if self.max_displacement_so_far is None or (
             self.moving_in_pos_x
-            and current_ball_position > self.max_displacement_so_far - self.tolerance
+            and (current_ball_position > self.max_displacement_so_far - self.tolerance)
         ):
             self.max_displacement_so_far = current_ball_position
             return ValidationStatus.PASSING
@@ -79,11 +79,25 @@ class BallMovesForwardInRegions(BallMovesForward):
     """Checks if ball is moving in a direction in certain regions"""
 
     def __init__(self, initial_ball_position, regions=[], tolerance: float = 0.1):
+        """
+        Constructs the validation with the given regions
+        :param initial_ball_position: the initial position of the ball
+        :param regions: the list of regions to check the ball in
+        :param tolerance: the tolerance for determining the ball's direction of movement
+                          to account for noisy world data
+        """
         super().__init__(initial_ball_position, tolerance=tolerance)
         self.regions = regions
 
     def get_validation_status(self, world) -> ValidationStatus:
+        """
+        In each of the given regions, calls the parent function 
+        to check if the ball is moving forward
 
+        :param world: The world msg to validate
+        :returns: FAILING if ball doesn't move in the direction
+                  PASSING if ball moves in the direction
+        """
         for region in self.regions:
             if tbots.contains(
                 region, tbots.createPoint(world.ball.current_state.global_position)

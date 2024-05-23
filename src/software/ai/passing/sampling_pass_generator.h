@@ -9,7 +9,11 @@
 #include "software/world/world.h"
 
 // the random seed used to initialize the random number generator
-static const int SEED = 14;
+static constexpr int SEED = 14;
+// the size of the circle used to visualize a sampled point while debugging
+static constexpr double DEBUG_SAMPLED_POINT_SIZE = 0.02;
+// used to visualize the best pass chosen
+static constexpr double DEBUG_BEST_SAMPLED_POINT_SIZE = 0.05;
 
 /**
  * This class is responsible for generating passes using a sampling method
@@ -24,13 +28,14 @@ class SamplingPassGenerator : public BasePassGenerator
      */
     SamplingPassGenerator(TbotsProto::PassingConfig passing_config);
 
-    virtual PassWithRating getBestPass(const World& world);
+    virtual PassWithRating getBestPass(const World& world) override;
 
    private:
     /**
-     * Samples NUM_POINTS_TO_SAMPLE_PER_ROBOT points around all friendly robots
+     * Samples x points around all friendly robots
      * using a normal distribution, with mean being the position of the robot and
-     * a standard deviation of SAMPLING_SD_METERS
+     * a standard deviation of y
+     * x and y being constants defined in the passing configuration
      *
      * @param world The current state of the world
      *

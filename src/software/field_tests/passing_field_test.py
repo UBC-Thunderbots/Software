@@ -9,10 +9,11 @@ from software.simulated_tests.friendly_receives_ball_slow import (
 )
 from software import py_constants
 
+passer_robot_id = 3
+receiver_robot_id = 5
+
 
 def test_passing(field_test_runner):
-    passer_robot_id = 3
-    receiver_robot_id = 5
     should_receive_pass = True
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
