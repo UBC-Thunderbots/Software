@@ -111,7 +111,6 @@ class RobotCommunication(object):
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
 
-
     def setup_for_fullsystem(self) -> None:
         """
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default

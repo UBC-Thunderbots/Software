@@ -327,9 +327,19 @@ def load_command_line_arguments():
         help="Run the test with friendly robots in yellow mode",
     )
 
-    parser.add_argument("--sslvision_multicast_address", type=str, default=None, help="the multicast address for ssl vision")
+    parser.add_argument(
+        "--sslvision_multicast_address",
+        type=str,
+        default=None,
+        help="the multicast address for ssl vision",
+    )
 
-    parser.add_argument("--sslreferee_multicast_address", type=str, default=None, help="the multicast address for referee (game controller likely)")
+    parser.add_argument(
+        "--sslreferee_multicast_address",
+        type=str,
+        default=None,
+        help="the multicast address for referee (game controller likely)",
+    )
 
     estop_group = parser.add_mutually_exclusive_group()
     estop_group.add_argument(
@@ -392,7 +402,7 @@ def field_test_runner():
         estop_path=estop_path,
         enable_radio=args.enable_radio,
         referee_address=args.sslreferee_multicast_address,
-        sslvision_address=args.sslvision_multicast_address
+        sslvision_address=args.sslvision_multicast_address,
     ) as rc_friendly:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs),
