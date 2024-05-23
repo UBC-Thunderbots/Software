@@ -330,6 +330,8 @@ if __name__ == "__main__":
             estop_mode=estop_mode,
             estop_path=estop_path,
             enable_radio=args.enable_radio,
+            referee_address=args.sslreferee_multicast_address,
+            sslvision_address=args.sslvision_multicast_address
         ) as robot_communication:
 
             if estop_mode == EstopMode.KEYBOARD_ESTOP:

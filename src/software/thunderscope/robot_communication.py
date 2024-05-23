@@ -41,6 +41,15 @@ class RobotCommunication(object):
         :param enable_radio: Whether to use radio to send primitives to robots
 
         """
+        # setting up the ssl vision and referee addresses
+        self.ssl_vision_address = sslvision_address
+        if self.ssl_vision_address is None:
+            self.ssl_vision_address = SSL_VISION_ADDRESS
+
+        self.referee_address = referee_address
+        if self.referee_address is None:
+            self.referee_address = SSL_REFEREE_ADDRESS
+
         self.receive_ssl_referee_proto = None
         self.receive_ssl_wrapper = None
         self.sequence_number = 0
@@ -102,13 +111,6 @@ class RobotCommunication(object):
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
 
-        self.ssl_vision_address = sslvision_address
-        if self.ssl_vision_address is None:
-            self.ssl_vision_address = SSL_VISION_ADDRESS
-
-        self.referee_address = referee_address
-        if self.ssl_vision_address is None:
-            self.ssl_vision_address = SSL_REFEREE_ADDRESS
 
     def setup_for_fullsystem(self) -> None:
         """
