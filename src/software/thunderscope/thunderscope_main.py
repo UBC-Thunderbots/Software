@@ -225,11 +225,20 @@ if __name__ == "__main__":
         default=None,
         help="The port number for the game controller.",
     )
-     
-    parser.add_argument("--sslvision_multicast_address", type=str, default=None, help="the multicast address for ssl vision")
 
-    parser.add_argument("--sslreferee_multicast_address", type=str, default=None, help="the multicast address for referee (game controller likely)")
+    parser.add_argument(
+        "--sslvision_multicast_address",
+        type=str,
+        default=None,
+        help="the multicast address for ssl vision",
+    )
 
+    parser.add_argument(
+        "--sslreferee_multicast_address",
+        type=str,
+        default=None,
+        help="the multicast address for referee (game controller likely)",
+    )
 
     args = parser.parse_args()
 
@@ -443,7 +452,7 @@ if __name__ == "__main__":
         ) as yellow_fs, Gamecontroller(
             supress_logs=(not args.verbose),
             gamecontroller_port=args.gamecontroller_port,
-            referee_addresse=args.sslreferee_multicast_address
+            referee_addresse=args.sslreferee_multicast_address,
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.

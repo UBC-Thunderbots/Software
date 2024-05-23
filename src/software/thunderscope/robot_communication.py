@@ -27,8 +27,8 @@ class RobotCommunication(object):
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
         enable_radio: bool = False,
-        referee_address: str = None, 
-        sslvision_address: str = None, 
+        referee_address: str = None,
+        sslvision_address: str = None,
     ):
         """Initialize the communication with the robots
 
