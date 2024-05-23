@@ -43,7 +43,6 @@ class SslSocket(object):
                 f"SSL Socket connection refused on port {port}. Is binary already running in a separate process?"
             )
 
-
     def send(self, proto: protobuf_message.Message) -> None:
         """
         Send the proto through the socket.

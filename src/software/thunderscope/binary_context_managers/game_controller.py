@@ -27,7 +27,12 @@ class Gamecontroller(object):
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, supress_logs: bool = False, gamecontroller_port:int =None, referee_addresse:int= None) -> None:
+    def __init__(
+        self,
+        supress_logs: bool = False,
+        gamecontroller_port: int = None,
+        referee_addresse: int = None,
+    ) -> None:
         """Run Gamecontroller
 
         :param supress_logs: Whether to suppress the logs
@@ -41,7 +46,7 @@ class Gamecontroller(object):
         self.referee_port = self.next_free_port()
 
         self.REFEREE_IP = referee_addresse
-        if referee_addresse is None: 
+        if referee_addresse is None:
             self.REFEREE_IP = "224.5.23.1"
 
         self.ci_port = gamecontroller_port
@@ -113,7 +118,7 @@ class Gamecontroller(object):
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
 
-    def is_valid_port(self, port:int) -> bool:
+    def is_valid_port(self, port: int) -> bool:
         """
         Check if a port is available 
 
