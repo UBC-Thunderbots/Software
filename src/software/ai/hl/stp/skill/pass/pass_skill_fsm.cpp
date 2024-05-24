@@ -88,10 +88,6 @@ void PassSkillFSM::findPass(
         .allow_excessive_dribbling = false};
 
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
-
-    LOG(VISUALIZE) << *createAttackerVisualization(
-        best_pass_so_far_->pass, true, std::nullopt,
-        event.common.world_ptr->ball().position(), std::nullopt);
 }
 
 void PassSkillFSM::takePass(
@@ -123,10 +119,6 @@ void PassSkillFSM::takePass(
         .retry_kick        = false};
 
     processEvent(PivotKickSkillFSM::Update(control_params, event.common));
-
-    LOG(VISUALIZE) << *createAttackerVisualization(
-        best_pass_so_far_->pass, true, std::nullopt,
-        event.common.world_ptr->ball().position(), std::nullopt);
 }
 
 void PassSkillFSM::moveToOpenAreas(const Update& event)
@@ -157,8 +149,4 @@ void PassSkillFSM::moveToOpenAreas(const Update& event)
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
-        
-    LOG(VISUALIZE) << *createAttackerVisualization(
-        best_pass_so_far_->pass, true, std::nullopt,
-        event.common.world_ptr->ball().position(), std::nullopt);
 }
