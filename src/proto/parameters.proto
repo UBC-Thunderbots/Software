@@ -210,7 +210,9 @@ message PassingConfig
     // how fast we ramp down to abs_min_pass_score. This is in seconds.
     required double pass_score_ramp_down_duration = 21
         [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-
+    // Width of the pass lane area that the ball must be inside of during the pass
+    required double pass_lane_width_meters = 22
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
     /*****  Visualization parameters *****/
     // Cost function visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
