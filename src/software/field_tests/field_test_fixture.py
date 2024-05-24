@@ -102,7 +102,7 @@ class FieldTestRunner(TbotsTestRunner):
         """Provide the current time in seconds since the epoch"""
 
         with self.timestamp_mutex:
-            return self.timestamp
+            return time.time()
 
     def run_test(
         self,
