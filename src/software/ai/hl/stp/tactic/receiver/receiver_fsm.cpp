@@ -117,7 +117,7 @@ void ReceiverFSM::updateOnetouch(const Update& event)
 {
     auto best_shot = findFeasibleShot(*event.common.world_ptr, event.common.robot);
 
-    if (best_shot.has_value() && event.control_params.pass)
+    if (best_shot.has_value() && event.control_params.receiver_point)
     {
         auto one_touch = getOneTouchShotPositionAndOrientation(
             event.common.robot, event.common.world_ptr->ball(),
@@ -139,11 +139,14 @@ void ReceiverFSM::updateOnetouch(const Update& event)
 
 void ReceiverFSM::updateReceive(const Update& event)
 {
-    if (event.control_params.pass)
+    if (event.control_params.receiver_point)
     {
+        const Ball& ball = event.common.world_ptr->ball();
+        const Point receiver_point = event.control_params.receiver_point.value();
+        const Angle receiver_orientation = (ball.position() - receiver_point).orientation();
+
         event.common.set_primitive(std::make_unique<MovePrimitive>(
-            event.common.robot, event.control_params.pass->receiverPoint(),
-            event.control_params.pass->receiverOrientation(),
+            event.common.robot, receiver_point, receiver_orientation,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
             TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
@@ -180,9 +183,9 @@ void ReceiverFSM::adjustReceive(const Update& event)
 
 bool ReceiverFSM::passStarted(const Update& event)
 {
-    auto ball           = event.common.world_ptr->ball();
-    auto receiver_point = event.control_params.pass->receiverPoint();
-
+    const Ball& ball = event.common.world_ptr->ball();
+    const Point receiver_point = event.control_params.receiver_point.value();
+    
     return ball.hasBallBeenKicked((receiver_point - ball.position()).orientation());
 }
 
@@ -207,8 +210,8 @@ bool ReceiverFSM::strayPass(const Update& event)
     auto ball_position = event.common.world_ptr->ball().position();
 
     Vector ball_receiver_point_vector(
-        event.control_params.pass->receiverPoint().x() - ball_position.x(),
-        event.control_params.pass->receiverPoint().y() - ball_position.y());
+        event.control_params.receiver_point->x() - ball_position.x(),
+        event.control_params.receiver_point->y() - ball_position.y());
 
     auto orientation_difference =
         event.common.world_ptr->ball().velocity().orientation() -

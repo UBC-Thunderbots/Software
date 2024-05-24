@@ -58,11 +58,11 @@ void PassSkillFSM::findPass(
 {
     best_pass_so_far_ = event.common.strategy->getBestPass();
 
-    const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
-
     // Update minimum pass score threshold. Wait for a good pass by starting out only
     // looking for "perfect" passes (with a score of 1) and decreasing this threshold
     // over time
+
+    const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
     double abs_min_pass_score = ai_config.passing_config().abs_min_pass_score();
     double pass_score_ramp_down_duration =
         ai_config.passing_config().pass_score_ramp_down_duration();
@@ -157,4 +157,8 @@ void PassSkillFSM::moveToOpenAreas(const Update& event)
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
+        
+    LOG(VISUALIZE) << *createAttackerVisualization(
+        best_pass_so_far_->pass, true, std::nullopt,
+        event.common.world_ptr->ball().position(), std::nullopt);
 }

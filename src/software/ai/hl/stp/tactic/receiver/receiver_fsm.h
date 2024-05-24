@@ -26,8 +26,8 @@ struct ReceiverFSM
 
     struct ControlParams
     {
-        // The pass to receive
-        std::optional<Pass> pass = std::nullopt;
+        // The point at which to receive the pass
+        std::optional<Point> receiver_point = std::nullopt;
 
         // If set to true, we will only receive and dribble
         bool disable_one_touch_shot = false;
