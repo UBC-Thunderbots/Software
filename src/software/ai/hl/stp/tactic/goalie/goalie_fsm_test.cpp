@@ -175,6 +175,15 @@ TEST(GoalieFSMTest, test_transitions)
     // goalie should return to PositionToBlock
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
+
+    // ball is stationary at the center of the field
+    ::TestUtil::setBallPosition(world_ptr, Point(0, 0), Timestamp::fromSeconds(124));
+    ::TestUtil::setBallVelocity(world_ptr, Vector(0, 0), Timestamp::fromSeconds(124));
+
+    // goalie should return to PositionToBlock
+    fsm.process_event(GoalieFSM::Update(
+        {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     TbotsProto::GoalieTacticConfig goalie_tactic_config;
