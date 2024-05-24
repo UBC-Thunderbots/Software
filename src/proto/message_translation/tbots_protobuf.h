@@ -5,6 +5,7 @@
 #include "proto/vision.pb.h"
 #include "proto/visualization.pb.h"
 #include "proto/world.pb.h"
+#include "software/ai/evaluation/shot.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/ai/passing/pass_with_rating.h"
@@ -127,23 +128,47 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     const std::map<std::string, double>& values);
 
 /**
- * Returns a TbotsProto::DebugShapesMap proto containing the name
- * shape pairs.
+ * Returns a TbotsProto::DebugShapes::DebugShape proto for a given shape,
+ * unique id, and an optional debug text.
+ *
+ * @tparam Shape A shape which has a matching createShapeProto function
+ *
+ * @param shape The shape to create the protobuf for
+ * @param unique_id A unique string used to differentiate this shape
+ * from others. Note that this ID should remain the same for the same shape
+ * to avoid it from being plotted multiple times.
+ * @param debug_text An optional string to display on the shape
+ *
+ * @return The unique_ptr to a TbotsProto::DebugShapes::DebugShape proto
+ */
+template <class Shape>
+std::unique_ptr<TbotsProto::DebugShapes::DebugShape> createDebugShape(
+    const Shape& shape, const std::string& unique_id, const std::string& debug_text = "")
+{
+    auto debug_shape = std::make_unique<TbotsProto::DebugShapes::DebugShape>();
+    (*debug_shape->mutable_shape()) = *createShapeProto(shape);
+    debug_shape->set_unique_id(unique_id);
+    debug_shape->set_debug_text(debug_text);
+    return debug_shape;
+};
+
+/**
+ * Returns a TbotsProto::DebugShapes proto containing the debug shapes
  *
  * Could use LOG(VISUALIZE) to plot these values. Example:
- *  LOG(VISUALIZE) << *createDebugShapesMap({
- *      {"circle_name", *createShapeProto(circle_object)},
- *      {"stadium_name", *createShapeProto(stadium_object)},
- *      {"polygon_name", *createShapeProto(polygon_object)}
+ *  LOG(VISUALIZE) << *createDebugShapes({
+ *       *createDebugShape(circle, unique_id1, optional_text),
+ *       *createDebugShape(polygon, unique_id2, optional_text),
+ *       *createDebugShape(stadium, unique_id3, optional_text)
  *  });
  *
- * @param named_shapes The map of name shape proto pairs to plot
+ * @param debug_shapes A list of debug shapes proto to plot
  *
- * @return The unique_ptr to a TbotsProto::DebugShapesMap proto containing data with
+ * @return The unique_ptr to a TbotsProto::DebugShapes proto containing data with
  *        specified names and shapes
  */
-std::unique_ptr<TbotsProto::DebugShapesMap> createDebugShapesMap(
-    const std::map<std::string, TbotsProto::Shape>& named_shapes);
+std::unique_ptr<TbotsProto::DebugShapes> createDebugShapes(
+    const std::vector<TbotsProto::DebugShapes::DebugShape>& debug_shapes);
 
 /**
  * Returns a TbotsProto::Shape proto given a shape.
@@ -188,6 +213,21 @@ BallState createBallState(const TbotsProto::BallState ball_state);
  */
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
+
+/**
+ * Returns an attacker visualization
+ *
+ * @param pass An optional pass to visualize
+ * @param pass_committed Whether we are committed to taking the pass
+ * @param shot An optional shot to visualize
+ * @param balls_position The current position of the ball used to visualize the shot
+ * @param chip_target An optional target that we are chipping to
+ *
+ * @return The unique_ptr to an AttackerVisualization proto
+ */
+std::unique_ptr<TbotsProto::AttackerVisualization> createAttackerVisualization(
+    const std::optional<Pass>& pass, bool pass_committed, const std::optional<Shot>& shot,
+    const std::optional<Point>& balls_position, const std::optional<Point>& chip_target);
 
 /**
  * Returns the WorldStateReceivedTrigger given the world state received trigger

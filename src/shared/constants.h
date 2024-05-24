@@ -67,7 +67,7 @@ static const double BALL_MAX_RADIUS_METERS = 0.0215;
 static const double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
 
 // The mass of a standard golf ball, as defined by https://en.wikipedia.org/wiki/Golf_ball
-static const double BALL_MASS_KG = 0.004593;
+constexpr double BALL_MASS_KG = 0.004593;
 // The max allowed speed of the robot when the stop command is issued, in meters per
 // second
 static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
@@ -82,6 +82,25 @@ static const double ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND = 3.0;
 static const double ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 4.0;
 
 static const double ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED = 9.81;
+
+/*Simulator Constants*/
+
+// these values are set in coordination with other objects the ball will collide with.
+// the resulting coefficient of friction is the product of both objects friction value.
+
+// the sliding friction the ball experiences in Newtons
+constexpr double BALL_SLIDING_FRICTION_NEWTONS = 1.0;
+// the restitution of the ball
+constexpr double BALL_RESTITUTION = 1.0;
+// the transition factor where the ball goes from sliding to rolling
+constexpr double FRICTION_TRANSITION_FACTOR = 5.0 / 7.0;
+// the stationary ball speed in m/s
+constexpr double STATIONARY_BALL_SPEED_METERS_PER_SECOND = 0.01;
+// the deceleration the ball experiences due to rolling friction in m/s^2
+constexpr double BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED = 0.5;
+// the deceleration the ball experiences due to sliding friction in m/s^2
+constexpr double BALL_SLIDING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED =
+    BALL_SLIDING_FRICTION_NEWTONS / BALL_MASS_KG;
 
 /* Unit Conversion */
 static const double MILLIMETERS_PER_METER = 1000.0;

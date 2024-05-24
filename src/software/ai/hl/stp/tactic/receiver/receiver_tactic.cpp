@@ -10,31 +10,12 @@ ReceiverTactic::ReceiverTactic(std::shared_ptr<Strategy> strategy)
     : Tactic({RobotCapability::Move}),
       strategy_(strategy),
       fsm_map(),
-      control_params({ReceiverFSM::ControlParams{.pass                   = std::nullopt,
+      control_params({ReceiverFSM::ControlParams{.receiver_point = std::nullopt,
                                                  .disable_one_touch_shot = false}})
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM());
-    }
-}
-
-void ReceiverTactic::updateControlParams(std::optional<Pass> updated_pass,
-                                         bool disable_one_touch_shot)
-{
-    // Update the control parameters stored by this Tactic
-    control_params.pass                   = updated_pass;
-    control_params.disable_one_touch_shot = disable_one_touch_shot;
-}
-
-void ReceiverTactic::prepare()
-{
-    std::optional<PassWithRating> best_pass = strategy_->getBestUncommittedPass();
-
-    if (best_pass)
-    {
-        strategy_->commitPass(*best_pass);
-        updateControlParams(best_pass->pass);
+        fsm_map[id] = std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM(strategy_));
     }
 }
 
@@ -43,13 +24,30 @@ void ReceiverTactic::accept(TacticVisitor& visitor) const
     visitor.visit(*this);
 }
 
+std::map<RobotId, std::shared_ptr<Primitive>> ReceiverTactic::get(
+    const WorldPtr& world_ptr)
+{
+    std::optional<Pass> committed_pass = strategy_->getNextCommittedPass();
+    if (committed_pass)
+    {
+        control_params.receiver_point = committed_pass->receiverPoint();
+    }
+    else 
+    {
+        control_params.receiver_point = strategy_->getNextBestReceivingPosition();
+    }
+
+    return Tactic::get(world_ptr);
+}
+
 void ReceiverTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] =
-            std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM());
+            std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM(strategy_));
     }
+
     fsm_map.at(tactic_update.robot.id())
         ->process_event(ReceiverFSM::Update(control_params, tactic_update));
 }

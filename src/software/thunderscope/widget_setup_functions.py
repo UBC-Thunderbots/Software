@@ -20,6 +20,7 @@ from software.thunderscope.gl.layers import (
     gl_path_layer,
     gl_validation_layer,
     gl_passing_layer,
+    gl_attacker_layer,
     gl_sandbox_world_layer,
     gl_world_layer,
     gl_debug_shapes_layer,
@@ -105,6 +106,9 @@ def setup_gl_widget(
     passing_layer = gl_passing_layer.GLPassingLayer(
         "Passing", visualization_buffer_size
     )
+    attacker_layer = gl_attacker_layer.GLAttackerLayer(
+        "Attacker Tactic", visualization_buffer_size
+    )
     cost_vis_layer = gl_cost_vis_layer.GLCostVisLayer(
         "Passing Cost", visualization_buffer_size
     )
@@ -134,16 +138,15 @@ def setup_gl_widget(
     gl_widget.add_layer(path_layer)
     gl_widget.add_layer(obstacle_layer)
     gl_widget.add_layer(passing_layer)
-    gl_widget.add_layer(cost_vis_layer, False)
+    gl_widget.add_layer(attacker_layer)
+    gl_widget.add_layer(cost_vis_layer, True)
     gl_widget.add_layer(tactic_layer, False)
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
-    gl_widget.add_layer(debug_shapes_layer, False)
+    gl_widget.add_layer(debug_shapes_layer, True)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
-    simulation_control_toolbar.pause_button.clicked.connect(
-        world_layer.toggle_play_state
-    )
+    simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
 
     # connect all sandbox controls if using sandbox mode
     if sandbox_mode:
@@ -158,11 +161,18 @@ def setup_gl_widget(
         world_layer.redo_toggle_enabled_signal.connect(
             simulation_control_toolbar.toggle_redo_enabled
         )
-
-    # Register observers
-    sim_proto_unix_io.register_observer(
-        SimulationState, simulation_control_toolbar.simulation_state_buffer
-    )
+        simulation_control_toolbar.pause_button.clicked.connect(
+            world_layer.toggle_play_state
+        )
+        sim_proto_unix_io.register_observer(
+            SimulationState, simulation_control_toolbar.simulation_state_buffer
+        )
+        sim_proto_unix_io.register_observer(
+            SimulationState, world_layer.simulation_state_buffer
+        )
+        sim_proto_unix_io.register_observer(
+            SimulationState, gl_widget.simulation_state_buffer
+        )
 
     for arg in [
         (World, world_layer.world_buffer),
@@ -173,13 +183,14 @@ def setup_gl_widget(
         (PrimitiveSet, path_layer.primitive_set_buffer),
         (PathVisualization, path_layer.path_visualization_buffer),
         (PassVisualization, passing_layer.pass_visualization_buffer),
+        (AttackerVisualization, attacker_layer.attacker_vis_buffer),
         (World, tactic_layer.world_buffer),
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),
         (SimulationState, simulation_control_toolbar.simulation_state_buffer),
         (CostVisualization, cost_vis_layer.cost_visualization_buffer),
         (World, trail_layer.world_buffer),
-        (DebugShapesMap, debug_shapes_layer.debug_shape_map_buffer),
+        (DebugShapes, debug_shapes_layer.debug_shapes_buffer),
     ]:
         full_system_proto_unix_io.register_observer(*arg)
 

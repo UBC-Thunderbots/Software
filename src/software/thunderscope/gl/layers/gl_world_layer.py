@@ -13,6 +13,7 @@ from software.thunderscope.constants import (
     SPEED_SEGMENT_SCALE,
     DEFAULT_EMPTY_FIELD_WORLD,
     is_field_message_empty,
+    SIMULATION_SPEEDS,
 )
 
 from typing import Dict, Tuple
@@ -62,6 +63,7 @@ class GLWorldLayer(GLLayer):
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
         self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
+        self.simulation_state_buffer = ThreadSafeBuffer(buffer_size, SimulationState)
         self.cached_world = World()
         # fields to store the team from the cached world state as a dict
         self._cached_friendly_team = {}
@@ -74,6 +76,8 @@ class GLWorldLayer(GLLayer):
             Qt.Key.Key_I,
             Qt.Key.Key_Space,
             Qt.Key.Key_Shift,
+            Qt.Key.Key_Up,
+            Qt.Key.Key_Down,
         ]
         for key in self.accepted_keys:
             self.key_pressed[key] = False
@@ -81,6 +85,7 @@ class GLWorldLayer(GLLayer):
         self.display_robot_ids = True
         self.display_speed_lines = True
         self.is_playing = True
+        self.simulation_speed = 1.0
 
         self.ball_velocity_vector = None
         self.point_in_scene_picked = None
@@ -150,18 +155,57 @@ class GLWorldLayer(GLLayer):
         ):
             self.toggle_play_state()
 
+        if (
+            self.key_pressed[QtCore.Qt.Key.Key_Control]
+            and self.key_pressed[QtCore.Qt.Key.Key_Up]
+        ):
+            self.increment_sim_speed()
+
+        if (
+            self.key_pressed[QtCore.Qt.Key.Key_Control]
+            and self.key_pressed[QtCore.Qt.Key.Key_Down]
+        ):
+            self.decrement_sim_speed()
+
+    def increment_sim_speed(self) -> None:
+        """Increment the simulation speed to the next fastest speed, if there's one"""
+        curr_sim_speed_index = SIMULATION_SPEEDS.index(self.simulation_speed)
+        new_simulation_speed = SIMULATION_SPEEDS[max(0, curr_sim_speed_index - 1)]
+        self.set_simulation_speed(new_simulation_speed)
+
+    def decrement_sim_speed(self) -> None:
+        """Decrement the simulation speed to the previous fastest speed, if there's one"""
+        curr_sim_speed_index = SIMULATION_SPEEDS.index(self.simulation_speed)
+        new_simulation_speed = SIMULATION_SPEEDS[
+            min(len(SIMULATION_SPEEDS) - 1, curr_sim_speed_index + 1)
+        ]
+        self.set_simulation_speed(new_simulation_speed)
+
     def toggle_play_state(self) -> bool:
         """
         Pauses the simulated gameplay and toggles the play state
         Calls all callback functions with the new play state
         :return: the current play state
         """
-        simulator_state = SimulationState(is_playing=not self.is_playing)
+        simulator_state = SimulationState(
+            is_playing=not self.is_playing, simulation_speed=self.simulation_speed
+        )
         self.is_playing = not self.is_playing
 
         self.simulator_io.send_proto(SimulationState, simulator_state)
 
         return self.is_playing
+
+    def set_simulation_speed(self, speed: float) -> None:
+        """
+        Sets the speed of the simulator
+        :param speed: the new speed to set
+        """
+        self.simulation_speed = speed
+        simulator_state = SimulationState(
+            is_playing=self.is_playing, simulation_speed=self.simulation_speed
+        )
+        self.simulator_io.send_proto(SimulationState, simulator_state)
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
@@ -292,6 +336,14 @@ class GLWorldLayer(GLLayer):
 
         self.__update_robot_status_graphics()
         self.__update_speed_line_graphics()
+
+        # Update internal simulation state
+        simulation_state = self.simulation_state_buffer.get(
+            block=False, return_cached=False
+        )
+        if simulation_state:
+            self.is_playing = simulation_state.is_playing
+            self.simulation_speed = simulation_state.simulation_speed
 
     def _update_robots_graphics(self) -> None:
         """

@@ -2,116 +2,58 @@
 
 Strategy::Strategy(const TbotsProto::AiConfig& ai_config)
     : ai_config_(ai_config),
-      pitch_division_(
-          std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField())),
-      pass_generator_(std::make_unique<ThreadedPassGenerator<EighteenZoneId>>(
-          pitch_division_, ai_config_.passing_config()))
+      sampling_pass_generator_(ai_config_.passing_config()),
+      receiver_position_generator_(
+          std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField()),
+          ai_config_.passing_config())
 {
 }
 
-TbotsProto::PossessionStrategy Strategy::getPossessionStrategy(int num_robots)
+PassWithRating Strategy::getBestPass()
 {
-    TbotsProto::PossessionStrategy possession_strategy;
-
-    int unassigned_robots   = num_robots;
-    int num_ideal_defenders = 2;
-
-    if (world_ptr_->getTeamWithPossession() == TeamPossession::FRIENDLY_TEAM)
+    if (!best_pass_)
     {
-        possession_strategy.set_attackers(1);
-        unassigned_robots -= 1;
-
-        possession_strategy.set_defenders(
-            std::min(num_ideal_defenders, std::max(unassigned_robots, 0)));
-        unassigned_robots -= possession_strategy.defenders();
-
-        possession_strategy.set_supporters(unassigned_robots);
-
-        return possession_strategy;
+        best_pass_ = sampling_pass_generator_.getBestPass(*world_ptr_);
     }
 
-    possession_strategy.set_defenders(std::min(num_ideal_defenders, unassigned_robots));
-    unassigned_robots -= possession_strategy.defenders();
-
-    possession_strategy.set_supporters(std::max(unassigned_robots, 0));
-
-    return possession_strategy;
+    return *best_pass_;
 }
 
-Pose Strategy::getBestDribblePose(const Robot& robot)
+std::optional<Pass> Strategy::getNextCommittedPass()
 {
-    if (robot_to_best_dribble_location_.contains(robot.id()))
-    {
-        return robot_to_best_dribble_location_.at(robot.id());
-    }
-
-    // TODO(#3082): temporary logic, find best dribble_position
-    Vector robot_to_goal   = world_ptr_->field().enemyGoalCenter() - robot.position();
-    Point dribble_position = robot.position() + robot_to_goal.normalize(0.8);
-
-    // cache the dribble position
-    robot_to_best_dribble_location_[robot.id()] =
-        Pose(dribble_position, robot_to_goal.orientation());
-
-    return robot_to_best_dribble_location_.at(robot.id());
-}
-
-std::optional<PassWithRating> Strategy::getBestUncommittedPass()
-{
-    Timestamp current_time = world_ptr_->getMostRecentTimestamp();
-
-    if (!cached_pass_eval_ ||
-        (current_time - cached_pass_time_) >
-            Duration::fromSeconds(
-                ai_config_.passing_config().pass_recalculation_commit_time_s()))
-    {
-        cached_pass_time_         = current_time;
-        cached_pass_eval_         = pass_generator_->getPassEvaluation();
-        cached_ranked_pass_zones_ = cached_pass_eval_->rankZonesForReceiving(
-            *world_ptr_, world_ptr_->ball().position());
-    }
-
-    for (EighteenZoneId zone : cached_ranked_pass_zones_)
-    {
-        // Predicate that filters out passes received inside the zone
-        const auto is_pass_outside_zone = [&](const PassWithRating& pass) {
-            return pitch_division_->getZoneId(pass.pass.receiverPoint()) != zone;
-        };
-
-        if (std::all_of(committed_passes_.begin(), committed_passes_.end(),
-                        is_pass_outside_zone))
-        {
-            return cached_pass_eval_->getBestPassInZones({zone});
-        }
-    }
-
-    return std::nullopt;
-}
-
-std::optional<PassWithRating> Strategy::getBestCommittedPass()
-{
-    if (committed_passes_.empty())
+    if (committed_passes_index_ >= committed_passes_.size())
     {
         return std::nullopt;
     }
 
-    // Predicate that filters out passes that are too short
-    auto pass_filter = [&](const PassWithRating& pass_with_rating) {
-        return distance(world_ptr_->ball().position(),
-                        pass_with_rating.pass.receiverPoint()) >=
-               ai_config_.passing_config().min_pass_distance();
-    };
-
-    std::vector<PassWithRating> filtered_passes;
-    std::copy_if(committed_passes_.begin(), committed_passes_.end(),
-                 std::back_inserter(filtered_passes), pass_filter);
-
-    return *std::max_element(committed_passes_.begin(), committed_passes_.end());
+    return committed_passes_.at(committed_passes_index_++);
 }
 
-void Strategy::commitPass(const PassWithRating& pass)
+void Strategy::commitPass(Pass pass)
 {
     committed_passes_.push_back(pass);
+}
+
+Point Strategy::getNextBestReceivingPosition()
+{
+    if (receiving_positions_.empty())
+    {
+        std::vector<Point> existing_receiver_positions;
+        std::transform(committed_passes_.begin(), committed_passes_.end(),
+                       std::back_inserter(existing_receiver_positions),
+                       [](const Pass& pass) { return pass.receiverPoint(); });
+
+        unsigned int num_positions_to_generate = static_cast<unsigned int>(
+            world_ptr_->friendlyTeam().numRobots() - existing_receiver_positions.size());
+
+        receiving_positions_ = receiver_position_generator_.getBestReceivingPositions(
+            *world_ptr_, num_positions_to_generate, existing_receiver_positions);
+    }
+
+    CHECK(receiving_positions_index_ < receiving_positions_.size())
+        << "No more receiving positions to return";
+
+    return receiving_positions_.at(receiving_positions_index_++);
 }
 
 std::optional<Shot> Strategy::getBestShot(const Robot& robot)
@@ -137,18 +79,24 @@ void Strategy::updateAiConfig(const TbotsProto::AiConfig& ai_config)
 {
     ai_config_ = ai_config;
 
-    // The pass generator must be recreated with the new passing config
-    pass_generator_ = std::make_unique<ThreadedPassGenerator<EighteenZoneId>>(
-        pitch_division_, ai_config_.passing_config());
+    // Pass generators must be recreated with the new passing config
+    sampling_pass_generator_     = SamplingPassGenerator(ai_config_.passing_config());
+    receiver_position_generator_ = ReceiverPositionGenerator<EighteenZoneId>(
+        std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField()),
+        ai_config_.passing_config());
 }
 
 void Strategy::updateWorld(const WorldPtr& world_ptr)
 {
     world_ptr_ = world_ptr;
 
-    pass_generator_->updateWorld(world_ptr_);
+    best_pass_.reset();
 
     committed_passes_.clear();
-    robot_to_best_dribble_location_.clear();
+    committed_passes_index_ = 0;
+
+    receiving_positions_.clear();
+    receiving_positions_index_ = 0;
+
     robot_to_best_shot_.clear();
 }

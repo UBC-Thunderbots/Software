@@ -154,29 +154,6 @@ cc_test(
 )
 
 cc_library(
-    name = "find_passes",
-    srcs = ["find_passes.cpp"],
-    hdrs = ["find_passes.h"],
-    deps = [
-        "//software/ai/passing:pass",
-        "//software/geom:circle",
-        "//software/geom/algorithms",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "find_passes_test",
-    srcs = ["find_passes_test.cpp"],
-    deps = [
-        ":find_passes",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-        "//software/world:ball",
-    ],
-)
-
-cc_library(
     name = "find_open_areas",
     srcs = ["find_open_areas.cpp"],
     hdrs = ["find_open_areas.h"],

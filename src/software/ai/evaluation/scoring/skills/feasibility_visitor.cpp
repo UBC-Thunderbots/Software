@@ -12,13 +12,6 @@ FeasibilityVisitor::FeasibilityVisitor(const Robot& robot,
 
 void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
 {
-    if (world_.field().pointInFriendlyHalf(robot_.position()) ||
-        contains(world_.field().enemyDefenseArea().expand(0.1), robot_.position()))
-    {
-        current_feasibility_ = 0;
-        return;
-    }
-
     if (!shouldKeepAway(robot_, world_.enemyTeam(),
                         strategy_->getAiConfig()
                             .attacker_tactic_config()
@@ -28,36 +21,42 @@ void FeasibilityVisitor::visit(const KeepAwaySkill& skill)
         return;
     }
 
-    current_feasibility_ = 1;
+    current_feasibility_ = 0.7;
 }
 
 void FeasibilityVisitor::visit(const KickPassSkill& skill)
 {
-    std::optional<PassWithRating> best_pass = strategy_->getBestCommittedPass();
-    if (!best_pass)
-    {
-        current_feasibility_ = 0;
-        return;
-    }
+    PassWithRating best_pass = strategy_->getBestPass();
+    
+    current_feasibility_ = best_pass.rating * 0.9;
 
-    current_feasibility_ = best_pass->rating;
+    Segment passing_lane(best_pass.pass.passerPoint(), best_pass.pass.receiverPoint());
+    if (std::all_of(world_.enemyTeam().getAllRobots().begin(), 
+                    world_.enemyTeam().getAllRobots().end(), 
+                    [&](auto enemy) { return distance(enemy.position(), passing_lane) >= 0.15; }))
+    {
+        current_feasibility_ += 0.05;
+    }
 }
 
 void FeasibilityVisitor::visit(const ChipPassSkill& skill)
 {
-    std::optional<PassWithRating> best_pass = strategy_->getBestCommittedPass();
-    if (!best_pass)
-    {
-        current_feasibility_ = 0;
-        return;
-    }
+    PassWithRating best_pass = strategy_->getBestPass();
+    
+    current_feasibility_ = best_pass.rating * 0.9;
 
-    current_feasibility_ = best_pass->rating;
+    Segment passing_lane(best_pass.pass.passerPoint(), best_pass.pass.receiverPoint());
+    if (std::any_of(world_.enemyTeam().getAllRobots().begin(), 
+                    world_.enemyTeam().getAllRobots().end(), 
+                    [&](auto enemy) { return distance(enemy.position(), passing_lane) < 0.15; }))
+    {
+        current_feasibility_ += 0.05;
+    }
 }
 
 void FeasibilityVisitor::visit(const ShootSkill& skill)
 {
-    static constexpr double IDEAL_SHOT_OPEN_ANGLE_DEGREES = 60.0;
+    static constexpr double IDEAL_SHOT_OPEN_ANGLE_DEGREES = 40.0;
     static constexpr double SIGMOID_WIDTH                 = 0.25;
 
     std::optional<Shot> best_shot = strategy_->getBestShot(robot_);
@@ -68,7 +67,7 @@ void FeasibilityVisitor::visit(const ShootSkill& skill)
     }
 
     double shot_origin_feasibility = rectangleSigmoid(
-        world_.field().enemyThird(), best_shot->getOrigin(), SIGMOID_WIDTH);
+        world_.field().enemyHalf(), best_shot->getOrigin(), SIGMOID_WIDTH);
 
     double shot_angle_feasibility =
         normalizeValueToRange(best_shot->getOpenAngle().toDegrees(), 0.0,

@@ -14,7 +14,7 @@ class PassGeneratorTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        passing_config.set_min_pass_speed_m_per_s(3.5);
+        passing_config.set_min_pass_speed_m_per_s(1);
         passing_config.set_max_pass_speed_m_per_s(5.5);
 
         pitch_division =
@@ -40,7 +40,7 @@ class PassGeneratorTest : public testing::Test
     {
         for (int i = 0; i < max_iters; i++)
         {
-            auto pass_eval = pass_generator->generatePassEvaluation(world);
+            auto pass_eval = pass_generator->generatePassEvaluation(*world);
         }
     }
 

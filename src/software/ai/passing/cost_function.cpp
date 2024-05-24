@@ -7,12 +7,14 @@
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/time_to_travel.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/convex_angle.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
-double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
+double ratePass(const World& world, const Pass& pass,
                 TbotsProto::PassingConfig passing_config)
 {
     double static_pass_quality =
@@ -20,6 +22,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double friendly_pass_rating =
         ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
+
+    double pass_forward_rating = ratePassForwardQuality(pass, passing_config);
 
     double enemy_pass_rating =
         ratePassEnemyRisk(world.enemyTeam(), pass,
@@ -29,16 +33,27 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double shoot_pass_rating =
         ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 
+    return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
+           pass_forward_rating * shoot_pass_rating;
+}
+
+double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
+                TbotsProto::PassingConfig passing_config)
+{
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
-    // Place strict limits on the ball speed
-    double min_pass_speed     = passing_config.min_pass_speed_m_per_s();
-    double max_pass_speed     = passing_config.max_pass_speed_m_per_s();
-    double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
-                                (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
+    return ratePass(world, pass, passing_config) * in_region_quality;
+}
 
-    return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-           shoot_pass_rating * pass_speed_quality * in_region_quality;
+double ratePassForwardQuality(const Pass& pass,
+                              const TbotsProto::PassingConfig& passing_config)
+{
+    // Rate receiving positions up the field higher and discourage passes back to
+    // friendly half if the passer is in the enemy half
+    return sigmoid(pass.receiverPoint().x(),
+                   std::min(0.0, pass.passerPoint().x() +
+                                     passing_config.backwards_pass_distance_meters()),
+                   4.0);
 }
 
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
@@ -82,11 +97,42 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
     return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
 }
 
+double rateReceivingPosition(const World& world, const Pass& pass,
+                             const TbotsProto::PassingConfig& passing_config)
+{
+    double static_recv_quality =
+        getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
+
+    double receiver_up_field_rating = ratePassForwardQuality(pass, passing_config);
+
+    // We want to encourage passes that are not too far away from the passer
+    // to stop the robots from trying to pass across the field
+    double receiver_not_too_far_rating = circleSigmoid(
+        Circle(pass.passerPoint(), passing_config.receiver_ideal_max_distance_meters()),
+        pass.receiverPoint(), 2.0);
+    double receiver_not_too_close_rating =
+        1 - circleSigmoid(Circle(pass.passerPoint(),
+                                 passing_config.receiver_ideal_min_distance_meters()),
+                          pass.receiverPoint(), 2.0);
+
+    auto enemy_reaction_time =
+        Duration::fromSeconds(passing_config.enemy_reaction_time());
+    double enemy_proximity_importance = passing_config.enemy_proximity_importance();
+    double enemy_risk_rating          = ratePassEnemyRisk(
+        world.enemyTeam(), pass, enemy_reaction_time, enemy_proximity_importance);
+
+    double pass_shoot_rating =
+        ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
+
+    return static_recv_quality * receiver_up_field_rating * receiver_not_too_far_rating *
+           receiver_not_too_close_rating * enemy_risk_rating * pass_shoot_rating;
+}
+
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
                           TbotsProto::PassingConfig passing_config)
 {
-    double ideal_max_rotation_to_shoot_degrees =
-        passing_config.ideal_max_rotation_to_shoot_degrees();
+    //    double ideal_max_rotation_to_shoot_degrees =
+    //        passing_config.ideal_max_rotation_to_shoot_degrees();
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
@@ -95,16 +141,16 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
         enemy_team.getAllRobots(), TeamType::ENEMY);
 
     Angle open_angle_to_goal = Angle::zero();
-    Point shot_target        = field.enemyGoalCenter();
+    //    Point shot_target        = field.enemyGoalCenter();
     if (shot_opt && shot_opt.value().getOpenAngle().abs() > Angle::fromDegrees(0))
     {
         open_angle_to_goal = shot_opt.value().getOpenAngle();
+        //        shot_target = shot_opt.value().getPointToShootAt();
     }
 
     // Figure out what the maximum open angle of the goal could be from the receiver pos.
-    Angle goal_angle = convexAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
-                                   field.enemyGoalpostPos())
-                           .abs();
+    Angle goal_angle        = convexAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
+                                   field.enemyGoalpostPos());
     double net_percent_open = 0;
     if (goal_angle > Angle::zero())
     {
@@ -123,17 +169,20 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     // locations on the friendly side
     //
     // TODO (#1987) This creates a very steep slope, find a better way to do this
-    if (pass.receiverPoint().x() < 0 || pass.passerPoint().x() < 0)
-    {
-        ideal_max_rotation_to_shoot_degrees = 180;
-    }
-    Angle rotation_to_shot_target_after_pass = pass.receiverOrientation().minDiff(
-        (shot_target - pass.receiverPoint()).orientation());
+    //    if (pass.receiverPoint().x() < 0 || pass.passerPoint().x() < 0)
+    //    {
+    //        ideal_max_rotation_to_shoot_degrees = 180;
+    //    }
+    //    Angle rotation_to_shot_target_after_pass = pass.receiverOrientation().minDiff(
+    //        (shot_target - pass.receiverPoint()).orientation());
     double required_rotation_for_shot_score =
-        1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
-                    ideal_max_rotation_to_shoot_degrees, 4);
+        1.0;  // TODO (NIMA): I don't know if we should take into account the orientation
+              //        1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
+    //                    ideal_max_rotation_to_shoot_degrees, 4); // 150) * 0.8; // TODO
+    //                    (NIMA): Add to config: lowerst 0.8
 
-    return shot_openness_score * required_rotation_for_shot_score;
+    double rating = shot_openness_score * required_rotation_for_shot_score;
+    return scaleRating(rating, passing_config.min_pass_shoot_score(), 1.0);
 }
 
 double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
@@ -159,68 +208,56 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
     }
     std::vector<double> enemy_intercept_risks(enemy_robots.size());
     std::transform(enemy_robots.begin(), enemy_robots.end(),
-                   enemy_intercept_risks.begin(), [&](Robot robot) {
+                   enemy_intercept_risks.begin(), [&](const Robot& robot) {
                        return calculateInterceptRisk(robot, pass, enemy_reaction_time);
                    });
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
-double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
-                              const Duration& enemy_reaction_time)
+double calculateInterceptRisk(
+    const Robot& enemy_robot, const Pass& pass,
+    const Duration& enemy_reaction_time)  // TODO (NIMA) Should we be using this
 {
-    // We estimate the intercept by the risk that the robot will get to the closest
-    // point on the pass before the ball, and by the risk that the robot will get to
-    // the reception point before the ball. We take the greater of these two risks.
+    // We estimate the intercept by the risk that the enemy robot will get to the closest
+    // point on the pass before the ball
 
-    // If the enemy cannot intercept the pass at BOTH the closest point on the pass and
-    // the receiver point for the pass, then it is guaranteed that it will not be
-    // able to intercept the pass anywhere.
-
-    // Figure out how long the enemy robot and ball will take to reach the closest
-    // point on the pass to the enemy's current position
-    Point closest_point_on_pass_to_robot = closestPoint(
+    Point closest_interception_point = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
-    // Subtracting by the max robot radius as a threshold of the enemy robot blocking the
-    // pass
-    double distance = (closest_point_on_pass_to_robot - enemy_robot.position()).length() -
-                      ROBOT_MAX_RADIUS_METERS;
-    Duration enemy_robot_time_to_closest_pass_point =
-        getTimeToTravelDistance(distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                                ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
-        (closest_point_on_pass_to_robot - pass.passerPoint()).length() / pass.speed());
+    Vector enemy_interception_vector =
+        closest_interception_point - enemy_robot.position();
+    // Take into account the enemy robot's radius for minimum min_interception_distance
+    // required to travel to intercept the pass.
+    double min_interception_distance = std::max(
+        0.0, enemy_interception_vector.length() -
+                 ROBOT_MAX_RADIUS_METERS);  // TODO (NIMA): It is potentially faster to
+                                            // travel to +radius than -radius
 
-    // Check for division by 0
-    if (pass.speed() == 0)
-    {
-        ball_time_to_closest_pass_point =
-            Duration::fromSeconds(std::numeric_limits<int>::max());
-    }
+    const double ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND = 0.5;
+    double signed_1d_enemy_vel =
+        enemy_robot.velocity().dot(enemy_interception_vector.normalize());
+    Duration enemy_robot_time_to_interception_point = getTimeToTravelDistance(
+        min_interception_distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, signed_1d_enemy_vel,
+        ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND);
+    // TODO (NIMA): Check for pass.speed = 00
+    Duration ball_time_to_interception_point = Duration::fromSeconds(
+        distance(pass.passerPoint(), closest_interception_point) / pass.speed());
 
-    // Figure out how long the enemy robot and ball will take to reach the receive point
-    // for the pass.
-    Duration enemy_robot_time_to_pass_receive_position =
-        enemy_robot.getTimeToPosition(pass.receiverPoint());
-    Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
+    Duration interception_delta_time =
+        ball_time_to_interception_point - enemy_robot_time_to_interception_point;
 
-    double robot_ball_time_diff_at_closest_pass_point =
-        ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
-         (ball_time_to_closest_pass_point))
-            .toSeconds();
-    double robot_ball_time_diff_at_pass_receive_point =
-        ((enemy_robot_time_to_pass_receive_position + enemy_reaction_time) -
-         (ball_time_to_pass_receive_position))
-            .toSeconds();
-
-    double min_time_diff = std::min(robot_ball_time_diff_at_closest_pass_point,
-                                    robot_ball_time_diff_at_pass_receive_point);
+    //    std::cout << "interception_delta_time: " << interception_delta_time.toSeconds()
+    //    << std::endl;
 
     // Whether or not the enemy will be able to intercept the pass can be determined
     // by whether or not they will be able to reach the pass receive position before
     // the pass does. As such, we place the time difference between the robot and ball
     // on a sigmoid that is centered at 0, and goes to 1 at positive values, 0 at
     // negative values.
-    return 1 - sigmoid(min_time_diff, 0, 1);
+    return std::clamp(interception_delta_time.toSeconds() * 4.0, 0.0,
+                      1.0);  // 1 - std::min(min_interception_distance * 5, 1.0);  // 1 -
+                             // sigmoid(min_time_to_interception, 0, 0.1); // TODO (NIMA):
+                             // Test this value
 }
 
 double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
@@ -340,8 +377,47 @@ double calculateProximityRisk(const Point& point, const Team& enemy_team,
     return point_enemy_proximity_risk;
 }
 
+double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
+{
+    // the default values for these passing parameters
+    // TODO: cleanup passing parameters as part of #1987
+    static constexpr double PASSER_ENEMY_PROXIMITY_IMPORTANCE   = 1.5;
+    static constexpr double RECEIVER_ENEMY_PROXIMITY_IMPORTANCE = 0.;
+    static const auto ENEMY_REACTION_TIME = Duration::fromSeconds(0);
+
+    return ratePassEnemyRisk(enemy_team, pass, ENEMY_REACTION_TIME,
+                             RECEIVER_ENEMY_PROXIMITY_IMPORTANCE) *
+           (1 - calculateProximityRisk(pass.passerPoint(), enemy_team,
+                                       PASSER_ENEMY_PROXIMITY_IMPORTANCE));
+}
+
+// TODO (NIMA): Visualize best pass point (i.e. keep away point
+double ratePasserPosition(const World& world, const Pass& pass,
+                          const Rectangle& dribbling_bounds)
+{
+    static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.5;
+
+    // the width of both the field boundary sigmoid and the circular search region sigmoid
+    static constexpr auto SIGMOID_WIDTH = 0.1;
+
+    // the region to which the optimization is (effectively) constrained to
+    Circle keepaway_search_region(world.ball().position(), KEEPAWAY_SEARCH_CIRCLE_RADIUS);
+
+    return ratePasserPointForKeepAway(pass, world.enemyTeam()) *
+           // constrain the optimization to a circular area around the ball
+           circleSigmoid(keepaway_search_region, pass.passerPoint(), SIGMOID_WIDTH) *
+           // don't try to dribble the ball off the field
+           rectangleSigmoid(dribbling_bounds, pass.passerPoint(), SIGMOID_WIDTH);
+}
+
+double scaleRating(double rating, double min, double max)
+{
+    return rating * (max - min) + min;
+}
+
 void samplePassesForVisualization(const World& world,
-                                  const TbotsProto::PassingConfig& passing_config)
+                                  const TbotsProto::PassingConfig& passing_config,
+                                  const std::optional<Pass>& best_pass_so_far)
 {
     // number of rows and columns are configured in parameters.proto
     int num_cols = passing_config.cost_vis_config().num_cols();
@@ -356,6 +432,7 @@ void samplePassesForVisualization(const World& world,
     double pass_friendly_capability_costs;
     double pass_enemy_risk_costs;
     double pass_shoot_score_costs;
+    double receiver_position_costs;
 
     // We loop column wise (in the same order as how zones are defined)
     for (int i = 0; i < num_cols; i++)
@@ -365,15 +442,17 @@ void samplePassesForVisualization(const World& world,
         for (int j = 0; j < num_rows; j++)
         {
             // y coordinate of the centre of the row
-            double y  = height * j + height / 2 - world.field().yLength() / 2;
-            auto pass = Pass(world.ball().position(), Point(x, y),
-                             passing_config.max_pass_speed_m_per_s());
+            double y = height * j + height / 2 - world.field().yLength() / 2;
+            Point curr_point(x, y);
+            auto pass = Pass::fromDestReceiveSpeed(world.ball().position(), curr_point,
+                                                   passing_config);
 
             // default values
             static_pos_quality_costs       = 1;
             pass_friendly_capability_costs = 1;
             pass_enemy_risk_costs          = 1;
             pass_shoot_score_costs         = 1;
+            receiver_position_costs        = 1;
 
             // getStaticPositionQuality
             if (passing_config.cost_vis_config().static_position_quality())
@@ -405,8 +484,26 @@ void samplePassesForVisualization(const World& world,
                     world.field(), world.enemyTeam(), pass, passing_config);
             }
 
+            // rateReceivingPosition
+            if (passing_config.cost_vis_config().receiver_position_score())
+            {
+                receiver_position_costs =
+                    rateReceivingPosition(world, pass, passing_config);
+            }
+
+            // ratePasserPosition
+            if (passing_config.cost_vis_config().passer_position_score() &&
+                best_pass_so_far.has_value())
+            {
+                Pass updated_best_pass = Pass::fromDestReceiveSpeed(
+                    curr_point, best_pass_so_far->receiverPoint(), passing_config);
+                receiver_position_costs = ratePasserPosition(
+                    world, updated_best_pass, world.field().fieldBoundary());
+            }
+
             costs.push_back(static_pos_quality_costs * pass_friendly_capability_costs *
-                            pass_enemy_risk_costs * pass_shoot_score_costs);
+                            pass_enemy_risk_costs * pass_shoot_score_costs *
+                            receiver_position_costs);
         }
     }
 

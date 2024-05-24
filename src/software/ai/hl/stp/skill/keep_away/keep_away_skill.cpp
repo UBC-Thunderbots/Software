@@ -12,5 +12,4 @@ void KeepAwaySkill::accept(SkillVisitor &skill_visitor)
 }
 
 // Register this Skill in the GenericFactory
-// static TGenericFactory<std::string, Skill, KeepAwaySkill, std::shared_ptr<Strategy>>
-// factory;
+static TGenericFactory<std::string, Skill, KeepAwaySkill, std::shared_ptr<Strategy>> factory;
