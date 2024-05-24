@@ -197,7 +197,7 @@ struct BallPlacementPlayFSM
     std::shared_ptr<MoveTactic> retreat_tactic;
     std::vector<std::shared_ptr<PlaceBallMoveTactic>> move_tactics;
     Point setup_point;
-    std::chrono::time_point<std::chrono::steady_clock> start_time;
+    Timestamp start_time;
     constexpr static double const WALL_KICKOFF_VELOCITY_M_PER_S   = 3.0;
     constexpr static double const RETREAT_DISTANCE_METERS         = 0.6;
     constexpr static double const PLACEMENT_DIST_THRESHOLD_METERS = 0.15;
