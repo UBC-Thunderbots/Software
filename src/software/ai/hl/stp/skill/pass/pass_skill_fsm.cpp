@@ -1,6 +1,10 @@
 #include "software/ai/hl/stp/skill/pass/pass_skill_fsm.h"
 
-bool PassSkillFSM::foundPass(const Update& event)
+#include "software/ai/hl/stp/primitive/move_primitive.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/find_open_circles.h"
+
+bool PassSkillFSM::passFound(const Update& event)
 {
     if (!best_pass_so_far_ || best_pass_so_far_->rating < min_pass_score_threshold_)
     {
@@ -19,9 +23,34 @@ bool PassSkillFSM::foundPass(const Update& event)
                                    best_pass_so_far_->pass.estimatePassDuration();
 }
 
-void PassSkillFSM::commitPass(const Update& event)
+bool PassSkillFSM::passReceived(const Update& event)
 {
-    event.common.strategy->commitPass(best_pass_so_far_->pass);
+    auto friendly_robots =
+        event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
+
+    return std::any_of(
+        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
+            return robot.isNearDribbler(event.common.world_ptr->ball().position());
+        });
+}
+
+bool PassSkillFSM::shouldAbortPass(const Update& event)
+{
+    const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
+    const Ball& ball = event.common.world_ptr->ball();
+
+    const auto pass_lane =
+        Polygon::fromSegment(Segment(best_pass_so_far_->pass.passerPoint(),
+                                     best_pass_so_far_->pass.receiverPoint()),
+                             ai_config.passing_config().pass_lane_width_meters());
+
+    if (!contains(pass_lane, ball.position()))
+    {
+        return true;
+    }
+
+    return ball.velocity().length() <
+           ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
 }
 
 void PassSkillFSM::findPass(
@@ -49,15 +78,9 @@ void PassSkillFSM::findPass(
                                                    pass_score_ramp_down_duration,
                                                1.0 - abs_min_pass_score);
 
-    Point enemy_goal_center   = event.common.world_ptr->field().enemyGoalCenter();
+    Point receiver_point = best_pass_so_far_->pass.receiverPoint();
     Point dribble_destination = event.common.world_ptr->ball().position();
-    Angle dribble_orientation = (enemy_goal_center - dribble_destination).orientation();
-
-    if (best_pass_so_far_)
-    {
-        Point receiver_point = best_pass_so_far_->pass.receiverPoint();
-        dribble_orientation  = (receiver_point - dribble_destination).orientation();
-    }
+    Angle dribble_orientation = (receiver_point - dribble_destination).orientation();
 
     DribbleSkillFSM::ControlParams control_params = {
         .dribble_destination       = dribble_destination,
@@ -67,20 +90,20 @@ void PassSkillFSM::findPass(
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
 
     LOG(VISUALIZE) << *createAttackerVisualization(
-        best_pass_so_far_->pass, true,
-        std::nullopt, event.common.world_ptr->ball().position(),
-        std::nullopt);
+        best_pass_so_far_->pass, true, std::nullopt,
+        event.common.world_ptr->ball().position(), std::nullopt);
 }
 
 void PassSkillFSM::takePass(
     const Update& event,
     boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
+    event.common.strategy->commitPass(best_pass_so_far_->pass);
+
     Point ball_position = event.common.world_ptr->ball().position();
     Point kick_target   = best_pass_so_far_->pass.receiverPoint();
 
     AutoChipOrKick auto_chip_or_kick;
-
     if (event.control_params.should_chip)
     {
         auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
@@ -102,7 +125,36 @@ void PassSkillFSM::takePass(
     processEvent(PivotKickSkillFSM::Update(control_params, event.common));
 
     LOG(VISUALIZE) << *createAttackerVisualization(
-        best_pass_so_far_->pass, true,
-        std::nullopt, event.common.world_ptr->ball().position(),
-        std::nullopt);
+        best_pass_so_far_->pass, true, std::nullopt,
+        event.common.world_ptr->ball().position(), std::nullopt);
+}
+
+void PassSkillFSM::moveToOpenAreas(const Update& event)
+{
+    event.common.strategy->commitPass(best_pass_so_far_->pass);
+
+    const auto friendly_robots =
+        event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
+    const auto enemy_robots = event.common.world_ptr->enemyTeam().getAllRobots();
+
+    std::vector<Point> all_robot_locations;
+    all_robot_locations.reserve(friendly_robots.size() + enemy_robots.size());
+    std::transform(friendly_robots.begin(), friendly_robots.end(),
+                   std::back_inserter(all_robot_locations),
+                   [](const Robot& robot) { return robot.position(); });
+    std::transform(enemy_robots.begin(), enemy_robots.end(),
+                   std::back_inserter(all_robot_locations),
+                   [](const Robot& robot) { return robot.position(); });
+
+    std::vector<Circle> openAreas = findOpenCircles(
+        event.common.world_ptr->field().fieldLines(), all_robot_locations);
+    Point target = openAreas.front().origin();
+
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, target,
+        (event.common.world_ptr->ball().position() - target).orientation(),
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
