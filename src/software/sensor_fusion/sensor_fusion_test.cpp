@@ -926,7 +926,7 @@ TEST_F(SensorFusionTest, breakbeam_not_fail_update_test)
     std::vector<BallDetection> ball_detection =
         createBallDetections({*(ssl_wrapper_packet->mutable_detection())});
 
-    bool state = sensor_fusion.shouldUseRobotBallPositionInsteadOfSSL(
+    bool state = sensor_fusion.shouldUseRobotBallPositionInsteadOfVision(
         *(ssl_wrapper_packet->mutable_detection()), ball_detection);
 
     EXPECT_TRUE(state);
@@ -981,7 +981,7 @@ TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
     std::vector<BallDetection> ball_detection =
         createBallDetections({*(ssl_wrapper_packet->mutable_detection())});
 
-    bool state = sensor_fusion.shouldUseRobotBallPositionInsteadOfSSL(
+    bool state = sensor_fusion.shouldUseRobotBallPositionInsteadOfVision(
         *(ssl_wrapper_packet->mutable_detection()), ball_detection);
 
     EXPECT_FALSE(state);
