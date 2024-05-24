@@ -67,19 +67,21 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
                        lateral_positioning_vector * distance_to_keep;
             Point destination;
             Rectangle fieldLines = world_ptr->field().fieldLines();
-            if (!contains(fieldLines, p1))
+            if (!contains(fieldLines, p2))
+            {
+                destination = p1;
+            }
+            else if (!contains(fieldLines, p1))
             {
                 destination = p2;
             }
-            else if (!contains(fieldLines, p2))
+            else if (distance(p1, robot.position()) < distance(p2, robot.position()))
             {
                 destination = p1;
             }
             else
             {
-                destination =
-                    distance(p1, robot.position()) < distance(p2, robot.position()) ? p1
-                                                                                    : p2;
+                destination = p2;
             }
             avoid_interference_tactics[idx]->updateControlParams(
                 destination, (ball_pos - robot.position()).orientation(), 0);
@@ -89,7 +91,8 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
             avoid_interference_tactics[idx]->updateControlParams(
                 robot.position(), (ball_pos - robot.position()).orientation(), 0);
         }
-        tactics_to_run[0].emplace_back(avoid_interference_tactics[idx++]);
+        tactics_to_run[0].emplace_back(avoid_interference_tactics[idx]);
+        idx++;
     }
 
     // Set tactics to run

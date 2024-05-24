@@ -1,4 +1,5 @@
 import software.python_bindings as tbots_cpp
+from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
 import time
 from proto.import_all_protos import *
 
@@ -14,11 +15,14 @@ class RobotEntersPlacementRegion(Validation):
     """Checks if a Robot enters the ball placement stadium region."""
 
     def __init__(self, placement_point):
+        """
+        :param placement_point: The ball placement coordinates
+        """
         self.placement_point = placement_point
         self.first_enter_time = None
-        self.interference_radius = 0.5
-        self.stay_in_region_threshold = (
-            2  # By SSL rules, only staying in the stadium for over 2 seconds counts
+        self.stay_in_region_threshold_sec = (
+            2  # By SSL rules, only staying in the stadium for over two seconds counts
+            # https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_placement_interference
         )
 
     def get_validation_status(self, world) -> ValidationStatus:
@@ -32,18 +36,18 @@ class RobotEntersPlacementRegion(Validation):
             self.placement_point,
             tbots_cpp.createPoint(world.ball.current_state.global_position),
         )
-        stadium = tbots_cpp.Stadium(segment, self.interference_radius)
+        stadium = tbots_cpp.Stadium(segment, ENEMY_BALL_PLACEMENT_DISTANCE_METERS)
 
         for robot in world.friendly_team.team_robots:
             if tbots_cpp.contains(
                 stadium, tbots_cpp.createPoint(robot.current_state.global_position)
             ):
                 if not self.first_enter_time:
-                    self.first_enter_time = time.time()
+                    self.first_enter_time = world.time_sent.epoch_timestamp_seconds
                 else:
                     if (
-                        time.time() - self.first_enter_time
-                        > self.stay_in_region_threshold
+                        world.time_sent.epoch_timestamp_seconds - self.first_enter_time
+                        > self.stay_in_region_threshold_sec
                     ):
                         return ValidationStatus.PASSING
                 break
@@ -60,7 +64,7 @@ class RobotEntersPlacementRegion(Validation):
             self.placement_point,
             tbots_cpp.createPoint(world.ball.current_state.global_position),
         )
-        stadium = tbots_cpp.Stadium(segment, 0.5)
+        stadium = tbots_cpp.Stadium(segment, ENEMY_BALL_PLACEMENT_DISTANCE_METERS)
         return create_validation_geometry([stadium])
 
     def __repr__(self):

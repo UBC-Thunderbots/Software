@@ -1,6 +1,7 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
+from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
 from proto.play_pb2 import Play, PlayName
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.ball_stops_in_region import *
@@ -132,7 +133,7 @@ def test_two_ai_ball_placement(
     drop_ball_eventually_validation_sequence_set = [
         [
             RobotEventuallyExitsRegion(
-                regions=[tbots_cpp.Circle(ball_placement_point, 0.5)]
+                regions=[tbots_cpp.Circle(ball_placement_point, ENEMY_BALL_PLACEMENT_DISTANCE_METERS)]
             ),
         ]
     ]

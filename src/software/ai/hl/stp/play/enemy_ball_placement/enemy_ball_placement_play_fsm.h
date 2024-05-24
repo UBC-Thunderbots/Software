@@ -15,7 +15,7 @@
  * This FSM implements the enemy ball placement play.
  * - If the ball placement point does not exist yet, then we wait
  * - If the ball placement point exists, but the ball is far from the placement point,
- * then we focus on avoiding ball placement interference If our robot R is in the ball
+ * then we focus on avoiding ball placement interference. If our robot R is in the ball
  * placement stadium, then it will move perpendicular to the segment connecting * and +,
  * to either p1 or p2, whichever one is within the field boundaries and closest to R
  *
