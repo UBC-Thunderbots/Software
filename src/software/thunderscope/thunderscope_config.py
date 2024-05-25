@@ -182,7 +182,7 @@ def configure_base_fullsystem(
             anchor="Field",
             position="left",
             has_refresh_func=False,
-            stretch=WidgetStretchData(x=3),
+            stretch=WidgetStretchData(x=5),
         ),
         TScopeWidget(
             name="Error Log",
@@ -191,19 +191,21 @@ def configure_base_fullsystem(
             ),
             anchor="Parameters",
             position="above",
+            stretch=WidgetStretchData(x=5),
         ),
         TScopeWidget(
             name="Logs",
             widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Parameters",
             position="above",
-            stretch=WidgetStretchData(x=3),
+            stretch=WidgetStretchData(x=5),
         ),
         TScopeWidget(
             name="Referee Info",
             widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Field",
             position="bottom",
+            stretch=WidgetStretchData(y=4),
         ),
         TScopeWidget(
             name="Performance",
@@ -217,6 +219,7 @@ def configure_base_fullsystem(
             in_window=True,
             anchor="Referee Info",
             position="below",
+            stretch=WidgetStretchData(y=4),
         ),
         TScopeWidget(
             name="FPS Widget",
@@ -228,12 +231,14 @@ def configure_base_fullsystem(
             ),
             anchor="Performance",
             position="below",
+            stretch=WidgetStretchData(y=4),
         ),
         TScopeWidget(
             name="Play Info",
             widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Referee Info",
             position="above",
+            stretch=WidgetStretchData(y=4),
         ),
     ] + extra_widgets
 
