@@ -302,6 +302,7 @@ def setup_robot_view(
     """
     robot_view = RobotView(available_control_modes)
     proto_unix_io.register_observer(RobotStatus, robot_view.robot_status_buffer)
+    proto_unix_io.register_observer(RoundTripTime, robot_view.round_trip_time_buffer)
     return robot_view
 
 

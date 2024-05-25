@@ -105,6 +105,7 @@ class RobotView(QScrollArea):
         super().__init__()
 
         self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
+        self.round_trip_time_buffer = ThreadSafeBuffer(10, RoundTripTime)
 
         self.layout = QVBoxLayout()
 
@@ -133,13 +134,10 @@ class RobotView(QScrollArea):
         Until the buffer is empty
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
+        round_trip_time = self.round_trip_time_buffer.get(block=False, return_cached=False)
 
-        # proto = RobotStatus()
-        # proto.robot_id = 3
-        # proto.omit_thunderloop_processing_time_sent.epoch_timestamp_seconds = time.time() - 0.005
-
-        while robot_status is not None:
-            self.robot_view_widgets[robot_status.robot_id].update(robot_status)
+        while robot_status is not None and round_trip_time is not None:
+            self.robot_view_widgets[robot_status.robot_id].update(robot_status, round_trip_time)
             robot_status = self.robot_status_buffer.get(
                 block=False, return_cached=False
             )

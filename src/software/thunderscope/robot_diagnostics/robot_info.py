@@ -119,13 +119,16 @@ class RobotInfo(QWidget):
 
         # Primitive loss rate label
         self.primitive_loss_rate_label = common_widgets.ColorQLabel(
+            label_text="P%",
+            initial_value="NA",
             max_val=MAX_ACCEPTABLE_PACKET_LOSS_PERCENT
         )
 
         # Primitive round-trip time label and queue
         self.primitive_rtt_label = common_widgets.ColorQLabel(
-            max_val=MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
-            text="MS"
+            label_text="RTT:",
+            initial_value="NA",
+            max_val=MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME
         )
         self.previous_primitive_rtt_values = deque(maxlen=MAX_LENGTH_PRIMITIVE_SET_STORE)
 
@@ -280,7 +283,7 @@ class RobotInfo(QWidget):
 
         return pixmap
 
-    def update(self, robot_status: RobotStatus):
+    def update(self, robot_status: RobotStatus, round_trip_time: RoundTripTime):
         """
         Receives parts of a RobotStatus message
 
@@ -289,12 +292,13 @@ class RobotInfo(QWidget):
         Then sets a timer callback to disconnect the robot if needed
 
         :param robot_status: The robot status message for this robot
+        :param round_trip_time: The round trip time proto for this robot's message
         """
         self.time_of_last_robot_status = time.time()
 
         self.robot_model.setPixmap(self.color_vision_pattern)
 
-        self.__update_ui(robot_status)
+        self.__update_ui(robot_status, round_trip_time)
 
         QtCore.QTimer.singleShot(DISCONNECT_DURATION_MS, self.disconnect_robot)
 
@@ -328,7 +332,7 @@ class RobotInfo(QWidget):
             f"background-color: {'green' if is_running else 'red'}; border: 1px solid black;"
         )
 
-    def __update_ui(self, robot_status: RobotStatus) -> None:
+    def __update_ui(self, robot_status: RobotStatus, round_trip_time: RoundTripTime) -> None:
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
@@ -338,12 +342,14 @@ class RobotInfo(QWidget):
             - If this robot has errors
             - If the robot is stopped or running
         :param robot_status: The robot status message for this robot
+        :param round_trip_time: The round trip time message for this robot
         """
         motor_status = robot_status.motor_status
         power_status = robot_status.power_status
         network_status = robot_status.network_status
         primitive_executor_status = robot_status.primitive_executor_status
         omit_thunderloop_processing_time_sent = robot_status.omit_thunderloop_processing_time_sent
+        rtt_recieved_time = round_trip_time.thunderscope_time_received_seconds
 
         self.__update_stop_primitive(primitive_executor_status.running_primitive)
 
@@ -353,7 +359,7 @@ class RobotInfo(QWidget):
 
         self.primitive_rtt_label.set_float_val(
             self.__calculate_average_round_trip_time(
-                ((time.time() - omit_thunderloop_processing_time_sent.epoch_timestamp_seconds)
+                ((rtt_recieved_time - omit_thunderloop_processing_time_sent.epoch_timestamp_seconds)
                     * MILLISECONDS_PER_SECOND)
             )
         )
@@ -371,8 +377,7 @@ class RobotInfo(QWidget):
 
     def __calculate_average_round_trip_time(self, new_time: float) -> int:
         self.previous_primitive_rtt_values.append(new_time)
-        average_rtt_time_milliseconds = 0
-        for value in self.previous_primitive_rtt_values:
-            average_rtt_time_milliseconds += value
-        return int(average_rtt_time_milliseconds/len(self.previous_primitive_rtt_values))
-
+        average_rtt_time_milliseconds = sum(self.previous_primitive_rtt_values)
+        val = int(average_rtt_time_milliseconds / len(self.previous_primitive_rtt_values))
+        print(f"{val}")
+        return val

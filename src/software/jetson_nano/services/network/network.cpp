@@ -86,23 +86,25 @@ void NetworkService::logNewPrimitiveSet(TbotsProto::PrimitiveSet input)
      *  - update the timestamp on each primitive set to the current epoch time
      */
 
-    if (primitive_set_tuple_rtt.size() >= 50)
+    if (primitive_set_rtt.size() >= 50)
     {
         LOG(WARNING) << "Too many primitive sets logged for round-trip calculations, halting log process";
         return;
     }
 
-    if (!primitive_set_tuple_rtt.empty()
-            && input.sequence_number() <= std::get<0>(primitive_set_tuple_rtt.back()))
+    if (!primitive_set_rtt.empty()
+            && input.sequence_number() <= primitive_set_rtt.back().primitive_sequence_num)
     {
         // If the proto is older than the last received proto, then ignore it
         return;
     }
-    primitive_set_tuple_rtt.emplace_back(
-            std::tuple(input.sequence_number(),
-                       getCurrentEpochTimeInSeconds(),
-                       input.time_sent().epoch_timestamp_seconds())
-                       );
+
+    NetworkService::RoundTripTime current_round_trip_time;
+    current_round_trip_time.primitive_sequence_num = input.sequence_number();
+    current_round_trip_time.thunderscope_sent_time_seconds = input.time_sent().epoch_timestamp_seconds();
+    current_round_trip_time.thunderloop_recieved_time_seconds = getCurrentEpochTimeInSeconds();
+
+    primitive_set_rtt.emplace_back(current_round_trip_time);
 }
 
 void NetworkService::updatePrimitiveSetLog(TbotsProto::RobotStatus &robot_status)
@@ -117,22 +119,21 @@ void NetworkService::updatePrimitiveSetLog(TbotsProto::RobotStatus &robot_status
      */
 
     uint64_t seq_num = robot_status.last_handled_primitive_set();
-    while (seq_num <= std::get<0>(primitive_set_tuple_rtt.back()))
+    while (seq_num <= primitive_set_rtt.back().primitive_sequence_num)
     {
-        if (std::get<0>(primitive_set_tuple_rtt.front()) == seq_num)
+        if (primitive_set_rtt.front().primitive_sequence_num == seq_num)
         {
-            double received_epoch_time_seconds = std::get<1>(primitive_set_tuple_rtt.front());
+            double received_epoch_time_seconds = primitive_set_rtt.front().thunderloop_recieved_time_seconds;
             double processing_time_seconds = getCurrentEpochTimeInSeconds() - received_epoch_time_seconds;
 
             robot_status.mutable_omit_thunderloop_processing_time_sent()->set_epoch_timestamp_seconds(
-                    std::get<2>(primitive_set_tuple_rtt.front())
+                    primitive_set_rtt.front().thunderscope_sent_time_seconds
                     + processing_time_seconds
             );
             return;
         }
-        primitive_set_tuple_rtt.pop_front();
+        primitive_set_rtt.pop_front();
     }
-    LOG(WARNING) << "No primitives available for round-trip calculations";
 }
 
 double NetworkService::getCurrentEpochTimeInSeconds()

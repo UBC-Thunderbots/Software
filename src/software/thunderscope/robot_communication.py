@@ -294,6 +294,8 @@ class RobotCommunication(object):
         for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
 
         """
+
+        #TODO: CHANGE FUNCS TO ONE DEFINED BELOW
         # Create the multicast listeners
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
@@ -336,9 +338,13 @@ class RobotCommunication(object):
     #   - Must retrieve the time_sent field of the proto,
     #     this means taking the diff of the current time and the omit_thunderloop_processing_time_sent
     #   - Must update the visualized widget component
-    # def __receive_robot_status(self, robot_status: Message) -> None:
-    #     print((time.time() - robot_status.omit_thunderloop_processing_time_sent.epoch_timestamp_seconds) * 1000)
-    #     self.__forward_to_proto_unix_io(RobotStatus, robot_status)
+    #   - Create new proto here, log its time here
+    def __receive_robot_status(self, robot_status: Message) -> None:
+        self.__forward_to_proto_unix_io(
+            RoundTripTime,
+            RoundTripTime(thunderscope_time_received_seconds=time.time())
+        )
+        self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
     def __exit__(self, type, value, traceback) -> None:
         """Exit RobotCommunication context manager

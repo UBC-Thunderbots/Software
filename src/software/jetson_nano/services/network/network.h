@@ -104,10 +104,16 @@ class NetworkService
     bool last_breakbeam_state_sent = false;
 
     /**
-     * Deque of key primitive set information as tuples for round-trip time calculations. Tuples specification:
-     * [0] uint64_t: Primitive Sequence Number
-     * [1] double: System time for when primitive set was received by Thunderloop in seconds
-     * [2] double: Epoch time of primitive set sent time from Thunderscope in seconds
+     * Struct of key primitive set information as for round-trip time calculations:
+     * sequence_num: Primitive Sequence Number
+     * thunderloop_recieved_time_seconds: System time for when primitive set was received by Thunderloop in seconds
+     * thunderscope_sent_time_seconds: Epoch time of primitive set sent time from Thunderscope in seconds
      */
-    std::deque<std::tuple<uint64_t, double, double>> primitive_set_tuple_rtt;
+    struct RoundTripTime {
+        uint64_t primitive_sequence_num;
+        double thunderscope_sent_time_seconds;
+        double thunderloop_recieved_time_seconds;
+    };
+
+    std::deque<RoundTripTime> primitive_set_rtt;
 };
