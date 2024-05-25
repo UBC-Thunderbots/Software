@@ -57,16 +57,27 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
     {
         if (contains(stadium, robot.position()))
         {
-            Vector lateral_positioning_vector =
+            // The "backbone" of the stadium connects the ball position and the placement
+            // point. A robot located in the stadium will move perpendicular to the
+            // backbone to be outside the stadium. There are two possible destination
+            // points, one on each side of the stadium
+
+            // This unit vector is perpendicular to the backbone, and determines the
+            // direction of robot motion
+            Vector lateral_positioning_unit_vector =
                 placement_point_to_ball.perpendicular().normalize();
+            // This vector represents the robot's longitudinal position along the
+            // backbone, relative to the placement point
             Vector longitudinal_positioning_vector =
                 (robot.position() - placement_point).project(placement_point_to_ball);
             Point p1 = placement_point + longitudinal_positioning_vector +
-                       lateral_positioning_vector * distance_to_keep;
+                       lateral_positioning_unit_vector * distance_to_keep;
             Point p2 = placement_point + longitudinal_positioning_vector -
-                       lateral_positioning_vector * distance_to_keep;
+                       lateral_positioning_unit_vector * distance_to_keep;
             Point destination;
             Rectangle fieldLines = world_ptr->field().fieldLines();
+            // If either destination point is outside the field, then pick the other
+            // point. It is impossible for both points to be outside the field
             if (!contains(fieldLines, p2))
             {
                 destination = p1;
@@ -75,6 +86,7 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
             {
                 destination = p2;
             }
+            // If both points are in the field, then pick the one closer to the robot
             else if (distance(p1, robot.position()) < distance(p2, robot.position()))
             {
                 destination = p1;
@@ -83,11 +95,13 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
             {
                 destination = p2;
             }
+            // Move to destination point while aligning to the ball
             avoid_interference_tactics[idx]->updateControlParams(
                 destination, (ball_pos - robot.position()).orientation(), 0);
         }
         else
         {
+            // Stay in place while aligning to the ball
             avoid_interference_tactics[idx]->updateControlParams(
                 robot.position(), (ball_pos - robot.position()).orientation(), 0);
         }

@@ -1,6 +1,5 @@
 import software.python_bindings as tbots_cpp
 from software.py_constants import ENEMY_BALL_PLACEMENT_DISTANCE_METERS
-import time
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
