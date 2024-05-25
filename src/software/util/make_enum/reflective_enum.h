@@ -6,6 +6,9 @@
  * Enums created using the MAKE_REFLECTIVE_ENUM macro will inherit
  * ReflectiveEnum. Having all reflective enums inherit this class
  * enables use of std::is_base_of to assert whether a type is a ReflectiveEnum.
+ * 
+ * Static virtual methods do not exist in C++ so this class definition is empty; 
+ * see the MAKE_REFLECTIVE_ENUM definition for methods supported by ReflectiveEnum.   
  */
 class ReflectiveEnum
 {

@@ -21,7 +21,7 @@ double AttackerMdpFeatureExtractor::ballYPositionFeature(const AttackerMdpState&
 {
     const double y_pos            = state.world_ptr->ball().position().y();
     const double field_y_length   = state.world_ptr->field().totalYLength();
-    const double normalized_y_pos = (y_pos + field_y_length / 2) / field_y_length;
+    const double normalized_y_pos = std::abs(y_pos) / (field_y_length / 2);
     return normalized_y_pos;
 }
 
