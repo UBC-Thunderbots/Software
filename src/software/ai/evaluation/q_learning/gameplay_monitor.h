@@ -24,6 +24,8 @@ class GameplayMonitor
      * of the AI's gameplay during the step. 
      * 
      * @param world_ptr the World at the end of the step
+     * 
+     * @return the reward for the step, normalized to range [-1, 1]
      */
     double endStepObservation(WorldPtr world_ptr);
 
