@@ -18,6 +18,7 @@ cc_library(
     deps = [
         ":attacker_mdp_action",
         ":feature_extractor",
+        "//software/ai/evaluation:possession",
     ]
 )
 

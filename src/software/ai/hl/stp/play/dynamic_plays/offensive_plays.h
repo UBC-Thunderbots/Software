@@ -12,9 +12,6 @@
  */
 class OffensivePlay : public DynamicPlay
 {
-   public:
-    void evaluate(double score) override;
-
    protected:
     /**
      * Base constructor for OffensivePlay

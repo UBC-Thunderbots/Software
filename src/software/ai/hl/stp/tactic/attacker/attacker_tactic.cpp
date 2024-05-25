@@ -62,7 +62,3 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     current_skill_->updatePrimitive(tactic_update.robot, tactic_update.world_ptr,
                                     tactic_update.set_primitive);
 }
-
-void AttackerTactic::evaluate(double score)
-{
-}

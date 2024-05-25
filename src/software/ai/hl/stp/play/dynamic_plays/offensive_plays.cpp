@@ -10,12 +10,6 @@ OffensivePlay::OffensivePlay(std::shared_ptr<Strategy> strategy,
 {
 }
 
-void OffensivePlay::evaluate(double score)
-{
-    DynamicPlay::evaluate(score);
-    attacker_tactic_->evaluate(score);
-}
-
 void OffensivePlay::updateTactics(const PlayUpdate& play_update)
 {
     int num_defenders = std::min(play_update.num_tactics - 1, 2u);

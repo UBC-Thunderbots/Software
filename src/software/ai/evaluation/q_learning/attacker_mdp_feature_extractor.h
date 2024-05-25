@@ -20,4 +20,6 @@ class AttackerMdpFeatureExtractor
     static double ballYPositionFeature(const AttackerMdpState& state);
 
     static double bestPassRatingFeature(const AttackerMdpState& state);
+
+    static double bestShotOpenAngleFeature(const AttackerMdpState& state);
 };
