@@ -234,12 +234,5 @@ struct FreeKickPlayFSM
     std::vector<EighteenZoneId> ranked_zones;
     PassGenerator<EighteenZoneId> pass_generator;
 
-    // The maximum time that we will wait before committing to a pass
-    static const inline Duration MAX_TIME_TO_COMMIT_TO_PASS = Duration::fromSeconds(5);
-    // The minimum pass score we will attempt
-    static constexpr double MIN_ACCEPTABLE_PASS_SCORE = 0.1;
-    // The minimum shot angle opening we will attempt
-    static constexpr double MIN_OPEN_ANGLE_FOR_SHOT = 5;
-
     Timestamp pass_optimization_start_time;
 };

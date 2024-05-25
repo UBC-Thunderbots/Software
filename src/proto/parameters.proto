@@ -78,6 +78,9 @@ message FreeKickPlayConfig
     // The maximum time that we will wait before committing to a pass
     required double max_time_commit_to_pass_seconds = 1
         [default = 5.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 8.0];
+    // The minimum pass score that we will attempt
+    required double min_acceptable_pass_score = 2
+        [default = 0.7, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 

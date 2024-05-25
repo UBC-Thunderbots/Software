@@ -79,11 +79,14 @@ void FreeKickPlayFSM::updateAlignToBallTactic(const WorldPtr &world_ptr)
 
 bool FreeKickPlayFSM::shotFound(const Update &event)
 {
-    shot =
-        calcBestShotOnGoal(event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
-                           event.common.world_ptr->enemyTeam(),
-                           event.common.world_ptr->ball().position(), TeamType::ENEMY);
-    return shot && shot->getOpenAngle() > Angle::fromDegrees(MIN_OPEN_ANGLE_FOR_SHOT);
+    shot = calcBestShotOnGoal(event.common.world_ptr->field(),
+                              event.common.world_ptr->friendlyTeam(),
+                              event.common.world_ptr->enemyTeam(),
+                              event.common.world_ptr->ball().position(), TeamType::ENEMY);
+    return shot &&
+           shot->getOpenAngle() >
+               Angle::fromDegrees(
+                   ai_config.attacker_tactic_config().min_open_angle_for_shot_deg());
 }
 
 void FreeKickPlayFSM::shootBall(const Update &event)
@@ -116,7 +119,8 @@ bool FreeKickPlayFSM::timeExpired(const FreeKickPlayFSM::Update &event)
 {
     Duration time_since_pass_optimization_start =
         event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time;
-    return time_since_pass_optimization_start > MAX_TIME_TO_COMMIT_TO_PASS;
+    return time_since_pass_optimization_start.toSeconds() >
+           ai_config.free_kick_play_config().max_time_commit_to_pass_seconds();
 }
 
 void FreeKickPlayFSM::chipBall(const Update &event)
@@ -125,10 +129,11 @@ void FreeKickPlayFSM::chipBall(const Update &event)
     PriorityTacticVector tactics_to_run = {{}};
 
     double fallback_chip_target_x_offset = 1.5;
-    Point chip_target                    = event.common.world_ptr->field().enemyGoalCenter() -
+    Point chip_target = event.common.world_ptr->field().enemyGoalCenter() -
                         Vector(fallback_chip_target_x_offset, 0);
 
-    chip_tactic->updateControlParams(event.common.world_ptr->ball().position(), chip_target);
+    chip_tactic->updateControlParams(event.common.world_ptr->ball().position(),
+                                     chip_target);
     tactics_to_run[0].emplace_back(chip_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -150,7 +155,8 @@ void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
     event.common.set_tactics(tactics_to_run);
 
     best_pass_and_score_so_far =
-        pass_generator.generatePassEvaluation(*event.common.world_ptr).getBestPassOnField();
+        pass_generator.generatePassEvaluation(*event.common.world_ptr)
+            .getBestPassOnField();
 }
 
 bool FreeKickPlayFSM::passFound(const Update &event)
@@ -160,11 +166,13 @@ bool FreeKickPlayFSM::passFound(const Update &event)
 
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
-    double min_score = 1 - std::min(time_since_pass_optimization_start.toSeconds() /
-                                        MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
-                                    1.0);
+    double min_score =
+        1 -
+        std::min(time_since_pass_optimization_start.toSeconds() /
+                     ai_config.free_kick_play_config().max_time_commit_to_pass_seconds(),
+                 1.0);
 
-    return min_score > MIN_ACCEPTABLE_PASS_SCORE &&
+    return min_score > ai_config.free_kick_play_config().min_acceptable_pass_score() &&
            best_pass_and_score_so_far.rating > min_score;
 }
 
