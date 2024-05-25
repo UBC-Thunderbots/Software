@@ -20,7 +20,8 @@ EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_con
           std::make_shared<MoveTactic>(),
       }),
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
-      distance_to_keep_meters(ai_config.enemy_ball_placement_play_config().distance_to_keep_meters()),
+      distance_to_keep_meters(
+          ai_config.enemy_ball_placement_play_config().distance_to_keep_meters()),
       nearly_placed_threshold_meters(0.5)
 {
 }
@@ -47,7 +48,7 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
     PriorityTacticVector tactics_to_run = {{}};
     Point ball_pos                      = world_ptr->ball().position();
 
-    Stadium stadium                = Stadium(ball_pos, placement_point, distance_to_keep_meters);
+    Stadium stadium = Stadium(ball_pos, placement_point, distance_to_keep_meters);
     Vector placement_point_to_ball = ball_pos - placement_point;
 
     // Check if robots are inside the ball placement stadium
