@@ -98,7 +98,7 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
 
 void BallPlacementPlayFSM::startWait(const Update &event)
 {
-    start_time = std::chrono::steady_clock::now();
+    start_time = event.common.world_ptr->getMostRecentTimestamp();
 }
 
 void BallPlacementPlayFSM::retreat(const Update &event)
@@ -208,11 +208,8 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
 
 bool BallPlacementPlayFSM::waitDone(const Update &event)
 {
-    std::chrono::time_point<std::chrono::steady_clock> current_time =
-        std::chrono::steady_clock::now();
-    return static_cast<double>(
-               std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time)
-                   .count()) > BALL_IS_PLACED_WAIT_S;
+    Timestamp current_time = event.common.world_ptr->getMostRecentTimestamp();
+    return (current_time - start_time) > Duration::fromSeconds(BALL_IS_PLACED_WAIT_S);
 }
 
 bool BallPlacementPlayFSM::retreatDone(const Update &event)
