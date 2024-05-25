@@ -56,7 +56,7 @@ double LinearQFunction<TState, TAction>::getMaxQValue(const TState& state) const
     std::vector<typename TAction::Enum> all_actions = TAction::allValues();
 
     return std::transform_reduce(
-        all_actions.begin(), all_actions.end(), std::numeric_limits<double>::min(),
+        all_actions.begin(), all_actions.end(), std::numeric_limits<double>::lowest(),
         [&](auto a, auto b) { return std::max(a, b); },
         [&](const auto& action) { return getQValue(state, action); });
 }

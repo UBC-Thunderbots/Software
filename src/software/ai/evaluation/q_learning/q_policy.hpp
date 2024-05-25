@@ -54,7 +54,7 @@ TAction::Enum QPolicy<TState, TAction>::selectAction(const TState& state)
     }
     else
     {
-        double max_q_value = std::numeric_limits<double>::min();
+        double max_q_value = std::numeric_limits<double>::lowest();
         for (const auto& action : all_actions_)
         {
             double q_value = q_function_->getQValue(state, action);
