@@ -37,6 +37,7 @@ message AiConfig
     required EnemyCapabilityConfig enemy_capability_config                  = 7;
     required ShootOrPassPlayConfig shoot_or_pass_play_config                = 8;
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
+    required EnemyBallPlacementPlayConfig enemy_ball_placement_play_config  = 10;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
     required AiParameterConfig ai_parameter_config                          = 13;
@@ -295,6 +296,13 @@ message SensorFusionConfig
 
     // Possession tracker for determining which team has possession of the ball
     required PossessionTrackerConfig possession_tracker_config = 13;
+}
+
+message EnemyBallPlacementPlayConfig
+{
+    // The distance to keep from the enemy ball placement stadium
+    required double distance_to_keep_meters = 1
+        [default = 0.75, (bounds).min_double_value = 0.65, (bounds).max_double_value = 1.5];
 }
 
 message DefensePlayConfig

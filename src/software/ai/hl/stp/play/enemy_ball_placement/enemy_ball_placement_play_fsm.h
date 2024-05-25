@@ -135,7 +135,7 @@ struct EnemyBallPlacementPlayFSM
     std::shared_ptr<GoalieTactic> goalie_tactic;
 
     Point placement_point;
-    double distance_to_keep;
+    double distance_to_keep_meters;
     double
-        nearly_placed_threshold;  // Threshold for the ball to be considered nearly placed
+        nearly_placed_threshold_meters;  // Threshold for the ball to be considered nearly placed
 };
