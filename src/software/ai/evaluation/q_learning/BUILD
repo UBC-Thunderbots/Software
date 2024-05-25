@@ -31,6 +31,16 @@ cc_library(
 )
 
 cc_library(
+    name = "gameplay_monitor",
+    hdrs = ["gameplay_monitor.h"],
+    srcs = ["gameplay_monitor.cpp"],
+    deps = [
+        "//software/logger",
+        "//software/world",
+    ]
+)
+
+cc_library(
     name = "q_function",
     hdrs = ["q_function.hpp"],
     deps = [

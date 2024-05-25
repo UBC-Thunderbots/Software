@@ -7,8 +7,9 @@
 AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
       strategy(strategy),
-      attacker_mdp_policy_(std::make_unique<LinearQFunction<AttackerMdpState, AttackerMdpAction>>(
-          AttackerMdpFeatureExtractor(), 0.2, 0.8)),
+      attacker_mdp_policy_(
+          std::make_unique<LinearQFunction<AttackerMdpState, AttackerMdpAction>>(
+              AttackerMdpFeatureExtractor(), 0.2, 0.8)),
       current_skill_(nullptr)
 {
 }
@@ -47,11 +48,14 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
         if (current_skill_)
         {
-            attacker_mdp_policy_.update(attacker_mdp_state, 0);
+            double reward = gameplay_monitor_.endStepObservation(tactic_update.world_ptr);
+            attacker_mdp_policy_.update(attacker_mdp_state, reward);
         }
 
         auto action    = attacker_mdp_policy_.selectAction(attacker_mdp_state);
         current_skill_ = createSkillFromAttackerMdpAction(action, strategy);
+
+        gameplay_monitor_.startStepObservation(tactic_update.world_ptr);
     }
 
     if (last_execution_robot != tactic_update.robot.id())
