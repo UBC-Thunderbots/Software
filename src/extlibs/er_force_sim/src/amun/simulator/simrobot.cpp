@@ -424,12 +424,17 @@ void SimRobot::begin(SimBall *ball, double time)
         {
             // we subtract the current speed of the ball from the intended kick speed
             // this ensures the ball leaves the robot at exactly the speed we want
-            power = qBound(0.05f,
-                           ball->speed().length() < kickSpeedBoundThreshold
-                               ? m_sslCommand.kick_speed() -
-                                     (ball->speed().length() / SIMULATOR_SCALE)
-                               : m_sslCommand.kick_speed(),
-                           m_specs.shot_linear_max());
+            float lowerBound = 0.0f;
+            if (ball->speed().length() < kickSpeedBoundThreshold)
+            {
+                lowerBound =
+                    m_sslCommand.kick_speed() - (ball->speed().length() / SIMULATOR_SCALE)
+            }
+            else
+            {
+                lowerBound = m_sslCommand.kick_speed()
+            }
+            power = qBound(0.05f, lowerBound, m_specs.shot_linear_max());
         }
         else
         {
