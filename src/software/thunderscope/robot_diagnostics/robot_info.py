@@ -348,8 +348,7 @@ class RobotInfo(QWidget):
         power_status = robot_status.power_status
         network_status = robot_status.network_status
         primitive_executor_status = robot_status.primitive_executor_status
-        omit_thunderloop_processing_time_sent = robot_status.omit_thunderloop_processing_time_sent
-        rtt_recieved_time = round_trip_time.thunderscope_time_received_seconds
+        rtt_time_seconds = round_trip_time.round_trip_time_seconds
 
         self.__update_stop_primitive(primitive_executor_status.running_primitive)
 
@@ -358,10 +357,7 @@ class RobotInfo(QWidget):
         )
 
         self.primitive_rtt_label.set_float_val(
-            self.__calculate_average_round_trip_time(
-                ((rtt_recieved_time - omit_thunderloop_processing_time_sent.epoch_timestamp_seconds)
-                    * MILLISECONDS_PER_SECOND)
-            )
+            self.__calculate_average_round_trip_time(rtt_time_seconds * MILLISECONDS_PER_SECOND)
         )
 
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)

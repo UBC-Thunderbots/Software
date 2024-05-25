@@ -4,5 +4,5 @@ import "proto/robot_status_msg.proto";
 
 message RoundTripTime
 {
-  double thunderscope_time_received_seconds         = 1;
+  double round_trip_time_seconds         = 1;
 }

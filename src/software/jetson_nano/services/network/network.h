@@ -103,16 +103,13 @@ class NetworkService
     // track last breakbeam state for sending RobotStatus outside of specified rate
     bool last_breakbeam_state_sent = false;
 
-    /**
-     * Struct of key primitive set information as for round-trip time calculations:
-     * sequence_num: Primitive Sequence Number
-     * thunderloop_recieved_time_seconds: System time for when primitive set was received by Thunderloop in seconds
-     * thunderscope_sent_time_seconds: Epoch time of primitive set sent time from Thunderscope in seconds
-     */
     struct RoundTripTime {
-        uint64_t primitive_sequence_num;
-        double thunderscope_sent_time_seconds;
-        double thunderloop_recieved_time_seconds;
+        // Primitive Sequence Number
+        uint64_t primitive_sequence_num = 0;
+        // System time for when primitive set was received by Thunderloop in seconds
+        double thunderscope_sent_time_seconds = 0;
+        // Epoch time of primitive set sent time from Thunderscope in seconds
+        double thunderloop_recieved_time_seconds = 1;
     };
 
     std::deque<RoundTripTime> primitive_set_rtt;

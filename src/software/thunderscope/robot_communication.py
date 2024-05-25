@@ -340,9 +340,10 @@ class RobotCommunication(object):
     #   - Must update the visualized widget component
     #   - Create new proto here, log its time here
     def __receive_robot_status(self, robot_status: Message) -> None:
+        round_trip_time_seconds = time.time() - robot_status.omit_thunderloop_processing_time_sent.epoch_timestamp_seconds
         self.__forward_to_proto_unix_io(
             RoundTripTime,
-            RoundTripTime(thunderscope_time_received_seconds=time.time())
+            RoundTripTime(round_trip_time_seconds=round_trip_time_seconds)
         )
         self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
