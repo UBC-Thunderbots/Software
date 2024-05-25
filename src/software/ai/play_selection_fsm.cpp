@@ -1,7 +1,6 @@
 #include "software/ai/play_selection_fsm.h"
 
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play.h"
-#include "software/ai/hl/stp/play/corner_kick_play.h"
 #include "software/ai/hl/stp/play/enemy_ball_placement_play.h"
 #include "software/ai/hl/stp/play/enemy_free_kick_play.h"
 #include "software/ai/hl/stp/play/free_kick/free_kick_play.h"

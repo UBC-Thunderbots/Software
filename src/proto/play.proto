@@ -8,25 +8,24 @@ enum PlayName
     ShootOrChipPlay                    = 2;
     KickoffFriendlyPlay                = 3;
     OffensePlay                        = 4;
-    CornerKickPlay                     = 5;
-    ShootOrPassPlay                    = 6;
-    BallPlacementPlay                  = 7;
-    HaltPlay                           = 8;
-    EnemyFreekickPlay                  = 9;
-    ExamplePlay                        = 10;
-    DefensePlay                        = 11;
-    EnemyBallPlacementPlay             = 12;
-    PenaltyKickEnemyPlay               = 13;
-    PenaltyKickPlay                    = 14;
-    FreeKickPlay                       = 15;
-    CreaseDefensePlay                  = 16;
-    StopPlay                           = 17;
-    KickoffEnemyPlay                   = 18;
-    AssignedTacticsPlay                = 19;
-    ScoringWithStaticDefendersPlay     = 20;
-    DribblingParcourPlay               = 21;
-    ScoringFromContestedPossessionPlay = 22;
-    PassEndurancePlay                  = 23;
+    ShootOrPassPlay                    = 5;
+    BallPlacementPlay                  = 6;
+    HaltPlay                           = 7;
+    EnemyFreekickPlay                  = 8;
+    ExamplePlay                        = 9;
+    DefensePlay                        = 10;
+    EnemyBallPlacementPlay             = 11;
+    PenaltyKickEnemyPlay               = 12;
+    PenaltyKickPlay                    = 13;
+    FreeKickPlay                       = 14;
+    CreaseDefensePlay                  = 15;
+    StopPlay                           = 16;
+    KickoffEnemyPlay                   = 17;
+    AssignedTacticsPlay                = 18;
+    ScoringWithStaticDefendersPlay     = 19;
+    DribblingParcourPlay               = 20;
+    ScoringFromContestedPossessionPlay = 21;
+    PassEndurancePlay                  = 22;
 }
 
 message Play
