@@ -8,6 +8,13 @@
 
 #include "software/ai/evaluation/q_learning/q_function.hpp"
 
+/**
+ * Policy for a Markov decision process (MDP) that tells the agent the best action 
+ * to take in each state. 
+ * 
+ * @tparam TState the type representing the state of the MDP
+ * @tparam TAction the type representing the set of actions the agent can execute in the MDP 
+ */
 template <typename TState, typename TAction>
 class QPolicy
 {
@@ -15,20 +22,46 @@ class QPolicy
                   "TAction must be a ReflectiveEnum");
 
    public:
+    /**
+     * Creates a QPolicy with the given Q-function.
+     * 
+     * @param q_function the Q-function of the policy
+     */
     explicit QPolicy(std::unique_ptr<QFunction<TState, TAction>> q_function);
 
+    /**
+     * Selects the action with the maximum expected reward when taken from the
+     * given state.
+     * 
+     * @param state the state the take the action from
+     * 
+     * @return the best action to take
+     */
     TAction::Enum selectAction(const TState& state);
 
+    /**
+     * Updates the policy with new information about the new state entered and
+     * the reward received after taking the action selected by the policy.
+     * 
+     * @param new_state the state entered after taking the selected action
+     * @param reward the reward after taking the selected action
+     */
     void update(const TState& new_state, double reward);
 
    private:
+    // The Q-function of the policy
     std::unique_ptr<QFunction<TState, TAction>> q_function_;
 
+    // List of all possible actions the agent can take
     std::vector<typename TAction::Enum> all_actions_;
 
+    // The last state used to select an action
     std::optional<TState> last_state_;
+
+    // The last action selected
     std::optional<typename TAction::Enum> last_action_;
 
+    // Random number generator
     std::mt19937 random_num_gen_;
 };
 

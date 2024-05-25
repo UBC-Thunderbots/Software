@@ -5,10 +5,30 @@
 #include "software/ai/evaluation/q_learning/q_function.hpp"
 #include "software/ai/evaluation/q_learning/feature_extractor.hpp"
 
+/**
+ * Implementation of a Q-function with linear function approximation.
+ * 
+ * We approximate the Q-function using a linear combination of state features and 
+ * their weights. This provides a reasonable estimate of Q(S, A) even if we have not 
+ * applied action A in state S previously.
+ * 
+ * See https://gibberblot.github.io/rl-notes/single-agent/function-approximation.html
+ * for more details.
+ * 
+ * @tparam TState the type representing the state of the MDP
+ * @tparam TAction the type representing the set of actions the agent can execute in the MDP 
+ */
 template <typename TState, typename TAction>
 class LinearQFunction : public QFunction<TState, TAction>
 {
    public:
+    /**
+     * Creates a LinearQFunction.
+     * 
+     * @param features the feature extractor to use on the state representation
+     * @param learning_rate the initial learning rate
+     * @param learning_rate the initial discount factor
+     */
     explicit LinearQFunction(FeatureExtractor<TState, TAction> features,
                              double learning_rate, double discount_factor);
 
@@ -19,15 +39,31 @@ class LinearQFunction : public QFunction<TState, TAction>
     void update(const TState& state, const TState& next_state,
                 const TAction::Enum& action, double reward) override;
 
+    /**
+     * Sets the learning rate used in the Q-function update equation.
+     * 
+     * @param learning_rate the new learning rate, between 0 and 1 inclusive
+     */
     void setLearningRate(double learning_rate);
 
+    /**
+     * Sets the discount factor used in the Q-function update equation.
+     * 
+     * @param learning_rate the new discount factor, between 0 and 1 inclusive
+     */
     void setDiscountFactor(double discount_factor);
 
    private:
+    // The feature extractor to use on the state representation
     FeatureExtractor<TState, TAction> features_;
+    
+    // The weights vector with one weight for each feature-action pair
     Eigen::VectorXd weights_;
-
+    
+    // The learning rate used in the Q-function update equation
     double learning_rate_;
+    
+    // The discount factor used in the Q-function update equation
     double discount_factor_;
 };
 
