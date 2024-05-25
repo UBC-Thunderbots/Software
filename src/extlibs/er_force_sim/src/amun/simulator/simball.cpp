@@ -130,11 +130,11 @@ void SimBall::begin(bool robot_collision)
 
                 // just apply rolling friction, normal friction is somehow handled by
                 // bullet
-                const btScalar rollingDeceleration =
-                    BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED;
+                const btScalar rollingFrictionAcceleration =
+                    BALL_ROLLING_FRICTION_ACCELERATION_METERS_PER_SECOND_SQUARED;
                 btVector3 force(velocity.x(), velocity.y(), 0.0f);
                 force.safeNormalize();
-                m_body->applyCentralImpulse(-force * rollingDeceleration *
+                m_body->applyCentralImpulse(force * rollingFrictionAcceleration *
                                             SIMULATOR_SCALE * BALL_MASS_KG *
                                             SUB_TIMESTEP);
 

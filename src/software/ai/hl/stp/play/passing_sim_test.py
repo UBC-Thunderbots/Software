@@ -270,7 +270,7 @@ def test_passing_receive_speed(
     # Validate that the ball is always received by the other robot
     # slower than the max receive speed
     always_validation_sequence_set = [
-        [FriendlyAlwaysReceivesBallSlow(robot_id=1, max_receive_speed=2.5)],
+        [FriendlyAlwaysReceivesBallSlow(robot_id=1, max_receive_speed=2.3)],
     ]
 
     simulated_test_runner.run_test(
@@ -288,7 +288,7 @@ def test_passing_receive_speed(
         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
         inv_always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=10,
-        run_till_end=True,
+        run_till_end=False,
     )
 
 

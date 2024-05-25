@@ -96,11 +96,11 @@ constexpr double BALL_RESTITUTION = 1.0;
 constexpr double FRICTION_TRANSITION_FACTOR = 5.0 / 7.0;
 // the stationary ball speed in m/s
 constexpr double STATIONARY_BALL_SPEED_METERS_PER_SECOND = 0.01;
-// the deceleration the ball experiences due to rolling friction in m/s^2
-constexpr double BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED = 0.5;
-// the deceleration the ball experiences due to sliding friction in m/s^2
-constexpr double BALL_SLIDING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED =
-    BALL_SLIDING_FRICTION_NEWTONS / BALL_MASS_KG;
+// the acceleration the ball experiences due to rolling friction in m/s^2
+constexpr double BALL_ROLLING_FRICTION_ACCELERATION_METERS_PER_SECOND_SQUARED = -0.5;
+// the acceleration the ball experiences due to sliding friction in m/s^2
+constexpr double BALL_SLIDING_FRICTION_ACCELERATION_METERS_PER_SECOND_SQUARED =
+    -BALL_SLIDING_FRICTION_NEWTONS / BALL_MASS_KG;
 
 /* Unit Conversion */
 static const double MILLIMETERS_PER_METER = 1000.0;

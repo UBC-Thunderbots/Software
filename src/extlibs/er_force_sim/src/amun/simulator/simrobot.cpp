@@ -416,7 +416,7 @@ void SimRobot::begin(SimBall *ball, double time)
         const float angle                   = m_sslCommand.kick_angle() / 180 * M_PI;
         const float dirFloor                = std::cos(angle);
         const float dirUp                   = std::sin(angle);
-        const float kickSpeedBoundThreshold = 1.0;
+        const float kickSpeedBoundThreshold = 1.0 * SIMULATOR_SCALE;
 
         stopDribbling();
 
@@ -424,17 +424,17 @@ void SimRobot::begin(SimBall *ball, double time)
         {
             // we subtract the current speed of the ball from the intended kick speed
             // this ensures the ball leaves the robot at exactly the speed we want
-            float lowerBound = 0.0f;
+            float kickSpeed = 0.0f;
             if (ball->speed().length() < kickSpeedBoundThreshold)
             {
-                lowerBound = m_sslCommand.kick_speed() -
-                             (ball->speed().length() / SIMULATOR_SCALE);
+                kickSpeed = m_sslCommand.kick_speed() -
+                            (ball->speed().length() / SIMULATOR_SCALE);
             }
             else
             {
-                lowerBound = m_sslCommand.kick_speed();
+                kickSpeed = m_sslCommand.kick_speed();
             }
-            power = qBound(0.05f, lowerBound, m_specs.shot_linear_max());
+            power = qBound(0.05f, kickSpeed, m_specs.shot_linear_max());
         }
         else
         {
@@ -459,7 +459,6 @@ void SimRobot::begin(SimBall *ball, double time)
             }
         };
         const float speedCompensation = getSpeedCompensation();
-
         ball->kick(t * btVector3(0, dirFloor * power + speedCompensation, dirUp * power) *
                    (1.0f / static_cast<float>(time)) * SIMULATOR_SCALE *
                    static_cast<float>(BALL_MASS_KG));
