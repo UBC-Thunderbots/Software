@@ -6,6 +6,12 @@ cc_library(
     hdrs = ["make_enum.h"],
 )
 
+cc_library(
+    name = "reflective_enum",
+    hdrs = ["reflective_enum.h"],
+    deps = [":make_enum"]
+)
+
 cc_test(
     name = "make_enum_test",
     srcs = [":make_enum_test.cpp"],
