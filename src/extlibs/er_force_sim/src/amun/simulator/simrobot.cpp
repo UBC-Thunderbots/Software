@@ -427,12 +427,12 @@ void SimRobot::begin(SimBall *ball, double time)
             float lowerBound = 0.0f;
             if (ball->speed().length() < kickSpeedBoundThreshold)
             {
-                lowerBound =
-                    m_sslCommand.kick_speed() - (ball->speed().length() / SIMULATOR_SCALE)
+                lowerBound = m_sslCommand.kick_speed() -
+                             (ball->speed().length() / SIMULATOR_SCALE);
             }
             else
             {
-                lowerBound = m_sslCommand.kick_speed()
+                lowerBound = m_sslCommand.kick_speed();
             }
             power = qBound(0.05f, lowerBound, m_specs.shot_linear_max());
         }
