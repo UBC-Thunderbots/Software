@@ -78,7 +78,7 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
     }
 }
 
-void NetworkService::logNewPrimitiveSet(TbotsProto::PrimitiveSet input)
+void NetworkService::logNewPrimitiveSet(const TbotsProto::PrimitiveSet& new_primitive_set)
 {
     /* TODO: THIS TRACKS THE RECEIVED PRIMITIVES
      *  - make sure it is in the lock
@@ -86,22 +86,22 @@ void NetworkService::logNewPrimitiveSet(TbotsProto::PrimitiveSet input)
      *  - update the timestamp on each primitive set to the current epoch time
      */
 
-    if (primitive_set_rtt.size() >= 50)
+    if (primitive_set_rtt.size() >= PRIMITIVE_DEQUE_MAX_SIZE)
     {
         LOG(WARNING) << "Too many primitive sets logged for round-trip calculations, halting log process";
         return;
     }
 
     if (!primitive_set_rtt.empty()
-            && input.sequence_number() <= primitive_set_rtt.back().primitive_sequence_num)
+            && new_primitive_set.sequence_number() <= primitive_set_rtt.back().primitive_sequence_num)
     {
         // If the proto is older than the last received proto, then ignore it
         return;
     }
 
     NetworkService::RoundTripTime current_round_trip_time;
-    current_round_trip_time.primitive_sequence_num = input.sequence_number();
-    current_round_trip_time.thunderscope_sent_time_seconds = input.time_sent().epoch_timestamp_seconds();
+    current_round_trip_time.primitive_sequence_num = new_primitive_set.sequence_number();
+    current_round_trip_time.thunderscope_sent_time_seconds = new_primitive_set.time_sent().epoch_timestamp_seconds();
     current_round_trip_time.thunderloop_recieved_time_seconds = getCurrentEpochTimeInSeconds();
 
     primitive_set_rtt.emplace_back(current_round_trip_time);
@@ -119,7 +119,7 @@ void NetworkService::updatePrimitiveSetLog(TbotsProto::RobotStatus &robot_status
      */
 
     uint64_t seq_num = robot_status.last_handled_primitive_set();
-    while (seq_num <= primitive_set_rtt.back().primitive_sequence_num)
+    while (!primitive_set_rtt.empty() && seq_num <= primitive_set_rtt.back().primitive_sequence_num)
     {
         if (primitive_set_rtt.front().primitive_sequence_num == seq_num)
         {
@@ -138,6 +138,10 @@ void NetworkService::updatePrimitiveSetLog(TbotsProto::RobotStatus &robot_status
 
 double NetworkService::getCurrentEpochTimeInSeconds()
 {
-    return std::chrono::duration<double>
-            (std::chrono::steady_clock::now().time_since_epoch()).count();
+    const auto clock_time = std::chrono::system_clock::now();
+    double time_in_seconds =
+            static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
+                    clock_time.time_since_epoch())
+                    .count()) * SECONDS_PER_MICROSECOND;
+    return time_in_seconds;
 }

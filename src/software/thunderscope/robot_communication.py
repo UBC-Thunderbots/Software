@@ -296,11 +296,10 @@ class RobotCommunication(object):
         """
 
         #TODO: CHANGE FUNCS TO ONE DEFINED BELOW
-        # Create the multicast listeners
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
-            lambda data: self.__forward_to_proto_unix_io(RobotStatus, data),
+            self.__receive_robot_status,
             True,
         )
 

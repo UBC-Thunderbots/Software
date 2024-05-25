@@ -58,7 +58,7 @@ class NetworkService
      *
      * @param input A potential primitive set to be logged
      */
-    void logNewPrimitiveSet(TbotsProto::PrimitiveSet input);
+    void logNewPrimitiveSet(const TbotsProto::PrimitiveSet& new_primitive_set);
 
     /**
      * Updates the cached primitive sets for Thunderscope to calculate round-trip time
@@ -79,6 +79,8 @@ class NetworkService
     static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
     static constexpr double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
         ROBOT_STATUS_BROADCAST_RATE_HZ / (THUNDERLOOP_HZ + 1.0);
+    static constexpr unsigned int PRIMITIVE_DEQUE_MAX_SIZE =
+            static_cast<unsigned int>(1500 / ROBOT_STATUS_BROADCAST_RATE_HZ);
 
     // Variables
     TbotsProto::PrimitiveSet primitive_set_msg;
@@ -109,7 +111,7 @@ class NetworkService
         // System time for when primitive set was received by Thunderloop in seconds
         double thunderscope_sent_time_seconds = 0;
         // Epoch time of primitive set sent time from Thunderscope in seconds
-        double thunderloop_recieved_time_seconds = 1;
+        double thunderloop_recieved_time_seconds = 0;
     };
 
     std::deque<RoundTripTime> primitive_set_rtt;

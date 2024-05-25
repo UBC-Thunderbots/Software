@@ -70,7 +70,7 @@ class RobotViewComponent(QWidget):
 
         self.robot_status.toggle_visibility()
 
-    def update(self, robot_status: RobotStatus) -> None:
+    def update(self, robot_status: RobotStatus, round_trip_time: RoundTripTime) -> None:
         """
         Updates the Robot View Components with the new robot status message
         Updates the robot info widget and, if initialized, the robot status widget as well
@@ -78,7 +78,7 @@ class RobotViewComponent(QWidget):
         :param robot_status: the new message data to update the widget with
         """
 
-        self.robot_info.update(robot_status)
+        self.robot_info.update(robot_status, round_trip_time)
         if self.robot_status:
             self.robot_status.update(robot_status)
 
@@ -141,3 +141,4 @@ class RobotView(QScrollArea):
             robot_status = self.robot_status_buffer.get(
                 block=False, return_cached=False
             )
+            round_trip_time = self.round_trip_time_buffer.get(block=False, return_cached=False)

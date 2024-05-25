@@ -375,5 +375,5 @@ class RobotInfo(QWidget):
         self.previous_primitive_rtt_values.append(new_time)
         average_rtt_time_milliseconds = sum(self.previous_primitive_rtt_values)
         val = int(average_rtt_time_milliseconds / len(self.previous_primitive_rtt_values))
-        print(f"{val}")
+        # print(f"{val}")
         return val
