@@ -112,9 +112,9 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    power_service_ = std::make_unique<PowerService>();
-    LOG(INFO)
-        << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
+//    power_service_ = std::make_unique<PowerService>();
+//    LOG(INFO)
+//        << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
     motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
     g_motor_service = motor_service_.get();
@@ -265,18 +265,18 @@ Thunderloop::~Thunderloop() {}
                 getMilliseconds(poll_time));
 
             // Power Service: execute the power control command
-            {
-                ScopedTimespecTimer timer(&poll_time);
+            //{
+            //    ScopedTimespecTimer timer(&poll_time);
 
-                ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService",
-                           true);
+            //    ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService",
+            //               true);
 
-                power_status_ =
-                    power_service_->poll(direct_control_.power_control(), kick_coeff_,
-                                         kick_constant_, chip_pulse_width_);
-            }
-            thunderloop_status_.set_power_service_poll_time_ms(
-                getMilliseconds(poll_time));
+            //    power_status_ =
+            //        power_service_->poll(direct_control_.power_control(), kick_coeff_,
+            //                             kick_constant_, chip_pulse_width_);
+            //}
+            //thunderloop_status_.set_power_service_poll_time_ms(
+            //    getMilliseconds(poll_time));
 
             struct timespec time_since_kicker_fired;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
