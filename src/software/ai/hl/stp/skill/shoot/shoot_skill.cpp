@@ -4,10 +4,5 @@
 
 ShootSkill::ShootSkill(std::shared_ptr<Strategy> strategy) : BaseSkill(strategy) {}
 
-void ShootSkill::accept(SkillVisitor& visitor)
-{
-    visitor.visit(*this);
-}
-
 // Register this Skill in the GenericFactory
 static TGenericFactory<std::string, Skill, ShootSkill, std::shared_ptr<Strategy>> factory;

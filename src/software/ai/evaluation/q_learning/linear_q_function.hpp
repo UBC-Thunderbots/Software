@@ -9,15 +9,15 @@ template <typename TState, typename TAction>
 class LinearQFunction : public QFunction<TState, TAction>
 {
    public:
-    explicit LinearQFunction(const FeatureExtractor<TState, TAction>& features,
+    explicit LinearQFunction(FeatureExtractor<TState, TAction> features,
                              double learning_rate, double discount_factor);
+
+    double getQValue(const TState& state, const TAction::Enum& action) const override;
+
+    double getMaxQValue(const TState& state) const override;
 
     void update(const TState& state, const TState& next_state,
                 const TAction::Enum& action, double reward) override;
-
-    double getQValue(const TState& state, const TAction::Enum& action) override;
-
-    double getMaxQValue(const TState& state) override;
 
     void setLearningRate(double learning_rate);
 
@@ -33,29 +33,17 @@ class LinearQFunction : public QFunction<TState, TAction>
 
 template <typename TState, typename TAction>
 LinearQFunction<TState, TAction>::LinearQFunction(
-    const FeatureExtractor<TState, TAction>& features, double learning_rate,
+    FeatureExtractor<TState, TAction> features, double learning_rate,
     double discount_factor)
-    : features_(features), weights_(features_.numFeatures() * TAction::size())
+    : features_(features), weights_(features_.numFeatures() * TAction::numValues())
 {
     setLearningRate(learning_rate);
     setDiscountFactor(discount_factor);
 }
 
 template <typename TState, typename TAction>
-void LinearQFunction<TState, TAction>::update(const TState& state,
-                                              const TState& next_state,
-                                              const TAction::Enum& action, double reward)
-{
-    Eigen::VectorXd feature_vector = features_.extract(state, action);
-
-    double temporal_diff_target = reward + discount_factor_ * getMaxQValue(next_state);
-    double delta                = temporal_diff_target - getQValue(state, action);
-    weights_                    = weights_ + (learning_rate_ * delta * feature_vector);
-}
-
-template <typename TState, typename TAction>
 double LinearQFunction<TState, TAction>::getQValue(const TState& state,
-                                                   const TAction::Enum& action)
+                                                   const typename TAction::Enum& action) const
 {
     Eigen::VectorXd feature_vector = features_.extract(state, action);
 
@@ -63,14 +51,26 @@ double LinearQFunction<TState, TAction>::getQValue(const TState& state,
 }
 
 template <typename TState, typename TAction>
-double LinearQFunction<TState, TAction>::getMaxQValue(const TState& state)
+double LinearQFunction<TState, TAction>::getMaxQValue(const TState& state) const
 {
     std::vector<typename TAction::Enum> all_actions = TAction::allValues();
 
     return std::transform_reduce(
-        all_actions.begin(), all_actions.end() std::numeric_limits<T>::min(),
+        all_actions.begin(), all_actions.end(), std::numeric_limits<double>::min(),
         [&](auto a, auto b) { return std::max(a, b); },
-        [&](const TAction& action) { return getQValue(state, action); });
+        [&](const auto& action) { return getQValue(state, action); });
+}
+
+template <typename TState, typename TAction>
+void LinearQFunction<TState, TAction>::update(const TState& state,
+                                              const TState& next_state,
+                                              const typename TAction::Enum& action, double reward)
+{
+    Eigen::VectorXd feature_vector = features_.extract(state, action);
+
+    double temporal_diff_target = reward + discount_factor_ * getMaxQValue(next_state);
+    double delta                = temporal_diff_target - getQValue(state, action);
+    weights_                    = weights_ + (learning_rate_ * delta * feature_vector);
 }
 
 template <typename TState, typename TAction>

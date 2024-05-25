@@ -1,13 +1,14 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/q_learning/linear_q_function.hpp"
 #include "software/logger/logger.h"
-#include "software/world/ball.h"
 
 AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
       strategy(strategy),
-      skill_graph_(strategy),
+      attacker_mdp_policy_(std::make_unique<LinearQFunction<AttackerMdpState, AttackerMdpAction>>(
+          AttackerMdpFeatureExtractor(), 0.2, 0.8)),
       current_skill_(nullptr)
 {
 }
@@ -20,7 +21,7 @@ void AttackerTactic::accept(TacticVisitor& visitor) const
 std::string AttackerTactic::getFSMState() const
 {
     std::string state = "Unknown";
-    if (current_skill_ != nullptr && last_execution_robot)
+    if (!current_skill_ && last_execution_robot)
     {
         state = current_skill_->getFSMState(*last_execution_robot);
     }
@@ -39,31 +40,29 @@ bool AttackerTactic::done() const
 
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
-    std::shared_ptr<Skill> next_skill =
-        skill_graph_.getNextSkill(tactic_update.robot, *tactic_update.world_ptr);
-
-    if (last_execution_robot == tactic_update.robot.id())
+    if (!current_skill_ || (last_execution_robot == tactic_update.robot.id() &&
+                            current_skill_->done(tactic_update.robot.id())))
     {
-        if (current_skill_ == nullptr || current_skill_->done(tactic_update.robot.id()))
+        AttackerMdpState attacker_mdp_state{tactic_update.world_ptr, strategy};
+
+        if (current_skill_)
         {
-            current_skill_ = next_skill;
-            current_skill_->reset(tactic_update.robot);
-            skill_graph_.extendSequence(current_skill_);
+            attacker_mdp_policy_.update(attacker_mdp_state, 0);
         }
 
-        current_skill_->updatePrimitive(tactic_update.robot, tactic_update.world_ptr,
-                                        tactic_update.set_primitive);
+        auto action    = attacker_mdp_policy_.selectAction(attacker_mdp_state);
+        current_skill_ = createSkillFromAttackerMdpAction(action, strategy);
     }
-    else
+
+    if (last_execution_robot != tactic_update.robot.id())
     {
-        next_skill->reset(tactic_update.robot);
-        next_skill->updatePrimitive(tactic_update.robot, tactic_update.world_ptr,
-                                    tactic_update.set_primitive);
+        current_skill_->reset(tactic_update.robot);
     }
+
+    current_skill_->updatePrimitive(tactic_update.robot, tactic_update.world_ptr,
+                                    tactic_update.set_primitive);
 }
 
 void AttackerTactic::evaluate(double score)
 {
-    skill_graph_.scoreSequence(score);
-    current_skill_ = nullptr;
 }

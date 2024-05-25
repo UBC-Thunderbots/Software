@@ -1,6 +1,8 @@
 #pragma once
 
-#include "software/ai/evaluation/scoring/skills/skill_graph.h"
+#include "software/ai/evaluation/q_learning/attacker_mdp_action.h"
+#include "software/ai/evaluation/q_learning/attacker_mdp_feature_extractor.h"
+#include "software/ai/evaluation/q_learning/q_policy.hpp"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 class AttackerTactic : public Tactic
@@ -27,8 +29,9 @@ class AttackerTactic : public Tactic
    private:
     std::shared_ptr<Strategy> strategy;
 
-    SkillGraph skill_graph_;
-    std::shared_ptr<Skill> current_skill_;
+    QPolicy<AttackerMdpState, AttackerMdpAction> attacker_mdp_policy_;
+
+    std::unique_ptr<Skill> current_skill_;
 
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 };

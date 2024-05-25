@@ -9,13 +9,10 @@ class QFunction
                   "TAction must be a ReflectiveEnum");
 
    public:
-    QFunction() = delete;
-    ~QFunction() = delete;
+    virtual double getQValue(const TState& state, const TAction::Enum& action) const = 0;
+
+    virtual double getMaxQValue(const TState& state) const = 0;
     
     virtual void update(const TState& state, const TState& new_state,
                         const TAction::Enum& action, double reward) = 0;
-
-    virtual double getQValue(const TState& state, const TAction::Enum& action) = 0;
-
-    virtual double getMaxQValue(const TState& state) = 0;
 };

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/ai/evaluation/scoring/skills/skill_visitor.h"
 #include "software/ai/hl/stp/skill/skill_fsm.h"
 #include "software/ai/strategy.h"
 
@@ -38,8 +37,6 @@ class Skill
     virtual bool done(const RobotId& robot_id) const = 0;
 
     virtual std::string getFSMState(RobotId robot_id) const = 0;
-
-    virtual void accept(SkillVisitor& visitor) = 0;
 
    protected:
     std::shared_ptr<Strategy> strategy_;

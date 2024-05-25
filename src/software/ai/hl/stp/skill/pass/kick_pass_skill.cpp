@@ -11,12 +11,6 @@ void KickPassSkill::updatePrimitive(const Robot& robot, const WorldPtr& world_pt
     BaseSkill::updatePrimitive(robot, world_ptr, set_primitive);
 }
 
-void KickPassSkill::accept(SkillVisitor& visitor)
-{
-    visitor.visit(*this);
-}
-
-
 // Register this Skill in the GenericFactory
 static TGenericFactory<std::string, Skill, KickPassSkill, std::shared_ptr<Strategy>>
     factory;

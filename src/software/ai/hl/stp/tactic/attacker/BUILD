@@ -7,11 +7,13 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai:strategy",
-        "//software/ai/evaluation/scoring/skills:skill_graph",
+        "//software/ai/evaluation/q_learning:attacker_mdp_action",
+        "//software/ai/evaluation/q_learning:attacker_mdp_feature_extractor",
+        "//software/ai/evaluation/q_learning:linear_q_function",
+        "//software/ai/evaluation/q_learning:q_policy",
         "//software/ai/hl/stp/skill",
         "//software/ai/hl/stp/tactic",
         "//software/logger",
-        "//software/world:ball",
     ],
 )
 

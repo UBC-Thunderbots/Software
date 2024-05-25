@@ -10,6 +10,4 @@ class ShootSkill : public BaseSkill<ShootSkillFSM, ShootSkillFSM::GetBallControl
 {
    public:
     explicit ShootSkill(std::shared_ptr<Strategy> strategy);
-
-    void accept(SkillVisitor& visitor);
 };

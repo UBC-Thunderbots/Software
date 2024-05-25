@@ -10,6 +10,4 @@ class ChipPassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, PivotKickS
 
     void updatePrimitive(const Robot& robot, const WorldPtr& world_ptr,
                          const SetPrimitiveCallback& set_primitive) override;
-
-    void accept(SkillVisitor& skill_visitor) override;
 };
