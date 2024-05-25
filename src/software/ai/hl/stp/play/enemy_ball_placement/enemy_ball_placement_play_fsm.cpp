@@ -76,7 +76,7 @@ void EnemyBallPlacementPlayFSM::avoid(const Update& event)
             Point destination;
             Rectangle fieldLines = world_ptr->field().fieldLines();
             // If either destination point is outside the field, then pick the other
-            // point. It is impossible for both points to be outside the field
+            // point, since it is very unlikely for both points to be outside the field
             if (!contains(fieldLines, p2))
             {
                 destination = p1;
