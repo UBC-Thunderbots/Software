@@ -295,7 +295,6 @@ class RobotCommunication(object):
 
         """
 
-        #TODO: CHANGE FUNCS TO ONE DEFINED BELOW
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
@@ -339,7 +338,9 @@ class RobotCommunication(object):
     #   - Must update the visualized widget component
     #   - Create new proto here, log its time here
     def __receive_robot_status(self, robot_status: Message) -> None:
-        round_trip_time_seconds = time.time() - robot_status.omit_thunderloop_processing_time_sent.epoch_timestamp_seconds
+        round_trip_time_seconds = time.time() - (
+            robot_status.omit_thunderloop_processing_time_sent.epoch_timestamp_seconds
+        )
         self.__forward_to_proto_unix_io(
             RoundTripTime,
             RoundTripTime(round_trip_time_seconds=round_trip_time_seconds)
