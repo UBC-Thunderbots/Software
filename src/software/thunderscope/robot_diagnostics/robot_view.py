@@ -70,7 +70,7 @@ class RobotViewComponent(QWidget):
 
         self.robot_status.toggle_visibility()
 
-    def update(self, robot_status: RobotStatus, round_trip_time: RoundTripTime) -> None:
+    def update(self, robot_status: RobotStatus, round_trip_time: RobotStatistic) -> None:
         """
         Updates the Robot View Components with the new robot status message
         Updates the robot info widget and, if initialized, the robot status widget as well
@@ -105,7 +105,7 @@ class RobotView(QScrollArea):
         super().__init__()
 
         self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
-        self.round_trip_time_buffer = ThreadSafeBuffer(10, RoundTripTime)
+        self.round_trip_time_buffer = ThreadSafeBuffer(10, RobotStatistic)
 
         self.layout = QVBoxLayout()
 

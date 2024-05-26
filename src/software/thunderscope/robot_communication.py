@@ -331,15 +331,13 @@ class RobotCommunication(object):
 
         return self
 
-    # TODO: MAKE THIS PRINT THE STUFF
-    # TODO: Functions that handles the returned robot status in Thunderscope
-    #   - Must retrieve the time_sent field of the proto,
-    #     this means taking the diff of the current time and the omit_thunderloop_processing_time_sent
-    #   - Must update the visualized widget component
-    #   - Create new proto here, log its time here
     def __receive_robot_status(self, robot_status: Message) -> None:
+        """
+        Forwards the given robot status to the full system along with the round-trip time
+        :param robot_status: RobotStatus to forward to fullsystem
+        """
         round_trip_time_seconds = time.time() - (
-            robot_status.omit_thunderloop_processing_time_sent.epoch_timestamp_seconds
+            robot_status.adjusted_time_sent.epoch_timestamp_seconds
         )
         self.__forward_to_proto_unix_io(
             RoundTripTime,

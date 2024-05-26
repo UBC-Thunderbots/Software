@@ -1,8 +1,6 @@
 syntax = "proto3";
 
-import "proto/robot_status_msg.proto";
-
-message RoundTripTime
+message RobotStatistic
 {
   double round_trip_time_seconds         = 1;
 }

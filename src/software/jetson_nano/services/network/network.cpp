@@ -80,12 +80,6 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
 
 void NetworkService::logNewPrimitiveSet(const TbotsProto::PrimitiveSet& new_primitive_set)
 {
-    /* TODO: THIS TRACKS THE RECEIVED PRIMITIVES
-     *  - make sure it is in the lock
-     *  - log the new PRIMITIVE SET PROTO within a deque if it is valid (see primitive_tracker.send())
-     *  - update the timestamp on each primitive set to the current epoch time
-     */
-
     if (primitive_set_rtt.size() >= PRIMITIVE_DEQUE_MAX_SIZE)
     {
         LOG(WARNING) << "Too many primitive sets logged for round-trip calculations, halting log process";
@@ -109,24 +103,15 @@ void NetworkService::logNewPrimitiveSet(const TbotsProto::PrimitiveSet& new_prim
 
 void NetworkService::updatePrimitiveSetLog(TbotsProto::RobotStatus &robot_status)
 {
-    /**
-     * TODO: Send return RobotStatus msg to Thunderscope
-     *      1) Traverse deque containing all received primitive_sets
-     *      2) If the last_handled_primitive_set for current robot_status is stored in the deque:
-     *         - delete all earlier sets
-     *         - stop & calculate the processing counter
-     *         - store the new omit_thunderloop_processing_time_sent = time_sent + processing duration
-     */
-
     uint64_t seq_num = robot_status.last_handled_primitive_set();
-    while (!primitive_set_rtt.empty() && seq_num <= primitive_set_rtt.back().primitive_sequence_num)
+    while (!primitive_set_rtt.empty())
     {
         if (primitive_set_rtt.front().primitive_sequence_num == seq_num)
         {
             double received_epoch_time_seconds = primitive_set_rtt.front().thunderloop_recieved_time_seconds;
             double processing_time_seconds = getCurrentEpochTimeInSeconds() - received_epoch_time_seconds;
 
-            robot_status.mutable_omit_thunderloop_processing_time_sent()->set_epoch_timestamp_seconds(
+            robot_status.mutable_adjusted_time_sent()->set_epoch_timestamp_seconds(
                     primitive_set_rtt.front().thunderscope_sent_time_seconds
                     + processing_time_seconds
             );

@@ -283,7 +283,7 @@ class RobotInfo(QWidget):
 
         return pixmap
 
-    def update(self, robot_status: RobotStatus, round_trip_time: RoundTripTime):
+    def update(self, robot_status: RobotStatus, round_trip_time: RobotStatistic):
         """
         Receives parts of a RobotStatus message
 
@@ -332,7 +332,7 @@ class RobotInfo(QWidget):
             f"background-color: {'green' if is_running else 'red'}; border: 1px solid black;"
         )
 
-    def __update_ui(self, robot_status: RobotStatus, round_trip_time: RoundTripTime) -> None:
+    def __update_ui(self, robot_status: RobotStatus, round_trip_time: RobotStatistic) -> None:
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
@@ -372,8 +372,11 @@ class RobotInfo(QWidget):
         self.battery_progress_bar.setValue(power_status.battery_voltage)
 
     def __calculate_average_round_trip_time(self, new_time: float) -> int:
+        """
+        Logs the given round-trip time and calculates the average
+        :param new_time: The new round-trip time to add
+        :return: The mean integer value of the previous round-trip times in milliseconds
+        """
         self.previous_primitive_rtt_values.append(new_time)
         average_rtt_time_milliseconds = sum(self.previous_primitive_rtt_values)
-        val = int(average_rtt_time_milliseconds / len(self.previous_primitive_rtt_values))
-        # print(f"{val}")
-        return val
+        return int(average_rtt_time_milliseconds / len(self.previous_primitive_rtt_values))
