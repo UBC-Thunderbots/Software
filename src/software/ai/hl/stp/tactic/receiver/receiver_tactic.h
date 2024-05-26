@@ -19,7 +19,7 @@ class ReceiverTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr &world_ptr) override;
+    std::map<RobotId, std::shared_ptr<Primitive>> get(const WorldPtr& world_ptr) override;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 

@@ -42,11 +42,11 @@ class FeatureExtractor
 
     /**
      * Creates a FeatureExtractor.
-     * 
-     * Each function provided to the FeatureExtractor extracts and returns 
+     *
+     * Each function provided to the FeatureExtractor extracts and returns
      * one feature value from the state passed to it.
-     * 
-     * @param features list of feature extraction functions  
+     *
+     * @param features list of feature extraction functions
      */
     explicit FeatureExtractor(const std::vector<FeatureFunc>& features);
 

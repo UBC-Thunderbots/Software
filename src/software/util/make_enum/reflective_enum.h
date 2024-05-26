@@ -6,9 +6,9 @@
  * Enums created using the MAKE_REFLECTIVE_ENUM macro will inherit
  * ReflectiveEnum. Having all reflective enums inherit this class
  * enables use of std::is_base_of to assert whether a type is a ReflectiveEnum.
- * 
- * Static virtual methods do not exist in C++ so this class definition is empty; 
- * see the MAKE_REFLECTIVE_ENUM definition for methods supported by ReflectiveEnum.   
+ *
+ * Static virtual methods do not exist in C++ so this class definition is empty;
+ * see the MAKE_REFLECTIVE_ENUM definition for methods supported by ReflectiveEnum.
  */
 class ReflectiveEnum
 {
@@ -16,13 +16,13 @@ class ReflectiveEnum
 
 /**
  * Creates an "smart" enum with compile-time, template-friendly reflection.
- * 
+ *
  * This enum supports
  * - getting the number of enum values
  * - getting a list of all enum values
  *
  * IMPORTANT: This macro does NOT support enums that have manually specified values
- * e.g. MAKE_ENUM(MyEnum, foo=1, bar) is not valid 
+ * e.g. MAKE_ENUM(MyEnum, foo=1, bar) is not valid
  *
  * @param name The name of the enum
  * @param ... The values of the enum

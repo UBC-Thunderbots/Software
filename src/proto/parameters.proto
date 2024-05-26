@@ -80,33 +80,39 @@ message AttackerTacticConfig
     ];
 
     /*****  Q-learning hyperparameters *****/
-    
-    // The learning rate determines the extent to which new information overrides old information.
-    // A higher learning rate means more emphasis on recent information.
+
+    // The learning rate determines the extent to which new information overrides old
+    // information. A higher learning rate means more emphasis on recent information.
     required double learning_rate = 3
         [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     // The discount factor determines the importance of future rewards.
-    // A factor of 0 makes the agent consider only immediate rewards, ignoring future rewards 
-    // completely. This makes the agent myopic, focusing solely on short-term gains.
-    // A factor closer to 1 makes the agent consider future rewards more significantly, 
-    // encouraging it to evaluate long-term benefits.
+    // A factor of 0 makes the agent consider only immediate rewards, ignoring future
+    // rewards completely. This makes the agent myopic, focusing solely on short-term
+    // gains. A factor closer to 1 makes the agent consider future rewards more
+    // significantly, encouraging it to evaluate long-term benefits.
     required double discount_factor = 4
         [default = 0.8, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     // Controls the epsilon parameter if using an epsilon-greedy selection strategy.
-    // The epsilon determines the exploration-exploitation balance; higher epsilons lead to
-    // more exploration of the action space, while lower epsilons favor exploitation 
-    // of the best-known actions.
-    required double action_selection_epsilon = 5
-        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // The epsilon determines the exploration-exploitation balance; higher epsilons lead
+    // to more exploration of the action space, while lower epsilons favor exploitation of
+    // the best-known actions.
+    required double action_selection_epsilon = 5 [
+        default                   = 0.1,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
 
     // Controls the temperature parameter if using a softmax action selection strategy.
-    // Temperature determines the exploration-exploitation balance; higher temperatures 
-    // lead to more exploration of the action space, while lower temperatures favor exploitation 
-    // of the best-known actions.
-    required double action_selection_temperature = 6
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Temperature determines the exploration-exploitation balance; higher temperatures
+    // lead to more exploration of the action space, while lower temperatures favor
+    // exploitation of the best-known actions.
+    required double action_selection_temperature = 6 [
+        default                   = 0.3,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
 }
 
 message ReceiverTacticConfig

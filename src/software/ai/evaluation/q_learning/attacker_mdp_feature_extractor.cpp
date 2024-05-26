@@ -1,6 +1,7 @@
 #include "software/ai/evaluation/q_learning/attacker_mdp_feature_extractor.h"
 
 #include <math.h>
+
 #include "software/ai/evaluation/possession.h"
 
 AttackerMdpFeatureExtractor::AttackerMdpFeatureExtractor()

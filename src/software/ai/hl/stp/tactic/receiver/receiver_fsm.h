@@ -16,9 +16,7 @@ struct ReceiverFSM
      *
      * @param attacker_tactic_config The config to fetch parameters from
      */
-    explicit ReceiverFSM(std::shared_ptr<Strategy> strategy) : strategy_(strategy)
-    {
-    }
+    explicit ReceiverFSM(std::shared_ptr<Strategy> strategy) : strategy_(strategy) {}
 
     class OneTouchShotState;
     class ReceiveAndDribbleState;

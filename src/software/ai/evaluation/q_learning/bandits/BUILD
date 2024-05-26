@@ -5,15 +5,15 @@ cc_library(
     hdrs = ["action_selection_strategy.hpp"],
     deps = [
         "//software/ai/evaluation/q_learning:q_function",
-    ]
+    ],
 )
 
 cc_library(
     name = "epsilon_greedy_strategy",
     hdrs = ["epsilon_greedy_strategy.hpp"],
     deps = [
-        ":action_selection_strategy"
-    ]
+        ":action_selection_strategy",
+    ],
 )
 
 cc_library(
@@ -21,6 +21,6 @@ cc_library(
     hdrs = ["softmax_strategy.hpp"],
     deps = [
         ":action_selection_strategy",
-        "@eigen"
-    ]
+        "@eigen",
+    ],
 )

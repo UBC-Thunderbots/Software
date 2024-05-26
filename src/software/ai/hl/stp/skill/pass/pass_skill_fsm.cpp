@@ -37,7 +37,7 @@ bool PassSkillFSM::passReceived(const Update& event)
 bool PassSkillFSM::shouldAbortPass(const Update& event)
 {
     const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
-    const Ball& ball = event.common.world_ptr->ball();
+    const Ball& ball                      = event.common.world_ptr->ball();
 
     const auto pass_lane =
         Polygon::fromSegment(Segment(best_pass_so_far_->pass.passerPoint(),
@@ -78,7 +78,7 @@ void PassSkillFSM::findPass(
                                                    pass_score_ramp_down_duration,
                                                1.0 - abs_min_pass_score);
 
-    Point receiver_point = best_pass_so_far_->pass.receiverPoint();
+    Point receiver_point      = best_pass_so_far_->pass.receiverPoint();
     Point dribble_destination = event.common.world_ptr->ball().position();
     Angle dribble_orientation = (receiver_point - dribble_destination).orientation();
 

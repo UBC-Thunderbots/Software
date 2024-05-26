@@ -2,8 +2,8 @@
 
 #include <optional>
 
-#include "software/ai/evaluation/q_learning/q_function.hpp"
 #include "software/ai/evaluation/q_learning/bandits/action_selection_strategy.hpp"
+#include "software/ai/evaluation/q_learning/q_function.hpp"
 
 /**
  * Policy for a Markov decision process (MDP) that tells the agent the action

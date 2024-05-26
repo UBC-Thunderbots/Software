@@ -75,7 +75,7 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
     // The percentage of open net the robot would shoot on
     if (best_shot_opt)
     {
-        TbotsProto::ReceiverTacticConfig receiver_tactic_config = 
+        TbotsProto::ReceiverTacticConfig receiver_tactic_config =
             strategy_->getAiConfig().receiver_tactic_config();
 
         Vector robot_to_ball = world.ball().position() - assigned_robot.position();
@@ -141,9 +141,10 @@ void ReceiverFSM::updateReceive(const Update& event)
 {
     if (event.control_params.receiver_point)
     {
-        const Ball& ball = event.common.world_ptr->ball();
+        const Ball& ball           = event.common.world_ptr->ball();
         const Point receiver_point = event.control_params.receiver_point.value();
-        const Angle receiver_orientation = (ball.position() - receiver_point).orientation();
+        const Angle receiver_orientation =
+            (ball.position() - receiver_point).orientation();
 
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, receiver_point, receiver_orientation,
@@ -183,9 +184,9 @@ void ReceiverFSM::adjustReceive(const Update& event)
 
 bool ReceiverFSM::passStarted(const Update& event)
 {
-    const Ball& ball = event.common.world_ptr->ball();
+    const Ball& ball           = event.common.world_ptr->ball();
     const Point receiver_point = event.control_params.receiver_point.value();
-    
+
     return ball.hasBallBeenKicked((receiver_point - ball.position()).orientation());
 }
 

@@ -1,7 +1,7 @@
 #include "software/ai/evaluation/q_learning/gameplay_monitor.h"
 
-#include "software/logger/logger.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/logger/logger.h"
 
 void GameplayMonitor::startStepObservation(WorldPtr world_ptr)
 {
@@ -10,7 +10,7 @@ void GameplayMonitor::startStepObservation(WorldPtr world_ptr)
 
 double GameplayMonitor::endStepObservation(WorldPtr world_ptr)
 {
-    CHECK(step_start_world_ptr_ != nullptr) 
+    CHECK(step_start_world_ptr_ != nullptr)
         << "Tried to end step observation for GameplayMonitor, "
         << "but no step observation was started";
 

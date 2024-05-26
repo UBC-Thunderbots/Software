@@ -28,7 +28,7 @@ class Strategy
 
     /**
      * Gets the best pass on the field.
-     * 
+     *
      * @return the best pass
      */
     PassWithRating getBestPass();
@@ -36,23 +36,23 @@ class Strategy
     /**
      * Gets the next committed pass that has not yet been returned by this method
      * since the last World update.
-     * 
-     * @return the next committed pass, or std::nullopt if there are no more 
+     *
+     * @return the next committed pass, or std::nullopt if there are no more
      * committed passes to return
      */
     std::optional<Pass> getNextCommittedPass();
 
     /**
      * Commits a pass.
-     * 
+     *
      * @param pass the pass to commit
      */
     void commitPass(Pass pass);
-    
+
     /**
-     * Gets the next best receiving position on the field that has not yet been 
+     * Gets the next best receiving position on the field that has not yet been
      * returned by this method since the last World update.
-     * 
+     *
      * @return the next best receiving position
      */
     Point getNextBestReceivingPosition();

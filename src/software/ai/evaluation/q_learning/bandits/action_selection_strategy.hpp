@@ -26,6 +26,6 @@ class ActionSelectionStrategy
      *
      * @return the action to take
      */
-    virtual TAction::Enum selectAction(
-        const TState& state, const QFunction<TState, TAction>& q_function) = 0;
+    virtual TAction::Enum selectAction(const TState& state,
+                                       const QFunction<TState, TAction>& q_function) = 0;
 };

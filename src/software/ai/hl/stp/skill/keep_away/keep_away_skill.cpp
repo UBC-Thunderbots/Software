@@ -6,4 +6,5 @@
 KeepAwaySkill::KeepAwaySkill(std::shared_ptr<Strategy> strategy) : BaseSkill(strategy) {}
 
 // Register this Skill in the GenericFactory
-static TGenericFactory<std::string, Skill, KeepAwaySkill, std::shared_ptr<Strategy>> factory;
+static TGenericFactory<std::string, Skill, KeepAwaySkill, std::shared_ptr<Strategy>>
+    factory;

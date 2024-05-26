@@ -15,7 +15,9 @@ AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
               strategy->getAiConfig().attacker_tactic_config().learning_rate(),
               strategy->getAiConfig().attacker_tactic_config().discount_factor()),
           std::make_unique<EpsilonGreedyStrategy<AttackerMdpState, AttackerMdpAction>>(
-              strategy->getAiConfig().attacker_tactic_config().action_selection_epsilon())),
+              strategy->getAiConfig()
+                  .attacker_tactic_config()
+                  .action_selection_epsilon())),
       gameplay_monitor_(),
       current_skill_(nullptr)
 {

@@ -41,7 +41,8 @@ struct GoalieFSM
                        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
         : strategy(strategy),
           goalie_tactic_config(strategy->getAiConfig().goalie_tactic_config()),
-          robot_navigation_obstacle_config(strategy->getAiConfig().robot_navigation_obstacle_config()),
+          robot_navigation_obstacle_config(
+              strategy->getAiConfig().robot_navigation_obstacle_config()),
           max_allowed_speed_mode(max_allowed_speed_mode),
           robot_radius_expansion_amount(
               ROBOT_MAX_RADIUS_METERS *
@@ -156,8 +157,9 @@ struct GoalieFSM
      *
      * @param event
      */
-    void retrieveFromDeadZone(const Update &event,
-                              boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
+    void retrieveFromDeadZone(
+        const Update &event,
+        boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
     /**
      * Move the robot to the goal line
@@ -221,18 +223,20 @@ struct GoalieFSM
             // src_state + event [guard] / action = dest_state
             *PositionToBlock_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            PositionToBlock_S +
-                Update_E[shouldEvacuateCrease_G] / retrieveFromDeadZone_A = DribbleSkillFSM_S,
-            PositionToBlock_S + Update_E[shouldPanic_G] / panic_A         = Panic_S,
+            PositionToBlock_S + Update_E[shouldEvacuateCrease_G] /
+                                    retrieveFromDeadZone_A        = DribbleSkillFSM_S,
+            PositionToBlock_S + Update_E[shouldPanic_G] / panic_A = Panic_S,
             PositionToBlock_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
                 PivotKickSkillFSM_S,
             PositionToBlock_S + Update_E / positionToBlock_A,
-            DribbleSkillFSM_S + Update_E[retrieveDone_G] / updatePivotKick_A = PivotKickSkillFSM_S,
+            DribbleSkillFSM_S + Update_E[retrieveDone_G] / updatePivotKick_A =
+                PivotKickSkillFSM_S,
             DribbleSkillFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            DribbleSkillFSM_S + Update_E[ballInInflatedDefenseArea_G] / retrieveFromDeadZone_A,
-            DribbleSkillFSM_S + Update_E[!ballInInflatedDefenseArea_G] / positionToBlock_A =
-                PositionToBlock_S,
+            DribbleSkillFSM_S +
+                Update_E[ballInInflatedDefenseArea_G] / retrieveFromDeadZone_A,
+            DribbleSkillFSM_S + Update_E[!ballInInflatedDefenseArea_G] /
+                                    positionToBlock_A = PositionToBlock_S,
             Panic_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
             Panic_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
@@ -241,9 +245,10 @@ struct GoalieFSM
             Panic_S + Update_E / panic_A,
             PivotKickSkillFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
-            PivotKickSkillFSM_S + Update_E[ballInInflatedDefenseArea_G] / updatePivotKick_A,
-            PivotKickSkillFSM_S + Update_E[!ballInInflatedDefenseArea_G] / positionToBlock_A =
-                PositionToBlock_S,
+            PivotKickSkillFSM_S +
+                Update_E[ballInInflatedDefenseArea_G] / updatePivotKick_A,
+            PivotKickSkillFSM_S + Update_E[!ballInInflatedDefenseArea_G] /
+                                      positionToBlock_A = PositionToBlock_S,
             MoveToGoalLine_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
             MoveToGoalLine_S + Update_E[!shouldMoveToGoalLine_G] / positionToBlock_A =
@@ -255,7 +260,7 @@ struct GoalieFSM
     static constexpr double BALL_RETRIEVED_THRESHOLD = 0.2;
 
     std::shared_ptr<Strategy> strategy;
-    
+
     // The goalie tactic config
     TbotsProto::GoalieTacticConfig goalie_tactic_config;
     // Configuration values for inflated obstacles

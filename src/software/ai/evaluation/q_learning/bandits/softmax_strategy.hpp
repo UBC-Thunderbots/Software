@@ -9,14 +9,14 @@
 #include "software/ai/evaluation/q_learning/bandits/action_selection_strategy.hpp"
 
 /**
- * The softmax selection strategy selects actions based on their Q-values, which are converted 
- * into probabilities using the softmax (Boltzmann) distribution. This technique allows for 
- * a balance between exploration and exploitation, where actions with higher Q-values are 
- * more likely to be selected, but there is still a non-zero probability of selecting 
- * actions with lower Q-values.
- * 
+ * The softmax selection strategy selects actions based on their Q-values, which are
+ * converted into probabilities using the softmax (Boltzmann) distribution. This technique
+ * allows for a balance between exploration and exploitation, where actions with higher
+ * Q-values are more likely to be selected, but there is still a non-zero probability of
+ * selecting actions with lower Q-values.
+ *
  * https://gibberblot.github.io/rl-notes/single-agent/multi-armed-bandits.html#softmax-strategy
- * 
+ *
  * @tparam TState the type representing the state of the MDP
  * @tparam TAction the type representing the set of actions the agent can execute
  */
@@ -26,9 +26,9 @@ class SoftmaxStrategy : public ActionSelectionStrategy<TState, TAction>
    public:
     /**
      * Creates a SoftmaxStrategy.
-     * 
-     * @param temperature parameter > 0 controlling the exploration-exploitation 
-     *        trade-off; higher temperatures lead to more exploration, while lower 
+     *
+     * @param temperature parameter > 0 controlling the exploration-exploitation
+     *        trade-off; higher temperatures lead to more exploration, while lower
      *        temperatures favor exploitation of the best-known actions
      */
     explicit SoftmaxStrategy(double temperature);

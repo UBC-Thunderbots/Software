@@ -12,9 +12,9 @@ OffensivePlay::OffensivePlay(std::shared_ptr<Strategy> strategy,
 
 void OffensivePlay::updateTactics(const PlayUpdate& play_update)
 {
-    int num_defenders = std::min(play_update.num_tactics - 1, 2u);
+    int num_defenders  = std::min(play_update.num_tactics - 1, 2u);
     int num_supporters = play_update.num_tactics - num_defenders - 1;
-    
+
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
     defense_play_->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     defense_play_->updateTactics(PlayUpdate(
@@ -28,7 +28,7 @@ void OffensivePlay::updateTactics(const PlayUpdate& play_update)
         },
         play_update.inter_play_communication,
         play_update.set_inter_play_communication_fun));
-    
+
     updateSupportTactics(num_supporters);
 
     play_update.set_tactics({{attacker_tactic_}, defense_tactics, support_tactics_});

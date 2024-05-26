@@ -102,11 +102,11 @@ cc_library(
     deps = [
         ":field_pitch_division",
         ":pass",
-        ":pass_with_rating",
         ":pass_evaluation",
-        "//software/optimization:gradient_descent",
+        ":pass_with_rating",
         "//software/geom:point",
         "//software/geom:rectangle",
+        "//software/optimization:gradient_descent",
         "//software/util/make_enum",
         "//software/world",
     ],

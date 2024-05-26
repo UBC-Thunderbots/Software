@@ -18,30 +18,30 @@ struct PassSkillFSM
 
     /**
      * Guard that checks if the best pass so far is viable
-     * 
+     *
      * @param event the Update event
-     * 
+     *
      * @return true if the best pass so far is viable, false otherwise
      */
     bool passFound(const Update& event);
 
     /**
-     * Guard that checks if the ball has been received by another friendly 
+     * Guard that checks if the ball has been received by another friendly
      * robot, completing the pass
-     * 
+     *
      * @param event the Update event
-     * 
+     *
      * @return true if the pass was received, false otherwise
      */
     bool passReceived(const Update& event);
 
     /**
      * Guard that checks if the current pass should be aborted
-     * (because the ball went astray from the target receiver point, 
+     * (because the ball went astray from the target receiver point,
      * stopped moving, got intercepted, etc.)
-     * 
+     *
      * @param event the Update event
-     * 
+     *
      * @return true if the pass should be aborted, false otherwise
      */
     bool shouldAbortPass(const Update& event);
@@ -49,7 +49,7 @@ struct PassSkillFSM
     /**
      * Action that updates the DribbleSkillFSM to get control of the ball,
      * while simultaneously updating the best pass so far
-     * 
+     *
      * @param event the Update event
      * @param processEvent processes the DribbleSkillFSM::Update event
      */
@@ -57,8 +57,8 @@ struct PassSkillFSM
                   boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
     /**
-     * Action that updates the PivotKickSkillFSM to take the committed pass 
-     * 
+     * Action that updates the PivotKickSkillFSM to take the committed pass
+     *
      * @param event the Update event
      * @param processEvent processes the PivotKickSkillFSM::Update event
      */
@@ -67,7 +67,7 @@ struct PassSkillFSM
 
     /**
      * Action to move to open areas on the field
-     * 
+     *
      * @param event the Update event
      */
     void moveToOpenAreas(const Update& event);

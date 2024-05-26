@@ -9,7 +9,7 @@ cc_library(
 cc_library(
     name = "reflective_enum",
     hdrs = ["reflective_enum.h"],
-    deps = [":make_enum"]
+    deps = [":make_enum"],
 )
 
 cc_test(
