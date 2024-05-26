@@ -12,6 +12,8 @@ cc_library(
         "//software/ai/evaluation/q_learning:gameplay_monitor",
         "//software/ai/evaluation/q_learning:linear_q_function",
         "//software/ai/evaluation/q_learning:q_policy",
+        "//software/ai/evaluation/q_learning/bandits:epsilon_greedy_strategy",
+        "//software/ai/evaluation/q_learning/bandits:softmax_strategy",
         "//software/ai/hl/stp/skill",
         "//software/ai/hl/stp/tactic",
         "//software/logger",

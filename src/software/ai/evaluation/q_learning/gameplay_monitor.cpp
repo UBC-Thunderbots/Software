@@ -1,6 +1,7 @@
 #include "software/ai/evaluation/q_learning/gameplay_monitor.h"
 
 #include "software/logger/logger.h"
+#include "software/geom/algorithms/contains.h"
 
 void GameplayMonitor::startStepObservation(WorldPtr world_ptr)
 {
@@ -13,11 +14,23 @@ double GameplayMonitor::endStepObservation(WorldPtr world_ptr)
         << "Tried to end step observation for GameplayMonitor, "
         << "but no step observation was started";
 
-    // TODO: tune and improve reward function
+    double reward = 0;
 
-    const double start_ball_pos = step_start_world_ptr_->ball().position().x();
-    const double final_ball_pos = world_ptr->ball().position().x();
-    const double ball_distance_travelled = final_ball_pos - start_ball_pos;
+    // Reward friendly team scoring
+    if (contains(world_ptr->field().enemyGoal(), world_ptr->ball().position()))
+    {
+        reward += 1.0;
+    }
 
-    return ball_distance_travelled / world_ptr->field().xLength();
+    // Penalize enemy team scoring
+    if (contains(world_ptr->field().friendlyGoal(), world_ptr->ball().position()))
+    {
+        reward -= 1.0;
+    }
+
+    // TODO: Reward keeping possession
+
+    // TODO: Reward enemy team fouls, penalize friendly team fouls
+
+    return reward;
 }

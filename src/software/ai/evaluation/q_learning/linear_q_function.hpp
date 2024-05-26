@@ -16,7 +16,7 @@
  * for more details.
  * 
  * @tparam TState the type representing the state of the MDP
- * @tparam TAction the type representing the set of actions the agent can execute in the MDP 
+ * @tparam TAction the type representing the set of actions the agent can execute
  */
 template <typename TState, typename TAction>
 class LinearQFunction : public QFunction<TState, TAction>

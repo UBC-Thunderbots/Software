@@ -1,6 +1,8 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/q_learning/bandits/epsilon_greedy_strategy.hpp"
+#include "software/ai/evaluation/q_learning/bandits/softmax_strategy.hpp"
 #include "software/ai/evaluation/q_learning/linear_q_function.hpp"
 #include "software/logger/logger.h"
 
@@ -9,7 +11,14 @@ AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
       strategy(strategy),
       attacker_mdp_policy_(
           std::make_unique<LinearQFunction<AttackerMdpState, AttackerMdpAction>>(
-              AttackerMdpFeatureExtractor(), 0.2, 0.8)),
+              AttackerMdpFeatureExtractor(),
+              strategy->getAiConfig().attacker_mdp_config().learning_rate(),
+              strategy->getAiConfig().attacker_mdp_config().discount_factor()),
+          std::make_unique<SoftmaxStrategy<AttackerMdpState, AttackerMdpAction>>(
+              strategy->getAiConfig()
+                  .attacker_mdp_config()
+                  .action_selection_temperature())),
+      gameplay_monitor_(),
       current_skill_(nullptr)
 {
 }

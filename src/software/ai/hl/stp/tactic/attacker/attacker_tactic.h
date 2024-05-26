@@ -23,6 +23,7 @@ class AttackerTactic : public Tactic
     std::shared_ptr<Strategy> strategy;
 
     QPolicy<AttackerMdpState, AttackerMdpAction> attacker_mdp_policy_;
+    
     GameplayMonitor gameplay_monitor_;
 
     std::unique_ptr<Skill> current_skill_;
