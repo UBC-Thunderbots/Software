@@ -12,12 +12,10 @@ AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
       attacker_mdp_policy_(
           std::make_unique<LinearQFunction<AttackerMdpState, AttackerMdpAction>>(
               AttackerMdpFeatureExtractor(),
-              strategy->getAiConfig().attacker_mdp_config().learning_rate(),
-              strategy->getAiConfig().attacker_mdp_config().discount_factor()),
-          std::make_unique<SoftmaxStrategy<AttackerMdpState, AttackerMdpAction>>(
-              strategy->getAiConfig()
-                  .attacker_mdp_config()
-                  .action_selection_temperature())),
+              strategy->getAiConfig().attacker_tactic_config().learning_rate(),
+              strategy->getAiConfig().attacker_tactic_config().discount_factor()),
+          std::make_unique<EpsilonGreedyStrategy<AttackerMdpState, AttackerMdpAction>>(
+              strategy->getAiConfig().attacker_tactic_config().action_selection_epsilon())),
       gameplay_monitor_(),
       current_skill_(nullptr)
 {

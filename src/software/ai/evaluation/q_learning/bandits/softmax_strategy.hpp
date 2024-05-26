@@ -27,7 +27,7 @@ class SoftmaxStrategy : public ActionSelectionStrategy<TState, TAction>
     /**
      * Creates a SoftmaxStrategy.
      * 
-     * @param temperature the temperature parameter controlling the exploration-exploitation 
+     * @param temperature parameter > 0 controlling the exploration-exploitation 
      *        trade-off; higher temperatures lead to more exploration, while lower 
      *        temperatures favor exploitation of the best-known actions
      */
