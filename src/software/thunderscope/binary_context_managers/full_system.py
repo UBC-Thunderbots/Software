@@ -75,7 +75,7 @@ class FullSystem(object):
 Run Fullsystem under sudo ==============
 1. Build the full system:
 
-./tbots.py build unix_full_system -o
+./tbots.py build unix_full_system
 
 2. Run the following binaries from src to run under sudo:
 
