@@ -1,7 +1,6 @@
 #include "software/networking/udp/network_utils.h"
 
-#include <netinet/in.h>
-#include <string>
+#include <arpa/inet.h>
 
 bool getLocalIp(const std::string& interface, std::string& ip_address, bool ipv4)
 {

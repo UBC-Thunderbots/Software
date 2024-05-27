@@ -1,6 +1,9 @@
 #pragma once
 
-std::string getLocalIp(const std::string& interface, std::string& ip_address, bool ipv4=true);
+#include <ifaddrs.h>
+#include <string>
+
+bool getLocalIp(const std::string& interface, std::string& ip_address, bool ipv4=true);
 
 /**
  * @brief Check if the given string is a valid IPv6 address
