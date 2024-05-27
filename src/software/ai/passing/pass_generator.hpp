@@ -7,7 +7,6 @@
 #include <random>
 #include <thread>
 
-#include "base_pass_generator.h"
 #include "eighteen_zone_pitch_division.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
@@ -30,7 +29,7 @@ using ZonePassMap = std::unordered_map<ZoneEnum, PassWithRating>;
  * This class is responsible for generating passes for us to perform
  */
 template <class ZoneEnum>
-class PassGenerator : public BasePassGenerator
+class PassGenerator
 {
     static_assert(std::is_enum<ZoneEnum>::value,
                   "PassGenerator: ZoneEnum must be a zone id enum");
@@ -69,7 +68,7 @@ class PassGenerator : public BasePassGenerator
      */
     PassEvaluation<ZoneEnum> generatePassEvaluation(const World& world);
 
-    virtual PassWithRating getBestPass(const World& world) override;
+    PassWithRating getBestPass(const World& world);
 
    private:
     // Weights used to normalize the parameters that we pass to GradientDescent

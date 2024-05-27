@@ -203,8 +203,7 @@ message PassingConfig
     /*****  Visualization parameters *****/
     // Cost function visualization parameters
     required CostVisualizationConfig cost_vis_config =
-        10;  // TODO (NIMA): Have this at the bottom. Does order or numbering matter in
-             // rendered order?
+        10;
 }
 
 message GoalieTacticConfig

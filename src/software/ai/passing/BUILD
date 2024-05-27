@@ -139,23 +139,12 @@ cc_test(
 )
 
 cc_library(
-    name = "base_pass_generator",
-    hdrs = [
-        "base_pass_generator.h",
-    ],
-    deps = [
-        "//software/world",
-    ],
-)
-
-cc_library(
     name = "sampling_pass_generator",
     srcs = [
         "sampling_pass_generator.cpp",
     ],
     hdrs = ["sampling_pass_generator.h"],
     deps = [
-        ":base_pass_generator",
         ":cost_functions",
         ":pass_with_rating",
         "//software/world",
@@ -179,7 +168,6 @@ cc_library(
         "pass_generator.hpp",
     ],
     deps = [
-        ":base_pass_generator",
         ":cost_functions",
         ":eighteen_zone_pitch_division",
         ":pass",
