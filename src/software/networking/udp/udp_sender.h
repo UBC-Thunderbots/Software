@@ -23,9 +23,11 @@ class UdpSender
      * @param multicast If true, joins the multicast group of given ip_address
      */
     UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
-              unsigned short port, bool multicast);
+              unsigned short port, const std::string& interface, bool multicast);
 
     ~UdpSender();
+
+    void setupMulticast(const boost::asio::ip::address& ip_address, const std::string& interface);
 
     /**
      * Sends a string message to the initialized ip address and port

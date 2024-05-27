@@ -33,6 +33,7 @@ cc_library(
     ],
     visibility = ["//visibility:private"],
     deps = [
+        ":network_utils",
         "@boost//:asio",
     ],
 )

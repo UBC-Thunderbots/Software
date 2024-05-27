@@ -67,7 +67,8 @@ class ProtoUdpListener
     void handleDataReception(const boost::system::error_code& error,
                              size_t num_bytes_received);
 
-    void setupMulticast();
+    void setupMulticast(const boost::asio::ip::address& ip_address,
+                        const std::string& listen_interface);
 
     /**
      * Start listening for data
@@ -121,9 +122,6 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     if (multicast)
     {
         setupMulticast(boost_ip, listen_interface);
-        // Join the multicast group.
-        socket_.set_option(boost::asio::ip::multicast::join_group(
-            boost::asio::ip::address::from_string(ip_address)));
     }
 
     startListen();
@@ -208,12 +206,20 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
 }
 
 template <class ReceiveProtoT>
-ProtoUdpListener<ReceiveProtoT>::setupMulticast(boost::asio::ip::address ip_address,
+ProtoUdpListener<ReceiveProtoT>::setupMulticast(const boost::asio::ip::address& ip_address,
         const std::string& listen_interface)
 {
     if (ip_address.is_v4())
     {
-
+        std::string interface_ip; 
+        if (!getLocalIp(listen_interface, interface_ip))
+        {
+            LOG(FATAL) << "Could not find the local ip address for the given interface: "
+                       << listen_interface << std::endl;
+        }
+        socket_.set_option(boost::asio::ip::multicast::join_group(
+                    ip_address, boost::asio::ip::address::from_string(interface_ip)));
+        return;
     }
     socket_.set_option(boost::asio::ip::multicast::join_group(ip_address));
 }
