@@ -88,6 +88,7 @@ class ProtoPlayer:
         """
         Sorting the replay files 
 
+        :param log_folder_path: the path to the folder that we are going to be sorting!
         :return: the sorted replay files
         """
         # Load up all replay files in the log folder

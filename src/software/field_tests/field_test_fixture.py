@@ -101,8 +101,7 @@ class FieldTestRunner(TbotsTestRunner):
     def time_provider(self):
         """Provide the current time in seconds since the epoch"""
 
-        with self.timestamp_mutex:
-            return time.time()
+        return time.time()
 
     def run_test(
         self,
@@ -131,12 +130,6 @@ class FieldTestRunner(TbotsTestRunner):
             test_end_time = time.time() + test_timeout_s
 
             while time.time() < test_end_time:
-                # Update the timestamp logged by the ProtoLogger
-                with self.timestamp_mutex:
-
-                    ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                    self.timestamp = ssl_wrapper.detection.t_capture
-
                 while True:
                     try:
                         world = self.world_buffer.get(
