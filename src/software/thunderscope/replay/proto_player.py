@@ -138,13 +138,13 @@ class ProtoPlayer:
         Check to see if we have unpack the log entry
 
         :param log_entry: the log entry we are checking
-        :return: True if we could unpack the log entry, False otherwise
+        :return: False if we could unpack the log entry, True otherwise
         """
         try: 
             _ = ProtoPlayer.unpack_log_entry(log_entry)
-            return True
+            return False
         except Exception: 
-            return False 
+            return True 
 
     def convert_field_test_replayfiles(self):
         """
