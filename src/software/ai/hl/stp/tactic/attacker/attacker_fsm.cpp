@@ -70,7 +70,7 @@ void AttackerFSM::keepAway(const Update& event,
     }
 
     auto keepaway_dribble_dest =
-        findKeepAwayTargetPoint(*event.common.world_ptr, best_pass_so_far);
+        findKeepAwayTargetPoint(*event.common.world_ptr, best_pass_so_far, ai_config.passing_config());
 
     const auto& enemy_team = event.common.world_ptr->enemyTeam();
     const auto& ball       = event.common.world_ptr->ball();
@@ -81,7 +81,7 @@ void AttackerFSM::keepAway(const Update& event,
     auto nearest_enemy_robot = enemy_team.getNearestRobot(event.common.robot.position());
     if (nearest_enemy_robot.has_value() &&
         distance(ball.position(), nearest_enemy_robot->position()) <
-            attacker_tactic_config.enemy_about_to_steal_ball_radius())
+            ai_config.attacker_tactic_config().enemy_about_to_steal_ball_radius())
     {
         auto dribble_orientation_vec = ball.position() - nearest_enemy_robot->position();
         final_dribble_orientation    = dribble_orientation_vec.orientation();

@@ -17,7 +17,7 @@ AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     {
         fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
             DribbleFSM(ai_config.dribble_tactic_config()),
-            AttackerFSM(ai_config.attacker_tactic_config()));
+            AttackerFSM(ai_config));
     }
 }
 
@@ -45,7 +45,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<AttackerFSM>>(
             DribbleFSM(ai_config.dribble_tactic_config()),
-            AttackerFSM(ai_config.attacker_tactic_config()));
+            AttackerFSM(ai_config));
     }
 
     std::optional<Shot> shot = calcBestShotOnGoal(
