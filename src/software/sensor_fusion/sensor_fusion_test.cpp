@@ -921,7 +921,7 @@ TEST_F(SensorFusionTest, breakbeam_pass_update_test)
 
     // we have to call update sensor fusion two times because of updating ball position
     // comes before updating breakbeam tripped. Thus, we have to call this function two
-    // times before the ball position is upated
+    // times before the ball position is updated
     sensor_fusion.processSensorProto(sensor_msg);
     sensor_fusion.processSensorProto(sensor_msg);
 
