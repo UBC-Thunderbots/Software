@@ -132,6 +132,20 @@ class ProtoPlayer:
         except AttributeError:
             return False
 
+    @staticmethod
+    def is_log_entry_corrupt(log_entry) -> bool:
+        """
+        Check to see if we have unpack the log entry
+
+        :param log_entry: the log entry we are checking
+        :return: True if we could unpack the log entry, False otherwise
+        """
+        try: 
+            _ = ProtoPlayer.unpack_log_entry(log_entry)
+            return True
+        except Exception: 
+            return False 
+
     def convert_field_test_replayfiles(self):
         """
         This is a four step operation!
@@ -259,7 +273,9 @@ class ProtoPlayer:
                     line = log_file.readline()
                     if not line:
                         break
-                    cached_data.append(line)
+
+                    if not ProtoPlayer.is_log_entry_corrupt(line):
+                        cached_data.append(line)
                 except EOFError:
                     break
 
@@ -557,7 +573,7 @@ class ProtoPlayer:
                         ) = ProtoPlayer.unpack_log_entry(
                             self.current_chunk[self.current_entry_index]
                         )
-                    except ValueError:
+                    except Exception:
                         self.current_entry_index += 1
                         logging.error("[ProtoPlayer] Error parsing log entry")
                         continue
