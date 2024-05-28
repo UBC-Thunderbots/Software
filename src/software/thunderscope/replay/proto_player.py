@@ -72,10 +72,6 @@ class ProtoPlayer:
         self.current_entry_index = 0
 
         self.sorted_chunks = self.sort_and_get_replay_files(self.log_folder_path)
-        if self.is_from_field_test():
-            print("Processing replay files")
-            self.convert_field_test_replayfiles()
-
         # We can get the total runtime of the log from the last entry in the last chunk
         self.end_time = self.find_actual_endtime()
 
@@ -146,93 +142,6 @@ class ProtoPlayer:
         except Exception: 
             return True 
 
-    def convert_field_test_replayfiles(self):
-        """
-        This is a four step operation!
-
-        1. load all the replay files and their protobuf into memory while discarding protobufs.
-        that does not meet requirements given by the self.is_valid_protobuf function.
-        2. delete the protobufs that are in the self.log_folder.
-        3. reindex the timestamp so it starts from 0 and write the new replay file to self.log_folder.
-        4. resort all the chunks.
-        """
-        messages_that_has_timestamp = []
-
-        # load all the protobufs into memory
-        for file in os.listdir(self.log_folder_path):
-            path_to_file = os.path.join(self.log_folder_path, file)
-            entries = ProtoPlayer.load_replay_chunk(path_to_file)
-
-            for entry in entries:
-                _, _, message = ProtoPlayer.unpack_log_entry(entry)
-
-                if ProtoPlayer.is_valid_protobuf(message):
-                    messages_that_has_timestamp.append(message)
-
-        # deleting all the replay files since we are writing new replay files
-        for file in os.listdir(self.log_folder_path):
-            path_to_file = os.path.join(self.log_folder_path, file)
-            try:
-                os.remove(path_to_file)
-            except OSError:
-                print("cannot delete file: {}".format(file))
-                print("we may not be able to replay this file!")
-
-        # sort the message as the protobuf may not be in chronological order!
-        messages_that_has_timestamp = sorted(
-            messages_that_has_timestamp,
-            key=lambda x: x.time_sent.epoch_timestamp_seconds,
-        )
-
-        smallest_timestamp = messages_that_has_timestamp[
-            0
-        ].time_sent.epoch_timestamp_seconds
-        # creating a log file
-        with gzip.open(
-            os.path.join(self.log_folder_path, "0.replay"), "wb"
-        ) as log_file:
-            # creating a logfile
-            for message in messages_that_has_timestamp:
-                # reset timestamp to be relative to when the game is started
-                current_time = (
-                    message.time_sent.epoch_timestamp_seconds - smallest_timestamp
-                )
-
-                log_entry = ProtoLogger.create_log_entry(message, current_time)
-                data = bytes(log_entry, encoding="utf-8")
-
-                ProtoLogger.write_to_logfile(log_file, data)
-
-        self.sorted_chunks = self.sort_and_get_replay_files(self.log_folder_path)
-
-    def is_from_field_test(self):
-        """
-        Checking to see if they are 
-        This is done so by checking if the last 10 time stamp is greater than the unix timestamp for 2023.
-        We know that field testing replay files timestamp is the actual unix timestamp, not the timestamp relative 
-        to when the user opens Thunderscope
-
-        :return: True if the replay files came from field test, False if the replay files came 
-        from simulated test
-        """
-        unixtimestamp_2023 = datetime(year=2023, month=1, day=1).timestamp()
-
-        is_from_field_test = False
-        loaded_chunk = ProtoPlayer.load_replay_chunk(self.sorted_chunks[-1])
-
-        # iterating over the last 10 log entries that are valid
-        for log_entry in loaded_chunk[-10:]:
-            try:
-                timestamp, _, _ = ProtoPlayer.unpack_log_entry(log_entry)
-                if timestamp > unixtimestamp_2023:
-                    is_from_field_test = True
-
-            # we have an exception here because the log entries may not all be valid!
-            # there may have been a file corruption somewhere causing error!
-            except DecodeError:
-                pass
-
-        return is_from_field_test
 
     def find_actual_endtime(self)->float:
         """
