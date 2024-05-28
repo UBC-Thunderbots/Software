@@ -94,7 +94,7 @@ class GLCostVisLayer(GLLayer):
         )
         self.cached_world = World()
         self.cached_cost_vis = CostVisualization()
-        self.timeout = 0.0
+        self.timeout = time.time() + GLCostVisLayer.COST_VISUALIZATION_TIMEOUT_S
 
         self.color_map = pg.colormap.get("CET-L1")
         self.color_map_gradient = self.color_map.getGradient()
