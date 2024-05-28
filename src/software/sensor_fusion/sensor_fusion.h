@@ -48,19 +48,6 @@ class SensorFusion
      */
     std::optional<World> getWorld() const;
 
-    /**
-     * This function controls the behavior of how the ball is being updated. If this
-     * returns True, we use the position of the robot that triggers the breakbeam instead
-     * of the one given by the ssl vision system.
-     *
-     * @return True if we were to use the position of the robot instead of the ssl camera
-     * system. False otherwise
-     */
-    bool shouldUseRobotBallPositionInsteadOfVision(
-        const SSLProto::SSL_DetectionFrame &frame,
-        const std::vector<BallDetection> &ball_detection);
-
-
     // Number of vision packets to indicate that the vision client most likely reset,
     // determined experimentally with the simulator
     static constexpr unsigned int VISION_PACKET_RESET_COUNT_THRESHOLD = 5;
@@ -157,6 +144,16 @@ class SensorFusion
      */
     static bool teamHasBall(const Team &team, const Ball &ball);
 
+    /**
+     * This function controls the behavior of how the ball is being updated. If this
+     * returns True, we use the position of the robot that triggers the breakbeam instead
+     * of the one given by the ssl vision system.
+     *
+     * @return True if we were to use the position of the robot instead of the ssl camera
+     * system. False otherwise
+     */
+    bool shouldTrustRobotStatus(const SSLProto::SSL_DetectionFrame &frame,
+                                const std::vector<BallDetection> &ball_detection);
     TbotsProto::SensorFusionConfig sensor_fusion_config;
     std::optional<Field> field;
     std::optional<Ball> ball;

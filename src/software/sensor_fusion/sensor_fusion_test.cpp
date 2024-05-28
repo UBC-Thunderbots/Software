@@ -876,7 +876,7 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
     EXPECT_EQ(initWorld(), result);
 }
 
-TEST_F(SensorFusionTest, breakbeam_not_fail_update_test)
+TEST_F(SensorFusionTest, breakbeam_pass_update_test)
 {
     // The following code test this thing: if the breakbeam is triggered and the position
     // of the robot and the ball given by the ssl vision system is less than a certain
@@ -888,9 +888,9 @@ TEST_F(SensorFusionTest, breakbeam_not_fail_update_test)
     const uint32_t frame_number = 40391;
     Timestamp time              = Timestamp::fromSeconds(12.1);
 
-    Point position(0, 0);
+    Point ssl_position(0.05, 0.05);
     Vector velocity(0, 0);
-    ball_state = BallState{position, velocity};
+    ball_state = BallState{ssl_position, velocity};
 
     yellow_robot_states.clear();
     blue_robot_states.clear();
@@ -898,7 +898,6 @@ TEST_F(SensorFusionTest, breakbeam_not_fail_update_test)
     RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::fromRadians(2),
                            AngularVelocity::zero());
     RobotStateWithId robot_id = {2, robot_state};
-    // blue_robot_states.push_back(robot_id);
     yellow_robot_states.push_back(robot_id);
 
     std::unique_ptr<SSLProto::SSL_DetectionFrame> frame =
@@ -920,23 +919,25 @@ TEST_F(SensorFusionTest, breakbeam_not_fail_update_test)
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
 
+    // we have to call update sensor fusion two times because of updating ball position
+    // comes before updating breakbeam tripped. Thus, we have to call this function two
+    // times before the ball position is upated
+    sensor_fusion.processSensorProto(sensor_msg);
     sensor_fusion.processSensorProto(sensor_msg);
 
-    // actually tesing the ball detection
-    std::vector<BallDetection> ball_detection =
-        createBallDetections({*(ssl_wrapper_packet->mutable_detection())});
+    Point updated_ball_pos = sensor_fusion.getWorld().value().ball().position();
 
-    bool state = sensor_fusion.shouldUseRobotBallPositionInsteadOfVision(
-        *(ssl_wrapper_packet->mutable_detection()), ball_detection);
-
-    EXPECT_TRUE(state);
+    // is it using the robot state position
+    EXPECT_TRUE(updated_ball_pos != robot_state.position());
+    // is it not using the ssl vision?
+    EXPECT_TRUE(updated_ball_pos == ssl_position);
 }
 
 TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
 {
     // The following code test this thing: if the breakbeam is triggered and the position
     // of the robot and the ball given by the ssl vision system is too far away to make
-    // sense , we expect shouldUseRobotBallPositionInsteadOfSSL to return False
+    // sense , we expect the ball position to not be the position of the robot!
     SensorProto sensor_msg;
 
     // creating ssl vision
@@ -944,9 +945,9 @@ TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
     const uint32_t frame_number = 40391;
     Timestamp time              = Timestamp::fromSeconds(12.1);
 
-    Point position(1.0, 1.0);
+    Point ball_position_ssl(0.75, 0.75);
     Vector velocity(0, 0);
-    ball_state = BallState{position, velocity};
+    ball_state = BallState{ball_position_ssl, velocity};
 
     yellow_robot_states.clear();
     blue_robot_states.clear();
@@ -977,12 +978,12 @@ TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
 
     sensor_fusion.processSensorProto(sensor_msg);
 
-    // actually tesing the ball detection
-    std::vector<BallDetection> ball_detection =
-        createBallDetections({*(ssl_wrapper_packet->mutable_detection())});
+    std::optional<World> current_world = sensor_fusion.getWorld();
+    Point ball_position                = current_world.value().ball().position();
 
-    bool state = sensor_fusion.shouldUseRobotBallPositionInsteadOfVision(
-        *(ssl_wrapper_packet->mutable_detection()), ball_detection);
+    // did it use ssl ball position
+    EXPECT_TRUE(ball_position == ball_position_ssl);
 
-    EXPECT_FALSE(state);
+    // did it not use robot position
+    EXPECT_TRUE(ball_position != robot_state.position());
 }
