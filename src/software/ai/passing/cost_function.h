@@ -205,7 +205,7 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team);
  * @param max
  * @return
  */
-double scaleRating(double rating, double min, double max);
+double scaleNormalizedRating(double rating, double min, double max);
 
 /**
  * Sample passes at different points on the field and rate them, similar to ratePass, to

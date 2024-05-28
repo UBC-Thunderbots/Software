@@ -126,70 +126,29 @@ double rateReceivingPosition(const World& world, const Pass& pass,
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
                           TbotsProto::PassingConfig passing_config)
 {
-    // TODO (NIMA):
-    //  This function should also take give worst scores to really shart shooting angles.
-    //  It should also use open angle, rather than net open angle?!
-    //  Consider taking into account the deflection angle as well
-
-
-    //    double ideal_max_rotation_to_shoot_degrees =
-    //        passing_config.ideal_max_rotation_to_shoot_degrees();
-
-    // Figure out the range of angles for which we have an open shot to the goal after
-    // receiving the pass
     auto shot_opt = calcBestShotOnGoal(
         Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg()), pass.receiverPoint(),
         enemy_team.getAllRobots(), TeamType::ENEMY);
 
     Angle open_angle_to_goal = Angle::zero();
-    //    Point shot_target        = field.enemyGoalCenter();
     if (shot_opt && shot_opt.value().getOpenAngle().abs() > Angle::fromDegrees(0))
     {
         open_angle_to_goal = shot_opt.value().getOpenAngle();
-        //        shot_target = shot_opt.value().getPointToShootAt();
     }
 
-    // Figure out what the maximum open angle of the goal could be from the receiver pos.
-    Angle goal_angle        = convexAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
-                                   field.enemyGoalpostPos());
-    double net_percent_open = 0;
-    if (goal_angle > Angle::zero())
-    {
-        net_percent_open = open_angle_to_goal.toDegrees() / goal_angle.toDegrees();
-    }
-
+    const double min_ideal_angle = passing_config.min_ideal_pass_shoot_goal_open_angle_deg();
     double open_angle_to_goal_score = open_angle_to_goal.toDegrees();
-    // Clamp to [0, 10]
-    open_angle_to_goal_score = std::clamp(open_angle_to_goal_score, 0.0, 10.0); // TODO (NIMA): Make 30 a cosntants
-    // Linearly scale to [0.0, 1.0]
-    open_angle_to_goal_score = open_angle_to_goal_score / 10;
 
-    // Create the shoot score by creating a sigmoid that goes to a large value as
-    // the section of net we're shooting on approaches 100% (ie. completely open)
-    double shot_openness_score = sigmoid(net_percent_open, 0.45, 0.1);
+    // Clamp angle to [0, min_ideal_angle], where all angle >=min_ideal_angle are given
+    // a score of 1.0.
+    open_angle_to_goal_score = std::clamp(open_angle_to_goal_score, 0.0, min_ideal_angle);
 
-    // Prefer angles where the robot does not have to turn much after receiving the
-    // pass to take the shot (or equivalently the shot deflection angle)
-    //
-    // Receiver robots on the friendly side, almost always, need to rotate a full 180
-    // degrees to shoot on net. So we relax that requirement for both receiver and ball
-    // locations on the friendly side
-    //
-    // TODO (#1987) This creates a very steep slope, find a better way to do this
-    //    if (pass.receiverPoint().x() < 0 || pass.passerPoint().x() < 0)
-    //    {
-    //        ideal_max_rotation_to_shoot_degrees = 180;
-    //    }
-    //    Angle rotation_to_shot_target_after_pass = pass.receiverOrientation().minDiff(
-    //        (shot_target - pass.receiverPoint()).orientation());
-    double required_rotation_for_shot_score =
-        1.0;  // TODO (NIMA): I don't know if we should take into account the orientation
-              //        1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
-    //                    ideal_max_rotation_to_shoot_degrees, 4); // 150) * 0.8; // TODO
-    //                    (NIMA): Add to config: lowerst 0.8
+    // Linearly scale score to [0.0, 1.0]
+    open_angle_to_goal_score = open_angle_to_goal_score / min_ideal_angle;
 
-    double rating = shot_openness_score * required_rotation_for_shot_score * open_angle_to_goal_score;
-    return scaleRating(rating, passing_config.min_pass_shoot_score(), 1.0);
+    // Linearly scale score to [min_pass_shoot_score, 1.0] to stop this cost function
+    // from returning a very low score, causing the other cost functions to be ignored.
+    return scaleNormalizedRating(open_angle_to_goal_score, passing_config.min_pass_shoot_score(), 1.0);
 }
 
 double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
@@ -413,7 +372,7 @@ double ratePasserPosition(const World& world, const Pass& pass,
            rectangleSigmoid(dribbling_bounds, pass.passerPoint(), SIGMOID_WIDTH);
 }
 
-double scaleRating(double rating, double min, double max)
+double scaleNormalizedRating(double rating, double min, double max)
 {
     return rating * (max - min) + min;
 }

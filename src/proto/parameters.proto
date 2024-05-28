@@ -114,11 +114,11 @@ message PassingConfig
 
     /*****  Pass generation parameters *****/
     // The number of passes to sample per robot.
-    required uint32 pass_gen_num_samples_per_robot = 17
+    required uint32 pass_gen_num_samples_per_robot = 18
         [default = 5, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
     // The standard deviation (in meters) of the normal sampling distribution
     // used to generate passes around robots.
-    required double pass_gen_rand_sample_std_dev_meters = 18 [
+    required double pass_gen_rand_sample_std_dev_meters = 19 [
         default                   = 0.2,
         (bounds).min_double_value = 0.01,
         (bounds).max_double_value = 3.0
@@ -191,8 +191,15 @@ message PassingConfig
         (bounds).min_double_value = 0.1,
         (bounds).max_double_value = 20.0
     ];
-    // The min score that ratePassShootScore return.
-    required double min_pass_shoot_score = 16
+    // The minimum open angle (in degrees) for an ideal shot on enemy goal from the receiver's position.
+    // Any angle greater than this is also considered ideal, where as angles below this are considered
+    // less ideal and are given a lower score.
+    required double min_ideal_pass_shoot_goal_open_angle_deg = 16
+        [default = 10.0, (bounds).min_double_value = 1.0, (bounds).max_double_value = 45.0];
+    // The min score that ratePassShootScore return. Used to limit the cost function
+    // from returning a very low score, causing the rest of the cost functions to be
+    // ignored.
+    required double min_pass_shoot_score = 17
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     /*****  Visualization parameters *****/
