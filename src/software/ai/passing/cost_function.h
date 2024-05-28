@@ -86,14 +86,13 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
  *
  * @param enemy_team The team of enemy robots
  * @param pass The pass to rate
- * @param passing_config The passing config used for tuning
+ * @param enemy_proximity_importance A scaling factor for the result
  * @return A value in [0,1] indicating the quality of the pass based on the risk
  *         that an enemy interfere with it, with 1 indicating the pass is guaranteed
  *         to run without interference, and 0 indicating that the pass will certainly
  *         be interfered with (and so is very poor)
  */
 double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
-                         const Duration& enemy_reaction_time,
                          double enemy_proximity_importance);
 
 /**
@@ -114,28 +113,24 @@ double ratePassForwardQuality(const Pass& pass,
  *
  * @param enemy_team The team of robots that we're worried about intercepting our pass
  * @param pass The pass we want to get the intercept probability for
- * @param passing_config The passing config used for tuning
  * @return A value in [0,1] indicating the probability that the given pass will be
  *         intercepted by a robot on the given team, with 1 indicating the pass is
  *         guaranteed to be intercepted, and 0 indicating it's impossible for the
  *         pass to be intercepted
  */
-double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
-                              const Duration& enemy_reaction_time);
+double calculateInterceptRisk(const Team& enemy_team, const Pass& pass);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted by a given robot
  *
  * @param enemy_robot The robot that might intercept our pass
  * @param pass The pass we want to get the intercept probability for
- * @param passing_config The passing config used for tuning
  * @return A value in [0,1] indicating the probability that the given pass will be
  *         intercepted by the given robot, with 1 indicating the pass is guaranteed to
  *         be intercepted, and 0 indicating it's impossible for the pass to be
  *         intercepted
  */
-double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
-                              const Duration& enemy_reaction_time);
+double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass);
 
 
 /**

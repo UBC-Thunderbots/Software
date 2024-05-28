@@ -110,6 +110,8 @@ message PassingConfig
     // they are displayed in Thunderscope's Parameters widget, and the order
     // is independent of the field's numbering.
 
+    reserved 8;
+
     /*****  Pass generation parameters *****/
     // The number of passes to sample per robot.
     required uint32 pass_gen_num_samples_per_robot = 17
@@ -157,7 +159,7 @@ message PassingConfig
         default                   = 0.5,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
-    ];  // TODO (NIMA): ignored
+    ];
     // The maximum angle that we have to rotate after receiving a pass to
     // shoot that we think would likely result in a goal. Note that we may
     // try to take shots that require us to rotate more then this, it's more
@@ -166,13 +168,6 @@ message PassingConfig
         default                   = 60.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 180.0
-    ];  // TODO (NIMA): ignored
-    // How long we think the enemy will take to recognize we're passing and start
-    // moving to intercept
-    required double enemy_reaction_time = 8 [
-        default                   = 0.2,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 3.0
     ];  // TODO (NIMA): ignored
     // The distance in meters along the x-axis from the passer that we prefer the receiver
     // to be when receiving a pass. Note that this is a soft limit and the receiver may be
