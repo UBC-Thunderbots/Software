@@ -103,12 +103,6 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
 }
 
 
-/**
- * Declares a Python binding for a PassGenerator of type T
- *
- * @param m The module to define the sender/receiver in
- * @param The name to insert into the binded class name (ex. {name}PassGenerator)
- */
 template <typename T>
 void declarePassGenerator(py::module& m, std::string name)
 {
@@ -430,11 +424,11 @@ PYBIND11_MODULE(python_bindings, m)
         .def("speed", &Pass::speed)
         .def_static("fromDestReceiveSpeed",
                     py::overload_cast<const Point&, const Point&, double, double, double>(
-                        &Pass::fromDestReceiveSpeed))
+                            &Pass::fromDestReceiveSpeed))
         .def_static("fromDestReceiveSpeed",
                     py::overload_cast<const Point&, const Point&,
-                                      const TbotsProto::PassingConfig&>(
-                        &Pass::fromDestReceiveSpeed));
+                            const TbotsProto::PassingConfig&>(
+                            &Pass::fromDestReceiveSpeed));
 
     py::enum_<EighteenZoneId>(m, "EighteenZoneId")
         .value("ZONE_1", EighteenZoneId::ZONE_1)

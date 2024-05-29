@@ -68,7 +68,6 @@ class PassGenerator
      */
     PassEvaluation<ZoneEnum> generatePassEvaluation(const World& world);
 
-    PassWithRating getBestPass(const World& world);
 
    private:
     // Weights used to normalize the parameters that we pass to GradientDescent
@@ -164,14 +163,10 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
         passes.push_back(zone_and_pass.second);
     }
 
+    LOG(VISUALIZE) << *createPassVisualization(passes);
+
     return PassEvaluation<ZoneEnum>(pitch_division_, current_best_passes_,
                                     passing_config_, world.getMostRecentTimestamp());
-}
-
-template <class ZoneEnum>
-PassWithRating PassGenerator<ZoneEnum>::getBestPass(const World& world)
-{
-    return generatePassEvaluation(world).getBestPassOnField();
 }
 
 template <class ZoneEnum>
@@ -190,11 +185,10 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
         auto pass_destination =
             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_));
 
-        auto pass =
-            Pass::fromDestReceiveSpeed(world.ball().position(), pass_destination,
-                                       passing_config_.max_receive_speed_m_per_s(),
-                                       passing_config_.min_pass_speed_m_per_s(),
-                                       passing_config_.max_pass_speed_m_per_s());
+        auto pass = Pass::fromDestReceiveSpeed(world.ball().position(), pass_destination,
+                                               passing_config_.max_receive_speed(),
+                                               passing_config_.min_pass_speed_m_per_s(),
+                                               passing_config_.max_pass_speed_m_per_s());
 
         passes.emplace(
             zone_id,
@@ -223,11 +217,11 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
                 // get a pass with the new appropriate speed using the new destination
                 return ratePass(
                     world,
-                    Pass::fromDestReceiveSpeed(
-                        world.ball().position(), Point(pass_array[0], pass_array[1]),
-                        passing_config_.max_receive_speed_m_per_s(),
-                        passing_config_.min_pass_speed_m_per_s(),
-                        passing_config_.max_pass_speed_m_per_s()),
+                    Pass::fromDestReceiveSpeed(world.ball().position(),
+                                               Point(pass_array[0], pass_array[1]),
+                                               passing_config_.max_receive_speed(),
+                                               passing_config_.min_pass_speed_m_per_s(),
+                                               passing_config_.max_pass_speed_m_per_s()),
                     pitch_division_->getZone(zone_id), passing_config_);
             };
 
@@ -239,8 +233,7 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
         auto new_pass = Pass::fromDestReceiveSpeed(
             world.ball().position(),
             Point(optimized_pass_array[0], optimized_pass_array[1]),
-            passing_config_.max_receive_speed_m_per_s(),
-            passing_config_.min_pass_speed_m_per_s(),
+            passing_config_.max_receive_speed(), passing_config_.min_pass_speed_m_per_s(),
             passing_config_.max_pass_speed_m_per_s());
         auto score =
             ratePass(world, new_pass, pitch_division_->getZone(zone_id), passing_config_);
@@ -263,8 +256,7 @@ void PassGenerator<ZoneEnum>::updatePasses(const World& world,
         // update the passer point of the current best pass
         current_best_passes_.at(zone_id).pass = Pass::fromDestReceiveSpeed(
             world.ball().position(), Point(pass_array[0], pass_array[1]),
-            passing_config_.max_receive_speed_m_per_s(),
-            passing_config_.min_pass_speed_m_per_s(),
+            passing_config_.max_receive_speed(), passing_config_.min_pass_speed_m_per_s(),
             passing_config_.max_pass_speed_m_per_s());
 
         if (ratePass(world, current_best_passes_.at(zone_id).pass,

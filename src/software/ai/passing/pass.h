@@ -59,7 +59,6 @@ class Pass
                                      double dest_speed_m_per_s,
                                      double min_pass_speed_m_per_s,
                                      double max_pass_speed_m_per_s);
-
     /**
      * Creates a pass from the given destination point and receive speed
      *
