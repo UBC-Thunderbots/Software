@@ -222,10 +222,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
 
     // Whether or not the enemy will be able to intercept the pass can be determined
     // by whether or not they will be able to reach the pass receive position before
-    // the pass does. As such, we place the time difference between the robot and ball
-    // on a sigmoid that is centered at 0, and goes to 1 at positive values, 0 at
-    // negative values.
-    return std::clamp(interception_delta_time.toSeconds() * 4.0, 0.0, 1.0); // TODO (NIMA): Make 4.0 a constant
+    // the pass does.
+    return std::clamp(interception_delta_time.toSeconds() * passing_config.enemy_interception_risk_importance(), 0.0, 1.0);
 }
 
 double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
@@ -275,7 +273,7 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
         best_receiver.timestamp() + time_to_receive_angle;
 
     // Figure out if rotation or moving will take us longer
-    Timestamp latest_time_to_reciever_state =
+    Timestamp latest_time_to_receiver_state =
         std::max(earliest_time_to_receive_angle, earliest_time_to_receive_point);
 
     // Create a sigmoid that goes to 0 as the time required to get to the reception
@@ -285,7 +283,7 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
 
     return sigmoid(
         receive_time.toSeconds(),
-        latest_time_to_reciever_state.toSeconds() + time_to_receiver_state_slack_s,
+        latest_time_to_receiver_state.toSeconds() + time_to_receiver_state_slack_s,
         sigmoid_width);
 }
 

@@ -110,15 +110,15 @@ message PassingConfig
     // they are displayed in Thunderscope's Parameters widget, and the order
     // is independent of the field's numbering.
 
-    reserved 8;
+    reserved 8, 5;
 
     /*****  Pass generation parameters *****/
     // The number of passes to sample per robot.
-    required uint32 pass_gen_num_samples_per_robot = 18
+    required uint32 pass_gen_num_samples_per_robot = 19
         [default = 5, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
     // The standard deviation (in meters) of the normal sampling distribution
     // used to generate passes around robots.
-    required double pass_gen_rand_sample_std_dev_meters = 19 [
+    required double pass_gen_rand_sample_std_dev_meters = 20 [
         default                   = 0.2,
         (bounds).min_double_value = 0.01,
         (bounds).max_double_value = 3.0
@@ -160,33 +160,32 @@ message PassingConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
-    // The maximum angle that we have to rotate after receiving a pass to
-    // shoot that we think would likely result in a goal. Note that we may
-    // try to take shots that require us to rotate more then this, it's more
-    // of a soft limit.
-    required double ideal_max_rotation_to_shoot_degrees = 5 [
-        default                   = 60.0,
+    // This controls how heavily we weigh the time the enemy team has to intercept a pass.
+    // Increasing this value increases the risk (decreasing the score) associated with a pass
+    // that the enemy could intercept.
+    required double enemy_interception_risk_importance = 13 [
+        default                   = 4.0,
         (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 180.0
-    ];  // TODO (NIMA): ignored
+        (bounds).max_double_value = 20.0
+    ];
     // The distance in meters along the x-axis from the passer that we prefer the receiver
     // to be when receiving a pass. Note that this is a soft limit and the receiver may be
     // further back.
-    required double backwards_pass_distance_meters = 13 [
+    required double backwards_pass_distance_meters = 14 [
         default                   = -1.0,
         (bounds).min_double_value = -10.0,
         (bounds).max_double_value = 5.0
     ];
     // The max distance in meters that the receiver can be from the passer when receiving
     // a pass.
-    required double receiver_ideal_max_distance_meters = 14 [
+    required double receiver_ideal_max_distance_meters = 15 [
         default                   = 7.0,
         (bounds).min_double_value = 0.1,
         (bounds).max_double_value = 20.0
     ];
     // The min distance in meters that the receiver can be from the passer when receiving
     // a pass.
-    required double receiver_ideal_min_distance_meters = 15 [
+    required double receiver_ideal_min_distance_meters = 16 [
         default                   = 2.0,
         (bounds).min_double_value = 0.1,
         (bounds).max_double_value = 20.0
@@ -194,18 +193,38 @@ message PassingConfig
     // The minimum open angle (in degrees) for an ideal shot on enemy goal from the receiver's position.
     // Any angle greater than this is also considered ideal, where as angles below this are considered
     // less ideal and are given a lower score.
-    required double min_ideal_pass_shoot_goal_open_angle_deg = 16
+    required double min_ideal_pass_shoot_goal_open_angle_deg = 17
         [default = 10.0, (bounds).min_double_value = 1.0, (bounds).max_double_value = 45.0];
     // The min score that ratePassShootScore return. Used to limit the cost function
     // from returning a very low score, causing the rest of the cost functions to be
     // ignored.
-    required double min_pass_shoot_score = 17
+    required double min_pass_shoot_score = 18
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     /*****  Visualization parameters *****/
     // Cost function visualization parameters
-    required CostVisualizationConfig cost_vis_config =
-        10;
+    required CostVisualizationConfig cost_vis_config = 10;
+
+    /*****  Receiver position generation parameters *****/
+    required ReceiverPositionGeneratorConfig receiver_position_generator_config = 21;
+}
+
+message ReceiverPositionGeneratorConfig
+{
+    // A multiplier to incentivize using the same receiver position as the previous iteration
+    required double previous_best_receiver_position_score_multiplier = 1
+        [default = 1.5, (bounds).min_double_value = 1.0, (bounds).max_double_value = 3.0];
+    // The number of samples to generate initially for each zone to get a sense of the best zones.
+    required uint32 num_initial_samples_per_zone = 2
+        [default = 5, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
+    // The number of additional samples to generate for the top zones after the initial samples. Used to get a more accurate max score.
+    required uint32 num_additional_samples_per_top_zone = 3
+        [default = 20, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
+    // The minimum angle (in degrees) between a receiver, the ball, and a previously selected receiver.
+    required double min_angle_between_receivers_deg = 4
+        [default = 20.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 45.0];
+
+
 }
 
 message GoalieTacticConfig

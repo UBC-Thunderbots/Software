@@ -14,12 +14,10 @@
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
-
-// The random seed to initialize the random number generator
-static const int RECEIVER_POSITION_GENERATOR_SEED = 1010;
-
 /**
- * This class is responsible for generating passes for us to perform
+ * This class is responsible for generating the best positions for our pass
+ * receivers to go to
+ * TODO (NIMA): Test
  */
 template <class ZoneEnum>
 class ReceiverPositionGenerator
@@ -29,17 +27,23 @@ class ReceiverPositionGenerator
 
    public:
     /**
-     * TODO (NIMA)
-     * @param pitch_division The pitch division to use when looking for passes
+     * Creates a new ReceiverPositionGenerator
+     * @param pitch_division The pitch division to split the receivers into
+     * @param passing_config The passing configuration to use when looking for best receiving positions
      */
     explicit ReceiverPositionGenerator(
         std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
         TbotsProto::PassingConfig passing_config);
 
     /**
-     * @param world
-     *
-     * @return
+     * Generates the best receiving positions for the friendly robots to go to
+     * @param world The world to generate the best receiving positions based on
+     * @param num_positions The number of receiving positions to generate
+     * @param existing_receiver_positions A set of existing receiver positions that will
+     * be avoided, if possible, when generating the new receiver positions.
+     * @param pass_origin_override An optional override for the position where the pass
+     * will be made from. If not provided, the ball position will be used.
+     * @return A vector of up to num_positions positions that the receivers could use.
      */
     std::vector<Point> getBestReceivingPositions(
         const World &world, unsigned int num_positions,
@@ -49,13 +53,13 @@ class ReceiverPositionGenerator
 
    private:
     /**
-     * TODO (NIMA)
-     * @note Updates best_receiving_positions
+     * Sample more points and update the best_receiving_positions map if better
+     * receiving positions in each zone were found
      *
-     * @param world
-     * @param zones_to_sample
-     * @param pass_origin
-     * @param num_samples_per_zone
+     * @param world The world to sample receiving positions in
+     * @param zones_to_sample The subset of the zones to sample receiving positions in
+     * @param pass_origin The origin of the pass
+     * @param num_samples_per_zone The number of samples to take per zone
      */
     void updateBestReceiverPositions(const World &world, const Point &pass_origin,
                                      const std::vector<ZoneEnum> &zones_to_sample,
@@ -75,6 +79,9 @@ class ReceiverPositionGenerator
 
     // A random number generator for use across the class
     std::mt19937 random_num_gen_;
+
+    // The random seed to initialize the random number generator
+    static constexpr int RNG_SEED = 1010;
 };
 
 template <class ZoneEnum>
@@ -83,7 +90,7 @@ ReceiverPositionGenerator<ZoneEnum>::ReceiverPositionGenerator(
     TbotsProto::PassingConfig passing_config)
     : pitch_division_(pitch_division),
       passing_config_(passing_config),
-      random_num_gen_(RECEIVER_POSITION_GENERATOR_SEED)
+      random_num_gen_(RNG_SEED)
 {
 }
 
@@ -109,16 +116,19 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     debug_shapes.clear();
 
     Point pass_origin = pass_origin_override.value_or(world.ball().position());
+    const auto& receiver_config = passing_config_.receiver_position_generator_config();
 
+    // Add the previous best sampled receiving positions
     for (const auto &[zone, prev_best_receiving_position] : prev_best_receiving_positions)
     {
-        // TODO (NIMA): Pass speed should be dynamic!!
         Pass pass = Pass::fromDestReceiveSpeed(pass_origin, prev_best_receiving_position,
                                                passing_config_);
+        // Increase the rating of the previous best receiving positions to
+        // discourage changing the receiver positions too much.
+        double receiver_position_rating = rateReceivingPosition(world, pass, passing_config_) * receiver_config.previous_best_receiver_position_score_multiplier();
         best_receiving_positions.insert_or_assign(
             zone,
-            PassWithRating{pass, rateReceivingPosition(world, pass, passing_config_) *
-                                     1.5});  // TODO (NIMA): Make this a parameter
+            PassWithRating{pass, receiver_position_rating});
     }
 
     auto all_zones = pitch_division_->getAllZoneIds();
@@ -126,9 +136,9 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     // Begin by sampling a few passes per zone to get an initial estimate of the best
     // receiving zones
     updateBestReceiverPositions(world, pass_origin, all_zones,
-                                5);  // TODO (NIMA): Make this a parameter
+                                receiver_config.num_initial_samples_per_zone());
 
-    // TODO:
+    // TODO (NIMA):
     //  5. RatePassShootScore should have less effect on the score, specially compared to
     //  enemy interception
     //  6. RatePassShootScore sometimes blocks large circles of the field. Should probably
@@ -141,21 +151,21 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     };
     std::sort(all_zones.begin(), all_zones.end(), zone_comparator);
 
+    const Angle min_angle_diff_between_receivers =
+            Angle::fromDegrees(receiver_config.min_angle_between_receivers_deg());
     std::vector<ZoneEnum> top_zones;
     for (unsigned int i = 0; i < all_zones.size() && top_zones.size() < num_positions;
          i++)
     {
         // Only add zones that are not too close to the previous top receiver positions
         // to encourage spreading out the receivers
-        static constexpr Angle MIN_ANGLE_DIFF =
-            Angle::fromDegrees(20);  // TODO (NIMA): Make this a parameter
         Angle curr_pass_angle =
             best_receiving_positions.find(all_zones[i])->second.pass.passerOrientation();
         bool no_prev_receivers_close =
             std::none_of(top_zones.begin(), top_zones.end(), [&](const ZoneEnum &zone) {
                 return curr_pass_angle.minDiff(best_receiving_positions.find(zone)
                                                    ->second.pass.passerOrientation()) <
-                       MIN_ANGLE_DIFF;
+                        min_angle_diff_between_receivers;
             });
         no_prev_receivers_close =
             no_prev_receivers_close &&
@@ -164,7 +174,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
                 [&](const Point &existing_receiver_position) {
                     return curr_pass_angle.minDiff(
                                (pass_origin - existing_receiver_position).orientation()) <
-                           MIN_ANGLE_DIFF;
+                            min_angle_diff_between_receivers;
                 });
 
         if (no_prev_receivers_close)
@@ -173,14 +183,13 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
         }
     }
 
-    // If we did not find enough receiver positions, add the remaining zones
+    // If we did not find enough receiver positions, add the remaining top zones
     if (top_zones.size() < num_positions)
     {
         LOG(WARNING) << "Not enough receiver positions were found. Expected to find "
                      << num_positions << " receiver positions, but only found "
                      << top_zones.size()
-                     << ". Consider reducing pass";  // TODO (NIMA): Update to include the
-                                                     // 20deg parameter
+                     << ". Consider reducing 'min_angle_between_receivers_deg' in the dynamic parameters";
         for (unsigned int i = 0; i < all_zones.size() && top_zones.size() < num_positions;
              i++)
         {
@@ -194,14 +203,13 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
 
     // Sample more passes from the top zones and update ranking
     updateBestReceiverPositions(world, pass_origin, top_zones,
-                                20);  // TODO (NIMA): Make this a parameter
+                                receiver_config.num_additional_samples_per_top_zone());
     std::sort(top_zones.begin(), top_zones.end(), zone_comparator);
 
     // Get the top best receiving positions and update the previous best
     std::vector<Point> best_positions;
     prev_best_receiving_positions.clear();
-    for (const auto zone :
-         top_zones)  // TODO (NIMA): don't add more than num_positions!!!!!!!!!!
+    for (const auto zone : top_zones)
     {
         Point best_position =
             best_receiving_positions.find(zone)->second.pass.receiverPoint();
@@ -209,7 +217,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
         prev_best_receiving_positions.insert_or_assign(zone, best_position);
     }
 
-    // Visualize the best zones
+    // Visualize the best zones TODO(NIMA): Consider adding this to dynamic params
     for (unsigned int i = 0; i < top_zones.size(); i++)
     {
         debug_shapes.push_back(*createDebugShape(pitch_division_->getZone(top_zones[i]),
@@ -252,7 +260,7 @@ void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
             auto pass = Pass::fromDestReceiveSpeed(
                 pass_origin,
                 Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
-                passing_config_);  // TODO (NIMA): Pass speed should be dynamic!!
+                passing_config_);
             double rating = rateReceivingPosition(world, pass, passing_config_);
             if (rating > best_pass_for_receiving.rating)
             {
