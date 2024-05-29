@@ -27,13 +27,22 @@ TEST_F(KeepAwayTest, test_keep_away_cost_no_enemies)
 
 TEST_F(KeepAwayTest, test_keep_away_cost_interception)
 {
-    TestUtil::setEnemyRobotPositions(world, {Point(0, 0)}, Timestamp::fromSeconds(0));
+    Point ball_position(-1, 0);
+    Point enemy_robot_position(0, 0);
+    TestUtil::setEnemyRobotPositions(world, {enemy_robot_position},
+                                     Timestamp::fromSeconds(0));
+    TestUtil::setBallPosition(world, ball_position, Timestamp::fromSeconds(0));
 
-    Pass bad_pass(Point(1, 0), Point(-1, 0), 5);
-    auto lower_result = rateKeepAwayPosition(bad_pass.passerPoint(), *world, bad_pass, field_bounds, passing_config);
+    // Keep away points are rated based on points around the ball that increase the best pass rating
+    Pass best_pass(ball_position, Point(1, 0), 5);
 
-    Pass good_pass(Point(-1, 1), Point(-1, 0), 5);
-    auto higher_result = rateKeepAwayPosition(good_pass.passerPoint(), *world, good_pass, field_bounds, passing_config);
+    // Pass from new keep away point is still blocked by enemy
+    Point keep_away_point_bad(-0.5, 0);
+    auto lower_result = rateKeepAwayPosition(keep_away_point_bad, *world, best_pass, field_bounds, passing_config);
+
+    // Pass from new keep away point is NOT blocked by enemy
+    Point keep_away_point_good(-1, 0.5);
+    auto higher_result = rateKeepAwayPosition(keep_away_point_good, *world, best_pass, field_bounds, passing_config);
 
     EXPECT_GT(higher_result, lower_result);
 }
@@ -42,12 +51,14 @@ TEST_F(KeepAwayTest, test_keep_away_cost_proximity)
 {
     TestUtil::setEnemyRobotPositions(world, {Point(0, 0)},
                                                    Timestamp::fromSeconds(0));
+    TestUtil::setBallPosition(world, Point(1, 0), Timestamp::fromSeconds(0));
 
-    Pass bad_pass(Point(0.25, 0), Point(1, 0), 5);
-    auto lower_result = rateKeepAwayPosition(bad_pass.passerPoint(), *world, bad_pass, field_bounds, passing_config);
+    Pass pass(Point(1, 0), Point(3, 0), 5);
+    Point keep_away_point_closer_to_enemy(0.3, 0);
+    auto lower_result = rateKeepAwayPosition(keep_away_point_closer_to_enemy, *world, pass, field_bounds, passing_config);
 
-    Pass good_pass(Point(2, 0), Point(1, 0), 5);
-    auto higher_result = rateKeepAwayPosition(good_pass.passerPoint(), *world, good_pass, field_bounds, passing_config);
+    Point keep_away_point_farther_from_enemy(0.6, 0);
+    auto higher_result = rateKeepAwayPosition(keep_away_point_farther_from_enemy, *world, pass, field_bounds, passing_config);
 
     EXPECT_GT(higher_result, lower_result);
 }

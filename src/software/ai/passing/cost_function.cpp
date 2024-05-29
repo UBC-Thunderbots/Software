@@ -328,21 +328,21 @@ double getStaticPositionQuality(const Field& field, const Point& position,
 double calculateProximityRisk(const Point& point, const Team& enemy_team,
                               const TbotsProto::PassingConfig& passing_config)
 {
-    // Calculate a risk score based on the distance of the enemy robots from the receive
+    // Calculate a risk score based on the distance of the enemy robots from the given
     // point, based on an exponential function of the distance of each robot from the
     // receiver point
-    auto enemy_robots                 = enemy_team.getAllRobots();
-    double point_enemy_proximity_risk = 1;
+    if (enemy_team.getAllRobots().empty())
+    {
+        return 0;
+    }
+
+    double risk = 0;
     for (const Robot& enemy : enemy_team.getAllRobots())
     {
-        double dist = (point - enemy.position()).length();
-        point_enemy_proximity_risk *= passing_config.enemy_proximity_importance() * std::exp(-dist * dist);
+        double dist_to_enemy = std::max(0.0, distance(point, enemy.position()) - ROBOT_MAX_RADIUS_METERS);
+        risk += std::exp((-dist_to_enemy * dist_to_enemy) / passing_config.enemy_proximity_importance());
     }
-    if (enemy_robots.empty())
-    {
-        point_enemy_proximity_risk = 0;
-    }
-    return point_enemy_proximity_risk;
+    return sigmoid(risk, 1, 2);
 }
 
 double rateKeepAwayPosition(const Point& keep_away_position,
@@ -361,7 +361,13 @@ double rateKeepAwayPosition(const Point& keep_away_position,
     Pass updated_best_pass(keep_away_position, best_pass_so_far.receiverPoint(),
                            best_pass_so_far.speed());
 
-    return ratePassEnemyRisk(world.enemyTeam(), updated_best_pass, passing_config) * // TODO (NIMA): Consider using rateShot here with max of that and ratePassShootScore. Though that would be concave which we cant have right now.
+    double enemy_receiver_proximity_risk = calculateProximityRisk(
+            keep_away_position, world.enemyTeam(), passing_config);
+    double intercept_risk = calculateInterceptRisk(world.enemyTeam(), updated_best_pass, passing_config);
+    // We want to rate a keep away position more highly if it is lower risk, so subtract from 1
+    double combined_score = 1 - std::max(intercept_risk, enemy_receiver_proximity_risk);
+
+    return combined_score *
            // constrain the optimization to a circular area around the ball
            circleSigmoid(keepaway_search_region, keep_away_position, SIGMOID_WIDTH) *
            // don't try to dribble the ball off the field
@@ -389,6 +395,7 @@ void samplePassesForVisualization(const World& world,
     double static_pos_quality_costs;
     double pass_friendly_capability_costs;
     double pass_enemy_risk_costs;
+    double enemy_proximity_cost;
     double pass_shoot_score_costs;
     double receiver_position_costs;
 
@@ -409,6 +416,7 @@ void samplePassesForVisualization(const World& world,
             static_pos_quality_costs       = 1;
             pass_friendly_capability_costs = 1;
             pass_enemy_risk_costs          = 1;
+            enemy_proximity_cost           = 1;
             pass_shoot_score_costs         = 1;
             receiver_position_costs        = 1;
 
@@ -441,6 +449,14 @@ void samplePassesForVisualization(const World& world,
                     world.field(), world.enemyTeam(), pass, passing_config);
             }
 
+            // calculateProximityRisk
+            if (passing_config.cost_vis_config().enemy_proximity_risk())
+            {
+                enemy_proximity_cost = calculateProximityRisk(
+                        curr_point, world.enemyTeam(),
+                        passing_config);
+            }
+
             // rateReceivingPosition
             if (passing_config.cost_vis_config().receiver_position_score())
             {
@@ -458,7 +474,7 @@ void samplePassesForVisualization(const World& world,
             }
 
             costs.push_back(static_pos_quality_costs * pass_friendly_capability_costs *
-                            pass_enemy_risk_costs * pass_shoot_score_costs *
+                            pass_enemy_risk_costs * enemy_proximity_cost * pass_shoot_score_costs *
                             receiver_position_costs);
         }
     }
