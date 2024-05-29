@@ -502,3 +502,22 @@ cc_test(
         "//software/ai/hl/stp/play:play_factory",
     ],
 )
+
+py_test(
+    name = "passing_sim_test",
+    srcs = [
+        "passing_sim_test.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    tags = ["exclusive"],
+    deps = [
+        "//proto:import_all_protos",
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
