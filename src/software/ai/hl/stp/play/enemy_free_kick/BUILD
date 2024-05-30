@@ -29,6 +29,7 @@ cc_library(
         "//software/logger",
         "//software/util/generic_factory",
         "//software/world:game_state",
+        "//software/ai/hl/stp/play/defense:defense_play_base",
         "@sml",
     ],
     alwayslink = True,
