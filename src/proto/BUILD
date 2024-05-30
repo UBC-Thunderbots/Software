@@ -17,6 +17,7 @@ proto_library(
         "primitive.proto",
         "robot_crash_msg.proto",
         "robot_log_msg.proto",
+        "robot_statistic.proto",
         "robot_status_msg.proto",
         "tactic.proto",
         "tbots_software_msgs.proto",
@@ -24,7 +25,6 @@ proto_library(
         "team.proto",
         "vision.proto",
         "world.proto",
-        "robot_statistic.proto",
     ],
     deps = [
         "@com_google_protobuf//:descriptor_proto",
@@ -53,6 +53,7 @@ py_proto_library(
         "parameters.proto",
         "play.proto",
         "primitive.proto",
+        "robot_statistic.proto",
         "robot_status_msg.proto",
         "tactic.proto",
         "tbots_software_msgs.proto",
@@ -62,7 +63,6 @@ py_proto_library(
         "vision.proto",
         "visualization.proto",
         "world.proto",
-        "robot_statistic.proto",
     ],
     deps = [
         "@nanopb//:nanopb_options_py_proto",

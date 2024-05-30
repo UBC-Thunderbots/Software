@@ -17,5 +17,4 @@ message PrimitiveSet
     map<uint32, Primitive> robot_primitives = 3;
 
     uint64 sequence_number = 4;
-
 }

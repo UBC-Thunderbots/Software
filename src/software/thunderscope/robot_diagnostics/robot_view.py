@@ -1,5 +1,3 @@
-import time
-
 import pyqtgraph as pg
 from google.protobuf import text_format
 from typing import List
@@ -70,7 +68,9 @@ class RobotViewComponent(QWidget):
 
         self.robot_status.toggle_visibility()
 
-    def update(self, robot_status: RobotStatus, round_trip_time: RobotStatistic) -> None:
+    def update(
+        self, robot_status: RobotStatus, round_trip_time: RobotStatistic
+    ) -> None:
         """
         Updates the Robot View Components with the new robot status message
         Updates the robot info widget and, if initialized, the robot status widget as well
@@ -134,11 +134,17 @@ class RobotView(QScrollArea):
         Until the buffer is empty
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
-        round_trip_time = self.round_trip_time_buffer.get(block=False, return_cached=False)
+        round_trip_time = self.round_trip_time_buffer.get(
+            block=False, return_cached=False
+        )
 
         while robot_status is not None and round_trip_time is not None:
-            self.robot_view_widgets[robot_status.robot_id].update(robot_status, round_trip_time)
+            self.robot_view_widgets[robot_status.robot_id].update(
+                robot_status, round_trip_time
+            )
             robot_status = self.robot_status_buffer.get(
                 block=False, return_cached=False
             )
-            round_trip_time = self.round_trip_time_buffer.get(block=False, return_cached=False)
+            round_trip_time = self.round_trip_time_buffer.get(
+                block=False, return_cached=False
+            )

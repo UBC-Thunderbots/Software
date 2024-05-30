@@ -2,5 +2,5 @@ syntax = "proto3";
 
 message RobotStatistic
 {
-  double round_trip_time_seconds         = 1;
+    double round_trip_time_seconds = 1;
 }

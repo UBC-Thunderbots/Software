@@ -12,6 +12,7 @@ import time as time
 from typing import Type, List
 from collections import deque
 
+
 class BreakbeamLabel(QLabel):
     """
     Displays the current breakbeam status
@@ -121,16 +122,18 @@ class RobotInfo(QWidget):
         self.primitive_loss_rate_label = common_widgets.ColorQLabel(
             label_text="P%",
             initial_value="NA",
-            max_val=MAX_ACCEPTABLE_PACKET_LOSS_PERCENT
+            max_val=MAX_ACCEPTABLE_PACKET_LOSS_PERCENT,
         )
 
         # Primitive round-trip time label and queue
         self.primitive_rtt_label = common_widgets.ColorQLabel(
             label_text="RTT:",
             initial_value="NA",
-            max_val=MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME
+            max_val=MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
         )
-        self.previous_primitive_rtt_values = deque(maxlen=MAX_LENGTH_PRIMITIVE_SET_STORE)
+        self.previous_primitive_rtt_values = deque(
+            maxlen=MAX_LENGTH_PRIMITIVE_SET_STORE
+        )
 
         self.battery_layout.addWidget(self.primitive_loss_rate_label)
         self.battery_layout.addWidget(self.primitive_rtt_label)
@@ -332,7 +335,9 @@ class RobotInfo(QWidget):
             f"background-color: {'green' if is_running else 'red'}; border: 1px solid black;"
         )
 
-    def __update_ui(self, robot_status: RobotStatus, round_trip_time: RobotStatistic) -> None:
+    def __update_ui(
+        self, robot_status: RobotStatus, round_trip_time: RobotStatistic
+    ) -> None:
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
@@ -357,7 +362,9 @@ class RobotInfo(QWidget):
         )
 
         self.primitive_rtt_label.set_float_val(
-            self.__calculate_average_round_trip_time(rtt_time_seconds * MILLISECONDS_PER_SECOND)
+            self.__calculate_average_round_trip_time(
+                rtt_time_seconds * MILLISECONDS_PER_SECOND
+            )
         )
 
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)
@@ -379,4 +386,6 @@ class RobotInfo(QWidget):
         """
         self.previous_primitive_rtt_values.append(new_time)
         average_rtt_time_milliseconds = sum(self.previous_primitive_rtt_values)
-        return int(average_rtt_time_milliseconds / len(self.previous_primitive_rtt_values))
+        return int(
+            average_rtt_time_milliseconds / len(self.previous_primitive_rtt_values)
+        )

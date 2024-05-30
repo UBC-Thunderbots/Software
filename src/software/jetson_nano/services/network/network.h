@@ -80,7 +80,7 @@ class NetworkService
     static constexpr double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
         ROBOT_STATUS_BROADCAST_RATE_HZ / (THUNDERLOOP_HZ + 1.0);
     static constexpr unsigned int PRIMITIVE_DEQUE_MAX_SIZE =
-            static_cast<unsigned int>(1500 / ROBOT_STATUS_BROADCAST_RATE_HZ);
+        static_cast<unsigned int>(1500 / ROBOT_STATUS_BROADCAST_RATE_HZ);
 
     // Variables
     TbotsProto::PrimitiveSet primitive_set_msg;
@@ -105,7 +105,8 @@ class NetworkService
     // track last breakbeam state for sending RobotStatus outside of specified rate
     bool last_breakbeam_state_sent = false;
 
-    struct RoundTripTime {
+    struct RoundTripTime
+    {
         // Primitive Sequence Number
         uint64_t primitive_sequence_num = 0;
         // System time for when primitive set was received by Thunderloop in seconds

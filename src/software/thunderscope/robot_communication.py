@@ -341,7 +341,7 @@ class RobotCommunication(object):
         )
         self.__forward_to_proto_unix_io(
             RoundTripTime,
-            RoundTripTime(round_trip_time_seconds=round_trip_time_seconds)
+            RoundTripTime(round_trip_time_seconds=round_trip_time_seconds),
         )
         self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
