@@ -303,15 +303,17 @@ class RobotCommunication(object):
         )
 
         self.receive_robot_log = tbots_cpp.RobotLogProtoListener(
-            self.multicast_channel + "%" + self.interface,
+            self.multicast_channel,
             ROBOT_LOGS_PORT,
+            self.interface,
             lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
             True,
         )
 
         self.receive_robot_crash = tbots_cpp.RobotCrashProtoListener(
-            self.multicast_channel + "%" + self.interface,
+            self.multicast_channel,
             ROBOT_CRASH_PORT,
+            self.interface,
             lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),
             True,
         )
@@ -321,7 +323,7 @@ class RobotCommunication(object):
             self.send_primitive_set = tbots_cpp.PrimitiveSetProtoRadioSender()
         else:
             self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
-                self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
+                self.multicast_channel, PRIMITIVE_PORT, self.interface, True
             )
 
         self.running = True

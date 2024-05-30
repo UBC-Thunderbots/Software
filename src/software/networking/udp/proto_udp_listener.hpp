@@ -206,7 +206,7 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
 }
 
 template <class ReceiveProtoT>
-ProtoUdpListener<ReceiveProtoT>::setupMulticast(const boost::asio::ip::address& ip_address,
+void ProtoUdpListener<ReceiveProtoT>::setupMulticast(const boost::asio::ip::address& ip_address,
         const std::string& listen_interface)
 {
     if (ip_address.is_v4())
@@ -218,7 +218,7 @@ ProtoUdpListener<ReceiveProtoT>::setupMulticast(const boost::asio::ip::address& 
                        << listen_interface << std::endl;
         }
         socket_.set_option(boost::asio::ip::multicast::join_group(
-                    ip_address, boost::asio::ip::address::from_string(interface_ip)));
+                    ip_address.to_v4(), boost::asio::ip::address::from_string(interface_ip).to_v4()));
         return;
     }
     socket_.set_option(boost::asio::ip::multicast::join_group(ip_address));

@@ -94,8 +94,8 @@ int main(int argc, char **argv)
     };
 
     auto log_input = std::make_unique<ThreadedProtoUdpListener<TbotsProto::RobotLog>>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(args.channel)) + "%" + args.interface,
-        ROBOT_LOGS_PORT, robot_log_callback, true);
+        std::string(ROBOT_MULTICAST_CHANNELS.at(args.channel)),
+        ROBOT_LOGS_PORT, args.interface, robot_log_callback, true);
 
 
     LOG(INFO) << "Network logger listening on channel "

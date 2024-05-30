@@ -27,12 +27,13 @@ class Gamecontroller(object):
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, supress_logs: bool = False) -> None:
+    def __init__(self, supress_logs: bool = False, interface: str = "lo") -> None:
         """Run Gamecontroller
 
         :param supress_logs: Whether to suppress the logs
         """
         self.supress_logs = supress_logs
+        self.interface = interface
 
         # We need to find 2 free ports to use for the gamecontroller
         # so that we can run multiple gamecontroller instances in parallel
@@ -150,7 +151,7 @@ class Gamecontroller(object):
                 autoref_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
+            Gamecontroller.REFEREE_IP, self.referee_port, self.interface, __send_referee_command, True,
         )
 
         blue_full_system_proto_unix_io.register_observer(

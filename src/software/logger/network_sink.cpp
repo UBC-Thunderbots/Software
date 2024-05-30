@@ -12,8 +12,8 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
     : robot_id(robot_id), log_merger(LogMerger(enable_log_merging))
 {
     log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(channel)) + "%" + interface,
-        ROBOT_LOGS_PORT, true));
+        std::string(ROBOT_MULTICAST_CHANNELS.at(channel)),
+        ROBOT_LOGS_PORT, interface, true));
 }
 
 void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)

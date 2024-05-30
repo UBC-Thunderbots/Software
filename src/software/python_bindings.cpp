@@ -59,7 +59,7 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoUdpSender";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<std::string, int, bool>())
+        .def(py::init<std::string, int, std::string, bool>())
         .def("send_proto", &Class::sendProto);
 }
 
@@ -93,7 +93,7 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<std::string, unsigned short, const std::function<void(T)>&, bool>())
+        .def(py::init<std::string, unsigned short, std::string, const std::function<void(T)>&, bool>())
         .def("close", &Class::close);
 }
 

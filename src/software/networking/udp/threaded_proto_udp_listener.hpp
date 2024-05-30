@@ -23,7 +23,7 @@ class ThreadedProtoUdpListener
      * from the network
      * @param multicast If true, joins the multicast group of given ip_address
      */
-    ThreadedProtoUdpListener(const std::string& ip_address, unsigned short port,
+    ThreadedProtoUdpListener(const std::string& ip_address, unsigned short port, const std::string& interface,
                              std::function<void(ReceiveProtoT)> receive_callback,
                              bool multicast);
 
@@ -37,7 +37,7 @@ class ThreadedProtoUdpListener
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
      */
-    ThreadedProtoUdpListener(unsigned short port,
+    ThreadedProtoUdpListener(unsigned short port, const std::string& interface,
                              std::function<void(ReceiveProtoT)> receive_callback);
 
     /**
@@ -60,10 +60,10 @@ class ThreadedProtoUdpListener
 
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
-    const std::string& ip_address, const unsigned short port,
+    const std::string& ip_address, const unsigned short port, const std::string& interface,
     std::function<void(ReceiveProtoT)> receive_callback, bool multicast)
     : io_service(),
-      udp_listener(io_service, ip_address, port, receive_callback, multicast)
+      udp_listener(io_service, ip_address, port, interface, receive_callback, multicast)
 {
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });
@@ -71,8 +71,8 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
 
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
-    const unsigned short port, std::function<void(ReceiveProtoT)> receive_callback)
-    : io_service(), udp_listener(io_service, port, receive_callback)
+    const unsigned short port, const std::string& interface, std::function<void(ReceiveProtoT)> receive_callback)
+    : io_service(), udp_listener(io_service, port, interface, receive_callback)
 {
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });

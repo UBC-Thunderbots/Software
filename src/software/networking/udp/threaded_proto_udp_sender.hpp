@@ -23,7 +23,7 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
      */
     ThreadedProtoUdpSender(const std::string& ip_address, unsigned short port, const std::string& interface,
                            bool multicast)
-        : ThreadedUdpSender(ip_address, port, multicast)
+        : ThreadedUdpSender(ip_address, port, interface, multicast)
     {
     }
 

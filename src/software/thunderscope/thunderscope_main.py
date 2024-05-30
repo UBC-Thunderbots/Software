@@ -449,6 +449,7 @@ if __name__ == "__main__":
             log_path=args.yellow_full_system_runtime_dir,
             time_provider=autoref.time_provider if args.enable_autoref else None,
         ) as yellow_logger:
+            print("arun: initialized everything")
 
             tscope.register_refresh_function(gamecontroller.refresh)
 

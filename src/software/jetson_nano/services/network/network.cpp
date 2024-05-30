@@ -2,15 +2,15 @@
 
 NetworkService::NetworkService(const std::string& ip_address,
                                unsigned short primitive_listener_port,
-                               unsigned short robot_status_sender_port, bool multicast)
+                               unsigned short robot_status_sender_port, const std::string& interface, bool multicast)
     : primitive_tracker(ProtoTracker("primitive set"))
 {
     sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
-        ip_address, robot_status_sender_port, multicast);
+        ip_address, robot_status_sender_port, interface, multicast);
 
     udp_listener_primitive_set =
         std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(
-            ip_address, primitive_listener_port,
+            ip_address, primitive_listener_port, interface,
             boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast);
 
     radio_listener_primitive_set =

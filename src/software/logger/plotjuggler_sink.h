@@ -17,7 +17,7 @@ class PlotJugglerSink
     /**
      * Creates a PlotJugglerSink that sends udp packets to the PlotJuggler server
      */
-    PlotJugglerSink();
+    PlotJugglerSink(const std::string& interface="lo");
 
     ~PlotJugglerSink() = default;
 

@@ -26,7 +26,7 @@ class NetworkService
      * we should join the group
      */
     NetworkService(const std::string& ip_address, unsigned short primitive_listener_port,
-                   unsigned short robot_status_sender_port, bool multicast);
+                   unsigned short robot_status_sender_port, const std::string& interface, bool multicast);
 
     /**
      * When the network service is polled, it sends the robot_status and returns
