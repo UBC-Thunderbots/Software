@@ -47,10 +47,9 @@ double ratePassForwardQuality(const Pass& pass,
                               const TbotsProto::PassingConfig& passing_config)
 {
     // Rate receiving positions up the field higher and discourage passes back to
-    // friendly half if the passer is in the enemy half
+    // friendly half, if the passer is in the enemy half
     return sigmoid(pass.receiverPoint().x(),
-                   std::min(0.0, pass.passerPoint().x() +
-                                     passing_config.backwards_pass_distance_meters()),
+                   std::min(0.0, pass.passerPoint().x()) + passing_config.backwards_pass_distance_meters(),
                    4.0);
 }
 
@@ -279,7 +278,7 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
     double sigmoid_width                  = 0.4;
-    double time_to_receiver_state_slack_s = 0.25;
+    double time_to_receiver_state_slack_s = passing_config.friendly_time_to_receive_slack_sec();
 
     return sigmoid(
         receive_time.toSeconds(),
@@ -396,6 +395,8 @@ void samplePassesForVisualization(const World& world,
     double enemy_proximity_cost;
     double pass_shoot_score_costs;
     double receiver_position_costs;
+    double keep_away_position_costs;
+    double pass_forward_costs;
 
     // We loop column wise (in the same order as how zones are defined)
     for (int i = 0; i < num_cols; i++)
@@ -417,12 +418,19 @@ void samplePassesForVisualization(const World& world,
             enemy_proximity_cost           = 1;
             pass_shoot_score_costs         = 1;
             receiver_position_costs        = 1;
+            keep_away_position_costs        = 1;
+            pass_forward_costs        = 1;
 
             // getStaticPositionQuality
             if (passing_config.cost_vis_config().static_position_quality())
             {
                 static_pos_quality_costs = getStaticPositionQuality(
                     world.field(), pass.receiverPoint(), passing_config);
+            }
+
+            if (passing_config.cost_vis_config().pass_forward_quality())
+            {
+                pass_forward_costs = ratePassForwardQuality(pass, passing_config);
             }
 
             // ratePassFriendlyCapability
@@ -466,14 +474,14 @@ void samplePassesForVisualization(const World& world,
             if (passing_config.cost_vis_config().passer_position_score() &&
                 best_pass_so_far.has_value())
             {
-                receiver_position_costs = rateKeepAwayPosition(
+                keep_away_position_costs = rateKeepAwayPosition(
                         curr_point,
                     world, best_pass_so_far.value(), world.field().fieldBoundary(), passing_config);
             }
 
             costs.push_back(static_pos_quality_costs * pass_friendly_capability_costs *
                             pass_enemy_risk_costs * enemy_proximity_cost * pass_shoot_score_costs *
-                            receiver_position_costs);
+                            receiver_position_costs * keep_away_position_costs * pass_forward_costs);
         }
     }
 

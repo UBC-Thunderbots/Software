@@ -153,6 +153,10 @@ message PassingConfig
     // to the goal having less of an effect.
     required double static_field_position_quality_friendly_goal_distance_weight = 3
         [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // The extra time added to the minimum time that it will take a friendly
+    // robot to reach the receiving position and orientation.
+    required double friendly_time_to_receive_slack_sec = 21
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
     // This controls how heavily we weigh an enemy robot being near the pass
     // receiver when calculating enemy risk to a pass
     required double enemy_proximity_importance = 4 [
@@ -169,8 +173,8 @@ message PassingConfig
         (bounds).max_double_value = 20.0
     ];
     // The distance in meters along the x-axis from the passer that we prefer the receiver
-    // to be when receiving a pass. Note that this is a soft limit and the receiver may be
-    // further back.
+    // to be when receiving a pass on the friendly half. Note that this is a soft limit and
+    // the receiver may be further back.
     required double backwards_pass_distance_meters = 14 [
         default                   = -1.0,
         (bounds).min_double_value = -10.0,
@@ -206,7 +210,7 @@ message PassingConfig
     required CostVisualizationConfig cost_vis_config = 10;
 
     /*****  Receiver position generation parameters *****/
-    required ReceiverPositionGeneratorConfig receiver_position_generator_config = 21;
+    required ReceiverPositionGeneratorConfig receiver_position_generator_config = 22;
 }
 
 message ReceiverPositionGeneratorConfig
@@ -481,12 +485,15 @@ message CostVisualizationConfig
         [default = 45, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
     // cost functions
     required bool static_position_quality  = 3 [default = false];
+    required bool pass_forward_quality     = 7 [default = false];
+
     required bool pass_friendly_capability = 4 [default = false];
     required bool pass_enemy_risk          = 5 [default = false];
     required bool pass_shoot_score         = 6 [default = false];
-    required bool enemy_proximity_risk     = 7 [default = false];
-    required bool passer_position_score    = 8 [default = false];
-    required bool receiver_position_score  = 9 [default = true];  // TODO (NIMA): Revert
+    required bool enemy_proximity_risk     = 8 [default = false];
+
+    required bool passer_position_score    = 9 [default = false];
+    required bool receiver_position_score  = 10 [default = false];
 }
 
 message PossessionTrackerConfig

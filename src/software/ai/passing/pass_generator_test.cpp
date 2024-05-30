@@ -40,7 +40,7 @@ class PassGeneratorTest : public testing::Test
     {
         for (int i = 0; i < max_iters; i++)
         {
-            auto pass_eval = pass_generator->generatePassEvaluation(*world);
+            auto pass_eval = pass_generator->generatePassEvaluation(world);
         }
     }
 
