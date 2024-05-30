@@ -34,8 +34,7 @@ class BallMovesForward(Validation):
         # if max displacement is not set or current ball is moving in the right direction
         # set it and return PASSING
         if self.max_displacement_so_far is None or (
-            self.moving_in_pos_x
-            and current_ball_position > self.max_displacement_so_far - self.tolerance
+            current_ball_position > self.max_displacement_so_far - self.tolerance
         ):
             self.max_displacement_so_far = current_ball_position
             return ValidationStatus.PASSING
