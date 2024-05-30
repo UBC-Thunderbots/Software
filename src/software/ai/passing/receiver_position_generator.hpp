@@ -43,7 +43,9 @@ class ReceiverPositionGenerator
      * be avoided, if possible, when generating the new receiver positions.
      * @param pass_origin_override An optional override for the position where the pass
      * will be made from. If not provided, the ball position will be used.
-     * @return A vector of up to num_positions positions that the receivers could use.
+     * @return A vector of
+     *      min(num_positions, num_friendly_robots - existing_receiver_positions.size())
+     * positions that the receivers could use.
      */
     std::vector<Point> getBestReceivingPositions(
         const World &world, unsigned int num_positions,
