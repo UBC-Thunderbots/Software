@@ -126,13 +126,18 @@ def sync_simulation(sim_proto_unix_io: ProtoUnixIO, num_robots: int) -> None:
     sim_proto_unix_io.register_observer(
         WorldStateReceivedTrigger, world_state_received_buffer
     )
+    world_state = tbots_protobuf.create_default_world_state(num_robots)
 
     while True:
-        world_state_received = world_state_received_buffer.get(
-            block=False, return_cached=False
-        )
-        if not world_state_received:
-            world_state = tbots_protobuf.create_default_world_state(num_robots)
-            sim_proto_unix_io.send_proto(WorldState, world_state)
+        sim_proto_unix_io.send_proto(WorldState, world_state)
+
+        try:
+            world_state_received = world_state_received_buffer.get(
+                block=True, timeout=0.1
+            )
+        except queue.Empty:
+            # Did not receive a response within timeout period
+            continue
         else:
+            # Received a response from the simulator
             break
