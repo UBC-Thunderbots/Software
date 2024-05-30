@@ -340,8 +340,8 @@ class RobotCommunication(object):
             robot_status.adjusted_time_sent.epoch_timestamp_seconds
         )
         self.__forward_to_proto_unix_io(
-            RoundTripTime,
-            RoundTripTime(round_trip_time_seconds=round_trip_time_seconds),
+            RobotStatistic,
+            RobotStatistic(round_trip_time_seconds=round_trip_time_seconds),
         )
         self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
