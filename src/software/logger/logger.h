@@ -82,10 +82,17 @@ class LoggerSingleton
         // hermetic build principles
 
         // if log dir doesn't exist, create it
+<<<<<<< HEAD
         if (!std::experimental::filesystem::exists(runtime_dir))
         {
             std::experimental::filesystem::create_directories(runtime_dir);
         }
+=======
+        //        if (!std::experimental::filesystem::exists(runtime_dir))
+        //        {
+        //            std::experimental::filesystem::create_directories(runtime_dir);
+        //        }
+>>>>>>> 5d8f24ac7138c9aa4e8a94ccd772bb4efee9b135
 
         auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(runtime_dir),
                                                   &CSVSink::appendToFile);
