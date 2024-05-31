@@ -229,14 +229,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--sslvision_multicast_address",
         type=str,
-        default=None,
+        default=SSL_VISION_ADDRESS,
         help="the multicast address for ssl vision",
     )
 
     parser.add_argument(
         "--sslreferee_multicast_address",
         type=str,
-        default=None,
+        default=SSL_REFEREE_ADDRESS,
         help="the multicast address for referee (game controller likely)",
     )
 
