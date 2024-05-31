@@ -43,24 +43,27 @@ PassWithRating SamplingPassGenerator::getBestPass(
             return pass_a.rating < pass_b.rating;
         });
 
-    std::vector<TbotsProto::DebugShapes::DebugShape>
-        debug_shapes;  // TODO (NIMA): Added for debugging
-    for (const auto& pass_with_rating : sampled_passes_and_ratings)
+    // Visualize the sampled passes and the best pass
+    if (passing_config_.pass_gen_vis_config().visualize_sampled_passes())
     {
+        std::vector<TbotsProto::DebugShapes::DebugShape> debug_shapes;
+        for (const auto& pass_with_rating : sampled_passes_and_ratings)
+        {
+            std::stringstream stream;
+            stream << std::fixed << std::setprecision(3) << pass_with_rating.rating;
+            debug_shapes.push_back(*createDebugShape(
+                Circle(pass_with_rating.pass.receiverPoint(), 0.02),
+                std::to_string(debug_shapes.size()) + "sp", stream.str()));
+        }
         std::stringstream stream;
-        stream << std::fixed << std::setprecision(3) << pass_with_rating.rating;
+        stream << "BP:" << std::fixed << std::setprecision(3) << best_pass.rating;
         debug_shapes.push_back(
-            *createDebugShape(Circle(pass_with_rating.pass.receiverPoint(), 0.02),
+            *createDebugShape(Circle(best_pass.pass.receiverPoint(), 0.05),
                               std::to_string(debug_shapes.size()) + "sp", stream.str()));
+        LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
     }
-    std::stringstream stream;
-    stream << "BP:" << std::fixed << std::setprecision(3) << best_pass.rating;
-    debug_shapes.push_back(*createDebugShape(Circle(best_pass.pass.receiverPoint(), 0.05),
-                                             std::to_string(debug_shapes.size()) + "sp",
-                                             stream.str()));
-    LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
 
-    // Generate sample passes for cost visualization
+    // Generate sample passes across the field for cost visualization
     if (passing_config_.cost_vis_config().generate_sample_passes())
     {
         samplePassesForVisualization(world, passing_config_, best_pass.pass);

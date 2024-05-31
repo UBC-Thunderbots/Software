@@ -183,9 +183,6 @@ bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
     const auto pass_area_polygon =
         Polygon::fromSegment(Segment(passer_point, receiver_point), 0.5);
 
-    LOG(VISUALIZE) << *createDebugShapes({*createDebugShape(
-        pass_area_polygon, "pass_area_polygon")});  // TODO (NIMA): Added for debugging
-
     // calculate a polygon that contains the receiver and passer point, and checks if the
     // ball is inside it. if the ball isn't being passed to the receiver then we should
     // abort

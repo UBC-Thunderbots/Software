@@ -211,9 +211,11 @@ message PassingConfig
     /*****  Visualization parameters *****/
     // Cost function visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
+    // Pass generator visualization parameters
+    required PassGeneratorVisualizationConfig pass_gen_vis_config = 22;
 
     /*****  Receiver position generation parameters *****/
-    required ReceiverPositionGeneratorConfig receiver_position_generator_config = 22;
+    required ReceiverPositionGeneratorConfig receiver_position_generator_config = 23;
 }
 
 message ReceiverPositionGeneratorConfig
@@ -237,6 +239,8 @@ message ReceiverPositionGeneratorConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 45.0
     ];
+
+    required ReceiverPositionGeneratorVisualizationConfig receiver_vis_config = 5;
 }
 
 message GoalieTacticConfig
@@ -502,6 +506,17 @@ message CostVisualizationConfig
 
     required bool passer_position_score   = 9 [default = false];
     required bool receiver_position_score = 10 [default = false];
+}
+
+message PassGeneratorVisualizationConfig
+{
+    required bool visualize_sampled_passes = 1 [default = false];
+}
+
+message ReceiverPositionGeneratorVisualizationConfig
+{
+    required bool visualize_best_zones     = 1 [default = false];
+    required bool visualize_sampled_points = 2 [default = false];
 }
 
 message PossessionTrackerConfig

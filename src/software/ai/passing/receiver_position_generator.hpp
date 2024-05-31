@@ -142,12 +142,6 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     updateBestReceiverPositions(world, pass_origin, all_zones,
                                 receiver_config.num_initial_samples_per_zone());
 
-    // TODO (NIMA):
-    //  5. RatePassShootScore should have less effect on the score, specially compared to
-    //  enemy interception
-    //  6. RatePassShootScore sometimes blocks large circles of the field. Should probably
-    //  only draw lines
-
     // Sort the zones based on initial ratings
     auto zone_comparator = [&](const ZoneEnum &z1, const ZoneEnum &z2) {
         return best_receiving_positions.find(z1)->second.rating >
@@ -221,19 +215,24 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
         prev_best_receiving_positions.insert_or_assign(zone, best_position);
     }
 
-    // Visualize the best zones TODO(NIMA): Consider adding this to dynamic params
-    for (unsigned int i = 0; i < top_zones.size(); i++)
+    // Visualize the best zones
+    if (passing_config_.receiver_position_generator_config()
+            .receiver_vis_config()
+            .visualize_best_zones())
     {
-        debug_shapes.push_back(*createDebugShape(pitch_division_->getZone(top_zones[i]),
-                                                 std::to_string(i + 1),
-                                                 std::to_string(i + 1)));
-        debug_shapes.push_back(*createDebugShape(
-            Circle(
-                best_receiving_positions.find(top_zones[i])->second.pass.receiverPoint(),
-                0.15),
-            std::to_string(i + 1) + "p", std::to_string(i + 1) + "p"));
+        for (unsigned int i = 0; i < top_zones.size(); i++)
+        {
+            debug_shapes.push_back(
+                *createDebugShape(pitch_division_->getZone(top_zones[i]),
+                                  std::to_string(i + 1), std::to_string(i + 1)));
+            debug_shapes.push_back(*createDebugShape(
+                Circle(best_receiving_positions.find(top_zones[i])
+                           ->second.pass.receiverPoint(),
+                       0.15),
+                std::to_string(i + 1) + "p", std::to_string(i + 1) + "p"));
+        }
+        LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
     }
-    LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
 
     return best_positions;
 }
@@ -271,11 +270,18 @@ void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
                 best_pass_for_receiving = PassWithRating{pass, rating};
             }
         }
-        //        std::stringstream stream;
-        //        stream << std::fixed << std::setprecision(3) <<
-        //        best_pass_for_receiving.rating;
-        //        debug_shapes.push_back(*createDebugShape(Circle(best_pass_for_receiving.pass.receiverPoint(),
-        //        0.05), std::to_string(debug_shapes.size()) + "s", stream.str()));
+
+        if (passing_config_.receiver_position_generator_config()
+                .receiver_vis_config()
+                .visualize_sampled_points())
+        {
+            std::stringstream stream;
+            stream << std::fixed << std::setprecision(3)
+                   << best_pass_for_receiving.rating;
+            debug_shapes.push_back(*createDebugShape(
+                Circle(best_pass_for_receiving.pass.receiverPoint(), 0.05),
+                std::to_string(debug_shapes.size()) + "s", stream.str()));
+        }
 
         best_receiving_positions.insert_or_assign(zone_id, best_pass_for_receiving);
     }
