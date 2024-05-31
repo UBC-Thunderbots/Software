@@ -10,7 +10,8 @@ TEST(ShootOrPassPlayFSMTest, test_transitions)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     // Initialize with enough robots for the number of tactics being assigned
-    ::TestUtil::setFriendlyRobotPositions(world, {Point(0, 0), Point(1, 0), Point(2, 0)}, Timestamp::fromSeconds(0));
+    ::TestUtil::setFriendlyRobotPositions(world, {Point(0, 0), Point(1, 0), Point(2, 0)},
+                                          Timestamp::fromSeconds(0));
 
     TbotsProto::AiConfig ai_config;
     FSM<ShootOrPassPlayFSM> fsm(ShootOrPassPlayFSM{ai_config});
@@ -29,7 +30,9 @@ TEST(ShootOrPassPlayFSMTest, test_abort_pass_guard)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     // Initialize with enough robots for the number of tactics being assigned
-    ::TestUtil::setFriendlyRobotPositions(world, {Point(0, 0), Point(1, 0), Point(2, 0), Point(3, 0)}, Timestamp::fromSeconds(0));
+    ::TestUtil::setFriendlyRobotPositions(
+        world, {Point(0, 0), Point(1, 0), Point(2, 0), Point(3, 0)},
+        Timestamp::fromSeconds(0));
     world->updateRefereeCommand(RefereeCommand::FORCE_START);
 
     TbotsProto::AiConfig ai_config;
@@ -98,7 +101,8 @@ TEST(ShootOrPassPlayFSMTest, test_took_shot_guard)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     // Initialize with enough robots for the number of tactics being assigned
-    ::TestUtil::setFriendlyRobotPositions(world, {Point(0, 0), Point(1, 0), Point(2, 0)}, Timestamp::fromSeconds(0));
+    ::TestUtil::setFriendlyRobotPositions(world, {Point(0, 0), Point(1, 0), Point(2, 0)},
+                                          Timestamp::fromSeconds(0));
 
     TbotsProto::AiConfig ai_config;
     FSM<ShootOrPassPlayFSM> fsm(ShootOrPassPlayFSM{ai_config});

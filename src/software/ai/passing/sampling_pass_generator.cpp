@@ -4,12 +4,14 @@
 
 #include "software/logger/logger.h"
 
-SamplingPassGenerator::SamplingPassGenerator(const TbotsProto::PassingConfig& passing_config)
+SamplingPassGenerator::SamplingPassGenerator(
+    const TbotsProto::PassingConfig& passing_config)
     : random_num_gen_(RNG_SEED), passing_config_(passing_config)
 {
 }
 
-PassWithRating SamplingPassGenerator::getBestPass(const World& world, const std::vector<RobotId>& robots_to_ignore)
+PassWithRating SamplingPassGenerator::getBestPass(
+    const World& world, const std::vector<RobotId>& robots_to_ignore)
 {
     auto sampled_pass_points = sampleReceivingPositions(world, robots_to_ignore);
 
@@ -47,15 +49,15 @@ PassWithRating SamplingPassGenerator::getBestPass(const World& world, const std:
     {
         std::stringstream stream;
         stream << std::fixed << std::setprecision(3) << pass_with_rating.rating;
-        debug_shapes.push_back(*createDebugShape(
-            Circle(pass_with_rating.pass.receiverPoint(), 0.02),
-            std::to_string(debug_shapes.size()) + "sp", stream.str()));
+        debug_shapes.push_back(
+            *createDebugShape(Circle(pass_with_rating.pass.receiverPoint(), 0.02),
+                              std::to_string(debug_shapes.size()) + "sp", stream.str()));
     }
     std::stringstream stream;
     stream << "BP:" << std::fixed << std::setprecision(3) << best_pass.rating;
-    debug_shapes.push_back(*createDebugShape(
-        Circle(best_pass.pass.receiverPoint(), 0.05),
-        std::to_string(debug_shapes.size()) + "sp", stream.str()));
+    debug_shapes.push_back(*createDebugShape(Circle(best_pass.pass.receiverPoint(), 0.05),
+                                             std::to_string(debug_shapes.size()) + "sp",
+                                             stream.str()));
     LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
 
     // Generate sample passes for cost visualization
@@ -67,12 +69,12 @@ PassWithRating SamplingPassGenerator::getBestPass(const World& world, const std:
     return best_pass;
 }
 
-std::vector<Point> SamplingPassGenerator::sampleReceivingPositions(const World &world, const std::vector<RobotId>& robots_to_ignore)
+std::vector<Point> SamplingPassGenerator::sampleReceivingPositions(
+    const World& world, const std::vector<RobotId>& robots_to_ignore)
 {
     std::vector<Point> all_sampled_passes;
 
-    const double sampling_std_dev =
-            passing_config_.pass_gen_rand_sample_std_dev_meters();
+    const double sampling_std_dev = passing_config_.pass_gen_rand_sample_std_dev_meters();
 
     for (const Robot& robot : world.friendlyTeam().getAllRobots())
     {

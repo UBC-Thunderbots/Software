@@ -15,10 +15,7 @@ struct AttackerFSM
      *
      * @param attacker_tactic_config The config to fetch parameters from
      */
-    explicit AttackerFSM(const TbotsProto::AiConfig& ai_config)
-        : ai_config(ai_config)
-    {
-    }
+    explicit AttackerFSM(const TbotsProto::AiConfig& ai_config) : ai_config(ai_config) {}
 
     struct ControlParams
     {

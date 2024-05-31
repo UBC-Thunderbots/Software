@@ -45,7 +45,9 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
             *world, num_tactics, existing_receiver_positions, pass_origin_override);
     // Note that getBestReceivingPositions may return fewer positions than requested
     // if there are not enough robots, so we will need to check the size of the vector.
-    for (unsigned int i = 0; i < offensive_positioning_tactics.size() && i < best_receiving_positions.size(); i++)
+    for (unsigned int i = 0;
+         i < offensive_positioning_tactics.size() && i < best_receiving_positions.size();
+         i++)
     {
         Angle receiver_orientation =
             (world->ball().position() - best_receiving_positions[i]).orientation();

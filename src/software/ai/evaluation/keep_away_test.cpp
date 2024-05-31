@@ -8,11 +8,13 @@
 
 class KeepAwayTest : public testing::Test
 {
-    protected:
-    KeepAwayTest():
-        world(TestUtil::createBlankTestingWorld()), field_bounds(world->field().fieldBoundary())
-    {}
-    
+   protected:
+    KeepAwayTest()
+        : world(TestUtil::createBlankTestingWorld()),
+          field_bounds(world->field().fieldBoundary())
+    {
+    }
+
     TbotsProto::PassingConfig passing_config;
     std::shared_ptr<World> world;
     Rectangle field_bounds;
@@ -21,7 +23,8 @@ TEST_F(KeepAwayTest, test_keep_away_cost_no_enemies)
 {
     Team enemy_team;
     Pass pass(Point(0, 0), Point(1, 1), 5);
-    auto result = rateKeepAwayPosition(pass.passerPoint(), *world, pass, field_bounds, passing_config);
+    auto result = rateKeepAwayPosition(pass.passerPoint(), *world, pass, field_bounds,
+                                       passing_config);
     EXPECT_GT(result, 0.99);
 }
 
@@ -33,32 +36,36 @@ TEST_F(KeepAwayTest, test_keep_away_cost_interception)
                                      Timestamp::fromSeconds(0));
     TestUtil::setBallPosition(world, ball_position, Timestamp::fromSeconds(0));
 
-    // Keep away points are rated based on points around the ball that increase the best pass rating
+    // Keep away points are rated based on points around the ball that increase the best
+    // pass rating
     Pass best_pass(ball_position, Point(1, 0), 5);
 
     // Pass from new keep away point is still blocked by enemy
     Point keep_away_point_bad(-0.5, 0);
-    auto lower_result = rateKeepAwayPosition(keep_away_point_bad, *world, best_pass, field_bounds, passing_config);
+    auto lower_result = rateKeepAwayPosition(keep_away_point_bad, *world, best_pass,
+                                             field_bounds, passing_config);
 
     // Pass from new keep away point is NOT blocked by enemy
     Point keep_away_point_good(-1, 0.5);
-    auto higher_result = rateKeepAwayPosition(keep_away_point_good, *world, best_pass, field_bounds, passing_config);
+    auto higher_result = rateKeepAwayPosition(keep_away_point_good, *world, best_pass,
+                                              field_bounds, passing_config);
 
     EXPECT_GT(higher_result, lower_result);
 }
 
 TEST_F(KeepAwayTest, test_keep_away_cost_proximity)
 {
-    TestUtil::setEnemyRobotPositions(world, {Point(0, 0)},
-                                                   Timestamp::fromSeconds(0));
+    TestUtil::setEnemyRobotPositions(world, {Point(0, 0)}, Timestamp::fromSeconds(0));
     TestUtil::setBallPosition(world, Point(1, 0), Timestamp::fromSeconds(0));
 
     Pass pass(Point(1, 0), Point(3, 0), 5);
     Point keep_away_point_closer_to_enemy(0.3, 0);
-    auto lower_result = rateKeepAwayPosition(keep_away_point_closer_to_enemy, *world, pass, field_bounds, passing_config);
+    auto lower_result = rateKeepAwayPosition(keep_away_point_closer_to_enemy, *world,
+                                             pass, field_bounds, passing_config);
 
     Point keep_away_point_farther_from_enemy(0.6, 0);
-    auto higher_result = rateKeepAwayPosition(keep_away_point_farther_from_enemy, *world, pass, field_bounds, passing_config);
+    auto higher_result = rateKeepAwayPosition(keep_away_point_farther_from_enemy, *world,
+                                              pass, field_bounds, passing_config);
 
     EXPECT_GT(higher_result, lower_result);
 }
@@ -84,9 +91,8 @@ TEST_F(KeepAwayTest, test_keep_away_point_interception)
     Pass pass(ball_point, Point(1, 0.1), 5);
     auto keep_away_pt = findKeepAwayTargetPoint(*world, pass, passing_config);
     Pass new_pass(keep_away_pt, pass.receiverPoint(), pass.speed());
-    EXPECT_GT(
-        calculateInterceptRisk(world->enemyTeam(), pass, passing_config),
-        calculateInterceptRisk(world->enemyTeam(), new_pass, passing_config));
+    EXPECT_GT(calculateInterceptRisk(world->enemyTeam(), pass, passing_config),
+              calculateInterceptRisk(world->enemyTeam(), new_pass, passing_config));
 }
 
 TEST_F(KeepAwayTest, test_keep_away_point_proximity)

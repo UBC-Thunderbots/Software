@@ -28,18 +28,21 @@ class SamplingPassGenerator
      *
      * @return The best pass that can be made and its rating
      */
-    PassWithRating getBestPass(const World& world, const std::vector<RobotId>& robots_to_ignore = {});
+    PassWithRating getBestPass(const World& world,
+                               const std::vector<RobotId>& robots_to_ignore = {});
 
    private:
     /**
-     * Randomly sample receiving points around friendly robots not included in the ignore list
+     * Randomly sample receiving points around friendly robots not included in the ignore
+     * list
      *
      * @param world The current state of the world
      * @param robots_to_ignore A list of robot ids to ignore when generating passes
      *
      * @return a list of sampled points around all friendly robots
      */
-    std::vector<Point> sampleReceivingPositions(const World &world, const std::vector<RobotId>& robots_to_ignore);
+    std::vector<Point> sampleReceivingPositions(
+        const World& world, const std::vector<RobotId>& robots_to_ignore);
 
     // the random seed used to initialize the random number generator
     static constexpr int RNG_SEED = 24;

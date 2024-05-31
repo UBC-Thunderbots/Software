@@ -51,7 +51,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
  *         great zone to send a cherry picker to, and 0 being a zone to avoid.
  */
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
-                const Point& ball_position, const TbotsProto::PassingConfig& passing_config);
+                const Point& ball_position,
+                const TbotsProto::PassingConfig& passing_config);
 
 /**
  * Rate a pass based on the quality of the receiving position
@@ -208,8 +209,8 @@ double calculateProximityRisk(const Point& point, const Team& enemy_team,
  * @return A value in [0,1] representing the quality of the passer position, with 1
  *        being an ideal position to pass from, and 0 being a poor position to pass from.
  */
-double rateKeepAwayPosition(const Point& keep_away_position,
-                            const World& world, const Pass& best_pass_so_far,
+double rateKeepAwayPosition(const Point& keep_away_position, const World& world,
+                            const Pass& best_pass_so_far,
                             const Rectangle& dribbling_bounds,
                             const TbotsProto::PassingConfig& passing_config);
 

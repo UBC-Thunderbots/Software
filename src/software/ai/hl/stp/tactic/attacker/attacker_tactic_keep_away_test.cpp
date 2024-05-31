@@ -77,8 +77,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
             }
 
             auto initial_enemy_proximity_risk = calculateProximityRisk(
-                world_ptr->ball().position(), world_ptr->enemyTeam(),
-                passing_config);
+                world_ptr->ball().position(), world_ptr->enemyTeam(), passing_config);
 
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(1))
             {
@@ -100,8 +99,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
                 last_timestamp = world_ptr->getMostRecentTimestamp();
 
                 auto current_enemy_proximity_risk = calculateProximityRisk(
-                    world_ptr->ball().position(), world_ptr->enemyTeam(),
-                    passing_config);
+                    world_ptr->ball().position(), world_ptr->enemyTeam(), passing_config);
 
                 // make sure we improved over the initial proximity risk score
                 if (current_enemy_proximity_risk > initial_enemy_proximity_risk + 0.05)
@@ -124,8 +122,8 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
                 yield("");
             }
 
-            auto initial_enemy_risk_score = ratePassEnemyRisk(
-                enemy_team, pass, passing_config);
+            auto initial_enemy_risk_score =
+                ratePassEnemyRisk(enemy_team, pass, passing_config);
 
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(1))
             {

@@ -29,7 +29,8 @@ class ReceiverPositionGenerator
     /**
      * Creates a new ReceiverPositionGenerator
      * @param pitch_division The pitch division to split the receivers into
-     * @param passing_config The passing configuration to use when looking for best receiving positions
+     * @param passing_config The passing configuration to use when looking for best
+     * receiving positions
      */
     explicit ReceiverPositionGenerator(
         std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
@@ -117,8 +118,8 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     best_receiving_positions.clear();
     debug_shapes.clear();
 
-    Point pass_origin = pass_origin_override.value_or(world.ball().position());
-    const auto& receiver_config = passing_config_.receiver_position_generator_config();
+    Point pass_origin           = pass_origin_override.value_or(world.ball().position());
+    const auto &receiver_config = passing_config_.receiver_position_generator_config();
 
     // Add the previous best sampled receiving positions
     for (const auto &[zone, prev_best_receiving_position] : prev_best_receiving_positions)
@@ -127,10 +128,11 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
                                                passing_config_);
         // Increase the rating of the previous best receiving positions to
         // discourage changing the receiver positions too much.
-        double receiver_position_rating = rateReceivingPosition(world, pass, passing_config_) * receiver_config.previous_best_receiver_position_score_multiplier();
+        double receiver_position_rating =
+            rateReceivingPosition(world, pass, passing_config_) *
+            receiver_config.previous_best_receiver_position_score_multiplier();
         best_receiving_positions.insert_or_assign(
-            zone,
-            PassWithRating{pass, receiver_position_rating});
+            zone, PassWithRating{pass, receiver_position_rating});
     }
 
     auto all_zones = pitch_division_->getAllZoneIds();
@@ -154,7 +156,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     std::sort(all_zones.begin(), all_zones.end(), zone_comparator);
 
     const Angle min_angle_diff_between_receivers =
-            Angle::fromDegrees(receiver_config.min_angle_between_receivers_deg());
+        Angle::fromDegrees(receiver_config.min_angle_between_receivers_deg());
     std::vector<ZoneEnum> top_zones;
     for (unsigned int i = 0; i < all_zones.size() && top_zones.size() < num_positions;
          i++)
@@ -167,7 +169,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
             std::none_of(top_zones.begin(), top_zones.end(), [&](const ZoneEnum &zone) {
                 return curr_pass_angle.minDiff(best_receiving_positions.find(zone)
                                                    ->second.pass.passerOrientation()) <
-                        min_angle_diff_between_receivers;
+                       min_angle_diff_between_receivers;
             });
         no_prev_receivers_close =
             no_prev_receivers_close &&
@@ -176,7 +178,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
                 [&](const Point &existing_receiver_position) {
                     return curr_pass_angle.minDiff(
                                (pass_origin - existing_receiver_position).orientation()) <
-                            min_angle_diff_between_receivers;
+                           min_angle_diff_between_receivers;
                 });
 
         if (no_prev_receivers_close)
@@ -188,10 +190,10 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     // If we did not find enough receiver positions, add the remaining top zones
     if (top_zones.size() < num_positions)
     {
-        LOG(WARNING) << "Not enough receiver positions were found. Expected to find "
-                     << num_positions << " receiver positions, but only found "
-                     << top_zones.size()
-                     << ". Consider reducing 'min_angle_between_receivers_deg' in the dynamic parameters";
+        LOG(WARNING)
+            << "Not enough receiver positions were found. Expected to find "
+            << num_positions << " receiver positions, but only found " << top_zones.size()
+            << ". Consider reducing 'min_angle_between_receivers_deg' in the dynamic parameters";
         for (unsigned int i = 0; i < all_zones.size() && top_zones.size() < num_positions;
              i++)
         {

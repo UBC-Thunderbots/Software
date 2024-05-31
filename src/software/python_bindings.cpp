@@ -424,11 +424,11 @@ PYBIND11_MODULE(python_bindings, m)
         .def("speed", &Pass::speed)
         .def_static("fromDestReceiveSpeed",
                     py::overload_cast<const Point&, const Point&, double, double, double>(
-                            &Pass::fromDestReceiveSpeed))
+                        &Pass::fromDestReceiveSpeed))
         .def_static("fromDestReceiveSpeed",
                     py::overload_cast<const Point&, const Point&,
-                            const TbotsProto::PassingConfig&>(
-                            &Pass::fromDestReceiveSpeed));
+                                      const TbotsProto::PassingConfig&>(
+                        &Pass::fromDestReceiveSpeed));
 
     py::enum_<EighteenZoneId>(m, "EighteenZoneId")
         .value("ZONE_1", EighteenZoneId::ZONE_1)

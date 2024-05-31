@@ -286,8 +286,7 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_center_no_enemies)
     EXPECT_GE(1.0, pass_rating);
 }
 
-TEST_F(PassingEvaluationTest,
-       ratePass_corner_kick_to_marked_robot_at_field_center)
+TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_center)
 {
     // A corner kick from the +x, +y corner of the field to a robot on the +x axis part
     // way up the enemy half of the field. The receiver friendly is marked by an enemy,
@@ -547,8 +546,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_team_no_robots)
     Team enemy_team(Duration::fromSeconds(10));
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(
-        enemy_team, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(enemy_team, pass, passing_config);
     EXPECT_EQ(0, intercept_risk);
 }
 
@@ -566,8 +564,7 @@ TEST_F(PassingEvaluationTest,
     });
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(
-        enemy_team, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(enemy_team, pass, passing_config);
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -586,8 +583,7 @@ TEST_F(PassingEvaluationTest,
     });
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(
-        enemy_team, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(enemy_team, pass, passing_config);
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -600,8 +596,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_sitting_on_pass_t
                       Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -615,8 +610,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_tra
                       Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -629,8 +623,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_far_away_from_tra
                       Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -643,8 +636,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_robot_at_far_end_of_field)
                       Timestamp::fromSeconds(0));
     Pass pass({3, -3}, {3, 3}, 3);
 
-    double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -657,8 +649,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_enemy_moving_far_away)
                       Timestamp::fromSeconds(0));
     Pass pass({1, 1}, {4, 4}, 2);
 
-    double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -675,22 +666,22 @@ TEST_F(PassingEvaluationTest,
                       AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {0, 2}, 0.5);
 
-    double intercept_risk = calculateInterceptRisk(
-        enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
     EXPECT_LE(0.5, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
 
-TEST_F(PassingEvaluationTest,
-       rateReceivingPosition_receiving_position_openness)
+TEST_F(PassingEvaluationTest, rateReceivingPosition_receiving_position_openness)
 {
     // Compare two passes, one with the receiving position directly behind the enemy robot
     // and the other with receiving position open next to the enemy robot
     auto world = ::TestUtil::createBlankTestingWorld();
     ::TestUtil::setEnemyRobotPositions(world, {Point(2, 0)}, Timestamp::fromSeconds(0));
 
-    Pass pass_blocked_by_enemy({2, 2}, {2, -2}, passing_config.max_pass_speed_m_per_s() - 0.2);
-    double pass_blocked_by_enemy_rating = rateReceivingPosition(*world, pass_blocked_by_enemy, passing_config);
+    Pass pass_blocked_by_enemy({2, 2}, {2, -2},
+                               passing_config.max_pass_speed_m_per_s() - 0.2);
+    double pass_blocked_by_enemy_rating =
+        rateReceivingPosition(*world, pass_blocked_by_enemy, passing_config);
 
     Pass pass_open({2, 2}, {3, -2}, passing_config.max_pass_speed_m_per_s() - 0.2);
     double pass_open_rating = rateReceivingPosition(*world, pass_open, passing_config);
@@ -702,52 +693,62 @@ TEST_F(PassingEvaluationTest,
     EXPECT_GE(pass_open_rating, 0.5);
 }
 
-TEST_F(PassingEvaluationTest,
-       rateReceivingPosition_opportunity_to_take_shot)
+TEST_F(PassingEvaluationTest, rateReceivingPosition_opportunity_to_take_shot)
 {
-    // Compare two corner kick passes, one with the receiving position unable to take a shot
-    // on enemy net due to the enemy crease-defenders, and the other with the
+    // Compare two corner kick passes, one with the receiving position unable to take a
+    // shot on enemy net due to the enemy crease-defenders, and the other with the
     // receiving position able to take a shot on the enemy net away from the crease
     // defenders.
     auto world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setEnemyRobotPositions(world, {Point(3.3, 0.5), Point(3.3, 0.32)}, Timestamp::fromSeconds(0));
+    ::TestUtil::setEnemyRobotPositions(world, {Point(3.3, 0.5), Point(3.3, 0.32)},
+                                       Timestamp::fromSeconds(0));
 
-    Pass receiver_shot_blocked(world->field().enemyCornerPos(), {2.8, 0.5}, passing_config.max_pass_speed_m_per_s() - 0.2);
-    double receiver_shot_blocked_rating = rateReceivingPosition(*world, receiver_shot_blocked, passing_config);
+    Pass receiver_shot_blocked(world->field().enemyCornerPos(), {2.8, 0.5},
+                               passing_config.max_pass_speed_m_per_s() - 0.2);
+    double receiver_shot_blocked_rating =
+        rateReceivingPosition(*world, receiver_shot_blocked, passing_config);
 
-    Pass receiver_shot_open(world->field().enemyCornerPos(), {2.3, -0.4}, passing_config.max_pass_speed_m_per_s() - 0.2);
-    double receiver_shot_open_rating = rateReceivingPosition(*world, receiver_shot_open, passing_config);
+    Pass receiver_shot_open(world->field().enemyCornerPos(), {2.3, -0.4},
+                            passing_config.max_pass_speed_m_per_s() - 0.2);
+    double receiver_shot_open_rating =
+        rateReceivingPosition(*world, receiver_shot_open, passing_config);
 
     EXPECT_GT(receiver_shot_open_rating, receiver_shot_blocked_rating);
 }
 
-TEST_F(PassingEvaluationTest,
-       calculateProximityRisk_distance_to_a_single_enemy_robot)
+TEST_F(PassingEvaluationTest, calculateProximityRisk_distance_to_a_single_enemy_robot)
 {
-    // Compare two positions, one in close proximity to an enemy, and the other farther away
+    // Compare two positions, one in close proximity to an enemy, and the other farther
+    // away
     auto world = ::TestUtil::createBlankTestingWorld();
     ::TestUtil::setEnemyRobotPositions(world, {Point(2, -2)}, Timestamp::fromSeconds(0));
 
-    double closer_proximity_risk = calculateProximityRisk(Point(2.1, -2), world->enemyTeam(), passing_config);
-    double farther_proximity_risk = calculateProximityRisk(Point(2.5, -2), world->enemyTeam(), passing_config);
+    double closer_proximity_risk =
+        calculateProximityRisk(Point(2.1, -2), world->enemyTeam(), passing_config);
+    double farther_proximity_risk =
+        calculateProximityRisk(Point(2.5, -2), world->enemyTeam(), passing_config);
 
     // Farther point should have a lower risk
     EXPECT_LE(farther_proximity_risk, closer_proximity_risk);
 }
 
-TEST_F(PassingEvaluationTest,
-       calculateProximityRisk_distance_to_a_multiple_enemy_robot)
+TEST_F(PassingEvaluationTest, calculateProximityRisk_distance_to_a_multiple_enemy_robot)
 {
-    // The risk when multiple enemies are close should be higher than when only one enemy is close
+    // The risk when multiple enemies are close should be higher than when only one enemy
+    // is close
     auto world = ::TestUtil::createBlankTestingWorld();
 
     // All three close
-    ::TestUtil::setEnemyRobotPositions(world, {Point(2, -1.8), Point(2, -2), Point(2, -2.2)}, Timestamp::fromSeconds(0));
-    double multiple_enemy_robots_risk = calculateProximityRisk(Point(1.7, -2), world->enemyTeam(), passing_config);
+    ::TestUtil::setEnemyRobotPositions(
+        world, {Point(2, -1.8), Point(2, -2), Point(2, -2.2)}, Timestamp::fromSeconds(0));
+    double multiple_enemy_robots_risk =
+        calculateProximityRisk(Point(1.7, -2), world->enemyTeam(), passing_config);
 
     // One close, two farther away
-    ::TestUtil::setEnemyRobotPositions(world, {Point(2, -2), Point(4, -2), Point(4, -2.2)}, Timestamp::fromSeconds(0));
-    double single_enemy_robots_risk = calculateProximityRisk(Point(1.7, -2), world->enemyTeam(), passing_config);
+    ::TestUtil::setEnemyRobotPositions(
+        world, {Point(2, -2), Point(4, -2), Point(4, -2.2)}, Timestamp::fromSeconds(0));
+    double single_enemy_robots_risk =
+        calculateProximityRisk(Point(1.7, -2), world->enemyTeam(), passing_config);
 
     EXPECT_LE(single_enemy_robots_risk, multiple_enemy_robots_risk);
 }

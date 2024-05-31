@@ -13,12 +13,10 @@ void AttackerFSM::pivotKick(const Update& event,
     }
     // default to chipping the ball away
     PivotKickFSM::ControlParams control_params{
-        .kick_origin    = ball_position,
-        .kick_direction = (chip_target - ball_position).orientation(),
-        .auto_chip_or_kick =
-            AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
-                           (chip_target - ball_position)
-                               .length()}};
+        .kick_origin       = ball_position,
+        .kick_direction    = (chip_target - ball_position).orientation(),
+        .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                                            (chip_target - ball_position).length()}};
 
     if (event.control_params.shot)
     {
@@ -69,8 +67,8 @@ void AttackerFSM::keepAway(const Update& event,
                   << "to enemy goal center.";
     }
 
-    auto keepaway_dribble_dest =
-        findKeepAwayTargetPoint(*event.common.world_ptr, best_pass_so_far, ai_config.passing_config());
+    auto keepaway_dribble_dest = findKeepAwayTargetPoint(
+        *event.common.world_ptr, best_pass_so_far, ai_config.passing_config());
 
     const auto& enemy_team = event.common.world_ptr->enemyTeam();
     const auto& ball       = event.common.world_ptr->ball();
