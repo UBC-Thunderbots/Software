@@ -57,21 +57,21 @@ template <typename TState, typename TAction>
 TAction::Enum EpsilonGreedyStrategy<TState, TAction>::selectAction(
     const TState& state, const QFunction<TState, TAction>& q_function)
 {
-    typename TAction::Enum selected_action = TAction::SHOOT;
-
     const double random_num =
         static_cast<double>(random_num_gen_()) / random_num_gen_.max();
 
     if (random_num < epsilon_)
     {
         // Explore: select random action from action space
-        selected_action = all_actions_.at(random_num_gen_() % all_actions_.size());
+        return all_actions_.at(random_num_gen_() % all_actions_.size());
     }
     else
     {
         // Exploit: select the action with the largest Q-value
         // i.e. argmax(Q(s, a)) over the set of all actions A
+        typename TAction::Enum selected_action = all_actions_.back();
         double max_q_value = std::numeric_limits<double>::lowest();
+
         for (const auto& action : all_actions_)
         {
             double q_value = q_function.getQValue(state, action);
@@ -81,7 +81,7 @@ TAction::Enum EpsilonGreedyStrategy<TState, TAction>::selectAction(
                 max_q_value     = q_value;
             }
         }
-    }
 
-    return selected_action;
+        return selected_action;
+    }
 }
