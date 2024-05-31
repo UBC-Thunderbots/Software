@@ -51,6 +51,7 @@ template <typename TState, typename TAction>
 SoftmaxStrategy<TState, TAction>::SoftmaxStrategy(double temperature)
     : temperature_(temperature), all_actions_(TAction::allValues())
 {
+    CHECK(temperature_ > 0) << "Softmax temperature must be greater than 0";
 }
 
 template <typename TState, typename TAction>

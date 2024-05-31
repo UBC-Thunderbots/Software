@@ -50,13 +50,14 @@ template <typename TState, typename TAction>
 EpsilonGreedyStrategy<TState, TAction>::EpsilonGreedyStrategy(double epsilon)
     : epsilon_(epsilon), all_actions_(TAction::allValues())
 {
+    CHECK(epsilon_ >= 0 && epsilon_ <= 1) << "Epsilon must be between 0 and 1 inclusive";
 }
 
 template <typename TState, typename TAction>
 TAction::Enum EpsilonGreedyStrategy<TState, TAction>::selectAction(
     const TState& state, const QFunction<TState, TAction>& q_function)
 {
-    typename TAction::Enum selected_action;
+    typename TAction::Enum selected_action = TAction::SHOOT;
 
     const double random_num =
         static_cast<double>(random_num_gen_()) / random_num_gen_.max();
