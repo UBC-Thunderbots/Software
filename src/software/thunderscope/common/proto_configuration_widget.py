@@ -22,7 +22,7 @@ class ProtoConfigurationWidget(QWidget):
 
     """
 
-    # where we are saving the default configuration file 
+    # where we are saving the default configuration file
     DEFAULT_SAVE_DIRECTORY = "/tmp/tbotspython/thunderbots_configurations_proto"
 
     def __init__(
@@ -85,12 +85,12 @@ class ProtoConfigurationWidget(QWidget):
 
         self.run_onetime_async(3, self.send_proto_to_fullsystem)
 
-    def run_onetime_async(self, time_in_seconds:float, func: Callable):
+    def run_onetime_async(self, time_in_seconds: float, func: Callable):
         """
-        starting a timer that runs a given function after a given 
+        starting a timer that runs a given function after a given
         amount of seconds one time asynchronously.
 
-        :time_in_seconds: the amount of time in seconds 
+        :time_in_seconds: the amount of time in seconds
         :func: the function that is going to be ran
         """
         self.timer = QTimer()
@@ -115,30 +115,13 @@ class ProtoConfigurationWidget(QWidget):
         save_hbox_bottom = QHBoxLayout()
         save_hbox_bottom.addWidget(load_proto_button)
         save_hbox_bottom.addWidget(reset_button)
+        save_hbox_bottom.addWidget(save_button)
 
         save_hbox_top = QHBoxLayout()
-        edit_box = QVBoxLayout()
+        line_box = QLabel(f"Currently Editing: {self.path_to_file}")
 
-        edit_box.addWidget(QLabel("Enter Filename Below To Save:"))
-        line_box = QLineEdit()
-        line_box.textChanged.connect(self.textChanged)
-
-        line_box.setText(self.path_to_file)
-        edit_box.addWidget(line_box)
-
-        save_hbox_top.addLayout(edit_box)
-        save_hbox_top.addWidget(save_button)
+        save_hbox_top.addWidget(line_box)
         return save_hbox_top, save_hbox_bottom, line_box
-
-
-    def textChanged(self, text):
-        """
-        a callback for what would be happening when the text has been changed!
-
-        :param text: the text that was changed
-        """
-
-        self.path_to_file = text
 
     def update_proto_from_file(self, path_to_file: str):
         """
@@ -160,6 +143,10 @@ class ProtoConfigurationWidget(QWidget):
         with open(path_to_file, "rb") as f:
             self.proto_to_configure = ThunderbotsConfig()
             self.proto_to_configure.ParseFromString(f.read())
+
+            self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
+                self.is_yellow
+            )
 
     def send_proto_to_fullsystem(self):
         """
@@ -196,15 +183,18 @@ class ProtoConfigurationWidget(QWidget):
         """
         try:
             path_to_file, should_open = QFileDialog.getOpenFileName(
-                self, "Select Protobufs", "/tmp/tbotspython"
+                self,
+                "Select Protobufs",
+                self.get_default_savepath(self.is_yellow),
+                options=QFileDialog.Option.DontUseNativeDialog,
             )
-            if not should_open: 
-                return 
+            if not should_open:
+                return
 
             self.path_to_file = path_to_file
             self.update_proto_from_file(path_to_file)
 
-            self.line_box.setText(self.path_to_file)
+            self.line_box.setText(f"Currently editing: {self.path_to_file}")
             self.update_widget()
         except Exception:
             logging.warning(
@@ -215,10 +205,10 @@ class ProtoConfigurationWidget(QWidget):
 
     def update_widget(self):
         """
-        The following function updates the current parameters tree based on the 
+        The following function updates the current parameters tree based on the
         current protobuf that is being configure (i.e. self.proto_to_configure) widget.
         """
-        
+
         # refreshing widgets after the parameters is called
         logging.info("I am updating widget?")
         self.param_group = parametertree.Parameter.create(
@@ -233,19 +223,18 @@ class ProtoConfigurationWidget(QWidget):
 
     def get_default_savepath(self, is_yellow):
         """
-        returns the default save path for the protobufs 
+        returns the default save path for the protobufs
 
         :param is_yellow: are we configuring yellow or blue configuration file?
         :return: the path where we are going to save the files
         """
 
-        path_to_file = ProtoConfigurationWidget.DEFAULT_SAVE_DIRECTORY + "/"
+        path_to_file = (
+            ProtoConfigurationWidget.DEFAULT_SAVE_DIRECTORY
+            + "/default_configuration.proto"
+        )
         # appending filename
-        if is_yellow:
-            path_to_file += f"default_yellow.proto"
-        else:
-            path_to_file += f"default_blue.proto"
-        return path_to_file 
+        return path_to_file
 
     def reset_button_callback(self):
         """
@@ -258,7 +247,7 @@ class ProtoConfigurationWidget(QWidget):
             self.is_yellow
         )
 
-        self.path_to_file = self.get_default_savepath(self.is_yellow) 
+        self.path_to_file = self.get_default_savepath(self.is_yellow)
         self.line_box.setText(self.path_to_file)
 
         self.build_proto(self.proto_to_configure)
