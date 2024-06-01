@@ -5,7 +5,8 @@
 #include "software/ai/hl/stp/play/play.h"
 
 /**
- * Play for defending against enemy free kicks
+ * Play for defending against enemy free kicks, attempting to block the kicker, while also protected potential
+ * passes
  */
 class EnemyFreeKickPlay : public Play
 {

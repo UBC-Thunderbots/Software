@@ -30,19 +30,20 @@ public:
      */
     explicit DefensePlayBase(TbotsProto::AiConfig ai_config);
 
+protected:
     /**
      * Helper function to set up crease defender tactic vector members
      *
      * @param num_crease_defenders the number of crease defender tactics to set
      */
-    void setUpCreaseDefenders(unsigned int num_crease_defenders);
+    void setUpCreaseDefenders(int num_crease_defenders);
 
     /**
      * Helper function to set up pass defender tactic vector members
      *
      * @param num_pass_defenders the number of pass defender tactics to set
      */
-    void setUpPassDefenders(unsigned int num_pass_defenders);
+    void setUpPassDefenders(int num_pass_defenders);
 
     /**
      * Helper function to set up alignments for the crease defense robots
@@ -59,7 +60,6 @@ public:
      */
     void updatePassDefenderControlParams(std::vector<DefenderAssignment> &pass_defender_assignments);
 
-protected:
     TbotsProto::AiConfig ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
     std::vector<std::shared_ptr<PassDefenderTactic>> pass_defenders;

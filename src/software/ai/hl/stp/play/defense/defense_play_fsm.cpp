@@ -63,11 +63,10 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
 
     // Reset tactics if the number of crease defenders or pass defenders
     // we intend to assign has changed
-    DefensePlayBase::setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
-    DefensePlayBase::setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
-
-    DefensePlayBase::setAlignment(event, crease_defender_assignments);
-    DefensePlayBase::updatePassDefenderControlParams(pass_defender_assignments);
+    setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
+    setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
+    setAlignment(event, crease_defender_assignments);
+    updatePassDefenderControlParams(pass_defender_assignments);
 
     PriorityTacticVector tactics_to_return = {{}, {}};
     tactics_to_return[0].insert(tactics_to_return[0].end(), crease_defenders.begin(),

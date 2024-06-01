@@ -30,22 +30,6 @@ cc_library(
 )
 
 cc_library(
-    name = "enemy_ball_placement_play",
-    srcs = ["enemy_ball_placement_play.cpp"],
-    hdrs = ["enemy_ball_placement_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/util/generic_factory",
-        "//software/world:game_state",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "example_play",
     srcs = ["example_play.cpp"],
     hdrs = ["example_play.h"],
@@ -198,7 +182,6 @@ cc_library(
     name = "all_plays",
     deps = [
         ":corner_kick_play",
-        ":enemy_ball_placement_play",
         ":example_play",
         ":free_kick_play",
         ":halt_play",
@@ -210,6 +193,7 @@ cc_library(
         "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
         "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/play/enemy_free_kick:enemy_free_kick_play",
+        "//software/ai/hl/stp/play/enemy_ball_placement:enemy_ball_placement_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:pass_endurance_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
@@ -308,19 +292,6 @@ py_test(
     tags = [
         "exclusive",
     ],
-    deps = [
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
-    ],
-)
-
-py_test(
-    name = "enemy_ball_placement_play_test",
-    srcs = [
-        "enemy_ball_placement_play_test.py",
-    ],
-    tags = ["exclusive"],
     deps = [
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",

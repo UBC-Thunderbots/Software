@@ -22,8 +22,12 @@ void EnemyFreeKickPlayFSM::blockEnemyKicker(const Update& event)
 
 void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tactics)
 {
+    if (num_tactics <= 0) {
+        return;
+    }
+
     // One tactic is always designated as the free kick defender
-    unsigned int num_defenders             = num_tactics - 1;
+    int num_defenders             = num_tactics - 1;
     PriorityTacticVector tactics_to_return = {{}, {}, {}};
     Point block_kick_point;
 
@@ -59,22 +63,26 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     std::vector<DefenderAssignment> crease_defender_assignments;
     std::vector<DefenderAssignment> pass_defender_assignments;
     std::queue<DefenderAssignment> assignments_skipped;
-    for (unsigned int i = 0; i < num_defenders; i++)
+    for (int i = 0; i < num_defenders; i++)
     {
         DefenderAssignment defender_assignment;
-        if (i + assignments_skipped.size() < assignments.size() - 1)
+        int assignment_index_with_skipped = i + assignments_skipped.size();
+        int assignment_index_last_assignment =  assignments.size() - 1;
+
+        if (assignment_index_with_skipped < assignment_index_last_assignment)
         {
-            defender_assignment = assignments.at(i + assignments_skipped.size());
+            defender_assignment = assignments.at(assignment_index_with_skipped);
 
             // Continuously skips pass defenders within threshold meters of free kick
             // defender
             while (defender_assignment.type == PASS_DEFENDER &&
-                   (i + assignments_skipped.size() < assignments.size() - 1) &&
+                   (assignment_index_with_skipped < assignment_index_last_assignment) &&
                    distance(defender_assignment.target, block_kick_point) <=
                        TOO_CLOSE_THRESHOLD_METERS)
             {
                 assignments_skipped.push(defender_assignment);
-                defender_assignment = assignments.at(i + assignments_skipped.size());
+                assignment_index_with_skipped = i + assignments_skipped.size();
+                defender_assignment = assignments.at(assignment_index_with_skipped);
             }
         }
         else
@@ -129,12 +137,10 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
 
     // Reset tactics if the number of crease defenders or pass defenders
     // we intend to assign has changed
-    DefensePlayBase::setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
-    DefensePlayBase::setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
-
-    DefensePlayBase::setAlignment(event, crease_defender_assignments);
-    DefensePlayBase::updatePassDefenderControlParams(pass_defender_assignments);
-
+    setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
+    setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
+    setAlignment(event, crease_defender_assignments);
+    updatePassDefenderControlParams(pass_defender_assignments);
 
     tactics_to_return[1].insert(tactics_to_return[1].end(), crease_defenders.begin(),
                                 crease_defenders.end());
