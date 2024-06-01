@@ -75,16 +75,20 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
-## [EnemyFreeKickPlayFSM](/src/software/ai/hl/stp/play/enemy_free_kick/enemy_free_kick_play_fsm.h)
+## [EnemyBallPlacementPlayFSM](/src/software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play_fsm.h)
 
 ```mermaid
 
 stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
-[*] --> BlockEnemyKickerState
-BlockEnemyKickerState --> BlockEnemyKickerState : <i>blockEnemyKicker</i>
-Terminate:::terminate --> Terminate:::terminate
+[*] --> WaitState
+WaitState --> AvoidState : [hasPlacementPoint]\n<i>setPlacementPoint</i>
+WaitState --> WaitState : [!hasPlacementPoint]
+AvoidState --> AvoidState : [!isNearlyPlaced]\n<i>avoid</i>
+AvoidState --> DefenseState : [isNearlyPlaced]
+DefenseState --> DefenseState : [isNearlyPlaced]\n<i>enterDefensiveFormation</i>
+DefenseState --> AvoidState : [!isNearlyPlaced]
 
 ```
 

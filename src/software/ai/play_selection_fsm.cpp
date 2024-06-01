@@ -2,8 +2,8 @@
 
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play.h"
 #include "software/ai/hl/stp/play/corner_kick_play.h"
-#include "software/ai/hl/stp/play/enemy_ball_placement_play.h"
 #include "software/ai/hl/stp/play/enemy_free_kick/enemy_free_kick_play.h"
+#include "software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play.h"
 #include "software/ai/hl/stp/play/free_kick_play.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/kickoff_enemy_play.h"
