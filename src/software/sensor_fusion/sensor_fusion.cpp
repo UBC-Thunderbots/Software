@@ -130,7 +130,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         }
     }
 
-    if (game_state.isOurBallPlacement())
+    if (game_state.isBallPlacement())
     {
         auto pt = getBallPlacementPoint(packet);
         if (pt)
@@ -139,9 +139,10 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         }
         else
         {
-            LOG(WARNING)
-                << "In BALL_PLACEMENT_US game state, but no ball placement point found"
-                << std::endl;
+            std::string state = game_state.isOurBallPlacement() ? "BALL_PLACEMENT_US"
+                                                                : "BALL_PLACEMENT_THEM";
+            LOG(WARNING) << "In " << state << " state, but no ball placement point found"
+                         << std::endl;
         }
     }
 
@@ -190,6 +191,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     std::optional<Ball> new_ball;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
                                                 max_valid_x, ignore_invalid_camera_data);
+
     auto yellow_team =
         createTeamDetection({ssl_detection_frame}, TeamColour::YELLOW, min_valid_x,
                             max_valid_x, ignore_invalid_camera_data);

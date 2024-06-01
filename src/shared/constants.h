@@ -71,6 +71,9 @@ constexpr double BALL_MASS_KG = 0.004593;
 // The max allowed speed of the robot when the stop command is issued, in meters per
 // second
 static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
+// The margin by which the speed of the robot should stay below the maximum allowed speed
+// when the stop command is issued
+static const double STOP_COMMAND_SPEED_SAFETY_MARGIN_METERS_PER_SECOND = 0.2;
 // The max allowed speed of the robot before collisions would incur a foul
 static const double COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND = 0.5;
 // The minimum distance from the ball all robots must be when the stop command is issued
@@ -82,6 +85,9 @@ static const double ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND = 3.0;
 static const double ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 4.0;
 
 static const double ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED = 9.81;
+// The minimum distance the non-placing team must keep to avoid ball placement
+// interference
+static const double ENEMY_BALL_PLACEMENT_DISTANCE_METERS = 0.5;
 
 /*Simulator Constants*/
 
