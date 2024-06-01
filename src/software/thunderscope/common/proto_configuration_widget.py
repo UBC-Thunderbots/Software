@@ -104,9 +104,9 @@ class ProtoConfigurationWidget(QWidget):
 
         :return: the top of the layout, the bottom of the layout, and edit box widget
         """
-        save_button = QPushButton("Save")
-        load_proto_button = QPushButton("Load Proto")
-        reset_button = QPushButton("Reset")
+        save_button = QPushButton("Save Parameters")
+        load_proto_button = QPushButton("Load Parameters")
+        reset_button = QPushButton("Reset All Parameters")
 
         reset_button.clicked.connect(self.reset_button_callback)
         save_button.clicked.connect(self.save_proto_callback)
