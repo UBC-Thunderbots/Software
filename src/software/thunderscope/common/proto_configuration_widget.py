@@ -22,6 +22,7 @@ class ProtoConfigurationWidget(QWidget):
 
     """
 
+    # where we are saving the default configuration file 
     DEFAULT_SAVE_DIRECTORY = "/tmp/tbotspython/thunderbots_configurations_proto"
 
     def __init__(
@@ -262,6 +263,8 @@ class ProtoConfigurationWidget(QWidget):
 
         self.build_proto(self.proto_to_configure)
         self.update_widget()
+
+        self.on_change_callback(None, None, self.proto_to_configure)
 
     def __handle_search_query_changed(self, search_term):
         """Given a new search term, reconfigure the parameter tree with parameters
