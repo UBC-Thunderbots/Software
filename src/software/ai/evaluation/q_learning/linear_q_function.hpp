@@ -28,9 +28,11 @@ class LinearQFunction : public QFunction<TState, TAction>
      * @param features the feature extractor to use on the state representation
      * @param learning_rate the initial learning rate
      * @param learning_rate the initial discount factor
+     * @param weights initial weights to use, or std::nullopt to initialize weights with 0
      */
     explicit LinearQFunction(FeatureExtractor<TState, TAction> features,
-                             double learning_rate, double discount_factor);
+                             double learning_rate, double discount_factor,
+                             std::optional<Eigen::VectorXd> weights = std::nullopt);
 
     double getQValue(const TState& state, const TAction::Enum& action) const override;
 
@@ -38,6 +40,13 @@ class LinearQFunction : public QFunction<TState, TAction>
 
     void update(const TState& state, const TState& next_state,
                 const TAction::Enum& action, double reward) override;
+
+    /**
+     * Gets the weights of the LinearQFunction.
+     * 
+     * @returns the function weights
+     */
+    const Eigen::VectorXd& getWeights();
 
     /**
      * Sets the learning rate used in the Q-function update equation.
@@ -70,9 +79,15 @@ class LinearQFunction : public QFunction<TState, TAction>
 template <typename TState, typename TAction>
 LinearQFunction<TState, TAction>::LinearQFunction(
     FeatureExtractor<TState, TAction> features, double learning_rate,
-    double discount_factor)
-    : features_(features), weights_(features_.numFeatures() * TAction::numValues())
+    double discount_factor, std::optional<Eigen::VectorXd> weights)
+    : features_(features),
+      weights_(weights.value_or(
+          Eigen::VectorXd(features_.numFeatures() * TAction::numValues())))
 {
+    CHECK(static_cast<size_t>(weights_.size()) ==
+          features_.numFeatures() * TAction::numValues())
+        << "Provided LinearQFunction weights vector has wrong dimensions";
+
     setLearningRate(learning_rate);
     setDiscountFactor(discount_factor);
 }
@@ -108,6 +123,12 @@ void LinearQFunction<TState, TAction>::update(const TState& state,
     double temporal_diff_target = reward + discount_factor_ * getMaxQValue(next_state);
     double delta                = temporal_diff_target - getQValue(state, action);
     weights_                    = weights_ + (learning_rate_ * delta * feature_vector);
+}
+
+template <typename TState, typename TAction>
+const Eigen::VectorXd& LinearQFunction<TState, TAction>::getWeights()
+{
+    return weights_;
 }
 
 template <typename TState, typename TAction>

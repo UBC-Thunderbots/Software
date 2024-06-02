@@ -44,8 +44,9 @@ class NetworkLoggerSingleton
             logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
                                &ColouredCoutSink::displayColouredLog);
 
+        // Sink for logging to CSV files
         auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(CSV_PATH),
-                                                  &CSVSink::appendToFile);
+                                                  &CSVSink::writeToFile);
 
         // Sink for PlotJuggler plotting
         auto plotjuggler_handle = logWorker->addSink(std::make_unique<PlotJugglerSink>(),

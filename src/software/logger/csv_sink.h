@@ -18,14 +18,15 @@ class CSVSink
      * @param log_directory the directory to save files to
      */
     CSVSink(const std::string& log_directory);
+    
     /**
-     * This function is called on every call to LOG(CSV, filename). It appends to the
+     * This function is called on every call to LOG(CSV, filename). It writes to the
      * specified file the message in log_entry. Note for .csv files: columns are separated
      * with "," and rows are separated with new line characters.
      *
      * @param log_entry the message received on a LOG() call
      */
-    void appendToFile(g3::LogMessageMover log_entry);
+    void writeToFile(g3::LogMessageMover log_entry);
 
    private:
     std::string log_directory;

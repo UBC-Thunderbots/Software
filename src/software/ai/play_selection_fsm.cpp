@@ -15,10 +15,13 @@
 PlaySelectionFSM::PlaySelectionFSM(std::shared_ptr<Strategy> strategy)
     : strategy_(strategy),
       current_dynamic_play_(nullptr),
+      attacker_tactic_(std::make_shared<AttackerTactic>(strategy)),
       offensive_friendly_third_play_(
-          std::make_shared<OffensiveFriendlyThirdPlay>(strategy)),
-      offensive_middle_third_play_(std::make_shared<OffensiveMiddleThirdPlay>(strategy)),
-      offensive_enemy_third_play_(std::make_shared<OffensiveEnemyThirdPlay>(strategy))
+          std::make_shared<OffensiveFriendlyThirdPlay>(strategy, attacker_tactic_)),
+      offensive_middle_third_play_(
+          std::make_shared<OffensiveMiddleThirdPlay>(strategy, attacker_tactic_)),
+      offensive_enemy_third_play_(
+          std::make_shared<OffensiveEnemyThirdPlay>(strategy, attacker_tactic_))
 {
 }
 

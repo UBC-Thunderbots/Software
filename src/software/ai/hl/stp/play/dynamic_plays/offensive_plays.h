@@ -20,7 +20,8 @@ class OffensivePlay : public DynamicPlay
      * @param feasibility_scorer the feasibility scorer for the play
      */
     explicit OffensivePlay(std::shared_ptr<Strategy> strategy,
-                           std::unique_ptr<FeasibilityScorer> feasibility_scorer);
+                           std::unique_ptr<FeasibilityScorer> feasibility_scorer,
+                           std::shared_ptr<AttackerTactic> attacker_tactic);
 
     void updateTactics(const PlayUpdate &play_update) override;
 
@@ -37,9 +38,11 @@ class OffensivePlay : public DynamicPlay
 class OffensiveFriendlyThirdPlay : public OffensivePlay
 {
    public:
-    explicit OffensiveFriendlyThirdPlay(std::shared_ptr<Strategy> strategy)
+    explicit OffensiveFriendlyThirdPlay(std::shared_ptr<Strategy> strategy,
+                                        std::shared_ptr<AttackerTactic> attacker_tactic)
         : OffensivePlay(strategy,
-                        std::make_unique<OffensiveFriendlyThirdFeasibilityScorer>())
+                        std::make_unique<OffensiveFriendlyThirdFeasibilityScorer>(),
+                        attacker_tactic)
     {
     }
 };
@@ -52,9 +55,11 @@ class OffensiveFriendlyThirdPlay : public OffensivePlay
 class OffensiveMiddleThirdPlay : public OffensivePlay
 {
    public:
-    explicit OffensiveMiddleThirdPlay(std::shared_ptr<Strategy> strategy)
+    explicit OffensiveMiddleThirdPlay(std::shared_ptr<Strategy> strategy,
+                                      std::shared_ptr<AttackerTactic> attacker_tactic)
         : OffensivePlay(strategy,
-                        std::make_unique<OffensiveMiddleThirdFeasibilityScorer>())
+                        std::make_unique<OffensiveMiddleThirdFeasibilityScorer>(),
+                        attacker_tactic)
     {
     }
 };
@@ -67,9 +72,11 @@ class OffensiveMiddleThirdPlay : public OffensivePlay
 class OffensiveEnemyThirdPlay : public OffensivePlay
 {
    public:
-    explicit OffensiveEnemyThirdPlay(std::shared_ptr<Strategy> strategy)
+    explicit OffensiveEnemyThirdPlay(std::shared_ptr<Strategy> strategy,
+                                     std::shared_ptr<AttackerTactic> attacker_tactic)
         : OffensivePlay(strategy,
-                        std::make_unique<OffensiveEnemyThirdFeasibilityScorer>())
+                        std::make_unique<OffensiveEnemyThirdFeasibilityScorer>(),
+                        attacker_tactic)
     {
     }
 };

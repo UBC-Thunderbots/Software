@@ -14,8 +14,9 @@ const std::string logging_dir = "software/logger";
 TEST(CSVSinkTest, test_csv_log_appends)
 {
     std::unique_ptr<g3::LogWorker> logWorker = g3::LogWorker::createLogWorker();
-    auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(logging_dir),
-                                              &CSVSink::appendToFile);
+    auto csv_sink_handle =
+        logWorker->addSink(std::make_unique<CSVSink>(logging_dir), &CSVSink::writeToFile);
+
     // We need to shut down logging started in tbots gtest main to setup the csv sinks
     g3::internal::shutDownLogging();
     g3::initializeLogging(logWorker.get());
@@ -36,8 +37,9 @@ TEST(CSVSinkTest, test_csv_log_appends)
 TEST_P(CSVSinkTest, test_csv_log_levels_not_logging)
 {
     std::unique_ptr<g3::LogWorker> logWorker = g3::LogWorker::createLogWorker();
-    auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(logging_dir),
-                                              &CSVSink::appendToFile);
+    auto csv_sink_handle =
+        logWorker->addSink(std::make_unique<CSVSink>(logging_dir), &CSVSink::writeToFile);
+
     // We need to shut down logging started in tbots gtest main to setup the csv sinks
     g3::internal::shutDownLogging();
     g3::initializeLogging(logWorker.get());

@@ -3,9 +3,10 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 OffensivePlay::OffensivePlay(std::shared_ptr<Strategy> strategy,
-                             std::unique_ptr<FeasibilityScorer> feasibility_scorer)
+                             std::unique_ptr<FeasibilityScorer> feasibility_scorer,
+                             std::shared_ptr<AttackerTactic> attacker_tactic)
     : DynamicPlay(strategy, std::move(feasibility_scorer)),
-      attacker_tactic_(std::make_shared<AttackerTactic>(strategy)),
+      attacker_tactic_(attacker_tactic),
       defense_play_(std::make_unique<DefensePlay>(strategy))
 {
 }
@@ -35,13 +36,13 @@ void OffensivePlay::updateTactics(const PlayUpdate& play_update)
 }
 
 static TGenericFactory<std::string, Play, OffensiveFriendlyThirdPlay,
-                       std::shared_ptr<Strategy>>
+                       std::shared_ptr<Strategy>, std::shared_ptr<AttackerTactic>>
     offensive_friendly_third_play_factory;
 
 static TGenericFactory<std::string, Play, OffensiveMiddleThirdPlay,
-                       std::shared_ptr<Strategy>>
+                       std::shared_ptr<Strategy>, std::shared_ptr<AttackerTactic>>
     offensive_middle_third_play_factory;
 
 static TGenericFactory<std::string, Play, OffensiveEnemyThirdPlay,
-                       std::shared_ptr<Strategy>>
+                       std::shared_ptr<Strategy>, std::shared_ptr<AttackerTactic>>
     offensive_enemy_third_play_factory;

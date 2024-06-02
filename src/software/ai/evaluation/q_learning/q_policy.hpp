@@ -25,8 +25,8 @@ class QPolicy
      * @param q_function the Q-function of the policy
      * @param action_selection_strategy the action selection strategy to use
      */
-    explicit QPolicy(std::unique_ptr<QFunction<TState, TAction>> q_function,
-                     std::unique_ptr<ActionSelectionStrategy<TState, TAction>>
+    explicit QPolicy(std::shared_ptr<QFunction<TState, TAction>> q_function,
+                     std::shared_ptr<ActionSelectionStrategy<TState, TAction>>
                          action_selection_strategy);
 
     /**
@@ -50,10 +50,10 @@ class QPolicy
 
    private:
     // The Q-function of the policy
-    std::unique_ptr<QFunction<TState, TAction>> q_function_;
+    std::shared_ptr<QFunction<TState, TAction>> q_function_;
 
     // The action selection strategy to use
-    std::unique_ptr<ActionSelectionStrategy<TState, TAction>> action_selection_strategy_;
+    std::shared_ptr<ActionSelectionStrategy<TState, TAction>> action_selection_strategy_;
 
     // The last state used to select an action
     std::optional<TState> last_state_;
@@ -64,10 +64,10 @@ class QPolicy
 
 template <typename TState, typename TAction>
 QPolicy<TState, TAction>::QPolicy(
-    std::unique_ptr<QFunction<TState, TAction>> q_function,
-    std::unique_ptr<ActionSelectionStrategy<TState, TAction>> action_selection_strategy)
-    : q_function_(std::move(q_function)),
-      action_selection_strategy_(std::move(action_selection_strategy)),
+    std::shared_ptr<QFunction<TState, TAction>> q_function,
+    std::shared_ptr<ActionSelectionStrategy<TState, TAction>> action_selection_strategy)
+    : q_function_(q_function),
+      action_selection_strategy_(action_selection_strategy),
       last_state_(std::nullopt),
       last_action_(std::nullopt)
 {
