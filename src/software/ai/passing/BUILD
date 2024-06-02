@@ -100,6 +100,7 @@ cc_library(
         "receiver_position_generator.hpp",
     ],
     deps = [
+        ":cost_functions",
         ":field_pitch_division",
         ":pass",
         ":pass_with_rating",
@@ -107,6 +108,18 @@ cc_library(
         "//software/geom:rectangle",
         "//software/util/make_enum",
         "//software/world",
+    ],
+)
+
+cc_test(
+    name = "receiver_position_generator_test",
+    srcs = ["receiver_position_generator_test.cpp"],
+    deps = [
+        ":eighteen_zone_pitch_division",
+        ":receiver_position_generator",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/math:math_functions",
+        "//software/test_util",
     ],
 )
 
