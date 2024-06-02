@@ -1,9 +1,9 @@
 #include "software/ai/play_selection_fsm.h"
 
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play.h"
-#include "software/ai/hl/stp/play/enemy_ball_placement_play.h"
-#include "software/ai/hl/stp/play/enemy_free_kick_play.h"
 #include "software/ai/hl/stp/play/free_kick/free_kick_play.h"
+#include "software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play.h"
+#include "software/ai/hl/stp/play/enemy_free_kick/enemy_free_kick_play.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/kickoff_enemy_play.h"
 #include "software/ai/hl/stp/play/kickoff_friendly_play.h"
@@ -78,7 +78,7 @@ void PlaySelectionFSM::setupSetPlay(const Update& event)
 
     if (event.game_state.isTheirDirectFree() || event.game_state.isTheirIndirectFree())
     {
-        event.set_current_play(std::make_unique<EnemyFreekickPlay>(ai_config));
+        event.set_current_play(std::make_unique<EnemyFreeKickPlay>(ai_config));
     }
 }
 

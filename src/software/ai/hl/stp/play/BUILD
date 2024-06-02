@@ -169,8 +169,6 @@ cc_library(
 cc_library(
     name = "all_plays",
     deps = [
-        ":enemy_ball_placement_play",
-        ":enemy_free_kick_play",
         ":example_play",
         ":halt_play",
         ":kickoff_enemy_play",
@@ -181,6 +179,8 @@ cc_library(
         "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
         "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/play/free_kick:free_kick_play",
+        "//software/ai/hl/stp/play/enemy_ball_placement:enemy_ball_placement_play",
+        "//software/ai/hl/stp/play/enemy_free_kick:enemy_free_kick_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:pass_endurance_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
@@ -395,5 +395,24 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:play_factory",
+    ],
+)
+
+py_test(
+    name = "passing_sim_test",
+    srcs = [
+        "passing_sim_test.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    tags = ["exclusive"],
+    deps = [
+        "//proto:import_all_protos",
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )

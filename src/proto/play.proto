@@ -11,7 +11,7 @@ enum PlayName
     ShootOrPassPlay                    = 5;
     BallPlacementPlay                  = 6;
     HaltPlay                           = 7;
-    EnemyFreekickPlay                  = 8;
+    EnemyFreeKickPlay                  = 8;
     ExamplePlay                        = 9;
     DefensePlay                        = 10;
     EnemyBallPlacementPlay             = 11;
