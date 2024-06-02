@@ -32,7 +32,7 @@ std::string AttackerTactic::getFSMState() const
     {
         state = current_skill_->getFSMState(*last_execution_robot);
     }
-    
+
     return state;
 }
 
@@ -55,14 +55,14 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     {
         AttackerMdpState attacker_mdp_state{tactic_update.world_ptr, strategy_};
 
-        // Update the policy if we completed executing a skill 
+        // Update the policy if we completed executing a skill
         if (current_skill_)
         {
             double reward = gameplay_monitor_.endStepObservation(tactic_update.world_ptr);
             policy_.update(attacker_mdp_state, reward);
 
-            const static Eigen::IOFormat CSV_FORMAT(
-                Eigen::StreamPrecision, Eigen::DontAlignCols, ",", "\n");
+            const static Eigen::IOFormat CSV_FORMAT(Eigen::StreamPrecision,
+                                                    Eigen::DontAlignCols, ",", "\n");
 
             // Save current Q-function weights to CSV file
             LOG(CSV_OVERWRITE, ATTACKER_MDP_Q_FUNCTION_WEIGHTS_FILE_NAME)

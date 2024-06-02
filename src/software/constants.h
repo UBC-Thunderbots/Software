@@ -57,4 +57,5 @@ const std::string SSL_REFEREE_ADDRESS          = "224.5.23.1";
 static constexpr unsigned int SSL_REFEREE_PORT = 10003;
 
 // Files where Q-learning weights are saved to at runtime
-const std::string ATTACKER_MDP_Q_FUNCTION_WEIGHTS_FILE_NAME = "attacker_mdp_q_function_weights.csv";
+const std::string ATTACKER_MDP_Q_FUNCTION_WEIGHTS_FILE_NAME =
+    "attacker_mdp_q_function_weights.csv";

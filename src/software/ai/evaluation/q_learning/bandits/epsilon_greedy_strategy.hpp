@@ -70,7 +70,7 @@ TAction::Enum EpsilonGreedyStrategy<TState, TAction>::selectAction(
         // Exploit: select the action with the largest Q-value
         // i.e. argmax(Q(s, a)) over the set of all actions A
         typename TAction::Enum selected_action = all_actions_.back();
-        double max_q_value = std::numeric_limits<double>::lowest();
+        double max_q_value                     = std::numeric_limits<double>::lowest();
 
         for (const auto& action : all_actions_)
         {

@@ -43,7 +43,7 @@ class LinearQFunction : public QFunction<TState, TAction>
 
     /**
      * Gets the weights of the LinearQFunction.
-     * 
+     *
      * @returns the function weights
      */
     const Eigen::VectorXd& getWeights();

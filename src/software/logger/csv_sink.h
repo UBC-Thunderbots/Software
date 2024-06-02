@@ -18,7 +18,7 @@ class CSVSink
      * @param log_directory the directory to save files to
      */
     CSVSink(const std::string& log_directory);
-    
+
     /**
      * This function is called on every call to LOG(CSV, filename). It writes to the
      * specified file the message in log_entry. Note for .csv files: columns are separated
