@@ -4,14 +4,14 @@
 
 AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
-      strategy(strategy),
+      strategy_(strategy),
       q_function_(std::make_shared<LinearQFunction<AttackerMdpState, AttackerMdpAction>>(
           AttackerMdpFeatureExtractor(),
-          strategy->getAiConfig().attacker_tactic_config().learning_rate(),
-          strategy->getAiConfig().attacker_tactic_config().discount_factor())),
+          strategy_->getAiConfig().attacker_tactic_config().learning_rate(),
+          strategy_->getAiConfig().attacker_tactic_config().discount_factor())),
       action_selection_strategy_(
           std::make_shared<EpsilonGreedyStrategy<AttackerMdpState, AttackerMdpAction>>(
-              strategy->getAiConfig()
+              strategy_->getAiConfig()
                   .attacker_tactic_config()
                   .action_selection_epsilon())),
       policy_(q_function_, action_selection_strategy_),
@@ -53,7 +53,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     if (!current_skill_ || (last_execution_robot == tactic_update.robot.id() &&
                             current_skill_->done(tactic_update.robot.id())))
     {
-        AttackerMdpState attacker_mdp_state{tactic_update.world_ptr, strategy};
+        AttackerMdpState attacker_mdp_state{tactic_update.world_ptr, strategy_};
 
         // Update the policy if we completed executing a skill 
         if (current_skill_)
@@ -71,7 +71,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
         // Select the next skill to execute according to the policy
         auto action    = policy_.selectAction(attacker_mdp_state);
-        current_skill_ = createSkillFromAttackerMdpAction(action, strategy);
+        current_skill_ = createSkillFromAttackerMdpAction(action, strategy_);
 
         gameplay_monitor_.startStepObservation(tactic_update.world_ptr);
     }
