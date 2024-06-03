@@ -23,9 +23,9 @@ class ThreadedProtoUdpListener
      * from the network
      * @param multicast If true, joins the multicast group of given ip_address
      */
-    ThreadedProtoUdpListener(const std::string& ip_address, unsigned short port, const std::string& interface,
+    ThreadedProtoUdpListener(const std::string& ip_address, unsigned short port,
                              std::function<void(ReceiveProtoT)> receive_callback,
-                             bool multicast);
+                             bool multicast, const std::string& interface);
 
     /**
      * Creates a ThreadedProtoUdpListener that will listen for ReceiveProtoT packets
@@ -60,8 +60,8 @@ class ThreadedProtoUdpListener
 
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
-    const std::string& ip_address, const unsigned short port, const std::string& interface,
-    std::function<void(ReceiveProtoT)> receive_callback, bool multicast)
+    const std::string& ip_address, const unsigned short port,
+    std::function<void(ReceiveProtoT)> receive_callback, bool multicast, const std::string& interface)
     : io_service(),
       udp_listener(io_service, ip_address, port, interface, receive_callback, multicast)
 {

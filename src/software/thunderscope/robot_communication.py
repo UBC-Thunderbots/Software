@@ -109,6 +109,7 @@ class RobotCommunication(object):
             SSL_VISION_PORT,
             lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
             True,
+            self.interface,
         )
 
         self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
@@ -116,6 +117,7 @@ class RobotCommunication(object):
             SSL_REFEREE_PORT,
             lambda data: self.current_proto_unix_io.send_proto(Referee, data),
             True,
+            "wlp3s0",
         )
 
         self.robots_connected_to_fullsystem = {
@@ -300,22 +302,23 @@ class RobotCommunication(object):
             ROBOT_STATUS_PORT,
             lambda data: self.__forward_to_proto_unix_io(RobotStatus, data),
             True,
+            self.interface,
         )
 
         self.receive_robot_log = tbots_cpp.RobotLogProtoListener(
             self.multicast_channel,
             ROBOT_LOGS_PORT,
-            self.interface,
             lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
             True,
+            self.interface,
         )
 
         self.receive_robot_crash = tbots_cpp.RobotCrashProtoListener(
             self.multicast_channel,
             ROBOT_CRASH_PORT,
-            self.interface,
             lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),
             True,
+            self.interface,
         )
 
         # Create multicast senders
@@ -323,7 +326,7 @@ class RobotCommunication(object):
             self.send_primitive_set = tbots_cpp.PrimitiveSetProtoRadioSender()
         else:
             self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
-                self.multicast_channel, PRIMITIVE_PORT, self.interface, True
+                self.multicast_channel, PRIMITIVE_PORT, True, self.interface,
             )
 
         self.running = True

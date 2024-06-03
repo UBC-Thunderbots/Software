@@ -151,7 +151,7 @@ class Gamecontroller(object):
                 autoref_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP, self.referee_port, self.interface, __send_referee_command, True,
+            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True, self.interface
         )
 
         blue_full_system_proto_unix_io.register_observer(

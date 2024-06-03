@@ -2,6 +2,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from proto.import_all_protos import *
 from enum import Enum, IntEnum
 from proto.robot_log_msg_pb2 import LogLevel
+from proto.parameters_pb2 import AiControlConfig
 
 import textwrap
 
@@ -196,7 +197,6 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
 
     """
 )
-
 
 def is_field_message_empty(field: Field) -> bool:
     """

@@ -170,6 +170,9 @@ def config_proto_to_field_list(
             if fuzz.partial_ratio(search_term, key) < search_filter_threshold:
                 continue
 
+        print(descriptor)
+        print(type(descriptor))
+        print(descriptor.name)
         if descriptor.type == descriptor.TYPE_MESSAGE:
             field_list.append(
                 {

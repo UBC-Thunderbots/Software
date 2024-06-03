@@ -5,6 +5,7 @@ from google.protobuf.json_format import MessageToDict
 from thefuzz import fuzz
 from proto.import_all_protos import *
 from software.thunderscope.common import proto_parameter_tree_util
+from software.thunderscope.constants import CUSTOM_PARAMETERS_OVERRIDE
 
 
 class ProtoConfigurationWidget(QWidget):
@@ -119,6 +120,7 @@ class ProtoConfigurationWidget(QWidget):
 
         """
 
+        print(CUSTOM_PARAMETERS_OVERRIDE)
         field_list = proto_parameter_tree_util.config_proto_to_field_list(
             message,
             search_term=search_term,

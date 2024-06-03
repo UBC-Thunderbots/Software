@@ -21,8 +21,8 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
      * @param port The port to send SendProto data on
      * @param multicast If true, joins the multicast group of given ip_address
      */
-    ThreadedProtoUdpSender(const std::string& ip_address, unsigned short port, const std::string& interface,
-                           bool multicast)
+    ThreadedProtoUdpSender(const std::string& ip_address, unsigned short port,
+                           bool multicast, const std::string& interface="lo")
         : ThreadedUdpSender(ip_address, port, interface, multicast)
     {
     }
