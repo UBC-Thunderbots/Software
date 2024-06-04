@@ -5,7 +5,6 @@
 #include "proto/vision.pb.h"
 #include "proto/visualization.pb.h"
 #include "proto/world.pb.h"
-#include "software/ai/evaluation/shot.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/ai/passing/pass_with_rating.h"
