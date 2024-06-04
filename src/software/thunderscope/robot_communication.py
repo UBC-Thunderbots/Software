@@ -75,6 +75,11 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
+        self.thunderbots_config_buffer = ThreadSafeBuffer(1, ThunderbotsConfig)
+        self.current_proto_unix_io.register_observer(
+                ThunderbotsConfig, self.thunderbots_config_buffer
+        )
+
         self.send_estop_state_thread = threading.Thread(
             target=self.__send_estop_state, daemon=True
         )
@@ -224,6 +229,10 @@ class RobotCommunication(object):
 
         """
         while self.running:
+            thunderbots_config = self.thunderbots_config_buffer.get(block=False, return_cached=False)
+            if thunderbots_config is not None:
+                print(thunderbots_config)
+
             # total primitives for all robots
             robot_primitives = {}
 

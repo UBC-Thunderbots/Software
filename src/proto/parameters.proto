@@ -50,14 +50,7 @@ message AiControlConfig
     // Override the existing play with the Play enum provided
     required PlayName override_ai_play = 2 [default = UseAiSelection];
 
-    // The referee interface
-    required string referee_interface = 3 [default = "lo"];
-
-    // The robot status interface
-    required string robot_status_interface = 4 [default = "lo"];
-
-    // The vision network interface
-    required string vision_network_interface = 5 [default = "lo"];
+    required NetworkConfig network_config = 3;
 }
 
 message AiParameterConfig
@@ -427,4 +420,16 @@ message PossessionTrackerConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
+}
+
+message NetworkConfig
+{
+    // The referee interface
+    required string referee_interface = 1 [default = "lo"];
+
+    // The robot status interface
+    required string robot_status_interface = 2 [default = "lo"];
+
+    // The vision network interface
+    required string vision_network_interface = 3 [default = "lo"];
 }

@@ -2,7 +2,12 @@ from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
 from google.protobuf.json_format import MessageToDict
 from thefuzz import fuzz
+import netifaces
 
+
+CUSTOM_PARAMETERS_OVERRIDE = {"referee_interface":          "__create_network_enum",
+                              "robot_status_interface":     "__create_network_enum",
+                              "vision_network_interface":   "__create_network_enum"}
 
 def __create_int_parameter_writable(key, value, descriptor):
     """Converts an int field of a proto to a NumericParameterItem with
@@ -124,6 +129,26 @@ def __create_parameter_read_only(key, value, descriptor):
     return {"name": key, "type": "str", "value": value, "readonly": True}
 
 
+def __create_network_enum(key, value, _):
+    """Converts an enum field in a protobuf to a ListParameter. Uses
+    the options to lookup all possible enum values and provides them
+    as a dropdown option.
+
+    :param key: The name of the parameter
+    :param value: The default value
+    :param descriptor: The proto descriptor
+
+    """
+    network_interfaces = netifaces.interfaces()
+    
+    return parametertree.parameterTypes.ListParameter(
+        name=key,
+        default=None,
+        value=value,
+        limits=network_interfaces
+    )
+
+
 def get_string_val(descriptor, value):
     """
     Converts the given value to a string depending on the descriptor type
@@ -170,10 +195,9 @@ def config_proto_to_field_list(
             if fuzz.partial_ratio(search_term, key) < search_filter_threshold:
                 continue
 
-        print(descriptor)
-        print(type(descriptor))
-        print(descriptor.name)
-        if descriptor.type == descriptor.TYPE_MESSAGE:
+        if descriptor.name in CUSTOM_PARAMETERS_OVERRIDE.keys():
+            field_list.append(eval(CUSTOM_PARAMETERS_OVERRIDE[descriptor.name])(key, value, descriptor))
+        elif descriptor.type == descriptor.TYPE_MESSAGE:
             field_list.append(
                 {
                     "name": key,
