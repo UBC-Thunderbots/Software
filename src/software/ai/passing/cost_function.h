@@ -116,11 +116,22 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
  * @param pass The pass to rate
  * @param passing_config The passing config used for tuning
  * @return A value in [0,1] indicating the quality of the pass, where
- *        1 indicates the pass is ideal and 0 indicates the pass is as
+ *        1 indicates the pass is ideal and 0 indicates the pass is bad as
  *        it passes back toward our friendly half.
  */
 double ratePassForwardQuality(const Pass& pass,
                               const TbotsProto::PassingConfig& passing_config);
+
+/**
+ * Encourage passes that are not too close to the passer
+ * @param pass The pass to rate
+ * @param passing_config The passing config used for tuning
+ * @return A value in [0,1] indicating the quality of the pass, where
+ *        1 indicates the pass is ideal and 0 indicates the pass is bad as
+ *        it is too close to the passer.
+ */
+double ratePassNotTooClose(const Pass& pass,
+                           const TbotsProto::PassingConfig& passing_config);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted

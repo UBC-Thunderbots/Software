@@ -4,9 +4,9 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/passing/receiver_position_generator.hpp"
-#include "software/ai/passing/gradient_descent_pass_generator.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/ai/passing/gradient_descent_pass_generator.h"
+#include "software/ai/passing/receiver_position_generator.hpp"
 
 /**
  * A Play for Direct Free kicks

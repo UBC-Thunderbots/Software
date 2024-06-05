@@ -190,7 +190,7 @@ message PassingConfig
     // The min distance in meters that the receiver can be from the passer when receiving
     // a pass.
     required double receiver_ideal_min_distance_meters = 16 [
-        default                   = 2.0,
+        default                   = 1.5,
         (bounds).min_double_value = 0.1,
         (bounds).max_double_value = 20.0
     ];
@@ -336,8 +336,11 @@ message ShootOrPassPlayConfig
 
     // The minimum pass quality we're willing to attempt before ramping
     // down the score to abs_min_pass_score
-    required double min_perfect_pass_score = 6
-        [default = 0.85, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    required double min_perfect_pass_score = 6 [
+        default                   = 0.85,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 1.0
+    ];
 
     // When we're choosing a pass, we start by looking for a pass with a perfect score
     // of 1, and then over time lower the score we're will to accept. This parameter
@@ -506,16 +509,17 @@ message CostVisualizationConfig
     required int32 num_cols              = 2
         [default = 45, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
     // cost functions
-    required bool static_position_quality = 3 [default = false];
-    required bool pass_forward_quality    = 7 [default = false];
+    required bool static_position_quality    = 3 [default = false];
+    required bool pass_forward_quality       = 7 [default = false];
+    required bool pass_not_too_close_quality = 8 [default = false];
 
     required bool pass_friendly_capability = 4 [default = false];
     required bool pass_enemy_risk          = 5 [default = false];
     required bool pass_shoot_score         = 6 [default = false];
-    required bool enemy_proximity_risk     = 8 [default = false];
+    required bool enemy_proximity_risk     = 9 [default = false];
 
-    required bool passer_position_score   = 9 [default = false];
-    required bool receiver_position_score = 10 [default = false];
+    required bool passer_position_score   = 10 [default = false];
+    required bool receiver_position_score = 11 [default = false];
 }
 
 message PassGeneratorVisualizationConfig

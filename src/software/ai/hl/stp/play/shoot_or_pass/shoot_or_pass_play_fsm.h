@@ -8,10 +8,10 @@
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/ai/passing/gradient_descent_pass_generator.h"
 #include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
-#include "software/ai/passing/gradient_descent_pass_generator.h"
 
 using Zones = std::unordered_set<EighteenZoneId>;
 

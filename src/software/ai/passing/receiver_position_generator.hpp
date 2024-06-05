@@ -6,11 +6,11 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
 #include "software/ai/passing/cost_function.h"
+#include "software/ai/passing/field_pitch_division.h"
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/logger/logger.h"
 #include "software/world/world.h"
-#include "software/ai/passing/field_pitch_division.h"
 
 /**
  * This class is responsible for generating the best positions for our pass
