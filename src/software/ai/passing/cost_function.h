@@ -226,11 +226,11 @@ double rateKeepAwayPosition(const Point& keep_away_position, const World& world,
                             const TbotsProto::PassingConfig& passing_config);
 
 /**
- * TODO (NIMA)
- * @param rating
- * @param min
- * @param max
- * @return
+ * Scale a normalized rating to a new range
+ * @param rating Rating in [0, 1] to scale
+ * @param min The new minimum value the rating = 0 will map to
+ * @param max The new maximum value the rating = 1 will map to
+ * @return The scaled rating
  */
 double scaleNormalizedRating(double rating, double min, double max);
 

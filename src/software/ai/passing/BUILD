@@ -16,7 +16,6 @@ cc_library(
         "//software/math:math_functions",
         "//software/util/make_enum",
         "//software/world",
-        "@tracy",  # TODO (NIMA)
     ],
 )
 
@@ -174,7 +173,6 @@ cc_library(
         ":pass_with_rating",
         "//software/optimization:gradient_descent",
         "//software/world",
-        "@tracy",  # TODO (NIMA)
     ],
 )
 
@@ -192,7 +190,6 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//software/optimization:gradient_descent",
         "//software/world",
-        "@tracy",  # TODO (NIMA)
     ],
 )
 

@@ -3,28 +3,25 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-#include "software//world/world.h"
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/test_util/test_util.h"
+#include "software/ai/passing/gradient_descent_pass_generator.h"
 
 class PassGeneratorTest : public testing::Test
 {
    protected:
+    PassGeneratorTest() : pass_generator(passing_config) {}
+
     virtual void SetUp()
     {
         passing_config.set_min_pass_speed_m_per_s(1);
         passing_config.set_max_pass_speed_m_per_s(5.5);
-
-        pitch_division =
-            std::make_shared<const EighteenZonePitchDivision>(world->field());
-        pass_generator = std::make_shared<PassGenerator<EighteenZoneId>>(pitch_division,
-                                                                         passing_config);
     }
 
     /**
-     * Calls generatePassEvaluation to step the pass generator a couple times
+     * Calls getBestPass to step the pass generator a couple times
      * to find better passes.
      *
      * The pass generator starts with bad passes and improves on them as it receives
@@ -35,19 +32,18 @@ class PassGeneratorTest : public testing::Test
      * @param max_iters The maximum number of iterations of the PassGenerator to run
      */
     static void stepPassGenerator(
-        std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator, const World& world,
+            GradientDescentPassGenerator pass_generator, const World& world,
         int max_iters)
     {
         for (int i = 0; i < max_iters; i++)
         {
-            auto pass_eval = pass_generator->generatePassEvaluation(world);
+            auto best_pass = pass_generator.getBestPass(world);
         }
     }
 
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     TbotsProto::PassingConfig passing_config;
-    std::shared_ptr<const FieldPitchDivision<EighteenZoneId>> pitch_division;
-    std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator;
+    GradientDescentPassGenerator pass_generator;
 };
 
 TEST_F(PassGeneratorTest, check_pass_converges)

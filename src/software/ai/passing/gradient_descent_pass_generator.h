@@ -41,9 +41,9 @@ class GradientDescentPassGenerator
      * @param world The current state of the world
      * @param robots_to_ignore A list of robot ids to ignore when generating passes
      *
-     * @return a list of sampled points around all friendly robots
+     * @return a map of sampled points around friendly robots
      */
-    std::vector<Point> sampleReceivingPositions(
+    std::map<RobotId, std::vector<Point>> sampleReceivingPositionsPerRobot(
         const World& world, const std::vector<RobotId>& robots_to_ignore);
 
     /**
@@ -55,7 +55,7 @@ class GradientDescentPassGenerator
      * @returns a mapping of the Zone id to the optimized pass
      */
     PassWithRating optimizeReceivingPositions(
-        const World& world, const std::vector<Point>& receiving_positions);
+        const World& world, const std::map<RobotId, std::vector<Point>>& receiving_positions_map);
 
     // Weights used to normalize the parameters that we pass to GradientDescent
     // (see the GradientDescent documentation for details)
@@ -70,7 +70,7 @@ class GradientDescentPassGenerator
     // The optimizer we're using to find passes
     GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer_;
 
-    Point previous_best_receiving_pos_;
+    std::map<RobotId, Point> previous_best_receiving_positions_;
 
     // the random seed used to initialize the random number generator
     static constexpr int RNG_SEED = 1010;
