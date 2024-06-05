@@ -194,6 +194,7 @@ cc_library(
         "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/play/enemy_free_kick:enemy_free_kick_play",
         "//software/ai/hl/stp/play/enemy_ball_placement:enemy_ball_placement_play",
+        "//software/ai/hl/stp/play/enemy_free_kick:enemy_free_kick_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:pass_endurance_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
