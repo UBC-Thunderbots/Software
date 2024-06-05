@@ -47,12 +47,12 @@ class GradientDescentPassGenerator
         const World& world, const std::vector<RobotId>& robots_to_ignore);
 
     /**
-     * Given a map of passes, runs a gradient descent optimizer to find TODO (NIMA):
+     * Given a map of passes, runs a gradient descent optimizer to find
      * Update better passes.
      *
      * @param The world
-     * @param The passes to be optimized mapped to the zone
-     * @returns a mapping of the Zone id to the optimized pass
+     * @param The pass receiver position to be optimized mapped to robots
+     * @returns Best optimized pass
      */
     PassWithRating optimizeReceivingPositions(
         const World& world, const std::map<RobotId, std::vector<Point>>& receiving_positions_map);

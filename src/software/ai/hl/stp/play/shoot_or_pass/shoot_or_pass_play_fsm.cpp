@@ -11,9 +11,7 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       receiver_position_generator(ReceiverPositionGenerator<EighteenZoneId>(
           std::make_shared<const EighteenZonePitchDivision>(
-              Field::createSSLDivisionBField()),  // TODO (NIMA): Not good practice to
-                                                  // hard code the field type. should use
-                                                  // the field from the world
+              Field::createSSLDivisionBField()),
           ai_config.passing_config())),
       pass_generator(ai_config.passing_config()),
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
