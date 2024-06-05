@@ -430,6 +430,6 @@ message NetworkConfig
     // The robot status interface
     required string robot_status_interface = 2 [default = "lo"];
 
-    // The vision network interface
-    required string vision_network_interface = 3 [default = "lo"];
+    // The vision interface
+    required string vision_interface = 3 [default = "lo"];
 }

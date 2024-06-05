@@ -136,13 +136,6 @@ if __name__ == "__main__":
         help="Run robots diagnostics for Manual or Xbox control; estop required",
     )
     parser.add_argument(
-        "--interface",
-        action="store",
-        type=str,
-        default=None,
-        help="Which interface to communicate over",
-    )
-    parser.add_argument(
         "--channel",
         action="store",
         type=int,
@@ -219,11 +212,6 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-
-    # Sanity check that an interface was provided
-    if args.run_blue or args.run_yellow:
-        if args.interface is None:
-            parser.error("Must specify interface")
 
     ###########################################################################
     #                      Visualize CPP Tests                                #
@@ -313,7 +301,6 @@ if __name__ == "__main__":
         with RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
             multicast_channel=getRobotMulticastChannel(args.channel),
-            interface=args.interface,
             estop_mode=estop_mode,
             estop_path=estop_path,
             enable_radio=args.enable_radio,

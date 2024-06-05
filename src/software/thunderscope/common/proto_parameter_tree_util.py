@@ -5,9 +5,9 @@ from thefuzz import fuzz
 import netifaces
 
 
-CUSTOM_PARAMETERS_OVERRIDE = {"referee_interface":          "__create_network_enum",
-                              "robot_status_interface":     "__create_network_enum",
-                              "vision_network_interface":   "__create_network_enum"}
+CUSTOM_PARAMETERS_OVERRIDE = {"referee_interface":      "__create_network_enum",
+                              "robot_status_interface": "__create_network_enum",
+                              "vision_interface":       "__create_network_enum"}
 
 def __create_int_parameter_writable(key, value, descriptor):
     """Converts an int field of a proto to a NumericParameterItem with
