@@ -64,9 +64,7 @@ class GLWorldLayer(GLLayer):
         self.friendly_colour_yellow = friendly_colour_yellow
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
-        self.primitive_set_buffer = ThreadSafeBuffer(
-            buffer_size, PrimitiveSet
-        )  # TODO (NIMA): Autokick/chip
+        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
         self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
         self.simulation_state_buffer = ThreadSafeBuffer(buffer_size, SimulationState)
