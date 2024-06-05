@@ -7,6 +7,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 
 
 using Zones = std::unordered_set<EighteenZoneId>;
@@ -66,6 +67,13 @@ struct BallPlacementPlayFSM
     void startWait(const Update& event);
 
     /**
+     * Action that stops the robot while waiting
+     *
+     * @param event the BallPlacementPlayFSM Update event
+     */
+    void wait(const Update& event);
+
+    /**
      * Action that has the placing robot retreat after placing the ball
      *
      * @param event the BallPlacementPlayFSM Update event
@@ -123,6 +131,8 @@ struct BallPlacementPlayFSM
      */
     bool retreatDone(const Update& event);
 
+
+
     /**
      * Helper function for calculating the angle to kick the ball off of a wall
      *
@@ -158,6 +168,7 @@ struct BallPlacementPlayFSM
         DEFINE_SML_ACTION(kickOffWall)
         DEFINE_SML_ACTION(startWait)
         DEFINE_SML_ACTION(retreat)
+        DEFINE_SML_ACTION(wait)
 
         DEFINE_SML_GUARD(shouldKickOffWall)
         DEFINE_SML_GUARD(alignDone)
@@ -181,7 +192,7 @@ struct BallPlacementPlayFSM
             AlignPlacementState_S + Update_E[alignDone_G]            = PlaceBallState_S,
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
             PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A  = WaitState_S,
-            WaitState_S + Update_E[!waitDone_G]                      = WaitState_S,
+            WaitState_S + Update_E[!waitDone_G] / wait_A          = WaitState_S,
             WaitState_S + Update_E[waitDone_G]                       = RetreatState_S,
             RetreatState_S + Update_E[retreatDone_G && ballPlaced_G] = X,
             RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = RetreatState_S);
@@ -193,6 +204,7 @@ struct BallPlacementPlayFSM
     std::shared_ptr<PlaceBallTactic> place_ball_tactic;
     std::shared_ptr<MoveTactic> align_placement_tactic;
     std::shared_ptr<MoveTactic> retreat_tactic;
+    std::shared_ptr<MoveTactic> wait_tactic;
     std::vector<std::shared_ptr<PlaceBallMoveTactic>> move_tactics;
     Point setup_point;
     Timestamp start_time;

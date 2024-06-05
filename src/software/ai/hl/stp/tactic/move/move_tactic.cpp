@@ -28,7 +28,8 @@ void MoveTactic::updateControlParams(
     TbotsProto::BallCollisionType ball_collision_type, AutoChipOrKick auto_chip_or_kick,
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
     TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode,
-    double target_spin_rev_per_s)
+    double target_spin_rev_per_s,
+    bool never_terminate)
 {
     // Update the control parameters stored by this Tactic
     control_params.destination             = destination;
@@ -40,6 +41,7 @@ void MoveTactic::updateControlParams(
     control_params.max_allowed_speed_mode  = max_allowed_speed_mode;
     control_params.obstacle_avoidance_mode = obstacle_avoidance_mode;
     control_params.target_spin_rev_per_s   = target_spin_rev_per_s;
+    control_params.never_terminate         = never_terminate;
 }
 
 void MoveTactic::updateControlParams(
@@ -57,6 +59,7 @@ void MoveTactic::updateControlParams(
     control_params.max_allowed_speed_mode  = max_allowed_speed_mode;
     control_params.obstacle_avoidance_mode = obstacle_avoidance_mode;
     control_params.target_spin_rev_per_s   = 0.0;
+    control_params.never_terminate         = false;
 }
 
 void MoveTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)

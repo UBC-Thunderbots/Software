@@ -6,6 +6,7 @@ BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
       place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config)),
       align_placement_tactic(std::make_shared<PlaceBallMoveTactic>()),
       retreat_tactic(std::make_shared<MoveTactic>()),
+      wait_tactic(std::make_shared<MoveTactic>()),
       move_tactics(std::vector<std::shared_ptr<PlaceBallMoveTactic>>())
 {
 }
@@ -101,6 +102,33 @@ void BallPlacementPlayFSM::startWait(const Update &event)
     start_time = event.common.world_ptr->getMostRecentTimestamp();
 }
 
+void BallPlacementPlayFSM::wait(const Update &event)
+{
+    WorldPtr world_ptr = event.common.world_ptr;
+    std::optional<Robot> nearest_robot =
+            world_ptr->friendlyTeam().getNearestRobot(world_ptr->ball().position());
+
+    if (nearest_robot.has_value())
+    {
+        PriorityTacticVector tactics_to_run = {{}};
+
+        // setup move tactics for robots away from ball placing robot
+        setupMoveTactics(event);
+        tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
+                                 move_tactics.end());
+
+
+        wait_tactic->updateControlParams(
+                nearest_robot->position(), nearest_robot->orientation(), 0.0, TbotsProto::DribblerMode::RELEASE_BALL_SLOW,
+                TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0},
+                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, // TODO: Instead of stop use a new speed mode for retreating in ball placement
+                TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0, true);
+        tactics_to_run[0].emplace_back(wait_tactic);
+
+        event.common.set_tactics(tactics_to_run);
+    }
+}
+
 void BallPlacementPlayFSM::retreat(const Update &event)
 {
     WorldPtr world_ptr = event.common.world_ptr;
@@ -145,7 +173,7 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         retreat_tactic->updateControlParams(
             retreat_position, final_orientation, 0.0, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, // TODO: Instead of stop use a new speed mode for retreating in ball placement
             TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
         tactics_to_run[0].emplace_back(retreat_tactic);
 

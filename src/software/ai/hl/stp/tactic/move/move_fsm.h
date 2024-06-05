@@ -31,6 +31,8 @@ struct MoveFSM
         TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode;
         // The target spin while moving in revolutions per second
         double target_spin_rev_per_s;
+        // If true, FSM will never terminate and simply hold at the destination
+        bool never_terminate;
     };
 
     // this struct defines the only event that the MoveFSM responds to

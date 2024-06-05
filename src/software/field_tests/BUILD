@@ -65,6 +65,24 @@ py_test(
 )
 
 py_test(
+    name = "ball_placement_field_test",
+    srcs = [
+        "ball_placement_field_test.py",
+    ],
+    # TODO (#2619) Remove tag to run in parallel
+    tags = [
+        "exclusive",
+    ],
+    deps = [
+        "//software/field_tests:field_test_fixture",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:tbots_test_runner",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
+py_test(
     name = "passing_field_test",
     srcs = [
         "passing_field_test.py",
