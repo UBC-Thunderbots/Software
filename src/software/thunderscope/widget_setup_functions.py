@@ -180,6 +180,7 @@ def setup_gl_widget(
         (RobotStatus, world_layer.robot_status_buffer),
         (Referee, world_layer.referee_buffer),
         (ObstacleList, obstacle_layer.obstacles_list_buffer),
+        (PrimitiveSet, world_layer.primitive_set_buffer),
         (PrimitiveSet, path_layer.primitive_set_buffer),
         (PathVisualization, path_layer.path_visualization_buffer),
         (PassVisualization, passing_layer.pass_visualization_buffer),

@@ -119,7 +119,7 @@ message PassingConfig
     // The standard deviation (in meters) of the normal sampling distribution
     // used to generate passes around robots.
     required double pass_gen_rand_sample_std_dev_meters = 20 [
-        default                   = 0.2,
+        default                   = 0.6,
         (bounds).min_double_value = 0.01,
         (bounds).max_double_value = 3.0
     ];
@@ -207,6 +207,11 @@ message PassingConfig
     // ignored.
     required double min_pass_shoot_score = 18
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // The estimated delay in seconds between the time we commit to a pass and the time
+    // the pass is taken.
+    required double pass_delay_sec = 24
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     /*****  Visualization parameters *****/
     // Cost function visualization parameters
@@ -328,6 +333,11 @@ message ShootOrPassPlayConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 1.0
     ];
+
+    // The minimum pass quality we're willing to attempt before ramping
+    // down the score to abs_min_pass_score
+    required double min_perfect_pass_score = 6
+        [default = 0.85, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     // When we're choosing a pass, we start by looking for a pass with a perfect score
     // of 1, and then over time lower the score we're will to accept. This parameter

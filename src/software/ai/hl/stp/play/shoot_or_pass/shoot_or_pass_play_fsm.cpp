@@ -15,7 +15,7 @@ ShootOrPassPlayFSM::ShootOrPassPlayFSM(const TbotsProto::AiConfig& ai_config)
                                                   // hard code the field type. should use
                                                   // the field from the world
           ai_config.passing_config())),
-      sampling_pass_generator(ai_config.passing_config()),
+      pass_generator(ai_config.passing_config()),
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
@@ -66,8 +66,19 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
     if (event.common.num_tactics > 1)
     {
         ZoneNamedN(_tracy_look_for_pass, "ShootOrPassPlayFSM: Look for pass", true);
-        best_pass_and_score_so_far =
-            sampling_pass_generator.getBestPass(*event.common.world_ptr);
+        // Avoid passes to the goalie and the passing robot
+        std::vector<RobotId> robots_to_ignore = {};
+        auto friendly_goalie_id_opt = event.common.world_ptr->friendlyTeam().getGoalieId();
+        if (friendly_goalie_id_opt.has_value())
+        {
+            robots_to_ignore.push_back(friendly_goalie_id_opt.value());
+        }
+        auto robot_with_ball_opt = event.common.world_ptr->friendlyTeam().getNearestRobot(event.common.world_ptr->ball().position());
+        if (robot_with_ball_opt.has_value())
+        {
+            robots_to_ignore.push_back(robot_with_ball_opt.value().id());
+        }
+        best_pass_and_score_so_far = pass_generator.getBestPass(*event.common.world_ptr, robots_to_ignore);
 
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
@@ -79,19 +90,21 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
                               offensive_positioning_tactics.end());
 
         // Update minimum pass score threshold. Wait for a good pass by starting out only
-        // looking for "perfect" passes (with a score of 1) and decreasing this threshold
-        // over time
+        // looking for "perfect" passes (with a score of min_perfect_pass_score) and decreasing this threshold
+        // over time (to abs_min_pass_score)
         double abs_min_pass_score =
             ai_config.shoot_or_pass_play_config().abs_min_pass_score();
+        double min_perfect_pass_score =
+                ai_config.shoot_or_pass_play_config().min_perfect_pass_score();
         double pass_score_ramp_down_duration =
             ai_config.shoot_or_pass_play_config().pass_score_ramp_down_duration();
 
         time_since_commit_stage_start = event.common.world_ptr->getMostRecentTimestamp() -
                                         pass_optimization_start_time;
         min_pass_score_threshold =
-            1 - std::min(time_since_commit_stage_start.toSeconds() /
+                min_perfect_pass_score - std::min(time_since_commit_stage_start.toSeconds() /
                              pass_score_ramp_down_duration,
-                         1.0 - abs_min_pass_score);
+                                                  min_perfect_pass_score - abs_min_pass_score);
     }
     event.common.set_tactics(ret_tactics);
 }
@@ -152,12 +165,7 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
-    const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
-    const auto ball_is_kicked_m_per_s_threshold =
-        this->ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
-
-    return (ball_velocity < ball_is_kicked_m_per_s_threshold) &&
-           (best_pass_and_score_so_far.rating > min_pass_score_threshold);
+    return best_pass_and_score_so_far.rating > min_pass_score_threshold;
 }
 
 bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)

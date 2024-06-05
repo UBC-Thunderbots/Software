@@ -1,4 +1,4 @@
-#include "software/ai/passing/sampling_pass_generator.h"
+#include "software/ai/passing/gradient_descent_pass_generator.h"
 
 #include <gtest/gtest.h>
 
@@ -29,7 +29,7 @@ class SamplingPassGeneratorTest : public testing::Test
 
     std::shared_ptr<Rectangle> entire_field;
     TbotsProto::PassingConfig passing_config;
-    SamplingPassGenerator sampling_pass_generator;
+    GradientDescentPassGenerator sampling_pass_generator;
 };
 
 

@@ -8,11 +8,10 @@
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/pass_generator.hpp" // TODO (NIMA): Could remove this dep + in BUILD
 #include "software/ai/passing/receiver_position_generator.hpp"
-#include "software/ai/passing/sampling_pass_generator.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
+#include "software/ai/passing/gradient_descent_pass_generator.h"
 
 using Zones = std::unordered_set<EighteenZoneId>;
 
@@ -147,7 +146,7 @@ struct ShootOrPassPlayFSM
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
     ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator;
-    SamplingPassGenerator sampling_pass_generator;
+    GradientDescentPassGenerator pass_generator;
     Timestamp pass_optimization_start_time;
     PassWithRating best_pass_and_score_so_far;
     Duration time_since_commit_stage_start;

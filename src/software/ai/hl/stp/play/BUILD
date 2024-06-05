@@ -111,7 +111,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:receiver_position_generator",
-        "//software/ai/passing:sampling_pass_generator",
+        "//software/ai/passing:gradient_descent_pass_generator",
         "//software/logger",
         "//software/util/generic_factory",
         "//software/world:ball",

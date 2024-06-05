@@ -16,6 +16,7 @@ cc_library(
         "//software/math:math_functions",
         "//software/util/make_enum",
         "//software/world",
+        "@tracy", # TODO (NIMA)
     ],
 )
 
@@ -151,27 +152,29 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "sampling_pass_generator",
-    srcs = [
-        "sampling_pass_generator.cpp",
+cc_test(
+    name = "gradient_descent_pass_generator_test",
+    srcs = ["gradient_descent_pass_generator.cpp"],
+    deps = [
+        ":gradient_descent_pass_generator",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/math:math_functions",
+        "//software/test_util",
     ],
-    hdrs = ["sampling_pass_generator.h"],
+)
+
+cc_library(
+    name = "gradient_descent_pass_generator",
+    srcs = [
+        "gradient_descent_pass_generator.cpp",
+    ],
+    hdrs = ["gradient_descent_pass_generator.h"],
     deps = [
         ":cost_functions",
         ":pass_with_rating",
         "//software/world",
-    ],
-)
-
-cc_test(
-    name = "sampling_pass_generator_test",
-    srcs = ["sampling_pass_generator_test.cpp"],
-    deps = [
-        ":sampling_pass_generator",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/math:math_functions",
-        "//software/test_util",
+        "//software/optimization:gradient_descent",
+        "@tracy", # TODO (NIMA)
     ],
 )
 
@@ -189,6 +192,7 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//software/optimization:gradient_descent",
         "//software/world",
+        "@tracy", # TODO (NIMA)
     ],
 )
 

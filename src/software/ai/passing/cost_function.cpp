@@ -20,6 +20,10 @@ double ratePass(const World& world, const Pass& pass,
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
 
+    double receiver_not_too_far_rating = circleSigmoid(
+            Circle(pass.passerPoint(), passing_config.receiver_ideal_max_distance_meters()),
+            pass.receiverPoint(), 2.0);
+
     double friendly_pass_rating =
         ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
@@ -30,7 +34,7 @@ double ratePass(const World& world, const Pass& pass,
     double shoot_pass_rating =
         ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 
-    return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
+    return static_pass_quality * receiver_not_too_far_rating * friendly_pass_rating * enemy_pass_rating *
            pass_forward_rating * shoot_pass_rating;
 }
 
@@ -214,7 +218,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
         ENEMY_ROBOT_INTERCEPTION_SPEED_METERS_PER_SECOND);
 
     Duration ball_time_to_interception_point = Duration::fromSeconds(
-        distance(pass.passerPoint(), closest_interception_point) / pass.speed());
+        distance(pass.passerPoint(), closest_interception_point) / pass.speed()) + Duration::fromSeconds(passing_config.pass_delay_sec());
 
     Duration interception_delta_time =
         ball_time_to_interception_point - enemy_robot_time_to_interception_point;
@@ -258,7 +262,7 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
     // Figure out what time the robot would have to receive the ball at
     // TODO (#2988): We should generate a more realistic ball trajectory
     Duration ball_travel_time = Duration::fromSeconds(
-        (pass.receiverPoint() - pass.passerPoint()).length() / pass.speed());
+        (pass.receiverPoint() - pass.passerPoint()).length() / pass.speed()) + Duration::fromSeconds(passing_config.pass_delay_sec());
     Timestamp receive_time = best_receiver.timestamp() + ball_travel_time;
 
     // Figure out how long it would take our robot to get there
