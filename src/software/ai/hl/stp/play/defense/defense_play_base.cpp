@@ -10,7 +10,7 @@ DefensePlayBase::DefensePlayBase(TbotsProto::AiConfig ai_config)
 
 void DefensePlayBase::setUpCreaseDefenders(int num_crease_defenders)
 {
-    if (num_crease_defenders == crease_defenders.size())
+    if (num_crease_defenders == int(crease_defenders.size()))
     {
         return;
     }
@@ -25,7 +25,7 @@ void DefensePlayBase::setUpCreaseDefenders(int num_crease_defenders)
 
 void DefensePlayBase::setUpPassDefenders(int num_pass_defenders)
 {
-    if (num_pass_defenders == pass_defenders.size())
+    if (num_pass_defenders == int(pass_defenders.size()))
     {
         return;
     }

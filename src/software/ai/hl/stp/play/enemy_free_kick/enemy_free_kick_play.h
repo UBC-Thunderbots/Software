@@ -11,6 +11,10 @@
 class EnemyFreeKickPlay : public Play
 {
    public:
+    /**
+     * Constructor for EnemyFreeKickPlay to defend against enemy free kicks, attempting to block the kicker
+     * @param config The given config proto.
+     */
     EnemyFreeKickPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
