@@ -64,9 +64,10 @@ std::map<RobotId, std::vector<Point>> GradientDescentPassGenerator::sampleReceiv
     const World& world, const std::vector<RobotId>& robots_to_ignore)
 {
     std::map<RobotId, std::vector<Point>> receiving_positions_map;
-    std::vector<TbotsProto::DebugShapes::DebugShape> debug_shapes;
 
     const double min_sampling_std_dev = passing_config_.pass_gen_min_rand_sample_std_dev_meters();
+    const double sampling_std_dev_vel_multiplier = passing_config_.pass_gen_rand_sample_std_dev_robot_vel_multiplier();
+    const double sampling_center_vel_multiplier = passing_config_.pass_gen_rand_sample_center_robot_vel_multiplier();
 
     for (const Robot& robot : world.friendlyTeam().getAllRobots())
     {
@@ -89,23 +90,14 @@ std::map<RobotId, std::vector<Point>> GradientDescentPassGenerator::sampleReceiv
                 previous_best_receiving_positions_[robot.id()]);
         }
 
-        // get random coordinates based on the normal distribution around the robot
-        // TODO (NIMA): https://download.tigers-mannheim.de/papers/2022-RoboCup-Champion.pdf 3.2
-        //  Shift the distribution to the direction of motion and change the radius/std
-
-        Point sampling_center = robot_position + (robot.velocity() * passing_config_.pass_gen_rand_sample_center_robot_vel_multiplier());
-        double std_dev = min_sampling_std_dev + (robot.velocity().length() * passing_config_.pass_gen_rand_sample_std_dev_robot_vel_multiplier());
+        // Sample random receiving positions using a normal distribution around the robot's
+        // future position with a standard deviation that scales with the robot's velocity.
+        Point sampling_center = robot_position + (robot.velocity() * sampling_center_vel_multiplier);
+        double std_dev = min_sampling_std_dev + (robot.velocity().length() * sampling_std_dev_vel_multiplier);
         std::normal_distribution x_normal_distribution{sampling_center.x(),
                                                        std_dev};
         std::normal_distribution y_normal_distribution{sampling_center.y(),
                                                        std_dev};
-
-        debug_shapes.push_back(
-                *createDebugShape(Stadium(robot.position(), sampling_center, 0.02),
-                                  std::to_string(debug_shapes.size()) + "gdpg"));
-        debug_shapes.push_back(*createDebugShape(
-                Circle(sampling_center, std_dev),
-                std::to_string(debug_shapes.size()) + "gdpg"));
 
         for (unsigned int i = 0; i < passing_config_.pass_gen_num_samples_per_robot();
              i++)
@@ -115,7 +107,6 @@ std::map<RobotId, std::vector<Point>> GradientDescentPassGenerator::sampleReceiv
             receiving_positions_map[robot.id()].push_back(point);
         }
     }
-    LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
 
     return receiving_positions_map;
 }
@@ -165,7 +156,17 @@ PassWithRating GradientDescentPassGenerator::optimizeReceivingPositions(
             }
         }
 
-        previous_best_receiving_positions_[robot_id] = best_pass_for_robot.pass.receiverPoint();
+        // Update the best receiving position for the robot used in the next iteration
+        // if the rating is above a certain threshold.
+        if (best_pass_for_robot.rating > 0.1)
+        {
+            previous_best_receiving_positions_[robot_id] = best_pass_for_robot.pass.receiverPoint();
+        }
+        else
+        {
+            previous_best_receiving_positions_.erase(robot_id);
+        }
+
         if (best_pass_for_robot.rating > best_pass.rating)
         {
             best_pass = best_pass_for_robot;
