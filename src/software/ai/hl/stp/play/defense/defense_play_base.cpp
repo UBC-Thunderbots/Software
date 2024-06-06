@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/enemy_threat.h"
 
 DefensePlayBase::DefensePlayBase(TbotsProto::AiConfig ai_config)
-        : ai_config(ai_config), crease_defenders({}), pass_defenders({})
+    : ai_config(ai_config), crease_defenders({}), pass_defenders({})
 {
 }
 
@@ -16,10 +16,10 @@ void DefensePlayBase::setUpCreaseDefenders(int num_crease_defenders)
     }
 
     crease_defenders =
-            std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_crease_defenders);
+        std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_crease_defenders);
     std::generate(crease_defenders.begin(), crease_defenders.end(), [this]() {
         return std::make_shared<CreaseDefenderTactic>(
-                ai_config.robot_navigation_obstacle_config());
+            ai_config.robot_navigation_obstacle_config());
     });
 }
 
@@ -35,7 +35,9 @@ void DefensePlayBase::setUpPassDefenders(int num_pass_defenders)
                   [this]() { return std::make_shared<PassDefenderTactic>(); });
 }
 
-void DefensePlayBase::updatePassDefenderControlParams(std::vector<DefenderAssignment> &pass_defender_assignments) {
+void DefensePlayBase::updatePassDefenderControlParams(
+    std::vector<DefenderAssignment>& pass_defender_assignments)
+{
     for (unsigned int i = 0; i < pass_defenders.size(); i++)
     {
         pass_defenders.at(i)->updateControlParams(pass_defender_assignments.at(i).target);
@@ -43,17 +45,17 @@ void DefensePlayBase::updatePassDefenderControlParams(std::vector<DefenderAssign
 }
 
 void DefensePlayBase::setAlignment(
-        const Update& event,
-        const std::vector<DefenderAssignment>& crease_defender_assignments
-) {
+    const Update& event,
+    const std::vector<DefenderAssignment>& crease_defender_assignments)
+{
     for (unsigned int i = 0; i < crease_defenders.size(); i++)
     {
         auto target = crease_defender_assignments.at(i).target;
 
         // Determine the number of crease defenders already assigned to the target
         auto defenders_with_target_count = std::count_if(
-                crease_defender_assignments.begin(), crease_defender_assignments.begin() + i,
-                [&target](const auto& assignment) { return assignment.target == target; });
+            crease_defender_assignments.begin(), crease_defender_assignments.begin() + i,
+            [&target](const auto& assignment) { return assignment.target == target; });
 
         // Pick alignment based on how many crease defenders are already assigned to the
         // target
@@ -82,6 +84,6 @@ void DefensePlayBase::setAlignment(
         }
 
         crease_defenders.at(i)->updateControlParams(
-                target, alignment, event.control_params.max_allowed_speed_mode);
+            target, alignment, event.control_params.max_allowed_speed_mode);
     }
 }

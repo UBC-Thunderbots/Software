@@ -75,4 +75,3 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
                                 pass_defenders.end());
     event.common.set_tactics(tactics_to_return);
 }
-
