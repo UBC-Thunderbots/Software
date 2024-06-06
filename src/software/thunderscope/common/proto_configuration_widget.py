@@ -6,15 +6,18 @@ from thefuzz import fuzz
 from proto.import_all_protos import *
 from software.thunderscope.common import proto_parameter_tree_util
 
+from threading import Thread
+import time
+
 
 class ProtoConfigurationWidget(QWidget):
+    DELAYED_CONFIGURATION_TIMEOUT_S = 5
 
     """Creates a searchable parameter widget that can take any protobuf,
     and convert it into a pyqtgraph ParameterTree. This will allow users
     to modify the values.
 
     """
-
     def __init__(
         self, proto_to_configure, on_change_callback, search_filter_threshold=60,
     ):

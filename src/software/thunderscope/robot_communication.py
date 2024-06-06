@@ -116,13 +116,7 @@ class RobotCommunication(object):
         change_referee_interface = (referee_interface != self.network_config.referee_interface)
         change_vision_interface = (vision_interface != self.network_config.vision_interface)
 
-        if self.receive_ssl_wrapper is not None and change_referee_interface:
-            self.receive_ssl_wrapper.close()
-
-        if self.receive_ssl_referee_proto is not None and change_referee_interface:
-            self.receive_ssl_referee_proto.close()
-
-        if self.receive_ssl_wrapper is None or change_referee_interface:
+        if change_referee_interface:
             self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
                 SSL_VISION_ADDRESS,
                 SSL_VISION_PORT,
@@ -131,7 +125,7 @@ class RobotCommunication(object):
                 vision_interface,
             )
 
-        if self.receive_ssl_referee_proto is None or change_vision_interface:
+        if change_vision_interface:
             self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
                 SSL_REFEREE_ADDRESS,
                 SSL_REFEREE_PORT,
@@ -154,15 +148,6 @@ class RobotCommunication(object):
     def __setup_for_robot_communication(self, robot_interface: str = "lo") -> None:
         if robot_interface == self.network_config.robot_status_interface:
             return
-
-        if self.receive_robot_status is not None:
-            self.receive_robot_status.close()
-
-        if self.receive_robot_log is not None:
-            self.receive_robot_log.close()
-
-        if self.receive_robot_crash is not None:
-            self.receive_robot_crash.close()
 
         # Create the multicast listeners
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
@@ -303,6 +288,7 @@ class RobotCommunication(object):
         while self.running:
             thunderbots_config = self.thunderbots_config_buffer.get(block=False, return_cached=False)
             if thunderbots_config is not None:
+                print(f"[RobotCommunication] Received new ThunderbotsConfig")
                 network_config = thunderbots_config.ai_config.ai_control_config.network_config
                 if self.is_setup_for_fullsystem:
                     self.setup_for_fullsystem(referee_interface=network_config.referee_interface,
