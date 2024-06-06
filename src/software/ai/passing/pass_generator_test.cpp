@@ -5,9 +5,9 @@
 
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/ai/passing/gradient_descent_pass_generator.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/test_util/test_util.h"
-#include "software/ai/passing/gradient_descent_pass_generator.h"
 
 class PassGeneratorTest : public testing::Test
 {
@@ -31,9 +31,8 @@ class PassGeneratorTest : public testing::Test
      * @param world The world to evaluate passes on
      * @param max_iters The maximum number of iterations of the PassGenerator to run
      */
-    static void stepPassGenerator(
-            GradientDescentPassGenerator pass_generator, const World& world,
-        int max_iters)
+    static void stepPassGenerator(GradientDescentPassGenerator pass_generator,
+                                  const World& world, int max_iters)
     {
         for (int i = 0; i < max_iters; i++)
         {

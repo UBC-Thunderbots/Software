@@ -15,8 +15,9 @@ GradientDescentPassGenerator::GradientDescentPassGenerator(
 PassWithRating GradientDescentPassGenerator::getBestPass(
     const World& world, const std::vector<RobotId>& robots_to_ignore)
 {
-    num_rate_pass            = 0;
-    auto receiving_positions_map = sampleReceivingPositionsPerRobot(world, robots_to_ignore);
+    num_rate_pass = 0;
+    auto receiving_positions_map =
+        sampleReceivingPositionsPerRobot(world, robots_to_ignore);
 
     // if there are no friendly robots, return early
     if (receiving_positions_map.empty())
@@ -26,7 +27,7 @@ PassWithRating GradientDescentPassGenerator::getBestPass(
     }
 
     // Optimize the receiving positions for each robot and get the best pass
-    PassWithRating best_pass     = optimizeReceivingPositions(world, receiving_positions_map);
+    PassWithRating best_pass = optimizeReceivingPositions(world, receiving_positions_map);
 
     // Visualize the sampled passes and the best pass
     if (passing_config_.pass_gen_vis_config().visualize_sampled_passes())
@@ -36,9 +37,10 @@ PassWithRating GradientDescentPassGenerator::getBestPass(
         {
             for (const Point& receiving_position : receiving_positions)
             {
-                debug_shapes.push_back(
-                        *createDebugShape(Stadium(world.friendlyTeam().getRobotById(robot_id)->position(), receiving_position, 0.02),
-                                          std::to_string(debug_shapes.size()) + "gdpg"));
+                debug_shapes.push_back(*createDebugShape(
+                    Stadium(world.friendlyTeam().getRobotById(robot_id)->position(),
+                            receiving_position, 0.02),
+                    std::to_string(debug_shapes.size()) + "gdpg"));
             }
         }
         std::stringstream stream;
@@ -55,19 +57,24 @@ PassWithRating GradientDescentPassGenerator::getBestPass(
         samplePassesForVisualization(world, passing_config_, best_pass.pass);
     }
 
-//    LOG(DEBUG) << "GradientDescentPassGenerator: Number of passes rated: " << num_rate_pass; // TODO (NIMA)
+    //    LOG(DEBUG) << "GradientDescentPassGenerator: Number of passes rated: " <<
+    //    num_rate_pass; // TODO (NIMA)
 
     return best_pass;
 }
 
-std::map<RobotId, std::vector<Point>> GradientDescentPassGenerator::sampleReceivingPositionsPerRobot(
+std::map<RobotId, std::vector<Point>>
+GradientDescentPassGenerator::sampleReceivingPositionsPerRobot(
     const World& world, const std::vector<RobotId>& robots_to_ignore)
 {
     std::map<RobotId, std::vector<Point>> receiving_positions_map;
 
-    const double min_sampling_std_dev = passing_config_.pass_gen_min_rand_sample_std_dev_meters();
-    const double sampling_std_dev_vel_multiplier = passing_config_.pass_gen_rand_sample_std_dev_robot_vel_multiplier();
-    const double sampling_center_vel_multiplier = passing_config_.pass_gen_rand_sample_center_robot_vel_multiplier();
+    const double min_sampling_std_dev =
+        passing_config_.pass_gen_min_rand_sample_std_dev_meters();
+    const double sampling_std_dev_vel_multiplier =
+        passing_config_.pass_gen_rand_sample_std_dev_robot_vel_multiplier();
+    const double sampling_center_vel_multiplier =
+        passing_config_.pass_gen_rand_sample_center_robot_vel_multiplier();
 
     for (const Robot& robot : world.friendlyTeam().getAllRobots())
     {
@@ -90,14 +97,15 @@ std::map<RobotId, std::vector<Point>> GradientDescentPassGenerator::sampleReceiv
                 previous_best_receiving_positions_[robot.id()]);
         }
 
-        // Sample random receiving positions using a normal distribution around the robot's
-        // future position with a standard deviation that scales with the robot's velocity.
-        Point sampling_center = robot_position + (robot.velocity() * sampling_center_vel_multiplier);
-        double std_dev = min_sampling_std_dev + (robot.velocity().length() * sampling_std_dev_vel_multiplier);
-        std::normal_distribution x_normal_distribution{sampling_center.x(),
-                                                       std_dev};
-        std::normal_distribution y_normal_distribution{sampling_center.y(),
-                                                       std_dev};
+        // Sample random receiving positions using a normal distribution around the
+        // robot's future position with a standard deviation that scales with the robot's
+        // velocity.
+        Point sampling_center =
+            robot_position + (robot.velocity() * sampling_center_vel_multiplier);
+        double std_dev = min_sampling_std_dev +
+                         (robot.velocity().length() * sampling_std_dev_vel_multiplier);
+        std::normal_distribution x_normal_distribution{sampling_center.x(), std_dev};
+        std::normal_distribution y_normal_distribution{sampling_center.y(), std_dev};
 
         for (unsigned int i = 0; i < passing_config_.pass_gen_num_samples_per_robot();
              i++)
@@ -112,7 +120,8 @@ std::map<RobotId, std::vector<Point>> GradientDescentPassGenerator::sampleReceiv
 }
 
 PassWithRating GradientDescentPassGenerator::optimizeReceivingPositions(
-    const World& world, const std::map<RobotId, std::vector<Point>>& receiving_positions_map)
+    const World& world,
+    const std::map<RobotId, std::vector<Point>>& receiving_positions_map)
 {
     // The objective function we minimize in gradient descent to improve each pass
     // that we're optimizing
@@ -137,16 +146,16 @@ PassWithRating GradientDescentPassGenerator::optimizeReceivingPositions(
         for (const Point& receiving_position : receiving_positions)
         {
             auto optimized_receiving_pos_array = optimizer_.maximize(
-                    objective_function, {receiving_position.x(), receiving_position.y()},
-                    passing_config_.number_of_gradient_descent_steps_per_iter());
+                objective_function, {receiving_position.x(), receiving_position.y()},
+                passing_config_.number_of_gradient_descent_steps_per_iter());
 
             // get a pass with the new appropriate speed using the optimized destination
             auto optimized_pass = Pass::fromDestReceiveSpeed(
-                    world.ball().position(),
-                    Point(optimized_receiving_pos_array[0], optimized_receiving_pos_array[1]),
-                    passing_config_.max_receive_speed_m_per_s(),
-                    passing_config_.min_pass_speed_m_per_s(),
-                    passing_config_.max_pass_speed_m_per_s());
+                world.ball().position(),
+                Point(optimized_receiving_pos_array[0], optimized_receiving_pos_array[1]),
+                passing_config_.max_receive_speed_m_per_s(),
+                passing_config_.min_pass_speed_m_per_s(),
+                passing_config_.max_pass_speed_m_per_s());
             num_rate_pass++;
             auto score = ratePass(world, optimized_pass, passing_config_);
 
@@ -160,7 +169,8 @@ PassWithRating GradientDescentPassGenerator::optimizeReceivingPositions(
         // if the rating is above a certain threshold.
         if (best_pass_for_robot.rating > 0.1)
         {
-            previous_best_receiving_positions_[robot_id] = best_pass_for_robot.pass.receiverPoint();
+            previous_best_receiving_positions_[robot_id] =
+                best_pass_for_robot.pass.receiverPoint();
         }
         else
         {

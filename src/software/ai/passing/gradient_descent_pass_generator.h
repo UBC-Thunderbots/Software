@@ -55,7 +55,8 @@ class GradientDescentPassGenerator
      * @returns Best optimized pass
      */
     PassWithRating optimizeReceivingPositions(
-        const World& world, const std::map<RobotId, std::vector<Point>>& receiving_positions_map);
+        const World& world,
+        const std::map<RobotId, std::vector<Point>>& receiving_positions_map);
 
     // Weights used to normalize the parameters that we pass to GradientDescent
     // (see the GradientDescent documentation for details)
