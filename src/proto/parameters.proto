@@ -56,7 +56,7 @@ message AiParameterConfig
 {
     // threshold to decide if ball hasn't been kicked
     required double ball_is_kicked_m_per_s_threshold = 1
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+        [default = 0.6, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 message AttackerTacticConfig
@@ -118,10 +118,20 @@ message PassingConfig
         [default = 5, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
     // The standard deviation (in meters) of the normal sampling distribution
     // used to generate passes around robots.
-    required double pass_gen_rand_sample_std_dev_meters = 20 [
-        default                   = 0.6,
+    required double pass_gen_min_rand_sample_std_dev_meters = 20 [
+        default                   = 0.4,
         (bounds).min_double_value = 0.01,
         (bounds).max_double_value = 3.0
+    ];
+    required double pass_gen_rand_sample_std_dev_robot_vel_multiplier = 21 [
+        default                   = 0.15,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 0.5
+    ];
+    required double pass_gen_rand_sample_center_robot_vel_multiplier = 22 [
+        default                   = 0.3,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 1.0
     ];
     // The minimum pass speed (in m/s)
     required double min_pass_speed_m_per_s = 6
@@ -155,7 +165,7 @@ message PassingConfig
         [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
     // The extra time added to the minimum time that it will take a friendly
     // robot to reach the receiving position and orientation.
-    required double friendly_time_to_receive_slack_sec = 21
+    required double friendly_time_to_receive_slack_sec = 23
         [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
     // This controls how heavily we weigh an enemy robot being near the pass
     // receiver when calculating enemy risk to a pass
@@ -217,10 +227,10 @@ message PassingConfig
     // Cost function visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
     // Pass generator visualization parameters
-    required PassGeneratorVisualizationConfig pass_gen_vis_config = 22;
+    required PassGeneratorVisualizationConfig pass_gen_vis_config = 25;
 
     /*****  Receiver position generation parameters *****/
-    required ReceiverPositionGeneratorConfig receiver_position_generator_config = 23;
+    required ReceiverPositionGeneratorConfig receiver_position_generator_config = 26;
 }
 
 message ReceiverPositionGeneratorConfig
