@@ -109,9 +109,9 @@ class NetworkService
     {
         // Primitive Sequence Number
         uint64_t primitive_sequence_num = 0;
-        // System time for when primitive set was received by Thunderloop in seconds
-        double thunderscope_sent_time_seconds = 0;
         // Epoch time of primitive set sent time from Thunderscope in seconds
+        double thunderscope_sent_time_seconds = 0;
+        // System time for when primitive set was received by Thunderloop in seconds
         double thunderloop_recieved_time_seconds = 0;
     };
 

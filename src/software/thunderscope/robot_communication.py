@@ -294,7 +294,7 @@ class RobotCommunication(object):
         for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
 
         """
-
+        # Create the multicast listeners
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
