@@ -89,6 +89,8 @@ std::map<RobotId, std::vector<Point>> GradientDescentPassGenerator::sampleReceiv
         }
 
         // get random coordinates based on the normal distribution around the robot
+        // TODO (NIMA): https://download.tigers-mannheim.de/papers/2022-RoboCup-Champion.pdf 3.2
+        //  Shift the distribution to the direction of motion and change the radius/std
         std::normal_distribution x_normal_distribution{robot_position.x(),
                                                        sampling_std_dev};
         std::normal_distribution y_normal_distribution{robot_position.y(),
