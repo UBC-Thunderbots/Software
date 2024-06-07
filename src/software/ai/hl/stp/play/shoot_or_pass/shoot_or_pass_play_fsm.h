@@ -43,7 +43,7 @@ struct ShootOrPassPlayFSM
      * @param existing_receiver_positions A set of positions of existing receiver
      * positions that should be taken into account when assigning additional offensive
      * tactics.
-     * @apram pass_origin_override An optional point that the pass origin should be
+     * @param pass_origin_override An optional point that the pass origin should be
      * overridden to
      */
     void updateOffensivePositioningTactics(

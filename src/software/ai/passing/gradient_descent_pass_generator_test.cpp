@@ -66,7 +66,7 @@ TEST_F(SamplingPassGeneratorTest, getBestPass_3_friendlies)
     world->updateBall(ball);
 
     PassWithRating best_pass = sampling_pass_generator.getBestPass(*world);
-    // not too sure why this pass is so bad but seems that way
+    // TODO(NIMA): not too sure why this pass is so bad but seems that way
     EXPECT_GE(best_pass.rating, 0.1);
 }
 

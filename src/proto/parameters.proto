@@ -90,7 +90,7 @@ message ReceiverTacticConfig
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
     required double max_deflection_for_one_touch_deg = 3 [
-        default                   = 45.0,
+        default                   = 60.0,
         (bounds).min_double_value = 10.0,
         (bounds).max_double_value = 90.0
     ];
@@ -195,7 +195,7 @@ message PassingConfig
     // The max distance in meters that the receiver can be from the passer when receiving
     // a pass.
     required double receiver_ideal_max_distance_meters = 15 [
-        default                   = 7.0,
+        default                   = 10.0,
         (bounds).min_double_value = 0.1,
         (bounds).max_double_value = 20.0
     ];

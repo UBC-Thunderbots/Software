@@ -70,9 +70,9 @@ double rateReceivingPosition(const World& world, const Pass& pass,
 /**
  * Rate a point to shoot on enemy goal from
  *
+ * @param shot_origin The point to shoot from
  * @param field The field we are playing on
  * @param enemy_team The enemy team
- * @param shot_origin The point to shoot from
  * @param passing_config The passing config used for tuning
  * @return A value in [0,1] representing the quality of the shot, with 1 being
  *       an ideal shot, and 0 being a shot that will most likely be blocked.

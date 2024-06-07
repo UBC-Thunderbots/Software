@@ -12,6 +12,7 @@
  *
  * @param world the world
  * @param best_pass_so_far the best pass so far
+ * @param passing_config the passing config
  * @return a Point with the qualities described above.
  */
 Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far,
