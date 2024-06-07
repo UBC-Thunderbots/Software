@@ -1,9 +1,9 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
+#include "software/ai/hl/stp/play/defense/defense_play_base.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
-#include "software/ai/hl/stp/play/defense/defense_play_base.h"
 
 /**
  * Play for defending against enemy free kicks

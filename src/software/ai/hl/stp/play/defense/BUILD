@@ -20,11 +20,11 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:defender_assignment",
         "//software/ai/hl/stp/play",
+        "//software/ai/hl/stp/play/defense:defense_play_base",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
         "//software/logger",
         "//software/util/generic_factory",
-        "//software/ai/hl/stp/play/defense:defense_play_base",
         "@sml",
     ],
     alwayslink = True,
@@ -59,10 +59,10 @@ cc_test(
 cc_library(
     name = "defense_play_base",
     srcs = [
-        "defense_play_base.cpp"
+        "defense_play_base.cpp",
     ],
     hdrs = [
-        "defense_play_base.h"
+        "defense_play_base.h",
     ],
     deps = [
         "//shared:constants",
