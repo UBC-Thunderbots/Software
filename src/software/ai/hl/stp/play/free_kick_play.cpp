@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/play/corner_kick_play.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"

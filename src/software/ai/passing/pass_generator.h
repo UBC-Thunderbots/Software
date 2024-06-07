@@ -11,7 +11,7 @@
 /**
  * This class is responsible for generating passes using a random sampling method
  */
-class GradientDescentPassGenerator
+class PassGenerator
 {
    public:
     /**
@@ -19,7 +19,7 @@ class GradientDescentPassGenerator
      *
      * @param passing_config The config to use when generating passes
      */
-    explicit GradientDescentPassGenerator(
+    explicit PassGenerator(
         const TbotsProto::PassingConfig& passing_config);
 
     /**

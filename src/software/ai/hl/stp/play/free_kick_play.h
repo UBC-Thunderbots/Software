@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/gradient_descent_pass_generator.h"
+#include "software/ai/passing/pass_generator.h"
 #include "software/ai/passing/receiver_position_generator.hpp"
 
 /**
@@ -77,6 +77,6 @@ class FreeKickPlay : public Play
     void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
                                  const WorldPtr &world_ptr);
 
-    GradientDescentPassGenerator pass_generator;
+    PassGenerator pass_generator;
     ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator;
 };

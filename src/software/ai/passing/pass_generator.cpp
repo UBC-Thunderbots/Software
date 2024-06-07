@@ -1,10 +1,10 @@
-#include "software/ai/passing/gradient_descent_pass_generator.h"
+#include "software/ai/passing/pass_generator.h"
 
 #include <iomanip>
 
 #include "software/logger/logger.h"
 
-GradientDescentPassGenerator::GradientDescentPassGenerator(
+PassGenerator::PassGenerator(
     const TbotsProto::PassingConfig& passing_config)
     : optimizer_(optimizer_param_weights),
       random_num_gen_(RNG_SEED),
@@ -12,7 +12,7 @@ GradientDescentPassGenerator::GradientDescentPassGenerator(
 {
 }
 
-PassWithRating GradientDescentPassGenerator::getBestPass(
+PassWithRating PassGenerator::getBestPass(
     const World& world, const std::vector<RobotId>& robots_to_ignore)
 {
     num_rate_pass = 0;
@@ -57,14 +57,14 @@ PassWithRating GradientDescentPassGenerator::getBestPass(
         samplePassesForVisualization(world, passing_config_, best_pass.pass);
     }
 
-    //    LOG(DEBUG) << "GradientDescentPassGenerator: Number of passes rated: " <<
+    //    LOG(DEBUG) << "PassGenerator: Number of passes rated: " <<
     //    num_rate_pass; // TODO (NIMA)
 
     return best_pass;
 }
 
 std::map<RobotId, std::vector<Point>>
-GradientDescentPassGenerator::sampleReceivingPositionsPerRobot(
+PassGenerator::sampleReceivingPositionsPerRobot(
     const World& world, const std::vector<RobotId>& robots_to_ignore)
 {
     std::map<RobotId, std::vector<Point>> receiving_positions_map;
@@ -119,7 +119,7 @@ GradientDescentPassGenerator::sampleReceivingPositionsPerRobot(
     return receiving_positions_map;
 }
 
-PassWithRating GradientDescentPassGenerator::optimizeReceivingPositions(
+PassWithRating PassGenerator::optimizeReceivingPositions(
     const World& world,
     const std::map<RobotId, std::vector<Point>>& receiving_positions_map)
 {

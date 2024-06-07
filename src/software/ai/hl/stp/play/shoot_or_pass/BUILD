@@ -24,7 +24,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
-        "//software/ai/passing:gradient_descent_pass_generator",
+        "//software/ai/passing:pass_generator",
         "//software/ai/passing:receiver_position_generator",
         "//software/geom/algorithms",
         "//software/logger",

@@ -124,70 +124,14 @@ cc_test(
 )
 
 cc_library(
-    name = "pass_evaluation",
-    hdrs = [
-        "pass_evaluation.hpp",
-    ],
-    deps = [
-        ":field_pitch_division",
-        ":pass",
-        ":pass_with_rating",
-        "//software/geom:point",
-        "//software/geom:rectangle",
-        "//software/util/make_enum",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "pass_evaluation_test",
-    srcs = ["pass_evaluation_test.cpp"],
-    deps = [
-        ":eighteen_zone_pitch_division",
-        ":pass",
-        ":pass_evaluation",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/geom/algorithms",
-    ],
-)
-
-cc_test(
-    name = "gradient_descent_pass_generator_test",
-    srcs = ["gradient_descent_pass_generator.cpp"],
-    deps = [
-        ":gradient_descent_pass_generator",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/math:math_functions",
-        "//software/test_util",
-    ],
-)
-
-cc_library(
-    name = "gradient_descent_pass_generator",
-    srcs = [
-        "gradient_descent_pass_generator.cpp",
-    ],
-    hdrs = ["gradient_descent_pass_generator.h"],
-    deps = [
-        ":cost_functions",
-        ":pass_with_rating",
-        "//software/optimization:gradient_descent",
-        "//software/world",
-    ],
-)
-
-cc_library(
     name = "pass_generator",
-    hdrs = [
-        "pass_generator.hpp",
+    srcs = [
+        "pass_generator.cpp",
     ],
+    hdrs = ["pass_generator.h"],
     deps = [
         ":cost_functions",
-        ":eighteen_zone_pitch_division",
-        ":pass",
-        ":pass_evaluation",
         ":pass_with_rating",
-        "//proto/message_translation:tbots_protobuf",
         "//software/optimization:gradient_descent",
         "//software/world",
     ],
