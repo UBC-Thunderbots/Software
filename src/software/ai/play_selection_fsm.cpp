@@ -132,11 +132,10 @@ void PlaySelectionFSM::setupDefensivePlay(const Update& event)
     event.set_current_play(std::make_shared<DefensePlay>(strategy_));
 }
 
-void PlaySelectionFSM::evaluateDynamicPlay(const Update& event)
+void PlaySelectionFSM::terminateDynamicPlay(const Update& event)
 {
     if (current_dynamic_play_)
     {
-        // TODO: Integrate PlayMonitor and feed score into evaluate
-        current_dynamic_play_->evaluate(0);
+        current_dynamic_play_->terminate(event.world_ptr);
     }
 }

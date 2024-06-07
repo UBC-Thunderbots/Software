@@ -36,6 +36,15 @@ class SoftmaxStrategy : public ActionSelectionStrategy<TState, TAction>
     TAction::Enum selectAction(const TState& state,
                                const QFunction<TState, TAction>& q_function) override;
 
+    /**
+     * Sets the temperature parameter that controls how much we explore and how much we
+     * exploit. Higher temperatures lead to more exploration, while lower temperatures
+     * favor exploitation of the best-known actions.
+     *
+     * @param temperature the new temperature to set, must be > 0
+     */
+    void setTemperature(double temperature);
+
    private:
     // Temperature parameter
     double temperature_;
@@ -43,15 +52,16 @@ class SoftmaxStrategy : public ActionSelectionStrategy<TState, TAction>
     // List of all possible actions the agent can take
     std::vector<typename TAction::Enum> all_actions_;
 
-    // Random number generator
+    // Random number generator and distributions
     std::mt19937 random_num_gen_;
+    std::uniform_real_distribution<> random_num_dist_;
 };
 
 template <typename TState, typename TAction>
 SoftmaxStrategy<TState, TAction>::SoftmaxStrategy(double temperature)
-    : temperature_(temperature), all_actions_(TAction::allValues())
+    : all_actions_(TAction::allValues()), random_num_dist_(0.0, 1.0)
 {
-    CHECK(temperature_ > 0) << "Softmax temperature must be greater than 0";
+    setTemperature(temperature);
 }
 
 template <typename TState, typename TAction>
@@ -72,8 +82,7 @@ TAction::Enum SoftmaxStrategy<TState, TAction>::selectAction(
     // Each action's slot size is proportional to its probability.
 
     // Randomly generate the final location of the roulette ball on the wheel
-    const double random_num =
-        static_cast<double>(random_num_gen_()) / random_num_gen_.max();
+    const double random_num = random_num_dist_(random_num_gen_);
 
     // Linear search finds the slot that contains the ball
     double current_cutoff = 0;
@@ -87,4 +96,12 @@ TAction::Enum SoftmaxStrategy<TState, TAction>::selectAction(
     }
 
     return all_actions_.back();
+}
+
+template <typename TState, typename TAction>
+void SoftmaxStrategy<TState, TAction>::setTemperature(double temperature)
+{
+    CHECK(temperature_ > 0) << "SoftmaxStrategy temperature must be greater than 0";
+
+    temperature_ = temperature;
 }

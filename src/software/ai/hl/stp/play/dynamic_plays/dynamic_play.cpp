@@ -24,9 +24,9 @@ void DynamicPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-void DynamicPlay::evaluate(double score)
+void DynamicPlay::terminate(const WorldPtr &world_ptr)
 {
-    support_tactic_success_scorer_->evaluate(score);
+    support_tactic_success_scorer_->evaluate(0);
     support_tactic_success_scorer_->reset();
     support_tactic_duplication_scorer_->reset();
     support_tactics_.clear();

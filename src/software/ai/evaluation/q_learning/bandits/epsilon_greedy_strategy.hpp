@@ -35,6 +35,15 @@ class EpsilonGreedyStrategy : public ActionSelectionStrategy<TState, TAction>
     TAction::Enum selectAction(const TState& state,
                                const QFunction<TState, TAction>& q_function) override;
 
+    /**
+     * Sets the epsilon parameter that controls how much we explore and how much we
+     * exploit.
+     *
+     * @param epsilon parameter that controls how much we explore and how much we exploit;
+     *                between 0 and 1 inclusive
+     */
+    void setEpsilon(double epsilon);
+
    private:
     // Epsilon parameter
     double epsilon_;
@@ -42,28 +51,29 @@ class EpsilonGreedyStrategy : public ActionSelectionStrategy<TState, TAction>
     // List of all possible actions the agent can take
     std::vector<typename TAction::Enum> all_actions_;
 
-    // Random number generator
+    // Random number generator and distributions
     std::mt19937 random_num_gen_;
+    std::uniform_real_distribution<> random_num_dist_;
+    std::uniform_int_distribution<> random_action_dist_;
 };
 
 template <typename TState, typename TAction>
 EpsilonGreedyStrategy<TState, TAction>::EpsilonGreedyStrategy(double epsilon)
-    : epsilon_(epsilon), all_actions_(TAction::allValues())
+    : all_actions_(TAction::allValues()),
+      random_num_dist_(0.0, 1.0),
+      random_action_dist_(0, static_cast<int>(all_actions_.size()) - 1)
 {
-    CHECK(epsilon_ >= 0 && epsilon_ <= 1) << "Epsilon must be between 0 and 1 inclusive";
+    setEpsilon(epsilon);
 }
 
 template <typename TState, typename TAction>
 TAction::Enum EpsilonGreedyStrategy<TState, TAction>::selectAction(
     const TState& state, const QFunction<TState, TAction>& q_function)
 {
-    const double random_num =
-        static_cast<double>(random_num_gen_()) / random_num_gen_.max();
-
-    if (random_num < epsilon_)
+    if (random_num_dist_(random_num_gen_) < epsilon_)
     {
         // Explore: select random action from action space
-        return all_actions_.at(random_num_gen_() % all_actions_.size());
+        return all_actions_.at(random_action_dist_(random_num_gen_));
     }
     else
     {
@@ -84,4 +94,13 @@ TAction::Enum EpsilonGreedyStrategy<TState, TAction>::selectAction(
 
         return selected_action;
     }
+}
+
+template <typename TState, typename TAction>
+void EpsilonGreedyStrategy<TState, TAction>::setEpsilon(double epsilon)
+{
+    CHECK(epsilon_ >= 0 && epsilon_ <= 1)
+        << "EpsilonGreedyStrategy epsilon must be between 0 and 1 inclusive";
+
+    epsilon_ = epsilon;
 }

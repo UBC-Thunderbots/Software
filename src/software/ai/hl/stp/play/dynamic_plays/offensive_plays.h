@@ -12,6 +12,9 @@
  */
 class OffensivePlay : public DynamicPlay
 {
+   public:
+    void terminate(const WorldPtr& world_ptr) override;
+
    protected:
     /**
      * Base constructor for OffensivePlay
@@ -23,7 +26,7 @@ class OffensivePlay : public DynamicPlay
                            std::unique_ptr<FeasibilityScorer> feasibility_scorer,
                            std::shared_ptr<AttackerTactic> attacker_tactic);
 
-    void updateTactics(const PlayUpdate &play_update) override;
+    void updateTactics(const PlayUpdate& play_update) override;
 
    private:
     std::shared_ptr<AttackerTactic> attacker_tactic_;

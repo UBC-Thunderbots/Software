@@ -46,6 +46,14 @@ bool AttackerTactic::done() const
     return true;
 }
 
+void AttackerTactic::terminate(const WorldPtr& world)
+{
+    // Update the policy if we are currently executing a skill
+    updatePolicy({world, strategy_});
+
+    current_skill_.reset();
+}
+
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
     // If the robot executing the current skill is done, or if there is no current skill
@@ -56,18 +64,11 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
         AttackerMdpState attacker_mdp_state{tactic_update.world_ptr, strategy_};
 
         // Update the policy if we completed executing a skill
-        if (current_skill_)
-        {
-            double reward = gameplay_monitor_.endStepObservation(tactic_update.world_ptr);
-            policy_.update(attacker_mdp_state, reward);
+        updatePolicy(attacker_mdp_state);
 
-            const static Eigen::IOFormat CSV_FORMAT(Eigen::StreamPrecision,
-                                                    Eigen::DontAlignCols, ",", "\n");
-
-            // Save current Q-function weights to CSV file
-            LOG(CSV_OVERWRITE, ATTACKER_MDP_Q_FUNCTION_WEIGHTS_FILE_NAME)
-                << q_function_->getWeights().transpose().format(CSV_FORMAT);
-        }
+        // Update ActionSelectionStrategy hyperparameters
+        action_selection_strategy_->setEpsilon(
+            strategy_->getAiConfig().attacker_tactic_config().action_selection_epsilon());
 
         // Select the next skill to execute according to the policy
         auto action    = policy_.selectAction(attacker_mdp_state);
@@ -83,4 +84,30 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
     current_skill_->updatePrimitive(tactic_update.robot, tactic_update.world_ptr,
                                     tactic_update.set_primitive);
+}
+
+void AttackerTactic::updatePolicy(const AttackerMdpState& attacker_mdp_state)
+{
+    // Only update the policy if we previously selected a skill
+    if (current_skill_)
+    {
+        const TbotsProto::AttackerTacticConfig& attacker_config =
+            strategy_->getAiConfig().attacker_tactic_config();
+
+        double reward =
+            gameplay_monitor_.endStepObservation(attacker_mdp_state.world_ptr);
+
+        // Update Q-function hyperparameters
+        q_function_->setLearningRate(attacker_config.learning_rate());
+        q_function_->setDiscountFactor(attacker_config.discount_factor());
+
+        policy_.update(attacker_mdp_state, reward);
+
+        const static Eigen::IOFormat CSV_FORMAT(Eigen::StreamPrecision,
+                                                Eigen::DontAlignCols, ",", "\n");
+
+        // Save current Q-function weights to CSV file
+        LOG(CSV_OVERWRITE, ATTACKER_MDP_Q_FUNCTION_WEIGHTS_FILE_NAME)
+            << q_function_->getWeights().transpose().format(CSV_FORMAT);
+    }
 }

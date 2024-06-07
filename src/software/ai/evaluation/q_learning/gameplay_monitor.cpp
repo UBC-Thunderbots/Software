@@ -30,6 +30,8 @@ double GameplayMonitor::endStepObservation(WorldPtr world_ptr)
 
     // TODO: Reward keeping possession
 
+    // TODO: Reward shots on goal, misses, saves
+
     // TODO: Reward enemy team fouls, penalize friendly team fouls
 
     return reward;

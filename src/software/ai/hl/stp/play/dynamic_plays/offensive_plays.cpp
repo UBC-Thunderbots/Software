@@ -11,6 +11,12 @@ OffensivePlay::OffensivePlay(std::shared_ptr<Strategy> strategy,
 {
 }
 
+void OffensivePlay::terminate(const WorldPtr& world_ptr)
+{
+    DynamicPlay::terminate(world_ptr);
+    attacker_tactic_->terminate(world_ptr);
+}
+
 void OffensivePlay::updateTactics(const PlayUpdate& play_update)
 {
     int num_defenders  = std::min(play_update.num_tactics - 1, 2u);

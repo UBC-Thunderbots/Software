@@ -75,11 +75,11 @@ struct PlaySelectionFSM
     void setupDefensivePlay(const Update& event);
 
     /**
-     * Action to evaluate the currently running DynamicPlay
+     * Action to terminate the currently running DynamicPlay
      *
      * @param event The PlaySelection::Update event
      */
-    void evaluateDynamicPlay(const Update& event);
+    void terminateDynamicPlay(const Update& event);
 
     auto operator()()
     {
@@ -105,7 +105,7 @@ struct PlaySelectionFSM
         DEFINE_SML_ACTION(setupHaltPlay)
         DEFINE_SML_ACTION(setupOffensivePlay)
         DEFINE_SML_ACTION(setupDefensivePlay)
-        DEFINE_SML_ACTION(evaluateDynamicPlay)
+        DEFINE_SML_ACTION(terminateDynamicPlay)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -129,22 +129,22 @@ struct PlaySelectionFSM
             Stop_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
 
             OffensivePlay_S + Update_E[gameStateHalted_G] /
-                                  (evaluateDynamicPlay_A, setupHaltPlay_A) = Halt_S,
+                                  (terminateDynamicPlay_A, setupHaltPlay_A) = Halt_S,
             OffensivePlay_S + Update_E[gameStateStopped_G] /
-                                  (evaluateDynamicPlay_A, setupStopPlay_A) = Stop_S,
+                                  (terminateDynamicPlay_A, setupStopPlay_A) = Stop_S,
             OffensivePlay_S + Update_E[gameStateSetupRestart_G && isFriendlyFreeKick_G] /
-                                  (evaluateDynamicPlay_A, setupOffensivePlay_A) =
+                                  (terminateDynamicPlay_A, setupOffensivePlay_A) =
                 OffensivePlay_S,
             OffensivePlay_S + Update_E[gameStateSetupRestart_G] /
-                                  (evaluateDynamicPlay_A, setupSetPlay_A) = SetPlay_S,
+                                  (terminateDynamicPlay_A, setupSetPlay_A) = SetPlay_S,
             OffensivePlay_S + Update_E[enemyHasPossession_G] /
-                                  (evaluateDynamicPlay_A, setupDefensivePlay_A) =
+                                  (terminateDynamicPlay_A, setupDefensivePlay_A) =
                 DefensivePlay_S,
 
             DefensivePlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A  = Halt_S,
             DefensivePlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
             DefensivePlay_S + Update_E[gameStateSetupRestart_G && isFriendlyFreeKick_G] /
-                                  (evaluateDynamicPlay_A, setupOffensivePlay_A) =
+                                  (terminateDynamicPlay_A, setupOffensivePlay_A) =
                 OffensivePlay_S,
             DefensivePlay_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
                 SetPlay_S,

@@ -35,6 +35,14 @@ class AttackerTactic : public Tactic
 
     std::string getFSMState() const override;
 
+    /**
+     * Terminate the current episode of the AttackerTactic and reset the tactic
+     * for a new episode
+     * 
+     * @param world_ptr the World at the end of the current episode
+     */
+    void terminate(const WorldPtr& world);
+
    private:
     // The shared Strategy used by all of AI
     std::shared_ptr<Strategy> strategy_;
@@ -43,7 +51,7 @@ class AttackerTactic : public Tactic
     std::shared_ptr<LinearQFunction<AttackerMdpState, AttackerMdpAction>> q_function_;
 
     // The action selection strategy of attacker agent's policy
-    std::shared_ptr<ActionSelectionStrategy<AttackerMdpState, AttackerMdpAction>>
+    std::shared_ptr<EpsilonGreedyStrategy<AttackerMdpState, AttackerMdpAction>>
         action_selection_strategy_;
 
     // The policy that the attacker agent will follow
@@ -56,4 +64,12 @@ class AttackerTactic : public Tactic
     std::unique_ptr<Skill> current_skill_;
 
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+
+    /**
+     * Update the policy of the attacker agent.
+     * 
+     * @param attacker_mdp_state the new state entered after the attacker agent
+     *                           completed the last executed action
+     */
+    void updatePolicy(const AttackerMdpState& attacker_mdp_state);
 };
