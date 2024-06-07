@@ -20,3 +20,12 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
     ],
 )
+
+cc_test(
+    name = "reflective_enum_test",
+    srcs = [":reflective_enum_test.cpp"],
+    deps = [
+        ":reflective_enum",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
