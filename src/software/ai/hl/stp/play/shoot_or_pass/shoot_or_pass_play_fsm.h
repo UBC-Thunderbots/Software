@@ -48,8 +48,8 @@ struct ShootOrPassPlayFSM
      */
     void updateOffensivePositioningTactics(
         const WorldPtr world, unsigned int num_tactics,
-        const std::vector<Point>& existing_receiver_positions,
-        const std::optional<Point>& pass_origin_override = std::nullopt);
+        const std::vector<Point>& existing_receiver_positions = {},
+        const std::optional<Point>& pass_origin_override      = std::nullopt);
 
     /**
      * Action that looks for a pass

@@ -86,7 +86,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 
         // add remaining tactics based on ranked zones
         updateOffensivePositioningTactics(event.common.world_ptr,
-                                          event.common.num_tactics - 1, {});
+                                          event.common.num_tactics - 1);
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
 
@@ -168,10 +168,7 @@ bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
     const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
     const auto ball_is_kicked_m_per_s_threshold =
-        this->ai_config.ai_parameter_config()
-            .ball_is_kicked_m_per_s_threshold();  // TODO (NIMA): Instead of velocity,
-                                                  // could check ball position being close
-                                                  // to start
+        this->ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
 
     return (ball_velocity < ball_is_kicked_m_per_s_threshold) &&
            (best_pass_and_score_so_far.rating > min_pass_score_threshold);

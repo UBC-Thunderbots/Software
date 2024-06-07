@@ -56,7 +56,7 @@ message AiParameterConfig
 {
     // threshold to decide if ball hasn't been kicked
     required double ball_is_kicked_m_per_s_threshold = 1
-        [default = 0.6, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 message AttackerTacticConfig
@@ -541,8 +541,7 @@ message PassGeneratorVisualizationConfig
 
 message ReceiverPositionGeneratorVisualizationConfig
 {
-    required bool visualize_best_zones     = 1 [default = false];
-    required bool visualize_sampled_points = 2 [default = false];
+    required bool visualize_best_receiving_positions_and_zones = 1 [default = false];
 }
 
 message PossessionTrackerConfig

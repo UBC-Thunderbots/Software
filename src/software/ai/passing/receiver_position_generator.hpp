@@ -40,7 +40,9 @@ class ReceiverPositionGenerator
      * @param existing_receiver_positions A set of existing receiver positions that will
      * be avoided, if possible, when generating the new receiver positions.
      * @param pass_origin_override An optional override for the position where the pass
-     * will be made from. If not provided, the ball position will be used.
+     * will be made from. If not provided, the ball position will be used. This could be
+     * helpful if you are trying to position the receivers based on the ball's future
+     * position.
      * @return A vector of
      *      min(num_positions, num_friendly_robots - existing_receiver_positions.size())
      * positions that the receivers could use.
@@ -56,25 +58,55 @@ class ReceiverPositionGenerator
      * Sample more points and update the best_receiving_positions map if better
      * receiving positions in each zone were found
      *
+     * @param best_receiving_positions The map of the best receiving positions for each
+     * zone found so far, and their ratings.
      * @param world The world to sample receiving positions in
      * @param zones_to_sample The subset of the zones to sample receiving positions in
      * @param pass_origin The origin of the pass
      * @param num_samples_per_zone The number of samples to take per zone
      */
-    void updateBestReceiverPositions(const World &world, const Point &pass_origin,
-                                     const std::vector<ZoneEnum> &zones_to_sample,
-                                     unsigned int num_samples_per_zone);
+    void updateBestReceiverPositions(
+        std::map<ZoneEnum, PassWithRating> &best_receiving_positions, const World &world,
+        const Point &pass_origin, const std::vector<ZoneEnum> &zones_to_sample,
+        unsigned int num_samples_per_zone);
+
+    /**
+     * Helper function for getting the top num_positions zones from the current
+     * best_receiving_positions. Note that this function will attempt to spread out the
+     * receivers so they are not too close to each other.
+     *
+     * @param best_receiving_positions The current best receiving position and rating per
+     * zone
+     * @param num_positions The number of top zones to get
+     * @param world The world to get the top zones in
+     * @param pass_origin The origin of the pass
+     * @param existing_receiver_positions The existing receiver positions to avoid
+     * @return A vector of the top num_positions zones
+     */
+    std::vector<ZoneEnum> getTopZones(
+        const std::map<ZoneEnum, PassWithRating> &best_receiving_positions,
+        unsigned int num_positions, const World &world, const Point &pass_origin,
+        const std::vector<Point> &existing_receiver_positions);
+
+    /**
+     * Helper method for visualizing the best receiving positions and zones
+     * @param best_receiving_positions The best receiving positions and their ratings
+     * @param top_zones The ranked top zones to visualize
+     */
+    void visualizeBestReceivingPositionsAndZones(
+        const std::map<ZoneEnum, PassWithRating> &best_receiving_positions,
+        const std::vector<ZoneEnum> &top_zones);
 
     // Pitch division
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division_;
 
+    // The best receiving position for each zone from the previous iteration
+    std::map<ZoneEnum, Point> prev_best_receiving_positions;
+
     // Passing configuration
     TbotsProto::PassingConfig passing_config_;
 
-    std::map<ZoneEnum, PassWithRating> best_receiving_positions;
-    std::map<ZoneEnum, Point> prev_best_receiving_positions;
-
-    // TODO (NIMA): Added for debugging
+    // A vector of shapes that will be visualized
     std::vector<TbotsProto::DebugShapes::DebugShape> debug_shapes;
 
     // A random number generator for use across the class
@@ -100,6 +132,13 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
     const std::vector<Point> &existing_receiver_positions,
     const std::optional<Point> &pass_origin_override)
 {
+    std::map<ZoneEnum, PassWithRating> best_receiving_positions;
+    debug_shapes.clear();
+
+    Point pass_origin           = pass_origin_override.value_or(world.ball().position());
+    const auto &receiver_config = passing_config_.receiver_position_generator_config();
+
+    // Verify that the number of receiver positions requested is valid
     if (num_positions >
         world.friendlyTeam().numRobots() - existing_receiver_positions.size())
     {
@@ -112,13 +151,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
                                                   existing_receiver_positions.size());
     }
 
-    best_receiving_positions.clear();
-    debug_shapes.clear();
-
-    Point pass_origin           = pass_origin_override.value_or(world.ball().position());
-    const auto &receiver_config = passing_config_.receiver_position_generator_config();
-
-    // Add the previous best sampled receiving positions
+    // Add the previous best sampled receiving positions with their updated rating
     for (const auto &[zone, prev_best_receiving_position] : prev_best_receiving_positions)
     {
         Pass pass = Pass::fromDestReceiveSpeed(pass_origin, prev_best_receiving_position,
@@ -132,43 +165,154 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
             zone, PassWithRating{pass, receiver_position_rating});
     }
 
-    auto all_zones = pitch_division_->getAllZoneIds();
-
     // Begin by sampling a few passes per zone to get an initial estimate of the best
     // receiving zones
-    updateBestReceiverPositions(world, pass_origin, all_zones,
+    updateBestReceiverPositions(best_receiving_positions, world, pass_origin,
+                                pitch_division_->getAllZoneIds(),
                                 receiver_config.num_initial_samples_per_zone());
 
-    // Sort the zones based on initial ratings
-    auto zone_comparator = [&](const ZoneEnum &z1, const ZoneEnum &z2) {
-        return best_receiving_positions.find(z1)->second.rating >
-               best_receiving_positions.find(z2)->second.rating;
-    };
-    std::sort(all_zones.begin(), all_zones.end(), zone_comparator);
+    // Get the top zones based on the initial sampling
+    std::vector<ZoneEnum> top_zones =
+        getTopZones(best_receiving_positions, num_positions, world, pass_origin,
+                    existing_receiver_positions);
 
-    const Angle min_angle_diff_between_receivers =
-        Angle::fromDegrees(receiver_config.min_angle_between_receivers_deg());
+    // Sample more passes from only the top zones and update their ranking
+    updateBestReceiverPositions(best_receiving_positions, world, pass_origin, top_zones,
+                                receiver_config.num_additional_samples_per_top_zone());
+    std::sort(top_zones.begin(), top_zones.end(),
+              [&](const ZoneEnum &z1, const ZoneEnum &z2) {
+                  return best_receiving_positions.find(z1)->second.rating >
+                         best_receiving_positions.find(z2)->second.rating;
+              });
+
+    // Get the top best receiving positions and update the previous best
+    std::vector<Point> best_positions;
+    prev_best_receiving_positions.clear();
+    for (const auto zone : top_zones)
+    {
+        Point best_position =
+            best_receiving_positions.find(zone)->second.pass.receiverPoint();
+        best_positions.push_back(best_position);
+        prev_best_receiving_positions.insert_or_assign(zone, best_position);
+    }
+
+    // Visualize the receiving positions and zones
+    if (receiver_config.receiver_vis_config()
+            .visualize_best_receiving_positions_and_zones())
+    {
+        visualizeBestReceivingPositionsAndZones(best_receiving_positions, top_zones);
+    }
+
+    return best_positions;
+}
+
+template <class ZoneEnum>
+void ReceiverPositionGenerator<ZoneEnum>::visualizeBestReceivingPositionsAndZones(
+    const std::map<ZoneEnum, PassWithRating> &best_receiving_positions,
+    const std::vector<ZoneEnum> &top_zones)
+{
+    for (unsigned int i = 0; i < top_zones.size(); i++)
+    {
+        debug_shapes.push_back(*createDebugShape(pitch_division_->getZone(top_zones[i]),
+                                                 std::to_string(i + 1),
+                                                 std::to_string(i + 1)));
+
+        debug_shapes.push_back(*createDebugShape(
+            Circle(
+                best_receiving_positions.find(top_zones[i])->second.pass.receiverPoint(),
+                0.15),
+            std::to_string(i + 1) + "p", std::to_string(i + 1) + "p"));
+    }
+
+    LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
+}
+
+template <class ZoneEnum>
+void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
+    std::map<ZoneEnum, PassWithRating> &best_receiving_positions, const World &world,
+    const Point &pass_origin, const std::vector<ZoneEnum> &zones_to_sample,
+    unsigned int num_samples_per_zone)
+{
+    for (const auto &zone_id : zones_to_sample)
+    {
+        auto zone = pitch_division_->getZone(zone_id);
+        std::uniform_real_distribution x_distribution(zone.xMin(), zone.xMax());
+        std::uniform_real_distribution y_distribution(zone.yMin(), zone.yMax());
+
+        PassWithRating best_pass_for_receiving{Pass(Point(0, 0), Point(0, 0), 1.0), -1.0};
+
+        // Check if we have already sampled some passes for this zone
+        const auto &best_sampled_pass_iter = best_receiving_positions.find(zone_id);
+        if (best_sampled_pass_iter != best_receiving_positions.end())
+        {
+            best_pass_for_receiving = best_sampled_pass_iter->second;
+        }
+
+        // Randomly sample receiving positions in the zone
+        for (unsigned int i = 0; i < num_samples_per_zone; ++i)
+        {
+            auto pass = Pass::fromDestReceiveSpeed(
+                pass_origin,
+                Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
+                passing_config_);
+            double rating = rateReceivingPosition(world, pass, passing_config_);
+
+            if (rating > best_pass_for_receiving.rating)
+            {
+                best_pass_for_receiving = PassWithRating{pass, rating};
+            }
+        }
+
+        best_receiving_positions.insert_or_assign(zone_id, best_pass_for_receiving);
+    }
+}
+
+template <class ZoneEnum>
+std::vector<ZoneEnum> ReceiverPositionGenerator<ZoneEnum>::getTopZones(
+    const std::map<ZoneEnum, PassWithRating> &best_receiving_positions,
+    unsigned int num_positions, const World &world, const Point &pass_origin,
+    const std::vector<Point> &existing_receiver_positions)
+{
     std::vector<ZoneEnum> top_zones;
+
+    // Sort the zones based on initial ratings
+    auto all_zones = pitch_division_->getAllZoneIds();
+    std::sort(all_zones.begin(), all_zones.end(),
+              [&](const ZoneEnum &z1, const ZoneEnum &z2) {
+                  return best_receiving_positions.find(z1)->second.rating >
+                         best_receiving_positions.find(z2)->second.rating;
+              });
+
+    // Iterate through the zones in descending order of rating and select them as top
+    // zones if they are not too close to the previous selected zones.
+    const Angle min_angle_diff_between_receivers =
+        Angle::fromDegrees(passing_config_.receiver_position_generator_config()
+                               .min_angle_between_receivers_deg());
+
     for (unsigned int i = 0; i < all_zones.size() && top_zones.size() < num_positions;
          i++)
     {
-        // Only add zones that are not too close to the previous top receiver positions
-        // to encourage spreading out the receivers
         Angle curr_pass_angle =
             best_receiving_positions.find(all_zones[i])->second.pass.passerOrientation();
+
+        // Check that none of the previously selected top zones are close to the current
+        // candidate zone
         bool no_prev_receivers_close =
             std::none_of(top_zones.begin(), top_zones.end(), [&](const ZoneEnum &zone) {
                 return curr_pass_angle.minDiff(best_receiving_positions.find(zone)
                                                    ->second.pass.passerOrientation()) <
                        min_angle_diff_between_receivers;
             });
+
+        // and none of the existing receiver positions are close to the current
+        // candidate zone
         no_prev_receivers_close =
             no_prev_receivers_close &&
             std::none_of(
                 existing_receiver_positions.begin(), existing_receiver_positions.end(),
                 [&](const Point &existing_receiver_position) {
                     return curr_pass_angle.minDiff(
-                               (pass_origin - existing_receiver_position).orientation()) <
+                               (existing_receiver_position - pass_origin).orientation()) <
                            min_angle_diff_between_receivers;
                 });
 
@@ -196,90 +340,5 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
         }
     }
 
-    // Sample more passes from the top zones and update ranking
-    updateBestReceiverPositions(world, pass_origin, top_zones,
-                                receiver_config.num_additional_samples_per_top_zone());
-    std::sort(top_zones.begin(), top_zones.end(), zone_comparator);
-
-    // Get the top best receiving positions and update the previous best
-    std::vector<Point> best_positions;
-    prev_best_receiving_positions.clear();
-    for (const auto zone : top_zones)
-    {
-        Point best_position =
-            best_receiving_positions.find(zone)->second.pass.receiverPoint();
-        best_positions.push_back(best_position);
-        prev_best_receiving_positions.insert_or_assign(zone, best_position);
-    }
-
-    // Visualize the best zones
-    if (passing_config_.receiver_position_generator_config()
-            .receiver_vis_config()
-            .visualize_best_zones())
-    {
-        for (unsigned int i = 0; i < top_zones.size(); i++)
-        {
-            debug_shapes.push_back(
-                *createDebugShape(pitch_division_->getZone(top_zones[i]),
-                                  std::to_string(i + 1), std::to_string(i + 1)));
-            debug_shapes.push_back(*createDebugShape(
-                Circle(best_receiving_positions.find(top_zones[i])
-                           ->second.pass.receiverPoint(),
-                       0.15),
-                std::to_string(i + 1) + "p", std::to_string(i + 1) + "p"));
-        }
-        LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
-    }
-
-    return best_positions;
-}
-
-template <class ZoneEnum>
-void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
-    const World &world, const Point &pass_origin,
-    const std::vector<ZoneEnum> &zones_to_sample, unsigned int num_samples_per_zone)
-{
-    for (const auto &zone_id : zones_to_sample)
-    {
-        auto zone = pitch_division_->getZone(zone_id);
-        std::uniform_real_distribution x_distribution(zone.xMin(), zone.xMax());
-        std::uniform_real_distribution y_distribution(zone.yMin(), zone.yMax());
-
-        PassWithRating best_pass_for_receiving{Pass(Point(0, 0), Point(0, 0), 0), -1.0};
-
-        // Check if we have already sampled some passes for this zone
-        const auto &best_sampled_pass_iter = best_receiving_positions.find(zone_id);
-        if (best_sampled_pass_iter != best_receiving_positions.end())
-        {
-            best_pass_for_receiving = best_sampled_pass_iter->second;
-        }
-
-        // Sample passes in the zone
-        for (unsigned int i = 0; i < num_samples_per_zone; ++i)
-        {
-            auto pass = Pass::fromDestReceiveSpeed(
-                pass_origin,
-                Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
-                passing_config_);
-            double rating = rateReceivingPosition(world, pass, passing_config_);
-            if (rating > best_pass_for_receiving.rating)
-            {
-                best_pass_for_receiving = PassWithRating{pass, rating};
-            }
-        }
-
-        if (passing_config_.receiver_position_generator_config()
-                .receiver_vis_config()
-                .visualize_sampled_points())
-        {
-            std::stringstream stream;
-            stream << std::fixed << std::setprecision(3)
-                   << best_pass_for_receiving.rating;
-            debug_shapes.push_back(*createDebugShape(
-                Circle(best_pass_for_receiving.pass.receiverPoint(), 0.05),
-                std::to_string(debug_shapes.size()) + "s", stream.str()));
-        }
-
-        best_receiving_positions.insert_or_assign(zone_id, best_pass_for_receiving);
-    }
+    return top_zones;
 }
