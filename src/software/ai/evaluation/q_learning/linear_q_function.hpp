@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 
+#include "csv.hpp"
 #include "software/ai/evaluation/q_learning/feature_extractor.hpp"
 #include "software/ai/evaluation/q_learning/q_function.hpp"
 
@@ -33,6 +34,37 @@ class LinearQFunction : public QFunction<TState, TAction>
     explicit LinearQFunction(FeatureExtractor<TState, TAction> features,
                              double learning_rate, double discount_factor,
                              std::optional<Eigen::VectorXd> weights = std::nullopt);
+
+    /**
+     * Creates a LinearQFunction with its weights initialized using the given
+     * CSV file.
+     *
+     * @param features the feature extractor to use on the state representation
+     * @param learning_rate the initial learning rate
+     * @param learning_rate the initial discount factor
+     * @param weights_csv_file the CSV file containing the initial weights to use
+     */
+    explicit LinearQFunction(FeatureExtractor<TState, TAction> features,
+                             double learning_rate, double discount_factor,
+                             std::string weights_csv_file);
+
+    /**
+     * Reads the given CSV file containing weights for a LinearQFunction
+     * and returns the weights as a vector.
+     *
+     * @param csv_file the CSV file containing the weights to load
+     *
+     * @return the weights from the CSV file, or std::nullopt if the file is empty
+     */
+    static std::optional<Eigen::VectorXd> loadWeightsFromCsv(std::string csv_file);
+
+    /**
+     * Saves the weights of the LinearQFunction to a file in CSV format.
+     * The file will be saved under tbots runtime directory (e.g. /tmp/tbots/blue).
+     *
+     * @param csv_file the name of the file to save the weights to
+     */
+    void saveWeightsToCsv(std::string csv_file);
 
     double getQValue(const TState& state, const TAction::Enum& action) const override;
 
@@ -90,6 +122,42 @@ LinearQFunction<TState, TAction>::LinearQFunction(
 
     setLearningRate(learning_rate);
     setDiscountFactor(discount_factor);
+}
+
+template <typename TState, typename TAction>
+LinearQFunction<TState, TAction>::LinearQFunction(
+    FeatureExtractor<TState, TAction> features, double learning_rate,
+    double discount_factor, std::string weights_csv_file)
+    : LinearQFunction(features, learning_rate, discount_factor,
+                      loadWeightsFromCsv(weights_csv_file))
+{
+}
+
+template <typename TState, typename TAction>
+std::optional<Eigen::VectorXd> LinearQFunction<TState, TAction>::loadWeightsFromCsv(
+    std::string csv_file)
+{
+    csv::CSVReader reader(csv_file);
+    csv::CSVRow csv_row;
+
+    if (reader.read_row(csv_row))
+    {
+        Eigen::VectorXd weights(csv_row.size());
+        std::transform(csv_row.begin(), csv_row.end(), weights.begin(),
+                       [](csv::CSVField& field) { return field.get<double>(); });
+        return weights;
+    }
+
+    return std::nullopt;
+}
+
+template <typename TState, typename TAction>
+void LinearQFunction<TState, TAction>::saveWeightsToCsv(std::string csv_file)
+{
+    const static Eigen::IOFormat CSV_FORMAT(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                                            ",", "\n");
+
+    LOG(CSV_OVERWRITE, csv_file) << getWeights().transpose().format(CSV_FORMAT);
 }
 
 template <typename TState, typename TAction>

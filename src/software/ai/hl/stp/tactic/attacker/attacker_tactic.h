@@ -38,7 +38,7 @@ class AttackerTactic : public Tactic
     /**
      * Terminate the current episode of the AttackerTactic and reset the tactic
      * for a new episode
-     * 
+     *
      * @param world_ptr the World at the end of the current episode
      */
     void terminate(const WorldPtr& world);
@@ -63,11 +63,19 @@ class AttackerTactic : public Tactic
     // The current skill that the attacker is executing
     std::unique_ptr<Skill> current_skill_;
 
+    // File to load Q-function weights from for initialization
+    inline static const std::string ATTACKER_MDP_Q_FUNCTION_INITIAL_WEIGHTS_FILE =
+        "software/ai/evaluation/q_learning/attacker_mdp_q_function_weights.csv";
+
+    // Name of file that Q-function weights will be saved to at runtime
+    inline static const std::string ATTACKER_MDP_Q_FUNCTION_RUNTIME_WEIGHTS_FILE =
+        "attacker_mdp_q_function_weights.csv";
+
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     /**
      * Update the policy of the attacker agent.
-     * 
+     *
      * @param attacker_mdp_state the new state entered after the attacker agent
      *                           completed the last executed action
      */

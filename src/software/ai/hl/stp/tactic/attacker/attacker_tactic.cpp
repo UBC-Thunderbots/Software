@@ -8,7 +8,8 @@ AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
       q_function_(std::make_shared<LinearQFunction<AttackerMdpState, AttackerMdpAction>>(
           AttackerMdpFeatureExtractor(),
           strategy_->getAiConfig().attacker_tactic_config().learning_rate(),
-          strategy_->getAiConfig().attacker_tactic_config().discount_factor())),
+          strategy_->getAiConfig().attacker_tactic_config().discount_factor(),
+          ATTACKER_MDP_Q_FUNCTION_INITIAL_WEIGHTS_FILE)),
       action_selection_strategy_(
           std::make_shared<EpsilonGreedyStrategy<AttackerMdpState, AttackerMdpAction>>(
               strategy_->getAiConfig()
@@ -103,11 +104,7 @@ void AttackerTactic::updatePolicy(const AttackerMdpState& attacker_mdp_state)
 
         policy_.update(attacker_mdp_state, reward);
 
-        const static Eigen::IOFormat CSV_FORMAT(Eigen::StreamPrecision,
-                                                Eigen::DontAlignCols, ",", "\n");
-
         // Save current Q-function weights to CSV file
-        LOG(CSV_OVERWRITE, ATTACKER_MDP_Q_FUNCTION_WEIGHTS_FILE_NAME)
-            << q_function_->getWeights().transpose().format(CSV_FORMAT);
+        q_function_->saveWeightsToCsv(ATTACKER_MDP_Q_FUNCTION_RUNTIME_WEIGHTS_FILE);
     }
 }

@@ -4,6 +4,9 @@ cc_library(
     name = "attacker_tactic",
     srcs = ["attacker_tactic.cpp"],
     hdrs = ["attacker_tactic.h"],
+    data = [
+        "//software/ai/evaluation/q_learning:attacker_mdp_q_function_weights.csv",
+    ],
     deps = [
         "//shared:constants",
         "//software/ai:strategy",

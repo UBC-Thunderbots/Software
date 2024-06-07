@@ -25,7 +25,7 @@ class DynamicPlay : public Play
     /**
      * Terminate the current episode of the DynamicPlay and reset the play
      * for a new episode
-     * 
+     *
      * @param world_ptr the World at the end of the current episode
      */
     virtual void terminate(const WorldPtr &world_ptr);

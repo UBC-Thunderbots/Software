@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+exports_files(["attacker_mdp_q_function_weights.csv"])
+
 cc_library(
     name = "attacker_mdp_action",
     srcs = ["attacker_mdp_action.cpp"],
@@ -54,6 +56,7 @@ cc_library(
     deps = [
         ":feature_extractor",
         ":q_function",
+        "@csv",
         "@eigen",
     ],
 )
