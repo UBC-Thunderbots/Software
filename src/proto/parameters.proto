@@ -37,6 +37,7 @@ message AiConfig
     required GoalieTacticConfig goalie_tactic_config                        = 6;
     required EnemyCapabilityConfig enemy_capability_config                  = 7;
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
+    required EnemyBallPlacementPlayConfig enemy_ball_placement_play_config  = 10;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
     required AiParameterConfig ai_parameter_config                          = 13;
@@ -213,6 +214,7 @@ message PassingConfig
     // Width of the pass lane area that the ball must be inside of during the pass
     required double pass_lane_width_meters = 22
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+
     /*****  Visualization parameters *****/
     // Cost function visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
@@ -363,6 +365,16 @@ message SensorFusionConfig
 
     // Possession tracker for determining which team has possession of the ball
     required PossessionTrackerConfig possession_tracker_config = 13;
+}
+
+message EnemyBallPlacementPlayConfig
+{
+    // The distance to keep from the enemy ball placement stadium
+    required double distance_to_keep_meters = 1 [
+        default                   = 0.75,
+        (bounds).min_double_value = 0.65,
+        (bounds).max_double_value = 1.5
+    ];
 }
 
 message DefensePlayConfig

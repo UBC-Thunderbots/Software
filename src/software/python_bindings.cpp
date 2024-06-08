@@ -273,6 +273,14 @@ PYBIND11_MODULE(python_bindings, m)
         .def("radius", &Circle::radius)
         .def("area", &Circle::area);
 
+    py::class_<Stadium>(m, "Stadium")
+        .def(py::init<Segment, double>())
+        .def("__repr__", [](const Stadium& s) {
+            std::stringstream stream;
+            stream << s;
+            return stream.str();
+        });
+
     py::class_<RobotConstants>(m, "RobotConstants")
         .def_readwrite("max_force_dribbler_speed_rpm",
                        &RobotConstants::max_force_dribbler_speed_rpm)
@@ -306,12 +314,14 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createCircle", &createCircle);
     m.def("createVector", &createVector);
     m.def("createSegment", &createSegment);
+    m.def("createStadium", &createStadium);
 
     m.def("createPointProto", &createPointProto);
     m.def("createPolygonProto", &createPolygonProto);
     m.def("createCircleProto", &createCircleProto);
     m.def("createVectorProto", &createVectorProto);
     m.def("createSegmentProto", &createSegmentProto);
+    m.def("createStadiumProto", &createStadiumProto);
 
     m.def("createGeometryData", &createGeometryData);
 
@@ -322,6 +332,7 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("contains",
           py::overload_cast<const Segment&, const Point&, double, int>(&contains));
     m.def("contains", py::overload_cast<const Rectangle&, const Point&>(&contains));
+    m.def("contains", py::overload_cast<const Stadium&, const Point&>(&contains));
 
     py::class_<Robot>(m, "Robot")
         .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())

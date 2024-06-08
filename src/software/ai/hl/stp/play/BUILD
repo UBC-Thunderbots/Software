@@ -7,42 +7,6 @@ load("@simulated_tests_deps//:requirements.bzl", "requirement")
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
 
 cc_library(
-    name = "enemy_ball_placement_play",
-    srcs = ["enemy_ball_placement_play.cpp"],
-    hdrs = ["enemy_ball_placement_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/util/generic_factory",
-        "//software/world:game_state",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
-    name = "enemy_free_kick_play",
-    srcs = ["enemy_free_kick_play.cpp"],
-    hdrs = ["enemy_free_kick_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-        "//software/world:game_state",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "halt_play",
     srcs = ["halt_play.cpp"],
     hdrs = ["halt_play.h"],
@@ -157,8 +121,6 @@ cc_library(
 cc_library(
     name = "all_plays",
     deps = [
-        ":enemy_ball_placement_play",
-        ":enemy_free_kick_play",
         ":free_kick_play",
         ":halt_play",
         ":kickoff_enemy_play",
@@ -166,6 +128,8 @@ cc_library(
         ":stop_play",
         "//software/ai/hl/stp/play/ball_placement:ball_placement_play",
         "//software/ai/hl/stp/play/defense:defense_play",
+        "//software/ai/hl/stp/play/enemy_ball_placement:enemy_ball_placement_play",
+        "//software/ai/hl/stp/play/enemy_free_kick:enemy_free_kick_play",
         "//software/ai/hl/stp/play/dynamic_plays:dynamic_play",
         "//software/ai/hl/stp/play/dynamic_plays:offensive_plays",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
@@ -219,35 +183,6 @@ py_test(
         "//software/simulated_tests:simulated_test_fixture",
         "//software/simulated_tests:validation",
         requirement("pytest"),
-    ],
-)
-
-py_test(
-    name = "enemy_ball_placement_play_test",
-    srcs = [
-        "enemy_ball_placement_play_test.py",
-    ],
-    tags = ["exclusive"],
-    deps = [
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
-    ],
-)
-
-cc_test(
-    name = "enemy_free_kick_play_test",
-    srcs = ["enemy_free_kick_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:enemy_free_kick_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
     ],
 )
 
@@ -358,5 +293,24 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:play_factory",
+    ],
+)
+
+py_test(
+    name = "passing_sim_test",
+    srcs = [
+        "passing_sim_test.py",
+    ],
+    data = [
+        "//software:py_constants.so",
+    ],
+    tags = ["exclusive"],
+    deps = [
+        "//proto:import_all_protos",
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )
