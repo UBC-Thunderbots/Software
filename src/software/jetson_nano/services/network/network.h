@@ -79,6 +79,8 @@ class NetworkService
     static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
     static constexpr double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
         ROBOT_STATUS_BROADCAST_RATE_HZ / (THUNDERLOOP_HZ + 1.0);
+
+    // increases size of deque when robot status messages are sent less frequently
     static constexpr unsigned int PRIMITIVE_DEQUE_MAX_SIZE =
         static_cast<unsigned int>(1500 / ROBOT_STATUS_BROADCAST_RATE_HZ);
 
