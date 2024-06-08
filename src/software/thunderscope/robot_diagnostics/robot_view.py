@@ -76,6 +76,7 @@ class RobotViewComponent(QWidget):
         Updates the robot info widget and, if initialized, the robot status widget as well
 
         :param robot_status: the new message data to update the widget with
+        :param round_trip_time: robot statistic proto to update with new metrics
         """
 
         self.robot_info.update(robot_status, round_trip_time)

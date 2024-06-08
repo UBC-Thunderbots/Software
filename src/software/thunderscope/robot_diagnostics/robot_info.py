@@ -101,7 +101,7 @@ class RobotInfo(QWidget):
         self.status_layout = QVBoxLayout()
 
         # Battery Bar
-        self.battery_layout = QHBoxLayout()
+        self.stats_layout = QHBoxLayout()
         self.battery_progress_bar = common_widgets.ColorProgressBar(
             MIN_BATTERY_VOLTAGE - self.BATTERY_MIN_OFFSET, MAX_BATTERY_VOLTAGE
         )
@@ -116,7 +116,7 @@ class RobotInfo(QWidget):
         # Stop primitive received indicator
         self.stop_primitive_label = QLabel()
         self.stop_primitive_label.setText("NA")
-        self.battery_layout.addWidget(self.stop_primitive_label)
+        self.stats_layout.addWidget(self.stop_primitive_label)
 
         # Primitive loss rate label
         self.primitive_loss_rate_label = common_widgets.ColorQLabel(
@@ -135,13 +135,13 @@ class RobotInfo(QWidget):
             maxlen=MAX_LENGTH_PRIMITIVE_SET_STORE
         )
 
-        self.battery_layout.addWidget(self.primitive_loss_rate_label)
-        self.battery_layout.addWidget(self.primitive_rtt_label)
+        self.stats_layout.addWidget(self.primitive_loss_rate_label)
+        self.stats_layout.addWidget(self.primitive_rtt_label)
 
-        self.battery_layout.addWidget(self.battery_progress_bar)
-        self.battery_layout.addWidget(self.battery_label)
+        self.stats_layout.addWidget(self.battery_progress_bar)
+        self.stats_layout.addWidget(self.battery_label)
 
-        self.status_layout.addLayout(self.battery_layout)
+        self.status_layout.addLayout(self.stats_layout)
 
         # Control mode dropdown
         self.control_mode_layout = QHBoxLayout()
@@ -385,7 +385,7 @@ class RobotInfo(QWidget):
         :return: The mean integer value of the previous round-trip times in milliseconds
         """
         self.previous_primitive_rtt_values.append(new_time)
-        average_rtt_time_milliseconds = sum(self.previous_primitive_rtt_values)
+        sum_rtt_time_milliseconds = sum(self.previous_primitive_rtt_values)
         return int(
-            average_rtt_time_milliseconds / len(self.previous_primitive_rtt_values)
+            sum_rtt_time_milliseconds / len(self.previous_primitive_rtt_values)
         )
