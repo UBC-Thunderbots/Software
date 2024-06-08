@@ -22,36 +22,7 @@
  *         ideal pass, and 0 being the worst pass possible
  */
 double ratePass(const World& world, const Pass& pass,
-                TbotsProto::PassingConfig passing_config);
-
-/**
- * Calculate the quality of a given pass accounting for the zone it's in
- *
- * @param world The world in which to rate the pass
- * @param pass The pass to rate
- * @param zone The zone this pass is constrained to
- * @param passing_config The passing config used for tuning
- *
- * @return A value in [0,1] representing the quality of the pass, with 1 being an
- *         ideal pass, and 0 being the worst pass possible
- */
-double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
-                TbotsProto::PassingConfig passing_config);
-
-/**
- * Calculate the quality of a given zone
- *
- * @param field The field on which to rate the zone
- * @param enemy_team The enemy team
- * @param zone The zone to rate
- * @param ball_position The position of the ball
- * @param passing_config The passing config used for tuning
- *
- * @return A value in [0,1] representing the quality of the zone, with 1 being a
- *         great zone to send a cherry picker to, and 0 being a zone to avoid.
- */
-double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
-                const Point& ball_position, TbotsProto::PassingConfig passing_config);
+                const TbotsProto::PassingConfig& passing_config);
 
 /**
  * Rate a pass based on the quality of the receiving position
@@ -67,6 +38,19 @@ double rateReceivingPosition(const World& world, const Pass& pass,
                              const TbotsProto::PassingConfig& passing_config);
 
 /**
+ * Rate a point to shoot on enemy goal from
+ *
+ * @param shot_origin The point to shoot from
+ * @param field The field we are playing on
+ * @param enemy_team The enemy team
+ * @param passing_config The passing config used for tuning
+ * @return A value in [0,1] representing the quality of the shot, with 1 being
+ *       an ideal shot, and 0 being a shot that will most likely be blocked.
+ */
+double rateShot(const Point& shot_origin, const Field& field, const Team& enemy_team,
+                const TbotsProto::PassingConfig& passing_config);
+
+/**
  * Rate pass based on the probability of scoring once we receive the pass
  *
  * @param field The field we are playing on
@@ -79,7 +63,7 @@ double rateReceivingPosition(const World& world, const Pass& pass,
  * able to score off of the pass
  */
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
-                          TbotsProto::PassingConfig passing_config);
+                          const TbotsProto::PassingConfig& passing_config);
 
 /**
  * Calculates the risk of an enemy robot interfering with a given pass
@@ -93,8 +77,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
  *         be interfered with (and so is very poor)
  */
 double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
-                         const Duration& enemy_reaction_time,
-                         double enemy_proximity_importance);
+                         const TbotsProto::PassingConfig& passing_config);
 
 /**
  * Rate the pass based on if it moves the ball up the field or not
@@ -103,11 +86,22 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
  * @param pass The pass to rate
  * @param passing_config The passing config used for tuning
  * @return A value in [0,1] indicating the quality of the pass, where
- *        1 indicates the pass is ideal and 0 indicates the pass is as
+ *        1 indicates the pass is ideal and 0 indicates the pass is bad as
  *        it passes back toward our friendly half.
  */
 double ratePassForwardQuality(const Pass& pass,
                               const TbotsProto::PassingConfig& passing_config);
+
+/**
+ * Encourage passes that are not too close to the passer
+ * @param pass The pass to rate
+ * @param passing_config The passing config used for tuning
+ * @return A value in [0,1] indicating the quality of the pass, where
+ *        1 indicates the pass is ideal and 0 indicates the pass is bad as
+ *        it is too close to the passer.
+ */
+double ratePassNotTooClose(const Pass& pass,
+                           const TbotsProto::PassingConfig& passing_config);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted
@@ -121,7 +115,7 @@ double ratePassForwardQuality(const Pass& pass,
  *         pass to be intercepted
  */
 double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
-                              const Duration& enemy_reaction_time);
+                              const TbotsProto::PassingConfig& passing_config);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted by a given robot
@@ -135,7 +129,7 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
  *         intercepted
  */
 double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
-                              const Duration& enemy_reaction_time);
+                              const TbotsProto::PassingConfig& passing_config);
 
 
 /**
@@ -153,7 +147,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
  *         being impossible
  */
 double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
-                                  TbotsProto::PassingConfig passing_config);
+                                  const TbotsProto::PassingConfig& passing_config);
 
 /**
  * Calculates the static position quality for a given position on a given field
@@ -170,47 +164,45 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
  *         field, with a higher value representing a more desirable position
  */
 double getStaticPositionQuality(const Field& field, const Point& position,
-                                TbotsProto::PassingConfig passing_config);
+                                const TbotsProto::PassingConfig& passing_config);
 
 /**
  * Returns a function that increases as the point approaches enemy robots.
  *
  * @param point a Point
  * @param enemy_team the enemy team
- * @param enemy_proximity_importance essentially a scaling factor for the result
+ * @param passing_config The passing config used for tuning
  * @return a measure of how close the point is to one or more enemy robots
  */
 double calculateProximityRisk(const Point& point, const Team& enemy_team,
-                              double enemy_proximity_importance);
+                              const TbotsProto::PassingConfig& passing_config);
 
 /**
- * Calculate the quality a passer position for a given pass
+ * Calculate the quality of a position for staying away from enemy robots
+ * while trying to create opportunity for passes and shots.
  *
+ * @param keep_away_position The position to rate
  * @param world The world in which to rate the pass
- * @param pass Pass to rate the passer position for
+ * @param best_pass_so_far The best pass so far used for rating passing opportunity of
+ * the keep away position
  * @param dribbling_bounds The bounds of the area the robot can dribble in
+ * @param passing_config The passing config used for tuning
  * @return A value in [0,1] representing the quality of the passer position, with 1
  *        being an ideal position to pass from, and 0 being a poor position to pass from.
  */
-double ratePasserPosition(const World& world, const Pass& pass,
-                          const Rectangle& dribbling_bounds);
+double rateKeepAwayPosition(const Point& keep_away_position, const World& world,
+                            const Pass& best_pass_so_far,
+                            const Rectangle& dribbling_bounds,
+                            const TbotsProto::PassingConfig& passing_config);
 
 /**
- * Calculate the quality of a given passer position given enemy threads TODO (NIMA)
- * @param pass
- * @param enemy_team
- * @return
+ * Scale a normalized rating to a new range
+ * @param rating Rating in [0, 1] to scale
+ * @param min The new minimum value the rating = 0 will map to
+ * @param max The new maximum value the rating = 1 will map to
+ * @return The scaled rating
  */
-double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team);
-
-/**
- * TODO (NIMA)
- * @param rating
- * @param min
- * @param max
- * @return
- */
-double scaleRating(double rating, double min, double max);
+double scaleNormalizedRating(double rating, double min, double max);
 
 /**
  * Sample passes at different points on the field and rate them, similar to ratePass, to

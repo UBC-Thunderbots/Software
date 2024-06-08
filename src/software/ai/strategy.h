@@ -5,9 +5,8 @@
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/receiver_position_generator.hpp"
-#include "software/ai/passing/sampling_pass_generator.h"
+#include "software/ai/passing/pass_generator.h"
 #include "software/geom/algorithms/distance.h"
-#include "software/geom/pose.h"
 #include "software/world/field.h"
 
 /**
@@ -92,7 +91,7 @@ class Strategy
 
     WorldPtr world_ptr_;
 
-    SamplingPassGenerator sampling_pass_generator_;
+    PassGenerator pass_generator_;
     ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator_;
 
     std::optional<PassWithRating> best_pass_;

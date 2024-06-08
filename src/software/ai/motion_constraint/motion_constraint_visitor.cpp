@@ -88,6 +88,11 @@ void MotionConstraintVisitor::visit(const WallKickoffSkillTactic &tactic)
     current_motion_constraints.clear();
 }
 
+void MotionConstraintVisitor::visit(const AvoidInterferenceTactic &tactic)
+{
+    current_motion_constraints.clear();
+}
+
 std::set<TbotsProto::MotionConstraint>
 MotionConstraintVisitor::getUpdatedMotionConstraints(
     const Tactic &tactic,

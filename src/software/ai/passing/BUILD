@@ -20,7 +20,7 @@ cc_library(
 )
 
 cc_test(
-    name = "evaluation_test",
+    name = "cost_function_test",
     srcs = ["cost_function_test.cpp"],
     deps = [
         ":cost_functions",
@@ -100,24 +100,7 @@ cc_library(
         "receiver_position_generator.hpp",
     ],
     deps = [
-        ":field_pitch_division",
-        ":pass",
-        ":pass_evaluation",
-        ":pass_with_rating",
-        "//software/geom:point",
-        "//software/geom:rectangle",
-        "//software/optimization:gradient_descent",
-        "//software/util/make_enum",
-        "//software/world",
-    ],
-)
-
-cc_library(
-    name = "pass_evaluation",
-    hdrs = [
-        "pass_evaluation.hpp",
-    ],
-    deps = [
+        ":cost_functions",
         ":field_pitch_division",
         ":pass",
         ":pass_with_rating",
@@ -129,46 +112,11 @@ cc_library(
 )
 
 cc_test(
-    name = "pass_evaluation_test",
-    srcs = ["pass_evaluation_test.cpp"],
+    name = "receiver_position_generator_test",
+    srcs = ["receiver_position_generator_test.cpp"],
     deps = [
         ":eighteen_zone_pitch_division",
-        ":pass",
-        ":pass_evaluation",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/geom/algorithms",
-    ],
-)
-
-cc_library(
-    name = "base_pass_generator",
-    hdrs = [
-        "base_pass_generator.h",
-    ],
-    deps = [
-        "//software/world",
-    ],
-)
-
-cc_library(
-    name = "sampling_pass_generator",
-    srcs = [
-        "sampling_pass_generator.cpp",
-    ],
-    hdrs = ["sampling_pass_generator.h"],
-    deps = [
-        ":base_pass_generator",
-        ":cost_functions",
-        ":pass_with_rating",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "sampling_pass_generator_test",
-    srcs = ["sampling_pass_generator_test.cpp"],
-    deps = [
-        ":sampling_pass_generator",
+        ":receiver_position_generator",
         "//shared/test_util:tbots_gtest_main",
         "//software/math:math_functions",
         "//software/test_util",
@@ -177,17 +125,13 @@ cc_test(
 
 cc_library(
     name = "pass_generator",
-    hdrs = [
-        "pass_generator.hpp",
+    srcs = [
+        "pass_generator.cpp",
     ],
+    hdrs = ["pass_generator.h"],
     deps = [
-        ":base_pass_generator",
         ":cost_functions",
-        ":eighteen_zone_pitch_division",
-        ":pass",
-        ":pass_evaluation",
         ":pass_with_rating",
-        "//proto/message_translation:tbots_protobuf",
         "//software/optimization:gradient_descent",
         "//software/world",
     ],

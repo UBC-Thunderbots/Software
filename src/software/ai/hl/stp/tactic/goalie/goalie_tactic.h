@@ -20,7 +20,7 @@ class GoalieTactic : public Tactic
     /**
      * Creates a new GoalieTactic
      *
-     * @param ai_config The AI configuration
+     * @param strategy the Strategy shared by all of AI
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
     explicit GoalieTactic(std::shared_ptr<Strategy> strategy,

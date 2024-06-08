@@ -23,9 +23,8 @@
 #include "shared/2021_robot_constants.h"
 #include "shared/robot_constants.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/pass.h"
-#include "software/ai/passing/pass_evaluation.hpp"
-#include "software/ai/passing/pass_generator.hpp"
+#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/pass_with_rating.h"
 #include "software/constants.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/geom/algorithms/contains.h"
@@ -100,35 +99,6 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
                                               py::buffer_protocol(), py::dynamic_attr())
         .def(py::init<std::string, unsigned short, const std::function<void(T)>&, bool>())
         .def("close", &Class::close);
-}
-
-
-/**
- * Declares a Python binding for a PassGenerator of type T
- *
- * @param m The module to define the sender/receiver in
- * @param The name to insert into the binded class name (ex. {name}PassGenerator)
- */
-template <typename T>
-void declarePassGenerator(py::module& m, std::string name)
-{
-    using Class              = PassGenerator<T>;
-    std::string pyclass_name = name + "PassGenerator";
-    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
-                                              py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<std::shared_ptr<EighteenZonePitchDivision>,
-                      TbotsProto::PassingConfig>())
-        .def("generatePassEvaluation", &PassGenerator<T>::generatePassEvaluation);
-}
-
-template <typename T>
-void declarePassEvaluation(py::module& m, std::string name)
-{
-    using Class              = PassEvaluation<T>;
-    std::string pyclass_name = name + "PassEvaluation";
-    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
-                                              py::buffer_protocol(), py::dynamic_attr())
-        .def("getBestPassOnField", &PassEvaluation<T>::getBestPassOnField);
 }
 
 
@@ -273,6 +243,14 @@ PYBIND11_MODULE(python_bindings, m)
         .def("radius", &Circle::radius)
         .def("area", &Circle::area);
 
+    py::class_<Stadium>(m, "Stadium")
+        .def(py::init<Segment, double>())
+        .def("__repr__", [](const Stadium& s) {
+            std::stringstream stream;
+            stream << s;
+            return stream.str();
+        });
+
     py::class_<RobotConstants>(m, "RobotConstants")
         .def_readwrite("max_force_dribbler_speed_rpm",
                        &RobotConstants::max_force_dribbler_speed_rpm)
@@ -306,12 +284,14 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createCircle", &createCircle);
     m.def("createVector", &createVector);
     m.def("createSegment", &createSegment);
+    m.def("createStadium", &createStadium);
 
     m.def("createPointProto", &createPointProto);
     m.def("createPolygonProto", &createPolygonProto);
     m.def("createCircleProto", &createCircleProto);
     m.def("createVectorProto", &createVectorProto);
     m.def("createSegmentProto", &createSegmentProto);
+    m.def("createStadiumProto", &createStadiumProto);
 
     m.def("createGeometryData", &createGeometryData);
 
@@ -322,6 +302,7 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("contains",
           py::overload_cast<const Segment&, const Point&, double, int>(&contains));
     m.def("contains", py::overload_cast<const Rectangle&, const Point&>(&contains));
+    m.def("contains", py::overload_cast<const Stadium&, const Point&>(&contains));
 
     py::class_<Robot>(m, "Robot")
         .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())
@@ -412,14 +393,14 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
 
-    declarePassGenerator<EighteenZoneId>(m, "EighteenZoneId");
-
     py::class_<EighteenZonePitchDivision, std::shared_ptr<EighteenZonePitchDivision>>(
         m, "EighteenZonePitchDivision")
         .def(py::init<Field>())
         .def("getZone", &EighteenZonePitchDivision::getZone);
 
-    declarePassEvaluation<EighteenZoneId>(m, "EighteenZoneId");
+    py::class_<PassGenerator>(m, "PassGenerator")
+        .def(py::init<const TbotsProto::PassingConfig&>())
+        .def("getBestPass", &PassGenerator::getBestPass);
 
     py::class_<PassWithRating, std::unique_ptr<PassWithRating>>(m, "PassWithRating")
         .def_readwrite("pass_value", &PassWithRating::pass);

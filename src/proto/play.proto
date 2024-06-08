@@ -10,7 +10,7 @@ enum PlayName
     KickoffFriendlyPlay        = 3;
     BallPlacementPlay          = 7;
     HaltPlay                   = 8;
-    EnemyFreekickPlay          = 9;
+    EnemyFreeKickPlay          = 9;
     DefensePlay                = 11;
     EnemyBallPlacementPlay     = 12;
     PenaltyKickEnemyPlay       = 13;
