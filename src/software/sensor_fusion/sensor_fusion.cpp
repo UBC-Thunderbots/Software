@@ -13,7 +13,7 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       ball_filter(),
       friendly_team_filter(),
       enemy_team_filter(),
-      possession(TeamPossession::FRIENDLY_TEAM),
+      possession(TeamPossession::LOOSE),
       possession_tracker(std::make_shared<PossessionTracker>(
           sensor_fusion_config.possession_tracker_config())),
       friendly_goalie_id(0),
@@ -401,5 +401,5 @@ void SensorFusion::resetWorldComponents()
     ball_filter          = BallFilter();
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
-    possession           = TeamPossession::FRIENDLY_TEAM;
+    possession           = TeamPossession::LOOSE;
 }

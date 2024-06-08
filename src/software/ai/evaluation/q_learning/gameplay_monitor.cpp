@@ -28,9 +28,13 @@ double GameplayMonitor::endStepObservation(WorldPtr world_ptr)
         reward -= 1.0;
     }
 
-    // TODO: Reward keeping possession
+    // Reward keeping possession
+    if (world_ptr->getTeamWithPossession() == TeamPossession::FRIENDLY)
+    {
+        reward += 0.1;
+    }
 
-    // TODO: Reward shots on goal, misses, saves
+    // Reward moving the ball up the field
 
     // TODO: Reward enemy team fouls, penalize friendly team fouls
 

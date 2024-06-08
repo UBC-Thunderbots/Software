@@ -53,7 +53,7 @@ bool PlaySelectionFSM::isFriendlyFreeKick(const Update& event)
 
 bool PlaySelectionFSM::enemyHasPossession(const Update& event)
 {
-    return event.world_ptr->getTeamWithPossession() == TeamPossession::ENEMY_TEAM;
+    return event.world_ptr->getTeamWithPossession() == TeamPossession::ENEMY;
 }
 
 void PlaySelectionFSM::setupSetPlay(const Update& event)
