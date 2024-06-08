@@ -65,6 +65,7 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
     : io_service(),
       udp_listener(io_service, ip_address, port, interface, receive_callback, multicast)
 {
+    std::cout << "arun" << std::endl;
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });
 }
@@ -81,7 +82,6 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::~ThreadedProtoUdpListener()
 {
-    close();
 }
 
 

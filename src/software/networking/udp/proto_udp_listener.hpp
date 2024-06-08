@@ -173,6 +173,7 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
 {
     if (!running_)
     {
+        LOG(WARNING) << "arun returning";
         return;
     }
 
@@ -181,19 +182,26 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
         auto packet_data = ReceiveProtoT();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
+        LOG(WARNING) << "calling receive callback";
         receive_callback(packet_data);
         // Once we've handled the data, start listening again
         startListen();
+        LOG(WARNING) << "starting to listen";
     }
     else
     {
-        // Start listening again to receive the next data
-        startListen();
-
         LOG(WARNING) << "An unknown network error occurred when attempting to receive "
                      << TYPENAME(ReceiveProtoT)
                      << " Data. The boost system error is: " << error.message()
                      << std::endl;
+
+        if (!running_)
+        {
+            LOG(WARNING) << "arun returning";
+            return;
+        }
+        // Start listening again to receive the next data
+        startListen();
     }
 
     if (num_bytes_received > MAX_BUFFER_LENGTH)
@@ -227,12 +235,12 @@ void ProtoUdpListener<ReceiveProtoT>::setupMulticast(const boost::asio::ip::addr
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::~ProtoUdpListener()
 {
-    close();
 }
 
 template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::close()
 {
+    LOG(WARNING) << "closing socket";
     running_ = false;
 
     // Shutdown both send and receive on the socket
@@ -243,7 +251,14 @@ void ProtoUdpListener<ReceiveProtoT>::close()
         LOG(WARNING)
             << "An unknown network error occurred when attempting to shutdown UDP socket for "
             << TYPENAME(ReceiveProtoT)
-            << ". The boost system error is: " << error_code.message() << std::endl;
+            << ". The boost system error is: " << error_code << ": " << error_code.message() << std::endl;
+        LOG(WARNING) << "arun";
+    }
+
+    LOG(WARNING) << boost::asio::error::not_connected;
+    if (error_code == boost::asio::error::not_connected)
+    {
+        return;
     }
 
     socket_.close(error_code);

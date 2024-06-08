@@ -44,6 +44,7 @@ class RobotCommunication(object):
         self.receive_robot_status = None
         self.receive_robot_log = None
         self.receive_robot_crash = None
+        self.send_primitive_set = None
 
         self.sequence_number = 0
         self.last_time = time.time()
@@ -79,9 +80,9 @@ class RobotCommunication(object):
         )
 
         self.network_config = NetworkConfig()
-        self.thunderbots_config_buffer = ThreadSafeBuffer(1, ThunderbotsConfig)
+        self.network_config_buffer = ThreadSafeBuffer(1, NetworkConfig)
         self.current_proto_unix_io.register_observer(
-                ThunderbotsConfig, self.thunderbots_config_buffer
+                NetworkConfig, self.network_config_buffer
         )
 
         self.send_estop_state_thread = threading.Thread(
@@ -115,8 +116,14 @@ class RobotCommunication(object):
         """
         change_referee_interface = (referee_interface != self.network_config.referee_interface)
         change_vision_interface = (vision_interface != self.network_config.vision_interface)
+        print(referee_interface)
+        print(vision_interface)
+        print(change_referee_interface)
+        print(change_vision_interface)
 
-        if change_referee_interface:
+        if change_vision_interface:
+            if self.receive_ssl_wrapper is not None:
+                self.receive_ssl_wrapper.close()
             self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
                 SSL_VISION_ADDRESS,
                 SSL_VISION_PORT,
@@ -125,13 +132,26 @@ class RobotCommunication(object):
                 vision_interface,
             )
 
-        if change_vision_interface:
-            self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
-                SSL_REFEREE_ADDRESS,
-                SSL_REFEREE_PORT,
-                lambda data: self.current_proto_unix_io.send_proto(Referee, data),
-                True,
-                referee_interface,
+        if change_referee_interface:
+            if self.receive_ssl_referee_proto is not None:
+                self.receive_ssl_referee_proto.close()
+                print("arun")
+
+            print(referee_interface)
+            print(SSL_REFEREE_ADDRESS)
+            print(SSL_REFEREE_PORT)
+            print(type(Referee()))
+            print(type(referee_interface))
+            print(type(str("arun")))
+
+
+            self.receive_ssl_referee = tbots_cpp.SSLRefereeProtoListener(
+                    SSL_REFEREE_ADDRESS,
+                    SSL_REFEREE_PORT,
+                    lambda data: print(data),
+                    #lambda data: self.__forward_to_proto_unix_io(Referee, data),
+                    True,
+                    "lo",
             )
 
         self.robots_connected_to_fullsystem = {
@@ -192,6 +212,17 @@ class RobotCommunication(object):
 
         if self.receive_ssl_referee_proto:
             self.receive_ssl_referee_proto.close()
+
+    def __close_for_robot_communication(self) -> None:
+        if self.receive_robot_status:
+            self.receive_robot_status.close()
+
+        if self.receive_robot_log:
+            self.receive_robot_log.close()
+
+        if self.receive_robot_crash:
+            self.receive_robot_crash.close()
+
 
     def toggle_keyboard_estop(self) -> None:
         """
@@ -286,13 +317,13 @@ class RobotCommunication(object):
 
         """
         while self.running:
-            thunderbots_config = self.thunderbots_config_buffer.get(block=False, return_cached=False)
-            if thunderbots_config is not None:
-                print(f"[RobotCommunication] Received new ThunderbotsConfig")
-                network_config = thunderbots_config.ai_config.ai_control_config.network_config
+            network_config = self.network_config_buffer.get(block=False, return_cached=False)
+            if network_config is not None:
+                print(f"[RobotCommunication] Received new NetworkConfig")
                 if self.is_setup_for_fullsystem:
                     self.setup_for_fullsystem(referee_interface=network_config.referee_interface,
                                               vision_interface=network_config.vision_interface)
+                self.__close_for_robot_communication()
                 self.__setup_for_robot_communication(
                         robot_interface=network_config.robot_status_interface
                 )

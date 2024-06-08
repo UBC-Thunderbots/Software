@@ -204,6 +204,7 @@ def setup_parameter_widget(
         attr: Any, value: Any, updated_proto: ThunderbotsConfig
     ) -> None:
         proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
+        proto_unix_io.send_proto(NetworkConfig, updated_proto.ai_config.ai_control_config.network_config)
 
     return ProtoConfigurationWidget(config, on_change_callback)
 
