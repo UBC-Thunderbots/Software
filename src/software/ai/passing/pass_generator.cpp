@@ -15,7 +15,6 @@ PassGenerator::PassGenerator(
 PassWithRating PassGenerator::getBestPass(
     const World& world, const std::vector<RobotId>& robots_to_ignore)
 {
-    num_rate_pass = 0;
     auto receiving_positions_map =
         sampleReceivingPositionsPerRobot(world, robots_to_ignore);
 
@@ -56,9 +55,6 @@ PassWithRating PassGenerator::getBestPass(
     {
         samplePassesForVisualization(world, passing_config_, best_pass.pass);
     }
-
-    //    LOG(DEBUG) << "PassGenerator: Number of passes rated: " <<
-    //    num_rate_pass; // TODO (NIMA)
 
     return best_pass;
 }
@@ -128,7 +124,6 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
     const auto objective_function =
         [this, &world](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
             // get a pass with the new appropriate speed using the new destination
-            num_rate_pass++;
             return ratePass(
                 world,
                 Pass::fromDestReceiveSpeed(world.ball().position(),
@@ -151,10 +146,7 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
             auto optimized_pass = Pass::fromDestReceiveSpeed(
                 world.ball().position(),
                 Point(optimized_receiving_pos_array[0], optimized_receiving_pos_array[1]),
-                passing_config_.max_receive_speed_m_per_s(),
-                passing_config_.min_pass_speed_m_per_s(),
-                passing_config_.max_pass_speed_m_per_s());
-            num_rate_pass++;
+                passing_config_);
             auto score = ratePass(world, optimized_pass, passing_config_);
 
             if (score > best_pass_for_robot.rating)

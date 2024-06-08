@@ -22,7 +22,6 @@
 #include "pybind11_protobuf/native_proto_caster.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/robot_constants.h"
-// TODO (NIMA): Add new passGen and update field test
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/constants.h"

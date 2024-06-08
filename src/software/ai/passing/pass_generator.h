@@ -81,5 +81,4 @@ class PassGenerator
 
     // Passing configuration
     TbotsProto::PassingConfig passing_config_;
-    int num_rate_pass = 0;  // TODO(NIMA): Remove
 };
