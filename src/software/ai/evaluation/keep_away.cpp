@@ -3,10 +3,10 @@
 #include "software/ai/passing/cost_function.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/math/math_functions.h"
 #include "software/optimization/gradient_descent_optimizer.hpp"
 
-Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far)
+Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far,
+                              const TbotsProto::PassingConfig& passing_config)
 {
     // the inward offset of the field boundaries to use for the field lines sigmoid
     static constexpr auto FIELD_SIZE_REDUCTION_M = 0.25;
@@ -30,10 +30,8 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far)
     // the position rating function we want to maximize
     const auto keepaway_point_cost = [&](const std::array<double, 2>& passer_pt_array) {
         Point passer_pt(std::get<0>(passer_pt_array), std::get<1>(passer_pt_array));
-        return ratePasserPosition(
-            world,
-            Pass(passer_pt, best_pass_so_far.receiverPoint(), best_pass_so_far.speed()),
-            reduced_field_bounds);
+        return rateKeepAwayPosition(passer_pt, world, best_pass_so_far,
+                                    reduced_field_bounds, passing_config);
     };
     GradientDescentOptimizer<2> optimizer{PARAM_WEIGHTS};
     auto passer_pt_array = optimizer.maximize(

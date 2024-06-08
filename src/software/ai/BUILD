@@ -64,8 +64,7 @@ cc_library(
         "//software/ai/evaluation:shot",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:receiver_position_generator",
-        "//software/ai/passing:sampling_pass_generator",
-        "//software/geom:pose",
+        "//software/ai/passing:pass_generator",
         "//software/world:field",
     ],
 )

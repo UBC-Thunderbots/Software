@@ -231,7 +231,7 @@ if __name__ == "__main__":
     # TODO (#2581) remove this
     if args.visualize_cpp_test:
 
-        runtime_dir = "/tmp/tbots/yellow_test"
+        runtime_dir = "/tmp/tbots/gtest_logs"
 
         try:
             os.makedirs(runtime_dir)

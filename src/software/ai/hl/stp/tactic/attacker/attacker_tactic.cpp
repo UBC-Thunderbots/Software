@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 
+#include "proto/message_translation/tbots_geometry.h"
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 #include "software/world/ball.h"

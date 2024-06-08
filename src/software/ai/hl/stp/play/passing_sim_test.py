@@ -94,22 +94,13 @@ def setup_pass_and_robots(
     )
 
     # construct a pass generator with a max receive speed set
-    pass_generator = tbots_cpp.EighteenZoneIdPassGenerator(
-        tbots_cpp.EighteenZonePitchDivision(tbots_cpp.Field.createSSLDivisionBField()),
-        PassingConfig(),
-    )
+    pass_generator = tbots_cpp.PassGenerator(PassingConfig(),)
 
     # generate the best pass on the world 100 times
     # this improves the passes generated over time
+    robots_to_ignore = []
     for index in range(0, 100):
-        pass_eval = pass_generator.generatePassEvaluation(world)
-        best_pass_eval = pass_eval.getBestPassOnField()
-        best_pass = best_pass_eval.pass_value
-
-    # after 100 times, get the best pass we have on the field
-    pass_evaluation = pass_generator.generatePassEvaluation(world)
-    best_pass_eval = pass_evaluation.getBestPassOnField()
-    best_pass = best_pass_eval.pass_value
+        best_pass = pass_generator.getBestPass(world, robots_to_ignore).pass_value
 
     kick_vec = tbots_cpp.Vector(
         best_pass.receiverPoint().x() - best_pass.passerPoint().x(),

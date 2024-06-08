@@ -7,7 +7,6 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/sampling_pass_generator.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"

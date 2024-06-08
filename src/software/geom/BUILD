@@ -222,16 +222,6 @@ cc_library(
 )
 
 cc_library(
-    name = "pose",
-    srcs = ["pose.cpp"],
-    hdrs = ["pose.h"],
-    deps = [
-        ":angle",
-        ":point",
-    ],
-)
-
-cc_library(
     name = "stadium",
     srcs = ["stadium.cpp"],
     hdrs = ["stadium.h"],
@@ -455,16 +445,5 @@ cc_test(
         ":cubic_bezier_spline2d",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-    ],
-)
-
-cc_test(
-    name = "pose_test",
-    srcs = ["pose_test.cpp"],
-    deps = [
-        ":angle",
-        ":point",
-        ":pose",
-        "//shared/test_util:tbots_gtest_main",
     ],
 )

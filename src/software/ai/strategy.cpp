@@ -2,7 +2,7 @@
 
 Strategy::Strategy(const TbotsProto::AiConfig& ai_config)
     : ai_config_(ai_config),
-      sampling_pass_generator_(ai_config_.passing_config()),
+      pass_generator_(ai_config_.passing_config()),
       receiver_position_generator_(
           std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField()),
           ai_config_.passing_config())
@@ -13,7 +13,7 @@ PassWithRating Strategy::getBestPass()
 {
     if (!best_pass_)
     {
-        best_pass_ = sampling_pass_generator_.getBestPass(*world_ptr_);
+        best_pass_ = pass_generator_.getBestPass(*world_ptr_);
     }
 
     return *best_pass_;
@@ -80,7 +80,7 @@ void Strategy::updateAiConfig(const TbotsProto::AiConfig& ai_config)
     ai_config_ = ai_config;
 
     // Pass generators must be recreated with the new passing config
-    sampling_pass_generator_     = SamplingPassGenerator(ai_config_.passing_config());
+    pass_generator_              = PassGenerator(ai_config_.passing_config());
     receiver_position_generator_ = ReceiverPositionGenerator<EighteenZoneId>(
         std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField()),
         ai_config_.passing_config());
