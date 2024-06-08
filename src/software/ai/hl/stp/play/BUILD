@@ -7,42 +7,6 @@ load("@simulated_tests_deps//:requirements.bzl", "requirement")
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
 
 cc_library(
-    name = "enemy_ball_placement_play",
-    srcs = ["enemy_ball_placement_play.cpp"],
-    hdrs = ["enemy_ball_placement_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/util/generic_factory",
-        "//software/world:game_state",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
-    name = "enemy_free_kick_play",
-    srcs = ["enemy_free_kick_play.cpp"],
-    hdrs = ["enemy_free_kick_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-        "//software/world:game_state",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "example_play",
     srcs = ["example_play.cpp"],
     hdrs = ["example_play.h"],
@@ -194,8 +158,6 @@ cc_library(
 cc_library(
     name = "all_plays",
     deps = [
-        ":enemy_ball_placement_play",
-        ":enemy_free_kick_play",
         ":example_play",
         ":free_kick_play",
         ":halt_play",
