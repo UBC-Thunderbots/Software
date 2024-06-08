@@ -15,16 +15,15 @@ class PassingEvaluationTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        entire_field =
-            std::make_shared<Rectangle>(Field::createSSLDivisionBField().fieldLines());
         passing_config.set_min_pass_speed_m_per_s(3.5);
         passing_config.set_max_pass_speed_m_per_s(5.5);
+        passing_config.set_pass_delay_sec(0.0);
+        passing_config.set_receiver_ideal_min_distance_meters(0.1);
         avg_desired_pass_speed = 3.9;
     }
 
     double avg_desired_pass_speed;
 
-    std::shared_ptr<Rectangle> entire_field;
     TbotsProto::PassingConfig passing_config;
 };
 
@@ -103,7 +102,7 @@ TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
     auto start_time = std::chrono::system_clock::now();
     for (auto pass : passes)
     {
-        ratePass(*world, pass, *entire_field, passing_config);
+        ratePass(*world, pass, passing_config);
     }
 
     double duration_ms = ::TestUtil::millisecondsSince(start_time);
@@ -135,7 +134,7 @@ TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
     });
     world->updateEnemyTeamState(enemy_team);
 
-    double pass_rating = ratePass(*world, pass, *entire_field, passing_config);
+    double pass_rating = ratePass(*world, pass, passing_config);
     EXPECT_GE(pass_rating, 0.0);
     EXPECT_LE(pass_rating, 0.11);
 }
@@ -163,7 +162,7 @@ TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free
     });
     world->updateEnemyTeamState(enemy_team);
 
-    double pass_rating = ratePass(*world, pass, *entire_field, passing_config);
+    double pass_rating = ratePass(*world, pass, passing_config);
     EXPECT_GE(pass_rating, 0.65);
     EXPECT_LE(pass_rating, 0.9);
 }
@@ -189,7 +188,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_friendly_marked)
     });
     world->updateEnemyTeamState(enemy_team);
 
-    double pass_rating = ratePass(*world, pass, *entire_field, passing_config);
+    double pass_rating = ratePass(*world, pass, passing_config);
     EXPECT_GE(pass_rating, 0.0);
     EXPECT_LE(pass_rating, 0.1);
 }
@@ -215,7 +214,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_goal_defender_somewhat_n
     });
     world->updateEnemyTeamState(enemy_team);
 
-    double pass_rating = ratePass(*world, pass, *entire_field, passing_config);
+    double pass_rating = ratePass(*world, pass, passing_config);
     EXPECT_GE(pass_rating, 0.5);
     EXPECT_LE(pass_rating, 1.0);
 }
@@ -241,7 +240,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net_goalie_in_net)
     });
     world->updateEnemyTeamState(enemy_team);
 
-    double pass_rating = ratePass(*world, pass, *entire_field, passing_config);
+    double pass_rating = ratePass(*world, pass, passing_config);
 
     EXPECT_GE(pass_rating, 0.68);
     EXPECT_LE(pass_rating, 1.0);
@@ -261,7 +260,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net)
 
     Pass pass({3, 2}, {2, -2}, avg_desired_pass_speed);
 
-    double pass_rating = ratePass(*world, pass, *entire_field, passing_config);
+    double pass_rating = ratePass(*world, pass, passing_config);
 
     EXPECT_LE(0.8, pass_rating);
     EXPECT_GE(1.0, pass_rating);
@@ -281,7 +280,7 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_center_no_enemies)
 
     Pass pass(world->field().enemyCornerPos(), {0, 0}, avg_desired_pass_speed);
 
-    double pass_rating = ratePass(*world, pass, *entire_field, passing_config);
+    double pass_rating = ratePass(*world, pass, passing_config);
     EXPECT_LE(0.8, pass_rating);
     EXPECT_GE(1.0, pass_rating);
 }
@@ -315,7 +314,7 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_cent
 
     Pass pass(world->field().enemyCornerPos(), {1.8, 0.8}, 4.8);
 
-    double pass_rating = ratePass(*world, pass, *entire_field, passing_config);
+    double pass_rating = ratePass(*world, pass, passing_config);
     EXPECT_GE(pass_rating, 0.1);
     EXPECT_LE(pass_rating, 0.7);
 }
@@ -334,7 +333,7 @@ TEST_F(PassingEvaluationTest, ratePass_below_min_ball_speed)
 
     Pass pass({3, 0}, {2, 0}, passing_config.min_pass_speed_m_per_s() - 0.1);
 
-    double pass_rating = ratePass(*world, pass, *entire_field, passing_config);
+    double pass_rating = ratePass(*world, pass, passing_config);
     EXPECT_LE(0.0, pass_rating);
     EXPECT_GE(0.05, pass_rating);
 }
@@ -353,7 +352,7 @@ TEST_F(PassingEvaluationTest, ratePass_above_max_ball_speed)
 
     Pass pass({3, 0}, {2, 0}, passing_config.max_pass_speed_m_per_s() + 0.1);
 
-    double pass_rating = ratePass(*world, pass, *entire_field, passing_config);
+    double pass_rating = ratePass(*world, pass, passing_config);
     EXPECT_LE(0.0, pass_rating);
     EXPECT_GE(0.05, pass_rating);
 }
@@ -383,7 +382,7 @@ TEST_F(PassingEvaluationTest, ratePass_attempting_to_pass_and_receive_no_shot)
     // receiving the ball
     Pass pass({0, 0}, {1, 0}, avg_desired_pass_speed);
 
-    double pass_rating = ratePass(*world, pass, *entire_field, passing_config);
+    double pass_rating = ratePass(*world, pass, passing_config);
     EXPECT_GE(pass_rating, 0.4);
     EXPECT_LE(pass_rating, 1.0);
 }
