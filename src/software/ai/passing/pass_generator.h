@@ -19,8 +19,7 @@ class PassGenerator
      *
      * @param passing_config The config to use when generating passes
      */
-    explicit PassGenerator(
-        const TbotsProto::PassingConfig& passing_config);
+    explicit PassGenerator(const TbotsProto::PassingConfig& passing_config);
 
     /**
      * Generates the best pass based on the state of the world

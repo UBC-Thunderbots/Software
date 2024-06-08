@@ -33,8 +33,8 @@ class PassGeneratorTest : public testing::Test
      * @param world The world to evaluate passes on
      * @param max_iters The maximum number of iterations of the PassGenerator to run
      */
-    static void stepPassGenerator(PassGenerator pass_generator,
-                                  const World& world, int max_iters)
+    static void stepPassGenerator(PassGenerator pass_generator, const World& world,
+                                  int max_iters)
     {
         for (int i = 0; i < max_iters; i++)
         {
@@ -188,7 +188,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
     stepPassGenerator(pass_generator, *world, 100);
 
     // Find what pass we converged to
-    auto converged_pass  = pass_generator.getBestPass(*world).pass;
+    auto converged_pass = pass_generator.getBestPass(*world).pass;
 
     // We expect to have converged to a point closer to the robot in the pos_y
     // compared to the robot in the neg_y position since the ball is in +y
@@ -204,7 +204,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
     stepPassGenerator(pass_generator, *world, 100);
 
     // Find what pass we converged to
-    converged_pass  = pass_generator.getBestPass(*world).pass;
+    converged_pass = pass_generator.getBestPass(*world).pass;
 
     // We expect to have converged to a point closer to the robot in the neg_y
     // compared to the robot in the pos_y position.
@@ -217,10 +217,10 @@ TEST_F(PassGeneratorTest, test_open_pass_score_being_high_2_friendlies)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots(
-            {Robot(1, {-1, 0}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::zero(),
-                   Timestamp::fromSeconds(0)),
-             Robot(2, {1, 0}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
-                   Timestamp::fromSeconds(0))});
+        {Robot(1, {-1, 0}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0)),
+         Robot(2, {1, 0}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0))});
     world->updateFriendlyTeamState(friendly_team);
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
     world->updateBall(ball);
@@ -234,12 +234,12 @@ TEST_F(PassGeneratorTest, test_open_pass_score_being_high_3_friendlies)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots(
-            {Robot(1, {1.5, 1.5}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::zero(),
-                   Timestamp::fromSeconds(0)),
-             Robot(2, {1.5, -1.5}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
-                   Timestamp::fromSeconds(0)),
-             Robot(3, {-1, 0}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
-                   Timestamp::fromSeconds(0))});
+        {Robot(1, {1.5, 1.5}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0)),
+         Robot(2, {1.5, -1.5}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0)),
+         Robot(3, {-1, 0}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0))});
     world->updateFriendlyTeamState(friendly_team);
     Ball ball({0.5, 0}, {0, 0}, Timestamp::fromSeconds(0));
     world->updateBall(ball);
@@ -252,17 +252,16 @@ TEST_F(PassGeneratorTest, test_two_blocked_friendly_one_open_friendly)
 {
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
-    friendly_team.updateRobots(
-            {
-                // Open friendly
-                Robot(1, {1, 2.5}, {0, 0}, Angle::fromDegrees(-100), AngularVelocity::zero(),
-                      Timestamp::fromSeconds(0)),
-                // Blocked friendly
-                Robot(2, {2, 0}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::zero(),
-                      Timestamp::fromSeconds(0)),
-                Robot(3, {-2.5, 0}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
-                      Timestamp::fromSeconds(0)),
-            });
+    friendly_team.updateRobots({
+        // Open friendly
+        Robot(1, {1, 2.5}, {0, 0}, Angle::fromDegrees(-100), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        // Blocked friendly
+        Robot(2, {2, 0}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        Robot(3, {-2.5, 0}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
     world->updateFriendlyTeamState(friendly_team);
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
     world->updateBall(ball);
@@ -276,7 +275,9 @@ TEST_F(PassGeneratorTest, test_two_blocked_friendly_one_open_friendly)
     PassWithRating best_pass = pass_generator.getBestPass(*world);
     EXPECT_GE(best_pass.rating, 0.5);
     // Verify that the pass is to the open friendly
-    EXPECT_TRUE((best_pass.pass.receiverPoint() - world->friendlyTeam().getRobotById(1)->position()).length() < 0.3);
+    EXPECT_TRUE((best_pass.pass.receiverPoint() -
+                 world->friendlyTeam().getRobotById(1)->position())
+                    .length() < 0.3);
 }
 
 TEST_F(PassGeneratorTest, test_robots_ignore_list)
@@ -285,13 +286,12 @@ TEST_F(PassGeneratorTest, test_robots_ignore_list)
     // however, robot 1 who is open is added to the ignore list.
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
-    friendly_team.updateRobots(
-            {
-                Robot(1, {2, 0}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::zero(),
-                      Timestamp::fromSeconds(0)),
-                Robot(2, {-2, 0}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
-                      Timestamp::fromSeconds(0)),
-            });
+    friendly_team.updateRobots({
+        Robot(1, {2, 0}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        Robot(2, {-2, 0}, {0, 0}, Angle::fromDegrees(180), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
     world->updateFriendlyTeamState(friendly_team);
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
     world->updateBall(ball);
@@ -301,9 +301,10 @@ TEST_F(PassGeneratorTest, test_robots_ignore_list)
     world->updateEnemyTeamState(enemy_team);
 
     std::vector<RobotId> ignore_list = {1};
-    PassWithRating best_pass = pass_generator.getBestPass(*world, ignore_list);
+    PassWithRating best_pass         = pass_generator.getBestPass(*world, ignore_list);
 
     // Verify that the pass is to the only friendly which is not ignored
-    EXPECT_TRUE((best_pass.pass.receiverPoint() - world->friendlyTeam().getRobotById(2)->position()).length() < 0.3);
+    EXPECT_TRUE((best_pass.pass.receiverPoint() -
+                 world->friendlyTeam().getRobotById(2)->position())
+                    .length() < 0.3);
 }
-

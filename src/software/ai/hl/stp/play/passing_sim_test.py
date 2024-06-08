@@ -94,9 +94,7 @@ def setup_pass_and_robots(
     )
 
     # construct a pass generator with a max receive speed set
-    pass_generator = tbots_cpp.PassGenerator(
-        PassingConfig(),
-    )
+    pass_generator = tbots_cpp.PassGenerator(PassingConfig(),)
 
     # generate the best pass on the world 100 times
     # this improves the passes generated over time

@@ -4,16 +4,15 @@
 
 #include "software/logger/logger.h"
 
-PassGenerator::PassGenerator(
-    const TbotsProto::PassingConfig& passing_config)
+PassGenerator::PassGenerator(const TbotsProto::PassingConfig& passing_config)
     : optimizer_(optimizer_param_weights),
       random_num_gen_(RNG_SEED),
       passing_config_(passing_config)
 {
 }
 
-PassWithRating PassGenerator::getBestPass(
-    const World& world, const std::vector<RobotId>& robots_to_ignore)
+PassWithRating PassGenerator::getBestPass(const World& world,
+                                          const std::vector<RobotId>& robots_to_ignore)
 {
     auto receiving_positions_map =
         sampleReceivingPositionsPerRobot(world, robots_to_ignore);
@@ -59,8 +58,7 @@ PassWithRating PassGenerator::getBestPass(
     return best_pass;
 }
 
-std::map<RobotId, std::vector<Point>>
-PassGenerator::sampleReceivingPositionsPerRobot(
+std::map<RobotId, std::vector<Point>> PassGenerator::sampleReceivingPositionsPerRobot(
     const World& world, const std::vector<RobotId>& robots_to_ignore)
 {
     std::map<RobotId, std::vector<Point>> receiving_positions_map;
@@ -124,12 +122,11 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
     const auto objective_function =
         [this, &world](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
             // get a pass with the new appropriate speed using the new destination
-            return ratePass(
-                world,
-                Pass::fromDestReceiveSpeed(world.ball().position(),
-                                           Point(pass_array[0], pass_array[1]),
-                                           passing_config_),
-                passing_config_);
+            return ratePass(world,
+                            Pass::fromDestReceiveSpeed(
+                                world.ball().position(),
+                                Point(pass_array[0], pass_array[1]), passing_config_),
+                            passing_config_);
         };
 
     PassWithRating best_pass{Pass(Point(), Point(), 1.0), 0.0};
