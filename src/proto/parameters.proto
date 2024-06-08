@@ -177,13 +177,13 @@ message PassingConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
-    // The enemy's capability to intercept a pass, where 1 implies that our interception
-    // capability of the enemy is exactly correct, and lower values mean that the enemy
-    // is less capable of intercepting a pass than we think, and higher values mean that
-    // the enemy is more capable of intercepting a pass than we think.
-    // TODO (NIMA): This is actually flipped...
-    required double enemy_interception_capability = 14
-        [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+    // A value multiplied by the duration that our enemy robot model predicts it will
+    // take an enemy robot to intercept a pass. 1 implies that our enemy robot model
+    // is exactly correct, with higher values meaning that the enemy will take longer
+    // to intercept the pass, and lower values meaning that the enemy will intercept
+    // the pass earlier than we anticipate.
+    required double enemy_interception_time_multiplier = 14
+        [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
     // This controls how heavily we weigh the time the enemy team has to intercept a pass.
     // Increasing this value increases the risk (decreasing the score) associated with a
     // pass that the enemy could intercept.

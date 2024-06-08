@@ -179,7 +179,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     // Scale the time to interception point by the enemy robot's interception capability
     Duration enemy_robot_time_to_interception_point =
         Duration::fromSeconds(enemy_robot_time_to_interception_point_sec *
-                              passing_config.enemy_interception_capability());
+                              passing_config.enemy_interception_time_multiplier());
 
     Duration ball_time_to_interception_point =
         Duration::fromSeconds(distance(pass.passerPoint(), closest_interception_point) /
