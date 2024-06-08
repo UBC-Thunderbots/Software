@@ -215,8 +215,11 @@ message PassingConfig
     // is exactly correct, with higher values meaning that the enemy will take longer
     // to intercept the pass, and lower values meaning that the enemy will intercept
     // the pass earlier than we anticipate.
-    required double enemy_interception_time_multiplier = 14
-        [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    required double enemy_interception_time_multiplier = 14 [
+        default                   = 1.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
     // This controls how heavily we weigh the time the enemy team has to intercept a pass.
     // Increasing this value increases the risk (decreasing the score) associated with a
     // pass that the enemy could intercept.

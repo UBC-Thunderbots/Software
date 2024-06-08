@@ -2,10 +2,11 @@
 
 EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(std::shared_ptr<Strategy> strategy)
     : strategy(strategy),
-      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(
-                                   strategy->getAiConfig().robot_navigation_obstacle_config()),
-                               std::make_shared<CreaseDefenderTactic>(
-                                   strategy->getAiConfig().robot_navigation_obstacle_config())}),
+      crease_defender_tactics(
+          {std::make_shared<CreaseDefenderTactic>(
+               strategy->getAiConfig().robot_navigation_obstacle_config()),
+           std::make_shared<CreaseDefenderTactic>(
+               strategy->getAiConfig().robot_navigation_obstacle_config())}),
       avoid_interference_tactics({
           std::make_shared<AvoidInterferenceTactic>(),
           std::make_shared<AvoidInterferenceTactic>(),
@@ -20,8 +21,9 @@ EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(std::shared_ptr<Strategy> s
           std::make_shared<MoveTactic>(),
       }),
       goalie_tactic(std::make_shared<GoalieTactic>(strategy)),
-      distance_to_keep_meters(
-          strategy->getAiConfig().enemy_ball_placement_play_config().distance_to_keep_meters()),
+      distance_to_keep_meters(strategy->getAiConfig()
+                                  .enemy_ball_placement_play_config()
+                                  .distance_to_keep_meters()),
       nearly_placed_threshold_meters(0.5)
 {
 }

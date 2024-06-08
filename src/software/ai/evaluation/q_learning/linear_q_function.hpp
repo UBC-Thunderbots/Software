@@ -28,7 +28,7 @@ class LinearQFunction : public QFunction<TState, TAction>
      *
      * @param features the feature extractor to use on the state representation
      * @param learning_rate the initial learning rate
-     * @param learning_rate the initial discount factor
+     * @param discount_factor the initial discount factor
      * @param weights initial weights to use, or std::nullopt to initialize weights with 0
      */
     explicit LinearQFunction(FeatureExtractor<TState, TAction> features,
@@ -41,7 +41,7 @@ class LinearQFunction : public QFunction<TState, TAction>
      *
      * @param features the feature extractor to use on the state representation
      * @param learning_rate the initial learning rate
-     * @param learning_rate the initial discount factor
+     * @param discount_factor the initial discount factor
      * @param weights_csv_file the CSV file containing the initial weights to use
      */
     explicit LinearQFunction(FeatureExtractor<TState, TAction> features,

@@ -52,6 +52,9 @@ class SoftmaxStrategy : public ActionSelectionStrategy<TState, TAction>
     // List of all possible actions the agent can take
     std::vector<typename TAction::Enum> all_actions_;
 
+    // Seed used to initialize the random number generator
+    static constexpr int RNG_SEED = 1010;
+
     // Random number generator and distributions
     std::mt19937 random_num_gen_;
     std::uniform_real_distribution<> random_num_dist_;
@@ -59,7 +62,9 @@ class SoftmaxStrategy : public ActionSelectionStrategy<TState, TAction>
 
 template <typename TState, typename TAction>
 SoftmaxStrategy<TState, TAction>::SoftmaxStrategy(double temperature)
-    : all_actions_(TAction::allValues()), random_num_dist_(0.0, 1.0)
+    : all_actions_(TAction::allValues()),
+      random_num_gen_(RNG_SEED),
+      random_num_dist_(0.0, 1.0)
 {
     setTemperature(temperature);
 }

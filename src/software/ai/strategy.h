@@ -4,8 +4,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/geom/algorithms/distance.h"
 #include "software/world/field.h"
 
