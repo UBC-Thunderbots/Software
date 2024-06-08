@@ -3,7 +3,7 @@
 #include <g3sinks/LogRotate.h>
 #include <g3sinks/LogRotateWithFilter.h>
 
-#include <experimental/filesystem>
+//#include <experimental/filesystem>
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 #include <g3log/logmessage.hpp>
@@ -82,10 +82,10 @@ class LoggerSingleton
         // hermetic build principles
 
         // if log dir doesn't exist, create it
-        if (!std::experimental::filesystem::exists(runtime_dir))
-        {
-            std::experimental::filesystem::create_directories(runtime_dir);
-        }
+//        if (!std::experimental::filesystem::exists(runtime_dir))
+//        {
+//            std::experimental::filesystem::create_directories(runtime_dir);
+//        }
 
         auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(runtime_dir),
                                                   &CSVSink::appendToFile);

@@ -366,7 +366,6 @@ class RobotInfo(QWidget):
                 rtt_time_seconds * MILLISECONDS_PER_SECOND
             )
         )
-
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)
 
         self.motor_fault_view.refresh(
