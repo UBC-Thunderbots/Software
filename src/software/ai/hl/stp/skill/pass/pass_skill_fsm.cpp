@@ -107,9 +107,8 @@ void PassSkillFSM::takePass(
     }
     else
     {
-        auto_chip_or_kick = AutoChipOrKick{
-            AutoChipOrKickMode::AUTOKICK,
-            std::min(best_pass_so_far_->pass.speed(), BALL_MAX_SPEED_METERS_PER_SECOND)};
+        auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                           best_pass_so_far_->pass.speed()};
     }
 
     PivotKickSkillFSM::ControlParams control_params = {
