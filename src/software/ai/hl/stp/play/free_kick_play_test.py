@@ -174,7 +174,7 @@ def test_free_kick_play_enemy(simulated_test_runner, ball_initial_pos, yellow_bo
                 ],
                 "yellow_bots": yellow_bots,
                 "ball_initial_pos": ball_initial_pos,
-                "play_name": PlayName.EnemyFreekickPlay,
+                "play_name": PlayName.EnemyFreeKickPlay,
             }
         ],
         inv_always_validation_sequence_set=[[]],
@@ -222,7 +222,7 @@ def test_free_kick_play_both(simulated_test_runner, ball_initial_pos):
                     tbots_cpp.Point(3, -0.25),
                 ],
                 "ball_initial_pos": ball_initial_pos,
-                "play_name": PlayName.EnemyFreekickPlay,
+                "play_name": PlayName.EnemyFreeKickPlay,
             }
         ],
         inv_always_validation_sequence_set=[[]],

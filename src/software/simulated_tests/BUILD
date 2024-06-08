@@ -107,6 +107,8 @@ py_library(
     srcs = [
         "avoid_collisions.py",
         "ball_enters_region.py",
+        "ball_moves_forward.py",
+        "ball_moves_from_rest.py",
         "ball_moves_in_direction.py",
         "ball_speed_threshold.py",
         "ball_stops_in_region.py",
@@ -114,6 +116,8 @@ py_library(
         "friendly_has_ball_possession.py",
         "friendly_receives_ball_slow.py",
         "friendly_team_scored.py",
+        "or_validation.py",
+        "robot_enters_placement_region.py",
         "robot_enters_region.py",
         "robot_enters_region_and_stops.py",
         "robot_speed_threshold.py",
