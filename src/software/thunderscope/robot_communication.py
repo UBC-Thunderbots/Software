@@ -27,6 +27,7 @@ class RobotCommunication(object):
         estop_baudrate: int = 115200,
         enable_radio: bool = False,
     ):
+        self.i = 0
         """Initialize the communication with the robots
 
         :param current_proto_unix_io: the current proto unix io object
@@ -121,38 +122,47 @@ class RobotCommunication(object):
         print(change_referee_interface)
         print(change_vision_interface)
 
-        if change_vision_interface:
-            if self.receive_ssl_wrapper is not None:
-                self.receive_ssl_wrapper.close()
-            self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
-                SSL_VISION_ADDRESS,
-                SSL_VISION_PORT,
-                lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
-                True,
-                vision_interface,
-            )
-
-        if change_referee_interface:
-            if self.receive_ssl_referee_proto is not None:
-                self.receive_ssl_referee_proto.close()
-                print("arun")
-
-            print(referee_interface)
-            print(SSL_REFEREE_ADDRESS)
-            print(SSL_REFEREE_PORT)
-            print(type(Referee()))
-            print(type(referee_interface))
-            print(type(str("arun")))
-
-
-            self.receive_ssl_referee = tbots_cpp.SSLRefereeProtoListener(
-                    SSL_REFEREE_ADDRESS,
-                    SSL_REFEREE_PORT,
-                    lambda data: print(data),
-                    #lambda data: self.__forward_to_proto_unix_io(Referee, data),
+        if change_vision_interface or change_referee_interface:
+            my_str_as_bytes = str.encode(vision_interface)
+            self.referee_interface = referee_interface
+            assert(isinstance(referee_interface, str))
+            interfaces = ["lo", "wlp3s0", referee_interface, vision_interface]
+            print(interfaces)
+            vi = str(vision_interface)
+            v2 = str(vi)
+            try :
+                self.receive_ssl_wrapper = tbots_cpp.createSSLWrapperPacketProtoListener(
+                    SSL_VISION_ADDRESS,
+                    SSL_VISION_PORT,
+                    lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
                     True,
-                    "lo",
-            )
+                    v2
+                )
+            except RuntimeError:
+                # print stacktrace
+                import traceback
+                traceback.print_exc()
+
+            self.i = (self.i + 1) % len(interfaces)
+
+            print(repr(referee_interface))
+            print(repr("wlp3s0"))
+            my_str_as_bytes = str.encode(referee_interface)
+            print(my_str_as_bytes)
+            self.vision_interface = vision_interface
+            try:
+                self.receive_ssl_referee_proto = tbots_cpp.createSSLRefereeProtoListener(
+                        SSL_REFEREE_ADDRESS,
+                        SSL_REFEREE_PORT,
+                        lambda data: self.__forward_to_proto_unix_io(Referee, data),
+                        True,
+                        v2
+                )
+            except RuntimeError:
+                # print stacktrace
+                import traceback
+                traceback.print_exc()
+                print(v2)
 
         self.robots_connected_to_fullsystem = {
             robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
@@ -323,7 +333,6 @@ class RobotCommunication(object):
                 if self.is_setup_for_fullsystem:
                     self.setup_for_fullsystem(referee_interface=network_config.referee_interface,
                                               vision_interface=network_config.vision_interface)
-                self.__close_for_robot_communication()
                 self.__setup_for_robot_communication(
                         robot_interface=network_config.robot_status_interface
                 )

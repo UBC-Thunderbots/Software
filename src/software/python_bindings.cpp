@@ -94,8 +94,20 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<std::string, unsigned short, const std::function<void(T)>&, bool, std::string>())
+        .def(py::init([](const std::string& ip, unsigned short port,
+                        const std::function<void(T)>& callback, bool multicast,
+                        const std::string& interface) {
+                    return std::make_shared<Class>(ip, port, callback, multicast, interface);
+                    }))
         .def("close", &Class::close);
+
+    std::stringstream ss;
+    ss << "create" << pyclass_name;
+    m.def(ss.str().c_str(), [](const std::string& ip, unsigned short port,
+                                      const std::function<void(T)>& callback,
+                                      bool multicast, const std::string& interface) {
+        return std::make_shared<Class>(ip, port, callback, multicast, interface);
+    });
 }
 
 /**

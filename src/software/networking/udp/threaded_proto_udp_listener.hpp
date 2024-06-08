@@ -82,6 +82,7 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::~ThreadedProtoUdpListener()
 {
+    close();
 }
 
 
