@@ -133,9 +133,7 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
                 world,
                 Pass::fromDestReceiveSpeed(world.ball().position(),
                                            Point(pass_array[0], pass_array[1]),
-                                           passing_config_.max_receive_speed_m_per_s(),
-                                           passing_config_.min_pass_speed_m_per_s(),
-                                           passing_config_.max_pass_speed_m_per_s()),
+                                           passing_config_),
                 passing_config_);
         };
 

@@ -36,6 +36,7 @@ double ratePass(const World& world, const Pass& pass,
            enemy_pass_rating * pass_forward_rating * shoot_pass_rating;
 }
 
+// TODO (NIMA): Remove zone related functions and tests. Similar to rateZone
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
                 const TbotsProto::PassingConfig& passing_config)
 {
