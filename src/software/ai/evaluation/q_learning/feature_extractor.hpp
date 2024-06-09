@@ -70,7 +70,7 @@ template <typename TState, typename TAction>
 Eigen::VectorXd FeatureExtractor<TState, TAction>::extract(
     const TState& state, const typename TAction::Enum& action) const
 {
-    Eigen::MatrixXd feature_matrix(numFeatures(), TAction::numValues());
+    Eigen::MatrixXd feature_matrix = Eigen::MatrixXd::Zero(numFeatures(), TAction::numValues());
 
     for (size_t i = 0; i < features_.size(); ++i)
     {
