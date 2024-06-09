@@ -16,7 +16,7 @@ AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
                   .attacker_tactic_config()
                   .action_selection_epsilon())),
       policy_(q_function_, action_selection_strategy_),
-      gameplay_monitor_(),
+      attacker_mdp_reward_function_(),
       current_skill_(nullptr)
 {
 }
@@ -75,7 +75,7 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
         auto action    = policy_.selectAction(attacker_mdp_state);
         current_skill_ = createSkillFromAttackerMdpAction(action, strategy_);
 
-        gameplay_monitor_.startStepObservation(tactic_update.world_ptr);
+        attacker_mdp_reward_function_.startStepObservation(tactic_update.world_ptr);
     }
 
     if (reset_fsm)
@@ -95,8 +95,8 @@ void AttackerTactic::updatePolicy(const AttackerMdpState& attacker_mdp_state)
         const TbotsProto::AttackerTacticConfig& attacker_config =
             strategy_->getAiConfig().attacker_tactic_config();
 
-        double reward =
-            gameplay_monitor_.endStepObservation(attacker_mdp_state.world_ptr);
+        double reward = attacker_mdp_reward_function_.endStepObservation(
+            attacker_mdp_state.world_ptr);
 
         // Update Q-function hyperparameters
         q_function_->setLearningRate(attacker_config.learning_rate());

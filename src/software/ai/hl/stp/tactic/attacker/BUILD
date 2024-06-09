@@ -12,7 +12,7 @@ cc_library(
         "//software/ai:strategy",
         "//software/ai/evaluation/q_learning:attacker_mdp_action",
         "//software/ai/evaluation/q_learning:attacker_mdp_feature_extractor",
-        "//software/ai/evaluation/q_learning:gameplay_monitor",
+        "//software/ai/evaluation/q_learning:attacker_mdp_reward_function",
         "//software/ai/evaluation/q_learning:linear_q_function",
         "//software/ai/evaluation/q_learning:q_policy",
         "//software/ai/evaluation/q_learning/bandits:epsilon_greedy_strategy",

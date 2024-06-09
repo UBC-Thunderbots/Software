@@ -2,9 +2,9 @@
 
 #include "software/ai/evaluation/q_learning/attacker_mdp_action.h"
 #include "software/ai/evaluation/q_learning/attacker_mdp_feature_extractor.h"
+#include "software/ai/evaluation/q_learning/attacker_mdp_reward_function.h"
 #include "software/ai/evaluation/q_learning/bandits/epsilon_greedy_strategy.hpp"
 #include "software/ai/evaluation/q_learning/bandits/softmax_strategy.hpp"
-#include "software/ai/evaluation/q_learning/gameplay_monitor.h"
 #include "software/ai/evaluation/q_learning/linear_q_function.hpp"
 #include "software/ai/evaluation/q_learning/q_policy.hpp"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -58,7 +58,7 @@ class AttackerTactic : public Tactic
     QPolicy<AttackerMdpState, AttackerMdpAction> policy_;
 
     // The reward function for the attacker agent
-    GameplayMonitor gameplay_monitor_;
+    AttackerMdpRewardFunction attacker_mdp_reward_function_;
 
     // The current skill that the attacker is executing
     std::unique_ptr<Skill> current_skill_;

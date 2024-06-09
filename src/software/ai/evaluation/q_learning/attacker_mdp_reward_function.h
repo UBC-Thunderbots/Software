@@ -3,13 +3,14 @@
 #include "software/world/world.h"
 
 /**
- * GameplayMonitor analyzes the state of the World at the start and end of each "step"
- * (the period of time between actions taken by the AI agent) and computes a reward
- * representing the success of the AI's gameplay during the step.
+ * AttackerMdpRewardFunction is the reward function for the Markov decision process (MDP)
+ * modelling the Attacker agent's gameplay decision making.
  *
- * It is the reward function for reinforcement learning algorithms used in our AI.
+ * It analyzes the state of the World at the start and end of each "step" (the period of
+ * time between actions taken by the agent) and computes a reward representing the success
+ * of the agent's gameplay during the step.
  */
-class GameplayMonitor
+class AttackerMdpRewardFunction
 {
    public:
     /**
@@ -21,7 +22,7 @@ class GameplayMonitor
 
     /**
      * Ends the current step and returns a reward representing the success
-     * of the AI's gameplay during the step.
+     * of the agent's gameplay during the step.
      *
      * @param world_ptr the World at the end of the step
      *

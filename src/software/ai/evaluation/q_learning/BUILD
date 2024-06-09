@@ -33,11 +33,12 @@ cc_library(
 )
 
 cc_library(
-    name = "gameplay_monitor",
-    srcs = ["gameplay_monitor.cpp"],
-    hdrs = ["gameplay_monitor.h"],
+    name = "attacker_mdp_reward_function",
+    srcs = ["attacker_mdp_reward_function.cpp"],
+    hdrs = ["attacker_mdp_reward_function.h"],
     deps = [
         "//software/logger",
+        "//software/math:math_functions",
         "//software/world",
     ],
 )
