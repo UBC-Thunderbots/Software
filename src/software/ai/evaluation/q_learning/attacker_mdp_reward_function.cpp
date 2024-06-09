@@ -32,14 +32,14 @@ double AttackerMdpRewardFunction::endStepObservation(WorldPtr world_ptr)
     // Reward keeping possession
     if (world_ptr->getTeamWithPossession() == TeamPossession::FRIENDLY)
     {
-        reward += 0.2;
+        reward += 0.1;
     }
 
     // Reward moving the ball up the field
-    Point ball_prev_pos = step_start_world_ptr_->ball().position();
-    Point ball_curr_pos = world_ptr->ball().position();
-    reward += normalizeValueToRange(std::max(ball_curr_pos.x() - ball_prev_pos.x(), 0.0),
-                                    0.0, world_ptr->field().xLength(), 0.0, 0.1);
+    // Point ball_prev_pos = step_start_world_ptr_->ball().position();
+    // Point ball_curr_pos = world_ptr->ball().position();
+    // reward += normalizeValueToRange(std::max(ball_curr_pos.x() - ball_prev_pos.x(), 0.0),
+    //                                 0.0, world_ptr->field().xLength(), 0.0, 0.1);
 
     // TODO: Reward enemy team fouls, penalize friendly team fouls
 
