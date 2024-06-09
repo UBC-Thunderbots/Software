@@ -27,20 +27,8 @@
 
 #include "extlibs/er_force_sim/src/protobuf/command.pb.h"
 #include "extlibs/er_force_sim/src/protobuf/sslsim.h"
+#include "shared/constants.h"
 #include "simfield.h"
-
-static const float BALL_RADIUS = 0.0215f;
-static const float BALL_MASS   = 0.046f;
-
-// these values are set in coordination with other objects the ball will collide with.
-// the resulting coefficient of friction is the product of both objects friction value.
-static constexpr float BALL_SLIDING_FRICTION = 1.f;
-static constexpr float BALL_RESTITUTION      = 1.f;
-
-static constexpr float BALL_ROLLING_FRICTION_DECELERATION = 0.5;
-static constexpr float FRICTION_TRANSITION_FACTOR         = 5.0 / 7.0;
-static constexpr float STATIONARY_BALL_SPEED              = 0.01;
-
 
 class RNG;
 namespace SSLProto
