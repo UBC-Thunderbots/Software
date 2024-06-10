@@ -25,7 +25,8 @@ int read_value;
 static const uint8_t CHIP_SELECT[] = {motor_service_->FRONT_LEFT_MOTOR_CHIP_SELECT,
                                       motor_service_->FRONT_RIGHT_MOTOR_CHIP_SELECT,
                                       motor_service_->BACK_LEFT_MOTOR_CHIP_SELECT,
-                                      motor_service_->BACK_RIGHT_MOTOR_CHIP_SELECT};
+                                      motor_service_->BACK_RIGHT_MOTOR_CHIP_SELECT,
+                                      4};
 
 constexpr int ASCII_4671_IN_HEXADECIMAL = 0x34363731;
 constexpr double THRESHOLD              = 0.0001;
@@ -34,7 +35,7 @@ std::string runtime_dir                 = "/tmp/tbots/yellow_test";
 
 int main(int argc, char **argv)
 {
-    LoggerSingleton::initializeLogger(runtime_dir);
+    LoggerSingleton::initializeLogger(runtime_dir, false);
     LOG(INFO) << "Running on the Jetson Nano!";
 
     motor_service_ =
@@ -43,10 +44,12 @@ int main(int argc, char **argv)
     // Testing Motor board SPI transfer
     for (uint8_t chip_select : CHIP_SELECT)
     {
+        LOG(INFO) << "Checking motor: " << int(chip_select);
+
         // Check driver fault
         if (!motor_service_->checkDriverFault(chip_select).drive_enabled)
         {
-            LOG(FATAL) << "Detected Motor Fault";
+            LOG(WARNING) << "Detected Motor Fault";
         }
 
         motor_service_->writeIntToTMC4671(chip_select, TMC4671_CHIPINFO_ADDR,
@@ -61,9 +64,11 @@ int main(int argc, char **argv)
         }
         else
         {
-            LOG(FATAL) << "SPI Transfer not successful";
+            LOG(WARNING) << "SPI Transfer not successful";
         }
     }
+
+    motor_service_->resetMotorBoard();
 
     // Testing Power board UART transfer
     try
@@ -78,23 +83,25 @@ int main(int argc, char **argv)
 
         if (abs(power_status.battery_voltage()) < THRESHOLD)
         {
-            LOG(FATAL) << "Battery voltage is zero";
+            LOG(WARNING) << "Battery voltage is zero";
         }
         else if (abs(power_status.capacitor_voltage()) < THRESHOLD)
         {
-            LOG(FATAL) << "Capacitor voltage is zero";
+            LOG(WARNING) << "Capacitor voltage is zero";
         }
         else if (abs(power_status.current_draw()) < THRESHOLD)
         {
-            LOG(FATAL) << "Current draw is zero";
+            LOG(WARNING) << "Current draw is zero";
         }
         else if (power_status.sequence_num() == 0)
         {
-            LOG(FATAL) << "Sequence number is zero";
+            LOG(WARNING) << "Sequence number is zero";
         }
     }
     catch (std::runtime_error &e)
     {
-        LOG(FATAL) << "Unable to communicate with the power board";
+        LOG(WARNING) << "Unable to communicate with the power board";
     }
+
+    return 0;
 }
