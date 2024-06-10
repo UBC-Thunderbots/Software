@@ -1,0 +1,43 @@
+#pragma once
+
+#include "software/ai/hl/stp/skill/base_skill.hpp"
+#include "software/ai/hl/stp/skill/pass/pass_skill_fsm.h"
+
+template <bool SHOULD_CHIP>
+class PassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, PivotKickSkillFSM>
+{
+   public:
+    explicit PassSkill(std::shared_ptr<Strategy> strategy);
+
+    void updatePrimitive(const Robot& robot, const WorldPtr& world_ptr,
+                         const SetPrimitiveCallback& set_primitive) override;
+};
+
+using KickPassSkill = PassSkill<false>;
+using ChipPassSkill = PassSkill<true>;
+
+template <bool SHOULD_CHIP>
+PassSkill<SHOULD_CHIP>::PassSkill(std::shared_ptr<Strategy> strategy)
+    : BaseSkill(strategy)
+{
+}
+
+template <bool SHOULD_CHIP>
+void PassSkill<SHOULD_CHIP>::updatePrimitive(const Robot& robot,
+                                             const WorldPtr& world_ptr,
+                                             const SetPrimitiveCallback& set_primitive)
+{
+    if (std::any_of(fsm_map_.begin(), fsm_map_.end(),
+                    [&](const auto& [robot_id, skill_fsm]) {
+                        return robot_id != robot.id() &&
+                               skill_fsm->is(PassSkillFSM::PassTakenState);
+                    }))
+    {
+        set_primitive(std::make_unique<StopPrimitive>());
+    }
+    else 
+    {
+        control_params_ = {.should_chip = SHOULD_CHIP};
+        BaseSkill::updatePrimitive(robot, world_ptr, set_primitive);
+    }
+}
