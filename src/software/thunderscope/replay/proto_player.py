@@ -1,3 +1,4 @@
+import logging
 import time
 import threading
 import base64
@@ -132,7 +133,7 @@ class ProtoPlayer:
     @staticmethod
     def is_log_entry_corrupt(log_entry) -> bool:
         """
-        Check to see if we have unpack the log entry
+        Check to see if we have can unpack the log entry
 
         :param log_entry: the log entry we are checking
         :return: False if we could unpack the log entry, True otherwise
@@ -141,6 +142,7 @@ class ProtoPlayer:
             _ = ProtoPlayer.unpack_log_entry(log_entry)
             return False
         except Exception: 
+            logging.warning("There exist log entries that are corrupt.")
             return True 
 
 
@@ -188,6 +190,9 @@ class ProtoPlayer:
                         cached_data.append(line)
                 except EOFError:
                     break
+
+                except Exception:
+                    logging.warning("Some unknown exception have occured. Error ignored in ProtoPlayer")
 
         return cached_data
 
