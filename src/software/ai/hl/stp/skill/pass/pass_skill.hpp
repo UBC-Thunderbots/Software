@@ -27,17 +27,6 @@ void PassSkill<SHOULD_CHIP>::updatePrimitive(const Robot& robot,
                                              const WorldPtr& world_ptr,
                                              const SetPrimitiveCallback& set_primitive)
 {
-    if (std::any_of(fsm_map_.begin(), fsm_map_.end(),
-                    [&](const auto& [robot_id, skill_fsm]) {
-                        return robot_id != robot.id() &&
-                               skill_fsm->is(PassSkillFSM::PassTakenState);
-                    }))
-    {
-        set_primitive(std::make_unique<StopPrimitive>());
-    }
-    else 
-    {
-        control_params_ = {.should_chip = SHOULD_CHIP};
-        BaseSkill::updatePrimitive(robot, world_ptr, set_primitive);
-    }
+    control_params_ = {.should_chip = SHOULD_CHIP};
+    BaseSkill::updatePrimitive(robot, world_ptr, set_primitive);
 }
