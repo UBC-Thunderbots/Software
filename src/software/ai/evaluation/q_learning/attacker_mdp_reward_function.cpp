@@ -20,13 +20,13 @@ double AttackerMdpRewardFunction::endStepObservation(WorldPtr world_ptr)
     // Reward friendly team scoring
     if (contains(world_ptr->field().enemyGoal(), world_ptr->ball().position()))
     {
-        reward += 0.5;
+        reward += 0.8;
     }
 
     // Penalize enemy team scoring
     if (contains(world_ptr->field().friendlyGoal(), world_ptr->ball().position()))
     {
-        reward -= 0.5;
+        reward -= 0.8;
     }
 
     // Reward keeping possession
