@@ -437,6 +437,11 @@ bool isPowerStable(std::ifstream& log_file)
         }
     }
 
+    // https://pastebin.com/ebsATa2h we need to clear the error state bit because we have
+    // reached the end of the file. After being clearing the bit, std::getline would return
+    // the changes in the file. See the pastebin for example.
+    log_file.clear();
+
     return true;
 }
 
@@ -459,7 +464,10 @@ void Thunderloop::updateErrorCodes()
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
     }
 
-    std::ifstream log_file(PATH_TO_RINGBUFFER_LOG);
+    // this is declared as static since we really only want to open this file once and
+    // pull from a buffer. clear would be called to ensure that std::getline would return
+    // the latest changes!
+    static std::ifstream log_file(PATH_TO_RINGBUFFER_LOG);
     if (!isPowerStable(log_file))
     {
         robot_status_.mutable_error_code()->Add(

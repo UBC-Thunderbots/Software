@@ -141,11 +141,10 @@ class Thunderloop
 };
 
 /*
- * reads from the kernel ring buffer, likely, /var/log/dmesg file to see if the power
+ * reads from the kernel ring buffer, likely /var/log/dmesg file, to see if the power
  * is stable
- *
- * This is not defined in Thunderscope because I want to test this function without
- * injecting gtest into the private class in Thunderloop
+*
+ * This is not defined in Thunderloop to allow it to be unit tested easily
  *
  * @return True if the power is stable, false otherwise
  */
