@@ -880,7 +880,8 @@ TEST_F(SensorFusionTest, breakbeam_pass_update_test)
 {
     // The following code test this thing: if the breakbeam is triggered and the position
     // of the robot and the ball given by the ssl vision system is less than a certain
-    // threshold, we expect shouldUseRobotBallPositionInsteadOfSSL to return True
+    // threshold, we should expcet the ball position to be updated as the position of the
+    // ssl vision packet!.
     SensorProto sensor_msg;
 
     // creating ssl vision
@@ -927,9 +928,9 @@ TEST_F(SensorFusionTest, breakbeam_pass_update_test)
 
     Point updated_ball_pos = sensor_fusion.getWorld().value().ball().position();
 
-    // is it using the robot state position
+    // is it not using the robot state position
     EXPECT_TRUE(updated_ball_pos != robot_state.position());
-    // is it not using the ssl vision?
+    // is it using the ssl vision?
     EXPECT_TRUE(updated_ball_pos == ssl_position);
 }
 
