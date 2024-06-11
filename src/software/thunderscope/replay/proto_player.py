@@ -110,27 +110,6 @@ class ProtoPlayer:
         return sorted(replay_files, key=__sort_replay_chunks)
 
     @staticmethod
-    def is_valid_protobuf(message):
-        """
-        True if the time send is greater than 2023 unix timestamp, and the protobuf have the timestamp field
-
-        :return: True if the time send is greater than 2023 unix timestamp, and the protobuf have the timestamp field
-        """
-        unixtimestamp_2023 = datetime(year=2023, month=1, day=1).timestamp()
-
-        try:
-            if message.time_sent.epoch_timestamp_seconds > unixtimestamp_2023:
-                # has the time send field and is greater than 2023 unix timestamp
-                return True
-
-            # return false where the timestamp is way to small!
-            return False
-
-        # does not contain the time_sent field, so we have a type error
-        except AttributeError:
-            return False
-
-    @staticmethod
     def is_log_entry_corrupt(log_entry) -> bool:
         """
         Check to see if we have can unpack the log entry
