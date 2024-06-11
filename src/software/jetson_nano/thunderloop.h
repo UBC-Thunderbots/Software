@@ -143,7 +143,7 @@ class Thunderloop
 /*
  * reads from the kernel ring buffer, likely /var/log/dmesg file, to see if the power
  * is stable
-*
+ *
  * This is not defined in Thunderloop to allow it to be unit tested easily
  *
  * @return True if the power is stable, false otherwise

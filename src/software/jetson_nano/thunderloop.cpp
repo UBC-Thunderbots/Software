@@ -438,8 +438,8 @@ bool isPowerStable(std::ifstream& log_file)
     }
 
     // https://pastebin.com/ebsATa2h we need to clear the error state bit because we have
-    // reached the end of the file. After being clearing the bit, std::getline would return
-    // the changes in the file. See the pastebin for example.
+    // reached the end of the file. After being clearing the bit, std::getline would
+    // return the changes in the file. See the pastebin for example.
     log_file.clear();
 
     return true;
