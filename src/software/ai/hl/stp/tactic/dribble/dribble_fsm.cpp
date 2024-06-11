@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
-#include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/hl/stp/tactic/move_primitive.h"
 
 Point DribbleFSM::robotPositionToFaceBall(const Point &ball_position,
                                           const Angle &face_ball_angle,
@@ -21,6 +21,8 @@ Point DribbleFSM::findInterceptionPoint(const Robot &robot, const Ball &ball,
     {
         auto face_ball_vector = (ball.position() - robot.position());
 
+        // Draw a long polygon from the dribbler forward, with the width of the dribbler
+        // that the ball should be within before we try to dribble into it.
         float dribbler_width      = robot.robotConstants().dribbler_width_meters;
         Vector robot_front_vector = Vector::createFromAngle(robot.orientation());
         Point middle_of_dribbler  = robot.position() + robot_front_vector.normalize(
@@ -30,16 +32,25 @@ Point DribbleFSM::findInterceptionPoint(const Robot &robot, const Ball &ball,
                     middle_of_dribbler + robot_front_vector.normalize(20)),
             0.0, dribbler_width / 2.0);
 
-        double offset_to_ball = 0.0;
-        // TODO (NIMA): Move to parameters.proto
-        if (!contains(infront_of_dribbler_polygon, ball.position()) || robot.angularVelocity().toDegrees() > 40)
-        {
-            offset_to_ball = 0.08;
-        }
-        LOG(VISUALIZE) << *createDebugShapesMap({{"poly", *createShapeProto(infront_of_dribbler_polygon)}});
+        bool dribbler_aligned_with_ball =
+            contains(infront_of_dribbler_polygon, ball.position());
+        bool robot_turning_too_fast =
+            robot.angularVelocity().toDegrees() >
+            dribble_tactic_config
+                .max_robot_angular_vel_when_getting_possession_deg_per_s();
 
-        auto point_in_front_of_ball =
-            robotPositionToFaceBall(ball.position(), face_ball_vector.orientation(), offset_to_ball);
+        double offset_to_ball = 0.0;
+        if (!dribbler_aligned_with_ball || robot_turning_too_fast)
+        {
+            // The ball is not infront of the robot, or the robot is turning too fast
+            // so add some additional offset to the ball destination, so we don't bump
+            // into it.
+            offset_to_ball =
+                dribble_tactic_config.offset_to_ball_when_not_aligned_meters();
+        }
+
+        auto point_in_front_of_ball = robotPositionToFaceBall(
+            ball.position(), face_ball_vector.orientation(), offset_to_ball);
         return point_in_front_of_ball;
     }
     Point intercept_position = ball.position();
@@ -52,8 +63,10 @@ Point DribbleFSM::findInterceptionPoint(const Robot &robot, const Ball &ball,
         // Give the robot some slack time to intercept the ball.
         // The slack time is reduced as we get closer to the ball and have
         // a better chance of intercepting it.
-        Duration slack_time_sec = std::min(ball_time_to_position,
-                                           Duration::fromSeconds(dribble_tactic_config.max_ball_interception_slack_time_sec()));
+        Duration slack_time_sec =
+            std::min(ball_time_to_position,
+                     Duration::fromSeconds(
+                         dribble_tactic_config.max_ball_interception_slack_time_sec()));
 
         if (robot_time_to_pos < (ball_time_to_position + slack_time_sec))
         {

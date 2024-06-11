@@ -66,8 +66,7 @@ struct DribbleFSM
      */
     // TODO (#1968): Merge this functionality with findBestInterceptForBall in the
     // evaluation folder
-    Point findInterceptionPoint(const Robot &robot, const Ball &ball,
-                                const Field &field);
+    Point findInterceptionPoint(const Robot &robot, const Ball &ball, const Field &field);
 
     /**
      * Gets the destination to dribble the ball to from the update event
