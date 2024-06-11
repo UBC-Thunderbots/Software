@@ -166,7 +166,12 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
 bool ShootOrPassPlayFSM::passFound(const Update& event)
 {
-    return best_pass_and_score_so_far.rating > min_pass_score_threshold;
+    const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
+    const auto min_pass_speed =
+            this->ai_config.passing_config().min_pass_speed_m_per_s();
+
+    return (ball_velocity < min_pass_speed) &&
+           (best_pass_and_score_so_far.rating > min_pass_score_threshold);
 }
 
 bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
