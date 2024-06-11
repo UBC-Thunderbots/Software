@@ -13,6 +13,7 @@ class KeepAwayTest : public testing::Test
         : world(TestUtil::createBlankTestingWorld()),
           field_bounds(world->field().fieldBoundary())
     {
+        passing_config.set_pass_delay_sec(0.0);
     }
 
     TbotsProto::PassingConfig passing_config;

@@ -371,11 +371,13 @@ void samplePassesForVisualization(const World& world,
     double static_pos_quality_costs;
     double pass_friendly_capability_costs;
     double pass_enemy_risk_costs;
-    double enemy_proximity_cost;
+    double enemy_proximity_costs;
+    double enemy_interception_costs;
     double pass_shoot_score_costs;
     double receiver_position_costs;
     double keep_away_position_costs;
     double pass_forward_costs;
+    double pass_not_too_close_costs;
 
     // We loop column wise (in the same order as how zones are defined)
     for (int i = 0; i < num_cols; i++)
@@ -394,11 +396,13 @@ void samplePassesForVisualization(const World& world,
             static_pos_quality_costs       = 1;
             pass_friendly_capability_costs = 1;
             pass_enemy_risk_costs          = 1;
-            enemy_proximity_cost           = 1;
+            enemy_proximity_costs          = 1;
+            enemy_interception_costs       = 1;
             pass_shoot_score_costs         = 1;
             receiver_position_costs        = 1;
             keep_away_position_costs       = 1;
             pass_forward_costs             = 1;
+            pass_not_too_close_costs       = 1;
 
             // getStaticPositionQuality
             if (passing_config.cost_vis_config().static_position_quality())
@@ -416,7 +420,7 @@ void samplePassesForVisualization(const World& world,
             // ratePassNotTooClose
             if (passing_config.cost_vis_config().pass_not_too_close_quality())
             {
-                pass_forward_costs = ratePassNotTooClose(pass, passing_config);
+                pass_not_too_close_costs = ratePassNotTooClose(pass, passing_config);
             }
 
             // ratePassFriendlyCapability
@@ -440,10 +444,17 @@ void samplePassesForVisualization(const World& world,
                     world.field(), world.enemyTeam(), pass, passing_config);
             }
 
+            // calculateInterceptRisk
+            if (passing_config.cost_vis_config().enemy_interception_risk())
+            {
+                enemy_interception_costs =
+                    calculateInterceptRisk(world.enemyTeam(), pass, passing_config);
+            }
+
             // calculateProximityRisk
             if (passing_config.cost_vis_config().enemy_proximity_risk())
             {
-                enemy_proximity_cost =
+                enemy_proximity_costs =
                     calculateProximityRisk(curr_point, world.enemyTeam(), passing_config);
             }
 
@@ -464,9 +475,10 @@ void samplePassesForVisualization(const World& world,
             }
 
             costs.push_back(static_pos_quality_costs * pass_friendly_capability_costs *
-                            pass_enemy_risk_costs * enemy_proximity_cost *
-                            pass_shoot_score_costs * receiver_position_costs *
-                            keep_away_position_costs * pass_forward_costs);
+                            pass_enemy_risk_costs * enemy_proximity_costs *
+                            pass_shoot_score_costs * enemy_interception_costs *
+                            receiver_position_costs * keep_away_position_costs *
+                            pass_forward_costs * pass_not_too_close_costs);
         }
     }
 
