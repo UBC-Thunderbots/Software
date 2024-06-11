@@ -1,5 +1,4 @@
 import os
-from sys import path
 from proto.import_all_protos import *
 from software.py_constants import MILLISECONDS_PER_SECOND
 import logging
@@ -26,10 +25,7 @@ class ProtoConfigurationWidget(QWidget):
     DEFAULT_SAVE_DIRECTORY = "/tmp/tbotspython/thunderbots_configurations_proto"
 
     def __init__(
-        self,
-        on_change_callback,
-        is_yellow,
-        search_filter_threshold=60,
+        self, on_change_callback, is_yellow, search_filter_threshold=60,
     ):
         """Create a parameter widget given a protobuf
 
@@ -281,7 +277,7 @@ class ProtoConfigurationWidget(QWidget):
         :param changes: The changes
 
         """
-        logging.info("Somethign is changing?")
+        logging.info("Something is changing?")
         logging.info(changes)
 
         for param, change, data in changes:
