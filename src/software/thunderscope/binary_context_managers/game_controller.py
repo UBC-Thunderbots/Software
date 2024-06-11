@@ -31,7 +31,7 @@ class Gamecontroller(object):
         self,
         supress_logs: bool = False,
         use_unconventional_port: bool = False,
-        not_launch_gc:bool = True
+        not_launch_gc: bool = True,
     ) -> None:
         """
         Run Gamecontroller
@@ -45,8 +45,8 @@ class Gamecontroller(object):
         self.not_launch_gc = not_launch_gc
 
         if use_unconventional_port:
-            # the intention of setting this port is to ensure that we don't listen other people's 
-            # gamecontroller. It is highly unlikely that other people would use port 12393 since 
+            # the intention of setting this port is to ensure that we don't listen other people's
+            # gamecontroller. It is highly unlikely that other people would use port 12393 since
             # this is a random number that was set by us!
             self.referee_port = self.next_free_port(start_port=12393)
         else:
@@ -76,7 +76,7 @@ class Gamecontroller(object):
         :return: gamecontroller context managed instance
 
         """
-        # sometimes we do not want to launch the gameconntroller because we are in robocup 
+        # sometimes we do not want to launch the gameconntroller because we are in robocup
         # the referee at robotcup would be the person launching the gamecontroller.
         if not self.not_launch_gc:
             command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
@@ -193,10 +193,7 @@ class Gamecontroller(object):
                 autoref_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
-            self.REFEREE_IP,
-            self.referee_port,
-            __send_referee_command,
-            True,
+            self.REFEREE_IP, self.referee_port, __send_referee_command, True,
         )
 
         blue_full_system_proto_unix_io.register_observer(

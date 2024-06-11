@@ -28,7 +28,7 @@ class RobotCommunication(object):
         estop_baudrate: int = 115200,
         enable_radio: bool = False,
         sslvision_address: str = None,
-        referee_port:int = SSL_REFEREE_PORT
+        referee_port: int = SSL_REFEREE_PORT,
     ):
         """Initialize the communication with the robots
 
