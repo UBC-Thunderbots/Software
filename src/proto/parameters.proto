@@ -189,7 +189,7 @@ message DribbleTacticConfig
 
     // Threshold to determine if the robot has the expected orientation when
     // completing the dribble (in degrees)
-    required double final_destination_close_threshold = 3 [
+    required double final_destination_close_threshold_deg = 3 [
         default                   = 3.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
@@ -206,6 +206,11 @@ message DribbleTacticConfig
     // Robot speed at which the robot is done dribbling (in m/s)
     required double robot_dribbling_done_speed = 5
         [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // The maximum amount of additional time that the robot should
+    // reach the interception point prior to the ball.
+    required double max_ball_interception_slack_time_sec = 6
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message EnemyCapabilityConfig
