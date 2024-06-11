@@ -199,12 +199,6 @@ bool SensorFusion::shouldTrustRobotStatus(
         return false;
     }
 
-    std::optional<Ball> ball = createBall(ball_detection);
-    if (!ball.has_value())
-    {
-        return false;
-    }
-
     double distance =
         (robot_with_ball_in_dribbler.value().position() - ball.value().position())
             .length();
@@ -213,7 +207,7 @@ bool SensorFusion::shouldTrustRobotStatus(
         return false;
     }
 
-    // In other words, this is only true if we have the position of the ball, breakbeam
+    // In other words, this is only true if we have the position of the breakbeam
     // robot, and the distance between what the ssl says and where the robots are actually
     // at is less that a threshold distance set by
     // DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION

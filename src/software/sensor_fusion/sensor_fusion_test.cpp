@@ -881,13 +881,13 @@ TEST_F(SensorFusionTest, breakbeam_pass_update_test)
     // The following code test this thing: if the breakbeam is triggered and the position
     // of the robot and the ball given by the ssl vision system is less than a certain
     // threshold, we should expcet the ball position to be updated as the position of the
-    // ssl vision packet!.
+    // ssl robot_position packet!.
     SensorProto sensor_msg;
 
     // creating ssl vision
     const uint32_t camera_id    = 0;
     const uint32_t frame_number = 40391;
-    Timestamp time              = Timestamp::fromSeconds(12.1);
+    Timestamp time              = Timestamp::fromSeconds(0.0);
 
     Point ssl_position(0.05, 0.05);
     Vector velocity(0, 0);
@@ -920,25 +920,48 @@ TEST_F(SensorFusionTest, breakbeam_pass_update_test)
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
 
-    // we have to call update sensor fusion two times because of updating ball position
-    // comes before updating breakbeam tripped. Thus, we have to call this function two
-    // times before the ball position is updated
+    // since updating breakbeam fix is after updating the ball position. We have to call
+    // processSensorProto twice: one for updating the fact that the breakbeam is triggered
+    // and the other for updating the ball position based on the robot
     sensor_fusion.processSensorProto(sensor_msg);
+
+
+    // we cannot use the same sensor_msg because the ball is updated through the
+    // createBall function. By default, the createBall function interpolate the velocity
+    // to update the ball- thus, the function require two different timestamp to work.
+    // This is to prevent division by zero! It we were to use the same sensor message, the
+    // position would default to the position of the ssl ball position instead of the
+    // robot position!
+    Timestamp new_time = Timestamp::fromSeconds(0.5);
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> new_frame =
+        createSSLDetectionFrame(camera_id, new_time, frame_number, {ball_state},
+                                yellow_robot_states, blue_robot_states);
+    auto gemotry_data_copy = initSSLDivBGeomData();
+    auto new_packet =
+        createSSLWrapperPacket(std::move(gemotry_data_copy), std::move(new_frame));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *new_packet;
     sensor_fusion.processSensorProto(sensor_msg);
 
     Point updated_ball_pos = sensor_fusion.getWorld().value().ball().position();
 
-    // is it not using the robot state position
-    EXPECT_TRUE(updated_ball_pos != robot_state.position());
-    // is it using the ssl vision?
-    EXPECT_TRUE(updated_ball_pos == ssl_position);
+    // is it using the robot state position? Note that it is not robot_state position
+    // because the updateBall function would update the ball based on the location of the
+    // breakbeam and not the center of mass!
+    EXPECT_TRUE(updated_ball_pos ==
+                robot_state.position() +
+                    Vector::createFromAngle(robot_state.orientation())
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                                   BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING));
+
+    // is it using not the ssl vision?
+    EXPECT_TRUE(updated_ball_pos != ssl_position);
 }
 
 TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
 {
     // The following code test this thing: if the breakbeam is triggered and the position
     // of the robot and the ball given by the ssl vision system is too far away to make
-    // sense , we expect the ball position to not be the position of the robot!
+    // sense , we expect the ball position to be the position of the ssl vision packet!
     SensorProto sensor_msg;
 
     // creating ssl vision
