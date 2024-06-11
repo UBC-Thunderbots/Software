@@ -99,7 +99,6 @@ def setup_pass_and_robots(
     # generate the best pass on the world 100 times
     # this improves the passes generated over time
     robots_to_ignore = []
-    max_score = 0
     for index in range(0, 100):
         best_pass_with_score = pass_generator.getBestPass(world, robots_to_ignore)
 
