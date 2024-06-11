@@ -27,8 +27,8 @@ class RobotCommunication(object):
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
         enable_radio: bool = False,
-        referee_address: str = None,
         sslvision_address: str = None,
+        referee_port:int = SSL_REFEREE_PORT
     ):
         """Initialize the communication with the robots
 
@@ -46,9 +46,7 @@ class RobotCommunication(object):
         if self.ssl_vision_address is None:
             self.ssl_vision_address = SSL_VISION_ADDRESS
 
-        self.referee_address = referee_address
-        if self.referee_address is None:
-            self.referee_address = SSL_REFEREE_ADDRESS
+        self.referee_port = referee_port
 
         self.receive_ssl_referee_proto = None
         self.receive_ssl_wrapper = None
@@ -123,7 +121,7 @@ class RobotCommunication(object):
         )
 
         self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
-            self.referee_address,
+            SSL_REFEREE_ADDRESS,
             SSL_REFEREE_PORT,
             lambda data: self.current_proto_unix_io.send_proto(Referee, data),
             True,

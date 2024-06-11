@@ -494,12 +494,6 @@ def load_command_line_arguments():
         help="Use realism in the simulator",
     )
 
-    parser.add_argument(
-        "--gamecontroller_port",
-        type=int,
-        default=None,
-        help="The port number for the game controller.",
-    )
     return parser.parse_args()
 
 
@@ -550,7 +544,6 @@ def simulated_test_runner():
     ) as yellow_fs:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs),
-            gamecontroller_port=args.gamecontroller_port,
         ) as gamecontroller:
 
             blue_fs.setup_proto_unix_io(blue_full_system_proto_unix_io)
