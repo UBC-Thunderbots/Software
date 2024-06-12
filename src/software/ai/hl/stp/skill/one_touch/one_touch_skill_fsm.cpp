@@ -85,22 +85,14 @@ bool OneTouchSkillFSM::ballKicked(const Update& event)
         (best_shot_->getPointToShootAt() - event.common.world_ptr->ball().position()).orientation());
 }
 
-void OneTouchSkillFSM::getBallControlAndPivot(
-    const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
-{
-    DribbleSkillFSM::ControlParams control_params{
-        .dribble_destination       = event.common.world_ptr->ball().position(),
-        .final_dribble_orientation = (best_shot_->getPointToShootAt() - event.common.world_ptr->ball().position()).orientation(),
-        .allow_excessive_dribbling = false};
-
-    processEvent(DribbleSkillFSM::Update(control_params, event.common));
-}
-
 void OneTouchSkillFSM::updateOneTouch(const Update& event)
 {
+    auto one_touch = getOneTouchShotPositionAndOrientation(
+        event.common.robot, event.common.world_ptr->ball(),
+        event.common.world_ptr->field(), best_shot_->getPointToShootAt());
+
     event.common.set_primitive(std::make_unique<MovePrimitive>(
-        event.common.robot, event.common.world_ptr->ball().position(),
-        (best_shot_->getPointToShootAt() - event.common.world_ptr->ball().position()).orientation(),
+        event.common.robot, one_touch.getPointToShootAt(), one_touch.getOpenAngle(),
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,

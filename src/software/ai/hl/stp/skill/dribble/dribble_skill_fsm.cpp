@@ -177,6 +177,7 @@ bool DribbleSkillFSM::dribblingDone(const Update &event)
                                           event.common.robot.position(),
                                           event.control_params.final_dribble_orientation),
                Angle::fromDegrees(dribble_config.final_destination_close_threshold())) &&
+           haveBallControl(event) &&
            robotStopped(event.common.robot, dribble_config.robot_dribbling_done_speed());
 }
 

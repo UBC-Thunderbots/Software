@@ -3,7 +3,7 @@
 #include "software/ai/hl/stp/skill/keep_away/keep_away_skill.h"
 #include "software/ai/hl/stp/skill/one_touch/one_touch_skill.h"
 #include "software/ai/hl/stp/skill/pass/pass_skill.hpp"
-#include "software/ai/hl/stp/skill/shoot/shoot_skill.h"
+#include "software/ai/hl/stp/skill/shoot/shoot_skill.hpp"
 #include "software/ai/strategy.h"
 #include "software/util/make_enum/reflective_enum.h"
 
@@ -13,7 +13,13 @@
  *
  * These actions correspond to Skills that the AttackerTactic can execute.
  */
-MAKE_REFLECTIVE_ENUM(AttackerMdpAction, KEEP_AWAY, CHIP_PASS, KICK_PASS, ONE_TOUCH, SHOOT)
+MAKE_REFLECTIVE_ENUM(AttackerMdpAction, 
+                     KEEP_AWAY, 
+                     CHIP_PASS, 
+                     KICK_PASS, 
+                     ONE_TOUCH, 
+                     SHOOT, 
+                     DRIBBLE_SHOOT)
 
 /**
  * Creates a new Skill corresponding to the given AttackerMdpAction enum value.

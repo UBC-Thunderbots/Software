@@ -64,6 +64,16 @@ class Strategy
      * @returns the best shot on goal, if one exists
      */
     std::optional<Shot> getBestShot(const Robot& robot);
+    
+    /**
+     * Gets the best shot on goal by sampling multiple potential shot origin 
+     * points for the given robot.
+     *
+     * @param robot the robot to find the best shot for
+     *
+     * @returns the best shot on goal found by sampling, if one exists
+     */
+    std::optional<Shot> getBestSampledShot(const Robot& robot);
 
     /**
      * Gets the current AI configuration in use.
@@ -102,4 +112,5 @@ class Strategy
     size_t receiving_positions_index_;
 
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
+    std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_sampled_shot_;
 };

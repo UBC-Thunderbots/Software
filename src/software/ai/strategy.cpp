@@ -60,14 +60,26 @@ std::optional<Shot> Strategy::getBestShot(const Robot& robot)
 {
     if (!robot_to_best_shot_.contains(robot.id()))
     {
-        robot_to_best_shot_[robot.id()] = sampleForBestShotOnGoal(
+        robot_to_best_shot_[robot.id()] = calcBestShotOnGoal(
+            world_ptr_->field(), world_ptr_->friendlyTeam(), world_ptr_->enemyTeam(),
+            world_ptr_->ball().position(), TeamType::ENEMY, {robot});
+    }
+
+    return robot_to_best_shot_.at(robot.id());
+}
+
+std::optional<Shot> Strategy::getBestSampledShot(const Robot& robot)
+{
+    if (!robot_to_best_sampled_shot_.contains(robot.id()))
+    {
+        robot_to_best_sampled_shot_[robot.id()] = sampleForBestShotOnGoal(
             world_ptr_->field(), world_ptr_->friendlyTeam(), world_ptr_->enemyTeam(),
             world_ptr_->ball().position(), TeamType::ENEMY,
             ai_config_.dribble_config().max_continuous_dribbling_distance(),
             ai_config_.shot_config().num_shot_origin_points_to_sample(), {robot});
     }
 
-    return robot_to_best_shot_.at(robot.id());
+    return robot_to_best_sampled_shot_.at(robot.id());
 }
 
 const TbotsProto::AiConfig& Strategy::getAiConfig() const

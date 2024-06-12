@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/skill/skill_fsm.h"
-#include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/geom/algorithms/convex_angle.h"
@@ -50,16 +49,6 @@ struct OneTouchSkillFSM
     bool ballKicked(const Update& event);
 
     /**
-     * Action that updates the DribbleSkillFSM to get control of the ball and pivot
-     *
-     * @param event the Update event
-     * @param processEvent processes the DribbleSkillFSM::Update event
-     */
-    void getBallControlAndPivot(
-        const Update& event,
-        boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
-
-    /**
      * Action to perform one touch
      *
      * @param event the Update event
@@ -72,20 +61,15 @@ struct OneTouchSkillFSM
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(DribbleSkillFSM)
         DEFINE_SML_STATE(OneTouchState)
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_GUARD(foundShot)
         DEFINE_SML_GUARD(ballKicked)
         DEFINE_SML_ACTION(updateOneTouch)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(getBallControlAndPivot, DribbleSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *DribbleSkillFSM_S + Update_E[!foundShot_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            DribbleSkillFSM_S + Update_E / getBallControlAndPivot_A,
-            DribbleSkillFSM_S = OneTouchState_S,
-            OneTouchState_S + Update_E[!foundShot_G || ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
+            *OneTouchState_S + Update_E[!foundShot_G || ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             OneTouchState_S + Update_E / updateOneTouch_A,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }

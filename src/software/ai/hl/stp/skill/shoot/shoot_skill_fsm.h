@@ -41,6 +41,9 @@ struct ShootSkillFSM
 
     struct ControlParams
     {
+        // Sample multiple potential shot origin points when finding
+        // the best shot to take (true), or do not sample (false)
+        bool sample_for_best_shot;
     };
 
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS

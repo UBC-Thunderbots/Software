@@ -17,7 +17,6 @@ cc_library(
     deps = [
         "//software/ai/hl/stp/primitive:move_primitive",
         "//software/ai/hl/stp/skill:base_skill",
-        "//software/ai/hl/stp/skill/dribble:dribble_skill",
         "//software/geom/algorithms",
         "//software/geom:ray",
         "//software/math:math_functions",
