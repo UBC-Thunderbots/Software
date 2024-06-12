@@ -16,8 +16,7 @@ class ShootOrPassPlayTest : public SimulatedErForceSimPlayTestFixture
     Field field                      = Field::createField(field_type);
 };
 
-// TODO (#2577): re-enable once fixed
-TEST_F(ShootOrPassPlayTest, DISABLED_test_shoot_or_pass_play)
+TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
 {
     BallState ball_state(Point(-4.4, 2.9), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({
