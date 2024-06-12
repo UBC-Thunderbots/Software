@@ -3,6 +3,7 @@
 #include <iomanip>
 
 #include "software/logger/logger.h"
+#include "software/geom/algorithms/contains.h"
 
 PassGenerator::PassGenerator(const TbotsProto::PassingConfig& passing_config)
     : optimizer_(optimizer_param_weights),
@@ -106,7 +107,11 @@ std::map<RobotId, std::vector<Point>> PassGenerator::sampleReceivingPositionsPer
         {
             auto point = Point(x_normal_distribution(random_num_gen_),
                                y_normal_distribution(random_num_gen_));
-            receiving_positions_map[robot.id()].push_back(point);
+            // Only consider points within the playing area
+            if (contains(world.field().fieldLines(), point))
+            {
+                receiving_positions_map[robot.id()].push_back(point);
+            }
         }
     }
 

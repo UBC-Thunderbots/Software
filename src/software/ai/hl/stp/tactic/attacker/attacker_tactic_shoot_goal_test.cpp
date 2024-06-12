@@ -24,7 +24,7 @@ class AttackerTacticShootGoalTest
    protected:
     AttackerTacticShootGoalTest()
     {
-        //        ai_config.mutable_passing_config()->set_pass_delay_sec(0.0); TODO
+        ai_config.mutable_passing_config()->set_pass_delay_sec(0.0);
         //        (NIMA): Fix this test
     }
 
@@ -76,7 +76,7 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(BallState(Point(2, 1), Vector()), Point(1, 1),
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(1.5, 1), Point(3, 0.4), Point(3, 0.8), Point(3.1, 0.6),
-                             Point(3.1, 1), Point(4.2, 1.2)})),
+                             Point(4.2, 1.2)})),
         // small opening in enemy formation
         std::make_tuple(BallState(Point(2, 1), Vector()), Point(1, 1),
                         TestUtil::createStationaryRobotStatesWithId(
