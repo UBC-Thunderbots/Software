@@ -154,7 +154,7 @@ LAST_OPENED_LAYOUT_PATH = (
     f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
 )
 
-SIMULATION_SPEEDS = [2, 1, 0.5, 0.2, 0.1, 0.05]
+SIMULATION_SPEEDS = [3, 2, 1, 0.5, 0.2, 0.1, 0.05]
 
 THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     f"""

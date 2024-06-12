@@ -135,8 +135,8 @@ def setup_gl_widget(
 
     gl_widget.add_layer(world_layer)
     gl_widget.add_layer(simulator_layer, False)
-    gl_widget.add_layer(path_layer)
-    gl_widget.add_layer(obstacle_layer)
+    gl_widget.add_layer(path_layer, False)
+    gl_widget.add_layer(obstacle_layer, False)
     gl_widget.add_layer(passing_layer)
     gl_widget.add_layer(attacker_layer)
     gl_widget.add_layer(cost_vis_layer, True)

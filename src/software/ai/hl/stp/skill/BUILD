@@ -29,6 +29,7 @@ cc_library(
         "//software/ai/hl/stp/skill/get_behind_ball:get_behind_ball_skill",
         "//software/ai/hl/stp/skill/keep_away:keep_away_skill",
         "//software/ai/hl/stp/skill/kick:kick_skill",
+        "//software/ai/hl/stp/skill/one_touch:one_touch_skill",
         "//software/ai/hl/stp/skill/pass:pass_skill",
         "//software/ai/hl/stp/skill/shoot:shoot_skill",
     ],

@@ -51,7 +51,7 @@ class AttackerTactic : public Tactic
     std::shared_ptr<LinearQFunction<AttackerMdpState, AttackerMdpAction>> q_function_;
 
     // The action selection strategy of attacker agent's policy
-    std::shared_ptr<EpsilonGreedyStrategy<AttackerMdpState, AttackerMdpAction>>
+    std::shared_ptr<SoftmaxStrategy<AttackerMdpState, AttackerMdpAction>>
         action_selection_strategy_;
 
     // The policy that the attacker agent will follow

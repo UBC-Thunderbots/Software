@@ -63,7 +63,7 @@ message AiParameterConfig
     // Multiplier to decrease the tactic assignment cost for robots previously
     // assigned to the tactic (makes tactic assignment "sticky")
     required double repeat_tactic_assignment_multiplier = 2
-        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+        [default = 0.75, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message AttackerTacticConfig
@@ -593,7 +593,7 @@ message PossessionTrackerConfig
     // Min distance in meters between robot and ball for robot
     // to be considered far away from the ball
     required double distance_far_tolerance_meters = 2 [
-        default                   = 0.5,
+        default                   = 0.3,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];

@@ -46,8 +46,6 @@ struct DribbleSkillFSM
      *
      * @return the best interception point
      */
-    // TODO (#1968): Merge this functionality with findBestInterceptForBall in the
-    // evaluation folder
     static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
                                        const Field &field);
 

@@ -11,10 +11,10 @@ AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
           strategy_->getAiConfig().attacker_tactic_config().discount_factor(),
           ATTACKER_MDP_Q_FUNCTION_INITIAL_WEIGHTS_FILE)),
       action_selection_strategy_(
-          std::make_shared<EpsilonGreedyStrategy<AttackerMdpState, AttackerMdpAction>>(
+          std::make_shared<SoftmaxStrategy<AttackerMdpState, AttackerMdpAction>>(
               strategy_->getAiConfig()
                   .attacker_tactic_config()
-                  .action_selection_epsilon())),
+                  .action_selection_temperature())),
       policy_(q_function_, action_selection_strategy_),
       attacker_mdp_reward_function_(),
       current_skill_(nullptr)
@@ -68,8 +68,8 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
         updatePolicy(attacker_mdp_state);
 
         // Update ActionSelectionStrategy hyperparameters
-        action_selection_strategy_->setEpsilon(
-            strategy_->getAiConfig().attacker_tactic_config().action_selection_epsilon());
+        action_selection_strategy_->setTemperature(
+            strategy_->getAiConfig().attacker_tactic_config().action_selection_temperature());
 
         // Select the next skill to execute according to the policy
         auto action    = policy_.selectAction(attacker_mdp_state);

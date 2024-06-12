@@ -10,8 +10,7 @@ ReceiverTactic::ReceiverTactic(std::shared_ptr<Strategy> strategy)
     : Tactic({RobotCapability::Move}),
       strategy_(strategy),
       fsm_map(),
-      control_params({ReceiverFSM::ControlParams{.receiver_point         = std::nullopt,
-                                                 .disable_one_touch_shot = false}})
+      control_params({ReceiverFSM::ControlParams{.receiver_point = std::nullopt}})
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {

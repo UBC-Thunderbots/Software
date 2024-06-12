@@ -106,7 +106,7 @@ TAction::Enum SoftmaxStrategy<TState, TAction>::selectAction(
 template <typename TState, typename TAction>
 void SoftmaxStrategy<TState, TAction>::setTemperature(double temperature)
 {
-    CHECK(temperature_ > 0) << "SoftmaxStrategy temperature must be greater than 0";
+    CHECK(temperature > 0) << "SoftmaxStrategy temperature must be greater than 0";
 
     temperature_ = temperature;
 }

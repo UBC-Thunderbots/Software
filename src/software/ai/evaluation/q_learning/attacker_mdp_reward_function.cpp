@@ -29,6 +29,13 @@ double AttackerMdpRewardFunction::endStepObservation(WorldPtr world_ptr)
         reward -= 0.8;
     }
 
+    // Reward getting the ball near the goal (i.e. in the enemy defense area)
+    // This accounts for missed shots, saves, and close calls 
+    if (contains(world_ptr->field().enemyDefenseArea(), world_ptr->ball().position()))
+    {
+        reward += 0.4;
+    }
+
     // Reward keeping possession
     if (world_ptr->getTeamWithPossession() == TeamPossession::FRIENDLY)
     {

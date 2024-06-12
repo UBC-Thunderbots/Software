@@ -158,7 +158,7 @@ bool DribbleSkillFSM::lostBallControl(const Update &event)
     return !event.common.robot.isNearDribbler(
         // avoid cases where ball is exactly on the edge of the robot
         event.common.world_ptr->ball().position(),
-        dribble_config.lose_ball_control_threshold());
+        dribble_config.lose_ball_control_threshold()); 
 };
 
 bool DribbleSkillFSM::dribblingDone(const Update &event)
@@ -177,7 +177,6 @@ bool DribbleSkillFSM::dribblingDone(const Update &event)
                                           event.common.robot.position(),
                                           event.control_params.final_dribble_orientation),
                Angle::fromDegrees(dribble_config.final_destination_close_threshold())) &&
-           haveBallControl(event) &&
            robotStopped(event.common.robot, dribble_config.robot_dribbling_done_speed());
 }
 

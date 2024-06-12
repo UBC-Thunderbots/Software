@@ -103,7 +103,7 @@ TAction::Enum EpsilonGreedyStrategy<TState, TAction>::selectAction(
 template <typename TState, typename TAction>
 void EpsilonGreedyStrategy<TState, TAction>::setEpsilon(double epsilon)
 {
-    CHECK(epsilon_ >= 0 && epsilon_ <= 1)
+    CHECK(epsilon >= 0 && epsilon <= 1)
         << "EpsilonGreedyStrategy epsilon must be between 0 and 1 inclusive";
 
     epsilon_ = epsilon;

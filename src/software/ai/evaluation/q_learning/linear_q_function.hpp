@@ -56,7 +56,7 @@ class LinearQFunction : public QFunction<TState, TAction>
      *
      * @return the weights from the CSV file, or std::nullopt if the file is empty
      */
-    static std::optional<Eigen::VectorXd> loadWeightsFromCsv(std::string csv_file);
+    static Eigen::VectorXd loadWeightsFromCsv(std::string csv_file);
 
     /**
      * Saves the weights of the LinearQFunction to a file in CSV format.
@@ -114,7 +114,7 @@ LinearQFunction<TState, TAction>::LinearQFunction(
     double discount_factor, std::optional<Eigen::VectorXd> weights)
     : features_(features),
       weights_(weights.value_or(
-          Eigen::VectorXd(features_.numFeatures() * TAction::numValues())))
+          Eigen::VectorXd::Zero(features_.numFeatures() * TAction::numValues())))
 {
     CHECK(static_cast<size_t>(weights_.size()) ==
           features_.numFeatures() * TAction::numValues())
@@ -134,21 +134,18 @@ LinearQFunction<TState, TAction>::LinearQFunction(
 }
 
 template <typename TState, typename TAction>
-std::optional<Eigen::VectorXd> LinearQFunction<TState, TAction>::loadWeightsFromCsv(
+Eigen::VectorXd LinearQFunction<TState, TAction>::loadWeightsFromCsv(
     std::string csv_file)
 {
-    csv::CSVReader reader(csv_file);
+    csv::CSVReader reader(csv_file, csv::CSVFormat().no_header());
     csv::CSVRow csv_row;
+    reader.read_row(csv_row);
 
-    if (reader.read_row(csv_row))
-    {
-        Eigen::VectorXd weights(csv_row.size());
-        std::transform(csv_row.begin(), csv_row.end(), weights.begin(),
-                       [](csv::CSVField& field) { return field.get<double>(); });
-        return weights;
-    }
-
-    return std::nullopt;
+    Eigen::VectorXd weights(csv_row.size());
+    std::transform(csv_row.begin(), csv_row.end(), weights.begin(),
+                   [](csv::CSVField& field) { return field.get<double>(); });
+    
+    return weights;
 }
 
 template <typename TState, typename TAction>
