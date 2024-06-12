@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iomanip>
 #include <random>
 
 #include "proto/message_translation/tbots_protobuf.h"
@@ -61,8 +60,8 @@ class ReceiverPositionGenerator
      * @param best_receiving_positions The map of the best receiving positions for each
      * zone found so far, and their ratings.
      * @param world The world to sample receiving positions in
-     * @param zones_to_sample The subset of the zones to sample receiving positions in
      * @param pass_origin The origin of the pass
+     * @param zones_to_sample The subset of the zones to sample receiving positions in
      * @param num_samples_per_zone The number of samples to take per zone
      */
     void updateBestReceiverPositions(

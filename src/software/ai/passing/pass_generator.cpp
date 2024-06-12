@@ -38,14 +38,14 @@ PassWithRating PassGenerator::getBestPass(const World& world,
                 debug_shapes.push_back(*createDebugShape(
                     Stadium(world.friendlyTeam().getRobotById(robot_id)->position(),
                             receiving_position, 0.02),
-                    std::to_string(debug_shapes.size()) + "gdpg"));
+                    std::to_string(debug_shapes.size()) + "pg"));
             }
         }
         std::stringstream stream;
         stream << "BP:" << std::fixed << std::setprecision(3) << best_pass.rating;
-        debug_shapes.push_back(*createDebugShape(
-            Circle(best_pass.pass.receiverPoint(), 0.05),
-            std::to_string(debug_shapes.size()) + "gdpg", stream.str()));
+        debug_shapes.push_back(
+            *createDebugShape(Circle(best_pass.pass.receiverPoint(), 0.05),
+                              std::to_string(debug_shapes.size()) + "pg", stream.str()));
         LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
     }
 

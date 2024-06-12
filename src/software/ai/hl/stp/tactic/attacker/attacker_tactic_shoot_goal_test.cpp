@@ -22,8 +22,10 @@ class AttackerTacticShootGoalTest
           std::tuple<BallState, Point, std::vector<RobotStateWithId>>>
 {
    protected:
-    AttackerTacticShootGoalTest() {
-//        ai_config.mutable_passing_config()->set_pass_delay_sec(0.0); TODO (NIMA): Fix this test
+    AttackerTacticShootGoalTest()
+    {
+        //        ai_config.mutable_passing_config()->set_pass_delay_sec(0.0); TODO
+        //        (NIMA): Fix this test
     }
 
     TbotsProto::AiConfig ai_config;

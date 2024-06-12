@@ -53,7 +53,11 @@ static const char PROTO_MSG_TYPE_DELIMITER[4] = "!!!";
 
 /* Game Rules */
 // The max allowed speed of the ball, in metres per second
+// https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_speed
 static const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
+// The safe max speed of the ball that we should shoot at, in metres per second
+static const double BALL_SAFE_MAX_SPEED_METERS_PER_SECOND =
+    BALL_MAX_SPEED_METERS_PER_SECOND - 0.5;
 // The max allowed height of the robots, in metres
 static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
