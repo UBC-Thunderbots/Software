@@ -2,8 +2,8 @@
 
 #include <iomanip>
 
-#include "software/logger/logger.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/logger/logger.h"
 
 PassGenerator::PassGenerator(const TbotsProto::PassingConfig& passing_config)
     : optimizer_(optimizer_param_weights),

@@ -25,7 +25,6 @@ class AttackerTacticShootGoalTest
     AttackerTacticShootGoalTest()
     {
         ai_config.mutable_passing_config()->set_pass_delay_sec(0.0);
-        //        (NIMA): Fix this test
     }
 
     TbotsProto::AiConfig ai_config;
