@@ -24,6 +24,7 @@ class ReceiverPositionGenerator
    public:
     /**
      * Creates a new ReceiverPositionGenerator
+     *
      * @param pitch_division The pitch division to split the receivers into
      * @param passing_config The passing configuration to use when looking for best
      * receiving positions
@@ -34,6 +35,7 @@ class ReceiverPositionGenerator
 
     /**
      * Generates the best receiving positions for the friendly robots to go to
+     *
      * @param world The world to generate the best receiving positions based on
      * @param num_positions The number of receiving positions to generate
      * @param existing_receiver_positions A set of existing receiver positions that will
@@ -77,14 +79,13 @@ class ReceiverPositionGenerator
      * @param best_receiving_positions The current best receiving position and rating per
      * zone
      * @param num_positions The number of top zones to get
-     * @param world The world to get the top zones in
      * @param pass_origin The origin of the pass
      * @param existing_receiver_positions The existing receiver positions to avoid
      * @return A vector of the top num_positions zones
      */
     std::vector<ZoneEnum> getTopZones(
         const std::map<ZoneEnum, PassWithRating> &best_receiving_positions,
-        unsigned int num_positions, const World &world, const Point &pass_origin,
+        unsigned int num_positions, const Point &pass_origin,
         const std::vector<Point> &existing_receiver_positions);
 
     /**
@@ -172,7 +173,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
 
     // Get the top zones based on the initial sampling
     std::vector<ZoneEnum> top_zones =
-        getTopZones(best_receiving_positions, num_positions, world, pass_origin,
+        getTopZones(best_receiving_positions, num_positions, pass_origin,
                     existing_receiver_positions);
 
     // Sample more passes from only the top zones and update their ranking
@@ -220,7 +221,7 @@ void ReceiverPositionGenerator<ZoneEnum>::visualizeBestReceivingPositionsAndZone
             Circle(
                 best_receiving_positions.find(top_zones[i])->second.pass.receiverPoint(),
                 0.15),
-            std::to_string(i + 1) + "p", std::to_string(i + 1) + "p"));
+            std::to_string(i + 1) + "rpg", std::to_string(i + 1) + "rpg"));
     }
 
     LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
@@ -269,7 +270,7 @@ void ReceiverPositionGenerator<ZoneEnum>::updateBestReceiverPositions(
 template <class ZoneEnum>
 std::vector<ZoneEnum> ReceiverPositionGenerator<ZoneEnum>::getTopZones(
     const std::map<ZoneEnum, PassWithRating> &best_receiving_positions,
-    unsigned int num_positions, const World &world, const Point &pass_origin,
+    unsigned int num_positions, const Point &pass_origin,
     const std::vector<Point> &existing_receiver_positions)
 {
     std::vector<ZoneEnum> top_zones;
