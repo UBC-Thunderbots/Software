@@ -7,11 +7,14 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+from colorama import Fore, Style
 from typing import Type
 import threading
 import time
 import os
 from google.protobuf.message import Message
+
+DISCONNECTED = "DISCONNECTED"
 
 
 class RobotCommunication(object):
@@ -27,7 +30,6 @@ class RobotCommunication(object):
         estop_baudrate: int = 115200,
         enable_radio: bool = False,
     ):
-        self.i = 0
         """Initialize the communication with the robots
 
         :param current_proto_unix_io: the current proto unix io object
@@ -80,7 +82,9 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
-        self.network_config = NetworkConfig()
+        self.robot_status_interface = DISCONNECTED
+        self.vision_interface = DISCONNECTED
+        self.referee_interface = DISCONNECTED
         self.network_config_buffer = ThreadSafeBuffer(1, NetworkConfig)
         self.current_proto_unix_io.register_observer(
                 NetworkConfig, self.network_config_buffer
@@ -115,93 +119,85 @@ class RobotCommunication(object):
         """
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
         """
-        change_referee_interface = (referee_interface != self.network_config.referee_interface)
-        change_vision_interface = (vision_interface != self.network_config.vision_interface)
-        print(referee_interface)
-        print(vision_interface)
-        print(change_referee_interface)
-        print(change_vision_interface)
+        change_referee_interface = (referee_interface != self.referee_interface) and (referee_interface != DISCONNECTED)
+        change_vision_interface = (vision_interface != self.vision_interface) and (vision_interface != DISCONNECTED)
 
-        if change_vision_interface or change_referee_interface:
-            my_str_as_bytes = str.encode(vision_interface)
-            self.referee_interface = referee_interface
-            assert(isinstance(referee_interface, str))
-            interfaces = ["lo", "wlp3s0", referee_interface, vision_interface]
-            print(interfaces)
-            vi = str(vision_interface)
-            v2 = str(vi)
-            try :
-                self.receive_ssl_wrapper = tbots_cpp.createSSLWrapperPacketProtoListener(
-                    SSL_VISION_ADDRESS,
-                    SSL_VISION_PORT,
-                    lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
-                    True,
-                    v2
-                )
-            except RuntimeError:
-                # print stacktrace
-                import traceback
-                traceback.print_exc()
+        error = None
+        if change_vision_interface:
 
-            self.i = (self.i + 1) % len(interfaces)
+            self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
+                SSL_VISION_ADDRESS,
+                SSL_VISION_PORT,
+                vision_interface,
+                lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
+                True,
+                error,
+            )
 
-            print(repr(referee_interface))
-            print(repr("wlp3s0"))
-            my_str_as_bytes = str.encode(referee_interface)
-            print(my_str_as_bytes)
-            self.vision_interface = vision_interface
-            try:
-                self.receive_ssl_referee_proto = tbots_cpp.createSSLRefereeProtoListener(
-                        SSL_REFEREE_ADDRESS,
-                        SSL_REFEREE_PORT,
-                        lambda data: self.__forward_to_proto_unix_io(Referee, data),
-                        True,
-                        v2
-                )
-            except RuntimeError:
-                # print stacktrace
-                import traceback
-                traceback.print_exc()
-                print(v2)
+            if error:
+                print(f"Error setting up vision interface: {error}")
+                return
 
-        self.robots_connected_to_fullsystem = {
-            robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
-        }
+            self.vision_interface = vision_interface if not error else DISCONNECTED
 
-        self.network_config.referee_interface = referee_interface
-        self.network_config.vision_interface = vision_interface
-        self.is_setup_for_fullsystem = True
+        if change_referee_interface:
+            self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
+                SSL_REFEREE_ADDRESS,
+                SSL_REFEREE_PORT,
+                referee_interface,
+                lambda data: self.__forward_to_proto_unix_io(Referee, data),
+                True,
+                error,
+            )
 
-        print(f"[RobotCommunication] Connected to referee on {referee_interface} and vision on {vision_interface}")
+            if error:
+                print(f"Error setting up referee interface: {error}")
+                return
+
+            self.referee_interface = referee_interface if not error else DISCONNECTED
+
+        if not self.is_setup_for_fullsystem:
+            self.robots_connected_to_fullsystem = {
+                robot_id for robot_id in range(MAX_ROBOT_IDS_PER_SIDE)
+            }
+
+            self.is_setup_for_fullsystem = True
+
+        self.__print_current_network_config()
 
 
-    def __setup_for_robot_communication(self, robot_interface: str = "lo") -> None:
-        if robot_interface == self.network_config.robot_status_interface:
+    def __setup_for_robot_communication(self, robot_status_interface: str = "lo") -> None:
+        if robot_status_interface == self.robot_status_interface or robot_status_interface == DISCONNECTED:
             return
+
+        error = None
 
         # Create the multicast listeners
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             self.multicast_channel,
             ROBOT_STATUS_PORT,
+            robot_status_interface,
             lambda data: self.__forward_to_proto_unix_io(RobotStatus, data),
             True,
-            robot_interface,
+            error
         )
 
         self.receive_robot_log = tbots_cpp.RobotLogProtoListener(
             self.multicast_channel,
             ROBOT_LOGS_PORT,
+            robot_status_interface,
             lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
             True,
-            robot_interface,
+            error
         )
 
         self.receive_robot_crash = tbots_cpp.RobotCrashProtoListener(
             self.multicast_channel,
             ROBOT_CRASH_PORT,
+            robot_status_interface,
             lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),
             True,
-            robot_interface,
+            error
         )
 
         # Create multicast senders
@@ -209,12 +205,14 @@ class RobotCommunication(object):
             self.send_primitive_set = tbots_cpp.PrimitiveSetProtoRadioSender()
         else:
             self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
-                self.multicast_channel, PRIMITIVE_PORT, True, robot_interface
+                self.multicast_channel, PRIMITIVE_PORT, robot_status_interface, True
             )
         
-        self.network_config.robot_status_interface = robot_interface
+        if error:
+            print(f"Error setting up robot status interface: {error}")
 
-        print(f"[RobotCommunication] Robot interface set to {robot_interface}")
+        self.robot_status_interface = robot_status_interface if not error else DISCONNECTED
+        self.__print_current_network_config()
 
     def close_for_fullsystem(self) -> None:
         if self.receive_ssl_wrapper:
@@ -334,7 +332,7 @@ class RobotCommunication(object):
                     self.setup_for_fullsystem(referee_interface=network_config.referee_interface,
                                               vision_interface=network_config.vision_interface)
                 self.__setup_for_robot_communication(
-                        robot_interface=network_config.robot_status_interface
+                    robot_status_interface=network_config.robot_status_interface
                 )
 
             # total primitives for all robots
@@ -409,8 +407,6 @@ class RobotCommunication(object):
         for RobotStatus, RobotLogs, and RobotCrash msgs, and multicast sender for PrimitiveSet
 
         """
-        self.__setup_for_robot_communication()
-
         self.running = True
 
         self.send_estop_state_thread.start()
@@ -431,3 +427,12 @@ class RobotCommunication(object):
         self.receive_robot_log.close()
         self.receive_robot_status.close()
         self.run_primitive_set_thread.join()
+
+    def __print_current_network_config(self) -> None:
+        def output_string(comm_name: str, status: str) -> str:
+            colour = Fore.RED if status == DISCONNECTED else Fore.GREEN
+            return f"{comm_name} {colour}{status} {Style.RESET_ALL}"
+
+        print(output_string("Robot Status\t", self.robot_status_interface))
+        print(output_string("Vision\t\t", self.vision_interface))
+        print(output_string("Referee\t\t", self.referee_interface))

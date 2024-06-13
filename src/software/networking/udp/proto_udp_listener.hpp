@@ -265,13 +265,6 @@ void ProtoUdpListener<ReceiveProtoT>::close()
             << "An unknown network error occurred when attempting to shutdown UDP socket for "
             << TYPENAME(ReceiveProtoT)
             << ". The boost system error is: " << error_code << ": " << error_code.message() << std::endl;
-        LOG(WARNING) << "arun";
-    }
-
-    LOG(WARNING) << boost::asio::error::not_connected;
-    if (error_code == boost::asio::error::not_connected)
-    {
-        return;
     }
 
     socket_.close(error_code);

@@ -156,6 +156,7 @@ py_library(
     ],
     deps = [
         "//software/thunderscope:constants",
+        requirement("colorama"),
     ],
 )
 

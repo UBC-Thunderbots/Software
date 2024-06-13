@@ -8,10 +8,15 @@ NetworkService::NetworkService(const std::string& ip_address,
     sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
         ip_address, robot_status_sender_port, interface, multicast);
 
+    std::optional<std::string> error;
     udp_listener_primitive_set =
         std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(
             ip_address, primitive_listener_port, interface,
-            boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast);
+            boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast, error);
+    if (error)
+    {
+        LOG(FATAL) << *error;
+    }
 
     radio_listener_primitive_set =
         std::make_unique<ThreadedProtoRadioListener<TbotsProto::PrimitiveSet>>(
