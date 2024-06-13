@@ -100,8 +100,9 @@ def setup_pass_and_robots(
     # this improves the passes generated over time
     robots_to_ignore = []
     for index in range(0, 100):
-        best_pass = pass_generator.getBestPass(world, robots_to_ignore).pass_value
+        best_pass_with_score = pass_generator.getBestPass(world, robots_to_ignore)
 
+    best_pass = best_pass_with_score.pass_value
     kick_vec = tbots_cpp.Vector(
         best_pass.receiverPoint().x() - best_pass.passerPoint().x(),
         best_pass.receiverPoint().y() - best_pass.passerPoint().y(),
@@ -328,7 +329,7 @@ def test_passing_receive_speed(
             tbots_cpp.Point(0.8, 0),
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(1, 0),
-            [tbots_cpp.Point(-1, 0), tbots_cpp.Point(2.5, 2.5)],
+            [tbots_cpp.Point(2.5, 2.5), tbots_cpp.Point(-1, 0)],
             [math.pi, 0],
             [],
         ),
@@ -371,7 +372,7 @@ def test_passing_no_backwards_passes(
         receiver_robot_positions=receiver_robot_positions,
         friendly_orientations=friendly_orientations,
         enemy_robot_positions=enemy_robot_positions,
-        receive_pass=False,
+        receive_pass=True,
         simulated_test_runner=simulated_test_runner,
     )
 

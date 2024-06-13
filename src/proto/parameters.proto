@@ -113,12 +113,12 @@ message PassingConfig
 
     /*****  Pass generation parameters *****/
     // The number of passes to sample per robot.
-    required uint32 pass_gen_num_samples_per_robot = 22
+    required uint32 pass_gen_num_samples_per_robot = 21
         [default = 5, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
     // The minimum standard deviation (in meters) of the normal sampling distribution
     // used to generate passes around robots. This STD is used when the robot is
     // stationary.
-    required double pass_gen_min_rand_sample_std_dev_meters = 21 [
+    required double pass_gen_min_rand_sample_std_dev_meters = 22 [
         default                   = 0.4,
         (bounds).min_double_value = 0.01,
         (bounds).max_double_value = 3.0
@@ -164,9 +164,13 @@ message PassingConfig
     // to the goal having less of an effect.
     required double static_field_position_quality_friendly_goal_distance_weight = 3
         [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // The estimated delay in seconds between the time we commit to a pass and the time
+    // the pass is taken.
+    required double pass_delay_sec = 12
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
     // The extra time added to the minimum time that it will take a friendly
     // robot to reach the receiving position and orientation.
-    required double friendly_time_to_receive_slack_sec = 12
+    required double friendly_time_to_receive_slack_sec = 13
         [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
     // This controls how heavily we weigh an enemy robot being near the pass
     // receiver when calculating enemy risk to a pass
@@ -180,8 +184,11 @@ message PassingConfig
     // is exactly correct, with higher values meaning that the enemy will take longer
     // to intercept the pass, and lower values meaning that the enemy will intercept
     // the pass earlier than we anticipate.
-    required double enemy_interception_time_multiplier = 14
-        [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    required double enemy_interception_time_multiplier = 14 [
+        default                   = 1.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
     // This controls how heavily we weigh the time the enemy team has to intercept a pass.
     // Increasing this value increases the risk (decreasing the score) associated with a
     // pass that the enemy could intercept.
@@ -193,21 +200,21 @@ message PassingConfig
     // The distance in meters along the x-axis from the passer that we prefer the receiver
     // to be when receiving a pass on the friendly half. Note that this is a soft limit
     // and the receiver may be further back.
-    required double backwards_pass_distance_meters = 13 [
+    required double backwards_pass_distance_meters = 16 [
         default                   = -1.0,
         (bounds).min_double_value = -10.0,
         (bounds).max_double_value = 5.0
     ];
     // The max distance in meters that the receiver can be from the passer when receiving
     // a pass.
-    required double receiver_ideal_max_distance_meters = 16 [
+    required double receiver_ideal_max_distance_meters = 17 [
         default                   = 10.0,
         (bounds).min_double_value = 0.1,
         (bounds).max_double_value = 20.0
     ];
     // The min distance in meters that the receiver can be from the passer when receiving
     // a pass.
-    required double receiver_ideal_min_distance_meters = 17 [
+    required double receiver_ideal_min_distance_meters = 18 [
         default                   = 1.5,
         (bounds).min_double_value = 0.1,
         (bounds).max_double_value = 20.0
@@ -215,7 +222,7 @@ message PassingConfig
     // The minimum open angle (in degrees) for an ideal shot on enemy goal from the
     // receiver's position. Any angle greater than this is also considered ideal, where as
     // angles below this are considered less ideal and are given a lower score.
-    required double min_ideal_pass_shoot_goal_open_angle_deg = 18 [
+    required double min_ideal_pass_shoot_goal_open_angle_deg = 19 [
         default                   = 10.0,
         (bounds).min_double_value = 1.0,
         (bounds).max_double_value = 45.0
@@ -223,12 +230,8 @@ message PassingConfig
     // The min score that ratePassShootScore return. Used to limit the cost function
     // from returning a very low score, causing the rest of the cost functions to be
     // ignored.
-    required double min_pass_shoot_score = 19
+    required double min_pass_shoot_score = 20
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-    // The estimated delay in seconds between the time we commit to a pass and the time
-    // the pass is taken.
-    required double pass_delay_sec = 20
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     /*****  PassSkill parameters *****/
     // The absolute minimum pass quality we're willing to attempt
@@ -530,9 +533,10 @@ message CostVisualizationConfig
     required bool pass_enemy_risk          = 5 [default = false];
     required bool pass_shoot_score         = 6 [default = false];
     required bool enemy_proximity_risk     = 9 [default = false];
+    required bool enemy_interception_risk  = 10 [default = false];
 
-    required bool passer_position_score   = 10 [default = false];
-    required bool receiver_position_score = 11 [default = false];
+    required bool passer_position_score   = 11 [default = false];
+    required bool receiver_position_score = 12 [default = false];
 }
 
 message PassGeneratorVisualizationConfig

@@ -403,7 +403,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("getBestPass", &PassGenerator::getBestPass);
 
     py::class_<PassWithRating, std::unique_ptr<PassWithRating>>(m, "PassWithRating")
-        .def_readwrite("pass_value", &PassWithRating::pass);
+        .def_readwrite("pass_value", &PassWithRating::pass)
+        .def_readwrite("rating", &PassWithRating::rating);
 
     py::class_<Pass, std::unique_ptr<Pass>>(m, "Pass")
         .def("passerPoint", &Pass::passerPoint)

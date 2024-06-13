@@ -177,12 +177,10 @@ INSTANTIATE_TEST_CASE_P(
         // If we are noticing issues with one-touch on the field, we should
         // add more tests here and explore more of the "one-touch" space
 
-        // TODO (#2577): re-enable once fixed
-        //        std::make_tuple(Pass(Point(4.0, 1.5), Point(4, -1), 5),
-        //                        RobotStateWithId{1, RobotState(Point(4.0, -1), Vector(0,
-        //                        0),
-        //                                                       Angle::fromDegrees(180),
-        //                                                       Angle::fromDegrees(0))}),
+        std::make_tuple(Pass(Point(4.0, 1.5), Point(4, -1), 5),
+                        RobotStateWithId{1, RobotState(Point(4.0, -1), Vector(0, 0),
+                                                       Angle::fromDegrees(180),
+                                                       Angle::fromDegrees(0))}),
 
         // TODO (#2570): re-enable when one-touch works for these tests
         // std::make_tuple(Pass(Point(4.0, 1.5), Point(3.5, -1), 5),
@@ -196,12 +194,10 @@ INSTANTIATE_TEST_CASE_P(
                                                        Angle::fromDegrees(180),
                                                        Angle::fromDegrees(0))}),
 
-        // TODO (#2577): re-enable once fixed
-        //        std::make_tuple(Pass(Point(4.0, -1.5), Point(4, 1), 5),
-        //                        RobotStateWithId{1, RobotState(Point(4.0, 1), Vector(0,
-        //                        0),
-        //                                                       Angle::fromDegrees(180),
-        //                                                       Angle::fromDegrees(0))}),
+        std::make_tuple(Pass(Point(4.0, -1.5), Point(4, 1), 5),
+                        RobotStateWithId{1, RobotState(Point(4.0, 1), Vector(0, 0),
+                                                       Angle::fromDegrees(180),
+                                                       Angle::fromDegrees(0))}),
 
         // TODO (#2570): re-enable when one-touch works for these tests
         // std::make_tuple(Pass(Point(4.0, -1.5), Point(3.5, 1), 5),

@@ -45,12 +45,6 @@ if __name__ == "__main__":
         help="Compile binaries with debug symbols",
     )
     parser.add_argument(
-        "-gdb",
-        "--run_under_gdb",
-        action="store_true",
-        help="Run the binaries under gdb",
-    )
-    parser.add_argument(
         "-ds",
         "--select_debug_binaries",
         choices=["sim", "blue", "yellow"],
@@ -166,18 +160,6 @@ if __name__ == "__main__":
             unknown_args += ["--debug_blue_full_system"]
         if "yellow" in args.select_debug_binaries:
             unknown_args += ["--debug_yellow_full_system"]
-
-    # If its a binary, then run under gdb. We need to special case thunderscope
-    # because it relies on --debug_simulator, --debug_blue_full_system and
-    # --debug_yellow_full_system prompts the user to run the command under gdb
-    # instead. So we only run_under gdb if its _not_ a thunderscope debug command
-    if args.action in "run" and args.debug_build and args.run_under_gdb:
-        if (
-            "--debug_yellow_full_system" not in unknown_args
-            and "--debug_blue_full_system" not in unknown_args
-            and "--debug_simulator" not in unknown_args
-        ):
-            command += ["--run_under=gdb"]
 
     # To run the Tracy profile, enable the TRACY_ENABLE macro
     if args.tracy:
