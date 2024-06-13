@@ -309,6 +309,11 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                             Vector(0, 0), closest_enemy->timestamp());
             }
         }
+
+        // we shouldn't trust breakbeam so we reset the dribbler and its associated
+        // variables
+        friendly_robot_id_with_ball_in_dribbler = std::nullopt;
+        ball_in_dribbler_timeout                = 0;
     }
 
     if (ball && field)

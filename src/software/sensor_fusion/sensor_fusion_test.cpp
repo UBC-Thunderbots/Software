@@ -880,7 +880,7 @@ TEST_F(SensorFusionTest, breakbeam_pass_update_test)
 {
     // The following code test this thing: if the breakbeam is triggered and the position
     // of the robot and the ball given by the ssl vision system is less than a certain
-    // threshold, we should expcet the ball position to be updated as the position of the
+    // threshold, we should expect the ball position to be updated as the position of the
     // ssl robot_position packet!.
     SensorProto sensor_msg;
 
