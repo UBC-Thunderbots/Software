@@ -2,6 +2,7 @@
 
 #include <iomanip>
 
+#include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
 PassGenerator::PassGenerator(const TbotsProto::PassingConfig& passing_config)
@@ -38,14 +39,14 @@ PassWithRating PassGenerator::getBestPass(const World& world,
                 debug_shapes.push_back(*createDebugShape(
                     Stadium(world.friendlyTeam().getRobotById(robot_id)->position(),
                             receiving_position, 0.02),
-                    std::to_string(debug_shapes.size()) + "gdpg"));
+                    std::to_string(debug_shapes.size()) + "pg"));
             }
         }
         std::stringstream stream;
         stream << "BP:" << std::fixed << std::setprecision(3) << best_pass.rating;
-        debug_shapes.push_back(*createDebugShape(
-            Circle(best_pass.pass.receiverPoint(), 0.05),
-            std::to_string(debug_shapes.size()) + "gdpg", stream.str()));
+        debug_shapes.push_back(
+            *createDebugShape(Circle(best_pass.pass.receiverPoint(), 0.05),
+                              std::to_string(debug_shapes.size()) + "pg", stream.str()));
         LOG(VISUALIZE) << *createDebugShapes(debug_shapes);
     }
 
@@ -106,7 +107,11 @@ std::map<RobotId, std::vector<Point>> PassGenerator::sampleReceivingPositionsPer
         {
             auto point = Point(x_normal_distribution(random_num_gen_),
                                y_normal_distribution(random_num_gen_));
-            receiving_positions_map[robot.id()].push_back(point);
+            // Only consider points within the playing area
+            if (contains(world.field().fieldLines(), point))
+            {
+                receiving_positions_map[robot.id()].push_back(point);
+            }
         }
     }
 
