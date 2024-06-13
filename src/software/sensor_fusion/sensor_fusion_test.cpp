@@ -914,9 +914,9 @@ TEST_F(SensorFusionTest, breakbeam_pass_update_test)
     *(robot_msg->mutable_power_status()) = *power_status_msg;
 
     // create ssl wrapper packet
-    auto gemotry_data = initSSLDivBGeomData();
+    auto geometry_data = initSSLDivBGeomData();
     auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::move(gemotry_data), std::move(frame));
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
 
@@ -936,9 +936,9 @@ TEST_F(SensorFusionTest, breakbeam_pass_update_test)
     std::unique_ptr<SSLProto::SSL_DetectionFrame> new_frame =
         createSSLDetectionFrame(camera_id, new_time, frame_number, {ball_state},
                                 yellow_robot_states, blue_robot_states);
-    auto gemotry_data_copy = initSSLDivBGeomData();
+    auto geomotry_data_copy = initSSLDivBGeomData();
     auto new_packet =
-        createSSLWrapperPacket(std::move(gemotry_data_copy), std::move(new_frame));
+        createSSLWrapperPacket(std::move(geomotry_data_copy), std::move(new_frame));
     *(sensor_msg.mutable_ssl_vision_msg()) = *new_packet;
     sensor_fusion.processSensorProto(sensor_msg);
 
@@ -994,9 +994,9 @@ TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
     *(robot_msg->mutable_power_status()) = *power_status_msg;
 
     // create ssl wrapper packet
-    auto gemotry_data = initSSLDivBGeomData();
+    auto geometry_data = initSSLDivBGeomData();
     auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::move(gemotry_data), std::move(frame));
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
 
