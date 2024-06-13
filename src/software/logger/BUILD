@@ -19,6 +19,7 @@ cc_library(
         "custom_logging_levels.h",
         "logger.h",
     ],
+    linkopts = ["-lstdc++fs"],
     deps = [
         ":coloured_cout_sink",
         ":csv_sink",
@@ -28,7 +29,6 @@ cc_library(
         "@g3log",
         "@g3sinks",
     ],
-    linkopts = ["-lstdc++fs"],
 )
 
 cc_library(
