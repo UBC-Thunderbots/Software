@@ -11,6 +11,7 @@ from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
+from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from datetime import datetime
 from google.protobuf.message import DecodeError, Message
@@ -81,8 +82,10 @@ class ProtoPlayer:
 
         # Start playing thread
         self.seek(0.0)
-        self.thread = threading.Thread(target=self.__play_protobufs, daemon=True)
+        self.thread = threading.Thread(target=self.__play_protobufs_wrapper, daemon=True)
         self.thread.start()
+
+        self.error_bit_flag = NO_ERROR_FLAG 
 
     def sort_and_get_replay_files(self, log_folder_path):
         """
@@ -121,6 +124,15 @@ class ProtoPlayer:
             return False
         except Exception:
             return True
+
+    def is_it_playing(self) -> bool: 
+        """
+        return whether or not the proto player is being played?
+
+        :return: whether or not proto player is playing!
+        """
+
+        return self.is_playing
 
     def find_actual_endtime(self) -> float:
         """
@@ -429,6 +441,37 @@ class ProtoPlayer:
                 return mid
 
         return min(abs(low), abs(high))
+
+    def __play_protobufs_wrapper(self) -> None: 
+        """
+        this function essentially executes __play_protobufs. However, the intention of this function 
+        is for testing purposes. __play_protobufs is launched in a different thread, it would be useful to know 
+        if there are uncaught exceptions. This is then used to test the robustness of the __play_protobufs
+        function when dealing with corrupted replay files.
+
+        As such, most of time, this function acts the same as self.__play_protobufs
+
+        :return: None
+        """
+
+        try:
+            self.__play_protobufs()
+        except Exception as e:
+            logging.exception("there is an uncaught exception when playing protobufs: {}".format(e))
+            # setting the error bit flags
+            self.error_bit_flag |= UNCAUGHT_EXCEPTION_FLAG
+            self.is_playing = False
+
+
+    def get_error_bit_flag(self) -> int: 
+        """
+        the error bit flags is defined as the following: 
+            1 if there is an uncaught exception in the code
+            0 if success
+
+        :return: the error bit flags. 
+        """
+        return self.error_bit_flag
 
     def __play_protobufs(self) -> None:
         """Plays all protos in the file in chronologoical order.
