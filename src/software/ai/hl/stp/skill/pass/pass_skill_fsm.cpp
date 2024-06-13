@@ -10,6 +10,16 @@ bool PassSkillFSM::passFound(const Update& event)
         return false;
     }
 
+    const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
+    const auto ai_config = event.common.strategy->getAiConfig();
+    const double min_pass_speed = ai_config.passing_config().min_pass_speed_m_per_s();
+    
+    // Ball needs to slow down before it is passed 
+    if (ball_velocity >= min_pass_speed)
+    {
+        return false;
+    }
+
     // Friendly robot must be in the vicinity of the receiver point
     // in order for pass to be valid
     std::vector<Robot> friendly_robots =
@@ -31,9 +41,12 @@ void PassSkillFSM::findPass(
     // looking for "perfect" passes (with a score of 1) and decreasing this threshold
     // over time
 
-    const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
-    double abs_min_pass_score = ai_config.passing_config().abs_min_pass_score();
-    double pass_score_ramp_down_duration =
+    const auto ai_config = event.common.strategy->getAiConfig();
+    const double abs_min_pass_score = 
+        ai_config.passing_config().abs_min_pass_score();
+    const double min_perfect_pass_score = 
+        ai_config.passing_config().min_perfect_pass_score();
+    const double pass_score_ramp_down_duration =
         ai_config.passing_config().pass_score_ramp_down_duration();
 
     if (!pass_optimization_start_time)
@@ -43,9 +56,10 @@ void PassSkillFSM::findPass(
 
     time_since_commit_stage_start =
         event.common.world_ptr->getMostRecentTimestamp() - *pass_optimization_start_time;
-    min_pass_score_threshold_ = 1.0 - std::min(time_since_commit_stage_start.toSeconds() /
-                                                   pass_score_ramp_down_duration,
-                                               1.0 - abs_min_pass_score);
+    min_pass_score_threshold_ = min_perfect_pass_score - 
+                                std::min(time_since_commit_stage_start.toSeconds() /
+                                             pass_score_ramp_down_duration,
+                                         min_perfect_pass_score - abs_min_pass_score);
 
     Point receiver_point      = best_pass_so_far_->pass.receiverPoint();
     Point dribble_destination = event.common.world_ptr->ball().position();
