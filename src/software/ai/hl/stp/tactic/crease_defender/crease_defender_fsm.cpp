@@ -1,4 +1,5 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
@@ -95,6 +96,13 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
     Rectangle inflated_defense_area =
         field.friendlyDefenseArea().expand(robot_radius_expansion_amount);
 
+    LOG(VISUALIZE) << *createDebugShapesMap({
+        {"RayStartPosition", *createShapeProto(Circle(ray.getStart(), 0.05))},
+        {"Ray", *createShapeProto(Polygon::fromSegment(Segment(ray.getStart(), ray.getStart()
+                                                                               + ray.toUnitVector().normalize(10)), 0.05))},
+        {"InflatedBox", *createShapeProto(inflated_defense_area)},
+            });
+
     auto front_segment = Segment(inflated_defense_area.posXPosYCorner(),
                                  inflated_defense_area.posXNegYCorner());
     auto left_segment  = Segment(inflated_defense_area.posXPosYCorner(),
@@ -125,5 +133,8 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
             return right_intersections[0];
         }
     }
+
+    //TODO: Intersection Unit Tests, and
+
     return std::nullopt;
 }
