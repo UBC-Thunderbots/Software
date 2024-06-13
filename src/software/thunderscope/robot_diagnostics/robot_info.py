@@ -130,6 +130,7 @@ class RobotInfo(QWidget):
             label_text="RTT:",
             initial_value="NA",
             max_val=MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
+            min_val=MIN_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME
         )
         self.previous_primitive_rtt_values = deque(
             maxlen=MAX_LENGTH_PRIMITIVE_SET_STORE

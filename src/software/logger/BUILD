@@ -28,6 +28,7 @@ cc_library(
         "@g3log",
         "@g3sinks",
     ],
+    linkopts = ["-lstdc++fs"],
 )
 
 cc_library(
