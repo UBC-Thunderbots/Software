@@ -18,11 +18,10 @@ from typing import Callable, Type
 
 
 class ProtoPlayer:
-
     """Plays back a proto log folder. All the playback is handled by a worker
     thread running in the background.
-        
-        
+
+
                              current_chunk
                                   │
                                   │
@@ -37,7 +36,7 @@ class ProtoPlayer:
                     │             └──current_chunk_index
                     │
              current_entry_index
-        
+
     The player will load chunks in order and play them back at the given playback
     speed. If the seek function is called with a specific time, the player will
     update the 3 variables (shown above) to point to the chunk and entry (in the
@@ -50,7 +49,7 @@ class ProtoPlayer:
 
         :param log_folder_path: The path to the log file.
         :param proto_unix_io: The proto_unix_io to send the protos to.
-            
+
         """
         self.log_folder_path = log_folder_path
         self.proto_unix_io = proto_unix_io
@@ -87,7 +86,7 @@ class ProtoPlayer:
 
     def sort_and_get_replay_files(self, log_folder_path):
         """
-        Sorting the replay files 
+        Sorting the replay files
 
         :param log_folder_path: the path to the folder that we are going to be sorting!
         :return: the sorted replay files
@@ -117,20 +116,18 @@ class ProtoPlayer:
         :param log_entry: the log entry we are checking
         :return: False if we could unpack the log entry, True otherwise
         """
-        try: 
+        try:
             _ = ProtoPlayer.unpack_log_entry(log_entry)
             return False
-        except Exception: 
-            logging.warning("There exist log entries that are corrupt.")
-            return True 
+        except Exception:
+            return True
 
-
-    def find_actual_endtime(self)->float:
+    def find_actual_endtime(self) -> float:
         """
         Finding the last end time.
-        Note that the end time may not necessarily be the last message in the last chunks since there may be 
+        Note that the end time may not necessarily be the last message in the last chunks since there may be
         file corruptions. We also assume a chronological order in the chunks data!
-        
+
         :return: the last end time, if no end time are found, return 0.0s
         """
         # reverse iterating over the chunks (file)
@@ -167,11 +164,17 @@ class ProtoPlayer:
 
                     if not ProtoPlayer.is_log_entry_corrupt(line):
                         cached_data.append(line)
+                    else:
+                        logging.warning(
+                            "There are log entires that are corrupted. Entires ignored!"
+                        )
                 except EOFError:
                     break
 
                 except Exception:
-                    logging.warning("Some unknown exception have occured. Error ignored in ProtoPlayer")
+                    logging.warning(
+                        "Some unknown exception have occured. Error ignored in ProtoPlayer"
+                    )
 
         return cached_data
 
@@ -210,7 +213,7 @@ class ProtoPlayer:
         :param filename: The file to save to
         :param start_time: the start time for the clip
         :param end_time: the end time for the clip
-    
+
         """
         if not filename:
             print("No filename selected")
@@ -306,8 +309,7 @@ class ProtoPlayer:
             self.play()
 
     def single_step_forward(self) -> None:
-        """Steps the player forward by one log entry
-        """
+        """Steps the player forward by one log entry"""
         self.pause()
         self.current_entry_index = self.current_entry_index + 1
         self.current_chunk_index = self.current_chunk_index
@@ -347,6 +349,7 @@ class ProtoPlayer:
         :param seek_time: The time to seek to.
 
         """
+
         # Let's binary search through the chunks to find the chunk that starts
         # with a timestamp less than (but closest to) the seek_time we want
         # to seek to.
@@ -428,7 +431,7 @@ class ProtoPlayer:
         return min(abs(low), abs(high))
 
     def __play_protobufs(self) -> None:
-        """Plays all protos in the file in chronologoical order. 
+        """Plays all protos in the file in chronologoical order.
 
         Playback controls:
             - Play/Pause through self.is_playing
