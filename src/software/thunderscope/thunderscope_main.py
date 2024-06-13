@@ -254,7 +254,7 @@ if __name__ == "__main__":
             {"proto_class": PassVisualization},
             {"proto_class": AttackerVisualization},
             {"proto_class": CostVisualization},
-            {"proto_class": DebugShapesMap},
+            {"proto_class": DebugShapes},
             {"proto_class": NamedValue},
             {"proto_class": PrimitiveSet},
             {"proto_class": World},
