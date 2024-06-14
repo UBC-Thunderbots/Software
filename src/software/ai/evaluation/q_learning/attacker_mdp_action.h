@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/hl/stp/skill/keep_away/keep_away_skill.h"
-#include "software/ai/hl/stp/skill/one_touch/one_touch_skill.h"
 #include "software/ai/hl/stp/skill/pass/pass_skill.hpp"
 #include "software/ai/hl/stp/skill/shoot/shoot_skill.hpp"
 #include "software/ai/strategy.h"
@@ -17,7 +16,6 @@ MAKE_REFLECTIVE_ENUM(AttackerMdpAction,
                      KEEP_AWAY, 
                      CHIP_PASS, 
                      KICK_PASS, 
-                     ONE_TOUCH, 
                      SHOOT, 
                      DRIBBLE_SHOOT)
 

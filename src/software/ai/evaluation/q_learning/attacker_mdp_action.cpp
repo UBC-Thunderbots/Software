@@ -11,8 +11,6 @@ std::unique_ptr<Skill> createSkillFromAttackerMdpAction(
             return std::make_unique<ChipPassSkill>(strategy);
         case AttackerMdpAction::KICK_PASS:
             return std::make_unique<KickPassSkill>(strategy);
-        case AttackerMdpAction::ONE_TOUCH:
-            return std::make_unique<OneTouchSkill>(strategy);
         case AttackerMdpAction::SHOOT:
             return std::make_unique<ShootSkill>(strategy);
         case AttackerMdpAction::DRIBBLE_SHOOT:
