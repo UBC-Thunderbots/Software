@@ -116,7 +116,8 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
 
     // Linearly scale score to [min_pass_shoot_score, 1.0] to stop this cost function
     // from returning a very low score, causing the other cost functions to be ignored.
-    return scaleNormalizedRating(shot_score, passing_config.min_pass_shoot_score(), 1.0);
+    return normalizeValueToRange(shot_score, 0.0, 1.0,
+                                 passing_config.min_pass_shoot_score(), 1.0);
 }
 
 double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
@@ -348,11 +349,6 @@ double rateKeepAwayPosition(const Point& keep_away_position, const World& world,
            circleSigmoid(keepaway_search_region, keep_away_position, SIGMOID_WIDTH) *
            // don't try to dribble the ball off the field
            rectangleSigmoid(dribbling_bounds, keep_away_position, SIGMOID_WIDTH);
-}
-
-double scaleNormalizedRating(double rating, double min, double max)
-{
-    return rating * (max - min) + min;
 }
 
 void samplePassesForVisualization(const World& world,
