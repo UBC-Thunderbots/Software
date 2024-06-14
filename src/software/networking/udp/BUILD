@@ -10,6 +10,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "network_utils_test",
+    srcs = [
+        "network_utils_test.cpp",
+    ],
+    deps = [
+        ":network_utils",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
 cc_library(
     name = "proto_udp_listener",
     hdrs = [
@@ -46,6 +57,17 @@ cc_library(
     deps = [
         ":proto_udp_listener",
         "@boost//:asio",
+    ],
+)
+
+cc_test(
+    name = "threaded_proto_udp_listener_test",
+    srcs = [
+        "threaded_proto_udp_listener_test.cpp",
+    ],
+    deps = [
+        ":threaded_proto_udp_listener",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
