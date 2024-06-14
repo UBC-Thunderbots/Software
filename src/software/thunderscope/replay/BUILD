@@ -45,17 +45,3 @@ py_binary(
         "//proto:import_all_protos",
     ],
 )
-
-py_test(
-    name = "replay_corruption_test", 
-    srcs = [
-        'replay_corruption_test.py',
-    ],
-    deps = [
-        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
-        "//proto:import_all_protos",
-        "//software/thunderscope:proto_unix_io",
-        ":proto_logger", 
-        ":proto_player"
-    ]
-)

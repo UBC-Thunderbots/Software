@@ -178,7 +178,7 @@ class ProtoPlayer:
                         cached_data.append(line)
                     else:
                         logging.warning(
-                            "There are log entires that are corrupted. Entires ignored!"
+                            "There are log entries that are corrupted. Entries ignored!"
                         )
                 except EOFError:
                     break

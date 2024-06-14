@@ -152,7 +152,7 @@ def cleanup():
     """
     shutil.rmtree(TMP_REPLAY_SAVE_PATH)
 
-def create_test_player()() -> ProtoPlayer:
+def create_test_player() -> ProtoPlayer:
     """
     Creating a protoplayer and setting a seed so that the generated 
     replay file stays the same over time!

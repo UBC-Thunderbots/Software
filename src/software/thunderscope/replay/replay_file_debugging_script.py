@@ -41,6 +41,10 @@ if __name__ == "__main__":
             line = replay_file.readline()
             line_num = 0
             while line is not None:
+                # do not parse empty line
+                if line == b"":
+                    continue 
+
                 try:
                     timestamp, protobuf_type, data = line.split(
                         bytes(REPLAY_METADATA_DELIMETER, encoding="utf-8")
