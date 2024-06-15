@@ -44,8 +44,8 @@ void CreaseDefenderFSM::blockThreat(
     }
     else
     {
-        if (event.control_params.enemy_threat_origin.x()
-            >= event.common.world_ptr->field().friendlyDefenseArea().negXNegYCorner().x())
+        if (event.control_params.enemy_threat_origin.x() >=
+            event.common.world_ptr->field().friendlyDefenseArea().negXNegYCorner().x())
         {
             LOG(WARNING)
                 << "Could not find a point on the defense area to block a potential shot";
@@ -134,7 +134,7 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
         ray.getStart().y() > inflated_defense_area.posXNegYCorner().y())
     {
         // Returns in center front of box if the ball is already in the goalie box
-        return Point(inflated_defense_area.posXPosYCorner().x() , 0);
+        return Point(inflated_defense_area.posXPosYCorner().x(), 0);
     }
 
     return std::nullopt;
