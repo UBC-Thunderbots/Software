@@ -317,7 +317,7 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createSegmentProto", &createSegmentProto);
     m.def("createStadiumProto", &createStadiumProto);
 
-    m.def("createGeometryData", &createGeometryData);
+    m.def("createGeometryDataProto", &createGeometryDataProto);
 
     m.def("contains", py::overload_cast<const Circle&, const Segment&>(&contains));
     m.def("contains", py::overload_cast<const Circle&, const Point&>(&contains));

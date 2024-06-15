@@ -160,7 +160,7 @@ class SensorFusionTest : public ::testing::Test
     {
         Field field           = Field::createSSLDivisionBField();
         const float thickness = 0.005f;
-        return createGeometryData(field, thickness);
+        return createGeometryDataProto(field, thickness);
     }
 
     World initWorld()

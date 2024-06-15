@@ -98,7 +98,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 
 void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet)
 {
-    field = createField(geometry_packet);
+    field = createFieldProto(geometry_packet);
     if (!field)
     {
         LOG(WARNING)
