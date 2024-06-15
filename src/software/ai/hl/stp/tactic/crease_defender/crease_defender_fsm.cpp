@@ -1,4 +1,5 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
+#include "software/geom/algorithms/contains.h"
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
@@ -129,9 +130,7 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
         }
     }
     // Check to see if ray is within goalie box to ignore
-    if (ray.getStart().x() < inflated_defense_area.posXPosYCorner().x() &&
-        ray.getStart().y() < inflated_defense_area.posXPosYCorner().y() &&
-        ray.getStart().y() > inflated_defense_area.posXNegYCorner().y())
+    if (contains(inflated_defense_area, ray.getStart()))
     {
         // Returns in center front of box if the ball is already in the goalie box
         return Point(inflated_defense_area.posXPosYCorner().x() , 0);
