@@ -24,6 +24,27 @@ struct PassSkillFSM
     bool passFound(const Update& event);
 
     /**
+     * Guard that checks if the ball has been received by another friendly
+     * robot, completing the pass
+     *
+     * @param event the SuspendedUpdate event
+     *
+     * @return true if the pass was received, false otherwise
+     */
+    bool passReceived(const SuspendedUpdate& event);
+
+    /**
+     * Guard that checks if the current pass should be aborted
+     * (because the ball went astray from the target receiver point,
+     * stopped moving, got intercepted, etc.)
+     *
+     * @param event the SuspendedUpdate event
+     *
+     * @return true if the pass should be aborted, false otherwise
+     */
+    bool shouldAbortPass(const SuspendedUpdate& event);
+
+    /**
      * Action that updates the DribbleSkillFSM to get control of the ball,
      * while simultaneously updating the best pass so far
      *
@@ -42,6 +63,15 @@ struct PassSkillFSM
     void takePass(const Update& event,
                   boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
 
+    /**
+     * Action to take while the skill is suspended.
+     * This will keep committing the pass that was taken so that receivers retain
+     * knowledge of the committed pass while this skill is suspended.
+     *
+     * @param event the SuspendedUpdate event
+     */
+    void keepPassCommitted(const SuspendedUpdate& event);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -50,15 +80,23 @@ struct PassSkillFSM
         DEFINE_SML_STATE(PivotKickSkillFSM)
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_GUARD(passFound)
+        DEFINE_SML_GUARD(passReceived)
+        DEFINE_SML_GUARD(shouldAbortPass)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(findPass, DribbleSkillFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(takePass, PivotKickSkillFSM)
+        DEFINE_SML_ACTION(keepPassCommitted)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *DribbleSkillFSM_S + Update_E[passFound_G] / takePass_A = PivotKickSkillFSM_S,
             DribbleSkillFSM_S + Update_E / findPass_A,
+
             PivotKickSkillFSM_S + Update_E / takePass_A,
-            PivotKickSkillFSM_S = X,
+            PivotKickSkillFSM_S = Suspended_S,
+
+            Suspended_S + SuspendedUpdate_E[passReceived_G || shouldAbortPass_G] = X,
+            Suspended_S + SuspendedUpdate_E / keepPassCommitted_A = Suspended_S,
+
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 

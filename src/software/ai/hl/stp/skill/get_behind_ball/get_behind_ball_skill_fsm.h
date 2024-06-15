@@ -69,6 +69,7 @@ struct GetBehindBallSkillFSM
             // src_state + event [guard] / action = dest_state
             *GetBehindBallState_S + Update_E[!behindBall_G] / updateMove_A,
             GetBehindBallState_S + Update_E[behindBall_G] / updateMove_A = X,
+            Suspended_S + SuspendedUpdate_E = X,
             X + Update_E[!behindBall_G] / updateMove_A = GetBehindBallState_S,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION   = X);
     }

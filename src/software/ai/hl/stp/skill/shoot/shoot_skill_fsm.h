@@ -35,6 +35,7 @@ struct ShootSkillFSM
             return make_transition_table(
                 // src_state + event [guard] / action = dest_state
                 *DribbleSkillFSM_S + Update_E / getBallControl_A, DribbleSkillFSM_S = X,
+                Suspended_S + SuspendedUpdate_E = X,
                 X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
         }
     };
@@ -102,6 +103,8 @@ struct ShootSkillFSM
             DribbleSkillFSM_S = PivotKickSkillFSM_S,
 
             PivotKickSkillFSM_S + Update_E / pivotKick_A, PivotKickSkillFSM_S = X,
+
+            Suspended_S + SuspendedUpdate_E = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 

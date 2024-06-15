@@ -65,6 +65,7 @@ struct KickSkillFSM
             GetBehindBallSkillFSM_S                               = KickState_S,
             KickState_S + Update_E[!ballChicked_G] / updateKick_A = KickState_S,
             KickState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
+            Suspended_S + SuspendedUpdate_E = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }
 };

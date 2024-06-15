@@ -186,6 +186,7 @@ struct DribbleSkillFSM
             LoseBall_S + Update_E[lostBallControl_G] / getBallControl_A =
                 GetBallControl_S,
             LoseBall_S + Update_E / loseBall_A,
+            Suspended_S + SuspendedUpdate_E = X,
             X + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
             X + Update_E[!dribblingDone_G] / dribble_A         = Dribble_S,
             X + Update_E / dribble_A                           = X);

@@ -19,14 +19,24 @@ void OffensivePlay::terminate(const WorldPtr& world_ptr)
 
 void OffensivePlay::updateTactics(const PlayUpdate& play_update)
 {
-    int num_defenders  = std::min(play_update.num_tactics - 1, 2u);
-    int num_supporters = play_update.num_tactics - num_defenders - 1;
+    PriorityTacticVector tactics;
+    tactics.reserve(play_update.num_tactics);
+
+    if (!attacker_tactic_->suspended(play_update.world_ptr))
+    {
+        tactics.push_back({attacker_tactic_});
+    }
+
+    int num_attackers  = static_cast<unsigned int>(tactics.size());
+    int num_defenders  = std::min(play_update.num_tactics - num_attackers, 2u);
+    int num_supporters = play_update.num_tactics - num_attackers - num_defenders;
 
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
     defense_play_->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     defense_play_->updateTactics(PlayUpdate(
         play_update.world_ptr, num_defenders,
-        [&](PriorityTacticVector new_tactics) {
+        [&](PriorityTacticVector new_tactics)
+        {
             for (auto& tactic_vec : new_tactics)
             {
                 defense_tactics.insert(defense_tactics.end(), tactic_vec.begin(),
@@ -38,7 +48,10 @@ void OffensivePlay::updateTactics(const PlayUpdate& play_update)
 
     updateSupportTactics(num_supporters);
 
-    play_update.set_tactics({{attacker_tactic_}, defense_tactics, support_tactics_});
+    tactics.push_back(defense_tactics);
+    tactics.push_back(support_tactics_);
+
+    play_update.set_tactics(tactics);
 }
 
 static TGenericFactory<std::string, Play, OffensiveFriendlyThirdPlay,

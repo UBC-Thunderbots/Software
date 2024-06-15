@@ -20,9 +20,11 @@ class BaseSkill : public Skill
 
     void reset(const Robot& robot) override;
 
+    std::string getFSMState(RobotId robot_id) const override;
+
     bool done(const RobotId& robot) const override;
 
-    std::string getFSMState(RobotId robot_id) const override;
+    bool suspended(const RobotId& robot, const WorldPtr& world_ptr) override;
 
    protected:
     explicit BaseSkill(std::shared_ptr<Strategy> strategy)
@@ -44,8 +46,9 @@ void BaseSkill<TSkillFSM, TSkillSubFSMs...>::updatePrimitive(
         reset(robot);
     }
 
-    fsm_map_[robot.id()]->process_event(typename TSkillFSM::Update(
-        control_params_, SkillUpdate(robot, world_ptr, strategy_, set_primitive)));
+    fsm_map_.at(robot.id())
+        ->process_event(typename TSkillFSM::Update(
+            control_params_, SkillUpdate(robot, world_ptr, strategy_, set_primitive)));
 }
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>
@@ -59,6 +62,15 @@ template <typename TSkillFSM, typename... TSkillSubFSMs>
 bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::done(const RobotId& robot) const
 {
     return fsm_map_.contains(robot) && fsm_map_.at(robot)->is(boost::sml::X);
+}
+
+template <typename TSkillFSM, typename... TSkillSubFSMs>
+bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::suspended(const RobotId& robot,
+                                                       const WorldPtr& world_ptr)
+{
+    return fsm_map_.contains(robot) && fsm_map_.at(robot)->is(TSkillFSM::Suspended_S) &&
+           fsm_map_.at(robot)->process_event(
+               typename TSkillFSM::SuspendedUpdate(world_ptr, strategy_));
 }
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>

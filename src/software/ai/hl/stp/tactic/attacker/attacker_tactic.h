@@ -31,9 +31,28 @@ class AttackerTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
+    std::string getFSMState() const override;
+
     bool done() const override;
 
-    std::string getFSMState() const override;
+    /**
+     * Returns whether the AttackerTactic has temporarily suspended execution
+     * of its current Skill.
+     *
+     * IMPORTANT: updatePrimitive should not be called on this tactic if it is
+     * suspended. This is because a suspended tactic will not yield any primitives 
+     * to execute.
+     *
+     * If suspended, the tactic will update its state with the given world and
+     * try to resume execution (i.e. leave the suspended state).
+     * If the tactic manages to resume execution, this method will return false
+     * the next it is called.
+     *
+     * @param world_ptr
+     *
+     * @return true if the tactic has suspended execution, false otherwise
+     */
+    bool suspended(const WorldPtr& world_ptr);
 
     /**
      * Terminate the current episode of the AttackerTactic and reset the tactic
@@ -41,7 +60,7 @@ class AttackerTactic : public Tactic
      *
      * @param world_ptr the World at the end of the current episode
      */
-    void terminate(const WorldPtr& world);
+    void terminate(const WorldPtr& world_ptr);
 
    private:
     // The shared Strategy used by all of AI

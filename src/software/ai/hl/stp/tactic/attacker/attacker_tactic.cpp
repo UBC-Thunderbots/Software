@@ -33,25 +33,27 @@ std::string AttackerTactic::getFSMState() const
     {
         state = current_skill_->getFSMState(*last_execution_robot);
     }
-
     return state;
 }
 
 bool AttackerTactic::done() const
 {
-    if (last_execution_robot)
-    {
-        return current_skill_->done(*last_execution_robot);
-    }
-
-    return true;
+    return last_execution_robot && current_skill_ &&
+           current_skill_->done(*last_execution_robot);
 }
 
-void AttackerTactic::terminate(const WorldPtr& world)
+bool AttackerTactic::suspended(const WorldPtr& world_ptr)
+{
+    return last_execution_robot && current_skill_ &&
+           current_skill_->suspended(*last_execution_robot, world_ptr);
+}
+
+void AttackerTactic::terminate(const WorldPtr& world_ptr)
 {
     // Update the policy if we are currently executing a skill
-    updatePolicy({world, strategy_});
+    updatePolicy({world_ptr, strategy_});
 
+    last_execution_robot.reset();
     current_skill_.reset();
 }
 
@@ -68,8 +70,9 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
         updatePolicy(attacker_mdp_state);
 
         // Update ActionSelectionStrategy hyperparameters
-        action_selection_strategy_->setTemperature(
-            strategy_->getAiConfig().attacker_tactic_config().action_selection_temperature());
+        action_selection_strategy_->setTemperature(strategy_->getAiConfig()
+                                                       .attacker_tactic_config()
+                                                       .action_selection_temperature());
 
         // Select the next skill to execute according to the policy
         auto action    = policy_.selectAction(attacker_mdp_state);
