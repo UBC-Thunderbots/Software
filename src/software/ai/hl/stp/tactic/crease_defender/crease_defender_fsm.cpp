@@ -45,8 +45,12 @@ void CreaseDefenderFSM::blockThreat(
     }
     else
     {
-        LOG(WARNING)
-            << "Could not find a point on the defense area to block a potential shot";
+        if (event.control_params.enemy_threat_origin.x()
+            >= event.common.world_ptr->field().friendlyDefenseArea().negXNegYCorner().x())
+        {
+            LOG(WARNING)
+                << "Could not find a point on the defense area to block a potential shot";
+        }
     }
     Angle face_threat_orientation =
         (event.control_params.enemy_threat_origin - event.common.robot.position())
@@ -96,13 +100,6 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
     Rectangle inflated_defense_area =
         field.friendlyDefenseArea().expand(robot_radius_expansion_amount);
 
-    LOG(VISUALIZE) << *createDebugShapesMap({
-        {"RayStartPosition", *createShapeProto(Circle(ray.getStart(), 0.05))},
-        {"Ray", *createShapeProto(Polygon::fromSegment(Segment(ray.getStart(), ray.getStart()
-                                                                               + ray.toUnitVector().normalize(10)), 0.05))},
-        {"InflatedBox", *createShapeProto(inflated_defense_area)},
-            });
-
     auto front_segment = Segment(inflated_defense_area.posXPosYCorner(),
                                  inflated_defense_area.posXNegYCorner());
     auto left_segment  = Segment(inflated_defense_area.posXPosYCorner(),
@@ -114,7 +111,6 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
     {
         return front_intersections[0];
     }
-
     if (ray.getStart().y() > 0)
     {
         // Check left segment if ray start point is in positive y half
@@ -133,8 +129,14 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
             return right_intersections[0];
         }
     }
-
-    //TODO: Intersection Unit Tests, and
+    // Check back segment to see if ray is within goalie box
+    if (ray.getStart().x() < inflated_defense_area.posXPosYCorner().x() &&
+        ray.getStart().y() < inflated_defense_area.posXPosYCorner().y() &&
+        ray.getStart().y() > inflated_defense_area.posXNegYCorner().y())
+    {
+        // Returns in center front of box if the ball is already in the goalie box
+        return Point(inflated_defense_area.posXPosYCorner().x() , 0);
+    }
 
     return std::nullopt;
 }
