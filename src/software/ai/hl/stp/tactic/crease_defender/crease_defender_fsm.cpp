@@ -1,5 +1,4 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
