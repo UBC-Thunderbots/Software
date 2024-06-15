@@ -237,6 +237,7 @@ void ProtoUdpListener<ReceiveProtoT>::setupMulticast(const boost::asio::ip::addr
             ss << "Could not find the local ip address for the given interface: "
                        << listen_interface << std::endl;
             error_ = ss.str();
+            std::cerr << error_.value() << std::endl;
             return;
         }
         socket_.set_option(boost::asio::ip::multicast::join_group(
