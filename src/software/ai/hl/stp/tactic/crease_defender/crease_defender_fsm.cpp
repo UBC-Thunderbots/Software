@@ -1,4 +1,5 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
+
 #include "software/geom/algorithms/contains.h"
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
