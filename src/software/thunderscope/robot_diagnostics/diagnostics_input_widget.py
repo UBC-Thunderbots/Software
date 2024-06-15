@@ -1,8 +1,14 @@
-from pyqtgraph.Qt.QtCore import *
+from typing import Type
+
+from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from software.py_constants import *
 import software.thunderscope.common.common_widgets as common_widgets
 from enum import IntEnum
+
+from software.thunderscope.robot_diagnostics.handheld_device_status_view import (
+    HandheldDeviceConnectionStatus,
+)
 
 
 class ControlMode(IntEnum):
@@ -11,10 +17,10 @@ class ControlMode(IntEnum):
     """
 
     DIAGNOSTICS = 0
-    XBOX = 1
+    HANDHELD = 1
 
 
-class FullSystemConnectWidget(QWidget):
+class DiagnosticsInputToggleWidget(QWidget):
     """
     Class to allow the user to switch between Manual, XBox, and Fullsystem control through Thunderscope UI
 
@@ -22,54 +28,62 @@ class FullSystemConnectWidget(QWidget):
 
     """
 
-    # Signal to indicate if manual controls should be disabled based on boolean parameter
-    toggle_controls_signal = pyqtSignal(bool)
-
-    def __init__(self) -> None:
+    def __init__(self, diagnostics_input_mode_signal: Type[QtCore.pyqtSignal]) -> None:
         """
         Initialises a new Fullsystem Connect Widget to allow switching between Diagnostics and XBox control
+        :param diagnostics_input_mode_signal The signal to emit when the input mode changes
         """
+        super(DiagnosticsInputToggleWidget, self).__init__()
 
-        super(FullSystemConnectWidget, self).__init__()
+        self.__control_mode = ControlMode.DIAGNOSTICS
 
-        vbox_layout = QVBoxLayout()
+        self.diagnostics_input_mode_signal = diagnostics_input_mode_signal
+
+        diagnostics_input_widget_vbox_layout = QVBoxLayout()
+
         self.connect_options_group = QButtonGroup()
 
-        radio_button_names = ["Diagnostics Control", "XBox Control"]
-
         self.connect_options_box, self.connect_options = common_widgets.create_radio(
-            radio_button_names, self.connect_options_group
+            ["Diagnostics Control", "Handheld Control"], self.connect_options_group
         )
+
+        self.connect_options_box.layout().setContentsMargins(0, 0, 0, 0)
+        self.connect_options_box.setTitle("Diagnostics Input")
 
         self.diagnostics_control_button = self.connect_options[ControlMode.DIAGNOSTICS]
-        self.xbox_control_button = self.connect_options[ControlMode.XBOX]
+        self.handheld_control_button = self.connect_options[ControlMode.HANDHELD]
 
         self.diagnostics_control_button.clicked.connect(
-            lambda: self.switch_control_mode(ControlMode.DIAGNOSTICS)
+            lambda: self.diagnostics_input_mode_signal.emit(ControlMode.DIAGNOSTICS)
         )
-        self.xbox_control_button.clicked.connect(
-            lambda: self.switch_control_mode(ControlMode.XBOX)
+        self.handheld_control_button.clicked.connect(
+            lambda: self.diagnostics_input_mode_signal.emit(ControlMode.HANDHELD)
         )
 
+        # default to diagnostics input, and disable handheld
+        self.handheld_control_button.setEnabled(False)
         self.diagnostics_control_button.setChecked(True)
-        self.control_mode = ControlMode.DIAGNOSTICS
 
-        vbox_layout.addWidget(self.connect_options_box)
+        diagnostics_input_widget_vbox_layout.addWidget(self.connect_options_box)
 
-        self.setLayout(vbox_layout)
+        self.setLayout(diagnostics_input_widget_vbox_layout)
 
-    def switch_control_mode(self, mode: ControlMode) -> None:
+    def refresh(self, status: HandheldDeviceConnectionStatus) -> None:
         """
-        Switches the control mode to the given mode
+        Refresh this widget.
+        If the handheld device is connected:
+            - enables the handheld button
+        If the handheld device is disconnected:
+            - disables the handheld control button
+            - sets the diagnostics button to checked
+            - emits diagnostics input change signal
 
-        Emits a signal to indicate whether diagnostics controls should be disabled or not
-
-        :param mode: mode to switch to (one of ControlMode values)
-
+        :param status:
         """
-        self.control_mode = mode
+        if status == HandheldDeviceConnectionStatus.CONNECTED:
+            self.handheld_control_button.setEnabled(True)
 
-        self.toggle_controls_signal.emit(self.control_mode == ControlMode.DIAGNOSTICS)
-
-    def refresh(self) -> None:
-        pass
+        elif status == HandheldDeviceConnectionStatus.DISCONNECTED:
+            self.diagnostics_control_button.setChecked(True)
+            self.handheld_control_button.setEnabled(False)
+            self.diagnostics_input_mode_signal.emit(ControlMode.DIAGNOSTICS)

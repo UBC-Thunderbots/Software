@@ -3,14 +3,14 @@ import threading
 import pytest
 
 from proto.import_all_protos import *
-from software.logger.logger import createLogger
+from software.logger.logger import create_logger
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.time_provider import TimeProvider
 from software.thunderscope.thunderscope import Thunderscope
 from proto.ssl_gc_common_pb2 import Team
 
 
-logger = createLogger(__name__)
+logger = create_logger(__name__)
 
 
 class TbotsTestRunner(TimeProvider):

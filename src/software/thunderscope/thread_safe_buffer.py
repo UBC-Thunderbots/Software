@@ -1,5 +1,5 @@
 import queue
-from software.logger.logger import createLogger
+from software.logger.logger import create_logger
 from typing import Type, Optional
 from google.protobuf.message import Message
 
@@ -32,7 +32,7 @@ class ThreadSafeBuffer(object):
         :param log_overrun: False
 
         """
-        self.logger = createLogger(protobuf_type.DESCRIPTOR.name + " Buffer")
+        self.logger = create_logger(protobuf_type.DESCRIPTOR.name + " Buffer")
         self.queue = queue.Queue(buffer_size)
         self.protobuf_type = protobuf_type
         self.log_overrun = log_overrun

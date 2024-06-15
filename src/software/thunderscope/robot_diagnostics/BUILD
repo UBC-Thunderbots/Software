@@ -24,6 +24,44 @@ py_library(
 )
 
 py_library(
+    name = "handheld_device_manager",
+    srcs = ["handheld_device_manager.py"],
+    deps = [
+        "//proto:software_py_proto",
+        "//software/logger:py_logger",
+        "//software/thunderscope:constants",
+        "//software/thunderscope:thread_safe_buffer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "handheld_device_status_view",
+    srcs = ["handheld_device_status_view.py"],
+    deps = [
+        "//software/thunderscope:constants",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "diagnostics_widget",
+    srcs = ["diagnostics_widget.py"],
+    deps = [
+        "//software/logger:py_logger",
+        "//software/thunderscope:constants",
+        "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope:thunderscope_types",
+        "//software/thunderscope/robot_diagnostics:chicker",
+        "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",
+        "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
+        "//software/thunderscope/robot_diagnostics:handheld_device_manager",
+        "//software/thunderscope/robot_diagnostics:handheld_device_status_view",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "diagnostics_input_widget",
     srcs = ["diagnostics_input_widget.py"],
     deps = [

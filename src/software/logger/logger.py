@@ -1,15 +1,15 @@
-import logging
+from logging import Logger, basicConfig, getLogger, INFO
 
-logging.basicConfig(
-    level=logging.INFO,
+basicConfig(
+    level=INFO,
     format="%(asctime)s - [%(levelname)s] - [%(threadName)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
 )
 
 
-def createLogger(name):
+def create_logger(name) -> Logger:
     """Create a logger given the name of the logger
 
     :returns: A Logger
 
     """
-    return logging.getLogger(name)
+    return getLogger(name)

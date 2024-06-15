@@ -2,10 +2,10 @@ import os
 import queue
 import socketserver
 from threading import Thread
-from software.logger.logger import createLogger
+from software.logger.logger import create_logger
 from software import py_constants
 
-logger = createLogger(__name__)
+logger = create_logger(__name__)
 
 
 class ThreadedUnixListener:
