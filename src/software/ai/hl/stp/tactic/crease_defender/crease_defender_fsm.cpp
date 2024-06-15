@@ -128,7 +128,7 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
             return right_intersections[0];
         }
     }
-    // Check back segment to see if ray is within goalie box
+    // Check to see if ray is within goalie box to ignore
     if (ray.getStart().x() < inflated_defense_area.posXPosYCorner().x() &&
         ray.getStart().y() < inflated_defense_area.posXPosYCorner().y() &&
         ray.getStart().y() > inflated_defense_area.posXNegYCorner().y())
