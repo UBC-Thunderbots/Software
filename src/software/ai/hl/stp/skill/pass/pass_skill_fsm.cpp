@@ -34,12 +34,15 @@ bool PassSkillFSM::passFound(const Update& event)
 
 bool PassSkillFSM::passReceived(const SuspendedUpdate& event)
 {
-    auto friendly_robots = event.world_ptr->friendlyTeam().getAllRobots();
+    const auto ai_config       = event.strategy->getAiConfig();
+    const auto friendly_robots = event.world_ptr->friendlyTeam().getAllRobots();
 
-    return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(),
-        [&](const Robot& robot)
-        { return robot.isNearDribbler(event.world_ptr->ball().position()); });
+    return event.world_ptr->ball().velocity().length() <
+               ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold() &&
+           std::any_of(
+               friendly_robots.begin(), friendly_robots.end(),
+               [&](const Robot& robot)
+               { return robot.isNearDribbler(event.world_ptr->ball().position()); });
 }
 
 bool PassSkillFSM::shouldAbortPass(const SuspendedUpdate& event)

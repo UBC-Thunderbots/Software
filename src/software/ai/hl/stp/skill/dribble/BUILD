@@ -16,6 +16,7 @@ cc_library(
         "//software/ai/hl/stp/primitive:move_primitive",
         "//software/ai/hl/stp/skill",
         "//software/ai/hl/stp/tactic:transition_conditions",
+        "//software/ai/evaluation:intercept",
     ],
     alwayslink = True,
 )

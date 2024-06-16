@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/tactic/receiver/receiver_fsm.h"
 
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/geom/algorithms/convex_angle.h"
 
@@ -157,29 +158,21 @@ void ReceiverFSM::updateReceive(const Update& event)
 
 void ReceiverFSM::adjustReceive(const Update& event)
 {
-    auto ball      = event.common.world_ptr->ball();
-    auto robot_pos = event.common.robot.position();
+    auto face_ball_orientation =
+        (event.common.world_ptr->ball().position() - event.common.robot.position())
+            .orientation();
 
-    if ((ball.position() - robot_pos).length() >
-        BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
-    {
-        Point ball_receive_pos = ball.position();
+    Point intercept_position =
+        findInterceptionPoint(event.common.robot, event.common.world_ptr->ball(),
+                              event.common.world_ptr->field()) +
+        Vector::createFromAngle(face_ball_orientation).normalize(0.05);
 
-        if (ball.velocity().length() > MIN_PASS_START_SPEED)
-        {
-            ball_receive_pos = closestPoint(
-                robot_pos, Line(ball.position(), ball.position() + ball.velocity()));
-        }
-
-        Angle ball_receive_orientation = (ball.position() - robot_pos).orientation();
-
-        event.common.set_primitive(std::make_unique<MovePrimitive>(
-            event.common.robot, ball_receive_pos, ball_receive_orientation,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
-            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
-    }
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, intercept_position, face_ball_orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
 
 bool ReceiverFSM::passStarted(const Update& event)
@@ -201,9 +194,9 @@ bool ReceiverFSM::passReceivedByTeammate(const Update& event)
         event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
 
     return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
-            return robot.isNearDribbler(event.common.world_ptr->ball().position());
-        });
+        friendly_robots.begin(), friendly_robots.end(),
+        [&](const Robot& robot)
+        { return robot.isNearDribbler(event.common.world_ptr->ball().position()); });
 }
 
 bool ReceiverFSM::strayPass(const Update& event)

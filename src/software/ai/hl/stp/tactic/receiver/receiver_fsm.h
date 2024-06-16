@@ -173,7 +173,7 @@ struct ReceiverFSM
                                         updateOnetouch_A = OneTouchShotState_S,
             WaitingForPassState_S + Update_E[passStarted_G && !onetouchPossible_G] /
                                         updateReceive_A = ReceiveAndDribbleState_S,
-            ReceiveAndDribbleState_S + Update_E[passReceived_G] / adjustReceive_A = X,
+            ReceiveAndDribbleState_S + Update_E[passReceived_G] / adjustReceive_A,
             ReceiveAndDribbleState_S + Update_E[passReceivedByTeammate_G] /
                                            updateReceive_A = WaitingForPassState_S,
             ReceiveAndDribbleState_S + Update_E / adjustReceive_A,
@@ -181,8 +181,8 @@ struct ReceiverFSM
                 Update_E[!passReceived_G && !strayPass_G] / updateOnetouch_A,
             OneTouchShotState_S + Update_E[!passReceived_G && strayPass_G] /
                                       adjustReceive_A = ReceiveAndDribbleState_S,
-            OneTouchShotState_S + Update_E[passReceived_G] / updateOnetouch_A = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
+            OneTouchShotState_S + Update_E[passReceived_G] / updateOnetouch_A,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 
    private:
