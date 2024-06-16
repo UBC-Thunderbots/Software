@@ -65,7 +65,6 @@ struct ChipSkillFSM
             GetBehindBallSkillFSM_S                               = ChipState_S,
             ChipState_S + Update_E[!ballChicked_G] / updateChip_A = ChipState_S,
             ChipState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            Suspended_S + SuspendedUpdate_E = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
     }
 };

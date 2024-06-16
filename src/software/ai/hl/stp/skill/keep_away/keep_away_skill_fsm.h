@@ -44,7 +44,6 @@ struct KeepAwaySkillFSM
             *DribbleSkillFSM_S + Update_E[isPossessionThreatened_G] / keepAway_A,
             DribbleSkillFSM_S + Update_E / SET_STOP_PRIMITIVE_ACTION = X,
             DribbleSkillFSM_S = X, 
-            Suspended_S + SuspendedUpdate_E = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 };

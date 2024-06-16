@@ -42,10 +42,16 @@ bool AttackerTactic::done() const
            current_skill_->done(*last_execution_robot);
 }
 
-bool AttackerTactic::suspended(const WorldPtr& world_ptr)
+bool AttackerTactic::suspended() const
 {
     return last_execution_robot && current_skill_ &&
-           current_skill_->suspended(*last_execution_robot, world_ptr);
+           current_skill_->suspended(*last_execution_robot);
+}
+
+bool AttackerTactic::tryResumingIfSuspended(const WorldPtr& world_ptr)
+{
+    return last_execution_robot && current_skill_ &&
+           current_skill_->tryResumingIfSuspended(*last_execution_robot, world_ptr);
 }
 
 void AttackerTactic::terminate(const WorldPtr& world_ptr)

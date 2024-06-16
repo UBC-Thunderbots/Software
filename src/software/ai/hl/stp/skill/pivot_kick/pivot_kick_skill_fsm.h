@@ -97,7 +97,6 @@ struct PivotKickSkillFSM
                               SET_STOP_PRIMITIVE_ACTION = X,
             KickState_S + Update_E / kickBall_A,
 
-            Suspended_S + SuspendedUpdate_E = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 };

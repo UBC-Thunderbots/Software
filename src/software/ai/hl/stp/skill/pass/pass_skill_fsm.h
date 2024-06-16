@@ -13,6 +13,7 @@ struct PassSkillFSM
     };
 
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_SUSPENDED_STATE_AND_UPDATE_STRUCT
 
     /**
      * Guard that checks if the best pass so far is viable
@@ -78,7 +79,9 @@ struct PassSkillFSM
 
         DEFINE_SML_STATE(DribbleSkillFSM)
         DEFINE_SML_STATE(PivotKickSkillFSM)
+        DEFINE_SML_STATE(Suspended)
         DEFINE_SML_EVENT(Update)
+        DEFINE_SML_EVENT(SuspendedUpdate)
         DEFINE_SML_GUARD(passFound)
         DEFINE_SML_GUARD(passReceived)
         DEFINE_SML_GUARD(shouldAbortPass)

@@ -40,19 +40,27 @@ class AttackerTactic : public Tactic
      * of its current Skill.
      *
      * IMPORTANT: updatePrimitive should not be called on this tactic if it is
-     * suspended. This is because a suspended tactic will not yield any primitives 
+     * suspended. This is because a suspended tactic will not yield any primitives
      * to execute.
-     *
-     * If suspended, the tactic will update its state with the given world and
-     * try to resume execution (i.e. leave the suspended state).
-     * If the tactic manages to resume execution, this method will return false
-     * the next it is called.
-     *
-     * @param world_ptr
      *
      * @return true if the tactic has suspended execution, false otherwise
      */
-    bool suspended(const WorldPtr& world_ptr);
+    bool suspended() const;
+
+    /**
+     * If the AttackerTactic has temporarily suspended execution of its current Skill,
+     * calling this method will update the AttackerTactic with the given world and try
+     * to resume execution (i.e. leave the suspended state).
+     *
+     * If the AttackerTactic is not suspended, then calling this method effectively
+     * does nothing.
+     *
+     * @param world_ptr the world pointer
+     *
+     * @return true if the tactic is still suspended after trying to resume execution,
+     * false otherwise
+     */
+    bool tryResumingIfSuspended(const WorldPtr& world_ptr);
 
     /**
      * Terminate the current episode of the AttackerTactic and reset the tactic

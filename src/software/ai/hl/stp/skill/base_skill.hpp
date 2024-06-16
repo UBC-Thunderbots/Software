@@ -24,7 +24,9 @@ class BaseSkill : public Skill
 
     bool done(const RobotId& robot) const override;
 
-    bool suspended(const RobotId& robot, const WorldPtr& world_ptr) override;
+    bool suspended(const RobotId& robot) const override;
+
+    bool tryResumingIfSuspended(const RobotId& robot, const WorldPtr& world_ptr) override;
 
    protected:
     explicit BaseSkill(std::shared_ptr<Strategy> strategy)
@@ -64,13 +66,45 @@ bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::done(const RobotId& robot) const
     return fsm_map_.contains(robot) && fsm_map_.at(robot)->is(boost::sml::X);
 }
 
-template <typename TSkillFSM, typename... TSkillSubFSMs>
-bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::suspended(const RobotId& robot,
-                                                       const WorldPtr& world_ptr)
+template <typename TSkillFSM>
+concept HasSuspendedState = requires
 {
-    return fsm_map_.contains(robot) && fsm_map_.at(robot)->is(TSkillFSM::Suspended_S) &&
-           fsm_map_.at(robot)->process_event(
-               typename TSkillFSM::SuspendedUpdate(world_ptr, strategy_));
+    typename TSkillFSM::Suspended;
+    typename TSkillFSM::SuspendedUpdate;
+};
+
+template <typename TSkillFSM, typename... TSkillSubFSMs>
+bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::suspended(const RobotId& robot) const
+{
+    // Check at compile time that type TSkillFSM::Suspended exists
+    if constexpr (HasSuspendedState<TSkillFSM>)
+    {
+        return fsm_map_.contains(robot) &&
+               fsm_map_.at(robot)->is(boost::sml::state<typename TSkillFSM::Suspended>);
+    }
+
+    // Otherwise, TSkillFSM has no Suspended state and thus can never 
+    // suspend execution
+    return false;
+}
+
+template <typename TSkillFSM, typename... TSkillSubFSMs>
+bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::tryResumingIfSuspended(
+    const RobotId& robot, const WorldPtr& world_ptr)
+{
+    // Check at compile time that type TSkillFSM::SuspendedUpdate exists
+    if constexpr (HasSuspendedState<TSkillFSM>)
+    {
+        if (suspended(robot))
+        {
+            fsm_map_.at(robot)->process_event(
+                typename TSkillFSM::SuspendedUpdate(world_ptr, strategy_));
+        }
+    }
+
+    // The FSM may have left SuspendedState after processing the SuspendedUpdate,
+    // so we need to recheck whether the skill is suspended
+    return suspended(robot);
 }
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>

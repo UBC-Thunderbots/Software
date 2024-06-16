@@ -44,7 +44,9 @@ struct SkillUpdate
         }                                                                                \
         ControlParams control_params;                                                    \
         SkillUpdate common;                                                              \
-    };                                                                                   \
+    };
+
+#define DEFINE_SUSPENDED_STATE_AND_UPDATE_STRUCT                                         \
     struct Suspended;                                                                    \
     struct SuspendedUpdate                                                               \
     {                                                                                    \
@@ -54,9 +56,7 @@ struct SkillUpdate
         }                                                                                \
         WorldPtr world_ptr;                                                              \
         std::shared_ptr<Strategy> strategy;                                              \
-    };                                                                                   \
-    static constexpr auto Suspended_S       = boost::sml::state<Suspended>;              \
-    static constexpr auto SuspendedUpdate_E = boost::sml::event<SuspendedUpdate>;
+    };
 
 #define SET_STOP_PRIMITIVE_ACTION                                                        \
     [this](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>()); }

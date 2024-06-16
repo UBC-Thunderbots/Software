@@ -39,21 +39,32 @@ class Skill
     /**
      * Returns whether the given robot has temporarily suspended execution of the Skill.
      *
-     * IMPORTANT: updatePrimitive should not be called with a robot that has 
-     * suspended execution of the Skill. This is because a suspended Skill 
+     * IMPORTANT: updatePrimitive should not be called with a robot that has
+     * suspended execution of the Skill. This is because a suspended Skill
      * will not yield any primitives for the robot to execute.
      *
-     * If suspended, the Skill will update its state with the given world and
-     * try to resume execution (i.e. leave the suspended state).
-     * If the Skill manages to resume execution, this method will return false 
-     * the next it is called.
+     * @param robot the robot executing the Skill
+     *
+     * @return true if the robot has suspended execution of the Skill, false otherwise
+     */
+    virtual bool suspended(const RobotId& robot_id) const = 0;
+
+    /**
+     * If the given robot has temporarily suspended execution of the Skill, calling this
+     * method will update the Skill with the given world and try to resume execution
+     * (i.e. leave the suspended state).
+     *
+     * If the Skill is not suspended for the given robot, then calling this method
+     * effectively does nothing.
      *
      * @param robot the robot executing the Skill
      * @param world_ptr the world pointer
      *
-     * @return true if the robot has suspended execution of the Skill, false otherwise
+     * @return true if the Skill is still suspended for the robot after
+     * trying to resume execution, false otherwise
      */
-    virtual bool suspended(const RobotId& robot_id, const WorldPtr& world_ptr) = 0;
+    virtual bool tryResumingIfSuspended(const RobotId& robot_id,
+                                        const WorldPtr& world_ptr) = 0;
 
     virtual std::string getFSMState(RobotId robot_id) const = 0;
 
