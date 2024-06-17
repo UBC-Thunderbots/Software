@@ -1,5 +1,6 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
@@ -16,6 +17,8 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       possession(TeamPossession::LOOSE),
       possession_tracker(std::make_shared<PossessionTracker>(
           sensor_fusion_config.possession_tracker_config())),
+      ball_contacts_by_friendly_robots(),
+      distance_dribbled_by_friendly_team(0),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
       defending_positive_side(false),
@@ -32,6 +35,8 @@ std::optional<World> SensorFusion::getWorld() const
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
         new_world.setTeamWithPossession(possession);
+        new_world.setDistanceDribbledByFriendlyTeam(distance_dribbled_by_friendly_team);
+
         if (referee_stage)
         {
             new_world.updateRefereeStage(*referee_stage);
@@ -288,6 +293,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     {
         possession = possession_tracker->getTeamWithPossession(friendly_team, enemy_team,
                                                                *ball, *field);
+
+        updateDistanceDribbledByFriendlyTeam();
     }
 }
 
@@ -341,6 +348,65 @@ std::optional<Point> SensorFusion::getBallPlacementPoint(const SSLProto::Referee
     return point_opt;
 }
 
+void SensorFusion::updateDistanceDribbledByFriendlyTeam()
+{
+    // Dribble distance algorithm taken from TIGERs autoref implementation
+    // https://t.ly/vNZf9
+
+    if (!ball.has_value())
+    {
+        return;
+    }
+
+    // Add new touching robots
+    for (const Robot &robot : friendly_team.getAllRobots())
+    {
+        if (robot.isNearDribbler(ball->position()))
+        {
+            ball_contacts_by_friendly_robots.insert(
+                std::make_pair(robot.id(), ball->position()));
+        }
+        else
+        {
+            ball_contacts_by_friendly_robots.erase(robot.id());
+        }
+    }
+
+    // Remove touching robots that have vanished
+    for (const auto &[robot_id, contact_point] : ball_contacts_by_friendly_robots)
+    {
+        if (std::none_of(friendly_team.getAllRobots().begin(),
+                            friendly_team.getAllRobots().end(),
+                            [&](const Robot &robot) { return robot.id() == robot_id; }))
+        {
+            ball_contacts_by_friendly_robots.erase(robot_id);
+        }
+    }
+
+    // Calculate distances from initial contact points to current ball position
+    std::vector<double> dribble_distances;
+    dribble_distances.reserve(ball_contacts_by_friendly_robots.size());
+    std::transform(ball_contacts_by_friendly_robots.begin(),
+                    ball_contacts_by_friendly_robots.end(),
+                    std::back_inserter(dribble_distances),
+                    [&](const auto &kv_pair)
+                    {
+                        const Point contact_point = kv_pair.second;
+                        return distance(contact_point, ball->position());
+                    });
+
+    // Set distance_dribbled_by_friendly_team to maximum of dribble_distances
+    if (dribble_distances.empty())
+    {
+        distance_dribbled_by_friendly_team = 0;
+    }
+    else
+    {
+        distance_dribbled_by_friendly_team =
+            *std::max_element(dribble_distances.begin(), dribble_distances.end());
+    }
+}
+
 RobotDetection SensorFusion::invert(RobotDetection robot_detection) const
 {
     robot_detection.position =
@@ -354,18 +420,6 @@ BallDetection SensorFusion::invert(BallDetection ball_detection) const
     ball_detection.position =
         Point(-ball_detection.position.x(), -ball_detection.position.y());
     return ball_detection;
-}
-
-bool SensorFusion::teamHasBall(const Team &team, const Ball &ball)
-{
-    for (const auto &robot : team.getAllRobots())
-    {
-        if (robot.isNearDribbler(ball.position()))
-        {
-            return true;
-        }
-    }
-    return false;
 }
 
 bool SensorFusion::checkForVisionReset(double t_capture)
@@ -392,14 +446,15 @@ bool SensorFusion::checkForVisionReset(double t_capture)
 
 void SensorFusion::resetWorldComponents()
 {
-    field                = std::nullopt;
-    ball                 = std::nullopt;
-    friendly_team        = Team();
-    enemy_team           = Team();
-    game_state           = GameState();
-    referee_stage        = std::nullopt;
-    ball_filter          = BallFilter();
-    friendly_team_filter = RobotTeamFilter();
-    enemy_team_filter    = RobotTeamFilter();
-    possession           = TeamPossession::LOOSE;
+    field                              = std::nullopt;
+    ball                               = std::nullopt;
+    friendly_team                      = Team();
+    enemy_team                         = Team();
+    game_state                         = GameState();
+    referee_stage                      = std::nullopt;
+    ball_filter                        = BallFilter();
+    friendly_team_filter               = RobotTeamFilter();
+    enemy_team_filter                  = RobotTeamFilter();
+    possession                         = TeamPossession::LOOSE;
+    distance_dribbled_by_friendly_team = 0;
 }

@@ -79,13 +79,6 @@ struct DribbleSkillFSM
     void dribble(const Update &event);
 
     /**
-     * Start dribbling
-     *
-     * @param event the Update event
-     */
-    void startDribble(const Update &event);
-
-    /**
      * Action to lose BallControl of the ball
      *
      * @param event the Update event
@@ -143,14 +136,13 @@ struct DribbleSkillFSM
         DEFINE_SML_GUARD(lostBallControl)
         DEFINE_SML_GUARD(dribblingDone)
         DEFINE_SML_GUARD(shouldLoseBall)
-        DEFINE_SML_ACTION(startDribble)
         DEFINE_SML_ACTION(loseBall)
         DEFINE_SML_ACTION(getBallControl)
         DEFINE_SML_ACTION(dribble)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetBallControl_S + Update_E[haveBallControl_G] / startDribble_A = Dribble_S,
+            *GetBallControl_S + Update_E[haveBallControl_G] / dribble_A = Dribble_S,
             GetBallControl_S + Update_E / getBallControl_A,
             Dribble_S + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
             Dribble_S + Update_E[shouldLoseBall_G] / loseBall_A        = LoseBall_S,
@@ -163,7 +155,4 @@ struct DribbleSkillFSM
             X + Update_E[!dribblingDone_G] / dribble_A         = Dribble_S,
             X + Update_E / dribble_A                           = X);
     }
-
-   private:
-    Point continuous_dribbling_start_point;
 };
