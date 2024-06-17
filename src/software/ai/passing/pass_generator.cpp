@@ -81,7 +81,7 @@ std::map<RobotId, std::vector<Point>> PassGenerator::sampleReceivingPositionsPer
         }
 
         // Add the robot's current position to the list of sampled passes
-        auto robot_position = robot.position();
+        Point robot_position = robot.position();
         receiving_positions_map.insert({robot.id(), {robot_position}});
 
         // Add the best pass from the previous iteration to the list of sampled passes
@@ -95,10 +95,10 @@ std::map<RobotId, std::vector<Point>> PassGenerator::sampleReceivingPositionsPer
         // Sample random receiving positions using a normal distribution around the
         // robot's future position with a standard deviation that scales with the robot's
         // velocity.
-        Point sampling_center =
+        const Point sampling_center =
             robot_position + (robot.velocity() * sampling_center_vel_multiplier);
-        double std_dev = min_sampling_std_dev +
-                         (robot.velocity().length() * sampling_std_dev_vel_multiplier);
+        const double std_dev = min_sampling_std_dev + (robot.velocity().length() *
+                                                       sampling_std_dev_vel_multiplier);
         std::normal_distribution x_normal_distribution{sampling_center.x(), std_dev};
         std::normal_distribution y_normal_distribution{sampling_center.y(), std_dev};
 
@@ -145,11 +145,11 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
                 passing_config_.number_of_gradient_descent_steps_per_iter());
 
             // get a pass with the new appropriate speed using the optimized destination
-            auto optimized_pass = Pass::fromDestReceiveSpeed(
+            Pass optimized_pass = Pass::fromDestReceiveSpeed(
                 world.ball().position(),
                 Point(optimized_receiving_pos_array[0], optimized_receiving_pos_array[1]),
                 passing_config_);
-            auto score = ratePass(world, optimized_pass, passing_config_);
+            double score = ratePass(world, optimized_pass, passing_config_);
 
             if (score > best_pass_for_robot.rating)
             {

@@ -31,7 +31,7 @@ double ratePass(const World& world, const Pass& pass,
  * @param pass The pass to rate
  * @param passing_config The passing config used for tuning
  * @return A value in [0,1] representing the quality of the pass receiving
- * position, with 1 being indicating that the receiving position is ideal, and 0
+ * position, with 1 indicating that the receiving position is ideal, and 0
  * indicating that the pass will likely not be received.
  */
 double rateReceivingPosition(const World& world, const Pass& pass,
