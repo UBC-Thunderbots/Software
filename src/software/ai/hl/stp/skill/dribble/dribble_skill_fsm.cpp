@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
 
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
-#include "software/ai/evaluation/intercept.h"
 
 Point DribbleSkillFSM::getDribbleBallDestination(const Point &ball_position,
                                                  std::optional<Point> dribble_destination)
@@ -100,13 +100,6 @@ void DribbleSkillFSM::loseBall(const Update &event)
         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 0.5}));
 }
 
-void DribbleSkillFSM::startDribble(const Update &event)
-{
-    // update continuous_dribbling_start_point once we start dribbling
-    continuous_dribbling_start_point = event.common.world_ptr->ball().position();
-    dribble(event);
-}
-
 bool DribbleSkillFSM::haveBallControl(const Update &event)
 {
     return event.common.robot.isNearDribbler(event.common.world_ptr->ball().position());
@@ -120,7 +113,7 @@ bool DribbleSkillFSM::lostBallControl(const Update &event)
     return !event.common.robot.isNearDribbler(
         // avoid cases where ball is exactly on the edge of the robot
         event.common.world_ptr->ball().position(),
-        dribble_config.lose_ball_control_threshold()); 
+        dribble_config.lose_ball_control_threshold());
 };
 
 bool DribbleSkillFSM::dribblingDone(const Update &event)
@@ -148,8 +141,7 @@ bool DribbleSkillFSM::shouldLoseBall(const Update &event)
     const TbotsProto::DribbleConfig &dribble_config =
         event.common.strategy->getAiConfig().dribble_config();
 
-    Point ball_position = event.common.world_ptr->ball().position();
-    return (!event.control_params.allow_excessive_dribbling &&
-            !comparePoints(ball_position, continuous_dribbling_start_point,
-                           dribble_config.max_continuous_dribbling_distance()));
+    return !event.control_params.allow_excessive_dribbling &&
+           event.common.world_ptr->getDistanceDribbledByFriendlyTeam() >=
+               dribble_config.max_continuous_dribbling_distance();
 }

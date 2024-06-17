@@ -164,12 +164,22 @@ const RefereeStage &World::getRefereeStage() const
     return current_referee_stage_;
 }
 
-void World::setTeamWithPossession(TeamPossession team_with_possesion)
+void World::setTeamWithPossession(TeamPossession possession)
 {
-    team_with_possession_ = team_with_possesion;
+    team_with_possession_ = possession;
 }
 
 TeamPossession World::getTeamWithPossession() const
 {
     return team_with_possession_;
+}
+
+void World::setDistanceDribbledByFriendlyTeam(double distance)
+{
+    distance_dribbled_by_friendly_team_ = distance;
+}
+
+double World::getDistanceDribbledByFriendlyTeam() const
+{
+    return distance_dribbled_by_friendly_team_;
 }

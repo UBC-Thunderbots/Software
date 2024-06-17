@@ -176,6 +176,22 @@ class World final
     TeamPossession getTeamWithPossession() const;
 
     /**
+     * Sets the distance in meters that the friendly team has
+     * continously dribbled the ball
+     *
+     * @param distance The distance dribbled in meters
+     */
+    void setDistanceDribbledByFriendlyTeam(double distance);
+
+    /**
+     * Gets the distance in meters that the friendly team has
+     * continously dribbled the ball
+     *
+     * @return The distance dribbled in meters
+     */
+    double getDistanceDribbledByFriendlyTeam() const;
+
+    /**
      * Defines the equality operator for a World. Worlds are equal if their field, ball
      * friendly_team, enemy_team and game_state are equal. The last update
      * timestamp and histories are not part of the equality.
@@ -216,6 +232,8 @@ class World final
     boost::circular_buffer<RefereeStage> referee_stage_history_;
     // which team has possession of the ball
     TeamPossession team_with_possession_;
+    // Distance in meters that the friendly team has continuously dribbled the ball
+    double distance_dribbled_by_friendly_team_;
 };
 
 using WorldPtr = std::shared_ptr<const World>;
