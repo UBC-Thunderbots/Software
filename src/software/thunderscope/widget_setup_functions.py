@@ -208,6 +208,24 @@ def setup_parameter_widget(
 
     return ProtoConfigurationWidget(config, on_change_callback)
 
+def setup_network_config_widget(
+    proto_unix_io: ProtoUnixIO
+) -> ProtoConfigurationWidget:
+    """Setup the network configuration widget
+
+    :param proto_unix_io: The proto unix io object
+
+    :returns: The proto configuration widget
+    """
+    config = NetworkConfig()
+
+    def on_change_callback(
+        attr: Any, value: Any, updated_proto: NetworkConfig
+    ) -> None:
+        proto_unix_io.send_proto(NetworkConfig, updated_proto)
+
+    return ProtoConfigurationWidget(config, on_change_callback)
+
 
 def setup_log_widget(proto_unix_io: ProtoUnixIO) -> g3logWidget:
     """Setup the wiget that receives logs from full system

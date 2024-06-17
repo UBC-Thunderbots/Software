@@ -64,6 +64,9 @@ class ProtoConfigurationWidget(QWidget):
         layout.addWidget(self.search_query)
         layout.addWidget(self.param_tree)
 
+        self.first_shot_thread = Thread(target=self.__first_shot, daemon=True)
+        self.first_shot_thread.start()
+
     def __handle_search_query_changed(self, search_term):
         """Given a new search term, reconfigure the parameter tree with parameters
         that match the term.
@@ -158,3 +161,7 @@ class ProtoConfigurationWidget(QWidget):
                     exec(f"{current_attr}.{key} = {value}")
             else:
                 self.build_proto(value, f"{current_attr}.{key}")
+
+    def __first_shot(self):
+        time.sleep(ProtoConfigurationWidget.DELAYED_CONFIGURATION_TIMEOUT_S)
+        self.on_change_callback(None, None, self.proto_to_configure)
