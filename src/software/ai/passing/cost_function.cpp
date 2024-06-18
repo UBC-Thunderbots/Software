@@ -182,6 +182,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
         Duration::fromSeconds(enemy_robot_time_to_interception_point_sec *
                               passing_config.enemy_interception_time_multiplier());
 
+    // TODO (#2988): We should generate a more realistic ball trajectory
     Duration ball_time_to_interception_point =
         Duration::fromSeconds(distance(pass.passerPoint(), closest_interception_point) /
                               pass.speed()) +
