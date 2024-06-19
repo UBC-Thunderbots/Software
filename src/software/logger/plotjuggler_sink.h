@@ -16,6 +16,8 @@ class PlotJugglerSink
    public:
     /**
      * Creates a PlotJugglerSink that sends udp packets to the PlotJuggler server
+     *
+     * @param interface The interface to send Plotjuggler UDP packets on
      */
     PlotJugglerSink(const std::string& interface="lo");
 

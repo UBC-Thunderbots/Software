@@ -254,16 +254,6 @@ def configure_base_diagnostics(
     """
     return [
         TScopeWidget(
-            name="Network Configuration",
-            widget=setup_network_config_widget(
-                **{
-                    "proto_unix_io": diagnostics_proto_unix_io,
-                }
-            ),
-            has_refresh_func=False,
-            stretch=WidgetStretchData(x=3),
-        ),
-        TScopeWidget(
             name="Logs",
             widget=setup_log_widget(**{"proto_unix_io": diagnostics_proto_unix_io}),
         ),
@@ -274,6 +264,17 @@ def configure_base_diagnostics(
             ),
             position="below",
             anchor="Logs",
+        ),
+        TScopeWidget(
+            name="Network Configuration",
+            widget=setup_network_config_widget(
+                **{
+                    "proto_unix_io": diagnostics_proto_unix_io,
+                }
+            ),
+            position="below",
+            anchor="Error Log",
+            has_refresh_func=False,
         ),
         TScopeWidget(
             name="Drive and Dribbler",

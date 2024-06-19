@@ -22,6 +22,7 @@ class NetworkService
      * @param ip_address The IP Address the service should connect to
      * @param primitive_listener_port The port to listen for primitive protos
      * @param robot_status_sender_port The port to send robot status
+     * @param interface the interface to listen and send on
      * @param multicast  If true, then the provided IP address is a multicast address and
      * we should join the group
      */

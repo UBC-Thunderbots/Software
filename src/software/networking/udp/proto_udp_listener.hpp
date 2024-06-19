@@ -136,6 +136,15 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
         }
     }
 
+    if (!socket_.is_open())
+    {
+        std::stringstream ss;
+        ss << "UdpListener: The socket is not open after attempting to bind to the listen endpoint";
+        error_ = ss.str();
+        error = error_;
+        return;
+    }
+
     startListen();
 }
 
