@@ -22,14 +22,18 @@ class ProtoUdpListener
      * ReceiveProtoT packet received, the receive_callback will be called to perform any
      * operations desired by the caller
      *
+     * The caller must check that the error is not set before using the listener
+     *
      * @param io_service The io_service to use to service incoming ReceiveProtoT data
      * @param ip_address The ip address of on which to listen for the given ReceiveProtoT
      * packets (IPv4 in dotted decimal or IPv6 in hex string) example IPv4: 192.168.0.2
-     *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
+     *  example IPv6: ff02::c3d0:42d2:bb8
      * @param port The port on which to listen for ReceiveProtoT packets
+     * @param listen_interface The interface to listen on
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
      * @param multicast If true, joins the multicast group of given ip_address
+     * @param error A user-provided optional string to store any error messages
      */
     ProtoUdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
                      unsigned short port, const std::string& listen_interface,
@@ -42,10 +46,13 @@ class ProtoUdpListener
      * received, the receive_callback will be called to perform any operations desired by
      * the caller
      *
+     * The caller must check that the error is not set before using the listener
+     *
      * @param io_service The io_service to use to service incoming ReceiveProtoT data
      * @param port The port on which to listen for ReceiveProtoT packets
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
+     * @param error A user-provided optional string to store any error messages
      */
     ProtoUdpListener(boost::asio::io_service& io_service, unsigned short port,
                      std::function<void(ReceiveProtoT&)> receive_callback,
@@ -68,8 +75,17 @@ class ProtoUdpListener
     void handleDataReception(const boost::system::error_code& error,
                              size_t num_bytes_received);
 
+    /**
+     * Sets up multicast for the given ip_address and listen_interface
+     *
+     * Any errors during setup will be stored in the error string
+     *
+     * @param ip_address The ip address of the multicast group to join
+     * @param listen_interface The interface to listen on
+     * @param error A user-provided optional string to store any error messages
+     */
     void setupMulticast(const boost::asio::ip::address& ip_address,
-                        const std::string& listen_interface);
+                        const std::string& listen_interface, std::optional<std::string>& error);
 
     /**
      * Start listening for data
@@ -89,8 +105,6 @@ class ProtoUdpListener
 
     // Whether or not the listener is running
     bool running_ = true;
-
-    std::optional<std::string> error_;
 };
 
 template <class ReceiveProtoT>
@@ -121,28 +135,17 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
                       "UdpListener running and using the port already. "
                       "(ip = "
                    << ip_address << ", port = " << port << ")";
-        error_ = ss.str();
-        error = error_;
+        error = ss.str();
         return;
     }
 
     if (multicast)
     {
-        setupMulticast(boost_ip, listen_interface);
-        if (error_)
+        setupMulticast(boost_ip, listen_interface, error);
+        if (error)
         {
-            error = error_;
             return;
         }
-    }
-
-    if (!socket_.is_open())
-    {
-        std::stringstream ss;
-        ss << "UdpListener: The socket is not open after attempting to bind to the listen endpoint";
-        error_ = ss.str();
-        error = error_;
-        return;
     }
 
     startListen();
@@ -235,7 +238,7 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
 
 template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::setupMulticast(const boost::asio::ip::address& ip_address,
-        const std::string& listen_interface)
+        const std::string& listen_interface, std::optional<std::string>& error)
 {
     if (ip_address.is_v4())
     {
@@ -245,8 +248,7 @@ void ProtoUdpListener<ReceiveProtoT>::setupMulticast(const boost::asio::ip::addr
             std::stringstream ss;
             ss << "Could not find the local ip address for the given interface: "
                        << listen_interface << std::endl;
-            error_ = ss.str();
-            std::cerr << error_.value() << std::endl;
+            error = ss.str();
             return;
         }
         socket_.set_option(boost::asio::ip::multicast::join_group(

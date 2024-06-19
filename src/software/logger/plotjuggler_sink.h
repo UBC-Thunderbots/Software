@@ -32,6 +32,9 @@ class PlotJugglerSink
     void sendToPlotJuggler(g3::LogMessageMover log_entry);
 
    private:
+    // Any error that occurs during the creation of the UDP sender will be stored here
+    std::optional<std::string> error;
+
     ThreadedUdpSender udp_sender;
 };
 

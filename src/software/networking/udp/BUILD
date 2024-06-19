@@ -81,6 +81,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "threaded_proto_udp_sender_test",
+    srcs = [
+        "threaded_proto_udp_sender_test.cpp",
+    ],
+    deps = [
+        ":threaded_proto_udp_sender",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
 cc_library(
     name = "threaded_udp_sender",
     srcs = [

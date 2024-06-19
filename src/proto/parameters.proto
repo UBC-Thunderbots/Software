@@ -50,6 +50,7 @@ message AiControlConfig
     // Override the existing play with the Play enum provided
     required PlayName override_ai_play = 2 [default = UseAiSelection];
 
+    // Interfaces for various network listeners
     required NetworkConfig network_config = 3;
 }
 

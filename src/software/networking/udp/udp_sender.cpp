@@ -5,7 +5,8 @@
 #include <iostream>
 
 UdpSender::UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
-                     const unsigned short port, const std::string& interface, bool multicast)
+                     const unsigned short port, const std::string& interface, bool multicast,
+                     std::optional<std::string>& error)
     : socket_(io_service)
 {
     boost::asio::ip::address boost_ip = boost::asio::ip::make_address(ip_address);
@@ -21,7 +22,7 @@ UdpSender::UdpSender(boost::asio::io_service& io_service, const std::string& ip_
 
     if (multicast)
     {
-        setupMulticast(boost_ip, interface);
+        setupMulticast(boost_ip, interface, error);
     }
 }
 
@@ -30,16 +31,20 @@ void UdpSender::sendString(const std::string& message)
     socket_.send_to(boost::asio::buffer(message, message.length()), receiver_endpoint);
 }
 
-void UdpSender::setupMulticast(const boost::asio::ip::address& ip_address, const std::string& interface)
+void UdpSender::setupMulticast(const boost::asio::ip::address& ip_address, const std::string& interface, std::optional<std::string>& error)
 {
     if (ip_address.is_v4())
     {
         std::string interface_ip;
         if (!getLocalIp(interface, interface_ip))
         {
-            std::cerr << "UdpSender: Could not get the local IP address for the interface "
+            std::stringstream ss;
+            ss << "UdpSender: Could not get the local IP address for the interface "
                           "specified. (interface = "
-                       << interface << ")" << std::endl;
+                       << interface << ")";
+            error = ss.str();
+
+            return;
         }
         
         socket_.set_option(boost::asio::ip::multicast::join_group(ip_address.to_v4(),
