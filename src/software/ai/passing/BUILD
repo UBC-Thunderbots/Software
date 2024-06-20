@@ -35,9 +35,29 @@ cc_library(
     srcs = ["pass.cpp"],
     hdrs = ["pass.h"],
     deps = [
+        ":base_pass",
         "//shared:constants",
-        "//software/time:timestamp",
-        "//software/world:field",
+        "//software/time:timestamp"
+    ],
+)
+
+cc_library(
+    name = "base_pass",
+    srcs = ["base_pass.cpp"],
+    hdrs = ["base_pass.h"],
+    deps = [
+        "//software/geom:point",
+        "//software/time:duration"
+    ],
+)
+
+cc_library(
+    name = "chip_pass",
+    srcs = ["chip_pass.cpp"],
+    hdrs = ["chip_pass.h"],
+    deps = [
+        ":base_pass",
+        "//shared:constants"
     ],
 )
 
@@ -46,6 +66,16 @@ cc_test(
     srcs = ["pass_test.cpp"],
     deps = [
         ":pass",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_test(
+    name = "chip_pass_test",
+    srcs = ["chip_pass_test.cpp"],
+    deps = [
+        ":chip_pass",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],

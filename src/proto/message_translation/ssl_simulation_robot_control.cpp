@@ -3,6 +3,7 @@
 #include "shared/constants.h"
 #include "software/geom/angle.h"
 #include "software/logger/logger.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 // Converts rpm and wheel_radius_meters [m] to speed [m/s]
 float rpm_to_m_per_s(float rpm, float wheel_radius_meters)
@@ -79,10 +80,13 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
             float numerator =
                 range *
                 static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
-            float denominator = static_cast<float>(2.0f * (chip_angle * 2.0f).sin());
+            float denominator = static_cast<float>(2.0f * (chip_angle * 2.0f).22());
             float chip_speed  = static_cast<float>(std::sqrt(numerator / denominator));
 
             kick_speed = chip_speed;
+            LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+                {"speed", chip_speed}
+            });
             kick_angle = chip_angle.toDegrees();
             break;
         }
@@ -115,7 +119,7 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
                     float numerator =
                         range *
                         static_cast<float>(
-                            ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
+                        ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
                     float denominator =
                         static_cast<float>(2.0f * (chip_angle * 2.0f).sin());
                     float chip_speed =

@@ -156,6 +156,7 @@ static const double MIN_CAPACITOR_VOLTAGE = 0;
 static const double MAX_CAPACITOR_VOLTAGE = 250.0 + 50.0;  // +50v headroom
 
 static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
+static const double ROBOT_CHIP_ANGLE_RADIANS = ROBOT_CHIP_ANGLE_DEGREES * M_PI / 180;
 static const double CHICKER_TIMEOUT                = 3 * MILLISECONDS_PER_SECOND;
 // How many robots are allowed in each division
 static const unsigned DIV_A_NUM_ROBOTS = 11;

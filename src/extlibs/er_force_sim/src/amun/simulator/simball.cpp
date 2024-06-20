@@ -28,6 +28,10 @@
 #include "extlibs/er_force_sim/src/core/vector.h"
 #include "proto/ssl_vision_detection.pb.h"
 #include "simulator.h"
+#include "software/logger/logger.h"
+#include "proto/message_translation/tbots_protobuf.h"
+
+// #include "software/logger/logger.h"
 
 using namespace camun::simulator;
 
@@ -82,6 +86,10 @@ void SimBall::begin(bool robot_collision)
     // custom implementation of rolling friction
     const btVector3 p        = m_body->getWorldTransform().getOrigin();
     const btVector3 velocity = m_body->getLinearVelocity();
+    LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+        {"dist", std::sqrt(pow(p.x() - 0, 2) + pow(p.y() - 0, 2))},
+        {"z", p.z()}
+    });
     if (p.z() < static_cast<float>(BALL_MAX_RADIUS_METERS) * 1.1f * SIMULATOR_SCALE)
     {  // ball is on the ground
         bool is_stationary =
