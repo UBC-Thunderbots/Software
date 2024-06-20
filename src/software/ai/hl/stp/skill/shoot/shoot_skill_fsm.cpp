@@ -43,6 +43,8 @@ void ShootSkillFSM::dribbleBallToKickOrigin(
             Point kick_target = event.common.world_ptr->field().enemyGoalCenter();
             best_shot_        = Shot(kick_origin, kick_target, Angle::zero());
         }
+
+        event.common.set_skill_state({.shot = best_shot_});
     }
 
     Point kick_origin = best_shot_->getOrigin();

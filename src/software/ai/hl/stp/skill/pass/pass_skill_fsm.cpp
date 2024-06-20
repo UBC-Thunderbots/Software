@@ -102,14 +102,15 @@ void PassSkillFSM::findPass(
         .allow_excessive_dribbling = false};
 
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
+
+    event.common.set_skill_state(
+        {.pass_committed = false, .pass = best_pass_so_far_->pass});
 }
 
 void PassSkillFSM::takePass(
     const Update& event,
     boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
-    event.common.strategy->commitPass(best_pass_so_far_->pass);
-
     Point ball_position = event.common.world_ptr->ball().position();
     Point kick_target   = best_pass_so_far_->pass.receiverPoint();
 
@@ -132,9 +133,7 @@ void PassSkillFSM::takePass(
         .retry_kick        = false};
 
     processEvent(PivotKickSkillFSM::Update(control_params, event.common));
-}
 
-void PassSkillFSM::keepPassCommitted(const SuspendedUpdate& event)
-{
-    event.strategy->commitPass(best_pass_so_far_->pass);
+    event.common.set_skill_state(
+        {.pass_committed = true, .pass = best_pass_so_far_->pass});
 }

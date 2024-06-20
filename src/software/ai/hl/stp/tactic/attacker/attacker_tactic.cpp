@@ -63,6 +63,56 @@ void AttackerTactic::terminate(const WorldPtr& world_ptr)
     current_skill_.reset();
 }
 
+SkillState AttackerTactic::getSkillState() const
+{
+    if (last_execution_robot && current_skill_)
+    {
+        return current_skill_->getSkillState(*last_execution_robot);
+    }
+
+    // Return empty SkillState if no Skill is being executed
+    return SkillState{};
+}
+
+void AttackerTactic::visualizeSkillState(const World& world)
+{
+    SkillState skill_state = getSkillState();    
+
+    TbotsProto::AttackerVisualization attacker_vis_msg;
+
+    if (skill_state.pass)
+    {
+        TbotsProto::Pass pass_msg;
+        *(pass_msg.mutable_passer_point()) =
+            *createPointProto(skill_state.pass->passerPoint());
+        *(pass_msg.mutable_receiver_point()) =
+            *createPointProto(skill_state.pass->receiverPoint());
+        pass_msg.set_pass_speed_m_per_s(skill_state.pass->speed());
+        *(attacker_vis_msg.mutable_pass_()) = pass_msg;
+    }
+
+    attacker_vis_msg.set_pass_committed(skill_state.pass_committed);
+
+    if (skill_state.shot)
+    {
+        TbotsProto::Shot shot_msg;
+        *(shot_msg.mutable_shot_origin()) = *createPointProto(world.ball().position());
+        *(shot_msg.mutable_shot_target()) =
+            *createPointProto(skill_state.shot->getPointToShootAt());
+        *(shot_msg.mutable_open_angle()) =
+            *createAngleProto(skill_state.shot->getOpenAngle());
+        *(attacker_vis_msg.mutable_shot()) = shot_msg;
+    }
+
+    if (skill_state.chip_target)
+    {
+        *(attacker_vis_msg.mutable_chip_target()) =
+            *createPointProto(skill_state.chip_target.value());
+    }
+
+    LOG(VISUALIZE) << attacker_vis_msg;
+}
+
 void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
     // If the robot executing the current skill is done, or if there is no current skill

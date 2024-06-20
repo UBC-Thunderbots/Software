@@ -19,41 +19,12 @@ PassWithRating Strategy::getBestPass()
     return *best_pass_;
 }
 
-std::optional<Pass> Strategy::getNextCommittedPass()
+std::vector<Point> Strategy::getBestReceivingPositions(
+    unsigned int num_positions, const std::vector<Point>& existing_receiver_positions,
+    const std::optional<Point>& pass_origin_override)
 {
-    if (committed_passes_index_ >= committed_passes_.size())
-    {
-        return std::nullopt;
-    }
-
-    return committed_passes_.at(committed_passes_index_++);
-}
-
-void Strategy::commitPass(Pass pass)
-{
-    committed_passes_.push_back(pass);
-}
-
-Point Strategy::getNextBestReceivingPosition()
-{
-    if (receiving_positions_.empty())
-    {
-        std::vector<Point> existing_receiver_positions;
-        std::transform(committed_passes_.begin(), committed_passes_.end(),
-                       std::back_inserter(existing_receiver_positions),
-                       [](const Pass& pass) { return pass.receiverPoint(); });
-
-        unsigned int num_positions_to_generate = static_cast<unsigned int>(
-            world_ptr_->friendlyTeam().numRobots() - existing_receiver_positions.size());
-
-        receiving_positions_ = receiver_position_generator_.getBestReceivingPositions(
-            *world_ptr_, num_positions_to_generate, existing_receiver_positions);
-    }
-
-    CHECK(receiving_positions_index_ < receiving_positions_.size())
-        << "No more receiving positions to return";
-
-    return receiving_positions_.at(receiving_positions_index_++);
+    return receiver_position_generator_.getBestReceivingPositions(
+        *world_ptr_, num_positions, existing_receiver_positions, pass_origin_override);
 }
 
 std::optional<Shot> Strategy::getBestShot(const Robot& robot)
@@ -103,12 +74,6 @@ void Strategy::updateWorld(const WorldPtr& world_ptr)
     world_ptr_ = world_ptr;
 
     best_pass_.reset();
-
-    committed_passes_.clear();
-    committed_passes_index_ = 0;
-
-    receiving_positions_.clear();
-    receiving_positions_index_ = 0;
-
     robot_to_best_shot_.clear();
+    robot_to_best_sampled_shot_.clear();
 }

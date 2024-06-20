@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/hl/stp/skill/dribble:dribble_skill",
-        "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic:support_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/passing:pass",
         "//software/ai/evaluation:intercept",

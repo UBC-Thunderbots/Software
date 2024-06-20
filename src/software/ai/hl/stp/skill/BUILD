@@ -7,6 +7,7 @@ cc_library(
         "skill_fsm.h",
     ],
     deps = [
+        ":skill_state",
         "//proto/primitive:primitive_msg_factory",
         "//software/ai:strategy",
         "//software/ai/hl/stp/primitive",
@@ -19,6 +20,15 @@ cc_library(
     name = "base_skill",
     hdrs = ["base_skill.hpp"],
     deps = [":skill"],
+)
+
+cc_library(
+    name = "skill_state",
+    hdrs = ["skill_state.h"],
+    deps = [        
+        "//software/ai/passing:pass",
+        "//software/ai/evaluation:shot",
+    ]
 )
 
 cc_library(

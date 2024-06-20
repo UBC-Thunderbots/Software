@@ -11,9 +11,7 @@ void ChipSkillFSM::updateGetBehindBall(
         .chick_direction = event.control_params.chip_direction};
 
     // Update the get behind ball fsm
-    processEvent(GetBehindBallSkillFSM::Update(
-        control_params, SkillUpdate(event.common.robot, event.common.world_ptr,
-                                    event.common.strategy, event.common.set_primitive)));
+    processEvent(GetBehindBallSkillFSM::Update(control_params, event.common));
 }
 
 void ChipSkillFSM::updateChip(const Update &event)

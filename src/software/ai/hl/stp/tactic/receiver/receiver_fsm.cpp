@@ -118,7 +118,7 @@ void ReceiverFSM::updateOnetouch(const Update& event)
 {
     auto best_shot = findFeasibleShot(*event.common.world_ptr, event.common.robot);
 
-    if (best_shot.has_value() && event.control_params.receiver_point)
+    if (best_shot.has_value() && event.control_params.receiving_position)
     {
         auto one_touch = getOneTouchShotPositionAndOrientation(
             event.common.robot, event.common.world_ptr->ball(),
@@ -140,15 +140,15 @@ void ReceiverFSM::updateOnetouch(const Update& event)
 
 void ReceiverFSM::updateReceive(const Update& event)
 {
-    if (event.control_params.receiver_point)
+    if (event.control_params.receiving_position)
     {
-        const Ball& ball           = event.common.world_ptr->ball();
-        const Point receiver_point = event.control_params.receiver_point.value();
+        const Ball& ball               = event.common.world_ptr->ball();
+        const Point receiving_position = event.control_params.receiving_position.value();
         const Angle receiver_orientation =
-            (ball.position() - receiver_point).orientation();
+            (ball.position() - receiving_position).orientation();
 
         event.common.set_primitive(std::make_unique<MovePrimitive>(
-            event.common.robot, receiver_point, receiver_orientation,
+            event.common.robot, receiving_position, receiver_orientation,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
             TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
@@ -177,10 +177,10 @@ void ReceiverFSM::adjustReceive(const Update& event)
 
 bool ReceiverFSM::passStarted(const Update& event)
 {
-    const Ball& ball           = event.common.world_ptr->ball();
-    const Point receiver_point = event.control_params.receiver_point.value();
+    const Ball& ball               = event.common.world_ptr->ball();
+    const Point receiving_position = event.control_params.receiving_position.value();
 
-    return ball.hasBallBeenKicked((receiver_point - ball.position()).orientation());
+    return ball.hasBallBeenKicked((receiving_position - ball.position()).orientation());
 }
 
 bool ReceiverFSM::passReceived(const Update& event)
@@ -204,8 +204,8 @@ bool ReceiverFSM::strayPass(const Update& event)
     auto ball_position = event.common.world_ptr->ball().position();
 
     Vector ball_receiver_point_vector(
-        event.control_params.receiver_point->x() - ball_position.x(),
-        event.control_params.receiver_point->y() - ball_position.y());
+        event.control_params.receiving_position->x() - ball_position.x(),
+        event.control_params.receiving_position->y() - ball_position.y());
 
     auto orientation_difference =
         event.common.world_ptr->ball().velocity().orientation() -

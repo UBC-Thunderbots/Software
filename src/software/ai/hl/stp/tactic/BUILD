@@ -59,6 +59,12 @@ cc_library(
 )
 
 cc_library(
+    name = "support_tactic",
+    hdrs = ["support_tactic.h"],
+    deps = [":tactic"],
+)
+
+cc_library(
     name = "transition_conditions",
     srcs = ["transition_conditions.cpp"],
     hdrs = ["transition_conditions.h"],

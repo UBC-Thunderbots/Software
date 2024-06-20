@@ -70,6 +70,21 @@ class AttackerTactic : public Tactic
      */
     void terminate(const WorldPtr& world_ptr);
 
+    /**
+     * Gets a SkillState containing details about the current state of the skill
+     * that the AttackerTactic is executing.
+     * 
+     * @return the current state of the Skill that the tactic is executing
+     */
+    SkillState getSkillState() const;
+
+    /**
+     * Log visualize the SkillState for this AttackerTactic.
+     *
+     * @param world the current state of the world
+     */
+    void visualizeSkillState(const World& world);
+
    private:
     // The shared Strategy used by all of AI
     std::shared_ptr<Strategy> strategy_;

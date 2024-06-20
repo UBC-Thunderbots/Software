@@ -7,10 +7,7 @@
 #include "software/logger/logger.h"
 
 ReceiverTactic::ReceiverTactic(std::shared_ptr<Strategy> strategy)
-    : Tactic({RobotCapability::Move}),
-      strategy_(strategy),
-      fsm_map(),
-      control_params({ReceiverFSM::ControlParams{.receiver_point = std::nullopt}})
+    : SupportTactic({RobotCapability::Move}), strategy_(strategy), fsm_map(), control_params()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
@@ -23,20 +20,17 @@ void ReceiverTactic::accept(TacticVisitor& visitor) const
     visitor.visit(*this);
 }
 
-std::map<RobotId, std::shared_ptr<Primitive>> ReceiverTactic::get(
-    const WorldPtr& world_ptr)
+void ReceiverTactic::updateReceivingPosition(std::optional<Point> receiving_position)
 {
-    std::optional<Pass> committed_pass = strategy_->getNextCommittedPass();
-    if (committed_pass)
-    {
-        control_params.receiver_point = committed_pass->receiverPoint();
-    }
-    else
-    {
-        control_params.receiver_point = strategy_->getNextBestReceivingPosition();
-    }
+    updateControlParams(receiving_position);
+}
 
-    return Tactic::get(world_ptr);
+void ReceiverTactic::updateControlParams(std::optional<Point> receiving_position,
+                                         bool disable_one_touch_shot)
+{
+    // Update the control parameters stored by this Tactic
+    control_params.receiving_position     = receiving_position;
+    control_params.disable_one_touch_shot = disable_one_touch_shot;
 }
 
 void ReceiverTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)

@@ -12,7 +12,7 @@
  * on the Play's success. This enables the Play to "learn" which tactics are
  * most effective for a given gameplay scenario.
  *
- * Every time we select and run the DynamicPlay, we call it an episode.
+ * We call each time we select and run the DynamicPlay an episode.
  * At the start of each episode, the DynamicPlay chooses which support tactics
  * to run and commits to those tactics for the length of the episode.
  * When the episode terminates, the DynamicPlay's performance over the episode
@@ -54,7 +54,7 @@ class DynamicPlay : public Play
      */
     void updateSupportTactics(unsigned int num_supporters);
 
-    std::vector<std::shared_ptr<Tactic>> support_tactics_;
+    std::vector<std::shared_ptr<SupportTactic>> support_tactics_;
     std::vector<std::shared_ptr<SupportTacticCandidate>> support_tactic_candidates_;
 
     std::unique_ptr<FeasibilityScorer> support_tactic_feasibility_scorer_;

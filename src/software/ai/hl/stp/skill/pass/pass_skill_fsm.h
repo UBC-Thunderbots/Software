@@ -64,15 +64,6 @@ struct PassSkillFSM
     void takePass(const Update& event,
                   boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
 
-    /**
-     * Action to take while the skill is suspended.
-     * This will keep committing the pass that was taken so that receivers retain
-     * knowledge of the committed pass while this skill is suspended.
-     *
-     * @param event the SuspendedUpdate event
-     */
-    void keepPassCommitted(const SuspendedUpdate& event);
-
     auto operator()()
     {
         using namespace boost::sml;
@@ -87,7 +78,6 @@ struct PassSkillFSM
         DEFINE_SML_GUARD(shouldAbortPass)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(findPass, DribbleSkillFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(takePass, PivotKickSkillFSM)
-        DEFINE_SML_ACTION(keepPassCommitted)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -98,7 +88,7 @@ struct PassSkillFSM
             PivotKickSkillFSM_S = Suspended_S,
 
             Suspended_S + SuspendedUpdate_E[passReceived_G || shouldAbortPass_G] = X,
-            Suspended_S + SuspendedUpdate_E / keepPassCommitted_A = Suspended_S,
+            Suspended_S + SuspendedUpdate_E = Suspended_S,
 
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
