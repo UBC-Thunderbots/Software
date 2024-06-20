@@ -12,12 +12,14 @@
  *
  * These actions correspond to Skills that the AttackerTactic can execute.
  */
+// clang-format off
 MAKE_REFLECTIVE_ENUM(AttackerMdpAction, 
                      KEEP_AWAY, 
                      CHIP_PASS, 
                      KICK_PASS, 
                      SHOOT, 
                      DRIBBLE_SHOOT)
+// clang-format on
 
 /**
  * Creates a new Skill corresponding to the given AttackerMdpAction enum value.

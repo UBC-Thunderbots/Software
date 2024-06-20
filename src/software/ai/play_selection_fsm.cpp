@@ -45,12 +45,6 @@ bool PlaySelectionFSM::gameStateSetupRestart(const Update& event)
     return event.world_ptr->gameState().isSetupRestart();
 }
 
-bool PlaySelectionFSM::isFriendlyFreeKick(const Update& event)
-{
-    const GameState& game_state = event.world_ptr->gameState();
-    return game_state.isOurDirectFree() || game_state.isOurIndirectFree();
-}
-
 bool PlaySelectionFSM::enemyHasPossession(const Update& event)
 {
     return event.world_ptr->getTeamWithPossession() == TeamPossession::ENEMY;
@@ -88,6 +82,11 @@ void PlaySelectionFSM::setupSetPlay(const Update& event)
     if (game_state.isTheirPenalty())
     {
         event.set_current_play(std::make_shared<PenaltyKickEnemyPlay>(strategy_));
+    }
+
+    if (game_state.isOurDirectFree() || game_state.isOurIndirectFree())
+    {
+        event.set_current_play(std::make_unique<FreeKickPlay>(strategy_));
     }
 
     if (game_state.isTheirDirectFree() || game_state.isTheirIndirectFree())

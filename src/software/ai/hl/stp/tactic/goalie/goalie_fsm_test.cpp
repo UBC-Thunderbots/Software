@@ -87,10 +87,11 @@ TEST(GoalieFSMTest, test_transitions)
         Point(GoalieFSM::getNoChipRectangle(world_ptr->field()).xMax(), 0);
     Angle clear_ball_direction = Angle::zero();
 
-    TbotsProto::AiConfig ai_config;
-    FSM<GoalieFSM> fsm(DribbleSkillFSM(ai_config.dribble_config()),
-                       GoalieFSM(ai_config.goalie_tactic_config(),
-                                 ai_config.robot_navigation_obstacle_config(),
+    std::shared_ptr<Strategy> strategy = 
+        std::make_shared<Strategy>(TbotsProto::AiConfig());
+    
+    FSM<GoalieFSM> fsm(DribbleSkillFSM(),
+                       GoalieFSM(strategy,
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
     // goalie starts in PositionToBlock
@@ -175,7 +176,7 @@ TEST(GoalieFSMTest, test_transitions)
     // goalie should return to PositionToBlock
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is stationary at the center of the field
     ::TestUtil::setBallPosition(world_ptr, Point(0, 0), Timestamp::fromSeconds(124));
@@ -199,5 +200,5 @@ TEST(GoalieFSMTest, test_transitions)
     // goalie should enter DribbleFSM
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM>));
 }

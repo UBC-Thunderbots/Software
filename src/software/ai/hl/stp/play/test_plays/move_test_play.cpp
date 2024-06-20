@@ -5,7 +5,7 @@
 
 MoveTestPlay::MoveTestPlay(const TbotsProto::AiConfig &config,
                            std::shared_ptr<Strategy> strategy)
-    : Play(config, false, strategy)
+    : Play(false, strategy)
 {
 }
 

@@ -32,9 +32,9 @@ TEST_P(ChipSkillTest, chip_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<ChipSkillTactic>();
-    tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
-                                5);
+    auto tactic = std::make_shared<ChipSkillTactic>(strategy);
+    tactic->updateControlParams(
+        {robot_position + ball_offset_from_robot, angle_to_kick_at, 5});
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

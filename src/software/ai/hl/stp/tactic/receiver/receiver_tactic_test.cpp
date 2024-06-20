@@ -37,7 +37,7 @@ TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
     friendly_robots.emplace_back(robot_state);
 
     auto tactic = std::make_shared<ReceiverTactic>(strategy);
-    tactic->updateControlParams(pass);
+    tactic->updateReceivingPosition(pass.receiverPoint());
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -124,7 +124,7 @@ TEST_P(ReceiverTacticTestOneTouch, test_one_touch)
     friendly_robots.emplace_back(robot_state);
 
     auto tactic = std::make_shared<ReceiverTactic>(strategy);
-    tactic->updateControlParams(pass);
+    tactic->updateReceivingPosition(pass.receiverPoint());
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
