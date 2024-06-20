@@ -35,28 +35,32 @@ void CreaseDefenderFSM::blockThreat(
 {
     Point destination = event.common.robot.position();
     // Use a slightly larger inflation factor to avoid the crease defenders from sitting
-    double robot_obstacle_inflation_factor = robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5;
+    double robot_obstacle_inflation_factor =
+        robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5;
     double robot_radius_expansion_amount =
-            ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
+        ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
     Rectangle inflated_defense_area =
-            event.common.world_ptr->field().friendlyDefenseArea().expand(robot_radius_expansion_amount);
+        event.common.world_ptr->field().friendlyDefenseArea().expand(
+            robot_radius_expansion_amount);
     // right on the edge of the defense area obstacle.
     auto block_threat_point = findBlockThreatPoint(
         event.common.world_ptr->field(), event.control_params.enemy_threat_origin,
-        event.control_params.crease_defender_alignment,
-        robot_obstacle_inflation_factor);
+        event.control_params.crease_defender_alignment, robot_obstacle_inflation_factor);
 
     if (contains(inflated_defense_area, event.control_params.enemy_threat_origin))
     {
-        // Check to see if ray is within goalie box to ignore and station bot along inflated defense area
+        // Check to see if ray is within goalie box to ignore and station bot along
+        // inflated defense area
         auto crease_defender_alignment = event.control_params.crease_defender_alignment;
         if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
         {
-            destination = Point(inflated_defense_area.posXPosYCorner().x() , ROBOT_MAX_RADIUS_METERS);
+            destination = Point(inflated_defense_area.posXPosYCorner().x(),
+                                ROBOT_MAX_RADIUS_METERS);
         }
         else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::RIGHT)
         {
-            destination = Point(inflated_defense_area.posXPosYCorner().x(), -ROBOT_MAX_RADIUS_METERS);
+            destination = Point(inflated_defense_area.posXPosYCorner().x(),
+                                -ROBOT_MAX_RADIUS_METERS);
         }
     }
     else if (block_threat_point)
