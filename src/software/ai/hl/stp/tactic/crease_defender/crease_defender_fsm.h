@@ -100,7 +100,7 @@ struct CreaseDefenderFSM
      * @param zone a stadium shape that defines the zone
      * @return true if any enemy robot is within the given zone, else false
      */
-    bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
+    static bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
 
    private:
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;

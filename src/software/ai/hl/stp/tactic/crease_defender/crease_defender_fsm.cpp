@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/stadium.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
@@ -33,7 +34,7 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 bool CreaseDefenderFSM::isAnyEnemyInZone(const Update& event, const Stadium& zone)
 {
     std::vector<Robot> enemy_robots = event.common.world_ptr->enemyTeam().getAllRobots();
-    for (int i = 0; i < event.common.world_ptr->enemyTeam().numRobots(); i++) {
+    for (int i = 0; i < static_cast<int>(event.common.world_ptr->enemyTeam().numRobots()); i++) {
         if (contains(zone, enemy_robots[i].position()))
         {
             return true;
@@ -91,15 +92,18 @@ void CreaseDefenderFSM::blockThreat(
      *  3) AutoChipOrKickMode::OFF + DribbleFSM <--> when ball nearby && no nearby threats
      */
     AutoChipOrKick auto_chip_or_kick{};
-    double ball_distance = distance(robot_position, event.common.world_ptr->ball().position());
-    double threat_distance = distance(robot_position, event.control_params.enemy_threat_origin);
+//    double ball_distance = distance(robot_position, event.common.world_ptr->ball().position());
+//    double threat_distance = distance(robot_position, event.control_params.enemy_threat_origin);
     auto goal_line_segment = Segment(event.common.world_ptr->field().friendlyGoal().posXPosYCorner(),
                                      event.common.world_ptr->field().friendlyGoal().posXNegYCorner());
     Ray robot_shoot_ray = Ray(robot_position, robot_orientation);
     std::vector<Point> goal_intersections = intersection(robot_shoot_ray, goal_line_segment);
     Stadium threat_zone = Stadium(robot_position,
-                                  Point(Vector::createFromAngle(robot_orientation).normalize(10)),
-                                  2);
+                                  Vector::createFromAngle(robot_orientation).normalize(1),
+                                  0.1);
+    LOG(VISUALIZE) << *createDebugShapes({
+         *createDebugShape(threat_zone, "1234", "threatzone")
+    });
     if (goal_intersections.empty() && CreaseDefenderFSM::isAnyEnemyInZone(event, threat_zone))
     {
         auto_chip_or_kick = AutoChipOrKick{
@@ -109,7 +113,7 @@ void CreaseDefenderFSM::blockThreat(
     }
     else
     {
-        auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF};
+        auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0};
     }
 
     MoveFSM::ControlParams control_params{
