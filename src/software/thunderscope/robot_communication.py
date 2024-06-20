@@ -15,6 +15,7 @@ import os
 from google.protobuf.message import Message
 
 DISCONNECTED = "DISCONNECTED"
+"""A constant to represent a disconnected interface"""
 
 
 class RobotCommunication(object):
@@ -118,6 +119,9 @@ class RobotCommunication(object):
     def setup_for_fullsystem(self, referee_interface: str = DISCONNECTED, vision_interface: str = DISCONNECTED) -> None:
         """
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
+
+        :param referee_interface: the interface to listen for referee data
+        :param vision_interface: the interface to listen for vision data
         """
         change_referee_interface = (referee_interface != self.current_network_config.referee_interface)\
                 and (referee_interface != DISCONNECTED)
@@ -160,10 +164,14 @@ class RobotCommunication(object):
 
             self.is_setup_for_fullsystem = True
 
-        self.__print_current_network_config()
-
 
     def __setup_for_robot_communication(self, robot_status_interface: str = "lo") -> None:
+        """
+        Set up senders and listeners for communicating with the robots
+
+        :param robot_status_interface: the interface to listen/send for robot status data. Ignored for sending
+        primitives if using radio
+        """
         if robot_status_interface == self.current_network_config.robot_status_interface\
                 or robot_status_interface == DISCONNECTED:
             return
@@ -197,7 +205,7 @@ class RobotCommunication(object):
         if self.enable_radio:
             self.send_primitive_set = tbots_cpp.PrimitiveSetProtoRadioSender()
         else:
-            self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
+            self.send_primitive_set, error = tbots_cpp.createPrimitiveSetProtoUdpSender(
                 self.multicast_channel, PRIMITIVE_PORT, robot_status_interface, True
             )
         
@@ -205,7 +213,6 @@ class RobotCommunication(object):
             print(f"Error setting up robot status interface: {error}")
 
         self.current_network_config.robot_status_interface = robot_status_interface if not error else DISCONNECTED
-        self.__print_current_network_config()
 
     def close_for_fullsystem(self) -> None:
         if self.receive_ssl_wrapper:
@@ -213,16 +220,6 @@ class RobotCommunication(object):
 
         if self.receive_ssl_referee_proto:
             self.receive_ssl_referee_proto.close()
-
-    def __close_for_robot_communication(self) -> None:
-        if self.receive_robot_status:
-            self.receive_robot_status.close()
-
-        if self.receive_robot_log:
-            self.receive_robot_log.close()
-
-        if self.receive_robot_crash:
-            self.receive_robot_crash.close()
 
 
     def toggle_keyboard_estop(self) -> None:
@@ -328,6 +325,7 @@ class RobotCommunication(object):
                 self.__setup_for_robot_communication(
                     robot_status_interface=network_config.robot_status_interface
                 )
+                self.__print_current_network_config()
 
             # total primitives for all robots
             robot_primitives = {}
@@ -423,7 +421,18 @@ class RobotCommunication(object):
         self.run_primitive_set_thread.join()
 
     def __print_current_network_config(self) -> None:
+        """
+        Prints the current network configuration to the console
+        """
         def output_string(comm_name: str, status: str) -> str:
+            """
+            Returns a formatted string with the communication name and status
+
+            Any status other than DISCONNECTED will be coloured green, otherwise red
+
+            :param comm_name: the name of the communication
+            :param status: the status of the communication
+            """
             colour = Fore.RED if status == DISCONNECTED else Fore.GREEN
             return f"{comm_name} {colour}{status} {Style.RESET_ALL}"
 

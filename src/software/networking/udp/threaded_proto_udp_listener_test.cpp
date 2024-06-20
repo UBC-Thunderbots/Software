@@ -14,6 +14,7 @@ TEST(ThreadedProtoUdpListenerTest, error_finding_local_ip_address)
 TEST(ThreadedProtoUdpListenerTest, error_creating_socket)
 {
     std::optional<std::string> error;
+    // This will always fail because it requires root privileges to open this port
     ThreadedProtoUdpListener<google::protobuf::Empty>("224.5.23.1", 1023, "lo", [](const auto&){}, true, error);
     EXPECT_TRUE(error.has_value());
 }

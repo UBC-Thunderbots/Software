@@ -222,6 +222,13 @@ def setup_network_config_widget(
     def on_change_callback(
         attr: Any, value: Any, updated_proto: NetworkConfig
     ) -> None:
+        """
+        Callback function that sends updated network configuration
+
+        :param attr: The parameter that changed
+        :param value: The new value
+        :param updated_proto: The updated network configuration
+        """
         proto_unix_io.send_proto(NetworkConfig, updated_proto)
 
     return ProtoConfigurationWidget(config, on_change_callback)

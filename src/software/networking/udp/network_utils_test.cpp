@@ -31,6 +31,7 @@ TEST(NetworkUtilsTest, isIpv6ForIpv4)
 
 TEST(NetworkUtilsTest, isIpv6ForIpv4Mapped)
 {
+    // This is actually an IPv4 address mapped to an IPv6 address
     std::string ip_address = "::ffff:0:0";
     EXPECT_TRUE(isIpv6(ip_address));
 }

@@ -4,7 +4,7 @@
 #include <string>
 
 /**
- * @brief Given an interface, get the IP address associated with that interface
+ * Given an interface, get the IP address associated with that interface
  *
  * The modified ip_address is valid only if the function returns true
  *
@@ -17,7 +17,10 @@
 bool getLocalIp(const std::string& interface, std::string& ip_address, bool ipv4=true);
 
 /**
- * @brief Check if the given string is a valid IPv6 address
+ * Check if the given string follows the IPv6 address format
+ *
+ * Addresses that are actually an "embedded IPv4 address" are still considered as an IPv6 address since it follows the
+ * IPv6 address format
  * 
  * @param ip_address The string to check
  * @return true if the string is a valid IPv6 address, false otherwise

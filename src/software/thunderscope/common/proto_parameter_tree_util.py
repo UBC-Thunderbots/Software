@@ -5,6 +5,15 @@ from thefuzz import fuzz
 import netifaces
 
 
+"""
+Instead of the using the generic parameter parsing, this constant can be used to define custom handlers for specific
+fields in the proto.
+
+To define a custom handler:
+    1. The key is the name of the field in the proto
+    2. The value is the function that will be called to parse the field. Make sure the function is callable from this
+       file
+"""
 CUSTOM_PARAMETERS_OVERRIDE = {"referee_interface":      "__create_network_enum",
                               "robot_status_interface": "__create_network_enum",
                               "vision_interface":       "__create_network_enum"}
@@ -136,8 +145,6 @@ def __create_network_enum(key, value, _):
 
     :param key: The name of the parameter
     :param value: The default value
-    :param descriptor: The proto descriptor
-
     """
     network_interfaces = netifaces.interfaces()
     

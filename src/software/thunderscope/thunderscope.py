@@ -120,8 +120,6 @@ class Thunderscope(object):
             lambda: QMessageBox.information(self.window, "Help", THUNDERSCOPE_HELP_TEXT)
         )
 
-        print("arun: thunderscope initializing")
-
     def reset_layout(self) -> None:
         """Reset the layout to the default layout"""
         saved_layout_path = pathlib.Path(LAST_OPENED_LAYOUT_PATH)

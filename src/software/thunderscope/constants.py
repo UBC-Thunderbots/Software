@@ -197,6 +197,7 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     """
 )
 
+
 def is_field_message_empty(field: Field) -> bool:
     """
     Checks if a field message is empty

@@ -223,6 +223,7 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
         {
             return;
         }
+
         // Start listening again to receive the next data
         startListen();
     }

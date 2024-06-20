@@ -2,6 +2,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <optional>
 #include <string>
 
 #include "software/networking/udp/threaded_udp_sender.h"
@@ -26,7 +27,7 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
      * @param error An optional user-provided string that will be set to an error message if an error occurs
      */
     ThreadedProtoUdpSender(const std::string& ip_address, unsigned short port, const std::string& interface,
-                           bool multicast, std::optional<std::string>& error = std::nullopt)
+                           bool multicast, std::optional<std::string>& error)
         : ThreadedUdpSender(ip_address, port, interface, multicast, error)
     {
     }

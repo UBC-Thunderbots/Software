@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(ThreadedProtoUdpSenderTest, error_finding_ip_address)
+TEST(ThreadedProtoUdpSenderTest, error_finding_local_ip_address)
 {
     std::optional<std::string> error;
     ThreadedProtoUdpSender<google::protobuf::Empty>("224.5.23.1", 40000, "interfacemcinterfaceface", true, error);
