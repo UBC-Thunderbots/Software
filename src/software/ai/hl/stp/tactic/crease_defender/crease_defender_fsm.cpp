@@ -1,4 +1,6 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/stadium.h"
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
@@ -28,10 +30,24 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     return findDefenseAreaIntersection(field, ray, robot_obstacle_inflation_factor);
 }
 
+bool CreaseDefenderFSM::isAnyEnemyInZone(const Update& event, const Stadium& zone)
+{
+    std::vector<Robot> enemy_robots = event.common.world_ptr->enemyTeam().getAllRobots();
+    for (int i = 0; i < event.common.world_ptr->enemyTeam().numRobots(); i++) {
+        if (contains(zone, enemy_robots[i].position()))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void CreaseDefenderFSM::blockThreat(
     const Update& event, boost::sml::back::process<MoveFSM::Update> processEvent)
 {
+    Point robot_position = event.common.robot.position();
     Point destination = event.common.robot.position();
+    Angle robot_orientation = event.common.robot.orientation();
     // Use a slightly larger inflation factor to avoid the crease defenders from sitting
     // right on the edge of the defense area obstacle.
     auto block_threat_point = findBlockThreatPoint(
@@ -64,9 +80,36 @@ void CreaseDefenderFSM::blockThreat(
     TbotsProto::BallCollisionType ball_collision_type =
         TbotsProto::BallCollisionType::ALLOW;
     if ((event.common.world_ptr->ball().position() - destination).length() <
-        (event.common.robot.position() - destination).length())
+        (robot_position - destination).length())
     {
         ball_collision_type = TbotsProto::BallCollisionType::AVOID;
+    }
+    /**
+     * TODO: Fix Auto chip behaviour by adding conditional logic based on the current world
+     *  1) AutoChipOrKickMode::OFF when facing the net
+     *  2) AutoChipOrKickMode::AUTOCHIP <--> when near OUR net && enemy in front
+     *  3) AutoChipOrKickMode::OFF + DribbleFSM <--> when ball nearby && no nearby threats
+     */
+    AutoChipOrKick auto_chip_or_kick{};
+    double ball_distance = distance(robot_position, event.common.world_ptr->ball().position());
+    double threat_distance = distance(robot_position, event.control_params.enemy_threat_origin);
+    auto goal_line_segment = Segment(event.common.world_ptr->field().friendlyGoal().posXPosYCorner(),
+                                     event.common.world_ptr->field().friendlyGoal().posXNegYCorner());
+    Ray robot_shoot_ray = Ray(robot_position, robot_orientation);
+    std::vector<Point> goal_intersections = intersection(robot_shoot_ray, goal_line_segment);
+    Stadium threat_zone = Stadium(robot_position,
+                                  Point(Vector::createFromAngle(robot_orientation).normalize(10)),
+                                  2);
+    if (goal_intersections.empty() && CreaseDefenderFSM::isAnyEnemyInZone(event, threat_zone))
+    {
+        auto_chip_or_kick = AutoChipOrKick{
+            AutoChipOrKickMode::AUTOCHIP,
+            chip_distance
+        };
+    }
+    else
+    {
+        auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF};
     }
 
     MoveFSM::ControlParams control_params{
@@ -75,7 +118,7 @@ void CreaseDefenderFSM::blockThreat(
         .final_speed         = 0.0,
         .dribbler_mode       = TbotsProto::DribblerMode::OFF,
         .ball_collision_type = ball_collision_type,
-        .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance},
+        .auto_chip_or_kick = auto_chip_or_kick,
         .max_allowed_speed_mode  = event.control_params.max_allowed_speed_mode,
         .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         .target_spin_rev_per_s   = 0.0};
