@@ -27,8 +27,9 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
         return;
     }
     const Point friendly_goal_center =
-            event.common.world_ptr->field().friendlyGoalCenter();
-    const double ball_far_threshold_m = event.common.world_ptr->field().totalYLength() / 2;
+        event.common.world_ptr->field().friendlyGoalCenter();
+    const double ball_far_threshold_m =
+        event.common.world_ptr->field().totalYLength() / 2;
 
 
     // One tactic is always designated as the free kick defender
@@ -106,7 +107,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
             }
             else if (tactics_to_return[0].size() < 2 &&
                      distance(friendly_goal_center, block_kick_point) >=
-                     ball_far_threshold_m)
+                         ball_far_threshold_m)
             {
                 auto mid_zone_defender = std::make_shared<PassDefenderTactic>();
                 Point mid_point =
