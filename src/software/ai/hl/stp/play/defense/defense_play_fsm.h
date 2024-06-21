@@ -8,7 +8,7 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 #include "software/logger/logger.h"
 
-struct DefensePlayFSM : public DefensePlayBase
+struct DefensePlayFSM : public DefensePlayFSMBase
 {
     class DefenseState;
 

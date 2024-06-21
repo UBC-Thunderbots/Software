@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/enemy_threat.h"
 
 DefensePlayFSM::DefensePlayFSM(TbotsProto::AiConfig ai_config)
-    : DefensePlayBase::DefensePlayBase(ai_config)
+    : DefensePlayFSMBase::DefensePlayFSMBase(ai_config)
 {
 }
 

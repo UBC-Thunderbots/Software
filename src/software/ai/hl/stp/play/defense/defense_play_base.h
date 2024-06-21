@@ -11,7 +11,7 @@
 /**
  * Struct containing frequently shared functions of the defense play class
  */
-class DefensePlayBase
+class DefensePlayFSMBase
 {
    public:
     struct ControlParams
@@ -27,7 +27,7 @@ class DefensePlayBase
      *
      * @param ai_config the play config for this play FSM
      */
-    explicit DefensePlayBase(TbotsProto::AiConfig ai_config);
+    explicit DefensePlayFSMBase(TbotsProto::AiConfig ai_config);
 
    protected:
     /**

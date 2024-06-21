@@ -8,7 +8,7 @@
 /**
  * Play for defending against enemy free kicks
  */
-struct EnemyFreeKickPlayFSM : public DefensePlayBase
+struct EnemyFreeKickPlayFSM : public DefensePlayFSMBase
 {
     class BlockEnemyKickerState;
 

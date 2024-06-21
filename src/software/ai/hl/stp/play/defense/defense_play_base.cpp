@@ -3,12 +3,12 @@
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
 
-DefensePlayBase::DefensePlayBase(TbotsProto::AiConfig ai_config)
+DefensePlayFSMBase::DefensePlayBase(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config), crease_defenders({}), pass_defenders({})
 {
 }
 
-void DefensePlayBase::setUpCreaseDefenders(int num_crease_defenders)
+void DefensePlayFSMBase::setUpCreaseDefenders(int num_crease_defenders)
 {
     if (num_crease_defenders == int(crease_defenders.size()))
     {
@@ -23,7 +23,7 @@ void DefensePlayBase::setUpCreaseDefenders(int num_crease_defenders)
     });
 }
 
-void DefensePlayBase::setUpPassDefenders(int num_pass_defenders)
+void DefensePlayFSMBase::setUpPassDefenders(int num_pass_defenders)
 {
     if (num_pass_defenders == int(pass_defenders.size()))
     {
@@ -35,7 +35,7 @@ void DefensePlayBase::setUpPassDefenders(int num_pass_defenders)
                   [this]() { return std::make_shared<PassDefenderTactic>(); });
 }
 
-void DefensePlayBase::updatePassDefenderControlParams(
+void DefensePlayFSMBase::updatePassDefenderControlParams(
     std::vector<DefenderAssignment>& pass_defender_assignments)
 {
     for (unsigned int i = 0; i < pass_defenders.size(); i++)
@@ -44,7 +44,7 @@ void DefensePlayBase::updatePassDefenderControlParams(
     }
 }
 
-void DefensePlayBase::setAlignment(
+void DefensePlayFSMBase::setAlignment(
     const Update& event,
     const std::vector<DefenderAssignment>& crease_defender_assignments)
 {

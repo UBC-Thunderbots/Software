@@ -11,7 +11,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(TbotsProto::AiConfig ai_config)
-    : DefensePlayBase::DefensePlayBase(ai_config)
+    : DefensePlayFSMBase::DefensePlayFSMBase(ai_config)
 {
 }
 
@@ -26,10 +26,11 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     {
         return;
     }
+    const Point friendly_goal_center =
+            event.common.world_ptr->field().friendlyGoalCenter();
+    const double ball_far_threshold_m = event.common.world_ptr->field().totalYLength() / 2;
 
-    const double HALF_FIELD_LENGTH = event.common.world_ptr->field().totalYLength() / 2;
-    const Point FRIENDLY_GOAL_CENTER =
-        event.common.world_ptr->field().friendlyGoalCenter();
+
     // One tactic is always designated as the free kick defender
     int num_defenders                      = num_tactics - 1;
     PriorityTacticVector tactics_to_return = {{}, {}, {}};
@@ -72,7 +73,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
         DefenderAssignment defender_assignment;
         int assignment_index_with_skipped =
             static_cast<int>(i + assignments_skipped.size());
-        int assignment_index_last_assignment = static_cast<int>(assignments.size() - 1);
+        int assignment_index_last_assignment = static_cast<int>(assignments.size()) - 1;
 
         if (assignment_index_with_skipped < assignment_index_last_assignment)
         {
@@ -104,13 +105,13 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
                 assignments_skipped.pop();
             }
             else if (tactics_to_return[0].size() < 2 &&
-                     distance(FRIENDLY_GOAL_CENTER, block_kick_point) >=
-                         HALF_FIELD_LENGTH)
+                     distance(friendly_goal_center, block_kick_point) >=
+                     ball_far_threshold_m)
             {
                 auto mid_zone_defender = std::make_shared<PassDefenderTactic>();
                 Point mid_point =
                     Point((event.common.world_ptr->ball().position().toVector() +
-                           FRIENDLY_GOAL_CENTER.toVector()) /
+                           friendly_goal_center.toVector()) /
                           2);
                 mid_zone_defender->updateControlParams(mid_point);
                 tactics_to_return[0].push_back(mid_zone_defender);
