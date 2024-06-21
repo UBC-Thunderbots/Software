@@ -56,6 +56,15 @@ struct CreaseDefenderFSM
     }
 
     /**
+     * Guard that checks if the ball is nearby and unguarded by the enemy
+     *
+     * @param event CreaseDefenderFSM::Update event
+     *
+     * @return if the ball is nearby and unguarded by the enemy
+     */
+    bool ballNearbyWithoutThreat(const Update &event);
+
+    /**
      * This is an Action that blocks the threat
      *
      * @param event CreaseDefenderFSM::Update event
@@ -69,11 +78,14 @@ struct CreaseDefenderFSM
 
         DEFINE_SML_STATE(MoveFSM)
         DEFINE_SML_EVENT(Update)
+        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockThreat, MoveFSM)
+
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
+            *MoveFSM_S + Update_E[ballNearbyWithoutThreat_G] / blockThreat_A, MoveFSM_S = X,
+            MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
             X + Update_E / blockThreat_A = MoveFSM_S);
     }
 

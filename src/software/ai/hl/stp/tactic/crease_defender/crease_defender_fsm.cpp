@@ -104,6 +104,7 @@ void CreaseDefenderFSM::blockThreat(
     LOG(VISUALIZE) << *createDebugShapes({
          *createDebugShape(threat_zone, "1234", "threatzone")
     });
+    // ALSO CLOSE TO NET ADD CLOSE TO NET
     if (goal_intersections.empty() && CreaseDefenderFSM::isAnyEnemyInZone(event, threat_zone))
     {
         auto_chip_or_kick = AutoChipOrKick{
