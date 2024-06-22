@@ -92,8 +92,6 @@ void CreaseDefenderFSM::blockThreat(
      *  3) AutoChipOrKickMode::OFF + DribbleFSM <--> when ball nearby && no nearby threats
      */
     AutoChipOrKick auto_chip_or_kick{};
-//    double ball_distance = distance(robot_position, event.common.world_ptr->ball().position());
-//    double threat_distance = distance(robot_position, event.control_params.enemy_threat_origin);
     auto goal_line_segment = Segment(event.common.world_ptr->field().friendlyGoal().posXPosYCorner(),
                                      event.common.world_ptr->field().friendlyGoal().posXNegYCorner());
     Ray robot_shoot_ray = Ray(robot_position, robot_orientation);
@@ -101,12 +99,18 @@ void CreaseDefenderFSM::blockThreat(
     Stadium threat_zone = Stadium(robot_position,
                                   Vector::createFromAngle(robot_orientation).normalize(1),
                                   0.1);
+    double robot_to_net_m = distance(robot_position, event.common.world_ptr->field().friendlyGoal().centre());
+
+    // DEBUG: Visualizes threat stadium
     LOG(VISUALIZE) << *createDebugShapes({
-         *createDebugShape(threat_zone, "1234", "threatzone")
+         *createDebugShape(threat_zone, std::to_string(event.common.robot.id()), "threatzone")
     });
-    // ALSO CLOSE TO NET ADD CLOSE TO NET
-    if (goal_intersections.empty() && CreaseDefenderFSM::isAnyEnemyInZone(event, threat_zone))
+
+    if (goal_intersections.empty()
+        && CreaseDefenderFSM::isAnyEnemyInZone(event, threat_zone)
+        && robot_to_net_m <= event.common.world_ptr->field().totalYLength() / 2)
     {
+        // Autochip only if the robot is not facing the net, there is an enemy in front, and robot is close to net
         auto_chip_or_kick = AutoChipOrKick{
             AutoChipOrKickMode::AUTOCHIP,
             chip_distance
@@ -174,4 +178,30 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
         }
     }
     return std::nullopt;
+}
+
+bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
+{
+    Point robot_position = event.common.robot.position();
+    double ball_distance = distance(robot_position, event.common.world_ptr->ball().position());
+    double threat_distance = distance(robot_position, event.control_params.enemy_threat_origin);
+    constexpr double GET_POSSESSION_THRESHOLD_M = 1;
+    constexpr  double THREAT_THRESHOLD_M = GET_POSSESSION_THRESHOLD_M * 2;
+
+    // DEBUG: Visualizes nearby threat zone
+    LOG(VISUALIZE) << *createDebugShapes({
+             *createDebugShape(
+                     Circle(robot_position, GET_POSSESSION_THRESHOLD_M),
+                     std::to_string(event.common.robot.id()) + "1",
+                     "ballzone"
+                     )
+     });
+    return ball_distance <= GET_POSSESSION_THRESHOLD_M && threat_distance >= THREAT_THRESHOLD_M;
+}
+
+void CreaseDefenderFSM::getPossession(const Update& event,
+                                             boost::sml::back::process<DribbleFSM::Update> processEvent)
+{
+    DribbleFSM::ControlParams control_params = {.allow_excessive_dribbling = false};
+    processEvent(DribbleFSM::Update(control_params, event.common));
 }

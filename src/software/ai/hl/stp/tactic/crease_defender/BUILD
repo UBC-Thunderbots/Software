@@ -18,6 +18,7 @@ cc_library(
         "//software/geom/algorithms",
         "//software/logger",
         "//software/geom:stadium",
+        "//software/ai/hl/stp/tactic/dribble:dribble_tactic"
     ],
 )
 

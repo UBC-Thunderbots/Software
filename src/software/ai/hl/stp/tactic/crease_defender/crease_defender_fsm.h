@@ -10,10 +10,10 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
 struct CreaseDefenderFSM
 {
-   public:
     // this struct defines the unique control parameters that the CreaseDefenderFSM
     // requires in its update
     struct ControlParams
@@ -62,7 +62,15 @@ struct CreaseDefenderFSM
      *
      * @return if the ball is nearby and unguarded by the enemy
      */
-    bool ballNearbyWithoutThreat(const Update &event);
+    bool ballNearbyWithoutThreat(const Update& event);
+
+    /**
+     * This is the Action that prepares for getting possession of the ball
+     * @param event CreaseDefenderFSM::Update event
+     * @param processEvent processes the DribbleFSM::Update
+     */
+    void prepareGetPossession(const Update& event,
+                              boost::sml::back::process<DribbleFSM::Update> processEvent);
 
     /**
      * This is an Action that blocks the threat
@@ -78,14 +86,16 @@ struct CreaseDefenderFSM
 
         DEFINE_SML_STATE(MoveFSM)
         DEFINE_SML_EVENT(Update)
-        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockThreat, MoveFSM)
-
+        DEFINE_SML_STATE(DribbleFSM)
+        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E[ballNearbyWithoutThreat_G] / blockThreat_A, MoveFSM_S = X,
+            *MoveFSM_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A = DribbleFSM_S,
             MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
+            DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A = X,
             X + Update_E / blockThreat_A = MoveFSM_S);
     }
 
@@ -114,6 +124,8 @@ struct CreaseDefenderFSM
      */
     static bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
 
-   private:
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
+
+    // AI config
+    TbotsProto::AiConfig ai_config;
 };
