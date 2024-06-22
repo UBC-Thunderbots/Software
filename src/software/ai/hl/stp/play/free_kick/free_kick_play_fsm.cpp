@@ -9,15 +9,17 @@ FreeKickPlayFSM::FreeKickPlayFSM(TbotsProto::AiConfig ai_config)
       chip_tactic(std::make_shared<ChipTactic>()),
       passer_tactic(std::make_shared<KickTactic>()),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
-      offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>(2)),
+      offensive_positioning_tactics(
+          {std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>()}),
+      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(
+                                   ai_config.robot_navigation_obstacle_config()),
+                               std::make_shared<CreaseDefenderTactic>(
+                                   ai_config.robot_navigation_obstacle_config())}),
       pass_generator(
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
                                             Field::createSSLDivisionBField()),
                                         ai_config.passing_config()))
 {
-    std::generate(offensive_positioning_tactics.begin(),
-                  offensive_positioning_tactics.end(),
-                  []() { return std::make_shared<MoveTactic>(); });
 }
 
 void FreeKickPlayFSM::setupPosition(const Update &event)
@@ -35,9 +37,15 @@ void FreeKickPlayFSM::setupPosition(const Update &event)
     tactics_to_run[0].emplace_back(align_to_ball_tactic);
 
     updateOffensivePositioningTactics(event.common.world_ptr);
-    tactics_to_run[0].insert(tactics_to_run[0].end(),
-                             offensive_positioning_tactics.begin(),
-                             offensive_positioning_tactics.end());
+    tactics_to_run[0].emplace_back(offensive_positioning_tactics[0]);
+    tactics_to_run[0].emplace_back(offensive_positioning_tactics[1]);
+
+    crease_defender_tactics[0]->updateControlParams(
+        event.common.world_ptr->ball().position(), TbotsProto::CreaseDefenderAlignment::LEFT);
+    crease_defender_tactics[1]->updateControlParams(
+        event.common.world_ptr->ball().position(), TbotsProto::CreaseDefenderAlignment::RIGHT);
+    tactics_to_run[0].emplace_back(crease_defender_tactics[0]);
+    tactics_to_run[0].emplace_back(crease_defender_tactics[1]);
 
     event.common.set_tactics(tactics_to_run);
 }
@@ -149,31 +157,35 @@ void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
 
     // Set robots to roam around the field to try to receive a pass
     updateOffensivePositioningTactics(event.common.world_ptr);
-    tactics_to_run[0].insert(tactics_to_run[0].end(),
-                             offensive_positioning_tactics.begin(),
-                             offensive_positioning_tactics.end());
-    event.common.set_tactics(tactics_to_run);
+    tactics_to_run[0].emplace_back(offensive_positioning_tactics[0]);
+    tactics_to_run[0].emplace_back(offensive_positioning_tactics[1]);
+
+    // Maintain crease defenders
+    crease_defender_tactics[0]->updateControlParams(
+        event.common.world_ptr->ball().position(), TbotsProto::CreaseDefenderAlignment::LEFT);
+    crease_defender_tactics[1]->updateControlParams(
+        event.common.world_ptr->ball().position(), TbotsProto::CreaseDefenderAlignment::RIGHT);
+    tactics_to_run[0].emplace_back(crease_defender_tactics[0]);
+    tactics_to_run[0].emplace_back(crease_defender_tactics[1]);
 
     best_pass_and_score_so_far =
         pass_generator.generatePassEvaluation(*event.common.world_ptr)
             .getBestPassOnField();
+
+    event.common.set_tactics(tactics_to_run);
 }
 
 bool FreeKickPlayFSM::passFound(const Update &event)
 {
-    Duration time_since_pass_optimization_start =
-        event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time;
+    double time_since_pass_optimization_start_seconds =
+        (event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time).toSeconds();
 
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
-    double min_score =
-        1 -
-        std::min(time_since_pass_optimization_start.toSeconds() /
-                     ai_config.free_kick_play_config().max_time_commit_to_pass_seconds(),
-                 1.0);
+    double min_score = 1 - (1 - ai_config.free_kick_play_config().min_acceptable_pass_score()) * (time_since_pass_optimization_start_seconds / ai_config.free_kick_play_config().max_time_commit_to_pass_seconds());
+    LOG(DEBUG) << "Score: " << best_pass_and_score_so_far.rating << " Min score: " << min_score;
 
-    return min_score > ai_config.free_kick_play_config().min_acceptable_pass_score() &&
-           best_pass_and_score_so_far.rating > min_score;
+    return best_pass_and_score_so_far.rating > min_score;
 }
 
 void FreeKickPlayFSM::passBall(const Update &event)
@@ -186,10 +198,13 @@ void FreeKickPlayFSM::passBall(const Update &event)
 
     Pass pass = best_pass_and_score_so_far.pass;
 
-    passer_tactic->updateControlParams(pass.passerPoint(), pass.passerOrientation(),
-                                       pass.speed());
+    chip_tactic->updateControlParams(event.common.world_ptr->ball().position(),
+                                     pass.receiverPoint());
+    // passer_tactic->updateControlParams(pass.passerPoint(), pass.passerOrientation(),
+    //                                    pass.speed());
     receiver_tactic->updateControlParams(pass);
-    tactics_to_run[0].emplace_back(passer_tactic);
+    tactics_to_run[0].emplace_back(chip_tactic);
+    // tactics_to_run[0].emplace_back(passer_tactic);
     tactics_to_run[0].emplace_back(receiver_tactic);
 
     event.common.set_tactics(tactics_to_run);

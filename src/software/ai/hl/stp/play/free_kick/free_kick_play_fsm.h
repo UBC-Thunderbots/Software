@@ -7,6 +7,7 @@
 #include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.hpp"
@@ -229,7 +230,8 @@ struct FreeKickPlayFSM
     std::shared_ptr<ChipTactic> chip_tactic;
     std::shared_ptr<KickTactic> passer_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
-    std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
+    std::array<std::shared_ptr<MoveTactic>, 2> offensive_positioning_tactics;
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics;
 
     std::vector<EighteenZoneId> ranked_zones;
     PassGenerator<EighteenZoneId> pass_generator;
