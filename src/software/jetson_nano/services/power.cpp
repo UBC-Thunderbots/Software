@@ -8,6 +8,9 @@
 
 PowerService::PowerService()
 {
+    nanopb_command =
+        createNanoPbPowerPulseControl(TbotsProto::PowerControl(), 0.0, 0, 0);
+
     if (!boost::filesystem::exists(DEVICE_SERIAL_PORT))
     {
         throw std::runtime_error("USB not plugged into the Jetson Nano");
