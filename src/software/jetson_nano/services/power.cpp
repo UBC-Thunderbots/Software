@@ -8,8 +8,7 @@
 
 PowerService::PowerService()
 {
-    nanopb_command =
-        createNanoPbPowerPulseControl(TbotsProto::PowerControl(), 0.0, 0, 0);
+    nanopb_command = createNanoPbPowerPulseControl(TbotsProto::PowerControl(), 0.0, 0, 0);
 
     if (!boost::filesystem::exists(DEVICE_SERIAL_PORT))
     {
