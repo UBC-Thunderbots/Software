@@ -41,9 +41,11 @@ void FreeKickPlayFSM::setupPosition(const Update &event)
     tactics_to_run[0].emplace_back(offensive_positioning_tactics[1]);
 
     crease_defender_tactics[0]->updateControlParams(
-        event.common.world_ptr->ball().position(), TbotsProto::CreaseDefenderAlignment::LEFT);
+        event.common.world_ptr->ball().position(),
+        TbotsProto::CreaseDefenderAlignment::LEFT);
     crease_defender_tactics[1]->updateControlParams(
-        event.common.world_ptr->ball().position(), TbotsProto::CreaseDefenderAlignment::RIGHT);
+        event.common.world_ptr->ball().position(),
+        TbotsProto::CreaseDefenderAlignment::RIGHT);
     tactics_to_run[0].emplace_back(crease_defender_tactics[0]);
     tactics_to_run[0].emplace_back(crease_defender_tactics[1]);
 
@@ -106,7 +108,7 @@ void FreeKickPlayFSM::shootBall(const Update &event)
 
     shoot_tactic->updateControlParams(
         ball_pos, (shot->getPointToShootAt() - ball_pos).orientation(),
-        BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
+        BALL_MAX_SPEED_METERS_PER_SECOND);
     tactics_to_run[0].emplace_back(shoot_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -160,9 +162,11 @@ void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
 
     // Maintain crease defenders
     crease_defender_tactics[0]->updateControlParams(
-        event.common.world_ptr->ball().position(), TbotsProto::CreaseDefenderAlignment::LEFT);
+        event.common.world_ptr->ball().position(),
+        TbotsProto::CreaseDefenderAlignment::LEFT);
     crease_defender_tactics[1]->updateControlParams(
-        event.common.world_ptr->ball().position(), TbotsProto::CreaseDefenderAlignment::RIGHT);
+        event.common.world_ptr->ball().position(),
+        TbotsProto::CreaseDefenderAlignment::RIGHT);
     tactics_to_run[0].emplace_back(crease_defender_tactics[0]);
     tactics_to_run[0].emplace_back(crease_defender_tactics[1]);
 
@@ -176,12 +180,17 @@ void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
 bool FreeKickPlayFSM::passFound(const Update &event)
 {
     double time_since_pass_optimization_start_seconds =
-        (event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time).toSeconds();
+        (event.common.world_ptr->getMostRecentTimestamp() - pass_optimization_start_time)
+            .toSeconds();
 
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
-    double min_score = 1 - (1 - ai_config.free_kick_play_config().min_acceptable_pass_score()) * (time_since_pass_optimization_start_seconds / ai_config.free_kick_play_config().max_time_commit_to_pass_seconds());
-    LOG(DEBUG) << "Score: " << best_pass_and_score_so_far.rating << " Min score: " << min_score;
+    double min_score =
+        1 - (1 - ai_config.free_kick_play_config().min_acceptable_pass_score()) *
+                (time_since_pass_optimization_start_seconds /
+                 ai_config.free_kick_play_config().max_time_commit_to_pass_seconds());
+    LOG(DEBUG) << "Score: " << best_pass_and_score_so_far.rating
+               << " Min score: " << min_score;
 
     return best_pass_and_score_so_far.rating > min_score;
 }
