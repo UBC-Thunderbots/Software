@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "eighteen_zone_pitch_division.h"
 #include "proto/parameters.pb.h"
 #include "software/ai/passing/field_pitch_division.h"
 #include "software/ai/passing/pass.h"

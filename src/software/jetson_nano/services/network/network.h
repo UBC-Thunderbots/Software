@@ -11,6 +11,8 @@
 #include "software/networking/radio/threaded_proto_radio_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_listener.hpp"
 #include "software/networking/udp/threaded_proto_udp_sender.hpp"
+#include "software/time/duration.h"
+#include "software/time/timestamp.h"
 
 class NetworkService
 {
@@ -52,11 +54,36 @@ class NetworkService
      */
     bool shouldSendNewRobotStatus(const TbotsProto::RobotStatus& robot_status) const;
 
+    /**
+     * Tracks the given primitive set for calculating round-trip time if valid
+     *
+     * @param input A potential primitive set to be logged
+     */
+    void logNewPrimitiveSet(const TbotsProto::PrimitiveSet& new_primitive_set);
+
+    /**
+     * Updates the cached primitive sets for Thunderscope to calculate round-trip time
+     *
+     * @param robot_status The robot status to compare to within the cache
+     */
+    void updatePrimitiveSetLog(TbotsProto::RobotStatus& robot_status);
+
+    /**
+     * Getter for the current epoch time in seconds as a double
+     *
+     * @return current epoch time in seconds as a double
+     */
+    double getCurrentEpochTimeInSeconds();
+
     // Constants
     static constexpr float PROTO_LOSS_WARNING_THRESHOLD          = 0.1f;
     static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
     static constexpr double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
         ROBOT_STATUS_BROADCAST_RATE_HZ / (THUNDERLOOP_HZ + 1.0);
+
+    // increases size of deque when robot status messages are sent less frequently
+    static constexpr unsigned int PRIMITIVE_DEQUE_MAX_SIZE =
+        static_cast<unsigned int>(1500 / ROBOT_STATUS_BROADCAST_RATE_HZ);
 
     // Variables
     TbotsProto::PrimitiveSet primitive_set_msg;
@@ -80,4 +107,16 @@ class NetworkService
 
     // track last breakbeam state for sending RobotStatus outside of specified rate
     bool last_breakbeam_state_sent = false;
+
+    struct RoundTripTime
+    {
+        // Primitive Sequence Number
+        uint64_t primitive_sequence_num = 0;
+        // Epoch time of primitive set sent time from Thunderscope in seconds
+        double thunderscope_sent_time_seconds = 0;
+        // System time for when primitive set was received by Thunderloop in seconds
+        double thunderloop_recieved_time_seconds = 0;
+    };
+
+    std::deque<RoundTripTime> primitive_set_rtt;
 };

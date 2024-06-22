@@ -22,6 +22,11 @@
 #include "pybind11_protobuf/native_proto_caster.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/robot_constants.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/ai/passing/pass.h"
+#include "software/ai/passing/pass_evaluation.hpp"
+#include "software/ai/passing/pass_generator.hpp"
+#include "software/constants.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/circle.h"
@@ -121,6 +126,30 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
             return std::make_tuple(listener, error);
     });
 }
+
+
+template <typename T>
+void declarePassGenerator(py::module& m, std::string name)
+{
+    using Class              = PassGenerator<T>;
+    std::string pyclass_name = name + "PassGenerator";
+    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
+                                              py::buffer_protocol(), py::dynamic_attr())
+        .def(py::init<std::shared_ptr<EighteenZonePitchDivision>,
+                      TbotsProto::PassingConfig>())
+        .def("generatePassEvaluation", &PassGenerator<T>::generatePassEvaluation);
+}
+
+template <typename T>
+void declarePassEvaluation(py::module& m, std::string name)
+{
+    using Class              = PassEvaluation<T>;
+    std::string pyclass_name = name + "PassEvaluation";
+    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
+                                              py::buffer_protocol(), py::dynamic_attr())
+        .def("getBestPassOnField", &PassEvaluation<T>::getBestPassOnField);
+}
+
 
 /**
  * Create a new threaded e-stop reader
@@ -263,6 +292,14 @@ PYBIND11_MODULE(python_bindings, m)
         .def("radius", &Circle::radius)
         .def("area", &Circle::area);
 
+    py::class_<Stadium>(m, "Stadium")
+        .def(py::init<Segment, double>())
+        .def("__repr__", [](const Stadium& s) {
+            std::stringstream stream;
+            stream << s;
+            return stream.str();
+        });
+
     py::class_<RobotConstants>(m, "RobotConstants")
         .def_readwrite("max_force_dribbler_speed_rpm",
                        &RobotConstants::max_force_dribbler_speed_rpm)
@@ -296,12 +333,14 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createCircle", &createCircle);
     m.def("createVector", &createVector);
     m.def("createSegment", &createSegment);
+    m.def("createStadium", &createStadium);
 
     m.def("createPointProto", &createPointProto);
     m.def("createPolygonProto", &createPolygonProto);
     m.def("createCircleProto", &createCircleProto);
     m.def("createVectorProto", &createVectorProto);
     m.def("createSegmentProto", &createSegmentProto);
+    m.def("createStadiumProto", &createStadiumProto);
 
     m.def("createGeometryData", &createGeometryData);
 
@@ -312,6 +351,7 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("contains",
           py::overload_cast<const Segment&, const Point&, double, int>(&contains));
     m.def("contains", py::overload_cast<const Rectangle&, const Point&>(&contains));
+    m.def("contains", py::overload_cast<const Stadium&, const Point&>(&contains));
 
     py::class_<Robot>(m, "Robot")
         .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())
@@ -321,7 +361,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("velocity", &Robot::velocity)
         .def("orientation", &Robot::orientation)
         .def("angularVelocity", &Robot::angularVelocity)
-        .def("isNearDribbler", &Robot::isNearDribbler)
+        .def("isNearDribbler", &Robot::isNearDribbler, py::arg("test_point"),
+             py::arg("TOLERANCE") = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
         .def("dribblerArea", &Robot::dribblerArea);
 
     py::class_<Team>(m, "Team")
@@ -329,7 +370,11 @@ PYBIND11_MODULE(python_bindings, m)
         .def("assignGoalie", &Team::assignGoalie)
         .def("getAllRobots", &Team::getAllRobots);
 
-    py::class_<Ball>(m, "Ball").def("position", &Ball::position);
+    py::class_<Timestamp>(m, "Timestamp").def(py::init<>());
+
+    py::class_<Ball>(m, "Ball")
+        .def(py::init<Point, Vector, Timestamp>())
+        .def("position", &Ball::position);
 
     // https://pybind11.readthedocs.io/en/stable/classes.html
     py::class_<Field>(m, "Field")
@@ -373,6 +418,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("enemyGoalpostPos", &Field::enemyGoalpostPos);
 
     py::class_<World>(m, "World")
+        .def(py::init<Field, Ball, Team, Team>())
+        .def(py::init<TbotsProto::World>())
         .def("friendlyTeam", &World::friendlyTeam)
         .def("enemyTeam", &World::enemyTeam)
         .def("ball", &World::ball)
@@ -394,6 +441,45 @@ PYBIND11_MODULE(python_bindings, m)
         m, "ThreadedEstopReader")
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
+
+    declarePassGenerator<EighteenZoneId>(m, "EighteenZoneId");
+
+    py::class_<EighteenZonePitchDivision, std::shared_ptr<EighteenZonePitchDivision>>(
+        m, "EighteenZonePitchDivision")
+        .def(py::init<Field>())
+        .def("getZone", &EighteenZonePitchDivision::getZone);
+
+    declarePassEvaluation<EighteenZoneId>(m, "EighteenZoneId");
+
+    py::class_<PassWithRating, std::unique_ptr<PassWithRating>>(m, "PassWithRating")
+        .def_readwrite("pass_value", &PassWithRating::pass);
+
+    py::class_<Pass, std::unique_ptr<Pass>>(m, "Pass")
+        .def("passerPoint", &Pass::passerPoint)
+        .def("receiverPoint", &Pass::receiverPoint)
+        .def("speed", &Pass::speed)
+        .def_static("fromDestReceiveSpeed", &Pass::fromDestReceiveSpeed);
+
+    py::enum_<EighteenZoneId>(m, "EighteenZoneId")
+        .value("ZONE_1", EighteenZoneId::ZONE_1)
+        .value("ZONE_2", EighteenZoneId::ZONE_2)
+        .value("ZONE_3", EighteenZoneId::ZONE_3)
+        .value("ZONE_4", EighteenZoneId::ZONE_4)
+        .value("ZONE_5", EighteenZoneId::ZONE_5)
+        .value("ZONE_6", EighteenZoneId::ZONE_6)
+        .value("ZONE_7", EighteenZoneId::ZONE_7)
+        .value("ZONE_8", EighteenZoneId::ZONE_8)
+        .value("ZONE_9", EighteenZoneId::ZONE_9)
+        .value("ZONE_10", EighteenZoneId::ZONE_10)
+        .value("ZONE_11", EighteenZoneId::ZONE_11)
+        .value("ZONE_12", EighteenZoneId::ZONE_12)
+        .value("ZONE_13", EighteenZoneId::ZONE_13)
+        .value("ZONE_14", EighteenZoneId::ZONE_14)
+        .value("ZONE_15", EighteenZoneId::ZONE_15)
+        .value("ZONE_16", EighteenZoneId::ZONE_16)
+        .value("ZONE_17", EighteenZoneId::ZONE_17)
+        .value("ZONE_18", EighteenZoneId::ZONE_18)
+        .export_values();
 
     py::enum_<EstopState>(m, "EstopStates")
         .value("STOP", EstopState::STOP)

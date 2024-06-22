@@ -220,7 +220,6 @@ class Thunderscope(object):
     def show(self) -> None:
         """Show the main window"""
 
-        self.window.show()
         self.window.showMaximized()
         pyqtgraph.exec()
 
