@@ -42,8 +42,7 @@ TEST_F(CreaseDefenderTacticTest, test_chip_ball)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.robot_navigation_obstacle_config());
+    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
 
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);
@@ -77,8 +76,7 @@ TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
         TestUtil::createStationaryRobotStatesWithId({initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.robot_navigation_obstacle_config());
+    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);
 
@@ -121,8 +119,7 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.robot_navigation_obstacle_config());
+    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
 
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);

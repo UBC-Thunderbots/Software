@@ -71,8 +71,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tac
                                      TbotsProto::AiConfig ai_config)
 {
     // TODO-AKHIL: Implement this
-    auto tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.robot_navigation_obstacle_config());
+    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
 
     tactic->updateControlParams(createPoint(tactic_proto.enemy_threat_origin()),
                                 tactic_proto.crease_defender_alignment(),

@@ -128,8 +128,7 @@ void DefensePlayFSM::setUpCreaseDefenders(unsigned int num_crease_defenders)
     crease_defenders =
         std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_crease_defenders);
     std::generate(crease_defenders.begin(), crease_defenders.end(), [this]() {
-        return std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config());
+        return std::make_shared<CreaseDefenderTactic>(ai_config);
     });
 }
 

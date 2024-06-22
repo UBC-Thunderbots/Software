@@ -51,6 +51,11 @@ void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
             CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()),
             DribbleFSM(ai_config.dribble_tactic_config()));
     }
+    DribbleFSM::ControlParams dribble_control_params{
+            .dribble_destination = Point(),
+            .final_dribble_orientation = Angle(),
+            .allow_excessive_dribbling = false
+    };
     fsm_map.at(tactic_update.robot.id())
         ->process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
     fsm_map.at(tactic_update.robot.id())

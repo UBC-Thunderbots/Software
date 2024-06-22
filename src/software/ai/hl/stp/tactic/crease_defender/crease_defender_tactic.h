@@ -5,6 +5,8 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/segment.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+
 
 /**
  * A crease defender moves around the exterior of our defense box to help shadow
@@ -57,8 +59,6 @@ class CreaseDefenderTactic : public Tactic
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
     std::map<RobotId, std::unique_ptr<FSM<CreaseDefenderFSM>>> fsm_map;
-
     CreaseDefenderFSM::ControlParams control_params;
-    DribbleFSM::ControlParams dribble_control_params{.allow_excessive_dribbling = false};
     TbotsProto::AiConfig ai_config;
 };

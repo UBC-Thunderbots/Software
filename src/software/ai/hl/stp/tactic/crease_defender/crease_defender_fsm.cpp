@@ -2,6 +2,7 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/stadium.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
@@ -202,6 +203,10 @@ bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 void CreaseDefenderFSM::prepareGetPossession(const Update& event,
                                              boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
-    DribbleFSM::ControlParams control_params{.allow_excessive_dribbling = false};
+    DribbleFSM::ControlParams control_params{
+        .dribble_destination = Point(),
+        .final_dribble_orientation = Angle(),
+        .allow_excessive_dribbling = false
+    };
     processEvent(DribbleFSM::Update(control_params, event.common));
 }
