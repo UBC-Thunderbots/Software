@@ -136,9 +136,7 @@ void FreeKickPlayFSM::chipBall(const Update &event)
     LOG(DEBUG) << "Time to look for pass expired. Chipping ball...";
     PriorityTacticVector tactics_to_run = {{}};
 
-    double fallback_chip_target_x_offset = 1.5;
-    Point chip_target = event.common.world_ptr->field().enemyGoalCenter() -
-                        Vector(fallback_chip_target_x_offset, 0);
+    Point chip_target = event.common.world_ptr->field().enemyGoalCenter();
 
     chip_tactic->updateControlParams(event.common.world_ptr->ball().position(),
                                      chip_target);
