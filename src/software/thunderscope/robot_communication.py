@@ -314,9 +314,9 @@ class RobotCommunication(object):
         is useful to dip in and out of robot diagnostics.
 
         """
-        while self.running:
-            network_config = self.network_config_buffer.get(block=False if self.send_primitive_set else True,
+        network_config = self.network_config_buffer.get(block=False if self.send_primitive_set else True,
                                                             return_cached=False)
+        while self.running:
             if network_config is not None:
                 print(f"[RobotCommunication] Received new NetworkConfig")
                 if self.is_setup_for_fullsystem:
@@ -326,6 +326,9 @@ class RobotCommunication(object):
                     robot_status_interface=network_config.robot_status_interface
                 )
                 self.__print_current_network_config()
+
+            # Set up network on the next tick
+            network_config = self.network_config_buffer.get(block=False, return_cached=False)
 
             # total primitives for all robots
             robot_primitives = {}

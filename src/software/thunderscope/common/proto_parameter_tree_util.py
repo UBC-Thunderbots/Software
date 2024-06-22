@@ -139,9 +139,8 @@ def __create_parameter_read_only(key, value, descriptor):
 
 
 def __create_network_enum(key, value, _):
-    """Converts an enum field in a protobuf to a ListParameter. Uses
-    the options to lookup all possible enum values and provides them
-    as a dropdown option.
+    """
+    Lists all the network interfaces available on the system as enum options for the given parameter field.
 
     :param key: The name of the parameter
     :param value: The default value
