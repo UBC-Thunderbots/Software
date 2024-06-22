@@ -14,6 +14,7 @@
 
 struct CreaseDefenderFSM
 {
+    public:
     // this struct defines the unique control parameters that the CreaseDefenderFSM
     // requires in its update
     struct ControlParams
@@ -120,12 +121,10 @@ struct CreaseDefenderFSM
      *
      * @param event CreaseDefenderFSM::Update event
      * @param zone a stadium shape that defines the zone
+     * @param zone a stadium shape that defines the zone
      * @return true if any enemy robot is within the given zone, else false
      */
     static bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
 
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
-
-    // AI config
-    TbotsProto::AiConfig ai_config;
 };

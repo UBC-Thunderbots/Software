@@ -199,9 +199,9 @@ bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
     return ball_distance <= GET_POSSESSION_THRESHOLD_M && threat_distance >= THREAT_THRESHOLD_M;
 }
 
-void CreaseDefenderFSM::getPossession(const Update& event,
+void CreaseDefenderFSM::prepareGetPossession(const Update& event,
                                              boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
-    DribbleFSM::ControlParams control_params = {.allow_excessive_dribbling = false};
+    DribbleFSM::ControlParams control_params{.allow_excessive_dribbling = false};
     processEvent(DribbleFSM::Update(control_params, event.common));
 }

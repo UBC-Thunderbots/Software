@@ -33,8 +33,7 @@ class CreaseDefenderTactic : public Tactic
      *
      * @param robot_obstacle_inflation_factor The amount to inflate the robot obstacles
      */
-    explicit CreaseDefenderTactic(
-        TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config);
+    explicit CreaseDefenderTactic(TbotsProto::AiConfig ai_config);
 
     CreaseDefenderTactic() = delete;
 
@@ -60,5 +59,6 @@ class CreaseDefenderTactic : public Tactic
     std::map<RobotId, std::unique_ptr<FSM<CreaseDefenderFSM>>> fsm_map;
 
     CreaseDefenderFSM::ControlParams control_params;
-    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
+    DribbleFSM::ControlParams dribble_control_params{.allow_excessive_dribbling = false};
+    TbotsProto::AiConfig ai_config;
 };

@@ -9,18 +9,21 @@
 #include "software/geom/segment.h"
 #include "software/logger/logger.h"
 
-CreaseDefenderTactic::CreaseDefenderTactic(
-    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config)
+CreaseDefenderTactic::CreaseDefenderTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Move}),
       fsm_map(),
       control_params({Point(0, 0), TbotsProto::CreaseDefenderAlignment::CENTRE,
                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}),
-      robot_navigation_obstacle_config(robot_navigation_obstacle_config)
+      ai_config(ai_config)
 {
+
+
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<CreaseDefenderFSM>>(
-            CreaseDefenderFSM(robot_navigation_obstacle_config));
+            CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()),
+            DribbleFSM(ai_config.dribble_tactic_config())
+            );
     }
 }
 
@@ -45,8 +48,11 @@ void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<CreaseDefenderFSM>>(
-            CreaseDefenderFSM(robot_navigation_obstacle_config));
+            CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()),
+            DribbleFSM(ai_config.dribble_tactic_config()));
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(DribbleFSM::Update(dribble_control_params, tactic_update));
 }
