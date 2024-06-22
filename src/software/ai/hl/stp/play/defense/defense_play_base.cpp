@@ -3,7 +3,7 @@
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
 
-DefensePlayFSMBase::DefensePlayBase(TbotsProto::AiConfig ai_config)
+DefensePlayFSMBase::DefensePlayFSMBase(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config), crease_defenders({}), pass_defenders({})
 {
 }
