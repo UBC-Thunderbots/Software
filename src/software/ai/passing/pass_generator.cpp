@@ -134,10 +134,10 @@ PassWithRating PassGenerator::optimizeReceivingPositions(
                             passing_config_);
         };
 
-    PassWithRating best_pass{Pass(Point(), Point(), 1.0), 0.0};
+    PassWithRating best_pass{Pass(Point(), Point(), 1.0), -1.0};
     for (const auto& [robot_id, receiving_positions] : receiving_positions_map)
     {
-        PassWithRating best_pass_for_robot{Pass(Point(), Point(), 1.0), 0.0};
+        PassWithRating best_pass_for_robot{Pass(Point(), Point(), 1.0), -1.0};
         for (const Point& receiving_position : receiving_positions)
         {
             auto optimized_receiving_pos_array = optimizer_.maximize(
