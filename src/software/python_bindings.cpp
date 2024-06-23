@@ -25,6 +25,7 @@
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/ai/passing/pass_with_rating.h"
+#include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/constants.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/geom/algorithms/contains.h"
@@ -42,7 +43,6 @@
 #include "software/world/field.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
-#include "software/ai/passing/receiver_position_generator.hpp"
 
 namespace py = pybind11;
 
@@ -109,9 +109,10 @@ void declareReceiverPositionGenerator(py::module& m, std::string name)
     std::string pyclass_name = name + "ReceiverPositionGenerator";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-            .def(py::init<std::shared_ptr<EighteenZonePitchDivision>,
-                    TbotsProto::PassingConfig>())
-            .def("getBestReceivingPositions", &ReceiverPositionGenerator<T>::getBestReceivingPositions);
+        .def(py::init<std::shared_ptr<EighteenZonePitchDivision>,
+                      TbotsProto::PassingConfig>())
+        .def("getBestReceivingPositions",
+             &ReceiverPositionGenerator<T>::getBestReceivingPositions);
 }
 
 

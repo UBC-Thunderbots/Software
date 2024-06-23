@@ -1,4 +1,3 @@
-import sys
 import pytest
 import math
 import software.python_bindings as tbots_cpp

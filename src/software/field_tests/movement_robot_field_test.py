@@ -1,7 +1,6 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-import sys
 from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *

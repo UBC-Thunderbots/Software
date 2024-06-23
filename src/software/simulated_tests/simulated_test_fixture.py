@@ -505,7 +505,11 @@ def pytest_main(file):
     args = load_command_line_arguments()
     # Run the test, -s disables all capturing at -vv increases verbosity
     # -W ignore::DeprecationWarning ignores deprecation warnings that spam the output
-    sys.exit(pytest.main(["-svv", "-W ignore::DeprecationWarning", "-k", args.test_filter, file]))
+    sys.exit(
+        pytest.main(
+            ["-svv", "-W ignore::DeprecationWarning", "-k", args.test_filter, file]
+        )
+    )
 
 
 @pytest.fixture
