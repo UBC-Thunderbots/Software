@@ -21,15 +21,13 @@ Point DribbleFSM::findInterceptionPoint(const Robot &robot, const Ball &ball,
     {
         auto face_ball_vector = (ball.position() - robot.position());
 
-        // Draw a long polygon from the dribbler forward, with the width of the dribbler
-        // that the ball should be within before we try to dribble into it.
+        // Draw a long polygon from the center of robot forward, with the width of the
+        // dribbler that the ball should be within before we try to dribble into it.
         float dribbler_width      = robot.robotConstants().dribbler_width_meters;
         Vector robot_front_vector = Vector::createFromAngle(robot.orientation());
-        Point middle_of_dribbler  = robot.position() + robot_front_vector.normalize(
-                                                          DIST_TO_FRONT_OF_ROBOT_METERS);
         Polygon infront_of_dribbler_polygon = Polygon::fromSegment(
-            Segment(middle_of_dribbler,
-                    middle_of_dribbler + robot_front_vector.normalize(20)),
+            Segment(robot.position(),
+                    robot.position() + robot_front_vector.normalize(20)),
             0.0, dribbler_width / 2.0);
 
         bool dribbler_aligned_with_ball =
