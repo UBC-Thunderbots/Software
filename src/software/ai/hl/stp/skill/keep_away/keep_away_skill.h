@@ -6,5 +6,5 @@
 class KeepAwaySkill : public BaseSkill<KeepAwaySkillFSM, DribbleSkillFSM>
 {
    public:
-    explicit KeepAwaySkill(std::shared_ptr<Strategy> strategy);
+    using BaseSkill::BaseSkill;
 };

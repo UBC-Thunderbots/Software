@@ -8,7 +8,7 @@ class BaseShootSkill : public BaseSkill<ShootSkillFSM, ShootSkillFSM::GetBallCon
                                     DribbleSkillFSM, PivotKickSkillFSM>
 {
    public:
-    explicit BaseShootSkill(std::shared_ptr<Strategy> strategy);
+    using BaseSkill::BaseSkill;
 
     void updatePrimitive(const Robot& robot, const WorldPtr& world_ptr,
                          const SetPrimitiveCallback& set_primitive) override;
@@ -16,12 +16,6 @@ class BaseShootSkill : public BaseSkill<ShootSkillFSM, ShootSkillFSM::GetBallCon
 
 using ShootSkill = BaseShootSkill<false>;
 using DribbleShootSkill = BaseShootSkill<true>;
-
-template <bool SAMPLE_FOR_BEST_SHOT>
-BaseShootSkill<SAMPLE_FOR_BEST_SHOT>::BaseShootSkill(std::shared_ptr<Strategy> strategy)
-    : BaseSkill(strategy)
-{
-}
 
 template <bool SAMPLE_FOR_BEST_SHOT>
 void BaseShootSkill<SAMPLE_FOR_BEST_SHOT>::updatePrimitive(const Robot& robot,

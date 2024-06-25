@@ -5,8 +5,6 @@ cc_library(
     hdrs = ["all_tactics.h"],
     deps = [
         ":tactic",
-        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic",
-        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactics",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",

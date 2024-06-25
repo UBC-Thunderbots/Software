@@ -3,7 +3,8 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactics.h"
+#include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill.h"
+#include "software/ai/hl/stp/skill/dribble/dribble_skill.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 

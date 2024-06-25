@@ -127,16 +127,9 @@ def setup_pass_and_robots(
     if receive_pass:
         # arguments for a ReceiverTactic
         receiver_args = {
-            "pass": Pass(
-                passer_point=Point(
-                    x_meters=best_pass.passerPoint().x(),
-                    y_meters=best_pass.passerPoint().y(),
-                ),
-                receiver_point=Point(
-                    x_meters=best_pass.receiverPoint().x(),
-                    y_meters=best_pass.receiverPoint().y(),
-                ),
-                pass_speed_m_per_s=best_pass.speed(),
+            "receiving_position": Point(
+                x_meters=best_pass.receiverPoint().x(),
+                y_meters=best_pass.receiverPoint().y(),
             ),
             "disable_one_touch_shot": True,
         }

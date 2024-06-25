@@ -89,8 +89,8 @@ message PenaltyKickTactic {}
 
 message ReceiverTactic
 {
-    // The pass to receive
-    optional Pass pass = 1;
+    // The point at which to receive the pass
+    optional Point receiving_position = 1;
     // If set to true, we will only receive and dribble
     required bool disable_one_touch_shot = 2;
 }

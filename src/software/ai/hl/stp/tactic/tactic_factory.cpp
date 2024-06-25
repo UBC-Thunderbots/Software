@@ -106,6 +106,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ReceiverTactic &tactic_pr
                                      std::shared_ptr<Strategy> strategy)
 {
     auto tactic = std::make_shared<ReceiverTactic>(strategy);
+    tactic->updateControlParams(createPoint(tactic_proto.receiving_position()),
+                                tactic_proto.disable_one_touch_shot());
     return tactic;
 }
 
@@ -133,7 +135,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ShootSkillTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy)
 {
-    auto tactic = std::make_shared<ShootSkillTactic>(strategy);
+    auto tactic = std::make_shared<ShootSkill::SkillTactic>(strategy);
     return tactic;
 }
 

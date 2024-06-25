@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactics.h"
+#include "software/ai/hl/stp/skill/chip/chip_skill.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
@@ -86,7 +86,7 @@ void FreeKickPlay::chipAtGoalStage(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     const WorldPtr &world_ptr)
 {
-    auto chip_tactic = std::make_shared<ChipSkillTactic>(strategy);
+    auto chip_tactic = std::make_shared<ChipSkill::SkillTactic>(strategy);
 
     // Figure out where the fallback chip target is
     // This is exerimentally determined to be a reasonable value

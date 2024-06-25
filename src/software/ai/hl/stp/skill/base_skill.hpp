@@ -1,10 +1,15 @@
 #pragma once
 
 #include "software/ai/hl/stp/skill/skill.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * Base implementation of a Skill that manages an FSM for each robot requesting
  * primitives from the Skill.
+ *
+ * This template also implements and exposes a Tactic that will execute this Skill.
+ * The Tactic can be used in simulated gameplay tests, field tests, or set plays that
+ * require robots to execute a single skill.
  *
  * @tparam TSkillFSM the FSM for the Skill; BaseSkill will use this FSM to generate
  *         primitives for each robot requesting primitives from this skill
@@ -15,6 +20,8 @@ template <typename TSkillFSM, typename... TSkillSubFSMs>
 class BaseSkill : public Skill
 {
    public:
+    explicit BaseSkill(std::shared_ptr<Strategy> strategy);
+
     virtual void updatePrimitive(const Robot& robot, const WorldPtr& world_ptr,
                                  const SetPrimitiveCallback& set_primitive) override;
 
@@ -31,16 +38,66 @@ class BaseSkill : public Skill
 
     SkillState getSkillState(const RobotId robot_id) const override;
 
-   protected:
-    explicit BaseSkill(std::shared_ptr<Strategy> strategy)
-        : Skill(strategy), fsm_map_(), control_params_(), skill_state_()
+    /**
+     * Implements a Tactic that executes this Skill.
+     *
+     * The Tactic can be used in simulated gameplay tests, field tests, or set plays that
+     * require robots to execute a single skill.
+     */
+    class SkillTactic : public Tactic
     {
-    }
+       public:
+        explicit SkillTactic(std::shared_ptr<Strategy> strategy);
 
+        void accept(TacticVisitor& visitor) const override;
+
+        bool done() const override;
+
+        std::string getFSMState() const override;
+
+        /**
+         * Updates the control params for the Skill FSM that this tactic is executing
+         *
+         * @param control_params the new control params to overwrite the
+         * current params with
+         */
+        void updateControlParams(const typename TSkillFSM::ControlParams& control_params);
+
+       private:
+        BaseSkill<TSkillFSM, TSkillSubFSMs...> skill_;
+
+        void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+    };
+
+   protected:
     std::map<RobotId, std::unique_ptr<FSM<TSkillFSM>>> fsm_map_;
     typename TSkillFSM::ControlParams control_params_;
     SkillState skill_state_;
 };
+
+/**
+ * Copies a BaseSkill::SkillTactic.
+ * The new tactic will be the same besides having a different name.
+ *
+ * @param new_class the new class that will be created
+ * @param skill the Skill whose BaseSkill::SkillTactic is being copied
+ */
+#define COPY_SKILL_TACTIC(new_class, skill)                                              \
+    class new_class : public skill::SkillTactic                                          \
+    {                                                                                    \
+        using skill::SkillTactic::SkillTactic;                                           \
+                                                                                         \
+        void accept(TacticVisitor& visitor) const                                        \
+        {                                                                                \
+            visitor.visit(*this);                                                        \
+        }                                                                                \
+    };
+
+template <typename TSkillFSM, typename... TSkillSubFSMs>
+BaseSkill<TSkillFSM, TSkillSubFSMs...>::BaseSkill(std::shared_ptr<Strategy> strategy)
+    : Skill(strategy), fsm_map_(), control_params_(), skill_state_()
+{
+}
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>
 void BaseSkill<TSkillFSM, TSkillSubFSMs...>::updatePrimitive(
@@ -133,4 +190,50 @@ SkillState BaseSkill<TSkillFSM, TSkillSubFSMs...>::getSkillState(
     const RobotId robot_id) const
 {
     return skill_state_;
+}
+
+template <typename TSkillFSM, typename... TSkillSubFSMs>
+BaseSkill<TSkillFSM, TSkillSubFSMs...>::SkillTactic::SkillTactic(
+    std::shared_ptr<Strategy> strategy)
+    : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
+      skill_(strategy)
+{
+}
+
+template <typename TSkillFSM, typename... TSkillSubFSMs>
+void BaseSkill<TSkillFSM, TSkillSubFSMs...>::SkillTactic::accept(
+    TacticVisitor& visitor) const
+{
+    visitor.visit(*this);
+}
+
+template <typename TSkillFSM, typename... TSkillSubFSMs>
+bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::SkillTactic::done() const
+{
+    return last_execution_robot && skill_.done(*last_execution_robot);
+}
+
+template <typename TSkillFSM, typename... TSkillSubFSMs>
+std::string BaseSkill<TSkillFSM, TSkillSubFSMs...>::SkillTactic::getFSMState() const
+{
+    if (last_execution_robot)
+    {
+        return skill_.getFSMState(*last_execution_robot);
+    }
+    return std::string();
+}
+
+template <typename TSkillFSM, typename... TSkillSubFSMs>
+void BaseSkill<TSkillFSM, TSkillSubFSMs...>::SkillTactic::updateControlParams(
+    const typename TSkillFSM::ControlParams& control_params)
+{
+    skill_.control_params_ = control_params;
+}
+
+template <typename TSkillFSM, typename... TSkillSubFSMs>
+void BaseSkill<TSkillFSM, TSkillSubFSMs...>::SkillTactic::updatePrimitive(
+    const TacticUpdate& tactic_update, bool reset_fsm)
+{
+    skill_.updatePrimitive(tactic_update.robot, tactic_update.world_ptr,
+                           tactic_update.set_primitive);
 }

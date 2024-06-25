@@ -19,7 +19,10 @@ cc_library(
 cc_library(
     name = "base_skill",
     hdrs = ["base_skill.hpp"],
-    deps = [":skill"],
+    deps = [
+        ":skill",
+        "//software/ai/hl/stp/tactic:tactic",
+    ],
 )
 
 cc_library(

@@ -7,7 +7,7 @@ template <bool SHOULD_CHIP>
 class PassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, PivotKickSkillFSM>
 {
    public:
-    explicit PassSkill(std::shared_ptr<Strategy> strategy);
+    using BaseSkill::BaseSkill;
 
     void updatePrimitive(const Robot& robot, const WorldPtr& world_ptr,
                          const SetPrimitiveCallback& set_primitive) override;
@@ -15,12 +15,6 @@ class PassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, PivotKickSkill
 
 using KickPassSkill = PassSkill<false>;
 using ChipPassSkill = PassSkill<true>;
-
-template <bool SHOULD_CHIP>
-PassSkill<SHOULD_CHIP>::PassSkill(std::shared_ptr<Strategy> strategy)
-    : BaseSkill(strategy)
-{
-}
 
 template <bool SHOULD_CHIP>
 void PassSkill<SHOULD_CHIP>::updatePrimitive(const Robot& robot,

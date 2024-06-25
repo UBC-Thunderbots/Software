@@ -10,6 +10,7 @@ cc_library(
         "kick_skill_fsm.cpp",
     ],
     hdrs = [
+        "kick_skill.h",
         "kick_skill_fsm.h",
     ],
     deps = [
