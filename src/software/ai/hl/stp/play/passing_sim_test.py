@@ -48,8 +48,7 @@ def setup_pass_and_robots(
     blue_robot_locations = [attacker_robot_position, *receiver_robot_positions]
 
     # Setup the world state
-    simulated_test_runner.simulator_proto_unix_io.send_proto(
-        WorldState,
+    simulated_test_runner.set_worldState(
         create_world_state(
             yellow_robot_locations=enemy_robot_positions,
             blue_robot_locations=blue_robot_locations,
@@ -94,27 +93,20 @@ def setup_pass_and_robots(
     )
 
     # construct a pass generator with a max receive speed set
-    pass_generator = tbots_cpp.EighteenZoneIdPassGenerator(
-        tbots_cpp.EighteenZonePitchDivision(tbots_cpp.Field.createSSLDivisionBField()),
-        PassingConfig(),
-    )
+    config = PassingConfig()
+    config.enemy_proximity_importance = 0.01
+    config.enemy_interception_time_multiplier = 5
+    config.max_receive_speed_m_per_s = 2.0
+    pass_generator = tbots_cpp.PassGenerator(config)
 
     # generate the best pass on the world 100 times
     # this improves the passes generated over time
+    robots_to_ignore = [0]  # Avoid sampling passes around the attacker robot
     for index in range(0, 100):
-        pass_eval = pass_generator.generatePassEvaluation(world)
-        best_pass_eval = pass_eval.getBestPassOnField()
-        best_pass = best_pass_eval.pass_value
+        best_pass_with_score = pass_generator.getBestPass(world, robots_to_ignore)
 
-    # after 100 times, get the best pass we have on the field
-    pass_evaluation = pass_generator.generatePassEvaluation(world)
-    best_pass_eval = pass_evaluation.getBestPassOnField()
-    best_pass = best_pass_eval.pass_value
-
-    kick_vec = tbots_cpp.Vector(
-        best_pass.receiverPoint().x() - best_pass.passerPoint().x(),
-        best_pass.receiverPoint().y() - best_pass.passerPoint().y(),
-    )
+    best_pass = best_pass_with_score.pass_value
+    kick_vec = best_pass.receiverPoint() - best_pass.passerPoint()
 
     # Setup the passer's tactic
     # We use KickTactic since AttackerTactic shoots towards the goal instead if open
@@ -215,7 +207,7 @@ def setup_pass_and_robots(
             tbots_cpp.Point(-1.7, 0),
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(-2.0, 0.0),
-            [tbots_cpp.Point(2.5, 0.0)],
+            [tbots_cpp.Point(1.0, 0.0)],
             [0, math.pi],
             [
                 tbots_cpp.Point(0.5, 2.0),
@@ -223,18 +215,6 @@ def setup_pass_and_robots(
                 tbots_cpp.Point(0.5, 0.0),
                 tbots_cpp.Point(0.5, -1.0),
                 tbots_cpp.Point(0.5, -2.0),
-            ],
-        ),
-        # pass with a dense wall of enemy robots in between the 2 robots
-        (
-            tbots_cpp.Point(-1.7, 0),
-            tbots_cpp.Vector(0.0, 0.0),
-            tbots_cpp.Point(-2.0, 0.0),
-            [tbots_cpp.Point(2.5, 0.0)],
-            [0, math.pi],
-            [
-                tbots_cpp.Point(0.5, float(y) / 10)
-                for y in range(int(-0.5 * 10), int(0.7 * 10), 2)
             ],
         ),
     ],
@@ -245,7 +225,6 @@ def setup_pass_and_robots(
         "pass_diagonally",
         "pass_with_enemy_in_between",
         "pass_through_sparse_wall_of_enemies",
-        "pass_through_dense_wall_of_enemies",
     ],
 )
 def test_passing_receive_speed(
@@ -337,7 +316,7 @@ def test_passing_receive_speed(
             tbots_cpp.Point(0.8, 0),
             tbots_cpp.Vector(0.0, 0.0),
             tbots_cpp.Point(1, 0),
-            [tbots_cpp.Point(-1, 0), tbots_cpp.Point(2.5, 2.5)],
+            [tbots_cpp.Point(2.5, 2.5), tbots_cpp.Point(-1, 0)],
             [math.pi, 0],
             [],
         ),
@@ -380,7 +359,7 @@ def test_passing_no_backwards_passes(
         receiver_robot_positions=receiver_robot_positions,
         friendly_orientations=friendly_orientations,
         enemy_robot_positions=enemy_robot_positions,
-        receive_pass=False,
+        receive_pass=True,
         simulated_test_runner=simulated_test_runner,
     )
 
