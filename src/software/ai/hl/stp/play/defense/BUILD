@@ -20,6 +20,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:defender_assignment",
         "//software/ai/hl/stp/play",
+        "//software/ai/hl/stp/play/defense:defense_play_base",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
         "//software/logger",
@@ -52,5 +53,24 @@ cc_test(
         ":defense_play",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
+    ],
+)
+
+cc_library(
+    name = "defense_play_base",
+    srcs = [
+        "defense_play_base.cpp",
+    ],
+    hdrs = [
+        "defense_play_base.h",
+    ],
+    deps = [
+        "//shared:constants",
+        "//software/ai/evaluation:defender_assignment",
+        "//software/ai/hl/stp/play",
+        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
     ],
 )
