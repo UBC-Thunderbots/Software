@@ -165,4 +165,4 @@ class ProtoConfigurationWidget(QWidget):
     def __first_shot(self):
         """Send the current configuration to the AI after a delay"""
         time.sleep(ProtoConfigurationWidget.DELAYED_CONFIGURATION_TIMEOUT_S)
-        self.on_change_callback(str(self.proto_to_configure), self.proto_to_configure, self.proto_to_configure)
+        self.on_change_callback(str(self.proto_to_configure), None, self.proto_to_configure)

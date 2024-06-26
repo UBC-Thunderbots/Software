@@ -150,7 +150,7 @@ class Gamecontroller(object):
                 autoref_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command, error = tbots_cpp.createSSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True, "lo"
+            Gamecontroller.REFEREE_IP, self.referee_port, "lo", __send_referee_command, True
         )
 
         if error:

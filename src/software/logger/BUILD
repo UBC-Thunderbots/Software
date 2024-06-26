@@ -19,7 +19,6 @@ cc_library(
         "custom_logging_levels.h",
         "logger.h",
     ],
-    linkopts = ["-lstdc++fs"],
     deps = [
         ":coloured_cout_sink",
         ":csv_sink",
