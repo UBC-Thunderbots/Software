@@ -223,7 +223,7 @@ if __name__ == "__main__":
         "--launch_gc",
         action="store_true",
         default=False,
-        help="wheter or not to launch the gamecontroller when --run_blue or --run_yellow is ran",
+        help="whether or not to launch the gamecontroller when --run_blue or --run_yellow is ran",
     )
 
     args = parser.parse_args()
