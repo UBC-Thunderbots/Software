@@ -29,12 +29,14 @@ from software.thunderscope.replay.proto_player import ProtoPlayer
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
+random.seed(0)
+
 # this would be the path where the file corruption would be tested
 TMP_REPLAY_SAVE_PATH = "/tmp/test_file_corruption"
 
 def create_random_proto() -> Message:
     """
-    creating referencing protos 
+    creating the proto that are going to be saved to the disk
 
     :return: the proto that we are referencing
     """
@@ -88,7 +90,7 @@ def create_corrupt_log_entry(proto: Message, current_time: float) -> str:
     )
 
 
-def make_part_replay_chunks(list_of_protos: [Message], save_path:str, duration:float, start_time: float, gen_log_entry_func: Callable[[Message, float], None], frequeny=0.1):
+def make_part_replay_chunks(list_of_protos: [Message], save_path:str, duration:float, start_time: float, gen_log_entry_func: Callable[[Message, float], None], frequency=0.1):
     """
     making a part of the replay chunks and appending it to the 0.replay file. There would be a frequency% chance that a
     invalid log  entry are created
@@ -96,7 +98,7 @@ def make_part_replay_chunks(list_of_protos: [Message], save_path:str, duration:f
 
     :list_of_protos: the list of proto that we are referencing when creating the log entries
     :save_path: where we are saving the replay file
-    :duration: how long do we want t create this replay chunks 
+    :duration: how long do we want to create theses replay chunks
     :start_time: when is the replay chunk being started? 
     :gen_log_entry_func: the function that is used to generate invalid log entries 
     :frequency: what percent of the time should we call gen_log_entry_func
@@ -110,7 +112,7 @@ def make_part_replay_chunks(list_of_protos: [Message], save_path:str, duration:f
             proto_time = start_time + (duration - 0)/len(list_of_protos) * i   
             proto = list_of_protos[i]
 
-            if random.random() > frequeny: 
+            if random.random() > frequency: 
                 # this would happen 90 % of the time
                 log_entry = create_valid_log_entry(proto, proto_time)
             else: 
@@ -139,7 +141,7 @@ def make_replay_chunk(size_of_replay_chunk=1000):
         replay_proto.append(some_proto)
 
     # making the replay chunks 
-    # the first part of the replay chunks is from  0 to 0.1 seconds, it all of the entries are valid
+    # the first part of the replay chunks is from  0 to 0.1 seconds, all of the entries are valid
     # the seconds part of the replay chunk is from 0.1 to 0.2 seconds, 10% of the proto cannot be decoded 
     # the third part of the replay chunk is from 0.2 to 0.3 seconds, 10% of the proto are missing delimeter
     make_part_replay_chunks(replay_proto, TMP_REPLAY_SAVE_PATH, 0.1, 0.0, create_valid_log_entry)
@@ -158,7 +160,6 @@ def create_test_player() -> ProtoPlayer:
     replay file stays the same over time!
     """
 
-    random.seed(0)
 
     make_replay_chunk()
 
