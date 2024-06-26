@@ -152,8 +152,7 @@ class SensorFusion
      * @return True if we were to use the position of the robot instead of the ssl camera
      * system. False otherwise
      */
-    bool shouldTrustRobotStatus(const SSLProto::SSL_DetectionFrame &frame,
-                                const std::vector<BallDetection> &ball_detection);
+    bool shouldTrustRobotStatus();
     TbotsProto::SensorFusionConfig sensor_fusion_config;
     std::optional<Field> field;
     std::optional<Ball> ball;

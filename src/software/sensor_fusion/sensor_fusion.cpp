@@ -180,9 +180,7 @@ void SensorFusion::updateWorld(
     }
 }
 
-bool SensorFusion::shouldTrustRobotStatus(
-    const SSLProto::SSL_DetectionFrame &ssl_detection_frame,
-    const std::vector<BallDetection> &ball_detection)
+bool SensorFusion::shouldTrustRobotStatus()
 {
     // the following if statements essentially ensures that we could calculate the
     // distance. Essentially unwarpping all the std::optional<T> that are required to
@@ -202,16 +200,12 @@ bool SensorFusion::shouldTrustRobotStatus(
     double distance =
         (robot_with_ball_in_dribbler.value().position() - ball.value().position())
             .length();
-    if (distance > DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION)
-    {
-        return false;
-    }
 
     // In other words, this is only true if we have the position of the breakbeam
     // robot, and the distance between what the ssl says and where the robots are actually
     // at is less that a threshold distance set by
     // DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION
-    return true;
+    return distance <= DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION;
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
@@ -265,8 +259,10 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         ball_in_dribbler_timeout                = 0;
     }
 
-    if (shouldTrustRobotStatus(ssl_detection_frame, ball_detections))
+    if (shouldTrustRobotStatus())
     {
+        // friendly_robot_id_with_ball_in_dribbler will always have a value since this is
+        // checked by the member function shouldTrustRobotStatus
         std::optional<Robot> robot_with_ball_in_dribbler =
             friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
 
