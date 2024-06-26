@@ -388,7 +388,7 @@ def field_test_runner():
     ) as friendly_fs, Gamecontroller(
         # we would be using conventional port if and only if we are playing in robocup.
         supress_logs=(not args.show_gamecontroller_logs),
-        use_conventional_port=False
+        use_conventional_port=False,
     ) as gamecontroller, RobotCommunication(
         current_proto_unix_io=friendly_proto_unix_io,
         multicast_channel=getRobotMulticastChannel(args.channel),
@@ -402,8 +402,7 @@ def field_test_runner():
         rc_friendly.setup_for_fullsystem()
 
         gamecontroller.setup_proto_unix_io(
-            blue_full_system_proto_unix_io,
-            yellow_full_system_proto_unix_io,
+            blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
         )
         # Inject the proto unix ios into thunderscope and start the test
         tscope = Thunderscope(

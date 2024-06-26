@@ -38,11 +38,11 @@ class Gamecontroller(object):
         self.supress_logs = supress_logs
 
         self.ci_port = self.next_free_port()
-        # we are not using conventional by default since most of the time 
-        # we are not in competition and. Thus, we would be conflicting with 
+        # we are not using conventional by default since most of the time
+        # we are not in competition and. Thus, we would be conflicting with
         # each other if we are using conventional port
         self.referee_port = self.next_free_port(random.randint(1024, 65535))
-        if use_conventional_port: 
+        if use_conventional_port:
             if not self.is_valid_port(40000):
                 raise OSError("Cannot use port 40000 for Gamecontroller")
 
