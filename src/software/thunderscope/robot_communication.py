@@ -27,7 +27,7 @@ class RobotCommunication(object):
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
         enable_radio: bool = False,
-        referee_port: int = SSL_REFEREE_PORT
+        referee_port: int = SSL_REFEREE_PORT,
     ):
         """Initialize the communication with the robots
 
