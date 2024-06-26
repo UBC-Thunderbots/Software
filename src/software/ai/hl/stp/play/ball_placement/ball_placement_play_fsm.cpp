@@ -121,7 +121,7 @@ void BallPlacementPlayFSM::wait(const Update &event)
         wait_tactic->updateControlParams(
                 nearest_robot->position(), nearest_robot->orientation(), 0.0, TbotsProto::DribblerMode::RELEASE_BALL_SLOW,
                 TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0},
-                TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, // TODO: Instead of stop use a new speed mode for retreating in ball placement
+                TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
                 TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0.0);
         tactics_to_run[0].emplace_back(wait_tactic);
 

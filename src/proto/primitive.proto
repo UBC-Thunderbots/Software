@@ -68,6 +68,8 @@ enum MaxAllowedSpeedMode
     STOP_COMMAND = 1;
     // Move at speed at which collisions are allowed
     COLLISIONS_ALLOWED = 2;
+    // Slow speed for retreating in ball placement
+    BALL_PLACEMENT_RETREAT = 3;
 }
 
 message AutoChipOrKick

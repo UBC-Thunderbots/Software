@@ -513,6 +513,8 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
                    STOP_COMMAND_SPEED_SAFETY_MARGIN_METERS_PER_SECOND;
         case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
             return COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND;
+        case TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT:
+            return BALL_PLACEMENT_RETREAT_SPEED_METERS_PER_SECOND;
         default:
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;
