@@ -96,7 +96,7 @@ struct CreaseDefenderFSM
             // src_state + event [guard] / action = dest_state
             *MoveFSM_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A = DribbleFSM_S,
             MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
-            DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A = X,
+            DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A = MoveFSM_S,
             X + Update_E / blockThreat_A = MoveFSM_S);
     }
 

@@ -130,9 +130,9 @@ void CreaseDefenderFSM::blockThreat(
     double robot_to_net_m = distance(robot_position, event.common.world_ptr->field().friendlyGoal().centre());
 
     // DEBUG: Visualizes threat stadium
-    LOG(VISUALIZE) << *createDebugShapes({
-         *createDebugShape(threat_zone, std::to_string(event.common.robot.id()), "threatzone")
-    });
+//    LOG(VISUALIZE) << *createDebugShapes({
+//         *createDebugShape(threat_zone, std::to_string(event.common.robot.id()), "threatzone")
+//    });
 
     if (goal_intersections.empty()
         && CreaseDefenderFSM::isAnyEnemyInZone(event, threat_zone)
@@ -217,13 +217,13 @@ bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
     constexpr  double THREAT_THRESHOLD_M = GET_POSSESSION_THRESHOLD_M * 2;
 
     // DEBUG: Visualizes nearby threat zone
-    LOG(VISUALIZE) << *createDebugShapes({
-             *createDebugShape(
-                     Circle(robot_position, GET_POSSESSION_THRESHOLD_M),
-                     std::to_string(event.common.robot.id()) + "1",
-                     "ballzone"
-                     )
-     });
+//    LOG(VISUALIZE) << *createDebugShapes({
+//             *createDebugShape(
+//                     Circle(robot_position, GET_POSSESSION_THRESHOLD_M),
+//                     std::to_string(event.common.robot.id()) + "1",
+//                     "ballzone"
+//                     )
+//     });
     return ball_distance <= GET_POSSESSION_THRESHOLD_M && threat_distance >= THREAT_THRESHOLD_M;
 }
 

@@ -131,7 +131,7 @@ TEST(CreaseDefenderFSMTest, test_transitions)
         .crease_defender_alignment = TbotsProto::CreaseDefenderAlignment::LEFT,
         .max_allowed_speed_mode    = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT};
 
-    FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM{ai_config});
+    FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM{config}, DribbleFSM(ai_config.dribble_tactic_config()));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // robot far from destination, ball in friendly half
