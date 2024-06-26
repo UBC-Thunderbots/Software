@@ -109,7 +109,7 @@ class RobotCommunication(object):
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
         """
         self.receive_ssl_wrapper = tbots_cpp.SSLWrapperPacketProtoListener(
-            self.ssl_vision_address,
+            SSL_VISION_ADDRESS,
             SSL_VISION_PORT,
             lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
             True,

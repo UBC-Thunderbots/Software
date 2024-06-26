@@ -320,27 +320,6 @@ def load_command_line_arguments():
         help="Run the test with friendly robots in yellow mode",
     )
 
-    parser.add_argument(
-        "--sslvision_multicast_address",
-        type=str,
-        default=SSL_VISION_ADDRESS,
-        help="the multicast address for ssl vision",
-    )
-
-    parser.add_argument(
-        "--use_unconventional_port",
-        action="store_true",
-        default=False,
-        help="setting this option would cause gamecontroller to bind on an unconventional port, likely 12393",
-    )
-
-    parser.add_argument(
-        "--not_launch_gc",
-        action="store_true",
-        default=False,
-        help="whether we are launching gamecontroller or not",
-    )
-
     estop_group = parser.add_mutually_exclusive_group()
     estop_group.add_argument(
         "--keyboard_estop",

@@ -459,9 +459,7 @@ if __name__ == "__main__":
             should_restart_on_crash=False,
             run_sudo=args.sudo,
         ) as yellow_fs, Gamecontroller(
-            supress_logs=(not args.verbose),
-            use_unconventional_port=args.use_unconventional_port,
-            not_launch_gc=args.not_launch_gc,
+            supress_logs=(not args.verbose)
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.

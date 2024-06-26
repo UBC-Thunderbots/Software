@@ -32,20 +32,10 @@ class Gamecontroller(object):
         """Run Gamecontroller
 
         :param supress_logs: Whether to suppress the logs
-        :disregard_gamecontroller_port: if set to True, the gamecontroller port would be set to 12393, else it would highly likely be 40000, i.e. the default port that everybodies uses!
         :not_launch_gc Whether to launch the gamecontroller or not!
         """
 
         self.supress_logs = supress_logs
-
-        if use_unconventional_port:
-            # the intention of setting this port is to ensure that we don't listen other people's
-            # gamecontroller. It is highly unlikely that other people would use port 12393 since
-            # this is a random number that was set by us!
-            self.referee_port = self.next_free_port(start_port=12393)
-        else:
-            # highly likely being 40000, the default gamecontroller port!
-            self.referee_port = self.next_free_port()
 
         self.ci_port = self.next_free_port()
         # we are not using conventional by default since most of the time 
@@ -75,27 +65,27 @@ class Gamecontroller(object):
         return self.referee_port
 
     def __enter__(self) -> "self":
-        """Enter the gamecontroller context manager.
+        """Enter the gamecontroller context manager. 
 
         :return: gamecontroller context managed instance
 
         """
-        # sometimes we do not want to launch the gameconntroller because we are in robocup
-        # the referee at robotcup would be the person launching the gamecontroller.
-        if not self.not_launch_gc:
-            command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
+        command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
 
-            command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
-            command += ["-ciAddress", f"localhost:{self.ci_port}"]
+        command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
+        command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
         if self.supress_logs:
             with open(os.devnull, "w") as fp:
                 self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
 
-            # We can't connect to the ci port right away, it takes
-            # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
-            time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
-            self.ci_socket = SslSocket(self.ci_port)
+        else:
+            self.gamecontroller_proc = Popen(command)
+
+        # We can't connect to the ci port right away, it takes
+        # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
+        time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+        self.ci_socket = SslSocket(self.ci_port)
 
         return self
 
@@ -122,16 +112,13 @@ class Gamecontroller(object):
             self.send_gc_command(
                 gc_command=manual_command.manual_command.type,
                 team=manual_command.manual_command.for_team,
-                final_ball_placement_point=(
-                    tbots_cpp.Point(
-                        manual_command.final_ball_placement_point.x,
-                        manual_command.final_ball_placement_point.y,
-                    )
-                    # HasField checks if the field was manually set by us
-                    # as opposed to if a value exists (since a default value always exists)
-                    if manual_command.HasField("final_ball_placement_point")
-                    else None
-                ),
+                final_ball_placement_point=tbots_cpp.Point(
+                    manual_command.final_ball_placement_point.x,
+                    manual_command.final_ball_placement_point.y,
+                )
+                # HasField checks if the field was manually set by us
+                # as opposed to if a value exists (since a default value always exists)
+                if manual_command.HasField("final_ball_placement_point") else None,
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
 
@@ -194,7 +181,7 @@ class Gamecontroller(object):
                 autoref_proto_unix_io.send_proto(Referee, data)
 
         self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
-            self.REFEREE_IP, self.referee_port, __send_referee_command, True,
+            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
         )
 
         blue_full_system_proto_unix_io.register_observer(
