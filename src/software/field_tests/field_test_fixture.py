@@ -358,6 +358,14 @@ def load_command_line_arguments():
     return parser.parse_args()
 
 
+def get_referee_port(gamecontroller: Gamecontroller):
+    if gamecontroller is not None:
+        print("Using a weird gamecontroller port")
+        return gamecontroller.get_referee_port()
+    print("Using default port")
+    return 40000
+
+
 @pytest.fixture
 def field_test_runner():
     """
@@ -395,9 +403,9 @@ def field_test_runner():
         friendly_colour_yellow=args.run_yellow,
         should_restart_on_crash=False,
     ) as friendly_fs, Gamecontroller(
-        use_unconventional_port=args.use_unconventional_port,
-        not_launch_gc=args.not_launch_gc,
+        # we would be using conventional port if and only if we are playing in robocup.
         supress_logs=(not args.show_gamecontroller_logs),
+        use_conventional_port=False
     ) as gamecontroller, RobotCommunication(
         current_proto_unix_io=friendly_proto_unix_io,
         multicast_channel=getRobotMulticastChannel(args.channel),
@@ -408,12 +416,12 @@ def field_test_runner():
         sslvision_address=args.sslvision_multicast_address,
         referee_port=gamecontroller.get_referee_port(),
     ) as rc_friendly:
-
         friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
         rc_friendly.setup_for_fullsystem()
 
         gamecontroller.setup_proto_unix_io(
-            blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
+            blue_full_system_proto_unix_io,
+            yellow_full_system_proto_unix_io,
         )
         # Inject the proto unix ios into thunderscope and start the test
         tscope = Thunderscope(

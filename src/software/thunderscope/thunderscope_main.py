@@ -220,24 +220,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--sslvision_multicast_address",
-        type=str,
-        default=SSL_VISION_ADDRESS,
-        help="the multicast address for ssl vision",
-    )
-
-    parser.add_argument(
-        "--use_unconventional_port",
+        "--launch_gc",
         action="store_true",
         default=False,
-        help="setting this option would cause gamecontroller to bind on an unconventional port, likely 12393",
-    )
-
-    parser.add_argument(
-        "--not_launch_gc",
-        action="store_true",
-        default=False,
-        help="whether we are launching gamecontroller or not",
+        help="wheter or not to launch the gamecontroller when --run_blue or --run_yellow is ran",
     )
 
     args = parser.parse_args()
@@ -310,7 +296,10 @@ if __name__ == "__main__":
             args.run_diagnostics,
             args.visualization_buffer_size,
         )
-        tscope = Thunderscope(config=tscope_config, layout_path=args.layout,)
+        tscope = Thunderscope(
+            config=tscope_config,
+            layout_path=args.layout,
+        )
 
         current_proto_unix_io = None
 
@@ -332,14 +321,25 @@ if __name__ == "__main__":
             args.keyboard_estop, args.disable_communication
         )
 
-        with RobotCommunication(
+        def get_referee_port(gamecontroller: Gamecontroller):
+            if gamecontroller is not None:
+                print("Using a weird gamecontroller port")
+                return gamecontroller.get_referee_port()
+            print("Using default port")
+            return 40000
+
+        with (
+            Gamecontroller(supress_logs=(not args.verbose), use_conventional_port=False)
+            if args.launch_gc
+            else contextlib.nullcontext()
+        ) as gamecontroller, RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
             multicast_channel=getRobotMulticastChannel(args.channel),
             interface=args.interface,
             estop_mode=estop_mode,
             estop_path=estop_path,
             enable_radio=args.enable_radio,
-            sslvision_address=args.sslvision_multicast_address,
+            referee_port=get_referee_port(gamecontroller),
         ) as robot_communication:
 
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
@@ -366,7 +366,9 @@ if __name__ == "__main__":
                     if args.run_blue
                     else args.yellow_full_system_runtime_dir
                 )
-                with ProtoLogger(full_system_runtime_dir,) as logger, FullSystem(
+                with ProtoLogger(
+                    full_system_runtime_dir,
+                ) as logger, FullSystem(
                     full_system_runtime_dir=runtime_dir,
                     debug_full_system=debug,
                     friendly_colour_yellow=friendly_colour_yellow,
@@ -389,7 +391,9 @@ if __name__ == "__main__":
     elif args.blue_log or args.yellow_log:
         tscope = Thunderscope(
             config=config.configure_replay_view(
-                args.blue_log, args.yellow_log, args.visualization_buffer_size,
+                args.blue_log,
+                args.yellow_log,
+                args.visualization_buffer_size,
             ),
             layout_path=args.layout,
         )
@@ -502,7 +506,9 @@ if __name__ == "__main__":
                 autoref_proto_unix_io,
             )
             if args.enable_autoref:
-                autoref.setup_ssl_wrapper_packets(autoref_proto_unix_io,)
+                autoref.setup_ssl_wrapper_packets(
+                    autoref_proto_unix_io,
+                )
 
             # Start the simulator
             sim_ticker_thread = threading.Thread(

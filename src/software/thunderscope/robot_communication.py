@@ -27,8 +27,7 @@ class RobotCommunication(object):
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
         enable_radio: bool = False,
-        sslvision_address: str = None,
-        referee_port: int = SSL_REFEREE_PORT,
+        referee_port: int = SSL_REFEREE_PORT
     ):
         """Initialize the communication with the robots
 
@@ -39,15 +38,11 @@ class RobotCommunication(object):
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
         :param enable_radio: Whether to use radio to send primitives to robots
+        :param referee_port: the referee port that we are using
 
         """
-        # setting up the ssl vision and referee addresses
-        self.ssl_vision_address = sslvision_address
-        if self.ssl_vision_address is None:
-            self.ssl_vision_address = SSL_VISION_ADDRESS
 
         self.referee_port = referee_port
-
         self.receive_ssl_referee_proto = None
         self.receive_ssl_wrapper = None
         self.sequence_number = 0
@@ -122,7 +117,7 @@ class RobotCommunication(object):
 
         self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
             SSL_REFEREE_ADDRESS,
-            SSL_REFEREE_PORT,
+            self.referee_port,
             lambda data: self.current_proto_unix_io.send_proto(Referee, data),
             True,
         )

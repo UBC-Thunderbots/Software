@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 import logging
 import os
 import socket
@@ -27,14 +28,8 @@ class Gamecontroller(object):
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(
-        self,
-        supress_logs: bool = False,
-        use_unconventional_port: bool = False,
-        not_launch_gc: bool = True,
-    ) -> None:
-        """
-        Run Gamecontroller
+    def __init__(self, supress_logs: bool = False, use_conventional_port=False) -> None:
+        """Run Gamecontroller
 
         :param supress_logs: Whether to suppress the logs
         :disregard_gamecontroller_port: if set to True, the gamecontroller port would be set to 12393, else it would highly likely be 40000, i.e. the default port that everybodies uses!
@@ -42,7 +37,6 @@ class Gamecontroller(object):
         """
 
         self.supress_logs = supress_logs
-        self.not_launch_gc = not_launch_gc
 
         if use_unconventional_port:
             # the intention of setting this port is to ensure that we don't listen other people's
@@ -54,7 +48,17 @@ class Gamecontroller(object):
             self.referee_port = self.next_free_port()
 
         self.ci_port = self.next_free_port()
+        # we are not using conventional by default since most of the time 
+        # we are not in competition and. Thus, we would be conflicting with 
+        # each other if we are using conventional port
+        self.referee_port = self.next_free_port(random.randint(1024, 65535))
+        if use_conventional_port: 
+            if not self.is_valid_port(40000):
+                raise OSError("Cannot use port 40000 for Gamecontroller")
 
+            self.referee_port = 40000
+
+        self.ci_port = self.next_free_port()
         # this allows gamecontroller to listen to override commands
         self.command_override_buffer = ThreadSafeBuffer(
             buffer_size=2, protobuf_type=ManualGCCommand
@@ -84,12 +88,9 @@ class Gamecontroller(object):
             command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
             command += ["-ciAddress", f"localhost:{self.ci_port}"]
 
-            if self.supress_logs:
-                with open(os.devnull, "w") as fp:
-                    self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
-
-            else:
-                self.gamecontroller_proc = Popen(command)
+        if self.supress_logs:
+            with open(os.devnull, "w") as fp:
+                self.gamecontroller_proc = Popen(command, stdout=fp, stderr=fp)
 
             # We can't connect to the ci port right away, it takes
             # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
@@ -134,12 +135,12 @@ class Gamecontroller(object):
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
 
-    def is_valid_port(self, port: int) -> bool:
+    def is_valid_port(self, port):
         """
-        Check if a port is available
+        determine whether or not a given port is valid
 
         :param port: the port we are checking
-        :return: True if the port is available, False otherwise
+        :return: True if a port is valid False otherwise
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
