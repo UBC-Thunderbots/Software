@@ -359,10 +359,14 @@ def load_command_line_arguments():
 
 
 def get_referee_port(gamecontroller: Gamecontroller):
+    """
+    return the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
+
+    :param gamecontroller: the gamecontroller we are using
+    :return: the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
+    """
     if gamecontroller is not None:
-        print("Using a weird gamecontroller port")
         return gamecontroller.get_referee_port()
-    print("Using default port")
     return 40000
 
 
