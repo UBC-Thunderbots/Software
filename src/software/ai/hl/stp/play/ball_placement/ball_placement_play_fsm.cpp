@@ -122,7 +122,7 @@ void BallPlacementPlayFSM::wait(const Update &event)
                 nearest_robot->position(), nearest_robot->orientation(), 0.0, TbotsProto::DribblerMode::RELEASE_BALL_SLOW,
                 TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0},
                 TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, // TODO: Instead of stop use a new speed mode for retreating in ball placement
-                TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0, true);
+                TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0.0);
         tactics_to_run[0].emplace_back(wait_tactic);
 
         event.common.set_tactics(tactics_to_run);

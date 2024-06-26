@@ -196,8 +196,8 @@ class Gamecontroller(object):
             ball_placement_pos = SetBallPlacementPos()
             ball_placement_pos.pos.CopyFrom(
                 Vector2(
-                    x=float(final_ball_placement_point.x_meters),
-                    y=float(final_ball_placement_point.y_meters),
+                    x=float(final_ball_placement_point.x()),
+                    y=float(final_ball_placement_point.y()),
                 )
             )
             change = Change()

@@ -40,8 +40,7 @@ class MoveTactic : public Tactic
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode =
             TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
-        double target_spin_rev_per_s = 0.0,
-        bool never_terminate = false);
+        double target_spin_rev_per_s = 0.0);
 
     /**
      * Updates the params assuming that the dribbler and chicker and while avoiding the
