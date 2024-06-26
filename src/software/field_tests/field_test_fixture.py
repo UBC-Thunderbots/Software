@@ -396,7 +396,6 @@ def field_test_runner():
         estop_mode=estop_mode,
         estop_path=estop_path,
         enable_radio=args.enable_radio,
-        sslvision_address=args.sslvision_multicast_address,
         referee_port=gamecontroller.get_referee_port(),
     ) as rc_friendly:
         friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
