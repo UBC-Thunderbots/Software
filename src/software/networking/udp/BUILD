@@ -2,11 +2,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "network_utils",
-    hdrs = [
-        "network_utils.h",
-    ],
     srcs = [
         "network_utils.cpp",
+    ],
+    hdrs = [
+        "network_utils.h",
     ],
 )
 

@@ -273,9 +273,7 @@ def configure_base_diagnostics(
         TScopeWidget(
             name="Network Configuration",
             widget=setup_network_config_widget(
-                **{
-                    "proto_unix_io": diagnostics_proto_unix_io,
-                }
+                **{"proto_unix_io": diagnostics_proto_unix_io,}
             ),
             position="below",
             anchor="Error Log",

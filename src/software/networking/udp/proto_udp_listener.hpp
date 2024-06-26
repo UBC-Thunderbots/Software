@@ -37,8 +37,8 @@ class ProtoUdpListener
      */
     ProtoUdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
                      unsigned short port, const std::string& listen_interface,
-                     std::function<void(ReceiveProtoT&)> receive_callback,
-                     bool multicast, std::optional<std::string>& error);
+                     std::function<void(ReceiveProtoT&)> receive_callback, bool multicast,
+                     std::optional<std::string>& error);
 
     /**
      * Creates an ProtoUdpListener that will listen for ReceiveProtoT packets from
@@ -85,7 +85,8 @@ class ProtoUdpListener
      * @param error A user-provided optional string to store any error messages
      */
     void setupMulticast(const boost::asio::ip::address& ip_address,
-                        const std::string& listen_interface, std::optional<std::string>& error);
+                        const std::string& listen_interface,
+                        std::optional<std::string>& error);
 
     /**
      * Start listening for data
@@ -111,7 +112,8 @@ template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
     const unsigned short port, const std::string& listen_interface,
-    std::function<void(ReceiveProtoT&)> receive_callback, bool multicast, std::optional<std::string>& error)
+    std::function<void(ReceiveProtoT&)> receive_callback, bool multicast,
+    std::optional<std::string>& error)
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::address boost_ip = boost::asio::ip::make_address(ip_address);
@@ -130,11 +132,11 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     {
         std::stringstream ss;
         ss << "UdpListener: There was an issue binding the socket to "
-                      "the listen_endpoint when trying to connect to the "
-                      "address. This may be due to another instance of the "
-                      "UdpListener running and using the port already. "
-                      "(ip = "
-                   << ip_address << ", port = " << port << ")";
+              "the listen_endpoint when trying to connect to the "
+              "address. This may be due to another instance of the "
+              "UdpListener running and using the port already. "
+              "(ip = "
+           << ip_address << ", port = " << port << ")";
         error = ss.str();
         return;
     }
@@ -154,7 +156,8 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const unsigned short port,
-    std::function<void(ReceiveProtoT&)> receive_callback, std::optional<std::string>& error)
+    std::function<void(ReceiveProtoT&)> receive_callback,
+    std::optional<std::string>& error)
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v6(), port);
@@ -169,11 +172,11 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     {
         std::stringstream ss;
         ss << "UdpListener: There was an issue binding the socket to "
-                      "the listen_endpoint when trying to connect to the "
-                      "address. This may be due to another instance of the "
-                      "UdpListener running and using the port already. "
-                      "(port = "
-                   << port << ")";
+              "the listen_endpoint when trying to connect to the "
+              "address. This may be due to another instance of the "
+              "UdpListener running and using the port already. "
+              "(port = "
+           << port << ")";
         error = ss.str();
         return;
     }
@@ -238,22 +241,24 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
 }
 
 template <class ReceiveProtoT>
-void ProtoUdpListener<ReceiveProtoT>::setupMulticast(const boost::asio::ip::address& ip_address,
-        const std::string& listen_interface, std::optional<std::string>& error)
+void ProtoUdpListener<ReceiveProtoT>::setupMulticast(
+    const boost::asio::ip::address& ip_address, const std::string& listen_interface,
+    std::optional<std::string>& error)
 {
     if (ip_address.is_v4())
     {
-        std::string interface_ip; 
+        std::string interface_ip;
         if (!getLocalIp(listen_interface, interface_ip))
         {
             std::stringstream ss;
             ss << "Could not find the local ip address for the given interface: "
-                       << listen_interface << std::endl;
+               << listen_interface << std::endl;
             error = ss.str();
             return;
         }
         socket_.set_option(boost::asio::ip::multicast::join_group(
-                    ip_address.to_v4(), boost::asio::ip::address::from_string(interface_ip).to_v4()));
+            ip_address.to_v4(),
+            boost::asio::ip::address::from_string(interface_ip).to_v4()));
         return;
     }
     socket_.set_option(boost::asio::ip::multicast::join_group(ip_address));
@@ -276,8 +281,8 @@ void ProtoUdpListener<ReceiveProtoT>::close()
     {
         LOG(WARNING)
             << "An unknown network error occurred when attempting to shutdown UDP socket for "
-            << TYPENAME(ReceiveProtoT)
-            << ". The boost system error is: " << error_code << ": " << error_code.message() << std::endl;
+            << TYPENAME(ReceiveProtoT) << ". The boost system error is: " << error_code
+            << ": " << error_code.message() << std::endl;
     }
 
     socket_.close(error_code);

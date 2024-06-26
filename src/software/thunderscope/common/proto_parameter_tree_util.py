@@ -14,9 +14,12 @@ To define a custom handler:
     2. The value is the function that will be called to parse the field. Make sure the function is callable from this
        file
 """
-CUSTOM_PARAMETERS_OVERRIDE = {"referee_interface":      "__create_network_enum",
-                              "robot_status_interface": "__create_network_enum",
-                              "vision_interface":       "__create_network_enum"}
+CUSTOM_PARAMETERS_OVERRIDE = {
+    "referee_interface": "__create_network_enum",
+    "robot_status_interface": "__create_network_enum",
+    "vision_interface": "__create_network_enum",
+}
+
 
 def __create_int_parameter_writable(key, value, descriptor):
     """Converts an int field of a proto to a NumericParameterItem with
@@ -146,12 +149,9 @@ def __create_network_enum(key, value, _):
     :param value: The default value
     """
     network_interfaces = netifaces.interfaces()
-    
+
     return parametertree.parameterTypes.ListParameter(
-        name=key,
-        default=None,
-        value=value,
-        limits=network_interfaces
+        name=key, default=None, value=value, limits=network_interfaces
     )
 
 
@@ -202,7 +202,11 @@ def config_proto_to_field_list(
                 continue
 
         if descriptor.name in CUSTOM_PARAMETERS_OVERRIDE.keys():
-            field_list.append(eval(CUSTOM_PARAMETERS_OVERRIDE[descriptor.name])(key, value, descriptor))
+            field_list.append(
+                eval(CUSTOM_PARAMETERS_OVERRIDE[descriptor.name])(
+                    key, value, descriptor
+                )
+            )
         elif descriptor.type == descriptor.TYPE_MESSAGE:
             field_list.append(
                 {

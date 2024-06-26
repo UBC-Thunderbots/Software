@@ -1,7 +1,8 @@
 #include "software/networking/udp/threaded_udp_sender.h"
 
 ThreadedUdpSender::ThreadedUdpSender(const std::string& ip_address,
-                                     const unsigned short port, const std::string& interface, bool multicast,
+                                     const unsigned short port,
+                                     const std::string& interface, bool multicast,
                                      std::optional<std::string>& error)
     : io_service(),
       udp_sender(io_service, ip_address, port, interface, multicast, error),

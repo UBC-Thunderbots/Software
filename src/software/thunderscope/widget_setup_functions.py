@@ -216,13 +216,14 @@ def setup_parameter_widget(
         attr: Any, value: Any, updated_proto: ThunderbotsConfig
     ) -> None:
         proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
-        proto_unix_io.send_proto(NetworkConfig, updated_proto.ai_config.ai_control_config.network_config)
+        proto_unix_io.send_proto(
+            NetworkConfig, updated_proto.ai_config.ai_control_config.network_config
+        )
 
     return ProtoConfigurationWidget(config, on_change_callback)
 
-def setup_network_config_widget(
-    proto_unix_io: ProtoUnixIO
-) -> ProtoConfigurationWidget:
+
+def setup_network_config_widget(proto_unix_io: ProtoUnixIO) -> ProtoConfigurationWidget:
     """Setup the network configuration widget
 
     :param proto_unix_io: The proto unix io object
@@ -231,9 +232,7 @@ def setup_network_config_widget(
     """
     config = NetworkConfig()
 
-    def on_change_callback(
-        attr: Any, value: Any, updated_proto: NetworkConfig
-    ) -> None:
+    def on_change_callback(attr: Any, value: Any, updated_proto: NetworkConfig) -> None:
         """
         Callback function that sends updated network configuration
 

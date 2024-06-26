@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
-
 #include "software/networking/udp/network_utils.h"
+
+#include <gtest/gtest.h>
 
 TEST(NetworkUtilsTest, getLocalIpValidInterface)
 {
-    std::string interface = "lo";    
+    std::string interface = "lo";
     std::string ip_address;
     EXPECT_TRUE(getLocalIp(interface, ip_address, true));
     EXPECT_EQ(ip_address, "127.0.0.1");

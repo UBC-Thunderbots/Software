@@ -23,7 +23,8 @@ class UdpSender
      * @param error A user-provided optional string to store any errors that occur
      */
     UdpSender(boost::asio::io_service& io_service, const std::string& ip_address,
-              unsigned short port, const std::string& interface, bool multicast, std::optional<std::string>& error);
+              unsigned short port, const std::string& interface, bool multicast,
+              std::optional<std::string>& error);
 
     ~UdpSender();
 
@@ -36,7 +37,8 @@ class UdpSender
      * @param interface The interface to join the multicast group on
      * @param error A user-provided optional string to store any errors that occur
      */
-    void setupMulticast(const boost::asio::ip::address& ip_address, const std::string& interface, std::optional<std::string>& error);
+    void setupMulticast(const boost::asio::ip::address& ip_address,
+                        const std::string& interface, std::optional<std::string>& error);
 
     /**
      * Sends a string message to the initialized ip address and port

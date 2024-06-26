@@ -83,12 +83,14 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
-        self.current_network_config = NetworkConfig(robot_status_interface=DISCONNECTED,
-                                                    vision_interface=DISCONNECTED,
-                                                    referee_interface=DISCONNECTED)
+        self.current_network_config = NetworkConfig(
+            robot_status_interface=DISCONNECTED,
+            vision_interface=DISCONNECTED,
+            referee_interface=DISCONNECTED,
+        )
         self.network_config_buffer = ThreadSafeBuffer(1, NetworkConfig)
         self.current_proto_unix_io.register_observer(
-                NetworkConfig, self.network_config_buffer
+            NetworkConfig, self.network_config_buffer
         )
 
         self.send_estop_state_thread = threading.Thread(
@@ -116,21 +118,30 @@ class RobotCommunication(object):
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
 
-    def setup_for_fullsystem(self, referee_interface: str = DISCONNECTED, vision_interface: str = DISCONNECTED) -> None:
+    def setup_for_fullsystem(
+        self,
+        referee_interface: str = DISCONNECTED,
+        vision_interface: str = DISCONNECTED,
+    ) -> None:
         """
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
 
         :param referee_interface: the interface to listen for referee data
         :param vision_interface: the interface to listen for vision data
         """
-        change_referee_interface = (referee_interface != self.current_network_config.referee_interface)\
-                and (referee_interface != DISCONNECTED)
-        change_vision_interface = (vision_interface != self.current_network_config.vision_interface)\
-                and (vision_interface != DISCONNECTED)
+        change_referee_interface = (
+            referee_interface != self.current_network_config.referee_interface
+        ) and (referee_interface != DISCONNECTED)
+        change_vision_interface = (
+            vision_interface != self.current_network_config.vision_interface
+        ) and (vision_interface != DISCONNECTED)
 
         if change_vision_interface:
 
-            self.receive_ssl_wrapper, error = tbots_cpp.createSSLWrapperPacketProtoListener(
+            (
+                self.receive_ssl_wrapper,
+                error,
+            ) = tbots_cpp.createSSLWrapperPacketProtoListener(
                 SSL_VISION_ADDRESS,
                 SSL_VISION_PORT,
                 vision_interface,
@@ -141,10 +152,15 @@ class RobotCommunication(object):
             if error:
                 print(f"Error setting up vision interface: {error}")
 
-            self.current_network_config.vision_interface = vision_interface if not error else DISCONNECTED
+            self.current_network_config.vision_interface = (
+                vision_interface if not error else DISCONNECTED
+            )
 
         if change_referee_interface:
-            self.receive_ssl_referee_proto, error = tbots_cpp.createSSLRefereeProtoListener(
+            (
+                self.receive_ssl_referee_proto,
+                error,
+            ) = tbots_cpp.createSSLRefereeProtoListener(
                 SSL_REFEREE_ADDRESS,
                 SSL_REFEREE_PORT,
                 referee_interface,
@@ -155,7 +171,9 @@ class RobotCommunication(object):
             if error:
                 print(f"Error setting up referee interface: {error}")
 
-            self.current_network_config.referee_interface = referee_interface if not error else DISCONNECTED
+            self.current_network_config.referee_interface = (
+                referee_interface if not error else DISCONNECTED
+            )
 
         if not self.is_setup_for_fullsystem:
             self.robots_connected_to_fullsystem = {
@@ -164,16 +182,19 @@ class RobotCommunication(object):
 
             self.is_setup_for_fullsystem = True
 
-
-    def __setup_for_robot_communication(self, robot_status_interface: str = "lo") -> None:
+    def __setup_for_robot_communication(
+        self, robot_status_interface: str = "lo"
+    ) -> None:
         """
         Set up senders and listeners for communicating with the robots
 
         :param robot_status_interface: the interface to listen/send for robot status data. Ignored for sending
         primitives if using radio
         """
-        if robot_status_interface == self.current_network_config.robot_status_interface\
-                or robot_status_interface == DISCONNECTED:
+        if (
+            robot_status_interface == self.current_network_config.robot_status_interface
+            or robot_status_interface == DISCONNECTED
+        ):
             return
 
         # Create the multicast listeners
@@ -208,11 +229,13 @@ class RobotCommunication(object):
             self.send_primitive_set, error = tbots_cpp.createPrimitiveSetProtoUdpSender(
                 self.multicast_channel, PRIMITIVE_PORT, robot_status_interface, True
             )
-        
+
         if error:
             print(f"Error setting up robot status interface: {error}")
 
-        self.current_network_config.robot_status_interface = robot_status_interface if not error else DISCONNECTED
+        self.current_network_config.robot_status_interface = (
+            robot_status_interface if not error else DISCONNECTED
+        )
 
     def close_for_fullsystem(self) -> None:
         if self.receive_ssl_wrapper:
@@ -220,7 +243,6 @@ class RobotCommunication(object):
 
         if self.receive_ssl_referee_proto:
             self.receive_ssl_referee_proto.close()
-
 
     def toggle_keyboard_estop(self) -> None:
         """
@@ -314,21 +336,26 @@ class RobotCommunication(object):
         is useful to dip in and out of robot diagnostics.
 
         """
-        network_config = self.network_config_buffer.get(block=False if self.send_primitive_set else True,
-                                                            return_cached=False)
+        network_config = self.network_config_buffer.get(
+            block=False if self.send_primitive_set else True, return_cached=False
+        )
         while self.running:
             if network_config is not None:
                 print(f"[RobotCommunication] Received new NetworkConfig")
                 if self.is_setup_for_fullsystem:
-                    self.setup_for_fullsystem(referee_interface=network_config.referee_interface,
-                                              vision_interface=network_config.vision_interface)
+                    self.setup_for_fullsystem(
+                        referee_interface=network_config.referee_interface,
+                        vision_interface=network_config.vision_interface,
+                    )
                 self.__setup_for_robot_communication(
                     robot_status_interface=network_config.robot_status_interface
                 )
                 self.__print_current_network_config()
 
             # Set up network on the next tick
-            network_config = self.network_config_buffer.get(block=False, return_cached=False)
+            network_config = self.network_config_buffer.get(
+                block=False, return_cached=False
+            )
 
             # total primitives for all robots
             robot_primitives = {}
@@ -441,6 +468,7 @@ class RobotCommunication(object):
         """
         Prints the current network configuration to the console
         """
+
         def output_string(comm_name: str, status: str) -> str:
             """
             Returns a formatted string with the communication name and status
@@ -453,6 +481,12 @@ class RobotCommunication(object):
             colour = Fore.RED if status == DISCONNECTED else Fore.GREEN
             return f"{comm_name} {colour}{status} {Style.RESET_ALL}"
 
-        print(output_string("Robot Status\t", self.current_network_config.robot_status_interface))
+        print(
+            output_string(
+                "Robot Status\t", self.current_network_config.robot_status_interface
+            )
+        )
         print(output_string("Vision\t\t", self.current_network_config.vision_interface))
-        print(output_string("Referee\t\t", self.current_network_config.referee_interface))
+        print(
+            output_string("Referee\t\t", self.current_network_config.referee_interface)
+        )
