@@ -31,7 +31,7 @@ double ratePass(const World& world, const Pass& pass,
  * @param pass The pass to rate
  * @param passing_config The passing config used for tuning
  * @return A value in [0,1] representing the quality of the pass receiving
- * position, with 1 being indicating that the receiving position is ideal, and 0
+ * position, with 1 indicating that the receiving position is ideal, and 0
  * indicating that the pass will likely not be received.
  */
 double rateReceivingPosition(const World& world, const Pass& pass,
@@ -194,15 +194,6 @@ double rateKeepAwayPosition(const Point& keep_away_position, const World& world,
                             const Pass& best_pass_so_far,
                             const Rectangle& dribbling_bounds,
                             const TbotsProto::PassingConfig& passing_config);
-
-/**
- * Scale a normalized rating to a new range
- * @param rating Rating in [0, 1] to scale
- * @param min The new minimum value the rating = 0 will map to
- * @param max The new maximum value the rating = 1 will map to
- * @return The scaled rating
- */
-double scaleNormalizedRating(double rating, double min, double max);
 
 /**
  * Sample passes at different points on the field and rate them, similar to ratePass, to

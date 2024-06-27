@@ -86,6 +86,7 @@ pybind_library(
         "//software:constants",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
+        "//software/ai/passing:receiver_position_generator",
         "//software/estop:threaded_estop_reader",
         "//software/geom:angle",
         "//software/geom:point",

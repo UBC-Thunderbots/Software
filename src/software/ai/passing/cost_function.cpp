@@ -102,11 +102,7 @@ double rateShot(const Point& shot_origin, const Field& field, const Team& enemy_
     open_angle_to_goal_score = std::clamp(open_angle_to_goal_score, 0.0, min_ideal_angle);
 
     // Linearly scale score to [0.0, 1.0]
-    open_angle_to_goal_score = open_angle_to_goal_score / min_ideal_angle;
-
-    // Linearly scale score to [min_pass_shoot_score, 1.0] to stop this cost function
-    // from returning a very low score, causing the other cost functions to be ignored.
-    return open_angle_to_goal_score;
+    return open_angle_to_goal_score / min_ideal_angle;
 }
 
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
@@ -116,7 +112,8 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
 
     // Linearly scale score to [min_pass_shoot_score, 1.0] to stop this cost function
     // from returning a very low score, causing the other cost functions to be ignored.
-    return scaleNormalizedRating(shot_score, passing_config.min_pass_shoot_score(), 1.0);
+    return normalizeValueToRange(shot_score, 0.0, 1.0,
+                                 passing_config.min_pass_shoot_score(), 1.0);
 }
 
 double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
@@ -181,6 +178,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
         Duration::fromSeconds(enemy_robot_time_to_interception_point_sec *
                               passing_config.enemy_interception_time_multiplier());
 
+    // TODO (#2988): We should generate a more realistic ball trajectory
     Duration ball_time_to_interception_point =
         Duration::fromSeconds(distance(pass.passerPoint(), closest_interception_point) /
                               pass.speed()) +
@@ -348,11 +346,6 @@ double rateKeepAwayPosition(const Point& keep_away_position, const World& world,
            circleSigmoid(keepaway_search_region, keep_away_position, SIGMOID_WIDTH) *
            // don't try to dribble the ball off the field
            rectangleSigmoid(dribbling_bounds, keep_away_position, SIGMOID_WIDTH);
-}
-
-double scaleNormalizedRating(double rating, double min, double max)
-{
-    return rating * (max - min) + min;
 }
 
 void samplePassesForVisualization(const World& world,

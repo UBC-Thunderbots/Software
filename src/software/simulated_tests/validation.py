@@ -191,7 +191,10 @@ def run_validation_sequence_sets(
 
     # Validate the eventually validations. Eventually valids
     for validation_sequence in list(eventually_validation_sequence_set):
-        for validation in validation_sequence:
+        # NOTE: It is critical that we iterate over a copy of the validation_sequence
+        # (using the `list` constructor) since we will be modifying the original list
+        # within the loop
+        for validation in list(validation_sequence):
 
             # Add to validation_proto_set and get status
             status = create_validation_proto_helper(
