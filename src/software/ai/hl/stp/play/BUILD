@@ -129,7 +129,7 @@ cc_library(
         "//software/ai/hl/stp/play/ball_placement:ball_placement_play",
         "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/play/dynamic_plays:dynamic_play",
-        "//software/ai/hl/stp/play/dynamic_plays:offensive_plays",
+        "//software/ai/hl/stp/play/dynamic_plays:offense_play",
         "//software/ai/hl/stp/play/enemy_ball_placement:enemy_ball_placement_play",
         "//software/ai/hl/stp/play/enemy_free_kick:enemy_free_kick_play",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",

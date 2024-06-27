@@ -1,23 +1,21 @@
-#include "software/ai/hl/stp/play/dynamic_plays/offensive_plays.h"
+#include "software/ai/hl/stp/play/dynamic_plays/offense_play.h"
 
 #include "software/util/generic_factory/generic_factory.h"
 
-OffensivePlay::OffensivePlay(std::shared_ptr<Strategy> strategy,
-                             std::unique_ptr<FeasibilityScorer> feasibility_scorer,
-                             std::shared_ptr<AttackerTactic> attacker_tactic)
-    : DynamicPlay(strategy, std::move(feasibility_scorer)),
-      attacker_tactic_(attacker_tactic),
+OffensePlay::OffensePlay(std::shared_ptr<Strategy> strategy)
+    : DynamicPlay(strategy),
+      attacker_tactic_(std::make_shared<AttackerTactic>(strategy)),
       defense_play_(std::make_unique<DefensePlay>(strategy))
 {
 }
 
-void OffensivePlay::terminate(const WorldPtr& world_ptr)
+void OffensePlay::terminate(const WorldPtr& world_ptr)
 {
     DynamicPlay::terminate(world_ptr);
     attacker_tactic_->terminate(world_ptr);
 }
 
-void OffensivePlay::updateTactics(const PlayUpdate& play_update)
+void OffensePlay::updateTactics(const PlayUpdate& play_update)
 {
     PriorityTacticVector tactics;
 
@@ -99,14 +97,5 @@ void OffensivePlay::updateTactics(const PlayUpdate& play_update)
     play_update.set_tactics(tactics);
 }
 
-static TGenericFactory<std::string, Play, OffensiveFriendlyThirdPlay,
-                       std::shared_ptr<Strategy>, std::shared_ptr<AttackerTactic>>
-    offensive_friendly_third_play_factory;
-
-static TGenericFactory<std::string, Play, OffensiveMiddleThirdPlay,
-                       std::shared_ptr<Strategy>, std::shared_ptr<AttackerTactic>>
-    offensive_middle_third_play_factory;
-
-static TGenericFactory<std::string, Play, OffensiveEnemyThirdPlay,
-                       std::shared_ptr<Strategy>, std::shared_ptr<AttackerTactic>>
-    offensive_enemy_third_play_factory;
+static TGenericFactory<std::string, Play, OffensePlay, std::shared_ptr<Strategy>>
+    offense_play_factory;

@@ -10,7 +10,6 @@ cc_library(
     hdrs = ["dynamic_play.h"],
     deps = [
         "//software/ai/evaluation/scoring/support_tactics:duplication_scorer",
-        "//software/ai/evaluation/scoring/support_tactics:feasibility_scorer",
         "//software/ai/evaluation/scoring/support_tactics:success_scorer",
         "//software/ai/evaluation/scoring/support_tactics:support_tactic_candidate",
         "//software/ai/hl/stp/play",
@@ -20,14 +19,11 @@ cc_library(
 )
 
 cc_library(
-    name = "offensive_plays",
-    srcs = ["offensive_plays.cpp"],
-    hdrs = ["offensive_plays.h"],
+    name = "offense_play",
+    srcs = ["offense_play.cpp"],
+    hdrs = ["offense_play.h"],
     deps = [
         ":dynamic_play",
-        "//software/ai/evaluation/scoring/support_tactics/feasibility_scorers:offensive_enemy_third_feasibility_scorer",
-        "//software/ai/evaluation/scoring/support_tactics/feasibility_scorers:offensive_friendly_third_feasibility_scorer",
-        "//software/ai/evaluation/scoring/support_tactics/feasibility_scorers:offensive_middle_third_feasibility_scorer",
         "//software/ai/hl/stp/play/defense:defense_play",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
     ],

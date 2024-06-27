@@ -14,14 +14,7 @@
 
 PlaySelectionFSM::PlaySelectionFSM(std::shared_ptr<Strategy> strategy)
     : strategy_(strategy),
-      current_dynamic_play_(nullptr),
-      attacker_tactic_(std::make_shared<AttackerTactic>(strategy)),
-      offensive_friendly_third_play_(
-          std::make_shared<OffensiveFriendlyThirdPlay>(strategy, attacker_tactic_)),
-      offensive_middle_third_play_(
-          std::make_shared<OffensiveMiddleThirdPlay>(strategy, attacker_tactic_)),
-      offensive_enemy_third_play_(
-          std::make_shared<OffensiveEnemyThirdPlay>(strategy, attacker_tactic_))
+      offense_play_(std::make_shared<OffensePlay>(strategy))
 {
 }
 
@@ -105,36 +98,17 @@ void PlaySelectionFSM::setupHaltPlay(const Update& event)
     event.set_current_play(std::make_shared<HaltPlay>(strategy_));
 }
 
-void PlaySelectionFSM::setupOffensivePlay(const Update& event)
+void PlaySelectionFSM::setupOffensePlay(const Update& event)
 {
-    const Field& field        = event.world_ptr->field();
-    const Point ball_position = event.world_ptr->ball().position();
-
-    if (field.pointInFriendlyThird(ball_position))
-    {
-        current_dynamic_play_ = offensive_friendly_third_play_;
-    }
-    else if (field.pointInEnemyThird(ball_position))
-    {
-        current_dynamic_play_ = offensive_enemy_third_play_;
-    }
-    else
-    {
-        current_dynamic_play_ = offensive_middle_third_play_;
-    }
-
-    event.set_current_play(current_dynamic_play_);
+    event.set_current_play(offense_play_);
 }
 
-void PlaySelectionFSM::setupDefensivePlay(const Update& event)
+void PlaySelectionFSM::setupDefensePlay(const Update& event)
 {
     event.set_current_play(std::make_shared<DefensePlay>(strategy_));
 }
 
-void PlaySelectionFSM::terminateDynamicPlay(const Update& event)
+void PlaySelectionFSM::terminateOffensePlay(const Update& event)
 {
-    if (current_dynamic_play_)
-    {
-        current_dynamic_play_->terminate(event.world_ptr);
-    }
+    offense_play_->terminate(event.world_ptr);
 }

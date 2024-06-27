@@ -2,12 +2,10 @@
 
 #include "software/util/generic_factory/generic_factory.h"
 
-DynamicPlay::DynamicPlay(std::shared_ptr<Strategy> strategy,
-                         std::unique_ptr<FeasibilityScorer> feasibility_scorer)
+DynamicPlay::DynamicPlay(std::shared_ptr<Strategy> strategy)
     : Play(true, strategy),
       support_tactics_(),
       support_tactic_candidates_(allSupportTacticCandidates()),
-      support_tactic_feasibility_scorer_(std::move(feasibility_scorer)),
       support_tactic_duplication_scorer_(std::make_unique<DuplicationScorer>()),
       support_tactic_success_scorer_(std::make_unique<SuccessScorer>())
 {
@@ -39,7 +37,6 @@ void DynamicPlay::updateSupportTactics(unsigned int num_supporters)
         for (auto &candidate : support_tactic_candidates_)
         {
             candidate->clearScores();
-            candidate->score(*support_tactic_feasibility_scorer_);
             candidate->score(*support_tactic_duplication_scorer_);
             candidate->score(*support_tactic_success_scorer_);
         }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/evaluation/scoring/support_tactics/duplication_scorer.h"
-#include "software/ai/evaluation/scoring/support_tactics/feasibility_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/success_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/support_tactic_candidate.hpp"
 #include "software/ai/hl/stp/play/play.h"
@@ -35,10 +34,8 @@ class DynamicPlay : public Play
      * Base constructor for DynamicPlay
      *
      * @param strategy the Strategy
-     * @param feasibility_scorer the feasibility scorer for the play
      */
-    explicit DynamicPlay(std::shared_ptr<Strategy> strategy,
-                         std::unique_ptr<FeasibilityScorer> feasibility_scorer);
+    explicit DynamicPlay(std::shared_ptr<Strategy> strategy);
 
     DynamicPlay() = delete;
 
@@ -57,7 +54,6 @@ class DynamicPlay : public Play
     std::vector<std::shared_ptr<SupportTactic>> support_tactics_;
     std::vector<std::shared_ptr<SupportTacticCandidate>> support_tactic_candidates_;
 
-    std::unique_ptr<FeasibilityScorer> support_tactic_feasibility_scorer_;
     std::unique_ptr<DuplicationScorer> support_tactic_duplication_scorer_;
     std::unique_ptr<SuccessScorer> support_tactic_success_scorer_;
 };

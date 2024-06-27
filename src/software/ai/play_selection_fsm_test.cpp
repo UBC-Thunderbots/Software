@@ -61,7 +61,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick)
     EXPECT_TRUE(game_state.isPlaying());
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensivePlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlay>));
 }
 
 TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal_conceded)
@@ -133,7 +133,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isPlaying());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensivePlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlay>));
 }
 
 TEST_F(PlaySelectionFSMTest,
@@ -198,5 +198,5 @@ TEST_F(PlaySelectionFSMTest,
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isPlaying());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensivePlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlay>));
 }
