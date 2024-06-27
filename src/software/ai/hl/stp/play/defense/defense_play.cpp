@@ -7,7 +7,7 @@
 
 DefensePlay::DefensePlay(std::shared_ptr<Strategy> strategy)
     : Play(true, strategy),
-      fsm(std::make_unique<FSM<DefensePlayFSM>>(DefensePlayFSM(strategy->getAiConfig()))),
+      fsm(std::make_unique<FSM<DefensePlayFSM>>(DefensePlayFSM(strategy))),
       control_params{.max_allowed_speed_mode =
                          TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
 {
