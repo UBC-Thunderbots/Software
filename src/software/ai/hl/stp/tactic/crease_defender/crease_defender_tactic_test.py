@@ -23,8 +23,8 @@ from proto.ssl_gc_common_pb2 import Team
     [
         (
             tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea().posXPosYCorner(),
-            tbots_cpp.Point(0.0, 0.0), tbots_cpp.Point(1, 0.0),
-            tbots_cpp.Point(-3.5, 0.0), tbots_cpp.Vector(0.0, 0),
+            tbots_cpp.Point(0, 0), tbots_cpp.Point(1, 0),
+            tbots_cpp.Point(-3, 0), tbots_cpp.Vector(0, 0),
         ),
     ],
 )
@@ -82,12 +82,12 @@ def test_crease_default(
     # Always Validation
     always_validation_sequence_set = [
         [
-            # RobotNeverEntersRegion(
-            #     regions=[tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea()]
-            # ),
-            # BallNeverEntersRegion(
-            #     regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
-            # ),
+            RobotNeverEntersRegion(
+                regions=[tbots_cpp.Field.createSSLDivisionBField().enemyDefenseArea()]
+            ),
+            BallNeverEntersRegion(
+                regions=[tbots_cpp.Field.createSSLDivisionBField().friendlyGoal()]
+            ),
             NeverExcessivelyDribbles(),
         ]
     ]
