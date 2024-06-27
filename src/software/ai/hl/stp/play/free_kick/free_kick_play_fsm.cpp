@@ -176,10 +176,23 @@ void FreeKickPlayFSM::chipBall(const Update &event)
     LOG(DEBUG) << "Time to look for pass expired. Chipping ball...";
     PriorityTacticVector tactics_to_run = {{}};
 
-    Point chip_target(0, 0);
+    Point ball_pos = event.common.world_ptr->ball().position();
+    std::optional<Robot> robot_kicking_opt = event.common.world_ptr->friendlyTeam().getNearestRobot(ball_pos);
+    if (!robot_kicking_opt.has_value())
+    {
+        return;
+    }
+
     // Chip towards the friendly farthest up the enemy half
+    Point chip_target(0, 0);
     for (const Robot& friendly: event.common.world_ptr->friendlyTeam().getAllRobots())
     {
+        // Skip over the robot kick the ball
+        if (friendly.id() == robot_kicking_opt->id())
+        {
+            continue;
+        }
+        // TODO (NIMA): Should face best receiving robot?!?
         if (friendly.position().x() > chip_target.x())
         {
             chip_target = friendly.position();
