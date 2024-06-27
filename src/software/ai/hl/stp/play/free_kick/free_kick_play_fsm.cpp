@@ -11,15 +11,12 @@ FreeKickPlayFSM::FreeKickPlayFSM(const TbotsProto::AiConfig& ai_config)
       receiver_tactic(std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config())),
       offensive_positioning_tactics(
           {std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>()}),
-      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(
-                                   ai_config.robot_navigation_obstacle_config()),
-                               std::make_shared<CreaseDefenderTactic>(
-                                   ai_config.robot_navigation_obstacle_config())}),
+      defense_play(std::make_shared<DefensePlay>(ai_config)),
       pass_generator(ai_config.passing_config()),
       receiver_position_generator(ReceiverPositionGenerator<EighteenZoneId>(
               std::make_shared<const EighteenZonePitchDivision>(
                       Field::createSSLDivisionBField()),
-              ai_config.passing_config()))
+              ai_config.passing_config())),
 {
 }
 
@@ -97,6 +94,39 @@ void FreeKickPlayFSM::updateOffensivePositioningTactics(
                 TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
                 TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE);
     }
+}
+
+void FreeKickPlayFSM::setTactics(const Update& event, int num_receivers,
+                                 int num_defenders)
+{
+    PriorityTacticVector tactics_to_return;
+
+    if (num_receivers > 0)
+    {
+        // Up to 2 receivers
+        unsigned int num_receivers = std::min(2u, event.common.num_tactics - 1);
+        updateOffensivePositioningTactics(event.common.world_ptr, num_receivers);
+        tactics_to_run[0].insert(tactics_to_run[0].end(), offensive_positioning_tactics.begin(),
+                                 offensive_positioning_tactics.end());
+    }
+
+    defense_play->updateControlParams(TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+
+    if (num_defenders > 0)
+    {
+        defense_play->updateTactics(PlayUpdate(
+                event.common.world_ptr, num_defenders,
+                [&tactics_to_return](PriorityTacticVector new_tactics) {
+                    for (const auto& tactic_vector : new_tactics)
+                    {
+                        tactics_to_return.push_back(tactic_vector);
+                    }
+                },
+                event.common.inter_play_communication,
+                event.common.set_inter_play_communication_fun));
+    }
+
+    event.common.set_tactics(tactics_to_return);
 }
 
 void FreeKickPlayFSM::updateAlignToBallTactic(const WorldPtr &world_ptr)

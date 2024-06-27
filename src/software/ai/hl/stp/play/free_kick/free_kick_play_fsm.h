@@ -13,6 +13,7 @@
 #include "software/ai/passing/pass_generator.h"
 #include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/logger/logger.h"
+#include "software/ai/hl/stp/play/defense/defense_play.h"
 
 /**
  * This FSM implements the free kick play. The logic of this play is:
@@ -79,6 +80,15 @@ struct FreeKickPlayFSM
             const WorldPtr world, unsigned int num_tactics,
             const std::vector<Point>& existing_receiver_positions = {},
             const std::optional<Point>& pass_origin_override      = std::nullopt);
+
+    /**
+     * TODO (NIMA)
+     * @param event
+     * @param num_receivers
+     * @param num_defenders
+     */
+    void FreeKickPlayFSM::setTactics(const Update& event, int num_receivers,
+                                     int num_defenders);
 
     /**
      * Updates the kicker to align to the ball
@@ -253,7 +263,7 @@ struct FreeKickPlayFSM
     std::shared_ptr<KickTactic> passer_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics;
+    std::shared_ptr<DefensePlay> defense_play;
 
     PassGenerator pass_generator;
     ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator;
