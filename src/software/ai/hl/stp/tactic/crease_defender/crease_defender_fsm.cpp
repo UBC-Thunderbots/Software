@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 
+#include "software/geom/algorithms/contains.h"
+
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
     const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
@@ -33,17 +35,42 @@ void CreaseDefenderFSM::blockThreat(
 {
     Point destination = event.common.robot.position();
     // Use a slightly larger inflation factor to avoid the crease defenders from sitting
+    double robot_obstacle_inflation_factor =
+        robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5;
+    double robot_radius_expansion_amount =
+        ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
+    Rectangle inflated_defense_area =
+        event.common.world_ptr->field().friendlyDefenseArea().expand(
+            robot_radius_expansion_amount);
     // right on the edge of the defense area obstacle.
     auto block_threat_point = findBlockThreatPoint(
         event.common.world_ptr->field(), event.control_params.enemy_threat_origin,
-        event.control_params.crease_defender_alignment,
-        robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5);
-    if (block_threat_point)
+        event.control_params.crease_defender_alignment, robot_obstacle_inflation_factor);
+
+    if (contains(inflated_defense_area, event.control_params.enemy_threat_origin))
+    {
+        // Check to see if ray is within goalie box to ignore and station bot along
+        // inflated defense area
+        auto crease_defender_alignment = event.control_params.crease_defender_alignment;
+        if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
+        {
+            destination = Point(inflated_defense_area.posXPosYCorner().x(),
+                                ROBOT_MAX_RADIUS_METERS);
+        }
+        else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::RIGHT)
+        {
+            destination = Point(inflated_defense_area.posXPosYCorner().x(),
+                                -ROBOT_MAX_RADIUS_METERS);
+        }
+    }
+    else if (block_threat_point)
     {
         destination = block_threat_point.value();
     }
-    else
+    else if (event.control_params.enemy_threat_origin.x() >=
+             event.common.world_ptr->field().friendlyDefenseArea().negXNegYCorner().x())
     {
+        // Ignore cases when the ball is behind the friendly goal baseline
         LOG(WARNING)
             << "Could not find a point on the defense area to block a potential shot";
     }
@@ -106,7 +133,6 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
     {
         return front_intersections[0];
     }
-
     if (ray.getStart().y() > 0)
     {
         // Check left segment if ray start point is in positive y half
@@ -125,5 +151,6 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
             return right_intersections[0];
         }
     }
+
     return std::nullopt;
 }

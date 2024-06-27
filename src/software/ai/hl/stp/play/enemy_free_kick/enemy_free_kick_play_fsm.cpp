@@ -11,7 +11,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(std::shared_ptr<Strategy> strategy)
-    : strategy(strategy), crease_defenders({}), pass_defenders({})
+    : DefensePlayFSMBase(strategy)
 {
 }
 
@@ -22,8 +22,18 @@ void EnemyFreeKickPlayFSM::blockEnemyKicker(const Update& event)
 
 void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tactics)
 {
+    if (num_tactics <= 0)
+    {
+        return;
+    }
+    const Point friendly_goal_center =
+        event.common.world_ptr->field().friendlyGoalCenter();
+    const double ball_far_threshold_m =
+        event.common.world_ptr->field().totalYLength() / 2;
+
+
     // One tactic is always designated as the free kick defender
-    unsigned int num_defenders             = num_tactics - 1;
+    int num_defenders                      = num_tactics - 1;
     PriorityTacticVector tactics_to_return = {{}, {}, {}};
     Point block_kick_point;
 
@@ -59,22 +69,28 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     std::vector<DefenderAssignment> crease_defender_assignments;
     std::vector<DefenderAssignment> pass_defender_assignments;
     std::queue<DefenderAssignment> assignments_skipped;
-    for (unsigned int i = 0; i < num_defenders; i++)
+    for (int i = 0; i < num_defenders; i++)
     {
         DefenderAssignment defender_assignment;
-        if (i + assignments_skipped.size() < assignments.size() - 1)
+        int assignment_index_with_skipped =
+            static_cast<int>(i + assignments_skipped.size());
+        int assignment_index_last_assignment = static_cast<int>(assignments.size()) - 1;
+
+        if (assignment_index_with_skipped < assignment_index_last_assignment)
         {
-            defender_assignment = assignments.at(i + assignments_skipped.size());
+            defender_assignment = assignments.at(assignment_index_with_skipped);
 
             // Continuously skips pass defenders within threshold meters of free kick
             // defender
             while (defender_assignment.type == PASS_DEFENDER &&
-                   (i + assignments_skipped.size() < assignments.size() - 1) &&
+                   (assignment_index_with_skipped < assignment_index_last_assignment) &&
                    distance(defender_assignment.target, block_kick_point) <=
                        TOO_CLOSE_THRESHOLD_METERS)
             {
                 assignments_skipped.push(defender_assignment);
-                defender_assignment = assignments.at(i + assignments_skipped.size());
+                assignment_index_with_skipped =
+                    static_cast<int>(i + assignments_skipped.size());
+                defender_assignment = assignments.at(assignment_index_with_skipped);
             }
         }
         else
@@ -90,15 +106,14 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
                 assignments_skipped.pop();
             }
             else if (tactics_to_return[0].size() < 2 &&
-                     distance(event.common.world_ptr->field().friendlyGoalCenter(),
-                              block_kick_point) >=
-                         event.common.world_ptr->field().totalYLength() / 2)
+                     distance(friendly_goal_center, block_kick_point) >=
+                         ball_far_threshold_m)
             {
                 auto mid_zone_defender = std::make_shared<PassDefenderTactic>();
-                Point mid_point        = Point(
-                    (event.common.world_ptr->ball().position().toVector() +
-                     event.common.world_ptr->field().friendlyGoalCenter().toVector()) /
-                    2);
+                Point mid_point =
+                    Point((event.common.world_ptr->ball().position().toVector() +
+                           friendly_goal_center.toVector()) /
+                          2);
                 mid_zone_defender->updateControlParams(mid_point);
                 tactics_to_return[0].push_back(mid_zone_defender);
             }
@@ -131,82 +146,12 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     // we intend to assign has changed
     setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
     setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
-
-    for (unsigned int i = 0; i < crease_defenders.size(); i++)
-    {
-        auto target = crease_defender_assignments.at(i).target;
-
-        // Determine the number of crease defenders already assigned to the target
-        auto defenders_with_target_count = std::count_if(
-            crease_defender_assignments.begin(), crease_defender_assignments.begin() + i,
-            [&target](const auto& assignment) { return assignment.target == target; });
-
-        // Pick alignment based on how many crease defenders are already assigned to the
-        // target
-        auto alignment = TbotsProto::CreaseDefenderAlignment::CENTRE;
-        if (defenders_with_target_count == 1)
-        {
-            if (event.common.world_ptr->ball().position().y() > 0)
-            {
-                alignment = TbotsProto::CreaseDefenderAlignment::LEFT;
-            }
-            else
-            {
-                alignment = TbotsProto::CreaseDefenderAlignment::RIGHT;
-            }
-        }
-        else if (defenders_with_target_count == 2)
-        {
-            if (event.common.world_ptr->ball().position().y() > 0)
-            {
-                alignment = TbotsProto::CreaseDefenderAlignment::RIGHT;
-            }
-            else
-            {
-                alignment = TbotsProto::CreaseDefenderAlignment::LEFT;
-            }
-        }
-
-        crease_defenders.at(i)->updateControlParams(
-            target, alignment, event.control_params.max_allowed_speed_mode);
-    }
-
-    for (unsigned int i = 0; i < pass_defenders.size(); i++)
-    {
-        pass_defenders.at(i)->updateControlParams(pass_defender_assignments.at(i).target);
-    }
-
+    setAlignment(event, crease_defender_assignments);
+    updatePassDefenderControlParams(pass_defender_assignments);
 
     tactics_to_return[1].insert(tactics_to_return[1].end(), crease_defenders.begin(),
                                 crease_defenders.end());
     tactics_to_return[2].insert(tactics_to_return[2].end(), pass_defenders.begin(),
                                 pass_defenders.end());
     event.common.set_tactics(tactics_to_return);
-}
-
-void EnemyFreeKickPlayFSM::setUpCreaseDefenders(unsigned int num_crease_defenders)
-{
-    if (num_crease_defenders == crease_defenders.size())
-    {
-        return;
-    }
-
-    crease_defenders =
-        std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_crease_defenders);
-    std::generate(crease_defenders.begin(), crease_defenders.end(), [this]() {
-        return std::make_shared<CreaseDefenderTactic>(
-            strategy->getAiConfig().robot_navigation_obstacle_config());
-    });
-}
-
-void EnemyFreeKickPlayFSM::setUpPassDefenders(unsigned int num_pass_defenders)
-{
-    if (num_pass_defenders == pass_defenders.size())
-    {
-        return;
-    }
-
-    pass_defenders = std::vector<std::shared_ptr<PassDefenderTactic>>(num_pass_defenders);
-    std::generate(pass_defenders.begin(), pass_defenders.end(),
-                  [this]() { return std::make_shared<PassDefenderTactic>(); });
 }
