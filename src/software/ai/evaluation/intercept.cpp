@@ -104,11 +104,11 @@ Point findInterceptionPoint(const Robot &robot, const Ball &ball, const Field &f
     Point intercept_position = ball.position();
     while (contains(field.fieldLines(), intercept_position))
     {
-        Duration ball_time_to_position = Duration::fromSeconds(
+        Duration ball_time_to_pos = Duration::fromSeconds(
             distance(intercept_position, ball.position()) / ball.velocity().length());
         Duration robot_time_to_pos = robot.getTimeToPosition(intercept_position);
 
-        if (robot_time_to_pos < ball_time_to_position)
+        if (robot_time_to_pos < ball_time_to_pos)
         {
             break;
         }

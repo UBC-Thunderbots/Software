@@ -57,8 +57,8 @@ class AttackerTactic : public Tactic
      *
      * @param world_ptr the world pointer
      *
-     * @return true if the tactic is still suspended after trying to resume execution,
-     * false otherwise
+     * @return true if the tactic resumed execution and is not suspended, 
+     * false if the tactic failed to resume and is still suspended
      */
     bool tryResumingIfSuspended(const WorldPtr& world_ptr);
 

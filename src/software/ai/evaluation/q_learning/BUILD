@@ -37,6 +37,7 @@ cc_library(
     srcs = ["attacker_mdp_reward_function.cpp"],
     hdrs = ["attacker_mdp_reward_function.h"],
     deps = [
+        "//software/ai:strategy",
         "//software/logger",
         "//software/math:math_functions",
         "//software/world",

@@ -5,14 +5,14 @@
 #include "software/ai/evaluation/possession.h"
 
 AttackerMdpFeatureExtractor::AttackerMdpFeatureExtractor()
-    : FeatureExtractor({ballXPositionFeature, bestPassRatingFeature, bestShotOpenAngleFeature})
+    : FeatureExtractor(
+          {ballXPositionFeature, bestPassRatingFeature, bestShotOpenAngleFeature})
 {
 }
 
 double AttackerMdpFeatureExtractor::ballXPositionFeature(const AttackerMdpState& state)
 {
-    const double x_pos = state.world_ptr->ball()
-        .estimateFutureState(Duration::fromSeconds(1.0)).position().x();
+    const double x_pos            = state.world_ptr->ball().position().x();
     const double field_x_length   = state.world_ptr->field().totalXLength();
     const double normalized_x_pos = std::max(x_pos, 0.0) / (field_x_length / 2);
     return normalized_x_pos;

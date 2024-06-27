@@ -108,8 +108,8 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
 
 bool ReceiverFSM::onetouchPossible(const Update& event)
 {
-    return !event.control_params.disable_one_touch_shot &&
-           !strategy_->getAiConfig().receiver_tactic_config().disable_one_touch_kick() &&
+    return event.control_params.enable_one_touch_shot &&
+           strategy_->getAiConfig().receiver_tactic_config().enable_one_touch_kick() &&
            (findFeasibleShot(*event.common.world_ptr, event.common.robot) !=
             std::nullopt);
 }

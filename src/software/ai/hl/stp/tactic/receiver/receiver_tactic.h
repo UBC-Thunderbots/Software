@@ -27,11 +27,11 @@ class ReceiverTactic : public SupportTactic
      * Updates the control parameters for this ReceiverTactic.
      *
      * @param receiving_position The point at which to receive the pass
-     * @param disable_one_touch_shot If set to true, the receiver will not perform a
-     * one-touch The robot will simply receive and dribble.
+     * @param enable_one_touch_shot If set to false, the receiver will not perform
+     * one-touch shots. The robot will simply receive and dribble.
      */
     void updateControlParams(std::optional<Point> receiving_position,
-                             bool disable_one_touch_shot = false);
+                             bool enable_one_touch_shot = true);
 
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;

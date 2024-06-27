@@ -131,7 +131,7 @@ def setup_pass_and_robots(
                 x_meters=best_pass.receiverPoint().x(),
                 y_meters=best_pass.receiverPoint().y(),
             ),
-            "disable_one_touch_shot": True,
+            "enable_one_touch_shot": False,
         }
 
         params.assigned_tactics[1].receiver.CopyFrom(ReceiverTactic(**receiver_args))

@@ -21,12 +21,12 @@ void OffensivePlay::updateTactics(const PlayUpdate& play_update)
 {
     PriorityTacticVector tactics;
 
-    const bool is_attacker_suspended =
+    const bool attacker_not_suspended =
         attacker_tactic_->tryResumingIfSuspended(play_update.world_ptr);
 
     // The AttackerTactic should only be returned if it has not suspended
     // execution of its current skill (it will not yield primitives if suspended)
-    if (!is_attacker_suspended)
+    if (attacker_not_suspended)
     {
         tactics.push_back({attacker_tactic_});
     }

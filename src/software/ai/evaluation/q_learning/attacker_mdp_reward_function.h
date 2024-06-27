@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/world/world.h"
+#include "software/ai/strategy.h"
 
 /**
  * AttackerMdpRewardFunction is the reward function for the Markov decision process (MDP)
@@ -13,6 +14,13 @@
 class AttackerMdpRewardFunction
 {
    public:
+    /**
+     * @brief Creates a AttackerMdpRewardFunction.
+     * 
+     * @param strategy the shared Strategy used by all of AI
+     */
+    explicit AttackerMdpRewardFunction(std::shared_ptr<Strategy> strategy);
+
     /**
      * Starts a new step.
      *
@@ -31,6 +39,9 @@ class AttackerMdpRewardFunction
     double endStepObservation(WorldPtr world_ptr);
 
    private:
+    // The shared Strategy used by all of AI
+    std::shared_ptr<Strategy> strategy_;
+
     // The World at the start of the current step
     WorldPtr step_start_world_ptr_;
 };

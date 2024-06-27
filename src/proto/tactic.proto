@@ -91,8 +91,8 @@ message ReceiverTactic
 {
     // The point at which to receive the pass
     optional Point receiving_position = 1;
-    // If set to true, we will only receive and dribble
-    required bool disable_one_touch_shot = 2;
+    // If set to false, we will only receive and dribble
+    required bool enable_one_touch_shot = 2;
 }
 
 message ShadowEnemyTactic

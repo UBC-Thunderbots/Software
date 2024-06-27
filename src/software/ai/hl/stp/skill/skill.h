@@ -61,8 +61,8 @@ class Skill
      * @param robot_id the ID of the robot executing the Skill
      * @param world_ptr the world pointer
      *
-     * @return true if the Skill is still suspended for the robot after
-     * trying to resume execution, false otherwise
+     * @return true if the Skill resumed execution and is not suspended, 
+     * false if the Skill failed to resume and is still suspended
      */
     virtual bool tryResumingIfSuspended(const RobotId robot_id,
                                         const WorldPtr& world_ptr) = 0;

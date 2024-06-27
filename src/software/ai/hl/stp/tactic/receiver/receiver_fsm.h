@@ -27,8 +27,8 @@ struct ReceiverFSM
         // The point at which to receive the pass
         std::optional<Point> receiving_position = std::nullopt;
 
-        // If set to true, we will only receive and dribble
-        bool disable_one_touch_shot = false;
+        // If set to false, we will only receive and dribble
+        bool enable_one_touch_shot = true;
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS

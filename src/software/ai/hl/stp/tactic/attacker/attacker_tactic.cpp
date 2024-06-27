@@ -16,7 +16,7 @@ AttackerTactic::AttackerTactic(std::shared_ptr<Strategy> strategy)
                   .attacker_tactic_config()
                   .action_selection_temperature())),
       policy_(q_function_, action_selection_strategy_),
-      attacker_mdp_reward_function_(),
+      attacker_mdp_reward_function_(strategy_),
       current_skill_(nullptr)
 {
 }
@@ -50,8 +50,13 @@ bool AttackerTactic::suspended() const
 
 bool AttackerTactic::tryResumingIfSuspended(const WorldPtr& world_ptr)
 {
-    return last_execution_robot && current_skill_ &&
-           current_skill_->tryResumingIfSuspended(*last_execution_robot, world_ptr);
+    if (last_execution_robot && current_skill_)
+    {
+        return current_skill_->tryResumingIfSuspended(*last_execution_robot, world_ptr);
+    }
+
+    // If no Skill is being executed, we consider the tactic as "resumed" 
+    return true;
 }
 
 void AttackerTactic::terminate(const WorldPtr& world_ptr)

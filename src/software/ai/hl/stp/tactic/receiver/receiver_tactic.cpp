@@ -7,7 +7,10 @@
 #include "software/logger/logger.h"
 
 ReceiverTactic::ReceiverTactic(std::shared_ptr<Strategy> strategy)
-    : SupportTactic({RobotCapability::Move}), strategy_(strategy), fsm_map(), control_params()
+    : SupportTactic({RobotCapability::Move}),
+      strategy_(strategy),
+      fsm_map(),
+      control_params()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
@@ -26,11 +29,11 @@ void ReceiverTactic::updateReceivingPosition(std::optional<Point> receiving_posi
 }
 
 void ReceiverTactic::updateControlParams(std::optional<Point> receiving_position,
-                                         bool disable_one_touch_shot)
+                                         bool enable_one_touch_shot)
 {
     // Update the control parameters stored by this Tactic
-    control_params.receiving_position     = receiving_position;
-    control_params.disable_one_touch_shot = disable_one_touch_shot;
+    control_params.receiving_position    = receiving_position;
+    control_params.enable_one_touch_shot = enable_one_touch_shot;
 }
 
 void ReceiverTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)

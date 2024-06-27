@@ -62,7 +62,7 @@ def test_passing(field_test_runner):
                 x_meters=pass_to_test.receiverPoint().x(),
                 y_meters=pass_to_test.receiverPoint().y(),
             ),
-            "disable_one_touch_shot": True,
+            "enable_one_touch_shot": False,
         }
 
         params.assigned_tactics[receiver_robot_id].receiver.CopyFrom(

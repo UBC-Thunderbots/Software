@@ -170,7 +170,7 @@ bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::tryResumingIfSuspended(
 
     // The FSM may have left SuspendedState after processing the SuspendedUpdate,
     // so we need to recheck whether the skill is suspended
-    return suspended(robot_id);
+    return !suspended(robot_id);
 }
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>
