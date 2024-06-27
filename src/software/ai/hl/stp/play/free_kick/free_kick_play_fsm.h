@@ -10,7 +10,8 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/pass_generator.hpp"
+#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/logger/logger.h"
 
 /**
@@ -44,7 +45,7 @@ struct FreeKickPlayFSM
      *
      * @param ai_config the play config for this play FSM
      */
-    explicit FreeKickPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit FreeKickPlayFSM(const TbotsProto::AiConfig& ai_config);
 
     /**
      * Action that sets up the robots in position to perform the free kick
@@ -63,11 +64,21 @@ struct FreeKickPlayFSM
     bool setupDone(const Update& event);
 
     /**
+     * TODO (NIMA): Copied from ShootOrPassPlayFSM
      * Updates the offensive positioning tactics
      *
-     * @param world the latest world
+     * @param world the world
+     * @param num_tactics the number of tactics to assign
+     * @param existing_receiver_positions A set of positions of existing receiver
+     * positions that should be taken into account when assigning additional offensive
+     * tactics.
+     * @param pass_origin_override An optional point that the pass origin should be
+     * overridden to
      */
-    void updateOffensivePositioningTactics(const WorldPtr& world_ptr);
+    void updateOffensivePositioningTactics(
+            const WorldPtr world, unsigned int num_tactics,
+            const std::vector<Point>& existing_receiver_positions = {},
+            const std::optional<Point>& pass_origin_override      = std::nullopt);
 
     /**
      * Updates the kicker to align to the ball
@@ -130,6 +141,15 @@ struct FreeKickPlayFSM
     bool passFound(const Update& event);
 
     /**
+     * Guard on whether to abort the pass
+     *
+     * @param event the ShootOrPassPlayFSM Update event
+     *
+     * @return whether the pass should be aborted
+     */
+    bool shouldAbortPass(const Update& event);
+
+    /**
      * Guard that checks if the allotted time to search for a pass is over
      *
      * @param event the FreeKickPlayFSM Update event
@@ -187,6 +207,7 @@ struct FreeKickPlayFSM
         DEFINE_SML_GUARD(setupDone)
         DEFINE_SML_GUARD(shotFound)
         DEFINE_SML_GUARD(shotDone)
+        DEFINE_SML_GUARD(shouldAbortPass)
         DEFINE_SML_GUARD(passFound)
         DEFINE_SML_GUARD(passDone)
         DEFINE_SML_GUARD(chipDone)
@@ -214,6 +235,7 @@ struct FreeKickPlayFSM
                 AttemptPassState_S,
             AttemptPassState_S + Update_E[passFound_G] = PassState_S,
 
+            PassState_S + Update_E[shouldAbortPass_G] = AttemptPassState_S,
             PassState_S + Update_E[!passDone_G] / passBall_A = PassState_S,
             PassState_S + Update_E[passDone_G]               = X,
 
@@ -230,11 +252,11 @@ struct FreeKickPlayFSM
     std::shared_ptr<ChipTactic> chip_tactic;
     std::shared_ptr<KickTactic> passer_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
-    std::array<std::shared_ptr<MoveTactic>, 2> offensive_positioning_tactics;
+    std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics;
 
-    std::vector<EighteenZoneId> ranked_zones;
-    PassGenerator<EighteenZoneId> pass_generator;
+    PassGenerator pass_generator;
+    ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator;
 
     Timestamp pass_optimization_start_time;
 };

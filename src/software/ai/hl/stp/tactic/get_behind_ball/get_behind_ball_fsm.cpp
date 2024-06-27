@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 
 GetBehindBallFSM::GetBehindBallFSM()
@@ -52,6 +53,16 @@ bool GetBehindBallFSM::behindBall(const Update& event)
 
     Polygon behind_ball_region = Polygon({behind_ball_vertex_A2, behind_ball_vertex_A1,
                                           behind_ball_vertex_B, behind_ball_vertex_C});
+
+    // TODO (NIMA):
+    //  New PR:
+    //  Polygon goes too close to the ball
+    //  Width should be (slightly smaller ?) than dribbler width
+    //  Should angle diff be less than 5?
+    //  Check robot speed
+    LOG(VISUALIZE) << *createDebugShapes({
+         *createDebugShape(behind_ball_region, "behind_ball", "behind_ball")
+    });
 
     return contains(behind_ball_region, event.common.robot.position()) &&
            compareAngles(event.common.robot.orientation(),

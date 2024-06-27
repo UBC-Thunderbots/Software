@@ -4,8 +4,11 @@
 
 void KickFSM::updateKick(const Update &event)
 {
+    Point ball_position = event.common.world_ptr->ball().position();
+    Vector direction_to_kick = Vector::createFromAngle(event.control_params.kick_direction);
+    Point kick_target = ball_position - direction_to_kick.normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01);
     event.common.set_primitive(std::make_unique<MovePrimitive>(
-        event.common.robot, event.control_params.kick_origin,
+        event.common.robot, kick_target,
         event.control_params.kick_direction,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
