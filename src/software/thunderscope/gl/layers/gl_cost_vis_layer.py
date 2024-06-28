@@ -8,7 +8,7 @@ import time
 import queue
 import numpy as np
 
-from proto.world_pb2 import World
+from proto.world_pb2 import World, SimulationState
 from proto.visualization_pb2 import CostVisualization
 
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer

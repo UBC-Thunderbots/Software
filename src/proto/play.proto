@@ -4,11 +4,12 @@ package TbotsProto;
 
 enum PlayName
 {
+    reserved 5;
+
     UseAiSelection                     = 1;
     ShootOrChipPlay                    = 2;
     KickoffFriendlyPlay                = 3;
     OffensePlay                        = 4;
-    CornerKickPlay                     = 5;
     ShootOrPassPlay                    = 6;
     BallPlacementPlay                  = 7;
     HaltPlay                           = 8;

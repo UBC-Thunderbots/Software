@@ -473,7 +473,7 @@ Tactics use [Intents](#intents) to implement their behaviour, so that it can dec
 
 ### Plays
 The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for the robots. They can be thought of much like Plays in real-life soccer. Examples include:
-1. A Play for taking friendly corner kicks
+1. A Play for taking friendly free kicks
 2. A Play for defending enemy kickoffs
 3. A general defense play
 4. A passing-based offense play

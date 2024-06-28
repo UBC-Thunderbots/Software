@@ -8,7 +8,8 @@
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/pass_generator.hpp"
+#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
@@ -37,14 +38,18 @@ struct ShootOrPassPlayFSM
     /**
      * Updates the offensive positioning tactics
      *
-     *
-     * @param the ranked zones to look for offensive positions in
-     * @param pass_eval The pass evaluation to help find best passes
-     * @param num_tactics the number of tactics to return
+     * @param world the world
+     * @param num_tactics the number of tactics to assign
+     * @param existing_receiver_positions A set of positions of existing receiver
+     * positions that should be taken into account when assigning additional offensive
+     * tactics.
+     * @param pass_origin_override An optional point that the pass origin should be
+     * overridden to
      */
     void updateOffensivePositioningTactics(
-        const std::vector<EighteenZoneId>& ranked_zones,
-        const PassEvaluation<EighteenZoneId>& pass_eval, unsigned int num_tactics);
+        const WorldPtr world, unsigned int num_tactics,
+        const std::vector<Point>& existing_receiver_positions = {},
+        const std::optional<Point>& pass_origin_override      = std::nullopt);
 
     /**
      * Action that looks for a pass
@@ -140,7 +145,8 @@ struct ShootOrPassPlayFSM
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
-    PassGenerator<EighteenZoneId> pass_generator;
+    ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator;
+    PassGenerator pass_generator;
     Timestamp pass_optimization_start_time;
     PassWithRating best_pass_and_score_so_far;
     Duration time_since_commit_stage_start;
