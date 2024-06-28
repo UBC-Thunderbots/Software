@@ -87,9 +87,11 @@ class RobotCommunication(object):
 
         if interface is None:
             interface = DISCONNECTED
-        self.current_network_config = NetworkConfig(robot_status_interface=interface,
-                                                             vision_interface=interface,
-                                                             referee_interface=interface)
+        self.current_network_config = NetworkConfig(
+            robot_status_interface=interface,
+            vision_interface=interface,
+            referee_interface=interface,
+        )
         self.network_config_buffer = ThreadSafeBuffer(1, NetworkConfig)
         self.current_proto_unix_io.register_observer(
             NetworkConfig, self.network_config_buffer
