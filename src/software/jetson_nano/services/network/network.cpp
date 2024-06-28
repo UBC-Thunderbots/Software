@@ -5,10 +5,14 @@ NetworkService::NetworkService(const std::string& ip_address,
                                unsigned short robot_status_sender_port, const std::string& interface, bool multicast)
     : primitive_tracker(ProtoTracker("primitive set"))
 {
-    sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
-        ip_address, robot_status_sender_port, interface, multicast);
-
     std::optional<std::string> error;
+    sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
+        ip_address, robot_status_sender_port, interface, multicast, error);
+    if (error)
+    {
+        LOG(FATAL) << *error;
+    }
+
     udp_listener_primitive_set =
         std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(
             ip_address, primitive_listener_port, interface,

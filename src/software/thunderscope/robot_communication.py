@@ -27,6 +27,7 @@ class RobotCommunication(object):
         current_proto_unix_io: ProtoUnixIO,
         multicast_channel: str,
         estop_mode: EstopMode,
+        interface: str = None,
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
         enable_radio: bool = False,
@@ -36,6 +37,7 @@ class RobotCommunication(object):
         :param current_proto_unix_io: the current proto unix io object
         :param multicast_channel: The multicast channel to use
         :param estop_mode: what estop mode we are running right now, of type EstopMode
+        :param interface: The interface to use
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
         :param enable_radio: Whether to use radio to send primitives to robots
@@ -83,9 +85,11 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
-        self.current_network_config = NetworkConfig(robot_status_interface=DISCONNECTED,
-                                                    vision_interface=DISCONNECTED,
-                                                    referee_interface=DISCONNECTED)
+        if interface is None:
+            interface = DISCONNECTED
+        self.current_network_config = NetworkConfig(robot_status_interface=interface,
+                                                    vision_interface=interface,
+                                                    referee_interface=interface)
         self.network_config_buffer = ThreadSafeBuffer(1, NetworkConfig)
         self.current_proto_unix_io.register_observer(
                 NetworkConfig, self.network_config_buffer

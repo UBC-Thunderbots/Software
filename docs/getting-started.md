@@ -216,18 +216,17 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - `[--run_diagnostics]` indicates if diagnostics should be loaded as well
       - If FullSystem is running, the robots receive input from the AI
       - If Diagnostics is enabled, the robots can also receive input from Manual controls or XBox controls
+      - Note: If you simply want to run diagnostics, you do not need to specify `--run_blue` or `--run_yellow`
       - This mode allows us to test and debug the robots by setting each robot's input to be either AI, Manual Control or XBox Control
       - Control mode for each robot can be set with each one's drop down menu in the Robot View widget
 
     - If we want to run it with real robots:
         - Open your terminal, `cd` into `Software/src` and run `ifconfig`.
-            - Pick the network interface you would like to use:
-                1. If you are running things locally, you can pick any interface that is not `lo`
-                2. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
+            - Pick the network interface you would like to use. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
             - For example, on a sample machine, the output may look like this:
 
                 ```
-                enp0s5: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+                wlp3s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
                         ...
                         [omitted]
                         ...
@@ -239,10 +238,16 @@ Now that you're setup, if you can run it on the command line, you can run it in 
                 ```
 
             - An appropriate interface we could choose is `enp0s5`
+            - Hint: If you are using a wired connection, the interface will likely start with `e-`. If you are using a wifi connection, the interface will likely start with `w-`.
         - If we are running the AI as "blue": `./tbots.py run thunderscope_main --interface=[interface_here] --run_blue`
         - If we are running the AI as "yellow": `./tbots.py run thunderscope_main --interface=[interface_here] --run_yellow`
         - `[interface_here]` corresponds to the `ifconfig` interfaces seen in the previous step
-            - For instance, a call to run the AI as blue on wifi could be: `./tbots.py run thunderscope_main --interface=enp0s5 --run_blue`
+            - For instance, a call to run the AI as blue on wifi could be: `./tbots.py run thunderscope_main --interface=wlp3s0 --run_blue`
+        - If you choose to include `--interface=[interface_here]` argument, Thunderscope will listen for and send robot messages on this port. If you include `--run_blue` or `--run_yellow`, Thunderscope will also listen for vision messages and referee messages on this interface
+        - Note: You do not need to include the `--interface=[interface_here]` argument! You can run Thunderscope without it and use the dynamic configuration widget to set the interfaces for communication to send and receive robot, vision and referee messages.
+            - This mode is recommended at Robocup. To reduce latencies, it is recommended to connect the robot router to the AI computer via ethernet and use a separate ethernet connection to receive vision and referee messages. In this configuration, Thunderscope will need to bind to two different interfaces, each likely starting with a "e-".
+            - If you have specified `--run_blue` or `--run_yellow`, navigate to the "Parameters" widget. In "ai_config" > "ai_control_config" > "network_config", you can set the appropriate interface using the dropdowns for robot, vision and referee message communication.
+            - If you have specified `--run_diagnostics`, navigate to the "Network Configuration" widget. Here, you can set the appropriate interface using the dropdowns for robot, vision and referee message communication.
         - This command will set up robot communication and the Unix full system binary context manager. The Unix full system context manager hooks up our AI, Backend and SensorFusion
 2. Run AI along with Robot Diagnostics:
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.

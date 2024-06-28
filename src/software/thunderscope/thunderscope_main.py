@@ -136,6 +136,13 @@ if __name__ == "__main__":
         help="Run robots diagnostics for Manual or Xbox control; estop required",
     )
     parser.add_argument(
+        "--interface",
+        action="store",
+        type=str,
+        default=None,
+        help="Which interface to communicate over",
+    )
+    parser.add_argument(
         "--channel",
         action="store",
         type=int,
@@ -303,6 +310,7 @@ if __name__ == "__main__":
         with RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
             multicast_channel=getRobotMulticastChannel(args.channel),
+            interface=args.interface,
             estop_mode=estop_mode,
             estop_path=estop_path,
             enable_radio=args.enable_radio,
