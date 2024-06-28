@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/skill/pass/pass_skill_fsm.h"
 
 template <bool SHOULD_CHIP>
-class PassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, PivotKickSkillFSM>
+class BasePassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, PivotKickSkillFSM>
 {
    public:
     using BaseSkill::BaseSkill;
@@ -13,13 +13,20 @@ class PassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, PivotKickSkill
                          const SetPrimitiveCallback& set_primitive) override;
 };
 
-using KickPassSkill = PassSkill<false>;
-using ChipPassSkill = PassSkill<true>;
+class KickPassSkill : public BasePassSkill<false>
+{
+    using BasePassSkill::BasePassSkill;
+};
+
+class ChipPassSkill : public BasePassSkill<true>
+{
+    using BasePassSkill::BasePassSkill;
+};
 
 template <bool SHOULD_CHIP>
-void PassSkill<SHOULD_CHIP>::updatePrimitive(const Robot& robot,
-                                             const WorldPtr& world_ptr,
-                                             const SetPrimitiveCallback& set_primitive)
+void BasePassSkill<SHOULD_CHIP>::updatePrimitive(
+    const Robot& robot, const WorldPtr& world_ptr,
+    const SetPrimitiveCallback& set_primitive)
 {
     control_params_ = {.should_chip = SHOULD_CHIP};
     BaseSkill::updatePrimitive(robot, world_ptr, set_primitive);

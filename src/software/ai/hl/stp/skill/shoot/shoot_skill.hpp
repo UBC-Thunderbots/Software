@@ -14,8 +14,15 @@ class BaseShootSkill : public BaseSkill<ShootSkillFSM, ShootSkillFSM::GetBallCon
                          const SetPrimitiveCallback& set_primitive) override;
 };
 
-using ShootSkill = BaseShootSkill<false>;
-using DribbleShootSkill = BaseShootSkill<true>;
+class ShootSkill : public BaseShootSkill<false>
+{
+    using BaseShootSkill::BaseShootSkill;
+};
+
+class DribbleShootSkill : public BaseShootSkill<true>
+{
+    using BaseShootSkill::BaseShootSkill;
+};
 
 template <bool SAMPLE_FOR_BEST_SHOT>
 void BaseShootSkill<SAMPLE_FOR_BEST_SHOT>::updatePrimitive(const Robot& robot,
