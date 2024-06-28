@@ -57,4 +57,5 @@ bool compareAngles(const Angle& angle1, const Angle& angle2,
  * @param chick_direction Direction the robot wants to chick in
  * @return True if the robot is behind the ball, false otherwise.
  */
-bool isRobotReadyToChick(const Robot& robot, const Point& ball_position, const Angle& chick_direction);
+bool isRobotReadyToChick(const Robot& robot, const Point& ball_position,
+                         const Angle& chick_direction);

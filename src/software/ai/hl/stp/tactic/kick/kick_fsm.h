@@ -72,9 +72,10 @@ struct KickFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
-            GetBehindBallFSM_S                                    = KickState_S,
+            GetBehindBallFSM_S = KickState_S,
 
-            KickState_S + Update_E[!robotAlignedForKick_G] / updateGetBehindBall_A = GetBehindBallFSM_S,
+            KickState_S + Update_E[!robotAlignedForKick_G] / updateGetBehindBall_A =
+                GetBehindBallFSM_S,
             KickState_S + Update_E[!ballChicked_G] / updateKick_A = KickState_S,
             KickState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);

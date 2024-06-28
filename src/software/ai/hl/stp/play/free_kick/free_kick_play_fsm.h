@@ -3,6 +3,7 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/play/defense/defense_play.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
@@ -13,7 +14,6 @@
 #include "software/ai/passing/pass_generator.h"
 #include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/logger/logger.h"
-#include "software/ai/hl/stp/play/defense/defense_play.h"
 
 /**
  * This FSM implements the free kick play. The logic of this play is:
@@ -77,9 +77,9 @@ struct FreeKickPlayFSM
      * overridden to
      */
     void updateOffensivePositioningTactics(
-            const WorldPtr world, unsigned int num_tactics,
-            const std::vector<Point>& existing_receiver_positions = {},
-            const std::optional<Point>& pass_origin_override      = std::nullopt);
+        const WorldPtr world, unsigned int num_tactics,
+        const std::vector<Point>& existing_receiver_positions = {},
+        const std::optional<Point>& pass_origin_override      = std::nullopt);
 
     /**
      * TODO (NIMA)
@@ -90,8 +90,8 @@ struct FreeKickPlayFSM
      * @param existing_receiver_positions
      * @param pass_origin_override
      */
-    void setTactics(PriorityTacticVector& tactics_to_run, const Update& event, int num_receivers,
-                     int num_defenders,
+    void setTactics(PriorityTacticVector& tactics_to_run, const Update& event,
+                    int num_receivers, int num_defenders,
                     const std::vector<Point>& existing_receiver_positions = {},
                     const std::optional<Point>& pass_origin_override      = std::nullopt);
 
@@ -250,7 +250,7 @@ struct FreeKickPlayFSM
                 AttemptPassState_S,
             AttemptPassState_S + Update_E[passFound_G] = PassState_S,
 
-            PassState_S + Update_E[shouldAbortPass_G] = AttemptPassState_S,
+            PassState_S + Update_E[shouldAbortPass_G]        = AttemptPassState_S,
             PassState_S + Update_E[!passDone_G] / passBall_A = PassState_S,
             PassState_S + Update_E[passDone_G]               = X,
 

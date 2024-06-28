@@ -1,12 +1,10 @@
 #include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 
-#include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/ai/hl/stp/tactic/move_primitive.h"
 
 
-GetBehindBallFSM::GetBehindBallFSM()
-{
-}
+GetBehindBallFSM::GetBehindBallFSM() {}
 
 void GetBehindBallFSM::updateMove(const Update& event)
 {
@@ -25,5 +23,8 @@ void GetBehindBallFSM::updateMove(const Update& event)
 
 bool GetBehindBallFSM::behindBall(const Update& event)
 {
-    return isRobotReadyToChick(event.common.robot, event.common.world_ptr->ball().position(), event.control_params.chick_direction);;
+    return isRobotReadyToChick(event.common.robot,
+                               event.common.world_ptr->ball().position(),
+                               event.control_params.chick_direction);
+    ;
 }
