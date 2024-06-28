@@ -67,7 +67,7 @@ class CreaseDefenderTacticTest
 
 TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
 {
-    Point enemy_threat_point = Point(-1.5, 0.0);
+    Point enemy_threat_point = Point(3, 0.0);
     TbotsProto::CreaseDefenderAlignment alignment =
         TbotsProto::CreaseDefenderAlignment::CENTRE;
 
