@@ -12,6 +12,7 @@ from software.simulated_tests.simulated_test_fixture import (
     simulated_test_runner,
     pytest_main,
 )
+from software.simulated_tests.ball_is_off_ground import *
 from proto.message_translation.tbots_protobuf import create_world_state
 from proto.ssl_gc_common_pb2 import Team
 #
@@ -120,10 +121,10 @@ friendlyDefenseAreaFrontCenter = tbots_cpp.Point(
     tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea().centre().y()
 )
 
-
 @pytest.mark.parametrize(
     "blue_bots, yellow_bots, ball_initial_position, ball_initial_velocity, should_chip",
     [
+        # Test auto chip over enemy
         (
                 friendlyDefenseAreaFrontCenter
                 + tbots_cpp.Vector(0.5, 0),
@@ -131,8 +132,10 @@ friendlyDefenseAreaFrontCenter = tbots_cpp.Point(
                 + tbots_cpp.Vector(1.1, 0),
                 friendlyDefenseAreaFrontCenter + tbots_cpp.Vector(0.9, 0),
                 tbots_cpp.Vector(-2, 0),
-                False,
+                True,
         ),
+
+        # Test block, auto chip off, enemy far
         (
                 friendlyDefenseAreaFrontCenter
                 + tbots_cpp.Vector(0.5, 0),

@@ -122,6 +122,7 @@ py_library(
         "robot_enters_region_and_stops.py",
         "robot_speed_threshold.py",
         "validation.py",
+        "ball_is_off_ground.py",
     ],
     data = [
         "//software:py_constants.so",
