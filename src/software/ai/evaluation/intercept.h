@@ -29,10 +29,15 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
  * @param robot The robot to do the interception
  * @param ball The ball to intercept
  * @param field The field to intercept on
+ * @param ball_moving_slow_speed_threshold maximum ball speed considered slow, in m/s
+ * @param intercept_position_search_interval distance to nudge interception point each step 
+ * during optimization, in metres
  *
  * @return the best interception point
  */
-Point findInterceptionPoint(const Robot &robot, const Ball &ball, const Field &field);
+Point findInterceptionPoint(const Robot &robot, const Ball &ball, const Field &field,
+                            double ball_moving_slow_speed_threshold   = 0.3,
+                            double intercept_position_search_interval = 0.1);
 
 /**
  * Converts the ball position to the robot's position given the direction that the

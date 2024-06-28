@@ -18,7 +18,8 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     // This is the objective function that we want to minimize, finding the
     // shortest duration in the future at which we can feasibly intercept the
     // ball
-    auto objective_function = [&](std::array<double, 1> x) {
+    auto objective_function = [&](std::array<double, 1> x)
+    {
         // We take the absolute value here because a negative time makes no sense
         double duration = std::abs(x.at(0));
 
@@ -88,12 +89,11 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     return std::make_pair(best_ball_intercept_pos, time_to_ball_pos);
 }
 
-Point findInterceptionPoint(const Robot &robot, const Ball &ball, const Field &field)
+Point findInterceptionPoint(const Robot &robot, const Ball &ball, const Field &field,
+                            double ball_moving_slow_speed_threshold,
+                            double intercept_position_search_interval)
 {
-    static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
-    static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
-
-    if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
+    if (ball.velocity().length() < ball_moving_slow_speed_threshold)
     {
         auto face_ball_vector = (ball.position() - robot.position());
         auto point_in_front_of_ball =
@@ -113,7 +113,7 @@ Point findInterceptionPoint(const Robot &robot, const Ball &ball, const Field &f
             break;
         }
         intercept_position +=
-            ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
+            ball.velocity().normalize(intercept_position_search_interval);
     }
     return intercept_position;
 }
