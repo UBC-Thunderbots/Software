@@ -74,6 +74,18 @@ bool PassSkillFSM::shouldAbortPass(const SuspendedUpdate& event)
 void PassSkillFSM::findPass(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
+    // Check if best_pass_so_far_ has been set BEFORE setting best_pass_so_far_,
+    // and only set SkillState IF best_pass_so_far_ has already been set.
+    //
+    // This ensures that a PassSkillFSM that has just been "reset" (i.e. constructed anew)
+    // will not immediately set the SkillState, and consequently override any SkillState
+    // changes made by another existing PassSkillFSM.
+    if (best_pass_so_far_)
+    {
+        event.common.set_skill_state(
+            {.pass_committed = false, .pass = best_pass_so_far_->pass});
+    }
+
     best_pass_so_far_ = event.common.strategy->getBestPass();
 
     // Update minimum pass score threshold. Wait for a good pass by starting out only
@@ -109,9 +121,6 @@ void PassSkillFSM::findPass(
         .allow_excessive_dribbling = false};
 
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
-
-    event.common.set_skill_state(
-        {.pass_committed = false, .pass = best_pass_so_far_->pass});
 }
 
 void PassSkillFSM::takePass(
@@ -143,4 +152,9 @@ void PassSkillFSM::takePass(
 
     event.common.set_skill_state(
         {.pass_committed = true, .pass = best_pass_so_far_->pass});
+}
+
+void PassSkillFSM::resetSkillState(const SuspendedUpdate& event)
+{
+    event.set_skill_state({});
 }

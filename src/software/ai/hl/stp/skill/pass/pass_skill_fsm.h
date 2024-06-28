@@ -64,6 +64,13 @@ struct PassSkillFSM
     void takePass(const Update& event,
                   boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
 
+    /**
+     * Action that resets the SkillState
+     *
+     * @param event the SuspendedUpdate event
+     */
+    void resetSkillState(const SuspendedUpdate& event);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -76,6 +83,7 @@ struct PassSkillFSM
         DEFINE_SML_GUARD(passFound)
         DEFINE_SML_GUARD(passReceived)
         DEFINE_SML_GUARD(shouldAbortPass)
+        DEFINE_SML_ACTION(resetSkillState)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(findPass, DribbleSkillFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(takePass, PivotKickSkillFSM)
 
@@ -87,8 +95,9 @@ struct PassSkillFSM
             PivotKickSkillFSM_S + Update_E / takePass_A,
             PivotKickSkillFSM_S = Suspended_S,
 
-            Suspended_S + SuspendedUpdate_E[passReceived_G || shouldAbortPass_G] = X,
-            Suspended_S + SuspendedUpdate_E = Suspended_S,
+            Suspended_S + SuspendedUpdate_E[passReceived_G || shouldAbortPass_G] /
+                              resetSkillState_A = X,
+            Suspended_S + SuspendedUpdate_E     = Suspended_S,
 
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }

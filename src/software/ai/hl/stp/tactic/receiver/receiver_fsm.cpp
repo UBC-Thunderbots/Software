@@ -158,14 +158,23 @@ void ReceiverFSM::updateReceive(const Update& event)
 
 void ReceiverFSM::adjustReceive(const Update& event)
 {
-    auto face_ball_orientation =
-        (event.common.world_ptr->ball().position() - event.common.robot.position())
-            .orientation();
+    const Ball& ball   = event.common.world_ptr->ball();
+    const Robot& robot = event.common.robot;
 
-    Point intercept_position =
-        findInterceptionPoint(event.common.robot, event.common.world_ptr->ball(),
-                              event.common.world_ptr->field()) +
-        Vector::createFromAngle(face_ball_orientation).normalize(0.05);
+    auto face_ball_orientation = (ball.position() - robot.position()).orientation();
+
+    Point intercept_position;
+    if (strayPass(event) || ball.velocity().length() <= MIN_STRAY_PASS_SPEED)
+    {
+        intercept_position =
+            findInterceptionPoint(robot, ball, event.common.world_ptr->field()) +
+            Vector::createFromAngle(face_ball_orientation).normalize(0.05);
+    }
+    else
+    {
+        intercept_position = closestPoint(
+            robot.position(), Line(ball.position(), ball.position() + ball.velocity()));
+    }
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, intercept_position, face_ball_orientation,
