@@ -16,7 +16,7 @@ FreeKickPlayFSM::FreeKickPlayFSM(const TbotsProto::AiConfig& ai_config)
       receiver_position_generator(ReceiverPositionGenerator<EighteenZoneId>(
               std::make_shared<const EighteenZonePitchDivision>(
                       Field::createSSLDivisionBField()),
-              ai_config.passing_config())),
+              ai_config.passing_config()))
 {
 }
 
@@ -30,25 +30,15 @@ void FreeKickPlayFSM::setupPosition(const Update &event)
 
     if (event.common.num_tactics <= 1)
     {
-        LOG(WARNING) << "Not enough tactics to setup receivers and crease defenders for free kick";
+        LOG(WARNING) << "Not enough tactics to setup pass receivers and defenders during free kick";
         return;
     }
 
-    // Up to 2 receivers
-    unsigned int num_receivers = std::min(2u, event.common.num_tactics - 1);
-    updateOffensivePositioningTactics(event.common.world_ptr, num_receivers);
-    tactics_to_run[0].insert(tactics_to_run[0].end(), offensive_positioning_tactics.begin(),
-                          offensive_positioning_tactics.end());
-
-    // Crease defenders
-    crease_defender_tactics[0]->updateControlParams(
-        event.common.world_ptr->ball().position(),
-        TbotsProto::CreaseDefenderAlignment::LEFT);
-    crease_defender_tactics[1]->updateControlParams(
-        event.common.world_ptr->ball().position(),
-        TbotsProto::CreaseDefenderAlignment::RIGHT);
-    tactics_to_run[0].emplace_back(crease_defender_tactics[0]);
-    tactics_to_run[0].emplace_back(crease_defender_tactics[1]);
+    // Up to 2 receivers and the remaining tactics are defenders
+    int num_tactics_remaining = std::max(0, static_cast<int>(event.common.num_tactics) - 1);
+    int num_receivers = std::min(2, num_tactics_remaining);
+    int num_defenders = std::max(0, num_tactics_remaining - num_receivers);
+    setTactics(tactics_to_run, event, num_receivers, num_defenders);
 
     event.common.set_tactics(tactics_to_run);
 }
@@ -96,16 +86,14 @@ void FreeKickPlayFSM::updateOffensivePositioningTactics(
     }
 }
 
-void FreeKickPlayFSM::setTactics(const Update& event, int num_receivers,
-                                 int num_defenders)
+void FreeKickPlayFSM::setTactics(PriorityTacticVector& tactics_to_run, const Update& event, int num_receivers,
+                                 int num_defenders,
+                                 const std::vector<Point>& existing_receiver_positions,
+                                 const std::optional<Point>& pass_origin_override)
 {
-    PriorityTacticVector tactics_to_return;
-
     if (num_receivers > 0)
     {
-        // Up to 2 receivers
-        unsigned int num_receivers = std::min(2u, event.common.num_tactics - 1);
-        updateOffensivePositioningTactics(event.common.world_ptr, num_receivers);
+        updateOffensivePositioningTactics(event.common.world_ptr, num_receivers, existing_receiver_positions, pass_origin_override);
         tactics_to_run[0].insert(tactics_to_run[0].end(), offensive_positioning_tactics.begin(),
                                  offensive_positioning_tactics.end());
     }
@@ -116,17 +104,15 @@ void FreeKickPlayFSM::setTactics(const Update& event, int num_receivers,
     {
         defense_play->updateTactics(PlayUpdate(
                 event.common.world_ptr, num_defenders,
-                [&tactics_to_return](PriorityTacticVector new_tactics) {
+                [&tactics_to_run](PriorityTacticVector new_tactics) {
                     for (const auto& tactic_vector : new_tactics)
                     {
-                        tactics_to_return.push_back(tactic_vector);
+                        tactics_to_run.push_back(tactic_vector);
                     }
                 },
                 event.common.inter_play_communication,
                 event.common.set_inter_play_communication_fun));
     }
-
-    event.common.set_tactics(tactics_to_return);
 }
 
 void FreeKickPlayFSM::updateAlignToBallTactic(const WorldPtr &world_ptr)
@@ -213,7 +199,8 @@ void FreeKickPlayFSM::chipBall(const Update &event)
         return;
     }
 
-    // Chip towards the friendly farthest up the enemy half
+    // Chip towards the friendly farthest up the enemy half,
+    // or the center of the field if no friendly is in the enemy half.
     Point chip_target(0, 0);
     for (const Robot& friendly: event.common.world_ptr->friendlyTeam().getAllRobots())
     {
@@ -222,7 +209,7 @@ void FreeKickPlayFSM::chipBall(const Update &event)
         {
             continue;
         }
-        // TODO (NIMA): Should face best receiving robot?!?
+
         if (friendly.position().x() > chip_target.x())
         {
             chip_target = friendly.position();
@@ -244,22 +231,13 @@ void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
     updateAlignToBallTactic(event.common.world_ptr);
     tactics_to_run[0].emplace_back(align_to_ball_tactic);
 
-    // Up to 2 receivers
-    unsigned int num_receivers = std::min(2u, event.common.num_tactics - 1);
-    updateOffensivePositioningTactics(event.common.world_ptr, num_receivers);
-    tactics_to_run[0].insert(tactics_to_run[0].end(), offensive_positioning_tactics.begin(),
-                             offensive_positioning_tactics.end());
+    // Up to 2 receivers and the remaining tactics are defenders
+    int num_tactics_remaining = std::max(0, static_cast<int>(event.common.num_tactics) - 1);
+    int num_receivers = std::min(2, num_tactics_remaining);
+    int num_defenders = std::max(0, num_tactics_remaining - num_receivers);
+    setTactics(tactics_to_run, event, num_receivers, num_defenders);
 
-    // Maintain crease defenders
-    crease_defender_tactics[0]->updateControlParams(
-        event.common.world_ptr->ball().position(),
-        TbotsProto::CreaseDefenderAlignment::LEFT);
-    crease_defender_tactics[1]->updateControlParams(
-        event.common.world_ptr->ball().position(),
-        TbotsProto::CreaseDefenderAlignment::RIGHT);
-    tactics_to_run[0].emplace_back(crease_defender_tactics[0]);
-    tactics_to_run[0].emplace_back(crease_defender_tactics[1]);
-
+    // Find the current best pass
     // Avoid passes to the goalie and the passing robot
     std::vector<RobotId> robots_to_ignore = {};
     auto friendly_goalie_id_opt =
@@ -339,21 +317,12 @@ void FreeKickPlayFSM::passBall(const Update &event)
     tactics_to_run[0].emplace_back(passer_tactic);
     tactics_to_run[0].emplace_back(receiver_tactic);
 
-    // Up to 1 receiver
-    unsigned int num_receivers = std::min(1u, event.common.num_tactics - 1);
-    updateOffensivePositioningTactics(event.common.world_ptr, num_receivers, {pass.receiverPoint()}, pass.receiverPoint());
-    tactics_to_run[0].insert(tactics_to_run[0].end(), offensive_positioning_tactics.begin(),
-                             offensive_positioning_tactics.end());
-
-    // Maintain crease defenders
-    crease_defender_tactics[0]->updateControlParams(
-            event.common.world_ptr->ball().position(),
-            TbotsProto::CreaseDefenderAlignment::LEFT);
-    crease_defender_tactics[1]->updateControlParams(
-            event.common.world_ptr->ball().position(),
-            TbotsProto::CreaseDefenderAlignment::RIGHT);
-    tactics_to_run[0].emplace_back(crease_defender_tactics[0]);
-    tactics_to_run[0].emplace_back(crease_defender_tactics[1]);
+    // Up to 1 other receiver and the remaining tactics are defenders
+    int num_tactics_remaining = std::max(0, static_cast<int>(event.common.num_tactics) - 2);
+    int num_receivers = std::min(1, num_tactics_remaining);
+    int num_defenders = std::max(0, num_tactics_remaining - num_receivers);
+    setTactics(tactics_to_run, event, num_receivers, num_defenders, {pass.receiverPoint()},
+               pass.receiverPoint());
 
     event.common.set_tactics(tactics_to_run);
 }

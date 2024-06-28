@@ -83,12 +83,17 @@ struct FreeKickPlayFSM
 
     /**
      * TODO (NIMA)
+     * @param tactics_to_run
      * @param event
      * @param num_receivers
      * @param num_defenders
+     * @param existing_receiver_positions
+     * @param pass_origin_override
      */
-    void FreeKickPlayFSM::setTactics(const Update& event, int num_receivers,
-                                     int num_defenders);
+    void setTactics(PriorityTacticVector& tactics_to_run, const Update& event, int num_receivers,
+                     int num_defenders,
+                    const std::vector<Point>& existing_receiver_positions = {},
+                    const std::optional<Point>& pass_origin_override      = std::nullopt);
 
     /**
      * Updates the kicker to align to the ball
