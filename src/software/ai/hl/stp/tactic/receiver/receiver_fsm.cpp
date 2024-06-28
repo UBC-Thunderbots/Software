@@ -190,7 +190,16 @@ bool ReceiverFSM::passReceived(const Update& event)
 
 bool ReceiverFSM::passReceivedByTeammate(const Update& event)
 {
-    auto friendly_robots =
+    const double ball_speed = event.common.world_ptr->ball().velocity().length();
+    const double ball_is_kicked_threshold =
+        strategy_->getAiConfig().ai_parameter_config().ball_is_kicked_m_per_s_threshold();
+
+    if (ball_speed > ball_is_kicked_threshold)
+    {
+        return false;
+    }
+
+    const auto friendly_robots =
         event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
 
     return std::any_of(
