@@ -75,7 +75,6 @@ class NetworkService
     double getCurrentEpochTimeInSeconds();
 
     // Constants
-    static constexpr float PROTO_LOSS_WARNING_THRESHOLD          = 0.1f;
     static constexpr unsigned int ROBOT_STATUS_BROADCAST_RATE_HZ = 30;
     static constexpr double ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO =
         ROBOT_STATUS_BROADCAST_RATE_HZ / (THUNDERLOOP_HZ + 1.0);
