@@ -318,7 +318,6 @@ if __name__ == "__main__":
             args.keyboard_estop, args.disable_communication
         )
 
-
         with (
             Gamecontroller(supress_logs=(not args.verbose), use_conventional_port=False)
             if args.launch_gc

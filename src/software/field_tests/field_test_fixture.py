@@ -336,6 +336,7 @@ def load_command_line_arguments():
 
     return parser.parse_args()
 
+
 @pytest.fixture
 def field_test_runner():
     """
