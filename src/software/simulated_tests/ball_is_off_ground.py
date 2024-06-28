@@ -12,8 +12,7 @@ class BallIsOffGround(Validation):
 
     """Checks if a ball is of ground (i.e. it has air time)"""
 
-    def __init__(self, ball=None, threshold=0.01):
-        self.ball = ball
+    def __init__(self, threshold=0.01):
         self.threshold = threshold
 
     def get_validation_status(self, world) -> ValidationStatus:
@@ -34,8 +33,11 @@ class BallIsOffGround(Validation):
         :returns: ValidationGeometry containing geometry to visualize
 
         """
+        # TODO: Make this a nicer visualization
         return create_validation_geometry(
-            [tbots_cpp.Circle(world.ball.position, 0.05)]
+            [tbots_cpp.Circle(tbots_cpp.createPoint(
+                world.ball.current_state.global_position
+            ), 0.1)]
         )
 
     def __repr__(self):
