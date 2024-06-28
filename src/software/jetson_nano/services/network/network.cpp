@@ -2,7 +2,8 @@
 
 NetworkService::NetworkService(const std::string& ip_address,
                                unsigned short primitive_listener_port,
-                               unsigned short robot_status_sender_port, const std::string& interface, bool multicast)
+                               unsigned short robot_status_sender_port,
+                               const std::string& interface, bool multicast)
     : primitive_tracker(ProtoTracker("primitive set"))
 {
     std::optional<std::string> error;
@@ -16,7 +17,8 @@ NetworkService::NetworkService(const std::string& ip_address,
     udp_listener_primitive_set =
         std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(
             ip_address, primitive_listener_port, interface,
-            boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast, error);
+            boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast,
+            error);
     if (error)
     {
         LOG(FATAL) << *error;

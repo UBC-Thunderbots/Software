@@ -15,7 +15,8 @@ class ThreadedProtoUdpListener
      * ReceiveProtoT packet received, the receive_callback will be called to perform any
      * operations desired by the caller.
      *
-     * Any caller using this constructor should ensure that error is not set before using the listener.
+     * Any caller using this constructor should ensure that error is not set before using
+     * the listener.
      *
      * @param ip_address The ip address on which to listen for the given ReceiveProtoT
      * packets (IPv4 in dotted decimal or IPv6 in hex string) example IPv4: 192.168.0.2
@@ -27,9 +28,11 @@ class ThreadedProtoUdpListener
      * @param multicast If true, joins the multicast group of given ip_address
      * @param errror A user-provided optional string to store any error messages
      */
-    ThreadedProtoUdpListener(const std::string& ip_address, unsigned short port, const std::string& interface, 
+    ThreadedProtoUdpListener(const std::string& ip_address, unsigned short port,
+                             const std::string& interface,
                              std::function<void(ReceiveProtoT)> receive_callback,
-                             bool multicast, std::optional<std::string>& error = std::nullopt);
+                             bool multicast,
+                             std::optional<std::string>& error = std::nullopt);
 
     /**
      * Creates a ThreadedProtoUdpListener that will listen for ReceiveProtoT packets
@@ -37,7 +40,8 @@ class ThreadedProtoUdpListener
      * packet received, the receive_callback will be called to perform any operations
      * desired by the caller.
      *
-     * Any caller using this constructor should ensure that error is not set before using the listener.
+     * Any caller using this constructor should ensure that error is not set before using
+     * the listener.
      *
      * @param port The port on which to listen for ReceiveProtoT packets
      * @param interface The interface on which to listen for ReceiveProtoT packets
@@ -69,11 +73,12 @@ class ThreadedProtoUdpListener
 
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
-    const std::string& ip_address, const unsigned short port, const std::string& interface,
-    std::function<void(ReceiveProtoT)> receive_callback, bool multicast,
-    std::optional<std::string>& error)
+    const std::string& ip_address, const unsigned short port,
+    const std::string& interface, std::function<void(ReceiveProtoT)> receive_callback,
+    bool multicast, std::optional<std::string>& error)
     : io_service(),
-      udp_listener(io_service, ip_address, port, interface, receive_callback, multicast, error)
+      udp_listener(io_service, ip_address, port, interface, receive_callback, multicast,
+                   error)
 {
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });
@@ -81,7 +86,8 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
 
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
-    const unsigned short port, const std::string& interface, std::function<void(ReceiveProtoT)> receive_callback,
+    const unsigned short port, const std::string& interface,
+    std::function<void(ReceiveProtoT)> receive_callback,
     std::optional<std::string>& error)
     : io_service(), udp_listener(io_service, port, interface, receive_callback, error)
 {

@@ -19,7 +19,7 @@ class PlotJugglerSink
      *
      * @param interface The interface to send Plotjuggler UDP packets on
      */
-    PlotJugglerSink(const std::string& interface="lo");
+    PlotJugglerSink(const std::string& interface = "lo");
 
     ~PlotJugglerSink() = default;
 

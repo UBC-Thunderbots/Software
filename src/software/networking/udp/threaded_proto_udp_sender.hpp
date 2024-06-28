@@ -15,7 +15,8 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
      * Creates a UdpSender that sends the SendProto over the network on the
      * given address and port.
      *
-     * Any callers must check the error string to see if the initialization was successful before using the object.
+     * Any callers must check the error string to see if the initialization was successful
+     * before using the object.
      *
      * @param ip_address The ip address to send data on
      * (IPv4 in dotted decimal or IPv6 in hex string)
@@ -24,10 +25,12 @@ class ThreadedProtoUdpSender : private ThreadedUdpSender
      * @param port The port to send SendProto data on
      * @param interface The interface to send data on
      * @param multicast If true, joins the multicast group of given ip_address
-     * @param error An optional user-provided string that will be set to an error message if an error occurs
+     * @param error An optional user-provided string that will be set to an error message
+     * if an error occurs
      */
-    ThreadedProtoUdpSender(const std::string& ip_address, unsigned short port, const std::string& interface,
-                           bool multicast, std::optional<std::string>& error)
+    ThreadedProtoUdpSender(const std::string& ip_address, unsigned short port,
+                           const std::string& interface, bool multicast,
+                           std::optional<std::string>& error)
         : ThreadedUdpSender(ip_address, port, interface, multicast, error)
     {
     }

@@ -5,7 +5,7 @@
 bool getLocalIp(const std::string& interface, std::string& ip_address, bool ipv4)
 {
     struct ifaddrs* ifAddrStruct = nullptr;
-    struct ifaddrs* ifa = nullptr;
+    struct ifaddrs* ifa          = nullptr;
 
     getifaddrs(&ifAddrStruct);
 
@@ -16,7 +16,7 @@ bool getLocalIp(const std::string& interface, std::string& ip_address, bool ipv4
             if (ipv4 && ifa->ifa_addr->sa_family == AF_INET)
             {
                 char addressBuffer[INET_ADDRSTRLEN];
-                struct sockaddr_in* sa = (struct sockaddr_in*) ifa->ifa_addr;
+                struct sockaddr_in* sa = (struct sockaddr_in*)ifa->ifa_addr;
                 inet_ntop(AF_INET, &sa->sin_addr, addressBuffer, INET_ADDRSTRLEN);
                 freeifaddrs(ifAddrStruct);
                 ip_address = addressBuffer;
@@ -25,7 +25,7 @@ bool getLocalIp(const std::string& interface, std::string& ip_address, bool ipv4
             else if (!ipv4 && ifa->ifa_addr->sa_family == AF_INET6)
             {
                 char addressBuffer[INET6_ADDRSTRLEN];
-                struct sockaddr_in6* sa = (struct sockaddr_in6*) ifa->ifa_addr;
+                struct sockaddr_in6* sa = (struct sockaddr_in6*)ifa->ifa_addr;
                 inet_ntop(AF_INET6, &sa->sin6_addr, addressBuffer, INET6_ADDRSTRLEN);
                 freeifaddrs(ifAddrStruct);
                 ip_address = addressBuffer;
