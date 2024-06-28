@@ -318,16 +318,6 @@ if __name__ == "__main__":
             args.keyboard_estop, args.disable_communication
         )
 
-        def get_referee_port(gamecontroller: Gamecontroller):
-            """
-            return the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
-
-            :param gamecontroller: the gamecontroller we are using
-            :return: the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
-            """
-            if gamecontroller is not None:
-                return gamecontroller.get_referee_port()
-            return 40000
 
         with (
             Gamecontroller(supress_logs=(not args.verbose), use_conventional_port=False)
@@ -340,7 +330,7 @@ if __name__ == "__main__":
             estop_mode=estop_mode,
             estop_path=estop_path,
             enable_radio=args.enable_radio,
-            referee_port=get_referee_port(gamecontroller),
+            referee_port=Gamecontroller.get_referee_port_staticmethod(gamecontroller),
         ) as robot_communication:
 
             if estop_mode == EstopMode.KEYBOARD_ESTOP:

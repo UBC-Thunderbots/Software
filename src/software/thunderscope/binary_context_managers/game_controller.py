@@ -54,6 +54,19 @@ class Gamecontroller(object):
             buffer_size=2, protobuf_type=ManualGCCommand
         )
 
+    @staticmethod
+    def get_referee_port_staticmethod(gamecontroller: Gamecontroller):
+        """
+        return the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
+
+        :param gamecontroller: the gamecontroller we are using
+        :return: the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
+        """
+        if gamecontroller is not None:
+            return gamecontroller.get_referee_port()
+
+        return 40000
+
     def get_referee_port(self) -> int:
         """
         Sometimes, the port that we are using changes depending on context.

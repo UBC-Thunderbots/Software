@@ -336,19 +336,6 @@ def load_command_line_arguments():
 
     return parser.parse_args()
 
-
-def get_referee_port(gamecontroller: Gamecontroller):
-    """
-    return the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
-
-    :param gamecontroller: the gamecontroller we are using
-    :return: the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
-    """
-    if gamecontroller is not None:
-        return gamecontroller.get_referee_port()
-    return 40000
-
-
 @pytest.fixture
 def field_test_runner():
     """
@@ -396,7 +383,7 @@ def field_test_runner():
         estop_mode=estop_mode,
         estop_path=estop_path,
         enable_radio=args.enable_radio,
-        referee_port=gamecontroller.get_referee_port(),
+        referee_port=Gamecontroller.get_referee_port_staticmethod(gamecontroller),
     ) as rc_friendly:
         friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
         rc_friendly.setup_for_fullsystem()
