@@ -210,28 +210,43 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
 
 bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
+    // HAVE CREASE DEFENDER TAKE THE BALL AND SIT THERE
     Point robot_position = event.common.robot.position();
-    double ball_distance = distance(robot_position, event.common.world_ptr->ball().position());
-    double threat_distance = distance(robot_position, event.control_params.enemy_threat_origin);
-    constexpr double GET_POSSESSION_THRESHOLD_M = 1;
-    constexpr  double THREAT_THRESHOLD_M = GET_POSSESSION_THRESHOLD_M * 2;
+    std::optional<Robot> nearest_enemy = event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
+    if (nearest_enemy)
+    {
+        // Get the ball if ball is closer to robot than enemy threat
+        constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.3;
+        constexpr double MAX_GET_BALL_RADIUS_M = 1;
+        constexpr double MAX_BALL_VELOCITY_TO_GET_MS = 0.5;
+        double ball_distance = distance(robot_position, event.common.world_ptr->ball().position());
+        double nearest_enemy_distance = distance(robot_position, nearest_enemy->position());
+        // DEBUG: Visualizes the max threat
+        LOG(VISUALIZE) << *createDebugShapes({
+                 *createDebugShape(
+                         Circle(robot_position,
+                                std::min(nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD, MAX_GET_BALL_RADIUS_M)),
+                         std::to_string(event.common.robot.id()) + "1",
+                         "ballgetzone"
+                 )
+         });
 
-    // DEBUG: Visualizes nearby threat zone
-//    LOG(VISUALIZE) << *createDebugShapes({
-//             *createDebugShape(
-//                     Circle(robot_position, GET_POSSESSION_THRESHOLD_M),
-//                     std::to_string(event.common.robot.id()) + "1",
-//                     "ballzone"
-//                     )
-//     });
-    return ball_distance <= GET_POSSESSION_THRESHOLD_M && threat_distance >= THREAT_THRESHOLD_M;
+        return ball_distance < nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD
+                && ball_distance <= MAX_GET_BALL_RADIUS_M
+                && event.common.world_ptr->ball().velocity().length() <= MAX_BALL_VELOCITY_TO_GET_MS;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 void CreaseDefenderFSM::prepareGetPossession(const Update& event,
                                              boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
+    LOG(DEBUG) << "Dribbling to " << event.common.world_ptr->ball().position();
     DribbleFSM::ControlParams control_params{
-        .dribble_destination = Point(),
+        .dribble_destination = event.common.world_ptr->ball().position(),
         .final_dribble_orientation = Angle(),
         .allow_excessive_dribbling = false
     };
