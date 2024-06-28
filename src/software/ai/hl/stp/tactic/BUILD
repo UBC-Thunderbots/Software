@@ -56,7 +56,6 @@ cc_library(
     srcs = ["transition_conditions.cpp"],
     hdrs = ["transition_conditions.h"],
     deps = [
-        "//proto/message_translation:tbots_protobuf",  # TODO (NIMA): Remove
         "//software/world",
     ],
 )

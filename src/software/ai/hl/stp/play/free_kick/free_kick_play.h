@@ -9,6 +9,11 @@
 class FreeKickPlay : public Play
 {
    public:
+    /**
+     * Creates a free kick play
+     *
+     * @param ai_config the play config for this play
+     */
     FreeKickPlay(TbotsProto::AiConfig config);
 
     void getNextTactics(TacticCoroutine::push_type &yield,

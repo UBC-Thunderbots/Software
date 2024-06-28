@@ -1,8 +1,6 @@
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 
-#include "proto/message_translation/tbots_protobuf.h"  // TODO (NIMA): Remove
 #include "software/geom/algorithms/contains.h"
-#include "software/logger/logger.h"  // TODO (NIMA): Remove
 
 bool robotReachedDestination(const Robot& robot, const Point& destination,
                              const Angle& final_orientation, double DISTANCE_THRESHOLD,
@@ -60,8 +58,6 @@ bool isRobotReadyToChick(const Robot& robot, const Point& ball_position,
     Polygon behind_ball_region =
         Polygon::fromSegment(behind_ball_segment, 0.0, chicker_width / 2);
 
-    LOG(VISUALIZE) << *createDebugShapes(
-        {*createDebugShape(behind_ball_region, "behind_ball", "behind_ball")});
     return contains(behind_ball_region, robot.position()) &&
            compareAngles(robot.orientation(), chick_direction, Angle::fromDegrees(5));
 }

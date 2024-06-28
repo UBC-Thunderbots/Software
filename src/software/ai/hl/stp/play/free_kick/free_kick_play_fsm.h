@@ -20,11 +20,9 @@
  * - One robot (the kicker) attempts to shoot first. If there is a good shot, then it
  * will shoot the ball.
  * - If there is no good shot, the kicker will attempt to pass. Two robots try to get in
- * good positions near the enemy net to receive a pass
- * - If we cannot find a pass in time, the kicker will chip the ball towards the enemy
- * goal
- * - Two robots crease defend
- * - One robot is goalie
+ * good receiving positions to receive a pass.
+ * - If we cannot find a pass in time, the kicker will chip the ball towards the friendly
+ * robot furthest up the field.
  */
 
 struct FreeKickPlayFSM
@@ -65,7 +63,6 @@ struct FreeKickPlayFSM
     bool setupDone(const Update& event);
 
     /**
-     * TODO (NIMA): Copied from ShootOrPassPlayFSM
      * Updates the offensive positioning tactics
      *
      * @param world the world
@@ -76,24 +73,28 @@ struct FreeKickPlayFSM
      * @param pass_origin_override An optional point that the pass origin should be
      * overridden to
      */
-    void updateOffensivePositioningTactics(
+    void updateReceiverPositioningTactics(
         const WorldPtr world, unsigned int num_tactics,
         const std::vector<Point>& existing_receiver_positions = {},
         const std::optional<Point>& pass_origin_override      = std::nullopt);
 
     /**
-     * TODO (NIMA)
-     * @param tactics_to_run
-     * @param event
-     * @param num_receivers
-     * @param num_defenders
-     * @param existing_receiver_positions
-     * @param pass_origin_override
+     * Sets the receiver and defender tactics for the free kick play
+     *
+     * @param tactics_to_run The priority tactic vector to add the tactics to
+     * @param event The update event
+     * @param num_receivers The number of receivers to assign
+     * @param num_defenders The number of defenders to assign
+     * @param existing_receiver_positions A set of positions of existing receiver
+     * positions that should be taken into account when assigning additional offensive
+     * tactics.
+     * @param pass_origin_override An optional point that the pass origin should be
+     * overridden to
      */
-    void setTactics(PriorityTacticVector& tactics_to_run, const Update& event,
-                    int num_receivers, int num_defenders,
-                    const std::vector<Point>& existing_receiver_positions = {},
-                    const std::optional<Point>& pass_origin_override      = std::nullopt);
+    void setReceiverAndDefenderTactics(
+        PriorityTacticVector& tactics_to_run, const Update& event, int num_receivers,
+        int num_defenders, const std::vector<Point>& existing_receiver_positions = {},
+        const std::optional<Point>& pass_origin_override = std::nullopt);
 
     /**
      * Updates the kicker to align to the ball
@@ -260,18 +261,17 @@ struct FreeKickPlayFSM
 
    private:
     TbotsProto::AiConfig ai_config;
-    PassWithRating best_pass_and_score_so_far;
     std::optional<Shot> shot;
     std::shared_ptr<MoveTactic> align_to_ball_tactic;
     std::shared_ptr<KickTactic> shoot_tactic;
     std::shared_ptr<ChipTactic> chip_tactic;
     std::shared_ptr<KickTactic> passer_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
-    std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;
+    std::vector<std::shared_ptr<MoveTactic>> receiver_positioning_tactics;
     std::shared_ptr<DefensePlay> defense_play;
 
-    PassGenerator pass_generator;
     ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator;
-
+    PassGenerator pass_generator;
+    PassWithRating best_pass_and_score_so_far;
     Timestamp pass_optimization_start_time;
 };
