@@ -76,6 +76,10 @@ static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
 static const double STOP_COMMAND_SPEED_SAFETY_MARGIN_METERS_PER_SECOND = 0.2;
 // The max speed at which we will retreat away from the ball after placing it
 static const double BALL_PLACEMENT_RETREAT_SPEED_METERS_PER_SECOND = 0.3;
+// The max speed at which we will pick the ball off the wall
+static const double BALL_PLACEMENT_WALL_SPEED_METERS_PER_SECOND = 0.3;
+// The max speed at which we dribble the ball
+static const double DRIBBLE_SPEED_METERS_PER_SECOND = 1.5;
 // The max allowed speed of the robot before collisions would incur a foul
 static const double COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND = 0.5;
 // The minimum distance from the ball all robots must be when the stop command is issued

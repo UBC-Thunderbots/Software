@@ -70,6 +70,10 @@ enum MaxAllowedSpeedMode
     COLLISIONS_ALLOWED = 2;
     // Slow speed for retreating in ball placement
     BALL_PLACEMENT_RETREAT = 3;
+    // Slow speed for picking the ball off the wall in ball placement
+    BALL_PLACEMENT_WALL_DRIBBLE = 4;
+    // Slower speed for dribbling
+    DRIBBLE = 5;
 }
 
 message AutoChipOrKick

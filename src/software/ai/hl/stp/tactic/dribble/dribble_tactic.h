@@ -35,7 +35,8 @@ class DribbleTactic : public Tactic
      */
     void updateControlParams(std::optional<Point> dribble_destination,
                              std::optional<Angle> final_dribble_orientation,
-                             bool allow_excessive_dribbling = false);
+                             bool allow_excessive_dribbling = false,
+                             TbotsProto::MaxAllowedSpeedMode max_speed = TbotsProto::MaxAllowedSpeedMode::DRIBBLE);
 
     void accept(TacticVisitor& visitor) const override;
 

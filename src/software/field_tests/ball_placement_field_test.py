@@ -18,9 +18,9 @@ logger = createLogger(__name__)
 
 def test_ball_placement(field_test_runner):
     # robot ID
-    id = 4
+    id = 2
     # point to place ball
-    placement_point = Point(x_meters=0, y_meters=0)
+    placement_point = tbots_cpp.Point(0, 0)
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     print("Here are the robots:")
