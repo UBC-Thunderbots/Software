@@ -1,10 +1,10 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
-#include "software/geom/algorithms/distance.h"
-#include "software/geom/stadium.h"
+
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/stadium.h"
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
@@ -37,19 +37,17 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
 bool CreaseDefenderFSM::isAnyEnemyInZone(const Update& event, const Stadium& zone)
 {
     std::vector<Robot> enemy_robots = event.common.world_ptr->enemyTeam().getAllRobots();
-    return std::any_of(
-            enemy_robots.begin(),
-            enemy_robots.end(),
-            [zone, enemy_robots](const Robot& robot)
-                {return contains(zone, robot.position()); }
-            );
+    return std::any_of(enemy_robots.begin(), enemy_robots.end(),
+                       [zone, enemy_robots](const Robot& robot) {
+                           return contains(zone, robot.position());
+                       });
 }
 
 void CreaseDefenderFSM::blockThreat(
     const Update& event, boost::sml::back::process<MoveFSM::Update> processEvent)
 {
-    Point robot_position = event.common.robot.position();
-    Point destination = event.common.robot.position();
+    Point robot_position    = event.common.robot.position();
+    Point destination       = event.common.robot.position();
     Angle robot_orientation = event.common.robot.orientation();
     // Use a slightly larger inflation factor to avoid the crease defenders from sitting
     double robot_obstacle_inflation_factor =
@@ -114,33 +112,33 @@ void CreaseDefenderFSM::blockThreat(
     }
 
     AutoChipOrKick auto_chip_or_kick{AutoChipOrKickMode::OFF, 0};
-    auto goal_line_segment = Segment(event.common.world_ptr->field().friendlyGoal().posXPosYCorner(),
-                                     event.common.world_ptr->field().friendlyGoal().posXNegYCorner());
+    auto goal_line_segment =
+        Segment(event.common.world_ptr->field().friendlyGoal().posXPosYCorner(),
+                event.common.world_ptr->field().friendlyGoal().posXNegYCorner());
     Ray robot_shoot_ray = Ray(robot_position, robot_orientation);
-    std::vector<Point> goal_intersections = intersection(robot_shoot_ray, goal_line_segment);
-    Stadium threat_zone = Stadium(robot_position,
-                                  Vector::createFromAngle(robot_orientation).normalize(1),
-                                  0.1);
-    double robot_to_net_m = distance(robot_position, event.common.world_ptr->field().friendlyGoal().centre());
+    std::vector<Point> goal_intersections =
+        intersection(robot_shoot_ray, goal_line_segment);
+    Stadium threat_zone = Stadium(
+        robot_position, Vector::createFromAngle(robot_orientation).normalize(1), 0.1);
+    double robot_to_net_m =
+        distance(robot_position, event.common.world_ptr->field().friendlyGoal().centre());
 
-    if (goal_intersections.empty()
-        && CreaseDefenderFSM::isAnyEnemyInZone(event, threat_zone)
-        && robot_to_net_m <= event.common.world_ptr->field().totalYLength() / 2)
+    if (goal_intersections.empty() &&
+        CreaseDefenderFSM::isAnyEnemyInZone(event, threat_zone) &&
+        robot_to_net_m <= event.common.world_ptr->field().totalYLength() / 2)
     {
-        // Autochip only if the robot is not facing the net, there is an enemy in front, and robot is close to net
-        auto_chip_or_kick = AutoChipOrKick{
-            AutoChipOrKickMode::AUTOCHIP,
-            chip_distance
-        };
+        // Autochip only if the robot is not facing the net, there is an enemy in front,
+        // and robot is close to net
+        auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance};
     }
 
     MoveFSM::ControlParams control_params{
-        .destination         = destination,
-        .final_orientation   = face_threat_orientation,
-        .final_speed         = 0.0,
-        .dribbler_mode       = TbotsProto::DribblerMode::OFF,
-        .ball_collision_type = ball_collision_type,
-        .auto_chip_or_kick = auto_chip_or_kick,
+        .destination             = destination,
+        .final_orientation       = face_threat_orientation,
+        .final_speed             = 0.0,
+        .dribbler_mode           = TbotsProto::DribblerMode::OFF,
+        .ball_collision_type     = ball_collision_type,
+        .auto_chip_or_kick       = auto_chip_or_kick,
         .max_allowed_speed_mode  = event.control_params.max_allowed_speed_mode,
         .obstacle_avoidance_mode = TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         .target_spin_rev_per_s   = 0.0};
@@ -196,16 +194,20 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
 bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
     Point robot_position = event.common.robot.position();
-    std::optional<Robot> nearest_enemy = event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
+    std::optional<Robot> nearest_enemy =
+        event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
     if (nearest_enemy)
     {
         // Get the ball if ball is closer to robot than enemy threat by threshold ratio
-        double ball_distance = distance(robot_position, event.common.world_ptr->ball().position());
-        double nearest_enemy_distance = distance(robot_position, nearest_enemy->position());
+        double ball_distance =
+            distance(robot_position, event.common.world_ptr->ball().position());
+        double nearest_enemy_distance =
+            distance(robot_position, nearest_enemy->position());
 
-        return ball_distance < nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD
-                && ball_distance <= MAX_GET_BALL_RADIUS_M
-                && event.common.world_ptr->ball().velocity().length() <= MAX_BALL_SPEED_TO_GET_MS;
+        return ball_distance < nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD &&
+               ball_distance <= MAX_GET_BALL_RADIUS_M &&
+               event.common.world_ptr->ball().velocity().length() <=
+                   MAX_BALL_SPEED_TO_GET_MS;
     }
     else
     {
@@ -213,19 +215,16 @@ bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
     }
 }
 
-void CreaseDefenderFSM::prepareGetPossession(const Update& event,
-                                             boost::sml::back::process<DribbleFSM::Update> processEvent)
+void CreaseDefenderFSM::prepareGetPossession(
+    const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
-    Point ball_position = event.common.world_ptr->ball().position();
-    Point enemy_goal_center = event.common.world_ptr->field().enemyGoal().centre();
-    Vector ball_to_net_vector = Vector(
-            enemy_goal_center.x() - ball_position.x() ,
-            enemy_goal_center.y() - ball_position.y()
-            );
+    Point ball_position       = event.common.world_ptr->ball().position();
+    Point enemy_goal_center   = event.common.world_ptr->field().enemyGoal().centre();
+    Vector ball_to_net_vector = Vector(enemy_goal_center.x() - ball_position.x(),
+                                       enemy_goal_center.y() - ball_position.y());
     DribbleFSM::ControlParams control_params{
-        .dribble_destination = ball_position,
+        .dribble_destination       = ball_position,
         .final_dribble_orientation = ball_to_net_vector.orientation(),
-        .allow_excessive_dribbling = false
-    };
+        .allow_excessive_dribbling = false};
     processEvent(DribbleFSM::Update(control_params, event.common));
 }

@@ -3,9 +3,9 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/segment.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
 
 /**

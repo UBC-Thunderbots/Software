@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "proto/tactic.pb.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
@@ -10,11 +11,10 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
 struct CreaseDefenderFSM
 {
-    public:
+   public:
     // this struct defines the unique control parameters that the CreaseDefenderFSM
     // requires in its update
     struct ControlParams
@@ -94,19 +94,20 @@ struct CreaseDefenderFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A = DribbleFSM_S,
+            *MoveFSM_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
+                DribbleFSM_S,
             MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
-            DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A = MoveFSM_S,
-            X + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A = DribbleFSM_S,
+            DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A =
+                MoveFSM_S,
+            X + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
+                DribbleFSM_S,
             X + Update_E / blockThreat_A = MoveFSM_S);
     }
 
    private:
-    /** Max distance ratio between (crease and ball) / (crease and nearest enemy) for crease to chase ball.
-     * Scale from (0, 1)
-     * Crease
-     *   | <-----------------------> Enemy
-     *   | <----> Ball                |
+    /** Max distance ratio between (crease and ball) / (crease and nearest enemy) for
+     * crease to chase ball. Scale from (0, 1) Crease | <-----------------------> Enemy |
+     * <----> Ball                |
      *  ()         o                 ()
      */
     static constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.3;

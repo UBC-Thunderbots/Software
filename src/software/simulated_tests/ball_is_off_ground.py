@@ -26,6 +26,7 @@ class BallIsOffGround(Validation):
             return ValidationStatus.PASSING
         else:
             return ValidationStatus.FAILING
+
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """Returns the underlying geometry this validation is checking
 
@@ -35,9 +36,11 @@ class BallIsOffGround(Validation):
         """
         # TODO: Make this a nicer visualization
         return create_validation_geometry(
-            [tbots_cpp.Circle(tbots_cpp.createPoint(
-                world.ball.current_state.global_position
-            ), 0.1)]
+            [
+                tbots_cpp.Circle(
+                    tbots_cpp.createPoint(world.ball.current_state.global_position), 0.1
+                )
+            ]
         )
 
     def __repr__(self):

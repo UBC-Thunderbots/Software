@@ -121,7 +121,8 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_threat_in_crease)
 TEST(CreaseDefenderFSMTest, test_transitions)
 {
     TbotsProto::AiConfig ai_config;
-    TbotsProto::RobotNavigationObstacleConfig config = ai_config.robot_navigation_obstacle_config();
+    TbotsProto::RobotNavigationObstacleConfig config =
+        ai_config.robot_navigation_obstacle_config();
     double robot_obstacle_inflation_factor = config.robot_obstacle_inflation_factor();
     std::shared_ptr<World> world           = ::TestUtil::createBlankTestingWorld();
     Robot robot                            = ::TestUtil::createRobotAtPos(Point(-2, -3));
@@ -131,7 +132,8 @@ TEST(CreaseDefenderFSMTest, test_transitions)
         .crease_defender_alignment = TbotsProto::CreaseDefenderAlignment::LEFT,
         .max_allowed_speed_mode    = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT};
 
-    FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM{config}, DribbleFSM(ai_config.dribble_tactic_config()));
+    FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM{config},
+                               DribbleFSM(ai_config.dribble_tactic_config()));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // robot far from destination, ball in friendly half
