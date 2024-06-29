@@ -20,7 +20,9 @@ cc_library(
     deps = [
         ":attacker_mdp_action",
         ":feature_extractor",
+        "//shared:constants",
         "//software/ai/evaluation:possession",
+        "//software/math:math_functions",
     ],
 )
 

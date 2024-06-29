@@ -2,11 +2,14 @@
 
 #include <math.h>
 
+#include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
+#include "software/math/math_functions.h"
 
 AttackerMdpFeatureExtractor::AttackerMdpFeatureExtractor()
-    : FeatureExtractor(
-          {ballXPositionFeature, bestPassRatingFeature, bestShotOpenAngleFeature})
+    : FeatureExtractor({ballXPositionFeature, bestPassRatingFeature,
+                        bestShotOpenAngleFeature, numFriendlyRobotsFeature,
+                        numEnemyRobotsFeature})
 {
 }
 
@@ -40,4 +43,19 @@ double AttackerMdpFeatureExtractor::bestShotOpenAngleFeature(
     }
 
     return 0;
+}
+
+double AttackerMdpFeatureExtractor::numFriendlyRobotsFeature(
+    const AttackerMdpState& state)
+{
+    const size_t num_robots = state.world_ptr->friendlyTeam().numRobots();
+    return normalizeValueToRange(static_cast<double>(num_robots), 0.0,
+                                 static_cast<double>(DIV_B_NUM_ROBOTS), 1.0, 0.0);
+}
+
+double AttackerMdpFeatureExtractor::numEnemyRobotsFeature(const AttackerMdpState& state)
+{
+    const size_t num_robots = state.world_ptr->enemyTeam().numRobots();
+    return normalizeValueToRange(static_cast<double>(num_robots), 0.0,
+                                 static_cast<double>(DIV_B_NUM_ROBOTS), 1.0, 0.0);
 }

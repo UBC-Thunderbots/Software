@@ -36,7 +36,7 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
         attacker_tactic_->visualizeSkillState(*play_update.world_ptr);
     }
 
-    // Determine number of defender and supporter tactics to assign
+    // Determine number of defense and support tactics to assign
     auto [num_defenders, num_supporters] = assignNumOfDefendersAndSupporters(
         std::max(static_cast<int>(play_update.num_tactics) - 1, 0));
 
