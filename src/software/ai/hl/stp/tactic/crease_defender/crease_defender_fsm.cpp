@@ -129,11 +129,6 @@ void CreaseDefenderFSM::blockThreat(
                                   0.1);
     double robot_to_net_m = distance(robot_position, event.common.world_ptr->field().friendlyGoal().centre());
 
-    // DEBUG: Visualizes threat stadium
-//    LOG(VISUALIZE) << *createDebugShapes({
-//         *createDebugShape(threat_zone, std::to_string(event.common.robot.id()), "threatzone")
-//    });
-
     if (goal_intersections.empty()
         && CreaseDefenderFSM::isAnyEnemyInZone(event, threat_zone)
         && robot_to_net_m <= event.common.world_ptr->field().totalYLength() / 2)
