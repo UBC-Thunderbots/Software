@@ -25,6 +25,7 @@
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/ai/passing/pass_with_rating.h"
+#include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/constants.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/geom/algorithms/contains.h"
@@ -99,6 +100,19 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
                                               py::buffer_protocol(), py::dynamic_attr())
         .def(py::init<std::string, unsigned short, const std::function<void(T)>&, bool>())
         .def("close", &Class::close);
+}
+
+template <typename T>
+void declareReceiverPositionGenerator(py::module& m, std::string name)
+{
+    using Class              = ReceiverPositionGenerator<T>;
+    std::string pyclass_name = name + "ReceiverPositionGenerator";
+    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
+                                              py::buffer_protocol(), py::dynamic_attr())
+        .def(py::init<std::shared_ptr<EighteenZonePitchDivision>,
+                      TbotsProto::PassingConfig>())
+        .def("getBestReceivingPositions",
+             &ReceiverPositionGenerator<T>::getBestReceivingPositions);
 }
 
 
@@ -397,6 +411,8 @@ PYBIND11_MODULE(python_bindings, m)
         m, "EighteenZonePitchDivision")
         .def(py::init<Field>())
         .def("getZone", &EighteenZonePitchDivision::getZone);
+
+    declareReceiverPositionGenerator<EighteenZoneId>(m, "EighteenZoneId");
 
     py::class_<PassGenerator>(m, "PassGenerator")
         .def(py::init<const TbotsProto::PassingConfig&>())

@@ -102,11 +102,7 @@ double rateShot(const Point& shot_origin, const Field& field, const Team& enemy_
     open_angle_to_goal_score = std::clamp(open_angle_to_goal_score, 0.0, min_ideal_angle);
 
     // Linearly scale score to [0.0, 1.0]
-    open_angle_to_goal_score = open_angle_to_goal_score / min_ideal_angle;
-
-    // Linearly scale score to [min_pass_shoot_score, 1.0] to stop this cost function
-    // from returning a very low score, causing the other cost functions to be ignored.
-    return open_angle_to_goal_score;
+    return open_angle_to_goal_score / min_ideal_angle;
 }
 
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,

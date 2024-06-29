@@ -178,7 +178,7 @@ message PassingConfig
     // receiver when calculating enemy risk to a pass
     required double enemy_proximity_importance = 4 [
         default                   = 0.5,
-        (bounds).min_double_value = 0.0,
+        (bounds).min_double_value = 0.01,
         (bounds).max_double_value = 10.0
     ];
     // A value multiplied by the duration that our enemy robot model predicts will
