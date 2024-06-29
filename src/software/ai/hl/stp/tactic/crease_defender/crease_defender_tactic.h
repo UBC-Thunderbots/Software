@@ -33,7 +33,7 @@ class CreaseDefenderTactic : public Tactic
     /**
      * Creates a new CreaseDefenderTactic
      *
-     * @param robot_obstacle_inflation_factor The amount to inflate the robot obstacles
+     * @param ai_config The AI configuration
      */
     explicit CreaseDefenderTactic(TbotsProto::AiConfig ai_config);
 

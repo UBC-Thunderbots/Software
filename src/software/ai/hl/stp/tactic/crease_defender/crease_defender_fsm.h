@@ -102,6 +102,18 @@ struct CreaseDefenderFSM
     }
 
    private:
+    /** Max distance ratio between (crease and ball) / (crease and nearest enemy) for crease to chase ball.
+     * Scale from (0, 1)
+     * Crease
+     *   | <-----------------------> Enemy
+     *   | <----> Ball                |
+     *  ()         o                 ()
+     */
+    static constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.3;
+    // Max distance that the crease will try and get possession of a ball
+    static constexpr double MAX_GET_BALL_RADIUS_M = 1;
+    // Max speed of ball that crease will try and get possession
+    static constexpr double MAX_BALL_SPEED_TO_GET_MS = 0.5;
     /**
      * Finds the intersection with the front or sides of the defense area with the given
      * ray
@@ -121,7 +133,6 @@ struct CreaseDefenderFSM
      * Returns true if any enemy robot is within the given zone
      *
      * @param event CreaseDefenderFSM::Update event
-     * @param zone a stadium shape that defines the zone
      * @param zone a stadium shape that defines the zone
      * @return true if any enemy robot is within the given zone, else false
      */
