@@ -26,7 +26,7 @@ class ThreadedProtoUdpListener
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
      * @param multicast If true, joins the multicast group of given ip_address
-     * @param errror A user-provided optional string to store any error messages
+     * @param error A user-provided optional string to store any error messages
      */
     ThreadedProtoUdpListener(const std::string& ip_address, unsigned short port,
                              const std::string& interface,

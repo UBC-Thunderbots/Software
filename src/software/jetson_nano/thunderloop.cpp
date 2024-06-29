@@ -56,9 +56,10 @@ extern "C"
         crash_msg.set_exit_signal(g3::signalToStr(signal_num));
         *(crash_msg.mutable_status()) = *robot_status;
 
+        std::optional<std::string> error;
         auto sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotCrash>>(
             std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)), ROBOT_CRASH_PORT,
-            network_interface, true);
+            network_interface, true, error);
         sender->sendProto(crash_msg);
         std::cerr << "Broadcasting robot crash msg";
 

@@ -11,6 +11,7 @@ PlotJugglerSink::PlotJugglerSink(const std::string& interface)
     if (error.has_value())
     {
         std::cerr << "Error setting up UDP sender for PlotJugglerSink: " << error.value();
+        std::terminate();
     }
 }
 

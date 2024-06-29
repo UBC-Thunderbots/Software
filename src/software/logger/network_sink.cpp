@@ -11,9 +11,15 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
                          bool enable_log_merging)
     : robot_id(robot_id), log_merger(LogMerger(enable_log_merging))
 {
+    std::optional<std::string> error;
     log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel)), ROBOT_LOGS_PORT, interface,
-        true));
+        true, error));
+    if (error)
+    {
+        std::cerr << error.value() << std::endl;
+        std::terminate();
+    }
 }
 
 void NetworkSink::sendToNetwork(g3::LogMessageMover log_entry)
