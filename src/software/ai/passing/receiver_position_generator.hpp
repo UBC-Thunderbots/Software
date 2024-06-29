@@ -140,7 +140,7 @@ std::vector<Point> ReceiverPositionGenerator<ZoneEnum>::getBestReceivingPosition
 
     // Verify that the number of receiver positions requested is valid
     if (num_positions >
-        world.friendlyTeam().numRobots() - existing_receiver_positions.size())
+        (world.friendlyTeam().numRobots() - existing_receiver_positions.size()))
     {
         LOG(WARNING) << "Not enough friendly robots to assign " << num_positions
                      << " receiver positions. Assigning "

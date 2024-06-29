@@ -15,7 +15,7 @@ struct ReceiverFSM
     /**
      * Constructor for AttackerFSM
      *
-     * @param attacker_tactic_config The config to fetch parameters from
+     * @param receiver_tactic_config The config to fetch parameters from
      */
     explicit ReceiverFSM(TbotsProto::ReceiverTacticConfig receiver_tactic_config)
         : receiver_tactic_config(receiver_tactic_config)
