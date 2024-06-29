@@ -33,14 +33,14 @@ struct ReceiverFSM
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    static constexpr double MIN_PASS_START_SPEED    = 0.02;
+    // The minimum speed required for ball to be considered moving
     static constexpr double BALL_MIN_MOVEMENT_SPEED = 0.04;
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray (i.e it won't make it to the receiver)
     static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(60);
 
-    // the minimum speed required for a pass to be considered stray
+    // The minimum speed required for a pass to be considered stray
     static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
 
     /**

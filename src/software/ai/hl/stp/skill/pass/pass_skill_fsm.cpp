@@ -80,6 +80,7 @@ void PassSkillFSM::findPass(
     // This ensures that a PassSkillFSM that has just been "reset" (i.e. constructed anew)
     // will not immediately set the SkillState, and consequently override any SkillState
     // changes made by another existing PassSkillFSM.
+    
     if (best_pass_so_far_)
     {
         event.common.set_skill_state(
