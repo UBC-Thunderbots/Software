@@ -1,24 +1,16 @@
 #pragma once
 
 #include "proto/parameters.pb.h"
+#include "software/ai/hl/stp/play/defense/defense_play_base.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
 
 /**
  * Play for defending against enemy free kicks
  */
-
-struct EnemyFreeKickPlayFSM
+struct EnemyFreeKickPlayFSM : public DefensePlayFSMBase
 {
     class BlockEnemyKickerState;
-
-    struct ControlParams
-    {
-        // The maximum allowed speed mode
-        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
-    };
-
-    DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     static constexpr double TOO_CLOSE_THRESHOLD_METERS = 0.1;
 
@@ -45,20 +37,6 @@ struct EnemyFreeKickPlayFSM
      */
     void setTactics(const Update &event, unsigned int num_tactics);
 
-    /**
-     * Helper function to set up crease defender tactic vector members
-     *
-     * @param num_crease_defenders the number of crease defender tactics to set
-     */
-    void setUpCreaseDefenders(unsigned int num_crease_defenders);
-
-    /**
-     * Helper function to set up pass defender tactic vector members
-     *
-     * @param num_pass_defenders the number of pass defender tactics to set
-     */
-    void setUpPassDefenders(unsigned int num_pass_defenders);
-
     auto operator()()
     {
         using namespace boost::sml;
@@ -75,9 +53,4 @@ struct EnemyFreeKickPlayFSM
                 BlockEnemyKickerState_S,
             X + Update_E = X);
     }
-
-   private:
-    TbotsProto::AiConfig ai_config;
-    std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
-    std::vector<std::shared_ptr<PassDefenderTactic>> pass_defenders;
 };
