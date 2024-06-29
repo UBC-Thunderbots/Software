@@ -23,6 +23,17 @@ class OffensePlay : public DynamicPlay
    protected:
     void updateTactics(const PlayUpdate& play_update) override;
 
+    /**
+     * Splits the given number of tactics to assign into the number of
+     * defender tactics and the number of supporter tactics to assign.
+     *
+     * @param num_tactics the total number of defense/support tactics to assign
+     *
+     * @return [num_defenders, num_supporters] tuple
+     */
+    std::tuple<unsigned int, unsigned int> assignNumOfDefendersAndSupporters(
+        unsigned int num_tactics);
+
    private:
     std::shared_ptr<AttackerTactic> attacker_tactic_;
     std::unique_ptr<DefensePlay> defense_play_;

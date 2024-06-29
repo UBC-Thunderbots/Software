@@ -32,6 +32,11 @@ void DynamicPlay::terminate(const WorldPtr &world_ptr)
 
 void DynamicPlay::updateSupportTactics(unsigned int num_supporters)
 {
+    if (support_tactics_.size() > num_supporters)
+    {
+        support_tactics_.resize(num_supporters);
+    }
+    
     while (support_tactics_.size() < num_supporters)
     {
         for (auto &candidate : support_tactic_candidates_)

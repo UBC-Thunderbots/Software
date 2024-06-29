@@ -19,22 +19,26 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
 {
     PriorityTacticVector tactics;
 
-    const bool attacker_not_suspended =
-        attacker_tactic_->tryResumingIfSuspended(play_update.world_ptr);
-
-    // The AttackerTactic should only be returned if it has not suspended
-    // execution of its current skill (it will not yield primitives if suspended)
-    if (attacker_not_suspended)
+    // AttackerTactic should always be assigned
+    if (play_update.num_tactics > 0)
     {
-        tactics.push_back({attacker_tactic_});
+        const bool attacker_not_suspended =
+            attacker_tactic_->tryResumingIfSuspended(play_update.world_ptr);
+
+        // The AttackerTactic should only be returned if it has not suspended
+        // execution of its current skill (it will not yield primitives if suspended)
+        if (attacker_not_suspended)
+        {
+            tactics.push_back({attacker_tactic_});
+        }
+
+        // Log visualize the state of the attacker's current skill
+        attacker_tactic_->visualizeSkillState(*play_update.world_ptr);
     }
 
-    // Log visualize the state of the attacker's current skill
-    attacker_tactic_->visualizeSkillState(*play_update.world_ptr);
-
-    int num_attackers  = static_cast<unsigned int>(tactics.size());
-    int num_defenders  = std::min(play_update.num_tactics - num_attackers, 2u);
-    int num_supporters = play_update.num_tactics - num_attackers - num_defenders;
+    // Determine number of defender and supporter tactics to assign
+    auto [num_defenders, num_supporters] = assignNumOfDefendersAndSupporters(
+        std::max(static_cast<int>(play_update.num_tactics) - 1, 0));
 
     // Get defense tactics from DefensePlay
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
@@ -88,13 +92,42 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
 
     // Add all defense and support tactics to the main PriorityTacticVector
     TacticVector secondary_tactics;
-    secondary_tactics.insert(secondary_tactics.end(), defense_tactics.begin(),
-                             defense_tactics.end());
     secondary_tactics.insert(secondary_tactics.end(), support_tactics_.begin(),
                              support_tactics_.end());
+    secondary_tactics.insert(secondary_tactics.end(), defense_tactics.begin(),
+                             defense_tactics.end());
     tactics.push_back(secondary_tactics);
 
     play_update.set_tactics(tactics);
+}
+
+std::tuple<unsigned int, unsigned int> OffensePlay::assignNumOfDefendersAndSupporters(
+    unsigned int num_tactics)
+{
+    unsigned int num_defenders, num_supporters;
+    switch (num_tactics)
+    {
+        case 0:
+            num_defenders  = 0;
+            num_supporters = 0;
+            break;
+        case 1:
+            num_defenders  = 0;
+            num_supporters = 1;
+            break;
+        case 2:
+            num_defenders  = 1;
+            num_supporters = 1;
+            break;
+        case 3:
+            num_defenders  = 1;
+            num_supporters = 2;
+            break;
+        default:
+            num_defenders  = 2;
+            num_supporters = num_tactics - 2;
+    }
+    return {num_defenders, num_supporters};
 }
 
 static TGenericFactory<std::string, Play, OffensePlay, std::shared_ptr<Strategy>>
