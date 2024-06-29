@@ -112,12 +112,7 @@ void CreaseDefenderFSM::blockThreat(
     {
         ball_collision_type = TbotsProto::BallCollisionType::AVOID;
     }
-    /**
-     * TODO: Fix Auto chip behaviour by adding conditional logic based on the current world
-     *  1) AutoChipOrKickMode::OFF when facing the net
-     *  2) AutoChipOrKickMode::AUTOCHIP <--> when near OUR net && enemy in front
-     *  3) AutoChipOrKickMode::OFF + DribbleFSM <--> when ball nearby && no nearby threats
-     */
+
     AutoChipOrKick auto_chip_or_kick{AutoChipOrKickMode::OFF, 0};
     auto goal_line_segment = Segment(event.common.world_ptr->field().friendlyGoal().posXPosYCorner(),
                                      event.common.world_ptr->field().friendlyGoal().posXNegYCorner());
@@ -200,23 +195,13 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
 
 bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
-    // HAVE CREASE DEFENDER TAKE THE BALL AND SIT THERE
     Point robot_position = event.common.robot.position();
     std::optional<Robot> nearest_enemy = event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
     if (nearest_enemy)
     {
-        // Get the ball if ball is closer to robot than enemy threat
+        // Get the ball if ball is closer to robot than enemy threat by threshold ratio
         double ball_distance = distance(robot_position, event.common.world_ptr->ball().position());
         double nearest_enemy_distance = distance(robot_position, nearest_enemy->position());
-        // DEBUG: Visualizes the max threat
-        LOG(VISUALIZE) << *createDebugShapes({
-                 *createDebugShape(
-                         Circle(robot_position,
-                                std::min(nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD, MAX_GET_BALL_RADIUS_M)),
-                         std::to_string(event.common.robot.id()) + "1",
-                         "ballgetzone"
-                 )
-         });
 
         return ball_distance < nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD
                 && ball_distance <= MAX_GET_BALL_RADIUS_M
