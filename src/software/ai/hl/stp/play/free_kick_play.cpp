@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
+#include "software/ai/hl/stp/skill/kick/kick_skill.h"
 #include "software/ai/hl/stp/skill/chip/chip_skill.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
@@ -123,17 +124,22 @@ void FreeKickPlay::performPassStage(
     LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
 
     // Perform the pass and wait until the receiver is finished
-    auto attacker = std::make_shared<AttackerTactic>(strategy);
+    auto passer   = std::make_shared<KickSkill::SkillTactic>(strategy);
     auto receiver = std::make_shared<ReceiverTactic>(strategy);
     do
     {
+        passer->updateControlParams({best_pass_and_score_so_far.pass.passerPoint(),
+                                     best_pass_and_score_so_far.pass.passerOrientation(),
+                                     best_pass_and_score_so_far.pass.speed()});
+        receiver->updateReceivingPosition(
+            best_pass_and_score_so_far.pass.receiverPoint());
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::LEFT);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
                                   TbotsProto::CreaseDefenderAlignment::RIGHT);
-        yield({{attacker, receiver, std::get<0>(crease_defender_tactics),
+        yield({{passer, receiver, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
     } while (!receiver->done());
 }

@@ -167,8 +167,7 @@ void ReceiverFSM::adjustReceive(const Update& event)
     if (strayPass(event) || ball.velocity().length() <= MIN_STRAY_PASS_SPEED)
     {
         intercept_position =
-            findInterceptionPoint(robot, ball, event.common.world_ptr->field()) +
-            Vector::createFromAngle(face_ball_orientation).normalize(0.05);
+            findInterceptionPoint(robot, ball, event.common.world_ptr->field());
     }
     else
     {

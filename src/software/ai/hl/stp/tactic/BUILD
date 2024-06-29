@@ -82,5 +82,6 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_protobuf",
         "//software/ai:strategy",
+        "//software/ai/hl/stp/skill:all_skills",
     ],
 )

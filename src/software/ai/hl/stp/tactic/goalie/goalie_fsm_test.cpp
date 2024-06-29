@@ -90,7 +90,7 @@ TEST(GoalieFSMTest, test_transitions)
     std::shared_ptr<Strategy> strategy = 
         std::make_shared<Strategy>(TbotsProto::AiConfig());
     
-    FSM<GoalieFSM> fsm(DribbleSkillFSM(),
+    FSM<GoalieFSM> fsm(DribbleSkillFSM(), PivotKickSkillFSM(),
                        GoalieFSM(strategy,
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 

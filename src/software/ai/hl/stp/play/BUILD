@@ -30,6 +30,7 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
         "//software/ai/evaluation:possession",
+        "//software/ai/hl/stp/skill/kick:kick_skill",
         "//software/ai/hl/stp/skill/chip:chip_skill",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",

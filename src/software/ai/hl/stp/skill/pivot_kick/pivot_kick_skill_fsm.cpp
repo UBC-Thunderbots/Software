@@ -13,6 +13,11 @@ void PivotKickSkillFSM::getBallControlAndPivot(
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
 }
 
+void PivotKickSkillFSM::setKickStartTime(const Update& event)
+{
+    kick_start_time_ = event.common.world_ptr->getMostRecentTimestamp();
+}
+
 void PivotKickSkillFSM::kickBall(const Update& event)
 {
     event.common.set_primitive(std::make_unique<MovePrimitive>(
@@ -25,13 +30,22 @@ void PivotKickSkillFSM::kickBall(const Update& event)
 
 bool PivotKickSkillFSM::lostBallControl(const Update& event)
 {
-    const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
+    const auto& ai_config         = event.common.strategy->getAiConfig();
+    const auto& pivot_kick_config = ai_config.pivot_kick_config();
 
-    return event.common.world_ptr->ball().velocity().length() <
-               ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold() &&
+    const Timestamp current_time = event.common.world_ptr->getMostRecentTimestamp();
+    const Duration time_since_kick_start = current_time - kick_start_time_;
+    const Duration lose_ball_control_time_threshold =
+        Duration::fromSeconds(pivot_kick_config.lose_ball_control_time_threshold());
+
+    const Ball& ball = event.common.world_ptr->ball();
+    const double ball_is_kicked_m_per_s_threshold =
+        ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
+
+    return time_since_kick_start >= lose_ball_control_time_threshold &&
+           ball.velocity().length() <= ball_is_kicked_m_per_s_threshold &&
            !event.common.robot.isNearDribbler(
-               event.common.world_ptr->ball().position(),
-               ai_config.dribble_config().lose_ball_control_threshold());
+               ball.position(), pivot_kick_config.lose_ball_control_distance_threshold());
 }
 
 bool PivotKickSkillFSM::ballKicked(const Update& event)

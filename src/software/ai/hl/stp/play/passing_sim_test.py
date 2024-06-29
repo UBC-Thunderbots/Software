@@ -11,7 +11,7 @@ from software.simulated_tests.friendly_receives_ball_slow import (
     FriendlyAlwaysReceivesBallSlow,
 )
 from software.simulated_tests.friendly_has_ball_possession import (
-    FriendlyEventuallyHasBallPossession,
+    AnyFriendlyEventuallyHasBallPossession,
 )
 from software.simulated_tests.ball_moves_in_direction import BallMovesForwardInRegions
 from software.simulated_tests.ball_enters_region import (
@@ -109,11 +109,11 @@ def setup_pass_and_robots(
     kick_vec = best_pass.receiverPoint() - best_pass.passerPoint()
 
     # Setup the passer's tactic
-    # We use KickTactic since AttackerTactic shoots towards the goal instead if open
-    # KickTactic just does the kick we want
+    # We use KickSkillTactic since AttackerTactic shoots towards the goal instead if open
+    # KickSkillTactic just does the kick we want
     params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[0].kick.CopyFrom(
-        KickTactic(
+    params.assigned_tactics[0].kick_skill.CopyFrom(
+        KickSkillTactic(
             kick_origin=Point(
                 x_meters=best_pass.passerPoint().x(),
                 y_meters=best_pass.passerPoint().y(),
@@ -235,7 +235,7 @@ def test_passing_receive_speed(
             BallEventuallyExitsRegion(
                 regions=[tbots_cpp.Circle(ball_initial_position, 0.4)]
             ),
-            FriendlyEventuallyHasBallPossession(tolerance=0.05),
+            AnyFriendlyEventuallyHasBallPossession(tolerance=0.05),
         ]
     ]
 

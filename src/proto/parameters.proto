@@ -43,6 +43,7 @@ message AiConfig
     required AiParameterConfig ai_parameter_config                          = 13;
     required ShotConfig shot_config                                         = 14;
     required ReceiverTacticConfig receiver_tactic_config                    = 15;
+    required PivotKickConfig pivot_kick_config                              = 16;
 }
 
 message AiControlConfig
@@ -426,6 +427,25 @@ message DribbleConfig
     // Robot speed at which the robot is done dribbling (in m/s)
     required double robot_dribbling_done_speed = 5
         [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+}
+
+message PivotKickConfig
+{
+    // If ball and front of robot are separated by this distance, then we've lost
+    // control over the ball (in m)
+    required double lose_ball_control_distance_threshold = 1 [
+        default                   = 0.04,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 1.0
+    ];
+
+    // If ball and front of robot are separated for this long, then we've lost
+    // control over the ball (in seconds)
+    required double lose_ball_control_time_threshold = 2 [
+        default                   = 1.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
 }
 
 message EnemyCapabilityConfig

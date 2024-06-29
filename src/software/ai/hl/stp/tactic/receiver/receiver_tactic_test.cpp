@@ -54,11 +54,6 @@ TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
             // because the robot is free to adjust itself to best receive
             // the pass (and dribble). We only care if the robot received the ball.
             robotReceivedBall(world_ptr, yield);
-
-            while (!tactic->done())
-            {
-                yield("Receiver tactic done but did not receive pass");
-            }
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};

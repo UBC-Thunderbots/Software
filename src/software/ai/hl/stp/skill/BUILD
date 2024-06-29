@@ -36,6 +36,7 @@ cc_library(
 
 cc_library(
     name = "all_skills",
+    hdrs = ["all_skills.h"],
     deps = [
         "//software/ai/hl/stp/skill/chip:chip_skill",
         "//software/ai/hl/stp/skill/dribble:dribble_skill",
