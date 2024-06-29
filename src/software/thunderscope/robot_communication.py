@@ -8,11 +8,14 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from colorama import Fore, Style
-from typing import Optional, Type
+from typing import Type
 import threading
 import time
 import os
 from google.protobuf.message import Message
+
+DISCONNECTED = "DISCONNECTED"
+"""A constant to represent a disconnected interface"""
 
 
 class RobotCommunication(object):
@@ -82,11 +85,11 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
-        self.current_network_config = NetworkConfig(
-            robot_status_interface=interface,
-            vision_interface=interface,
-            referee_interface=interface,
-        )
+        if interface is None:
+            interface = DISCONNECTED
+        self.current_network_config = NetworkConfig(robot_status_interface=interface,
+                                                             vision_interface=interface,
+                                                             referee_interface=interface)
         self.network_config_buffer = ThreadSafeBuffer(1, NetworkConfig)
         self.current_proto_unix_io.register_observer(
             NetworkConfig, self.network_config_buffer
@@ -119,8 +122,8 @@ class RobotCommunication(object):
 
     def setup_for_fullsystem(
         self,
-        referee_interface: Optional[str] = None,
-        vision_interface: Optional[str] = None,
+        referee_interface: str = DISCONNECTED,
+        vision_interface: str = DISCONNECTED,
     ) -> None:
         """
         Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
@@ -128,12 +131,12 @@ class RobotCommunication(object):
         :param referee_interface: the interface to listen for referee data
         :param vision_interface: the interface to listen for vision data
         """
-        change_referee_interface = (referee_interface is not None) and (
+        change_referee_interface = (
             referee_interface != self.current_network_config.referee_interface
-        )
-        change_vision_interface = (vision_interface is not None) and (
+        ) and (referee_interface != DISCONNECTED)
+        change_vision_interface = (
             vision_interface != self.current_network_config.vision_interface
-        )
+        ) and (vision_interface != DISCONNECTED)
 
         if change_vision_interface:
 
@@ -152,7 +155,7 @@ class RobotCommunication(object):
                 print(f"Error setting up vision interface: {error}")
 
             self.current_network_config.vision_interface = (
-                vision_interface if not error else None
+                vision_interface if not error else DISCONNECTED
             )
 
         if change_referee_interface:
@@ -170,7 +173,9 @@ class RobotCommunication(object):
             if error:
                 print(f"Error setting up referee interface: {error}")
 
-            self.current_network_config.referee_interface = None
+            self.current_network_config.referee_interface = (
+                referee_interface if not error else DISCONNECTED
+            )
 
         if not self.is_setup_for_fullsystem:
             self.robots_connected_to_fullsystem = {
@@ -180,7 +185,7 @@ class RobotCommunication(object):
             self.is_setup_for_fullsystem = True
 
     def __setup_for_robot_communication(
-        self, robot_status_interface: Optional[str] = None
+        self, robot_status_interface: str = "lo"
     ) -> None:
         """
         Set up senders and listeners for communicating with the robots
@@ -189,9 +194,8 @@ class RobotCommunication(object):
         primitives if using radio
         """
         if (
-            robot_status_interface is None
-            or robot_status_interface
-            == self.current_network_config.robot_status_interface
+            robot_status_interface == self.current_network_config.robot_status_interface
+            or robot_status_interface == DISCONNECTED
         ):
             return
 
@@ -232,7 +236,7 @@ class RobotCommunication(object):
             print(f"Error setting up robot status interface: {error}")
 
         self.current_network_config.robot_status_interface = (
-            robot_status_interface if not error else None
+            robot_status_interface if not error else DISCONNECTED
         )
 
     def close_for_fullsystem(self) -> None:
@@ -467,19 +471,17 @@ class RobotCommunication(object):
         Prints the current network configuration to the console
         """
 
-        def output_string(comm_name: str, status: Optional[str]) -> str:
+        def output_string(comm_name: str, status: str) -> str:
             """
             Returns a formatted string with the communication name and status
 
-            If status is None, it will be coloured red, otherwise it's green
+            Any status other than DISCONNECTED will be coloured green, otherwise red
 
             :param comm_name: the name of the communication
             :param status: the status of the communication
             """
-            colour = Fore.RED if status is None else Fore.GREEN
-            return f"{comm_name} {colour}{status if status else {0}} {Style.RESET_ALL}".format(
-                "DISCONNECTED"
-            )
+            colour = Fore.RED if status == DISCONNECTED else Fore.GREEN
+            return f"{comm_name} {colour}{status} {Style.RESET_ALL}"
 
         print(
             output_string(
