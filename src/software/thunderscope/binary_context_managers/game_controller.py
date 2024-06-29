@@ -149,9 +149,18 @@ class Gamecontroller(object):
             if autoref_proto_unix_io is not None:
                 autoref_proto_unix_io.send_proto(Referee, data)
 
-        self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
+        self.receive_referee_command, error = tbots_cpp.createSSLRefereeProtoListener(
+            Gamecontroller.REFEREE_IP,
+            self.referee_port,
+            "lo",
+            __send_referee_command,
+            True,
         )
+
+        if error:
+            print(
+                "[Gamecontroller] Failed to bind to the referee port and listen to referee messages"
+            )
 
         blue_full_system_proto_unix_io.register_observer(
             ManualGCCommand, self.command_override_buffer

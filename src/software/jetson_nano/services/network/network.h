@@ -24,11 +24,13 @@ class NetworkService
      * @param ip_address The IP Address the service should connect to
      * @param primitive_listener_port The port to listen for primitive protos
      * @param robot_status_sender_port The port to send robot status
+     * @param interface the interface to listen and send on
      * @param multicast  If true, then the provided IP address is a multicast address and
      * we should join the group
      */
     NetworkService(const std::string& ip_address, unsigned short primitive_listener_port,
-                   unsigned short robot_status_sender_port, bool multicast);
+                   unsigned short robot_status_sender_port, const std::string& interface,
+                   bool multicast);
 
     /**
      * When the network service is polled, it sends the robot_status and returns

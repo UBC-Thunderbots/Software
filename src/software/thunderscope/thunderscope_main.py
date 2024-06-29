@@ -220,11 +220,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Sanity check that an interface was provided
-    if args.run_blue or args.run_yellow:
-        if args.interface is None:
-            parser.error("Must specify interface")
-
     ###########################################################################
     #                      Visualize CPP Tests                                #
     ###########################################################################
@@ -451,7 +446,6 @@ if __name__ == "__main__":
             log_path=args.yellow_full_system_runtime_dir,
             time_provider=autoref.time_provider if args.enable_autoref else None,
         ) as yellow_logger:
-
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()

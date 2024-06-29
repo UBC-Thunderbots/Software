@@ -6,8 +6,13 @@ from thefuzz import fuzz
 from proto.import_all_protos import *
 from software.thunderscope.common import proto_parameter_tree_util
 
+from threading import Thread
+import time
+
 
 class ProtoConfigurationWidget(QWidget):
+    DELAYED_CONFIGURATION_TIMEOUT_S = 5
+    """How long to wait after startup to send the first configuration to our AI"""
 
     """Creates a searchable parameter widget that can take any protobuf,
     and convert it into a pyqtgraph ParameterTree. This will allow users
@@ -60,6 +65,9 @@ class ProtoConfigurationWidget(QWidget):
 
         layout.addWidget(self.search_query)
         layout.addWidget(self.param_tree)
+
+        self.first_shot_thread = Thread(target=self.__first_shot, daemon=True)
+        self.first_shot_thread.start()
 
     def __handle_search_query_changed(self, search_term):
         """Given a new search term, reconfigure the parameter tree with parameters
@@ -118,7 +126,6 @@ class ProtoConfigurationWidget(QWidget):
         :param search_term: The search filter
 
         """
-
         field_list = proto_parameter_tree_util.config_proto_to_field_list(
             message,
             search_term=search_term,
@@ -155,3 +162,10 @@ class ProtoConfigurationWidget(QWidget):
                     exec(f"{current_attr}.{key} = {value}")
             else:
                 self.build_proto(value, f"{current_attr}.{key}")
+
+    def __first_shot(self):
+        """Send the current configuration to the AI after a delay"""
+        time.sleep(ProtoConfigurationWidget.DELAYED_CONFIGURATION_TIMEOUT_S)
+        self.on_change_callback(
+            str(self.proto_to_configure), None, self.proto_to_configure
+        )
