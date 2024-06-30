@@ -54,16 +54,16 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
                 crease_defender_assignments.emplace_back(defender_assignment);
                 i++;
             }
-
         }
         else
         {
             pass_defender_assignments.emplace_back(defender_assignment);
         }
     }
-    //TODO - BIG TODO:
+    // TODO - BIG TODO:
     // - calculate block threat position for num of crease defenders ->
-    // - loop through all crease defenders and update control params to include the position
+    // - loop through all crease defenders and update control params to include the
+    // position
     // - Get position of all robots from the CURRENT defenders ->
     // - Get nearest defender to the ball and check if it is viable for a steal
     // - If viable, pop a defender and assign DribbleTactic, else nothing

@@ -58,7 +58,7 @@ void CreaseDefenderFSM::blockThreat(
         event.common.world_ptr->field().friendlyDefenseArea().expand(
             robot_radius_expansion_amount);
     // right on the edge of the defense area obstacle.
-    //TODO GET RID OF THIS AND PUT IN DEFENSE PLAY
+    // TODO GET RID OF THIS AND PUT IN DEFENSE PLAY
     auto block_threat_point = findBlockThreatPoint(
         event.common.world_ptr->field(), event.control_params.enemy_threat_origin,
         event.control_params.crease_defender_alignment, robot_obstacle_inflation_factor);
