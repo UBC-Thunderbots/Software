@@ -160,6 +160,8 @@ LAST_OPENED_LAYOUT_PATH = (
     f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
 )
 
+SAVED_Q_FUNCTION_WEIGHTS_PATH = "/tmp/tbots/q_function_weights"
+
 SIMULATION_SPEEDS = [3, 2, 1, 0.5, 0.2, 0.1, 0.05]
 
 THUNDERSCOPE_HELP_TEXT = textwrap.dedent(

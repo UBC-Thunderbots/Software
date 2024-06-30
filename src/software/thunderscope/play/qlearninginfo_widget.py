@@ -1,8 +1,12 @@
+import time
+import logging
+import pathlib
+
 import pyqtgraph as pg
 import pyqtgraph.console as pg_console
 from proto.q_learning_pb2 import LinearQFunctionInfo
 from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
-import software.thunderscope.constants as constants
+from software.thunderscope.constants import SAVED_Q_FUNCTION_WEIGHTS_PATH
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
@@ -37,14 +41,20 @@ class QLearningInfoWidget(QWidget):
             self.__display_linear_q_function_weights
         )
 
+        self.save_linear_q_func_weights_button = QPushButton("Save Weights")
+        self.save_linear_q_func_weights_button.clicked.connect(
+            self.__save_linear_q_function_weights
+        )
+
         self.vertical_layout = QVBoxLayout()
         self.vertical_layout.addWidget(self.linear_q_func_combo_box)
         self.vertical_layout.addWidget(self.linear_q_func_weights_table)
+        self.vertical_layout.addWidget(self.save_linear_q_func_weights_button)
         self.setLayout(self.vertical_layout)
 
     def refresh(self) -> None:
-        """Update the Q-learning info widget with new information
-        """
+        """Update the Q-learning info widget with new information"""
+
         linear_q_func_info = self.linear_q_func_info_buffer.get(block=False, return_cached=False)
 
         # Updating QTableWidget could be expensive, so we only update if there is new data
@@ -65,10 +75,11 @@ class QLearningInfoWidget(QWidget):
             self.__display_linear_q_function_weights(linear_q_func_name)
 
     def __display_linear_q_function_weights(self, linear_q_func_name: str):
-        """Update the weights table widget with the weights of the specified LinearQFunction
+        """Update the QTableWidget with the weights of the specified LinearQFunction
 
         :param linear_q_func_name: the name identifying the LinearQFunction
         """
+
         if linear_q_func_name not in self.linear_q_func_infos:
             return
 
@@ -93,3 +104,33 @@ class QLearningInfoWidget(QWidget):
         self.linear_q_func_weights_table.resizeColumnsToContents()
         self.linear_q_func_weights_table.resizeRowsToContents()
 
+    def __save_linear_q_function_weights(self):
+        """Open a file dialog to save the weights of the currently selected 
+        LinearQFunction to a CSV file
+        """
+        linear_q_func_name = self.linear_q_func_combo_box.currentText()
+        if linear_q_func_name not in self.linear_q_func_infos:
+            return
+        linear_q_func_info = self.linear_q_func_infos[linear_q_func_name]
+
+        # Create a folder at SAVED_Q_FUNCTION_WEIGHTS_PATH if it doesn't exist
+        try:
+            pathlib.Path(SAVED_Q_FUNCTION_WEIGHTS_PATH).mkdir(exist_ok=True)
+        except FileNotFoundError:
+            logging.warning(
+                f"Could not create folder at '{SAVED_Q_FUNCTION_WEIGHTS_PATH}'"
+            )
+
+        # Open file dialog
+        fileName, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save weights as CSV",
+            f"{SAVED_Q_FUNCTION_WEIGHTS_PATH}/{linear_q_func_name}_weights_{int(time.time())}.csv",
+            options=QFileDialog.Option.DontUseNativeDialog,
+        )
+
+        # Save weights as CSV file
+        if fileName:
+            weights = ",".join(map(str, linear_q_func_info["weights"]))
+            with open(fileName, 'w') as f:
+                f.write(weights)
