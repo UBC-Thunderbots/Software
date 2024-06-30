@@ -62,6 +62,7 @@ cc_library(
         ":q_function",
         "@csv",
         "@eigen",
+        "//proto:tbots_cc_proto",
     ],
 )
 

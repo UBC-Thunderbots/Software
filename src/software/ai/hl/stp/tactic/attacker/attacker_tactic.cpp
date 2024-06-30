@@ -55,7 +55,7 @@ bool AttackerTactic::tryResumingIfSuspended(const WorldPtr& world_ptr)
         return current_skill_->tryResumingIfSuspended(*last_execution_robot, world_ptr);
     }
 
-    // If no Skill is being executed, we consider the tactic as "resumed" 
+    // If no Skill is being executed, we consider the tactic as "resumed"
     return true;
 }
 
@@ -81,7 +81,7 @@ SkillState AttackerTactic::getSkillState() const
 
 void AttackerTactic::visualizeSkillState(const World& world)
 {
-    SkillState skill_state = getSkillState();    
+    SkillState skill_state = getSkillState();
 
     TbotsProto::AttackerVisualization attacker_vis_msg;
 
@@ -170,5 +170,10 @@ void AttackerTactic::updatePolicy(const AttackerMdpState& attacker_mdp_state)
 
         // Save current Q-function weights to CSV file
         q_function_->saveWeightsToCsv(ATTACKER_MDP_Q_FUNCTION_RUNTIME_WEIGHTS_FILE);
+
+        // Send Q-function info message to Thunderscope
+        TbotsProto::LinearQFunctionInfo q_function_info = q_function_->getInfo();
+        q_function_info.set_name(ATTACKER_MDP_Q_FUNCTION_NAME);
+        LOG(VISUALIZE) << q_function_info;
     }
 }

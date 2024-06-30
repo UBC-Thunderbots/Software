@@ -23,6 +23,7 @@ class OffensePlay : public DynamicPlay
    protected:
     void updateTactics(const PlayUpdate& play_update) override;
 
+   private:
     /**
      * Splits the given number of tactics to assign into the number of
      * defender tactics and the number of supporter tactics to assign.

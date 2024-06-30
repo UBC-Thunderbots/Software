@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 
 #include "csv.hpp"
+#include "proto/q_learning.pb.h"
 #include "software/ai/evaluation/q_learning/feature_extractor.hpp"
 #include "software/ai/evaluation/q_learning/q_function.hpp"
 
@@ -65,6 +66,14 @@ class LinearQFunction : public QFunction<TState, TAction>
      * @param csv_file the name of the file to save the weights to
      */
     void saveWeightsToCsv(std::string csv_file);
+
+    /**
+     * Gets a LinearQFunctionInfo message containing information about
+     * the LinearQFunction and its weights.
+     *
+     * @return a LinearQFunctionInfo message with info about this LinearQFunction
+     */
+    TbotsProto::LinearQFunctionInfo getInfo() const;
 
     double getQValue(const TState& state, const TAction::Enum& action) const override;
 
@@ -134,8 +143,7 @@ LinearQFunction<TState, TAction>::LinearQFunction(
 }
 
 template <typename TState, typename TAction>
-Eigen::VectorXd LinearQFunction<TState, TAction>::loadWeightsFromCsv(
-    std::string csv_file)
+Eigen::VectorXd LinearQFunction<TState, TAction>::loadWeightsFromCsv(std::string csv_file)
 {
     csv::CSVReader reader(csv_file, csv::CSVFormat().no_header());
     csv::CSVRow csv_row;
@@ -144,7 +152,7 @@ Eigen::VectorXd LinearQFunction<TState, TAction>::loadWeightsFromCsv(
     Eigen::VectorXd weights(csv_row.size());
     std::transform(csv_row.begin(), csv_row.end(), weights.begin(),
                    [](csv::CSVField& field) { return field.get<double>(); });
-    
+
     return weights;
 }
 
@@ -155,6 +163,20 @@ void LinearQFunction<TState, TAction>::saveWeightsToCsv(std::string csv_file)
                                             ",", "\n");
 
     LOG(CSV_OVERWRITE, csv_file) << getWeights().transpose().format(CSV_FORMAT);
+}
+
+template <typename TState, typename TAction>
+TbotsProto::LinearQFunctionInfo LinearQFunction<TState, TAction>::getInfo() const
+{
+    TbotsProto::LinearQFunctionInfo linear_q_function_info;
+
+    linear_q_function_info.set_num_features(
+        static_cast<unsigned int>(features_.numFeatures()));
+    linear_q_function_info.set_num_actions(
+        static_cast<unsigned int>(TAction::numValues()));
+    *linear_q_function_info.mutable_weights() = {weights_.begin(), weights_.end()};
+
+    return linear_q_function_info;
 }
 
 template <typename TState, typename TAction>

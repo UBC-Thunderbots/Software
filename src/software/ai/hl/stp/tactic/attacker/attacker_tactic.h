@@ -113,6 +113,10 @@ class AttackerTactic : public Tactic
     inline static const std::string ATTACKER_MDP_Q_FUNCTION_RUNTIME_WEIGHTS_FILE =
         "attacker_mdp_q_function_weights.csv";
 
+    // Name that identifies the attacker's Q-function in Thunderscope
+    inline static const std::string ATTACKER_MDP_Q_FUNCTION_NAME = 
+        "AttackerMdpLinearQFunction";
+
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     /**
