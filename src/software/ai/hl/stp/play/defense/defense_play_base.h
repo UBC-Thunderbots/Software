@@ -50,7 +50,7 @@ class DefensePlayFSMBase
      * @param event the FSM event
      * @param crease_defender_assignments crease defender assignments to be aligned
      */
-    void setAlignment(const Update &event,
+    virtual void updateCreaseDefenderControlParams(const Update &event,
                       const std::vector<DefenderAssignment> &crease_defender_assignments);
 
     /**
@@ -60,6 +60,24 @@ class DefensePlayFSMBase
      */
     void updatePassDefenderControlParams(
         std::vector<DefenderAssignment> &pass_defender_assignments);
+
+//    /**
+//     * Helper function to update the given crease defender control params
+//     *
+////     * @param event the FSM event
+//     * @param crease_defender_assignments crease defender assignment to update to
+//     * @param crease_defender_tactic crease defender tactic to update
+//     * @param enemy_threat_origin The origin of the enemy threat
+//     * @param block_threat_point The location to move the crease defender to
+//     * @param alignment The alignment of the crease defender
+//     */
+//    virtual void updateCreaseDefenderControlParams(
+////            const Update& event,
+//            const DefenderAssignment& crease_defender_assignment,
+//            CreaseDefenderTactic crease_defender_tactic,
+//            const Point &enemy_threat_origin,
+//            const std::optional<Point>& block_threat_point,
+//            const TbotsProto::CreaseDefenderAlignment &alignment);
 
     TbotsProto::AiConfig ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;

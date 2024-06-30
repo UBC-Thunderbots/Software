@@ -42,7 +42,7 @@ void DefensePlayFSMBase::updatePassDefenderControlParams(
     }
 }
 
-void DefensePlayFSMBase::setAlignment(
+void DefensePlayFSMBase::updateCreaseDefenderControlParams(
     const Update& event,
     const std::vector<DefenderAssignment>& crease_defender_assignments)
 {
@@ -81,7 +81,17 @@ void DefensePlayFSMBase::setAlignment(
             }
         }
 
+        double robot_obstacle_inflation_factor =
+                ai_config.robot_navigation_obstacle_config().robot_obstacle_inflation_factor() + 0.5;
+
+        auto block_threat_point = CreaseDefenderFSM::findBlockThreatPoint(
+                event.common.world_ptr->field(), target,
+                alignment, robot_obstacle_inflation_factor);
+
         crease_defenders.at(i)->updateControlParams(
-            target, alignment, event.control_params.max_allowed_speed_mode);
+            target,
+            block_threat_point,
+            alignment,
+            event.control_params.max_allowed_speed_mode);
     }
 }

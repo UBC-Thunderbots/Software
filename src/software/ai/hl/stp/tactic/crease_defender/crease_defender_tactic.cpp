@@ -12,14 +12,15 @@
 CreaseDefenderTactic::CreaseDefenderTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Move}),
       fsm_map(),
-      control_params({Point(0, 0), TbotsProto::CreaseDefenderAlignment::CENTRE,
+      control_params({Point(0, 0), std::nullopt,
+                      TbotsProto::CreaseDefenderAlignment::CENTRE,
                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}),
       ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<CreaseDefenderFSM>>(
-            CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()),
+                CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()),
             DribbleFSM(ai_config.dribble_tactic_config()));
     }
 }
@@ -31,10 +32,12 @@ void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
 
 void CreaseDefenderTactic::updateControlParams(
     const Point &enemy_threat_origin,
+    const std::optional<Point>& block_threat_point,
     const TbotsProto::CreaseDefenderAlignment &alignment,
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     control_params.enemy_threat_origin       = enemy_threat_origin;
+    control_params.block_threat_point        = block_threat_point;
     control_params.crease_defender_alignment = alignment;
     control_params.max_allowed_speed_mode    = max_allowed_speed_mode;
 }

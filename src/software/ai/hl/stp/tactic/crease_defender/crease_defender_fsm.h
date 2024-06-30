@@ -21,6 +21,8 @@ struct CreaseDefenderFSM
     {
         // The origin point of the enemy threat
         Point enemy_threat_origin;
+        // The point the defender should go to block
+        std::optional<Point> block_threat_point;
         // The crease defender alignment with respect to the enemy threat
         TbotsProto::CreaseDefenderAlignment crease_defender_alignment;
         // The maximum allowed speed mode

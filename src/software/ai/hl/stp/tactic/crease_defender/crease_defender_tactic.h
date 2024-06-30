@@ -45,10 +45,12 @@ class CreaseDefenderTactic : public Tactic
      * Update control params for this tactic
      *
      * @param enemy_threat_origin The origin of the enemy threat
+     * @param block_threat_point The point the defender should go to block
      * @param alignment The alignment for this crease defender
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
     void updateControlParams(const Point &enemy_threat_origin,
+                             const std::optional<Point>& block_threat_point,
                              const TbotsProto::CreaseDefenderAlignment &alignment,
                              TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);

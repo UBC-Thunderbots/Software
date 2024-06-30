@@ -18,7 +18,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
         ai_config.defense_play_config().defender_assignment_config());
 
-    if (assignments.size() == 0)
+    if (assignments.empty())
     {
         return;
     }
@@ -54,18 +54,23 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
                 crease_defender_assignments.emplace_back(defender_assignment);
                 i++;
             }
+
         }
         else
         {
             pass_defender_assignments.emplace_back(defender_assignment);
         }
     }
+    //TODO - BIG TODO:
+    // - calculate block threat position for num of crease defenders ->
+    // - loop through all crease defenders and update control params to include the position
+    // - Get position of all robots from the CURRENT defenders ->
+    // - Get nearest defender to the ball and check if it is viable for a steal
+    // - If viable, pop a defender and assign DribbleTactic, else nothing
 
-    // Reset tactics if the number of crease defenders or pass defenders
-    // we intend to assign has changed
     setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
     setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
-    setAlignment(event, crease_defender_assignments);
+    updateCreaseDefenderControlParams(event, crease_defender_assignments);
     updatePassDefenderControlParams(pass_defender_assignments);
 
     PriorityTacticVector tactics_to_return = {{}, {}};
