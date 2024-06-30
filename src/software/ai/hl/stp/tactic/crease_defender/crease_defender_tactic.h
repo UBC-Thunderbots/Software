@@ -50,7 +50,7 @@ class CreaseDefenderTactic : public Tactic
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
     void updateControlParams(const Point &enemy_threat_origin,
-                             const std::optional<Point>& block_threat_point,
+                             const std::optional<Point> &block_threat_point,
                              const TbotsProto::CreaseDefenderAlignment &alignment,
                              TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);

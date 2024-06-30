@@ -82,16 +82,16 @@ void DefensePlayFSMBase::updateCreaseDefenderControlParams(
         }
 
         double robot_obstacle_inflation_factor =
-                ai_config.robot_navigation_obstacle_config().robot_obstacle_inflation_factor() + 0.5;
+            ai_config.robot_navigation_obstacle_config()
+                .robot_obstacle_inflation_factor() +
+            0.5;
 
         auto block_threat_point = CreaseDefenderFSM::findBlockThreatPoint(
-                event.common.world_ptr->field(), target,
-                alignment, robot_obstacle_inflation_factor);
+            event.common.world_ptr->field(), target, alignment,
+            robot_obstacle_inflation_factor);
 
         crease_defenders.at(i)->updateControlParams(
-            target,
-            block_threat_point,
-            alignment,
+            target, block_threat_point, alignment,
             event.control_params.max_allowed_speed_mode);
     }
 }

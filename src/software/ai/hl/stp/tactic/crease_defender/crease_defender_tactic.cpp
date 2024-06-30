@@ -20,7 +20,7 @@ CreaseDefenderTactic::CreaseDefenderTactic(TbotsProto::AiConfig ai_config)
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<CreaseDefenderFSM>>(
-                CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()),
+            CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()),
             DribbleFSM(ai_config.dribble_tactic_config()));
     }
 }
@@ -31,8 +31,7 @@ void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
 }
 
 void CreaseDefenderTactic::updateControlParams(
-    const Point &enemy_threat_origin,
-    const std::optional<Point>& block_threat_point,
+    const Point &enemy_threat_origin, const std::optional<Point> &block_threat_point,
     const TbotsProto::CreaseDefenderAlignment &alignment,
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
 {
