@@ -143,6 +143,8 @@ struct PlaySelectionFSM
                                  setupOffensePlay_A = OffensePlayState_S,
             SetPlayState_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
                                  setupDefensePlay_A = DefensePlayState_S,
+            SetPlayState_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
+                SetPlayState_S,
 
             X + Update_E = X);
     }
