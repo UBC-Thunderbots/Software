@@ -70,7 +70,7 @@ message CreaseDefenderTactic
     // The maximum allowed speed mode
     required MaxAllowedSpeedMode max_allowed_speed_mode = 3;
     // The point the defender should go to block
-    required Point block_threat_point = 4;
+    optional Point block_threat_point = 4;
 }
 
 message DribbleTactic

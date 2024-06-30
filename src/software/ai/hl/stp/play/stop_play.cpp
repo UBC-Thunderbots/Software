@@ -91,8 +91,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
             (world_ptr->ball().position() - ball_defense_point_right).orientation(), 0,
             stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
 
-        // TODO: This is disgusting, we should pass this responsibility to defense play fsm instead with stop_mode
-        //  control param
+        // TODO: NEW TASK - This is disgusting, we should rewrite this responsibility to be a null block point for
+        //  defense_play_fsm instead with stop_mode control param
         double robot_obstacle_inflation_factor =
                 ai_config.robot_navigation_obstacle_config().robot_obstacle_inflation_factor() + 0.5;
 
