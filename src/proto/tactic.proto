@@ -48,7 +48,7 @@ message ChipTactic
 {
     // The location where the chip will be taken from
     required Point chip_origin = 1;
-    // The direction the Robot will chip in
+    // The direction the Robot will chip in// The
     required Angle chip_direction = 2;
     // The distance the robot will chip to
     required double chip_distance_meters = 3;
@@ -69,6 +69,8 @@ message CreaseDefenderTactic
     required CreaseDefenderAlignment crease_defender_alignment = 2;
     // The maximum allowed speed mode
     required MaxAllowedSpeedMode max_allowed_speed_mode = 3;
+    // The point the defender should go to block
+    required Point block_threat_point = 4;
 }
 
 message DribbleTactic

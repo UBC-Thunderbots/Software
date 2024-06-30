@@ -10,6 +10,7 @@ CreaseDefensePlay::CreaseDefensePlay(TbotsProto::AiConfig config)
       fsm{CreaseDefensePlayFSM{config}},
       control_params{
           .enemy_threat_origin    = Point(),
+          .block_threat_point     = Point(),
           .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
 {
 }

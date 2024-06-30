@@ -14,6 +14,8 @@ struct CreaseDefensePlayFSM
     {
         // The origin point of the enemy threat
         Point enemy_threat_origin;
+        // The point the defender should go to block
+        std::optional<Point> block_threat_point;
         // The maximum allowed speed mode
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     };

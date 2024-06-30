@@ -37,6 +37,7 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
 
     std::unique_ptr<CreaseDefensePlay> play =
         std::make_unique<CreaseDefensePlay>(getAiConfig());
+
     play->updateControlParams(Point(1, 3));
 
     setAiPlay(std::move(play));
