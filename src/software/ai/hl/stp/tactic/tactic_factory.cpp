@@ -72,10 +72,10 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tac
 {
     auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
 
-    tactic->updateControlParams(createPoint(tactic_proto.enemy_threat_origin()),
-                                (const std::optional<Point> &) tactic_proto.block_threat_point(),
-                                tactic_proto.crease_defender_alignment(),
-                                tactic_proto.max_allowed_speed_mode());
+    tactic->updateControlParams(
+        createPoint(tactic_proto.enemy_threat_origin()),
+        (const std::optional<Point> &)tactic_proto.block_threat_point(),
+        tactic_proto.crease_defender_alignment(), tactic_proto.max_allowed_speed_mode());
 
     return tactic;
 }

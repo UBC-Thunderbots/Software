@@ -27,8 +27,7 @@ void CreaseDefensePlayFSM::defendDefenseArea(const Update& event)
     {
         crease_defenders.at(i)->updateControlParams(
             event.control_params.enemy_threat_origin,
-            event.control_params.block_threat_point,
-            ALIGNMENTS.at(i),
+            event.control_params.block_threat_point, ALIGNMENTS.at(i),
             event.control_params.max_allowed_speed_mode);
     }
     PriorityTacticVector tactics_to_return = {{}};
