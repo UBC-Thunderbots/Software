@@ -91,36 +91,37 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
             (world_ptr->ball().position() - ball_defense_point_right).orientation(), 0,
             stop_mode, TbotsProto::ObstacleAvoidanceMode::SAFE);
 
-        // TODO: NEW TASK - This is disgusting, we should rewrite this responsibility to be a null block point for
+        // TODO: NEW TASK - This is disgusting, we should rewrite this responsibility to
+        // be a null block point for
         //  defense_play_fsm instead with stop_mode control param
         double robot_obstacle_inflation_factor =
-                ai_config.robot_navigation_obstacle_config().robot_obstacle_inflation_factor() + 0.5;
+            ai_config.robot_navigation_obstacle_config()
+                .robot_obstacle_inflation_factor() +
+            0.5;
 
         auto block_threat_point_left = CreaseDefenderFSM::findBlockThreatPoint(
-                world_ptr->field(), world_ptr->ball().position(),
-                TbotsProto::CreaseDefenderAlignment::LEFT, robot_obstacle_inflation_factor);
+            world_ptr->field(), world_ptr->ball().position(),
+            TbotsProto::CreaseDefenderAlignment::LEFT, robot_obstacle_inflation_factor);
 
         auto block_threat_point_right = CreaseDefenderFSM::findBlockThreatPoint(
-                world_ptr->field(), world_ptr->ball().position(),
-                TbotsProto::CreaseDefenderAlignment::RIGHT, robot_obstacle_inflation_factor);
+            world_ptr->field(), world_ptr->ball().position(),
+            TbotsProto::CreaseDefenderAlignment::RIGHT, robot_obstacle_inflation_factor);
 
         // What happens here if we have null points?
         if (block_threat_point_left)
         {
             std::get<0>(crease_defender_tactics)
-                    ->updateControlParams(world_ptr->ball().position(),
-                                          block_threat_point_left.value(),
-                                          TbotsProto::CreaseDefenderAlignment::LEFT,
-                                          stop_mode);
+                ->updateControlParams(
+                    world_ptr->ball().position(), block_threat_point_left.value(),
+                    TbotsProto::CreaseDefenderAlignment::LEFT, stop_mode);
         }
 
         if (block_threat_point_right)
         {
             std::get<1>(crease_defender_tactics)
-                    ->updateControlParams(world_ptr->ball().position(),
-                                          block_threat_point_right.value(),
-                                          TbotsProto::CreaseDefenderAlignment::RIGHT,
-                                          stop_mode);
+                ->updateControlParams(
+                    world_ptr->ball().position(), block_threat_point_right.value(),
+                    TbotsProto::CreaseDefenderAlignment::RIGHT, stop_mode);
         }
 
         // insert all the tactics to the result

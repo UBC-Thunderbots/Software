@@ -81,7 +81,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
     event.common.set_tactics(tactics_to_return);
 }
 //
-//bool DefensePlayFSM::ballNearbyWithoutThreat(const Update& event)
+// bool DefensePlayFSM::ballNearbyWithoutThreat(const Update& event)
 //{
 //    Point robot_position = event.common.robot.position();
 //    std::optional<Robot> nearest_enemy =
@@ -105,7 +105,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
 //    }
 //}
 //
-//void DefensePlayFSM::prepareGetPossession(
+// void DefensePlayFSM::prepareGetPossession(
 //        const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 //{
 //    Point ball_position       = event.common.world_ptr->ball().position();

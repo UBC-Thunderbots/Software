@@ -23,9 +23,12 @@ friendlyDefenseAreaFrontCenter = tbots_cpp.Point(
     .posXPosYCorner()
     .x(),
     tbots_cpp.Field.createSSLDivisionBField().friendlyDefenseArea().centre().y(),
-    )
+)
 
-defaultDefenseAreaPoint = tbots_cpp.createPointProto(friendlyDefenseAreaFrontCenter + tbots_cpp.Vector(0.2, 0))
+defaultDefenseAreaPoint = tbots_cpp.createPointProto(
+    friendlyDefenseAreaFrontCenter + tbots_cpp.Vector(0.2, 0)
+)
+
 
 @pytest.mark.parametrize(
     "blue_bots, yellow_bots, ball_initial_pos, ball_initial_velocity",
@@ -141,6 +144,7 @@ def test_crease_positioning(
         test_timeout_s=4,
     )
 
+
 @pytest.mark.parametrize(
     "blue_bots, yellow_bots, ball_initial_pos, ball_initial_velocity, should_chip",
     [
@@ -255,6 +259,7 @@ def test_crease_autochip(
         ag_always_validation_sequence_set=always_validation_sequence_set,
         test_timeout_s=3,
     )
+
 
 #
 # @pytest.mark.parametrize(

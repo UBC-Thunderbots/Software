@@ -58,7 +58,8 @@ void CreaseDefenderFSM::blockThreat(
         event.common.world_ptr->field().friendlyDefenseArea().expand(
             robot_radius_expansion_amount);
     // right on the edge of the defense area obstacle.
-    //TODO GET RID OF THIS AND PUT IN DEFENSE PLAY, IF BLOCK POINT IS NOT ON CREASE, SET DEFAULT BEHAVIOUR
+    // TODO GET RID OF THIS AND PUT IN DEFENSE PLAY, IF BLOCK POINT IS NOT ON CREASE, SET
+    // DEFAULT BEHAVIOUR
 
     if (contains(inflated_defense_area, event.control_params.enemy_threat_origin))
     {
