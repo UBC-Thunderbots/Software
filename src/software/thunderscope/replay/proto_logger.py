@@ -81,8 +81,8 @@ class ProtoLogger:
         save a _lot_ of space.
 
         """
-        # self.thread = threading.Thread(target=self.__log_protobufs, daemon=True)
-        # self.thread.start()
+        self.thread = threading.Thread(target=self.__log_protobufs, daemon=True)
+        self.thread.start()
         return self
 
     def __exit__(self, type, value, traceback) -> None:

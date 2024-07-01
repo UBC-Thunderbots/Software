@@ -135,7 +135,6 @@ class ProtoPlayer:
         """
 
         # Unpack metadata
-        print(f"{log_entry=}")
         timestamp, protobuf_type, data = log_entry.split(
             bytes(REPLAY_METADATA_DELIMETER, encoding="utf-8")
         )
@@ -150,8 +149,11 @@ class ProtoPlayer:
         except NameError:
             raise TypeError(f"Unknown proto type in replay: '{protobuf_type}'")
 
+        # filtered = data[:-len('\n')]
+        # print(f"{timestamp=}  {protobuf_type=}  {data=}  {filtered=}") # TODO (NIMA)
+
         # Deserialize protobuf
-        proto = proto_class.FromString(base64.b64decode(data[len("b") : -len("\n")]))
+        proto = proto_class.FromString(base64.b64decode(data[:-len("\n")]))
 
         return float(timestamp), proto_class, proto
 
