@@ -14,8 +14,8 @@
 #include "software/ai/hl/stp/play/stop_play.h"
 
 
-PlaySelectionFSM::PlaySelectionFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config), current_play(std::make_unique<HaltPlay>(ai_config))
+PlaySelectionFSM::PlaySelectionFSM(TbotsProto::AiConfig ai_config) : 
+    ai_config(ai_config), current_set_play(NONE)
 {
 }
 
@@ -41,45 +41,70 @@ bool PlaySelectionFSM::gameStateSetupRestart(const Update& event)
 
 void PlaySelectionFSM::setupSetPlay(const Update& event)
 {
-    current_play.reset();
     if (event.game_state.isOurBallPlacement())
     {
-        event.set_current_play(std::make_unique<BallPlacementPlay>(ai_config));
+        if (current_set_play != FRIENDLY_BALL_PLACEMENT)
+        {
+            current_set_play = FRIENDLY_BALL_PLACEMENT;
+            event.set_current_play(std::make_unique<BallPlacementPlay>(ai_config));
+        }
     }
-
-    if (event.game_state.isTheirBallPlacement())
+    else if (event.game_state.isTheirBallPlacement())
     {
-        event.set_current_play(std::make_unique<EnemyBallPlacementPlay>(ai_config));
+        if (current_set_play != ENEMY_BALL_PLACEMENT)
+        {
+            current_set_play = ENEMY_BALL_PLACEMENT;
+            event.set_current_play(std::make_unique<EnemyBallPlacementPlay>(ai_config));
+        }
     }
-
-    if (event.game_state.isOurKickoff())
+    else if (event.game_state.isOurKickoff())
     {
-        event.set_current_play(std::make_unique<KickoffFriendlyPlay>(ai_config));
+        if (current_set_play != FRIENDLY_KICKOFF)
+        {
+            current_set_play = FRIENDLY_KICKOFF;
+            event.set_current_play(std::make_unique<KickoffFriendlyPlay>(ai_config));
+        }
     }
-
-    if (event.game_state.isTheirKickoff())
+    else if (event.game_state.isTheirKickoff())
     {
-        event.set_current_play(std::make_unique<KickoffEnemyPlay>(ai_config));
+        if (current_set_play != ENEMY_KICKOFF)
+        {
+            current_set_play = ENEMY_KICKOFF;
+            event.set_current_play(std::make_unique<KickoffEnemyPlay>(ai_config));
+        }
     }
-
-    if (event.game_state.isOurPenalty())
+    else if (event.game_state.isOurPenalty())
     {
-        event.set_current_play(std::make_unique<PenaltyKickPlay>(ai_config));
+        if (current_set_play != FRIENDLY_PENALTY_KICK)
+        {
+            current_set_play = FRIENDLY_PENALTY_KICK;
+            event.set_current_play(std::make_unique<PenaltyKickPlay>(ai_config));
+        }
     }
-
-    if (event.game_state.isTheirPenalty())
+    else if (event.game_state.isTheirPenalty())
     {
-        event.set_current_play(std::make_unique<PenaltyKickEnemyPlay>(ai_config));
+        if (current_set_play != ENEMY_PENALTY_KICK)
+        {
+            current_set_play = ENEMY_PENALTY_KICK;
+            event.set_current_play(std::make_unique<PenaltyKickEnemyPlay>(ai_config));
+        }
     }
-
-    if (event.game_state.isOurDirectFree() || event.game_state.isOurIndirectFree())
+    else if (event.game_state.isOurDirectFree() || event.game_state.isOurIndirectFree())
     {
-        event.set_current_play(std::make_unique<FreeKickPlay>(ai_config));
+        if (current_set_play != FRIENDLY_FREE_KICK)
+        {
+            current_set_play = FRIENDLY_FREE_KICK;
+            event.set_current_play(std::make_unique<FreeKickPlay>(ai_config));
+        }
     }
-
-    if (event.game_state.isTheirDirectFree() || event.game_state.isTheirIndirectFree())
+    else if (event.game_state.isTheirDirectFree() ||
+             event.game_state.isTheirIndirectFree())
     {
-        event.set_current_play(std::make_unique<EnemyFreeKickPlay>(ai_config));
+        if (current_set_play != ENEMY_FREE_KICK)
+        {
+            current_set_play = ENEMY_FREE_KICK;
+            event.set_current_play(std::make_unique<EnemyFreeKickPlay>(ai_config));
+        }
     }
 }
 
@@ -96,4 +121,9 @@ void PlaySelectionFSM::setupHaltPlay(const Update& event)
 void PlaySelectionFSM::setupOffensePlay(const Update& event)
 {
     event.set_current_play(std::make_unique<OffensePlay>(ai_config));
+}
+
+void PlaySelectionFSM::resetSetPlay(const Update& event)
+{
+    current_set_play = NONE;   
 }
