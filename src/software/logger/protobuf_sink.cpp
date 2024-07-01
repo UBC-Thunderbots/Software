@@ -7,7 +7,8 @@
 #include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 
-ProtobufSink::ProtobufSink(std::string runtime_dir)
+ProtobufSink::ProtobufSink(std::string runtime_dir, const std::shared_ptr<ProtoLogger>& proto_logger) :
+    proto_logger(proto_logger)
 {
     // Setup the logs
     unix_senders_["log"] = std::make_unique<ThreadedUnixSender>(runtime_dir + "/log");
@@ -30,6 +31,11 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
                        proto_type_name_pos - TYPE_DELIMITER.length());
         std::string serialized_proto =
             base64_decode(msg.substr(proto_type_name_pos + TYPE_DELIMITER.length()));
+
+        if (proto_logger)
+        {
+            proto_logger->saveSerializedProto(proto_type_name, serialized_proto);
+        }
 
         // Use the protobuf type as the file name, if no file name was specified in the
         // message

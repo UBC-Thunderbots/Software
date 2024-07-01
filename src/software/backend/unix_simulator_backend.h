@@ -8,6 +8,7 @@
 #include "software/backend/backend.h"
 #include "software/networking/unix/threaded_proto_unix_listener.hpp"
 #include "software/networking/unix/threaded_proto_unix_sender.hpp"
+#include "software/logger/proto_logger.h"
 
 class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::ThunderbotsConfig>
 {
@@ -17,7 +18,8 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
      *
      * @param runtime_dir The directory to setup the unix sockets
      */
-    UnixSimulatorBackend(std::string runtime_dir);
+    UnixSimulatorBackend(std::string runtime_dir,
+                         const std::shared_ptr<ProtoLogger>& proto_logger);
 
    private:
     void receiveThunderbotsConfig(TbotsProto::ThunderbotsConfig request);
@@ -40,6 +42,8 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>> primitive_output;
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::ThunderbotsConfig>>
         dynamic_parameter_update_respone_sender;
+
+    std::shared_ptr<ProtoLogger> proto_logger;
 
     // World protobuf sequence number counter
     uint64_t sequence_number = 0;

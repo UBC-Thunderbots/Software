@@ -15,7 +15,8 @@ class ThreadedProtoUnixSender : private ThreadedUnixSender
      *
      * @param unix_path The unix socket path to send on
      */
-    ThreadedProtoUnixSender(const std::string& unix_path) : ThreadedUnixSender(unix_path)
+    ThreadedProtoUnixSender(const std::string& unix_path,
+                            const std::shared_ptr<ProtoLogger>& proto_logger = nullptr) : ThreadedUnixSender(unix_path)
     {
     }
 
@@ -29,6 +30,8 @@ class ThreadedProtoUnixSender : private ThreadedUnixSender
 
    private:
     std::string data_buffer;
+
+    std::shared_ptr<ProtoLogger> proto_logger;
 };
 
 template <class SendProtoT>
@@ -36,4 +39,9 @@ void ThreadedProtoUnixSender<SendProtoT>::sendProto(const SendProtoT& message)
 {
     message.SerializeToString(&data_buffer);
     sendString(data_buffer);
+
+    if (proto_logger)
+    {
+        proto_logger->saveSerializedProto<SendProtoT>(data_buffer);
+    }
 }

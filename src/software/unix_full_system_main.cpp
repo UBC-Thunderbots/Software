@@ -19,6 +19,7 @@
 #include "software/networking/unix/threaded_proto_unix_listener.hpp"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/generic_factory/generic_factory.h"
+#include "software/logger/proto_logger.h"
 
 int main(int argc, char** argv)
 {
@@ -61,15 +62,15 @@ int main(int argc, char** argv)
         {
             TracySetProgramName("Thunderbots: Yellow");
         }
-
-        LoggerSingleton::initializeLogger(args.runtime_dir);
+        auto proto_logger = std::make_shared<ProtoLogger>(args.runtime_dir, []() { return std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count(); });
+        LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger);
         TbotsProto::ThunderbotsConfig tbots_proto;
 
         // Override friendly color
         tbots_proto.mutable_sensor_fusion_config()->set_friendly_color_yellow(
             args.friendly_colour_yellow);
 
-        auto backend = std::make_shared<UnixSimulatorBackend>(args.runtime_dir);
+        auto backend = std::make_shared<UnixSimulatorBackend>(args.runtime_dir, proto_logger);
         auto sensor_fusion =
             std::make_shared<ThreadedSensorFusion>(tbots_proto.sensor_fusion_config());
         auto ai = std::make_shared<ThreadedAi>(tbots_proto.ai_config());
