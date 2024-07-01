@@ -16,7 +16,7 @@ class ThreadedProtoUnixSender : private ThreadedUnixSender
      * @param unix_path The unix socket path to send on
      */
     ThreadedProtoUnixSender(const std::string& unix_path,
-                            const std::shared_ptr<ProtoLogger>& proto_logger = nullptr) : ThreadedUnixSender(unix_path)
+                            const std::shared_ptr<ProtoLogger>& proto_logger = nullptr) : ThreadedUnixSender(unix_path), proto_logger(proto_logger)
     {
     }
 

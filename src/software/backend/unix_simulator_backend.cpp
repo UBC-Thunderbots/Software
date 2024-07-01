@@ -37,7 +37,7 @@ UnixSimulatorBackend::UnixSimulatorBackend(std::string runtime_dir,
 
     // Protobuf Outputs
     world_output.reset(
-        new ThreadedProtoUnixSender<TbotsProto::World>(runtime_dir + WORLD_PATH));
+        new ThreadedProtoUnixSender<TbotsProto::World>(runtime_dir + WORLD_PATH, proto_logger));
 
     primitive_output.reset(new ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>(
         runtime_dir + PRIMITIVE_PATH, proto_logger));

@@ -113,7 +113,7 @@ void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
 
         if (proto_logger)
         {
-            proto_logger->saveSerializedProto<ReceiveProtoT>(raw_received_data_.data());
+            proto_logger->saveSerializedProto<ReceiveProtoT>(std::string(raw_received_data_.data(), num_bytes_received));
         }
 
         // Once we've handled the data, start listening again
