@@ -94,7 +94,7 @@ void ProtoLogger::logProtobufs()
                              << base64_encode(serialized_proto) << "\n";
                 std::string log_entry = log_entry_ss.str();
 
-                gzwrite(gz_file, log_entry.c_str(), static_cast<unsigned>(log_entry.size()));
+                gzwrite(gz_file, log_entry.c_str(), static_cast<unsigned>(log_entry.size())); // TODO (NIMA): Check output - Could also use gzputs?! gzprintf
 
                 if (gzoffset(gz_file) > REPLAY_MAX_CHUNK_SIZE_BYTES)
                 {

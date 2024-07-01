@@ -135,6 +135,7 @@ class ProtoPlayer:
         """
 
         # Unpack metadata
+        print(f"{log_entry=}")
         timestamp, protobuf_type, data = log_entry.split(
             bytes(REPLAY_METADATA_DELIMETER, encoding="utf-8")
         )

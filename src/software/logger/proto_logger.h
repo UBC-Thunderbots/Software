@@ -43,7 +43,7 @@ class ProtoLogger
     const std::string REPLAY_FILE_PREFIX                      = "proto_";
     const std::string REPLAY_FILE_EXTENSION                   = "replay";
     const std::string REPLAY_FILE_TIME_FORMAT                 = "%Y_%m_%d_%H_%M_%S";
-    const std::string REPLAY_METADATA_DELIMETER               = "!#!";
+    const std::string REPLAY_METADATA_DELIMETER               = ",";
     static constexpr unsigned int PROTOBUF_BUFFER_SIZE        = 1000;
     static constexpr unsigned int REPLAY_MAX_CHUNK_SIZE_BYTES = 1024 * 1024;  // 1 MB
 };

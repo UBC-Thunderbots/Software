@@ -26,7 +26,6 @@ cc_library(
         ":log_merger",
         ":plotjuggler_sink",
         ":protobuf_sink",
-        "//software/logger:proto_logger_cpp", # TODO (NIMA): Can probably remove -- causes compilation issues
         "@g3log",
         "@g3sinks",
     ],
@@ -156,7 +155,7 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//shared:constants",
         "//software/networking/unix:threaded_unix_sender",
-#        "//software/logger:proto_logger_cpp",
+        "//software/logger:proto_logger_cpp",
         "@base64",
         "@g3log",
     ],
