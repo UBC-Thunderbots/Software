@@ -65,7 +65,7 @@ void ProtoLogger::saveSerializedProto(const std::string& protobuf_type_full_name
 
 void ProtoLogger::logProtobufs()
 {
-    int replay_index = 0;
+    unsigned int replay_index = 0;
 
     try
     {
@@ -73,18 +73,13 @@ void ProtoLogger::logProtobufs()
         {
             std::string log_file_path =
                 log_folder_ + std::to_string(replay_index) + "." + REPLAY_FILE_EXTENSION;
-            std::ofstream file(log_file_path, std::ios_base::out | std::ios_base::binary);
-
-            if (!file.is_open())
-            {
-                throw std::runtime_error("Failed to open log file");
-            }
 
             gzFile gz_file = gzopen(log_file_path.c_str(), "wb");
             if (!gz_file)
-            {  // TODO (NIMA): On failure, gzopen() shall return Z_NULL and may set errno
-               // accordingly.
-                throw std::runtime_error("Failed to open gzip file");
+            {
+                std::string error_msg =
+                    "Failed to open gzip file. Error: " + std::string(strerror(errno));
+                throw std::runtime_error(error_msg);
             }
 
             while (!stop_logging_)
@@ -100,6 +95,9 @@ void ProtoLogger::logProtobufs()
                 double current_time = time_provider_() - start_time_;
                 const auto& [proto_full_name, serialized_proto] =
                     serialized_proto_opt.value();
+
+                // Write the log entry to the file with the format:
+                // <time>,<protobuf_type_full_name>,<base64_encoded_serialized_proto>
                 std::stringstream log_entry_ss;
                 log_entry_ss << current_time << REPLAY_METADATA_DELIMETER
                              << proto_full_name << REPLAY_METADATA_DELIMETER
@@ -107,10 +105,9 @@ void ProtoLogger::logProtobufs()
                 std::string log_entry = log_entry_ss.str();
 
                 gzwrite(gz_file, log_entry.c_str(),
-                        static_cast<unsigned>(
-                            log_entry.size()));  // TODO (NIMA): Check output - Could also
-                                                 // use gzputs?! gzprintf
+                        static_cast<unsigned>(log_entry.size()));
 
+                // Limit the size of each replay chunk
                 if (gzoffset(gz_file) > REPLAY_MAX_CHUNK_SIZE_BYTES)
                 {
                     break;
@@ -118,7 +115,6 @@ void ProtoLogger::logProtobufs()
             }
 
             gzclose(gz_file);
-            file.close();
             replay_index++;
         }
     }
