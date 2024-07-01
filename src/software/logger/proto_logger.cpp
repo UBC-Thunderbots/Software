@@ -14,6 +14,7 @@
 #include <optional>
 //#include <sstream>
 //#include <stdexcept>
+#include <zlib.h>
 #include <vector>
 
 #include "base64.h"
@@ -70,14 +71,14 @@ void ProtoLogger::logProtobufs()
                 throw std::runtime_error("Failed to open log file");
             }
 
-//            boost::iostreams::filtering_ostream out;
-//            out.push(boost::iostreams::gzip_compressor());
-//            out.push(file);
+            gzFile gz_file = gzopen(log_file_path.c_str(), "wb");
+            if (!gz_file) { // TODO (NIMA): On failure, gzopen() shall return Z_NULL and may set errno accordingly.
+                throw std::runtime_error("Failed to open gzip file");
+            }
 
             while (!stop_logging_)
             {
-                auto serialized_proto_opt = buffer_.popLeastRecentlyAddedValue(
-                    Duration::fromSeconds(BUFFER_BLOCK_TIMEOUT_SEC));
+                auto serialized_proto_opt = buffer_.popLeastRecentlyAddedValue(BUFFER_BLOCK_TIMEOUT);
                 if (!serialized_proto_opt.has_value())
                 {
                     // Timed out without getting a new value
@@ -86,24 +87,22 @@ void ProtoLogger::logProtobufs()
 
                 double current_time = time_provider_() - start_time_;
                 const auto& [proto_full_name, serialized_proto] =
-                    serialized_proto_opt.value();
+                        serialized_proto_opt.value();
                 std::stringstream log_entry_ss;
                 log_entry_ss << current_time << REPLAY_METADATA_DELIMETER
                              << proto_full_name << REPLAY_METADATA_DELIMETER
                              << base64_encode(serialized_proto) << "\n";
                 std::string log_entry = log_entry_ss.str();
-                // TODO (NIMA): Can you combine the lines by outputting directory to the
-                // file?
-//                out.write(log_entry.c_str(), log_entry.size());
-                file << log_entry;
 
-                if (file.tellp() > REPLAY_MAX_CHUNK_SIZE_BYTES)
+                gzwrite(gz_file, log_entry.c_str(), static_cast<unsigned>(log_entry.size()));
+
+                if (gzoffset(gz_file) > REPLAY_MAX_CHUNK_SIZE_BYTES)
                 {
                     break;
                 }
             }
 
-//            out.reset();
+            gzclose(gz_file);
             file.close();
             replay_index++;
         }

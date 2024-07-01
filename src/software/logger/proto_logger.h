@@ -37,7 +37,7 @@ class ProtoLogger
     bool stop_logging_;
     std::thread log_thread_;
     ThreadSafeBuffer<std::pair<std::string, std::string>> buffer_;
-    static constexpr double BUFFER_BLOCK_TIMEOUT_SEC = 0.1;
+    const Duration BUFFER_BLOCK_TIMEOUT = Duration::fromSeconds(0.1);
 
     // TODO (NIMA): Move to constants and pybind to python
     const std::string REPLAY_FILE_PREFIX                      = "proto_";
