@@ -1,28 +1,21 @@
 #include "proto_logger.h"
 
-#include <boost/filesystem.hpp>
-//#include <boost/iostreams/filter/gzip.hpp>
-//#include <boost/iostreams/filtering_stream.hpp>
 #include <google/protobuf/message.h>
+#include <zlib.h>
 
 #include <chrono>
 #include <ctime>
 #include <experimental/filesystem>
 #include <fstream>
 #include <iomanip>
-//#include <iostream>
-//#include <memory>
 #include <optional>
-//#include <sstream>
-//#include <stdexcept>
-#include <zlib.h>
-
 #include <vector>
 
 #include "base64.h"
 
 ProtoLogger::ProtoLogger(const std::string& log_path,
-                         std::function<double()> time_provider)
+                         std::function<double()> time_provider,
+                         const bool friendly_colour_yellow)
     : log_path_(log_path),
       time_provider_(time_provider),
       stop_logging_(false),
@@ -37,6 +30,19 @@ ProtoLogger::ProtoLogger(const std::string& log_path,
     ss << std::put_time(&tm, REPLAY_FILE_TIME_FORMAT.data());
     log_folder_ = log_path_ + "/" + REPLAY_FILE_PREFIX + ss.str() + "/";
     std::experimental::filesystem::create_directories(log_folder_);
+
+    if (friendly_colour_yellow)
+    {
+        std::cout
+            << "\nTo watch the replay for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log  "
+            << log_folder_ << std::endl;
+    }
+    else
+    {
+        std::cout
+            << "\nTo watch the replay for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log  "
+            << log_folder_ << std::endl;
+    }
 
     // Start logging in a separate thread
     log_thread_ = std::thread(&ProtoLogger::logProtobufs, this);
@@ -68,7 +74,6 @@ void ProtoLogger::logProtobufs()
             std::string log_file_path =
                 log_folder_ + std::to_string(replay_index) + "." + REPLAY_FILE_EXTENSION;
             std::ofstream file(log_file_path, std::ios_base::out | std::ios_base::binary);
-            std::cout << "Writing to " << log_file_path << std::endl;
 
             if (!file.is_open())
             {

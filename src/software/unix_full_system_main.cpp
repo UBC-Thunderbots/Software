@@ -62,11 +62,14 @@ int main(int argc, char** argv)
         {
             TracySetProgramName("Thunderbots: Yellow");
         }
-        auto proto_logger = std::make_shared<ProtoLogger>(args.runtime_dir, []() {
-            return std::chrono::duration<double>(
-                       std::chrono::system_clock::now().time_since_epoch())
-                .count();
-        });
+        auto proto_logger = std::make_shared<ProtoLogger>(
+            args.runtime_dir,
+            []() {
+                return std::chrono::duration<double>(
+                           std::chrono::system_clock::now().time_since_epoch())
+                    .count();
+            },
+            args.friendly_colour_yellow);
         LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger);
         TbotsProto::ThunderbotsConfig tbots_proto;
 

@@ -15,7 +15,8 @@ class ProtoLogger
 {
    public:
     explicit ProtoLogger(const std::string& log_path,
-                         std::function<double()> time_provider = nullptr);
+                         std::function<double()> time_provider,
+                         bool friendly_colour_yellow);
 
     ~ProtoLogger();
 
