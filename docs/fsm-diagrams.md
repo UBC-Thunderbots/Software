@@ -49,6 +49,19 @@ RetreatState --> RetreatState : [ballPlaced]\n<i>retreat</i>
 
 ```
 
+## [CreaseDefensePlayFSM](/src/software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> DefenseState
+DefenseState --> DefenseState : <i>defendDefenseArea</i>
+Terminate:::terminate --> Terminate:::terminate
+
+```
+
 ## [DefensePlayFSM](/src/software/ai/hl/stp/play/defense/defense_play_fsm.h)
 
 ```mermaid

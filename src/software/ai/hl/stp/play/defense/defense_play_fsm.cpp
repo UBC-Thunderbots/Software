@@ -2,8 +2,6 @@
 
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 DefensePlayFSM::DefensePlayFSM(TbotsProto::AiConfig ai_config)
     : DefensePlayFSMBase::DefensePlayFSMBase(ai_config)
@@ -20,7 +18,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
         ai_config.defense_play_config().defender_assignment_config());
 
-    if (assignments.empty())
+    if (assignments.size() == 0)
     {
         return;
     }
@@ -62,91 +60,18 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
             pass_defender_assignments.emplace_back(defender_assignment);
         }
     }
-    // TODO - BIG TODO:
-    // - calculate block threat position for num of crease defenders ->
-    // - loop through all crease defenders and update control params to include the
-    // position
-    // - Get position of all robots from the CURRENT defenders ->
-    // - Get nearest defender to the ball and check if it is viable for a steal
-    // - If viable, pop a defender and assign DribbleTactic, else nothing
 
+    // Reset tactics if the number of crease defenders or pass defenders
+    // we intend to assign has changed
     setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
     setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
-    updateCreaseDefenderControlParams(event, crease_defender_assignments);
+    setAlignment(event, crease_defender_assignments);
     updatePassDefenderControlParams(pass_defender_assignments);
 
-    PriorityTacticVector tactics_to_return = {{}, {}, {}};
-    prepareGetPossession(event, tactics_to_return);
-    LOG(DEBUG) << (tactics_to_return[0].size());
-
-    tactics_to_return[1].insert(tactics_to_return[1].end(), crease_defenders.begin(),
+    PriorityTacticVector tactics_to_return = {{}, {}};
+    tactics_to_return[0].insert(tactics_to_return[0].end(), crease_defenders.begin(),
                                 crease_defenders.end());
-    tactics_to_return[2].insert(tactics_to_return[2].end(), pass_defenders.begin(),
+    tactics_to_return[1].insert(tactics_to_return[1].end(), pass_defenders.begin(),
                                 pass_defenders.end());
     event.common.set_tactics(tactics_to_return);
 }
-
- bool DefensePlayFSM::ballNearbyWithoutThreat(const Update& event)
-{
-    std::optional<Robot> nearest_robot_to_ball =
-            event.common.world_ptr->friendlyTeam().getNearestRobot(event.common.world_ptr->ball().position());
-    std::optional<Robot> friendly_nearest_enemy;
-    if (nearest_robot_to_ball)
-    {
-        friendly_nearest_enemy =
-                event.common.world_ptr->enemyTeam().getNearestRobot(nearest_robot_to_ball->position());
-    }
-
-    if (friendly_nearest_enemy)
-    {
-        // Get the ball if ball is closer to robot than enemy threat by threshold ratio
-        double ball_distance =
-                distance(nearest_robot_to_ball->position(), event.common.world_ptr->ball().position());
-        double nearest_enemy_distance =
-                distance(nearest_robot_to_ball->position(), friendly_nearest_enemy->position());
-
-        LOG(VISUALIZE) << *createDebugShapes({
-             *createDebugShape(
-                     Circle(nearest_robot_to_ball->position(),
-                            std::min(nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD, MAX_GET_BALL_RADIUS_M)),
-                     "1123",
-                     "ballgetzone"
-             )});
-
-        return ball_distance < nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD &&
-               ball_distance <= MAX_GET_BALL_RADIUS_M &&
-               event.common.world_ptr->ball().velocity().length() <=
-               MAX_BALL_SPEED_TO_GET_MS;
-    }
-    else
-    {
-        return true;
-    }
-}
-
- void DefensePlayFSM::prepareGetPossession(
-        const Update& event, PriorityTacticVector tactics_to_return)
-{
-    if (ballNearbyWithoutThreat(event) && (!pass_defenders.empty() || !crease_defenders.empty()))
-    {
-        if (!pass_defenders.empty())
-        {
-            pass_defenders.pop_back();
-        }
-        else if (!crease_defenders.empty())
-        {
-            crease_defenders.pop_back();
-        }
-        auto ball_stealer = std::make_shared<DribbleTactic>(ai_config);
-        Point ball_position       = event.common.world_ptr->ball().position();
-        Point enemy_goal_center   = event.common.world_ptr->field().enemyGoal().centre();
-        Vector ball_to_net_vector = Vector(enemy_goal_center.x() - ball_position.x(),
-                                           enemy_goal_center.y() - ball_position.y());
-        ball_stealer->updateControlParams(
-                ball_position,
-                ball_to_net_vector.orientation(),
-                false);
-        tactics_to_return[0].push_back(ball_stealer);
-    }
-}
-

@@ -12,8 +12,7 @@
 CreaseDefenderTactic::CreaseDefenderTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Move}),
       fsm_map(),
-      control_params({Point(0, 0), std::nullopt,
-                      TbotsProto::CreaseDefenderAlignment::CENTRE,
+      control_params({Point(0, 0), TbotsProto::CreaseDefenderAlignment::CENTRE,
                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}),
       ai_config(ai_config)
 {
@@ -31,12 +30,11 @@ void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
 }
 
 void CreaseDefenderTactic::updateControlParams(
-    const Point &enemy_threat_origin, const std::optional<Point> &block_threat_point,
+    const Point &enemy_threat_origin,
     const TbotsProto::CreaseDefenderAlignment &alignment,
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     control_params.enemy_threat_origin       = enemy_threat_origin;
-    control_params.block_threat_point        = block_threat_point;
     control_params.crease_defender_alignment = alignment;
     control_params.max_allowed_speed_mode    = max_allowed_speed_mode;
 }
@@ -47,21 +45,20 @@ void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<CreaseDefenderFSM>>(
-            CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()));
-        //            DribbleFSM(ai_config.dribble_tactic_config()));
+            CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()),
+            DribbleFSM(ai_config.dribble_tactic_config()));
     }
-    //    Point ball_position       = tactic_update.world_ptr->ball().position();
-    //    Point enemy_goal_center   =
-    //    tactic_update.world_ptr->field().enemyGoal().centre(); Vector ball_to_net_vector
-    //    = Vector(enemy_goal_center.x() - ball_position.x(),
-    //                                       enemy_goal_center.y() - ball_position.y());
-    //    DribbleFSM::ControlParams dribble_control_params{
-    //        .dribble_destination       = ball_position,
-    //        .final_dribble_orientation = ball_to_net_vector.orientation(),
-    //        .allow_excessive_dribbling = false};
+    Point ball_position       = tactic_update.world_ptr->ball().position();
+    Point enemy_goal_center   = tactic_update.world_ptr->field().enemyGoal().centre();
+    Vector ball_to_net_vector = Vector(enemy_goal_center.x() - ball_position.x(),
+                                       enemy_goal_center.y() - ball_position.y());
+    DribbleFSM::ControlParams dribble_control_params{
+        .dribble_destination       = ball_position,
+        .final_dribble_orientation = ball_to_net_vector.orientation(),
+        .allow_excessive_dribbling = false};
 
     fsm_map.at(tactic_update.robot.id())
         ->process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
-    //    fsm_map.at(tactic_update.robot.id())
-    //        ->process_event(DribbleFSM::Update(dribble_control_params, tactic_update));
+    fsm_map.at(tactic_update.robot.id())
+        ->process_event(DribbleFSM::Update(dribble_control_params, tactic_update));
 }

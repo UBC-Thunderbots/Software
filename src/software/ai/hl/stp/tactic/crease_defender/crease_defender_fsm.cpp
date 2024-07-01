@@ -58,8 +58,9 @@ void CreaseDefenderFSM::blockThreat(
         event.common.world_ptr->field().friendlyDefenseArea().expand(
             robot_radius_expansion_amount);
     // right on the edge of the defense area obstacle.
-    // TODO GET RID OF THIS AND PUT IN DEFENSE PLAY, IF BLOCK POINT IS NOT ON CREASE, SET
-    // DEFAULT BEHAVIOUR
+    auto block_threat_point = findBlockThreatPoint(
+        event.common.world_ptr->field(), event.control_params.enemy_threat_origin,
+        event.control_params.crease_defender_alignment, robot_obstacle_inflation_factor);
 
     if (contains(inflated_defense_area, event.control_params.enemy_threat_origin))
     {
@@ -77,9 +78,9 @@ void CreaseDefenderFSM::blockThreat(
                                 -ROBOT_MAX_RADIUS_METERS);
         }
     }
-    else if (event.control_params.block_threat_point)
+    else if (block_threat_point)
     {
-        destination = event.control_params.block_threat_point.value();
+        destination = block_threat_point.value();
     }
     else if (event.control_params.enemy_threat_origin.x() >=
              event.common.world_ptr->field().friendlyDefenseArea().negXNegYCorner().x())
@@ -188,4 +189,42 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
     }
 
     return std::nullopt;
+}
+
+bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
+{
+    Point robot_position = event.common.robot.position();
+    std::optional<Robot> nearest_enemy =
+        event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
+    if (nearest_enemy)
+    {
+        // Get the ball if ball is closer to robot than enemy threat by threshold ratio
+        double ball_distance =
+            distance(robot_position, event.common.world_ptr->ball().position());
+        double nearest_enemy_distance =
+            distance(robot_position, nearest_enemy->position());
+
+        return ball_distance < nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD &&
+               ball_distance <= MAX_GET_BALL_RADIUS_M &&
+               event.common.world_ptr->ball().velocity().length() <=
+                   MAX_BALL_SPEED_TO_GET_MS;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+void CreaseDefenderFSM::prepareGetPossession(
+    const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+{
+    Point ball_position       = event.common.world_ptr->ball().position();
+    Point enemy_goal_center   = event.common.world_ptr->field().enemyGoal().centre();
+    Vector ball_to_net_vector = Vector(enemy_goal_center.x() - ball_position.x(),
+                                       enemy_goal_center.y() - ball_position.y());
+    DribbleFSM::ControlParams control_params{
+        .dribble_destination       = ball_position,
+        .final_dribble_orientation = ball_to_net_vector.orientation(),
+        .allow_excessive_dribbling = false};
+    processEvent(DribbleFSM::Update(control_params, event.common));
 }

@@ -90,37 +90,12 @@ void FreeKickPlay::chipAtGoalStage(
     do
     {
         chip_tactic->updateControlParams(world_ptr->ball().position(), chip_target);
-        // TODO: This is disgusting, we should pass this responsibility to defense play
-        // fsm instead
-        double robot_obstacle_inflation_factor =
-            ai_config.robot_navigation_obstacle_config()
-                .robot_obstacle_inflation_factor() +
-            0.5;
-
-        auto block_threat_point_left = CreaseDefenderFSM::findBlockThreatPoint(
-            world_ptr->field(), world_ptr->ball().position(),
-            TbotsProto::CreaseDefenderAlignment::LEFT, robot_obstacle_inflation_factor);
-
-        auto block_threat_point_right = CreaseDefenderFSM::findBlockThreatPoint(
-            world_ptr->field(), world_ptr->ball().position(),
-            TbotsProto::CreaseDefenderAlignment::RIGHT, robot_obstacle_inflation_factor);
-
-        // What happens here if we have null points?
-        if (block_threat_point_left)
-        {
-            std::get<0>(crease_defender_tactics)
-                ->updateControlParams(world_ptr->ball().position(),
-                                      block_threat_point_left.value(),
-                                      TbotsProto::CreaseDefenderAlignment::LEFT);
-        }
-
-        if (block_threat_point_right)
-        {
-            std::get<1>(crease_defender_tactics)
-                ->updateControlParams(world_ptr->ball().position(),
-                                      block_threat_point_right.value(),
-                                      TbotsProto::CreaseDefenderAlignment::RIGHT);
-        }
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world_ptr->ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world_ptr->ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
 
         yield({{chip_tactic, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -147,37 +122,12 @@ void FreeKickPlay::performPassStage(
         attacker->updateControlParams(pass, true);
         receiver->updateControlParams(pass);
 
-        // TODO: This is disgusting, we should pass this responsibility to defense play
-        // fsm instead
-        double robot_obstacle_inflation_factor =
-            ai_config.robot_navigation_obstacle_config()
-                .robot_obstacle_inflation_factor() +
-            0.5;
-
-        auto block_threat_point_left = CreaseDefenderFSM::findBlockThreatPoint(
-            world_ptr->field(), world_ptr->ball().position(),
-            TbotsProto::CreaseDefenderAlignment::LEFT, robot_obstacle_inflation_factor);
-
-        auto block_threat_point_right = CreaseDefenderFSM::findBlockThreatPoint(
-            world_ptr->field(), world_ptr->ball().position(),
-            TbotsProto::CreaseDefenderAlignment::RIGHT, robot_obstacle_inflation_factor);
-
-        // What happens here if we have null points?
-        if (block_threat_point_left)
-        {
-            std::get<0>(crease_defender_tactics)
-                ->updateControlParams(world_ptr->ball().position(),
-                                      block_threat_point_left.value(),
-                                      TbotsProto::CreaseDefenderAlignment::LEFT);
-        }
-
-        if (block_threat_point_right)
-        {
-            std::get<1>(crease_defender_tactics)
-                ->updateControlParams(world_ptr->ball().position(),
-                                      block_threat_point_right.value(),
-                                      TbotsProto::CreaseDefenderAlignment::RIGHT);
-        }
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world_ptr->ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world_ptr->ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
         yield({{attacker, receiver, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
     } while (!receiver->done());
@@ -232,37 +182,12 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
             TbotsProto::ObstacleAvoidanceMode::SAFE);
 
-        // TODO: This is disgusting, we should pass this responsibility to defense play
-        // fsm instead
-        double robot_obstacle_inflation_factor =
-            ai_config.robot_navigation_obstacle_config()
-                .robot_obstacle_inflation_factor() +
-            0.5;
-
-        auto block_threat_point_left = CreaseDefenderFSM::findBlockThreatPoint(
-            world_ptr->field(), world_ptr->ball().position(),
-            TbotsProto::CreaseDefenderAlignment::LEFT, robot_obstacle_inflation_factor);
-
-        auto block_threat_point_right = CreaseDefenderFSM::findBlockThreatPoint(
-            world_ptr->field(), world_ptr->ball().position(),
-            TbotsProto::CreaseDefenderAlignment::RIGHT, robot_obstacle_inflation_factor);
-
-        // What happens here if we have null points?
-        if (block_threat_point_left)
-        {
-            std::get<0>(crease_defender_tactics)
-                ->updateControlParams(world_ptr->ball().position(),
-                                      block_threat_point_left.value(),
-                                      TbotsProto::CreaseDefenderAlignment::LEFT);
-        }
-
-        if (block_threat_point_right)
-        {
-            std::get<1>(crease_defender_tactics)
-                ->updateControlParams(world_ptr->ball().position(),
-                                      block_threat_point_right.value(),
-                                      TbotsProto::CreaseDefenderAlignment::RIGHT);
-        }
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world_ptr->ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world_ptr->ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
         yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
                 std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -295,38 +220,12 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
             TbotsProto::ObstacleAvoidanceMode::SAFE);
 
-        // TODO: This is disgusting, we should pass this responsibility to defense play
-        // fsm instead
-        double robot_obstacle_inflation_factor =
-            ai_config.robot_navigation_obstacle_config()
-                .robot_obstacle_inflation_factor() +
-            0.5;
-
-        auto block_threat_point_left = CreaseDefenderFSM::findBlockThreatPoint(
-            world_ptr->field(), world_ptr->ball().position(),
-            TbotsProto::CreaseDefenderAlignment::LEFT, robot_obstacle_inflation_factor);
-
-        auto block_threat_point_right = CreaseDefenderFSM::findBlockThreatPoint(
-            world_ptr->field(), world_ptr->ball().position(),
-            TbotsProto::CreaseDefenderAlignment::RIGHT, robot_obstacle_inflation_factor);
-
-        // What happens here if we have null points?
-        if (block_threat_point_left)
-        {
-            std::get<0>(crease_defender_tactics)
-                ->updateControlParams(world_ptr->ball().position(),
-                                      block_threat_point_left.value(),
-                                      TbotsProto::CreaseDefenderAlignment::LEFT);
-        }
-
-        if (block_threat_point_right)
-        {
-            std::get<1>(crease_defender_tactics)
-                ->updateControlParams(world_ptr->ball().position(),
-                                      block_threat_point_right.value(),
-                                      TbotsProto::CreaseDefenderAlignment::RIGHT);
-        }
-
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world_ptr->ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world_ptr->ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
         yield({{align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
                 cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});

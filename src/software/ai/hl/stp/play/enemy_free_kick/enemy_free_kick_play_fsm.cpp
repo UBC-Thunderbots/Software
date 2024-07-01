@@ -45,7 +45,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
         enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
         ai_config.defense_play_config().defender_assignment_config());
 
-    if (assignments.empty())
+    if (assignments.size() == 0)
     {
         return;
     }
@@ -146,7 +146,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     // we intend to assign has changed
     setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
     setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
-    updateCreaseDefenderControlParams(event, crease_defender_assignments);
+    setAlignment(event, crease_defender_assignments);
     updatePassDefenderControlParams(pass_defender_assignments);
 
     tactics_to_return[1].insert(tactics_to_return[1].end(), crease_defenders.begin(),

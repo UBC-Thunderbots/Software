@@ -27,22 +27,6 @@ struct DefensePlayFSM : public DefensePlayFSMBase
      */
     void defendAgainstThreats(const Update& event);
 
-    /**
-     * Checks if the ball is near one of our robots and unguarded by the enemy
-     *
-     * @param event DefensePlayFSM::Update event
-     *
-     * @return true if the ball is near our robots and unguarded by the enemy
-     */
-    bool ballNearbyWithoutThreat(const Update& event);
-
-    /**
-     * This is the Action that prepares for getting possession of the ball
-     * @param event CreaseDefenderFSM::Update event
-     * @param tactics_to_return the tactics vector to add steal tactic to
-     */
-    void prepareGetPossession(const Update& event, PriorityTacticVector tactics_to_return);
-
     auto operator()()
     {
         using namespace boost::sml;
@@ -58,18 +42,4 @@ struct DefensePlayFSM : public DefensePlayFSMBase
             *DefenseState_S + Update_E / defendAgainstThreats_A = DefenseState_S,
             X + Update_E                                        = X);
     }
-
-        private:
-        /** Max distance ratio between (crease and ball) / (crease and nearest enemy)
-        for
-         * crease to chase ball. Scale from (0, 1) Crease | <----------------------->
-         Enemy |
-         * <----> Ball                |
-         *  ()         o                 ()
-         */
-        static constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.5;
-        // Max distance that the crease will try and get possession of a ball
-        static constexpr double MAX_GET_BALL_RADIUS_M = 1.5;
-        // Max speed of ball that crease will try and get possession
-        static constexpr double MAX_BALL_SPEED_TO_GET_MS = 0.5;
 };

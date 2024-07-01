@@ -7,22 +7,20 @@ load("@simulated_tests_deps//:requirements.bzl", "requirement")
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
 
 cc_library(
-    name = "defense_play",
+    name = "crease_defense_play",
     srcs = [
-        "defense_play.cpp",
-        "defense_play_fsm.cpp",
+        "crease_defense_play.cpp",
+        "crease_defense_play_fsm.cpp",
     ],
     hdrs = [
-        "defense_play.h",
-        "defense_play_fsm.h",
+        "crease_defense_play.h",
+        "crease_defense_play_fsm.h",
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/evaluation:defender_assignment",
         "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/play/defense:defense_play_base",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
+        "//software/geom/algorithms",
         "//software/logger",
         "//software/util/generic_factory",
         "@sml",
@@ -31,9 +29,9 @@ cc_library(
 )
 
 py_test(
-    name = "defense_play_test",
+    name = "crease_defense_play_test",
     srcs = [
-        "defense_play_test.py",
+        "crease_defense_play_test.py",
     ],
     # TODO (#2619) Remove tag to run in parallel
     tags = [
@@ -47,30 +45,25 @@ py_test(
 )
 
 cc_test(
-    name = "defense_play_fsm_test",
-    srcs = ["defense_play_fsm_test.cpp"],
+    name = "crease_defense_play_cpp_test",
+    srcs = ["crease_defense_play_test.cpp"],
     deps = [
-        ":defense_play",
+        ":crease_defense_play",
         "//shared/test_util:tbots_gtest_main",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
+        "//software/simulated_tests/non_terminating_validation_functions",
+        "//software/simulated_tests/terminating_validation_functions",
+        "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
     ],
 )
 
-cc_library(
-    name = "defense_play_base",
-    srcs = [
-        "defense_play_base.cpp",
-    ],
-    hdrs = [
-        "defense_play_base.h",
-    ],
+cc_test(
+    name = "crease_defense_play_fsm_test",
+    srcs = ["crease_defense_play_fsm_test.cpp"],
     deps = [
-        "//shared:constants",
-        "//software/ai/evaluation:defender_assignment",
-        "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
+        ":crease_defense_play",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
