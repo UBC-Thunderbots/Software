@@ -4,8 +4,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/geom/algorithms/distance.h"
 #include "software/world/field.h"
 
@@ -27,34 +27,20 @@ class Strategy
 
     /**
      * Gets the best pass on the field.
-     * 
+     *
      * @return the best pass
      */
     PassWithRating getBestPass();
 
     /**
-     * Gets the next committed pass that has not yet been returned by this method
-     * since the last World update.
+     * Gets the best receiving positions for the friendly robots to go to.
      * 
-     * @return the next committed pass, or std::nullopt if there are no more 
-     * committed passes to return
+     * @see ReceiverPositionGenerator::getBestReceivingPositions
      */
-    std::optional<Pass> getNextCommittedPass();
-
-    /**
-     * Commits a pass.
-     * 
-     * @param pass the pass to commit
-     */
-    void commitPass(Pass pass);
-    
-    /**
-     * Gets the next best receiving position on the field that has not yet been 
-     * returned by this method since the last World update.
-     * 
-     * @return the next best receiving position
-     */
-    Point getNextBestReceivingPosition();
+    std::vector<Point> getBestReceivingPositions(
+        unsigned int num_positions,
+        const std::vector<Point> &existing_receiver_positions = {},
+        const std::optional<Point> &pass_origin_override      = std::nullopt);
 
     /**
      * Gets the best shot on goal for the given robot.
@@ -64,6 +50,16 @@ class Strategy
      * @returns the best shot on goal, if one exists
      */
     std::optional<Shot> getBestShot(const Robot& robot);
+    
+    /**
+     * Gets the best shot on goal by sampling multiple potential shot origin 
+     * points for the given robot.
+     *
+     * @param robot the robot to find the best shot for
+     *
+     * @returns the best shot on goal found by sampling, if one exists
+     */
+    std::optional<Shot> getBestSampledShot(const Robot& robot);
 
     /**
      * Gets the current AI configuration in use.
@@ -95,11 +91,7 @@ class Strategy
     ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator_;
 
     std::optional<PassWithRating> best_pass_;
-    std::vector<Pass> committed_passes_;
-    size_t committed_passes_index_;
-
-    std::vector<Point> receiving_positions_;
-    size_t receiving_positions_index_;
 
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
+    std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_sampled_shot_;
 };

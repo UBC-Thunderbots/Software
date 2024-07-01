@@ -279,6 +279,7 @@ void GoalieFSM::retrieveFromDeadZone(
         .allow_excessive_dribbling = false,
     };
 
-    processEvent(DribbleSkillFSM::Update(control_params, SkillUpdate(
-        event.common.robot, event.common.world_ptr, strategy, event.common.set_primitive)));
+    processEvent(DribbleSkillFSM::Update(
+        control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
+                                    event.common.set_primitive)));
 }

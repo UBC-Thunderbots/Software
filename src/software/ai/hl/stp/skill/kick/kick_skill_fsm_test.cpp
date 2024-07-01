@@ -6,6 +6,8 @@
 
 TEST(KickSkillFSMTest, test_transitions)
 {
+    std::shared_ptr<Strategy> strategy =
+        std::make_shared<Strategy>(TbotsProto::AiConfig());
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
     KickSkillFSM::ControlParams control_params{.kick_origin    = Point(-2, 1.5),
@@ -21,7 +23,7 @@ TEST(KickSkillFSMTest, test_transitions)
 
     // Transition to GetBehindBallSkillFSM state's GetBehindBallState
     fsm.process_event(KickSkillFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+        control_params, SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallSkillFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallSkillFSM>)>(
         boost::sml::state<GetBehindBallSkillFSM::GetBehindBallState>));
@@ -32,7 +34,7 @@ TEST(KickSkillFSMTest, test_transitions)
                              AngularVelocity::zero()),
                   Timestamp::fromSeconds(123));
     fsm.process_event(KickSkillFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+        control_params, SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     // Transition to KickState
     EXPECT_TRUE(fsm.is(boost::sml::state<KickSkillFSM::KickState>));
 
@@ -42,6 +44,6 @@ TEST(KickSkillFSMTest, test_transitions)
 
     // Tactic is done
     fsm.process_event(KickSkillFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+        control_params, SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }

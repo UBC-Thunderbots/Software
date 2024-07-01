@@ -82,6 +82,14 @@ http_archive(
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
 )
 
+http_archive(
+    name = "csv",
+    build_file = "@//extlibs:csv.BUILD",
+    sha256 = "83170169f2af38b171d7c3e127d9411fe381988a4b8910465f7d1c4c6169e815",
+    strip_prefix = "csv-parser-2.2.3",
+    url = "https://github.com/vincentlaucsb/csv-parser/archive/refs/tags/2.2.3.zip",
+)
+
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(

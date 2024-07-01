@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactics.h"
+#include "software/ai/hl/stp/skill/chip/chip_skill.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 

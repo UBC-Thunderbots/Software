@@ -10,6 +10,7 @@ cc_library(
         "get_behind_ball_skill_fsm.cpp",
     ],
     hdrs = [
+        "get_behind_ball_skill.h",
         "get_behind_ball_skill_fsm.h",
     ],
     deps = [

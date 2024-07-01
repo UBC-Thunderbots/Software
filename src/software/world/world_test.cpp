@@ -209,8 +209,12 @@ TEST_F(WorldTest, update_referee_stage)
 
 TEST_F(WorldTest, set_team_with_possession)
 {
-    world.setTeamWithPossession(TeamPossession::FRIENDLY_TEAM);
-    EXPECT_EQ(world.getTeamWithPossession(), TeamPossession::FRIENDLY_TEAM);
-    world.setTeamWithPossession(TeamPossession::ENEMY_TEAM);
-    EXPECT_EQ(world.getTeamWithPossession(), TeamPossession::ENEMY_TEAM);
+    world.setTeamWithPossession(TeamPossession::FRIENDLY);
+    EXPECT_EQ(world.getTeamWithPossession(), TeamPossession::FRIENDLY);
+    world.setTeamWithPossession(TeamPossession::ENEMY);
+    EXPECT_EQ(world.getTeamWithPossession(), TeamPossession::ENEMY);
+    world.setTeamWithPossession(TeamPossession::IN_CONTEST);
+    EXPECT_EQ(world.getTeamWithPossession(), TeamPossession::IN_CONTEST);
+    world.setTeamWithPossession(TeamPossession::LOOSE);
+    EXPECT_EQ(world.getTeamWithPossession(), TeamPossession::LOOSE);
 }

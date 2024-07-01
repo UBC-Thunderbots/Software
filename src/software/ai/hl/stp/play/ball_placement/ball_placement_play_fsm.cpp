@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
 
+#include "software/geom/algorithms/contains.h"
+
 BallPlacementPlayFSM::BallPlacementPlayFSM(std::shared_ptr<Strategy> strategy)
     : ai_config(strategy->getAiConfig()),
       pivot_kick_tactic(std::make_shared<WallKickoffSkillTactic>(strategy)),

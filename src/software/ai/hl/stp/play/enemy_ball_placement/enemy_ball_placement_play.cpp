@@ -27,5 +27,6 @@ std::vector<std::string> EnemyBallPlacementPlay::getState()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, std::shared_ptr<Strategy>>
+static TGenericFactory<std::string, Play, EnemyBallPlacementPlay,
+                       std::shared_ptr<Strategy>>
     factory;

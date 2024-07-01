@@ -14,7 +14,7 @@ PossessionTracker::PossessionTracker(const TbotsProto::PossessionTrackerConfig &
       time_near_enemy(Duration::fromSeconds(0)),
       time_far_friendly(Duration::fromSeconds(0)),
       time_far_enemy(Duration::fromSeconds(0)),
-      possession(TeamPossession::FRIENDLY_TEAM)
+      possession(TeamPossession::LOOSE)
 {
 }
 
@@ -31,44 +31,24 @@ TeamPossession PossessionTracker::getTeamWithPossession(const Team &friendly_tea
     if ((time_near_friendly > time_near_threshold) &&
         (time_near_enemy < time_near_threshold))
     {
-        possession = TeamPossession::FRIENDLY_TEAM;
+        possession = TeamPossession::FRIENDLY;
     }
     else if ((time_near_friendly < time_near_threshold) &&
              (time_near_enemy > time_near_threshold))
     {
-        possession = TeamPossession::ENEMY_TEAM;
+        possession = TeamPossession::ENEMY;
     }
     else if ((time_near_friendly > time_near_threshold) &&
              (time_near_enemy > time_near_threshold))
     {
         // Both teams are considered to have presence over the ball.
-        // If the ball is on our side of the field, or there are enemy robots
-        // on our side of the field, consider enemy team as having possession.
-
-        auto enemy_team_robots = enemy_team.getAllRobotsExceptGoalie();
-        auto num_enemies_in_friendly_half =
-            std::count_if(enemy_team_robots.begin(), enemy_team_robots.end(),
-                          [&field](const auto &enemy) {
-                              return field.pointInFriendlyHalf(enemy.position());
-                          });
-
-        if (field.pointInFriendlyHalf(ball.position()) ||
-            num_enemies_in_friendly_half > 0)
-        {
-            possession = TeamPossession::ENEMY_TEAM;
-        }
-        else
-        {
-            possession = TeamPossession::FRIENDLY_TEAM;
-        }
+        possession = TeamPossession::IN_CONTEST;
     }
     else if ((time_far_friendly > time_far_threshold) &&
              (time_far_enemy > time_far_threshold))
     {
         // No team has presence over the ball.
-        // Consider our team as having possession since we should seek to gain
-        // possession of the ball.
-        possession = TeamPossession::FRIENDLY_TEAM;
+        possession = TeamPossession::LOOSE;
     }
 
     return possession;

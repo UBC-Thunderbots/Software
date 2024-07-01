@@ -7,11 +7,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "shoot_skill",
     srcs = [
-        "shoot_skill.cpp",
         "shoot_skill_fsm.cpp",
     ],
     hdrs = [
-        "shoot_skill.h",
+        "shoot_skill.hpp",
         "shoot_skill_fsm.h",
     ],
     deps = [

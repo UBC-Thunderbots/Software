@@ -26,6 +26,7 @@ message Tactic
         StopTactic stop                                     = 14;
         PassDefenderTactic pass_defender                    = 15;
         ShootSkillTactic shoot_skill                        = 16;
+        KickSkillTactic kick_skill                          = 17;
     }
     reserved 2, 4, 5, 7, 11;
 }
@@ -89,10 +90,10 @@ message PenaltyKickTactic {}
 
 message ReceiverTactic
 {
-    // The pass to receive
-    optional Pass pass = 1;
-    // If set to true, we will only receive and dribble
-    required bool disable_one_touch_shot = 2;
+    // The point at which to receive the pass
+    optional Point receiving_position = 1;
+    // If set to false, we will only receive and dribble
+    required bool enable_one_touch_shot = 2;
 }
 
 message ShadowEnemyTactic
@@ -109,3 +110,13 @@ message ShadowEnemyTactic
 message StopTactic {}
 
 message ShootSkillTactic {}
+
+message KickSkillTactic 
+{
+    // The location where the kick will be taken from
+    required Point kick_origin = 1;
+    // The direction the Robot will kick in
+    required Angle kick_direction = 2;
+    // How fast the Robot will kick the ball in meters per second
+    required double kick_speed_meters_per_second = 3;
+}

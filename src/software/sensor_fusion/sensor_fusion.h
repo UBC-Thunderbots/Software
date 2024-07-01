@@ -106,6 +106,11 @@ class SensorFusion
     std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet);
 
     /**
+     * Updates the distance that the friendly team has continuously dribbled the ball.
+     */
+    void updateDistanceDribbledByFriendlyTeam();
+
+    /**
      *Inverts all positions and orientations across the x and y axis
      *
      * @param Detection to invert
@@ -128,16 +133,6 @@ class SensorFusion
      */
     void resetWorldComponents();
 
-    /**
-     * Determines if the team has control over the given ball
-     *
-     * @param team The team to check
-     * @param ball The ball to check
-     *
-     * @return whether the team has control over the ball
-     */
-    static bool teamHasBall(const Team &team, const Ball &ball);
-
     TbotsProto::SensorFusionConfig sensor_fusion_config;
     std::optional<Field> field;
     std::optional<Ball> ball;
@@ -152,6 +147,12 @@ class SensorFusion
 
     TeamPossession possession;
     std::shared_ptr<PossessionTracker> possession_tracker;
+
+    // Points on the field where a friendly bot initially touched the ball
+    std::map<RobotId, Point> ball_contacts_by_friendly_robots;
+
+    // Distance in meters that the friendly team has continuously dribbled the ball
+    double distance_dribbled_by_friendly_team;
 
     std::optional<RobotId> friendly_robot_id_with_ball_in_dribbler;
 

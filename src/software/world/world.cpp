@@ -14,7 +14,8 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       // Store a small buffer of previous referee commands so we can filter out noise
       referee_command_history_(REFEREE_COMMAND_BUFFER_SIZE),
       referee_stage_history_(REFEREE_COMMAND_BUFFER_SIZE),
-      team_with_possession_(TeamPossession::FRIENDLY_TEAM)
+      team_with_possession_(TeamPossession::LOOSE),
+      distance_dribbled_by_friendly_team_(0)
 {
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
@@ -164,12 +165,22 @@ const RefereeStage &World::getRefereeStage() const
     return current_referee_stage_;
 }
 
-void World::setTeamWithPossession(TeamPossession team_with_possesion)
+void World::setTeamWithPossession(TeamPossession possession)
 {
-    team_with_possession_ = team_with_possesion;
+    team_with_possession_ = possession;
 }
 
 TeamPossession World::getTeamWithPossession() const
 {
     return team_with_possession_;
+}
+
+void World::setDistanceDribbledByFriendlyTeam(double distance)
+{
+    distance_dribbled_by_friendly_team_ = distance;
+}
+
+double World::getDistanceDribbledByFriendlyTeam() const
+{
+    return distance_dribbled_by_friendly_team_;
 }

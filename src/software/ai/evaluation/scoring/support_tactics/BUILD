@@ -30,16 +30,6 @@ cc_library(
 )
 
 cc_library(
-    name = "feasibility_scorer",
-    srcs = ["feasibility_scorer.cpp"],
-    hdrs = ["feasibility_scorer.h"],
-    deps = [
-        ":support_tactic_candidate",
-        ":support_tactic_scorer",
-    ],
-)
-
-cc_library(
     name = "success_scorer",
     srcs = ["success_scorer.cpp"],
     hdrs = ["success_scorer.h"],

@@ -109,7 +109,7 @@ double Pass::getPassSpeed(const Point& ball_position, const Point& pass_destinat
 
     double squared_pass_speed =
         (pow(dest_speed_m_per_s, 2) -
-         2 * -BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED *
+         2 * BALL_ROLLING_FRICTION_DECELERATION_METERS_PER_SECOND_SQUARED *
              pass_distance_length_m) /
         pass_speed_calc_constant;
     double pass_speed_m_per_s = sqrt(squared_pass_speed);

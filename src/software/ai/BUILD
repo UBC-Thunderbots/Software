@@ -63,8 +63,8 @@ cc_library(
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:shot",
         "//software/ai/passing:eighteen_zone_pitch_division",
-        "//software/ai/passing:receiver_position_generator",
         "//software/ai/passing:pass_generator",
+        "//software/ai/passing:receiver_position_generator",
         "//software/world:field",
     ],
 )

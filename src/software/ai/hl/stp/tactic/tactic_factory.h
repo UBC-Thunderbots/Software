@@ -2,6 +2,7 @@
 
 #include "proto/tactic.pb.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
+#include "software/ai/hl/stp/skill/all_skills.h"
 
 /**
  * Creates a tactic given a tactic proto
@@ -35,6 +36,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ShadowEnemyTactic &tactic
 std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ShootSkillTactic &tactic_proto,
+                                     std::shared_ptr<Strategy> strategy);
+std::shared_ptr<Tactic> createTactic(const TbotsProto::KickSkillTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
 
 /**

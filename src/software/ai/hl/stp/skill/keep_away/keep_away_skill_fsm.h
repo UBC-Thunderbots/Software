@@ -43,6 +43,7 @@ struct KeepAwaySkillFSM
             // src_state + event [guard] / action = dest_state
             *DribbleSkillFSM_S + Update_E[isPossessionThreatened_G] / keepAway_A,
             DribbleSkillFSM_S + Update_E / SET_STOP_PRIMITIVE_ACTION = X,
-            DribbleSkillFSM_S = X, X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
+            DribbleSkillFSM_S = X, 
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 };

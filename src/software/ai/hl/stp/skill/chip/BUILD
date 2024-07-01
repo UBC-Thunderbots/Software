@@ -10,6 +10,7 @@ cc_library(
         "chip_skill_fsm.cpp",
     ],
     hdrs = [
+        "chip_skill.h",
         "chip_skill_fsm.h",
     ],
     deps = [

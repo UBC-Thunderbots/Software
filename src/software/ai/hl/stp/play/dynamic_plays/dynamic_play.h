@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/evaluation/scoring/support_tactics/duplication_scorer.h"
-#include "software/ai/evaluation/scoring/support_tactics/feasibility_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/success_scorer.h"
 #include "software/ai/evaluation/scoring/support_tactics/support_tactic_candidate.hpp"
 #include "software/ai/hl/stp/play/play.h"
@@ -12,33 +11,31 @@
  * on the Play's success. This enables the Play to "learn" which tactics are
  * most effective for a given gameplay scenario.
  *
- * Every time we select and run the DynamicPlay, we call it an iteration of the play.
- * At the start of each iteration, the DynamicPlay chooses which support tactics
- * to run and commits to those tactics for the length of the iteration.
- * When the iteration ends, the DynamicPlay's performance over the iteration
+ * We call each time we select and run the DynamicPlay an episode.
+ * At the start of each episode, the DynamicPlay chooses which support tactics
+ * to run and commits to those tactics for the length of the episode.
+ * When the episode terminates, the DynamicPlay's performance over the episode
  * is evaluated, and the assessment is used to either encourage or discourage
- * selection of the iteration's chosen support tactics in future iterations.
+ * selection of the episodes' chosen support tactics in future episodes.
  */
 class DynamicPlay : public Play
 {
    public:
     /**
-     * Evaluate the DynamicPlay and start a new iteration
+     * Terminate the current episode of the DynamicPlay and reset the play
+     * for a new episode
      *
-     * @param score score between [-1, 1] rating the success of the DynamicPlay
-     * for the current iteration
+     * @param world_ptr the World at the end of the current episode
      */
-    virtual void evaluate(double score);
+    virtual void terminate(const WorldPtr &world_ptr);
 
    protected:
     /**
      * Base constructor for DynamicPlay
      *
      * @param strategy the Strategy
-     * @param feasibility_scorer the feasibility scorer for the play
      */
-    explicit DynamicPlay(std::shared_ptr<Strategy> strategy,
-                         std::unique_ptr<FeasibilityScorer> feasibility_scorer);
+    explicit DynamicPlay(std::shared_ptr<Strategy> strategy);
 
     DynamicPlay() = delete;
 
@@ -54,10 +51,9 @@ class DynamicPlay : public Play
      */
     void updateSupportTactics(unsigned int num_supporters);
 
-    std::vector<std::shared_ptr<Tactic>> support_tactics_;
+    std::vector<std::shared_ptr<SupportTactic>> support_tactics_;
     std::vector<std::shared_ptr<SupportTacticCandidate>> support_tactic_candidates_;
 
-    std::unique_ptr<FeasibilityScorer> support_tactic_feasibility_scorer_;
     std::unique_ptr<DuplicationScorer> support_tactic_duplication_scorer_;
     std::unique_ptr<SuccessScorer> support_tactic_success_scorer_;
 };

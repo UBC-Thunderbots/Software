@@ -3,6 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/time_to_travel.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/optimization/gradient_descent_optimizer.hpp"
 
 std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &ball,
@@ -17,7 +18,8 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     // This is the objective function that we want to minimize, finding the
     // shortest duration in the future at which we can feasibly intercept the
     // ball
-    auto objective_function = [&](std::array<double, 1> x) {
+    auto objective_function = [&](std::array<double, 1> x)
+    {
         // We take the absolute value here because a negative time makes no sense
         double duration = std::abs(x.at(0));
 
@@ -85,4 +87,41 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     }
 
     return std::make_pair(best_ball_intercept_pos, time_to_ball_pos);
+}
+
+Point findInterceptionPoint(const Robot &robot, const Ball &ball, const Field &field,
+                            double ball_moving_slow_speed_threshold,
+                            double intercept_position_search_interval)
+{
+    if (ball.velocity().length() < ball_moving_slow_speed_threshold)
+    {
+        auto face_ball_vector = (ball.position() - robot.position());
+        auto point_in_front_of_ball =
+            robotPositionToFaceBall(ball.position(), face_ball_vector.orientation());
+        return point_in_front_of_ball;
+    }
+
+    Point intercept_position = ball.position();
+    while (contains(field.fieldLines(), intercept_position))
+    {
+        Duration ball_time_to_pos = Duration::fromSeconds(
+            distance(intercept_position, ball.position()) / ball.velocity().length());
+        Duration robot_time_to_pos = robot.getTimeToPosition(intercept_position);
+
+        if (robot_time_to_pos < ball_time_to_pos)
+        {
+            break;
+        }
+        intercept_position +=
+            ball.velocity().normalize(intercept_position_search_interval);
+    }
+    return intercept_position;
+}
+
+Point robotPositionToFaceBall(const Point &ball_position, const Angle &face_ball_angle,
+                              double additional_offset)
+{
+    return ball_position - Vector::createFromAngle(face_ball_angle)
+                               .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                                          BALL_MAX_RADIUS_METERS + additional_offset);
 }

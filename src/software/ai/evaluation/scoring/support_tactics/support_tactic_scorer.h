@@ -25,7 +25,7 @@ class SupportTacticScorer
      *
      * @return the score for the SupportTacticCandidate, in the range [-1.0, 1.0]
      */
-    double score(const TypedSupportTacticCandidate<Tactic> &candidate) = delete;
+    double score(const TypedSupportTacticCandidate<SupportTactic> &candidate) = delete;
     virtual double score(
         const TypedSupportTacticCandidate<ReceiverTactic> &candidate) = 0;
 
@@ -35,7 +35,7 @@ class SupportTacticScorer
      *
      * @param candidate the SupportTacticCandidate to visits
      */
-    void update(const TypedSupportTacticCandidate<Tactic> &candidate) = delete;
+    void update(const TypedSupportTacticCandidate<SupportTactic> &candidate) = delete;
     virtual void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) {}
 
     /**

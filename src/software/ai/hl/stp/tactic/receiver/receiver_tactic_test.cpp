@@ -37,7 +37,7 @@ TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
     friendly_robots.emplace_back(robot_state);
 
     auto tactic = std::make_shared<ReceiverTactic>(strategy);
-    tactic->updateControlParams(pass);
+    tactic->updateReceivingPosition(pass.receiverPoint());
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -54,11 +54,6 @@ TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
             // because the robot is free to adjust itself to best receive
             // the pass (and dribble). We only care if the robot received the ball.
             robotReceivedBall(world_ptr, yield);
-
-            while (!tactic->done())
-            {
-                yield("Receiver tactic done but did not receive pass");
-            }
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -124,7 +119,7 @@ TEST_P(ReceiverTacticTestOneTouch, test_one_touch)
     friendly_robots.emplace_back(robot_state);
 
     auto tactic = std::make_shared<ReceiverTactic>(strategy);
-    tactic->updateControlParams(pass);
+    tactic->updateReceivingPosition(pass.receiverPoint());
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
