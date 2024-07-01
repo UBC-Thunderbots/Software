@@ -14,8 +14,8 @@
 #include "software/ai/hl/stp/play/stop_play.h"
 
 
-PlaySelectionFSM::PlaySelectionFSM(TbotsProto::AiConfig ai_config) : 
-    ai_config(ai_config), current_set_play(NONE)
+PlaySelectionFSM::PlaySelectionFSM(TbotsProto::AiConfig ai_config)
+    : ai_config(ai_config), current_set_play(NONE)
 {
 }
 
@@ -125,5 +125,5 @@ void PlaySelectionFSM::setupOffensePlay(const Update& event)
 
 void PlaySelectionFSM::resetSetPlay(const Update& event)
 {
-    current_set_play = NONE;   
+    current_set_play = NONE;
 }
