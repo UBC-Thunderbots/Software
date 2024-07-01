@@ -139,7 +139,7 @@ TEST(CreaseDefenderFSMTest, test_transitions)
     // robot far from destination, ball in friendly half
     fsm.process_event(CreaseDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     auto block_point = CreaseDefenderFSM::findBlockThreatPoint(
         world->field(), control_params.enemy_threat_origin,
@@ -155,11 +155,11 @@ TEST(CreaseDefenderFSMTest, test_transitions)
     // Set robot to the correct position to block the ball
     fsm.process_event(CreaseDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::X));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
     // Check that the FSM stays done
     fsm.process_event(CreaseDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::X));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     robot.updateState(
         RobotState(
@@ -171,5 +171,5 @@ TEST(CreaseDefenderFSMTest, test_transitions)
     // change orientation to make the FSM not done
     fsm.process_event(CreaseDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 }

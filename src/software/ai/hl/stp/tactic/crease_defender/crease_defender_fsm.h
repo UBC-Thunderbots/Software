@@ -106,9 +106,10 @@ struct CreaseDefenderFSM
 
    private:
     /** Max distance ratio between (crease and ball) / (crease and nearest enemy) for
-     * crease to chase ball. Scale from (0, 1) Crease | <-----------------------> Enemy |
-     * <----> Ball                |
-     *  ()         o                 ()
+     * crease to chase ball. Scale from (0, 1)
+     * | Crease | <-----------------------> Enemy |
+     * |         <----> Ball                |
+     * |        ()         o                 ()
      */
     static constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.3;
     // Max distance that the crease will try and get possession of a ball
