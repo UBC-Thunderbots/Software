@@ -66,6 +66,8 @@ class BasePass
         return Duration::fromSeconds(0);
     }
 
+    virtual Duration estimateTimeToPoint(Point& point) const;
+
     /**
      * Converts a pass to an array
      *

@@ -54,9 +54,6 @@ class GLGamecontrollerToolbar(GLToolbar):
         self.proto_unix_io = proto_unix_io
         self.friendly_color_yellow = friendly_color_yellow
 
-        # the currently selected play (starts as None)
-        # self.current_selected_play = GamecontrollerPlays.NONE
-
         # Setup Stop button for sending the STOP gamecontroller command
         self.stop_button = self.__setup_icon_button(
             icons.get_stop_icon(self.BUTTON_ICON_COLOR),

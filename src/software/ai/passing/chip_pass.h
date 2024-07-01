@@ -21,6 +21,8 @@ class ChipPass: public BasePass
 
     virtual Duration estimatePassDuration() const;
 
+    virtual Duration estimateTimeToPoint(Point& point) const;
+
     friend std::ostream& operator<<(std::ostream& output_stream, const ChipPass& pass);
 
     virtual bool operator==(const ChipPass& other) const;
@@ -35,4 +37,5 @@ class ChipPass: public BasePass
 
     double first_bounce_range_m;
     double pass_length;
+    std::vector<double> bounce_ranges;
 };

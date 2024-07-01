@@ -56,8 +56,10 @@ message SimulatorTick
 
 message SimulationState
 {
-    required bool is_playing = 1 [default = true];
+    required bool is_playing         = 1 [default = true];
+    required double simulation_speed = 2 [default = 1.0];
 }
+
 message Pass
 {
     // The location of the passer
@@ -68,6 +70,13 @@ message Pass
 
     // The speed of the pass in meters/second
     required double pass_speed_m_per_s = 3;
+}
+
+message Shot
+{
+    required Point shot_origin = 1;
+    required Point shot_target = 2;
+    required Angle open_angle  = 3;
 }
 
 message EnemyThreat

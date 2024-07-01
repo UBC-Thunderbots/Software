@@ -95,6 +95,11 @@ Duration Pass::estimatePassDuration() const
                                  pass_speed_m_per_s);
 }
 
+Duration Pass::estimateTimeToPoint(Point& point) const
+{
+    return Duration::fromSeconds(0);
+}
+
 std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)
 {
      output_stream << "Pass from " << pass.passer_point 

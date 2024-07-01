@@ -2,26 +2,25 @@
 
 
 ChipPass::ChipPass(Point passer_point, Point receiver_point)
-    : BasePass(passer_point, receiver_point)
-{
+    : BasePass(passer_point, receiver_point),
+      bounce_ranges()
+{   
     pass_length = length();
     first_bounce_range_m = calcFirstBounceRange();
 }
 
 double ChipPass::calcFirstBounceRange() 
 {
-    double last_bounce_range;
+    double last_bounce_range = 0.0;
     double length_to_go = length();
 
-    std::cout << "LENGTH: " << length_to_go << std::endl;
-
     // if we cover more than 90% of the pass, stop calculating
-    while(length_to_go >= pass_length * 0.1)
+    while(length_to_go >= pass_length * 0.2)
     {
         double bounce_height = getBounceHeightFromDistanceTraveled(length_to_go);
         last_bounce_range = getBounceRangeFromBounceHeight(bounce_height);
+        bounce_ranges.push_back(last_bounce_range);
         length_to_go -= last_bounce_range;
-        std::cout << "LENGTH: " << length_to_go << std::endl;
     }
 
     return last_bounce_range;
@@ -29,7 +28,7 @@ double ChipPass::calcFirstBounceRange()
 
 double ChipPass::getBounceHeightFromDistanceTraveled(double distance_traveled)
 {
-    return 0.0306 * std::exp(-2.04 * (distance_traveled - pass_length));
+    return 2 * std::exp(-1.61 * (distance_traveled + 2.82 - pass_length));
 }
 
 double ChipPass::getBounceRangeFromBounceHeight(double bounce_height)
@@ -43,6 +42,11 @@ double ChipPass::firstBounceRange()
 }
 
 Duration ChipPass::estimatePassDuration() const
+{
+    return Duration::fromSeconds(0);
+}
+
+Duration ChipPass::estimateTimeToPoint(Point& point) const
 {
     return Duration::fromSeconds(0);
 }

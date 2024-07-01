@@ -88,8 +88,11 @@ void SimBall::begin(bool robot_collision)
     const btVector3 velocity = m_body->getLinearVelocity();
     LOG(PLOTJUGGLER) << *createPlotJugglerValue({
         {"dist", std::sqrt(pow(p.x() - 0, 2) + pow(p.y() - 0, 2))},
-        {"z", p.z()}
+        {"z", p.z()},
+        {"speed", velocity.length()}
     });
+
+    std::cout << "SPEED: " << velocity.length() << std::endl;
     if (p.z() < static_cast<float>(BALL_MAX_RADIUS_METERS) * 1.1f * SIMULATOR_SCALE)
     {  // ball is on the ground
         bool is_stationary =

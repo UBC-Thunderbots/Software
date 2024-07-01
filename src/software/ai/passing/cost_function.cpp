@@ -13,7 +13,19 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/logger/logger.h"
 
-double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
+double rateGroundPass(const World& world, const Pass& pass, const Rectangle& zone,
+                TbotsProto::PassingConfig passing_config)
+{
+    return ratePass(world, pass, zone, world.enemyTeam(), passing_config);
+}
+
+double rateChipPass(const World& world, const ChipPass& pass, const Rectangle& zone,
+                TbotsProto::PassingConfig passing_config)
+{
+    return ratePass(world, pass, zone, world.enemyTeam(), passing_config);
+}
+
+double ratePass(const World& world, const BasePass& pass, const Rectangle& zone, const Team& enemy_team,
                 TbotsProto::PassingConfig passing_config)
 {
     double static_pass_quality =
@@ -26,7 +38,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
         ratePassBackwardsQuality(world.field(), pass, passing_config);
 
     double enemy_pass_rating =
-        ratePassEnemyRisk(world.enemyTeam(), pass,
+        ratePassEnemyRisk(enemy_team, pass,
                           Duration::fromSeconds(passing_config.enemy_reaction_time()),
                           passing_config.enemy_proximity_importance());
 
@@ -39,7 +51,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
            pass_backwards_rating * shoot_pass_rating * in_region_quality;
 }
 
-double ratePassBackwardsQuality(const Field& field, const Pass& pass,
+double ratePassBackwardsQuality(const Field& field, const BasePass& pass,
                                 TbotsProto::PassingConfig& passing_config)
 {
     if (field.pointInFriendlyHalf(pass.receiverPoint()) &&
@@ -96,7 +108,7 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
     return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
 }
 
-double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
+double ratePassShootScore(const Field& field, const Team& enemy_team, const BasePass& pass,
                           TbotsProto::PassingConfig passing_config)
 {
     double ideal_max_rotation_to_shoot_degrees =
@@ -150,7 +162,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     return shot_openness_score * required_rotation_for_shot_score;
 }
 
-double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
+double ratePassEnemyRisk(const Team& enemy_team, const BasePass& pass,
                          const Duration& enemy_reaction_time,
                          double enemy_proximity_importance)
 {
@@ -162,7 +174,7 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
     return 1 - std::max(intercept_risk, enemy_receiver_proximity_risk);
 }
 
-double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
+double calculateInterceptRisk(const Team& enemy_team, const BasePass& pass,
                               const Duration& enemy_reaction_time)
 {
     // Return the highest risk for all the enemy robots, if there are any
@@ -179,7 +191,7 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
-double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
+double calculateInterceptRisk(const Robot& enemy_robot, const BasePass& pass,
                               const Duration& enemy_reaction_time)
 {
     // We estimate the intercept by the risk that the robot will get to the closest
@@ -201,15 +213,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     Duration enemy_robot_time_to_closest_pass_point =
         getTimeToTravelDistance(distance, ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
                                 ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
-        (closest_point_on_pass_to_robot - pass.passerPoint()).length() / pass.speed());
-
-    // Check for division by 0
-    if (pass.speed() == 0)
-    {
-        ball_time_to_closest_pass_point =
-            Duration::fromSeconds(std::numeric_limits<int>::max());
-    }
+    Duration ball_time_to_closest_pass_point = pass.estimateTimeToPoint(closest_point_on_pass_to_robot);
 
     // Figure out how long the enemy robot and ball will take to reach the receive point
     // for the pass.
@@ -237,17 +241,11 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     return 1 - sigmoid(min_time_diff, 0, 1);
 }
 
-double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
+double ratePassFriendlyCapability(const Team& friendly_team, const BasePass& pass,
                                   TbotsProto::PassingConfig passing_config)
 {
     // We need at least one robot to pass to
     if (friendly_team.getAllRobots().empty())
-    {
-        return 0;
-    }
-
-    // Special case where pass speed is 0
-    if (pass.speed() == 0)
     {
         return 0;
     }
@@ -267,8 +265,7 @@ double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
 
     // Figure out what time the robot would have to receive the ball at
     // TODO (#2988): We should generate a more realistic ball trajectory
-    Duration ball_travel_time = Duration::fromSeconds(
-        (pass.receiverPoint() - pass.passerPoint()).length() / pass.speed());
+    Duration ball_travel_time = pass.estimatePassDuration();
     Timestamp receive_time = best_receiver.timestamp() + ball_travel_time;
 
     // Figure out how long it would take our robot to get there
