@@ -26,7 +26,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick)
     // Start in halt
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Halt>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::HaltState>));
     EXPECT_EQ("HaltPlay", objectTypeName(*current_play));
 
     // Stop
@@ -34,7 +34,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick)
     world_ptr->updateGameState(game_state);
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Stop>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::StopState>));
     EXPECT_EQ("StopPlay", objectTypeName(*current_play));
 
     // Penalty kick preparation
@@ -42,7 +42,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick)
     world_ptr->updateGameState(game_state);
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
     EXPECT_EQ("PenaltyKickPlay", objectTypeName(*current_play));
 
     // Normal start
@@ -51,7 +51,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick)
     EXPECT_TRUE(game_state.isReadyState());
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
     EXPECT_EQ("PenaltyKickPlay", objectTypeName(*current_play));
 
     // Playing
@@ -61,7 +61,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick)
     EXPECT_TRUE(game_state.isPlaying());
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlayState>));
 }
 
 TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal_conceded)
@@ -71,7 +71,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
     // Start in halt
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Halt>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::HaltState>));
     EXPECT_EQ("HaltPlay", objectTypeName(*current_play));
 
     // Stop
@@ -79,7 +79,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
     world_ptr->updateGameState(game_state);
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Stop>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::StopState>));
     EXPECT_EQ("StopPlay", objectTypeName(*current_play));
 
     // Penalty kick preparation
@@ -88,7 +88,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isTheirPenalty());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
     EXPECT_EQ("PenaltyKickEnemyPlay", objectTypeName(*current_play));
 
     // Normal start
@@ -97,7 +97,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isReadyState());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
     EXPECT_EQ("PenaltyKickEnemyPlay", objectTypeName(*current_play));
 
     // Goal conceded
@@ -106,7 +106,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isStopped());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Stop>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::StopState>));
     EXPECT_EQ("StopPlay", objectTypeName(*current_play));
 
     // Kickoff preparation
@@ -115,7 +115,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isSetupState());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
     EXPECT_EQ("KickoffFriendlyPlay", objectTypeName(*current_play));
 
     // Normal start
@@ -124,7 +124,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isReadyState());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
     EXPECT_EQ("KickoffFriendlyPlay", objectTypeName(*current_play));
 
     // Ball is kicked and restart state is cleared, enter playing state
@@ -133,7 +133,7 @@ TEST_F(PlaySelectionFSMTest, test_transition_out_of_penalty_kick_enemy_when_goal
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isPlaying());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlayState>));
 }
 
 TEST_F(PlaySelectionFSMTest,
@@ -144,7 +144,7 @@ TEST_F(PlaySelectionFSMTest,
     // Start in halt
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Halt>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::HaltState>));
     EXPECT_EQ("HaltPlay", objectTypeName(*current_play));
 
     // Stop
@@ -152,7 +152,7 @@ TEST_F(PlaySelectionFSMTest,
     world_ptr->updateGameState(game_state);
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Stop>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::StopState>));
     EXPECT_EQ("StopPlay", objectTypeName(*current_play));
 
     // Penalty kick preparation
@@ -161,7 +161,7 @@ TEST_F(PlaySelectionFSMTest,
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isTheirPenalty());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
     EXPECT_EQ("PenaltyKickEnemyPlay", objectTypeName(*current_play));
 
     // Normal start
@@ -170,7 +170,7 @@ TEST_F(PlaySelectionFSMTest,
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isReadyState());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
     EXPECT_EQ("PenaltyKickEnemyPlay", objectTypeName(*current_play));
 
     // Stop because no goal
@@ -179,7 +179,7 @@ TEST_F(PlaySelectionFSMTest,
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isStopped());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Stop>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::StopState>));
     EXPECT_EQ("StopPlay", objectTypeName(*current_play));
 
     // Free kick
@@ -189,7 +189,7 @@ TEST_F(PlaySelectionFSMTest,
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isOurDirectFree());
     EXPECT_TRUE(game_state.isReadyState());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
     EXPECT_EQ("FreeKickPlay", objectTypeName(*current_play));
 
     // Ball is kicked and restart state is cleared, enter playing state
@@ -198,5 +198,69 @@ TEST_F(PlaySelectionFSMTest,
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(game_state.isPlaying());
-    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlay>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlayState>));
+}
+
+TEST_F(PlaySelectionFSMTest, test_transition_between_ball_placement_and_free_kick)
+{
+    std::shared_ptr<Play> current_play = std::make_shared<HaltPlay>(strategy);
+
+    // Start in halt
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::HaltState>));
+    EXPECT_EQ("HaltPlay", objectTypeName(*current_play));
+
+    // Stop
+    game_state.updateRefereeCommand(RefereeCommand::STOP);
+    world_ptr->updateGameState(game_state);;
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::StopState>));
+    EXPECT_EQ("StopPlay", objectTypeName(*current_play));
+
+    // Friendly ball placement
+    game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_US);
+    world_ptr->updateGameState(game_state);
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
+    EXPECT_TRUE(game_state.isOurBallPlacement());
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
+    EXPECT_EQ("BallPlacementPlay", objectTypeName(*current_play));
+
+    // Friendly free kick
+    game_state.updateRefereeCommand(RefereeCommand::DIRECT_FREE_US);
+    world_ptr->updateGameState(game_state);
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
+    EXPECT_TRUE(game_state.isOurDirectFree());
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
+    EXPECT_EQ("FreeKickPlay", objectTypeName(*current_play));
+
+    // Enemy ball placement
+    game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
+    world_ptr->updateGameState(game_state);
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
+    EXPECT_TRUE(game_state.isTheirBallPlacement());
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
+    EXPECT_EQ("EnemyBallPlacementPlay", objectTypeName(*current_play));
+
+    // Enemy free kick
+    game_state.updateRefereeCommand(RefereeCommand::DIRECT_FREE_THEM);
+    world_ptr->updateGameState(game_state);
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
+    EXPECT_TRUE(game_state.isTheirDirectFree());
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlayState>));
+    EXPECT_EQ("EnemyFreeKickPlay", objectTypeName(*current_play));
+
+    // Ball is kicked and restart state is cleared, enter playing state
+    game_state.setRestartCompleted();
+    world_ptr->updateGameState(game_state);
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
+    EXPECT_TRUE(game_state.isPlaying());
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlayState>));
+    EXPECT_EQ("OffensePlay", objectTypeName(*current_play));
 }

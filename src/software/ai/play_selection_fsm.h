@@ -57,12 +57,18 @@ struct PlaySelectionFSM
      *
      * @param event The PlaySelection::Update event
      */
-    void setupOverridePlay(Update event);
     void setupSetPlay(const Update& event);
     void setupStopPlay(const Update& event);
     void setupHaltPlay(const Update& event);
     void setupOffensePlay(const Update& event);
     void setupDefensePlay(const Update& event);
+
+    /**
+     * Action to reset the current SetPlay to none
+     *
+     * @param event The PlaySelection::Update event
+     */
+    void resetSetPlay(const Update& event);
 
     /**
      * Action to terminate the OffensePlay
@@ -94,6 +100,7 @@ struct PlaySelectionFSM
         DEFINE_SML_ACTION(setupHaltPlay)
         DEFINE_SML_ACTION(setupOffensePlay)
         DEFINE_SML_ACTION(setupDefensePlay)
+        DEFINE_SML_ACTION(resetSetPlay)
         DEFINE_SML_ACTION(terminateOffensePlay)
 
         return make_transition_table(
@@ -137,12 +144,17 @@ struct PlaySelectionFSM
             DefensePlayState_S + Update_E[!enemyHasPossession_G] / setupOffensePlay_A =
                 OffensePlayState_S,
 
-            SetPlayState_S + Update_E[gameStateHalted_G] / setupHaltPlay_A  = HaltState_S,
-            SetPlayState_S + Update_E[gameStateStopped_G] / setupStopPlay_A = StopState_S,
+            SetPlayState_S + Update_E[gameStateHalted_G] /
+                                 (resetSetPlay_A, setupHaltPlay_A) = HaltState_S,
+            SetPlayState_S + Update_E[gameStateStopped_G] /
+                                 (resetSetPlay_A, setupStopPlay_A) = StopState_S,
             SetPlayState_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
-                                 setupOffensePlay_A = OffensePlayState_S,
+                                 (resetSetPlay_A, setupOffensePlay_A) =
+                OffensePlayState_S,
             SetPlayState_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
-                                 setupDefensePlay_A = DefensePlayState_S,
+                                 (resetSetPlay_A, setupDefensePlay_A) =
+                DefensePlayState_S,
+            SetPlayState_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A,
 
             X + Update_E = X);
     }
@@ -150,4 +162,19 @@ struct PlaySelectionFSM
    private:
     std::shared_ptr<Strategy> strategy_;
     std::shared_ptr<OffensePlay> offense_play_;
+
+    enum SetPlayType
+    {
+        NONE,
+        FRIENDLY_BALL_PLACEMENT,
+        ENEMY_BALL_PLACEMENT,
+        FRIENDLY_KICKOFF,
+        ENEMY_KICKOFF,
+        FRIENDLY_PENALTY_KICK,
+        ENEMY_PENALTY_KICK,
+        FRIENDLY_FREE_KICK,
+        ENEMY_FREE_KICK,
+    };
+
+    SetPlayType current_set_play_;
 };
