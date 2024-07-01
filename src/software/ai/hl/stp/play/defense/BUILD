@@ -25,6 +25,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
         "//software/logger",
         "//software/util/generic_factory",
+        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "@sml",
     ],
     alwayslink = True,

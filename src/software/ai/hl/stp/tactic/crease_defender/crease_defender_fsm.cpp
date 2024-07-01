@@ -80,7 +80,6 @@ void CreaseDefenderFSM::blockThreat(
     else if (event.control_params.block_threat_point)
     {
         destination = event.control_params.block_threat_point.value();
-        LOG(DEBUG) << "Going To: " << destination;
     }
     else if (event.control_params.enemy_threat_origin.x() >=
              event.common.world_ptr->field().friendlyDefenseArea().negXNegYCorner().x())

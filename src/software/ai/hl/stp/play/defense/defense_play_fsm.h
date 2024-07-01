@@ -27,23 +27,21 @@ struct DefensePlayFSM : public DefensePlayFSMBase
      */
     void defendAgainstThreats(const Update& event);
 
-    //    /**
-    //     * Guard that checks if the ball is nearby and unguarded by the enemy
-    //     *
-    //     * @param event CreaseDefenderFSM::Update event
-    //     *
-    //     * @return if the ball is nearby and unguarded by the enemy
-    //     */
-    //    bool ballNearbyWithoutThreat(const Update& event);
-    //
-    //    /**
-    //     * This is the Action that prepares for getting possession of the ball
-    //     * @param event CreaseDefenderFSM::Update event
-    //     * @param processEvent processes the DribbleFSM::Update
-    //     */
-    //    void prepareGetPossession(const Update& event,
-    //                              boost::sml::back::process<DribbleFSM::Update>
-    //                              processEvent);
+    /**
+     * Checks if the ball is near one of our robots and unguarded by the enemy
+     *
+     * @param event DefensePlayFSM::Update event
+     *
+     * @return true if the ball is near our robots and unguarded by the enemy
+     */
+    bool ballNearbyWithoutThreat(const Update& event);
+
+    /**
+     * This is the Action that prepares for getting possession of the ball
+     * @param event CreaseDefenderFSM::Update event
+     * @param tactics_to_return the tactics vector to add steal tactic to
+     */
+    void prepareGetPossession(const Update& event, PriorityTacticVector tactics_to_return);
 
     auto operator()()
     {
@@ -61,17 +59,17 @@ struct DefensePlayFSM : public DefensePlayFSMBase
             X + Update_E                                        = X);
     }
 
-    //    private:
-    //    /** Max distance ratio between (crease and ball) / (crease and nearest enemy)
-    //    for
-    //     * crease to chase ball. Scale from (0, 1) Crease | <----------------------->
-    //     Enemy |
-    //     * <----> Ball                |
-    //     *  ()         o                 ()
-    //     */
-    //    static constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.3;
-    //    // Max distance that the crease will try and get possession of a ball
-    //    static constexpr double MAX_GET_BALL_RADIUS_M = 1;
-    //    // Max speed of ball that crease will try and get possession
-    //    static constexpr double MAX_BALL_SPEED_TO_GET_MS = 0.5;
+        private:
+        /** Max distance ratio between (crease and ball) / (crease and nearest enemy)
+        for
+         * crease to chase ball. Scale from (0, 1) Crease | <----------------------->
+         Enemy |
+         * <----> Ball                |
+         *  ()         o                 ()
+         */
+        static constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.5;
+        // Max distance that the crease will try and get possession of a ball
+        static constexpr double MAX_GET_BALL_RADIUS_M = 1.5;
+        // Max speed of ball that crease will try and get possession
+        static constexpr double MAX_BALL_SPEED_TO_GET_MS = 0.5;
 };
