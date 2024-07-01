@@ -152,7 +152,7 @@ class ProtoPlayer:
         # print(f"{timestamp=}  {protobuf_type=}  {data=}  {filtered=}") # TODO (NIMA)
 
         # Deserialize protobuf
-        proto = proto_class.FromString(base64.b64decode(data[:-len("\n")]))
+        proto = proto_class.FromString(base64.b64decode(data[: -len("\n")]))
 
         return float(timestamp), proto_class, proto
 

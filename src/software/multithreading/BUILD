@@ -37,7 +37,7 @@ cc_library(
         "thread_safe_buffer.hpp",
     ],
     deps = [
-#        "//software/logger", TODO (NIMA)
+        #        "//software/logger", TODO (NIMA)
         "//software/time:duration",
         "//software/util/typename",
         "@boost//:circular_buffer",

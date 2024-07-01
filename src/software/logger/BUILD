@@ -154,8 +154,8 @@ cc_library(
         "//proto:any_cc_proto",
         "//proto:tbots_cc_proto",
         "//shared:constants",
+        "//software/logger:proto_logger",
         "//software/networking/unix:threaded_unix_sender",
-        "//software/logger:proto_logger_cpp",
         "@base64",
         "@g3log",
     ],
@@ -168,9 +168,8 @@ py_library(
     ],
 )
 
-
 cc_library(
-    name = "proto_logger_cpp",
+    name = "proto_logger",
     srcs = [
         "proto_logger.cpp",
     ],
@@ -178,11 +177,10 @@ cc_library(
         "proto_logger.h",
     ],
     deps = [
+        "//proto:tbots_cc_proto",
         "//software/multithreading:thread_safe_buffer",
         "@base64",
         "@boost//:filesystem",
-#        "@boost//:iostreams",
         "@zlib",
-        "//proto:tbots_cc_proto",
     ],
 )

@@ -49,7 +49,7 @@ cc_library(
     ],
     deps = [
         ":threaded_unix_sender",
-        "//software/logger:proto_logger_cpp",
+        "//software/logger:proto_logger",
     ],
 )
 
@@ -60,7 +60,7 @@ cc_library(
     ],
     deps = [
         ":proto_unix_listener",
-        "//software/logger:proto_logger_cpp",
+        "//software/logger:proto_logger",
         "@boost//:asio",
     ],
 )

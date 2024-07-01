@@ -10,8 +10,9 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-UnixSimulatorBackend::UnixSimulatorBackend(std::string runtime_dir,
-                                           const std::shared_ptr<ProtoLogger>& proto_logger) : proto_logger(proto_logger)
+UnixSimulatorBackend::UnixSimulatorBackend(
+    std::string runtime_dir, const std::shared_ptr<ProtoLogger>& proto_logger)
+    : proto_logger(proto_logger)
 {
     // Protobuf Inputs
     robot_status_input.reset(new ThreadedProtoUnixListener<TbotsProto::RobotStatus>(
@@ -33,11 +34,12 @@ UnixSimulatorBackend::UnixSimulatorBackend(std::string runtime_dir,
     dynamic_parameter_update_request_listener.reset(
         new ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>(
             runtime_dir + DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
-            boost::bind(&UnixSimulatorBackend::receiveThunderbotsConfig, this, _1), proto_logger));
+            boost::bind(&UnixSimulatorBackend::receiveThunderbotsConfig, this, _1),
+            proto_logger));
 
     // Protobuf Outputs
-    world_output.reset(
-        new ThreadedProtoUnixSender<TbotsProto::World>(runtime_dir + WORLD_PATH, proto_logger));
+    world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(
+        runtime_dir + WORLD_PATH, proto_logger));
 
     primitive_output.reset(new ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>(
         runtime_dir + PRIMITIVE_PATH, proto_logger));

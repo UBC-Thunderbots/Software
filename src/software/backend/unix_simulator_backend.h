@@ -6,9 +6,9 @@
 #include "proto/sensor_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
+#include "software/logger/proto_logger.h"
 #include "software/networking/unix/threaded_proto_unix_listener.hpp"
 #include "software/networking/unix/threaded_proto_unix_sender.hpp"
-#include "software/logger/proto_logger.h"
 
 class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::ThunderbotsConfig>
 {

@@ -4,9 +4,10 @@
 //#include <boost/iostreams/filter/gzip.hpp>
 //#include <boost/iostreams/filtering_stream.hpp>
 #include <google/protobuf/message.h>
-#include <experimental/filesystem>
+
 #include <chrono>
 #include <ctime>
+#include <experimental/filesystem>
 #include <fstream>
 #include <iomanip>
 //#include <iostream>
@@ -15,11 +16,13 @@
 //#include <sstream>
 //#include <stdexcept>
 #include <zlib.h>
+
 #include <vector>
 
 #include "base64.h"
 
-ProtoLogger::ProtoLogger(const std::string& log_path, std::function<double()> time_provider)
+ProtoLogger::ProtoLogger(const std::string& log_path,
+                         std::function<double()> time_provider)
     : log_path_(log_path),
       time_provider_(time_provider),
       stop_logging_(false),
@@ -48,7 +51,8 @@ ProtoLogger::~ProtoLogger()
     }
 }
 
-void ProtoLogger::saveSerializedProto(const std::string &protobuf_type_full_name, const std::string &serialized_proto)
+void ProtoLogger::saveSerializedProto(const std::string& protobuf_type_full_name,
+                                      const std::string& serialized_proto)
 {
     buffer_.push(std::make_pair(protobuf_type_full_name, serialized_proto));
 }
@@ -72,13 +76,16 @@ void ProtoLogger::logProtobufs()
             }
 
             gzFile gz_file = gzopen(log_file_path.c_str(), "wb");
-            if (!gz_file) { // TODO (NIMA): On failure, gzopen() shall return Z_NULL and may set errno accordingly.
+            if (!gz_file)
+            {  // TODO (NIMA): On failure, gzopen() shall return Z_NULL and may set errno
+               // accordingly.
                 throw std::runtime_error("Failed to open gzip file");
             }
 
             while (!stop_logging_)
             {
-                auto serialized_proto_opt = buffer_.popLeastRecentlyAddedValue(BUFFER_BLOCK_TIMEOUT);
+                auto serialized_proto_opt =
+                    buffer_.popLeastRecentlyAddedValue(BUFFER_BLOCK_TIMEOUT);
                 if (!serialized_proto_opt.has_value())
                 {
                     // Timed out without getting a new value
@@ -87,14 +94,17 @@ void ProtoLogger::logProtobufs()
 
                 double current_time = time_provider_() - start_time_;
                 const auto& [proto_full_name, serialized_proto] =
-                        serialized_proto_opt.value();
+                    serialized_proto_opt.value();
                 std::stringstream log_entry_ss;
                 log_entry_ss << current_time << REPLAY_METADATA_DELIMETER
                              << proto_full_name << REPLAY_METADATA_DELIMETER
                              << base64_encode(serialized_proto) << "\n";
                 std::string log_entry = log_entry_ss.str();
 
-                gzwrite(gz_file, log_entry.c_str(), static_cast<unsigned>(log_entry.size())); // TODO (NIMA): Check output - Could also use gzputs?! gzprintf
+                gzwrite(gz_file, log_entry.c_str(),
+                        static_cast<unsigned>(
+                            log_entry.size()));  // TODO (NIMA): Check output - Could also
+                                                 // use gzputs?! gzprintf
 
                 if (gzoffset(gz_file) > REPLAY_MAX_CHUNK_SIZE_BYTES)
                 {

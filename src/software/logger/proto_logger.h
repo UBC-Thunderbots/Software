@@ -1,22 +1,26 @@
 #pragma once
 
+#include <google/protobuf/message.h>
+
 #include <functional>
 #include <string>
 #include <thread>
-#include <google/protobuf/message.h>
+
 #include "software/multithreading/thread_safe_buffer.hpp"
 
-//template <typename T=std::pair<std::string, std::string>>
-//class ThreadSafeBuffer;
+// template <typename T=std::pair<std::string, std::string>>
+// class ThreadSafeBuffer;
 
 class ProtoLogger
 {
    public:
-    explicit ProtoLogger(const std::string& log_path, std::function<double()> time_provider = nullptr);
+    explicit ProtoLogger(const std::string& log_path,
+                         std::function<double()> time_provider = nullptr);
 
     ~ProtoLogger();
 
-    void saveSerializedProto(const std::string& protobuf_type_full_name, const std::string& serialized_proto);
+    void saveSerializedProto(const std::string& protobuf_type_full_name,
+                             const std::string& serialized_proto);
 
     template <typename ProtoType>
     inline void saveSerializedProto(const std::string& serialized_proto)

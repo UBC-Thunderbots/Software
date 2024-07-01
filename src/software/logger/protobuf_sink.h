@@ -5,8 +5,8 @@
 
 #include "google/protobuf/any.pb.h"
 #include "software/logger/custom_logging_levels.h"
-#include "software/networking/unix/threaded_unix_sender.h"
 #include "software/logger/proto_logger.h"
+#include "software/networking/unix/threaded_unix_sender.h"
 
 static const std::string TYPE_DELIMITER = "!!!";
 
@@ -23,7 +23,8 @@ class ProtobufSink
      *
      * @param runtime_dir The runtime directory
      */
-    ProtobufSink(std::string runtime_dir, const std::shared_ptr<ProtoLogger>& proto_logger);
+    ProtobufSink(std::string runtime_dir,
+                 const std::shared_ptr<ProtoLogger>& proto_logger);
 
     /*
      * Send the protobuf to /tmp/tbots/(protobuf typename)

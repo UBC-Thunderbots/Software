@@ -7,8 +7,9 @@
 #include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 
-ProtobufSink::ProtobufSink(std::string runtime_dir, const std::shared_ptr<ProtoLogger>& proto_logger) :
-    proto_logger(proto_logger)
+ProtobufSink::ProtobufSink(std::string runtime_dir,
+                           const std::shared_ptr<ProtoLogger>& proto_logger)
+    : proto_logger(proto_logger)
 {
     // Setup the logs
     unix_senders_["log"] = std::make_unique<ThreadedUnixSender>(runtime_dir + "/log");
