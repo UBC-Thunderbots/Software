@@ -57,11 +57,13 @@ struct CreaseDefenderFSM
     }
 
     /**
-     * Guard that checks if the ball is nearby and unguarded by the enemy
+     * Guard that checks if the ball is on friendly side, nearby, and unguarded by the
+     * enemy
      *
      * @param event CreaseDefenderFSM::Update event
      *
-     * @return if the ball is nearby and unguarded by the enemy
+     * @return true if the ball is on friendly side, nearby, unguarded by the enemy up,
+     *          and within a max get possession threshold
      */
     bool ballNearbyWithoutThreat(const Update& event);
 
@@ -105,11 +107,13 @@ struct CreaseDefenderFSM
     }
 
    private:
-    /** Max distance ratio between (crease and ball) / (crease and nearest enemy) for
+    /** Max ratio between distances (crease and ball) / (crease and nearest enemy) for
      * crease to chase ball. Scale from (0, 1)
+     * |------------------------------------------|
      * | Crease | <-----------------------> Enemy |
-     * |         <----> Ball                |
-     * |        ()         o                 ()
+     * |        | <----> Ball                 |   |
+     * |       ()         x                  ()   |
+     * |------------------------------------------|
      */
     static constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.3;
     // Max distance that the crease will try and get possession of a ball
