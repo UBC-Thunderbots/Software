@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "base64.h"
+#include "shared/constants.h"
 
 ProtoLogger::ProtoLogger(const std::string& log_path,
                          std::function<double()> time_provider,
@@ -137,7 +138,7 @@ bool ProtoLogger::shouldStopLogging() const
     double curr_time_sec = std::chrono::duration<double>(
             std::chrono::system_clock::now().time_since_epoch())
             .count();
-    return (curr_time_sec - destructor_called_time_sec_) > MAX_TIME_TO_FLUSH_SEC || buffer_.empty();
+    return (curr_time_sec - destructor_called_time_sec_) > MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC || buffer_.empty();
 }
 
 void ProtoLogger::flushAndStopLogging()

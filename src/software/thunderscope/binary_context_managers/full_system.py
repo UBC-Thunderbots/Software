@@ -3,7 +3,7 @@ import logging
 import time
 import threading
 
-from subprocess import Popen
+from subprocess import Popen, TimeoutExpired
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
 from proto.import_all_protos import *
@@ -42,7 +42,7 @@ class FullSystem(object):
         self.should_run_under_sudo = run_sudo
         self.running_in_realtime = running_in_realtime
 
-        self.thread = threading.Thread(target=self.__restart__)
+        self.thread = threading.Thread(target=self.__restart__, daemon=True)
 
     def __enter__(self) -> "self":
         """Enter the full_system context manager. 
@@ -135,7 +135,7 @@ gdb --args bazel-bin/{self.full_system}
 
     def __restart__(self) -> None:
         "Restarts full system."
-        while True:
+        while self.should_restart_on_crash:
             if not is_cmd_running(
                 [
                     "unix_full_system",
@@ -155,12 +155,18 @@ gdb --args bazel-bin/{self.full_system}
         :param traceback: The traceback of the exception
 
         """
-        if self.full_system_proc:
-            self.full_system_proc.terminate()
-            self.full_system_proc.wait()
+        self.should_restart_on_crash = False
 
-        if self.should_restart_on_crash:
-            self.thread.join()
+        if self.full_system_proc:
+            # It's important to terminate full system instead of killing
+            # it to allow it to clean up its resources.
+            self.full_system_proc.terminate()
+
+            # Kill the process if it doesn't exit in the given time plus some buffer.
+            try:
+                self.full_system_proc.wait(timeout=MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC + 0.1)
+            except TimeoutExpired:
+                self.full_system_proc.kill()
 
     def setup_proto_unix_io(self, proto_unix_io: ProtoUnixIO) -> None:
         """Helper to run full system and attach the appropriate unix senders/listeners

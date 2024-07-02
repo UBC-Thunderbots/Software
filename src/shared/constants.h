@@ -45,8 +45,6 @@ static const short unsigned int ROBOT_CRASH_PORT  = 42074;
 // this is an int to avoid Wconversion with lwip
 static const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
 
-static const char PROTO_MSG_TYPE_DELIMITER[4] = "!!!";
-
 // This file contains all constants that are shared between our software (AI)
 // and firmware code. Since this needs to be compiled by both C and C++, everything
 // should be defined in a way that's compatible with C.
@@ -138,6 +136,9 @@ static const double DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK =
 static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
 // The total number of possible robot ids between two teams
 static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
+
+// The maximum time in seconds given to Full System to cleanly exit the process.
+static const double MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC = 0.5;
 
 // Battery Constants
 static const unsigned NUM_CELLS_IN_BATTERY    = 3;

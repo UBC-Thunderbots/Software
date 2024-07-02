@@ -112,7 +112,6 @@ class ProtoLogger
 
     // TODO (NIMA): Move to constants and pybind to python
     const Duration BUFFER_BLOCK_TIMEOUT                = Duration::fromSeconds(0.1);
-    const double MAX_TIME_TO_FLUSH_SEC                     = 0.5;
     const std::string REPLAY_FILE_PREFIX               = "proto_";
     const std::string REPLAY_FILE_EXTENSION            = "replay";
     const std::string REPLAY_FILE_TIME_FORMAT          = "%Y_%m_%d_%H_%M_%S";

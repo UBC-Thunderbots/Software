@@ -21,7 +21,23 @@
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/generic_factory/generic_factory.h"
 
+// ProtoLogger has to be defined as a global variable so that it can be accessed by the cleanup callback.
 std::shared_ptr<ProtoLogger> proto_logger;
+
+/**
+ * Signal handler to cleanly shutdown the program
+ * @param signal_num The signal number that was caught
+ */
+void cleanup(int signal_num)
+{
+    if (proto_logger)
+    {
+        proto_logger->flushAndStopLogging();
+    }
+
+    // Program has cleaned up core resources, so we can safely exit
+    exit(0);
+}
 
 int main(int argc, char** argv)
 {
@@ -130,13 +146,11 @@ int main(int argc, char** argv)
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(ai);
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(sensor_fusion);
 
-        std::signal(SIGTERM, [](int signal_number){
-            if (proto_logger)
-            {
-                proto_logger->flushAndStopLogging();
-            }
-            exit(0);
-        });
+        // Handle some of the signals that we manually send when we want to shut down full system cleanly.
+        // SIGTERM is sent by Thunderscope to stop full system
+        std::signal(SIGTERM, cleanup);
+        // SIGINT is sent by the user when they Ctrl+C in the terminal
+        std::signal(SIGINT, cleanup);
 
         // This blocks forever without using the CPU
         std::promise<void>().get_future().wait();
