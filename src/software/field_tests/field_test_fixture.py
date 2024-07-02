@@ -90,18 +90,17 @@ class FieldTestRunner(TbotsTestRunner):
         team: proto.ssl_gc_common_pb2.Team,
         final_ball_placement_point=None,
     ):
+        """Send a command to the gamecontroller
 
+        :param gc_command: The command to send
+        :param team: The team which the command as attributed to
+        :param final_ball_placement_point: The ball placement point
+        """
         self.gamecontroller.send_ci_input(
             gc_command=gc_command,
             team=team,
             final_ball_placement_point=final_ball_placement_point,
         )
-
-    def time_provider(self):
-        """Provide the current time in seconds since the epoch"""
-
-        with self.timestamp_mutex:
-            return self.timestamp
 
     def run_test(
         self,
@@ -130,12 +129,6 @@ class FieldTestRunner(TbotsTestRunner):
             test_end_time = time.time() + test_timeout_s
 
             while time.time() < test_end_time:
-                # Update the timestamp logged by the ProtoLogger # TODO (NIMA): Remove time providers
-                with self.timestamp_mutex:
-
-                    ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                    self.timestamp = ssl_wrapper.detection.t_capture
-
                 while True:
                     try:
                         world = self.world_buffer.get(

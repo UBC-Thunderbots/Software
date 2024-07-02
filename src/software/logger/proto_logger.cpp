@@ -23,8 +23,7 @@ ProtoLogger::ProtoLogger(const std::string& log_path,
       friendly_colour_yellow_(friendly_colour_yellow),
       buffer_(PROTOBUF_BUFFER_SIZE, true)
 {
-    start_time_ = time_provider_();  // TODO (NIMA): Consider making the start time, the
-                                     // time of the first protobuf received
+    start_time_ = time_provider_();
 
     // Create a folder for the logs with the formatted current time
     std::time_t t = std::time(nullptr);

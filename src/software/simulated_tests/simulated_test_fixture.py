@@ -76,12 +76,6 @@ class SimulatedTestRunner(TbotsTestRunner):
         """
         self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
 
-    def time_provider(self):
-        """Provide the current time in seconds since the epoch"""
-
-        with self.timestamp_mutex:
-            return self.timestamp
-
     def excepthook(self, args):
         """This function is _critical_ for show_thunderscope to work.
         If the test Thread will raises an exception we won't be able to close
@@ -153,11 +147,6 @@ class SimulatedTestRunner(TbotsTestRunner):
                     # remove command from the list
                     ci_cmd_with_delay.remove((delay, cmd, team))
 
-            # Update the timestamp logged by the ProtoLogger
-            with self.timestamp_mutex:
-                ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                self.timestamp = ssl_wrapper.detection.t_capture
-
             tick = SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
             self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
             time_elapsed_s += tick_duration_s
@@ -209,17 +198,24 @@ class SimulatedTestRunner(TbotsTestRunner):
                 always_validation_sequence_set,
             )
 
-            if self.thunderscope:  # TODO (NIMA): Send validations even without tscope
+            # Set the test name
+            eventually_validation_proto_set.test_name = self.test_name
+            always_validation_proto_set.test_name = self.test_name
 
-                # Set the test name
-                eventually_validation_proto_set.test_name = self.test_name
-                always_validation_proto_set.test_name = self.test_name
-
-                # Send out the validation proto to thunderscope
-                self.thunderscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE].send_proto(
+            # Send out the validation proto to the full system
+            # for visualization and logging for replays.
+            if self.is_yellow_friendly:
+                self.yellow_full_system_proto_unix_io.send_proto(
                     ValidationProtoSet, eventually_validation_proto_set
                 )
-                self.thunderscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE].send_proto(
+                self.yellow_full_system_proto_unix_io.send_proto(
+                    ValidationProtoSet, always_validation_proto_set
+                )
+            else:
+                self.blue_full_system_proto_unix_io.send_proto(
+                    ValidationProtoSet, eventually_validation_proto_set
+                )
+                self.blue_full_system_proto_unix_io.send_proto(
                     ValidationProtoSet, always_validation_proto_set
                 )
 

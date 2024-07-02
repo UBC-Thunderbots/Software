@@ -26,6 +26,12 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
 static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
+// ProtoLogger constants for replay files
+static const std::string REPLAY_FILE_EXTENSION      = "replay";
+static const std::string REPLAY_METADATA_DELIMITER  = ",";
+static const std::string REPLAY_FILE_VERSION_PREFIX = "version:";
+static const unsigned int REPLAY_FILE_VERSION       = 2;
+
 #endif  // PLATFORMIO_BUILD
 
 // Redis default server connections properties
@@ -139,12 +145,6 @@ static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
 
 // The maximum time in seconds given to Full System to cleanly exit the process.
 static const double MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC = 0.5;
-
-// ProtoLogger constants for replay files
-static const std::string REPLAY_FILE_EXTENSION      = "replay";
-static const std::string REPLAY_METADATA_DELIMITER  = ",";
-static const std::string REPLAY_FILE_VERSION_PREFIX = "version:";
-static const unsigned int REPLAY_FILE_VERSION       = 2;
 
 // Battery Constants
 static const unsigned NUM_CELLS_IN_BATTERY    = 3;
