@@ -59,6 +59,11 @@ class Gamecontroller(object):
         """
         return the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
 
+        This function is used situation like the following: https://github.com/Mr-Anyone/Thunderbot_Software/blob/cf668bfeaff698097aadce1d01c60b4c731322c6/src/software/thunderscope/thunderscope_main.py#L322. 
+        In otherwords, the instance of gamecontroller has type None, but we want a function or staticmethod to return the default port of the referee 
+        Since the type is None, we cannot call self.get_referee_port, and thus this function is declared as a static method. If the gamecontroller has type None. We want to listen to the default port instead!
+
+
         :param gamecontroller: the gamecontroller we are using
         :return: the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
         """
