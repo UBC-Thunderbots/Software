@@ -23,27 +23,22 @@
             insertafter: EOF
             line: '{{ ansible_user }} ALL=NOPASSWD:/usr/bin/rsync'
 
-        - name: Run Jetson Clocks
-          become: true
-          become_method: sudo
-          shell: /usr/bin/jetson_clocks
-
         - name: Sync Setup Script
           become: true
           become_method: sudo
           tags:
             - sync
           ansible.posix.synchronize:
-            src: ../../setup_nano.sh
+            src: ../../setup_robot_software_deps.sh
             dest: ~/
             recursive: yes
             copy_links: yes
 
-        # Output of each nano streamed to that Nano's /tmp/setup.log
+        # Output of each nano streamed to that Pi's /tmp/setup.log
         - name: Running the setup script, this will take a while
           become_method: sudo
           become: true
-          command: '/home/{{ ansible_user }}/setup_nano.sh >& /tmp/setup.log'
+          command: '/home/{{ ansible_user }}/setup_robot_software_deps.sh >& /tmp/setup.log'
           register: result
           args:
             chdir: ~/
@@ -54,16 +49,17 @@
               - "[Robot ID = {{ inventory_hostname }}]"
               - "Setup Script run successfully"
 
-        # UART setup
-        - name: Stop nvgetty
+        - name: Setup wifi udev rule
           become: true
           become_method: sudo
-          command: 'systemctl stop nvgetty'
-
-        - name: Disable nvgetty
-          become: true
-          become_method: sudo
-          command: 'systemctl disable nvgetty'
+          tags:
+            - wifi
+          copy:
+            src: ../../linux_configs/10-persistent-net.link
+            dest: /etc/systemd/network/10-persistent-net.link
+            owner: root
+            group: root
+            mode: '0644'
 
         - name: Setup udevadm trigger
           become: true

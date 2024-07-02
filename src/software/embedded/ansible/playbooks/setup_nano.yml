@@ -1,0 +1,123 @@
+---
+
+- name: Setting up the jetson Nano
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+
+    - name: Run basic setup
+      tags: dependencies
+      block:
+        - ansible.builtin.import_tasks:
+            file: shared_setup.yml
+            apply:
+              tags:
+                - check_internet
+                - enable_passwordless_sudo
+                - setup_robot_software_deps
+
+        - name: Run Jetson Clocks
+          become: true
+          become_method: sudo
+          shell: /usr/bin/jetson_clocks
+
+        # UART setup
+        - name: Stop nvgetty
+          become: true
+          become_method: sudo
+          command: 'systemctl stop nvgetty'
+
+        - name: Disable nvgetty
+          become: true
+          become_method: sudo
+          command: 'systemctl disable nvgetty'
+
+        - name: Setup udevadm trigger
+          become: true
+          become_method: sudo
+          command: 'udevadm trigger'
+
+        - ansible.builtin.import_tasks:
+          file: shared_setup.yml
+          apply:
+            tags:
+              - add_user_robot_to_dialout
+
+        # Device tree setup
+        - name: Sync Device Tree
+          become: true
+          become_method: sudo
+          tags:
+            - sync
+            - device_tree
+          ansible.posix.synchronize:
+            src: ../../../linux_configs/jetson_nano/device_tree.zip
+            dest: ~/
+            recursive: yes
+            copy_links: yes
+
+        - name: Sync extlinux conf
+          become: true
+          become_method: sudo
+          tags:
+            - sync
+            - device_tree
+          ansible.posix.synchronize:
+            src: ../../../linux_configs/jetson_nano/extlinux.conf
+            dest: ~/
+            recursive: yes
+            copy_links: yes
+
+        - name: Unzip device tree
+          tags:
+            - sync
+            - device_tree
+          command: 'unzip -o ~/device_tree.zip'
+          register: result
+          args:
+            chdir: ~/
+
+        - name: Compile device tree
+          tags:
+            - sync
+            - device_tree
+          shell: 'dtc -q -I dts -O dtb ~/device_tree.dts > device_tree.dtb'
+          register: result
+          args:
+            chdir: ~/
+
+        - name: Move compiled device tree binary to boot path
+          become_method: sudo
+          become: true
+          tags:
+            - sync
+            - device_tree
+          shell: 'mv /home/robot/device_tree.dtb /boot/kernel_tegra210-p3448-0000-p3449-0000-b00-user-custom.dtb'
+          register: result
+          args:
+            chdir: ~/
+
+        - ansible.builtin.import_tasks:
+          file: shared_setup.yml
+          apply:
+            tags:
+              - systemd
+
+        - name: Move extlinux file
+          become_method: sudo
+          become: true
+          tags:
+            - sync
+            - device_tree
+          shell: 'mv /home/robot/extlinux.conf /boot/extlinux/extlinux.conf'
+          register: result
+          args:
+            chdir: ~/
+
+        - ansible.builtin.import_tasks:
+          file: shared_setup.yml
+          apply:
+            tags:
+              - systemd
+              - reboot
+              - setup_success
