@@ -37,6 +37,13 @@ UnixSimulatorBackend::UnixSimulatorBackend(
             boost::bind(&UnixSimulatorBackend::receiveThunderbotsConfig, this, _1),
             proto_logger));
 
+    // Empty callback for ValidationProtoSet since it's only used by proto_logger
+    validation_proto_set_listener.reset(
+        new ThreadedProtoUnixListener<TbotsProto::ValidationProtoSet>(
+            runtime_dir + VALIDATION_PROTO_SET_PATH,
+            [](TbotsProto::ValidationProtoSet v){},
+            proto_logger));
+
     // Protobuf Outputs
     world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(
         runtime_dir + WORLD_PATH, proto_logger));

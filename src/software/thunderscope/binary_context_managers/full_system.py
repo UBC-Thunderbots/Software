@@ -201,8 +201,9 @@ gdb --args bazel-bin/{self.full_system}
             (SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (SSL_REFEREE_PATH, Referee),
             (SENSOR_PROTO_PATH, SensorProto),
-            (TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams,),
+            (TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams),
             (PLAY_OVERRIDE_PATH, Play),
-            (DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH, ThunderbotsConfig,),
+            (DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH, ThunderbotsConfig),
+            (VALIDATION_PROTO_SET_PATH, ValidationProtoSet),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)

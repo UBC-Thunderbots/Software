@@ -50,6 +50,7 @@ ProtoLogger::ProtoLogger(const std::string& log_path,
 
 ProtoLogger::~ProtoLogger()
 {
+    // TODO (NIMA): Add a ticket for gracefully shutting down unix fullsystem main and proto logger. Should print the replay command at the end as well
     stop_logging_ = true;
     if (log_thread_.joinable())
     {
