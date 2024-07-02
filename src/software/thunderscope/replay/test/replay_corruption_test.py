@@ -104,12 +104,12 @@ def make_part_replay_chunks(list_of_protos: [Message], save_path:str, duration:f
     :frequency: what percent of the time should we call gen_log_entry_func
     """
     os.makedirs(save_path, exist_ok=True)
-    path_to_repaly_file = os.path.join(save_path, "0.replay")
+    path_to_replay_file = os.path.join(save_path, "0.replay")
 
-    with gzip.open(path_to_repaly_file, "ab") as log_file:
+    with gzip.open(path_to_replay_file, "ab") as log_file:
         for i in range(len(list_of_protos)): 
             # calculate time based on linear interpolation
-            proto_time = start_time + (duration - 0)/len(list_of_protos) * i   
+            proto_time = start_time + duration/len(list_of_protos) * i   
             proto = list_of_protos[i]
 
             if random.random() > frequency: 
