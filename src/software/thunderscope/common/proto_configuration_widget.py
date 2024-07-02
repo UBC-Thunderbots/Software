@@ -216,7 +216,7 @@ class ProtoConfigurationWidget(QWidget):
     def update_widget(self):
         """
         The following function updates the current parameters tree based on the
-        current protobuf that is being configure (i.e. self.proto_to_configure) widget.
+        current protobuf that is being configured (i.e. self.proto_to_configure) widget.
         """
 
         # refreshing widgets after the parameters is called
