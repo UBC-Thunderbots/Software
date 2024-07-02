@@ -8,7 +8,7 @@ and seeing whether or not proto player could play the replay files.
 Steps to test: 
     1. we create a directory to store the replay files 
     2. we create invalid entries of two type: the data is actually corrupted, and we are missing a delimeter. We 
-        the mixed those replay entries with valid replay entries to check if proto player could actually player those
+        mixed those replay entries with valid replay entries to check if proto player could actually player those
         entires
     4. we check to see if there are uncaught exception. If there are, we know fore sure proto player wouldn't work!
 """
