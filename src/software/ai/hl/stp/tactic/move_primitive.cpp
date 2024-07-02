@@ -165,10 +165,12 @@ MovePrimitive::generatePrimitiveProtoMessage(
     }
     else if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOKICK)
     {
+        // Clamp the max speed to a safe allowable range
+        double kick_max_speed = std::clamp(auto_chip_or_kick.autokick_speed_m_per_s, 0.0,
+                                           BALL_SAFE_MAX_SPEED_METERS_PER_SECOND);
         primitive_proto->mutable_move()
             ->mutable_auto_chip_or_kick()
-            ->set_autokick_speed_m_per_s(
-                static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
+            ->set_autokick_speed_m_per_s(static_cast<float>(kick_max_speed));
     }
 
     return std::make_pair(traj_path, std::move(primitive_proto));

@@ -36,7 +36,7 @@ TEST_P(ReceiverTacticTest, perfect_pass_receiver_test)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto tactic = std::make_shared<ReceiverTactic>();
+    auto tactic = std::make_shared<ReceiverTactic>(TbotsProto::ReceiverTacticConfig());
     tactic->updateControlParams(pass);
     setTactic(1, tactic);
 
@@ -126,7 +126,7 @@ TEST_P(ReceiverTacticTestOneTouch, test_one_touch)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto tactic = std::make_shared<ReceiverTactic>();
+    auto tactic = std::make_shared<ReceiverTactic>(TbotsProto::ReceiverTacticConfig());
     tactic->updateControlParams(pass);
     setTactic(1, tactic);
 
@@ -180,12 +180,10 @@ INSTANTIATE_TEST_CASE_P(
         // If we are noticing issues with one-touch on the field, we should
         // add more tests here and explore more of the "one-touch" space
 
-        // TODO (#2577): re-enable once fixed
-        //        std::make_tuple(Pass(Point(4.0, 1.5), Point(4, -1), 5),
-        //                        RobotStateWithId{1, RobotState(Point(4.0, -1), Vector(0,
-        //                        0),
-        //                                                       Angle::fromDegrees(180),
-        //                                                       Angle::fromDegrees(0))}),
+        std::make_tuple(Pass(Point(4.0, 1.5), Point(4, -1), 5),
+                        RobotStateWithId{1, RobotState(Point(4.0, -1), Vector(0, 0),
+                                                       Angle::fromDegrees(180),
+                                                       Angle::fromDegrees(0))}),
 
         // TODO (#2570): re-enable when one-touch works for these tests
         // std::make_tuple(Pass(Point(4.0, 1.5), Point(3.5, -1), 5),
@@ -200,12 +198,10 @@ INSTANTIATE_TEST_CASE_P(
         //                                                Angle::fromDegrees(180),
         //                                                Angle::fromDegrees(0))}),
 
-        // TODO (#2577): re-enable once fixed
-        //        std::make_tuple(Pass(Point(4.0, -1.5), Point(4, 1), 5),
-        //                        RobotStateWithId{1, RobotState(Point(4.0, 1), Vector(0,
-        //                        0),
-        //                                                       Angle::fromDegrees(180),
-        //                                                       Angle::fromDegrees(0))}),
+        std::make_tuple(Pass(Point(4.0, -1.5), Point(4, 1), 5),
+                        RobotStateWithId{1, RobotState(Point(4.0, 1), Vector(0, 0),
+                                                       Angle::fromDegrees(180),
+                                                       Angle::fromDegrees(0))}),
 
         // TODO (#2570): re-enable when one-touch works for these tests
         // std::make_tuple(Pass(Point(4.0, -1.5), Point(3.5, 1), 5),

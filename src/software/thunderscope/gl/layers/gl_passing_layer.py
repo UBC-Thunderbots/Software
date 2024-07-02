@@ -22,9 +22,6 @@ class GLPassingLayer(GLLayer):
     # If we no longer receive new passes, we need to remove the old one.
     PASS_VISUALIZATION_TIMEOUT_S = 0.5
 
-    # The number of passes to show in the visualization
-    NUM_PASSES_TO_SHOW = 1
-
     def __init__(self, name: str, buffer_size: int = 5) -> None:
         """Initialize the GLPassingLayer
 
@@ -57,33 +54,35 @@ class GLPassingLayer(GLLayer):
 
             # If we haven't received pass visualizations for a bit, skip updating graphics
             if time.time() > self.timeout:
+                self.pass_graphics.clear()
                 return
         else:
             # We received new pass data, so lets update our timeout
             self.timeout = time.time() + GLPassingLayer.PASS_VISUALIZATION_TIMEOUT_S
-            self.cached_pass_vis = pass_vis
+            if pass_vis.pass_committed != self.cached_pass_vis.pass_committed:
+                self.pass_graphics.clear()
 
-        sorted_pass_with_rating = sorted(
-            pass_vis.best_passes, key=lambda x: x.rating, reverse=True
-        )
-        passes_to_show = sorted_pass_with_rating[0 : GLPassingLayer.NUM_PASSES_TO_SHOW]
+            self.cached_pass_vis = pass_vis
 
         # Ensure we have the same number of graphics as protos
         self.pass_graphics.resize(
-            len(passes_to_show),
-            lambda: GLPolygon(outline_color=Colors.PASS_VISUALIZATION_COLOR),
+            1,
+            lambda: GLPolygon(
+                outline_color=Colors.COMMITTED_PASS_VISUALIZATION_COLOR
+                if pass_vis.pass_committed
+                else Colors.UNCOMMITTED_PASS_VISUALIZATION_COLOR
+            ),
         )
 
-        for pass_graphic, pass_with_rating in zip(self.pass_graphics, passes_to_show,):
-            pass_graphic.set_points(
+        self.pass_graphics[0].set_points(
+            [
                 [
-                    [
-                        pass_with_rating.pass_.passer_point.x_meters,
-                        pass_with_rating.pass_.passer_point.y_meters,
-                    ],
-                    [
-                        pass_with_rating.pass_.receiver_point.x_meters,
-                        pass_with_rating.pass_.receiver_point.y_meters,
-                    ],
-                ]
-            )
+                    pass_vis.best_pass.passer_point.x_meters,
+                    pass_vis.best_pass.passer_point.y_meters,
+                ],
+                [
+                    pass_vis.best_pass.receiver_point.x_meters,
+                    pass_vis.best_pass.receiver_point.y_meters,
+                ],
+            ]
+        )

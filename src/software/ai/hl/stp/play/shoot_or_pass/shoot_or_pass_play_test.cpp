@@ -16,7 +16,7 @@ class ShootOrPassPlayTest : public SimulatedErForceSimPlayTestFixture
     Field field                      = Field::createField(field_type);
 };
 
-// TODO (#2577): re-enable once fixed
+// TODO (#3233): The attacker robot sometimes doesn't kick the ball towards the receiver
 TEST_F(ShootOrPassPlayTest, DISABLED_test_shoot_or_pass_play)
 {
     BallState ball_state(Point(-4.4, 2.9), Vector(0, 0));
