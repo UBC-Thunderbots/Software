@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "proto/tactic.pb.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
@@ -56,6 +57,25 @@ struct CreaseDefenderFSM
     }
 
     /**
+     * Guard that checks if the ball is on friendly side, nearby, and unguarded by the
+     * enemy
+     *
+     * @param event CreaseDefenderFSM::Update event
+     *
+     * @return true if the ball is on friendly side, nearby, unguarded by the enemy up,
+     *          and within a max get possession threshold
+     */
+    bool ballNearbyWithoutThreat(const Update& event);
+
+    /**
+     * This is the Action that prepares for getting possession of the ball
+     * @param event CreaseDefenderFSM::Update event
+     * @param processEvent processes the DribbleFSM::Update
+     */
+    void prepareGetPossession(const Update& event,
+                              boost::sml::back::process<DribbleFSM::Update> processEvent);
+
+    /**
      * This is an Action that blocks the threat
      *
      * @param event CreaseDefenderFSM::Update event
@@ -70,14 +90,36 @@ struct CreaseDefenderFSM
         DEFINE_SML_STATE(MoveFSM)
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockThreat, MoveFSM)
+        DEFINE_SML_STATE(DribbleFSM)
+        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
+            *MoveFSM_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
+                DribbleFSM_S,
+            MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
+            DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A =
+                MoveFSM_S,
+            X + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
+                DribbleFSM_S,
             X + Update_E / blockThreat_A = MoveFSM_S);
     }
 
    private:
+    /** Max ratio between distances (crease and ball) / (crease and nearest enemy) for
+     * crease to chase ball. Scale from (0, 1)
+     * |------------------------------------------|
+     * | Crease | <-----------------------> Enemy |
+     * |        | <----> Ball                 |   |
+     * |       ()         x                  ()   |
+     * |------------------------------------------|
+     */
+    static constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.3;
+    // Max distance that the crease will try and get possession of a ball
+    static constexpr double MAX_GET_BALL_RADIUS_M = 1;
+    // Max speed of ball that crease will try and get possession
+    static constexpr double MAX_BALL_SPEED_TO_GET_MS = 0.5;
     /**
      * Finds the intersection with the front or sides of the defense area with the given
      * ray
@@ -93,6 +135,14 @@ struct CreaseDefenderFSM
     static std::optional<Point> findDefenseAreaIntersection(
         const Field& field, const Ray& ray, double robot_obstacle_inflation_factor);
 
-   private:
+    /**
+     * Returns true if any enemy robot is within the given zone
+     *
+     * @param event CreaseDefenderFSM::Update event
+     * @param zone a stadium shape that defines the zone
+     * @return true if any enemy robot is within the given zone, else false
+     */
+    static bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
+
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
 };

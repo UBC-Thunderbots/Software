@@ -2,10 +2,8 @@
 
 EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
-      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(
-                                   ai_config.robot_navigation_obstacle_config()),
-                               std::make_shared<CreaseDefenderTactic>(
-                                   ai_config.robot_navigation_obstacle_config())}),
+      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(ai_config),
+                               std::make_shared<CreaseDefenderTactic>(ai_config)}),
       avoid_interference_tactics({
           std::make_shared<AvoidInterferenceTactic>(),
           std::make_shared<AvoidInterferenceTactic>(),
