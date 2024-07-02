@@ -89,7 +89,7 @@ if __name__ == "__main__":
         try:
             total_line_num += read_one_chunk(replay_file_name)
         except Exception as e:
-            print(f"Cannot read {replay_file_name} wiht exception")
+            print(f"Cannot read {replay_file_name}")
             print("Please note that the following traceback is ignored. The program is still running")
             print(traceback.format_exc())
 
