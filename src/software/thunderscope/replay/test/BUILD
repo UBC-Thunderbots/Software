@@ -1,0 +1,18 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
+py_test(
+    name = "replay_corruption_test", 
+    srcs = [
+        'replay_corruption_test.py',
+    ],
+    deps = [
+        "//extlibs/er_force_sim/src/protobuf:erforce_py_proto",
+        "//proto:import_all_protos",
+        "//software/thunderscope:proto_unix_io",
+        "//software/thunderscope/replay:proto_logger", 
+        "//software/thunderscope/replay:proto_player",
+        requirement("pytest")
+    ]
+)

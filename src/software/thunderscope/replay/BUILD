@@ -34,3 +34,14 @@ py_library(
         ":proto_player",
     ],
 )
+
+py_binary(
+    name = "replay_file_debugging_script",
+    srcs = [
+        "replay_constants.py",
+        "replay_file_debugging_script.py",
+    ],
+    deps = [
+        "//proto:import_all_protos",
+    ],
+)
