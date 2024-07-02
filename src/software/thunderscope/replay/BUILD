@@ -6,7 +6,6 @@ py_library(
     name = "proto_player",
     srcs = [
         "proto_player.py",
-        "replay_constants.py",
     ],
     deps = [
         requirement("pyqtgraph"),

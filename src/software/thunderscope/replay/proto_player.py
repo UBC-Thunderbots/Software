@@ -8,7 +8,7 @@ import glob
 import proto
 from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
-from software.thunderscope.replay.replay_constants import *
+from software.py_constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from google.protobuf.message import DecodeError, Message
 from typing import Callable, Type
@@ -41,6 +41,7 @@ class ProtoPlayer:
     chunk) that contains the data at that time and continue playing from there.
 
     """
+    PLAY_PAUSE_POLL_INTERVAL_SECONDS = 0.1
 
     def __init__(self, log_folder_path: str, proto_unix_io: ProtoUnixIO) -> None:
         """Creates a proto player that plays back all protos
@@ -135,7 +136,7 @@ class ProtoPlayer:
 
         # Unpack metadata
         timestamp, protobuf_type, data = log_entry.split(
-            bytes(REPLAY_METADATA_DELIMETER, encoding="utf-8")
+            bytes(REPLAY_METADATA_DELIMITER, encoding="utf-8")
         )
 
         # Convert string to type. eval is an order of magnitude
@@ -392,7 +393,7 @@ class ProtoPlayer:
 
             # Only play if we are playing
             if not self.is_playing:
-                time.sleep(PLAY_PAUSE_POLL_INTERVAL_SECONDS)
+                time.sleep(self.PLAY_PAUSE_POLL_INTERVAL_SECONDS)
                 continue
 
             # Check if replay has ended and stop playing if so
