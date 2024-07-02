@@ -10,6 +10,7 @@ from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.py_constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
+import software.python_bindings as tbots_cpp
 from google.protobuf.message import DecodeError, Message
 from typing import Callable, Type
 
@@ -54,6 +55,7 @@ class ProtoPlayer:
         self.proto_unix_io = proto_unix_io
         self.current_packet_time = 0.0
         self.end_time = 0
+        self.replay_file_format_version = REPLAY_FILE_VERSION
 
         # Don't continue setting things up if the log folder was not provided
         if self.log_folder_path is None:
@@ -150,6 +152,7 @@ class ProtoPlayer:
             raise TypeError(f"Unknown proto type in replay: '{protobuf_type}'")
 
         # Deserialize protobuf
+        # if self.replay_file_format_version == 1:
         proto = proto_class.FromString(base64.b64decode(data[: -len("\n")]))
 
         return float(timestamp), proto_class, proto
@@ -199,8 +202,8 @@ class ProtoPlayer:
                         self.current_chunk[self.current_entry_index]
                     )
 
-                    log_entry = ProtoLogger.create_log_entry(
-                        proto, self.current_packet_time - start_time
+                    log_entry = tbots_cpp.ProtoLogger.createLogEntry(
+                        proto.DESCRIPTOR.full_name, proto.SerializeToString(), self.current_packet_time - start_time
                     )
                     log_file.write(bytes(log_entry, encoding="utf-8"))
                     self.current_entry_index += 1

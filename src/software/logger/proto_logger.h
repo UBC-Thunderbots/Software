@@ -90,12 +90,27 @@ class ProtoLogger
      */
     void flushAndStopLogging();
 
+    /**
+     * Helper function for creating a log entry
+     * @param protobuf_type_full_name The full name of the protobuf message type
+     * (e.g. TbotsProto.ThunderbotsConfig)
+     * @param serialized_proto The serialized protobuf message to store
+     * @param receive_time_sec The time the protobuf was received
+     * @return A string containing the log entry
+     */
+    static std::string createLogEntry(const std::string &proto_full_name, const std::string &serialized_proto,
+                   double receive_time_sec);
+
    private:
     /**
      * The loop which will be continuously logging the protobufs
      */
     void logProtobufs();
 
+    /**
+     * Helper function to determine if the logging thread should stop
+     * @return True if the logging thread should stop, false otherwise
+     */
     bool shouldStopLogging() const;
 
     std::string log_path_;
@@ -110,12 +125,9 @@ class ProtoLogger
 
     ThreadSafeBuffer<SerializedProtoLog> buffer_;
 
-    // TODO (NIMA): Move to constants and pybind to python
     const Duration BUFFER_BLOCK_TIMEOUT                = Duration::fromSeconds(0.1);
     const std::string REPLAY_FILE_PREFIX               = "proto_";
-    const std::string REPLAY_FILE_EXTENSION            = "replay";
     const std::string REPLAY_FILE_TIME_FORMAT          = "%Y_%m_%d_%H_%M_%S";
-    const std::string REPLAY_METADATA_DELIMETER        = ",";
     static constexpr unsigned int PROTOBUF_BUFFER_SIZE = 1000;
     static constexpr unsigned int REPLAY_MAX_CHUNK_SIZE_BYTES = 1024 * 1024;  // 1 MB
     static constexpr unsigned int FAILED_LOG_PRINT_FREQUENCY  = 100;

@@ -417,6 +417,10 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
 
+    py::class_<ProtoLogger>(m, "ProtoLogger")
+            .def_static("createLogEntry",
+                        &ProtoLogger::createLogEntry);
+
     declarePassGenerator<EighteenZoneId>(m, "EighteenZoneId");
 
     py::class_<EighteenZonePitchDivision, std::shared_ptr<EighteenZonePitchDivision>>(

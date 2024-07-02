@@ -72,6 +72,17 @@ void ProtoLogger::logProtobufs()
                 throw std::runtime_error(error_msg);
             }
 
+            // Start every replay file with the metadata, which includes the file format version.
+            // This allows us to keep backwards compatibility as the replay file format evolves.
+            std::string file_metadata = "version:" + std::to_string(REPLAY_FILE_VERSION) + "\n";
+            int num_bytes_written = gzwrite(gz_file, file_metadata.c_str(),
+                                            static_cast<unsigned>(file_metadata.size()));
+            if (num_bytes_written == 0)
+            {
+                std::cerr << "ProtoLogger: Failed to write metadata to log file: " << log_file_path
+                          << std::endl;
+            }
+
             while (!shouldStopLogging())
             {
                 auto serialized_proto_opt =
@@ -86,22 +97,16 @@ void ProtoLogger::logProtobufs()
                     serialized_proto_opt.value();
 
                 // Write the log entry to the file with the format:
-                // <time>,<protobuf_type_full_name>,<base64_encoded_serialized_proto>
-                std::stringstream log_entry_ss;
-                log_entry_ss << receive_time_sec << REPLAY_METADATA_DELIMETER
-                             << proto_full_name << REPLAY_METADATA_DELIMETER
-                             << base64_encode(serialized_proto) << "\n";
-                std::string log_entry = log_entry_ss.str();
-
-                int num_bytes_written = gzwrite(gz_file, log_entry.c_str(),
-                                                static_cast<unsigned>(log_entry.size()));
+                std::string log_entry = createLogEntry(proto_full_name, serialized_proto, receive_time_sec);
+                num_bytes_written = gzwrite(gz_file, log_entry.c_str(),
+                                            static_cast<unsigned>(log_entry.size()));
 
                 // Check if write was successful
                 if (num_bytes_written == 0)
                 {
                     if (num_failed_logs_++ % FAILED_LOG_PRINT_FREQUENCY == 0)
                     {
-                        std::cerr << "Failed to write " << proto_full_name
+                        std::cerr << "ProtoLogger: Failed to write " << proto_full_name
                                   << " to log file: " << log_file_path << " "
                                   << std::to_string(num_failed_logs_) << " times"
                                   << std::endl;
@@ -123,6 +128,18 @@ void ProtoLogger::logProtobufs()
     {
         std::cerr << "Exception detected in ProtoLogger: " << e.what() << std::endl;
     }
+}
+
+std::string ProtoLogger::createLogEntry(const std::string &proto_full_name, const std::string &serialized_proto,
+                                        const double receive_time_sec)
+{
+    // <time>,<protobuf_type_full_name>,<base64_encoded_serialized_proto>
+    std::stringstream log_entry_ss;
+    log_entry_ss << receive_time_sec << REPLAY_METADATA_DELIMITER
+                 << proto_full_name << REPLAY_METADATA_DELIMITER
+                 << base64_encode(serialized_proto) << "\n";
+    std::string log_entry = log_entry_ss.str();
+    return log_entry;
 }
 
 void ProtoLogger::updateTimeProvider(std::function<double()> time_provider)
