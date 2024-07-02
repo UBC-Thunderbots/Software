@@ -23,7 +23,8 @@ ProtoLogger::ProtoLogger(const std::string& log_path,
       friendly_colour_yellow_(friendly_colour_yellow),
       buffer_(PROTOBUF_BUFFER_SIZE, true)
 {
-    start_time_ = time_provider_(); // TODO (NIMA): Consider making the start time, the time of the first protobuf received
+    start_time_ = time_provider_();  // TODO (NIMA): Consider making the start time, the
+                                     // time of the first protobuf received
 
     // Create a folder for the logs with the formatted current time
     std::time_t t = std::time(nullptr);
@@ -46,9 +47,9 @@ void ProtoLogger::saveSerializedProto(const std::string& protobuf_type_full_name
                                       const std::string& serialized_proto)
 {
     buffer_.push({
-        .protobuf_type_full_name  = protobuf_type_full_name,
-        .serialized_proto = serialized_proto,
-        .receive_time_sec = time_provider_() - start_time_,
+        .protobuf_type_full_name = protobuf_type_full_name,
+        .serialized_proto        = serialized_proto,
+        .receive_time_sec        = time_provider_() - start_time_,
     });
 }
 
@@ -93,14 +94,17 @@ void ProtoLogger::logProtobufs()
                 std::string log_entry = log_entry_ss.str();
 
                 int num_bytes_written = gzwrite(gz_file, log_entry.c_str(),
-                        static_cast<unsigned>(log_entry.size()));
+                                                static_cast<unsigned>(log_entry.size()));
 
                 // Check if write was successful
                 if (num_bytes_written == 0)
                 {
                     if (num_failed_logs_++ % FAILED_LOG_PRINT_FREQUENCY == 0)
                     {
-                        std::cerr << "Failed to write " << proto_full_name << " to log file: " << log_file_path << " " << std::to_string(num_failed_logs_) << " times" << std::endl;
+                        std::cerr << "Failed to write " << proto_full_name
+                                  << " to log file: " << log_file_path << " "
+                                  << std::to_string(num_failed_logs_) << " times"
+                                  << std::endl;
                     }
                 }
 
@@ -135,17 +139,19 @@ bool ProtoLogger::shouldStopLogging() const
 
     // If stop_logging_ is true, empty the buffer for up to 0.5 seconds to ensure all
     // logs are written
-    double curr_time_sec = std::chrono::duration<double>(
-            std::chrono::system_clock::now().time_since_epoch())
+    double curr_time_sec =
+        std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch())
             .count();
-    return (curr_time_sec - destructor_called_time_sec_) > MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC || buffer_.empty();
+    return (curr_time_sec - destructor_called_time_sec_) >
+               MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC ||
+           buffer_.empty();
 }
 
 void ProtoLogger::flushAndStopLogging()
 {
     stop_logging_ = true;
-    destructor_called_time_sec_ = std::chrono::duration<double>(
-            std::chrono::system_clock::now().time_since_epoch())
+    destructor_called_time_sec_ =
+        std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch())
             .count();
     if (log_thread_.joinable())
     {
@@ -156,13 +162,13 @@ void ProtoLogger::flushAndStopLogging()
     if (friendly_colour_yellow_)
     {
         std::cout
-                << "\nTo watch the replay for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log  "
-                << log_folder_ << std::endl;
+            << "\nTo watch the replay for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log  "
+            << log_folder_ << std::endl;
     }
     else
     {
         std::cout
-                << "\nTo watch the replay for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log  "
-                << log_folder_ << std::endl;
+            << "\nTo watch the replay for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log  "
+            << log_folder_ << std::endl;
     }
 }

@@ -177,7 +177,7 @@ std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue(
     return buffer_lock;
 }
 
-template<typename T>
+template <typename T>
 bool ThreadSafeBuffer<T>::empty() const
 {
     return buffer.empty();

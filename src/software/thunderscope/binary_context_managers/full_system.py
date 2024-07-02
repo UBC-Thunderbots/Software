@@ -164,7 +164,9 @@ gdb --args bazel-bin/{self.full_system}
 
             # Kill the process if it doesn't exit in the given time plus some buffer.
             try:
-                self.full_system_proc.wait(timeout=MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC + 0.1)
+                self.full_system_proc.wait(
+                    timeout=MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC + 0.1
+                )
             except TimeoutExpired:
                 self.full_system_proc.kill()
 

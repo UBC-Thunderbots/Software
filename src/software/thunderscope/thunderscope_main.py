@@ -421,12 +421,14 @@ if __name__ == "__main__":
             friendly_colour_yellow=False,
             should_restart_on_crash=False,
             run_sudo=args.sudo,
+            running_in_realtime=(not args.ci_mode),
         ) as blue_fs, FullSystem(
             full_system_runtime_dir=args.yellow_full_system_runtime_dir,
             debug_full_system=args.debug_yellow_full_system,
             friendly_colour_yellow=True,
             should_restart_on_crash=False,
             run_sudo=args.sudo,
+            running_in_realtime=(not args.ci_mode),
         ) as yellow_fs, Gamecontroller(
             supress_logs=(not args.verbose)
         ) as gamecontroller, (

@@ -5,9 +5,9 @@
 #include "proto/parameters.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
-#include "proto/validation.pb.h"
 #include "proto/sensor_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "proto/validation.pb.h"
 #include "software/backend/backend.h"
 #include "software/logger/proto_logger.h"
 #include "software/networking/unix/threaded_proto_unix_listener.hpp"
@@ -42,7 +42,7 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>>
         dynamic_parameter_update_request_listener;
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::ValidationProtoSet>>
-            validation_proto_set_listener;
+        validation_proto_set_listener;
 
     // Outputs
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::World>> world_output;

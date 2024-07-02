@@ -209,7 +209,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 always_validation_sequence_set,
             )
 
-            if self.thunderscope: # TODO (NIMA): Send validations even without tscope
+            if self.thunderscope:  # TODO (NIMA): Send validations even without tscope
 
                 # Set the test name
                 eventually_validation_proto_set.test_name = self.test_name

@@ -21,7 +21,8 @@
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-// ProtoLogger has to be defined as a global variable so that it can be accessed by the cleanup callback.
+// ProtoLogger has to be defined as a global variable so that it can be accessed by the
+// cleanup callback.
 std::shared_ptr<ProtoLogger> proto_logger;
 
 /**
@@ -47,7 +48,7 @@ int main(int argc, char** argv)
         bool help                   = false;
         std::string runtime_dir     = "/tmp/tbots";
         bool friendly_colour_yellow = false;
-        bool ci = false;
+        bool ci                     = false;
     };
 
     CommandLineArgs args;
@@ -61,9 +62,9 @@ int main(int argc, char** argv)
     desc.add_options()("friendly_colour_yellow",
                        boost::program_options::bool_switch(&args.friendly_colour_yellow),
                        "If false, friendly colour is blue");
-    desc.add_options()("ci",
-                       boost::program_options::bool_switch(&args.ci),
-                       "If true, then the World timestamp will be used to as the time provider for ProtoLogger");
+    desc.add_options()(
+        "ci", boost::program_options::bool_switch(&args.ci),
+        "If true, then the World timestamp will be used to as the time provider for ProtoLogger");
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -91,22 +92,18 @@ int main(int argc, char** argv)
             // Return the current time since epoch in seconds
             time_provider = []() {
                 return std::chrono::duration<double>(
-                        std::chrono::system_clock::now().time_since_epoch())
-                        .count();
+                           std::chrono::system_clock::now().time_since_epoch())
+                    .count();
             };
         }
         else
         {
-            // Default to returning 0 and update the time_provider with the World timestamp
-            // once the backend is set up
-            time_provider = []() {
-                return 0;
-            };
+            // Default to returning 0 and update the time_provider with the World
+            // timestamp once the backend is set up
+            time_provider = []() { return 0; };
         }
-        proto_logger = std::make_shared<ProtoLogger>(
-            args.runtime_dir,
-            time_provider,
-            args.friendly_colour_yellow);
+        proto_logger = std::make_shared<ProtoLogger>(args.runtime_dir, time_provider,
+                                                     args.friendly_colour_yellow);
         LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger);
         TbotsProto::ThunderbotsConfig tbots_proto;
 
@@ -119,7 +116,8 @@ int main(int argc, char** argv)
         if (args.ci)
         {
             // Update the time provider for ProtoLogger
-            proto_logger->updateTimeProvider(boost::bind(&UnixSimulatorBackend::getLastWorldTimeSec, backend));
+            proto_logger->updateTimeProvider(
+                boost::bind(&UnixSimulatorBackend::getLastWorldTimeSec, backend));
         }
 
         auto sensor_fusion =
@@ -146,8 +144,8 @@ int main(int argc, char** argv)
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(ai);
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(sensor_fusion);
 
-        // Handle some of the signals that we manually send when we want to shut down full system cleanly.
-        // SIGTERM is sent by Thunderscope to stop full system
+        // Handle some of the signals that we manually send when we want to shut down full
+        // system cleanly. SIGTERM is sent by Thunderscope to stop full system
         std::signal(SIGTERM, cleanup);
         // SIGINT is sent by the user when they Ctrl+C in the terminal
         std::signal(SIGINT, cleanup);

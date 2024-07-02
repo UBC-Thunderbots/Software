@@ -41,8 +41,7 @@ UnixSimulatorBackend::UnixSimulatorBackend(
     validation_proto_set_listener.reset(
         new ThreadedProtoUnixListener<TbotsProto::ValidationProtoSet>(
             runtime_dir + VALIDATION_PROTO_SET_PATH,
-            [](TbotsProto::ValidationProtoSet v){},
-            proto_logger));
+            [](TbotsProto::ValidationProtoSet v) {}, proto_logger));
 
     // Protobuf Outputs
     world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(
