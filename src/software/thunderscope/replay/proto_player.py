@@ -103,7 +103,7 @@ class ProtoPlayer:
         except DecodeError:
             self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-2], self.version)
         logging.info(
-            "Loaded log file with total runtime of {:.2f} seconds".format(self.end_time)
+            "Loaded a version {} replay file with total runtime of {:.2f} seconds".format(self.version, self.end_time)
         )
 
         # Start playing thread
@@ -159,6 +159,8 @@ class ProtoPlayer:
                 file_version_prefix_bytes = bytes(REPLAY_FILE_VERSION_PREFIX, encoding="utf-8")
                 if line is not None and line.startswith(file_version_prefix_bytes):
                     file_version = int(line.split(file_version_prefix_bytes)[1])
+                else:
+                    print(f"Could not find version in {replay_chunk_path}")
             except EOFError:
                 pass
 
@@ -236,7 +238,8 @@ class ProtoPlayer:
                     f"Writing to {log_file.name} starting at {self.current_packet_time}"
                 )
 
-
+                # Save all clips with the latest replay format version
+                log_file.write(bytes(REPLAY_FILE_VERSION_PREFIX + str(REPLAY_FILE_VERSION) + "\n", encoding="utf-8"))
 
                 while self.current_entry_index < len(self.current_chunk):
                     (
