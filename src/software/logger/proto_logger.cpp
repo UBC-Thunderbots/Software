@@ -74,7 +74,7 @@ void ProtoLogger::logProtobufs()
 
             // Start every replay file with the metadata, which includes the file format version.
             // This allows us to keep backwards compatibility as the replay file format evolves.
-            std::string file_metadata = "version:" + std::to_string(REPLAY_FILE_VERSION) + "\n";
+            std::string file_metadata = REPLAY_FILE_VERSION_PREFIX + std::to_string(REPLAY_FILE_VERSION) + "\n";
             int num_bytes_written = gzwrite(gz_file, file_metadata.c_str(),
                                             static_cast<unsigned>(file_metadata.size()));
             if (num_bytes_written == 0)
