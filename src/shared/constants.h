@@ -141,10 +141,10 @@ static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
 static const double MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC = 0.5;
 
 // ProtoLogger constants for replay files
-static const std::string REPLAY_FILE_EXTENSION = "replay";
-static const std::string REPLAY_METADATA_DELIMITER = ",";
+static const std::string REPLAY_FILE_EXTENSION      = "replay";
+static const std::string REPLAY_METADATA_DELIMITER  = ",";
 static const std::string REPLAY_FILE_VERSION_PREFIX = "version:";
-static const unsigned int REPLAY_FILE_VERSION = 2;
+static const unsigned int REPLAY_FILE_VERSION       = 2;
 
 // Battery Constants
 static const unsigned NUM_CELLS_IN_BATTERY    = 3;

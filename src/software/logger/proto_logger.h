@@ -98,8 +98,9 @@ class ProtoLogger
      * @param receive_time_sec The time the protobuf was received
      * @return A string containing the log entry
      */
-    static std::string createLogEntry(const std::string &proto_full_name, const std::string &serialized_proto,
-                   double receive_time_sec);
+    static std::string createLogEntry(const std::string& proto_full_name,
+                                      const std::string& serialized_proto,
+                                      double receive_time_sec);
 
    private:
     /**

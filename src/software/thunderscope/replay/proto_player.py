@@ -42,6 +42,7 @@ class ProtoPlayer:
     chunk) that contains the data at that time and continue playing from there.
 
     """
+
     PLAY_PAUSE_POLL_INTERVAL_SECONDS = 0.1
 
     def __init__(self, log_folder_path: str, proto_unix_io: ProtoUnixIO) -> None:
@@ -94,16 +95,26 @@ class ProtoPlayer:
                 f"to the folder containing the .replay files is provided."
             )
 
-        self.version = ProtoPlayer.get_replay_chunk_format_version(self.sorted_chunks[0])
+        self.version = ProtoPlayer.get_replay_chunk_format_version(
+            self.sorted_chunks[0]
+        )
 
         # We can get the total runtime of the log from the last entry in the last chunk
-        last_chunk_data = ProtoPlayer.load_replay_chunk(self.sorted_chunks[-1], self.version)
+        last_chunk_data = ProtoPlayer.load_replay_chunk(
+            self.sorted_chunks[-1], self.version
+        )
         try:
-            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-1], self.version)
+            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(
+                last_chunk_data[-1], self.version
+            )
         except DecodeError:
-            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-2], self.version)
+            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(
+                last_chunk_data[-2], self.version
+            )
         logging.info(
-            "Loaded a version {} replay file with total runtime of {:.2f} seconds".format(self.version, self.end_time)
+            "Loaded a version {} replay file with total runtime of {:.2f} seconds".format(
+                self.version, self.end_time
+            )
         )
 
         # Start playing thread
@@ -156,7 +167,9 @@ class ProtoPlayer:
         with gzip.open(replay_chunk_path, "rb") as log_file:
             try:
                 line = log_file.readline()
-                file_version_prefix_bytes = bytes(REPLAY_FILE_VERSION_PREFIX, encoding="utf-8")
+                file_version_prefix_bytes = bytes(
+                    REPLAY_FILE_VERSION_PREFIX, encoding="utf-8"
+                )
                 if line is not None and line.startswith(file_version_prefix_bytes):
                     file_version = int(line.split(file_version_prefix_bytes)[1])
                 else:
@@ -167,7 +180,9 @@ class ProtoPlayer:
         return file_version
 
     @staticmethod
-    def unpack_log_entry(log_entry: str, version: int) -> (float, Type[Message], Message):
+    def unpack_log_entry(
+        log_entry: str, version: int
+    ) -> (float, Type[Message], Message):
         """Unpacks a log entry into the timestamp and proto.
 
         :param log_entry: The log entry.
@@ -193,9 +208,13 @@ class ProtoPlayer:
 
         # Deserialize protobuf
         if version == 1:
-            deserialized_proto = proto_class.FromString(base64.b64decode(data[len("b") : -len("\n")]))
+            deserialized_proto = proto_class.FromString(
+                base64.b64decode(data[len("b") : -len("\n")])
+            )
         elif version == 2:
-            deserialized_proto = proto_class.FromString(base64.b64decode(data[: -len("\n")]))
+            deserialized_proto = proto_class.FromString(
+                base64.b64decode(data[: -len("\n")])
+            )
         else:
             raise ValueError(f"Unknown replay file version: {version}")
 
@@ -239,7 +258,12 @@ class ProtoPlayer:
                 )
 
                 # Save all clips with the latest replay format version
-                log_file.write(bytes(REPLAY_FILE_VERSION_PREFIX + str(REPLAY_FILE_VERSION) + "\n", encoding="utf-8"))
+                log_file.write(
+                    bytes(
+                        REPLAY_FILE_VERSION_PREFIX + str(REPLAY_FILE_VERSION) + "\n",
+                        encoding="utf-8",
+                    )
+                )
 
                 while self.current_entry_index < len(self.current_chunk):
                     (
@@ -251,7 +275,9 @@ class ProtoPlayer:
                     )
 
                     log_entry = tbots_cpp.ProtoLogger.createLogEntry(
-                        proto.DESCRIPTOR.full_name, proto.SerializeToString(), self.current_packet_time - start_time
+                        proto.DESCRIPTOR.full_name,
+                        proto.SerializeToString(),
+                        self.current_packet_time - start_time,
                     )
                     log_file.write(bytes(log_entry, encoding="utf-8"))
                     self.current_entry_index += 1

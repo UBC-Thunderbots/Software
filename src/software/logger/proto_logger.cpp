@@ -72,15 +72,17 @@ void ProtoLogger::logProtobufs()
                 throw std::runtime_error(error_msg);
             }
 
-            // Start every replay file with the metadata, which includes the file format version.
-            // This allows us to keep backwards compatibility as the replay file format evolves.
-            std::string file_metadata = REPLAY_FILE_VERSION_PREFIX + std::to_string(REPLAY_FILE_VERSION) + "\n";
+            // Start every replay file with the metadata, which includes the file format
+            // version. This allows us to keep backwards compatibility as the replay file
+            // format evolves.
+            std::string file_metadata =
+                REPLAY_FILE_VERSION_PREFIX + std::to_string(REPLAY_FILE_VERSION) + "\n";
             int num_bytes_written = gzwrite(gz_file, file_metadata.c_str(),
                                             static_cast<unsigned>(file_metadata.size()));
             if (num_bytes_written == 0)
             {
-                std::cerr << "ProtoLogger: Failed to write metadata to log file: " << log_file_path
-                          << std::endl;
+                std::cerr << "ProtoLogger: Failed to write metadata to log file: "
+                          << log_file_path << std::endl;
             }
 
             while (!shouldStopLogging())
@@ -97,7 +99,8 @@ void ProtoLogger::logProtobufs()
                     serialized_proto_opt.value();
 
                 // Write the log entry to the file with the format:
-                std::string log_entry = createLogEntry(proto_full_name, serialized_proto, receive_time_sec);
+                std::string log_entry =
+                    createLogEntry(proto_full_name, serialized_proto, receive_time_sec);
                 num_bytes_written = gzwrite(gz_file, log_entry.c_str(),
                                             static_cast<unsigned>(log_entry.size()));
 
@@ -130,14 +133,14 @@ void ProtoLogger::logProtobufs()
     }
 }
 
-std::string ProtoLogger::createLogEntry(const std::string &proto_full_name, const std::string &serialized_proto,
+std::string ProtoLogger::createLogEntry(const std::string& proto_full_name,
+                                        const std::string& serialized_proto,
                                         const double receive_time_sec)
 {
     // <time>,<protobuf_type_full_name>,<base64_encoded_serialized_proto>
     std::stringstream log_entry_ss;
-    log_entry_ss << receive_time_sec << REPLAY_METADATA_DELIMITER
-                 << proto_full_name << REPLAY_METADATA_DELIMITER
-                 << base64_encode(serialized_proto) << "\n";
+    log_entry_ss << receive_time_sec << REPLAY_METADATA_DELIMITER << proto_full_name
+                 << REPLAY_METADATA_DELIMITER << base64_encode(serialized_proto) << "\n";
     std::string log_entry = log_entry_ss.str();
     return log_entry;
 }
