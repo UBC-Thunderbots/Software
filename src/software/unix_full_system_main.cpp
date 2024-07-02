@@ -21,6 +21,8 @@
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/generic_factory/generic_factory.h"
 
+std::shared_ptr<ProtoLogger> proto_logger;
+
 int main(int argc, char** argv)
 {
     // Setup dynamic parameters
@@ -29,6 +31,7 @@ int main(int argc, char** argv)
         bool help                   = false;
         std::string runtime_dir     = "/tmp/tbots";
         bool friendly_colour_yellow = false;
+        bool ci = false;
     };
 
     CommandLineArgs args;
@@ -42,6 +45,9 @@ int main(int argc, char** argv)
     desc.add_options()("friendly_colour_yellow",
                        boost::program_options::bool_switch(&args.friendly_colour_yellow),
                        "If false, friendly colour is blue");
+    desc.add_options()("ci",
+                       boost::program_options::bool_switch(&args.ci),
+                       "If true, then the World timestamp will be used to as the time provider for ProtoLogger");
 
     boost::program_options::variables_map vm;
     boost::program_options::store(parse_command_line(argc, argv, desc), vm);
@@ -62,13 +68,28 @@ int main(int argc, char** argv)
         {
             TracySetProgramName("Thunderbots: Yellow");
         }
-        auto proto_logger = std::make_shared<ProtoLogger>(
-            args.runtime_dir,
-            []() {
+
+        std::function<double()> time_provider;
+        if (!args.ci)
+        {
+            // Return the current time since epoch in seconds
+            time_provider = []() {
                 return std::chrono::duration<double>(
-                           std::chrono::system_clock::now().time_since_epoch())
-                    .count();
-            },
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count();
+            };
+        }
+        else
+        {
+            // Default to returning 0 and update the time_provider with the World timestamp
+            // once the backend is set up
+            time_provider = []() {
+                return 0;
+            };
+        }
+        proto_logger = std::make_shared<ProtoLogger>(
+            args.runtime_dir,
+            time_provider,
             args.friendly_colour_yellow);
         LoggerSingleton::initializeLogger(args.runtime_dir, proto_logger);
         TbotsProto::ThunderbotsConfig tbots_proto;
@@ -79,6 +100,12 @@ int main(int argc, char** argv)
 
         auto backend =
             std::make_shared<UnixSimulatorBackend>(args.runtime_dir, proto_logger);
+        if (args.ci)
+        {
+            // Update the time provider for ProtoLogger
+            proto_logger->updateTimeProvider(boost::bind(&UnixSimulatorBackend::getLastWorldTimeSec, backend));
+        }
+
         auto sensor_fusion =
             std::make_shared<ThreadedSensorFusion>(tbots_proto.sensor_fusion_config());
         auto ai = std::make_shared<ThreadedAi>(tbots_proto.ai_config());
@@ -102,6 +129,14 @@ int main(int argc, char** argv)
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(ai);
         backend->Subject<TbotsProto::ThunderbotsConfig>::registerObserver(sensor_fusion);
+
+        std::signal(SIGTERM, [](int signal_number){
+            if (proto_logger)
+            {
+                proto_logger->flushAndStopLogging();
+            }
+            exit(0);
+        });
 
         // This blocks forever without using the CPU
         std::promise<void>().get_future().wait();

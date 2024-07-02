@@ -209,7 +209,7 @@ class SimulatedTestRunner(TbotsTestRunner):
                 always_validation_sequence_set,
             )
 
-            if self.thunderscope:
+            if self.thunderscope: # TODO (NIMA): Send validations even without tscope
 
                 # Set the test name
                 eventually_validation_proto_set.test_name = self.test_name
@@ -534,11 +534,13 @@ def simulated_test_runner():
         args.debug_blue_full_system,
         False,
         should_restart_on_crash=False,
+        running_in_realtime=args.enable_thunderscope,
     ) as blue_fs, FullSystem(
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         args.debug_yellow_full_system,
         True,
         should_restart_on_crash=False,
+        running_in_realtime=args.enable_thunderscope,
     ) as yellow_fs:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs)

@@ -22,6 +22,7 @@ class FullSystem(object):
         friendly_colour_yellow: bool = False,
         should_restart_on_crash: bool = True,
         run_sudo: bool = False,
+        running_in_realtime: bool = True,
     ) -> None:
         """Run FullSystem
 
@@ -30,6 +31,7 @@ class FullSystem(object):
         :param friendly_color_yellow: a argument passed into the unix_full_system binary (--friendly_colour_yellow)
         :param should_restart_on_crash: whether or not to restart the program after it has been crashed
         :param run_sudo: true if we should run full system under sudo
+        :param running_in_realtime: True if we are running fullsystem in realtime, else False
 
         """
         self.full_system_runtime_dir = full_system_runtime_dir
@@ -38,6 +40,7 @@ class FullSystem(object):
         self.full_system_proc = None
         self.should_restart_on_crash = should_restart_on_crash
         self.should_run_under_sudo = run_sudo
+        self.running_in_realtime = running_in_realtime
 
         self.thread = threading.Thread(target=self.__restart__)
 
@@ -57,9 +60,10 @@ class FullSystem(object):
         except:
             pass
 
-        self.full_system = "software/unix_full_system --runtime_dir={} {}".format(
+        self.full_system = "software/unix_full_system --runtime_dir={} {} {}".format(
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
+            "--ci" if not self.running_in_realtime else "",
         )
 
         if self.should_run_under_sudo:
@@ -152,7 +156,7 @@ gdb --args bazel-bin/{self.full_system}
 
         """
         if self.full_system_proc:
-            self.full_system_proc.kill()
+            self.full_system_proc.terminate()
             self.full_system_proc.wait()
 
         if self.should_restart_on_crash:

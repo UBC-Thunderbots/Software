@@ -33,6 +33,13 @@
  */
 class ProtoLogger
 {
+    struct SerializedProtoLog
+    {
+        std::string protobuf_type_full_name;
+        std::string serialized_proto;
+        double receive_time_sec;
+    };
+
    public:
     /**
      * Constructor
@@ -71,29 +78,46 @@ class ProtoLogger
         saveSerializedProto(ProtoType::GetDescriptor()->full_name(), serialized_proto);
     };
 
+    /**
+     * Update the time provider used to create timestamp for the protobufs
+     * @param time_provider A function that returns the current time in seconds
+     */
+    void updateTimeProvider(std::function<double()> time_provider);
+
+    /**
+     * Flushes the buffer and stops the logging thread.
+     * Note that
+     */
+    void flushAndStopLogging();
+
    private:
     /**
      * The loop which will be continuously logging the protobufs
      */
     void logProtobufs();
 
+    bool shouldStopLogging() const;
+
     std::string log_path_;
     std::string log_folder_;
     std::function<double()> time_provider_;
     double start_time_;
-    bool stop_logging_;
+    double destructor_called_time_sec_;
+    std::atomic<bool> stop_logging_;
+    bool friendly_colour_yellow_;
     std::thread log_thread_;
+    unsigned long int num_failed_logs_ = 0;
 
-    // Buffer storing the full name of the protobuf type to the serialized
-    // message which should be stored.
-    ThreadSafeBuffer<std::pair<std::string, std::string>> buffer_;
+    ThreadSafeBuffer<SerializedProtoLog> buffer_;
 
     // TODO (NIMA): Move to constants and pybind to python
     const Duration BUFFER_BLOCK_TIMEOUT                = Duration::fromSeconds(0.1);
+    const double MAX_TIME_TO_FLUSH_SEC                     = 0.5;
     const std::string REPLAY_FILE_PREFIX               = "proto_";
     const std::string REPLAY_FILE_EXTENSION            = "replay";
     const std::string REPLAY_FILE_TIME_FORMAT          = "%Y_%m_%d_%H_%M_%S";
     const std::string REPLAY_METADATA_DELIMETER        = ",";
     static constexpr unsigned int PROTOBUF_BUFFER_SIZE = 1000;
     static constexpr unsigned int REPLAY_MAX_CHUNK_SIZE_BYTES = 1024 * 1024;  // 1 MB
+    static constexpr unsigned int FAILED_LOG_PRINT_FREQUENCY  = 100;
 };

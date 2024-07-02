@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include "proto/parameters.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
@@ -21,6 +23,8 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
      */
     UnixSimulatorBackend(std::string runtime_dir,
                          const std::shared_ptr<ProtoLogger>& proto_logger);
+
+    double getLastWorldTimeSec();
 
    private:
     void receiveThunderbotsConfig(TbotsProto::ThunderbotsConfig request);
@@ -50,4 +54,8 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
 
     // World protobuf sequence number counter
     uint64_t sequence_number = 0;
+
+    // The timestamp of the last world received
+    double last_world_time_sec = 0;
+    std::mutex last_world_time_mutex;
 };

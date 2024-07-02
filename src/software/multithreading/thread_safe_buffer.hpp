@@ -84,6 +84,8 @@ class ThreadSafeBuffer
      */
     void push(const T& value);
 
+    bool empty() const;
+
     ~ThreadSafeBuffer();
 
    private:
@@ -173,6 +175,12 @@ std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue(
     // NOTE: We need to return this in order to prevent it being destructed so
     //       the lock is maintained until the value is read
     return buffer_lock;
+}
+
+template<typename T>
+bool ThreadSafeBuffer<T>::empty() const
+{
+    return buffer.empty();
 }
 
 template <typename T>
