@@ -31,11 +31,9 @@ class ProtoConfigurationWidget(QWidget):
 
         NOTE: This class handles the ParameterRangeOptions
 
-        :param proto_to_configure: The protobuf we would like to generate
-                                   a parameter tree for. This should be
-                                   populated with the default values
         :param on_change_callback: The callback to trigger on change
                                     args: name, updated_value, updated_proto
+        :param is_yellow: whether we are editing yellow or blue team's configuration
         :param search_filter_threshold: How close should the search query be?
                         100 is an exact match (not ideal), 0 lets everything through
 
@@ -48,11 +46,13 @@ class ProtoConfigurationWidget(QWidget):
 
         # Create search query bar
         self.search_query = QLineEdit()
+        self.search_query.setPlaceholderText("Search Parameters")
+
         self.search_query.textChanged.connect(self.__handle_search_query_changed)
         self.search_filter_threshold = search_filter_threshold
 
         self.is_yellow = is_yellow
-        self.path_to_file = self.get_default_savepath(self.is_yellow)
+        self.path_to_file = self.get_default_savepath()
         self.update_proto_from_file(self.path_to_file)
 
         # Create ParameterGroup from Protobuf
@@ -70,12 +70,11 @@ class ProtoConfigurationWidget(QWidget):
         self.param_group.sigTreeStateChanged.connect(self.__handle_parameter_changed)
         self.param_tree.setAlternatingRowColors(False)
 
-        self.save_hbox_top, self.save_hbox_bottom, self.line_box = self.create_widget()
+        self.save_hbox_top, self.save_hbox_bottom = self.create_widget()
 
         layout.addLayout(self.save_hbox_top)
         layout.addLayout(self.save_hbox_bottom)
 
-        layout.addWidget(QLabel("Edit TBotsConfig"))
         layout.addWidget(self.search_query)
         layout.addWidget(self.param_tree)
 
@@ -114,11 +113,8 @@ class ProtoConfigurationWidget(QWidget):
         save_hbox_bottom.addWidget(save_button)
 
         save_hbox_top = QHBoxLayout()
-        line_box = QLabel(f"Currently Editing: {self.path_to_file}")
 
-        save_hbox_top.addWidget(line_box)
-        return save_hbox_top, save_hbox_bottom, line_box
-
+        return save_hbox_top, save_hbox_bottom
     def update_proto_from_file(self, path_to_file: str):
         """
         load the protobuf from path_to_file to the variable self.proto_to_configure
@@ -157,7 +153,26 @@ class ProtoConfigurationWidget(QWidget):
         """
         This is a callback for a button that save the current protobuf to disk!
         """
-        self.save_current_config_to_file(self.path_to_file)
+        try:
+            save_to_path, should_save = QFileDialog.getSaveFileName(
+                self,
+                "Select Protobufs",
+                self.get_default_savepath(),
+                options=QFileDialog.Option.DontUseNativeDialog,
+            )
+
+            if not should_save:
+                return
+
+
+            self.save_current_config_to_file(save_to_path)
+            self.update_widget()
+        except Exception:
+            logging.warning(
+                "cannot save configuration to {}".format(
+                    save_to_path
+                )
+            )
 
     def save_current_config_to_file(self, path_to_file):
         """
@@ -181,7 +196,7 @@ class ProtoConfigurationWidget(QWidget):
             path_to_file, should_open = QFileDialog.getOpenFileName(
                 self,
                 "Select Protobufs",
-                self.get_default_savepath(self.is_yellow),
+                self.get_default_savepath(),
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
             if not should_open:
@@ -190,7 +205,6 @@ class ProtoConfigurationWidget(QWidget):
             self.path_to_file = path_to_file
             self.update_proto_from_file(path_to_file)
 
-            self.line_box.setText(f"Currently editing: {self.path_to_file}")
             self.update_widget()
         except Exception:
             logging.warning(
@@ -217,11 +231,10 @@ class ProtoConfigurationWidget(QWidget):
         self.param_group.sigTreeStateChanged.connect(self.__handle_parameter_changed)
         self.param_tree.setAlternatingRowColors(False)
 
-    def get_default_savepath(self, is_yellow):
+    def get_default_savepath(self):
         """
         returns the default save path for the protobufs
 
-        :param is_yellow: are we configuring yellow or blue configuration file?
         :return: the path where we are going to save the files
         """
 
@@ -243,8 +256,7 @@ class ProtoConfigurationWidget(QWidget):
             self.is_yellow
         )
 
-        self.path_to_file = self.get_default_savepath(self.is_yellow)
-        self.line_box.setText(self.path_to_file)
+        self.path_to_file = self.get_default_savepath()
 
         self.build_proto(self.proto_to_configure)
         self.update_widget()
