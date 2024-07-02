@@ -193,7 +193,7 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
 
 bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
-    Point robot_position = event.common.robot.position();
+    Point robot_position   = event.common.robot.position();
     double ball_position_x = event.common.world_ptr->ball().position().x();
     std::optional<Robot> nearest_enemy =
         event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
@@ -206,8 +206,7 @@ bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
             distance(robot_position, nearest_enemy->position());
 
         return ball_distance < nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD &&
-               ball_position_x < 0 &&
-               ball_distance <= MAX_GET_BALL_RADIUS_M &&
+               ball_position_x < 0 && ball_distance <= MAX_GET_BALL_RADIUS_M &&
                event.common.world_ptr->ball().velocity().length() <=
                    MAX_BALL_SPEED_TO_GET_MS;
     }
