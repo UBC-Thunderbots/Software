@@ -202,8 +202,8 @@ bool SensorFusion::shouldTrustRobotStatus()
             .length();
 
     // In other words, this is only true if we have the position of the breakbeam
-    // robot, and the distance between what the ssl says and where the robots are actually
-    // at is less that a threshold distance set by
+    // robot, and the distance between what SSL says and where the robots are actually
+    // at is less than a threshold distance set by
     // DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION
     return distance <= DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION;
 }
