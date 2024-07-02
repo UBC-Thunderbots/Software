@@ -98,7 +98,7 @@ def make_part_replay_chunks(list_of_protos: [Message], save_path:str, duration:f
 
     :list_of_protos: the list of proto that we are referencing when creating the log entries
     :save_path: where we are saving the replay file
-    :duration: how long do we want to create theses replay chunks
+    :duration: how long do we want to create these replay chunks
     :start_time: when is the replay chunk being started? 
     :gen_log_entry_func: the function that is used to generate invalid log entries 
     :frequency: what percent of the time should we call gen_log_entry_func
