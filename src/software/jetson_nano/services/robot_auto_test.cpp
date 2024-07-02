@@ -34,7 +34,7 @@ std::string runtime_dir                 = "/tmp/tbots/yellow_test";
 
 int main(int argc, char **argv)
 {
-    LoggerSingleton::initializeLogger(runtime_dir);
+    LoggerSingleton::initializeLogger(runtime_dir, nullptr);
     LOG(INFO) << "Running on the Jetson Nano!";
 
     motor_service_ =

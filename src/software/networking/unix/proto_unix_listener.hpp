@@ -21,7 +21,8 @@ class ProtoUnixListener
      * @param receive_callback The callback to trigger on a new packet
      */
     ProtoUnixListener(boost::asio::io_service &io_service, const std::string &unix_path,
-                      std::function<void(ReceiveProtoT &)> receive_callback);
+                      std::function<void(ReceiveProtoT &)> receive_callback,
+                      const std::shared_ptr<ProtoLogger> &proto_logger = nullptr);
 
     virtual ~ProtoUnixListener();
 
@@ -52,6 +53,8 @@ class ProtoUnixListener
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT &)> receive_callback;
 
+    std::shared_ptr<ProtoLogger> proto_logger;
+
     // Whether or not the listener is running
     bool running_ = true;
 };
@@ -59,8 +62,9 @@ class ProtoUnixListener
 template <class ReceiveProtoT>
 ProtoUnixListener<ReceiveProtoT>::ProtoUnixListener(
     boost::asio::io_service &io_service, const std::string &unix_path,
-    std::function<void(ReceiveProtoT &)> receive_callback)
-    : socket_(io_service), receive_callback(receive_callback)
+    std::function<void(ReceiveProtoT &)> receive_callback,
+    const std::shared_ptr<ProtoLogger> &proto_logger)
+    : socket_(io_service), receive_callback(receive_callback), proto_logger(proto_logger)
 {
     ::unlink(unix_path.c_str());
 
@@ -106,6 +110,12 @@ void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
         receive_callback(packet_data);
+
+        if (proto_logger)
+        {
+            proto_logger->saveSerializedProto<ReceiveProtoT>(
+                std::string(raw_received_data_.data(), num_bytes_received));
+        }
 
         // Once we've handled the data, start listening again
         startListen();

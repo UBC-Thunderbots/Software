@@ -57,7 +57,6 @@ class ProtoUnixIO:
     def __init__(self) -> None:
         # Mapping from ProtoType.DESCRIPTOR.full_name -> buffer
         self.proto_observers = {}
-        self.all_proto_observers = []
         self.unix_senders = {}
         self.unix_listeners = {}
         self.send_proto_to_observer_threads = {}
@@ -80,12 +79,6 @@ class ProtoUnixIO:
                     except queue.Full:
                         pass
 
-            for buffer in self.all_proto_observers:
-                try:
-                    buffer.put(proto, block=False)
-                except queue.Full:
-                    print("Buffer registered to receive everything dropped data")
-
     def register_observer(
         self, proto_class: Type[Message], buffer: ThreadSafeBuffer
     ) -> None:
@@ -99,14 +92,6 @@ class ProtoUnixIO:
             self.proto_observers[proto_class.DESCRIPTOR.full_name].append(buffer)
         else:
             self.proto_observers[proto_class.DESCRIPTOR.full_name] = [buffer]
-
-    def register_to_observe_everything(self, buffer: ThreadSafeBuffer) -> None:
-        """Register a buffer to observe all incoming protobufs
-
-        :param buffer: buffer to push protos onto
-        
-        """
-        self.all_proto_observers.append(buffer)
 
     def send_proto(
         self,
@@ -127,11 +112,6 @@ class ProtoUnixIO:
         if proto_class.DESCRIPTOR.full_name in self.proto_observers:
             for buffer in self.proto_observers[proto_class.DESCRIPTOR.full_name]:
                 buffer.put(data, block, timeout)
-        for buffer in self.all_proto_observers:
-            try:
-                buffer.put(data, block, timeout)
-            except queue.Full:
-                print("Buffer registered to receive everything dropped data")
 
     def attach_unix_sender(
         self,

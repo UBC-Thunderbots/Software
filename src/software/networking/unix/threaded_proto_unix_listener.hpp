@@ -17,7 +17,8 @@ class ThreadedProtoUnixListener
      * @param receive_callback The callback to trigger on a new packet
      */
     ThreadedProtoUnixListener(const std::string& unix_path,
-                              std::function<void(ReceiveProtoT&)> receive_callback);
+                              std::function<void(ReceiveProtoT&)> receive_callback,
+                              const std::shared_ptr<ProtoLogger>& proto_logger = nullptr);
 
     ~ThreadedProtoUnixListener();
 
@@ -33,8 +34,9 @@ class ThreadedProtoUnixListener
 
 template <class ReceiveProtoT>
 ThreadedProtoUnixListener<ReceiveProtoT>::ThreadedProtoUnixListener(
-    const std::string& unix_path, std::function<void(ReceiveProtoT&)> receive_callback)
-    : io_service(), unix_listener(io_service, unix_path, receive_callback)
+    const std::string& unix_path, std::function<void(ReceiveProtoT&)> receive_callback,
+    const std::shared_ptr<ProtoLogger>& proto_logger)
+    : io_service(), unix_listener(io_service, unix_path, receive_callback, proto_logger)
 {
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });

@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     else
     {
         std::string runtime_dir = args.runtime_dir;
-        LoggerSingleton::initializeLogger(runtime_dir);
+        LoggerSingleton::initializeLogger(runtime_dir, nullptr);
 
         /**
          * Creates a ER force simulator and sets up the appropriate

@@ -15,7 +15,6 @@ from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.logger.logger import createLogger
 
 
@@ -131,7 +130,7 @@ class FieldTestRunner(TbotsTestRunner):
             test_end_time = time.time() + test_timeout_s
 
             while time.time() < test_end_time:
-                # Update the timestamp logged by the ProtoLogger
+                # Update the timestamp logged by the ProtoLogger # TODO (NIMA): Remove time providers
                 with self.timestamp_mutex:
 
                     ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
@@ -426,31 +425,4 @@ def field_test_runner():
 
             friendly_proto_unix_io.register_observer(World, runner.world_buffer)
 
-            # Setup proto loggers.
-            #
-            # NOTE: Its important we use the test runners time provider because
-            # test will run as fast as possible with a varying tick rate. The
-            # SimulatorTestRunner time provider is tied to the simulators
-            # t_capture coming out of the wrapper packet (rather than time.time).
-            with ProtoLogger(
-                f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
-                time_provider=runner.time_provider,
-            ) as blue_logger, ProtoLogger(
-                f"{args.yellow_full_system_runtime_dir}/logs/{current_test}",
-                time_provider=runner.time_provider,
-            ) as yellow_logger:
-                blue_full_system_proto_unix_io.register_to_observe_everything(
-                    blue_logger.buffer
-                )
-                yellow_full_system_proto_unix_io.register_to_observe_everything(
-                    yellow_logger.buffer
-                )
-                yield runner
-                print(
-                    f"\n\nTo replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}",
-                    flush=True,
-                )
-                print(
-                    f"\n\nTo replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}",
-                    flush=True,
-                )
+            yield runner

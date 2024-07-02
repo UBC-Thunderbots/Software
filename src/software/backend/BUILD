@@ -21,6 +21,7 @@ cc_library(
     deps = [
         ":backend",
         "//proto:tbots_cc_proto",
+        "//proto:validation_cc_proto",
         "//proto/message_translation:ssl_wrapper",
         "//proto/message_translation:tbots_protobuf",
         "//shared:constants",

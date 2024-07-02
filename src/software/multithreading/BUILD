@@ -37,7 +37,6 @@ cc_library(
         "thread_safe_buffer.hpp",
     ],
     deps = [
-        "//software/logger",
         "//software/time:duration",
         "//software/util/typename",
         "@boost//:circular_buffer",
