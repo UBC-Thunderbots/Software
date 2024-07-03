@@ -54,6 +54,15 @@ class ProtoLogger
                          std::function<double()> time_provider,
                          bool friendly_colour_yellow);
 
+    ProtoLogger() = delete;
+
+    /**
+     * Removing copy constructor and assignment operator to prevent accidental copying
+     * of the ProtoLogger.
+     */
+    ProtoLogger(const ProtoLogger&) = delete;
+    ProtoLogger& operator=(const ProtoLogger&) = delete;
+
     ~ProtoLogger();
 
     /**

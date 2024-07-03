@@ -150,6 +150,13 @@ int main(int argc, char** argv)
         // SIGINT is sent by the user when they Ctrl+C in the terminal
         std::signal(SIGINT, cleanup);
 
+        // Handle the rest of the catch-able signals to ensure we have flushed proto
+        // logger before exiting, so we can debug the cause of the error.
+        std::signal(SIGSEGV, cleanup);
+        std::signal(SIGABRT, cleanup);
+        std::signal(SIGFPE, cleanup);
+        std::signal(SIGILL, cleanup);
+
         // This blocks forever without using the CPU
         std::promise<void>().get_future().wait();
     }
