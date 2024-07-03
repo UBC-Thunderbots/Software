@@ -108,7 +108,7 @@ namespace reflective_enum
      * @return the enum value
      */
     template <ReflectiveEnum E>
-    E fromName(const std::string value_name)
+    constexpr E fromName(const std::string value_name)
     {
         constexpr size_t enum_size      = size<E>();
         constexpr auto enum_value_names = valueNames<E>();
