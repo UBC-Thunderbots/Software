@@ -162,19 +162,5 @@ struct PlaySelectionFSM
    private:
     std::shared_ptr<Strategy> strategy_;
     std::shared_ptr<OffensePlay> offense_play_;
-
-    enum SetPlayType
-    {
-        NONE,
-        FRIENDLY_BALL_PLACEMENT,
-        ENEMY_BALL_PLACEMENT,
-        FRIENDLY_KICKOFF,
-        ENEMY_KICKOFF,
-        FRIENDLY_PENALTY_KICK,
-        ENEMY_PENALTY_KICK,
-        FRIENDLY_FREE_KICK,
-        ENEMY_FREE_KICK,
-    };
-
-    SetPlayType current_set_play_;
+    std::optional<TbotsProto::PlayName> current_set_play_;
 };
