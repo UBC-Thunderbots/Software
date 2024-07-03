@@ -2,6 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 bool PassDefenderFSM::passStarted(const Update& event)
 {
@@ -109,7 +110,6 @@ void PassDefenderFSM::interceptBall(const Update& event)
 bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
     Point robot_position   = event.common.robot.position();
-    double ball_position_x = event.common.world_ptr->ball().position().x();
     std::optional<Robot> nearest_enemy =
             event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
     if (nearest_enemy)
@@ -120,10 +120,20 @@ bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
         double nearest_enemy_distance =
                 distance(robot_position, nearest_enemy->position());
 
-        return ball_distance < nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD &&
-               ball_position_x < 0 && ball_distance <= MAX_GET_BALL_RADIUS_M &&
-               event.common.world_ptr->ball().velocity().length() <=
-               MAX_BALL_SPEED_TO_GET_MS;
+        LOG(VISUALIZE) << *createDebugShapes({
+                 *createDebugShape(
+                         Circle(robot_position,
+                                std::min(nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD, MAX_GET_BALL_RADIUS_M)),
+                         std::to_string(event.common.robot.id()) + "1",
+                         "ballgetzone"
+                 )
+         });
+
+        bool ball_is_near_friendly = ball_distance < nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD;
+        bool ball_is_within_max_range = ball_distance <= MAX_GET_BALL_RADIUS_M;
+        bool ball_is_slow = event.common.world_ptr->ball().velocity().length() <= MAX_BALL_SPEED_TO_GET_MS;
+
+        return  ball_is_near_friendly && ball_is_within_max_range && ball_is_slow;
     }
     else
     {
