@@ -78,17 +78,11 @@ namespace reflective_enum
     };
 
     /**
-     * Concept that is satisfied by any type E that is a reflective enum.
-     */
-    template <typename E>
-    concept ReflectiveEnum = is_reflective_enum<E>::value;
-
-    /**
      * Returns the number of values in the reflective enum E.
      *
      * @return the number of values in the enum
      */
-    template <ReflectiveEnum E>
+    template <typename E>
     constexpr size_t size();
 
     /**
@@ -96,7 +90,7 @@ namespace reflective_enum
      *
      * @return an array with the values of the enum
      */
-    template <ReflectiveEnum E>
+    template <typename E>
     constexpr auto values();
 
     /**
@@ -105,7 +99,7 @@ namespace reflective_enum
      *
      * @return an array with the names of the values in the enum
      */
-    template <ReflectiveEnum E>
+    template <typename E>
     constexpr auto valueNames();
 
     /**
@@ -115,7 +109,7 @@ namespace reflective_enum
      *
      * @return the enum value
      */
-    template <ReflectiveEnum E>
+    template <typename E>
     constexpr E fromName(const std::string value_name)
     {
         constexpr size_t enum_size      = size<E>();
