@@ -279,7 +279,7 @@ class GameStatePredicateTest : public ::testing::Test
     void SetUp() override
     {
         constexpr auto enum_values = reflective_enum::values<RefereeCommand>();
-        allRefereeCommands = std::vector(enum_values.begin(), enum_values.end());
+        allRefereeCommands         = std::vector(enum_values.begin(), enum_values.end());
     }
     std::vector<RefereeCommand> allRefereeCommands;
 };
