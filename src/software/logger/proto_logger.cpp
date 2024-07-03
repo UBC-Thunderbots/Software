@@ -175,17 +175,17 @@ void ProtoLogger::flushAndStopLogging()
         log_thread_.join();
     }
 
-    // Print the command to run to watch the replay
+    // In blue, print the command to run to watch the replay
     if (friendly_colour_yellow_)
     {
         std::cout
-            << "\nTo watch the replay for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log  "
-            << log_folder_ << std::endl;
+            << "\nTo watch the replay for the yellow team, go to the `src` folder and run \n\033[34m./tbots.py run thunderscope --yellow_log  "
+            << log_folder_ << "\033[m" << std::endl;
     }
     else
     {
         std::cout
-            << "\nTo watch the replay for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log  "
-            << log_folder_ << std::endl;
+            << "\nTo watch the replay for the blue team, go to the `src` folder and run \n\033[34m./tbots.py run thunderscope --blue_log  "
+            << log_folder_ << "\033[m" << std::endl;
     }
 }
