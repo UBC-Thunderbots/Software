@@ -10,8 +10,9 @@ TEST(PassDefenderFSMTest, test_transitions)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(-1, 0));
     PassDefenderFSM::ControlParams control_params{.position_to_block_from = Point(-2, 0)};
+    TbotsProto::AiConfig ai_config;
 
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM()};
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(), DribbleFSM(ai_config.dribble_tactic_config())};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
@@ -49,8 +50,9 @@ TEST(PassDefenderFSMTest, test_intercept_edge_case)
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot                  = ::TestUtil::createRobotAtPos(Point(0, 0));
     PassDefenderFSM::ControlParams control_params{.position_to_block_from = Point(-2, 0)};
+    TbotsProto::AiConfig ai_config;
 
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM()};
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(), DribbleFSM(ai_config.dribble_tactic_config())};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));

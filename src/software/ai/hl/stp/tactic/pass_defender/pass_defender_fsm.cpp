@@ -136,8 +136,7 @@ void PassDefenderFSM::prepareGetPossession(
 {
     Point ball_position       = event.common.world_ptr->ball().position();
     Point enemy_goal_center   = event.common.world_ptr->field().enemyGoal().centre();
-    Vector ball_to_net_vector = Vector(enemy_goal_center.x() - ball_position.x(),
-                                       enemy_goal_center.y() - ball_position.y());
+    auto ball_to_net_vector = Vector(enemy_goal_center - ball_position);
     DribbleFSM::ControlParams control_params{
             .dribble_destination       = ball_position,
             .final_dribble_orientation = ball_to_net_vector.orientation(),
