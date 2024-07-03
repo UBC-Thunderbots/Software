@@ -19,8 +19,8 @@ ProtoLogger::ProtoLogger(const std::string& log_path,
                          const bool friendly_colour_yellow)
     : log_path_(log_path),
       time_provider_(time_provider),
-      stop_logging_(false),
       friendly_colour_yellow_(friendly_colour_yellow),
+      stop_logging_(false),
       buffer_(PROTOBUF_BUFFER_SIZE, true)
 {
     start_time_ = time_provider_();
@@ -140,8 +140,7 @@ std::string ProtoLogger::createLogEntry(const std::string& proto_full_name,
     std::stringstream log_entry_ss;
     log_entry_ss << receive_time_sec << REPLAY_METADATA_DELIMITER << proto_full_name
                  << REPLAY_METADATA_DELIMITER << base64_encode(serialized_proto) << "\n";
-    std::string log_entry = log_entry_ss.str();
-    return log_entry;
+    return log_entry_ss.str();
 }
 
 void ProtoLogger::updateTimeProvider(std::function<double()> time_provider)
@@ -151,7 +150,7 @@ void ProtoLogger::updateTimeProvider(std::function<double()> time_provider)
 
 bool ProtoLogger::shouldStopLogging() const
 {
-    if (!stop_logging_)
+    if (!stop_logging_.load())
     {
         return false;
     }
@@ -161,17 +160,17 @@ bool ProtoLogger::shouldStopLogging() const
     double curr_time_sec =
         std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch())
             .count();
-    return (curr_time_sec - destructor_called_time_sec_) >
-               MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC ||
-           buffer_.empty();
+    return buffer_.empty() || (curr_time_sec - destructor_called_time_sec_) >
+                                  MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC;
 }
 
 void ProtoLogger::flushAndStopLogging()
 {
-    stop_logging_ = true;
     destructor_called_time_sec_ =
         std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch())
             .count();
+    stop_logging_.store(true);
+
     if (log_thread_.joinable())
     {
         log_thread_.join();

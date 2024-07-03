@@ -24,6 +24,9 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     UnixSimulatorBackend(std::string runtime_dir,
                          const std::shared_ptr<ProtoLogger>& proto_logger);
 
+    /**
+     * Get the timestamp (in seconds) of the last World received
+     */
     double getLastWorldTimeSec();
 
    private:
@@ -56,6 +59,5 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     uint64_t sequence_number = 0;
 
     // The timestamp of the last world received
-    double last_world_time_sec = 0;
-    std::mutex last_world_time_mutex;
+    std::atomic<double> last_world_time_sec = 0;
 };

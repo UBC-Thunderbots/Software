@@ -33,6 +33,9 @@
  */
 class ProtoLogger
 {
+    /**
+     * A struct to store a serialized protobuf message for the purpose of replay logging
+     */
     struct SerializedProtoLog
     {
         std::string protobuf_type_full_name;
@@ -118,11 +121,12 @@ class ProtoLogger
     std::string log_folder_;
     std::function<double()> time_provider_;
     double start_time_;
-    double destructor_called_time_sec_;
-    std::atomic<bool> stop_logging_;
     bool friendly_colour_yellow_;
-    std::thread log_thread_;
     unsigned long int num_failed_logs_ = 0;
+
+    std::thread log_thread_;
+    std::atomic<bool> stop_logging_;
+    double destructor_called_time_sec_;
 
     ThreadSafeBuffer<SerializedProtoLog> buffer_;
 

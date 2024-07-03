@@ -83,12 +83,10 @@ void UnixSimulatorBackend::onValueReceived(World world)
         static_cast<float>(
             FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
 
-    std::scoped_lock lock(last_world_time_mutex);
-    last_world_time_sec = world.getMostRecentTimestamp().toSeconds();
+    last_world_time_sec.store(world.getMostRecentTimestamp().toSeconds());
 }
 
 double UnixSimulatorBackend::getLastWorldTimeSec()
 {
-    std::scoped_lock lock(last_world_time_mutex);
-    return last_world_time_sec;
+    return last_world_time_sec.load();
 }
