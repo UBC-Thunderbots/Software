@@ -38,7 +38,7 @@ class RobotCommunication(object):
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
         :param enable_radio: Whether to use radio to send primitives to robots
-        :param referee_port: the referee port that we are using
+        :param referee_port: the referee port that we are using. If this is None, the default port is used
 
         """
 

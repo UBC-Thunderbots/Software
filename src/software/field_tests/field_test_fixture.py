@@ -384,7 +384,7 @@ def field_test_runner():
         estop_mode=estop_mode,
         estop_path=estop_path,
         enable_radio=args.enable_radio,
-        referee_port=Gamecontroller.get_referee_port_staticmethod(gamecontroller),
+        referee_port=Gamecontroller.get_referee_port_static(gamecontroller),
     ) as rc_friendly:
         friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
         rc_friendly.setup_for_fullsystem()

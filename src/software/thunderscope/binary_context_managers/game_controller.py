@@ -32,21 +32,19 @@ class Gamecontroller(object):
         """Run Gamecontroller
 
         :param supress_logs: Whether to suppress the logs
-        :not_launch_gc Whether to launch the gamecontroller or not!
+        :param use_conventional_port: whether or not to use the conventional port!
         """
 
         self.supress_logs = supress_logs
 
         self.ci_port = self.next_free_port()
-        # we are not using conventional by default since most of the time
-        # we are not in competition and. Thus, we would be conflicting with
-        # each other if we are using conventional port
         self.referee_port = self.next_free_port(random.randint(1024, 65535))
+        # We default to using a non-conventional port to avoid emitting on the same port as what other teams may be listening on.
         if use_conventional_port:
-            if not self.is_valid_port(40000):
+            if not self.is_valid_port(SSL_REFEREE_PORT):
                 raise OSError("Cannot use port 40000 for Gamecontroller")
 
-            self.referee_port = 40000
+            self.referee_port = SSL_REFEREE_PORT
 
         self.ci_port = self.next_free_port()
         # this allows gamecontroller to listen to override commands
@@ -55,14 +53,9 @@ class Gamecontroller(object):
         )
 
     @staticmethod
-    def get_referee_port_staticmethod(gamecontroller: Gamecontroller):
+    def get_referee_port_static(gamecontroller: Gamecontroller):
         """
         return the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
-
-        This function is used situation like the following: https://github.com/Mr-Anyone/Thunderbot_Software/blob/cf668bfeaff698097aadce1d01c60b4c731322c6/src/software/thunderscope/thunderscope_main.py#L322. 
-        In otherwords, the instance of gamecontroller has type None, but we want a function or staticmethod to return the default port of the referee 
-        Since the type is None, we cannot call self.get_referee_port, and thus this function is declared as a static method. If the gamecontroller has type None. We want to listen to the default port instead!
-
 
         :param gamecontroller: the gamecontroller we are using
         :return: the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
@@ -70,7 +63,7 @@ class Gamecontroller(object):
         if gamecontroller is not None:
             return gamecontroller.get_referee_port()
 
-        return 40000
+        return SSL_REFEREE_PORT
 
     def get_referee_port(self) -> int:
         """
