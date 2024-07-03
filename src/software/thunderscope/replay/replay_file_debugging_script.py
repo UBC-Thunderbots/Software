@@ -19,7 +19,6 @@ def read_one_chunk(replay_file_name):
 
     line_num = 0
     with gzip.open(replay_file_name, "rb") as replay_file:
-        line = replay_file.readline()
 
         for line in replay_file.readlines():
             # do not parse empty line
