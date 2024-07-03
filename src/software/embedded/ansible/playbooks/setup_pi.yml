@@ -1,6 +1,6 @@
 ---
 
-- name: Setting up the jetson Nano
+- name: Setting up the Raspberry Pi
   hosts: THUNDERBOTS_HOSTS
 
   tasks:
@@ -8,233 +8,46 @@
     - name: Run basic setup
       tags: dependencies
       block:
-        - name: check internet connection
-          uri:
-            url: "https://google.com"
-            timeout: 30
-            status_code: 200
+        - ansible.builtin.import_tasks:
+          file: shared_setup.yml
+          apply:
+            tags:
+              - check_internet
+              - enable_passwordless_sudo
+              - setup_robot_software_deps
+              - add_user_robot_to_dialout
+              - systemd
 
-        - name: enable passwordless sudo for rsync
-          become: true
-          become_method: sudo
-          lineinfile:
-            path: /etc/sudoers
-            state: present
-            insertafter: EOF
-            line: '{{ ansible_user }} ALL=NOPASSWD:/usr/bin/rsync'
-
-        - name: Sync Setup Script
-          become: true
-          become_method: sudo
-          tags:
-            - sync
-          ansible.posix.synchronize:
-            src: ../../setup_robot_software_deps.sh
-            dest: ~/
-            recursive: yes
-            copy_links: yes
-
-        # Output of each nano streamed to that Pi's /tmp/setup.log
-        - name: Running the setup script, this will take a while
-          become_method: sudo
-          become: true
-          command: '/home/{{ ansible_user }}/setup_robot_software_deps.sh >& /tmp/setup.log'
-          register: result
-          args:
-            chdir: ~/
-
-        - name: success msg
-          debug:
-            msg:
-              - "[Robot ID = {{ inventory_hostname }}]"
-              - "Setup Script run successfully"
-
-        - name: Setup wifi udev rule
-          become: true
-          become_method: sudo
-          tags:
-            - wifi
-          copy:
-            src: ../../linux_configs/10-persistent-net.link
-            dest: /etc/systemd/network/10-persistent-net.link
-            owner: root
-            group: root
-            mode: '0644'
-
-        - name: Setup udevadm trigger
-          become: true
-          become_method: sudo
-          command: 'udevadm trigger'
-
-        - name: Add user robot to dialout
-          become: true
-          become_method: sudo
-          command: 'adduser robot dialout'
-
-        # Device tree setup
-        - name: Sync Device Tree
-          become: true
-          become_method: sudo
-          tags:
-            - sync
-            - device_tree
-          ansible.posix.synchronize:
-            src: ../../../linux_configs/device_tree.zip
-            dest: ~/
-            recursive: yes
-            copy_links: yes
-
-        - name: Sync extlinux conf
-          become: true
-          become_method: sudo
-          tags:
-            - sync
-            - device_tree
-          ansible.posix.synchronize:
-            src: ../../../linux_configs/extlinux.conf
-            dest: ~/
-            recursive: yes
-            copy_links: yes
-
-        - name: Unzip device tree
-          tags:
-            - sync
-            - device_tree
-          command: 'unzip -o ~/device_tree.zip'
-          register: result
-          args:
-            chdir: ~/
-
-        - name: Compile device tree
-          tags:
-            - sync
-            - device_tree
-          shell: 'dtc -q -I dts -O dtb ~/device_tree.dts > device_tree.dtb'
-          register: result
-          args:
-            chdir: ~/
-
-
-        - name: Move compiled device tree binary to boot path
-          become_method: sudo
-          become: true
-          tags:
-            - sync
-            - device_tree
-          shell: 'mv /home/robot/device_tree.dtb /boot/kernel_tegra210-p3448-0000-p3449-0000-b00-user-custom.dtb'
-          register: result
-          args:
-            chdir: ~/
-
-        - name: Move extlinux file
-          become_method: sudo
-          become: true
-          tags:
-            - sync
-            - device_tree
-          shell: 'mv /home/robot/extlinux.conf /boot/extlinux/extlinux.conf'
-          register: result
-          args:
-            chdir: ~/
-
-
-    - name: Run systemd setup
-      tags: systemd
-      block:
-        - name: Delete everything on ~/
-          file:
+    - name: Configure Pi
+      tags: dependencies
+      - name: Disable pcie_aspm
+        block:
+          ansible.builtin.lineinfile:
+            path: /boot/firmware/cmdline.txt
+            search_string: 'pcie_aspm=off'
             state: absent
-            path: /home/robot/thunderbots_binaries
-          become_method: sudo
-          become: true
-          register: result
 
-        - name: Sync Binaries
-          with_items:
-            # bazel makes its own zip files, we append another zip to deconflict
-            - ../../display/robot_ui_zip.zip
-            - ../../thunderloop_main
-          loop_control:
-            loop_var: binary_path
-          ansible.posix.synchronize:
-            src: "{{ binary_path }}"
-            dest: ~/thunderbots_binaries/
-            recursive: yes
-            copy_links: yes
-          tags:
-            - syncBinaries
+          ansible.builtin.lineinfile:
+            path: /boot/firmware/cmdline.txt
+            line: ' pcie_aspm=off'
 
-        - name: Unzipping python binaries
-          command: 'unzip ~/thunderbots_binaries/*.zip'
-          register: result
-          args:
-            chdir: ~/thunderbots_binaries
+      - name: Set up SPI and Wifi drivers
+        block:
+          - name: Sync setup files
+            ansible.posix.synchronize:
+              src: ../../linux_configs/pi/setup.zip
+              dest: ~/
 
-        - name: Sync all systemd files
-          become_method: sudo
-          become: true
-          tags:
-            - syncSystemdFiles
-          register: res
-          ansible.posix.synchronize:
-            src: ../../linux_configs/systemd/
-            dest: /etc/systemd/system
-            copy_links: yes
+          - name: Unzip setup files
+            ansible.builtin.unarchive:
+              src: ~/setup.zip
+              dest: ~/
+           
+          - name: Set up Wifi drivers
+            become: true
+            shell: 'mv ~/iwlwifi* /lib/firmware/'
 
-        - name: Remove announcements
-          become_method: sudo
-          become: true
-          tags:
-            - syncSystemdFiles
-          file:
-            path: "/etc/systemd/system/{{ service_name }}.service"
-            state: absent
-          with_items: ["wifi_announcement", "ethernet_announcement"]
-          loop_control:
-            loop_var: service_name
-
-          # NOTE: "Enabling systems" means they will start on boot
-        - name: Enable system services
-          become: true
-          become_method: sudo
-          with_items:
-            - thunderbots
-            - thunderloop
-            - display
-          loop_control:
-            loop_var: service_name
-          ansible.builtin.systemd:
-            name: "{{ service_name }}"
-            enabled: yes
-            masked: no
-            daemon_reload: yes
-          tags:
-            - enableSystemd
-
-        - name: Enable WiFi waiter service
-          become: true
-          become_method: sudo
-          service: name=NetworkManager-wait-online enabled=yes
-
-        - name: Reboot
-          become: true
-          become_user: root
-          become_method: sudo
-          register: res
-          tags:
-            - reboot
-            - device_tree
-          reboot:
-            msg: "Reboot initiated by Ansible"
-            connect_timeout: 20
-            reboot_timeout: 1200
-            pre_reboot_delay: 0
-            post_reboot_delay: 10
-            test_command: whoami
-
-        - name: Success msg
-          debug:
-            msg:
-              - "[Robot ID = {{ inventory_hostname }}]"
-              - "Systemd Setup run successfully"
+          - name: Set up SPI overlay
+            become: true
+            shell: 'mv ~/spi0-5cs.dtbo /boot/firmware/overlays/'
 
