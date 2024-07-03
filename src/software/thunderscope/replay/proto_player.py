@@ -125,11 +125,11 @@ class ProtoPlayer:
         except Exception:
             return True
 
-    def is_it_playing(self) -> bool: 
+    def is_playing(self) -> bool: 
         """
-        return whether or not the proto player is being played?
+        return whether or not the proto player is being played.
 
-        :return: whether or not proto player is playing!
+        :return: True if the proto player is playing, False otherwise.
         """
 
         return self.is_playing
