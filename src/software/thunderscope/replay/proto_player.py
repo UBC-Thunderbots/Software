@@ -126,11 +126,11 @@ class ProtoPlayer:
         except Exception:
             return True
 
-    def is_it_playing(self) -> bool:
+    def is_playing(self) -> bool:
         """
-        return whether or not the proto player is being played?
+        return whether or not the proto player is being played.
 
-        :return: whether or not proto player is playing!
+        :return: True if the proto player is playing, False otherwise.
         """
 
         return self.is_playing
@@ -184,9 +184,9 @@ class ProtoPlayer:
                 except EOFError:
                     break
 
-                except Exception:
+                except Exception as e:
                     logging.warning(
-                        "Some unknown exception have occurred. Error ignored in ProtoPlayer"
+                        f"An unknown exception has occurred while reading {replay_chunk_path}: {e}"
                     )
 
         return cached_data
