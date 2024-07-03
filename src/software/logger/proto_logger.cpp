@@ -56,79 +56,78 @@ void ProtoLogger::logProtobufs()
 {
     unsigned int replay_index = 0;
 
-    try
+    while (!shouldStopLogging())
     {
+        std::string log_file_path =
+            log_folder_ + std::to_string(replay_index) + "." + REPLAY_FILE_EXTENSION;
+
+        gzFile gz_file = gzopen(log_file_path.c_str(), "wb");
+        if (!gz_file)
+        {
+            std::cerr << "ProtoLogger: Failed to open gzip log file: " << log_file_path
+                      << " Error: " + std::string(strerror(errno))
+                      << "\nStopping ProtoLogger logger thread!" << std::endl;
+            return;
+        }
+
+        // Start every replay file with the metadata, which includes the file format
+        // version. This allows us to keep backwards compatibility as the replay file
+        // format evolves.
+        std::string file_metadata =
+            REPLAY_FILE_VERSION_PREFIX + std::to_string(REPLAY_FILE_VERSION) + "\n";
+        int num_bytes_written = gzwrite(gz_file, file_metadata.c_str(),
+                                        static_cast<unsigned>(file_metadata.size()));
+        if (num_bytes_written != static_cast<int>(file_metadata.size()))
+        {
+            std::cerr << "ProtoLogger: Failed to write metadata to log file: "
+                      << log_file_path << std::endl;
+        }
+
         while (!shouldStopLogging())
         {
-            std::string log_file_path =
-                log_folder_ + std::to_string(replay_index) + "." + REPLAY_FILE_EXTENSION;
-
-            gzFile gz_file = gzopen(log_file_path.c_str(), "wb");
-            if (!gz_file)
+            auto serialized_proto_opt =
+                buffer_.popLeastRecentlyAddedValue(BUFFER_BLOCK_TIMEOUT);
+            if (!serialized_proto_opt.has_value())
             {
-                std::string error_msg =
-                    "Failed to open gzip file. Error: " + std::string(strerror(errno));
-                throw std::runtime_error(error_msg);
+                // Timed out without getting a new value
+                continue;
             }
 
-            // Start every replay file with the metadata, which includes the file format
-            // version. This allows us to keep backwards compatibility as the replay file
-            // format evolves.
-            std::string file_metadata =
-                REPLAY_FILE_VERSION_PREFIX + std::to_string(REPLAY_FILE_VERSION) + "\n";
-            int num_bytes_written = gzwrite(gz_file, file_metadata.c_str(),
-                                            static_cast<unsigned>(file_metadata.size()));
-            if (num_bytes_written == 0)
+            const auto& [proto_full_name, serialized_proto, receive_time_sec] =
+                serialized_proto_opt.value();
+
+            // Write the log entry to the file with the format:
+            std::string log_entry =
+                createLogEntry(proto_full_name, serialized_proto, receive_time_sec);
+            num_bytes_written = gzwrite(gz_file, log_entry.c_str(),
+                                        static_cast<unsigned>(log_entry.size()));
+
+            // Check if write was successful
+            if (num_bytes_written != static_cast<int>(log_entry.size()))
             {
-                std::cerr << "ProtoLogger: Failed to write metadata to log file: "
-                          << log_file_path << std::endl;
-            }
-
-            while (!shouldStopLogging())
-            {
-                auto serialized_proto_opt =
-                    buffer_.popLeastRecentlyAddedValue(BUFFER_BLOCK_TIMEOUT);
-                if (!serialized_proto_opt.has_value())
+                if (num_failed_logs_++ % FAILED_LOG_PRINT_FREQUENCY == 0)
                 {
-                    // Timed out without getting a new value
-                    continue;
-                }
-
-                const auto& [proto_full_name, serialized_proto, receive_time_sec] =
-                    serialized_proto_opt.value();
-
-                // Write the log entry to the file with the format:
-                std::string log_entry =
-                    createLogEntry(proto_full_name, serialized_proto, receive_time_sec);
-                num_bytes_written = gzwrite(gz_file, log_entry.c_str(),
-                                            static_cast<unsigned>(log_entry.size()));
-
-                // Check if write was successful
-                if (num_bytes_written == 0)
-                {
-                    if (num_failed_logs_++ % FAILED_LOG_PRINT_FREQUENCY == 0)
-                    {
-                        std::cerr << "ProtoLogger: Failed to write " << proto_full_name
-                                  << " to log file: " << log_file_path << " "
-                                  << std::to_string(num_failed_logs_) << " times"
-                                  << std::endl;
-                    }
-                }
-
-                // Limit the size of each replay chunk
-                if (gzoffset(gz_file) > REPLAY_MAX_CHUNK_SIZE_BYTES)
-                {
-                    break;
+                    std::cerr << "ProtoLogger: Failed to write " << proto_full_name
+                              << " to log file: " << log_file_path << " "
+                              << std::to_string(num_failed_logs_) << " times"
+                              << std::endl;
                 }
             }
 
-            gzclose(gz_file);
-            replay_index++;
+            // Limit the size of each replay chunk
+            if (gzoffset(gz_file) > REPLAY_MAX_CHUNK_SIZE_BYTES)
+            {
+                break;
+            }
         }
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Exception detected in ProtoLogger: " << e.what() << std::endl;
+
+        int result = gzclose(gz_file);
+        if (result != Z_OK)
+        {
+            std::cerr << "ProtoLogger: Failed to close log file: " << log_file_path
+                      << " with error " << result << std::endl;
+        }
+        replay_index++;
     }
 }
 
