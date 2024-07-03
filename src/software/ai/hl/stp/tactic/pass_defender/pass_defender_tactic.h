@@ -14,7 +14,12 @@
 class PassDefenderTactic : public Tactic
 {
    public:
-    explicit PassDefenderTactic();
+    /**
+     * Creates a new PassDefenderTactic
+     *
+     * @param ai_config The AI configuration
+     */
+    explicit PassDefenderTactic(TbotsProto::AiConfig ai_config);
 
     /**
      * Update control params for this tactic
@@ -33,4 +38,5 @@ class PassDefenderTactic : public Tactic
     std::map<RobotId, std::unique_ptr<FSM<PassDefenderFSM>>> fsm_map;
 
     PassDefenderFSM::ControlParams control_params;
+    TbotsProto::AiConfig ai_config;
 };

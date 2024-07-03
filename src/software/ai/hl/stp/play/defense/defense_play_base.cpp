@@ -32,7 +32,7 @@ void DefensePlayFSMBase::setUpPassDefenders(int num_pass_defenders)
 
     pass_defenders = std::vector<std::shared_ptr<PassDefenderTactic>>(num_pass_defenders);
     std::generate(pass_defenders.begin(), pass_defenders.end(),
-                  [this]() { return std::make_shared<PassDefenderTactic>(); });
+                  [this]() { return std::make_shared<PassDefenderTactic>(ai_config); });
 }
 
 void DefensePlayFSMBase::updatePassDefenderControlParams(

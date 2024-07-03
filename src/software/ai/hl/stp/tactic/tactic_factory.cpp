@@ -153,7 +153,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::MoveTactic &tactic_proto,
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PassDefenderTactic &tactic_proto,
                                      TbotsProto::AiConfig ai_config)
 {
-    auto tactic = std::make_shared<PassDefenderTactic>();
+    auto tactic = std::make_shared<PassDefenderTactic>(ai_config);
     tactic->updateControlParams(createPoint(tactic_proto.position_to_block_from()));
     return tactic;
 }

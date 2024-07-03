@@ -19,6 +19,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:move_primitive",
         "//software/geom/algorithms",
         "//software/logger",
+        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
     ],
 )
 

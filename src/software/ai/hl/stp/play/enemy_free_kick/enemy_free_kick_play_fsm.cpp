@@ -53,7 +53,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     // Adds designated free kick defender to block the direction the kicker is facing
     if (!enemy_threats.empty())
     {
-        auto block_free_kicker = std::make_shared<PassDefenderTactic>();
+        auto block_free_kicker = std::make_shared<PassDefenderTactic>(ai_config);
         Vector block_direction =
             Vector::createFromAngle(enemy_threats[0].robot.orientation());
         block_kick_point =
@@ -109,7 +109,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
                      distance(friendly_goal_center, block_kick_point) >=
                          ball_far_threshold_m)
             {
-                auto mid_zone_defender = std::make_shared<PassDefenderTactic>();
+                auto mid_zone_defender = std::make_shared<PassDefenderTactic>(ai_config);
                 Point mid_point =
                     Point((event.common.world_ptr->ball().position().toVector() +
                            friendly_goal_center.toVector()) /

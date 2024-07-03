@@ -3,6 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
 struct PassDefenderFSM
 {
@@ -67,6 +68,26 @@ struct PassDefenderFSM
      */
     void interceptBall(const Update& event);
 
+    /**
+     * Guard that checks if the ball is on friendly side, nearby, and unguarded by the
+     * enemy
+     *
+     * @param event PassDefenderFSM::Update event
+     *
+     * @return true if the ball is on friendly side, nearby, unguarded by the enemy up,
+     *          and within a max get possession threshold
+     */
+    bool ballNearbyWithoutThreat(const Update& event);
+
+    /**
+     * This is the Action that prepares for getting possession of the ball
+     * @param event PassDefenderFSM::Update event
+     * @param processEvent processes the DribbleFSM::Update
+     */
+    void prepareGetPossession(const Update& event,
+                              boost::sml::back::process<DribbleFSM::Update> processEvent);
+
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -82,6 +103,10 @@ struct PassDefenderFSM
         DEFINE_SML_ACTION(blockPass)
         DEFINE_SML_ACTION(interceptBall)
 
+        DEFINE_SML_STATE(DribbleFSM)
+        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)
+
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *BlockPassState_S + Update_E[passStarted_G] / interceptBall_A =
@@ -89,10 +114,27 @@ struct PassDefenderFSM
             BlockPassState_S + Update_E / blockPass_A,
             InterceptBallState_S + Update_E[ballDeflected_G] / blockPass_A =
                 BlockPassState_S,
+            InterceptBallState_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
+            DribbleFSM_S,
+            DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockPass_A =
+                    BlockPassState_S,
             InterceptBallState_S + Update_E / interceptBall_A,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 
    private:
+    /** Max ratio between distances (crease and ball) / (crease and nearest enemy) for
+     * crease to chase ball. Scale from (0, 1)
+     * |------------------------------------------|
+     * | Crease | <-----------------------> Enemy |
+     * |        | <----> Ball                 |   |
+     * |       ()         x                  ()   |
+     * |------------------------------------------|
+     */
+    static constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.3;
+    // Max distance that the crease will try and get possession of a ball
+    static constexpr double MAX_GET_BALL_RADIUS_M = 1;
+    // Max speed of ball that crease will try and get possession
+    static constexpr double MAX_BALL_SPEED_TO_GET_MS = 0.5;
     Angle pass_orientation;
 };
