@@ -2,8 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "make_enum",
-    srcs = ["make_enum.cpp"],
-    hdrs = ["make_enum.h"],
+    hdrs = ["make_enum.hpp", "make_enum_helpers.hpp"],
 )
 
 cc_test(
