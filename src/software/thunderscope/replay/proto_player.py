@@ -183,9 +183,9 @@ class ProtoPlayer:
                 except EOFError:
                     break
 
-                except Exception:
+                except Exception as e:
                     logging.warning(
-                        "Some unknown exception have occured. Error ignored in ProtoPlayer"
+                        f"An unknown exception has occurred while reading {replay_chunk_path}: {e}"
                     )
 
         return cached_data
