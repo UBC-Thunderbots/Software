@@ -15,7 +15,7 @@
 
 
 PlaySelectionFSM::PlaySelectionFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config), current_set_play(NONE)
+    : ai_config(ai_config), current_set_play(std::nullopt)
 {
 }
 
@@ -43,66 +43,66 @@ void PlaySelectionFSM::setupSetPlay(const Update& event)
 {
     if (event.game_state.isOurBallPlacement())
     {
-        if (current_set_play != FRIENDLY_BALL_PLACEMENT)
+        if (current_set_play != TbotsProto::PlayName::BallPlacementPlay)
         {
-            current_set_play = FRIENDLY_BALL_PLACEMENT;
+            current_set_play = TbotsProto::PlayName::BallPlacementPlay;
             event.set_current_play(std::make_unique<BallPlacementPlay>(ai_config));
         }
     }
     else if (event.game_state.isTheirBallPlacement())
     {
-        if (current_set_play != ENEMY_BALL_PLACEMENT)
+        if (current_set_play != TbotsProto::PlayName::EnemyBallPlacementPlay)
         {
-            current_set_play = ENEMY_BALL_PLACEMENT;
+            current_set_play = TbotsProto::PlayName::EnemyBallPlacementPlay;
             event.set_current_play(std::make_unique<EnemyBallPlacementPlay>(ai_config));
         }
     }
     else if (event.game_state.isOurKickoff())
     {
-        if (current_set_play != FRIENDLY_KICKOFF)
+        if (current_set_play != TbotsProto::PlayName::KickoffFriendlyPlay)
         {
-            current_set_play = FRIENDLY_KICKOFF;
+            current_set_play = TbotsProto::PlayName::KickoffFriendlyPlay;
             event.set_current_play(std::make_unique<KickoffFriendlyPlay>(ai_config));
         }
     }
     else if (event.game_state.isTheirKickoff())
     {
-        if (current_set_play != ENEMY_KICKOFF)
+        if (current_set_play != TbotsProto::PlayName::KickoffEnemyPlay)
         {
-            current_set_play = ENEMY_KICKOFF;
+            current_set_play = TbotsProto::PlayName::KickoffEnemyPlay;
             event.set_current_play(std::make_unique<KickoffEnemyPlay>(ai_config));
         }
     }
     else if (event.game_state.isOurPenalty())
     {
-        if (current_set_play != FRIENDLY_PENALTY_KICK)
+        if (current_set_play != TbotsProto::PlayName::PenaltyKickPlay)
         {
-            current_set_play = FRIENDLY_PENALTY_KICK;
+            current_set_play = TbotsProto::PlayName::PenaltyKickPlay;
             event.set_current_play(std::make_unique<PenaltyKickPlay>(ai_config));
         }
     }
     else if (event.game_state.isTheirPenalty())
     {
-        if (current_set_play != ENEMY_PENALTY_KICK)
+        if (current_set_play != TbotsProto::PlayName::PenaltyKickEnemyPlay)
         {
-            current_set_play = ENEMY_PENALTY_KICK;
+            current_set_play = TbotsProto::PlayName::PenaltyKickEnemyPlay;
             event.set_current_play(std::make_unique<PenaltyKickEnemyPlay>(ai_config));
         }
     }
     else if (event.game_state.isOurDirectFree() || event.game_state.isOurIndirectFree())
     {
-        if (current_set_play != FRIENDLY_FREE_KICK)
+        if (current_set_play != TbotsProto::PlayName::FreeKickPlay)
         {
-            current_set_play = FRIENDLY_FREE_KICK;
+            current_set_play = TbotsProto::PlayName::FreeKickPlay;
             event.set_current_play(std::make_unique<FreeKickPlay>(ai_config));
         }
     }
     else if (event.game_state.isTheirDirectFree() ||
              event.game_state.isTheirIndirectFree())
     {
-        if (current_set_play != ENEMY_FREE_KICK)
+        if (current_set_play != TbotsProto::PlayName::EnemyFreeKickPlay)
         {
-            current_set_play = ENEMY_FREE_KICK;
+            current_set_play = TbotsProto::PlayName::EnemyFreeKickPlay;
             event.set_current_play(std::make_unique<EnemyFreeKickPlay>(ai_config));
         }
     }
@@ -125,5 +125,5 @@ void PlaySelectionFSM::setupOffensePlay(const Update& event)
 
 void PlaySelectionFSM::resetSetPlay(const Update& event)
 {
-    current_set_play = NONE;
+    current_set_play.reset();
 }

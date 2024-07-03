@@ -121,19 +121,5 @@ struct PlaySelectionFSM
 
    private:
     TbotsProto::AiConfig ai_config;
-
-    enum SetPlayType
-    {
-        NONE,
-        FRIENDLY_BALL_PLACEMENT,
-        ENEMY_BALL_PLACEMENT,
-        FRIENDLY_KICKOFF,
-        ENEMY_KICKOFF,
-        FRIENDLY_PENALTY_KICK,
-        ENEMY_PENALTY_KICK,
-        FRIENDLY_FREE_KICK,
-        ENEMY_FREE_KICK,
-    };
-
-    SetPlayType current_set_play;
+    std::optional<TbotsProto::PlayName> current_set_play;
 };
