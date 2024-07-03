@@ -121,22 +121,22 @@ namespace reflective_enum
         }
         throw std::invalid_argument(value_name + " cannot be converted to enum value");
     }
-
-    /**
-     * Implements the << operator for printing.
-     *
-     * @param os the output stream to print to
-     * @param value the enum value to print
-     *
-     * @return the output stream with the string representation of the enum value appended
-     */
-    template <ReflectiveEnum E>
-    std::ostream& operator<<(std::ostream& os, E value)
-    {
-        // This index lookup relies on the assumption that the enum does not manually
-        // specify any values. If it did, the underlying integer of the given value
-        // may be out of range of the vector of strings
-        os << valueNames<E>().at(static_cast<int>(value));
-        return os;
-    }
 }  // namespace reflective_enum
+
+/**
+ * Implements the << operator for printing reflective enums.
+ *
+ * @param os the output stream to print to
+ * @param value the reflective enum value to print
+ *
+ * @return the output stream with the string representation of the enum value appended
+ */
+template <reflective_enum::ReflectiveEnum E>
+std::ostream& operator<<(std::ostream& os, E value)
+{
+    // This index lookup relies on the assumption that the enum does not manually
+    // specify any values. If it did, the underlying integer of the given value
+    // may be out of range of the vector of strings
+    os << reflective_enum::valueNames<E>().at(static_cast<int>(value));
+    return os;
+}

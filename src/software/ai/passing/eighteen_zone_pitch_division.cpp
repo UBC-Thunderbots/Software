@@ -20,7 +20,8 @@ EighteenZonePitchDivision::EighteenZonePitchDivision(const Field& field)
         }
     }
 
-    zones_       = allValuesEighteenZoneId();
+    constexpr auto enum_values = reflective_enum::values<EighteenZoneId>();
+    zones_       = std::vector(enum_values.begin(), enum_values.end());
     field_lines_ = std::make_shared<Rectangle>(field.fieldLines());
 }
 
