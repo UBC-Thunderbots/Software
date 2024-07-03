@@ -75,12 +75,12 @@ class LinearQFunction : public QFunction<TState, TAction>
      */
     TbotsProto::LinearQFunctionInfo getInfo() const;
 
-    double getQValue(const TState& state, const TAction::Enum& action) const override;
+    double getQValue(const TState& state, const TAction& action) const override;
 
     double getMaxQValue(const TState& state) const override;
 
-    void update(const TState& state, const TState& next_state,
-                const TAction::Enum& action, double reward) override;
+    void update(const TState& state, const TState& next_state, const TAction& action,
+                double reward) override;
 
     /**
      * Gets the weights of the LinearQFunction.
@@ -122,11 +122,11 @@ LinearQFunction<TState, TAction>::LinearQFunction(
     FeatureExtractor<TState, TAction> features, double learning_rate,
     double discount_factor, std::optional<Eigen::VectorXd> weights)
     : features_(features),
-      weights_(weights.value_or(
-          Eigen::VectorXd::Zero(features_.numFeatures() * TAction::numValues())))
+      weights_(weights.value_or(Eigen::VectorXd::Zero(features_.numFeatures() *
+                                                      reflective_enum::size<TAction>())))
 {
     CHECK(static_cast<size_t>(weights_.size()) ==
-          features_.numFeatures() * TAction::numValues())
+          features_.numFeatures() * reflective_enum::size<TAction>())
         << "Provided LinearQFunction weights vector has wrong dimensions";
 
     setLearningRate(learning_rate);
@@ -173,15 +173,15 @@ TbotsProto::LinearQFunctionInfo LinearQFunction<TState, TAction>::getInfo() cons
     linear_q_function_info.set_num_features(
         static_cast<unsigned int>(features_.numFeatures()));
     linear_q_function_info.set_num_actions(
-        static_cast<unsigned int>(TAction::numValues()));
+        static_cast<unsigned int>(reflective_enum::size<TAction>()));
     *linear_q_function_info.mutable_weights() = {weights_.begin(), weights_.end()};
 
     return linear_q_function_info;
 }
 
 template <typename TState, typename TAction>
-double LinearQFunction<TState, TAction>::getQValue(
-    const TState& state, const typename TAction::Enum& action) const
+double LinearQFunction<TState, TAction>::getQValue(const TState& state,
+                                                   const TAction& action) const
 {
     Eigen::VectorXd feature_vector = features_.extract(state, action);
 
@@ -191,7 +191,7 @@ double LinearQFunction<TState, TAction>::getQValue(
 template <typename TState, typename TAction>
 double LinearQFunction<TState, TAction>::getMaxQValue(const TState& state) const
 {
-    std::vector<typename TAction::Enum> all_actions = TAction::allValues();
+    const auto all_actions = reflective_enum::values<TAction>();
 
     return std::transform_reduce(
         all_actions.begin(), all_actions.end(), std::numeric_limits<double>::lowest(),
@@ -202,8 +202,7 @@ double LinearQFunction<TState, TAction>::getMaxQValue(const TState& state) const
 template <typename TState, typename TAction>
 void LinearQFunction<TState, TAction>::update(const TState& state,
                                               const TState& next_state,
-                                              const typename TAction::Enum& action,
-                                              double reward)
+                                              const TAction& action, double reward)
 {
     Eigen::VectorXd feature_vector = features_.extract(state, action);
 

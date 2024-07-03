@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/util/make_enum/reflective_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 
 /**
  * The Q-function is the core calculation of the Q-learning algorithm.
@@ -30,8 +30,8 @@
 template <typename TState, typename TAction>
 class QFunction
 {
-    static_assert(std::is_base_of<ReflectiveEnum, TAction>::value,
-                  "TAction must be a ReflectiveEnum");
+    static_assert(reflective_enum::is_reflective_enum<TAction>::value,
+                  "TAction must be a reflective enum");
 
    public:
     /**
@@ -43,7 +43,7 @@ class QFunction
      *
      * @return the Q-value for the given state-action combination
      */
-    virtual double getQValue(const TState& state, const TAction::Enum& action) const = 0;
+    virtual double getQValue(const TState& state, const TAction& action) const = 0;
 
     /**
      * Gets the maximum Q-value that can be obtained from the given state by
@@ -65,5 +65,5 @@ class QFunction
      * @param reward the reward observed for taking `action` in `state`
      */
     virtual void update(const TState& state, const TState& next_state,
-                        const TAction::Enum& action, double reward) = 0;
+                        const TAction& action, double reward) = 0;
 };

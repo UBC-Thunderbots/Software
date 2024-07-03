@@ -14,8 +14,8 @@
 template <typename TState, typename TAction>
 class ActionSelectionStrategy
 {
-    static_assert(std::is_base_of<ReflectiveEnum, TAction>::value,
-                  "TAction must be a ReflectiveEnum");
+    static_assert(reflective_enum::is_reflective_enum<TAction>::value,
+                  "TAction must be a reflective enum");
 
    public:
     /**
@@ -26,6 +26,6 @@ class ActionSelectionStrategy
      *
      * @return the action to take
      */
-    virtual TAction::Enum selectAction(const TState& state,
-                                       const QFunction<TState, TAction>& q_function) = 0;
+    virtual TAction selectAction(const TState& state,
+                                 const QFunction<TState, TAction>& q_function) = 0;
 };

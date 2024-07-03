@@ -4,7 +4,7 @@
 #include "software/geom/circle.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
-#include "software/util/make_enum/make_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 
 typedef enum
 {

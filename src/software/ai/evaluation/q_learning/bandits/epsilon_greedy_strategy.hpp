@@ -32,8 +32,8 @@ class EpsilonGreedyStrategy : public ActionSelectionStrategy<TState, TAction>
      */
     explicit EpsilonGreedyStrategy(double epsilon);
 
-    TAction::Enum selectAction(const TState& state,
-                               const QFunction<TState, TAction>& q_function) override;
+    TAction selectAction(const TState& state,
+                         const QFunction<TState, TAction>& q_function) override;
 
     /**
      * Sets the epsilon parameter that controls how much we explore and how much we
@@ -48,9 +48,6 @@ class EpsilonGreedyStrategy : public ActionSelectionStrategy<TState, TAction>
     // Epsilon parameter
     double epsilon_;
 
-    // List of all possible actions the agent can take
-    std::vector<typename TAction::Enum> all_actions_;
-
     // Seed used to initialize the random number generator
     static constexpr int RNG_SEED = 1010;
 
@@ -62,31 +59,32 @@ class EpsilonGreedyStrategy : public ActionSelectionStrategy<TState, TAction>
 
 template <typename TState, typename TAction>
 EpsilonGreedyStrategy<TState, TAction>::EpsilonGreedyStrategy(double epsilon)
-    : all_actions_(TAction::allValues()),
-      random_num_gen_(RNG_SEED),
+    : random_num_gen_(RNG_SEED),
       random_num_dist_(0.0, 1.0),
-      random_action_dist_(0, static_cast<int>(all_actions_.size()) - 1)
+      random_action_dist_(0, static_cast<int>(reflective_enum::size<TAction>()) - 1)
 {
     setEpsilon(epsilon);
 }
 
 template <typename TState, typename TAction>
-TAction::Enum EpsilonGreedyStrategy<TState, TAction>::selectAction(
+TAction EpsilonGreedyStrategy<TState, TAction>::selectAction(
     const TState& state, const QFunction<TState, TAction>& q_function)
 {
+    constexpr auto all_actions = reflective_enum::values<TAction>();
+
     if (random_num_dist_(random_num_gen_) < epsilon_)
     {
         // Explore: select random action from action space
-        return all_actions_.at(random_action_dist_(random_num_gen_));
+        return all_actions.at(random_action_dist_(random_num_gen_));
     }
     else
     {
         // Exploit: select the action with the largest Q-value
         // i.e. argmax(Q(s, a)) over the set of all actions A
-        typename TAction::Enum selected_action = all_actions_.back();
-        double max_q_value                     = std::numeric_limits<double>::lowest();
+        TAction selected_action = all_actions.back();
+        double max_q_value      = std::numeric_limits<double>::lowest();
 
-        for (const auto& action : all_actions_)
+        for (const auto& action : all_actions)
         {
             double q_value = q_function.getQValue(state, action);
             if (q_value > max_q_value)

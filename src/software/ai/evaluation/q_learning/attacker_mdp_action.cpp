@@ -1,7 +1,7 @@
 #include "software/ai/evaluation/q_learning/attacker_mdp_action.h"
 
 std::unique_ptr<Skill> createSkillFromAttackerMdpAction(
-    AttackerMdpAction::Enum action, std::shared_ptr<Strategy> strategy)
+    AttackerMdpAction action, std::shared_ptr<Strategy> strategy)
 {
     switch (action)
     {

@@ -33,8 +33,8 @@ class SoftmaxStrategy : public ActionSelectionStrategy<TState, TAction>
      */
     explicit SoftmaxStrategy(double temperature);
 
-    TAction::Enum selectAction(const TState& state,
-                               const QFunction<TState, TAction>& q_function) override;
+    TAction selectAction(const TState& state,
+                         const QFunction<TState, TAction>& q_function) override;
 
     /**
      * Sets the temperature parameter that controls how much we explore and how much we
@@ -49,9 +49,6 @@ class SoftmaxStrategy : public ActionSelectionStrategy<TState, TAction>
     // Temperature parameter
     double temperature_;
 
-    // List of all possible actions the agent can take
-    std::vector<typename TAction::Enum> all_actions_;
-
     // Seed used to initialize the random number generator
     static constexpr int RNG_SEED = 1010;
 
@@ -62,23 +59,23 @@ class SoftmaxStrategy : public ActionSelectionStrategy<TState, TAction>
 
 template <typename TState, typename TAction>
 SoftmaxStrategy<TState, TAction>::SoftmaxStrategy(double temperature)
-    : all_actions_(TAction::allValues()),
-      random_num_gen_(RNG_SEED),
-      random_num_dist_(0.0, 1.0)
+    : random_num_gen_(RNG_SEED), random_num_dist_(0.0, 1.0)
 {
     setTemperature(temperature);
 }
 
 template <typename TState, typename TAction>
-TAction::Enum SoftmaxStrategy<TState, TAction>::selectAction(
+TAction SoftmaxStrategy<TState, TAction>::selectAction(
     const TState& state, const QFunction<TState, TAction>& q_function)
 {
+    constexpr auto all_actions = reflective_enum::values<TAction>();
+
     // Get Boltzmann distribution of action Q-values in the given state
-    Eigen::VectorXd probabilities(all_actions_.size());
-    for (size_t i = 0; i < all_actions_.size(); ++i)
+    Eigen::VectorXd probabilities(all_actions.size());
+    for (size_t i = 0; i < all_actions.size(); ++i)
     {
         probabilities[i] =
-            std::exp(q_function.getQValue(state, all_actions_.at(i)) / temperature_);
+            std::exp(q_function.getQValue(state, all_actions.at(i)) / temperature_);
     }
     probabilities /= probabilities.sum();
 
@@ -91,16 +88,16 @@ TAction::Enum SoftmaxStrategy<TState, TAction>::selectAction(
 
     // Linear search finds the slot that contains the ball
     double current_cutoff = 0;
-    for (size_t i = 0; i < all_actions_.size() - 1; ++i)
+    for (size_t i = 0; i < all_actions.size() - 1; ++i)
     {
         current_cutoff += probabilities[i];
         if (random_num < current_cutoff)
         {
-            return all_actions_.at(i);
+            return all_actions.at(i);
         }
     }
 
-    return all_actions_.back();
+    return all_actions.back();
 }
 
 template <typename TState, typename TAction>

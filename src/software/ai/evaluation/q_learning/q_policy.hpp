@@ -15,8 +15,8 @@
 template <typename TState, typename TAction>
 class QPolicy
 {
-    static_assert(std::is_base_of<ReflectiveEnum, TAction>::value,
-                  "TAction must be a ReflectiveEnum");
+    static_assert(reflective_enum::is_reflective_enum<TAction>::value,
+                  "TAction must be a reflective enum");
 
    public:
     /**
@@ -37,7 +37,7 @@ class QPolicy
      *
      * @return the action to take
      */
-    TAction::Enum selectAction(const TState& state);
+    TAction selectAction(const TState& state);
 
     /**
      * Updates the policy with new information about the new state entered and
@@ -59,7 +59,7 @@ class QPolicy
     std::optional<TState> last_state_;
 
     // The last action selected
-    std::optional<typename TAction::Enum> last_action_;
+    std::optional<TAction> last_action_;
 };
 
 template <typename TState, typename TAction>
@@ -74,7 +74,7 @@ QPolicy<TState, TAction>::QPolicy(
 }
 
 template <typename TState, typename TAction>
-TAction::Enum QPolicy<TState, TAction>::selectAction(const TState& state)
+TAction QPolicy<TState, TAction>::selectAction(const TState& state)
 {
     last_state_  = state;
     last_action_ = action_selection_strategy_->selectAction(state, *q_function_);

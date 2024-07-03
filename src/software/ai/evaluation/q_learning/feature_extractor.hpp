@@ -2,7 +2,7 @@
 
 #include <Eigen/Dense>
 
-#include "software/util/make_enum/reflective_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 
 /**
  * A FeatureExtractor extracts the values of features from the state of a
@@ -14,8 +14,8 @@
 template <typename TState, typename TAction>
 class FeatureExtractor
 {
-    static_assert(std::is_base_of<ReflectiveEnum, TAction>::value,
-                  "TAction must be a ReflectiveEnum");
+    static_assert(reflective_enum::is_reflective_enum<TAction>::value,
+                  "TAction must be a reflective enum");
 
    public:
     /**
@@ -35,7 +35,7 @@ class FeatureExtractor
      *
      * @return the extracted feature vector
      */
-    Eigen::VectorXd extract(const TState& state, const TAction::Enum& action) const;
+    Eigen::VectorXd extract(const TState& state, const TAction& action) const;
 
    protected:
     using FeatureFunc = std::function<double(const TState& state)>;
@@ -67,11 +67,11 @@ size_t FeatureExtractor<TState, TAction>::numFeatures() const
 }
 
 template <typename TState, typename TAction>
-Eigen::VectorXd FeatureExtractor<TState, TAction>::extract(
-    const TState& state, const typename TAction::Enum& action) const
+Eigen::VectorXd FeatureExtractor<TState, TAction>::extract(const TState& state,
+                                                           const TAction& action) const
 {
     Eigen::MatrixXd feature_matrix =
-        Eigen::MatrixXd::Zero(numFeatures(), TAction::numValues());
+        Eigen::MatrixXd::Zero(numFeatures(), reflective_enum::size<TAction>());
 
     for (size_t i = 0; i < features_.size(); ++i)
     {

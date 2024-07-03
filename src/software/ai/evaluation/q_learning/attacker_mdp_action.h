@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/skill/pass/pass_skill.hpp"
 #include "software/ai/hl/stp/skill/shoot/shoot_skill.hpp"
 #include "software/ai/strategy.h"
-#include "software/util/make_enum/reflective_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 
 /**
  * Enum of actions that the Attacker agent can take in the
@@ -13,12 +13,12 @@
  * These actions correspond to Skills that the AttackerTactic can execute.
  */
 // clang-format off
-MAKE_REFLECTIVE_ENUM(AttackerMdpAction, 
-                     KEEP_AWAY, 
-                     CHIP_PASS, 
-                     KICK_PASS, 
-                     SHOOT, 
-                     DRIBBLE_SHOOT)
+MAKE_ENUM(AttackerMdpAction, 
+          KEEP_AWAY, 
+          CHIP_PASS, 
+          KICK_PASS, 
+          SHOOT, 
+          DRIBBLE_SHOOT)
 // clang-format on
 
 /**
@@ -30,4 +30,4 @@ MAKE_REFLECTIVE_ENUM(AttackerMdpAction,
  * @return a newly created Skill corresponding to the given action
  */
 std::unique_ptr<Skill> createSkillFromAttackerMdpAction(
-    AttackerMdpAction::Enum action, std::shared_ptr<Strategy> strategy);
+    AttackerMdpAction action, std::shared_ptr<Strategy> strategy);

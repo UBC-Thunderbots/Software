@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//software/ai:strategy",
         "//software/ai/hl/stp/skill:all_skills",
-        "//software/util/make_enum:reflective_enum",
+        "//software/util/make_enum:make_enum",
     ],
 )
 
@@ -30,7 +30,7 @@ cc_library(
     name = "feature_extractor",
     hdrs = ["feature_extractor.hpp"],
     deps = [
-        "//software/util/make_enum:reflective_enum",
+        "//software/util/make_enum:make_enum",
     ],
 )
 
@@ -50,7 +50,7 @@ cc_library(
     name = "q_function",
     hdrs = ["q_function.hpp"],
     deps = [
-        "//software/util/make_enum:reflective_enum",
+        "//software/util/make_enum:make_enum",
     ],
 )
 
