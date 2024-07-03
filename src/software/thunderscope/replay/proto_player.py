@@ -13,7 +13,6 @@ from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
-from datetime import datetime
 from google.protobuf.message import DecodeError, Message
 from typing import Callable, Type
 
@@ -82,10 +81,12 @@ class ProtoPlayer:
 
         # Start playing thread
         self.seek(0.0)
-        self.thread = threading.Thread(target=self.__play_protobufs_wrapper, daemon=True)
+        self.thread = threading.Thread(
+            target=self.__play_protobufs_wrapper, daemon=True
+        )
         self.thread.start()
 
-        self.error_bit_flag = NO_ERROR_FLAG 
+        self.error_bit_flag = NO_ERROR_FLAG
 
     def sort_and_get_replay_files(self, log_folder_path):
         """
@@ -125,7 +126,7 @@ class ProtoPlayer:
         except Exception:
             return True
 
-    def is_it_playing(self) -> bool: 
+    def is_it_playing(self) -> bool:
         """
         return whether or not the proto player is being played?
 
@@ -185,7 +186,7 @@ class ProtoPlayer:
 
                 except Exception:
                     logging.warning(
-                        "Some unknown exception have occured. Error ignored in ProtoPlayer"
+                        "Some unknown exception have occurred. Error ignored in ProtoPlayer"
                     )
 
         return cached_data
@@ -442,7 +443,7 @@ class ProtoPlayer:
 
         return min(abs(low), abs(high))
 
-    def __play_protobufs_wrapper(self) -> None: 
+    def __play_protobufs_wrapper(self) -> None:
         """
         this function essentially executes __play_protobufs. However, the intention of this function 
         is for testing purposes. __play_protobufs is launched in a different thread, it would be useful to know 
@@ -457,13 +458,14 @@ class ProtoPlayer:
         try:
             self.__play_protobufs()
         except Exception as e:
-            logging.exception("there is an uncaught exception when playing protobufs: {}".format(e))
+            logging.exception(
+                "there is an uncaught exception when playing protobufs: {}".format(e)
+            )
             # setting the error bit flags
             self.error_bit_flag |= UNCAUGHT_EXCEPTION_FLAG
             self.is_playing = False
 
-
-    def get_error_bit_flag(self) -> int: 
+    def get_error_bit_flag(self) -> int:
         """
         the error bit flags is defined as the following: 
             1 if there is an uncaught exception in the code

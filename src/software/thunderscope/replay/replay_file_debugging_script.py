@@ -52,7 +52,11 @@ def read_one_chunk(replay_file_name):
             #######################################
             # Do something with the protobuf here #
             #######################################
-            print(f"{line_num}: {float(timestamp)}: {protobuf_type} - {proto=}")
+            print(
+                "{}: {}: {} - {=}".format(
+                    line_num, float(timestamp), protobuf_type, proto
+                )
+            )
 
             line = replay_file.readline()
             line_num += 1
@@ -88,9 +92,18 @@ if __name__ == "__main__":
     for replay_file_name in sorted_chunks:
         try:
             total_line_num += read_one_chunk(replay_file_name)
-        except Exception as e:
+
+        except gzip.BadGzipFile as e:
+            print(
+                "replay file is a invalid gzip file:{} with exception: {}".format(
+                    replay_file_name, e
+                )
+            )
+        except Exception:
             print(f"Cannot read {replay_file_name}")
-            print("Please note that the following traceback is ignored. The program is still running")
+            print(
+                "Please note that the following traceback is ignored. The program is still running"
+            )
             print(traceback.format_exc())
 
     print(f"Replayed {total_line_num} log lines")
