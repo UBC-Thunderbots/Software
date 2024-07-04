@@ -60,7 +60,7 @@ struct CreaseDefenderFSM
 
     /**
      * Guard that checks if the ball is on friendly side, nearby, and unguarded by the
-     * enemy
+     * enemy (only if stealing is enabled).
      *
      * @param event CreaseDefenderFSM::Update event
      *

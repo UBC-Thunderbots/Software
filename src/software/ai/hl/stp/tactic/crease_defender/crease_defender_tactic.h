@@ -47,6 +47,7 @@ class CreaseDefenderTactic : public Tactic
      * @param enemy_threat_origin The origin of the enemy threat
      * @param alignment The alignment for this crease defender
      * @param max_allowed_speed_mode The mode of maximum speed allowed
+     * @param ball_steal_mode The mode of ball stealing to follow
      */
     void updateControlParams(const Point &enemy_threat_origin,
                              const TbotsProto::CreaseDefenderAlignment &alignment,
