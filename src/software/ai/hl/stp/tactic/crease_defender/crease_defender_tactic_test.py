@@ -243,7 +243,7 @@ def test_crease_autochip(
         always_validation_sequence_set = [[]]
         # Eventually Validation for chipping
         eventually_validation_sequence_set = [
-            [BallIsEventuallyOffGround(threshold=0.01),]
+            [BallIsEventuallyOffGround(threshold=0.05)]
         ]
 
     simulated_test_runner.run_test(

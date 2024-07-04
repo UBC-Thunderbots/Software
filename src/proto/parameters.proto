@@ -41,6 +41,7 @@ message AiConfig
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
     required AiParameterConfig ai_parameter_config                          = 13;
+    required CreaseDefenderConfig crease_defender_config                    = 14;
 }
 
 message AiControlConfig
@@ -434,4 +435,25 @@ message PossessionTrackerConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
+}
+
+message CreaseDefenderConfig
+{
+    /*
+    Max ratio between distances (crease and ball) / (crease and nearest enemy) for
+    crease to chase ball. Scale from (0, 1)
+    ┌──────────────────────────────────────────┐
+    | Crease | <───────────────────────> Enemy |
+    |        | <────> Ball                 |   |
+    |       ()         x                  ()   |
+    └──────────────────────────────────────────┘
+     */
+    required double max_get_ball_ratio_threshold = 1
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // Max distance that the crease will try and get possession of a ball
+    required double max_get_ball_radius_m = 2
+        [default = 1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Max speed of ball that crease will try and get possession
+    required double max_ball_speed_to_get_ms = 3
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
 }

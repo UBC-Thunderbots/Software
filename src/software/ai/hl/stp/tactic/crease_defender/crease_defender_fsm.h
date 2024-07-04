@@ -107,19 +107,9 @@ struct CreaseDefenderFSM
     }
 
    private:
-    /** Max ratio between distances (crease and ball) / (crease and nearest enemy) for
-     * crease to chase ball. Scale from (0, 1)
-     * |------------------------------------------|
-     * | Crease | <-----------------------> Enemy |
-     * |        | <----> Ball                 |   |
-     * |       ()         x                  ()   |
-     * |------------------------------------------|
-     */
-    static constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.3;
-    // Max distance that the crease will try and get possession of a ball
-    static constexpr double MAX_GET_BALL_RADIUS_M = 1;
-    // Max speed of ball that crease will try and get possession
-    static constexpr double MAX_BALL_SPEED_TO_GET_MS = 0.5;
+    static constexpr double DETECT_THREAT_AHEAD_SHAPE_LENGTH_M = 1;
+    static constexpr double DETECT_THREAT_AHEAD_SHAPE_RADIUS_M = 0.1;
+    const Vector GOALPOST_OFFSET                               = Vector(0, 0.5);
     /**
      * Finds the intersection with the front or sides of the defense area with the given
      * ray
@@ -145,4 +135,5 @@ struct CreaseDefenderFSM
     static bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
 
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
+    TbotsProto::CreaseDefenderConfig crease_defender_config;
 };
