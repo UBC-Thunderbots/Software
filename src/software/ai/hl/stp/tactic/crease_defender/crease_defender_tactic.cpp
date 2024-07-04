@@ -51,8 +51,8 @@ void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
             CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()),
             DribbleFSM(ai_config.dribble_tactic_config()));
     }
-    Point ball_position       = tactic_update.world_ptr->ball().position();
-    Point enemy_goal_center   = tactic_update.world_ptr->field().enemyGoal().centre();
+    Point ball_position     = tactic_update.world_ptr->ball().position();
+    Point enemy_goal_center = tactic_update.world_ptr->field().enemyGoal().centre();
     auto ball_to_net_vector = Vector(enemy_goal_center - ball_position);
     DribbleFSM::ControlParams dribble_control_params{
         .dribble_destination       = ball_position,
