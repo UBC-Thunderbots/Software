@@ -93,10 +93,12 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::LEFT, stop_mode);
+                                  TbotsProto::CreaseDefenderAlignment::LEFT, stop_mode,
+                                  TbotsProto::BallStealMode::IGNORE);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::RIGHT, stop_mode);
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT, stop_mode,
+                                  TbotsProto::BallStealMode::IGNORE);
 
         // insert all the tactics to the result
         result[0].emplace_back(std::get<0>(crease_defender_tactics));

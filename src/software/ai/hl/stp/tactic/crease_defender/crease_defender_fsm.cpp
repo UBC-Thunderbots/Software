@@ -200,10 +200,24 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
 bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
     Point robot_position   = event.common.robot.position();
-    double ball_position_x = event.common.world_ptr->ball().position().x();
+    Point ball_position = event.common.world_ptr->ball().position();
+
+    std::optional<Robot> nearest_friendly =
+            event.common.world_ptr->friendlyTeam().getNearestRobot(ball_position);
     std::optional<Robot> nearest_enemy =
         event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
-    if (nearest_enemy)
+
+    if (event.control_params.ball_steal_mode == TbotsProto::BallStealMode::IGNORE)
+    {
+        // Do nothing if stealing is disabled
+        return false;
+    }
+    else if (nearest_friendly.has_value() && event.common.robot.id() != nearest_friendly.value().id())
+    {
+        // Do nothing if this robot is not the closest to the ball
+        return false;
+    }
+    else if (nearest_enemy.has_value())
     {
         double ball_distance =
             distance(robot_position, event.common.world_ptr->ball().position());
@@ -219,7 +233,7 @@ bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
             ball_distance <= crease_defender_config.max_get_ball_radius_m();
         bool ball_is_slow = event.common.world_ptr->ball().velocity().length() <=
                             crease_defender_config.max_get_ball_radius_m();
-        bool ball_on_friendly_side = ball_position_x < 0;
+        bool ball_on_friendly_side = ball_position.x() < 0;
 
         return ball_on_friendly_side && ball_is_near_friendly &&
                ball_is_within_max_range && ball_is_slow;

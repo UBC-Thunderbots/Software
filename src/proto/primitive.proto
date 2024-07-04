@@ -184,3 +184,11 @@ message DirectControlPrimitive
     MotorControl motor_control = 1;
     PowerControl power_control = 2;
 }
+
+enum BallStealMode
+{
+    // The robot avoids stealing ball/getting possession
+    IGNORE = 0;
+    // The robot can steal the ball/try to get possession of the ball
+    STEAL = 1;
+}

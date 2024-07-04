@@ -13,7 +13,8 @@ CreaseDefenderTactic::CreaseDefenderTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Move}),
       fsm_map(),
       control_params({Point(0, 0), TbotsProto::CreaseDefenderAlignment::CENTRE,
-                      TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}),
+                      TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                      TbotsProto::BallStealMode::STEAL}),
       ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
@@ -32,11 +33,13 @@ void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
 void CreaseDefenderTactic::updateControlParams(
     const Point &enemy_threat_origin,
     const TbotsProto::CreaseDefenderAlignment &alignment,
-    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+    TbotsProto::BallStealMode ball_steal_mode)
 {
     control_params.enemy_threat_origin       = enemy_threat_origin;
     control_params.crease_defender_alignment = alignment;
     control_params.max_allowed_speed_mode    = max_allowed_speed_mode;
+    control_params.ball_steal_mode           = ball_steal_mode;
 }
 
 void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
