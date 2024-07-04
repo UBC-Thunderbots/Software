@@ -26,7 +26,12 @@
 std::shared_ptr<ProtoLogger> proto_logger;
 
 /**
- * Signal handler to cleanly shutdown the program
+ * Signal handler which attempts to cleanly shutdown the program.
+ *
+ * @note This function is not guaranteed to clean up all resources since it calls
+ * non signal-safe functions (e.g. std::shared_ptr, std::cout, exit, etc.). The primary
+ * purpose of this function is to *try* to flush and stop the ProtoLogger.
+ *
  * @param signal_num The signal number that was caught
  */
 void cleanup(int signal_num)

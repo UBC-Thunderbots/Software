@@ -98,7 +98,11 @@ class ProtoLogger
 
     /**
      * Flushes the buffer and stops the logging thread.
-     * Note that
+     *
+     * @note ProtoLogger will try to flush the buffer for up to
+     * MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC seconds before stopping the logging thread. As
+     * such, if there are many logs in the buffer, not all may be flushed in time and some
+     * data may be lost.
      */
     void flushAndStopLogging();
 
