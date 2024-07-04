@@ -199,11 +199,11 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
 
 bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
-    Point robot_position   = event.common.robot.position();
-    Point ball_position = event.common.world_ptr->ball().position();
+    Point robot_position = event.common.robot.position();
+    Point ball_position  = event.common.world_ptr->ball().position();
 
     std::optional<Robot> nearest_friendly =
-            event.common.world_ptr->friendlyTeam().getNearestRobot(ball_position);
+        event.common.world_ptr->friendlyTeam().getNearestRobot(ball_position);
     std::optional<Robot> nearest_enemy =
         event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
 
@@ -212,7 +212,8 @@ bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
         // Do nothing if stealing is disabled
         return false;
     }
-    else if (nearest_friendly.has_value() && event.common.robot.id() != nearest_friendly.value().id())
+    else if (nearest_friendly.has_value() &&
+             event.common.robot.id() != nearest_friendly.value().id())
     {
         // Do nothing if this robot is not the closest to the ball
         return false;

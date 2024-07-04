@@ -49,12 +49,12 @@ class CreaseDefenderTactic : public Tactic
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      * @param ball_steal_mode The mode of ball stealing to follow
      */
-    void updateControlParams(const Point &enemy_threat_origin,
-                             const TbotsProto::CreaseDefenderAlignment &alignment,
-                             TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
-                                 TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                             TbotsProto::BallStealMode ball_steal_mode =
-                                 TbotsProto::BallStealMode::STEAL);
+    void updateControlParams(
+        const Point &enemy_threat_origin,
+        const TbotsProto::CreaseDefenderAlignment &alignment,
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::BallStealMode ball_steal_mode = TbotsProto::BallStealMode::STEAL);
 
     void accept(TacticVisitor &visitor) const override;
 
