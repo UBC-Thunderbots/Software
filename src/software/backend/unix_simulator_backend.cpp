@@ -17,31 +17,32 @@ UnixSimulatorBackend::UnixSimulatorBackend(
     // Protobuf Inputs
     robot_status_input.reset(new ThreadedProtoUnixListener<TbotsProto::RobotStatus>(
         runtime_dir + ROBOT_STATUS_PATH,
-        boost::bind(&Backend::receiveRobotStatus, this, _1), proto_logger));
+        [&](TbotsProto::RobotStatus& msg) { receiveRobotStatus(msg); }, proto_logger));
 
     ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
         runtime_dir + SSL_WRAPPER_PATH,
-        boost::bind(&Backend::receiveSSLWrapperPacket, this, _1), proto_logger));
+        [&](SSLProto::SSL_WrapperPacket& msg) { receiveSSLWrapperPacket(msg); },
+        proto_logger));
 
     ssl_referee_input.reset(new ThreadedProtoUnixListener<SSLProto::Referee>(
         runtime_dir + SSL_REFEREE_PATH,
-        boost::bind(&Backend::receiveSSLReferee, this, _1), proto_logger));
+        [&](SSLProto::Referee& msg) { receiveSSLReferee(msg); }, proto_logger));
 
     sensor_proto_input.reset(new ThreadedProtoUnixListener<SensorProto>(
         runtime_dir + SENSOR_PROTO_PATH,
-        boost::bind(&Backend::receiveSensorProto, this, _1), proto_logger));
+        [&](SensorProto& msg) { receiveSensorProto(msg); }, proto_logger));
 
     dynamic_parameter_update_request_listener.reset(
         new ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>(
             runtime_dir + DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH,
-            boost::bind(&UnixSimulatorBackend::receiveThunderbotsConfig, this, _1),
+            [&](TbotsProto::ThunderbotsConfig& msg) { receiveThunderbotsConfig(msg); },
             proto_logger));
 
     // Empty callback for ValidationProtoSet since it's only used by proto_logger
     validation_proto_set_listener.reset(
         new ThreadedProtoUnixListener<TbotsProto::ValidationProtoSet>(
             runtime_dir + VALIDATION_PROTO_SET_PATH,
-            [](TbotsProto::ValidationProtoSet v) {}, proto_logger));
+            [](TbotsProto::ValidationProtoSet& v) {}, proto_logger));
 
     // Protobuf Outputs
     world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(
