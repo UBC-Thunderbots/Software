@@ -1,4 +1,4 @@
-#include "software/jetson_nano/primitive_executor.h"
+#include "software/embedded/primitive_executor.h"
 
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"

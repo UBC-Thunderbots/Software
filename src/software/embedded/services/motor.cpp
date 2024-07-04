@@ -1,4 +1,4 @@
-#include "software/jetson_nano/services/motor.h"
+#include "software/embedded/services/motor.h"
 
 #include <errno.h>
 #include <fcntl.h>

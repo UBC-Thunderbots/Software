@@ -1,4 +1,4 @@
-#include "software/jetson_nano/thunderloop.h"
+#include "software/embedded/thunderloop.h"
 
 #include <Tracy.hpp>
 
@@ -8,8 +8,8 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
-#include "software/jetson_nano/primitive_executor.h"
-#include "software/jetson_nano/services/motor.h"
+#include "software/embedded/primitive_executor.h"
+#include "software/embedded/services/motor.h"
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
 #include "software/tracy/tracy_constants.h"

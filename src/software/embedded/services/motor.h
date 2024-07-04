@@ -7,7 +7,7 @@
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/robot_constants.h"
-#include "software/jetson_nano/gpio.h"
+#include "software/embedded/gpio.h"
 #include "software/physics/euclidean_to_wheel.h"
 
 class MotorService

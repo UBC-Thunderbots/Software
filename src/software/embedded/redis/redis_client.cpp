@@ -1,4 +1,4 @@
-#include "software/jetson_nano/redis/redis_client.h"
+#include "software/embedded/redis/redis_client.h"
 
 
 RedisClient::RedisClient(std::string host, size_t port)

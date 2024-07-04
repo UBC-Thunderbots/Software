@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
-        "//software/jetson_nano:gpio",
+        "//software/embedded:gpio",
         "//software/logger",
         "//software/physics:euclidean_to_wheel",
         "//software/util/scoped_timespec_timer",
@@ -43,7 +43,7 @@ cc_binary(
         "//proto/message_translation:tbots_geometry",
         "//proto/primitive:primitive_msg_factory",
         "//shared:robot_constants",
-        "//software/jetson_nano:primitive_executor",
+        "//software/embedded:primitive_executor",
         "//software/logger",
         "@trinamic",
     ],

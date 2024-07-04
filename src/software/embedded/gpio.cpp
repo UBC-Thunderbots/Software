@@ -1,4 +1,4 @@
-#include "software/jetson_nano/gpio.h"
+#include "software/embedded/gpio.h"
 
 #include "software/logger/logger.h"
 

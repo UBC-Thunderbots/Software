@@ -1,4 +1,4 @@
-#include "software/jetson_nano/services/network/network.h"
+#include "software/embedded/services/network/network.h"
 
 NetworkService::NetworkService(const std::string& ip_address,
                                unsigned short primitive_listener_port,

@@ -2,9 +2,9 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
-#include "software/jetson_nano/primitive_executor.h"
-#include "software/jetson_nano/services/motor.h"
-#include "software/jetson_nano/services/power.h"
+#include "software/embedded/primitive_executor.h"
+#include "software/embedded/services/motor.h"
+#include "software/embedded/services/power.h"
 #include "software/logger/network_logger.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 

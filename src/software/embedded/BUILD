@@ -23,10 +23,10 @@ cc_library(
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
-        "//software/jetson_nano/redis",
-        "//software/jetson_nano/services:motor",
-        "//software/jetson_nano/services:power",
-        "//software/jetson_nano/services/network",
+        "//software/embedded/redis",
+        "//software/embedded/services:motor",
+        "//software/embedded/services:power",
+        "//software/embedded/services/network",
         "//software/logger:network_logger",
         "//software/tracy:tracy_constants",
         "//software/util/scoped_timespec_timer",
@@ -61,6 +61,6 @@ cc_binary(
 )
 
 sh_binary(
-    name = "setup_nano",
-    srcs = ["setup_nano.sh"],
+    name = "setup_robot_software_deps",
+    srcs = ["setup_robot_software_deps.sh"],
 )

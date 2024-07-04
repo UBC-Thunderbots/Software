@@ -8,46 +8,65 @@
     - name: Run basic setup
       tags: dependencies
       block:
-        - ansible.builtin.import_tasks:
-          file: shared_setup.yml
-          apply:
-            tags:
-              - check_internet
-              - enable_passwordless_sudo
-              - setup_robot_software_deps
-              - add_user_robot_to_dialout
-              - systemd
+        - ansible.builtin.include_tasks:
+            file: shared_setup.yml
+            apply:
+              tags:
+                - check_internet
+                - enable_passwordless_sudo
+                - setup_robot_software_deps
+                - add_user_robot_to_dialout
+                - systemd
 
     - name: Configure Pi
       tags: dependencies
-      - name: Disable pcie_aspm
-        block:
-          ansible.builtin.lineinfile:
-            path: /boot/firmware/cmdline.txt
-            search_string: 'pcie_aspm=off'
-            state: absent
+      block:
+        - name: Disable pcie_aspm
+          block:
+            - ansible.builtin.lineinfile:
+                path: /boot/firmware/cmdline.txt
+                search_string: 'pcie_aspm=off'
+                state: absent
 
-          ansible.builtin.lineinfile:
-            path: /boot/firmware/cmdline.txt
-            line: ' pcie_aspm=off'
+            - ansible.builtin.lineinfile:
+                path: /boot/firmware/cmdline.txt
+                line: ' pcie_aspm=off'
 
-      - name: Set up SPI and Wifi drivers
-        block:
-          - name: Sync setup files
-            ansible.posix.synchronize:
-              src: ../../linux_configs/pi/setup.zip
-              dest: ~/
+        - name: Set up SPI and Wifi drivers
+          block:
+            - name: Sync setup files
+              ansible.posix.synchronize:
+                src: ../../linux_configs/pi/setup.zip
+                dest: ~/
 
-          - name: Unzip setup files
-            ansible.builtin.unarchive:
-              src: ~/setup.zip
-              dest: ~/
-           
-          - name: Set up Wifi drivers
-            become: true
-            shell: 'mv ~/iwlwifi* /lib/firmware/'
+            - name: Unzip setup files
+              ansible.builtin.unarchive:
+                src: ~/setup.zip
+                dest: ~/
+             
+            - name: Set up Wifi drivers
+              become: true
+              shell: 'mv ~/iwlwifi* /lib/firmware/'
 
-          - name: Set up SPI overlay
-            become: true
-            shell: 'mv ~/spi0-5cs.dtbo /boot/firmware/overlays/'
+            - name: Set up SPI overlay
+              become: true
+              shell: 'mv ~/spi0-5cs.dtbo /boot/firmware/overlays/'
 
+        - name: Change hostname
+          tags: update_hostname
+          when: new_hostname is defined
+          ansible.builtin.include_tasks:
+            file: shared_setup.yml
+            apply:
+              tags:
+                - update_hostname
+              vars:
+                new_hostname: "{{ new_hostname }}"
+
+    - name: Reboot
+      ansible.builtin.include_tasks:
+        file: shared_setup.yml
+        apply:
+          tags:
+            - reboot
+            - setup_success

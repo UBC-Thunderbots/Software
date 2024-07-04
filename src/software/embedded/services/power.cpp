@@ -1,4 +1,4 @@
-#include "software/jetson_nano/services/power.h"
+#include "software/embedded/services/power.h"
 
 #include <boost/bind/bind.hpp>
 #include <boost/filesystem.hpp>

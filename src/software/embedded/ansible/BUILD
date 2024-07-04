@@ -12,10 +12,10 @@ py_binary(
     data = [
         ":playbooks",
         ":scripts",
-        "//software/embedded:setup_nano",
+        "//software/embedded:setup_robot_software_deps",
         "//software/embedded:thunderloop_main",
-        "//software/embedded/jetson_nano:jetson_nano_files",
-        "//software/embedded/pi:pi_files",
+        "//software/embedded/linux_configs/jetson_nano:jetson_nano_files",
+        "//software/embedded/linux_configs/pi:pi_files",
         "//software/embedded/linux_configs/systemd:systemd_files",
         "//software/embedded/redis",
         "//software/embedded/services:robot_auto_test",
