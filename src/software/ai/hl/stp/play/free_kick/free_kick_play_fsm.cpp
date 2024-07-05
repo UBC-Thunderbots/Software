@@ -48,10 +48,6 @@ void FreeKickPlayFSM::setupPosition(const Update &event)
 
 bool FreeKickPlayFSM::setupDone(const Update &event)
 {
-    if (align_to_ball_tactic->done())
-    {
-        LOG(INFO) << "Finished aligning to ball.";
-    }
     return align_to_ball_tactic->done();
 }
 
@@ -147,7 +143,7 @@ bool FreeKickPlayFSM::shotFound(const Update &event)
 
 void FreeKickPlayFSM::shootBall(const Update &event)
 {
-    LOG(INFO) << "Shooting ball...";
+    LOG(INFO) << "Shooting ball.";
     PriorityTacticVector tactics_to_run = {{}};
 
     Point ball_pos = event.common.world_ptr->ball().position();
@@ -175,7 +171,7 @@ bool FreeKickPlayFSM::timeExpired(const FreeKickPlayFSM::Update &event)
 
 void FreeKickPlayFSM::chipBall(const Update &event)
 {
-    LOG(INFO) << "Time to look for pass expired. Chipping ball...";
+    LOG(INFO) << "Time to look for pass expired. Chipping ball.";
     PriorityTacticVector tactics_to_run = {{}};
 
     Point ball_pos = event.common.world_ptr->ball().position();
@@ -264,8 +260,6 @@ bool FreeKickPlayFSM::passFound(const Update &event)
         min_perfect_pass_score - std::min(time_since_pass_optimization_start_seconds /
                                               pass_score_ramp_down_duration,
                                           min_perfect_pass_score - abs_min_pass_score);
-    LOG(INFO) << "Pass Score: " << best_pass_and_score_so_far.rating
-              << " Score threshold: " << min_score;
 
     return best_pass_and_score_so_far.rating > min_score;
 }
@@ -293,10 +287,6 @@ void FreeKickPlayFSM::passBall(const Update &event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
-    // We have committed to the pass
-    LOG(INFO) << "Found pass with score: " << best_pass_and_score_so_far.rating
-              << ". Passing...";
-
     Pass pass = best_pass_and_score_so_far.pass;
 
     passer_tactic->updateControlParams(pass.passerPoint(), pass.passerOrientation(),
@@ -318,27 +308,15 @@ void FreeKickPlayFSM::passBall(const Update &event)
 
 bool FreeKickPlayFSM::shotDone(const Update &event)
 {
-    if (shoot_tactic->done())
-    {
-        LOG(INFO) << "Finished shot.";
-    }
     return shoot_tactic->done();
 }
 
 bool FreeKickPlayFSM::passDone(const FreeKickPlayFSM::Update &event)
 {
-    if (receiver_tactic->done())
-    {
-        LOG(INFO) << "Finished pass.";
-    }
     return receiver_tactic->done();
 }
 
 bool FreeKickPlayFSM::chipDone(const FreeKickPlayFSM::Update &event)
 {
-    if (chip_tactic->done())
-    {
-        LOG(INFO) << "Finished chip.";
-    }
     return chip_tactic->done();
 }
