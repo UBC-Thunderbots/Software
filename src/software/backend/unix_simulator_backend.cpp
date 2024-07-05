@@ -52,10 +52,6 @@ void UnixSimulatorBackend::receiveThunderbotsConfig(TbotsProto::ThunderbotsConfi
     Subject<TbotsProto::ThunderbotsConfig>::sendValueToObservers(request);
 
     // Echo back the request as an acknowledge
-    LOG(DEBUG) << "I've got new: " << request.ai_config().ai_control_config().run_ai();
-    LOG(DEBUG)
-        << "I've got new: "
-        << request.ai_config().dribble_tactic_config().lose_ball_possession_threshold();
     dynamic_parameter_update_respone_sender->sendProto(request);
 }
 

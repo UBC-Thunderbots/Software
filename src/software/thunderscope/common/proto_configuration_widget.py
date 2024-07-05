@@ -23,6 +23,7 @@ class ProtoConfigurationWidget(QWidget):
 
     # where we are saving the default configuration file
     DEFAULT_SAVE_DIRECTORY = "/tmp/tbotspython/thunderbots_configurations_proto"
+    DEFAULT_SAVE_PATH = DEFAULT_SAVE_DIRECTORY + "/default_conrfiguration.proto"
 
     def __init__(
         self, on_change_callback, is_yellow, search_filter_threshold=60,
@@ -52,7 +53,7 @@ class ProtoConfigurationWidget(QWidget):
         self.search_filter_threshold = search_filter_threshold
 
         self.is_yellow = is_yellow
-        self.path_to_file = self.get_default_savepath()
+        self.path_to_file = ProtoConfigurationWidget.DEFAULT_SAVE_PATH
         self.update_proto_from_file(self.path_to_file)
 
         # Create ParameterGroup from Protobuf
@@ -122,6 +123,7 @@ class ProtoConfigurationWidget(QWidget):
         :param path_to_file:
         """
         if not os.path.isfile(path_to_file):
+            logging.info(f"There are such no file in {path_to_file} crearting new ThunderbotsConfig proto.")
             self.proto_to_configure = ThunderbotsConfig()
             self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
                 self.is_yellow
@@ -157,7 +159,7 @@ class ProtoConfigurationWidget(QWidget):
             save_to_path, should_save = QFileDialog.getSaveFileName(
                 self,
                 "Select Protobufs",
-                self.get_default_savepath(),
+                ProtoConfigurationWidget.DEFAULT_SAVE_PATH,
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
 
@@ -196,7 +198,7 @@ class ProtoConfigurationWidget(QWidget):
             path_to_file, should_open = QFileDialog.getOpenFileName(
                 self,
                 "Select Protobufs",
-                self.get_default_savepath(),
+                ProtoConfigurationWidget.DEFAULT_SAVE_PATH,
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
             if not should_open:
@@ -206,10 +208,10 @@ class ProtoConfigurationWidget(QWidget):
             self.update_proto_from_file(path_to_file)
 
             self.update_widget()
-        except Exception:
+        except Exception as e:
             logging.warning(
-                "cannot load configuration from {}. Are you sure it is a configuration proto?".format(
-                    path_to_file
+                    "cannot load configuration from {}. Error: {} Are you sure it is a configuration proto?".format(
+                    path_to_file, e
                 )
             )
 
@@ -231,20 +233,6 @@ class ProtoConfigurationWidget(QWidget):
         self.param_group.sigTreeStateChanged.connect(self.__handle_parameter_changed)
         self.param_tree.setAlternatingRowColors(False)
 
-    def get_default_savepath(self):
-        """
-        returns the default save path for the protobufs
-
-        :return: the path where we are going to save the files
-        """
-
-        path_to_file = (
-            ProtoConfigurationWidget.DEFAULT_SAVE_DIRECTORY
-            + "/default_configuration.proto"
-        )
-        # appending filename
-        return path_to_file
-
     def reset_button_callback(self):
         """
         resetting the protobufs when the reset button has been clicked!
@@ -256,7 +244,7 @@ class ProtoConfigurationWidget(QWidget):
             self.is_yellow
         )
 
-        self.path_to_file = self.get_default_savepath()
+        self.path_to_file = ProtoConfigurationWidget.DEFAULT_SAVE_PATH
 
         self.build_proto(self.proto_to_configure)
         self.update_widget()
@@ -289,9 +277,6 @@ class ProtoConfigurationWidget(QWidget):
         :param changes: The changes
 
         """
-        logging.info("Something is changing?")
-        logging.info(changes)
-
         for param, change, data in changes:
             path = self.param_group.childPath(param)
 
@@ -311,7 +296,6 @@ class ProtoConfigurationWidget(QWidget):
             except (TypeError, NameError):
                 exec(f"self.proto_to_configure.{child_name} = data")
 
-            logging.info(f"child name: {child_name} data: {data}")
             self.on_change_callback(child_name, data, self.proto_to_configure)
 
     def config_proto_to_param_dict(self, message, search_term=None):
