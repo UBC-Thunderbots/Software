@@ -1,6 +1,7 @@
 import os
 from proto.import_all_protos import *
 from software.py_constants import MILLISECONDS_PER_SECOND
+from software.thunderscope.constants import ProtoConfigurationConstant
 import logging
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import QTimer
@@ -22,8 +23,6 @@ class ProtoConfigurationWidget(QWidget):
     """
 
     # where we are saving the default configuration file
-    DEFAULT_SAVE_DIRECTORY = "/tmp/tbotspython/thunderbots_configurations_proto"
-    DEFAULT_SAVE_PATH = DEFAULT_SAVE_DIRECTORY + "/default_conrfiguration.proto"
 
     def __init__(
         self, on_change_callback, is_yellow, search_filter_threshold=60,
@@ -53,7 +52,7 @@ class ProtoConfigurationWidget(QWidget):
         self.search_filter_threshold = search_filter_threshold
 
         self.is_yellow = is_yellow
-        self.path_to_file = ProtoConfigurationWidget.DEFAULT_SAVE_PATH
+        self.path_to_file = ProtoConfigurationConstant.DEFAULT_SAVE_PATH
         self.update_proto_from_file(self.path_to_file)
 
         # Create ParameterGroup from Protobuf
@@ -159,7 +158,7 @@ class ProtoConfigurationWidget(QWidget):
             save_to_path, should_save = QFileDialog.getSaveFileName(
                 self,
                 "Select Protobufs",
-                ProtoConfigurationWidget.DEFAULT_SAVE_PATH,
+                ProtoConfigurationConstant.DEFAULT_SAVE_PATH,
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
 
@@ -198,7 +197,7 @@ class ProtoConfigurationWidget(QWidget):
             path_to_file, should_open = QFileDialog.getOpenFileName(
                 self,
                 "Select Protobufs",
-                ProtoConfigurationWidget.DEFAULT_SAVE_PATH,
+                ProtoConfigurationConstant.DEFAULT_SAVE_PATH,
                 options=QFileDialog.Option.DontUseNativeDialog,
             )
             if not should_open:
@@ -222,7 +221,6 @@ class ProtoConfigurationWidget(QWidget):
         """
 
         # refreshing widgets after the parameters is called
-        logging.info("I am updating widget?")
         self.param_group = parametertree.Parameter.create(
             name="params",
             type="group",
@@ -244,7 +242,7 @@ class ProtoConfigurationWidget(QWidget):
             self.is_yellow
         )
 
-        self.path_to_file = ProtoConfigurationWidget.DEFAULT_SAVE_PATH
+        self.path_to_file = ProtoConfigurationConstant.DEFAULT_SAVE_PATH
 
         self.build_proto(self.proto_to_configure)
         self.update_widget()

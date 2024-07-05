@@ -317,3 +317,7 @@ class TrailValues:
 
     DEFAULT_TRAIL_LENGTH = 20
     DEFAULT_TRAIL_SAMPLING_RATE = 0
+
+class ProtoConfigurationConstant:
+    DEFAULT_SAVE_DIRECTORY = "/tmp/tbotspython/thunderbots_configurations_proto"
+    DEFAULT_SAVE_PATH = DEFAULT_SAVE_DIRECTORY + "/default_conrfiguration.proto"
