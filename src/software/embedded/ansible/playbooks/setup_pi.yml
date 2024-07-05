@@ -11,6 +11,8 @@
         - ansible.builtin.include_tasks:
             file: shared_setup.yml
             apply:
+              become: true
+              become_method: sudo
               tags:
                 - check_internet
                 - enable_passwordless_sudo

@@ -5,23 +5,46 @@ set -ex
 host_software_packages=(
     redis
     device-tree-compiler
-    python3.8      # Python 3
-    python3.8-venv # Virtual Environment
-    python3.8-dev  # Python 3 Headers
     curl
+    # add-apt-repository is unavailable on Debian platforms, so we install a consitent python from source. At a later
+    # time, consider upgrading python
+    build-essential
+    gdb
+    lcov
+    pkg-config
+    libbz2-dev
+    libffi-dev
+    libgdbm-dev
+    libgdbm-compat-dev
+    liblzma-dev
+    libncurses5-dev
+    libreadline6-dev
+    libsqlite3-dev
+    libssl-dev
+    lzma
+    lzma-dev
+    tk-dev
+    uuid-dev
+    zlib1g-dev
 )
 
-sudo apt-get update
-sudo add-apt-repository -y ppa:deadsnakes/ppa
-
 # Install packages
+sudo apt-get update
 sudo apt-get install "${host_software_packages[@]}" -y
+
+# Install python3.8 from source
+sudo wget -O /tmp/python.tar.xz https://www.python.org/ftp/python/3.8.19/Python-3.8.19.tar.xz
+tar -xf /tmp/python.tar.xz -C /tmp
+cd /tmp/Python-3.8.19
+sudo ./configure --enable-optimizations
+sudo make altinstall > /tmp/python_install.log
+cd -
 
 # Delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
 # Setup python3.8 venv
-sudo /usr/bin/python3.8 -m venv /opt/tbotspython
+sudo python3.8 -m venv /opt/tbotspython
 sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip
 
 pip_libaries=(
