@@ -56,8 +56,6 @@ def read_one_chunk(replay_file_name):
                     line_num, float(timestamp), protobuf_type, proto
                 )
             )
-
-            line = replay_file.readline()
             line_num += 1
 
     return line_num
