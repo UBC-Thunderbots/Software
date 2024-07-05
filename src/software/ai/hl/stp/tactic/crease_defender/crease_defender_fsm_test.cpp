@@ -130,7 +130,8 @@ TEST(CreaseDefenderFSMTest, test_transitions)
     CreaseDefenderFSM::ControlParams control_params{
         .enemy_threat_origin       = Point(2, 3),
         .crease_defender_alignment = TbotsProto::CreaseDefenderAlignment::LEFT,
-        .max_allowed_speed_mode    = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT};
+        .max_allowed_speed_mode    = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        .ball_steal_mode           = TbotsProto::BallStealMode::STEAL};
 
     FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM{config},
                                DribbleFSM(ai_config.dribble_tactic_config()));
