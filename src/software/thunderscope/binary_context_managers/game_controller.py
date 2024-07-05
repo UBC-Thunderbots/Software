@@ -41,7 +41,7 @@ class Gamecontroller(object):
         # on the same port as what other teams may be listening on.
         if use_conventional_port:
             if not self.is_valid_port(SSL_REFEREE_PORT):
-                raise OSError("Cannot use port 40000 for Gamecontroller")
+                raise OSError(f"Cannot use port {SSL_REFEREE_PORT} for Gamecontroller")
 
             self.referee_port = SSL_REFEREE_PORT
         else:
