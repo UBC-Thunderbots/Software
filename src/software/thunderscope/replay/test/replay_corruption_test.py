@@ -195,7 +195,7 @@ def test_for_file_corruption():
 
     # block until the player has finished playing!
     # in total, this should play for around 0.4 seconds
-    while player.is_playing():
+    while player.is_proto_player_playing():
         time.sleep(0.1)
 
     # asserting that no exception has occurred when the protobufs are being played
