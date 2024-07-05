@@ -46,8 +46,8 @@ constexpr size_t countSubstrings(std::string_view str, char delimiter)
     size_t count = 1;
     for (size_t i = 0; i < str.size(); ++i)
     {
-        // Trailing commas are not counted
-        if (str.at(i) == ',' && (i != str.size() - 1))
+        // Trailing delimiters are not counted
+        if (str.at(i) == delimiter && (i != str.size() - 1))
         {
             ++count;
         }
@@ -62,7 +62,7 @@ constexpr size_t countSubstrings(std::string_view str, char delimiter)
  *
  * @param str a string of substrings separated by the delimiter
  * @param delimiter the delimiting character between substrings
- * @param index_seq an index sequence 0, 1, 2, ..., N where N is the number of
+ * @param index_seq an index sequence 0, 1, 2, ..., (N - 1) where N is the number of
  * substrings in str (use countSubstrings to count the number of substrings)
  *
  * @return an array containing the substrings

@@ -18,9 +18,9 @@
  * @param ... The values of the enum
  */
 #define MAKE_ENUM(name, ...)                                                               \
-    constexpr std::string_view _enum_string_args_##name = #__VA_ARGS__;                    \
+    constexpr std::string_view enum_string_args_##name = #__VA_ARGS__;                     \
     static_assert(                                                                         \
-        isEnumArgsValid(_enum_string_args_##name),                                         \
+        isEnumArgsValid(enum_string_args_##name),                                          \
         "Error: Enums created with the MAKE_ENUM macro may not manually specify enum "     \
         "values. Please remove any enum assignments with the '=' operator");               \
     enum class name                                                                      \
@@ -34,10 +34,10 @@
         /* these cases means we will get warnings (or errors). See this stackoverflow */ \
         /* answer for a similar explanation: https://stackoverflow.com/a/2102673 */      \
     }; \
-    constexpr size_t _enum_size_##name = countSubstrings(_enum_string_args_##name, ',');   \
-    constexpr auto _enum_values_##name = getEnumValues<name, _enum_size_##name>();         \
-    constexpr auto _enum_value_names_##name = splitString(                                 \
-        _enum_string_args_##name, ',', std::make_index_sequence<_enum_size_##name>());     \
+    constexpr size_t enum_size_##name = countSubstrings(enum_string_args_##name, ',');     \
+    constexpr auto enum_values_##name = getEnumValues<name, enum_size_##name>();           \
+    constexpr auto enum_value_names_##name = splitString(                                  \
+        enum_string_args_##name, ',', std::make_index_sequence<enum_size_##name>());       \
     template <>                                                                            \
     struct reflective_enum::is_reflective_enum<name> : std::true_type                      \
     {                                                                                      \
@@ -45,17 +45,17 @@
     template <>                                                                            \
     constexpr size_t reflective_enum::size<name>()                                         \
     {                                                                                      \
-        return _enum_size_##name;                                                          \
+        return enum_size_##name;                                                           \
     }                                                                                      \
     template <>                                                                            \
     constexpr auto reflective_enum::values<name>()                                         \
     {                                                                                      \
-        return _enum_values_##name;                                                        \
+        return enum_values_##name;                                                         \
     }                                                                                      \
     template <>                                                                            \
     constexpr auto reflective_enum::valueNames<name>()                                     \
     {                                                                                      \
-        return _enum_value_names_##name;                                                   \
+        return enum_value_names_##name;                                                    \
     }                                                                                      \
     inline std::ostream& operator<<(std::ostream& os, name value)                          \
     {                                                                                      \
