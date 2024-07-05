@@ -45,15 +45,17 @@ class DefensePlayFSMBase
     void setUpPassDefenders(int num_pass_defenders);
 
     /**
-     * Helper function to set up alignments for the crease defense robots and control params
+     * Helper function to set up alignments for the crease defense robots and control
+     * params
      *
      * @param event the FSM event
      * @param crease_defender_assignments crease defender assignments to be aligned
      * @param ball_steal_mode crease defender ball steal behaviour/aggressiveness
      */
-    void setAlignment(const Update &event,
-                      const std::vector<DefenderAssignment> &crease_defender_assignments,
-                      TbotsProto::BallStealMode ball_steal_mode = TbotsProto::BallStealMode::STEAL);
+    void setAlignment(
+        const Update &event,
+        const std::vector<DefenderAssignment> &crease_defender_assignments,
+        TbotsProto::BallStealMode ball_steal_mode = TbotsProto::BallStealMode::STEAL);
 
     /**
      * Helper function to update all given pass defender control params
