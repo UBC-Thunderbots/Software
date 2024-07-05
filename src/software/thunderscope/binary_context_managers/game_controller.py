@@ -37,7 +37,7 @@ class Gamecontroller(object):
 
         self.supress_logs = supress_logs
 
-        # We default to using a non-conventional port to avoid emitting 
+        # We default to using a non-conventional port to avoid emitting
         # on the same port as what other teams may be listening on.
         if use_conventional_port:
             if not self.is_valid_port(SSL_REFEREE_PORT):
