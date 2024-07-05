@@ -53,7 +53,7 @@ struct KickFSM
      *
      * @return if the robot is aligned for the kick
      */
-    bool robotAlignedForKick(const Update &event);
+    bool shouldRealignWithBall(const Update &event);
 
 
     auto operator()()
@@ -65,7 +65,7 @@ struct KickFSM
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(ballChicked)
-        DEFINE_SML_GUARD(robotAlignedForKick)
+        DEFINE_SML_GUARD(shouldRealignWithBall)
         DEFINE_SML_ACTION(updateKick)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
 
@@ -74,7 +74,7 @@ struct KickFSM
             *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
             GetBehindBallFSM_S = KickState_S,
 
-            KickState_S + Update_E[!robotAlignedForKick_G] / updateGetBehindBall_A =
+            KickState_S + Update_E[shouldRealignWithBall_G] / updateGetBehindBall_A =
                 GetBehindBallFSM_S,
             KickState_S + Update_E[!ballChicked_G] / updateKick_A = KickState_S,
             KickState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,

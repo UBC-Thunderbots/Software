@@ -53,7 +53,7 @@ struct ChipFSM
      *
      * @return if the robot is aligned for the chip
      */
-    bool robotAlignedForChip(const Update &event);
+    bool shouldRealignWithBall(const Update &event);
 
     auto operator()()
     {
@@ -64,7 +64,7 @@ struct ChipFSM
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(ballChicked)
-        DEFINE_SML_GUARD(robotAlignedForChip)
+        DEFINE_SML_GUARD(shouldRealignWithBall)
         DEFINE_SML_ACTION(updateChip)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
 
@@ -73,7 +73,7 @@ struct ChipFSM
             *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
             GetBehindBallFSM_S = ChipState_S,
 
-            ChipState_S + Update_E[!robotAlignedForChip_G] / updateGetBehindBall_A =
+            ChipState_S + Update_E[shouldRealignWithBall_G] / updateGetBehindBall_A =
                 GetBehindBallFSM_S,
             ChipState_S + Update_E[!ballChicked_G] / updateChip_A = ChipState_S,
             ChipState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,

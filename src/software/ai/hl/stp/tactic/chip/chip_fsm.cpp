@@ -36,9 +36,18 @@ bool ChipFSM::ballChicked(const Update &event)
         event.control_params.chip_direction);
 }
 
-bool ChipFSM::robotAlignedForChip(const ChipFSM::Update &event)
+bool ChipFSM::shouldRealignWithBall(const Update &event)
 {
-    return isRobotReadyToChick(event.common.robot,
-                               event.common.world_ptr->ball().position(),
-                               event.control_params.chip_direction);
+    const Robot &robot        = event.common.robot;
+    const Point ball_position = event.common.world_ptr->ball().position();
+
+    // First check to see if it's too late to realign with the ball
+    if (robot.isNearDribbler(ball_position, 0.05))
+    {
+        return false;
+    }
+
+    // Check if the robot is already aligned to kick the ball
+    return !isRobotReadyToChick(robot, ball_position,
+                                event.control_params.chip_direction);
 }
