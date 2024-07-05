@@ -37,14 +37,15 @@ class Gamecontroller(object):
 
         self.supress_logs = supress_logs
 
-        self.ci_port = self.next_free_port()
-        self.referee_port = self.next_free_port(random.randint(1024, 65535))
-        # We default to using a non-conventional port to avoid emitting on the same port as what other teams may be listening on.
+        # We default to using a non-conventional port to avoid emitting 
+        # on the same port as what other teams may be listening on.
         if use_conventional_port:
             if not self.is_valid_port(SSL_REFEREE_PORT):
                 raise OSError("Cannot use port 40000 for Gamecontroller")
 
             self.referee_port = SSL_REFEREE_PORT
+        else:
+            self.referee_port = self.next_free_port(random.randint(1024, 65535))
 
         self.ci_port = self.next_free_port()
         # this allows gamecontroller to listen to override commands
