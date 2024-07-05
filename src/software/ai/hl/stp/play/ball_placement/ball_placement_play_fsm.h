@@ -21,6 +21,7 @@ struct BallPlacementPlayFSM
 {
     class StartState;
     class PickOffWallState;
+    class PickOffWaitState;
     class ReleaseWallState;
     class AlignWallState;
     class AlignPlacementState;
@@ -190,6 +191,7 @@ struct BallPlacementPlayFSM
         DEFINE_SML_STATE(StartState)
         DEFINE_SML_STATE(AlignWallState)
         DEFINE_SML_STATE(PickOffWallState)
+        DEFINE_SML_STATE(PickOffWaitState)
         DEFINE_SML_STATE(ReleaseWallState)
         DEFINE_SML_STATE(AlignPlacementState)
         DEFINE_SML_STATE(PlaceBallState)
@@ -225,7 +227,9 @@ struct BallPlacementPlayFSM
             AlignWallState_S + Update_E[wallAlignDone_G] / setPickOffDest_A = PickOffWallState_S,
             AlignWallState_S + Update_E[!shouldPickOffWall_G]    = AlignPlacementState_S,
             PickOffWallState_S + Update_E[!wallPickOffDone_G] / pickOffWall_A = PickOffWallState_S,
-            PickOffWallState_S + Update_E[wallPickOffDone_G] = ReleaseWallState_S,
+            PickOffWallState_S + Update_E[wallPickOffDone_G] / startWait_A = PickOffWaitState_S,
+            PickOffWaitState_S + Update_E[!waitDone_G] / wait_A = PickOffWaitState_S,
+            PickOffWaitState_S + Update_E[waitDone_G]           = ReleaseWallState_S,
             ReleaseWallState_S + Update_E[!ballReleased_G] / releaseBall_A = ReleaseWallState_S,
             ReleaseWallState_S + Update_E[ballReleased_G] = AlignPlacementState_S,
             AlignPlacementState_S + Update_E[shouldPickOffWall_G] = AlignWallState_S,
@@ -259,5 +263,5 @@ struct BallPlacementPlayFSM
     constexpr static double const WALL_KICKOFF_VELOCITY_M_PER_S   = 3.0;
     constexpr static double const RETREAT_DISTANCE_METERS         = 0.6;
     constexpr static double const PLACEMENT_DIST_THRESHOLD_METERS = 0.15;
-    constexpr static double const BALL_IS_PLACED_WAIT_S           = 3.0;
+    constexpr static double const BALL_IS_PLACED_WAIT_S           = 2.0;
 };

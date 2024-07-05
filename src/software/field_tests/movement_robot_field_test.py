@@ -78,7 +78,7 @@ logger = createLogger(__name__)
 
 # this test can only be run on the field
 def test_basic_rotation(field_test_runner):
-    test_angles = [0, 45, 90, 180, 270, 0]
+    test_angles = [0, math.pi, 0, math.pi, 0, math.pi]
 
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     if len(world.friendly_team.team_robots) == 0:
@@ -122,7 +122,7 @@ def test_basic_rotation(field_test_runner):
         field_test_runner.run_test(
             always_validation_sequence_set=[[]],
             eventually_validation_sequence_set=[[]],
-            test_timeout_s=5,
+            test_timeout_s=3,
         )
         # Send a stop tactic after the test finishes
         stop_tactic = StopTactic()
@@ -134,7 +134,7 @@ def test_basic_rotation(field_test_runner):
         # validate by eye
         logger.info(f"robot set to {angle} orientation")
 
-        time.sleep(2)
+        # time.sleep(2)
 
 
 def test_one_robots_square(field_test_runner):
@@ -150,13 +150,18 @@ def test_one_robots_square(field_test_runner):
         ]
     )
 
+
+    # field_test_runner.gamecontroller.send_gc_command(
+    #     gc_command=Command.Type.FORCE_START, team=Team.BLUE
+    # )
+
     id = world.friendly_team.team_robots[0].id
     print(f"Running test on robot {id}")
 
-    point1 = Point(x_meters=-0.3, y_meters=0.6)
-    point2 = Point(x_meters=-0.3, y_meters=-0.6)
-    point3 = Point(x_meters=-1.5, y_meters=-0.6)
-    point4 = Point(x_meters=-1.5, y_meters=0.6)
+    point1 = Point(x_meters=-0.75, y_meters=0.6)
+    point2 = Point(x_meters=-0.75, y_meters=-0.6)
+    point3 = Point(x_meters=0.75, y_meters=-0.6)
+    point4 = Point(x_meters=0.75, y_meters=0.6)
 
     tactic_0 = MoveTactic(
         destination=point1,
@@ -204,17 +209,18 @@ def test_one_robots_square(field_test_runner):
     )
     tactics = [tactic_0, tactic_1, tactic_2, tactic_3]
 
-    for tactic in tactics:
-        print(f"Going to {tactic.destination}")
-        params = AssignedTacticPlayControlParams()
-        params.assigned_tactics[id].move.CopyFrom(tactic)
+    for i in range(3):
+        for tactic in tactics:
+            print(f"Going to {tactic.destination}")
+            params = AssignedTacticPlayControlParams()
+            params.assigned_tactics[id].move.CopyFrom(tactic)
 
-        field_test_runner.set_tactics(params, True)
-        field_test_runner.run_test(
-            always_validation_sequence_set=[[]],
-            eventually_validation_sequence_set=[[]],
-            test_timeout_s=4,
-        )
+            field_test_runner.set_tactics(params, True)
+            field_test_runner.run_test(
+                always_validation_sequence_set=[[]],
+                eventually_validation_sequence_set=[[]],
+                test_timeout_s=4,
+            )
 
     # Send a stop tactic after the test finishes
     stop_tactic = StopTactic()
