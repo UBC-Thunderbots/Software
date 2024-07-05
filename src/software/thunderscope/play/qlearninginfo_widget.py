@@ -18,8 +18,8 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 class QLearningInfoWidget(QWidget):
 
-    # empirically makes even bolded items fit within columns
     ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
+    """Empirically makes even bolded items fit within columns"""
 
     def __init__(self, buffer_size: int = 1) -> None:
         """Shows current information about Q-learning functions in our AI
@@ -74,7 +74,7 @@ class QLearningInfoWidget(QWidget):
         if self.linear_q_func_combo_box.currentText() == linear_q_func_name: 
             self.__display_linear_q_function_weights(linear_q_func_name)
 
-    def __display_linear_q_function_weights(self, linear_q_func_name: str):
+    def __display_linear_q_function_weights(self, linear_q_func_name: str) -> None:
         """Update the QTableWidget with the weights of the specified LinearQFunction
 
         :param linear_q_func_name: the name identifying the LinearQFunction
@@ -104,7 +104,7 @@ class QLearningInfoWidget(QWidget):
         self.linear_q_func_weights_table.resizeColumnsToContents()
         self.linear_q_func_weights_table.resizeRowsToContents()
 
-    def __save_linear_q_function_weights(self):
+    def __save_linear_q_function_weights(self) -> None:
         """Open a file dialog to save the weights of the currently selected 
         LinearQFunction to a CSV file
         """
@@ -120,6 +120,7 @@ class QLearningInfoWidget(QWidget):
             logging.warning(
                 f"Could not create folder at '{SAVED_Q_FUNCTION_WEIGHTS_PATH}'"
             )
+            return
 
         # Open file dialog
         fileName, _ = QFileDialog.getSaveFileName(
