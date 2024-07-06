@@ -95,6 +95,8 @@
           shell: 'mv /home/{{ ansible_user }}/spi0-5cs.dtbo /boot/firmware/overlays/'
 
         - name: Update config.txt to select custom SPI overlay
+          become: true
+          become_method: sudo
           ansible.posix.synchronize:
             src: ../../linux_configs/pi/config.txt
             dest: /boot/firmware/
