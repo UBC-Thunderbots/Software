@@ -34,7 +34,7 @@ class BallIsOffGround(Validation):
         :returns: ValidationGeometry containing geometry to visualize
 
         """
-        # TODO: Make this a nicer visualization
+        # TODO #3244: Make this a nicer visualization
         return create_validation_geometry(
             [
                 tbots_cpp.Circle(

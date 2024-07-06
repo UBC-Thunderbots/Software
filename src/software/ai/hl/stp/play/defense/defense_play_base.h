@@ -53,7 +53,7 @@ class DefensePlayFSMBase
      */
     void setAlignment(const Update &event,
                       const std::vector<DefenderAssignment> &crease_defender_assignments,
-                      TbotsProto::BallStealMode ball_steal_mode = TbotsProto::BallStealMode::STEAL);
+                      TbotsProto::BallStealMode ball_steal_mode);
 
     /**
      * Helper function to update all given pass defender control params

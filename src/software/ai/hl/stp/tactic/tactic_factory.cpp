@@ -74,7 +74,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tac
 
     tactic->updateControlParams(createPoint(tactic_proto.enemy_threat_origin()),
                                 tactic_proto.crease_defender_alignment(),
-                                tactic_proto.max_allowed_speed_mode());
+                                tactic_proto.max_allowed_speed_mode(),
+                                tactic_proto.ball_steal_mode());
 
     return tactic;
 }

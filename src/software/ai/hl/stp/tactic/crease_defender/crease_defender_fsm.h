@@ -111,7 +111,6 @@ struct CreaseDefenderFSM
    private:
     static constexpr double DETECT_THREAT_AHEAD_SHAPE_LENGTH_M = 1;
     static constexpr double DETECT_THREAT_AHEAD_SHAPE_RADIUS_M = 0.1;
-    const Vector GOALPOST_OFFSET                               = Vector(0, 0.5);
     /**
      * Finds the intersection with the front or sides of the defense area with the given
      * ray

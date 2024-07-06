@@ -454,6 +454,10 @@ message CreaseDefenderConfig
     required double max_get_ball_radius_m = 2
         [default = 1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
     // Max speed of ball that crease will try and get possession
-    required double max_ball_speed_to_get_ms = 3
+    required double max_ball_speed_to_get_m_per_s = 3
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
+    // The additional buffer length for each side of the goal
+    // to determine if crease defender chipping is "towards goal"
+    required double goal_post_offset_chipping = 4
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 }
