@@ -23,9 +23,12 @@ void PassDefenderTactic::accept(TacticVisitor &visitor) const
     visitor.visit(*this);
 }
 
-void PassDefenderTactic::updateControlParams(const Point &position_to_block_from)
+void PassDefenderTactic::updateControlParams(
+        const Point &position_to_block_from,
+        TbotsProto::BallStealMode ball_steal_mode)
 {
     control_params.position_to_block_from = position_to_block_from;
+    control_params.ball_steal_mode        = ball_steal_mode;
 }
 
 void PassDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,

@@ -25,8 +25,9 @@ class PassDefenderTactic : public Tactic
      * Update control params for this tactic
      *
      * @param position_to_block_from The location on the field to block enemy passes from
+     * @param ball_steal_mode
      */
-    void updateControlParams(const Point& position_to_block_from);
+    void updateControlParams(const Point& position_to_block_from, TbotsProto::BallStealMode ball_steal_mode);
 
     void accept(TacticVisitor& visitor) const override;
 

@@ -61,6 +61,14 @@ enum CreaseDefenderAlignment
     CENTRE = 2;
 }
 
+enum BallStealMode
+{
+    // The robot avoids stealing ball/getting possession
+    IGNORE = 0;
+    // The robot can steal the ball/try to get possession of the ball
+    STEAL = 1;
+}
+
 message CreaseDefenderTactic
 {
     // The origin point of the enemy threat

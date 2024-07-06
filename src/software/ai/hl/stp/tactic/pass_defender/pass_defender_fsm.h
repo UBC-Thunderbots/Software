@@ -16,6 +16,7 @@ struct PassDefenderFSM
     {
         // The location on the field to block enemy passes from
         Point position_to_block_from;
+
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -123,18 +124,6 @@ struct PassDefenderFSM
     }
 
    private:
-    /** Max ratio between distances (crease and ball) / (crease and nearest enemy) for
-     * crease to chase ball. Scale from (0, 1)
-     * |------------------------------------------|
-     * | Crease | <-----------------------> Enemy |
-     * |        | <----> Ball                 |   |
-     * |       ()         x                  ()   |
-     * |------------------------------------------|
-     */
-    static constexpr double MAX_GET_BALL_RATIO_THRESHOLD = 0.3;
-    // Max distance that the crease will try and get possession of a ball
-    static constexpr double MAX_GET_BALL_RADIUS_M = 1;
-    // Max speed of ball that crease will try and get possession
-    static constexpr double MAX_BALL_SPEED_TO_GET_MS = 0.5;
     Angle pass_orientation;
+
 };
