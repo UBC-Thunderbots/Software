@@ -36,9 +36,28 @@ TEST(KickFSMTest, test_transitions)
     // Transition to KickState
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM::KickState>));
 
+    // Change the chip direction and expect the FSM to realign
+    control_params.kick_direction = Angle::quarter();
+    fsm.process_event(KickFSM::Update(
+            control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
+    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
+            boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
+
+    // Robot is now behind ball in the new direction
+    robot = Robot(0,
+                  RobotState(Point(-2, 1.3), Vector(), Angle::quarter(),
+                             AngularVelocity::zero()),
+                  Timestamp::fromSeconds(124));
+    fsm.process_event(KickFSM::Update(
+            control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+    // Transition to ChipState again
+    EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM::KickState>));
+
     // Ball is now kicked
-    ::TestUtil::setBallVelocity(world, Vector(0, -2.1), Timestamp::fromSeconds(123));
-    EXPECT_TRUE(world->ball().hasBallBeenKicked(Angle::threeQuarter()));
+    ::TestUtil::setBallVelocity(world, Vector(0, 2.1), Timestamp::fromSeconds(123));
+
+    EXPECT_TRUE(world->ball().hasBallBeenKicked(Angle::quarter()));
 
     // Tactic is done
     fsm.process_event(KickFSM::Update(

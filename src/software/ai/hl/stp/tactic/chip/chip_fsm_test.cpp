@@ -28,7 +28,7 @@ TEST(ChipFSMTest, test_transitions)
 
     // Robot is now behind ball
     robot = Robot(0,
-                  RobotState(Point(-2, 1.65), Vector(), Angle::threeQuarter(),
+                  RobotState(Point(-2, 1.7), Vector(), Angle::threeQuarter(),
                              AngularVelocity::zero()),
                   Timestamp::fromSeconds(123));
     fsm.process_event(ChipFSM::Update(
@@ -44,11 +44,13 @@ TEST(ChipFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
             boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 
-
+    // Robot is now behind ball in the new direction
     robot = Robot(0,
                   RobotState(Point(-2, 1.3), Vector(), Angle::quarter(),
                              AngularVelocity::zero()),
                   Timestamp::fromSeconds(124));
+    fsm.process_event(ChipFSM::Update(
+            control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     // Transition to ChipState again
     EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM::ChipState>));
 

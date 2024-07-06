@@ -24,6 +24,6 @@ void GetBehindBallFSM::updateMove(const Update& event)
 bool GetBehindBallFSM::behindBall(const Update& event)
 {
     return isRobotReadyToChick(event.common.robot,
-                               event.common.world_ptr->ball().position(),
+                               event.control_params.ball_location,
                                event.control_params.chick_direction);
 }
