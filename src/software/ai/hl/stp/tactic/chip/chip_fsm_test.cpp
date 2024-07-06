@@ -39,18 +39,18 @@ TEST(ChipFSMTest, test_transitions)
     // Change the chip direction and expect the FSM to realign
     control_params.chip_direction = Angle::quarter();
     fsm.process_event(ChipFSM::Update(
-            control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
-            boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
+        boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 
     // Robot is now behind ball in the new direction
-    robot = Robot(0,
-                  RobotState(Point(-2, 1.3), Vector(), Angle::quarter(),
-                             AngularVelocity::zero()),
-                  Timestamp::fromSeconds(124));
+    robot = Robot(
+        0,
+        RobotState(Point(-2, 1.3), Vector(), Angle::quarter(), AngularVelocity::zero()),
+        Timestamp::fromSeconds(124));
     fsm.process_event(ChipFSM::Update(
-            control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     // Transition to ChipState again
     EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM::ChipState>));
 
