@@ -101,6 +101,10 @@
             src: ../../linux_configs/pi/config.txt
             dest: /boot/firmware/
             copy_links: yes
+            rsync_opts:
+              - "--no-perms"
+              - "--no-o"
+              - "--no-g"
 
     - name: Change hostname
       tags: update_hostname
