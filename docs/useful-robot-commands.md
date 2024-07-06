@@ -33,7 +33,7 @@ If desired, the `-ho`, `--hosts` argument can be replaced with `-p`, `--port`, d
 
 The `--tags` argument can be used to specify which actions to perform and on which services.
 
-## Flashing the nano
+## Flashing the robot's compute module
 
 This will stop the current Systemd services, replace and restart them. Binaries that are used for Systemd services are located in a folder in `home/robot` (the default directory) called `thunderbots_binaries`.
 
@@ -41,9 +41,9 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 
 <b>This will trigger motor calibration meaning the wheels may spin. Please elevate the robot so the wheels are not touching the ground for proper calibration.</b>
 
-`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
+`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
 
-You could also use the `tbots.py` script to flash
+You could also use the `tbots.py` script to flash Jetson Nanos (not yet supported for Raspberry Pis)
 
 `./tbots.py run run_ansible -f <robot_ids> -pwd <jetson_nano_password>` (Note that this uses robot IDs rather than full robot IP addresses)
 
@@ -59,13 +59,19 @@ Looking from the back of the robot the reset and boot buttons are on right side 
 
 `bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_powerboard.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
 
-## Setting up nano 
+## Setting up the embedded host
 
-This refers to setting up the Jetson Nano for the first time. This will enable Systemd services, modify device tree files and perform other setup necessary for the communication protocols used.
+This section refers to setting up the computer on the robot for the first time. We need to setup dependencies, drivers and necessary configurations.
 
-<b>Setting up the nano for the first time requires internet access</b>
+<b>Setting up the robot for the first time requires internet access</b>
+
+### Jetson Nano
 
 `bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <jetson_nano_password>`
+
+### Raspberry Pi
+
+`bazel run //software/jetson_nano/ansible:run_ansible --cpu=jetson_nano -- --playbook setup_raspberry_pi.yml --hosts <robot_ip> --ssh_pass <raspberry_pi_password>`
 
 ## Robot Diagnostics
 

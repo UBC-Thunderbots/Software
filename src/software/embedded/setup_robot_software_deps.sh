@@ -54,7 +54,7 @@ pip_libaries=(
 )
 
 # Install python dependencies
-sudo /opt/tbotspython/bin/pip3.8 install "${pip_libaries[@]}"
+sudo /opt/tbotspython/bin/pip3.8 install "${pip_libaries[@]}" --default-timeout=100
 
 # Install platformio udev rules
 curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/system/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules

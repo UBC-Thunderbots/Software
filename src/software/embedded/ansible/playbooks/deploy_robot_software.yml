@@ -11,7 +11,6 @@
       - start
     binary_paths:
       thunderloop: ../../thunderloop_main
-      display: ../../display/robot_ui_zip.zip
 
   tasks:
 
@@ -66,14 +65,6 @@
           when: "'sync' in actions"
           tags: always
 
-        - name: Unzipping python binaries
-          command: 'unzip ~/thunderbots_binaries/*.zip'
-          register: result
-          args:
-            chdir: ~/thunderbots_binaries
-          when: "'sync' in actions"
-          ignore_errors: yes # Remove when display is re-enabled
-
         - name: Start Services
           become: true
           become_method: sudo
@@ -87,22 +78,3 @@
             loop_var: service_name
           when: "'start' in actions"
           tags: always
-
-        - name: Enable WiFi waiter service
-          become: true
-          become_method: sudo
-          service: name=NetworkManager-wait-online enabled=yes
-
-        - name: Disable Announcements
-          become: true
-          become_method: sudo
-          ansible.builtin.systemd:
-            name: "{{ service_name }}"
-            enabled: no
-            masked: no
-            state: stopped
-          with_items: ["wifi_announcement", "ethernet_announcement"]
-          loop_control:
-            loop_var: service_name
-          tags: always
-          failed_when: false

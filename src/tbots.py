@@ -52,7 +52,7 @@ if __name__ == "__main__":
         nargs="+",
         type=int,
         help="A list of space seperated integers representing the robot IDs "
-        "that should be flashed by the deploy_nano Ansible playbook",
+        "that should be flashed by the deploy_robot_software Ansible playbook",
         action="store",
     )
     parser.add_argument(
@@ -186,9 +186,9 @@ if __name__ == "__main__":
     if args.enable_thunderscope:
         bazel_arguments += ["--enable_thunderscope"]
     if args.flash_robots:
-        bazel_arguments += ["-pb deploy_nano.yml"]
+        bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
-        bazel_arguments += [f"192.168.0.20{id}" for id in args.flash_robots]
+        bazel_arguments += [f"192.168.{id}" for id in args.flash_robots]
         bazel_arguments += ["-pwd", args.pwd]
 
     if args.action in "test":
