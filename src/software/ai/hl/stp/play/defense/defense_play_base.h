@@ -45,7 +45,8 @@ class DefensePlayFSMBase
     void setUpPassDefenders(int num_pass_defenders);
 
     /**
-     * Helper function to set up alignments for the crease defense robots and control params
+     * Helper function to set up alignments for the crease defense robots and control
+     * params
      *
      * @param event the FSM event
      * @param crease_defender_assignments crease defender assignments to be aligned

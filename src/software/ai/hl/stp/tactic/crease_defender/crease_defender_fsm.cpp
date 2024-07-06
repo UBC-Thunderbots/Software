@@ -112,10 +112,13 @@ void CreaseDefenderFSM::blockThreat(
     }
 
     AutoChipOrKick auto_chip_or_kick{AutoChipOrKickMode::OFF, 0};
-    auto goal_post_offset_vector = Vector(0, crease_defender_config.goal_post_offset_chipping());
-    auto goal_line_segment = Segment(
-        event.common.world_ptr->field().friendlyGoal().posXPosYCorner() + goal_post_offset_vector,
-        event.common.world_ptr->field().friendlyGoal().posXNegYCorner() - goal_post_offset_vector);
+    auto goal_post_offset_vector =
+        Vector(0, crease_defender_config.goal_post_offset_chipping());
+    auto goal_line_segment =
+        Segment(event.common.world_ptr->field().friendlyGoal().posXPosYCorner() +
+                    goal_post_offset_vector,
+                event.common.world_ptr->field().friendlyGoal().posXNegYCorner() -
+                    goal_post_offset_vector);
     Ray robot_shoot_ray = Ray(robot_position, robot_orientation);
     std::vector<Point> goal_intersections =
         intersection(robot_shoot_ray, goal_line_segment);
@@ -215,7 +218,8 @@ bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
     else if (nearest_friendly.has_value() &&
              event.common.robot.id() != nearest_friendly.value().id())
     {
-        // Do nothing if this robot is not the closest to the ball. Resolves issue of multiple simultaneous steals
+        // Do nothing if this robot is not the closest to the ball. Resolves issue of
+        // multiple simultaneous steals
         return false;
     }
     else if (nearest_enemy.has_value())

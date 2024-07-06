@@ -83,6 +83,7 @@ void DefensePlayFSMBase::setAlignment(
         }
 
         crease_defenders.at(i)->updateControlParams(
-            target, alignment, event.control_params.max_allowed_speed_mode, ball_steal_mode);
+            target, alignment, event.control_params.max_allowed_speed_mode,
+            ball_steal_mode);
     }
 }

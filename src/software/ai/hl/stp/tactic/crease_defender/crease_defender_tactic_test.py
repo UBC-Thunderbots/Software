@@ -81,7 +81,7 @@ def test_crease_positioning(
                 enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
                 crease_defender_alignment=2,
                 max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                ball_steal_mode=BallStealMode.STEAL
+                ball_steal_mode=BallStealMode.STEAL,
             )
         )
 
@@ -219,7 +219,7 @@ def test_crease_autochip(
                 enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
                 crease_defender_alignment=2,
                 max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                ball_steal_mode=BallStealMode.STEAL
+                ball_steal_mode=BallStealMode.STEAL,
             )
         )
 
@@ -319,7 +319,7 @@ def test_crease_get_ball(
                 enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
                 crease_defender_alignment=2,
                 max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
-                ball_steal_mode=BallStealMode.STEAL
+                ball_steal_mode=BallStealMode.STEAL,
             )
         )
 
