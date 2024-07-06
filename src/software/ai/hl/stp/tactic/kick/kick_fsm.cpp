@@ -4,11 +4,10 @@
 
 void KickFSM::updateKick(const Update &event)
 {
-    Point ball_position = event.common.world_ptr->ball().position();
     Vector direction_to_kick =
         Vector::createFromAngle(event.control_params.kick_direction);
     Point kick_target =
-        ball_position - direction_to_kick.normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01);
+          event.control_params.kick_origin - direction_to_kick.normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01);
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, kick_target, event.control_params.kick_direction,
@@ -39,15 +38,14 @@ bool KickFSM::ballChicked(const Update &event)
 bool KickFSM::shouldRealignWithBall(const Update &event)
 {
     const Robot &robot        = event.common.robot;
-    const Point ball_position = event.common.world_ptr->ball().position();
 
     // First check to see if it's too late to realign with the ball
-    if (robot.isNearDribbler(ball_position, 0.05))
+    if (robot.isNearDribbler(event.control_params.kick_origin, 0.05))
     {
         return false;
     }
 
     // Check if the robot is already aligned to kick the ball
-    return !isRobotReadyToChick(robot, ball_position,
+    return !isRobotReadyToChick(robot, event.control_params.kick_origin,
                                 event.control_params.kick_direction);
 }

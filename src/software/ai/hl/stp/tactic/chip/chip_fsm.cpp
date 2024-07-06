@@ -15,11 +15,10 @@ void ChipFSM::updateGetBehindBall(
 
 void ChipFSM::updateChip(const Update &event)
 {
-    Point ball_position = event.common.world_ptr->ball().position();
     Vector direction_to_chip =
         Vector::createFromAngle(event.control_params.chip_direction);
     Point chip_target =
-        ball_position - direction_to_chip.normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01);
+        event.control_params.chip_origin - direction_to_chip.normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01);
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, chip_target, event.control_params.chip_direction,
@@ -39,15 +38,14 @@ bool ChipFSM::ballChicked(const Update &event)
 bool ChipFSM::shouldRealignWithBall(const Update &event)
 {
     const Robot &robot        = event.common.robot;
-    const Point ball_position = event.common.world_ptr->ball().position();
 
     // First check to see if it's too late to realign with the ball
-    if (robot.isNearDribbler(ball_position, 0.05))
+    if (robot.isNearDribbler(event.control_params.chip_origin, 0.05))
     {
         return false;
     }
 
-    // Check if the robot is already aligned to kick the ball
-    return !isRobotReadyToChick(robot, ball_position,
+    // Check if the robot is already aligned to chip the ball
+    return !isRobotReadyToChick(robot, event.control_params.chip_origin,
                                 event.control_params.chip_direction);
 }
