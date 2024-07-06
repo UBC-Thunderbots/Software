@@ -113,7 +113,7 @@ if __name__ == "__main__":
     targets = list(
         itertools.chain.from_iterable(
             [
-                run(query, stdout=PIPE).stdout.split(b"\n")
+                run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
                 for query in bazel_queries[args.action]
             ]
         )
