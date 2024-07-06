@@ -1,10 +1,10 @@
-#include "software/embedded/gpio.h"
+#include "software/embedded/gpio_char_dev.h"
 
 #include "software/logger/logger.h"
 
 #include <linux/gpio.h>
 
-Gpio::Gpio(int gpio_number, GpioDirection direction, GpioState initial_state, std::string char_dev_path)
+GpioCharDev::GpioCharDev(int gpio_number, GpioDirection direction, GpioState initial_state)
 {
     int fd = open(char_dev_path.c_str(), O_RDONLY);
     if (fd < 0)
@@ -48,7 +48,7 @@ Gpio::Gpio(int gpio_number, GpioDirection direction, GpioState initial_state, st
     LOG(DEBUG) << "GPIO " << gpio_number << " online";
 }
 
-void Gpio::setValue(GpioState state)
+void GpioCharDev::setValue(GpioState state)
 {
     struct gpiohandle_data data;
     data.values[0] = parseGpioState(state);
@@ -60,12 +60,12 @@ void Gpio::setValue(GpioState state)
     }
 }
 
-Gpio::~Gpio()
+GpioCharDev::~GpioCharDev()
 {
     close(gpio_fd);
 }
 
-GpioState Gpio::getValue()
+GpioState GpioCharDev::getValue()
 {
     struct gpiohandle_data data;
     int ret = ioctl(gpio_fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL, &data);
@@ -91,7 +91,7 @@ GpioState Gpio::getValue()
     return GpioState::LOW;
 }
 
-uint8_t Gpio::parseGpioState(GpioState gpio_state)
+uint8_t GpioCharDev::parseGpioState(GpioState gpio_state)
 {
     switch (gpio_state)
     {

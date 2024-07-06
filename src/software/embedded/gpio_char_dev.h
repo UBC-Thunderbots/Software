@@ -7,7 +7,7 @@
 MAKE_ENUM(GpioState, LOW, HIGH);
 MAKE_ENUM(GpioDirection, INPUT, OUTPUT);
 
-class Gpio
+class GpioCharDev
 {
    public:
     /**
@@ -19,12 +19,12 @@ class Gpio
      * @param state The initial state of the gpio
      * @param char_dev_path The path to the gpio character device
      */
-    Gpio(int gpio_number, GpioDirection direction, GpioState state, std::string char_dev_path="/dev/gpiochip0");
+    GpioCharDev(int gpio_number, GpioDirection direction, GpioState state, std::string char_dev_path="/dev/gpiochip0");
 
     /**
      * Destructor
      */
-    virtual ~Gpio();
+    virtual ~GpioCharDev();
 
     /**
      * Set the value to the provided state
@@ -46,6 +46,8 @@ class Gpio
      * @return The number representation of the state
      */
     uint8_t parseGpioState(GpioState state);
+
+    static const std::string CHAR_DEV_PATH = "/dev/gpiochip4";
 
     int gpio_fd;  // File descriptor for the gpio
 };
