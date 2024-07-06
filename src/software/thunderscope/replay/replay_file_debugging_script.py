@@ -52,7 +52,7 @@ def read_one_chunk(replay_file_name):
             # Do something with the protobuf here #
             #######################################
             print(
-                "{}: {}: {} - {=}".format(
+                "{}: {}: {} - {}".format(
                     line_num, float(timestamp), protobuf_type, proto
                 )
             )
