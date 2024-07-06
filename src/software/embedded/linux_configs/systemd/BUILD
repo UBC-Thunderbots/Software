@@ -4,5 +4,6 @@ filegroup(
     name = "systemd_files",
     data = glob([
         "*service",
+		"*.link",
     ]),
 )
