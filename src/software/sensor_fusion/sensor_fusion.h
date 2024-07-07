@@ -55,6 +55,12 @@ class SensorFusion
     // started, determined experimentally with the simulator
     static constexpr double VISION_PACKET_RESET_TIME_THRESHOLD = 0.5;
 
+    // This is used for detecting if the breakbeam is at fault. The idea is that distance
+    // between the robot that has the ball is greater than the distance below, then we
+    // know that the breakbeam has a problem see for more:
+    // https://github.com/UBC-Thunderbots/Software/issues/3197
+    static constexpr double DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION = 0.5;
+
    private:
     /**
      * Updates relevant components of world based on a new data
@@ -132,6 +138,26 @@ class SensorFusion
      * Resets the world components to initial state
      */
     void resetWorldComponents();
+    
+    /**
+     * This function controls the behavior of how the ball is being updated. If this
+     * returns True, we use the position of the robot that triggers the breakbeam instead
+     * of the one given by the ssl vision system.
+     *
+     * @return True if we were to use the position of the robot instead of the ssl camera
+     * system. False otherwise
+     */
+    static bool teamHasBall(const Team &team, const Ball &ball);
+
+    /**
+     * This function controls the behavior of how the ball is being updated. If this
+     * returns True, we use the position of the robot that triggers the breakbeam instead
+     * of the one given by the ssl vision system.
+     *
+     * @return True if we were to use the position of the robot instead of the ssl camera
+     * system. False otherwise
+     */
+    bool shouldTrustRobotStatus();
 
     TbotsProto::SensorFusionConfig sensor_fusion_config;
     std::optional<Field> field;
