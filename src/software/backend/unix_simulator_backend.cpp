@@ -38,11 +38,18 @@ UnixSimulatorBackend::UnixSimulatorBackend(
             [&](TbotsProto::ThunderbotsConfig& msg) { receiveThunderbotsConfig(msg); },
             proto_logger));
 
-    // Empty callback for ValidationProtoSet since it's only used by proto_logger
+    // The following listeners have an empty callback since their values are
+    // only used by proto_logger for replay purposes.
     validation_proto_set_listener.reset(
         new ThreadedProtoUnixListener<TbotsProto::ValidationProtoSet>(
             runtime_dir + VALIDATION_PROTO_SET_PATH,
             [](TbotsProto::ValidationProtoSet& v) {}, proto_logger));
+
+    robot_log_listener.reset(new ThreadedProtoUnixListener<TbotsProto::RobotLog>(
+        runtime_dir + ROBOT_LOG_PATH, [](TbotsProto::RobotLog& v) {}, proto_logger));
+
+    robot_crash_listener.reset(new ThreadedProtoUnixListener<TbotsProto::RobotCrash>(
+        runtime_dir + ROBOT_CRASH_PATH, [](TbotsProto::RobotCrash& v) {}, proto_logger));
 
     // Protobuf Outputs
     world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(

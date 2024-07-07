@@ -291,8 +291,6 @@ if __name__ == "__main__":
         )
         tscope = Thunderscope(config=tscope_config, layout_path=args.layout,)
 
-        current_proto_unix_io = None
-
         if args.run_blue:
             runtime_dir = args.blue_full_system_runtime_dir
             friendly_colour_yellow = False

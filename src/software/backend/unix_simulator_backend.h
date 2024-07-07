@@ -3,6 +3,7 @@
 #include <mutex>
 
 #include "proto/parameters.pb.h"
+#include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/sensor_msg.pb.h"
@@ -46,6 +47,9 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
         dynamic_parameter_update_request_listener;
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::ValidationProtoSet>>
         validation_proto_set_listener;
+    std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotLog>> robot_log_listener;
+    std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotCrash>>
+        robot_crash_listener;
 
     // Outputs
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::World>> world_output;

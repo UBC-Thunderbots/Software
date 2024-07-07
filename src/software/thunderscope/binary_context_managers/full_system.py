@@ -217,5 +217,7 @@ gdb --args bazel-bin/{self.full_system}
             (PLAY_OVERRIDE_PATH, Play),
             (DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH, ThunderbotsConfig),
             (VALIDATION_PROTO_SET_PATH, ValidationProtoSet),
+            (ROBOT_LOG_PATH, RobotLog),
+            (ROBOT_CRASH_PATH, RobotCrash),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)
