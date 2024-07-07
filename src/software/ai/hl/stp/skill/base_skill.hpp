@@ -6,10 +6,6 @@
  * Base implementation of a Skill that manages an FSM for each robot requesting
  * primitives from the Skill.
  *
- * This template also implements and exposes a Tactic that will execute this Skill.
- * The Tactic can be used in simulated gameplay tests, field tests, or set plays that
- * require robots to execute a single skill.
- *
  * @tparam TSkillFSM the FSM for the Skill; BaseSkill will use this FSM to generate
  *         primitives for each robot requesting primitives from this skill
  * @tparam TSkillSubFSMs sub-FSMs of TSkillFSM that need to be instantiated separately
