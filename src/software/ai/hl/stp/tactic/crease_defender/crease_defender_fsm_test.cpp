@@ -174,25 +174,27 @@ TEST(CreaseDefenderFSMTest, test_transitions)
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
-    std::vector<Point> enemy_robots = {Point(0, 0), };
+    std::vector<Point> enemy_robots = {
+        Point(0, 0),
+    };
     ::TestUtil::setEnemyRobotPositions(world, enemy_robots, Timestamp::fromSeconds(123));
     // Check that the FSM stops dribbling with enemy near ball
     fsm.process_event(CreaseDefenderFSM::Update(
-            control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     robot.updateState(
-            RobotState(
-                    block_point.value(), Vector(0, 0),
-                    (control_params.enemy_threat_origin - block_point.value()).orientation(),
-                    AngularVelocity::zero()),
-            Timestamp::fromSeconds(123));
+        RobotState(
+            block_point.value(), Vector(0, 0),
+            (control_params.enemy_threat_origin - block_point.value()).orientation(),
+            AngularVelocity::zero()),
+        Timestamp::fromSeconds(123));
     // Check FSM terminates
     fsm.process_event(CreaseDefenderFSM::Update(
-            control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
     // Check that FSM stays done
     fsm.process_event(CreaseDefenderFSM::Update(
-            control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }
