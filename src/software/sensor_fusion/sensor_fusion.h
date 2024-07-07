@@ -138,16 +138,6 @@ class SensorFusion
      * Resets the world components to initial state
      */
     void resetWorldComponents();
-    
-    /**
-     * This function controls the behavior of how the ball is being updated. If this
-     * returns True, we use the position of the robot that triggers the breakbeam instead
-     * of the one given by the ssl vision system.
-     *
-     * @return True if we were to use the position of the robot instead of the ssl camera
-     * system. False otherwise
-     */
-    static bool teamHasBall(const Team &team, const Ball &ball);
 
     /**
      * This function controls the behavior of how the ball is being updated. If this
