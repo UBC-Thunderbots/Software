@@ -8,5 +8,3 @@ class DribbleSkill : public BaseSkill<DribbleSkillFSM>
    public:
     using BaseSkill::BaseSkill;
 };
-
-COPY_SKILL_TACTIC(PlaceBallSkillTactic, DribbleSkill)

@@ -7,7 +7,15 @@
 class Skill
 {
    public:
+    /**
+     * Base constructor for Skill
+     * 
+     * @param strategy the Strategy shared by all of AI
+     */
     explicit Skill(std::shared_ptr<Strategy> strategy) : strategy_(strategy){};
+
+    Skill()          = delete;
+    virtual ~Skill() = default;
 
     /**
      * Calls the SetPrimitiveCallback with a primitive for the given robot.
@@ -61,7 +69,7 @@ class Skill
      * @param robot_id the ID of the robot executing the Skill
      * @param world_ptr the world pointer
      *
-     * @return true if the Skill resumed execution and is not suspended, 
+     * @return true if the Skill resumed execution and is not suspended,
      * false if the Skill failed to resume and is still suspended
      */
     virtual bool tryResumingIfSuspended(const RobotId robot_id,
@@ -69,9 +77,9 @@ class Skill
 
     /**
      * Gets the FSM state of the Skill for the given robot.
-     * 
+     *
      * @param robot_id the ID of the robot
-     * 
+     *
      * @return the FSM state for the given robot
      */
     virtual std::string getFSMState(const RobotId robot_id) const = 0;
@@ -79,10 +87,10 @@ class Skill
     /**
      * Gets a SkillState containing details about the current state of the skill
      * for the given robot.
-     * 
+     *
      * @param robot_id the ID of the robot
-     * 
-     * @return the SkillState for the given robot 
+     *
+     * @return the SkillState for the given robot
      */
     virtual SkillState getSkillState(const RobotId robot_id) const = 0;
 

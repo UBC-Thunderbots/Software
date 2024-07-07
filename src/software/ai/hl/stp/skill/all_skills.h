@@ -6,4 +6,5 @@
 #include "software/ai/hl/stp/skill/keep_away/keep_away_skill.h"
 #include "software/ai/hl/stp/skill/kick/kick_skill.h"
 #include "software/ai/hl/stp/skill/pass/pass_skill.hpp"
+#include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill.h"
 #include "software/ai/hl/stp/skill/shoot/shoot_skill.hpp"

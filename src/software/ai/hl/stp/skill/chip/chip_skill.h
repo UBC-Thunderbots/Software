@@ -8,5 +8,3 @@ class ChipSkill : public BaseSkill<ChipSkillFSM, GetBehindBallSkillFSM>
    public:
     using BaseSkill::BaseSkill;
 };
-
-COPY_SKILL_TACTIC(KickoffChipSkillTactic, ChipSkill)

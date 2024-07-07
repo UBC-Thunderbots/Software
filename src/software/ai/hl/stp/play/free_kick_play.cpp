@@ -4,6 +4,7 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/skill/kick/kick_skill.h"
 #include "software/ai/hl/stp/skill/chip/chip_skill.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
@@ -87,7 +88,7 @@ void FreeKickPlay::chipAtGoalStage(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     const WorldPtr &world_ptr)
 {
-    auto chip_tactic = std::make_shared<ChipSkill::SkillTactic>(strategy);
+    auto chip_tactic = std::make_shared<AssignedSkillTactic<ChipSkill>>(strategy);
 
     // Figure out where the fallback chip target is
     // This is exerimentally determined to be a reasonable value
@@ -124,7 +125,7 @@ void FreeKickPlay::performPassStage(
     LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
 
     // Perform the pass and wait until the receiver is finished
-    auto passer   = std::make_shared<KickSkill::SkillTactic>(strategy);
+    auto passer   = std::make_shared<AssignedSkillTactic<KickSkill>>(strategy);
     auto receiver = std::make_shared<ReceiverTactic>(strategy);
     do
     {

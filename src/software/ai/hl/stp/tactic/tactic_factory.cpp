@@ -136,14 +136,14 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::StopTactic &tactic_proto,
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ShootSkillTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy)
 {
-    auto tactic = std::make_shared<ShootSkill::SkillTactic>(strategy);
+    auto tactic = std::make_shared<AssignedSkillTactic<ShootSkill>>(strategy);
     return tactic;
 }
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::KickSkillTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy)
 {
-    auto tactic = std::make_shared<KickSkill::SkillTactic>(strategy);
+    auto tactic = std::make_shared<AssignedSkillTactic<KickSkill>>(strategy);
     tactic->updateControlParams({createPoint(tactic_proto.kick_origin()),
                                  createAngle(tactic_proto.kick_direction()),
                                  tactic_proto.kick_speed_meters_per_second()});

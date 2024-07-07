@@ -8,5 +8,3 @@ class PivotKickSkill : public BaseSkill<PivotKickSkillFSM, DribbleSkillFSM>
    public:
     using BaseSkill::BaseSkill;
 };
-
-COPY_SKILL_TACTIC(WallKickoffSkillTactic, PivotKickSkill)
