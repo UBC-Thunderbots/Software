@@ -52,10 +52,9 @@ struct CreaseDefenderFSM
      *
      * @param robot_navigation_obstacle_config The config
      */
-    explicit CreaseDefenderFSM(
-        const TbotsProto::AiConfig& ai_config)
+    explicit CreaseDefenderFSM(const TbotsProto::AiConfig& ai_config)
         : robot_navigation_obstacle_config(ai_config.robot_navigation_obstacle_config()),
-        crease_defender_config(ai_config.crease_defender_config())
+          crease_defender_config(ai_config.crease_defender_config())
     {
     }
 
