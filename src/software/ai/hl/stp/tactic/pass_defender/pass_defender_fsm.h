@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+#include "proto/tactic.pb.h"
 
 struct PassDefenderFSM
 {
@@ -82,12 +83,11 @@ struct PassDefenderFSM
     void interceptBall(const Update& event);
 
     /**
-     * Guard that checks if the ball is on friendly side, nearby, and unguarded by the
-     * enemy
+     * Guard that determines whether it is appropriate to steal the ball
      *
      * @param event PassDefenderFSM::Update event
      *
-     * @return true if the ball is on friendly side, nearby, unguarded by the enemy up,
+     * @return true if stealing is enabled and the ball is on friendly side, nearby, unguarded by the enemy up,
      *          and within a max get possession threshold
      */
     bool ballNearbyWithoutThreat(const Update& event);
