@@ -2,6 +2,7 @@
 
 #include "software/ai/hl/stp/skill/base_skill.hpp"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/util/is_template_base_of/is_template_base_of.hpp"
 
 /**
  * Implements a Tactic that executes a Skill.
@@ -14,6 +15,9 @@
 template <typename TSkill>
 class AssignedSkillTactic : public Tactic
 {
+    static_assert(is_template_base_of<BaseSkill, TSkill>::value,
+                  "TSkill must derive from an instantiation of the BaseSkill template");
+
    public:
     /**
      * Create an AssignedSkillTactic that executes the specified Skill.

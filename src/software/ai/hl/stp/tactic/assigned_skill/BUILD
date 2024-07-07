@@ -6,6 +6,7 @@ cc_library(
     deps = [
         "//software/ai/hl/stp/skill:base_skill",
         "//software/ai/hl/stp/tactic",
+        "//software/util/is_template_base_of",
     ],
 )
 
