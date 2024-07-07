@@ -120,14 +120,14 @@ bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
         double nearest_enemy_distance =
                 distance(robot_position, nearest_enemy->position());
 
-        LOG(VISUALIZE) << *createDebugShapes({
-                 *createDebugShape(
-                         Circle(robot_position,
-                                std::min(nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD, MAX_GET_BALL_RADIUS_M)),
-                         std::to_string(event.common.robot.id()) + "1",
-                         "ballgetzone"
-                 )
-         });
+//        LOG(VISUALIZE) << *createDebugShapes({
+//                 *createDebugShape(
+//                         Circle(robot_position,
+//                                std::min(nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD, MAX_GET_BALL_RADIUS_M)),
+//                         std::to_string(event.common.robot.id()) + "1",
+//                         "ballgetzone"
+//                 )
+//         });
 
         bool ball_is_near_friendly = ball_distance < nearest_enemy_distance * MAX_GET_BALL_RATIO_THRESHOLD;
         bool ball_is_within_max_range = ball_distance <= MAX_GET_BALL_RADIUS_M;

@@ -16,8 +16,20 @@ struct PassDefenderFSM
     {
         // The location on the field to block enemy passes from
         Point position_to_block_from;
-
+        // The pass defender's aggressiveness towards the ball
+        TbotsProto::BallStealMode ball_steal_mode;
     };
+
+    /**
+     * Constructor for PassDefenderFSM struct
+     *
+     * @param ai_config The ai config required
+     */
+    explicit PassDefenderFSM(const TbotsProto::AiConfig& ai_config)
+            : pass_defender_config(ai_config.pass_defender_config())
+    {
+    }
+
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
@@ -125,5 +137,5 @@ struct PassDefenderFSM
 
    private:
     Angle pass_orientation;
-
+    TbotsProto::PassDefenderConfig pass_defender_config;
 };
