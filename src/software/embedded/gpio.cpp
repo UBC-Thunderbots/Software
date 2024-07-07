@@ -1,10 +1,11 @@
 #include "software/embedded/gpio.h"
 
-#include "software/logger/logger.h"
-
 #include <linux/gpio.h>
 
-Gpio::Gpio(int gpio_number, GpioDirection direction, GpioState initial_state, std::string char_dev_path)
+#include "software/logger/logger.h"
+
+Gpio::Gpio(int gpio_number, GpioDirection direction, GpioState initial_state,
+           std::string char_dev_path)
 {
     int fd = open(char_dev_path.c_str(), O_RDONLY);
     if (fd < 0)
@@ -14,7 +15,7 @@ Gpio::Gpio(int gpio_number, GpioDirection direction, GpioState initial_state, st
 
     struct gpiohandle_request req;
     req.lineoffsets[0] = gpio_number;
-    req.lines = 1;
+    req.lines          = 1;
 
     switch (direction)
     {
@@ -31,7 +32,7 @@ Gpio::Gpio(int gpio_number, GpioDirection direction, GpioState initial_state, st
         default:
         {
             LOG(FATAL) << "Invalid GPIO direction: " << direction;
-        } 
+        }
     }
 
     req.default_values[0] = parseGpioState(initial_state);

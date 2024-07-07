@@ -6,7 +6,7 @@ host_software_packages=(
     redis
     device-tree-compiler
     curl
-    # add-apt-repository is unavailable on Debian platforms, so we install a consitent python from source. At a later
+    # add-apt-repository is unavailable on Debian platforms, so we install a consistent python from source. At a later
     # time, consider upgrading python
     build-essential
     gdb
