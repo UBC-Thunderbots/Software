@@ -53,8 +53,9 @@ struct CreaseDefenderFSM
      * @param robot_navigation_obstacle_config The config
      */
     explicit CreaseDefenderFSM(
-        TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config)
-        : robot_navigation_obstacle_config(robot_navigation_obstacle_config)
+        const TbotsProto::AiConfig& ai_config)
+        : robot_navigation_obstacle_config(ai_config.robot_navigation_obstacle_config()),
+        crease_defender_config(ai_config.crease_defender_config())
     {
     }
 
@@ -110,7 +111,7 @@ struct CreaseDefenderFSM
 
    private:
     static constexpr double DETECT_THREAT_AHEAD_SHAPE_LENGTH_M = 1;
-    static constexpr double DETECT_THREAT_AHEAD_SHAPE_RADIUS_M = 0.1;
+    static constexpr double DETECT_THREAT_AHEAD_SHAPE_RADIUS_M = 0.25;
     /**
      * Finds the intersection with the front or sides of the defense area with the given
      * ray

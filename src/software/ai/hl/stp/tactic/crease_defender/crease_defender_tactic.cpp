@@ -20,7 +20,7 @@ CreaseDefenderTactic::CreaseDefenderTactic(TbotsProto::AiConfig ai_config)
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<CreaseDefenderFSM>>(
-            CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()),
+            CreaseDefenderFSM(ai_config),
             DribbleFSM(ai_config.dribble_tactic_config()));
     }
 }
@@ -48,7 +48,7 @@ void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<CreaseDefenderFSM>>(
-            CreaseDefenderFSM(ai_config.robot_navigation_obstacle_config()),
+            CreaseDefenderFSM(ai_config),
             DribbleFSM(ai_config.dribble_tactic_config()));
     }
     Point ball_position     = tactic_update.world_ptr->ball().position();
