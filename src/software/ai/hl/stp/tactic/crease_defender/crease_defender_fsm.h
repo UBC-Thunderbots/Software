@@ -50,7 +50,7 @@ struct CreaseDefenderFSM
     /**
      * Constructor for CreaseDefenderFSM struct
      *
-     * @param robot_navigation_obstacle_config The config
+     * @param ai_config The ai config for this struct
      */
     explicit CreaseDefenderFSM(
         const TbotsProto::AiConfig& ai_config)
