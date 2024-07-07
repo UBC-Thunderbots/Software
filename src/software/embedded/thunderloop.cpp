@@ -1,6 +1,7 @@
 #include "software/embedded/thunderloop.h"
 
 #include <Tracy.hpp>
+#include <fstream>
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_crash_msg.pb.h"
@@ -416,6 +417,34 @@ double Thunderloop::getCpuTemperature()
     }
 }
 
+bool isPowerStable(std::ifstream& log_file)
+{
+    // if the log file cannot be open, we would return false. Chances are, the battery
+    // power supply is indeed stable
+    if (!log_file.is_open())
+    {
+        LOG(WARNING) << "Cannot dmesg log file. Do you have permission?";
+        return true;
+    }
+
+    std::string line;
+    while (std::getline(log_file, line))
+    {
+        // if this lines exist, we know for sure that the battery is not stable!
+        if (line.find("soctherm: OC ALARM 0x00000001") != std::string::npos)
+        {
+            return false;
+        }
+    }
+
+    // We have reached the end of the line with the while loop from above. Therefore, we
+    // need to run std::ifstream::clear so that std::getline would return the new lines in
+    // the file stream.
+    log_file.clear();
+
+    return true;
+}
+
 void Thunderloop::updateErrorCodes()
 {
     // Clear existing codes
@@ -433,5 +462,11 @@ void Thunderloop::updateErrorCodes()
     if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
+    }
+
+    if (!isPowerStable(log_file))
+    {
+        robot_status_.mutable_error_code()->Add(
+            TbotsProto::ErrorCode::UNSTABLE_POWER_SUPPLY);
     }
 }

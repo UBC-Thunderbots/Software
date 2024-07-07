@@ -607,10 +607,9 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
     sensor_fusion.processSensorProto(sensor_msg);
     World result = *sensor_fusion.getWorld();
 
-    // ball placement is only set when the Referee command is for friendly team
-    // so result should remain std::nullopt
+    // result should be (0.02, 0.035)
     std::optional<Point> returned_point = result.gameState().getBallPlacementPoint();
-    EXPECT_EQ(std::nullopt, returned_point);
+    EXPECT_EQ(Point(0.02, 0.035), returned_point);
 }
 
 TEST_F(SensorFusionTest, ball_placement_friendly_invalid_point_set_by_referee)
@@ -622,7 +621,7 @@ TEST_F(SensorFusionTest, ball_placement_friendly_invalid_point_set_by_referee)
     // Remove ball placement point
     ball_placement_ref_msg.clear_designated_position();
 
-    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_blue;
+    *(sensor_msg.mutable_ssl_referee_msg()) = ball_placement_ref_msg;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
@@ -874,4 +873,140 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
     ASSERT_TRUE(sensor_fusion.getWorld());
     result = *sensor_fusion.getWorld();
     EXPECT_EQ(initWorld(), result);
+}
+
+TEST_F(SensorFusionTest, breakbeam_pass_update_test)
+{
+    // The following code test this thing: if the breakbeam is triggered and the position
+    // of the robot and the ball given by the ssl vision system is less than a certain
+    // threshold, we should expect the ball position to be updated as the position of the
+    // ssl robot_position packet!.
+    SensorProto sensor_msg;
+
+    // creating ssl vision
+    const uint32_t camera_id    = 0;
+    const uint32_t frame_number = 40391;
+    Timestamp time              = Timestamp::fromSeconds(0.0);
+
+    Point ssl_position(0.05, 0.05);
+    Vector velocity(0, 0);
+    ball_state = BallState{ssl_position, velocity};
+
+    yellow_robot_states.clear();
+    blue_robot_states.clear();
+
+    RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::fromRadians(2),
+                           AngularVelocity::zero());
+    RobotStateWithId robot_id = {2, robot_state};
+    yellow_robot_states.push_back(robot_id);
+
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame =
+        createSSLDetectionFrame(camera_id, time, frame_number, {ball_state},
+                                yellow_robot_states, blue_robot_states);
+
+    // creating robot status
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(2);
+
+    auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+    power_status_msg->set_breakbeam_tripped(true);
+    *(robot_msg->mutable_power_status()) = *power_status_msg;
+
+    // create ssl wrapper packet
+    auto geometry_data = initSSLDivBGeomData();
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
+
+    // since updating breakbeam fix is after updating the ball position. We have to call
+    // processSensorProto twice: one for updating the fact that the breakbeam is triggered
+    // and the other for updating the ball position based on the robot
+    sensor_fusion.processSensorProto(sensor_msg);
+
+
+    // we cannot use the same sensor_msg because the ball is updated through the
+    // createBall function. By default, the createBall function interpolate the velocity
+    // to update the ball- thus, the function require two different timestamp to work.
+    // This is to prevent division by zero! It we were to use the same sensor message, the
+    // position would default to the position of the ssl ball position instead of the
+    // robot position!
+    Timestamp new_time = Timestamp::fromSeconds(0.5);
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> new_frame =
+        createSSLDetectionFrame(camera_id, new_time, frame_number, {ball_state},
+                                yellow_robot_states, blue_robot_states);
+    auto geomotry_data_copy = initSSLDivBGeomData();
+    auto new_packet =
+        createSSLWrapperPacket(std::move(geomotry_data_copy), std::move(new_frame));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *new_packet;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    Point updated_ball_pos = sensor_fusion.getWorld().value().ball().position();
+
+    // is it using the robot state position? Note that it is not robot_state position
+    // because the updateBall function would update the ball based on the location of the
+    // breakbeam and not the center of mass!
+    EXPECT_TRUE(updated_ball_pos ==
+                robot_state.position() +
+                    Vector::createFromAngle(robot_state.orientation())
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                                   BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING));
+
+    // is it using not the ssl vision?
+    EXPECT_TRUE(updated_ball_pos != ssl_position);
+}
+
+TEST_F(SensorFusionTest, breakbeam_fail_test_ssl)
+{
+    // The following code test this thing: if the breakbeam is triggered and the position
+    // of the robot and the ball given by the ssl vision system is too far away to make
+    // sense , we expect the ball position to be the position of the ssl vision packet!
+    SensorProto sensor_msg;
+
+    // creating ssl vision
+    const uint32_t camera_id    = 0;
+    const uint32_t frame_number = 40391;
+    Timestamp time              = Timestamp::fromSeconds(12.1);
+
+    Point ball_position_ssl(0.75, 0.75);
+    Vector velocity(0, 0);
+    ball_state = BallState{ball_position_ssl, velocity};
+
+    yellow_robot_states.clear();
+    blue_robot_states.clear();
+
+    RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::fromRadians(2),
+                           AngularVelocity::zero());
+    RobotStateWithId robot_id = {2, robot_state};
+    yellow_robot_states.push_back(robot_id);
+
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> frame =
+        createSSLDetectionFrame(camera_id, time, frame_number, {ball_state},
+                                yellow_robot_states, blue_robot_states);
+
+    // creating robot status
+    auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+    robot_msg->set_robot_id(2);
+
+    auto power_status_msg = std::make_unique<TbotsProto::PowerStatus>();
+    power_status_msg->set_breakbeam_tripped(true);
+    *(robot_msg->mutable_power_status()) = *power_status_msg;
+
+    // create ssl wrapper packet
+    auto geometry_data = initSSLDivBGeomData();
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geometry_data), std::move(frame));
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_msg;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<World> current_world = sensor_fusion.getWorld();
+    Point ball_position                = current_world.value().ball().position();
+
+    // did it use ssl ball position
+    EXPECT_TRUE(ball_position == ball_position_ssl);
+
+    // did it not use robot position
+    EXPECT_TRUE(ball_position != robot_state.position());
 }

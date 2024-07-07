@@ -32,12 +32,18 @@ if __name__ == "__main__":
         help="Print the generated Bazel command",
     )
     parser.add_argument(
-        "-o",
-        "--optimized_build",
+        "-no",
+        "--no_optimized_build",
         action="store_true",
-        help="Compile binaries with -O3 optimizations",
+        default=False,
+        help="Compile binaries without -O3 optimizations",
     )
-    parser.add_argument("-d", "--debug_build", action="store_true")
+    parser.add_argument(
+        "-d",
+        "--debug_build",
+        action="store_true",
+        help="Compile binaries with debug symbols",
+    )
     parser.add_argument(
         "-ds",
         "--select_debug_binaries",
@@ -137,9 +143,9 @@ if __name__ == "__main__":
     if args.debug_build or args.select_debug_binaries:
         command += ["-c", "dbg"]
 
-    # Trigger an optimized build. Note that Thunderloop should always be
-    # compiled with optimizations for best formance
-    if args.optimized_build or args.flash_robots:
+    # Trigger an optimized build by default. Note that Thunderloop should always be
+    # compiled with optimizations for best performance
+    if not args.no_optimized_build or args.flash_robots:
         command += ["--copt=-O3"]
 
     # Used for when flashing Jetsons
@@ -154,18 +160,6 @@ if __name__ == "__main__":
             unknown_args += ["--debug_blue_full_system"]
         if "yellow" in args.select_debug_binaries:
             unknown_args += ["--debug_yellow_full_system"]
-
-    # If its a binary, then run under gdb. We need to special case thunderscope
-    # because it relies on --debug_simulator, --debug_blue_full_system and
-    # --debug_yellow_full_system prompts the user to run the command under gdb
-    # instead. So we only run_under gdb if its _not_ a thunderscope debug command
-    if args.action in "run" and args.debug_build:
-        if (
-            "--debug_yellow_full_system" not in unknown_args
-            and "--debug_blue_full_system" not in unknown_args
-            and "--debug_simulator" not in unknown_args
-        ):
-            command += ["--run_under=gdb"]
 
     # To run the Tracy profile, enable the TRACY_ENABLE macro
     if args.tracy:

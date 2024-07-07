@@ -5,6 +5,7 @@ from pyqtgraph.opengl import *
 import math
 import numpy as np
 
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import (
@@ -13,6 +14,9 @@ from software.thunderscope.constants import (
     SPEED_SEGMENT_SCALE,
     DEFAULT_EMPTY_FIELD_WORLD,
     is_field_message_empty,
+    SIMULATION_SPEEDS,
+    LINE_WIDTH,
+    CustomGLOptions,
 )
 
 from typing import Dict, Tuple
@@ -60,8 +64,10 @@ class GLWorldLayer(GLLayer):
         self.friendly_colour_yellow = friendly_colour_yellow
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
         self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
+        self.simulation_state_buffer = ThreadSafeBuffer(buffer_size, SimulationState)
         self.cached_world = World()
         # fields to store the team from the cached world state as a dict
         self._cached_friendly_team = {}
@@ -74,6 +80,8 @@ class GLWorldLayer(GLLayer):
             Qt.Key.Key_I,
             Qt.Key.Key_Space,
             Qt.Key.Key_Shift,
+            Qt.Key.Key_Up,
+            Qt.Key.Key_Down,
         ]
         for key in self.accepted_keys:
             self.key_pressed[key] = False
@@ -81,6 +89,7 @@ class GLWorldLayer(GLLayer):
         self.display_robot_ids = True
         self.display_speed_lines = True
         self.is_playing = True
+        self.simulation_speed = 1.0
 
         self.ball_velocity_vector = None
         self.point_in_scene_picked = None
@@ -128,6 +137,8 @@ class GLWorldLayer(GLLayer):
         self.friendly_robot_id_graphics = ObservableList(self._graphics_changed)
         self.enemy_robot_id_graphics = ObservableList(self._graphics_changed)
         self.breakbeam_graphics = ObservableList(self._graphics_changed)
+        self.auto_kick_graphics = ObservableList(self._graphics_changed)
+        self.auto_chip_graphics = ObservableList(self._graphics_changed)
         self.speed_line_graphics = ObservableList(self._graphics_changed)
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
@@ -150,18 +161,57 @@ class GLWorldLayer(GLLayer):
         ):
             self.toggle_play_state()
 
+        if (
+            self.key_pressed[QtCore.Qt.Key.Key_Control]
+            and self.key_pressed[QtCore.Qt.Key.Key_Up]
+        ):
+            self.increment_sim_speed()
+
+        if (
+            self.key_pressed[QtCore.Qt.Key.Key_Control]
+            and self.key_pressed[QtCore.Qt.Key.Key_Down]
+        ):
+            self.decrement_sim_speed()
+
+    def increment_sim_speed(self) -> None:
+        """Increment the simulation speed to the next fastest speed, if there's one"""
+        curr_sim_speed_index = SIMULATION_SPEEDS.index(self.simulation_speed)
+        new_simulation_speed = SIMULATION_SPEEDS[max(0, curr_sim_speed_index - 1)]
+        self.set_simulation_speed(new_simulation_speed)
+
+    def decrement_sim_speed(self) -> None:
+        """Decrement the simulation speed to the previous fastest speed, if there's one"""
+        curr_sim_speed_index = SIMULATION_SPEEDS.index(self.simulation_speed)
+        new_simulation_speed = SIMULATION_SPEEDS[
+            min(len(SIMULATION_SPEEDS) - 1, curr_sim_speed_index + 1)
+        ]
+        self.set_simulation_speed(new_simulation_speed)
+
     def toggle_play_state(self) -> bool:
         """
         Pauses the simulated gameplay and toggles the play state
         Calls all callback functions with the new play state
         :return: the current play state
         """
-        simulator_state = SimulationState(is_playing=not self.is_playing)
+        simulator_state = SimulationState(
+            is_playing=not self.is_playing, simulation_speed=self.simulation_speed
+        )
         self.is_playing = not self.is_playing
 
         self.simulator_io.send_proto(SimulationState, simulator_state)
 
         return self.is_playing
+
+    def set_simulation_speed(self, speed: float) -> None:
+        """
+        Sets the speed of the simulator
+        :param speed: the new speed to set
+        """
+        self.simulation_speed = speed
+        simulator_state = SimulationState(
+            is_playing=self.is_playing, simulation_speed=self.simulation_speed
+        )
+        self.simulator_io.send_proto(SimulationState, simulator_state)
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
@@ -291,7 +341,16 @@ class GLWorldLayer(GLLayer):
         self._update_robots_graphics()
 
         self.__update_robot_status_graphics()
+        self.__update_auto_chip_or_kick_graphics()
         self.__update_speed_line_graphics()
+
+        # Update internal simulation state
+        simulation_state = self.simulation_state_buffer.get(
+            block=False, return_cached=False
+        )
+        if simulation_state:
+            self.is_playing = simulation_state.is_playing
+            self.simulation_speed = simulation_state.simulation_speed
 
     def _update_robots_graphics(self) -> None:
         """
@@ -486,6 +545,90 @@ class GLWorldLayer(GLLayer):
                 )
             else:
                 breakbeam_graphic.hide()
+
+    def __update_auto_chip_or_kick_graphics(self) -> None:
+        """Update the auto kick and auto chip graphics"""
+
+        # See which robots have auto kick or auto chip enabled
+        auto_kick_robots = []
+        auto_chip_robots = []
+        primitive_set = self.primitive_set_buffer.get(block=False)
+
+        for robot_id in primitive_set.robot_primitives:
+            primitive = primitive_set.robot_primitives[robot_id]
+
+            if primitive.HasField("move"):
+                autochip_or_kick = primitive.move.auto_chip_or_kick
+
+                if (
+                    autochip_or_kick.HasField("autokick_speed_m_per_s")
+                    and autochip_or_kick.autokick_speed_m_per_s > 0
+                ):
+                    auto_kick_robots.append(robot_id)
+                elif (
+                    autochip_or_kick.HasField("autochip_distance_meters")
+                    and autochip_or_kick.autochip_distance_meters > 0
+                ):
+                    auto_chip_robots.append(robot_id)
+
+        # Ensure we have the same number of graphics as robots
+        self.auto_chip_graphics.resize(
+            len(self.cached_world.friendly_team.team_robots),
+            lambda: GLPolygon(
+                outline_color=Colors.AUTO_CHIP_ENABLED_COLOR, line_width=LINE_WIDTH * 2
+            ),
+        )
+        self.auto_kick_graphics.resize(
+            len(self.cached_world.friendly_team.team_robots),
+            lambda: GLPolygon(
+                outline_color=Colors.AUTO_KICK_ENABLED_COLOR, line_width=LINE_WIDTH * 2
+            ),
+        )
+
+        def update_polygon(polygon_graphic: GLPolygon, robot: tbots_cpp.Robot) -> None:
+            """
+            Update the polygon graphic with the robot's dribbler area
+            :param polygon_graphic: The polygon graphic to update
+            :param robot: The robot to get the dribbler area from
+            """
+            polygon_graphic.updateGLOptions(CustomGLOptions.OPAQUE_WITH_OUT_DEPTH_TEST)
+            polygon_graphic.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
+
+            dribble_area_polygon_points = (
+                tbots_cpp.Robot(robot).dribblerArea().getPoints()
+            )
+            polygon_graphic.set_points(
+                [
+                    (
+                        dribble_area_polygon_points[0].x(),
+                        dribble_area_polygon_points[0].y(),
+                    ),
+                    (
+                        dribble_area_polygon_points[3].x(),
+                        dribble_area_polygon_points[3].y(),
+                    ),
+                ]
+            )
+
+        # Update the graphics
+        for auto_chip_graphic, auto_kick_graphic, robot in zip(
+            self.auto_chip_graphics,
+            self.auto_kick_graphics,
+            self.cached_world.friendly_team.team_robots,
+        ):
+            if robot.id in auto_chip_robots:
+                auto_chip_graphic.show()
+                auto_kick_graphic.hide()
+                update_polygon(auto_chip_graphic, robot)
+
+            elif robot.id in auto_kick_robots:
+                auto_kick_graphic.show()
+                auto_chip_graphic.hide()
+                update_polygon(auto_kick_graphic, robot)
+
+            else:
+                auto_chip_graphic.hide()
+                auto_kick_graphic.hide()
 
     def __update_speed_line_graphics(self) -> None:
         """Update the speed lines visualizing the robot and ball speeds"""
