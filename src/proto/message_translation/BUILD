@@ -163,6 +163,7 @@ cc_library(
         "//shared:robot_constants",
         "//software/geom:angle",
         "//software/logger",
+        "//proto/message_translation:tbots_protobuf"
     ],
 )
 

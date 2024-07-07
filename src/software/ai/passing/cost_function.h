@@ -11,6 +11,11 @@
 #include "software/world/team.h"
 #include "software/world/world.h"
 
+double rateGroundPass(const World& world, const Pass& pass, const Rectangle& zone,
+                TbotsProto::PassingConfig passing_config);
+
+double rateChipPass(const World& world, const ChipPass& pass, const Rectangle& zone,
+                TbotsProto::PassingConfig passing_config)
 /**
  * Calculate the quality of a given pass
  *
@@ -22,7 +27,7 @@
  * @return A value in [0,1] representing the quality of the pass, with 1 being an
  *         ideal pass, and 0 being the worst pass possible
  */
-double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
+double ratePass(const World& world, const BasePass& pass, const Rectangle& zone, const Team& enemy_team,
                 TbotsProto::PassingConfig passing_config);
 
 /**
@@ -52,7 +57,7 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
  *         the pass, and 1 indicating that it is guaranteed to be able to score off of
  *         the pass
  */
-double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
+double ratePassShootScore(const Field& field, const Team& enemy_team, const BasePass& pass,
                           TbotsProto::PassingConfig passing_config);
 
 /**
@@ -66,7 +71,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
  *         to run without interference, and 0 indicating that the pass will certainly
  *         be interfered with (and so is very poor)
  */
-double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
+double ratePassEnemyRisk(const Team& enemy_team, const BasePass& pass,
                          const Duration& enemy_reaction_time,
                          double enemy_proximity_importance);
 
@@ -78,7 +83,7 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
  * @param passing_config The passing config used for tuning
  * @return
  */
-double ratePassBackwardsQuality(const Field& field, const Pass& pass,
+double ratePassBackwardsQuality(const Field& field, const BasePass& pass,
                                 TbotsProto::PassingConfig& passing_config);
 
 /**
@@ -92,7 +97,7 @@ double ratePassBackwardsQuality(const Field& field, const Pass& pass,
  *         guaranteed to be intercepted, and 0 indicating it's impossible for the
  *         pass to be intercepted
  */
-double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
+double calculateInterceptRisk(const Team& enemy_team, const BasePass& pass,
                               const Duration& enemy_reaction_time);
 
 /**
@@ -106,7 +111,7 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
  *         be intercepted, and 0 indicating it's impossible for the pass to be
  *         intercepted
  */
-double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
+double calculateInterceptRisk(const Robot& enemy_robot, const BasePass& pass,
                               const Duration& enemy_reaction_time);
 
 
@@ -124,7 +129,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
  *         friendly team to receive the given pass, with 1 being very likely, 0
  *         being impossible
  */
-double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass,
+double ratePassFriendlyCapability(const Team& friendly_team, const BasePass& pass,
                                   TbotsProto::PassingConfig passing_config);
 
 /**

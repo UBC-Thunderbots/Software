@@ -420,6 +420,9 @@ void SimRobot::begin(SimBall *ball, double time)
 
         stopDribbling();
 
+
+            std::cout << "ANGLE: " << m_sslCommand.kick_angle() << std::endl;
+
         if (m_sslCommand.kick_angle() == 0)
         {
             // we subtract the current speed of the ball from the intended kick speed
@@ -453,13 +456,14 @@ void SimRobot::begin(SimBall *ball, double time)
             {
                 // if the ball hits the robot the chip distance actually decreases
                 const btVector3 relBallSpeed = relativeBallSpeed(ball) / SIMULATOR_SCALE;
+
                 return std::max((btScalar)0, relBallSpeed.y()) -
                        qBound((btScalar)0, (btScalar)0.5 * relBallSpeed.y(),
                               (btScalar)0.5 * dirFloor);
             }
         };
         const float speedCompensation = getSpeedCompensation();
-        ball->kick(t * btVector3(0, dirFloor * power + speedCompensation, dirUp * power) *
+        ball->kick(t * btVector3(0, dirFloor * power - speedCompensation, dirUp * power) *
                    (1.0f / static_cast<float>(time)) * SIMULATOR_SCALE *
                    static_cast<float>(BALL_MASS_KG));
         // discharge

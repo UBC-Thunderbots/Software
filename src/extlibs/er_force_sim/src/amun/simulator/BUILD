@@ -15,6 +15,8 @@ qt_cc_library(
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_widgets",
+        "//software/logger:logger",
+        "//proto/message_translation:tbots_protobuf"
     ],
     #linkstatic = True,
     alwayslink = True,
