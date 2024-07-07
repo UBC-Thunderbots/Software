@@ -13,7 +13,7 @@
 struct ReceiverFSM
 {
     /**
-     * Constructor for AttackerFSM
+     * Constructor for ReceiverFSM
      *
      * @param receiver_tactic_config The config to fetch parameters from
      */
