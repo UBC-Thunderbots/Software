@@ -3,15 +3,12 @@ from proto.import_all_protos import *
 from software.py_constants import MILLISECONDS_PER_SECOND
 from software.thunderscope.constants import ProtoConfigurationConstant
 import logging
-from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtCore import QTimer
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
-from google.protobuf.json_format import MessageToDict
-from thefuzz import fuzz
 from proto.import_all_protos import *
 from software.thunderscope.common import proto_parameter_tree_util
-from typing import Callable
+from typing import Any, Callable
 from PyQt6.QtWidgets import *
 
 
@@ -22,10 +19,11 @@ class ProtoConfigurationWidget(QWidget):
 
     """
 
-    # where we are saving the default configuration file
-
     def __init__(
-        self, on_change_callback, is_yellow, search_filter_threshold=60,
+        self,
+        on_change_callback: Callable[[Any, Any, ThunderbotsConfig], None],
+        is_yellow: bool,
+        search_filter_threshold: int = 60,
     ):
         """Create a parameter widget given a protobuf
 
@@ -115,14 +113,17 @@ class ProtoConfigurationWidget(QWidget):
         save_hbox_top = QHBoxLayout()
 
         return save_hbox_top, save_hbox_bottom
+
     def update_proto_from_file(self, path_to_file: str):
         """
         load the protobuf from path_to_file to the variable self.proto_to_configure
 
-        :param path_to_file:
+        :param path_to_file: the path to the ThunderbotsConfig proto
         """
         if not os.path.isfile(path_to_file):
-            logging.info(f"There are such no file in {path_to_file} crearting new ThunderbotsConfig proto.")
+            logging.info(
+                f"There are such no file in {path_to_file} crearting new ThunderbotsConfig proto."
+            )
             self.proto_to_configure = ThunderbotsConfig()
             self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
                 self.is_yellow
@@ -165,15 +166,10 @@ class ProtoConfigurationWidget(QWidget):
             if not should_save:
                 return
 
-
             self.save_current_config_to_file(save_to_path)
             self.update_widget()
         except Exception:
-            logging.warning(
-                "cannot save configuration to {}".format(
-                    save_to_path
-                )
-            )
+            logging.warning("cannot save configuration to {}".format(save_to_path))
 
     def save_current_config_to_file(self, path_to_file):
         """
@@ -209,7 +205,7 @@ class ProtoConfigurationWidget(QWidget):
             self.update_widget()
         except Exception as e:
             logging.warning(
-                    "cannot load configuration from {}. Error: {} Are you sure it is a configuration proto?".format(
+                "cannot load configuration from {}. Error: {} Are you sure it is a configuration proto?".format(
                     path_to_file, e
                 )
             )
@@ -236,7 +232,6 @@ class ProtoConfigurationWidget(QWidget):
         resetting the protobufs when the reset button has been clicked!
         """
 
-        logging.info("reset button callback has been clicked")
         self.proto_to_configure = ThunderbotsConfig()
         self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
             self.is_yellow
