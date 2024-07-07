@@ -77,8 +77,8 @@ message AttackerTacticConfig
 
 message ReceiverTacticConfig
 {
-    // Whether one touch kicks should be disabled or not
-    required bool disable_one_touch_kick = 1 [default = false];
+    // Whether one touch kicks should be enabled or not
+    required bool enable_one_touch_kick = 1 [default = true];
 
     // The minimum open angle to the goal that we require before taking a one touch kick
     required double min_open_angle_for_one_touch_deg = 2 [
