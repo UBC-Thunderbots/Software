@@ -19,6 +19,7 @@ message RobotStatus
     Timestamp time_sent                               = 10;
     uint64 last_handled_primitive_set                 = 11;
     PrimitiveExecutorStatus primitive_executor_status = 12;
+    Timestamp adjusted_time_sent                      = 13;
 }
 
 message PrimitiveExecutorStatus
@@ -74,10 +75,11 @@ enum ErrorCode
     NO_ERROR = 0;
 
     // Level triggered events
-    HIGH_CAP           = 1;
-    LOW_BATTERY        = 2;
-    HIGH_BOARD_TEMP    = 3;
-    DRIBBLER_MOTOR_HOT = 4;
+    HIGH_CAP              = 1;
+    LOW_BATTERY           = 2;
+    HIGH_BOARD_TEMP       = 3;
+    DRIBBLER_MOTOR_HOT    = 4;
+    UNSTABLE_POWER_SUPPLY = 5;
 }
 
 enum MotorFault
