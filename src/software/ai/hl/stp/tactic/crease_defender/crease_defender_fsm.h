@@ -103,6 +103,7 @@ struct CreaseDefenderFSM
             MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
             DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A =
                 MoveFSM_S,
+            DribbleFSM_S + Update_E / prepareGetPossession_A,
             X + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
                 DribbleFSM_S,
             X + Update_E / blockThreat_A = MoveFSM_S);

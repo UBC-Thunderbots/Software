@@ -49,16 +49,6 @@ void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<CreaseDefenderFSM>>(
             CreaseDefenderFSM(ai_config), DribbleFSM(ai_config.dribble_tactic_config()));
     }
-    Point ball_position     = tactic_update.world_ptr->ball().position();
-    Point enemy_goal_center = tactic_update.world_ptr->field().enemyGoal().centre();
-    auto ball_to_net_vector = Vector(enemy_goal_center - ball_position);
-    DribbleFSM::ControlParams dribble_control_params{
-        .dribble_destination       = ball_position,
-        .final_dribble_orientation = ball_to_net_vector.orientation(),
-        .allow_excessive_dribbling = false};
-
     fsm_map.at(tactic_update.robot.id())
         ->process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
-    fsm_map.at(tactic_update.robot.id())
-        ->process_event(DribbleFSM::Update(dribble_control_params, tactic_update));
 }
