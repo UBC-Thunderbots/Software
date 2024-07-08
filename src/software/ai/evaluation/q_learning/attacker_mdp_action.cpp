@@ -18,6 +18,5 @@ std::unique_ptr<Skill> createSkillFromAttackerMdpAction(
         default:
             LOG(FATAL) << "AttackerMdpAction value " << action << " not handled";
     }
-
-    return nullptr;
+    __builtin_unreachable();
 }
