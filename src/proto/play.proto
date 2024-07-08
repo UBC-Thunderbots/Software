@@ -4,7 +4,7 @@ package TbotsProto;
 
 enum PlayName
 {
-    reserved 2, 5, 6, 10, 16;
+    reserved 2, 5, 6, 16;
 
     UseAiSelection         = 1;
     KickoffFriendlyPlay    = 3;
@@ -19,6 +19,7 @@ enum PlayName
     DefensePlay            = 11;
     HaltPlay               = 8;
     StopPlay               = 17;
+    ExamplePlay            = 10;
     AssignedTacticsPlay    = 19;
 }
 

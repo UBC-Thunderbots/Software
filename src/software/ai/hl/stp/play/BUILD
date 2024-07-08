@@ -134,6 +134,9 @@ cc_library(
         "//software/ai/hl/stp/play/enemy_free_kick:enemy_free_kick_play",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/penalty_kick_enemy:penalty_kick_enemy_play",
+        "//software/ai/hl/stp/play/test_plays:example_play",
+        "//software/ai/hl/stp/play/test_plays:halt_test_play",
+        "//software/ai/hl/stp/play/test_plays:move_test_play",
     ],
 )
 
