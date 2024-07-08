@@ -259,7 +259,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     {
         friendly_robot_id_with_ball_in_dribbler = std::nullopt;
         ball_in_dribbler_timeout                = 0;
-        LOG(DEBUG) << "ball_in_dribbler_timeout: " << ball_in_dribbler_timeout;
     }
 
     if (shouldTrustRobotStatus())
