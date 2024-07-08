@@ -142,8 +142,8 @@ class TrajectoryPlanner
     static std::vector<Vector> getRelativeSubDestinations();
 
     const std::vector<Vector> relative_sub_destinations;
-    static constexpr std::array<double, 4> SUB_DESTINATION_DISTANCES_METERS = {1.1, 2.3,
-                                                                               3};
+    static constexpr std::array<double, 4> SUB_DESTINATION_DISTANCES_METERS = {0.4, 1.1,
+                                                                               2.3, 3};
     static constexpr unsigned int NUM_SUB_DESTINATION_ANGLES                = 16;
     static constexpr Angle MIN_SUB_DESTINATION_ANGLE = Angle::fromDegrees(20);
     static constexpr Angle MAX_SUB_DESTINATION_ANGLE = Angle::fromDegrees(140);
