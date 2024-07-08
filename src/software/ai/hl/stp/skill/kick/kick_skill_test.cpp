@@ -2,7 +2,8 @@
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactics.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
+#include "software/ai/hl/stp/skill/kick/kick_skill.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
@@ -32,14 +33,15 @@ TEST_P(KickSkillTest, kick_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<KickSkillTactic>();
-    tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
-                                5);
+    auto tactic = std::make_shared<AssignedSkillTactic<KickSkill>>(strategy);
+    tactic->updateControlParams(
+        {robot_position + ball_offset_from_robot, angle_to_kick_at, 5});
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [angle_to_kick_at, tactic](std::shared_ptr<World> world_ptr,
-                                   ValidationCoroutine::push_type& yield) {
+                                   ValidationCoroutine::push_type& yield)
+        {
             while (!tactic->done())
             {
                 yield("Tactic did not complete!");
@@ -55,7 +57,7 @@ TEST_P(KickSkillTest, kick_test)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    BallLocations, KickTacticTest,
+    BallLocations, KickSkillTest,
     ::testing::Values(
         // place the ball directly to the left of the robot
         std::make_tuple(Vector(0, 0.5), Angle::zero()),

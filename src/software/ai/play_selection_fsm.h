@@ -2,15 +2,15 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/dynamic_plays/offensive_plays.h"
+#include "software/ai/hl/stp/play/dynamic_plays/offense_play.h"
 
 struct PlaySelectionFSM
 {
-    class Halt;
-    class Stop;
-    class SetPlay;
-    class OffensivePlay;
-    class DefensivePlay;
+    class HaltState;
+    class StopState;
+    class SetPlayState;
+    class OffensePlayState;
+    class DefensePlayState;
 
     struct Update
     {
@@ -43,16 +43,6 @@ struct PlaySelectionFSM
     bool gameStateSetupRestart(const Update& event);
 
     /**
-     * Guard to check whether the current game state is a free kick for the
-     * friendly team
-     *
-     * @param event The PlaySelection::Update event
-     *
-     * @return whether the current game state is a free kick for the friendly team
-     */
-    bool isFriendlyFreeKick(const Update& event);
-
-    /**
      * Guard to check whether the enemy team has possession of the ball
      *
      * @param event The PlaySelection::Update event
@@ -63,39 +53,44 @@ struct PlaySelectionFSM
 
     /**
      * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay,
-     * OffensivePlay, or DefensivePlay
+     * OffensePlay, or DefensePlay
      *
      * @param event The PlaySelection::Update event
      */
-    void setupOverridePlay(Update event);
     void setupSetPlay(const Update& event);
     void setupStopPlay(const Update& event);
     void setupHaltPlay(const Update& event);
-    void setupOffensivePlay(const Update& event);
-    void setupDefensivePlay(const Update& event);
+    void setupOffensePlay(const Update& event);
+    void setupDefensePlay(const Update& event);
 
     /**
-     * Action to evaluate the currently running DynamicPlay
+     * Action to reset the current SetPlay to none
      *
      * @param event The PlaySelection::Update event
      */
-    void evaluateDynamicPlay(const Update& event);
+    void resetSetPlay(const Update& event);
+
+    /**
+     * Action to terminate the OffensePlay
+     *
+     * @param event The PlaySelection::Update event
+     */
+    void terminateOffensePlay(const Update& event);
 
     auto operator()()
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(Halt)
-        DEFINE_SML_STATE(Stop)
-        DEFINE_SML_STATE(SetPlay)
-        DEFINE_SML_STATE(OffensivePlay)
-        DEFINE_SML_STATE(DefensivePlay)
+        DEFINE_SML_STATE(HaltState)
+        DEFINE_SML_STATE(StopState)
+        DEFINE_SML_STATE(SetPlayState)
+        DEFINE_SML_STATE(OffensePlayState)
+        DEFINE_SML_STATE(DefensePlayState)
 
         DEFINE_SML_GUARD(gameStateStopped)
         DEFINE_SML_GUARD(gameStateHalted)
         DEFINE_SML_GUARD(gameStatePlaying)
         DEFINE_SML_GUARD(gameStateSetupRestart)
-        DEFINE_SML_GUARD(isFriendlyFreeKick)
         DEFINE_SML_GUARD(enemyHasPossession)
 
         DEFINE_SML_EVENT(Update)
@@ -103,68 +98,69 @@ struct PlaySelectionFSM
         DEFINE_SML_ACTION(setupSetPlay)
         DEFINE_SML_ACTION(setupStopPlay)
         DEFINE_SML_ACTION(setupHaltPlay)
-        DEFINE_SML_ACTION(setupOffensivePlay)
-        DEFINE_SML_ACTION(setupDefensivePlay)
-        DEFINE_SML_ACTION(evaluateDynamicPlay)
+        DEFINE_SML_ACTION(setupOffensePlay)
+        DEFINE_SML_ACTION(setupDefensePlay)
+        DEFINE_SML_ACTION(resetSetPlay)
+        DEFINE_SML_ACTION(terminateOffensePlay)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
 
-            *Halt_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
-            Halt_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
-                         setupOffensivePlay_A = OffensivePlay_S,
-            Halt_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
-                         setupDefensivePlay_A = DefensivePlay_S,
-            Halt_S + Update_E[gameStateSetupRestart_G && isFriendlyFreeKick_G] /
-                         setupOffensivePlay_A                           = OffensivePlay_S,
-            Halt_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            *HaltState_S + Update_E[gameStateStopped_G] / setupStopPlay_A = StopState_S,
+            HaltState_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
+                              setupOffensePlay_A = OffensePlayState_S,
+            HaltState_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
+                              setupDefensePlay_A = DefensePlayState_S,
+            HaltState_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
+                SetPlayState_S,
 
-            Stop_S + Update_E[gameStateHalted_G] / setupHaltPlay_A = Halt_S,
-            Stop_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
-                         setupOffensivePlay_A = OffensivePlay_S,
-            Stop_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
-                         setupDefensivePlay_A = DefensivePlay_S,
-            Stop_S + Update_E[gameStateSetupRestart_G && isFriendlyFreeKick_G] /
-                         setupOffensivePlay_A                           = OffensivePlay_S,
-            Stop_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A = SetPlay_S,
+            StopState_S + Update_E[gameStateHalted_G] / setupHaltPlay_A = HaltState_S,
+            StopState_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
+                              setupOffensePlay_A = OffensePlayState_S,
+            StopState_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
+                              setupDefensePlay_A = DefensePlayState_S,
+            StopState_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
+                SetPlayState_S,
 
-            OffensivePlay_S + Update_E[gameStateHalted_G] /
-                                  (evaluateDynamicPlay_A, setupHaltPlay_A) = Halt_S,
-            OffensivePlay_S + Update_E[gameStateStopped_G] /
-                                  (evaluateDynamicPlay_A, setupStopPlay_A) = Stop_S,
-            OffensivePlay_S + Update_E[gameStateSetupRestart_G && isFriendlyFreeKick_G] /
-                                  (evaluateDynamicPlay_A, setupOffensivePlay_A) =
-                OffensivePlay_S,
-            OffensivePlay_S + Update_E[gameStateSetupRestart_G] /
-                                  (evaluateDynamicPlay_A, setupSetPlay_A) = SetPlay_S,
-            OffensivePlay_S + Update_E[enemyHasPossession_G] /
-                                  (evaluateDynamicPlay_A, setupDefensivePlay_A) =
-                DefensivePlay_S,
+            OffensePlayState_S +
+                Update_E[gameStateHalted_G] / (terminateOffensePlay_A, setupHaltPlay_A) =
+                HaltState_S,
+            OffensePlayState_S +
+                Update_E[gameStateStopped_G] / (terminateOffensePlay_A, setupStopPlay_A) =
+                StopState_S,
+            OffensePlayState_S + Update_E[gameStateSetupRestart_G] /
+                                     (terminateOffensePlay_A, setupSetPlay_A) =
+                SetPlayState_S,
+            OffensePlayState_S + Update_E[enemyHasPossession_G] /
+                                     (terminateOffensePlay_A, setupDefensePlay_A) =
+                DefensePlayState_S,
 
-            DefensivePlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A  = Halt_S,
-            DefensivePlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
-            DefensivePlay_S + Update_E[gameStateSetupRestart_G && isFriendlyFreeKick_G] /
-                                  (evaluateDynamicPlay_A, setupOffensivePlay_A) =
-                OffensivePlay_S,
-            DefensivePlay_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
-                SetPlay_S,
-            DefensivePlay_S + Update_E[!enemyHasPossession_G] / setupOffensivePlay_A =
-                OffensivePlay_S,
+            DefensePlayState_S + Update_E[gameStateHalted_G] / setupHaltPlay_A =
+                HaltState_S,
+            DefensePlayState_S + Update_E[gameStateStopped_G] / setupStopPlay_A =
+                StopState_S,
+            DefensePlayState_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
+                SetPlayState_S,
+            DefensePlayState_S + Update_E[!enemyHasPossession_G] / setupOffensePlay_A =
+                OffensePlayState_S,
 
-            SetPlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A  = Halt_S,
-            SetPlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
-            SetPlay_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
-                            setupOffensivePlay_A = OffensivePlay_S,
-            SetPlay_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
-                            setupDefensivePlay_A = DefensivePlay_S,
+            SetPlayState_S + Update_E[gameStateHalted_G] /
+                                 (resetSetPlay_A, setupHaltPlay_A) = HaltState_S,
+            SetPlayState_S + Update_E[gameStateStopped_G] /
+                                 (resetSetPlay_A, setupStopPlay_A) = StopState_S,
+            SetPlayState_S + Update_E[gameStatePlaying_G && !enemyHasPossession_G] /
+                                 (resetSetPlay_A, setupOffensePlay_A) =
+                OffensePlayState_S,
+            SetPlayState_S + Update_E[gameStatePlaying_G && enemyHasPossession_G] /
+                                 (resetSetPlay_A, setupDefensePlay_A) =
+                DefensePlayState_S,
+            SetPlayState_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A,
 
             X + Update_E = X);
     }
 
    private:
     std::shared_ptr<Strategy> strategy_;
-    std::shared_ptr<DynamicPlay> current_dynamic_play_;
-    std::shared_ptr<OffensiveFriendlyThirdPlay> offensive_friendly_third_play_;
-    std::shared_ptr<OffensiveMiddleThirdPlay> offensive_middle_third_play_;
-    std::shared_ptr<OffensiveEnemyThirdPlay> offensive_enemy_third_play_;
+    std::shared_ptr<OffensePlay> offense_play_;
+    std::optional<TbotsProto::PlayName> current_set_play_;
 };

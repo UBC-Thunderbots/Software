@@ -66,7 +66,7 @@ void ColouredCoutSink::displaySingleLog(g3::LogMessage &log)
     auto colour = colourToString(getColour(level));
 
     if (level.value == VISUALIZE.value || level.value == CSV.value ||
-        level.value == PLOTJUGGLER.value)
+        level.value == CSV_OVERWRITE.value || level.value == PLOTJUGGLER.value)
     {
         // Don't log anything that calls LOG(VISUALIZE) and LOG(CSV)
         return;

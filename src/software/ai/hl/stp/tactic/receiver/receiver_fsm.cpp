@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/tactic/receiver/receiver_fsm.h"
 
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/geom/algorithms/convex_angle.h"
 
@@ -75,7 +76,7 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
     // The percentage of open net the robot would shoot on
     if (best_shot_opt)
     {
-        TbotsProto::ReceiverTacticConfig receiver_tactic_config = 
+        TbotsProto::ReceiverTacticConfig receiver_tactic_config =
             strategy_->getAiConfig().receiver_tactic_config();
 
         Vector robot_to_ball = world.ball().position() - assigned_robot.position();
@@ -107,8 +108,8 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
 
 bool ReceiverFSM::onetouchPossible(const Update& event)
 {
-    return !event.control_params.disable_one_touch_shot &&
-           !strategy_->getAiConfig().receiver_tactic_config().disable_one_touch_kick() &&
+    return event.control_params.enable_one_touch_shot &&
+           strategy_->getAiConfig().receiver_tactic_config().enable_one_touch_kick() &&
            (findFeasibleShot(*event.common.world_ptr, event.common.robot) !=
             std::nullopt);
 }
@@ -117,7 +118,7 @@ void ReceiverFSM::updateOnetouch(const Update& event)
 {
     auto best_shot = findFeasibleShot(*event.common.world_ptr, event.common.robot);
 
-    if (best_shot.has_value() && event.control_params.receiver_point)
+    if (best_shot.has_value() && event.control_params.receiving_position)
     {
         auto one_touch = getOneTouchShotPositionAndOrientation(
             event.common.robot, event.common.world_ptr->ball(),
@@ -129,7 +130,7 @@ void ReceiverFSM::updateOnetouch(const Update& event)
             TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                           BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}));
+                           BALL_MAX_SPEED_METERS_PER_SECOND}));
     }
     else
     {
@@ -139,14 +140,15 @@ void ReceiverFSM::updateOnetouch(const Update& event)
 
 void ReceiverFSM::updateReceive(const Update& event)
 {
-    if (event.control_params.receiver_point)
+    if (event.control_params.receiving_position)
     {
-        const Ball& ball = event.common.world_ptr->ball();
-        const Point receiver_point = event.control_params.receiver_point.value();
-        const Angle receiver_orientation = (ball.position() - receiver_point).orientation();
+        const Ball& ball               = event.common.world_ptr->ball();
+        const Point receiving_position = event.control_params.receiving_position.value();
+        const Angle receiver_orientation =
+            (ball.position() - receiving_position).orientation();
 
         event.common.set_primitive(std::make_unique<MovePrimitive>(
-            event.common.robot, receiver_point, receiver_orientation,
+            event.common.robot, receiving_position, receiver_orientation,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
             TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
@@ -156,37 +158,37 @@ void ReceiverFSM::updateReceive(const Update& event)
 
 void ReceiverFSM::adjustReceive(const Update& event)
 {
-    auto ball      = event.common.world_ptr->ball();
-    auto robot_pos = event.common.robot.position();
+    const Ball& ball   = event.common.world_ptr->ball();
+    const Robot& robot = event.common.robot;
 
-    if ((ball.position() - robot_pos).length() >
-        BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
+    auto face_ball_orientation = (ball.position() - robot.position()).orientation();
+
+    Point intercept_position;
+    if (strayPass(event) || ball.velocity().length() <= MIN_STRAY_PASS_SPEED)
     {
-        Point ball_receive_pos = ball.position();
-
-        if (ball.velocity().length() > MIN_PASS_START_SPEED)
-        {
-            ball_receive_pos = closestPoint(
-                robot_pos, Line(ball.position(), ball.position() + ball.velocity()));
-        }
-
-        Angle ball_receive_orientation = (ball.position() - robot_pos).orientation();
-
-        event.common.set_primitive(std::make_unique<MovePrimitive>(
-            event.common.robot, ball_receive_pos, ball_receive_orientation,
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
-            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-            AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
+        intercept_position =
+            findInterceptionPoint(robot, ball, event.common.world_ptr->field());
     }
+    else
+    {
+        intercept_position = closestPoint(
+            robot.position(), Line(ball.position(), ball.position() + ball.velocity()));
+    }
+
+    event.common.set_primitive(std::make_unique<MovePrimitive>(
+        event.common.robot, intercept_position, face_ball_orientation,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
 }
 
 bool ReceiverFSM::passStarted(const Update& event)
 {
-    const Ball& ball = event.common.world_ptr->ball();
-    const Point receiver_point = event.control_params.receiver_point.value();
-    
-    return ball.hasBallBeenKicked((receiver_point - ball.position()).orientation());
+    const Ball& ball               = event.common.world_ptr->ball();
+    const Point receiving_position = event.control_params.receiving_position.value();
+
+    return ball.hasBallBeenKicked((receiving_position - ball.position()).orientation());
 }
 
 bool ReceiverFSM::passReceived(const Update& event)
@@ -196,13 +198,22 @@ bool ReceiverFSM::passReceived(const Update& event)
 
 bool ReceiverFSM::passReceivedByTeammate(const Update& event)
 {
-    auto friendly_robots =
+    const double ball_speed = event.common.world_ptr->ball().velocity().length();
+    const double ball_is_kicked_threshold =
+        strategy_->getAiConfig().ai_parameter_config().ball_is_kicked_m_per_s_threshold();
+
+    if (ball_speed > ball_is_kicked_threshold)
+    {
+        return false;
+    }
+
+    const auto friendly_robots =
         event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
 
     return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
-            return robot.isNearDribbler(event.common.world_ptr->ball().position());
-        });
+        friendly_robots.begin(), friendly_robots.end(),
+        [&](const Robot& robot)
+        { return robot.isNearDribbler(event.common.world_ptr->ball().position()); });
 }
 
 bool ReceiverFSM::strayPass(const Update& event)
@@ -210,8 +221,8 @@ bool ReceiverFSM::strayPass(const Update& event)
     auto ball_position = event.common.world_ptr->ball().position();
 
     Vector ball_receiver_point_vector(
-        event.control_params.receiver_point->x() - ball_position.x(),
-        event.control_params.receiver_point->y() - ball_position.y());
+        event.control_params.receiving_position->x() - ball_position.x(),
+        event.control_params.receiving_position->y() - ball_position.y());
 
     auto orientation_difference =
         event.common.world_ptr->ball().velocity().orientation() -

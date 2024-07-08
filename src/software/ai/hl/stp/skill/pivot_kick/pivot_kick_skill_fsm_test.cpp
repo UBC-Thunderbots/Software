@@ -16,7 +16,7 @@ TEST(PivotKickSkillFSMTest, test_transitions)
     std::shared_ptr<Strategy> strategy =
         std::make_shared<Strategy>(TbotsProto::AiConfig());
 
-    FSM<PivotKickSkillFSM> fsm{DribbleSkillFSM()};
+    FSM<PivotKickSkillFSM> fsm{PivotKickSkillFSM(), DribbleSkillFSM()};
 
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickSkillFSM::StartState>));
 
@@ -32,14 +32,21 @@ TEST(PivotKickSkillFSMTest, test_transitions)
     ::TestUtil::setBallPosition(world, Point(-2, 1.5), Timestamp::fromSeconds(123));
     EXPECT_TRUE(robot.isNearDribbler(world->ball().position()));
 
-    // it takes two ticks for the fsm to realize that it's in the kick state
+    // it takes two ticks for the fsm to realize that it's going to kick
     fsm.process_event(PivotKickSkillFSM::Update(
         control_params,
         SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     fsm.process_event(PivotKickSkillFSM::Update(
         control_params,
         SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
+    
+    // Transition to KickStartState
+    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickSkillFSM::KickStartState>));
+    
     // Transition to KickState
+    fsm.process_event(PivotKickSkillFSM::Update(
+        control_params,
+        SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickSkillFSM::KickState>));
 
     // Ball is now kicked

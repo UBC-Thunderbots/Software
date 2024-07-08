@@ -2,7 +2,8 @@
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactics.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
+#include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
@@ -32,7 +33,7 @@ TEST_P(PivotKickSkillTest, pivot_kick_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<PivotKickSkillTactic>(strategy);
+    auto tactic = std::make_shared<AssignedSkillTactic<PivotKickSkill>>(strategy);
     tactic->updateControlParams({robot_position + ball_offset_from_robot,
                                  angle_to_kick_at,
                                  {AutoChipOrKickMode::AUTOKICK, 5}});

@@ -6,7 +6,7 @@
 #include "proto/parameters.pb.h"
 #include "software/ai/passing/pass.h"
 #include "software/math/math_functions.h"
-#include "software/util/make_enum/make_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 #include "software/world/field.h"
 #include "software/world/team.h"
 #include "software/world/world.h"

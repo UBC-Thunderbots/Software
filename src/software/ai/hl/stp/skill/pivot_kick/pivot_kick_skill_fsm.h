@@ -5,6 +5,7 @@
 
 struct PivotKickSkillFSM
 {
+    class KickStartState;
     class KickState;
     class StartState;
 
@@ -31,6 +32,13 @@ struct PivotKickSkillFSM
     void getBallControlAndPivot(
         const Update& event,
         boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
+
+    /**
+     * Action that sets the kick start time
+     *
+     * @param event the Update event
+     */
+    void setKickStartTime(const Update& event);
 
     /**
      * Action that kicks the ball
@@ -72,6 +80,7 @@ struct PivotKickSkillFSM
 
         DEFINE_SML_STATE(StartState)
         DEFINE_SML_STATE(KickState)
+        DEFINE_SML_STATE(KickStartState)
         DEFINE_SML_STATE(DribbleSkillFSM)
 
         DEFINE_SML_EVENT(Update)
@@ -81,6 +90,7 @@ struct PivotKickSkillFSM
         DEFINE_SML_GUARD(retryKickAllowed)
 
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(getBallControlAndPivot, DribbleSkillFSM)
+        DEFINE_SML_ACTION(setKickStartTime)
         DEFINE_SML_ACTION(kickBall)
 
         return make_transition_table(
@@ -88,7 +98,9 @@ struct PivotKickSkillFSM
             *StartState_S + Update_E / getBallControlAndPivot_A = DribbleSkillFSM_S,
 
             DribbleSkillFSM_S + Update_E / getBallControlAndPivot_A,
-            DribbleSkillFSM_S = KickState_S,
+            DribbleSkillFSM_S = KickStartState_S,
+
+            KickStartState_S + Update_E / (setKickStartTime_A, kickBall_A) = KickState_S,
 
             KickState_S + Update_E[ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             KickState_S + Update_E[lostBallControl_G && retryKickAllowed_G] /
@@ -99,4 +111,7 @@ struct PivotKickSkillFSM
 
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
+
+   private:
+    Timestamp kick_start_time_;
 };

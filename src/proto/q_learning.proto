@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package TbotsProto;
+
+message LinearQFunctionInfo
+{
+    // The name identifying this LinearQFunction
+    string name = 1;
+    // The number of state features associated with this LinearQFunction 
+    uint32 num_features = 2;
+    // The number of actions associated with this LinearQFunction
+    uint32 num_actions = 3;
+    // The weights associated with this LinearQFunction
+    repeated double weights = 4;
+}

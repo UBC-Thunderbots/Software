@@ -16,9 +16,7 @@ struct ReceiverFSM
      *
      * @param attacker_tactic_config The config to fetch parameters from
      */
-    explicit ReceiverFSM(std::shared_ptr<Strategy> strategy) : strategy_(strategy)
-    {
-    }
+    explicit ReceiverFSM(std::shared_ptr<Strategy> strategy) : strategy_(strategy) {}
 
     class OneTouchShotState;
     class ReceiveAndDribbleState;
@@ -27,22 +25,22 @@ struct ReceiverFSM
     struct ControlParams
     {
         // The point at which to receive the pass
-        std::optional<Point> receiver_point = std::nullopt;
+        std::optional<Point> receiving_position = std::nullopt;
 
-        // If set to true, we will only receive and dribble
-        bool disable_one_touch_shot = false;
+        // If set to false, we will only receive and dribble
+        bool enable_one_touch_shot = true;
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    static constexpr double MIN_PASS_START_SPEED    = 0.02;
+    // The minimum speed required for ball to be considered moving
     static constexpr double BALL_MIN_MOVEMENT_SPEED = 0.04;
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray (i.e it won't make it to the receiver)
     static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(60);
 
-    // the minimum speed required for a pass to be considered stray
+    // The minimum speed required for a pass to be considered stray
     static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
 
     /**
@@ -175,7 +173,6 @@ struct ReceiverFSM
                                         updateOnetouch_A = OneTouchShotState_S,
             WaitingForPassState_S + Update_E[passStarted_G && !onetouchPossible_G] /
                                         updateReceive_A = ReceiveAndDribbleState_S,
-            ReceiveAndDribbleState_S + Update_E[passReceived_G] / adjustReceive_A = X,
             ReceiveAndDribbleState_S + Update_E[passReceivedByTeammate_G] /
                                            updateReceive_A = WaitingForPassState_S,
             ReceiveAndDribbleState_S + Update_E / adjustReceive_A,
@@ -183,8 +180,9 @@ struct ReceiverFSM
                 Update_E[!passReceived_G && !strayPass_G] / updateOnetouch_A,
             OneTouchShotState_S + Update_E[!passReceived_G && strayPass_G] /
                                       adjustReceive_A = ReceiveAndDribbleState_S,
-            OneTouchShotState_S + Update_E[passReceived_G] / updateOnetouch_A = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);
+            OneTouchShotState_S + Update_E[passReceived_G] / updateOnetouch_A =
+                WaitingForPassState_S,
+            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 
    private:

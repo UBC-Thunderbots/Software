@@ -7,7 +7,6 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "keep_away_skill",
     srcs = [
-        "keep_away_skill.cpp",
         "keep_away_skill_fsm.cpp",
     ],
     hdrs = [

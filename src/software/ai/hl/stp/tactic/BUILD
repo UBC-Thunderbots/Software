@@ -1,22 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_test(
-    name = "penalty_setup_tactic_test",
-    srcs = ["penalty_setup_tactic_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/test_util",
-    ],
-)
-
 cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
         ":tactic",
         "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic",
-        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactics",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
@@ -59,6 +48,12 @@ cc_library(
 )
 
 cc_library(
+    name = "support_tactic",
+    hdrs = ["support_tactic.h"],
+    deps = [":tactic"],
+)
+
+cc_library(
     name = "transition_conditions",
     srcs = ["transition_conditions.cpp"],
     hdrs = ["transition_conditions.h"],
@@ -88,5 +83,6 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_protobuf",
         "//software/ai:strategy",
+        "//software/ai/hl/stp/skill:all_skills",
     ],
 )

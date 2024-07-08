@@ -27,7 +27,14 @@ void ShootSkillFSM::dribbleBallToKickOrigin(
 {
     if (!best_shot_)
     {
-        best_shot_ = event.common.strategy->getBestShot(event.common.robot);
+        if (event.control_params.sample_for_best_shot)
+        {
+            best_shot_ = event.common.strategy->getBestSampledShot(event.common.robot);
+        }
+        else 
+        {
+            best_shot_ = event.common.strategy->getBestShot(event.common.robot);
+        }
 
         if (!best_shot_)
         {
@@ -36,6 +43,8 @@ void ShootSkillFSM::dribbleBallToKickOrigin(
             Point kick_target = event.common.world_ptr->field().enemyGoalCenter();
             best_shot_        = Shot(kick_origin, kick_target, Angle::zero());
         }
+
+        event.common.set_skill_state({.shot = best_shot_});
     }
 
     Point kick_origin = best_shot_->getOrigin();

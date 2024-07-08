@@ -2,7 +2,8 @@
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactics.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
+#include "software/ai/hl/stp/skill/chip/chip_skill.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
@@ -32,9 +33,9 @@ TEST_P(ChipSkillTest, chip_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<ChipSkillTactic>();
-    tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
-                                5);
+    auto tactic = std::make_shared<AssignedSkillTactic<ChipSkill>>(strategy);
+    tactic->updateControlParams(
+        {robot_position + ball_offset_from_robot, angle_to_kick_at, 5});
     setTactic(1, tactic);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

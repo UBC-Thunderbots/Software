@@ -2,11 +2,20 @@
 
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/geom/algorithms/find_open_circles.h"
 
 bool PassSkillFSM::passFound(const Update& event)
 {
     if (!best_pass_so_far_ || best_pass_so_far_->rating < min_pass_score_threshold_)
+    {
+        return false;
+    }
+
+    const auto ball_velocity    = event.common.world_ptr->ball().velocity().length();
+    const auto ai_config        = event.common.strategy->getAiConfig();
+    const double min_pass_speed = ai_config.passing_config().min_pass_speed_m_per_s();
+
+    // Ball needs to slow down before it is passed
+    if (ball_velocity >= min_pass_speed)
     {
         return false;
     }
@@ -23,21 +32,30 @@ bool PassSkillFSM::passFound(const Update& event)
                                    best_pass_so_far_->pass.estimatePassDuration();
 }
 
-bool PassSkillFSM::passReceived(const Update& event)
+bool PassSkillFSM::passReceived(const SuspendedUpdate& event)
 {
-    auto friendly_robots =
-        event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
+    const auto ai_config    = event.strategy->getAiConfig();
+    const double ball_speed = event.world_ptr->ball().velocity().length();
+    const double ball_is_kicked_threshold =
+        ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
+
+    if (ball_speed > ball_is_kicked_threshold)
+    {
+        return false;
+    }
+
+    const auto friendly_robots = event.world_ptr->friendlyTeam().getAllRobots();
 
     return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
-            return robot.isNearDribbler(event.common.world_ptr->ball().position());
-        });
+        friendly_robots.begin(), friendly_robots.end(),
+        [&](const Robot& robot)
+        { return robot.isNearDribbler(event.world_ptr->ball().position()); });
 }
 
-bool PassSkillFSM::shouldAbortPass(const Update& event)
+bool PassSkillFSM::shouldAbortPass(const SuspendedUpdate& event)
 {
-    const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
-    const Ball& ball = event.common.world_ptr->ball();
+    const auto ai_config = event.strategy->getAiConfig();
+    const Ball& ball     = event.world_ptr->ball();
 
     const auto pass_lane =
         Polygon::fromSegment(Segment(best_pass_so_far_->pass.passerPoint(),
@@ -56,15 +74,30 @@ bool PassSkillFSM::shouldAbortPass(const Update& event)
 void PassSkillFSM::findPass(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
+    // Check if best_pass_so_far_ has been set BEFORE setting best_pass_so_far_,
+    // and only set SkillState IF best_pass_so_far_ has already been set.
+    //
+    // This ensures that a PassSkillFSM that has just been "reset" (i.e. constructed anew)
+    // will not immediately set the SkillState, and consequently override any SkillState
+    // changes made by another existing PassSkillFSM.
+    
+    if (best_pass_so_far_)
+    {
+        event.common.set_skill_state(
+            {.pass_committed = false, .pass = best_pass_so_far_->pass});
+    }
+
     best_pass_so_far_ = event.common.strategy->getBestPass();
 
     // Update minimum pass score threshold. Wait for a good pass by starting out only
     // looking for "perfect" passes (with a score of 1) and decreasing this threshold
     // over time
 
-    const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
-    double abs_min_pass_score = ai_config.passing_config().abs_min_pass_score();
-    double pass_score_ramp_down_duration =
+    const auto ai_config            = event.common.strategy->getAiConfig();
+    const double abs_min_pass_score = ai_config.passing_config().abs_min_pass_score();
+    const double min_perfect_pass_score =
+        ai_config.passing_config().min_perfect_pass_score();
+    const double pass_score_ramp_down_duration =
         ai_config.passing_config().pass_score_ramp_down_duration();
 
     if (!pass_optimization_start_time)
@@ -74,11 +107,12 @@ void PassSkillFSM::findPass(
 
     time_since_commit_stage_start =
         event.common.world_ptr->getMostRecentTimestamp() - *pass_optimization_start_time;
-    min_pass_score_threshold_ = 1.0 - std::min(time_since_commit_stage_start.toSeconds() /
-                                                   pass_score_ramp_down_duration,
-                                               1.0 - abs_min_pass_score);
+    min_pass_score_threshold_ =
+        min_perfect_pass_score - std::min(time_since_commit_stage_start.toSeconds() /
+                                              pass_score_ramp_down_duration,
+                                          min_perfect_pass_score - abs_min_pass_score);
 
-    Point receiver_point = best_pass_so_far_->pass.receiverPoint();
+    Point receiver_point      = best_pass_so_far_->pass.receiverPoint();
     Point dribble_destination = event.common.world_ptr->ball().position();
     Angle dribble_orientation = (receiver_point - dribble_destination).orientation();
 
@@ -94,8 +128,6 @@ void PassSkillFSM::takePass(
     const Update& event,
     boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
-    event.common.strategy->commitPass(best_pass_so_far_->pass);
-
     Point ball_position = event.common.world_ptr->ball().position();
     Point kick_target   = best_pass_so_far_->pass.receiverPoint();
 
@@ -107,8 +139,8 @@ void PassSkillFSM::takePass(
     }
     else
     {
-        auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                           best_pass_so_far_->pass.speed()};
+        auto_chip_or_kick =
+            AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, best_pass_so_far_->pass.speed()};
     }
 
     PivotKickSkillFSM::ControlParams control_params = {
@@ -118,34 +150,12 @@ void PassSkillFSM::takePass(
         .retry_kick        = false};
 
     processEvent(PivotKickSkillFSM::Update(control_params, event.common));
+
+    event.common.set_skill_state(
+        {.pass_committed = true, .pass = best_pass_so_far_->pass});
 }
 
-void PassSkillFSM::moveToOpenAreas(const Update& event)
+void PassSkillFSM::resetSkillState(const SuspendedUpdate& event)
 {
-    event.common.strategy->commitPass(best_pass_so_far_->pass);
-
-    const auto friendly_robots =
-        event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
-    const auto enemy_robots = event.common.world_ptr->enemyTeam().getAllRobots();
-
-    std::vector<Point> all_robot_locations;
-    all_robot_locations.reserve(friendly_robots.size() + enemy_robots.size());
-    std::transform(friendly_robots.begin(), friendly_robots.end(),
-                   std::back_inserter(all_robot_locations),
-                   [](const Robot& robot) { return robot.position(); });
-    std::transform(enemy_robots.begin(), enemy_robots.end(),
-                   std::back_inserter(all_robot_locations),
-                   [](const Robot& robot) { return robot.position(); });
-
-    std::vector<Circle> openAreas = findOpenCircles(
-        event.common.world_ptr->field().fieldLines(), all_robot_locations);
-    Point target = openAreas.front().origin();
-
-    event.common.set_primitive(std::make_unique<MovePrimitive>(
-        event.common.robot, target,
-        (event.common.world_ptr->ball().position() - target).orientation(),
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
-        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
+    event.set_skill_state({});
 }

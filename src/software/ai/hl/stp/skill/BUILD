@@ -7,9 +7,9 @@ cc_library(
         "skill_fsm.h",
     ],
     deps = [
+        ":skill_state",
         "//proto/primitive:primitive_msg_factory",
         "//software/ai:strategy",
-        "//software/ai/evaluation/scoring/skills:skill_visitor",
         "//software/ai/hl/stp/primitive",
         "//software/ai/hl/stp/primitive:stop_primitive",
         "//software/util/sml_fsm",
@@ -23,7 +23,17 @@ cc_library(
 )
 
 cc_library(
+    name = "skill_state",
+    hdrs = ["skill_state.h"],
+    deps = [        
+        "//software/ai/passing:pass",
+        "//software/ai/evaluation:shot",
+    ]
+)
+
+cc_library(
     name = "all_skills",
+    hdrs = ["all_skills.h"],
     deps = [
         "//software/ai/hl/stp/skill/chip:chip_skill",
         "//software/ai/hl/stp/skill/dribble:dribble_skill",
