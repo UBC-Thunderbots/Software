@@ -12,9 +12,9 @@
 struct ReceiverFSM
 {
     /**
-     * Constructor for AttackerFSM
+     * Constructor for ReceiverFSM
      *
-     * @param attacker_tactic_config The config to fetch parameters from
+     * @param receiver_tactic_config The config to fetch parameters from
      */
     explicit ReceiverFSM(std::shared_ptr<Strategy> strategy) : strategy_(strategy) {}
 

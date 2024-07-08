@@ -174,7 +174,7 @@ message ReceiverTacticConfig
 
     // TODO (#2570): try to make it as big as possible when tuning
     // The maximum deflection angle that we will attempt a one-touch kick towards the
-    // enemy goal with
+    // enemy goal
     required double max_deflection_for_one_touch_deg = 3 [
         default                   = 45.0,
         (bounds).min_double_value = 10.0,
@@ -258,7 +258,7 @@ message PassingConfig
         (bounds).min_double_value = 0.01,
         (bounds).max_double_value = 10.0
     ];
-    // A value multiplied by the duration that our enemy robot model predicts it will
+    // A value multiplied by the duration that our enemy robot model predicts will
     // take an enemy robot to intercept a pass. 1 implies that our enemy robot model
     // is exactly correct, with higher values meaning that the enemy will take longer
     // to intercept the pass, and lower values meaning that the enemy will intercept
