@@ -10,11 +10,6 @@
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/geom/algorithms/closest_point.h"
 
-
-//TODO: align closer to the ball in wall pickoff
-//TODO: wall pickoff, let go of the ball and drive back, then align for placement
-//
-
 using Zones = std::unordered_set<EighteenZoneId>;
 
 struct BallPlacementPlayFSM
@@ -43,23 +38,31 @@ struct BallPlacementPlayFSM
     explicit BallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
 
     /**
-     * Action that has the placing robot kick the ball off the wall to give more space to
-     * dribble
+     * Action that has the robot align with the wall in order to pick the ball off of it.
      *
      * @param event the BallPlacementPlayFSM Update event
      */
     void alignWall(const Update& event);
 
+    /**
+     * The transition action into picking the ball off the wall, set the target destination.
+     *
+     * @param event the BallPlacementPlayFSM Update event
+     */
     void setPickOffDest(const Update& event);
 
     /**
-     * Action that has the placing robot kick the ball off the wall to give more space to
-     * dribble
+     * Action that has the robot slowly pick up the ball and dribble it away the wall
      *
      * @param event the BallPlacementPlayFSM Update event
      */
     void pickOffWall(const Update& event);
 
+    /**
+     * Action that slowly drives away from the ball after picking it off the wall
+     *
+     * @param event the BallPlacementPlayFSM Update event
+     */
     void releaseBall(const Update& event);
 
 
@@ -104,11 +107,11 @@ struct BallPlacementPlayFSM
     void retreat(const Update& event);
 
     /**
-     * Guard on whether the ball is in a "dead zone"
+     * Guard on whether the ball is close enough to the wall that the robot cannot safely fit behind it
      *
      * @param event the BallPlacementPlayFSM Update event
      *
-     * @return whether the ball is in a "dead zone"
+     * @return whether the ball is close to the wall
      */
     bool shouldPickOffWall(const Update& event);
 
@@ -121,23 +124,30 @@ struct BallPlacementPlayFSM
     bool alignDone(const Update& event);
 
     /**
-     * Action that has the placing robot kick the ball off the wall to give more space to
-     * dribble
+     * Guard on wether the robot is in position to pick the ball off the wall
      *
      * @param event the BallPlacementPlayFSM Update event
+     * @return whether the robot is in position to begin picking the ball off the wall
      */
     bool wallAlignDone(const Update& event);
 
     /**
      * Guard on whether the placing robot has finished moving the ball into a better
-     * position with a kick
+     * position
      *
      * @param event the BallPlacementPlayFSM Update event
      *
-     * @return whether the kick has been performed
+     * @return whether the pick off has been performed
      */
     bool wallPickOffDone(const Update& event);
 
+    /**
+     * Guard on whether the placing robot has finished moving away from the ball
+     *
+     * @param event the BallPlacementPlayFSM Update event
+     *
+     * @return whether the robot has backed off from the ball
+     */
     bool ballReleased(const Update& event);
 
     /**
