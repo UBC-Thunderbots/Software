@@ -215,6 +215,7 @@ MoveFSM --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
 MoveFSM --> MoveFSM : <i>blockThreat</i>
 MoveFSM --> Terminate:::terminate
 DribbleFSM --> MoveFSM : [!ballNearbyWithoutThreat]\n<i>blockThreat</i>
+DribbleFSM --> DribbleFSM : <i>prepareGetPossession</i>
 Terminate:::terminate --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
 Terminate:::terminate --> MoveFSM : <i>blockThreat</i>
 
