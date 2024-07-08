@@ -32,8 +32,8 @@
  * - A passer
  * - A receiver (for a pass)
  *
- * Tactics are stateful, and use Primitives to implement their behaviour. They also
- * make heavy use of our Evaluation functions in order to help them make decisions.
+ * Tactics are stateful, and use Skills and Primitives to implement their behaviour. They
+ * also make heavy use of our Evaluation functions in order to help them make decisions.
  */
 class Tactic
 {
