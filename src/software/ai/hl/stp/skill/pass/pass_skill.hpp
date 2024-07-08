@@ -3,6 +3,14 @@
 #include "software/ai/hl/stp/skill/base_skill.hpp"
 #include "software/ai/hl/stp/skill/pass/pass_skill_fsm.h"
 
+/**
+ * Base class template for a PassSkill.
+ *
+ * PassSkill finds the best pass on the field and takes the pass by either
+ * kicking or chipping the ball.
+ *
+ * @tparam SHOULD_CHIP whether the PassSkill should chip (true) or kick (false) the ball
+ */
 template <bool SHOULD_CHIP>
 class BasePassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, PivotKickSkillFSM>
 {
@@ -13,11 +21,17 @@ class BasePassSkill : public BaseSkill<PassSkillFSM, DribbleSkillFSM, PivotKickS
                          const SetPrimitiveCallback& set_primitive) override;
 };
 
+/**
+ * PassSkill that will take the pass by kicking the ball.
+ */
 class KickPassSkill : public BasePassSkill<false>
 {
     using BasePassSkill::BasePassSkill;
 };
 
+/**
+ * PassSkill that will take the pass by chipping the ball.
+ */
 class ChipPassSkill : public BasePassSkill<true>
 {
     using BasePassSkill::BasePassSkill;

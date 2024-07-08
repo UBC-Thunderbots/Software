@@ -107,7 +107,7 @@ struct SkillUpdate
     };
 
 /**
- * Defines a Skill FSM action that calls the given event's SetPrimitiveCallback
+ * Defines a FSM action that calls the given event's SetPrimitiveCallback
  * with StopPrimitive.
  */
 #define SET_STOP_PRIMITIVE_ACTION                                                        \

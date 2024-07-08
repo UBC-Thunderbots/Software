@@ -33,7 +33,7 @@ class SupportTacticScorer
      * The javadoc comment for all `update` methods below can be read as:
      * Updates the state of the scorer based on the SupportTacticCandidate it visits
      *
-     * @param candidate the SupportTacticCandidate to visits
+     * @param candidate the SupportTacticCandidate to visit
      */
     void update(const TypedSupportTacticCandidate<SupportTactic> &candidate) = delete;
     virtual void update(const TypedSupportTacticCandidate<ReceiverTactic> &candidate) {}
