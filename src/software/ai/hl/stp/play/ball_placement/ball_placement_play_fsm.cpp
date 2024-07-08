@@ -410,9 +410,9 @@ std::pair<Angle, Point> BallPlacementPlayFSM::calculateWallPickOffLocation(
 void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
 {
     // assign all but one of the robots to line up away from the ball placing robot
-    unsigned int num_move_tactics = event.common.num_tactics - 1;
+    int num_move_tactics = event.common.num_tactics - 1;
 
-    if (num_move_tactics == 0)
+    if (num_move_tactics <= 0)
     {
         return;
     }

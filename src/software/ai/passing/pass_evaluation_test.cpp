@@ -30,7 +30,7 @@ TEST_F(PassEvaluationTest, best_pass_over_entire_field)
 
     std::unordered_map<EighteenZoneId, PassWithRating> passes_with_rating;
 
-    for (EighteenZoneId zone_id : allValuesEighteenZoneId())
+    for (EighteenZoneId zone_id : reflective_enum::values<EighteenZoneId>())
     {
         passes_with_rating.emplace(
             zone_id, PassWithRating{std::move(Pass(Point(0, 0), Point(0, 0), 0)), 0});
@@ -56,7 +56,7 @@ TEST_F(PassEvaluationTest, best_pass_in_zones)
 
     std::unordered_map<EighteenZoneId, PassWithRating> passes_with_rating;
 
-    for (EighteenZoneId zone_id : allValuesEighteenZoneId())
+    for (EighteenZoneId zone_id : reflective_enum::values<EighteenZoneId>())
     {
         passes_with_rating.emplace(
             zone_id, PassWithRating{std::move(Pass(Point(0, 0), Point(0, 0), 0)),
@@ -93,7 +93,7 @@ TEST_F(PassEvaluationTest, get_pitch_division_and_timestamp)
 
     std::unordered_map<EighteenZoneId, PassWithRating> passes_with_rating;
 
-    for (EighteenZoneId zone_id : allValuesEighteenZoneId())
+    for (EighteenZoneId zone_id : reflective_enum::values<EighteenZoneId>())
     {
         passes_with_rating.emplace(
             zone_id, PassWithRating{std::move(Pass(Point(0, 0), Point(0, 0), 0)), 0});
