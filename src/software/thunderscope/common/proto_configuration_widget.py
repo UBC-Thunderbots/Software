@@ -204,7 +204,7 @@ class ProtoConfigurationWidget(QWidget):
 
             self.update_widget()
             # this callback send the proto to unix full system
-            self.on_change_callback(None, None,  self.proto_to_configure)
+            self.on_change_callback(None, None, self.proto_to_configure)
         except Exception as e:
             logging.warning(
                 "cannot load configuration from {}. Error: {} Are you sure it is a configuration proto?".format(
