@@ -9,7 +9,6 @@ from software.simulated_tests.validation import (
 
 
 class BallIsOffGround(Validation):
-
     """Checks if a ball is of ground (i.e. it has air time)"""
 
     def __init__(self, threshold=0.01):

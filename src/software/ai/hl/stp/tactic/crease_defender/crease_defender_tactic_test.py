@@ -61,25 +61,13 @@ def test_crease_positioning(
             ),
         )
 
-        # These aren't necessary for this test, but this is just an example
-        # of how to send commands to the simulator.
-        #
-        # NOTE: The gamecontroller responses are automatically handled by
-        # the gamecontroller context manager class
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
-        )
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
-        )
-
         # Setup Tactic
         params = AssignedTacticPlayControlParams()
 
         params.assigned_tactics[0].crease_defender.CopyFrom(
             CreaseDefenderTactic(
                 enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
-                crease_defender_alignment=2,
+                crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
                 max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
                 ball_steal_mode=BallStealMode.STEAL,
             )
@@ -199,25 +187,13 @@ def test_crease_autochip(
             ),
         )
 
-        # These aren't necessary for this test, but this is just an example
-        # of how to send commands to the simulator.
-        #
-        # NOTE: The gamecontroller responses are automatically handled by
-        # the gamecontroller context manager class
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
-        )
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
-        )
-
         # Setup Tactic
         params = AssignedTacticPlayControlParams()
 
         params.assigned_tactics[0].crease_defender.CopyFrom(
             CreaseDefenderTactic(
                 enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
-                crease_defender_alignment=2,
+                crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
                 max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
                 ball_steal_mode=BallStealMode.STEAL,
             )
@@ -299,25 +275,13 @@ def test_crease_get_ball(
             ),
         )
 
-        # These aren't necessary for this test, but this is just an example
-        # of how to send commands to the simulator.
-        #
-        # NOTE: The gamecontroller responses are automatically handled by
-        # the gamecontroller context manager class
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.STOP, team=Team.UNKNOWN
-        )
-        simulated_test_runner.gamecontroller.send_gc_command(
-            gc_command=Command.Type.FORCE_START, team=Team.BLUE
-        )
-
         # Setup Tactic
         params = AssignedTacticPlayControlParams()
 
         params.assigned_tactics[0].crease_defender.CopyFrom(
             CreaseDefenderTactic(
                 enemy_threat_origin=tbots_cpp.createPointProto(ball_initial_pos),
-                crease_defender_alignment=2,
+                crease_defender_alignment=CreaseDefenderAlignment.CENTRE,
                 max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
                 ball_steal_mode=BallStealMode.STEAL,
             )
