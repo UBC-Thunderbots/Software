@@ -517,7 +517,9 @@ def configure_replay_view(
                     replay_log=blue_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[
-                        configure_robot_view_fullsystem(proto_unix_io_map[ProtoUnixIOTypes.BLUE])
+                        configure_robot_view_fullsystem(
+                            proto_unix_io_map[ProtoUnixIOTypes.BLUE]
+                        )
                     ],
                 ),
             )
@@ -539,7 +541,9 @@ def configure_replay_view(
                     replay_log=yellow_replay_log,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[
-                        configure_robot_view_fullsystem(proto_unix_io_map[ProtoUnixIOTypes.YELLOW])
+                        configure_robot_view_fullsystem(
+                            proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
+                        )
                     ],
                 ),
             )

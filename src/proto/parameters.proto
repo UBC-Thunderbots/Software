@@ -394,8 +394,11 @@ message RobotNavigationObstacleConfig
         [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 
     // Additional amount to inflate ball obstacle by for extra safety
-    required double additional_ball_obstacle_inflation_meters = 5
-        [default = 0.05, (bounds).min_double_value = 0.0, (bounds).max_double_value = 0.5];
+    required double additional_ball_obstacle_inflation_meters = 5 [
+        default                   = 0.05,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 0.5
+    ];
 }
 
 message CostVisualizationConfig

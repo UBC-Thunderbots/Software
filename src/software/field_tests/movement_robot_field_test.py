@@ -150,7 +150,6 @@ def test_one_robots_square(field_test_runner):
         ]
     )
 
-
     # field_test_runner.gamecontroller.send_gc_command(
     #     gc_command=Command.Type.FORCE_START, team=Team.BLUE
     # )

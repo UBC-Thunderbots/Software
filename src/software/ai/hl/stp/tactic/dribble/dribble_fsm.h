@@ -37,8 +37,10 @@ struct DribbleFSM
         // whether to allow excessive dribbling, i.e. more than 1 metre at a time
         bool allow_excessive_dribbling;
         // Max allowed speed mode
-        TbotsProto::MaxAllowedSpeedMode max_speed_dribble = TbotsProto::MaxAllowedSpeedMode::DRIBBLE;
-        TbotsProto::MaxAllowedSpeedMode max_speed_get_possession = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
+        TbotsProto::MaxAllowedSpeedMode max_speed_dribble =
+            TbotsProto::MaxAllowedSpeedMode::DRIBBLE;
+        TbotsProto::MaxAllowedSpeedMode max_speed_get_possession =
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS

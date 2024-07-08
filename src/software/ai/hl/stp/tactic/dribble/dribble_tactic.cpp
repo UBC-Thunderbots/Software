@@ -5,11 +5,12 @@
 DribbleTactic::DribbleTactic(TbotsProto::AiConfig ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
       fsm_map(),
-      control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
-                                               .final_dribble_orientation = std::nullopt,
-                                               .allow_excessive_dribbling = false,
-                                               .max_speed_dribble         = TbotsProto::MaxAllowedSpeedMode::DRIBBLE,
-                                               .max_speed_get_possession  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}},
+      control_params{DribbleFSM::ControlParams{
+          .dribble_destination       = std::nullopt,
+          .final_dribble_orientation = std::nullopt,
+          .allow_excessive_dribbling = false,
+          .max_speed_dribble         = TbotsProto::MaxAllowedSpeedMode::DRIBBLE,
+          .max_speed_get_possession  = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}},
       ai_config(ai_config)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
@@ -19,17 +20,17 @@ DribbleTactic::DribbleTactic(TbotsProto::AiConfig ai_config)
     }
 }
 
-void DribbleTactic::updateControlParams(std::optional<Point> dribble_destination,
-                                        std::optional<Angle> final_dribble_orientation,
-                                        bool allow_excessive_dribbling,
-                                        TbotsProto::MaxAllowedSpeedMode max_speed_dribble,
-                                        TbotsProto::MaxAllowedSpeedMode max_speed_get_possession)
+void DribbleTactic::updateControlParams(
+    std::optional<Point> dribble_destination,
+    std::optional<Angle> final_dribble_orientation, bool allow_excessive_dribbling,
+    TbotsProto::MaxAllowedSpeedMode max_speed_dribble,
+    TbotsProto::MaxAllowedSpeedMode max_speed_get_possession)
 {
     control_params.dribble_destination       = dribble_destination;
     control_params.final_dribble_orientation = final_dribble_orientation;
     control_params.allow_excessive_dribbling = allow_excessive_dribbling;
-    control_params.max_speed_dribble = max_speed_dribble;
-    control_params.max_speed_get_possession = max_speed_get_possession;
+    control_params.max_speed_dribble         = max_speed_dribble;
+    control_params.max_speed_get_possession  = max_speed_get_possession;
 }
 
 void DribbleTactic::accept(TacticVisitor &visitor) const

@@ -2,7 +2,6 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 import sys
-import math
 from proto.ssl_gc_common_pb2 import Team
 from proto.ssl_gc_state_pb2 import Command
 from proto.import_all_protos import *
@@ -31,8 +30,9 @@ def test_ball_placement(field_test_runner):
         ]
     )
 
-    field_test_runner.send_gamecontroller_command(Command.Type.BALL_PLACEMENT, proto.ssl_gc_common_pb2.Team.BLUE,
-                                                  placement_point)
+    field_test_runner.send_gamecontroller_command(
+        Command.Type.BALL_PLACEMENT, proto.ssl_gc_common_pb2.Team.BLUE, placement_point
+    )
     field_test_runner.run_test(
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
