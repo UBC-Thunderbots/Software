@@ -393,6 +393,8 @@ void SensorFusion::updateDistanceDribbledByFriendlyTeam()
     {
         if (robot.isNearDribbler(ball->position()))
         {
+            // Insert only occurs if the map doesn't already contain a value
+            // with the key robot.id()
             ball_contacts_by_friendly_robots.insert(
                 std::make_pair(robot.id(), ball->position()));
         }

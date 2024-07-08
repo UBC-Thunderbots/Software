@@ -19,8 +19,8 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far,
                               const TbotsProto::PassingConfig& passing_config);
 
 /**
- * Returns true if the given robot is being threatened by enemy robots near in
- * proximity to the robot. If true, the robot should move to get far away from
+ * Returns true if the given robot is being threatened by enemy robots close
+ * to the robot. If true, the robot should move to get far away from
  * the enemy robots.
  *
  * @param robot the robot to check

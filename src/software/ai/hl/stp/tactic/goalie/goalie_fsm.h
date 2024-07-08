@@ -147,7 +147,9 @@ struct GoalieFSM
      * Guard that checks whether the goalie has finished retrieving the ball from the dead
      * zone
      *
-     * @param event
+     * @param event GoalieFSM::Update event
+     * 
+     * @return true if the goalie has finished retrieving the ball
      */
     bool retrieveDone(const Update &event);
 
@@ -155,7 +157,8 @@ struct GoalieFSM
      * Action that prompts the goalie to leave the crease momentarily to chip the ball
      * away
      *
-     * @param event
+     * @param event GoalieFSM::Update event
+     * @param processEvent processes the DribbleSkillFSM::Update
      */
     void retrieveFromDeadZone(
         const Update &event,

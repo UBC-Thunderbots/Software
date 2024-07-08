@@ -16,6 +16,9 @@
  * selecting actions with lower Q-values.
  *
  * https://gibberblot.github.io/rl-notes/single-agent/multi-armed-bandits.html#softmax-strategy
+ * 
+ * Softmax visualization:
+ * https://colab.research.google.com/drive/10ogYKW_mswenUXdC_nA4mE1jfa-xrMkH?usp=sharing
  *
  * @tparam TState the type representing the state of the MDP
  * @tparam TAction the type representing the set of actions the agent can execute
@@ -40,6 +43,9 @@ class SoftmaxStrategy : public ActionSelectionStrategy<TState, TAction>
      * Sets the temperature parameter that controls how much we explore and how much we
      * exploit. Higher temperatures lead to more exploration, while lower temperatures
      * favor exploitation of the best-known actions.
+     * 
+     * See below for a visualization of how the temperature affects the output distribution:
+     * https://colab.research.google.com/drive/10ogYKW_mswenUXdC_nA4mE1jfa-xrMkH?usp=sharing
      *
      * @param temperature the new temperature to set, must be > 0
      */

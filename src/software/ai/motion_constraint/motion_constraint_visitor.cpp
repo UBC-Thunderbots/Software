@@ -2,8 +2,6 @@
 
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 
-void MotionConstraintVisitor::visit(const Tactic &tactic) {}
-
 void MotionConstraintVisitor::visit(const GoalieTactic &tactic)
 {
     current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
@@ -66,7 +64,14 @@ void MotionConstraintVisitor::visit(const PlaceBallMoveTactic &tactic)
     current_motion_constraints.clear();
 }
 
+void MotionConstraintVisitor::visit(const AvoidInterferenceTactic &tactic)
+{
+    current_motion_constraints.clear();
+}
+
 void MotionConstraintVisitor::visit(const PassDefenderTactic &tactic) {}
+
+void MotionConstraintVisitor::visit(const SkillTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const KickoffChipSkillTactic &tactic)
 {
@@ -84,11 +89,6 @@ void MotionConstraintVisitor::visit(const PlaceBallSkillTactic &tactic)
 }
 
 void MotionConstraintVisitor::visit(const WallKickoffSkillTactic &tactic)
-{
-    current_motion_constraints.clear();
-}
-
-void MotionConstraintVisitor::visit(const AvoidInterferenceTactic &tactic)
 {
     current_motion_constraints.clear();
 }

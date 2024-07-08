@@ -185,8 +185,9 @@ class Play
     // The Play's knowledge of the most up-to-date World
     std::optional<WorldPtr> world_ptr_;
 
+    // Counter that keeps track of the latest Primitive sequence number
     uint64_t sequence_number = 0;
 
-    bool should_reset;
+    // Creates obstacles for a robot given some motion constraints
     RobotNavigationObstacleFactory obstacle_factory;
 };

@@ -103,7 +103,8 @@ class TypeMap
         // have completely different static variables `id` instantiated to
         // different values. Here, `id` is instantiated to whatever the global
         // type id counter was at the time of the template instantiation.
-        static const int id = type_id_counter_++;
+        static const int id = type_id_counter_;
+        ++type_id_counter_;
         return id;
     }
 };

@@ -394,7 +394,7 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
 
 std::unique_ptr<TbotsProto::AttackerVisualization> createAttackerVisualization(
     const std::optional<Pass>& pass, const bool pass_committed,
-    const std::optional<Shot>& shot, const std::optional<Point>& balls_position,
+    const std::optional<Shot>& shot, const std::optional<Point>& ball_position,
     const std::optional<Point>& chip_target)
 {
     auto pass_visualization_msg = std::make_unique<TbotsProto::AttackerVisualization>();
@@ -410,10 +410,10 @@ std::unique_ptr<TbotsProto::AttackerVisualization> createAttackerVisualization(
 
     pass_visualization_msg->set_pass_committed(pass_committed);
 
-    if (shot.has_value() && balls_position.has_value())
+    if (shot.has_value() && ball_position.has_value())
     {
         TbotsProto::Shot shot_msg;
-        *(shot_msg.mutable_shot_origin()) = *createPointProto(balls_position.value());
+        *(shot_msg.mutable_shot_origin()) = *createPointProto(ball_position.value());
         *(shot_msg.mutable_shot_target()) = *createPointProto(shot->getPointToShootAt());
         *(shot_msg.mutable_open_angle())  = *createAngleProto(shot->getOpenAngle());
         *(pass_visualization_msg->mutable_shot()) = shot_msg;

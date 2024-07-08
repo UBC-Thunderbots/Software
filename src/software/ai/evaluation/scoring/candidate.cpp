@@ -1,6 +1,7 @@
 #include "software/ai/evaluation/scoring/candidate.h"
 
 #include <numeric>
+#include <cmath>
 
 #include "software/math/math_functions.h"
 
@@ -40,7 +41,7 @@ void Candidate::computeTotalScore()
     double sum = std::accumulate(
         scores_.begin(), scores_.end(), 0.0, [](double current_sum, double score) {
             double term = std::pow(std::abs(score), 1.0 / SINGLE_SCORE_INFLUENCE);
-            return current_sum + signum(score) * term;
+            return current_sum + std::copysign(1.0, score) * term;
         });
 
     double num_scores = static_cast<double>(scores_.size());

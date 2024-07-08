@@ -64,7 +64,7 @@ double AttackerMdpRewardFunction::endStepObservation(WorldPtr world_ptr)
                                     0.0, world_ptr->field().xLength(), 0.0,
                                     reward_function_config.forward_progress_reward());
 
-    // TODO: Reward enemy team fouls, penalize friendly team fouls
+    // TODO (#3247): Reward enemy team fouls, penalize friendly team fouls
 
     return reward;
 }

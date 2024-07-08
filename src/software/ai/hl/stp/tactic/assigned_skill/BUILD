@@ -11,8 +11,8 @@ cc_library(
 )
 
 cc_library(
-    name = "assigned_skill_tactic_copies",
-    hdrs = ["assigned_skill_tactic_copies.h"],
+    name = "specialized_assigned_skill_tactics",
+    hdrs = ["specialized_assigned_skill_tactics.h"],
     deps = [
         ":assigned_skill_tactic",
         "//software/ai/hl/stp/skill:all_skills",

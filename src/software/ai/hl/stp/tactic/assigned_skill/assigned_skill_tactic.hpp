@@ -5,6 +5,14 @@
 #include "software/util/is_template_base_of/is_template_base_of.hpp"
 
 /**
+ * All AssignedSkillTactics inherit from SkillTactic so that they
+ * share a common non-template base class.
+ */
+class SkillTactic
+{
+};
+
+/**
  * Implements a Tactic that executes a Skill.
  *
  * The AssignedSkillTactic can be used in simulated gameplay tests, field tests, or set
@@ -13,7 +21,7 @@
  * @tparam TSkill the Skill to execute (must inherit BaseSkill)
  */
 template <typename TSkill>
-class AssignedSkillTactic : public Tactic
+class AssignedSkillTactic : public Tactic, public SkillTactic
 {
     static_assert(is_template_base_of<BaseSkill, TSkill>::value,
                   "TSkill must derive from an instantiation of the BaseSkill template");

@@ -220,14 +220,14 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
  * @param pass An optional pass to visualize
  * @param pass_committed Whether we are committed to taking the pass
  * @param shot An optional shot to visualize
- * @param balls_position The current position of the ball used to visualize the shot
+ * @param ball_position The current position of the ball used to visualize the shot
  * @param chip_target An optional target that we are chipping to
  *
  * @return The unique_ptr to an AttackerVisualization proto
  */
 std::unique_ptr<TbotsProto::AttackerVisualization> createAttackerVisualization(
     const std::optional<Pass>& pass, bool pass_committed, const std::optional<Shot>& shot,
-    const std::optional<Point>& balls_position, const std::optional<Point>& chip_target);
+    const std::optional<Point>& ball_position, const std::optional<Point>& chip_target);
 
 /**
  * Returns the WorldStateReceivedTrigger given the world state received trigger

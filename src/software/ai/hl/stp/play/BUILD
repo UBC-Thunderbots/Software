@@ -71,7 +71,7 @@ cc_library(
         ":play",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic_copies",
+        "//software/ai/hl/stp/tactic/assigned_skill:specialized_assigned_skill_tactics",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
         "//software/util/generic_factory",
