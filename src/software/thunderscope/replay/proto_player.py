@@ -470,7 +470,7 @@ class ProtoPlayer:
 
             # Only play if we are playing
             if not self.is_playing:
-                time.sleep(self.PLAY_PAUSE_POLL_INTERVAL_SECONDS)
+                time.sleep(ProtoPlayer.PLAY_PAUSE_POLL_INTERVAL_SECONDS)
                 continue
 
             # Check if replay has ended and stop playing if so

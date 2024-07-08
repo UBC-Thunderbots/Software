@@ -105,13 +105,17 @@ void ProtoLogger::logProtobufs()
             // Check if write was successful
             if (num_bytes_written != static_cast<int>(log_entry.size()))
             {
-                if (num_failed_logs_++ % FAILED_LOG_PRINT_FREQUENCY == 0)
+                // Only log every FAILED_LOG_PRINT_FREQUENCY times to avoid
+                // spamming the console if the error persists.
+                if (failed_logs_frequency_counter_ == 0)
                 {
                     std::cerr << "ProtoLogger: Failed to write " << proto_full_name
                               << " to log file: " << log_file_path << " "
-                              << std::to_string(num_failed_logs_) << " times"
-                              << std::endl;
+                              << std::to_string(failed_logs_frequency_counter_)
+                              << " times" << std::endl;
                 }
+                failed_logs_frequency_counter_ =
+                    (failed_logs_frequency_counter_ + 1) % FAILED_LOG_PRINT_FREQUENCY;
             }
 
             // Limit the size of each replay chunk

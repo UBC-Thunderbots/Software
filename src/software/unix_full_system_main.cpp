@@ -122,7 +122,7 @@ int main(int argc, char** argv)
         {
             // Update the time provider for ProtoLogger
             proto_logger->updateTimeProvider(
-                boost::bind(&UnixSimulatorBackend::getLastWorldTimeSec, backend));
+                [&backend]() { return backend->getLastWorldTimeSec(); });
         }
 
         auto sensor_fusion =

@@ -135,7 +135,7 @@ class ProtoLogger
     std::function<double()> time_provider_;
     double start_time_;
     bool friendly_colour_yellow_;
-    unsigned long int num_failed_logs_ = 0;
+    unsigned int failed_logs_frequency_counter_ = 0;
 
     std::thread log_thread_;
     std::atomic<bool> stop_logging_;
