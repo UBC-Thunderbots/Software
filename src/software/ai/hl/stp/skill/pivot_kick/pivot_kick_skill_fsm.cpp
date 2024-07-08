@@ -33,19 +33,34 @@ bool PivotKickSkillFSM::lostBallControl(const Update& event)
     const auto& ai_config         = event.common.strategy->getAiConfig();
     const auto& pivot_kick_config = ai_config.pivot_kick_config();
 
+    const Ball& ball = event.common.world_ptr->ball();
+
+    // Ball must be away from dribbler for it to be out of our control
+    if (event.common.robot.isNearDribbler(
+            ball.position(), pivot_kick_config.lose_ball_control_distance_threshold()))
+    {
+        return false;
+    }
+
     const Timestamp current_time = event.common.world_ptr->getMostRecentTimestamp();
     const Duration time_since_kick_start = current_time - kick_start_time_;
+
     const Duration lose_ball_control_time_threshold =
         Duration::fromSeconds(pivot_kick_config.lose_ball_control_time_threshold());
-
-    const Ball& ball = event.common.world_ptr->ball();
     const double ball_is_kicked_m_per_s_threshold =
         ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
 
-    return time_since_kick_start >= lose_ball_control_time_threshold &&
-           ball.velocity().length() <= ball_is_kicked_m_per_s_threshold &&
-           !event.common.robot.isNearDribbler(
-               ball.position(), pivot_kick_config.lose_ball_control_distance_threshold());
+    // Ball must be still for a period of time since the kick attempt started
+    // for it to be considered out of our control; otherwise we might consider 
+    // kicked balls as out of our control
+    if (time_since_kick_start < lose_ball_control_time_threshold ||
+        ball.velocity().length() > ball_is_kicked_m_per_s_threshold)
+    {
+        return false;
+    }
+
+    // Ball is out of our control
+    return true;
 }
 
 bool PivotKickSkillFSM::ballKicked(const Update& event)
@@ -62,9 +77,4 @@ bool PivotKickSkillFSM::ballKicked(const Update& event)
         return !event.common.robot.isNearDribbler(
             event.common.world_ptr->ball().position(), ROBOT_MAX_RADIUS_METERS);
     }
-}
-
-bool PivotKickSkillFSM::retryKickAllowed(const Update& event)
-{
-    return event.control_params.retry_kick;
 }

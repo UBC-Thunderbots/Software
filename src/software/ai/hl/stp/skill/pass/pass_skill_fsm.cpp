@@ -146,8 +146,7 @@ void PassSkillFSM::takePass(
     PivotKickSkillFSM::ControlParams control_params = {
         .kick_origin       = ball_position,
         .kick_direction    = (kick_target - ball_position).orientation(),
-        .auto_chip_or_kick = auto_chip_or_kick,
-        .retry_kick        = false};
+        .auto_chip_or_kick = auto_chip_or_kick};
 
     processEvent(PivotKickSkillFSM::Update(control_params, event.common));
 

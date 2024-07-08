@@ -65,6 +65,3 @@ struct TacticUpdate
                 getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));      \
         return state_str;                                                                \
     }
-
-#define SET_STOP_PRIMITIVE_ACTION                                                        \
-    [this](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>()); }
