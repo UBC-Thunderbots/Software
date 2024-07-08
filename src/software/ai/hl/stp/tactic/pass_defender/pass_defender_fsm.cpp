@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 bool PassDefenderFSM::passStarted(const Update& event)
 {
@@ -113,9 +113,9 @@ bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
     Point ball_position  = event.common.world_ptr->ball().position();
 
     std::optional<Robot> nearest_friendly_to_ball =
-            event.common.world_ptr->friendlyTeam().getNearestRobot(ball_position);
+        event.common.world_ptr->friendlyTeam().getNearestRobot(ball_position);
     std::optional<Robot> nearest_enemy_to_ball =
-            event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
+        event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
     if (event.control_params.ball_steal_mode == TbotsProto::BallStealMode::IGNORE)
     {
         // Do nothing if stealing is disabled
@@ -130,18 +130,20 @@ bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
     }
     if (nearest_enemy_to_ball.has_value())
     {
-        // Get the ball if ball is closer to robot than enemy threat by threshold ratio and within max range
-        double ball_distance_to_friendly =
-                distance(robot_position, ball_position);
+        // Get the ball if ball is closer to robot than enemy threat by threshold ratio
+        // and within max range
+        double ball_distance_to_friendly = distance(robot_position, ball_position);
         double ball_distance_to_enemy =
-                distance(nearest_enemy_to_ball.value().position(), ball_position);
+            distance(nearest_enemy_to_ball.value().position(), ball_position);
 
-        bool ball_is_near_friendly = ball_distance_to_friendly
-                < ball_distance_to_enemy * (1.0 - pass_defender_config.max_get_ball_ratio_threshold());
+        bool ball_is_near_friendly =
+            ball_distance_to_friendly <
+            ball_distance_to_enemy *
+                (1.0 - pass_defender_config.max_get_ball_ratio_threshold());
         bool ball_is_within_max_range =
-                ball_distance_to_friendly <= pass_defender_config.max_get_ball_radius_m();
-        bool ball_is_slow = event.common.world_ptr->ball().velocity().length()
-                <= pass_defender_config.max_ball_speed_to_get_m_per_s();
+            ball_distance_to_friendly <= pass_defender_config.max_get_ball_radius_m();
+        bool ball_is_slow = event.common.world_ptr->ball().velocity().length() <=
+                            pass_defender_config.max_ball_speed_to_get_m_per_s();
 
         return ball_is_near_friendly && ball_is_within_max_range && ball_is_slow;
     }
@@ -152,14 +154,14 @@ bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 }
 
 void PassDefenderFSM::prepareGetPossession(
-        const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
-    Point ball_position       = event.common.world_ptr->ball().position();
-    Point enemy_goal_center   = event.common.world_ptr->field().enemyGoal().centre();
+    Point ball_position     = event.common.world_ptr->ball().position();
+    Point enemy_goal_center = event.common.world_ptr->field().enemyGoal().centre();
     auto ball_to_net_vector = Vector(enemy_goal_center - ball_position);
     DribbleFSM::ControlParams control_params{
-            .dribble_destination       = ball_position,
-            .final_dribble_orientation = ball_to_net_vector.orientation(),
-            .allow_excessive_dribbling = false};
+        .dribble_destination       = ball_position,
+        .final_dribble_orientation = ball_to_net_vector.orientation(),
+        .allow_excessive_dribbling = false};
     processEvent(DribbleFSM::Update(control_params, event.common));
 }

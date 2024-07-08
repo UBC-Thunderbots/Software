@@ -36,7 +36,8 @@ void DefensePlayFSMBase::setUpPassDefenders(int num_pass_defenders)
 }
 
 void DefensePlayFSMBase::updatePassDefenderControlParams(
-    std::vector<DefenderAssignment>& pass_defender_assignments, TbotsProto::BallStealMode ball_steal_mode)
+    std::vector<DefenderAssignment>& pass_defender_assignments,
+    TbotsProto::BallStealMode ball_steal_mode)
 {
     for (unsigned int i = 0; i < pass_defenders.size(); i++)
     {

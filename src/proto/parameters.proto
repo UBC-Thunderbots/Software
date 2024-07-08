@@ -42,7 +42,7 @@ message AiConfig
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
     required AiParameterConfig ai_parameter_config                          = 13;
 
-    required PassDefenderConfig pass_defender_config                    = 14;
+    required PassDefenderConfig pass_defender_config = 14;
 }
 
 message AiControlConfig
@@ -445,15 +445,18 @@ message PassDefenderConfig
     pass defender to chase ball.
     Threshold = 1.0 results in pass defenders chasing the ball even ball is equidistant to
     nearest enemy.
-    Threshold < 1.0 results in pass defenders chasing the ball only when it is at least (threshold) percent
-    closer to our bot than the nearest enemy.
+    Threshold < 1.0 results in pass defenders chasing the ball only when it is at least
+    (threshold) percent closer to our bot than the nearest enemy.
     ┌──────────────────────────────────────────┐
     | Pass   | <────> Ball <───────────> Enemy |
     |       ()         x                  ()   |
     └──────────────────────────────────────────┘
      */
-    required double max_get_ball_ratio_threshold = 1
-        [default = 0.3, (bounds).min_double_value = 0.01, (bounds).max_double_value = 1.0];
+    required double max_get_ball_ratio_threshold = 1 [
+        default                   = 0.3,
+        (bounds).min_double_value = 0.01,
+        (bounds).max_double_value = 1.0
+    ];
     // Max distance that the pass defender will try and get possession of a ball
     required double max_get_ball_radius_m = 2
         [default = 1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];

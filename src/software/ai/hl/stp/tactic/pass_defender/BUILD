@@ -17,9 +17,9 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic:move_primitive",
+        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
     ],
 )
 
