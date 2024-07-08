@@ -1,13 +1,10 @@
 #pragma once
 
+#include "software/embedded/gpio.h"
+
 #include <unistd.h>
 
-#include "software/util/make_enum/make_enum.h"
-
-MAKE_ENUM(GpioState, LOW, HIGH);
-MAKE_ENUM(GpioDirection, INPUT, OUTPUT);
-
-class GpioCharDev
+class GpioCharDev: Gpio
 {
    public:
     /**
@@ -31,12 +28,12 @@ class GpioCharDev
      *
      * @param state The state
      */
-    void setValue(GpioState state);
+    void setValue(GpioState state) override;
 
     /**
      * Get the current state of the gpio
      */
-    GpioState getValue(void);
+    GpioState getValue(void) override;
 
    private:
     /**
@@ -46,8 +43,6 @@ class GpioCharDev
      * @return The number representation of the state
      */
     uint8_t parseGpioState(GpioState state);
-
-    static const std::string CHAR_DEV_PATH = "/dev/gpiochip4";
 
     int gpio_fd;  // File descriptor for the gpio
 };

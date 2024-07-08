@@ -38,7 +38,10 @@ cc_library(
 cc_library(
     name = "gpio",
     srcs = ["gpio_char_dev.cpp"],
-    hdrs = ["gpio_char_dev.h"],
+    hdrs = [
+        "gpio.h",
+        "gpio_char_dev.h"
+    ],
     deps = [
         "//software/logger",
         "//software/logger:network_logger",
