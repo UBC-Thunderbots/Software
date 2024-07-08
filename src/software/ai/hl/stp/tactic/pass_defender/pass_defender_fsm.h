@@ -87,7 +87,7 @@ struct PassDefenderFSM
      *
      * @param event PassDefenderFSM::Update event
      *
-     * @return true if stealing is enabled and the ball is on friendly side, nearby, unguarded by the enemy up,
+     * @return true if stealing is enabled and the ball is nearby, unguarded by the enemy,
      *          and within a max get possession threshold
      */
     bool ballNearbyWithoutThreat(const Update& event);
@@ -128,7 +128,7 @@ struct PassDefenderFSM
             InterceptBallState_S + Update_E[ballDeflected_G] / blockPass_A =
                 BlockPassState_S,
             InterceptBallState_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
-            DribbleFSM_S,
+                DribbleFSM_S,
             DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockPass_A =
                 BlockPassState_S,
             DribbleFSM_S + Update_E / prepareGetPossession_A,

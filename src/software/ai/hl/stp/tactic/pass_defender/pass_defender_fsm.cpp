@@ -112,44 +112,34 @@ bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
     Point robot_position = event.common.robot.position();
     Point ball_position  = event.common.world_ptr->ball().position();
 
-    std::optional<Robot> nearest_friendly =
+    std::optional<Robot> nearest_friendly_to_ball =
             event.common.world_ptr->friendlyTeam().getNearestRobot(ball_position);
-    std::optional<Robot> nearest_enemy =
+    std::optional<Robot> nearest_enemy_to_ball =
             event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
     if (event.control_params.ball_steal_mode == TbotsProto::BallStealMode::IGNORE)
     {
         // Do nothing if stealing is disabled
         return false;
     }
-    else if (nearest_friendly.has_value() &&
-             event.common.robot.id() != nearest_friendly.value().id())
+    else if (nearest_friendly_to_ball.has_value() &&
+             event.common.robot.id() != nearest_friendly_to_ball.value().id())
     {
         // Do nothing if this robot is not the closest to the ball. Resolves issue of
         // multiple simultaneous steals
         return false;
     }
-    if (nearest_enemy.has_value())
+    if (nearest_enemy_to_ball.has_value())
     {
         // Get the ball if ball is closer to robot than enemy threat by threshold ratio and within max range
-        double ball_distance =
-                distance(robot_position, event.common.world_ptr->ball().position());
-        double nearest_enemy_distance =
-                distance(robot_position, nearest_enemy->position());
+        double ball_distance_to_friendly =
+                distance(robot_position, ball_position);
+        double ball_distance_to_enemy =
+                distance(nearest_enemy_to_ball.value().position(), ball_position);
 
-        LOG(VISUALIZE) << *createDebugShapes({
-                 *createDebugShape(
-                         Circle(robot_position,
-                                std::min(nearest_enemy_distance * pass_defender_config.max_get_ball_ratio_threshold(),
-                                         pass_defender_config.max_get_ball_radius_m())),
-                         std::to_string(event.common.robot.id()) + "1",
-                         "ballgetzone"
-                 )
-         });
-
-        bool ball_is_near_friendly =
-                ball_distance < nearest_enemy_distance * pass_defender_config.max_get_ball_ratio_threshold();
+        bool ball_is_near_friendly = ball_distance_to_friendly
+                < ball_distance_to_enemy * (1.0 - pass_defender_config.max_get_ball_ratio_threshold());
         bool ball_is_within_max_range =
-                ball_distance <= pass_defender_config.max_get_ball_radius_m();
+                ball_distance_to_friendly <= pass_defender_config.max_get_ball_radius_m();
         bool ball_is_slow = event.common.world_ptr->ball().velocity().length()
                 <= pass_defender_config.max_ball_speed_to_get_m_per_s();
 
