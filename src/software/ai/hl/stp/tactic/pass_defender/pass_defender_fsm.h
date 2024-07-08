@@ -130,7 +130,8 @@ struct PassDefenderFSM
             InterceptBallState_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
             DribbleFSM_S,
             DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockPass_A =
-                    BlockPassState_S,
+                BlockPassState_S,
+            DribbleFSM_S + Update_E / prepareGetPossession_A,
             InterceptBallState_S + Update_E / interceptBall_A,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }

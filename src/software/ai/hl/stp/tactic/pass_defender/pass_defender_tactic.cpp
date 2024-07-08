@@ -13,7 +13,7 @@ PassDefenderTactic::PassDefenderTactic(TbotsProto::AiConfig ai_config)
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<PassDefenderFSM>>(
-                PassDefenderFSM(),
+                PassDefenderFSM(ai_config),
                 DribbleFSM(ai_config.dribble_tactic_config()));
     }
 }
@@ -37,21 +37,9 @@ void PassDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<PassDefenderFSM>>(
-                PassDefenderFSM(),
+                PassDefenderFSM(ai_config),
                 DribbleFSM(ai_config.dribble_tactic_config()));
     }
-    Point ball_position       = tactic_update.world_ptr->ball().position();
-    Point enemy_goal_center   = tactic_update.world_ptr->field().enemyGoal().centre();
-    Vector ball_to_net_vector = Vector(enemy_goal_center.x() - ball_position.x(),
-                                       enemy_goal_center.y() - ball_position.y());
-    DribbleFSM::ControlParams dribble_control_params{
-            .dribble_destination       = ball_position,
-            .final_dribble_orientation = ball_to_net_vector.orientation(),
-            .allow_excessive_dribbling = false};
-
-
     fsm_map.at(tactic_update.robot.id())
         ->process_event(PassDefenderFSM::Update(control_params, tactic_update));
-    fsm_map.at(tactic_update.robot.id())
-            ->process_event(DribbleFSM::Update(dribble_control_params, tactic_update));
 }

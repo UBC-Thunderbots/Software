@@ -57,9 +57,10 @@ class DefensePlayFSMBase
      * Helper function to update all given pass defender control params
      *
      * @param pass_defender_assignments pass defender assignments to be updated
+     * @param ball_steal_mode The pass defender's aggressiveness towards the ball
      */
     void updatePassDefenderControlParams(
-        std::vector<DefenderAssignment> &pass_defender_assignments);
+        std::vector<DefenderAssignment> &pass_defender_assignments, TbotsProto::BallStealMode ball_steal_mode);
 
     TbotsProto::AiConfig ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
