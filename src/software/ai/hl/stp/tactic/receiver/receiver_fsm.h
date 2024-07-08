@@ -111,6 +111,17 @@ struct ReceiverFSM
     void adjustReceive(const Update& event);
 
     /**
+     * Retrieves the ball using DribbleSkillFSM.
+     * The interception algorithm used by DribbleSkillFSM works well for balls
+     * that are not moving or went astray from the intended pass.
+     *
+     * @param event ReceiverFSM::Update event
+     * @param processEvent processes the DribbleSkillFSM::Update
+     */
+    void retrieveBall(const Update& event,
+                      boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
+
+    /**
      * Guard that checks if the ball has been kicked
      *
      * @param event ReceiverFSM::Update event
@@ -147,13 +158,24 @@ struct ReceiverFSM
      */
     bool strayPass(const Update& event);
 
+    /**
+     * Guard that checks if the pass went astray or if the ball is slowing down.
+     *
+     * @param event ReceiverFSM::Update event
+     *
+     * @return true if the pass went astray or if the ball is slowing down
+     */
+    bool strayOrSlowPass(const Update& event);
+
     auto operator()()
     {
         using namespace boost::sml;
 
+        DEFINE_SML_STATE(WaitingForPassState)
         DEFINE_SML_STATE(ReceiveAndDribbleState)
         DEFINE_SML_STATE(OneTouchShotState)
-        DEFINE_SML_STATE(WaitingForPassState)
+        DEFINE_SML_STATE(DribbleSkillFSM)
+
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(onetouchPossible)
@@ -161,10 +183,12 @@ struct ReceiverFSM
         DEFINE_SML_GUARD(passReceived)
         DEFINE_SML_GUARD(passReceivedByTeammate)
         DEFINE_SML_GUARD(strayPass)
+        DEFINE_SML_GUARD(strayOrSlowPass)
 
         DEFINE_SML_ACTION(updateOnetouch)
         DEFINE_SML_ACTION(updateReceive)
         DEFINE_SML_ACTION(adjustReceive)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(retrieveBall, DribbleSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
@@ -173,15 +197,24 @@ struct ReceiverFSM
                                         updateOnetouch_A = OneTouchShotState_S,
             WaitingForPassState_S + Update_E[passStarted_G && !onetouchPossible_G] /
                                         updateReceive_A = ReceiveAndDribbleState_S,
+
             ReceiveAndDribbleState_S + Update_E[passReceivedByTeammate_G] /
                                            updateReceive_A = WaitingForPassState_S,
+            ReceiveAndDribbleState_S + Update_E[strayOrSlowPass_G] / retrieveBall_A =
+                DribbleSkillFSM_S,
             ReceiveAndDribbleState_S + Update_E / adjustReceive_A,
+
+            DribbleSkillFSM_S + Update_E[passReceivedByTeammate_G] / updateReceive_A =
+                WaitingForPassState_S,
+            DribbleSkillFSM_S + Update_E / retrieveBall_A,
+
             OneTouchShotState_S +
                 Update_E[!passReceived_G && !strayPass_G] / updateOnetouch_A,
             OneTouchShotState_S + Update_E[!passReceived_G && strayPass_G] /
                                       adjustReceive_A = ReceiveAndDribbleState_S,
             OneTouchShotState_S + Update_E[passReceived_G] / updateOnetouch_A =
                 WaitingForPassState_S,
+
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 

@@ -316,3 +316,37 @@ TEST_F(DribbleSkillTest, test_running_into_enemy_robot_knocking_ball_away)
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(20));
 }
+
+TEST_F(DribbleSkillTest, test_robot_not_bumping_ball_when_turning_around)
+{
+    // The ball is placed right behind the friendly robot. Verify that the robot
+    // does not bump the ball away when turning around to dribble it.
+    RobotStateWithId friendly_robot{
+        .id          = 1,
+        .robot_state = RobotState(Point(-1, 0), Vector(0, 0), Angle::half(),
+                                  AngularVelocity::zero())};
+    BallState initial_ball_state(Point(-1 + ROBOT_MAX_RADIUS_METERS, 0),
+                                 Vector(0.0, 0.0));
+
+    auto tactic = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
+    setTactic(1, tactic, motion_constraints);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [this, tactic](std::shared_ptr<World> world_ptr,
+                       ValidationCoroutine::push_type& yield) {
+            checkPossession(tactic, world_ptr, yield);
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            while (distance(world_ptr->ball().position(), initial_ball_state.position()) >
+                   0.05)
+            {
+                yield("Robot bumped the ball away while turning around");
+            }
+        }};
+
+    runTest(field_type, initial_ball_state, {friendly_robot}, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
+}

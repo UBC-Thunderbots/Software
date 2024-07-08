@@ -161,19 +161,10 @@ void ReceiverFSM::adjustReceive(const Update& event)
     const Ball& ball   = event.common.world_ptr->ball();
     const Robot& robot = event.common.robot;
 
-    auto face_ball_orientation = (ball.position() - robot.position()).orientation();
+    Angle face_ball_orientation = (ball.position() - robot.position()).orientation();
 
-    Point intercept_position;
-    if (strayPass(event) || ball.velocity().length() <= MIN_STRAY_PASS_SPEED)
-    {
-        intercept_position =
-            findInterceptionPoint(robot, ball, event.common.world_ptr->field());
-    }
-    else
-    {
-        intercept_position = closestPoint(
-            robot.position(), Line(ball.position(), ball.position() + ball.velocity()));
-    }
+    Point intercept_position = closestPoint(
+        robot.position(), Line(ball.position(), ball.position() + ball.velocity()));
 
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, intercept_position, face_ball_orientation,
@@ -181,6 +172,23 @@ void ReceiverFSM::adjustReceive(const Update& event)
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
+}
+
+void ReceiverFSM::retrieveBall(
+    const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
+{
+    const Ball& ball   = event.common.world_ptr->ball();
+    const Robot& robot = event.common.robot;
+
+    DribbleSkillFSM::ControlParams control_params{
+        .dribble_destination       = ball.position(),
+        .final_dribble_orientation = (ball.position() - robot.position()).orientation(),
+        .allow_excessive_dribbling = false,
+    };
+
+    processEvent(DribbleSkillFSM::Update(
+        control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy_,
+                                    event.common.set_primitive)));
 }
 
 bool ReceiverFSM::passStarted(const Update& event)
@@ -235,4 +243,10 @@ bool ReceiverFSM::strayPass(const Update& event)
         orientation_difference > MIN_STRAY_PASS_ANGLE;
 
     return stray_pass;
+}
+
+bool ReceiverFSM::strayOrSlowPass(const Update& event)
+{
+    return strayPass(event) ||
+           event.common.world_ptr->ball().velocity().length() <= MIN_STRAY_PASS_SPEED;
 }
