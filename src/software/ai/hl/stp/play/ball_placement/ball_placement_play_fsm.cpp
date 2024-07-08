@@ -54,7 +54,7 @@ void BallPlacementPlayFSM::pickOffWall(const BallPlacementPlayFSM::Update &event
     tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
                              move_tactics.end());
 
-    pickoff_wall_tactic->updateControlParams(pickoff_destination, pickoff_final_orientation, true, TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE);
+    pickoff_wall_tactic->updateControlParams(pickoff_destination, pickoff_final_orientation, true, TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE, TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE);
 
     tactics_to_run[0].emplace_back(pickoff_wall_tactic);
 
@@ -115,7 +115,7 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
         align_placement_tactic->updateControlParams(
             setup_point, setup_angle, 0.0, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
             TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
 
         tactics_to_run[0].emplace_back(align_placement_tactic);
