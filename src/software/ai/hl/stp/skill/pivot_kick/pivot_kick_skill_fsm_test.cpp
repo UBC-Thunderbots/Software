@@ -39,10 +39,10 @@ TEST(PivotKickSkillFSMTest, test_transitions)
     fsm.process_event(PivotKickSkillFSM::Update(
         control_params,
         SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
-    
+
     // Transition to KickStartState
     EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickSkillFSM::KickStartState>));
-    
+
     // Transition to KickState
     fsm.process_event(PivotKickSkillFSM::Update(
         control_params,

@@ -72,8 +72,9 @@ void BaseSkill<TSkillFSM, TSkillSubFSMs...>::updatePrimitive(
     fsm_map_.at(robot.id())
         ->process_event(typename TSkillFSM::Update(
             control_params_, SkillUpdate(robot, world_ptr, strategy_, set_primitive,
-                                         [&](const SkillState& skill_state)
-                                         { skill_state_ = skill_state; })));
+                                         [&](const SkillState& skill_state) {
+                                             skill_state_ = skill_state;
+                                         })));
 }
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>
@@ -97,8 +98,8 @@ concept HasSuspendedState = requires
 };
 
 template <typename TSkillFSM, typename... TSkillSubFSMs>
-bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::suspended(
-    [[maybe_unused]] const RobotId robot_id) const
+bool BaseSkill<TSkillFSM, TSkillSubFSMs...>::suspended([
+    [maybe_unused]] const RobotId robot_id) const
 {
     // Check at compile time that type TSkillFSM::Suspended exists
     if constexpr (HasSuspendedState<TSkillFSM>)

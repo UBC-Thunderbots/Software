@@ -213,7 +213,8 @@ TEST_F(PlaySelectionFSMTest, test_transition_between_ball_placement_and_free_kic
 
     // Stop
     game_state.updateRefereeCommand(RefereeCommand::STOP);
-    world_ptr->updateGameState(game_state);;
+    world_ptr->updateGameState(game_state);
+    ;
     fsm->process_event(PlaySelectionFSM::Update(
         [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world_ptr));
     EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::StopState>));

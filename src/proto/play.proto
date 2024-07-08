@@ -6,20 +6,20 @@ enum PlayName
 {
     reserved 2, 5, 6, 10, 16;
 
-    UseAiSelection             = 1;
-    KickoffFriendlyPlay        = 3;
-    KickoffEnemyPlay           = 18;
-    FreeKickPlay               = 15;
-    EnemyFreeKickPlay          = 9;
-    PenaltyKickPlay            = 14;
-    PenaltyKickEnemyPlay       = 13;
-    BallPlacementPlay          = 7;
-    EnemyBallPlacementPlay     = 12;
-    OffensePlay                = 4;
-    DefensePlay                = 11;
-    HaltPlay                   = 8;
-    StopPlay                   = 17;
-    AssignedTacticsPlay        = 19;
+    UseAiSelection         = 1;
+    KickoffFriendlyPlay    = 3;
+    KickoffEnemyPlay       = 18;
+    FreeKickPlay           = 15;
+    EnemyFreeKickPlay      = 9;
+    PenaltyKickPlay        = 14;
+    PenaltyKickEnemyPlay   = 13;
+    BallPlacementPlay      = 7;
+    EnemyBallPlacementPlay = 12;
+    OffensePlay            = 4;
+    DefensePlay            = 11;
+    HaltPlay               = 8;
+    StopPlay               = 17;
+    AssignedTacticsPlay    = 19;
 }
 
 message Play

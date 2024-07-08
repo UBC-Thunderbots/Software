@@ -4,8 +4,8 @@
 #include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 
 // The COPY_TACTIC macro doesn't support class template instantiations
-// as the parent class, so we need to create a type alias for each 
-// AssignedSkillTactic instantiation.  
+// as the parent class, so we need to create a type alias for each
+// AssignedSkillTactic instantiation.
 
 using ChipSkillTactic = AssignedSkillTactic<ChipSkill>;
 COPY_TACTIC(KickoffChipSkillTactic, ChipSkillTactic);

@@ -25,10 +25,10 @@ cc_library(
 cc_library(
     name = "skill_state",
     hdrs = ["skill_state.h"],
-    deps = [        
-        "//software/ai/passing:pass",
+    deps = [
         "//software/ai/evaluation:shot",
-    ]
+        "//software/ai/passing:pass",
+    ],
 )
 
 cc_library(

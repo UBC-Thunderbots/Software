@@ -242,7 +242,9 @@ def configure_base_fullsystem(
         ),
         TScopeWidget(
             name="Q-Learning Info",
-            widget=setup_q_learning_info(**{"proto_unix_io": full_system_proto_unix_io}),
+            widget=setup_q_learning_info(
+                **{"proto_unix_io": full_system_proto_unix_io}
+            ),
             anchor="Referee Info",
             position="above",
             stretch=WidgetStretchData(y=4),

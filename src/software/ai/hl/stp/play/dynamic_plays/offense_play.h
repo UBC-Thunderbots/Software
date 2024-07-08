@@ -7,9 +7,9 @@
 /**
  * OffensePlay is a DynamicPlay that is run when we have possession of the ball.
  * It is a Play that sets up tactics to make passes and score goals.
- * 
+ *
  * The main ball handler in OffensePlay is AttackerTactic. OffensePlay enables
- * coordination between the AttackerTactic and SupportTactics by relaying 
+ * coordination between the AttackerTactic and SupportTactics by relaying
  * information between them.
  */
 class OffensePlay : public DynamicPlay

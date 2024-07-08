@@ -1,9 +1,10 @@
+#include "software/ai/hl/stp/skill/kick/kick_skill.h"
+
 #include <gtest/gtest.h>
 
 #include <utility>
 
 #include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
-#include "software/ai/hl/stp/skill/kick/kick_skill.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
@@ -40,8 +41,7 @@ TEST_P(KickSkillTest, kick_test)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [angle_to_kick_at, tactic](std::shared_ptr<World> world_ptr,
-                                   ValidationCoroutine::push_type& yield)
-        {
+                                   ValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
                 yield("Tactic did not complete!");

@@ -2,11 +2,11 @@
 
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
-#include "software/ai/strategy.h"
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
+#include "software/ai/strategy.h"
 #include "software/logger/logger.h"
 
 /**

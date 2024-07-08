@@ -9,7 +9,7 @@ class Skill
    public:
     /**
      * Base constructor for Skill
-     * 
+     *
      * @param strategy the Strategy shared by all of AI
      */
     explicit Skill(std::shared_ptr<Strategy> strategy) : strategy_(strategy){};

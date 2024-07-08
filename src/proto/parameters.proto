@@ -111,35 +111,53 @@ message AttackerTacticConfig
         (bounds).max_double_value = 10.0
     ];
 
-    // Reward function parameters 
-    required AttackerRewardFunctionConfig reward_function_config = 7; 
+    // Reward function parameters
+    required AttackerRewardFunctionConfig reward_function_config = 7;
 }
 
 message AttackerRewardFunctionConfig
 {
     // Reward for a goal scored by the friendly team
-    required double friendly_team_scoring_reward = 1
-    [default = 0.8, (bounds).min_double_value = -1.0, (bounds).max_double_value = 1.0];
-    
+    required double friendly_team_scoring_reward = 1 [
+        default                   = 0.8,
+        (bounds).min_double_value = -1.0,
+        (bounds).max_double_value = 1.0
+    ];
+
     // Penalty for a goal scored by the enemy team
-    required double enemy_team_scoring_penalty = 2
-    [default = -0.8, (bounds).min_double_value = -1.0, (bounds).max_double_value = 1.0];
-    
+    required double enemy_team_scoring_penalty = 2 [
+        default                   = -0.8,
+        (bounds).min_double_value = -1.0,
+        (bounds).max_double_value = 1.0
+    ];
+
     // Reward for getting the ball near the enemy goal (i.e. in the enemy defense area)
-    required double ball_near_enemy_goal_reward = 3
-        [default = 0.4, (bounds).min_double_value = -1.0, (bounds).max_double_value = 1.0];
+    required double ball_near_enemy_goal_reward = 3 [
+        default                   = 0.4,
+        (bounds).min_double_value = -1.0,
+        (bounds).max_double_value = 1.0
+    ];
 
     // Reward for keeping friendly possession
-    required double kept_possession_reward = 4
-        [default = 0.2, (bounds).min_double_value = -1.0, (bounds).max_double_value = 1.0];
+    required double kept_possession_reward = 4 [
+        default                   = 0.2,
+        (bounds).min_double_value = -1.0,
+        (bounds).max_double_value = 1.0
+    ];
 
     // Penalty for losing friendly possession
-    required double lost_possession_penalty = 5
-        [default = 0.2, (bounds).min_double_value = -1.0, (bounds).max_double_value = 1.0];
+    required double lost_possession_penalty = 5 [
+        default                   = 0.2,
+        (bounds).min_double_value = -1.0,
+        (bounds).max_double_value = 1.0
+    ];
 
     // Maximum reward for moving the ball up the field towards the enemy goal
-    required double forward_progress_reward = 6
-        [default = 0.1, (bounds).min_double_value = -1.0, (bounds).max_double_value = 1.0];
+    required double forward_progress_reward = 6 [
+        default                   = 0.1,
+        (bounds).min_double_value = -1.0,
+        (bounds).max_double_value = 1.0
+    ];
 }
 
 message ReceiverTacticConfig

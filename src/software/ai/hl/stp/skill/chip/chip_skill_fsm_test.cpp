@@ -23,7 +23,8 @@ TEST(ChipSkillFSMTest, test_transitions)
 
     // Transition to GetBehindBallSkillFSM state's GetBehindBallState
     fsm.process_event(ChipSkillFSM::Update(
-        control_params, SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
+        control_params,
+        SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallSkillFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallSkillFSM>)>(
         boost::sml::state<GetBehindBallSkillFSM::GetBehindBallState>));
@@ -34,7 +35,8 @@ TEST(ChipSkillFSMTest, test_transitions)
                              AngularVelocity::zero()),
                   Timestamp::fromSeconds(123));
     fsm.process_event(ChipSkillFSM::Update(
-        control_params, SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
+        control_params,
+        SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     // Transition to ChipState
     EXPECT_TRUE(fsm.is(boost::sml::state<ChipSkillFSM::ChipState>));
 
@@ -45,6 +47,7 @@ TEST(ChipSkillFSMTest, test_transitions)
 
     // Tactic is done
     fsm.process_event(ChipSkillFSM::Update(
-        control_params, SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
+        control_params,
+        SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }

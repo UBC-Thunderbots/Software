@@ -31,7 +31,7 @@ void ShootSkillFSM::dribbleBallToKickOrigin(
         {
             best_shot_ = event.common.strategy->getBestSampledShot(event.common.robot);
         }
-        else 
+        else
         {
             best_shot_ = event.common.strategy->getBestShot(event.common.robot);
         }

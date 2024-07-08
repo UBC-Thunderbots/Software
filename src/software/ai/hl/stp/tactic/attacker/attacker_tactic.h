@@ -57,7 +57,7 @@ class AttackerTactic : public Tactic
      *
      * @param world_ptr the world pointer
      *
-     * @return true if the tactic resumed execution and is not suspended, 
+     * @return true if the tactic resumed execution and is not suspended,
      * false if the tactic failed to resume and is still suspended
      */
     bool tryResumingIfSuspended(const WorldPtr& world_ptr);
@@ -73,7 +73,7 @@ class AttackerTactic : public Tactic
     /**
      * Gets a SkillState containing details about the current state of the skill
      * that the AttackerTactic is executing.
-     * 
+     *
      * @return the current state of the Skill that the tactic is executing
      */
     SkillState getSkillState() const;
@@ -114,7 +114,7 @@ class AttackerTactic : public Tactic
         "attacker_mdp_q_function_weights.csv";
 
     // Name that identifies the attacker's Q-function in Thunderscope
-    inline static const std::string ATTACKER_MDP_Q_FUNCTION_NAME = 
+    inline static const std::string ATTACKER_MDP_Q_FUNCTION_NAME =
         "AttackerMdpLinearQFunction";
 
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;

@@ -44,8 +44,7 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
     defense_play_->updateTactics(PlayUpdate(
         play_update.world_ptr, num_defenders,
-        [&](PriorityTacticVector new_tactics)
-        {
+        [&](PriorityTacticVector new_tactics) {
             for (auto& tactic_vec : new_tactics)
             {
                 defense_tactics.insert(defense_tactics.end(), tactic_vec.begin(),

@@ -5,7 +5,7 @@
 
 template <bool SAMPLE_FOR_BEST_SHOT>
 class BaseShootSkill : public BaseSkill<ShootSkillFSM, ShootSkillFSM::GetBallControlFSM,
-                                    DribbleSkillFSM, PivotKickSkillFSM>
+                                        DribbleSkillFSM, PivotKickSkillFSM>
 {
    public:
     using BaseSkill::BaseSkill;
@@ -25,9 +25,9 @@ class DribbleShootSkill : public BaseShootSkill<true>
 };
 
 template <bool SAMPLE_FOR_BEST_SHOT>
-void BaseShootSkill<SAMPLE_FOR_BEST_SHOT>::updatePrimitive(const Robot& robot,
-                                             const WorldPtr& world_ptr,
-                                             const SetPrimitiveCallback& set_primitive)
+void BaseShootSkill<SAMPLE_FOR_BEST_SHOT>::updatePrimitive(
+    const Robot& robot, const WorldPtr& world_ptr,
+    const SetPrimitiveCallback& set_primitive)
 {
     control_params_ = {.sample_for_best_shot = SAMPLE_FOR_BEST_SHOT};
     BaseSkill::updatePrimitive(robot, world_ptr, set_primitive);

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "proto/tactic.pb.h"
-#include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/skill/all_skills.h"
+#include "software/ai/hl/stp/tactic/all_tactics.h"
 
 /**
  * Creates a tactic given a tactic proto

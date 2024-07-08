@@ -11,7 +11,8 @@
 // This namespace contains all the test parameters
 namespace
 {
-    std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>(TbotsProto::AiConfig());
+    std::shared_ptr<Strategy> strategy =
+        std::make_shared<Strategy>(TbotsProto::AiConfig());
     std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Pass pass({1, 1}, {0.5, 0}, 2.29);
 
@@ -24,11 +25,12 @@ namespace
             std::make_tuple(std::make_shared<MoveTactic>(),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),
-            std::make_tuple(std::make_shared<CreaseDefenderTactic>(
-                                strategy->getAiConfig().robot_navigation_obstacle_config()),
-                            std::set<TbotsProto::MotionConstraint>(
-                                {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL}),
-                            std::set<TbotsProto::MotionConstraint>()),
+            std::make_tuple(
+                std::make_shared<CreaseDefenderTactic>(
+                    strategy->getAiConfig().robot_navigation_obstacle_config()),
+                std::set<TbotsProto::MotionConstraint>(
+                    {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL}),
+                std::set<TbotsProto::MotionConstraint>()),
             std::make_tuple(std::make_shared<GoalieTactic>(strategy),
                             std::set<TbotsProto::MotionConstraint>(
                                 {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA,
@@ -56,17 +58,15 @@ namespace
                                  TbotsProto::MotionConstraint::FRIENDLY_HALF,
                                  TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL}),
                             std::set<TbotsProto::MotionConstraint>()),
-            std::make_tuple(
-                std::make_shared<ReceiverTactic>(strategy),
-                std::set<TbotsProto::MotionConstraint>(),
-                std::set<TbotsProto::MotionConstraint>()),
+            std::make_tuple(std::make_shared<ReceiverTactic>(strategy),
+                            std::set<TbotsProto::MotionConstraint>(),
+                            std::set<TbotsProto::MotionConstraint>()),
             std::make_tuple(std::make_shared<ShadowEnemyTactic>(),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),
-            std::make_tuple(
-                std::make_shared<AttackerTactic>(strategy),
-                std::set<TbotsProto::MotionConstraint>(),
-                std::set<TbotsProto::MotionConstraint>()),
+            std::make_tuple(std::make_shared<AttackerTactic>(strategy),
+                            std::set<TbotsProto::MotionConstraint>(),
+                            std::set<TbotsProto::MotionConstraint>()),
             std::make_tuple(std::make_shared<StopTactic>(),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),

@@ -16,13 +16,15 @@ TEST(GetBehindBallSkillFSMTest, test_transitions)
     FSM<GetBehindBallSkillFSM> fsm{GetBehindBallSkillFSM()};
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallSkillFSM::GetBehindBallState>));
     fsm.process_event(GetBehindBallSkillFSM::Update(
-        control_params, SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
+        control_params,
+        SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallSkillFSM::GetBehindBallState>));
 
     // robot behind ball but far away
     robot = ::TestUtil::createRobotAtPos(Point(2, 2));
     fsm.process_event(GetBehindBallSkillFSM::Update(
-        control_params, SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
+        control_params,
+        SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallSkillFSM::GetBehindBallState>));
 
     // robot behind ball and close enough
@@ -30,13 +32,15 @@ TEST(GetBehindBallSkillFSMTest, test_transitions)
         0, RobotState(Point(2, 2.8), Vector(), Angle::quarter(), AngularVelocity::zero()),
         Timestamp::fromSeconds(123));
     fsm.process_event(GetBehindBallSkillFSM::Update(
-        control_params, SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
+        control_params,
+        SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     // destination updated so robot needs to move to new destination
     control_params = GetBehindBallSkillFSM::ControlParams{
         .ball_location = Point(-2, 1), .chick_direction = Angle::quarter()};
     fsm.process_event(GetBehindBallSkillFSM::Update(
-        control_params, SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
+        control_params,
+        SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallSkillFSM::GetBehindBallState>));
 }

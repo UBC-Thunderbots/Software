@@ -20,7 +20,7 @@ class ReceiverTactic : public SupportTactic
     void accept(TacticVisitor& visitor) const override;
 
     void updateReceivingPosition(std::optional<Point> receiving_position) override;
-    
+
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
     /**

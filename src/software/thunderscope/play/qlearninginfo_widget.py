@@ -29,7 +29,9 @@ class QLearningInfoWidget(QWidget):
         """
         QWidget.__init__(self)
 
-        self.linear_q_func_info_buffer = ThreadSafeBuffer(buffer_size, LinearQFunctionInfo, False)
+        self.linear_q_func_info_buffer = ThreadSafeBuffer(
+            buffer_size, LinearQFunctionInfo, False
+        )
         self.linear_q_func_infos = {}
 
         self.linear_q_func_weights_table = QTableWidget(0, 0)
@@ -55,7 +57,9 @@ class QLearningInfoWidget(QWidget):
     def refresh(self) -> None:
         """Update the Q-learning info widget with new information"""
 
-        linear_q_func_info = self.linear_q_func_info_buffer.get(block=False, return_cached=False)
+        linear_q_func_info = self.linear_q_func_info_buffer.get(
+            block=False, return_cached=False
+        )
 
         # Updating QTableWidget could be expensive, so we only update if there is new data
         if linear_q_func_info is None:
@@ -68,10 +72,10 @@ class QLearningInfoWidget(QWidget):
         if linear_q_func_name not in self.linear_q_func_infos:
             self.linear_q_func_combo_box.addItem(linear_q_func_name)
 
-        self.linear_q_func_infos[linear_q_func_name] = linear_q_func_info_dict 
+        self.linear_q_func_infos[linear_q_func_name] = linear_q_func_info_dict
 
         # Update QTableWidget if this LinearQFunction is currently selected in combo box
-        if self.linear_q_func_combo_box.currentText() == linear_q_func_name: 
+        if self.linear_q_func_combo_box.currentText() == linear_q_func_name:
             self.__display_linear_q_function_weights(linear_q_func_name)
 
     def __display_linear_q_function_weights(self, linear_q_func_name: str) -> None:
@@ -97,8 +101,16 @@ class QLearningInfoWidget(QWidget):
             for col in range(num_features):
                 weight = str(linear_q_func_info["weights"][row * num_features + col])
                 table_item = QTableWidgetItem(weight)
-                table_item.setSizeHint(QtCore.QSize(len(weight) * QLearningInfoWidget.ITEM_SIZE_HINT_WIDTH_EXPANSION, 1))
-                table_item.setFlags(table_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                table_item.setSizeHint(
+                    QtCore.QSize(
+                        len(weight)
+                        * QLearningInfoWidget.ITEM_SIZE_HINT_WIDTH_EXPANSION,
+                        1,
+                    )
+                )
+                table_item.setFlags(
+                    table_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable
+                )
                 self.linear_q_func_weights_table.setItem(row, col, table_item)
 
         self.linear_q_func_weights_table.resizeColumnsToContents()
@@ -133,5 +145,5 @@ class QLearningInfoWidget(QWidget):
         # Save weights as CSV file
         if fileName:
             weights = ",".join(map(str, linear_q_func_info["weights"]))
-            with open(fileName, 'w') as f:
+            with open(fileName, "w") as f:
                 f.write(weights)

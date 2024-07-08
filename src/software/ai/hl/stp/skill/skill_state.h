@@ -15,10 +15,10 @@ struct SkillState
 
     // The pass that the Skill is planning to take
     std::optional<Pass> pass = std::nullopt;
-    
+
     // The shot on goal that the Skill is planning to take
     std::optional<Shot> shot = std::nullopt;
-    
+
     // The point on the field that the Skill is planning to chip the ball to
     std::optional<Point> chip_target = std::nullopt;
 };

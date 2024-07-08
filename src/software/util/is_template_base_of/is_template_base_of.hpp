@@ -5,7 +5,7 @@
 /**
  * Type trait to check whether Derived inherits from any instantiation
  * of the class template Base.
- * 
+ *
  * Taken from: https://stackoverflow.com/a/73034562
  *
  * TODO (#3242): Change is_template_base_of to use C++20 concepts

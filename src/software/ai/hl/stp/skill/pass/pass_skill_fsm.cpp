@@ -47,9 +47,9 @@ bool PassSkillFSM::passReceived(const SuspendedUpdate& event)
     const auto friendly_robots = event.world_ptr->friendlyTeam().getAllRobots();
 
     return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(),
-        [&](const Robot& robot)
-        { return robot.isNearDribbler(event.world_ptr->ball().position()); });
+        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
+            return robot.isNearDribbler(event.world_ptr->ball().position());
+        });
 }
 
 bool PassSkillFSM::shouldAbortPass(const SuspendedUpdate& event)
@@ -80,7 +80,7 @@ void PassSkillFSM::findPass(
     // This ensures that a PassSkillFSM that has just been "reset" (i.e. constructed anew)
     // will not immediately set the SkillState, and consequently override any SkillState
     // changes made by another existing PassSkillFSM.
-    
+
     if (best_pass_so_far_)
     {
         event.common.set_skill_state(

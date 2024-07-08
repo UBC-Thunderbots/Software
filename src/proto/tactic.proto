@@ -111,7 +111,7 @@ message StopTactic {}
 
 message ShootSkillTactic {}
 
-message KickSkillTactic 
+message KickSkillTactic
 {
     // The location where the kick will be taken from
     required Point kick_origin = 1;

@@ -34,13 +34,13 @@ class Strategy
 
     /**
      * Gets the best receiving positions for the friendly robots to go to.
-     * 
+     *
      * @see ReceiverPositionGenerator::getBestReceivingPositions
      */
     std::vector<Point> getBestReceivingPositions(
         unsigned int num_positions,
-        const std::vector<Point> &existing_receiver_positions = {},
-        const std::optional<Point> &pass_origin_override      = std::nullopt);
+        const std::vector<Point>& existing_receiver_positions = {},
+        const std::optional<Point>& pass_origin_override      = std::nullopt);
 
     /**
      * Gets the best shot on goal for the given robot.
@@ -50,9 +50,9 @@ class Strategy
      * @returns the best shot on goal, if one exists
      */
     std::optional<Shot> getBestShot(const Robot& robot);
-    
+
     /**
-     * Gets the best shot on goal by sampling multiple potential shot origin 
+     * Gets the best shot on goal by sampling multiple potential shot origin
      * points for the given robot.
      *
      * @param robot the robot to find the best shot for

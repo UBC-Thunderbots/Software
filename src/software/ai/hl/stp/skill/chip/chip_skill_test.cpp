@@ -1,9 +1,10 @@
+#include "software/ai/hl/stp/skill/chip/chip_skill.h"
+
 #include <gtest/gtest.h>
 
 #include <utility>
 
 #include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
-#include "software/ai/hl/stp/skill/chip/chip_skill.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"

@@ -2,8 +2,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/skill/kick/kick_skill.h"
 #include "software/ai/hl/stp/skill/chip/chip_skill.h"
+#include "software/ai/hl/stp/skill/kick/kick_skill.h"
 #include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"

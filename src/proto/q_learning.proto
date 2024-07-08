@@ -6,7 +6,7 @@ message LinearQFunctionInfo
 {
     // The name identifying this LinearQFunction
     string name = 1;
-    // The number of state features associated with this LinearQFunction 
+    // The number of state features associated with this LinearQFunction
     uint32 num_features = 2;
     // The number of actions associated with this LinearQFunction
     uint32 num_actions = 3;

@@ -406,8 +406,8 @@ void SensorFusion::updateDistanceDribbledByFriendlyTeam()
     for (const auto &[robot_id, contact_point] : ball_contacts_by_friendly_robots)
     {
         if (std::none_of(friendly_team.getAllRobots().begin(),
-                            friendly_team.getAllRobots().end(),
-                            [&](const Robot &robot) { return robot.id() == robot_id; }))
+                         friendly_team.getAllRobots().end(),
+                         [&](const Robot &robot) { return robot.id() == robot_id; }))
         {
             ball_contacts_by_friendly_robots.erase(robot_id);
         }
@@ -417,13 +417,11 @@ void SensorFusion::updateDistanceDribbledByFriendlyTeam()
     std::vector<double> dribble_distances;
     dribble_distances.reserve(ball_contacts_by_friendly_robots.size());
     std::transform(ball_contacts_by_friendly_robots.begin(),
-                    ball_contacts_by_friendly_robots.end(),
-                    std::back_inserter(dribble_distances),
-                    [&](const auto &kv_pair)
-                    {
-                        const Point contact_point = kv_pair.second;
-                        return distance(contact_point, ball->position());
-                    });
+                   ball_contacts_by_friendly_robots.end(),
+                   std::back_inserter(dribble_distances), [&](const auto &kv_pair) {
+                       const Point contact_point = kv_pair.second;
+                       return distance(contact_point, ball->position());
+                   });
 
     // Set distance_dribbled_by_friendly_team to maximum of dribble_distances
     if (dribble_distances.empty())
