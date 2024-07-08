@@ -6,7 +6,7 @@
 #include "proto/ssl_vision_geometry.pb.h"
 #include "software/geom/circle.h"
 #include "software/geom/segment.h"
-#include "software/util/make_enum/make_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 #include "software/world/field.h"
 
 /**
