@@ -231,9 +231,9 @@ struct BallPlacementPlayFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *StartState_S + Update_E[!shouldPickOffWall_G] / alignPlacement_A =
-                AlignPlacementState_S,
+                    AlignPlacementState_S,
             StartState_S + Update_E[shouldPickOffWall_G] = AlignWallState_S,
-            AlignWallState_S + Update_E[!wallAlignDone_G] / alignWall_A = AlignWallState_S,
+            AlignWallState_S + Update_E[!wallAlignDone_G && shouldPickOffWall_G] / alignWall_A = AlignWallState_S,
             AlignWallState_S + Update_E[wallAlignDone_G] / setPickOffDest_A = PickOffWallState_S,
             AlignWallState_S + Update_E[!shouldPickOffWall_G]    = AlignPlacementState_S,
             PickOffWallState_S + Update_E[!wallPickOffDone_G] / pickOffWall_A = PickOffWallState_S,
@@ -244,7 +244,7 @@ struct BallPlacementPlayFSM
             ReleaseWallState_S + Update_E[ballReleased_G] = AlignPlacementState_S,
             AlignPlacementState_S + Update_E[shouldPickOffWall_G] = AlignWallState_S,
             AlignPlacementState_S + Update_E[!alignDone_G] / alignPlacement_A =
-                AlignPlacementState_S,
+                    AlignPlacementState_S,
             AlignPlacementState_S + Update_E[alignDone_G]                = PlaceBallState_S,
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A     = PlaceBallState_S,
             PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A      = WaitState_S,
