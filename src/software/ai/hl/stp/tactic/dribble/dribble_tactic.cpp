@@ -29,7 +29,7 @@ void DribbleTactic::updateControlParams(std::optional<Point> dribble_destination
     control_params.final_dribble_orientation = final_dribble_orientation;
     control_params.allow_excessive_dribbling = allow_excessive_dribbling;
     control_params.max_speed_dribble = max_speed_dribble;
-    control_params.max_speed_get_possession = max_speed_get_possession
+    control_params.max_speed_get_possession = max_speed_get_possession;
 }
 
 void DribbleTactic::accept(TacticVisitor &visitor) const

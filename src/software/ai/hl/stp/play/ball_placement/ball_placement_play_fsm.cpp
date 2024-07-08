@@ -30,7 +30,7 @@ void BallPlacementPlayFSM::alignWall(const Update &event) {
                                            0.0, TbotsProto::DribblerMode::OFF,
                                            TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
                                            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                                           TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
+                                           TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0.0);
     tactics_to_run[0].emplace_back(align_wall_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -83,7 +83,7 @@ void BallPlacementPlayFSM::releaseBall(const BallPlacementPlayFSM::Update &event
                                            0.0, TbotsProto::DribblerMode::RELEASE_BALL_SLOW,
                                            TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0},
                                            TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
-                                           TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
+                                           TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0.0);
     tactics_to_run[0].emplace_back(align_wall_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -154,7 +154,7 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
 
     Vector placement_dribble_vector =
         placement_point.value() - event.common.world_ptr->ball().position();
-    if (placement_dribble_vector.length() > 0.3) // TODO: move to a dynamics parameter
+    if (placement_dribble_vector.length() > 0.3)
     {
         final_angle = placement_dribble_vector.orientation();
     }
@@ -243,7 +243,7 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         retreat_tactic->updateControlParams(
             retreat_position, final_orientation, 0.0, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT, // TODO: Instead of stop use a new speed mode for retreating in ball placement
+            TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
             TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
         tactics_to_run[0].emplace_back(retreat_tactic);
 
@@ -335,46 +335,46 @@ std::pair<Angle, Point> BallPlacementPlayFSM::calculateWallPickOffLocation(const
 {
     Angle facing_angle;
     Point backoff_point;
-    bool near_north = field_boundary.yMax() - ball_pos.y() < max_dist;
-    bool near_south = ball_pos.y() - field_boundary.yMin() < max_dist;
-    bool near_east = field_boundary.xMax() - ball_pos.x() < max_dist;
-    bool near_west = ball_pos.x() - field_boundary.xMin() < max_dist;
-    if (near_north && near_east) // top right corner
+    bool near_positive_y_boundary = (field_boundary.yMax() - ball_pos.y()) < max_dist;
+    bool near_negative_y_boundary = (ball_pos.y() - field_boundary.yMin()) < max_dist;
+    bool near_positive_x_boundary  = (field_boundary.xMax() - ball_pos.x()) < max_dist;
+    bool near_negative_x_boundary  = (ball_pos.x() - field_boundary.xMin()) < max_dist;
+    if (near_positive_y_boundary && near_positive_x_boundary) // top right corner
     {
         facing_angle = Angle::fromDegrees(45);
-        backoff_point = field_boundary.posXPosYCorner();
+        backoff_point = field_boundary.posXPosYCorner() - Vector::createFromAngle(facing_angle).normalize(0.9);
     }
-    else if (near_north && near_west) // top left corner
+    else if (near_positive_y_boundary && near_negative_x_boundary) // top left corner
     {
         facing_angle = Angle::fromDegrees(135);
-        backoff_point = field_boundary.negXPosYCorner();
+        backoff_point = field_boundary.negXPosYCorner() - Vector::createFromAngle(facing_angle).normalize(0.9);
     }
-    else if (near_south && near_east) // bottom right corner
+    else if (near_negative_y_boundary && near_positive_x_boundary) // bottom right corner
     {
         facing_angle = Angle::fromDegrees(-45);
-        backoff_point = field_boundary.posXNegYCorner();
+        backoff_point = field_boundary.posXNegYCorner() - Vector::createFromAngle(facing_angle).normalize(0.9);
     }
-    else if (near_south && near_west) // bottom left corner
+    else if (near_negative_y_boundary && near_negative_x_boundary) // bottom left corner
     {
         facing_angle = Angle::fromDegrees(-135);
-        backoff_point = field_boundary.negXNegYCorner();
+        backoff_point = field_boundary.negXNegYCorner() - Vector::createFromAngle(facing_angle).normalize(0.9);
     }
-    else if (near_north)
+    else if (near_positive_y_boundary)
     {
         facing_angle = Angle::fromDegrees(90);
         backoff_point = Point(ball_pos.x(), field_boundary.yMax());
     }
-    else if (near_east)
+    else if (near_positive_x_boundary)
     {
         facing_angle = Angle::fromDegrees(0);
         backoff_point = Point(field_boundary.xMax(), ball_pos.y());
     }
-    else if (near_south)
+    else if (near_negative_y_boundary)
     {
         facing_angle = Angle::fromDegrees(-90);
         backoff_point = Point(ball_pos.x(), field_boundary.yMin());
     }
-    else if (near_west)
+    else if (near_negative_x_boundary)
     {
         facing_angle = Angle::fromDegrees(180);
         backoff_point = Point(field_boundary.xMin(), ball_pos.y());

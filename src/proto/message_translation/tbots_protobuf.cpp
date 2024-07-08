@@ -491,7 +491,7 @@ double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode
         case TbotsProto::DribblerMode::OFF:
             return 0.0;
         case TbotsProto::DribblerMode::RELEASE_BALL_SLOW:
-            return 2000.0;
+            return robot_constants.release_ball_dribbler_speed_rpm;
         default:
             LOG(WARNING) << "DribblerMode is invalid" << std::endl;
             return 0.0;
