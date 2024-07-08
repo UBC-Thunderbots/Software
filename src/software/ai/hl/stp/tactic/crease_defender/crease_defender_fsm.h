@@ -124,7 +124,7 @@ struct CreaseDefenderFSM
      * std::nullopt if there is no intersection or if the start point of the ray is inside
      * or behind the defense area
      */
-    std::optional<Point> findDefenseAreaIntersection(
+    static std::optional<Point> findDefenseAreaIntersection(
         const Field& field, const Ray& ray, double robot_obstacle_inflation_factor);
 
     /**
@@ -134,7 +134,7 @@ struct CreaseDefenderFSM
      * @param zone a stadium shape that defines the zone
      * @return true if any enemy robot is within the given zone, else false
      */
-    bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
+    static bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
 
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
     TbotsProto::CreaseDefenderConfig crease_defender_config;

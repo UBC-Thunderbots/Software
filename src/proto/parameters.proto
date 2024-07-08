@@ -442,7 +442,7 @@ message CreaseDefenderConfig
     /*
     Max ratio between distances (crease defender and ball) / (nearest enemy and ball) for
     pass defender to chase ball.
-    Threshold = 1.0 results in crease defenders chasing the ball even ball is equidistant
+    Threshold = 1.0 results in crease defenders chasing the ball even if the ball is equidistant
     to nearest enemy. Threshold < 1.0 results in crease defenders chasing the ball only
     when it is at least (threshold) percent closer to our bot than the nearest enemy.
     ┌──────────────────────────────────────────┐
