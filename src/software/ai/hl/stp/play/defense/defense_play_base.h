@@ -60,7 +60,8 @@ class DefensePlayFSMBase
      * @param ball_steal_mode The pass defender's aggressiveness towards the ball
      */
     void updatePassDefenderControlParams(
-        std::vector<DefenderAssignment> &pass_defender_assignments, TbotsProto::BallStealMode ball_steal_mode);
+        std::vector<DefenderAssignment> &pass_defender_assignments,
+        TbotsProto::BallStealMode ball_steal_mode);
 
     TbotsProto::AiConfig ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;

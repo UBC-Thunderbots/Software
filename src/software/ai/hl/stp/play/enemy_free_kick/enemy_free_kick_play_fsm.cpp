@@ -60,7 +60,8 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
             event.common.world_ptr->ball().position() +
             block_direction.normalize(STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M +
                                       2 * ROBOT_MAX_RADIUS_METERS);
-        block_free_kicker->updateControlParams(block_kick_point,  TbotsProto::BallStealMode::IGNORE);
+        block_free_kicker->updateControlParams(block_kick_point,
+                                               TbotsProto::BallStealMode::IGNORE);
         tactics_to_return[0].push_back(block_free_kicker);
     }
 
@@ -114,7 +115,8 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
                     Point((event.common.world_ptr->ball().position().toVector() +
                            friendly_goal_center.toVector()) /
                           2);
-                mid_zone_defender->updateControlParams(mid_point,  TbotsProto::BallStealMode::IGNORE);
+                mid_zone_defender->updateControlParams(mid_point,
+                                                       TbotsProto::BallStealMode::IGNORE);
                 tactics_to_return[0].push_back(mid_zone_defender);
             }
             else
@@ -147,7 +149,8 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
     setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
     setAlignment(event, crease_defender_assignments);
-    updatePassDefenderControlParams(pass_defender_assignments, TbotsProto::BallStealMode::IGNORE);
+    updatePassDefenderControlParams(pass_defender_assignments,
+                                    TbotsProto::BallStealMode::IGNORE);
 
     tactics_to_return[1].insert(tactics_to_return[1].end(), crease_defenders.begin(),
                                 crease_defenders.end());

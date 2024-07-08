@@ -1,10 +1,10 @@
 #pragma once
 
+#include "proto/tactic.pb.h"
 #include "shared/constants.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "proto/tactic.pb.h"
 
 struct PassDefenderFSM
 {
@@ -27,7 +27,7 @@ struct PassDefenderFSM
      * @param ai_config The ai config required
      */
     explicit PassDefenderFSM(const TbotsProto::AiConfig& ai_config)
-            : pass_defender_config(ai_config.pass_defender_config())
+        : pass_defender_config(ai_config.pass_defender_config())
     {
     }
 
@@ -127,8 +127,8 @@ struct PassDefenderFSM
             BlockPassState_S + Update_E / blockPass_A,
             InterceptBallState_S + Update_E[ballDeflected_G] / blockPass_A =
                 BlockPassState_S,
-            InterceptBallState_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
-                DribbleFSM_S,
+            InterceptBallState_S + Update_E[ballNearbyWithoutThreat_G] /
+                                       prepareGetPossession_A = DribbleFSM_S,
             DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockPass_A =
                 BlockPassState_S,
             DribbleFSM_S + Update_E / prepareGetPossession_A,

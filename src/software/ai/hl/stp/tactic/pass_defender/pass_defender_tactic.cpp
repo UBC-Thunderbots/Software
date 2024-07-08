@@ -13,8 +13,7 @@ PassDefenderTactic::PassDefenderTactic(TbotsProto::AiConfig ai_config)
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<PassDefenderFSM>>(
-                PassDefenderFSM(ai_config),
-                DribbleFSM(ai_config.dribble_tactic_config()));
+            PassDefenderFSM(ai_config), DribbleFSM(ai_config.dribble_tactic_config()));
     }
 }
 
@@ -23,9 +22,8 @@ void PassDefenderTactic::accept(TacticVisitor &visitor) const
     visitor.visit(*this);
 }
 
-void PassDefenderTactic::updateControlParams(
-        const Point &position_to_block_from,
-        TbotsProto::BallStealMode ball_steal_mode)
+void PassDefenderTactic::updateControlParams(const Point &position_to_block_from,
+                                             TbotsProto::BallStealMode ball_steal_mode)
 {
     control_params.position_to_block_from = position_to_block_from;
     control_params.ball_steal_mode        = ball_steal_mode;
@@ -37,8 +35,7 @@ void PassDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<PassDefenderFSM>>(
-                PassDefenderFSM(ai_config),
-                DribbleFSM(ai_config.dribble_tactic_config()));
+            PassDefenderFSM(ai_config), DribbleFSM(ai_config.dribble_tactic_config()));
     }
     fsm_map.at(tactic_update.robot.id())
         ->process_event(PassDefenderFSM::Update(control_params, tactic_update));
