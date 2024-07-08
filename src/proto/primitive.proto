@@ -54,9 +54,9 @@ enum MotionConstraint
 
 enum DribblerMode
 {
-    OFF        = 0;
-    INDEFINITE = 1;
-    MAX_FORCE  = 2;
+    OFF               = 0;
+    INDEFINITE        = 1;
+    MAX_FORCE         = 2;
     RELEASE_BALL_SLOW = 3;
 }
 
