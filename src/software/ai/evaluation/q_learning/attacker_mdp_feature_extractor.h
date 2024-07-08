@@ -75,4 +75,8 @@ class AttackerMdpFeatureExtractor
      * @return the value of the feature
      */
     static double numEnemyRobotsFeature(const AttackerMdpState& state);
+
+   protected:
+    // Factor to multiply the open shot angle by in bestShotOpenAngleFeature
+    static constexpr double SHOT_OPEN_ANGLE_FACTOR = 0.1;
 };

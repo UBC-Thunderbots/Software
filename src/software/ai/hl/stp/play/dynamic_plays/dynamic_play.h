@@ -34,10 +34,15 @@ class DynamicPlay : public Play
      * Base constructor for DynamicPlay
      *
      * @param strategy the Strategy
+     * @param support_tactic_candidates the SupportTacticsCandidates eligible for
+     * scoring and assignment
      */
-    explicit DynamicPlay(std::shared_ptr<Strategy> strategy);
+    explicit DynamicPlay(
+        std::shared_ptr<Strategy> strategy,
+        std::vector<std::shared_ptr<SupportTacticCandidate>> support_tactic_candidates);
 
-    DynamicPlay() = delete;
+    DynamicPlay()          = delete;
+    virtual ~DynamicPlay() = default;
 
     // TODO (#2359): delete once all plays are not coroutines
     void getNextTactics(TacticCoroutine::push_type &yield,
@@ -57,11 +62,3 @@ class DynamicPlay : public Play
     std::unique_ptr<DuplicationScorer> support_tactic_duplication_scorer_;
     std::unique_ptr<SuccessScorer> support_tactic_success_scorer_;
 };
-
-/**
- * Returns all SupportTacticCandidates eligible for scoring and assignment
- * in a DynamicPlay
- *
- * @return a vector of shared pointers to all SupportTacticCandidates
- */
-std::vector<std::shared_ptr<SupportTacticCandidate>> allSupportTacticCandidates();

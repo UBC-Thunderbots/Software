@@ -2,10 +2,12 @@
 
 #include "software/util/generic_factory/generic_factory.h"
 
-DynamicPlay::DynamicPlay(std::shared_ptr<Strategy> strategy)
+DynamicPlay::DynamicPlay(
+    std::shared_ptr<Strategy> strategy,
+    std::vector<std::shared_ptr<SupportTacticCandidate>> support_tactic_candidates)
     : Play(true, strategy),
       support_tactics_(),
-      support_tactic_candidates_(allSupportTacticCandidates()),
+      support_tactic_candidates_(support_tactic_candidates),
       support_tactic_duplication_scorer_(std::make_unique<DuplicationScorer>()),
       support_tactic_success_scorer_(std::make_unique<SuccessScorer>())
 {
@@ -55,9 +57,4 @@ void DynamicPlay::updateSupportTactics(unsigned int num_supporters)
         best_candidate->updateScorer(*support_tactic_duplication_scorer_);
         best_candidate->updateScorer(*support_tactic_success_scorer_);
     }
-}
-
-std::vector<std::shared_ptr<SupportTacticCandidate>> allSupportTacticCandidates()
-{
-    return {std::make_shared<TypedSupportTacticCandidate<ReceiverTactic>>()};
 }

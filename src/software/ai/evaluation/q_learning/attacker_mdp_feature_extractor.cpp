@@ -38,7 +38,7 @@ double AttackerMdpFeatureExtractor::bestShotOpenAngleFeature(
         std::optional<Shot> best_shot = state.strategy->getBestShot(*attacker);
         if (best_shot)
         {
-            return best_shot->getOpenAngle().toDegrees() / 10.0;
+            return best_shot->getOpenAngle().toDegrees() * SHOT_OPEN_ANGLE_FACTOR;
         }
     }
 
