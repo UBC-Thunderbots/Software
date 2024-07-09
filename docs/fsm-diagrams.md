@@ -125,6 +125,7 @@ SetupPositionState --> AttemptPassState : <i>startLookingForPass</i>
 AttemptPassState --> ChipState : [timeExpired]
 AttemptPassState --> AttemptPassState : [!passFound]\n<i>lookForPass</i>
 AttemptPassState --> PassState : [passFound]
+PassState --> AttemptPassState : [shouldAbortPass]
 PassState --> PassState : [!passDone]\n<i>passBall</i>
 PassState --> Terminate:::terminate : [passDone]
 ChipState --> ChipState : [!chipDone]\n<i>chipBall</i>
@@ -224,6 +225,7 @@ direction LR
 [*] --> GetBehindBallFSM
 GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
 GetBehindBallFSM --> ChipState
+ChipState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
 ChipState --> ChipState : [!ballChicked]\n<i>updateChip</i>
 ChipState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
@@ -321,6 +323,7 @@ direction LR
 [*] --> GetBehindBallFSM
 GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
 GetBehindBallFSM --> KickState
+KickState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
 KickState --> KickState : [!ballChicked]\n<i>updateKick</i>
 KickState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
