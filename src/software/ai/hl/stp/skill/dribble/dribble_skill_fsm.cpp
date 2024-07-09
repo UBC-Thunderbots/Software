@@ -217,7 +217,10 @@ bool DribbleSkillFSM::shouldLoseBall(const Update &event)
     const TbotsProto::DribbleConfig &dribble_config =
         event.common.strategy->getAiConfig().dribble_config();
 
-    return !event.control_params.allow_excessive_dribbling &&
-           event.common.world_ptr->getDistanceDribbledByFriendlyTeam() >=
+    const std::optional<Segment> &dribble_displacement =
+        event.common.world_ptr->getDribbleDisplacement();
+
+    return !event.control_params.allow_excessive_dribbling && dribble_displacement &&
+           dribble_displacement->length() >=
                dribble_config.max_continuous_dribbling_distance();
 }

@@ -112,9 +112,10 @@ class SensorFusion
     std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet);
 
     /**
-     * Updates the distance that the friendly team has continuously dribbled the ball.
+     * Updates the segment representing the displacement of the ball due to 
+     * the friendly team continously dribbling the ball across the field.
      */
-    void updateDistanceDribbledByFriendlyTeam();
+    void updateDribbleDisplacement();
 
     /**
      *Inverts all positions and orientations across the x and y axis
@@ -167,8 +168,19 @@ class SensorFusion
     // Points on the field where a friendly bot initially touched the ball
     std::map<RobotId, Point> ball_contacts_by_friendly_robots;
 
-    // Distance in meters that the friendly team has continuously dribbled the ball
-    double distance_dribbled_by_friendly_team;
+    // Segment representing the displacement of the ball (in metres) due to 
+    // the friendly team continously dribbling the ball across the field.
+    //
+    // - The start point of the segment is the point on the field where the friendly
+    //   team started dribbling the ball.
+    //
+    // - The end point of the segment is the current position of the ball.
+    //
+    // - The length of the segment is the distance between where the friendly team
+    //   started dribbling the ball and where the ball is now.
+    //
+    // If the friendly team does not have possession over the ball, this is std::nullopt.
+    std::optional<Segment> dribble_displacement;
 
     std::optional<RobotId> friendly_robot_id_with_ball_in_dribbler;
 

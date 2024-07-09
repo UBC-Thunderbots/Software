@@ -15,7 +15,7 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       referee_command_history_(REFEREE_COMMAND_BUFFER_SIZE),
       referee_stage_history_(REFEREE_COMMAND_BUFFER_SIZE),
       team_with_possession_(TeamPossession::LOOSE),
-      distance_dribbled_by_friendly_team_(0)
+      dribble_displacement_(std::nullopt)
 {
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
@@ -175,12 +175,12 @@ TeamPossession World::getTeamWithPossession() const
     return team_with_possession_;
 }
 
-void World::setDistanceDribbledByFriendlyTeam(double distance)
+void World::setDribbleDisplacement(const std::optional<Segment>& displacement)
 {
-    distance_dribbled_by_friendly_team_ = distance;
+    dribble_displacement_ = displacement;
 }
 
-double World::getDistanceDribbledByFriendlyTeam() const
+const std::optional<Segment>& World::getDribbleDisplacement() const
 {
-    return distance_dribbled_by_friendly_team_;
+    return dribble_displacement_;
 }
