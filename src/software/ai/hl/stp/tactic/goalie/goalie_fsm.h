@@ -148,7 +148,7 @@ struct GoalieFSM
      * zone
      *
      * @param event GoalieFSM::Update event
-     * 
+     *
      * @return true if the goalie has finished retrieving the ball
      */
     bool retrieveDone(const Update &event);

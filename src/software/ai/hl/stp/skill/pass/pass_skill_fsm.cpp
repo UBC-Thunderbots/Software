@@ -36,8 +36,8 @@ bool PassSkillFSM::shouldAbortPass(const Update& event)
 {
     const auto& passing_config = event.common.strategy->getAiConfig().passing_config();
 
-    best_pass_so_far_->rating = ratePass(*event.common.world_ptr,
-                                         best_pass_so_far_->pass, passing_config);
+    best_pass_so_far_->rating =
+        ratePass(*event.common.world_ptr, best_pass_so_far_->pass, passing_config);
 
     return best_pass_so_far_->rating < passing_config.abs_min_pass_score();
 }
@@ -57,9 +57,9 @@ bool PassSkillFSM::passReceived(const SuspendedUpdate& event)
     const auto friendly_robots = event.world_ptr->friendlyTeam().getAllRobots();
 
     return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(),
-        [&](const Robot& robot)
-        { return robot.isNearDribbler(event.world_ptr->ball().position()); });
+        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
+            return robot.isNearDribbler(event.world_ptr->ball().position());
+        });
 }
 
 bool PassSkillFSM::strayPass(const SuspendedUpdate& event)

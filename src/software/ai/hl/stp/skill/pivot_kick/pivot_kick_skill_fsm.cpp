@@ -51,7 +51,7 @@ bool PivotKickSkillFSM::lostBallControl(const Update& event)
         ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
 
     // Ball must be still for a period of time since the kick attempt started
-    // for it to be considered out of our control; otherwise we might consider 
+    // for it to be considered out of our control; otherwise we might consider
     // kicked balls as out of our control
     if (time_since_kick_start < lose_ball_control_time_threshold ||
         ball.velocity().length() > ball_is_kicked_m_per_s_threshold)

@@ -45,7 +45,7 @@ class SuccessScorer : public SupportTacticScorer
     void reset() override;
 
    private:
-    // Maps types of tactics to a score rating the past performance and 
+    // Maps types of tactics to a score rating the past performance and
     // success of the tactic
     TypeMap<double> tactic_scores_;
 

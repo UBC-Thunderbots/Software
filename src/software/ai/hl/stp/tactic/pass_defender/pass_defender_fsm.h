@@ -1,8 +1,8 @@
 #pragma once
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/skill/skill_fsm.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
 
 struct PassDefenderFSM

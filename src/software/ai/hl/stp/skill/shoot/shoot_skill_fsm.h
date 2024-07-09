@@ -18,10 +18,10 @@ struct ShootSkillFSM
      * Guard to check whether we should abort the current shot on goal
      * because the open angle to the goal decreased below an acceptable
      * threshold.
-     * 
-     * @param event 
-     * 
-     * @return true if we should abort the shot, false otherwise 
+     *
+     * @param event
+     *
+     * @return true if we should abort the shot, false otherwise
      */
     bool shouldAbortShot(const Update& event);
 
@@ -32,9 +32,8 @@ struct ShootSkillFSM
      * @param event the Update event
      * @param processEvent processes the DribbleSkillFSM::Update event
      */
-    void getBallControl(
-        const Update& event,
-        boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
+    void getBallControl(const Update& event,
+                        boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
     /**
      * Action that updates the PivotKickSkillFSM to shoot
@@ -46,7 +45,7 @@ struct ShootSkillFSM
                    boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
 
     /**
-     * Action that aborts the current shot, stopping the robot and 
+     * Action that aborts the current shot, stopping the robot and
      * resetting the SkillState
      *
      * @param event the Update event

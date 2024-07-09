@@ -234,9 +234,10 @@ direction LR
 [*] --> DribbleSkillFSM
 DribbleSkillFSM --> PivotKickSkillFSM : [passFound]\n<i>takePass</i>
 DribbleSkillFSM --> DribbleSkillFSM : <i>findPass</i>
+PivotKickSkillFSM --> Terminate:::terminate : [shouldAbortPass]\n<i>abortPass</i>
 PivotKickSkillFSM --> PivotKickSkillFSM : <i>takePass</i>
 PivotKickSkillFSM --> Suspended
-Suspended --> Terminate:::terminate : [passReceived_G||shouldAbortPass]\n<i>resetSkillState</i>
+Suspended --> Terminate:::terminate : [passReceived_G||strayPass]\n<i>resetSkillState</i>
 Suspended --> Suspended
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
@@ -256,8 +257,7 @@ DribbleSkillFSM --> KickStartState
 KickStartState --> KickStartState : <i>(setKickStartTime</i>
 kickBall_A) --> KickState
 KickState --> Terminate:::terminate : [ballKicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
-KickState --> DribbleSkillFSM : [lostBallControl && retryKickAllowed]\n<i>getBallControlAndPivot</i>
-KickState --> Terminate:::terminate : [lostBallControl && !retryKickAllowed]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
+KickState --> DribbleSkillFSM : [lostBallControl]\n<i>getBallControlAndPivot</i>
 KickState --> KickState : <i>kickBall</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
@@ -272,7 +272,10 @@ classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DribbleSkillFSM
 DribbleSkillFSM --> DribbleSkillFSM : <i>getBallControl</i>
-DribbleSkillFSM --> Terminate:::terminate
+DribbleSkillFSM --> PivotKickSkillFSM
+PivotKickSkillFSM --> Terminate:::terminate : [shouldAbortShot]\n<i>abortShot</i>
+PivotKickSkillFSM --> PivotKickSkillFSM : <i>pivotKick</i>
+PivotKickSkillFSM --> Terminate:::terminate
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
 ```

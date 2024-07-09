@@ -74,7 +74,7 @@ struct PassSkillFSM
                   boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
 
     /**
-     * Action that aborts the current pass, stopping the robot and 
+     * Action that aborts the current pass, stopping the robot and
      * resetting the SkillState
      *
      * @param event the Update event

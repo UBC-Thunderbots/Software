@@ -19,8 +19,7 @@ bool ShootSkillFSM::shouldAbortShot(const Update& event)
 }
 
 void ShootSkillFSM::getBallControl(
-    const Update& event,
-    boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
     Point ball_position = event.common.world_ptr->ball().position();
 
@@ -62,7 +61,7 @@ void ShootSkillFSM::pivotKick(
 
     Point kick_origin = best_shot_->getOrigin();
     Point kick_target = best_shot_->getPointToShootAt();
-    
+
     processEvent(PivotKickSkillFSM::Update(
         PivotKickSkillFSM::ControlParams{
             .kick_origin       = kick_origin,

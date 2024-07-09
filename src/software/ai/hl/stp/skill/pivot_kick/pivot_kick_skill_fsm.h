@@ -91,8 +91,8 @@ struct PivotKickSkillFSM
             KickStartState_S + Update_E / (setKickStartTime_A, kickBall_A) = KickState_S,
 
             KickState_S + Update_E[ballKicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
-            KickState_S + Update_E[lostBallControl_G] /
-                              getBallControlAndPivot_A = DribbleSkillFSM_S,
+            KickState_S + Update_E[lostBallControl_G] / getBallControlAndPivot_A =
+                DribbleSkillFSM_S,
             KickState_S + Update_E / kickBall_A,
 
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);

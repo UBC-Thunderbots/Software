@@ -1,7 +1,7 @@
 #include "software/ai/evaluation/scoring/candidate.h"
 
-#include <numeric>
 #include <cmath>
+#include <numeric>
 
 #include "software/math/math_functions.h"
 

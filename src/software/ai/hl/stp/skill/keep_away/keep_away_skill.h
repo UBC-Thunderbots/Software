@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/skill/keep_away/keep_away_skill_fsm.h"
 
 /**
- * KeepAwaySkill dribbles the ball to an open area while facing away from 
+ * KeepAwaySkill dribbles the ball to an open area while facing away from
  * nearby enemy robots.
  */
 class KeepAwaySkill : public BaseSkill<KeepAwaySkillFSM, DribbleSkillFSM>
