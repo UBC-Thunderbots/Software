@@ -263,10 +263,6 @@ struct FreeKickPlayFSM
     }
 
    private:
-    // The distance threshold for the ball to be considered in play
-    // https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_in_and_out_of_play
-    static constexpr double BALL_IN_PLAY_DISTANCE_THRESHOLD_METERS = 0.05;
-
     TbotsProto::AiConfig ai_config;
     std::optional<Shot> shot;
     std::shared_ptr<MoveTactic> align_to_ball_tactic;

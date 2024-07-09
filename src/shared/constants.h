@@ -58,6 +58,10 @@ static const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
 // The safe max speed of the ball that we should shoot at, in metres per second
 static const double BALL_SAFE_MAX_SPEED_METERS_PER_SECOND =
     BALL_MAX_SPEED_METERS_PER_SECOND - 0.5;
+// The distance that the ball has to travel for it to be considered in play
+// after a kick-off, free kick, or penalty kick.
+// https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_in_and_out_of_play
+static const double BALL_IN_PLAY_DISTANCE_THRESHOLD_METERS = 0.05;
 // The max allowed height of the robots, in metres
 static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
