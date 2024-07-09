@@ -49,6 +49,17 @@ struct ShootSkillFSM
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
+     * Guard to check whether we should abort the current shot on goal
+     * because the open angle to the goal decreased below an acceptable
+     * threshold.
+     * 
+     * @param event 
+     * 
+     * @return true if we should abort the shot, false otherwise 
+     */
+    bool shouldAbortShot(const Update& event);
+
+    /**
      * Action that updates the GetBallControlFSM to get control of the ball
      * and steady it
      *
@@ -79,6 +90,15 @@ struct ShootSkillFSM
     void pivotKick(const Update& event,
                    boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
 
+
+    /**
+     * Action that aborts the current shot, stopping the robot and 
+     * resetting the SkillState
+     *
+     * @param event the Update event
+     */
+    void abortShot(const Update& event);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -89,6 +109,9 @@ struct ShootSkillFSM
 
         DEFINE_SML_EVENT(Update)
 
+        DEFINE_SML_GUARD(shouldAbortShot)
+
+        DEFINE_SML_ACTION(abortShot)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(getBallControl, GetBallControlFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(dribbleBallToKickOrigin, DribbleSkillFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(pivotKick, PivotKickSkillFSM)
@@ -98,9 +121,11 @@ struct ShootSkillFSM
             *GetBallControlFSM_S + Update_E / getBallControl_A,
             GetBallControlFSM_S = DribbleSkillFSM_S,
 
+            DribbleSkillFSM_S + Update_E[shouldAbortShot_G] / abortShot_A = X,
             DribbleSkillFSM_S + Update_E / dribbleBallToKickOrigin_A,
             DribbleSkillFSM_S = PivotKickSkillFSM_S,
 
+            PivotKickSkillFSM_S + Update_E[shouldAbortShot_G] / abortShot_A = X,
             PivotKickSkillFSM_S + Update_E / pivotKick_A, PivotKickSkillFSM_S = X,
 
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);

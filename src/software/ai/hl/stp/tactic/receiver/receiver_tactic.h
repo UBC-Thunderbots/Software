@@ -6,11 +6,13 @@
 #include "software/ai/passing/pass.h"
 
 /**
- * This tactic is for a robot receiving a pass. It should be used in conjunction with
- * the `AttackerTactic` in order to complete the pass.
+ * ReceiverTactic is a SupportTactic responsible for receiving passes.
+ * It will move to the given receiving position and intercept any
+ * kicks or chips directed towards it.
  *
- * Note that this tactic does not take into account the time the pass should occur at,
- * it simply tries to move to the best position to receive the pass as possible
+ * Note that this tactic does not take into account the time the pass should occur at;
+ * it simply tries to move to the receiving position to receive a potential pass as 
+ * soon as possible
  */
 class ReceiverTactic : public SupportTactic
 {

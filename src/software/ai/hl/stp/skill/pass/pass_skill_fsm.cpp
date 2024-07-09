@@ -11,7 +11,7 @@ bool PassSkillFSM::passFound(const Update& event)
     }
 
     const auto ball_velocity    = event.common.world_ptr->ball().velocity().length();
-    const auto ai_config        = event.common.strategy->getAiConfig();
+    const auto& ai_config       = event.common.strategy->getAiConfig();
     const double min_pass_speed = ai_config.passing_config().min_pass_speed_m_per_s();
 
     // Ball needs to slow down before it is passed
@@ -32,12 +32,22 @@ bool PassSkillFSM::passFound(const Update& event)
                                    best_pass_so_far_->pass.estimatePassDuration();
 }
 
+bool PassSkillFSM::shouldAbortPass(const Update& event)
+{
+    const auto& passing_config = event.common.strategy->getAiConfig().passing_config();
+
+    best_pass_so_far_->rating = ratePass(*event.common.world_ptr,
+                                         best_pass_so_far_->pass, passing_config);
+
+    return best_pass_so_far_->rating < passing_config.abs_min_pass_score();
+}
+
 bool PassSkillFSM::passReceived(const SuspendedUpdate& event)
 {
-    const auto ai_config    = event.strategy->getAiConfig();
-    const double ball_speed = event.world_ptr->ball().velocity().length();
-    const double ball_is_kicked_threshold =
-        ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
+    const double ball_speed               = event.world_ptr->ball().velocity().length();
+    const double ball_is_kicked_threshold = event.strategy->getAiConfig()
+                                                .ai_parameter_config()
+                                                .ball_is_kicked_m_per_s_threshold();
 
     if (ball_speed > ball_is_kicked_threshold)
     {
@@ -47,15 +57,15 @@ bool PassSkillFSM::passReceived(const SuspendedUpdate& event)
     const auto friendly_robots = event.world_ptr->friendlyTeam().getAllRobots();
 
     return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
-            return robot.isNearDribbler(event.world_ptr->ball().position());
-        });
+        friendly_robots.begin(), friendly_robots.end(),
+        [&](const Robot& robot)
+        { return robot.isNearDribbler(event.world_ptr->ball().position()); });
 }
 
-bool PassSkillFSM::shouldAbortPass(const SuspendedUpdate& event)
+bool PassSkillFSM::strayPass(const SuspendedUpdate& event)
 {
-    const auto ai_config = event.strategy->getAiConfig();
-    const Ball& ball     = event.world_ptr->ball();
+    const auto& ai_config = event.strategy->getAiConfig();
+    const Ball& ball      = event.world_ptr->ball();
 
     const auto pass_lane =
         Polygon::fromSegment(Segment(best_pass_so_far_->pass.passerPoint(),
@@ -93,7 +103,7 @@ void PassSkillFSM::findPass(
     // looking for "perfect" passes (with a score of 1) and decreasing this threshold
     // over time
 
-    const auto ai_config            = event.common.strategy->getAiConfig();
+    const auto& ai_config           = event.common.strategy->getAiConfig();
     const double abs_min_pass_score = ai_config.passing_config().abs_min_pass_score();
     const double min_perfect_pass_score =
         ai_config.passing_config().min_perfect_pass_score();
@@ -128,14 +138,14 @@ void PassSkillFSM::takePass(
     const Update& event,
     boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
-    Point ball_position = event.common.world_ptr->ball().position();
-    Point kick_target   = best_pass_so_far_->pass.receiverPoint();
+    Point pass_origin = best_pass_so_far_->pass.passerPoint();
+    Point pass_target = best_pass_so_far_->pass.receiverPoint();
 
     AutoChipOrKick auto_chip_or_kick;
     if (event.control_params.should_chip)
     {
         auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
-                                           distance(ball_position, kick_target)};
+                                           distance(pass_origin, pass_target)};
     }
     else
     {
@@ -144,14 +154,20 @@ void PassSkillFSM::takePass(
     }
 
     PivotKickSkillFSM::ControlParams control_params = {
-        .kick_origin       = ball_position,
-        .kick_direction    = (kick_target - ball_position).orientation(),
+        .kick_origin       = pass_origin,
+        .kick_direction    = (pass_target - pass_origin).orientation(),
         .auto_chip_or_kick = auto_chip_or_kick};
 
     processEvent(PivotKickSkillFSM::Update(control_params, event.common));
 
     event.common.set_skill_state(
         {.pass_committed = true, .pass = best_pass_so_far_->pass});
+}
+
+void PassSkillFSM::abortPass(const Update& event)
+{
+    event.common.set_skill_state({});
+    event.common.set_primitive(std::make_unique<StopPrimitive>());
 }
 
 void PassSkillFSM::resetSkillState(const SuspendedUpdate& event)

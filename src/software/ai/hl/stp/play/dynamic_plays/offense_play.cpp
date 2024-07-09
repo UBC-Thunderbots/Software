@@ -65,16 +65,26 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
         SkillState skill_state = attacker_tactic_->getSkillState();
 
         std::vector<Point> existing_receiving_positions;
-        auto support_tactics_it = support_tactics_.begin();
+        std::optional<Point> pass_origin_override = std::nullopt;
+        auto support_tactics_it                   = support_tactics_.begin();
 
-        // If the attacker has committed to a pass, set the receiving position
-        // of the first support tactic to the receiver point of the pass
+        // Check if the attacker has committed to a pass
         if (skill_state.pass_committed && skill_state.pass)
         {
+            // Get the receiver point of the committed pass
             Point receiving_position = skill_state.pass->receiverPoint();
+
+            // Set the receiving position of the first support tactic to the 
+            // committed pass receiver point
             support_tactics_.front()->updateReceivingPosition(receiving_position);
             existing_receiving_positions.push_back(receiving_position);
             ++support_tactics_it;
+
+            // Assume the ball will be received by the receiver.
+            // Set the pass_origin_override passed to the ReceiverPositionGenerator
+            // to the committed pass receiver point so that receiving positions generated
+            // will be relative to where the ball is expected to be received.
+            pass_origin_override = receiving_position;
         }
 
         unsigned int num_positions_to_generate = static_cast<unsigned int>(
@@ -82,7 +92,8 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
 
         // Generate receiving positions for the remaining support tactics
         std::vector<Point> receiving_positions = strategy->getBestReceivingPositions(
-            num_positions_to_generate, existing_receiving_positions);
+            num_positions_to_generate, existing_receiving_positions,
+            pass_origin_override);
 
         for (const Point& receiving_position : receiving_positions)
         {

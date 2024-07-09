@@ -25,6 +25,16 @@ struct PassSkillFSM
     bool passFound(const Update& event);
 
     /**
+     * Guard that checks if the current pass should be aborted because
+     * its rating dropped below an acceptable threshold
+     *
+     * @param event the Update event
+     *
+     * @return true if the current pass should be aborted, false otherwise
+     */
+    bool shouldAbortPass(const Update& event);
+
+    /**
      * Guard that checks if the ball has been received by another friendly
      * robot, completing the pass
      *
@@ -35,15 +45,14 @@ struct PassSkillFSM
     bool passReceived(const SuspendedUpdate& event);
 
     /**
-     * Guard that checks if the current pass should be aborted
-     * (because the ball went astray from the target receiver point,
-     * stopped moving, got intercepted, etc.)
+     * Guard that checks if the ball went astray from the target receiver point
+     * or stopped moving
      *
      * @param event the SuspendedUpdate event
      *
      * @return true if the pass should be aborted, false otherwise
      */
-    bool shouldAbortPass(const SuspendedUpdate& event);
+    bool strayPass(const SuspendedUpdate& event);
 
     /**
      * Action that updates the DribbleSkillFSM to get control of the ball,
@@ -65,6 +74,14 @@ struct PassSkillFSM
                   boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
 
     /**
+     * Action that aborts the current pass, stopping the robot and 
+     * resetting the SkillState
+     *
+     * @param event the Update event
+     */
+    void abortPass(const Update& event);
+
+    /**
      * Action that resets the SkillState
      *
      * @param event the SuspendedUpdate event
@@ -78,11 +95,16 @@ struct PassSkillFSM
         DEFINE_SML_STATE(DribbleSkillFSM)
         DEFINE_SML_STATE(PivotKickSkillFSM)
         DEFINE_SML_STATE(Suspended)
+
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_EVENT(SuspendedUpdate)
+
         DEFINE_SML_GUARD(passFound)
-        DEFINE_SML_GUARD(passReceived)
         DEFINE_SML_GUARD(shouldAbortPass)
+        DEFINE_SML_GUARD(passReceived)
+        DEFINE_SML_GUARD(strayPass)
+
+        DEFINE_SML_ACTION(abortPass)
         DEFINE_SML_ACTION(resetSkillState)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(findPass, DribbleSkillFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(takePass, PivotKickSkillFSM)
@@ -92,12 +114,13 @@ struct PassSkillFSM
             *DribbleSkillFSM_S + Update_E[passFound_G] / takePass_A = PivotKickSkillFSM_S,
             DribbleSkillFSM_S + Update_E / findPass_A,
 
+            PivotKickSkillFSM_S + Update_E[shouldAbortPass_G] / abortPass_A = X,
             PivotKickSkillFSM_S + Update_E / takePass_A,
             PivotKickSkillFSM_S = Suspended_S,
 
-            Suspended_S + SuspendedUpdate_E[passReceived_G || shouldAbortPass_G] /
-                              resetSkillState_A = X,
-            Suspended_S + SuspendedUpdate_E     = Suspended_S,
+            Suspended_S +
+                SuspendedUpdate_E[passReceived_G || strayPass_G] / resetSkillState_A = X,
+            Suspended_S + SuspendedUpdate_E = Suspended_S,
 
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }

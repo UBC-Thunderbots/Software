@@ -409,6 +409,13 @@ message ShotConfig
     // Number of shot origin points to sample when finding the best shot to take
     required int32 num_shot_origin_points_to_sample = 1
         [default = 8, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
+    
+    // The absolute minimum open angle to the goal that we require to attempt a shot
+    required double abs_min_open_angle_for_shot_deg = 2 [
+        default                   = 1.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 90.0
+    ];
 }
 
 message DribbleConfig

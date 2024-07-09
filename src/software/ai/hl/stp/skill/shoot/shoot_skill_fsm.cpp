@@ -1,5 +1,23 @@
 #include "software/ai/hl/stp/skill/shoot/shoot_skill_fsm.h"
 
+bool ShootSkillFSM::shouldAbortShot(const Update& event)
+{
+    if (!best_shot_)
+    {
+        return false;
+    }
+
+    const auto& shot_config = event.common.strategy->getAiConfig().shot_config();
+
+    std::optional<Shot> shot = calcBestShotOnGoal(
+        event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
+        event.common.world_ptr->enemyTeam(), best_shot_->getOrigin(), TeamType::ENEMY,
+        {event.common.robot});
+
+    return !shot || shot->getOpenAngle().toDegrees() <
+                        shot_config.abs_min_open_angle_for_shot_deg();
+}
+
 void ShootSkillFSM::GetBallControlFSM::getBallControl(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
@@ -72,4 +90,10 @@ void ShootSkillFSM::pivotKick(
             .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                                                 BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}},
         event.common));
+}
+
+void ShootSkillFSM::abortShot(const Update& event)
+{
+    event.common.set_skill_state({});
+    event.common.set_primitive(std::make_unique<StopPrimitive>());
 }
