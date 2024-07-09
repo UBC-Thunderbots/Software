@@ -130,7 +130,7 @@ void ReceiverFSM::updateOnetouch(const Update& event)
             TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                           BALL_MAX_SPEED_METERS_PER_SECOND}));
+                           BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}));
     }
     else
     {

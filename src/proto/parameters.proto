@@ -41,8 +41,8 @@ message AiConfig
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
     required AiParameterConfig ai_parameter_config                          = 13;
-    required ShotConfig shot_config                                         = 14;
-    required ReceiverTacticConfig receiver_tactic_config                    = 15;
+    required ReceiverTacticConfig receiver_tactic_config                    = 14;
+    required ShotConfig shot_config                                         = 15;
     required PivotKickConfig pivot_kick_config                              = 16;
 }
 
