@@ -55,7 +55,10 @@ bool compareAngles(const Angle& angle1, const Angle& angle2,
  * @param robot Robot to check
  * @param ball_position Position of the ball
  * @param chick_direction Direction the robot wants to chick in
+ * @param ANGLE_THRESHOLD The threshold for how close the robot's orientation is to the
+ * chick_direction for it to be considered ready to chick
  * @return True if the robot is behind the ball, false otherwise.
  */
 bool isRobotReadyToChick(const Robot& robot, const Point& ball_position,
-                         const Angle& chick_direction);
+                         const Angle& chick_direction,
+                         const Angle& ANGLE_THRESHOLD = Angle::fromDegrees(5));

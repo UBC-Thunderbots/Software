@@ -44,7 +44,7 @@ Shot ReceiverFSM::getOneTouchShotPositionAndOrientation(const Robot& robot,
 
     // Find the closest point to the ball contact point on the ball's trajectory
     Point closest_ball_pos = ball.position();
-    if (ball.velocity().length() >= BALL_MIN_MOVEMENT_SPEED)
+    if (ball.velocity().length() >= BALL_MIN_MOVEMENT_SPEED_M_PER_SEC)
     {
         closest_ball_pos = closestPoint(
             ball_contact_point, Line(ball.position(), ball.position() + ball.velocity()));
@@ -157,7 +157,7 @@ void ReceiverFSM::adjustReceive(const Update& event)
     {
         Point ball_receive_pos = ball.position();
 
-        if (ball.velocity().length() > MIN_PASS_START_SPEED)
+        if (ball.velocity().length() > MIN_PASS_START_SPEED_M_PER_SEC)
         {
             ball_receive_pos = closestPoint(
                 robot_pos, Line(ball.position(), ball.position() + ball.velocity()));

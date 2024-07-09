@@ -26,7 +26,7 @@ bool compareAngles(const Angle& angle1, const Angle& angle2, const Angle& ANGLE_
 }
 
 bool isRobotReadyToChick(const Robot& robot, const Point& ball_position,
-                         const Angle& chick_direction)
+                         const Angle& chick_direction, const Angle& ANGLE_THRESHOLD)
 {
     /*
      * Region behind ball where the robot should be to chick the ball.
@@ -59,5 +59,5 @@ bool isRobotReadyToChick(const Robot& robot, const Point& ball_position,
         Polygon::fromSegment(behind_ball_segment, 0.0, chicker_width / 2);
 
     return contains(behind_ball_region, robot.position()) &&
-           compareAngles(robot.orientation(), chick_direction, Angle::fromDegrees(5));
+           compareAngles(robot.orientation(), chick_direction, ANGLE_THRESHOLD);
 }

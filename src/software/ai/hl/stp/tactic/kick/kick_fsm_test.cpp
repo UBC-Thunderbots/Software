@@ -51,7 +51,7 @@ TEST(KickFSMTest, test_transitions)
         Timestamp::fromSeconds(124));
     fsm.process_event(KickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    // Transition to ChipState again
+    // Transition to KickState again
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM::KickState>));
 
     // Ball is now kicked

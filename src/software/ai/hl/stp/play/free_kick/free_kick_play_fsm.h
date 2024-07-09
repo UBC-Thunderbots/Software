@@ -83,8 +83,10 @@ struct FreeKickPlayFSM
      *
      * @param tactics_to_run The priority tactic vector to add the tactics to
      * @param event The update event
-     * @param num_receivers The number of receivers to assign
-     * @param num_defenders The number of defenders to assign
+     * @param ideal_num_receivers The ideal number of receivers to assign. This value
+     * may be adjusted based on the number of available tactics.
+     * @param num_tactics_already_assigned The number of tactics already assigned from
+     * event.common.num_tactics
      * @param existing_receiver_positions A set of positions of existing receiver
      * positions that should be taken into account when assigning additional offensive
      * tactics.
@@ -92,9 +94,10 @@ struct FreeKickPlayFSM
      * overridden to
      */
     void setReceiverAndDefenderTactics(
-        PriorityTacticVector& tactics_to_run, const Update& event, int num_receivers,
-        int num_defenders, const std::vector<Point>& existing_receiver_positions = {},
-        const std::optional<Point>& pass_origin_override = std::nullopt);
+        PriorityTacticVector& tactics_to_run, const Update& event,
+        int ideal_num_receivers, int num_tactics_already_assigned,
+        const std::vector<Point>& existing_receiver_positions = {},
+        const std::optional<Point>& pass_origin_override      = std::nullopt);
 
     /**
      * Updates the kicker to align to the ball
@@ -260,6 +263,10 @@ struct FreeKickPlayFSM
     }
 
    private:
+    // The distance threshold for the ball to be considered in play
+    // https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_in_and_out_of_play
+    static constexpr double BALL_IN_PLAY_DISTANCE_THRESHOLD_METERS = 0.05;
+
     TbotsProto::AiConfig ai_config;
     std::optional<Shot> shot;
     std::shared_ptr<MoveTactic> align_to_ball_tactic;

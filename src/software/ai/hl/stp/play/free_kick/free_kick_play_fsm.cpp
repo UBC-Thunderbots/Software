@@ -36,12 +36,9 @@ void FreeKickPlayFSM::setupPosition(const Update &event)
         return;
     }
 
-    // Up to 2 receivers and the remaining tactics are defenders
-    int num_tactics_remaining =
-        std::max(0, static_cast<int>(event.common.num_tactics) - 1);
-    int num_receivers = std::min(2, num_tactics_remaining);
-    int num_defenders = std::max(0, num_tactics_remaining - num_receivers);
-    setReceiverAndDefenderTactics(tactics_to_run, event, num_receivers, num_defenders);
+    // Already assigned one tactic to align to ball.
+    // Assign up to 2 receivers and the remaining tactics are defenders
+    setReceiverAndDefenderTactics(tactics_to_run, event, 2, 1);
 
     event.common.set_tactics(tactics_to_run);
 }
@@ -86,10 +83,16 @@ void FreeKickPlayFSM::updateReceiverPositioningTactics(
 }
 
 void FreeKickPlayFSM::setReceiverAndDefenderTactics(
-    PriorityTacticVector &tactics_to_run, const Update &event, int num_receivers,
-    int num_defenders, const std::vector<Point> &existing_receiver_positions,
+    PriorityTacticVector &tactics_to_run, const Update &event, int ideal_num_receivers,
+    int num_tactics_already_assigned,
+    const std::vector<Point> &existing_receiver_positions,
     const std::optional<Point> &pass_origin_override)
 {
+    int num_tactics_remaining = std::max(
+        0, static_cast<int>(event.common.num_tactics) - num_tactics_already_assigned);
+    int num_receivers = std::min(ideal_num_receivers, num_tactics_remaining);
+    int num_defenders = std::max(0, num_tactics_remaining - num_receivers);
+
     if (num_receivers > 0)
     {
         updateReceiverPositioningTactics(event.common.world_ptr, num_receivers,
@@ -179,6 +182,7 @@ void FreeKickPlayFSM::chipBall(const Update &event)
         event.common.world_ptr->friendlyTeam().getNearestRobot(ball_pos);
     if (!robot_kicking_opt.has_value())
     {
+        LOG(WARNING) << "No robot found to chip the ball during free kick.";
         return;
     }
 
@@ -187,7 +191,7 @@ void FreeKickPlayFSM::chipBall(const Update &event)
     Point chip_target(0, 0);
     for (const Robot &friendly : event.common.world_ptr->friendlyTeam().getAllRobots())
     {
-        // Skip over the robot kick the ball
+        // Skip over the robot kicking the ball
         if (friendly.id() == robot_kicking_opt->id())
         {
             continue;
@@ -214,12 +218,9 @@ void FreeKickPlayFSM::lookForPass(const FreeKickPlayFSM::Update &event)
     updateAlignToBallTactic(event.common.world_ptr);
     tactics_to_run[0].emplace_back(align_to_ball_tactic);
 
-    // Up to 2 receivers and the remaining tactics are defenders
-    int num_tactics_remaining =
-        std::max(0, static_cast<int>(event.common.num_tactics) - 1);
-    int num_receivers = std::min(2, num_tactics_remaining);
-    int num_defenders = std::max(0, num_tactics_remaining - num_receivers);
-    setReceiverAndDefenderTactics(tactics_to_run, event, num_receivers, num_defenders);
+    // Already assigned one tactic to align to ball.
+    // Assign up to 2 receivers and the remaining tactics are defenders
+    setReceiverAndDefenderTactics(tactics_to_run, event, 2, 1);
 
     // Find the current best pass
     // Avoid passes to the goalie and the passing robot
@@ -268,7 +269,8 @@ bool FreeKickPlayFSM::shouldAbortPass(const Update &event)
 {
     // Check if ball has already been passed
     if (distance(event.common.world_ptr->ball().position(),
-                 best_pass_and_score_so_far.pass.passerPoint()) > 0.05)
+                 best_pass_and_score_so_far.pass.passerPoint()) >
+        BALL_IN_PLAY_DISTANCE_THRESHOLD_METERS)
     {
         return false;
     }
@@ -295,13 +297,10 @@ void FreeKickPlayFSM::passBall(const Update &event)
     tactics_to_run[0].emplace_back(passer_tactic);
     tactics_to_run[0].emplace_back(receiver_tactic);
 
-    // Up to 1 other receiver and the remaining tactics are defenders
-    int num_tactics_remaining =
-        std::max(0, static_cast<int>(event.common.num_tactics) - 2);
-    int num_receivers = std::min(1, num_tactics_remaining);
-    int num_defenders = std::max(0, num_tactics_remaining - num_receivers);
-    setReceiverAndDefenderTactics(tactics_to_run, event, num_receivers, num_defenders,
-                                  {pass.receiverPoint()}, pass.receiverPoint());
+    // Already assigned two tactics to pass and receive.
+    // Assign up to 1 other receiver and the remaining tactics are defenders
+    setReceiverAndDefenderTactics(tactics_to_run, event, 1, 2, {pass.receiverPoint()},
+                                  pass.receiverPoint());
 
     event.common.set_tactics(tactics_to_run);
 }
