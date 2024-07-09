@@ -45,7 +45,7 @@ namespace
                      TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL}),
                 std::set<TbotsProto::MotionConstraint>(
                     {TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE})),
-            std::make_tuple(std::make_shared<PenaltyKickTactic>(strategy->getAiConfig()),
+            std::make_tuple(std::make_shared<PenaltyKickTactic>(strategy),
                             std::set<TbotsProto::MotionConstraint>(
                                 {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL,
                                  TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA,

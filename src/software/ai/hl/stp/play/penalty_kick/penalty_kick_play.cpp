@@ -6,8 +6,7 @@
 
 PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<Strategy> strategy)
     : Play(true, strategy),
-      fsm(std::make_unique<FSM<PenaltyKickPlayFSM>>(
-          PenaltyKickPlayFSM(strategy->getAiConfig()))),
+      fsm(std::make_unique<FSM<PenaltyKickPlayFSM>>(PenaltyKickPlayFSM(strategy))),
       control_params{}
 {
 }

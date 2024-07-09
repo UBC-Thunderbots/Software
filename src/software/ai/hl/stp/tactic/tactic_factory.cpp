@@ -99,7 +99,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::PassDefenderTactic &tacti
 std::shared_ptr<Tactic> createTactic(const TbotsProto::PenaltyKickTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy)
 {
-    auto tactic = std::make_shared<PenaltyKickTactic>(strategy->getAiConfig());
+    auto tactic = std::make_shared<PenaltyKickTactic>(strategy);
     return tactic;
 }
 

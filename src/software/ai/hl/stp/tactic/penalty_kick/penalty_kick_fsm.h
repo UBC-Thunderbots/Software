@@ -11,8 +11,10 @@ struct PenaltyKickFSM
 {
     /**
      * Constructor for PenaltyKickFSM
+     * 
+     * @param strategy the Strategy shared by all of AI
      */
-    PenaltyKickFSM();
+    PenaltyKickFSM(std::shared_ptr<Strategy> strategy);
 
     struct ControlParams
     {
@@ -142,9 +144,7 @@ struct PenaltyKickFSM
         Duration::fromSeconds(4);
 
    private:
+    std::shared_ptr<Strategy> strategy;
     std::optional<Timestamp> complete_approach;
     Angle shot_angle;
-
-    // TODO: Remove this once we actually pass Strategy into this tactic
-    std::shared_ptr<Strategy> strategy;
 };

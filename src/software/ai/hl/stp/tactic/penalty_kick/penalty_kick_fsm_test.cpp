@@ -12,8 +12,9 @@ TEST(PenaltyKickFSM, DISABLED_test_transitions)
                                 Timestamp::fromSeconds(0));
     Robot robot = ::TestUtil::createRobotAtPos(world->field().friendlyPenaltyMark());
 
-    TbotsProto::AiConfig ai_config;
-    FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(), DribbleSkillFSM(), GetBehindBallSkillFSM()};
+    std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>(TbotsProto::AiConfig());
+
+    FSM<PenaltyKickFSM> fsm{PenaltyKickFSM(strategy), DribbleSkillFSM(), GetBehindBallSkillFSM()};
 
     PenaltyKickFSM::ControlParams control_params{};
 
