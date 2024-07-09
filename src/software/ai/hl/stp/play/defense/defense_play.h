@@ -11,6 +11,11 @@
 class DefensePlay : public Play
 {
    public:
+    /**
+     * Creates a DefensePlay.
+     *
+     * @param strategy the Strategy shared by all of AI
+     */
     DefensePlay(std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
