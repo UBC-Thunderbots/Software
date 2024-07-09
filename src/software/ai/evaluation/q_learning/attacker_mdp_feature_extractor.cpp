@@ -7,9 +7,11 @@
 #include "software/math/math_functions.h"
 
 AttackerMdpFeatureExtractor::AttackerMdpFeatureExtractor()
-    : FeatureExtractor({ballXPositionFeature, bestPassRatingFeature,
-                        bestShotOpenAngleFeature, numFriendlyRobotsFeature,
-                        numEnemyRobotsFeature})
+    : FeatureExtractor({{"ball_x_position", ballXPositionFeature},
+                        {"best_pass_rating", bestPassRatingFeature},
+                        {"best_shot_open_angle", bestShotOpenAngleFeature},
+                        {"num_friendly_robots", numFriendlyRobotsFeature},
+                        {"num_enemy_robots", numEnemyRobotsFeature}})
 {
 }
 

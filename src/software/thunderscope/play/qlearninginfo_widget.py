@@ -21,6 +21,9 @@ class QLearningInfoWidget(QWidget):
     ITEM_SIZE_HINT_WIDTH_EXPANSION = 10
     """Empirically makes even bolded items fit within columns"""
 
+    TABLE_DEFAULT_COLUMN_WIDTH = 200
+    """Default width of columns in the weights table"""
+    
     def __init__(self, buffer_size: int = 1) -> None:
         """Shows current information about Q-learning functions in our AI
 
@@ -35,8 +38,9 @@ class QLearningInfoWidget(QWidget):
         self.linear_q_func_infos = {}
 
         self.linear_q_func_weights_table = QTableWidget(0, 0)
-        self.linear_q_func_weights_table.horizontalHeader().hide()
-        self.linear_q_func_weights_table.verticalHeader().hide()
+        self.linear_q_func_weights_table.horizontalHeader().setDefaultSectionSize(
+            QLearningInfoWidget.TABLE_DEFAULT_COLUMN_WIDTH
+        )
 
         self.linear_q_func_combo_box = QComboBox()
         self.linear_q_func_combo_box.currentTextChanged.connect(
@@ -113,8 +117,11 @@ class QLearningInfoWidget(QWidget):
                 )
                 self.linear_q_func_weights_table.setItem(row, col, table_item)
 
-        self.linear_q_func_weights_table.resizeColumnsToContents()
-        self.linear_q_func_weights_table.resizeRowsToContents()
+        # Set row and column headers
+        feature_names = linear_q_func_info["featureNames"]
+        action_names = linear_q_func_info["actionNames"]
+        self.linear_q_func_weights_table.setHorizontalHeaderLabels(feature_names)
+        self.linear_q_func_weights_table.setVerticalHeaderLabels(action_names)
 
     def __save_linear_q_function_weights(self) -> None:
         """Open a file dialog to save the weights of the currently selected 

@@ -110,6 +110,7 @@ class AttackerTactic : public Tactic
         "software/ai/evaluation/q_learning/attacker_mdp_q_function_weights.csv";
 
     // Name of file that Q-function weights will be saved to at runtime
+    // TODO (#3249): Append timestamp to Q-function weights file name
     inline static const std::string ATTACKER_MDP_Q_FUNCTION_RUNTIME_WEIGHTS_FILE =
         "attacker_mdp_q_function_weights.csv";
 

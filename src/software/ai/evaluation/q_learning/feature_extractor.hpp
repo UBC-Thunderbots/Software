@@ -37,33 +37,54 @@ class FeatureExtractor
      */
     Eigen::VectorXd extract(const TState& state, const TAction& action) const;
 
+    /**
+     * Gets the names of the features that will be extracted from the state
+     * in the order that they appear in the feature vector returned by `extract`.
+     *
+     * @return the names of the features that will be extracted
+     */
+    const std::vector<std::string>& featureNames() const;
+
    protected:
+    // Function that extracts and returns one feature value from
+    // the state passed to it
     using FeatureFunc = std::function<double(const TState& state)>;
+
+    // Representation of a feature: the name of the feature and the
+    // function used to extract that feature value
+    using Feature = std::tuple<std::string, FeatureFunc>;
 
     /**
      * Creates a FeatureExtractor.
      *
-     * Each function provided to the FeatureExtractor extracts and returns
-     * one feature value from the state passed to it.
+     * Each Feature provided to the FeatureExtractor has a function that
+     * extracts and returns the value of that feature from the state passed to it.
      *
-     * @param features list of feature extraction functions
+     * @param features list of features that this FeatureExtractor will extract
      */
-    explicit FeatureExtractor(const std::vector<FeatureFunc>& features);
+    explicit FeatureExtractor(const std::vector<Feature>& features);
 
-    std::vector<FeatureFunc> features_;
+    std::vector<std::string> feature_names_;
+    std::vector<FeatureFunc> feature_funcs_;
 };
 
 template <typename TState, typename TAction>
-FeatureExtractor<TState, TAction>::FeatureExtractor(
-    const std::vector<FeatureFunc>& features)
-    : features_(features)
+FeatureExtractor<TState, TAction>::FeatureExtractor(const std::vector<Feature>& features)
 {
+    feature_names_.reserve(features.size());
+    feature_funcs_.reserve(features.size());
+
+    for (const auto& [feature_name, feature_func] : features)
+    {
+        feature_names_.push_back(feature_name);
+        feature_funcs_.push_back(feature_func);
+    }
 }
 
 template <typename TState, typename TAction>
 size_t FeatureExtractor<TState, TAction>::numFeatures() const
 {
-    return features_.size();
+    return feature_funcs_.size();
 }
 
 template <typename TState, typename TAction>
@@ -73,11 +94,17 @@ Eigen::VectorXd FeatureExtractor<TState, TAction>::extract(const TState& state,
     Eigen::MatrixXd feature_matrix =
         Eigen::MatrixXd::Zero(numFeatures(), reflective_enum::size<TAction>());
 
-    for (size_t i = 0; i < features_.size(); ++i)
+    for (size_t i = 0; i < feature_funcs_.size(); ++i)
     {
-        double feature_value = std::clamp(features_.at(i)(state), 0.0, 1.0);
+        double feature_value = std::clamp(feature_funcs_.at(i)(state), 0.0, 1.0);
         feature_matrix(i, static_cast<size_t>(action)) = feature_value;
     }
 
     return feature_matrix.reshaped();
+}
+
+template <typename TState, typename TAction>
+const std::vector<std::string>& FeatureExtractor<TState, TAction>::featureNames() const
+{
+    return feature_names_;
 }

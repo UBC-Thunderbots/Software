@@ -12,4 +12,8 @@ message LinearQFunctionInfo
     uint32 num_actions = 3;
     // The weights associated with this LinearQFunction
     repeated double weights = 4;
+    // The names of the state features associated with this LinearQFunction
+    repeated string feature_names = 5;
+    // The names of the actions associated with this LinearQFunction
+    repeated string action_names = 6; 
 }

@@ -176,6 +176,14 @@ TbotsProto::LinearQFunctionInfo LinearQFunction<TState, TAction>::getInfo() cons
         static_cast<unsigned int>(reflective_enum::size<TAction>()));
     *linear_q_function_info.mutable_weights() = {weights_.begin(), weights_.end()};
 
+    const auto& feature_names                       = features_.featureNames();
+    *linear_q_function_info.mutable_feature_names() = {feature_names.begin(),
+                                                       feature_names.end()};
+
+    const auto& action_names = reflective_enum::valueNames<TAction>();
+    *linear_q_function_info.mutable_action_names() = {action_names.begin(),
+                                                      action_names.end()};
+
     return linear_q_function_info;
 }
 
