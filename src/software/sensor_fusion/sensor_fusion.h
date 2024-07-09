@@ -100,7 +100,6 @@ class SensorFusion
     Team createFriendlyTeam(const std::vector<RobotDetection> &robot_detections);
     Team createEnemyTeam(const std::vector<RobotDetection> &robot_detections);
 
-
     /**
      * Get the ball placement point in our reference frame.
      *
@@ -112,13 +111,25 @@ class SensorFusion
     std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet);
 
     /**
+     * Checks whether to trust breakbeam status or vision data for determining
+     * the position of the ball.
+     *
+     * If this returns true, we should use the position of the robot with a tripped
+     * breakbeam to determine the ball position instead of using the ball position
+     * from SSL vision.
+     *
+     * @return true if we should trust breakbeam status, false otherwise
+     */
+    bool shouldTrustRobotStatus();
+
+    /**
      * Updates the segment representing the displacement of the ball due to
      * the friendly team continuously dribbling the ball across the field.
      */
     void updateDribbleDisplacement();
 
     /**
-     *Inverts all positions and orientations across the x and y axis
+     * Inverts all positions and orientations across the x and y axis
      *
      * @param Detection to invert
      *
@@ -139,16 +150,6 @@ class SensorFusion
      * Resets the world components to initial state
      */
     void resetWorldComponents();
-
-    /**
-     * This function controls the behavior of how the ball is being updated. If this
-     * returns True, we use the position of the robot that triggers the breakbeam instead
-     * of the one given by the ssl vision system.
-     *
-     * @return True if we were to use the position of the robot instead of the ssl camera
-     * system. False otherwise
-     */
-    bool shouldTrustRobotStatus();
 
     TbotsProto::SensorFusionConfig sensor_fusion_config;
     std::optional<Field> field;
