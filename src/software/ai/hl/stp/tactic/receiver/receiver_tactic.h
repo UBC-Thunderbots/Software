@@ -16,7 +16,7 @@
 class ReceiverTactic : public Tactic
 {
    public:
-    ReceiverTactic();
+    explicit ReceiverTactic(const TbotsProto::ReceiverTacticConfig& receiver_config);
 
     /**
      * Updates the control parameters for this ReceiverTactic.
@@ -81,4 +81,5 @@ class ReceiverTactic : public Tactic
     std::optional<Shot> findFeasibleShot();
 
     ReceiverFSM::ControlParams control_params;
+    TbotsProto::ReceiverTacticConfig receiver_config;
 };

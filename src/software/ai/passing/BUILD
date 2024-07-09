@@ -95,11 +95,12 @@ cc_test(
 )
 
 cc_library(
-    name = "pass_evaluation",
+    name = "receiver_position_generator",
     hdrs = [
-        "pass_evaluation.hpp",
+        "receiver_position_generator.hpp",
     ],
     deps = [
+        ":cost_functions",
         ":field_pitch_division",
         ":pass",
         ":pass_with_rating",
@@ -111,29 +112,26 @@ cc_library(
 )
 
 cc_test(
-    name = "pass_evaluation_test",
-    srcs = ["pass_evaluation_test.cpp"],
+    name = "receiver_position_generator_test",
+    srcs = ["receiver_position_generator_test.cpp"],
     deps = [
         ":eighteen_zone_pitch_division",
-        ":pass",
-        ":pass_evaluation",
+        ":receiver_position_generator",
         "//shared/test_util:tbots_gtest_main",
-        "//software/geom/algorithms",
+        "//software/math:math_functions",
+        "//software/test_util",
     ],
 )
 
 cc_library(
     name = "pass_generator",
-    hdrs = [
-        "pass_generator.hpp",
+    srcs = [
+        "pass_generator.cpp",
     ],
+    hdrs = ["pass_generator.h"],
     deps = [
         ":cost_functions",
-        ":eighteen_zone_pitch_division",
-        ":pass",
-        ":pass_evaluation",
         ":pass_with_rating",
-        "//proto/message_translation:tbots_protobuf",
         "//software/optimization:gradient_descent",
         "//software/world",
     ],
