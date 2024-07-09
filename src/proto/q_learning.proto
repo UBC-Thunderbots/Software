@@ -15,5 +15,5 @@ message LinearQFunctionInfo
     // The names of the state features associated with this LinearQFunction
     repeated string feature_names = 5;
     // The names of the actions associated with this LinearQFunction
-    repeated string action_names = 6; 
+    repeated string action_names = 6;
 }

@@ -23,7 +23,7 @@ class QLearningInfoWidget(QWidget):
 
     TABLE_DEFAULT_COLUMN_WIDTH = 200
     """Default width of columns in the weights table"""
-    
+
     def __init__(self, buffer_size: int = 1) -> None:
         """Shows current information about Q-learning functions in our AI
 
