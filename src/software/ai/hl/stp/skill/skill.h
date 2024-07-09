@@ -8,7 +8,7 @@
  * In the STP framework, a Skill represents an action that a robot can execute
  * (e.g. kick, dribble, pass). They are typically small in scope and complete a single,
  * tightly defined objective.
- * 
+ *
  * Skills are stateful and yield Primitives that implement their behaviour.
  */
 class Skill

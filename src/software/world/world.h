@@ -177,7 +177,7 @@ class World final
 
     /**
      * Sets the distance in meters that the friendly team has
-     * continously dribbled the ball
+     * continuously dribbled the ball
      *
      * @param distance The distance dribbled in meters
      */
@@ -185,7 +185,7 @@ class World final
 
     /**
      * Gets the distance in meters that the friendly team has
-     * continously dribbled the ball
+     * continuously dribbled the ball
      *
      * @return The distance dribbled in meters
      */

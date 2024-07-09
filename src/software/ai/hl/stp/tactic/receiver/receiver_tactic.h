@@ -11,7 +11,7 @@
  * kicks or chips directed towards it.
  *
  * Note that this tactic does not take into account the time the pass should occur at;
- * it simply tries to move to the receiving position to receive a potential pass as 
+ * it simply tries to move to the receiving position to receive a potential pass as
  * soon as possible
  */
 class ReceiverTactic : public SupportTactic

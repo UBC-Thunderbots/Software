@@ -5,7 +5,7 @@
 
 /**
  * GetBehindBallSkill moves the robot so that it is behind the ball and facing
- * the desired direction. 
+ * the desired direction.
  */
 class GetBehindBallSkill : public BaseSkill<GetBehindBallSkillFSM>
 {

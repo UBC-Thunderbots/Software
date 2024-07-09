@@ -27,8 +27,8 @@ using SetSkillStateCallback = std::function<void(const SkillState &)>;
 struct SkillUpdate
 {
     /**
-     * Creates a SkillUpdate struct. 
-     * 
+     * Creates a SkillUpdate struct.
+     *
      * @param robot the robot executing the Skill
      * @param world_ptr the current World
      * @param strategy the Strategy shared by all of AI
@@ -55,8 +55,8 @@ struct SkillUpdate
 };
 
 /**
- * Place this macro in a Skill FSM class definition to define an Update struct. 
- * 
+ * Place this macro in a Skill FSM class definition to define an Update struct.
+ *
  * The Update struct is the main event that a Skill FSM should respond to and it is
  * composed of the following structs:
  *
@@ -76,18 +76,18 @@ struct SkillUpdate
     };
 
 /**
- * Optionally place this macro in a Skill FSM class definition to define a Suspended 
+ * Optionally place this macro in a Skill FSM class definition to define a Suspended
  * state struct and a SuspendedUpdate event struct.
- * 
+ *
  * A Skill FSM can temporarily "suspend" its execution by entering the Suspended state.
- * When a Skill FSM is the Suspended state, it should only respond to the SuspendedUpdate 
+ * When a Skill FSM is the Suspended state, it should only respond to the SuspendedUpdate
  * event and NOT respond to the Update event.
- * 
+ *
  * The Skill FSM does NOT return Primitives in the Suspended state.
- * It should only evaluate the state of the World via FSM guards and wait until the 
+ * It should only evaluate the state of the World via FSM guards and wait until the
  * World is in the desired state for the Skill. Once the World is in the desired state,
  * the Skill FSM should leave the Suspended state and return to normal execution.
- *  
+ *
  * See Skill::suspended and Skill::tryResumingIfSuspended for more details.
  */
 #define DEFINE_SUSPENDED_STATE_AND_UPDATE_STRUCT                                         \
@@ -111,5 +111,6 @@ struct SkillUpdate
  * with StopPrimitive.
  */
 #define SET_STOP_PRIMITIVE_ACTION                                                        \
-    [this](Update event)                                                                 \
-    { event.common.set_primitive(std::make_unique<StopPrimitive>()); }
+    [this](Update event) {                                                               \
+        event.common.set_primitive(std::make_unique<StopPrimitive>());                   \
+    }

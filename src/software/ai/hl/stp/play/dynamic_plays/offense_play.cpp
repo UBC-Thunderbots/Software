@@ -45,8 +45,7 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
     defense_play_->updateTactics(PlayUpdate(
         play_update.world_ptr, num_defenders,
-        [&](PriorityTacticVector new_tactics)
-        {
+        [&](PriorityTacticVector new_tactics) {
             for (auto& tactic_vec : new_tactics)
             {
                 defense_tactics.insert(defense_tactics.end(), tactic_vec.begin(),
@@ -74,7 +73,7 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
             // Get the receiver point of the committed pass
             Point receiving_position = skill_state.pass->receiverPoint();
 
-            // Set the receiving position of the first support tactic to the 
+            // Set the receiving position of the first support tactic to the
             // committed pass receiver point
             support_tactics_.front()->updateReceivingPosition(receiving_position);
             existing_receiving_positions.push_back(receiving_position);
