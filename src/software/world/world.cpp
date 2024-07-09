@@ -175,12 +175,12 @@ TeamPossession World::getTeamWithPossession() const
     return team_with_possession_;
 }
 
-void World::setDribbleDisplacement(const std::optional<Segment>& displacement)
+void World::setDribbleDisplacement(const std::optional<Segment> &displacement)
 {
     dribble_displacement_ = displacement;
 }
 
-const std::optional<Segment>& World::getDribbleDisplacement() const
+const std::optional<Segment> &World::getDribbleDisplacement() const
 {
     return dribble_displacement_;
 }

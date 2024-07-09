@@ -176,9 +176,9 @@ class World final
     TeamPossession getTeamWithPossession() const;
 
     /**
-     * Sets the segment representing the displacement of the ball (in metres) due to 
-     * the friendly team continously dribbling the ball across the field.
-     * 
+     * Sets the segment representing the displacement of the ball (in metres) due to
+     * the friendly team continuously dribbling the ball across the field.
+     *
      * @see getDribbleDisplacement for details
      *
      * @param distance the displacement of the ball
@@ -186,8 +186,8 @@ class World final
     void setDribbleDisplacement(const std::optional<Segment>& displacement);
 
     /**
-     * Gets a segment representing the displacement of the ball (in metres) due to 
-     * the friendly team continously dribbling the ball across the field.
+     * Gets a segment representing the displacement of the ball (in metres) due to
+     * the friendly team continuously dribbling the ball across the field.
      *
      * - The start point of the segment is the point on the field where the friendly
      *   team started dribbling the ball.
@@ -200,8 +200,8 @@ class World final
      * If the friendly team does not have possession over the ball, std::nullopt
      * is returned.
      *
-     * @return A segment representing the displacement of the ball (in metres) due to 
-     * the friendly team continously dribbling the ball
+     * @return A segment representing the displacement of the ball (in metres) due to
+     * the friendly team continuously dribbling the ball
      */
     const std::optional<Segment>& getDribbleDisplacement() const;
 
@@ -250,8 +250,8 @@ class World final
     // Which team has possession of the ball
     TeamPossession team_with_possession_;
 
-    // Segment representing the displacement of the ball (in metres) due to 
-    // the friendly team continously dribbling the ball across the field
+    // Segment representing the displacement of the ball (in metres) due to
+    // the friendly team continuously dribbling the ball across the field
     std::optional<Segment> dribble_displacement_;
 };
 

@@ -11,7 +11,7 @@ struct PenaltyKickFSM
 {
     /**
      * Constructor for PenaltyKickFSM
-     * 
+     *
      * @param strategy the Strategy shared by all of AI
      */
     PenaltyKickFSM(std::shared_ptr<Strategy> strategy);
