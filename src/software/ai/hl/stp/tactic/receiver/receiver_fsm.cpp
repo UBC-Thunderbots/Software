@@ -104,7 +104,7 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
 bool ReceiverFSM::onetouchPossible(const Update& event)
 {
     return !event.control_params.disable_one_touch_shot &&
-           !receiver_tactic_config.disable_one_touch_kick() &&
+           receiver_tactic_config.enable_one_touch_kick() &&
            (findFeasibleShot(*event.common.world_ptr, event.common.robot) !=
             std::nullopt);
 }
@@ -125,7 +125,7 @@ void ReceiverFSM::updateOnetouch(const Update& event)
             TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                           BALL_MAX_SPEED_METERS_PER_SECOND}));
+                           BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}));
     }
     else
     {
