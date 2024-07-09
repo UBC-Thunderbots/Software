@@ -43,7 +43,7 @@ message AiConfig
     required AiParameterConfig ai_parameter_config                          = 13;
     required ReceiverTacticConfig receiver_tactic_config                    = 14;
 
-    required PassDefenderConfig pass_defender_config                        = 16;
+    required PassDefenderConfig pass_defender_config = 16;
 }
 
 message AiControlConfig
