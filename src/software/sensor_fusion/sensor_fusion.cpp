@@ -352,7 +352,7 @@ std::optional<Point> SensorFusion::getBallPlacementPoint(const SSLProto::Referee
 
 bool SensorFusion::shouldTrustRobotStatus()
 {
-    // Check if there is a robot with a tripped breakbeam 
+    // Check if there is a robot with a tripped breakbeam
     if (!friendly_robot_id_with_ball_in_dribbler.has_value())
     {
         return false;
@@ -421,9 +421,7 @@ void SensorFusion::updateDribbleDisplacement()
     dribble_displacements.reserve(ball_contacts_by_friendly_robots.size());
     std::transform(ball_contacts_by_friendly_robots.begin(),
                    ball_contacts_by_friendly_robots.end(),
-                   std::back_inserter(dribble_displacements),
-                   [&](const auto &kv_pair)
-                   {
+                   std::back_inserter(dribble_displacements), [&](const auto &kv_pair) {
                        const Point contact_point = kv_pair.second;
                        return Segment(contact_point, ball->position());
                    });
