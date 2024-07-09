@@ -29,13 +29,6 @@ void FreeKickPlayFSM::setupPosition(const Update &event)
     updateAlignToBallTactic(event.common.world_ptr);
     tactics_to_run[0].emplace_back(align_to_ball_tactic);
 
-    if (event.common.num_tactics <= 1)
-    {
-        LOG(WARNING)
-            << "Not enough tactics to setup pass receivers and defenders during free kick";
-        return;
-    }
-
     // Already assigned one tactic to align to ball.
     // Assign up to 2 receivers and the remaining tactics are defenders
     setReceiverAndDefenderTactics(tactics_to_run, event, 2, 1);
