@@ -5,12 +5,14 @@
 
 TEST(GameStateTest, test_get_name_of_referee_command)
 {
-    for (unsigned int i = 0; i < sizeRefereeCommand(); i++)
+    for (unsigned int i = 0; i < reflective_enum::size<RefereeCommand>(); i++)
     {
         try
         {
             RefereeCommand state = static_cast<RefereeCommand>(i);
-            toString(state);
+            std::ostringstream ss;
+            ss << state;
+            ss.str();
         }
         catch (std::invalid_argument &)
         {
@@ -276,7 +278,8 @@ class GameStatePredicateTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        allRefereeCommands = allValuesRefereeCommand();
+        constexpr auto enum_values = reflective_enum::values<RefereeCommand>();
+        allRefereeCommands         = std::vector(enum_values.begin(), enum_values.end());
     }
     std::vector<RefereeCommand> allRefereeCommands;
 };
