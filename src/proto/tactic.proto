@@ -25,8 +25,9 @@ message Tactic
         ShadowEnemyTactic shadow_enemy                      = 13;
         StopTactic stop                                     = 14;
         PassDefenderTactic pass_defender                    = 15;
-        ShootSkillTactic shoot_skill                        = 16;
-        KickSkillTactic kick_skill                          = 17;
+        KickSkillTactic kick_skill                          = 16;
+        PivotKickSkillTactic pivot_kick_skill               = 17;
+        ShootSkillTactic shoot_skill                        = 18;
     }
     reserved 2, 4, 5, 7, 11;
 }
@@ -110,6 +111,16 @@ message ShadowEnemyTactic
 message StopTactic {}
 
 message ShootSkillTactic {}
+
+message PivotKickSkillTactic
+{
+    // The location where the kick will be taken from
+    required Point kick_origin = 1;
+    // The direction the Robot will kick in
+    required Angle kick_direction = 2;
+    // How the robot will chip or kick the ball
+    required AutoChipOrKick auto_chip_or_kick = 3;
+}
 
 message KickSkillTactic
 {

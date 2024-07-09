@@ -40,11 +40,11 @@ def test_passing(field_test_runner):
     )
 
     # Setup the passer's tactic
-    # We use KickTactic since AttackerTactic shoots towards the goal instead if open
-    # KickTactic just does the kick we want
+    # We use KickSkillTactic since AttackerTactic shoots towards the goal instead if open
+    # KickSkillTactic just does the kick we want
     params = AssignedTacticPlayControlParams()
     params.assigned_tactics[passer_robot_id].kick.CopyFrom(
-        KickTactic(
+        KickSkillTactic(
             kick_origin=Point(
                 x_meters=pass_to_test.passerPoint().x(),
                 y_meters=pass_to_test.passerPoint().y(),

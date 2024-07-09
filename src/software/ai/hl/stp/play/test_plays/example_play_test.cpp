@@ -24,7 +24,6 @@ TEST_F(ExamplePlayTest, test_example_play)
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
     setFriendlyGoalie(0);
     setAiPlay(TbotsProto::PlayName::ExamplePlay);
-
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::HALT);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

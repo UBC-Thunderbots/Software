@@ -30,7 +30,7 @@ def test_pivot_kick(field_test_runner):
 
     params = AssignedTacticPlayControlParams()
     params.assigned_tactics[id].pivot_kick.CopyFrom(
-        PivotKickTactic(
+        PivotKickSkillTactic(
             kick_origin=Point(x_meters=-1.13, y_meters=0.75),
             kick_direction=Angle(radians=-math.pi / 2),
             auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=5.0),
