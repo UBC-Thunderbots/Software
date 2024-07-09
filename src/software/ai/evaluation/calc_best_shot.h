@@ -6,7 +6,7 @@
 #include "software/geom/angle_segment.h"
 #include "software/geom/point.h"
 #include "software/geom/segment.h"
-#include "software/util/make_enum/make_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 #include "software/world/field.h"
 #include "software/world/robot.h"
 #include "software/world/team.h"

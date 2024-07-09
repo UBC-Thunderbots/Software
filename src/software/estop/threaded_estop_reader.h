@@ -10,7 +10,7 @@
 
 #include "shared/constants.h"
 #include "software/uart/uart_communication.h"
-#include "software/util/make_enum/make_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 
 // enum that represents the possible states of estop
 MAKE_ENUM(EstopState, PLAY, STOP, STATUS_ERROR);

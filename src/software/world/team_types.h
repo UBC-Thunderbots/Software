@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/util/make_enum/make_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 
 /**
  * The possible team sides of SSL robots
