@@ -18,8 +18,7 @@
  * point (false)
  */
 template <bool SAMPLE_FOR_BEST_SHOT>
-class BaseShootSkill : public BaseSkill<ShootSkillFSM, ShootSkillFSM::GetBallControlFSM,
-                                        DribbleSkillFSM, PivotKickSkillFSM>
+class BaseShootSkill : public BaseSkill<ShootSkillFSM, DribbleSkillFSM, PivotKickSkillFSM>
 {
    public:
     using BaseSkill::BaseSkill;
