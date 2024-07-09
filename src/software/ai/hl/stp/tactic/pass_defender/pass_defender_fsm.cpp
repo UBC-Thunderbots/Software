@@ -115,7 +115,7 @@ bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
     std::optional<Robot> nearest_friendly_to_ball =
         event.common.world_ptr->friendlyTeam().getNearestRobot(ball_position);
     std::optional<Robot> nearest_enemy_to_ball =
-        event.common.world_ptr->enemyTeam().getNearestRobot(robot_position);
+        event.common.world_ptr->enemyTeam().getNearestRobot(ball_position);
     if (event.control_params.ball_steal_mode == TbotsProto::BallStealMode::IGNORE)
     {
         // Do nothing if stealing is disabled
