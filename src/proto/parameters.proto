@@ -626,8 +626,10 @@ message PassDefenderConfig
     Threshold = 1.0 results in pass defenders chasing the ball even if the ball is
     equidistant to nearest enemy. Threshold < 1.0 results in pass defenders chasing the
     ball only when it is at least (threshold) percent closer to our bot than the nearest
-    enemy. ┌──────────────────────────────────────────┐ | Pass   | <────> Ball
-    <───────────> Enemy | |       ()         x                  ()   |
+    enemy. 
+    ┌──────────────────────────────────────────┐ 
+    | Pass   | <────> Ball <───────────> Enemy | 
+    |       ()         x                  ()   |
     └──────────────────────────────────────────┘
      */
     required double max_get_ball_ratio_threshold = 1 [
