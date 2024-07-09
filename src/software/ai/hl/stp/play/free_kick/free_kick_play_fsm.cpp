@@ -122,8 +122,11 @@ void FreeKickPlayFSM::setReceiverAndDefenderTactics(
 
 void FreeKickPlayFSM::updateAlignToBallTactic(const WorldPtr &world_ptr)
 {
-    // Face towards the center of the field
-    Point position_to_face(0, 0);
+    // Face towards the center of the left segment of the enemy defense area,
+    // so we are prepared to take a shot on enemy net, or pass the ball near
+    // the enemy defense area.
+    Point position_to_face =
+        Point(world_ptr->field().enemyDefenseArea().negXNegYCorner().x(), 0.0);
     Point ball_pos           = world_ptr->ball().position();
     Vector direction_to_face = position_to_face - ball_pos;
 
