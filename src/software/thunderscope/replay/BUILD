@@ -36,7 +36,7 @@ py_binary(
         "replay_file_debugging_script.py",
     ],
     deps = [
-        "//proto:import_all_protos",
         ":proto_player",
+        "//proto:import_all_protos",
     ],
 )

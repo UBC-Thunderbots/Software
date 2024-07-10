@@ -1,5 +1,4 @@
 import traceback
-import base64
 import glob
 import gzip
 import os
@@ -33,7 +32,9 @@ def read_one_chunk(replay_file_name: str):
                 continue
 
             try:
-                timestamp, protobuf_type, proto = ProtoPlayer.unpack_log_entry(line, version)
+                timestamp, protobuf_type, proto = ProtoPlayer.unpack_log_entry(
+                    line, version
+                )
             except Exception as e:
                 print("Exception ignored. Please see below for more!")
                 print(e)
