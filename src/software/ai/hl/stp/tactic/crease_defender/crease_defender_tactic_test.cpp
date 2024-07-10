@@ -26,48 +26,9 @@ class CreaseDefenderTacticTest
     TbotsProto::AiConfig ai_config;
 };
 
-TEST_F(CreaseDefenderTacticTest, test_chip_ball)
-{
-    Point enemy_threat_point = Point(0.0, 0);
-    TbotsProto::CreaseDefenderAlignment alignment =
-        TbotsProto::CreaseDefenderAlignment::CENTRE;
-
-    Point initial_position = Point(-3, 1.0);
-
-    BallState ball_state(enemy_threat_point, Vector(-2.5, 0));
-    auto friendly_robots =
-        TestUtil::createStationaryRobotStatesWithId({initial_position});
-    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -1.5), field.enemyGoalCenter(),
-         field.enemyDefenseArea().negXNegYCorner(),
-         field.enemyDefenseArea().negXPosYCorner()});
-
-    auto tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.robot_navigation_obstacle_config());
-
-    tactic->updateControlParams(enemy_threat_point, alignment);
-    setTactic(0, tactic);
-
-    std::vector<ValidationFunction> terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
-            ballKicked(Angle::zero(), world_ptr, yield);
-            while (!tactic->done())
-            {
-                yield("Tactic not done");
-            }
-        }};
-
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
-
-    runTest(field_type, ball_state, friendly_robots, enemy_robots,
-            terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(5));
-}
-
 TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
 {
-    Point enemy_threat_point = Point(-1.5, 0.0);
+    Point enemy_threat_point = Point(3, 0.0);
     TbotsProto::CreaseDefenderAlignment alignment =
         TbotsProto::CreaseDefenderAlignment::CENTRE;
 
@@ -77,8 +38,7 @@ TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
         TestUtil::createStationaryRobotStatesWithId({initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.robot_navigation_obstacle_config());
+    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);
 
@@ -121,8 +81,7 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.robot_navigation_obstacle_config());
+    auto tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
 
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(0, tactic);

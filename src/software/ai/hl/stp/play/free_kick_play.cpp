@@ -37,10 +37,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config())};
+        std::make_shared<CreaseDefenderTactic>(ai_config),
+        std::make_shared<CreaseDefenderTactic>(ai_config)};
 
     auto attacker = std::make_shared<AttackerTactic>(ai_config);
 
@@ -99,10 +97,14 @@ void FreeKickPlay::chipAtGoalStage(
         chip_tactic->updateControlParams(world_ptr->ball().position(), chip_target);
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::LEFT);
+                                  TbotsProto::CreaseDefenderAlignment::LEFT,
+                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                                  TbotsProto::BallStealMode::IGNORE);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT,
+                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                                  TbotsProto::BallStealMode::IGNORE);
 
         yield({{chip_tactic, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -131,10 +133,14 @@ void FreeKickPlay::performPassStage(
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::LEFT);
+                                  TbotsProto::CreaseDefenderAlignment::LEFT,
+                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                                  TbotsProto::BallStealMode::IGNORE);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT,
+                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                                  TbotsProto::BallStealMode::IGNORE);
         yield({{attacker, receiver, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
     } while (!receiver->done());
@@ -179,10 +185,14 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::LEFT);
+                                  TbotsProto::CreaseDefenderAlignment::LEFT,
+                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                                  TbotsProto::BallStealMode::IGNORE);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT,
+                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                                  TbotsProto::BallStealMode::IGNORE);
         yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
                 std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -219,10 +229,14 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::LEFT);
+                                  TbotsProto::CreaseDefenderAlignment::LEFT,
+                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                                  TbotsProto::BallStealMode::IGNORE);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world_ptr->ball().position(),
-                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT,
+                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                                  TbotsProto::BallStealMode::IGNORE);
         yield({{align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
                 cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
