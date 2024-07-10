@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/skill/pass/pass_skill_fsm.h"
 
+#include "software/ai/evaluation/keep_away.h"
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/geom/algorithms/contains.h"
 
@@ -57,9 +58,9 @@ bool PassSkillFSM::passReceived(const SuspendedUpdate& event)
     const auto friendly_robots = event.world_ptr->friendlyTeam().getAllRobots();
 
     return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
-            return robot.isNearDribbler(event.world_ptr->ball().position());
-        });
+        friendly_robots.begin(), friendly_robots.end(),
+        [&](const Robot& robot)
+        { return robot.isNearDribbler(event.world_ptr->ball().position()); });
 }
 
 bool PassSkillFSM::strayPass(const SuspendedUpdate& event)
@@ -100,8 +101,8 @@ void PassSkillFSM::findPass(
     best_pass_so_far_ = event.common.strategy->getBestPass();
 
     // Update minimum pass score threshold. Wait for a good pass by starting out only
-    // looking for "perfect" passes (with a score of 1) and decreasing this threshold
-    // over time
+    // looking for "perfect" passes (with a high score close to 1) and decreasing this
+    // threshold over time
 
     const auto& ai_config           = event.common.strategy->getAiConfig();
     const double abs_min_pass_score = ai_config.passing_config().abs_min_pass_score();
@@ -122,8 +123,18 @@ void PassSkillFSM::findPass(
                                               pass_score_ramp_down_duration,
                                           min_perfect_pass_score - abs_min_pass_score);
 
-    Point receiver_point      = best_pass_so_far_->pass.receiverPoint();
     Point dribble_destination = event.common.world_ptr->ball().position();
+
+    // If the best pass so far has a less than "perfect" score, 
+    // try dribbling to an open area
+    if (best_pass_so_far_->rating < min_perfect_pass_score)
+    {
+        dribble_destination =
+            findKeepAwayTargetPoint(*event.common.world_ptr, best_pass_so_far_->pass,
+                                    event.common.strategy->getAiConfig().passing_config());
+    }
+
+    Point receiver_point      = best_pass_so_far_->pass.receiverPoint();
     Angle dribble_orientation = (receiver_point - dribble_destination).orientation();
 
     DribbleSkillFSM::ControlParams control_params = {
