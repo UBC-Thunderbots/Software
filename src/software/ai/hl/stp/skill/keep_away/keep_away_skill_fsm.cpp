@@ -13,9 +13,9 @@ bool KeepAwaySkillFSM::shouldKeepAway(const Update& event)
                                                 .attacker_tactic_config()
                                                 .enemy_about_to_steal_ball_radius());
     const bool possession_threatened =
-        std::any_of(enemy_robots.begin(), enemy_robots.end(),
-                    [&](const Robot& enemy)
-                    { return contains(about_to_steal_danger_zone, enemy.position()); });
+        std::any_of(enemy_robots.begin(), enemy_robots.end(), [&](const Robot& enemy) {
+            return contains(about_to_steal_danger_zone, enemy.position());
+        });
 
     return !event.control_params.terminate_if_unthreatened || possession_threatened;
 }

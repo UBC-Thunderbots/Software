@@ -201,8 +201,8 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> DribbleSkillFSM
-DribbleSkillFSM --> DribbleSkillFSM : [isPossessionThreatened]\n<i>keepAway</i>
-DribbleSkillFSM --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
+DribbleSkillFSM --> Terminate:::terminate : [!shouldKeepAway]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
+DribbleSkillFSM --> DribbleSkillFSM : <i>keepAway</i>
 DribbleSkillFSM --> Terminate:::terminate
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 

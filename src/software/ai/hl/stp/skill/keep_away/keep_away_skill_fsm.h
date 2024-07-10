@@ -43,8 +43,8 @@ struct KeepAwaySkillFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *DribbleSkillFSM_S +
-                Update_E[!shouldKeepAway_G] / SET_STOP_PRIMITIVE_ACTION = X,
+            *DribbleSkillFSM_S + Update_E[!shouldKeepAway_G] / SET_STOP_PRIMITIVE_ACTION =
+                X,
             DribbleSkillFSM_S + Update_E / keepAway_A, DribbleSkillFSM_S = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
