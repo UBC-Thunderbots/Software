@@ -4,7 +4,7 @@
 
 #include <unistd.h>
 
-class GpioCharDev: Gpio
+class GpioCharDev: public Gpio
 {
    public:
     /**
@@ -33,7 +33,7 @@ class GpioCharDev: Gpio
     /**
      * Get the current state of the gpio
      */
-    GpioState getValue(void) override;
+    GpioState getValue() override;
 
    private:
     /**

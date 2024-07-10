@@ -7,7 +7,7 @@
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/robot_constants.h"
-#include "software/embedded/gpio_char_dev.h"
+#include "software/embedded/gpio.h"
 #include "software/physics/euclidean_to_wheel.h"
 
 class MotorService
@@ -335,12 +335,12 @@ class MotorService
     bool is_initialized_ = false;
 
     // Select between driver and controller gpio
-    GpioCharDev spi_demux_select_0_;
-    GpioCharDev spi_demux_select_1_;
+    std::unique_ptr<Gpio> spi_demux_select_0_;
+    std::unique_ptr<Gpio> spi_demux_select_1_;
 
     // Enable driver gpio
-    GpioCharDev driver_control_enable_gpio_;
-    GpioCharDev reset_gpio_;
+    std::unique_ptr<Gpio> driver_control_enable_gpio_;
+    std::unique_ptr<Gpio> reset_gpio_;
 
     // Transfer Buffers for spiTransfer
     uint8_t tx_[5] = {0};

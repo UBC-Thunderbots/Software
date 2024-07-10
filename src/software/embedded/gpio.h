@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/util/make_enum/make_enum.h"
 
 MAKE_ENUM(GpioState, LOW, HIGH);
@@ -16,5 +18,5 @@ class Gpio
         /**
          * Get the current state of the gpio
          */
-        virtual GpioState getValue(void) = 0;
+        virtual GpioState getValue() = 0;
 };

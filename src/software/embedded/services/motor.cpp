@@ -26,6 +26,8 @@
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 
 #include "shared/thunderloop_constants.h"
+#include "software/embedded/gpio_char_dev.h"
+#include "software/embedded/gpio_sysfs.h"
 
 extern "C"
 {
@@ -43,13 +45,6 @@ static const uint8_t SPI_BITS           = 8;
 static const uint32_t SPI_MODE          = 0x3u;
 static const uint32_t NUM_RETRIES_SPI   = 3;
 static const uint32_t TMC_CMD_MSG_SIZE  = 5;
-
-
-
-
-
-
-
 
 static double RUNAWAY_PROTECTION_THRESHOLD_MPS         = 2.00;
 static int DRIBBLER_ACCELERATION_THRESHOLD_RPM_PER_S_2 = 10000;
@@ -77,20 +72,30 @@ extern "C"
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            int control_loop_frequency_hz)
-    : spi_demux_select_0_(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
-                          GpioState::LOW, "/dev/gpiochip4"),
-      spi_demux_select_1_(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT,
-                          GpioState::LOW, "/dev/gpiochip4"),
-      driver_control_enable_gpio_(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
-                                  GpioState::HIGH, "/dev/gpiochip4"),
-      reset_gpio_(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH, "/dev/gpiochip4"),
-      robot_constants_(robot_constants),
+    : robot_constants_(robot_constants),
       euclidean_to_four_wheel_(robot_constants),
       motor_fault_detector_(0),
       dribbler_ramp_rpm_(0),
       tracked_motor_fault_start_time_(std::nullopt),
       num_tracked_motor_resets_(0)
 {
+#ifdef PI
+        spi_demux_select_0_ = std::make_unique<GpioCharDev>(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
+                                          GpioState::LOW, "/dev/gpiochip4");
+        spi_demux_select_1_ = std::make_unique<GpioCharDev>(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT,
+                                          GpioState::LOW, "/dev/gpiochip4");
+        driver_control_enable_gpio_ = std::make_unique<GpioCharDev>(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
+                                                  GpioState::HIGH, "/dev/gpiochip4");
+        reset_gpio_ = std::make_unique<GpioCharDev>(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH, "/dev/gpiochip4");
+#else
+        spi_demux_select_0_ = std::make_unique<GpioSysfs>(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
+                                          GpioState::LOW);
+        spi_demux_select_1_ = std::make_unique<GpioSysfs>(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT,
+                                          GpioState::LOW);
+        driver_control_enable_gpio_ = std::make_unique<GpioSysfs>(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
+                                                  GpioState::HIGH);
+        reset_gpio_ = std::make_unique<GpioSysfs>(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH);
+#endif
     motorServiceInit(robot_constants, control_loop_frequency_hz);
 }
 
@@ -171,10 +176,10 @@ void MotorService::setup()
     prev_wheel_velocities_ = {0.0, 0.0, 0.0, 0.0};
 
     // Clear faults by resetting all the chips on the motor board
-    reset_gpio_.setValue(GpioState::LOW);
+    reset_gpio_->setValue(GpioState::LOW);
     usleep(MICROSECONDS_PER_MILLISECOND * 100);
 
-    reset_gpio_.setValue(GpioState::HIGH);
+    reset_gpio_->setValue(GpioState::HIGH);
     usleep(MICROSECONDS_PER_MILLISECOND * 100);
 
     for (uint8_t motor = 0; motor < NUM_MOTORS; ++motor)
@@ -488,28 +493,28 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
                  prev_wheel_velocities_[FRONT_RIGHT_WHEEL_SPACE_INDEX]) >
         RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
-        driver_control_enable_gpio_.setValue(GpioState::LOW);
+        driver_control_enable_gpio_->setValue(GpioState::LOW);
         LOG(FATAL) << "Front right motor runaway";
     }
     else if (std::abs(current_wheel_velocities[FRONT_LEFT_WHEEL_SPACE_INDEX] -
                       prev_wheel_velocities_[FRONT_LEFT_WHEEL_SPACE_INDEX]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
-        driver_control_enable_gpio_.setValue(GpioState::LOW);
+        driver_control_enable_gpio_->setValue(GpioState::LOW);
         LOG(FATAL) << "Front left motor runaway";
     }
     else if (std::abs(current_wheel_velocities[BACK_LEFT_WHEEL_SPACE_INDEX] -
                       prev_wheel_velocities_[BACK_LEFT_WHEEL_SPACE_INDEX]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
-        driver_control_enable_gpio_.setValue(GpioState::LOW);
+        driver_control_enable_gpio_->setValue(GpioState::LOW);
         LOG(FATAL) << "Back left motor runaway";
     }
     else if (std::abs(current_wheel_velocities[BACK_RIGHT_WHEEL_SPACE_INDEX] -
                       prev_wheel_velocities_[BACK_RIGHT_WHEEL_SPACE_INDEX]) >
              RUNAWAY_PROTECTION_THRESHOLD_MPS)
     {
-        driver_control_enable_gpio_.setValue(GpioState::LOW);
+        driver_control_enable_gpio_->setValue(GpioState::LOW);
         LOG(FATAL) << "Back right motor runaway";
     }
 
@@ -703,16 +708,16 @@ void MotorService::readThenWriteSpiTransfer(int fd, const uint8_t* read_tx,
 uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
-    spi_demux_select_0_.setValue(GpioState::HIGH);
-    spi_demux_select_1_.setValue(GpioState::LOW);
+    spi_demux_select_0_->setValue(GpioState::HIGH);
+    spi_demux_select_1_->setValue(GpioState::LOW);
     return readWriteByte(motor, data, last_transfer, TMC4671_SPI_SPEED);
 }
 
 int32_t MotorService::tmc4671ReadThenWriteValue(uint8_t motor, uint8_t read_addr,
                                                 uint8_t write_addr, int32_t write_data)
 {
-    spi_demux_select_0_.setValue(GpioState::HIGH);
-    spi_demux_select_1_.setValue(GpioState::LOW);
+    spi_demux_select_0_->setValue(GpioState::HIGH);
+    spi_demux_select_1_->setValue(GpioState::LOW);
     // ensure tx_ and rx_ are cleared
     memset(read_tx_, 0, 5);
     memset(write_tx_, 0, 5);
@@ -751,8 +756,8 @@ int32_t MotorService::tmc4671ReadThenWriteValue(uint8_t motor, uint8_t read_addr
 uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
-    spi_demux_select_0_.setValue(GpioState::LOW);
-    spi_demux_select_1_.setValue(GpioState::HIGH);
+    spi_demux_select_0_->setValue(GpioState::LOW);
+    spi_demux_select_1_->setValue(GpioState::HIGH);
     return readWriteByte(motor, data, last_transfer, TMC6100_SPI_SPEED);
 }
 
@@ -839,7 +844,7 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
 
     // If we get here, we have failed to write to the driver. We reset
     // the chip to clear any bad values we just wrote and crash so everything stops.
-    reset_gpio_.setValue(GpioState::LOW);
+    reset_gpio_->setValue(GpioState::LOW);
     CHECK(read_value == value) << "Couldn't write " << value
                                << " to the TMC6100 at address " << address
                                << " at address " << static_cast<uint32_t>(address)
@@ -879,7 +884,7 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
 
     // If we get here, we have failed to write to the controller. We reset
     // the chip to clear any bad values we just wrote and crash so everything stops.
-    reset_gpio_.setValue(GpioState::LOW);
+    reset_gpio_->setValue(GpioState::LOW);
     CHECK(read_value == value) << "Couldn't write " << value
                                << " to the TMC4671 at address " << address
                                << " at address " << static_cast<uint32_t>(address)
@@ -1204,5 +1209,5 @@ void MotorService::checkEncoderConnections()
 
 void MotorService::resetMotorBoard()
 {
-    reset_gpio_.setValue(GpioState::LOW);
+    reset_gpio_->setValue(GpioState::LOW);
 }

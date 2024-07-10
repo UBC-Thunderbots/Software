@@ -15,6 +15,12 @@ cc_library(
         "@eigen",
         "@trinamic",
     ],
+    defines =
+    select({
+      "//shared:build_nano": ["NANO"],
+      "//shared:build_pi": ["PI"],
+      "//conditions:default": ["NONE"],
+    })
 )
 
 cc_library(
