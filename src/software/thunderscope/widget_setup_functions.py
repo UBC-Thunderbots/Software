@@ -305,8 +305,13 @@ def setup_q_learning_info(proto_unix_io: ProtoUnixIO) -> QLearningInfoWidget:
     :returns: The Q-learning info widget
     """
     q_learning_info = QLearningInfoWidget()
+
     proto_unix_io.register_observer(
         LinearQFunctionInfo, q_learning_info.linear_q_func_info_buffer
+    )
+    proto_unix_io.register_observer(
+        ActionSelectionStrategyInfo,
+        q_learning_info.action_selection_strategy_info_buffer,
     )
 
     return q_learning_info

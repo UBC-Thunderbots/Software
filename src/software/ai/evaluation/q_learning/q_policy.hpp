@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include "proto/q_learning.pb.h"
 #include "software/ai/evaluation/q_learning/bandits/action_selection_strategy.hpp"
 #include "software/ai/evaluation/q_learning/q_function.hpp"
 
@@ -35,9 +36,10 @@ class QPolicy
      *
      * @param state the state the take the action from
      *
-     * @return the action to take
+     * @return the action to take and information about how the action was selected
      */
-    TAction selectAction(const TState& state);
+    std::tuple<TAction, TbotsProto::ActionSelectionStrategyInfo> selectAction(
+        const TState& state);
 
     /**
      * Updates the policy with new information about the new state entered and
@@ -74,12 +76,16 @@ QPolicy<TState, TAction>::QPolicy(
 }
 
 template <typename TState, typename TAction>
-TAction QPolicy<TState, TAction>::selectAction(const TState& state)
+std::tuple<TAction, TbotsProto::ActionSelectionStrategyInfo>
+QPolicy<TState, TAction>::selectAction(const TState& state)
 {
-    last_state_  = state;
-    last_action_ = action_selection_strategy_->selectAction(state, *q_function_);
+    auto [action, action_selection_strategy_info] =
+        action_selection_strategy_->selectAction(state, *q_function_);
 
-    return *last_action_;
+    last_state_  = state;
+    last_action_ = action;
+
+    return {action, action_selection_strategy_info};
 }
 
 template <typename TState, typename TAction>

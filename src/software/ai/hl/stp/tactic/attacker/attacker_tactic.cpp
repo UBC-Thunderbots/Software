@@ -136,8 +136,14 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
                                                        .action_selection_temperature());
 
         // Select the next skill to execute according to the policy
-        auto action    = policy_.selectAction(attacker_mdp_state);
+        auto [action, action_selection_strategy_info] =
+            policy_.selectAction(attacker_mdp_state);
+
         current_skill_ = createSkillFromAttackerMdpAction(action, strategy_);
+
+        // Visualize the ActionSelectionStrategyInfo in Thunderscope
+        action_selection_strategy_info.set_mdp_name(ATTACKER_MDP_NAME);
+        LOG(VISUALIZE) << action_selection_strategy_info;
 
         attacker_mdp_reward_function_.startStepObservation(tactic_update.world_ptr);
     }
@@ -173,7 +179,7 @@ void AttackerTactic::updatePolicy(const AttackerMdpState& attacker_mdp_state)
 
         // Send Q-function info message to Thunderscope
         TbotsProto::LinearQFunctionInfo q_function_info = q_function_->getInfo();
-        q_function_info.set_name(ATTACKER_MDP_Q_FUNCTION_NAME);
+        q_function_info.set_mdp_name(ATTACKER_MDP_NAME);
         LOG(VISUALIZE) << q_function_info;
     }
 }

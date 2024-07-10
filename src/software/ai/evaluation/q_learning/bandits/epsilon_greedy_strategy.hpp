@@ -32,8 +32,8 @@ class EpsilonGreedyStrategy : public ActionSelectionStrategy<TState, TAction>
      */
     explicit EpsilonGreedyStrategy(double epsilon);
 
-    TAction selectAction(const TState& state,
-                         const QFunction<TState, TAction>& q_function) override;
+    std::tuple<TAction, TbotsProto::ActionSelectionStrategyInfo> selectAction(
+        const TState& state, const QFunction<TState, TAction>& q_function) override;
 
     /**
      * Sets the epsilon parameter that controls how much we explore and how much we
@@ -67,22 +67,25 @@ EpsilonGreedyStrategy<TState, TAction>::EpsilonGreedyStrategy(double epsilon)
 }
 
 template <typename TState, typename TAction>
-TAction EpsilonGreedyStrategy<TState, TAction>::selectAction(
+std::tuple<TAction, TbotsProto::ActionSelectionStrategyInfo>
+EpsilonGreedyStrategy<TState, TAction>::selectAction(
     const TState& state, const QFunction<TState, TAction>& q_function)
 {
     constexpr auto all_actions = reflective_enum::values<TAction>();
 
+    TAction selected_action;
+
     if (random_num_dist_(random_num_gen_) < epsilon_)
     {
         // Explore: select random action from action space
-        return all_actions.at(random_action_dist_(random_num_gen_));
+        selected_action = all_actions.at(random_action_dist_(random_num_gen_));
     }
     else
     {
         // Exploit: select the action with the largest Q-value
         // i.e. argmax(Q(s, a)) over the set of all actions A
-        TAction selected_action = all_actions.back();
-        double max_q_value      = std::numeric_limits<double>::lowest();
+        selected_action    = all_actions.back();
+        double max_q_value = std::numeric_limits<double>::lowest();
 
         for (const auto& action : all_actions)
         {
@@ -93,9 +96,25 @@ TAction EpsilonGreedyStrategy<TState, TAction>::selectAction(
                 max_q_value     = q_value;
             }
         }
-
-        return selected_action;
     }
+
+    std::vector<TbotsProto::ActionSelectionStrategyInfo::Action> action_infos(
+        all_actions.size());
+
+    for (size_t i = 0; i < all_actions.size(); ++i)
+    {
+        TAction action = all_actions.at(i);
+        action_infos.at(i).set_name(std::string(reflective_enum::nameOf(action)));
+        action_infos.at(i).set_value(q_function.getQValue(state, action));
+        action_infos.at(i).set_selected(action == selected_action);
+    }
+
+    TbotsProto::ActionSelectionStrategyInfo action_selection_strategy_info;
+    *action_selection_strategy_info.mutable_actions() = {action_infos.begin(),
+                                                         action_infos.end()};
+    action_selection_strategy_info.set_action_value_description("Q-value");
+
+    return {selected_action, action_selection_strategy_info};
 }
 
 template <typename TState, typename TAction>

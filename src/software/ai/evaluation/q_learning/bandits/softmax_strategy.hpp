@@ -36,8 +36,8 @@ class SoftmaxStrategy : public ActionSelectionStrategy<TState, TAction>
      */
     explicit SoftmaxStrategy(double temperature);
 
-    TAction selectAction(const TState& state,
-                         const QFunction<TState, TAction>& q_function) override;
+    std::tuple<TAction, TbotsProto::ActionSelectionStrategyInfo> selectAction(
+        const TState& state, const QFunction<TState, TAction>& q_function) override;
 
     /**
      * Sets the temperature parameter that controls how much we explore and how much we
@@ -72,7 +72,8 @@ SoftmaxStrategy<TState, TAction>::SoftmaxStrategy(double temperature)
 }
 
 template <typename TState, typename TAction>
-TAction SoftmaxStrategy<TState, TAction>::selectAction(
+std::tuple<TAction, TbotsProto::ActionSelectionStrategyInfo>
+SoftmaxStrategy<TState, TAction>::selectAction(
     const TState& state, const QFunction<TState, TAction>& q_function)
 {
     constexpr auto all_actions = reflective_enum::values<TAction>();
@@ -94,17 +95,35 @@ TAction SoftmaxStrategy<TState, TAction>::selectAction(
     const double random_num = random_num_dist_(random_num_gen_);
 
     // Linear search finds the slot that contains the ball
-    double current_cutoff = 0;
+    TAction selected_action = all_actions.back();
+    double current_cutoff   = 0;
     for (size_t i = 0; i < all_actions.size() - 1; ++i)
     {
         current_cutoff += probabilities[i];
         if (random_num < current_cutoff)
         {
-            return all_actions.at(i);
+            selected_action = all_actions.at(i);
         }
     }
 
-    return all_actions.back();
+    std::vector<TbotsProto::ActionSelectionStrategyInfo::Action> action_infos(
+        all_actions.size());
+
+    for (size_t i = 0; i < all_actions.size(); ++i)
+    {
+        TAction action = all_actions.at(i);
+        action_infos.at(i).set_name(std::string(reflective_enum::nameOf(action)));
+        action_infos.at(i).set_value(probabilities[i]);
+        action_infos.at(i).set_selected(action == selected_action);
+    }
+
+    TbotsProto::ActionSelectionStrategyInfo action_selection_strategy_info;
+    *action_selection_strategy_info.mutable_actions() = {action_infos.begin(),
+                                                         action_infos.end()};
+    action_selection_strategy_info.set_action_value_description(
+        "Softmax Probability from Q-value");
+
+    return {selected_action, action_selection_strategy_info};
 }
 
 template <typename TState, typename TAction>

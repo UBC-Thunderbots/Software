@@ -72,6 +72,7 @@ cc_library(
     deps = [
         ":feature_extractor",
         ":q_function",
+        "//proto:tbots_cc_proto",
         "//software/ai/evaluation/q_learning/bandits:action_selection_strategy",
         "@eigen",
     ],

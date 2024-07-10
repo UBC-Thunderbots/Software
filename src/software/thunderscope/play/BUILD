@@ -20,6 +20,7 @@ py_library(
         "//proto:software_py_proto",
         "//software/thunderscope:constants",
         "//software/thunderscope:thread_safe_buffer",
+        "//software/thunderscope/common:bar_graph_widget",
         requirement("pyqtgraph"),
     ],
 )

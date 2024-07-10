@@ -1,5 +1,8 @@
 #pragma once
 
+#include <tuple>
+
+#include "proto/q_learning.pb.h"
 #include "software/ai/evaluation/q_learning/q_function.hpp"
 
 /**
@@ -24,8 +27,8 @@ class ActionSelectionStrategy
      * @param state the state the take the action from
      * @param q_function the Q-function to use
      *
-     * @return the action to take
+     * @return the action to take and information about how the action was selected
      */
-    virtual TAction selectAction(const TState& state,
-                                 const QFunction<TState, TAction>& q_function) = 0;
+    virtual std::tuple<TAction, TbotsProto::ActionSelectionStrategyInfo> selectAction(
+        const TState& state, const QFunction<TState, TAction>& q_function) = 0;
 };

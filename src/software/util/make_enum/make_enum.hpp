@@ -57,12 +57,17 @@
     {                                                                                      \
         return enum_value_names_##name;                                                    \
     }                                                                                      \
+    template <>                                                                            \
+    constexpr std::string_view reflective_enum::nameOf<name>(const name value)             \
+    {                                                                                      \
+        return reflective_enum::valueNames<name>().at(static_cast<int>(value));            \
+    }                                                                                      \
     inline std::ostream& operator<<(std::ostream& os, name value)                          \
     {                                                                                      \
         /* This index lookup relies on the assumption that the enum does not manually */   \
         /* specify any values. If it did, the underlying integer of the given value */     \
         /* may be out of range of the vector of strings */                                 \
-        os << reflective_enum::valueNames<name>().at(static_cast<int>(value));             \
+        os << reflective_enum::nameOf<name>(value);                                        \
         return os;                                                                         \
     }
 
@@ -123,4 +128,14 @@ namespace reflective_enum
         }
         throw std::invalid_argument(value_name + " cannot be converted to enum value");
     }
+
+    /**
+     * Returns the string representation of the given enum value.
+     *
+     * @param value the enum value
+     *
+     * @return the string representation of the enum value
+     */
+    template <typename E>
+    constexpr std::string_view nameOf(const E value);
 }  // namespace reflective_enum
