@@ -8,7 +8,7 @@ void PivotKickSkillFSM::getBallControlAndPivot(
     DribbleSkillFSM::ControlParams control_params{
         .dribble_destination       = event.control_params.kick_origin,
         .final_dribble_orientation = event.control_params.kick_direction,
-        .excessive_dribbling_mode = TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED};
+        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED};
 
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
 }

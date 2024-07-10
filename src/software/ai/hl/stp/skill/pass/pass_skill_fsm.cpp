@@ -58,9 +58,9 @@ bool PassSkillFSM::passReceived(const SuspendedUpdate& event)
     const auto friendly_robots = event.world_ptr->friendlyTeam().getAllRobots();
 
     return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(),
-        [&](const Robot& robot)
-        { return robot.isNearDribbler(event.world_ptr->ball().position()); });
+        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
+            return robot.isNearDribbler(event.world_ptr->ball().position());
+        });
 }
 
 bool PassSkillFSM::strayPass(const SuspendedUpdate& event)
@@ -125,13 +125,13 @@ void PassSkillFSM::findPass(
 
     Point dribble_destination = event.common.world_ptr->ball().position();
 
-    // If the best pass so far has a less than "perfect" score, 
+    // If the best pass so far has a less than "perfect" score,
     // try dribbling to an open area
     if (best_pass_so_far_->rating < min_perfect_pass_score)
     {
-        dribble_destination =
-            findKeepAwayTargetPoint(*event.common.world_ptr, best_pass_so_far_->pass,
-                                    event.common.strategy->getAiConfig().passing_config());
+        dribble_destination = findKeepAwayTargetPoint(
+            *event.common.world_ptr, best_pass_so_far_->pass,
+            event.common.strategy->getAiConfig().passing_config());
     }
 
     Point receiver_point      = best_pass_so_far_->pass.receiverPoint();
@@ -140,7 +140,7 @@ void PassSkillFSM::findPass(
     DribbleSkillFSM::ControlParams control_params = {
         .dribble_destination       = dribble_destination,
         .final_dribble_orientation = dribble_orientation,
-        .excessive_dribbling_mode = TbotsProto::ExcessiveDribblingMode::TERMINATE};
+        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::TERMINATE};
 
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
 }

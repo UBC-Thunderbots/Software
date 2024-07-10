@@ -14,10 +14,10 @@ cc_library(
         "pass_skill_fsm.h",
     ],
     deps = [
+        "//software/ai/evaluation:keep_away",
         "//software/ai/hl/stp/skill:base_skill",
         "//software/ai/hl/stp/skill/dribble:dribble_skill",
         "//software/ai/hl/stp/skill/pivot_kick:pivot_kick_skill",
-        "//software/ai/evaluation:keep_away",
         "//software/util/generic_factory",
     ],
     alwayslink = True,
