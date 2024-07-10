@@ -230,11 +230,17 @@ if __name__ == "__main__":
 
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
     if not args.run_blue and not args.run_yellow and args.launch_gc:
-        parser.error("--launch_gc has to be ran with --run_blue or --run_yellow argument")
+        parser.error(
+            "--launch_gc has to be ran with --run_blue or --run_yellow argument"
+        )
 
     # Sanity check that an interface was provided if we are running diagnostics since it will not load the network
     # configuration widget
-    if not (args.run_blue or args.run_yellow) and args.run_diagnostics and args.interface is None:
+    if (
+        not (args.run_blue or args.run_yellow)
+        and args.run_diagnostics
+        and args.interface is None
+    ):
         parser.error("Must specify interface")
 
     ###########################################################################

@@ -20,6 +20,7 @@ DISCONNECTED = "DISCONNECTED"
 
 logger = logging.getLogger(__name__)
 
+
 class RobotCommunication(object):
     """ Communicate with the robots """
 
@@ -210,7 +211,8 @@ class RobotCommunication(object):
         primitives if using radio
         """
         if (
-            robot_communication_interface == self.current_network_config.robot_communication_interface
+            robot_communication_interface
+            == self.current_network_config.robot_communication_interface
             or robot_communication_interface == DISCONNECTED
         ):
             return
@@ -226,44 +228,50 @@ class RobotCommunication(object):
             """
             listener, error = listener_creator()
             if error:
-                is_listener_setup_successfully = False
                 logger.error(f"Error setting up robot status interface: {error}")
 
             return listener
 
-
         # Create the multicast listeners
-        self.receive_robot_status = setup_listener(lambda: tbots_cpp.createRobotStatusProtoListener(
-            self.multicast_channel,
-            ROBOT_STATUS_PORT,
-            robot_communication_interface,
-            self.__receive_robot_status,
-            True,
-        ))
+        self.receive_robot_status = setup_listener(
+            lambda: tbots_cpp.createRobotStatusProtoListener(
+                self.multicast_channel,
+                ROBOT_STATUS_PORT,
+                robot_communication_interface,
+                self.__receive_robot_status,
+                True,
+            )
+        )
 
-        self.receive_robot_log = setup_listener(lambda: tbots_cpp.createRobotLogProtoListener(
-            self.multicast_channel,
-            ROBOT_LOGS_PORT,
-            robot_communication_interface,
-            lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
-            True,
-        ))
+        self.receive_robot_log = setup_listener(
+            lambda: tbots_cpp.createRobotLogProtoListener(
+                self.multicast_channel,
+                ROBOT_LOGS_PORT,
+                robot_communication_interface,
+                lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
+                True,
+            )
+        )
 
-
-        self.receive_robot_crash = setup_listener(lambda: tbots_cpp.createRobotCrashProtoListener(
-            self.multicast_channel,
-            ROBOT_CRASH_PORT,
-            robot_communication_interface,
-            lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),
-            True,
-        ))
+        self.receive_robot_crash = setup_listener(
+            lambda: tbots_cpp.createRobotCrashProtoListener(
+                self.multicast_channel,
+                ROBOT_CRASH_PORT,
+                robot_communication_interface,
+                lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),
+                True,
+            )
+        )
 
         # Create multicast senders
         if self.enable_radio:
             self.send_primitive_set = tbots_cpp.PrimitiveSetProtoRadioSender()
         else:
             self.send_primitive_set, error = tbots_cpp.createPrimitiveSetProtoUdpSender(
-                self.multicast_channel, PRIMITIVE_PORT, robot_communication_interface, True
+                self.multicast_channel,
+                PRIMITIVE_PORT,
+                robot_communication_interface,
+                True,
             )
 
             if error:
@@ -271,7 +279,9 @@ class RobotCommunication(object):
                 print(f"Error setting up primitive set sender: {error}")
 
         self.current_network_config.robot_communication_interface = (
-            robot_communication_interface if is_listener_setup_successfully else DISCONNECTED
+            robot_communication_interface
+            if is_listener_setup_successfully
+            else DISCONNECTED
         )
 
     def close_for_fullsystem(self) -> None:
@@ -374,7 +384,8 @@ class RobotCommunication(object):
 
         """
         network_config = self.network_config_buffer.get(
-            block=True if self.accept_next_network_config else False, return_cached=False
+            block=True if self.accept_next_network_config else False,
+            return_cached=False,
         )
         while self.running:
             if network_config is not None and self.accept_next_network_config:
@@ -390,9 +401,11 @@ class RobotCommunication(object):
                 )
                 self.__print_current_network_config()
             elif network_config is not None:
-                logger.warning("[RobotCommunication] We received a proto configuration update with a newer network"
-                " configuration. We will ignore this update, likely because the interface was provided at startup but"
-                " the next update will be accepted.")
+                logger.warning(
+                    "[RobotCommunication] We received a proto configuration update with a newer network"
+                    " configuration. We will ignore this update, likely because the interface was provided at startup but"
+                    " the next update will be accepted."
+                )
                 self.accept_next_network_config = True
                 self.__print_current_network_config()
 
@@ -527,7 +540,8 @@ class RobotCommunication(object):
 
         print(
             output_string(
-                "Robot Status\t", self.current_network_config.robot_communication_interface
+                "Robot Status\t",
+                self.current_network_config.robot_communication_interface,
             )
         )
         print(output_string("Vision\t\t", self.current_network_config.vision_interface))
