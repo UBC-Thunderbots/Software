@@ -352,3 +352,12 @@ class CustomGLOptions:
         GL_ALPHA_TEST: False,
         GL_CULL_FACE: False,
     }
+
+
+class ProtoPlayerFlags(Enum):
+    """
+    Flags set by the ProtoPlayer to indicate the state of the player
+    """
+
+    NO_ERROR_FLAG = 0
+    UNCAUGHT_EXCEPTION_FLAG = 1 << 0
