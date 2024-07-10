@@ -41,6 +41,14 @@ enum CreaseDefenderAlignment
     CENTRE = 2;
 }
 
+enum BallStealMode
+{
+    // The robot avoids stealing ball/getting possession
+    IGNORE = 0;
+    // The robot can steal the ball/try to get possession of the ball
+    STEAL = 1;
+}
+
 message CreaseDefenderTactic
 {
     // The origin point of the enemy threat
@@ -49,6 +57,8 @@ message CreaseDefenderTactic
     required CreaseDefenderAlignment crease_defender_alignment = 2;
     // The maximum allowed speed mode
     required MaxAllowedSpeedMode max_allowed_speed_mode = 3;
+    // The crease defender's aggressiveness towards the ball
+    required BallStealMode ball_steal_mode = 4;
 }
 
 message GoalieTactic

@@ -34,7 +34,7 @@ struct GoalieFSM
     /**
      * Constructor for GoalieFSM struct
      *
-     * @param goalie_tactic_config The config to fetch parameters from
+     * @param strategy the Strategy shared by all of AI
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
     explicit GoalieFSM(std::shared_ptr<Strategy> strategy,

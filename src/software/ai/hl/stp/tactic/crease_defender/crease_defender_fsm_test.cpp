@@ -120,23 +120,27 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_threat_in_crease)
 
 TEST(CreaseDefenderFSMTest, test_transitions)
 {
-    TbotsProto::RobotNavigationObstacleConfig config;
-    double robot_obstacle_inflation_factor = config.robot_obstacle_inflation_factor();
-    std::shared_ptr<World> world           = ::TestUtil::createBlankTestingWorld();
-    Robot robot                            = ::TestUtil::createRobotAtPos(Point(-2, -3));
+    std::shared_ptr<Strategy> strategy =
+        std::make_shared<Strategy>(TbotsProto::AiConfig());
+    double robot_obstacle_inflation_factor = strategy->getAiConfig()
+                                                 .robot_navigation_obstacle_config()
+                                                 .robot_obstacle_inflation_factor();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+    Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
     ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(123));
     CreaseDefenderFSM::ControlParams control_params{
         .enemy_threat_origin       = Point(2, 3),
         .crease_defender_alignment = TbotsProto::CreaseDefenderAlignment::LEFT,
-        .max_allowed_speed_mode    = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT};
+        .max_allowed_speed_mode    = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        .ball_steal_mode           = TbotsProto::BallStealMode::STEAL};
 
-    FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM{config});
+    FSM<CreaseDefenderFSM> fsm(CreaseDefenderFSM{strategy}, DribbleSkillFSM());
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // robot far from destination, ball in friendly half
     fsm.process_event(CreaseDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM>));
 
     auto block_point = CreaseDefenderFSM::findBlockThreatPoint(
         world->field(), control_params.enemy_threat_origin,
@@ -149,15 +153,16 @@ TEST(CreaseDefenderFSMTest, test_transitions)
             (control_params.enemy_threat_origin - block_point.value()).orientation(),
             AngularVelocity::zero()),
         Timestamp::fromSeconds(123));
-    // Set robot to the correct position to block the ball
+    // Set robot to the correct position to steal the ball
     fsm.process_event(CreaseDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::X));
-    // Check that the FSM stays done
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM>));
+    // Check that the FSM is stealing the ball
     fsm.process_event(CreaseDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::X));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM>));
 
+    // Check FSM steals ball
     robot.updateState(
         RobotState(
             block_point.value(), Vector(0, 0),
@@ -165,8 +170,31 @@ TEST(CreaseDefenderFSMTest, test_transitions)
                 Angle::half(),
             AngularVelocity::zero()),
         Timestamp::fromSeconds(123));
-    // change orientation to make the FSM not done
+    fsm.process_event(CreaseDefenderFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM>));
+
+    std::vector<Point> enemy_robots = {
+        Point(0, 0),
+    };
+    ::TestUtil::setEnemyRobotPositions(world, enemy_robots, Timestamp::fromSeconds(123));
+    // Check that the FSM stops dribbling with enemy near ball
     fsm.process_event(CreaseDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
+
+    robot.updateState(
+        RobotState(
+            block_point.value(), Vector(0, 0),
+            (control_params.enemy_threat_origin - block_point.value()).orientation(),
+            AngularVelocity::zero()),
+        Timestamp::fromSeconds(123));
+    // Check FSM terminates
+    fsm.process_event(CreaseDefenderFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::X));
+    // Check that FSM stays done
+    fsm.process_event(CreaseDefenderFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::X));
 }

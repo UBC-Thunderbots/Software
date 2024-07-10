@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "proto/tactic.pb.h"
+#include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
@@ -24,6 +25,8 @@ struct CreaseDefenderFSM
         TbotsProto::CreaseDefenderAlignment crease_defender_alignment;
         // The maximum allowed speed mode
         TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+        // The crease defender's aggressiveness towards the ball
+        TbotsProto::BallStealMode ball_steal_mode;
     };
 
     // this struct defines the only event that the CreaseDefenderFSM responds to
@@ -47,13 +50,29 @@ struct CreaseDefenderFSM
     /**
      * Constructor for CreaseDefenderFSM struct
      *
-     * @param robot_navigation_obstacle_config The config
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit CreaseDefenderFSM(
-        TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config)
-        : robot_navigation_obstacle_config(robot_navigation_obstacle_config)
-    {
-    }
+    explicit CreaseDefenderFSM(std::shared_ptr<Strategy> strategy) : strategy(strategy) {}
+
+    /**
+     * Guard that checks if the ball is on friendly side, nearby, and unguarded by the
+     * enemy (only if stealing is enabled).
+     *
+     * @param event CreaseDefenderFSM::Update event
+     *
+     * @return true if the ball is on friendly side, nearby, unguarded by the enemy up,
+     *          and within a max get possession threshold
+     */
+    bool ballNearbyWithoutThreat(const Update& event);
+
+    /**
+     * This is the Action that prepares for getting possession of the ball
+     * @param event CreaseDefenderFSM::Update event
+     * @param processEvent processes the DribbleSkillFSM::Update
+     */
+    void prepareGetPossession(
+        const Update& event,
+        boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
     /**
      * This is an Action that blocks the threat
@@ -70,14 +89,27 @@ struct CreaseDefenderFSM
         DEFINE_SML_STATE(MoveFSM)
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockThreat, MoveFSM)
+        DEFINE_SML_STATE(DribbleSkillFSM)
+        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
+            *MoveFSM_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
+                DribbleSkillFSM_S,
+            MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
+            DribbleSkillFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A =
+                MoveFSM_S,
+            DribbleSkillFSM_S + Update_E / prepareGetPossession_A,
+            X + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
+                DribbleSkillFSM_S,
             X + Update_E / blockThreat_A = MoveFSM_S);
     }
 
    private:
+    static constexpr double DETECT_THREAT_AHEAD_SHAPE_LENGTH_M = 1;
+    static constexpr double DETECT_THREAT_AHEAD_SHAPE_RADIUS_M = 0.25;
+
     /**
      * Finds the intersection with the front or sides of the defense area with the given
      * ray
@@ -93,6 +125,14 @@ struct CreaseDefenderFSM
     static std::optional<Point> findDefenseAreaIntersection(
         const Field& field, const Ray& ray, double robot_obstacle_inflation_factor);
 
-   private:
-    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
+    /**
+     * Returns true if any enemy robot is within the given zone
+     *
+     * @param event CreaseDefenderFSM::Update event
+     * @param zone a stadium shape that defines the zone
+     * @return true if any enemy robot is within the given zone, else false
+     */
+    static bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
+
+    std::shared_ptr<Strategy> strategy;
 };

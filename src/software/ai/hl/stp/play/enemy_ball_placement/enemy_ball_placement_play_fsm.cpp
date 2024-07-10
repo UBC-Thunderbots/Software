@@ -2,11 +2,8 @@
 
 EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(std::shared_ptr<Strategy> strategy)
     : strategy(strategy),
-      crease_defender_tactics(
-          {std::make_shared<CreaseDefenderTactic>(
-               strategy->getAiConfig().robot_navigation_obstacle_config()),
-           std::make_shared<CreaseDefenderTactic>(
-               strategy->getAiConfig().robot_navigation_obstacle_config())}),
+      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(strategy),
+                               std::make_shared<CreaseDefenderTactic>(strategy)}),
       avoid_interference_tactics({
           std::make_shared<AvoidInterferenceTactic>(),
           std::make_shared<AvoidInterferenceTactic>(),

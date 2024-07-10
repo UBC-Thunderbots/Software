@@ -65,7 +65,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
     // we intend to assign has changed
     setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
     setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
-    setAlignment(event, crease_defender_assignments);
+    setAlignment(event, crease_defender_assignments, TbotsProto::BallStealMode::STEAL);
     updatePassDefenderControlParams(pass_defender_assignments);
 
     PriorityTacticVector tactics_to_return = {{}, {}};
