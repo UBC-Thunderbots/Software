@@ -15,10 +15,9 @@
 // clang-format off
 MAKE_ENUM(AttackerMdpAction, 
           KEEP_AWAY, 
-          CHIP_PASS, 
           KICK_PASS, 
-          SHOOT, 
-          DRIBBLE_SHOOT)
+          SHOOT,
+)
 // clang-format on
 
 /**
