@@ -441,11 +441,11 @@ message PossessionTrackerConfig
 
 message NetworkConfig
 {
-    // The referee interface
-    required string referee_interface = 1 [default = "lo"];
+    // The robot communication interface
+    required string robot_communication_interface = 1 [default = "lo"];
 
-    // The robot status interface
-    required string robot_status_interface = 2 [default = "lo"];
+    // The referee interface
+    required string referee_interface = 2 [default = "lo"];
 
     // The vision interface
     required string vision_interface = 3 [default = "lo"];

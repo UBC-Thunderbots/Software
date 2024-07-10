@@ -11,14 +11,14 @@ import time
 
 
 class ProtoConfigurationWidget(QWidget):
-    DELAYED_CONFIGURATION_TIMEOUT_S = 5
-    """How long to wait after startup to send the first configuration to our AI"""
-
     """Creates a searchable parameter widget that can take any protobuf,
     and convert it into a pyqtgraph ParameterTree. This will allow users
     to modify the values.
 
     """
+
+    DELAYED_CONFIGURATION_TIMEOUT_S = 5
+    """How long to wait after startup to send the first configuration to our AI"""
 
     def __init__(
         self, proto_to_configure, on_change_callback, search_filter_threshold=60,

@@ -8,7 +8,8 @@ from proto.import_all_protos import *
 from pyqtgraph.Qt import QtCore
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from colorama import Fore, Style
-from typing import Type
+import logging
+from typing import Any, Callable, Tuple, Type
 import threading
 import time
 import os
@@ -17,9 +18,9 @@ from google.protobuf.message import Message
 DISCONNECTED = "DISCONNECTED"
 """A constant to represent a disconnected interface"""
 
+logger = logging.getLogger(__name__)
 
 class RobotCommunication(object):
-
     """ Communicate with the robots """
 
     def __init__(
@@ -85,10 +86,16 @@ class RobotCommunication(object):
             PowerControl, self.power_control_diagnostics_buffer
         )
 
-        if interface is None:
+        # we will be provided a proto configuration from the ProtoConfigurationWidget. If the user provides an
+        # interface, we will accept it as the first network configuration. If not, we will wait for this configuration
+        self.accept_next_network_config = True
+        if interface:
+            self.accept_next_network_config = False
+        else:
             interface = DISCONNECTED
+
         self.current_network_config = NetworkConfig(
-            robot_status_interface=interface,
+            robot_communication_interface=interface,
             vision_interface=interface,
             referee_interface=interface,
         )
@@ -96,6 +103,8 @@ class RobotCommunication(object):
         self.current_proto_unix_io.register_observer(
             NetworkConfig, self.network_config_buffer
         )
+        if self.accept_next_network_config:
+            self.__setup_for_robot_communication(interface)
 
         self.send_estop_state_thread = threading.Thread(
             target=self.__send_estop_state, daemon=True
@@ -121,6 +130,8 @@ class RobotCommunication(object):
                 )
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
+
+        self.__print_current_network_config()
 
     def setup_for_fullsystem(
         self,
@@ -187,58 +198,77 @@ class RobotCommunication(object):
             self.is_setup_for_fullsystem = True
 
     def __setup_for_robot_communication(
-        self, robot_status_interface: str = "lo"
+        self, robot_communication_interface: str = DISCONNECTED
     ) -> None:
         """
         Set up senders and listeners for communicating with the robots
 
-        :param robot_status_interface: the interface to listen/send for robot status data. Ignored for sending
+        :param robot_communication_interface: the interface to listen/send for robot status data. Ignored for sending
         primitives if using radio
         """
         if (
-            robot_status_interface == self.current_network_config.robot_status_interface
-            or robot_status_interface == DISCONNECTED
+            robot_communication_interface == self.current_network_config.robot_communication_interface
+            or robot_communication_interface == DISCONNECTED
         ):
             return
 
+        is_listener_setup_successfully = True
+
+        def setup_listener(listener_creator: Callable[[], Tuple[Any, str]]) -> Any:
+            """
+            Sets up a listener with the given creator function. Logs any errors that occur.
+
+            :param listener_creator: the function to create the listener. It must return a type of
+            (listener object, error)
+            """
+            listener, error = listener_creator()
+            if error:
+                is_listener_setup_successfully = False
+                logger.error(f"Error setting up robot status interface: {error}")
+
+            return listener
+
+
         # Create the multicast listeners
-        self.receive_robot_status, error = tbots_cpp.createRobotStatusProtoListener(
+        self.receive_robot_status = setup_listener(lambda: tbots_cpp.createRobotStatusProtoListener(
             self.multicast_channel,
             ROBOT_STATUS_PORT,
-            robot_status_interface,
+            robot_communication_interface,
             self.__receive_robot_status,
             True,
-        )
+        ))
 
-        self.receive_robot_log, error = tbots_cpp.createRobotLogProtoListener(
+        self.receive_robot_log = setup_listener(lambda: tbots_cpp.createRobotLogProtoListener(
             self.multicast_channel,
             ROBOT_LOGS_PORT,
-            robot_status_interface,
+            robot_communication_interface,
             lambda data: self.__forward_to_proto_unix_io(RobotLog, data),
             True,
-        )
+        ))
 
-        self.receive_robot_crash, error = tbots_cpp.createRobotCrashProtoListener(
+
+        self.receive_robot_crash = setup_listener(lambda: tbots_cpp.createRobotCrashProtoListener(
             self.multicast_channel,
             ROBOT_CRASH_PORT,
-            robot_status_interface,
+            robot_communication_interface,
             lambda data: self.current_proto_unix_io.send_proto(RobotCrash, data),
             True,
-        )
+        ))
 
         # Create multicast senders
         if self.enable_radio:
             self.send_primitive_set = tbots_cpp.PrimitiveSetProtoRadioSender()
         else:
             self.send_primitive_set, error = tbots_cpp.createPrimitiveSetProtoUdpSender(
-                self.multicast_channel, PRIMITIVE_PORT, robot_status_interface, True
+                self.multicast_channel, PRIMITIVE_PORT, robot_communication_interface, True
             )
 
-        if error:
-            print(f"Error setting up robot status interface: {error}")
+            if error:
+                is_listener_setup_successfully = False
+                print(f"Error setting up primitive set sender: {error}")
 
-        self.current_network_config.robot_status_interface = (
-            robot_status_interface if not error else DISCONNECTED
+        self.current_network_config.robot_communication_interface = (
+            robot_communication_interface if is_listener_setup_successfully else DISCONNECTED
         )
 
     def close_for_fullsystem(self) -> None:
@@ -341,19 +371,26 @@ class RobotCommunication(object):
 
         """
         network_config = self.network_config_buffer.get(
-            block=False if self.send_primitive_set else True, return_cached=False
+            block=True if self.accept_next_network_config else False, return_cached=False
         )
         while self.running:
-            if network_config is not None:
+            if network_config is not None and self.accept_next_network_config:
                 print(f"[RobotCommunication] Received new NetworkConfig")
+
                 if self.is_setup_for_fullsystem:
                     self.setup_for_fullsystem(
                         referee_interface=network_config.referee_interface,
                         vision_interface=network_config.vision_interface,
                     )
                 self.__setup_for_robot_communication(
-                    robot_status_interface=network_config.robot_status_interface
+                    robot_communication_interface=network_config.robot_communication_interface
                 )
+                self.__print_current_network_config()
+            elif network_config is not None:
+                logger.warning("[RobotCommunication] We received a proto configuration update with a newer network"
+                " configuration. We will ignore this update, likely because the interface was provided at startup but"
+                " the next update will be accepted.")
+                self.accept_next_network_config = True
                 self.__print_current_network_config()
 
             # Set up network on the next tick
@@ -487,7 +524,7 @@ class RobotCommunication(object):
 
         print(
             output_string(
-                "Robot Status\t", self.current_network_config.robot_status_interface
+                "Robot Status\t", self.current_network_config.robot_communication_interface
             )
         )
         print(output_string("Vision\t\t", self.current_network_config.vision_interface))

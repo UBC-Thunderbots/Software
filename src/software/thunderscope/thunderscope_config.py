@@ -271,15 +271,6 @@ def configure_base_diagnostics(
             anchor="Logs",
         ),
         TScopeWidget(
-            name="Network Configuration",
-            widget=setup_network_config_widget(
-                **{"proto_unix_io": diagnostics_proto_unix_io,}
-            ),
-            position="below",
-            anchor="Error Log",
-            has_refresh_func=False,
-        ),
-        TScopeWidget(
             name="Drive and Dribbler",
             widget=setup_drive_and_dribbler_widget(
                 **{"proto_unix_io": diagnostics_proto_unix_io}
