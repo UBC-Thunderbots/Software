@@ -61,14 +61,14 @@ TEST_P(DribbleSkillPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, -2.5), initial_position});
 
     auto tactic = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
-    tactic->updateControlParams({dribble_destination, dribble_orientation, false});
+    tactic->updateControlParams({dribble_destination, dribble_orientation,
+                                 TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED});
     setTactic(1, tactic, {TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
-            checkPossession(tactic, world_ptr, yield);
-        }};
+                       ValidationCoroutine::push_type& yield)
+        { checkPossession(tactic, world_ptr, yield); }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 

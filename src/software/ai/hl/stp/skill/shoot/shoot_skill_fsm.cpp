@@ -28,7 +28,7 @@ void ShootSkillFSM::getBallControl(
         .final_dribble_orientation =
             (event.common.world_ptr->field().enemyGoalCenter() - ball_position)
                 .orientation(),
-        .allow_excessive_dribbling = false};
+        .excessive_dribbling_mode = TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED};
 
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
 }

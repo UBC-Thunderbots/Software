@@ -120,6 +120,19 @@ message ShadowEnemyTactic
 
 message StopTactic {}
 
+enum ExcessiveDribblingMode
+{
+    // Allow excessive dribbling (i.e. more than 1 meter at a time)
+    ALLOWED = 0;
+
+    // Lose ball control if we excessively dribble 
+    NOT_ALLOWED = 1;
+    
+    // Terminate the DribbleSkill if we excessively dribble,
+    // regardless of whether we make it to the final dribble destination
+    TERMINATE = 2;
+}
+
 message ShootSkillTactic {}
 
 message PivotKickSkillTactic

@@ -113,6 +113,7 @@ struct PassSkillFSM
             // src_state + event [guard] / action = dest_state
             *DribbleSkillFSM_S + Update_E[passFound_G] / takePass_A = PivotKickSkillFSM_S,
             DribbleSkillFSM_S + Update_E / findPass_A,
+            DribbleSkillFSM_S = PivotKickSkillFSM_S,
 
             PivotKickSkillFSM_S + Update_E[shouldAbortPass_G] / abortPass_A = X,
             PivotKickSkillFSM_S + Update_E / takePass_A,

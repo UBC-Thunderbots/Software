@@ -264,7 +264,7 @@ void CreaseDefenderFSM::prepareGetPossession(
     DribbleSkillFSM::ControlParams control_params{
         .dribble_destination       = ball_position,
         .final_dribble_orientation = ball_to_net_vector.orientation(),
-        .allow_excessive_dribbling = false};
+        .excessive_dribbling_mode = TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED};
 
     processEvent(DribbleSkillFSM::Update(
         control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,

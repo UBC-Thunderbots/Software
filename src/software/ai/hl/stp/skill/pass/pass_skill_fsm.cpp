@@ -140,7 +140,7 @@ void PassSkillFSM::findPass(
     DribbleSkillFSM::ControlParams control_params = {
         .dribble_destination       = dribble_destination,
         .final_dribble_orientation = dribble_orientation,
-        .allow_excessive_dribbling = false};
+        .excessive_dribbling_mode = TbotsProto::ExcessiveDribblingMode::TERMINATE};
 
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
 }

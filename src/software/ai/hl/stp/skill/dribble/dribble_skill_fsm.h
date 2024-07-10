@@ -2,6 +2,7 @@
 
 #include <include/boost/sml.hpp>
 
+#include "proto/tactic.pb.h"
 #include "software/ai/hl/stp/skill/skill_fsm.h"
 
 struct DribbleSkillFSM
@@ -16,8 +17,8 @@ struct DribbleSkillFSM
         std::optional<Point> dribble_destination;
         // The final orientation to face the ball when finishing dribbling
         std::optional<Angle> final_dribble_orientation;
-        // whether to allow excessive dribbling, i.e. more than 1 metre at a time
-        bool allow_excessive_dribbling;
+        // Controls whether to allow excessive dribbling, i.e. more than 1 metre at a time
+        TbotsProto::ExcessiveDribblingMode excessive_dribbling_mode;
     };
 
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -155,6 +156,17 @@ struct DribbleSkillFSM
      */
     bool shouldLoseBall(const Update &event);
 
+    /**
+     * Guard that checks whether the excessive_dribbling_mode control param
+     * is set to TbotsProto::ExcessiveDribblingMode::TERMINATE
+     *
+     * @param event the Update event
+     *
+     * @return whether the excessive_dribbling_mode control param is set
+     * to TbotsProto::ExcessiveDribblingMode::TERMINATE
+     */
+    bool terminateIfExcessiveDribbling(const Update &event);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -162,11 +174,15 @@ struct DribbleSkillFSM
         DEFINE_SML_STATE(GetBallControl)
         DEFINE_SML_STATE(Dribble)
         DEFINE_SML_STATE(LoseBall)
+
         DEFINE_SML_EVENT(Update)
+
         DEFINE_SML_GUARD(haveBallControl)
         DEFINE_SML_GUARD(lostBallControl)
         DEFINE_SML_GUARD(dribblingDone)
         DEFINE_SML_GUARD(shouldLoseBall)
+        DEFINE_SML_GUARD(terminateIfExcessiveDribbling)
+
         DEFINE_SML_ACTION(loseBall)
         DEFINE_SML_ACTION(getBallControl)
         DEFINE_SML_ACTION(dribble)
@@ -175,13 +191,19 @@ struct DribbleSkillFSM
             // src_state + event [guard] / action = dest_state
             *GetBallControl_S + Update_E[haveBallControl_G] / dribble_A = Dribble_S,
             GetBallControl_S + Update_E / getBallControl_A,
+
             Dribble_S + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
-            Dribble_S + Update_E[shouldLoseBall_G] / loseBall_A        = LoseBall_S,
-            Dribble_S + Update_E[dribblingDone_G] / dribble_A          = X,
+            Dribble_S + Update_E[shouldLoseBall_G && !terminateIfExcessiveDribbling_G] /
+                            loseBall_A = LoseBall_S,
+            Dribble_S + Update_E[shouldLoseBall_G && terminateIfExcessiveDribbling_G] /
+                            dribble_A                         = X,
+            Dribble_S + Update_E[dribblingDone_G] / dribble_A = X,
             Dribble_S + Update_E / dribble_A,
+
             LoseBall_S + Update_E[lostBallControl_G] / getBallControl_A =
                 GetBallControl_S,
             LoseBall_S + Update_E / loseBall_A,
+
             X + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
             X + Update_E[!dribblingDone_G] / dribble_A         = Dribble_S,
             X + Update_E / dribble_A                           = X);

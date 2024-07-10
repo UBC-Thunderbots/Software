@@ -220,7 +220,15 @@ bool DribbleSkillFSM::shouldLoseBall(const Update &event)
     const std::optional<Segment> &dribble_displacement =
         event.common.world_ptr->getDribbleDisplacement();
 
-    return !event.control_params.allow_excessive_dribbling && dribble_displacement &&
+    return event.control_params.excessive_dribbling_mode !=
+               TbotsProto::ExcessiveDribblingMode::ALLOWED &&
+           dribble_displacement.has_value() &&
            dribble_displacement->length() >=
                dribble_config.max_continuous_dribbling_distance();
+}
+
+bool DribbleSkillFSM::terminateIfExcessiveDribbling(const Update &event)
+{
+    return event.control_params.excessive_dribbling_mode ==
+           TbotsProto::ExcessiveDribblingMode::TERMINATE;
 }

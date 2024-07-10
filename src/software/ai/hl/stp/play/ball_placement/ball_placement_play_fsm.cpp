@@ -92,7 +92,10 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
 
     // setup ball placement tactic for ball placing robot
     place_ball_tactic->updateControlParams(
-        {event.common.world_ptr->gameState().getBallPlacementPoint(), final_angle, true});
+        {.dribble_destination =
+             event.common.world_ptr->gameState().getBallPlacementPoint(),
+         .final_dribble_orientation = final_angle,
+         .excessive_dribbling_mode = TbotsProto::ExcessiveDribblingMode::ALLOWED});
     tactics_to_run[0].emplace_back(place_ball_tactic);
 
     event.common.set_tactics(tactics_to_run);

@@ -183,7 +183,7 @@ void ReceiverFSM::retrieveBall(
     DribbleSkillFSM::ControlParams control_params{
         .dribble_destination       = ball.position(),
         .final_dribble_orientation = (ball.position() - robot.position()).orientation(),
-        .allow_excessive_dribbling = false,
+        .excessive_dribbling_mode = TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED,
     };
 
     processEvent(DribbleSkillFSM::Update(
