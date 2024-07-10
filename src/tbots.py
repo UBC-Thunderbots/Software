@@ -73,6 +73,14 @@ if __name__ == "__main__":
         help="Run the binary with the TRACY_ENABLE macro defined",
         action="store_true",
     )
+    parser.add_argument(
+        "-pl",
+        "--platform",
+        type=str,
+        choices=["PI", "NANO"],
+        help="The platform to build Thunderloop for",
+        action="store"
+    )
 
     # These are shortcut args for commonly used arguments on our tests
     # and full_system. All other arguments are passed through as-is
@@ -179,6 +187,8 @@ if __name__ == "__main__":
 
     bazel_arguments = unknown_args
 
+    if args.platform:
+        bazel_arguments += ["--//shared:platform="+args.platform]
     if args.stop_ai_on_start:
         bazel_arguments += ["--stop_ai_on_start"]
     if args.enable_visualizer:
