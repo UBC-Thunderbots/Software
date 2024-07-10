@@ -54,10 +54,8 @@ double AttackerMdpFeatureExtractor::nearbyEnemyThreatsFeature(
     const std::vector<Robot> enemy_robots =
         state.world_ptr->enemyTeam().getAllRobotsExceptGoalie();
 
-    const size_t num_enemy_threats = std::count_if(
-        enemy_robots.begin(), enemy_robots.end(),
-        [&](const Robot& robot)
-        {
+    const size_t num_enemy_threats =
+        std::count_if(enemy_robots.begin(), enemy_robots.end(), [&](const Robot& robot) {
             return distance(robot.position(), state.world_ptr->ball().position()) <
                    state.strategy->getAiConfig()
                        .defense_play_config()

@@ -616,7 +616,7 @@ message DefensePlayConfig
         ];
     }
 
-    // The distance between an enemy robot and the ball for the enemy to be considered 
+    // The distance between an enemy robot and the ball for the enemy to be considered
     // an "immediate" threat that must be avoided
     required double immediate_threat_distance = 1
         [default = 1.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 9.5];
