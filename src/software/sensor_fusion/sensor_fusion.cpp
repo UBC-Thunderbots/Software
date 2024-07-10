@@ -368,13 +368,13 @@ bool SensorFusion::shouldTrustRobotStatus()
     // Check if vision detects a ball on the field
     if (!ball.has_value())
     {
-        return false;
+        return true;
     }
 
     // In other words, we trust the breakbeam reading from robot status if vision also
-    // agrees that the ball is roughly near the robot. If vision has the ball far from the
-    // breakbeam detection, then we will ignore the breakbeam detection and trust vision
-    // instead.
+    // agrees that the ball is roughly near the robot or if ssl vision doesn't detect an
+    // ball. If vision has the ball far from the breakbeam detection, then we will ignore
+    // the breakbeam detection and trust vision instead.
     return distance(robot_with_ball_in_dribbler->position(), ball->position()) <=
            DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION;
 }

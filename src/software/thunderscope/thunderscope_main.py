@@ -218,7 +218,18 @@ if __name__ == "__main__":
         help="Whether to populate with default robot positions (False) or start with an empty field (True) for AI vs AI",
     )
 
+    parser.add_argument(
+        "--launch_gc",
+        action="store_true",
+        default=False,
+        help="whether or not to launch the gamecontroller when --run_blue or --run_yellow is ran",
+    )
+
     args = parser.parse_args()
+
+    # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
+    if not args.run_blue and not args.run_yellow and args.launch_gc:
+        parser.error("--launch_gc has to be ran with --run_blue argument")
 
     # Sanity check that an interface was provided
     if args.run_blue or args.run_yellow:
@@ -314,13 +325,18 @@ if __name__ == "__main__":
             args.keyboard_estop, args.disable_communication
         )
 
-        with RobotCommunication(
+        with (
+            Gamecontroller(supress_logs=(not args.verbose), use_conventional_port=False)
+            if args.launch_gc
+            else contextlib.nullcontext()
+        ) as gamecontroller, RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
             multicast_channel=getRobotMulticastChannel(args.channel),
             interface=args.interface,
             estop_mode=estop_mode,
             estop_path=estop_path,
             enable_radio=args.enable_radio,
+            referee_port=Gamecontroller.get_referee_port_static(gamecontroller),
         ) as robot_communication:
 
             if estop_mode == EstopMode.KEYBOARD_ESTOP:

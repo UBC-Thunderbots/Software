@@ -2,18 +2,14 @@ import time
 import logging
 import pathlib
 
-from dataclasses import dataclass
 import pyqtgraph as pg
-import pyqtgraph.console as pg_console
+from dataclasses import dataclass
 from proto.q_learning_pb2 import *
-from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.constants import SAVED_Q_FUNCTION_WEIGHTS_PATH
+from software.thunderscope.common.bar_graph_widget import BarGraphWidget
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import *
-from proto.import_all_protos import *
-from software.thunderscope.common.bar_graph_widget import BarGraphWidget
-
-from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class QLearningInfoWidget(QWidget):
