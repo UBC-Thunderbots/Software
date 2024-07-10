@@ -23,15 +23,18 @@ config_setting(
 
 string_flag(
     name = "platform",
-    values = ["PI", "NANO"],
     build_setting_default = "",
+    values = [
+        "PI",
+        "NANO",
+    ],
 )
 
 cc_library(
     name = "constants",
     srcs = [],
     hdrs = ["constants.h"],
-    deps = ["//software/util/make_enum:make_enum"],
+    deps = ["//software/util/make_enum"],
     alwayslink = True,
 )
 
@@ -57,8 +60,7 @@ cc_library(
 cc_test(
     name = "testington",
     srcs = ["test.cpp"],
-    deps = [":thunderloop_constants"]
-
+    deps = [":thunderloop_constants"],
 )
 
 cc_library(
@@ -78,12 +80,11 @@ cc_library(
 cc_library(
     name = "jetson_constants",
     hdrs = ["jetson_constants.h"],
-    deps = ["//software/util/make_enum",]
+    deps = ["//software/util/make_enum"],
 )
 
 cc_library(
     name = "pi_constants",
     hdrs = ["pi_constants.h"],
-    deps = ["//software/util/make_enum",]
-
+    deps = ["//software/util/make_enum"],
 )

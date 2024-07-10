@@ -10,7 +10,9 @@
 
 #include "software/logger/logger.h"
 
-GpioSysfs::GpioSysfs(const std::string& gpio_number, GpioDirection direction, GpioState initial_state) {
+GpioSysfs::GpioSysfs(const std::string& gpio_number, GpioDirection direction,
+                     GpioState initial_state)
+{
     // Setup the provided GPIO pin
     gpio_number_ = gpio_number;
 
@@ -19,7 +21,7 @@ GpioSysfs::GpioSysfs(const std::string& gpio_number, GpioDirection direction, Gp
     export_gpio_fs.close();
 
     auto set_direction_fs =
-            std::ofstream("/sys/class/gpio/gpio" + gpio_number + "/direction");
+        std::ofstream("/sys/class/gpio/gpio" + gpio_number + "/direction");
 
     switch (direction)
     {

@@ -22,12 +22,11 @@
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
-#include "software/logger/logger.h"
-#include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
-
 #include "shared/thunderloop_constants.h"
 #include "software/embedded/gpio_char_dev.h"
 #include "software/embedded/gpio_sysfs.h"
+#include "software/logger/logger.h"
+#include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 
 extern "C"
 {
@@ -80,21 +79,27 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
       num_tracked_motor_resets_(0)
 {
 #ifdef PI
-    spi_demux_select_0_ = std::make_unique<GpioCharDev>(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
-                                      GpioState::LOW, "/dev/gpiochip4");
-    spi_demux_select_1_ = std::make_unique<GpioCharDev>(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT,
-                                      GpioState::LOW, "/dev/gpiochip4");
-    driver_control_enable_gpio_ = std::make_unique<GpioCharDev>(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
-                                              GpioState::HIGH, "/dev/gpiochip4");
-    reset_gpio_ = std::make_unique<GpioCharDev>(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH, "/dev/gpiochip4");
+    spi_demux_select_0_ = std::make_unique<GpioCharDev>(
+        SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT, GpioState::LOW,
+        "/dev/gpiochip4");
+    spi_demux_select_1_ = std::make_unique<GpioCharDev>(
+        SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT, GpioState::LOW,
+        "/dev/gpiochip4");
+    driver_control_enable_gpio_ =
+        std::make_unique<GpioCharDev>(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
+                                      GpioState::HIGH, "/dev/gpiochip4");
+    reset_gpio_ =
+        std::make_unique<GpioCharDev>(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT,
+                                      GpioState::HIGH, "/dev/gpiochip4");
 #else
-    spi_demux_select_0_ = std::make_unique<GpioSysfs>(SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT,
-                                      GpioState::LOW);
-    spi_demux_select_1_ = std::make_unique<GpioSysfs>(SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT,
-                                      GpioState::LOW);
-    driver_control_enable_gpio_ = std::make_unique<GpioSysfs>(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
-                                              GpioState::HIGH);
-    reset_gpio_ = std::make_unique<GpioSysfs>(MOTOR_DRIVER_RESET_GPIO, GpioDirection::OUTPUT, GpioState::HIGH);
+    spi_demux_select_0_ = std::make_unique<GpioSysfs>(
+        SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO, GpioDirection::OUTPUT, GpioState::LOW);
+    spi_demux_select_1_ = std::make_unique<GpioSysfs>(
+        SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO, GpioDirection::OUTPUT, GpioState::LOW);
+    driver_control_enable_gpio_ = std::make_unique<GpioSysfs>(
+        DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT, GpioState::HIGH);
+    reset_gpio_ = std::make_unique<GpioSysfs>(MOTOR_DRIVER_RESET_GPIO,
+                                              GpioDirection::OUTPUT, GpioState::HIGH);
 #endif
     motorServiceInit(robot_constants, control_loop_frequency_hz);
 }
