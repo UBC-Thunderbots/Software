@@ -338,7 +338,7 @@ class TrailValues:
 
 class ProtoConfigurationConstant:
     DEFAULT_SAVE_DIRECTORY = "/tmp/tbotspython/thunderbots_configurations_proto"
-    DEFAULT_SAVE_PATH = DEFAULT_SAVE_DIRECTORY + "/default_conrfiguration.proto"
+    DEFAULT_SAVE_PATH = DEFAULT_SAVE_DIRECTORY + "/default_configuration.proto"
 
 
 class CustomGLOptions:
