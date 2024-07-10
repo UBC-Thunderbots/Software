@@ -1,6 +1,4 @@
-#include "software/util/make_enum/make_enum.hpp"
-
-MAKE_ENUM(Platform, RASP_PI, JETSON_NANO);
+#include "shared/constants.h"
 
 static const int SPI_CS_DRIVER_TO_CONTROLLER_MUX_0_GPIO = 16;
 static const int SPI_CS_DRIVER_TO_CONTROLLER_MUX_1_GPIO = 19;

@@ -31,7 +31,7 @@ cc_library(
     name = "constants",
     srcs = [],
     hdrs = ["constants.h"],
-    deps = [],
+    deps = ["//software/util/make_enum:make_enum"],
     alwayslink = True,
 )
 
