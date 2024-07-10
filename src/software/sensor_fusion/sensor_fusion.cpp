@@ -389,10 +389,11 @@ void SensorFusion::updateDribbleDisplacement()
         return;
     }
 
-    // Add new touching robots
+    // Add new touching robots and remove non-touching robots
     for (const Robot &robot : friendly_team.getAllRobots())
     {
-        if (robot.isNearDribbler(ball->position()))
+        if (robot.isNearDribbler(ball->position(),
+                                 sensor_fusion_config.touching_ball_threshold()))
         {
             // Insert only occurs if the map doesn't already contain a value
             // with the key robot.id()
@@ -421,7 +422,9 @@ void SensorFusion::updateDribbleDisplacement()
     dribble_displacements.reserve(ball_contacts_by_friendly_robots.size());
     std::transform(ball_contacts_by_friendly_robots.begin(),
                    ball_contacts_by_friendly_robots.end(),
-                   std::back_inserter(dribble_displacements), [&](const auto &kv_pair) {
+                   std::back_inserter(dribble_displacements),
+                   [&](const auto &kv_pair)
+                   {
                        const Point contact_point = kv_pair.second;
                        return Segment(contact_point, ball->position());
                    });

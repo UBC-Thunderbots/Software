@@ -1,21 +1,23 @@
 #include "software/ai/hl/stp/skill/keep_away/keep_away_skill_fsm.h"
 
 #include "software/ai/evaluation/keep_away.h"
+#include "software/geom/algorithms/contains.h"
 
-bool KeepAwaySkillFSM::isPossessionThreatened(const Update& event)
+bool KeepAwaySkillFSM::shouldKeepAway(const Update& event)
 {
-    const TbotsProto::AiConfig& ai_config = event.common.strategy->getAiConfig();
+    const std::vector<Robot> enemy_robots =
+        event.common.world_ptr->enemyTeam().getAllRobotsExceptGoalie();
 
-    if (!event.common.robot.isNearDribbler(
-            event.common.world_ptr->ball().position(),
-            ai_config.dribble_config().lose_ball_control_threshold()))
-    {
-        return true;
-    }
+    const Circle about_to_steal_danger_zone(event.common.robot.position(),
+                                            event.common.strategy->getAiConfig()
+                                                .attacker_tactic_config()
+                                                .enemy_about_to_steal_ball_radius());
+    const bool possession_threatened =
+        std::any_of(enemy_robots.begin(), enemy_robots.end(),
+                    [&](const Robot& enemy)
+                    { return contains(about_to_steal_danger_zone, enemy.position()); });
 
-    return shouldKeepAway(
-        event.common.robot, event.common.world_ptr->enemyTeam(),
-        ai_config.attacker_tactic_config().enemy_about_to_steal_ball_radius());
+    return !event.control_params.terminate_if_unthreatened || possession_threatened;
 }
 
 void KeepAwaySkillFSM::keepAway(

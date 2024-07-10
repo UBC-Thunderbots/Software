@@ -17,18 +17,3 @@
  */
 Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far,
                               const TbotsProto::PassingConfig& passing_config);
-
-/**
- * Returns true if the given robot is being threatened by enemy robots close
- * to the robot. If true, the robot should move to get far away from
- * the enemy robots.
- *
- * @param robot the robot to check
- * @param enemy_team the enemy team
- * @param about_to_steal_radius radius of a circle in meters around the robot
- * inside which we consider an enemy is about to steal the ball
- *
- * @return true if the robot is being threatened by the enemy team
- */
-bool shouldKeepAway(const Robot& robot, const Team& enemy_team,
-                    double about_to_steal_radius);
