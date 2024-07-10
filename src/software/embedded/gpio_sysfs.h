@@ -10,8 +10,6 @@
 #include <fstream>
 #include <iostream>
 
-#include "software/util/make_enum/make_enum.h"
-
 class GpioSysfs: public Gpio {
     public:
         /*

@@ -17,7 +17,7 @@ TEST(AttackerFSMTest, test_transitions)
 
     TbotsProto::AiConfig ai_config;
     FSM<AttackerFSM> fsm{DribbleFSM(ai_config.dribble_tactic_config()),
-                         AttackerFSM(ai_config.attacker_tactic_config())};
+                         AttackerFSM(ai_config)};
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     // robot far from attacker point

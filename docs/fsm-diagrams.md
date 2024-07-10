@@ -17,9 +17,13 @@ Stop --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Playing --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
 Playing --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
 Playing --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
-SetPlay --> Halt : [gameStateHalted]\n<i>setupHaltPlay</i>
-SetPlay --> Stop : [gameStateStopped]\n<i>setupStopPlay</i>
-SetPlay --> Playing : [gameStatePlaying]\n<i>setupOffensePlay</i>
+SetPlay --> SetPlay : [gameStateHalted]\n<i>(resetSetPlay</i>
+setupHaltPlay_A) --> Halt
+SetPlay --> SetPlay : [gameStateStopped]\n<i>(resetSetPlay</i>
+setupStopPlay_A) --> Stop
+SetPlay --> SetPlay : [gameStatePlaying]\n<i>(resetSetPlay</i>
+setupOffensePlay_A) --> Playing
+SetPlay --> SetPlay : [gameStateSetupRestart]\n<i>setupSetPlay</i>
 Terminate:::terminate --> Terminate:::terminate
 
 ```
@@ -211,8 +215,12 @@ stateDiagram-v2
 classDef terminate fill:white,color:black,font-weight:bold
 direction LR
 [*] --> MoveFSM
+MoveFSM --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
 MoveFSM --> MoveFSM : <i>blockThreat</i>
 MoveFSM --> Terminate:::terminate
+DribbleFSM --> MoveFSM : [!ballNearbyWithoutThreat]\n<i>blockThreat</i>
+DribbleFSM --> DribbleFSM : <i>prepareGetPossession</i>
+Terminate:::terminate --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
 Terminate:::terminate --> MoveFSM : <i>blockThreat</i>
 
 ```
