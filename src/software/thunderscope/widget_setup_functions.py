@@ -204,21 +204,20 @@ def setup_parameter_widget(
 ) -> ProtoConfigurationWidget:
     """Setup the parameter widget
 
-    :param proto_unix_io: The proto unix io object
-    :param friendly_colour_yellow:
-    :returns: The proto configuration widget
+        :param proto_unix_io: The proto unix io object
+        :param friendly_colour_yellow:
+        :returns: The proto configuration widget
 
     """
-
-    config = ThunderbotsConfig()
-    config.sensor_fusion_config.friendly_color_yellow = friendly_colour_yellow
 
     def on_change_callback(
         attr: Any, value: Any, updated_proto: ThunderbotsConfig
     ) -> None:
         proto_unix_io.send_proto(ThunderbotsConfig, updated_proto)
 
-    return ProtoConfigurationWidget(config, on_change_callback)
+    return ProtoConfigurationWidget(
+        on_change_callback, is_yellow=friendly_colour_yellow
+    )
 
 
 def setup_log_widget(proto_unix_io: ProtoUnixIO) -> g3logWidget:
@@ -275,7 +274,7 @@ def setup_play_info(proto_unix_io: ProtoUnixIO) -> PlayInfoWidget:
 
 
 def setup_fps_widget(bufferswap_counter, refresh_func_counter):
-    """ setup fps widget
+    """setup fps widget
     :param bufferswap_counter: a counter at the bufferswap
     :param refresh_func_counter: a counter at the refresh function
     :returns: a FPS Widget
