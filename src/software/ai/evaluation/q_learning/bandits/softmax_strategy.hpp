@@ -103,6 +103,7 @@ SoftmaxStrategy<TState, TAction>::selectAction(
         if (random_num < current_cutoff)
         {
             selected_action = all_actions.at(i);
+            break;
         }
     }
 
