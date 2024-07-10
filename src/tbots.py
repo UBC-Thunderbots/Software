@@ -119,21 +119,30 @@ if __name__ == "__main__":
     targets = list(
         itertools.chain.from_iterable(
             [
-                run(query, stdout=PIPE).stdout.split(b"\n")
+                run(query, stdout=PIPE).stdout.rstrip(b"\n").split(b"\n")
                 for query in bazel_queries[args.action]
             ]
         )
     )
-    target, confidence = process.extract(args.search_query, targets, limit=1)[0]
-    target = str(target, encoding="utf-8")
+    # Create a dictionary to map target names to complete bazel targets
+    target_dict = {target.split(b":")[-1]: target for target in targets}
+
+    # Use thefuzz to find the best matching target name
+    most_similar_target_name, confidence = process.extract(
+        args.search_query, list(target_dict.keys()), limit=1
+    )[0]
+    target = str(target_dict[most_similar_target_name], encoding="utf-8")
 
     print("Found target {} with confidence {}".format(target, confidence))
 
     if args.interactive or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
         filtered_targets = process.extract(
-            args.search_query, targets, limit=NUM_FILTERED_MATCHES_TO_SHOW
+            args.search_query, list(targets.keys()), limit=NUM_FILTERED_MATCHES_TO_SHOW
         )
-        targets = [filtered_target[0] for filtered_target in filtered_targets]
+        targets = [
+            target_dict[filtered_target_name[0]]
+            for filtered_target_name in filtered_targets
+        ]
         target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
         print("User selected {}".format(target))
 
