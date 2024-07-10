@@ -1,6 +1,7 @@
 #include "software/embedded/thunderloop.h"
 
 #include <Tracy.hpp>
+#include <fstream>
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_crash_msg.pb.h"
@@ -112,9 +113,9 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-//    power_service_ = std::make_unique<PowerService>();
-//    LOG(INFO)
-//        << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
+    power_service_ = std::make_unique<PowerService>();
+    LOG(INFO)
+        << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
     motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
     g_motor_service = motor_service_.get();
@@ -265,18 +266,18 @@ Thunderloop::~Thunderloop() {}
                 getMilliseconds(poll_time));
 
             // Power Service: execute the power control command
-            //{
-            //    ScopedTimespecTimer timer(&poll_time);
+            {
+                ScopedTimespecTimer timer(&poll_time);
 
-            //    ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService",
-            //               true);
+                ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService",
+                           true);
 
-            //    power_status_ =
-            //        power_service_->poll(direct_control_.power_control(), kick_coeff_,
-            //                             kick_constant_, chip_pulse_width_);
-            //}
-            //thunderloop_status_.set_power_service_poll_time_ms(
-            //    getMilliseconds(poll_time));
+                power_status_ =
+                    power_service_->poll(direct_control_.power_control(), kick_coeff_,
+                                         kick_constant_, chip_pulse_width_);
+            }
+            thunderloop_status_.set_power_service_poll_time_ms(
+                getMilliseconds(poll_time));
 
             struct timespec time_since_kicker_fired;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
@@ -416,6 +417,34 @@ double Thunderloop::getCpuTemperature()
     }
 }
 
+bool isPowerStable(std::ifstream& log_file)
+{
+    // if the log file cannot be open, we would return false. Chances are, the battery
+    // power supply is indeed stable
+    if (!log_file.is_open())
+    {
+        LOG(WARNING) << "Cannot dmesg log file. Do you have permission?";
+        return true;
+    }
+
+    std::string line;
+    while (std::getline(log_file, line))
+    {
+        // if this lines exist, we know for sure that the battery is not stable!
+        if (line.find("soctherm: OC ALARM 0x00000001") != std::string::npos)
+        {
+            return false;
+        }
+    }
+
+    // We have reached the end of the line with the while loop from above. Therefore, we
+    // need to run std::ifstream::clear so that std::getline would return the new lines in
+    // the file stream.
+    log_file.clear();
+
+    return true;
+}
+
 void Thunderloop::updateErrorCodes()
 {
     // Clear existing codes
@@ -433,5 +462,11 @@ void Thunderloop::updateErrorCodes()
     if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
+    }
+
+    if (!isPowerStable(log_file))
+    {
+        robot_status_.mutable_error_code()->Add(
+            TbotsProto::ErrorCode::UNSTABLE_POWER_SUPPLY);
     }
 }

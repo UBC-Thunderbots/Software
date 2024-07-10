@@ -69,3 +69,12 @@ sh_binary(
     name = "setup_robot_software_deps",
     srcs = ["setup_robot_software_deps.sh"],
 )
+
+cc_test(
+    name = "test_battery",
+    srcs = ["battery_test.cpp"],
+    deps = [
+        ":thunderloop",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)

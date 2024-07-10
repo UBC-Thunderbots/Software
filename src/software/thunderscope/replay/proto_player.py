@@ -244,7 +244,7 @@ class ProtoPlayer:
             else:
                 self.pause()
 
-    def set_playback_speed(self, speed: float) -> None:
+    def set_playback_speed(self, speed: str) -> None:
         """Sets the playback speed.
 
         :param speed: The speed to set the playback to.

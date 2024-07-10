@@ -1,0 +1,8 @@
+---
+- name: Set up systemd WiFi interface rule
+  become: true
+  become_method: sudo
+  ansible.posix.synchronize:
+    src: ../../linux_configs/systemd/10-persistent-net.link
+    dest: /etc/systemd/network/
+    copy_links: yes

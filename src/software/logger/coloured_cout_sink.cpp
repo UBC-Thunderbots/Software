@@ -3,7 +3,9 @@
 #include "software/logger/custom_logging_levels.h"
 
 ColouredCoutSink::ColouredCoutSink(bool print_detailed, bool reduce_repetition)
-    : print_detailed(print_detailed), reduce_repetition(reduce_repetition), log_merger(LogMerger())
+    : print_detailed(print_detailed),
+      reduce_repetition(reduce_repetition),
+      log_merger(LogMerger())
 {
 }
 

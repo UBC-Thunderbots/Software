@@ -130,7 +130,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         }
     }
 
-    if (game_state.isOurBallPlacement())
+    if (game_state.isBallPlacement())
     {
         auto pt = getBallPlacementPoint(packet);
         if (pt)
@@ -139,9 +139,10 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         }
         else
         {
-            LOG(WARNING)
-                << "In BALL_PLACEMENT_US game state, but no ball placement point found"
-                << std::endl;
+            std::string state = game_state.isOurBallPlacement() ? "BALL_PLACEMENT_US"
+                                                                : "BALL_PLACEMENT_THEM";
+            LOG(WARNING) << "In " << state << " state, but no ball placement point found"
+                         << std::endl;
         }
     }
 
@@ -180,6 +181,34 @@ void SensorFusion::updateWorld(
     }
 }
 
+bool SensorFusion::shouldTrustRobotStatus()
+{
+    // the following if statements essentially ensures that we could calculate the
+    // distance. Essentially unwarpping all the std::optional<T> that are required to
+    // calculate the distance
+    if (!friendly_robot_id_with_ball_in_dribbler.has_value())
+    {
+        return false;
+    }
+
+    std::optional<Robot> robot_with_ball_in_dribbler =
+        friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
+    if (!robot_with_ball_in_dribbler.has_value())
+    {
+        return false;
+    }
+
+    double distance =
+        (robot_with_ball_in_dribbler.value().position() - ball.value().position())
+            .length();
+
+    // In other words, this is only true if we have the position of the breakbeam
+    // robot, and the distance between what SSL says and where the robots are actually
+    // at is less than a threshold distance set by
+    // DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION
+    return distance <= DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION;
+}
+
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
     double min_valid_x              = sensor_fusion_config.min_valid_x();
@@ -190,6 +219,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     std::optional<Ball> new_ball;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
                                                 max_valid_x, ignore_invalid_camera_data);
+
     auto yellow_team =
         createTeamDetection({ssl_detection_frame}, TeamColour::YELLOW, min_valid_x,
                             max_valid_x, ignore_invalid_camera_data);
@@ -231,31 +261,28 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         ball_in_dribbler_timeout                = 0;
     }
 
-    if (friendly_robot_id_with_ball_in_dribbler.has_value())
+    if (shouldTrustRobotStatus())
     {
+        // friendly_robot_id_with_ball_in_dribbler will always have a value since this is
+        // checked by the member function shouldTrustRobotStatus
         std::optional<Robot> robot_with_ball_in_dribbler =
             friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
 
-        if (robot_with_ball_in_dribbler.has_value())
+        std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
+            .position =
+                robot_with_ball_in_dribbler->position() +
+                Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
+                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                               BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
+            .distance_from_ground = 0,
+            .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
+            .confidence = 1}};
+
+        std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
+
+        if (new_ball)
         {
-            std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
-                .position =
-                    robot_with_ball_in_dribbler->position() +
-                    Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                        // MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT of the ball should be
-                        // inside the robot
-                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                   BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
-                .distance_from_ground = 0,
-                .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-                .confidence = 1}};
-
-            std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
-
-            if (new_ball)
-            {
-                updateBall(*new_ball);
-            }
+            updateBall(*new_ball);
         }
     }
     else
@@ -280,6 +307,11 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                             Vector(0, 0), closest_enemy->timestamp());
             }
         }
+
+        // we shouldn't trust breakbeam so we reset the dribbler and its associated
+        // variables
+        friendly_robot_id_with_ball_in_dribbler = std::nullopt;
+        ball_in_dribbler_timeout                = 0;
     }
 
     if (ball && field)

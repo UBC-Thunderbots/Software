@@ -1,6 +1,8 @@
 #pragma once
+
 #include <chrono>
 #include <csignal>
+#include <fstream>
 #include <iostream>
 #include <thread>
 
@@ -58,7 +60,7 @@ class Thunderloop
     // Services
     std::unique_ptr<MotorService> motor_service_;
     std::unique_ptr<NetworkService> network_service_;
-    //std::unique_ptr<PowerService> power_service_;
+    std::unique_ptr<PowerService> power_service_;
 
     // Clients
     std::unique_ptr<RedisClient> redis_client_;
@@ -97,6 +99,7 @@ class Thunderloop
      */
     void updateErrorCodes();
 
+
     // Input Msg Buffers
     TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::World world_;
@@ -134,5 +137,18 @@ class Thunderloop
     const double PACKET_TIMEOUT_NS = 500.0 * NANOSECONDS_PER_MILLISECOND;
 
     // Path to the CPU thermal zone temperature file
-    const std::string CPU_TEMP_FILE_PATH = "/sys/class/thermal/thermal_zone1/temp";
+    const std::string CPU_TEMP_FILE_PATH     = "/sys/class/thermal/thermal_zone1/temp";
+    const std::string PATH_TO_RINGBUFFER_LOG = "/var/log/dmesg";
+
+    std::ifstream log_file = std::ifstream(PATH_TO_RINGBUFFER_LOG);
 };
+
+/*
+ * reads from the kernel ring buffer, likely /var/log/dmesg file, to see if the power
+ * is stable
+ *
+ * This is not defined in Thunderloop to allow it to be unit tested easily
+ *
+ * @return True if the power is stable, false otherwise
+ */
+bool isPowerStable(std::ifstream &log_file);

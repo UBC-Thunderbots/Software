@@ -14,7 +14,7 @@ GpioCharDev::GpioCharDev(int gpio_number, GpioDirection direction, GpioState ini
 
     struct gpiohandle_request req;
     req.lineoffsets[0] = gpio_number;
-    req.lines = 1;
+    req.lines          = 1;
 
     switch (direction)
     {
