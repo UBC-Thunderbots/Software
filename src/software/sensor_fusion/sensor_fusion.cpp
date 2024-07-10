@@ -422,9 +422,7 @@ void SensorFusion::updateDribbleDisplacement()
     dribble_displacements.reserve(ball_contacts_by_friendly_robots.size());
     std::transform(ball_contacts_by_friendly_robots.begin(),
                    ball_contacts_by_friendly_robots.end(),
-                   std::back_inserter(dribble_displacements),
-                   [&](const auto &kv_pair)
-                   {
+                   std::back_inserter(dribble_displacements), [&](const auto &kv_pair) {
                        const Point contact_point = kv_pair.second;
                        return Segment(contact_point, ball->position());
                    });
