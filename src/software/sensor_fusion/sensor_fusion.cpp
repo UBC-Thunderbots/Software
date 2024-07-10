@@ -1,5 +1,6 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
@@ -181,6 +182,37 @@ void SensorFusion::updateWorld(
     }
 }
 
+bool SensorFusion::shouldTrustRobotStatus()
+{
+    // Check if there is a robot with a tripped breakbeam
+    if (!friendly_robot_id_with_ball_in_dribbler.has_value())
+    {
+        return false;
+    }
+
+    std::optional<Robot> robot_with_ball_in_dribbler =
+        friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
+    if (!robot_with_ball_in_dribbler.has_value())
+    {
+        return false;
+    }
+
+    // Check if vision detects a ball on the field
+    if (!ball.has_value())
+    {
+        return true;
+    }
+
+    // In other words, we trust the breakbeam reading from robot status if vision also
+    // agrees that the ball is roughly near the robot or if ssl vision doesn't detect an
+    // ball. If vision has the ball far from the breakbeam detection, then we will ignore
+    // the breakbeam detection and trust vision instead.
+    return distance(robot_with_ball_in_dribbler->position(), ball->position()) <=
+           DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION;
+}
+
+
+
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
     double min_valid_x              = sensor_fusion_config.min_valid_x();
@@ -233,31 +265,28 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         ball_in_dribbler_timeout                = 0;
     }
 
-    if (friendly_robot_id_with_ball_in_dribbler.has_value())
+    if (shouldTrustRobotStatus())
     {
+        // friendly_robot_id_with_ball_in_dribbler will always have a value since this is
+        // checked by the member function shouldTrustRobotStatus
         std::optional<Robot> robot_with_ball_in_dribbler =
             friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
 
-        if (robot_with_ball_in_dribbler.has_value())
+        std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
+            .position =
+                robot_with_ball_in_dribbler->position() +
+                Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
+                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                               BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
+            .distance_from_ground = 0,
+            .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
+            .confidence = 1}};
+
+        std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
+
+        if (new_ball)
         {
-            std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
-                .position =
-                    robot_with_ball_in_dribbler->position() +
-                    Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                        // MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT of the ball should be
-                        // inside the robot
-                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                   BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING),
-                .distance_from_ground = 0,
-                .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-                .confidence = 1}};
-
-            std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
-
-            if (new_ball)
-            {
-                updateBall(*new_ball);
-            }
+            updateBall(*new_ball);
         }
     }
     else
@@ -282,6 +311,11 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                             Vector(0, 0), closest_enemy->timestamp());
             }
         }
+
+        // we shouldn't trust breakbeam so we reset the dribbler and its associated
+        // variables
+        friendly_robot_id_with_ball_in_dribbler = std::nullopt;
+        ball_in_dribbler_timeout                = 0;
     }
 
     if (ball && field)

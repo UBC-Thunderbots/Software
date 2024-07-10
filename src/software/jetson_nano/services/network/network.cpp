@@ -80,13 +80,6 @@ void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
     {
         primitive_set_msg = input;
     }
-
-    float primitive_set_loss_rate = primitive_tracker.getLossRate();
-    if (primitive_set_loss_rate > PROTO_LOSS_WARNING_THRESHOLD)
-    {
-        LOG(WARNING) << "Primitive set loss rate is " << primitive_set_loss_rate * 100
-                     << "%";
-    }
 }
 
 void NetworkService::logNewPrimitiveSet(const TbotsProto::PrimitiveSet& new_primitive_set)
