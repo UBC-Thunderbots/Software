@@ -53,6 +53,16 @@ class AttackerMdpFeatureExtractor
     static double bestShotOpenAngleFeature(const AttackerMdpState& state);
 
     /**
+     * Extracts the value of a feature representing how many enemy threats
+     * are nearby the ball and could potentially steal it.
+     * 
+     * @param state the state to extract the feature from 
+     * 
+     * @return the value of the feature
+     */
+    static double nearbyEnemyThreatsFeature(const AttackerMdpState& state);
+
+    /**
      * Extracts the value of a feature representing the number of friendly
      * robots on the field. The fewer robots on the field, the larger the
      * feature value (i.e. this feature is more important when we are down

@@ -10,6 +10,7 @@ AttackerMdpFeatureExtractor::AttackerMdpFeatureExtractor()
     : FeatureExtractor({{"ball_x_position", ballXPositionFeature},
                         {"best_pass_rating", bestPassRatingFeature},
                         {"best_shot_open_angle", bestShotOpenAngleFeature},
+                        {"nearby_enemy_threats", nearbyEnemyThreatsFeature},
                         {"num_friendly_robots", numFriendlyRobotsFeature},
                         {"num_enemy_robots", numEnemyRobotsFeature}})
 {
@@ -45,6 +46,26 @@ double AttackerMdpFeatureExtractor::bestShotOpenAngleFeature(
     }
 
     return 0;
+}
+
+double AttackerMdpFeatureExtractor::nearbyEnemyThreatsFeature(
+    const AttackerMdpState& state)
+{
+    const std::vector<Robot> enemy_robots =
+        state.world_ptr->enemyTeam().getAllRobotsExceptGoalie();
+
+    const size_t num_enemy_threats = std::count_if(
+        enemy_robots.begin(), enemy_robots.end(),
+        [&](const Robot& robot)
+        {
+            return distance(robot.position(), state.world_ptr->ball().position()) <
+                   state.strategy->getAiConfig()
+                       .defense_play_config()
+                       .immediate_threat_distance();
+        });
+
+    return normalizeValueToRange(static_cast<double>(num_enemy_threats), 0.0,
+                                 static_cast<double>(DIV_B_NUM_ROBOTS), 0.0, 1.0);
 }
 
 double AttackerMdpFeatureExtractor::numFriendlyRobotsFeature(
