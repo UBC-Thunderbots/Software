@@ -122,7 +122,7 @@ class ProtoConfigurationWidget(QWidget):
         """
         if not os.path.isfile(path_to_file):
             logging.info(
-                f"There are such no file in {path_to_file} crearting new ThunderbotsConfig proto."
+                f"No previously saved ThunderbotsConfig found. Creating a new default one."
             )
             self.proto_to_configure = ThunderbotsConfig()
             self.proto_to_configure.sensor_fusion_config.friendly_color_yellow = (
