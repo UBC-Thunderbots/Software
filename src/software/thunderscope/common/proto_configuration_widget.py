@@ -11,9 +11,6 @@ from software.thunderscope.common import proto_parameter_tree_util
 from typing import Any, Callable
 from PyQt6.QtWidgets import *
 
-from threading import Thread
-import time
-
 
 class ProtoConfigurationWidget(QWidget):
     """Creates a searchable parameter widget that can take any protobuf,
@@ -82,7 +79,10 @@ class ProtoConfigurationWidget(QWidget):
         layout.addWidget(self.search_query)
         layout.addWidget(self.param_tree)
 
-        self.run_onetime_async(ProtoConfigurationWidget.DELAYED_CONFIGURATION_TIMEOUT_S, self.send_proto_to_fullsystem)
+        self.run_onetime_async(
+            ProtoConfigurationWidget.DELAYED_CONFIGURATION_TIMEOUT_S,
+            self.send_proto_to_fullsystem,
+        )
 
     def run_onetime_async(self, time_in_seconds: float, func: Callable):
         """

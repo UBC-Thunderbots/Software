@@ -544,7 +544,9 @@ class RobotCommunication(object):
                 self.current_network_config.robot_communication_interface,
             )
         )
-        logging.info(output_string("Vision\t\t", self.current_network_config.vision_interface))
+        logging.info(
+            output_string("Vision\t\t", self.current_network_config.vision_interface)
+        )
         logging.info(
             output_string("Referee\t\t", self.current_network_config.referee_interface)
         )
