@@ -164,8 +164,8 @@ class RobotCommunication(object):
         ) and (new_vision_interface != DISCONNECTED))
 
         if force_reconnect:
-            change_referee_interface = True
-            change_vision_interface = True
+            change_referee_interface = True if new_referee_interface != DISCONNECTED else change_referee_interface
+            change_vision_interface = True if new_vision_interface != DISCONNECTED else change_vision_interface
 
         if change_vision_interface:
             (
@@ -213,7 +213,7 @@ class RobotCommunication(object):
             self.is_setup_for_fullsystem = True
 
     def __setup_for_robot_communication(
-            self, robot_communication_interface: str = DISCONNECTED, force_reconnect: bool = False
+            self, robot_communication_interface: str, force_reconnect: bool = False
     ) -> None:
         """
         Set up senders and listeners for communicating with the robots
@@ -225,9 +225,8 @@ class RobotCommunication(object):
         """
         if (
             (robot_communication_interface
-            == self.current_network_config.robot_communication_interface
-            or robot_communication_interface == DISCONNECTED)
-            and not force_reconnect
+            == self.current_network_config.robot_communication_interface and not force_reconnect)
+            or (robot_communication_interface == DISCONNECTED)
         ):
             return
 
