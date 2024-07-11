@@ -107,9 +107,6 @@ class RobotCommunication(object):
         self.current_proto_unix_io.register_observer(
             NetworkConfig, self.network_config_buffer
         )
-        # We will ignore the first network configuration update only if the interface is provided
-        if not self.accept_next_network_config:
-            self.__setup_for_robot_communication(interface)
 
         self.send_estop_state_thread = threading.Thread(
             target=self.__send_estop_state, daemon=True
