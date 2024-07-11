@@ -362,7 +362,8 @@ if __name__ == "__main__":
                             )
 
             if args.run_blue or args.run_yellow:
-                robot_communication.setup_for_fullsystem()
+                robot_communication.setup_for_fullsystem(force_reconnect=True)
+                robot_communication.print_current_network_config()
                 full_system_runtime_dir = (
                     args.blue_full_system_runtime_dir
                     if args.run_blue

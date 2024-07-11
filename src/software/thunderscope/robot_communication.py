@@ -9,7 +9,7 @@ from pyqtgraph.Qt import QtCore
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from colorama import Fore, Style
 import logging
-from typing import Any, Callable, Tuple, Type
+from typing import Any, Callable, Optional, Tuple, Type
 import threading
 import time
 import os
@@ -108,8 +108,9 @@ class RobotCommunication(object):
         self.current_proto_unix_io.register_observer(
             NetworkConfig, self.network_config_buffer
         )
-        if self.accept_next_network_config:
-            self.__setup_for_robot_communication(interface)
+        # We will ignore the first network configuration update only if the interface is provided
+        if not self.accept_next_network_config:
+            self.__setup_for_robot_communication(interface, True)
 
         self.send_estop_state_thread = threading.Thread(
             target=self.__send_estop_state, daemon=True
@@ -136,25 +137,35 @@ class RobotCommunication(object):
             except Exception:
                 raise Exception(f"Invalid Estop found at location {self.estop_path}")
 
-        self.__print_current_network_config()
+        self.print_current_network_config()
 
     def setup_for_fullsystem(
         self,
-        referee_interface: str = DISCONNECTED,
-        vision_interface: str = DISCONNECTED,
+        referee_interface: Optional[str] = None,
+        vision_interface: Optional[str] = None,
+        force_reconnect: bool = False,
     ) -> None:
         """
-        Sets up a listener for SSL vision and referee data, and connects all robots to fullsystem as default
+        Sets up a listener for SSL vision and referee data
 
         :param referee_interface: the interface to listen for referee data
         :param vision_interface: the interface to listen for vision data
+        :param force_reconnect: whether to force a reconnection regardless of whether our stored state says we are
+        already connected
         """
-        change_referee_interface = (
-            referee_interface != self.current_network_config.referee_interface
-        ) and (referee_interface != DISCONNECTED)
-        change_vision_interface = (
-            vision_interface != self.current_network_config.vision_interface
-        ) and (vision_interface != DISCONNECTED)
+        new_referee_interface = referee_interface if referee_interface else self.current_network_config.referee_interface
+        new_vision_interface = vision_interface if vision_interface else self.current_network_config.vision_interface
+
+        change_referee_interface = ((
+            new_referee_interface != self.current_network_config.referee_interface
+        ) and (new_referee_interface != DISCONNECTED))
+        change_vision_interface = ((
+            new_vision_interface != self.current_network_config.vision_interface
+        ) and (new_vision_interface != DISCONNECTED))
+
+        if force_reconnect:
+            change_referee_interface = True
+            change_vision_interface = True
 
         if change_vision_interface:
             (
@@ -163,7 +174,7 @@ class RobotCommunication(object):
             ) = tbots_cpp.createSSLWrapperPacketProtoListener(
                 SSL_VISION_ADDRESS,
                 SSL_VISION_PORT,
-                vision_interface,
+                new_vision_interface,
                 lambda data: self.__forward_to_proto_unix_io(SSL_WrapperPacket, data),
                 True,
             )
@@ -172,7 +183,7 @@ class RobotCommunication(object):
                 logger.error(f"Error setting up vision interface:\n{error}")
 
             self.current_network_config.vision_interface = (
-                vision_interface if not error else DISCONNECTED
+                new_vision_interface if not error else DISCONNECTED
             )
 
         if change_referee_interface:
@@ -182,7 +193,7 @@ class RobotCommunication(object):
             ) = tbots_cpp.createSSLRefereeProtoListener(
                 SSL_REFEREE_ADDRESS,
                 self.referee_port,
-                referee_interface,
+                new_referee_interface,
                 lambda data: self.__forward_to_proto_unix_io(Referee, data),
                 True,
             )
@@ -191,7 +202,7 @@ class RobotCommunication(object):
                 logger.error(f"Error setting up referee interface:\n{error}")
 
             self.current_network_config.referee_interface = (
-                referee_interface if not error else DISCONNECTED
+                new_referee_interface if not error else DISCONNECTED
             )
 
         if not self.is_setup_for_fullsystem:
@@ -202,18 +213,21 @@ class RobotCommunication(object):
             self.is_setup_for_fullsystem = True
 
     def __setup_for_robot_communication(
-        self, robot_communication_interface: str = DISCONNECTED
+            self, robot_communication_interface: str = DISCONNECTED, force_reconnect: bool = False
     ) -> None:
         """
         Set up senders and listeners for communicating with the robots
 
         :param robot_communication_interface: the interface to listen/send for robot status data. Ignored for sending
         primitives if using radio
+        :param force_reconnect: whether to force a reconnection regardless of whether our stored state says we are
+        already connected
         """
         if (
-            robot_communication_interface
+            (robot_communication_interface
             == self.current_network_config.robot_communication_interface
-            or robot_communication_interface == DISCONNECTED
+            or robot_communication_interface == DISCONNECTED)
+            and not force_reconnect
         ):
             return
 
@@ -392,7 +406,7 @@ class RobotCommunication(object):
                 self.__setup_for_robot_communication(
                     robot_communication_interface=network_config.robot_communication_interface
                 )
-                self.__print_current_network_config()
+                self.print_current_network_config()
             elif network_config is not None:
                 logger.warning(
                     "[RobotCommunication] We received a proto configuration update with a newer network"
@@ -400,7 +414,7 @@ class RobotCommunication(object):
                     " the next update will be accepted."
                 )
                 self.accept_next_network_config = True
-                self.__print_current_network_config()
+                self.print_current_network_config()
 
             # Set up network on the next tick
             network_config = self.network_config_buffer.get(
@@ -510,7 +524,7 @@ class RobotCommunication(object):
 
         self.run_primitive_set_thread.join()
 
-    def __print_current_network_config(self) -> None:
+    def print_current_network_config(self) -> None:
         """
         Prints the current network configuration to the console
         """
@@ -534,8 +548,8 @@ class RobotCommunication(object):
             )
         )
         logging.info(
-            output_string("Vision\t\t", self.current_network_config.vision_interface)
+            output_string("Vision\t\t", self.current_network_config.vision_interface if self.is_setup_for_fullsystem else DISCONNECTED)
         )
         logging.info(
-            output_string("Referee\t\t", self.current_network_config.referee_interface)
+            output_string("Referee\t\t", self.current_network_config.referee_interface if self.is_setup_for_fullsystem else DISCONNECTED)
         )
