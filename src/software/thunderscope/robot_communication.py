@@ -284,13 +284,6 @@ class RobotCommunication(object):
             else DISCONNECTED
         )
 
-    def close_for_fullsystem(self) -> None:
-        if self.receive_ssl_wrapper:
-            self.receive_ssl_wrapper.close()
-
-        if self.receive_ssl_referee_proto:
-            self.receive_ssl_referee_proto.close()
-
     def toggle_keyboard_estop(self) -> None:
         """
         If keyboard estop is being used, toggles the estop state
@@ -515,10 +508,6 @@ class RobotCommunication(object):
         """
         self.running = False
 
-        self.close_for_fullsystem()
-
-        self.receive_robot_log.close()
-        self.receive_robot_status.close()
         self.run_primitive_set_thread.join()
 
     def __print_current_network_config(self) -> None:
