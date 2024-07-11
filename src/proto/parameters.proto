@@ -654,8 +654,8 @@ message DefenderStealConfig {
     ];
     // Max distance that the defender will try and get possession of a ball
     required double max_get_ball_radius_m = 2
-    [default = 1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
-    // Max speed of ball that defender will try and get possession
+        [default = 1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Max speed of ball that pass defender will try and get possession
     required double max_ball_speed_to_get_m_per_s = 3
-    [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
 }
