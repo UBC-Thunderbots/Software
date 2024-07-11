@@ -434,7 +434,7 @@ class ProtoPlayer:
 
         """
 
-        # Lets binary search through the chunks to find the chunk that starts
+        # Let's binary search through the chunks to find the chunk that starts
         # with a timestamp less than (but closest to) the seek_time we want
         # to seek to.
         def __bisect_chunks_by_timestamp(chunk: str) -> None:
