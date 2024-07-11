@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import threading
+from robot_communication import DISCONNECTED
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
@@ -362,7 +363,12 @@ if __name__ == "__main__":
                             )
 
             if args.run_blue or args.run_yellow:
-                robot_communication.setup_for_fullsystem(force_reconnect=True)
+                robot_communication.setup_for_fullsystem(
+                    referee_interface=args.interface
+                    if args.interface
+                    else DISCONNECTED,
+                    vision_interface=args.interface if args.interface else DISCONNECTED,
+                )
                 robot_communication.print_current_network_config()
                 full_system_runtime_dir = (
                     args.blue_full_system_runtime_dir
