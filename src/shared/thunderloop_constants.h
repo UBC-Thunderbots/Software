@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef NANO
 #include "shared/jetson_constants.h"
 #endif

@@ -1,8 +1,14 @@
 #pragma once
 
+
 #include <Eigen/Dense>
 #include <memory>
 #include <string>
+
+#include "shared/constants.h"
+#include "shared/thunderloop_constants.h"
+#include "software/embedded/gpio_char_dev.h"
+#include "software/embedded/gpio_sysfs.h"
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -312,6 +318,10 @@ class MotorService
                                               double back_right_velocity_mps,
                                               double dribbler_rpm);
 
+	template <typename T>
+	static std::unique_ptr<Gpio> setupGpio(const T& gpio_number, GpioDirection direction,
+										   GpioState initial_state);
+
     /**
      * Returns true if we've detected a RESET in our cached motor faults indicators or if
      * we have a fault that disables drive.
@@ -403,3 +413,17 @@ class MotorService
     static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right",
                                                   "front_right", "dribbler"};
 };
+
+template <typename T>
+std::unique_ptr<Gpio> MotorService::setupGpio(const T& gpio_number,
+											  GpioDirection direction, GpioState initial_state)
+{
+	if constexpr(PLATFORM == Platform::RASP_PI)
+	{
+		return std::make_unique<GpioCharDev>(gpio_number, direction, initial_state, "/dev/gpiochip4");
+	}
+	else
+	{
+		return std::make_unique<GpioSysfs>(gpio_number, direction, initial_state);
+	}
+}
