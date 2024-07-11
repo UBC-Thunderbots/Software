@@ -169,7 +169,7 @@ class RobotCommunication(object):
             )
 
             if error:
-                print(f"Error setting up vision interface: {error}")
+                logger.error(f"Error setting up vision interface:\n{error}")
 
             self.current_network_config.vision_interface = (
                 vision_interface if not error else DISCONNECTED
@@ -188,7 +188,7 @@ class RobotCommunication(object):
             )
 
             if error:
-                print(f"Error setting up referee interface: {error}")
+                logger.error(f"Error setting up referee interface:\n{error}")
 
             self.current_network_config.referee_interface = (
                 referee_interface if not error else DISCONNECTED
@@ -228,7 +228,7 @@ class RobotCommunication(object):
             """
             listener, error = listener_creator()
             if error:
-                logger.error(f"Error setting up robot status interface: {error}")
+                logger.error(f"Error setting up robot status interface:\n{error}")
 
             return listener
 
@@ -276,7 +276,7 @@ class RobotCommunication(object):
 
             if error:
                 is_listener_setup_successfully = False
-                print(f"Error setting up primitive set sender: {error}")
+                logger.error(f"Error setting up primitive set sender:\n{error}")
 
         self.current_network_config.robot_communication_interface = (
             robot_communication_interface
@@ -389,7 +389,7 @@ class RobotCommunication(object):
         )
         while self.running:
             if network_config is not None and self.accept_next_network_config:
-                print(f"[RobotCommunication] Received new NetworkConfig")
+                logging.info(f"[RobotCommunication] Received new NetworkConfig")
 
                 if self.is_setup_for_fullsystem:
                     self.setup_for_fullsystem(
@@ -538,13 +538,13 @@ class RobotCommunication(object):
             colour = Fore.RED if status == DISCONNECTED else Fore.GREEN
             return f"{comm_name} {colour}{status} {Style.RESET_ALL}"
 
-        print(
+        logging.info(
             output_string(
                 "Robot Status\t",
                 self.current_network_config.robot_communication_interface,
             )
         )
-        print(output_string("Vision\t\t", self.current_network_config.vision_interface))
-        print(
+        logging.info(output_string("Vision\t\t", self.current_network_config.vision_interface))
+        logging.info(
             output_string("Referee\t\t", self.current_network_config.referee_interface)
         )

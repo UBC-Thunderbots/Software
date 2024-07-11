@@ -15,8 +15,8 @@ To define a custom handler:
        file
 """
 CUSTOM_PARAMETERS_OVERRIDE = {
+    "robot_communication_interface": "__create_network_enum",
     "referee_interface": "__create_network_enum",
-    "robot_status_interface": "__create_network_enum",
     "vision_interface": "__create_network_enum",
 }
 

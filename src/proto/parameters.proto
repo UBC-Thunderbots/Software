@@ -620,7 +620,6 @@ message PossessionTrackerConfig
     ];
 }
 
-<<<<<<< HEAD
 message NetworkConfig
 {
     // The robot communication interface
@@ -631,7 +630,8 @@ message NetworkConfig
 
     // The vision interface
     required string vision_interface = 3 [default = "lo"];
-=======
+}
+
 message CreaseDefenderConfig
 {
     /*
@@ -658,5 +658,4 @@ message CreaseDefenderConfig
     // to determine if crease defender chipping is "towards goal"
     required double goal_post_offset_chipping = 4
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
->>>>>>> fc912f9706feff39af40d9756311d03b27c038be
 }

@@ -17,8 +17,9 @@ class UdpSender
      * @param ip_address The ip address to send data on
      * (IPv4 in dotted decimal or IPv6 in hex string)
      *  example IPv4: 192.168.0.2
-     *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
+     *  example IPv6: ff02::c3d0:42d2:bb8
      * @param port The port to send SendString data to
+     * @param interface The interface to send data on
      * @param multicast If true, joins the multicast group of given ip_address
      * @param error A user-provided optional string to store any errors that occur
      */

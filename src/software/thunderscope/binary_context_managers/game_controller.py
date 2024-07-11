@@ -20,6 +20,8 @@ from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
+logger = logging.getLogger(__name__)
+
 
 class Gamecontroller(object):
     """Gamecontroller Context Manager"""
@@ -201,7 +203,7 @@ class Gamecontroller(object):
         )
 
         if error:
-            print(
+            logger.error(
                 "[Gamecontroller] Failed to bind to the referee port and listen to referee messages"
             )
 
