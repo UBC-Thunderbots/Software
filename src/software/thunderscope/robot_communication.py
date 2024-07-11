@@ -153,15 +153,23 @@ class RobotCommunication(object):
         :param force_reconnect: whether to force a reconnection regardless of whether our stored state says we are
         already connected
         """
-        new_referee_interface = referee_interface if referee_interface else self.current_network_config.referee_interface
-        new_vision_interface = vision_interface if vision_interface else self.current_network_config.vision_interface
+        new_referee_interface = (
+            referee_interface
+            if referee_interface
+            else self.current_network_config.referee_interface
+        )
+        new_vision_interface = (
+            vision_interface
+            if vision_interface
+            else self.current_network_config.vision_interface
+        )
 
-        change_referee_interface = ((
+        change_referee_interface = (
             new_referee_interface != self.current_network_config.referee_interface
-        ) and (new_referee_interface != DISCONNECTED))
-        change_vision_interface = ((
+        ) and (new_referee_interface != DISCONNECTED)
+        change_vision_interface = (
             new_vision_interface != self.current_network_config.vision_interface
-        ) and (new_vision_interface != DISCONNECTED))
+        ) and (new_vision_interface != DISCONNECTED)
 
         if force_reconnect:
             change_referee_interface = True if new_referee_interface != DISCONNECTED else change_referee_interface
@@ -213,7 +221,9 @@ class RobotCommunication(object):
             self.is_setup_for_fullsystem = True
 
     def __setup_for_robot_communication(
-            self, robot_communication_interface: str, force_reconnect: bool = False
+        self,
+        robot_communication_interface: str,
+        force_reconnect: bool = False,
     ) -> None:
         """
         Set up senders and listeners for communicating with the robots
@@ -547,8 +557,18 @@ class RobotCommunication(object):
             )
         )
         logging.info(
-            output_string("Vision\t\t", self.current_network_config.vision_interface if self.is_setup_for_fullsystem else DISCONNECTED)
+            output_string(
+                "Vision\t\t",
+                self.current_network_config.vision_interface
+                if self.is_setup_for_fullsystem
+                else DISCONNECTED,
+            )
         )
         logging.info(
-            output_string("Referee\t\t", self.current_network_config.referee_interface if self.is_setup_for_fullsystem else DISCONNECTED)
+            output_string(
+                "Referee\t\t",
+                self.current_network_config.referee_interface
+                if self.is_setup_for_fullsystem
+                else DISCONNECTED,
+            )
         )
