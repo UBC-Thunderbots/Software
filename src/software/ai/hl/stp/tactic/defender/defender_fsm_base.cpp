@@ -1,9 +1,9 @@
-#include "defender_base.h"
+#include "defender_fsm_base.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
 
-bool DefenderBase::ballNearbyWithoutThreat(
+bool DefenderFSMBase::ballNearbyWithoutThreat(
         const WorldPtr& world_ptr,
         const Robot& robot,
         const TbotsProto::BallStealMode& ball_steal_mode,
@@ -53,7 +53,7 @@ bool DefenderBase::ballNearbyWithoutThreat(
     }
 }
 
-void DefenderBase::prepareGetPossession(
+void DefenderFSMBase::prepareGetPossession(
         const TacticUpdate& tactic_update, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
     Point ball_position     = tactic_update.world_ptr->ball().position();

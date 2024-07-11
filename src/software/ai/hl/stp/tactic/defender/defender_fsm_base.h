@@ -6,9 +6,9 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
 
-struct DefenderBase {
+struct DefenderFSMBase {
     /**
-     * Guard that determines whether it is appropriate to steal the ball
+     * Guard that determines whether it is appropriate to steal the ball for FSMs
      *
      * @param world_ptr The current state of the world
      * @param robot The current defender robot
@@ -22,7 +22,7 @@ struct DefenderBase {
             const TbotsProto::BallStealMode& ball_steal_mode,
             const TbotsProto::DefenderStealConfig& defender_steal_config);
     /**
-     * This is the Action that prepares for getting possession of the ball
+     * This is the Action that prepares for getting possession of the ball with FSMs
      * @param tactic_update the Defender's Update event
      * @param processEvent processes the DribbleFSM::Update
      */

@@ -109,7 +109,7 @@ void PassDefenderFSM::interceptBall(const Update& event)
 
 bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
-    return DefenderBase::ballNearbyWithoutThreat(
+    return DefenderFSMBase::ballNearbyWithoutThreat(
             event.common.world_ptr,
             event.common.robot,
             event.control_params.ball_steal_mode,
@@ -119,5 +119,5 @@ bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 void PassDefenderFSM::prepareGetPossession(
     const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
-    DefenderBase::prepareGetPossession(event.common, processEvent);
+    DefenderFSMBase::prepareGetPossession(event.common, processEvent);
 }

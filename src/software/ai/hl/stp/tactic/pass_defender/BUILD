@@ -20,7 +20,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/ai/hl/stp/tactic/defender:defender_base",
+        "//software/ai/hl/stp/tactic/defender:defender_fsm_base",
     ],
 )
 
