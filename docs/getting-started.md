@@ -216,7 +216,6 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - `[--run_diagnostics]` indicates if diagnostics should be loaded as well
       - If FullSystem is running, the robots receive input from the AI
       - If Diagnostics is enabled, the robots can also receive input from Manual controls or XBox controls
-      - Note: If you simply want to run diagnostics, you do not need to specify `--run_blue` or `--run_yellow`
       - This mode allows us to test and debug the robots by setting each robot's input to be either AI, Manual Control or XBox Control
       - Control mode for each robot can be set with each one's drop down menu in the Robot View widget
 
@@ -238,12 +237,12 @@ Now that you're setup, if you can run it on the command line, you can run it in 
                 ```
 
             - An appropriate interface we could choose is `enp0s5`
-            - Hint: If you are using a wired connection, the interface will likely start with `e-`. If you are using a wifi connection, the interface will likely start with `w-`.
+            - Hint: If you are using a wired connection, the interface will likely start with `e-`. If you are using a WiFi connection, the interface will likely start with `w-`.
         - If we are running the AI as "blue": `./tbots.py run thunderscope_main --interface=[interface_here] --run_blue`
         - If we are running the AI as "yellow": `./tbots.py run thunderscope_main --interface=[interface_here] --run_yellow`
         - `[interface_here]` corresponds to the `ifconfig` interfaces seen in the previous step
-            - For instance, a call to run the AI as blue on wifi could be: `./tbots.py run thunderscope_main --interface=wlp3s0 --run_blue`. This will start Thunderscope and set up comunication with robots over the wifi interface. It will also listen for referee and vision messages on the same interface.
-        - Note: You do not need to include the `--interface=[interface_here]` argument! You can run Thunderscope without it in some cases and use the dynamic configuration widget to set the interfaces for communication to send and receive robot, vision and referee messages.
+            - For instance, a call to run the AI as blue on WiFi could be: `./tbots.py run thunderscope_main --interface=wlp3s0 --run_blue`. This will start Thunderscope and set up comunication with robots over the wifi interface. It will also listen for referee and vision messages on the same interface.
+        - **Note: You do not need to include the `--interface=[interface_here]` argument!** You can run Thunderscope without it and use the dynamic configuration widget to set the interfaces for communication to send and receive robot, vision and referee messages.
             - If you choose to include `--interface=[interface_here]` argument, Thunderscope will listen for and send robot messages on this port. If you include `--run_blue` or `--run_yellow`, Thunderscope will also listen for vision messages and referee messages on this interface.
             - Using the dynamic configuration widget is recommended at Robocup. To reduce latencies, it is recommended to connect the robot router to the AI computer via ethernet and use a separate ethernet connection to receive vision and referee messages. In this configuration, Thunderscope will need to bind to two different interfaces, each likely starting with a "e-".
             - If you have specified `--run_blue` or `--run_yellow`, navigate to the "Parameters" widget. In "ai_config" > "ai_control_config" > "network_config", you can set the appropriate interface using the dropdowns for robot, vision and referee message communication.
@@ -259,7 +258,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
         - None means the robots are receiving no commands
         - More info about Manual control below
         - `--interface=[interface_here]` corresponds to the `ifconfig` interfaces seen in the previous step
-            - For instance, a call to run the AI as blue on wifi could be: `./tbots.py run thunderscope_main --interface=wlp3s0 --run_blue --run_diagnostics`
+            - For instance, a call to run the AI as blue on WiFi could be: `./tbots.py run thunderscope_main --interface=wlp3s0 --run_blue --run_diagnostics`
             - The `--interface` flag is optional. If you do not include it, you can set the interface in the dynamic configuration widget. See above for how to set the interface in the dynamic configuration widget.
 3. Run only Diagnostics
     - To run just Diagnostics
