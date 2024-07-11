@@ -247,19 +247,20 @@ Now that you're setup, if you can run it on the command line, you can run it in 
             - If you choose to include `--interface=[interface_here]` argument, Thunderscope will listen for and send robot messages on this port. If you include `--run_blue` or `--run_yellow`, Thunderscope will also listen for vision messages and referee messages on this interface.
             - Using the dynamic configuration widget is recommended at Robocup. To reduce latencies, it is recommended to connect the robot router to the AI computer via ethernet and use a separate ethernet connection to receive vision and referee messages. In this configuration, Thunderscope will need to bind to two different interfaces, each likely starting with a "e-".
             - If you have specified `--run_blue` or `--run_yellow`, navigate to the "Parameters" widget. In "ai_config" > "ai_control_config" > "network_config", you can set the appropriate interface using the dropdowns for robot, vision and referee message communication.
-            - If you have specified `--run_diagnostics` without `--run_blue` nor `--run_yellow`, the dynamic configuration widget will not load. You will need to set the interface via the `--interface=[interface_here]` argument.
-                - For example: `./tbots.py run thunderscope_main --interface=[interface_here] --run_diagnostics`
         - This command will set up robot communication and the Unix full system binary context manager. The Unix full system context manager hooks up our AI, Backend and SensorFusion
 2. Run AI along with Robot Diagnostics:
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
     - If we want to run with one AI and Diagnostics
-        - `./tbots.py run thunderscope_main [--run_blue | --run_yellow] --run_diagnostics` will start Thunderscope
+        - `./tbots.py run thunderscope_main [--run_blue | --run_yellow] --run_diagnostics --interface=[interface_here]` will start Thunderscope
             - `[--run_blue | --run_yellow]` indicate which FullSystem to run
             - `--run_diagnostics` indicates if diagnostics should be loaded as well
         - Initially, the robots are all connected to the AI and only receive input from it
         - To change the input source for the robot, use the drop-down menu of that robot to change it between None, AI, and Manual
         - None means the robots are receiving no commands
         - More info about Manual control below
+        - `--interface=[interface_here]` corresponds to the `ifconfig` interfaces seen in the previous step
+            - For instance, a call to run the AI as blue on wifi could be: `./tbots.py run thunderscope_main --interface=wlp3s0 --run_blue --run_diagnostics`
+            - The `--interface` flag is optional. If you do not include it, you can set the interface in the dynamic configuration widget. See above for how to set the interface in the dynamic configuration widget.
 3. Run only Diagnostics
     - To run just Diagnostics
         - `./tbots.py run thunderscope --run_diagnostics --interface <network_interface>`
