@@ -110,7 +110,7 @@ class RobotCommunication(object):
         )
         # We will ignore the first network configuration update only if the interface is provided
         if not self.accept_next_network_config:
-            self.__setup_for_robot_communication(interface, True)
+            self.__setup_for_robot_communication(interface)
 
         self.send_estop_state_thread = threading.Thread(
             target=self.__send_estop_state, daemon=True
@@ -147,7 +147,6 @@ class RobotCommunication(object):
 
         :param referee_interface: the interface to listen for referee data
         :param vision_interface: the interface to listen for vision data
-        already connected
         """
         # Check cache to see if we're already connected
         change_referee_interface = (
@@ -212,20 +211,17 @@ class RobotCommunication(object):
             self.is_setup_for_fullsystem = True
 
     def __setup_for_robot_communication(
-        self, robot_communication_interface: str, force_reconnect: bool = False,
+        self, robot_communication_interface: str
     ) -> None:
         """
         Set up senders and listeners for communicating with the robots
 
         :param robot_communication_interface: the interface to listen/send for robot status data. Ignored for sending
         primitives if using radio
-        :param force_reconnect: whether to force a reconnection regardless of whether our stored state says we are
-        already connected
         """
         if (
             robot_communication_interface
             == self.current_network_config.robot_communication_interface
-            and not force_reconnect
         ) or (robot_communication_interface == DISCONNECTED):
             return
 
