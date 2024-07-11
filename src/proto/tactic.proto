@@ -77,6 +77,8 @@ message CreaseDefenderTactic
     required CreaseDefenderAlignment crease_defender_alignment = 2;
     // The maximum allowed speed mode
     required MaxAllowedSpeedMode max_allowed_speed_mode = 3;
+    // The crease defender's aggressiveness towards the ball
+    required BallStealMode ball_steal_mode = 4;
 }
 
 message DribbleTactic
@@ -142,6 +144,8 @@ message PassDefenderTactic
 {
     // The location on the field to block enemy passes from
     required Point position_to_block_from = 1;
+    // The pass defender's aggressiveness towards the ball
+    required BallStealMode ball_steal_mode = 2;
 }
 
 message PenaltyKickTactic {}

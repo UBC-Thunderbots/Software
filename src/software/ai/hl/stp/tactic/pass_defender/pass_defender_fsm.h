@@ -5,8 +5,9 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
+#include "software/ai/hl/stp/tactic/defender/defender_base.h"
 
-struct PassDefenderFSM
+struct PassDefenderFSM : public DefenderBase
 {
     class BlockPassState;
     class InterceptBallState;

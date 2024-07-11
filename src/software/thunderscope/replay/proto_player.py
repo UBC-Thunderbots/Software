@@ -1,3 +1,4 @@
+import logging
 import time
 import threading
 import base64
@@ -10,17 +11,17 @@ from proto.import_all_protos import *
 from extlibs.er_force_sim.src.protobuf.world_pb2 import *
 from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.replay.proto_logger import ProtoLogger
+from software.thunderscope.replay.replay_constants import *
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from google.protobuf.message import DecodeError, Message
 from typing import Callable, Type
 
 
 class ProtoPlayer:
-
     """Plays back a proto log folder. All the playback is handled by a worker
     thread running in the background.
-        
-        
+
+
                              current_chunk
                                   │
                                   │
@@ -35,7 +36,7 @@ class ProtoPlayer:
                     │             └──current_chunk_index
                     │
              current_entry_index
-        
+
     The player will load chunks in order and play them back at the given playback
     speed. If the seek function is called with a specific time, the player will
     update the 3 variables (shown above) to point to the chunk and entry (in the
@@ -48,7 +49,7 @@ class ProtoPlayer:
 
         :param log_folder_path: The path to the log file.
         :param proto_unix_io: The proto_unix_io to send the protos to.
-            
+
         """
         self.log_folder_path = log_folder_path
         self.proto_unix_io = proto_unix_io
@@ -70,12 +71,36 @@ class ProtoPlayer:
         self.current_chunk_index = 0
         self.current_entry_index = 0
 
+        self.sorted_chunks = self.sort_and_get_replay_files(self.log_folder_path)
+        # We can get the total runtime of the log from the last entry in the last chunk
+        self.end_time = self.find_actual_endtime()
+
+        logging.info(
+            "Loaded log file with total runtime of {:.2f} seconds".format(self.end_time)
+        )
+
+        # Start playing thread
+        self.seek(0.0)
+        self.thread = threading.Thread(
+            target=self.__play_protobufs_wrapper, daemon=True
+        )
+        self.thread.start()
+
+        self.error_bit_flag = NO_ERROR_FLAG
+
+    def sort_and_get_replay_files(self, log_folder_path):
+        """
+        Sorting the replay files
+
+        :param log_folder_path: the path to the folder that we are going to be sorting!
+        :return: the sorted replay files
+        """
         # Load up all replay files in the log folder
-        replay_files = glob.glob(self.log_folder_path + f"/*.{REPLAY_FILE_EXTENSION}")
+        replay_files = glob.glob(log_folder_path + f"/*.{REPLAY_FILE_EXTENSION}")
 
         if len(replay_files) == 0:
             raise ValueError(
-                f'No replay files found in "{self.log_folder_path}", make sure that an absolute path '
+                f'No replay files found in "{log_folder_path}", make sure that an absolute path '
                 f"to the folder containing the replay files is provided."
             )
 
@@ -85,22 +110,52 @@ class ProtoPlayer:
             replay_index, _ = tail.split(".")
             return int(replay_index)
 
-        self.sorted_chunks = sorted(replay_files, key=__sort_replay_chunks)
+        return sorted(replay_files, key=__sort_replay_chunks)
 
-        # We can get the total runtime of the log from the last entry in the last chunk
-        last_chunk_data = ProtoPlayer.load_replay_chunk(self.sorted_chunks[-1])
+    @staticmethod
+    def is_log_entry_corrupt(log_entry) -> bool:
+        """
+        Check to see if we have can unpack the log entry
+
+        :param log_entry: the log entry we are checking
+        :return: False if we could unpack the log entry, True otherwise
+        """
         try:
-            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-1])
-        except DecodeError:
-            self.end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[-2])
-        logging.info(
-            "Loaded log file with total runtime of {:.2f} seconds".format(self.end_time)
-        )
+            _ = ProtoPlayer.unpack_log_entry(log_entry)
+            return False
+        except Exception:
+            return True
 
-        # Start playing thread
-        self.seek(0.0)
-        self.thread = threading.Thread(target=self.__play_protobufs, daemon=True)
-        self.thread.start()
+    def is_proto_player_playing(self) -> bool:
+        """
+        return whether or not the proto player is being played.
+
+        :return: True if the proto player is playing, False otherwise.
+        """
+
+        return self.is_playing
+
+    def find_actual_endtime(self) -> float:
+        """
+        Finding the last end time.
+        Note that the end time may not necessarily be the last message in the last chunks since there may be
+        file corruptions. We also assume a chronological order in the chunks data!
+
+        :return: the last end time, if no end time are found, return 0.0s
+        """
+        # reverse iterating over the chunks (file)
+        for i in reversed(range(len(self.sorted_chunks))):
+            last_chunk_data = ProtoPlayer.load_replay_chunk(self.sorted_chunks[i])
+
+            # reverse iterating the protobufs message in each and every file
+            for j in reversed(range(len(last_chunk_data))):
+                try:
+                    end_time, _, _ = ProtoPlayer.unpack_log_entry(last_chunk_data[j])
+                    return end_time
+                except Exception:
+                    pass
+
+        return 0.0
 
     @staticmethod
     def load_replay_chunk(replay_chunk_path: str) -> list:
@@ -119,9 +174,20 @@ class ProtoPlayer:
                     line = log_file.readline()
                     if not line:
                         break
-                    cached_data.append(line)
+
+                    if not ProtoPlayer.is_log_entry_corrupt(line):
+                        cached_data.append(line)
+                    else:
+                        logging.warning(
+                            "There are log entries that are corrupted. Entries ignored!"
+                        )
                 except EOFError:
                     break
+
+                except Exception as e:
+                    logging.warning(
+                        f"An unknown exception has occurred while reading {replay_chunk_path}: {e}"
+                    )
 
         return cached_data
 
@@ -160,7 +226,7 @@ class ProtoPlayer:
         :param filename: The file to save to
         :param start_time: the start time for the clip
         :param end_time: the end time for the clip
-    
+
         """
         if not filename:
             print("No filename selected")
@@ -256,8 +322,7 @@ class ProtoPlayer:
             self.play()
 
     def single_step_forward(self) -> None:
-        """Steps the player forward by one log entry
-        """
+        """Steps the player forward by one log entry"""
         self.pause()
         self.current_entry_index = self.current_entry_index + 1
         self.current_chunk_index = self.current_chunk_index
@@ -297,6 +362,7 @@ class ProtoPlayer:
         :param seek_time: The time to seek to.
 
         """
+
         # Let's binary search through the chunks to find the chunk that starts
         # with a timestamp less than (but closest to) the seek_time we want
         # to seek to.
@@ -377,8 +443,40 @@ class ProtoPlayer:
 
         return min(abs(low), abs(high))
 
+    def __play_protobufs_wrapper(self) -> None:
+        """
+        this function essentially executes __play_protobufs. However, the intention of this function 
+        is for testing purposes. __play_protobufs is launched in a different thread, it would be useful to know 
+        if there are uncaught exceptions. This is then used to test the robustness of the __play_protobufs
+        function when dealing with corrupted replay files.
+
+        As such, most of time, this function acts the same as self.__play_protobufs
+
+        :return: None
+        """
+
+        try:
+            self.__play_protobufs()
+        except Exception as e:
+            logging.exception(
+                "there is an uncaught exception when playing protobufs: {}".format(e)
+            )
+            # setting the error bit flags
+            self.error_bit_flag |= UNCAUGHT_EXCEPTION_FLAG
+            self.is_playing = False
+
+    def get_error_bit_flag(self) -> int:
+        """
+        the error bit flags is defined as the following: 
+            1 if there is an uncaught exception in the code
+            0 if success
+
+        :return: the error bit flags. 
+        """
+        return self.error_bit_flag
+
     def __play_protobufs(self) -> None:
-        """Plays all protos in the file in chronologoical order. 
+        """Plays all protos in the file in chronologoical order.
 
         Playback controls:
             - Play/Pause through self.is_playing
@@ -417,7 +515,7 @@ class ProtoPlayer:
                         ) = ProtoPlayer.unpack_log_entry(
                             self.current_chunk[self.current_entry_index]
                         )
-                    except ValueError:
+                    except Exception:
                         self.current_entry_index += 1
                         logging.error("[ProtoPlayer] Error parsing log entry")
                         continue

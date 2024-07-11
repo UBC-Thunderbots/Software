@@ -38,14 +38,26 @@ TEST(PassDefenderFSMTest, test_transitions)
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::InterceptBallState>));
 
-    // Deflect ball away from pass defender
+    // Deflect ball away from pass defender and return to block state
     ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(124));
     ::TestUtil::setBallVelocity(world, Vector(0, 1), Timestamp::fromSeconds(125));
     EXPECT_TRUE(world->ball().hasBallBeenKicked(Angle::quarter()));
+    fsm.process_event(PassDefenderFSM::Update(
+            control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
 
-    // Move Ball Close and Transition to DribbleFSM
-    ::TestUtil::setBallVelocity(world, Vector(-0.1, 0), Timestamp::fromSeconds(125));
-    ::TestUtil::setBallPosition(world, Point(-1.8, 0), Timestamp::fromSeconds(125));
+    // Ball is now again kicked towards pass defender
+    ::TestUtil::setBallVelocity(world, Vector(-1, 0), Timestamp::fromSeconds(125));
+    EXPECT_TRUE(world->ball().hasBallBeenKicked(Angle::half()));
+
+    // Transition to InterceptBallState again
+    fsm.process_event(PassDefenderFSM::Update(
+            control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::InterceptBallState>));
+
+    // Move Ball Close and Transition to DribbleFSM from interception
+    ::TestUtil::setBallVelocity(world, Vector(-0.1, 0), Timestamp::fromSeconds(126));
+    ::TestUtil::setBallPosition(world, Point(-1.8, 0), Timestamp::fromSeconds(126));
     fsm.process_event(PassDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));

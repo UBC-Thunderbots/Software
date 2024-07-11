@@ -17,10 +17,8 @@ void DefensePlayFSMBase::setUpCreaseDefenders(int num_crease_defenders)
 
     crease_defenders =
         std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_crease_defenders);
-    std::generate(crease_defenders.begin(), crease_defenders.end(), [this]() {
-        return std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config());
-    });
+    std::generate(crease_defenders.begin(), crease_defenders.end(),
+                  [this]() { return std::make_shared<CreaseDefenderTactic>(ai_config); });
 }
 
 void DefensePlayFSMBase::setUpPassDefenders(int num_pass_defenders)
@@ -48,7 +46,8 @@ void DefensePlayFSMBase::updatePassDefenderControlParams(
 
 void DefensePlayFSMBase::setAlignment(
     const Update& event,
-    const std::vector<DefenderAssignment>& crease_defender_assignments)
+    const std::vector<DefenderAssignment>& crease_defender_assignments,
+    TbotsProto::BallStealMode ball_steal_mode)
 {
     for (unsigned int i = 0; i < crease_defenders.size(); i++)
     {
@@ -86,6 +85,7 @@ void DefensePlayFSMBase::setAlignment(
         }
 
         crease_defenders.at(i)->updateControlParams(
-            target, alignment, event.control_params.max_allowed_speed_mode);
+            target, alignment, event.control_params.max_allowed_speed_mode,
+            ball_steal_mode);
     }
 }
