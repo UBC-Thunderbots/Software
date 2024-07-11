@@ -236,14 +236,14 @@ Now that you're setup, if you can run it on the command line, you can run it in 
                         ...
                 ```
 
-            - An appropriate interface we could choose is `enp0s5`
+            - An appropriate interface we could choose is `wlp3s0`
             - Hint: If you are using a wired connection, the interface will likely start with `e-`. If you are using a WiFi connection, the interface will likely start with `w-`.
         - If we are running the AI as "blue": `./tbots.py run thunderscope_main --interface=[interface_here] --run_blue`
         - If we are running the AI as "yellow": `./tbots.py run thunderscope_main --interface=[interface_here] --run_yellow`
         - `[interface_here]` corresponds to the `ifconfig` interfaces seen in the previous step
             - For instance, a call to run the AI as blue on WiFi could be: `./tbots.py run thunderscope_main --interface=wlp3s0 --run_blue`. This will start Thunderscope and set up comunication with robots over the wifi interface. It will also listen for referee and vision messages on the same interface.
         - **Note: You do not need to include the `--interface=[interface_here]` argument!** You can run Thunderscope without it and use the dynamic configuration widget to set the interfaces for communication to send and receive robot, vision and referee messages.
-            - If you choose to include `--interface=[interface_here]` argument, Thunderscope will listen for and send robot messages on this port. If you include `--run_blue` or `--run_yellow`, Thunderscope will also listen for vision messages and referee messages on this interface.
+            - If you choose to include `--interface=[interface_here]` argument, Thunderscope will listen for and send robot messages on this port as well as receive vision and referee messages.
             - Using the dynamic configuration widget is recommended at Robocup. To reduce latencies, it is recommended to connect the robot router to the AI computer via ethernet and use a separate ethernet connection to receive vision and referee messages. In this configuration, Thunderscope will need to bind to two different interfaces, each likely starting with a "e-".
             - If you have specified `--run_blue` or `--run_yellow`, navigate to the "Parameters" widget. In "ai_config" > "ai_control_config" > "network_config", you can set the appropriate interface using the dropdowns for robot, vision and referee message communication.
         - This command will set up robot communication and the Unix full system binary context manager. The Unix full system context manager hooks up our AI, Backend and SensorFusion
