@@ -156,15 +156,6 @@ class RobotCommunication(object):
             vision_interface != self.current_network_config.vision_interface
         ) and (vision_interface != DISCONNECTED)
 
-        # If we haven't been setup for fullsystem yet, we need to connect regardless of cache state
-        if not self.is_setup_for_fullsystem:
-            change_referee_interface = (
-                True if referee_interface != DISCONNECTED else change_referee_interface
-            )
-            change_vision_interface = (
-                True if vision_interface != DISCONNECTED else change_vision_interface
-            )
-
         if change_vision_interface:
             (
                 self.receive_ssl_wrapper,
