@@ -103,7 +103,6 @@ class RobotCommunication(object):
         if interface:
             self.accept_next_network_config = False
             self.__setup_for_robot_communication(interface)
-            self.current_network_config.robot_communication_interface = interface
         self.network_config_buffer = ThreadSafeBuffer(1, NetworkConfig)
         self.current_proto_unix_io.register_observer(
             NetworkConfig, self.network_config_buffer
