@@ -6,7 +6,8 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
 
-struct DefenderFSMBase {
+struct DefenderFSMBase
+{
     /**
      * Guard that determines whether it is appropriate to steal the ball for FSMs
      *
@@ -17,16 +18,15 @@ struct DefenderFSMBase {
      *          and within a max get possession threshold
      */
     static bool ballNearbyWithoutThreat(
-            const WorldPtr& world_ptr,
-            const Robot& robot ,
-            const TbotsProto::BallStealMode& ball_steal_mode,
-            const TbotsProto::DefenderStealConfig& defender_steal_config);
+        const WorldPtr& world_ptr, const Robot& robot,
+        const TbotsProto::BallStealMode& ball_steal_mode,
+        const TbotsProto::DefenderStealConfig& defender_steal_config);
     /**
      * This is the Action that prepares for getting possession of the ball with FSMs
      * @param tactic_update the Defender's Update event
      * @param processEvent processes the DribbleFSM::Update
      */
     static void prepareGetPossession(
-            const TacticUpdate& tactic_update,
-            boost::sml::back::process<DribbleFSM::Update> processEvent);
+        const TacticUpdate& tactic_update,
+        boost::sml::back::process<DribbleFSM::Update> processEvent);
 };

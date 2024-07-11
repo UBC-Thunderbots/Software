@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "proto/tactic.pb.h"
+#include "software/ai/hl/stp/tactic/defender/defender_fsm_base.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -11,7 +12,6 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
-#include "software/ai/hl/stp/tactic/defender/defender_fsm_base.h"
 
 struct CreaseDefenderFSM : public DefenderFSMBase
 {

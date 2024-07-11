@@ -136,7 +136,6 @@ def test_avoid_intercept_scenario(
         PassDefenderTactic(
             position_to_block_from=tbots_cpp.createPointProto(position_to_block_from),
             ball_steal_mode=BallStealMode.STEAL,
-
         )
     )
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(
@@ -263,7 +262,6 @@ def test_steal_ball(
         PassDefenderTactic(
             position_to_block_from=tbots_cpp.createPointProto(position_to_block_from),
             ball_steal_mode=BallStealMode.STEAL,
-
         )
     )
     simulated_test_runner.blue_full_system_proto_unix_io.send_proto(

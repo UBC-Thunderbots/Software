@@ -634,14 +634,14 @@ message PassDefenderConfig
     required DefenderStealConfig defender_steal_config = 1;
 }
 
-message DefenderStealConfig {
+message DefenderStealConfig
+{
     /*
     Max ratio between distances (defender and ball) / (nearest enemy and ball) for
     defender to chase ball.
-    Threshold = 1.0 results in defenders chasing the ball even if the ball is equidistant to
-    nearest enemy.
-    Threshold < 1.0 results in defenders chasing the ball only when it is at least
-    (threshold)% closer to our bot than the nearest enemy.
+    Threshold = 1.0 results in defenders chasing the ball even if the ball is equidistant
+    to nearest enemy. Threshold < 1.0 results in defenders chasing the ball only when it
+    is at least (threshold)% closer to our bot than the nearest enemy.
     ┌──────────────────────────────────────────┐
     | Defender <────> Ball <───────────> Enemy |
     |    ()            x                  ()   |

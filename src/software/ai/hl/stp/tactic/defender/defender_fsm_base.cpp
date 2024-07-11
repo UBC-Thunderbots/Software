@@ -1,21 +1,21 @@
 #include "defender_fsm_base.h"
+
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
 
 bool DefenderFSMBase::ballNearbyWithoutThreat(
-        const WorldPtr& world_ptr,
-        const Robot& robot,
-        const TbotsProto::BallStealMode& ball_steal_mode,
-        const TbotsProto::DefenderStealConfig& defender_steal_config)
+    const WorldPtr& world_ptr, const Robot& robot,
+    const TbotsProto::BallStealMode& ball_steal_mode,
+    const TbotsProto::DefenderStealConfig& defender_steal_config)
 {
     Point robot_position = robot.position();
     Point ball_position  = world_ptr->ball().position();
 
     std::optional<Robot> nearest_friendly_to_ball =
-            world_ptr->friendlyTeam().getNearestRobot(ball_position);
+        world_ptr->friendlyTeam().getNearestRobot(ball_position);
     std::optional<Robot> nearest_enemy_to_ball =
-            world_ptr->enemyTeam().getNearestRobot(robot_position);
+        world_ptr->enemyTeam().getNearestRobot(robot_position);
     if (ball_steal_mode == TbotsProto::BallStealMode::IGNORE)
     {
         // Do nothing if stealing is disabled
@@ -34,16 +34,16 @@ bool DefenderFSMBase::ballNearbyWithoutThreat(
         // and within max range
         double ball_distance_to_friendly = distance(robot_position, ball_position);
         double ball_distance_to_enemy =
-                distance(nearest_enemy_to_ball.value().position(), ball_position);
+            distance(nearest_enemy_to_ball.value().position(), ball_position);
 
         bool ball_is_near_friendly =
-                ball_distance_to_friendly <
-                ball_distance_to_enemy *
+            ball_distance_to_friendly <
+            ball_distance_to_enemy *
                 (1.0 - defender_steal_config.max_get_ball_ratio_threshold());
         bool ball_is_within_max_range =
-                ball_distance_to_friendly <= defender_steal_config.max_get_ball_radius_m();
+            ball_distance_to_friendly <= defender_steal_config.max_get_ball_radius_m();
         bool ball_is_slow = world_ptr->ball().velocity().length() <=
-                defender_steal_config.max_ball_speed_to_get_m_per_s();
+                            defender_steal_config.max_ball_speed_to_get_m_per_s();
 
         return ball_is_near_friendly && ball_is_within_max_range && ball_is_slow;
     }
@@ -54,14 +54,15 @@ bool DefenderFSMBase::ballNearbyWithoutThreat(
 }
 
 void DefenderFSMBase::prepareGetPossession(
-        const TacticUpdate& tactic_update, boost::sml::back::process<DribbleFSM::Update> processEvent)
+    const TacticUpdate& tactic_update,
+    boost::sml::back::process<DribbleFSM::Update> processEvent)
 {
     Point ball_position     = tactic_update.world_ptr->ball().position();
     Point enemy_goal_center = tactic_update.world_ptr->field().enemyGoal().centre();
     auto ball_to_net_vector = Vector(enemy_goal_center - ball_position);
     DribbleFSM::ControlParams control_params{
-            .dribble_destination       = ball_position,
-            .final_dribble_orientation = ball_to_net_vector.orientation(),
-            .allow_excessive_dribbling = false};
+        .dribble_destination       = ball_position,
+        .final_dribble_orientation = ball_to_net_vector.orientation(),
+        .allow_excessive_dribbling = false};
     processEvent(DribbleFSM::Update(control_params, tactic_update));
 }

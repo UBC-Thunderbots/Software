@@ -110,10 +110,8 @@ void PassDefenderFSM::interceptBall(const Update& event)
 bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
     return DefenderFSMBase::ballNearbyWithoutThreat(
-            event.common.world_ptr,
-            event.common.robot,
-            event.control_params.ball_steal_mode,
-            pass_defender_config.defender_steal_config());
+        event.common.world_ptr, event.common.robot, event.control_params.ball_steal_mode,
+        pass_defender_config.defender_steal_config());
 }
 
 void PassDefenderFSM::prepareGetPossession(

@@ -204,10 +204,9 @@ bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
     bool ball_on_friendly_side = event.common.world_ptr->ball().position().x() < 0;
     return ball_on_friendly_side && DefenderFSMBase::ballNearbyWithoutThreat(
-            event.common.world_ptr,
-            event.common.robot,
-            event.control_params.ball_steal_mode,
-            crease_defender_config.defender_steal_config());
+                                        event.common.world_ptr, event.common.robot,
+                                        event.control_params.ball_steal_mode,
+                                        crease_defender_config.defender_steal_config());
 }
 
 void CreaseDefenderFSM::prepareGetPossession(
