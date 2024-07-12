@@ -28,7 +28,7 @@ string_flag(
 cc_library(
     name = "platform",
     hdrs = ["platform.h"],
-    deps = ["//software/util/make_enum:make_enum"],
+    deps = ["//software/util/make_enum"],
 )
 
 cc_library(

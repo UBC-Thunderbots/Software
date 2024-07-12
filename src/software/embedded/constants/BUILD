@@ -7,11 +7,11 @@ cc_library(
         "jetson_constants.h",
         "pi_constants.h",
     ],
-    deps = [
-        "//software/embedded:platform"
-    ],
     defines = select({
         "//software/embedded:build_nano": ["NANO"],
         "//software/embedded:build_pi": ["PI"],
     }),
+    deps = [
+        "//software/embedded:platform",
+    ],
 )

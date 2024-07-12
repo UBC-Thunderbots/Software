@@ -13,8 +13,8 @@ cc_library(
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
-        "//software/embedded/constants:constants",
         "//software/embedded:gpio",
+        "//software/embedded/constants",
         "//software/logger",
         "//software/physics:euclidean_to_wheel",
         "//software/util/scoped_timespec_timer",
