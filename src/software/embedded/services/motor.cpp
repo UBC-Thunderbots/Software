@@ -21,7 +21,6 @@
 #include <bitset>
 
 #include "proto/tbots_software_msgs.pb.h"
-#include "shared/thunderloop_constants.h"
 #include "software/logger/logger.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 

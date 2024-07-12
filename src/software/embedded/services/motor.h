@@ -1,14 +1,14 @@
 #pragma once
 
-
 #include <Eigen/Dense>
 #include <memory>
 #include <string>
 
 #include "shared/constants.h"
-#include "shared/thunderloop_constants.h"
+#include "software/embedded/constants/constants.h"
 #include "software/embedded/gpio_char_dev.h"
 #include "software/embedded/gpio_sysfs.h"
+#include "software/embedded/platform.h"
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"

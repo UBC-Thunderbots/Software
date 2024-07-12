@@ -1,5 +1,36 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+config_setting(
+    name = "build_nano",
+    flag_values = {
+        ":host_platform": "NANO",
+    },
+)
+
+config_setting(
+    name = "build_pi",
+    flag_values = {
+        ":host_platform": "PI",
+    },
+)
+
+string_flag(
+    name = "host_platform",
+    build_setting_default = "",
+    values = [
+        "PI",
+        "NANO",
+    ],
+)
+
+cc_library(
+    name = "platform",
+    hdrs = ["platform.h"],
+    deps = ["//software/util/make_enum:make_enum"],
+)
+
 cc_library(
     name = "primitive_executor",
     srcs = ["primitive_executor.cpp"],
@@ -7,7 +38,6 @@ cc_library(
     deps = [
         "//proto:tbots_cc_proto",
         "//proto/primitive:primitive_msg_factory",
-        "//shared:constants",
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
         "//software/ai/navigator/trajectory:trajectory_path",
         "//software/math:math_functions",
@@ -62,7 +92,6 @@ cc_binary(
     ],
     deps = [
         ":thunderloop",
-        "//shared:constants",
         "@boost//:program_options",
     ],
 )

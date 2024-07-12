@@ -6,14 +6,14 @@ cc_library(
     hdrs = ["motor.h"],
     defines =
         select({
-            "//shared:build_nano": ["NANO"],
-            "//shared:build_pi": ["PI"],
+            "//software/embedded:build_nano": ["NANO"],
+            "//software/embedded:build_pi": ["PI"],
             "//conditions:default": ["NONE"],
         }),
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
-        "//shared:thunderloop_constants",
+        "//software/embedded/constants:constants",
         "//software/embedded:gpio",
         "//software/logger",
         "//software/physics:euclidean_to_wheel",

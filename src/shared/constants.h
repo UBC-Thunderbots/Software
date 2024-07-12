@@ -8,8 +8,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "software/util/make_enum/make_enum.hpp"
-
 
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
@@ -30,7 +28,6 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
 static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
-MAKE_ENUM(Platform, RASP_PI, JETSON_NANO);
 #endif  // PLATFORMIO_BUILD
 
 // Redis default server connections properties

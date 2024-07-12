@@ -191,7 +191,7 @@ if __name__ == "__main__":
     bazel_arguments = unknown_args
 
     if args.platform:
-        bazel_arguments += ["--//shared:platform=" + args.platform]
+        bazel_arguments += ["--//software/embedded:host_platform=" + args.platform]
     if args.stop_ai_on_start:
         bazel_arguments += ["--stop_ai_on_start"]
     if args.enable_visualizer:
