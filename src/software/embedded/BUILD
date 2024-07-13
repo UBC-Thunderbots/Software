@@ -18,7 +18,7 @@ config_setting(
 
 string_flag(
     name = "host_platform",
-    build_setting_default = "",
+    build_setting_default = "PI",
     values = [
         "PI",
         "NANO",
