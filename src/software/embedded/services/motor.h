@@ -326,16 +326,18 @@ class MotorService
                                               double dribbler_rpm);
 
     /**
-     * Helper function to setup a GPIO pin. Selects the appropriate GPIO implementation based on the host platform.
+     * Helper function to setup a GPIO pin. Selects the appropriate GPIO implementation
+     * based on the host platform.
      *
      * @tparam T The representation of the GPIO number
-     * @param gpio_number The GPIO number (this is typically different from the hardware pin number)
+     * @param gpio_number The GPIO number (this is typically different from the hardware
+     * pin number)
      * @param direction The direction of the GPIO pin (input or output)
      * @param initial_state The initial state of the GPIO pin (high or low)
      */
-	template <typename T>
-	static std::unique_ptr<Gpio> setupGpio(const T& gpio_number, GpioDirection direction,
-										   GpioState initial_state);
+    template <typename T>
+    static std::unique_ptr<Gpio> setupGpio(const T& gpio_number, GpioDirection direction,
+                                           GpioState initial_state);
 
     /**
      * Returns true if we've detected a RESET in our cached motor faults indicators or if
@@ -444,4 +446,3 @@ std::unique_ptr<Gpio> MotorService::setupGpio(const T& gpio_number,
         return std::make_unique<GpioSysfs>(gpio_number, direction, initial_state);
     }
 }
-
