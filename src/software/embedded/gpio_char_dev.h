@@ -4,6 +4,11 @@
 
 #include "software/embedded/gpio.h"
 
+/**
+ * GPIO with the character device interface
+ *
+ * Available on Linux kernels 5.10 and later.
+ */
 class GpioCharDev : public Gpio
 {
    public:

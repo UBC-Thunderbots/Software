@@ -5,6 +5,9 @@
 MAKE_ENUM(GpioState, LOW, HIGH);
 MAKE_ENUM(GpioDirection, INPUT, OUTPUT);
 
+/**
+ * An abstract interface for interacting with General Purpose Input/Output (GPIO) pins
+ */
 class Gpio
 {
    public:

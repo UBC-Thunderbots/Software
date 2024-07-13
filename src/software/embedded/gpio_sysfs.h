@@ -10,6 +10,11 @@
 
 #include "software/embedded/gpio.h"
 
+/**
+ * GPIO with the sysfs interface
+ *
+ * Deprecated in Linux kernels 4.8 and later but still available on some systems.
+ */
 class GpioSysfs : public Gpio
 {
    public:

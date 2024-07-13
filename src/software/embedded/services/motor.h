@@ -16,6 +16,14 @@
 #include "software/embedded/gpio.h"
 #include "software/physics/euclidean_to_wheel.h"
 
+/**
+ * A service that interacts with the motor.
+ *
+ * It is responsible for:
+ * - Converting Euclidean velocities to wheel velocities
+ * - Communicating with the motor
+ * - Detecting and handling faults
+ */
 class MotorService
 {
    public:
@@ -318,6 +326,14 @@ class MotorService
                                               double back_right_velocity_mps,
                                               double dribbler_rpm);
 
+    /**
+     * Helper function to setup a GPIO pin. Selects the appropriate GPIO implementation based on the host platform.
+     *
+     * @tparam T The representation of the GPIO number
+     * @param gpio_number The GPIO number (this is typically different from the hardware pin number)
+     * @param direction The direction of the GPIO pin (input or output)
+     * @param initial_state The initial state of the GPIO pin (high or low)
+     */
 	template <typename T>
 	static std::unique_ptr<Gpio> setupGpio(const T& gpio_number, GpioDirection direction,
 										   GpioState initial_state);
@@ -427,3 +443,4 @@ std::unique_ptr<Gpio> MotorService::setupGpio(const T& gpio_number,
 		return std::make_unique<GpioSysfs>(gpio_number, direction, initial_state);
 	}
 }
+
