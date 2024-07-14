@@ -195,9 +195,9 @@ struct DribbleSkillFSM
             Dribble_S + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
             Dribble_S + Update_E[shouldLoseBall_G && !shouldExcessivelyDribble_G] /
                             loseBall_A = LoseBall_S,
-            Dribble_S + Update_E[shouldLoseBall_G && shouldExcessivelyDribble_G] /
-                            dribble_A                         = X,
-            Dribble_S + Update_E[dribblingDone_G] / dribble_A = X,
+            Dribble_S +
+                Update_E[shouldLoseBall_G && shouldExcessivelyDribble_G] / dribble_A = X,
+            Dribble_S + Update_E[dribblingDone_G] / dribble_A                        = X,
             Dribble_S + Update_E / dribble_A,
 
             LoseBall_S + Update_E[lostBallControl_G] / getBallControl_A =

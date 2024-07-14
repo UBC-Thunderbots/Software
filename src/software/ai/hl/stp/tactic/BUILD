@@ -41,7 +41,7 @@ cc_library(
     hdrs = ["tactic_visitor.h"],
     deps = [
         "//software/ai/hl/stp/skill:all_skills",
-    ]
+    ],
 )
 
 cc_library(

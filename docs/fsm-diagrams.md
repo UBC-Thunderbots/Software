@@ -167,8 +167,8 @@ direction LR
 GetBallControl --> Dribble : [haveBallControl]\n<i>dribble</i>
 GetBallControl --> GetBallControl : <i>getBallControl</i>
 Dribble --> GetBallControl : [lostBallControl]\n<i>getBallControl</i>
-Dribble --> LoseBall : [shouldLoseBall && !terminateIfExcessiveDribbling]\n<i>loseBall</i>
-Dribble --> Terminate:::terminate : [shouldLoseBall && terminateIfExcessiveDribbling]\n<i>dribble</i>
+Dribble --> LoseBall : [shouldLoseBall && !shouldExcessivelyDribble]\n<i>loseBall</i>
+Dribble --> Terminate:::terminate : [shouldLoseBall && shouldExcessivelyDribble]\n<i>dribble</i>
 Dribble --> Terminate:::terminate : [dribblingDone]\n<i>dribble</i>
 Dribble --> Dribble : <i>dribble</i>
 LoseBall --> GetBallControl : [lostBallControl]\n<i>getBallControl</i>
