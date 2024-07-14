@@ -1,15 +1,16 @@
 import traceback
-import base64
 import glob
 import gzip
 import os
 import argparse
 
 from proto.import_all_protos import *
-from software.thunderscope.replay.replay_constants import *
+from software.py_constants import *
+
+from software.thunderscope.replay.proto_player import ProtoPlayer
 
 
-def read_one_chunk(replay_file_name):
+def read_one_chunk(replay_file_name: str):
     """
     read one chunk of the replay file:
 
@@ -17,8 +18,13 @@ def read_one_chunk(replay_file_name):
     :return: the number of lines that have been read
     """
 
+    version = ProtoPlayer.get_replay_chunk_format_version(replay_file_name)
+
     line_num = 0
     with gzip.open(replay_file_name, "rb") as replay_file:
+        # Skip the metadata line
+        if version >= 2:
+            replay_file.readline()
 
         for line in replay_file.readlines():
             # do not parse empty line
@@ -26,27 +32,13 @@ def read_one_chunk(replay_file_name):
                 continue
 
             try:
-                timestamp, protobuf_type, data = line.split(
-                    bytes(REPLAY_METADATA_DELIMETER, encoding="utf-8")
+                timestamp, protobuf_type, proto = ProtoPlayer.unpack_log_entry(
+                    line, version
                 )
             except Exception as e:
                 print("Exception ignored. Please see below for more!")
                 print(e)
                 continue
-
-            try:
-                # The format of the protobuf type is:
-                # package.proto_class (e.g. TbotsProto.Primitive)
-                proto_class = eval(str(protobuf_type.split(b".")[-1], encoding="utf-8"))
-            except Exception as e:
-                print("Error ignored with Exception")
-                print(e)
-                continue
-
-            # Deserialize protobuf
-            proto = proto_class.FromString(
-                base64.b64decode(data[len("b") : -len("\n")])
-            )
 
             #######################################
             # Do something with the protobuf here #
