@@ -167,7 +167,8 @@ direction LR
 GetBallControl --> Dribble : [haveBallControl]\n<i>dribble</i>
 GetBallControl --> GetBallControl : <i>getBallControl</i>
 Dribble --> GetBallControl : [lostBallControl]\n<i>getBallControl</i>
-Dribble --> LoseBall : [shouldLoseBall]\n<i>loseBall</i>
+Dribble --> LoseBall : [shouldLoseBall && !terminateIfExcessiveDribbling]\n<i>loseBall</i>
+Dribble --> Terminate:::terminate : [shouldLoseBall && terminateIfExcessiveDribbling]\n<i>dribble</i>
 Dribble --> Terminate:::terminate : [dribblingDone]\n<i>dribble</i>
 Dribble --> Dribble : <i>dribble</i>
 LoseBall --> GetBallControl : [lostBallControl]\n<i>getBallControl</i>
@@ -234,6 +235,7 @@ direction LR
 [*] --> DribbleSkillFSM
 DribbleSkillFSM --> PivotKickSkillFSM : [passFound]\n<i>takePass</i>
 DribbleSkillFSM --> DribbleSkillFSM : <i>findPass</i>
+DribbleSkillFSM --> PivotKickSkillFSM
 PivotKickSkillFSM --> Terminate:::terminate : [shouldAbortPass]\n<i>abortPass</i>
 PivotKickSkillFSM --> PivotKickSkillFSM : <i>takePass</i>
 PivotKickSkillFSM --> Suspended
