@@ -24,16 +24,24 @@ cc_library(
     srcs = ["tactic.cpp"],
     hdrs = [
         "tactic.h",
-        "tactic_visitor.h",
     ],
     deps = [
         ":tactic_fsm",
+        ":tactic_visitor",
         ":transition_conditions",
         "//software/ai/hl/stp/primitive:stop_primitive",
         "//software/util/typename",
         "//software/world",
         "@tracy",
     ],
+)
+
+cc_library(
+    name = "tactic_visitor",
+    hdrs = ["tactic_visitor.h"],
+    deps = [
+        "//software/ai/hl/stp/skill:all_skills",
+    ]
 )
 
 cc_library(

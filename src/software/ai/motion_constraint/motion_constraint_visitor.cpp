@@ -71,7 +71,29 @@ void MotionConstraintVisitor::visit(const AvoidInterferenceTactic &tactic)
 
 void MotionConstraintVisitor::visit(const PassDefenderTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const SkillTactic &tactic) {}
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<ChipSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<DribbleSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<GetBehindBallSkill> &tactic)
+{
+}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<KeepAwaySkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<KickSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<KickPassSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<ChipPassSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<PivotKickSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<ShootSkill> &tactic) {}
+
+void MotionConstraintVisitor::visit(const AssignedSkillTactic<DribbleShootSkill> &tactic)
+{
+}
 
 void MotionConstraintVisitor::visit(const KickoffChipSkillTactic &tactic)
 {
