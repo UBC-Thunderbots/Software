@@ -19,7 +19,7 @@ struct ShootSkillFSM
      * because the open angle to the goal decreased below an acceptable
      * threshold.
      *
-     * @param event
+     * @param event the Update event
      *
      * @return true if we should abort the shot, false otherwise
      */

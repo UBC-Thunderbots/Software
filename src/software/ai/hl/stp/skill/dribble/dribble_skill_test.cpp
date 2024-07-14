@@ -131,7 +131,7 @@ TEST_F(DribbleSkillTest, test_moving_ball_dribble_dest)
 
     auto tactic = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
     tactic->updateControlParams({dribble_destination, std::nullopt,
-                                 TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED});
+                                 TbotsProto::ExcessiveDribblingMode::LOSE_BALL});
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -163,7 +163,7 @@ TEST_F(DribbleSkillTest, test_moving_ball_dribble_orientation)
 
     auto tactic = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
     tactic->updateControlParams({std::nullopt, dribble_orientation,
-                                 TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED});
+                                 TbotsProto::ExcessiveDribblingMode::LOSE_BALL});
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -193,7 +193,7 @@ TEST_F(DribbleSkillTest, test_moving_ball_dribble_dest_and_orientation)
 
     auto tactic = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
     tactic->updateControlParams({dribble_destination, dribble_orientation,
-                                 TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED});
+                                 TbotsProto::ExcessiveDribblingMode::LOSE_BALL});
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -228,7 +228,7 @@ TEST_F(DribbleSkillTest, test_dribble_dest_and_orientation_around_rectangle)
 
     auto tactic = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
     tactic->updateControlParams({dribble_destination, dribble_orientation,
-                                 TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED});
+                                 TbotsProto::ExcessiveDribblingMode::LOSE_BALL});
     setTactic(1, tactic, motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -299,7 +299,7 @@ TEST_F(DribbleSkillTest, test_running_into_enemy_robot_knocking_ball_away)
 
     auto tactic = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
     tactic->updateControlParams({dribble_destination, dribble_orientation,
-                                 TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED});
+                                 TbotsProto::ExcessiveDribblingMode::LOSE_BALL});
     // Don't avoid enemy robots to knock ball away
     setTactic(1, tactic, {});
 

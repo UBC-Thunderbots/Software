@@ -21,33 +21,33 @@ TEST(DribbleSkillFSMTest, test_transitions)
 
     // Stay in Dribble since ball not in possession yet
     fsm.process_event(DribbleSkillFSM::Update(
-        {std::nullopt, std::nullopt, TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED},
+        {std::nullopt, std::nullopt, TbotsProto::ExcessiveDribblingMode::LOSE_BALL},
         SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM::GetBallControl>));
 
     // Robot at ball point, so it has possession, so transition to dribble state
     robot = ::TestUtil::createRobotAtPos(Point(0.5, 0));
     fsm.process_event(DribbleSkillFSM::Update(
-        {std::nullopt, std::nullopt, TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED},
+        {std::nullopt, std::nullopt, TbotsProto::ExcessiveDribblingMode::LOSE_BALL},
         SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM::Dribble>));
 
     // No dribble destination set, so tactic is done
     fsm.process_event(DribbleSkillFSM::Update(
-        {std::nullopt, std::nullopt, TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED},
+        {std::nullopt, std::nullopt, TbotsProto::ExcessiveDribblingMode::LOSE_BALL},
         SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     // Set dribble destination, so tactic should be undone
     fsm.process_event(DribbleSkillFSM::Update(
-        {Point(1, -1), std::nullopt, TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED},
+        {Point(1, -1), std::nullopt, TbotsProto::ExcessiveDribblingMode::LOSE_BALL},
         SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM::Dribble>));
 
     // Move ball to destination, but not the robot, so we should try to regain possession
     ::TestUtil::setBallPosition(world, Point(1, -1), Timestamp::fromSeconds(124));
     fsm.process_event(DribbleSkillFSM::Update(
-        {Point(1, -1), std::nullopt, TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED},
+        {Point(1, -1), std::nullopt, TbotsProto::ExcessiveDribblingMode::LOSE_BALL},
         SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM::GetBallControl>));
 
@@ -55,13 +55,13 @@ TEST(DribbleSkillFSMTest, test_transitions)
     // destination, but we go to the dribble state before being done
     robot = ::TestUtil::createRobotAtPos(Point(1, -1));
     fsm.process_event(DribbleSkillFSM::Update(
-        {Point(1, -1), std::nullopt, TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED},
+        {Point(1, -1), std::nullopt, TbotsProto::ExcessiveDribblingMode::LOSE_BALL},
         SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM::Dribble>));
 
     // Finally FSM is done again
     fsm.process_event(DribbleSkillFSM::Update(
-        {Point(1, -1), std::nullopt, TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED},
+        {Point(1, -1), std::nullopt, TbotsProto::ExcessiveDribblingMode::LOSE_BALL},
         SkillUpdate(robot, world, strategy, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }

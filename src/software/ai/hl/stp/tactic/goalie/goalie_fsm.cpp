@@ -276,7 +276,7 @@ void GoalieFSM::retrieveFromDeadZone(
         .dribble_destination =
             event.common.world_ptr->field().friendlyDefenseArea().centre(),
         .final_dribble_orientation = final_dribble_orientation.orientation(),
-        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED,
+        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL,
     };
 
     processEvent(DribbleSkillFSM::Update(

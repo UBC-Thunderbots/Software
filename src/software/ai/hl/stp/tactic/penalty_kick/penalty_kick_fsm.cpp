@@ -145,7 +145,7 @@ void PenaltyKickFSM::updateApproachKeeper(
     DribbleSkillFSM::ControlParams control_params{
         .dribble_destination       = std::optional<Point>(position),
         .final_dribble_orientation = std::optional<Angle>(Angle::zero()),
-        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED};
+        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL};
     processEvent(DribbleSkillFSM::Update(
         control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
                                     event.common.set_primitive)));
@@ -162,7 +162,7 @@ void PenaltyKickFSM::adjustOrientationForShot(
     DribbleSkillFSM::ControlParams control_params{
         .dribble_destination       = std::optional<Point>(final_position),
         .final_dribble_orientation = std::optional<Angle>(shot_angle),
-        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED};
+        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL};
     processEvent(DribbleSkillFSM::Update(
         control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
                                     event.common.set_primitive)));

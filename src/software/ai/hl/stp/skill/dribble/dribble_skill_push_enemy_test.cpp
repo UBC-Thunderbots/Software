@@ -62,7 +62,7 @@ TEST_P(DribbleSkillPushEnemyTest, DISABLED_test_steal_ball_from_behind_enemy)
 
     auto tactic = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
     tactic->updateControlParams({dribble_destination, dribble_orientation,
-                                 TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED});
+                                 TbotsProto::ExcessiveDribblingMode::LOSE_BALL});
     setTactic(1, tactic, {TbotsProto::MotionConstraint::ENEMY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {

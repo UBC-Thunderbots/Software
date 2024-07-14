@@ -8,7 +8,7 @@ void PivotKickSkillFSM::getBallControlAndPivot(
     DribbleSkillFSM::ControlParams control_params{
         .dribble_destination       = event.control_params.kick_origin,
         .final_dribble_orientation = event.control_params.kick_direction,
-        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED};
+        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL};
 
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
 }
@@ -65,8 +65,13 @@ bool PivotKickSkillFSM::lostBallControl(const Update& event)
 
 bool PivotKickSkillFSM::ballKicked(const Update& event)
 {
-    if (event.control_params.auto_chip_or_kick.auto_chip_kick_mode ==
-        AutoChipOrKickMode::AUTOKICK)
+    const AutoChipOrKickMode auto_chip_kick_mode =
+        event.control_params.auto_chip_or_kick.auto_chip_kick_mode;
+
+    CHECK(auto_chip_kick_mode != AutoChipOrKickMode::OFF)
+        << "AutoChipOrKickMode cannot be OFF for PivotKickSkillFSM";
+
+    if (auto_chip_kick_mode == AutoChipOrKickMode::AUTOKICK)
     {
         return event.common.world_ptr->ball().hasBallBeenKicked(
             event.control_params.kick_direction);

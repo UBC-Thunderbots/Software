@@ -48,7 +48,7 @@ void KeepAwaySkillFSM::keepAway(
     DribbleSkillFSM::ControlParams control_params = {
         .dribble_destination       = keepaway_dribble_dest,
         .final_dribble_orientation = final_dribble_orientation,
-        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED};
+        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL};
 
     processEvent(DribbleSkillFSM::Update(control_params, event.common));
 }

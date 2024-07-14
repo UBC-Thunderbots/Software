@@ -227,7 +227,7 @@ bool DribbleSkillFSM::shouldLoseBall(const Update &event)
                dribble_config.max_continuous_dribbling_distance();
 }
 
-bool DribbleSkillFSM::terminateIfExcessiveDribbling(const Update &event)
+bool DribbleSkillFSM::shouldExcessivelyDribble(const Update &event)
 {
     return event.control_params.excessive_dribbling_mode ==
            TbotsProto::ExcessiveDribblingMode::TERMINATE;

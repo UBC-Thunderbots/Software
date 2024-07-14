@@ -14,9 +14,9 @@ struct ReceiverFSM
     /**
      * Constructor for ReceiverFSM
      *
-     * @param receiver_tactic_config The config to fetch parameters from
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit ReceiverFSM(std::shared_ptr<Strategy> strategy) : strategy_(strategy) {}
+    explicit ReceiverFSM(std::shared_ptr<Strategy> strategy);
 
     class OneTouchShotState;
     class ReceiveAndDribbleState;

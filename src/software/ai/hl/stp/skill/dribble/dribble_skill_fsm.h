@@ -111,7 +111,7 @@ struct DribbleSkillFSM
     void dribble(const Update &event);
 
     /**
-     * Action to lose BallControl of the ball
+     * Action to lose control of the ball
      *
      * @param event the Update event
      */
@@ -165,7 +165,7 @@ struct DribbleSkillFSM
      * @return whether the excessive_dribbling_mode control param is set
      * to TbotsProto::ExcessiveDribblingMode::TERMINATE
      */
-    bool terminateIfExcessiveDribbling(const Update &event);
+    bool shouldExcessivelyDribble(const Update &event);
 
     auto operator()()
     {
@@ -181,7 +181,7 @@ struct DribbleSkillFSM
         DEFINE_SML_GUARD(lostBallControl)
         DEFINE_SML_GUARD(dribblingDone)
         DEFINE_SML_GUARD(shouldLoseBall)
-        DEFINE_SML_GUARD(terminateIfExcessiveDribbling)
+        DEFINE_SML_GUARD(shouldExcessivelyDribble)
 
         DEFINE_SML_ACTION(loseBall)
         DEFINE_SML_ACTION(getBallControl)
@@ -193,9 +193,9 @@ struct DribbleSkillFSM
             GetBallControl_S + Update_E / getBallControl_A,
 
             Dribble_S + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
-            Dribble_S + Update_E[shouldLoseBall_G && !terminateIfExcessiveDribbling_G] /
+            Dribble_S + Update_E[shouldLoseBall_G && !shouldExcessivelyDribble_G] /
                             loseBall_A = LoseBall_S,
-            Dribble_S + Update_E[shouldLoseBall_G && terminateIfExcessiveDribbling_G] /
+            Dribble_S + Update_E[shouldLoseBall_G && shouldExcessivelyDribble_G] /
                             dribble_A                         = X,
             Dribble_S + Update_E[dribblingDone_G] / dribble_A = X,
             Dribble_S + Update_E / dribble_A,

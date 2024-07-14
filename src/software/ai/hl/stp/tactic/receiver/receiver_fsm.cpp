@@ -4,6 +4,8 @@
 #include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/geom/algorithms/convex_angle.h"
 
+ReceiverFSM::ReceiverFSM(std::shared_ptr<Strategy> strategy) : strategy_(strategy) {}
+
 Angle ReceiverFSM::getOneTouchShotDirection(const Ray& shot, const Ball& ball)
 {
     Vector shot_vector = shot.toUnitVector();
@@ -183,7 +185,7 @@ void ReceiverFSM::retrieveBall(
     DribbleSkillFSM::ControlParams control_params{
         .dribble_destination       = ball.position(),
         .final_dribble_orientation = (ball.position() - robot.position()).orientation(),
-        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::NOT_ALLOWED,
+        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL,
     };
 
     processEvent(DribbleSkillFSM::Update(
@@ -219,9 +221,9 @@ bool ReceiverFSM::passReceivedByTeammate(const Update& event)
         event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
 
     return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
-            return robot.isNearDribbler(event.common.world_ptr->ball().position());
-        });
+        friendly_robots.begin(), friendly_robots.end(),
+        [&](const Robot& robot)
+        { return robot.isNearDribbler(event.common.world_ptr->ball().position()); });
 }
 
 bool ReceiverFSM::strayPass(const Update& event)
