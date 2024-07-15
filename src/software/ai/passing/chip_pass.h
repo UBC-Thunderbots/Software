@@ -2,6 +2,7 @@
 
 #include "software/ai/passing/base_pass.h"
 #include "shared/constants.h"
+#include "software/geom/algorithms/contains.h"
 
 class ChipPass: public BasePass
 {
@@ -19,6 +20,8 @@ class ChipPass: public BasePass
 
     double firstBounceRange();
 
+    bool isSkipped(const Point& point) const;
+
     virtual Duration estimatePassDuration() const;
 
     virtual Duration estimateTimeToPoint(Point& point) const;
@@ -27,9 +30,13 @@ class ChipPass: public BasePass
 
     virtual bool operator==(const ChipPass& other) const;
 
+    virtual PassType type() const;
+
     private:
 
     double calcFirstBounceRange();
+
+    Polygon calcSkipArea();
 
     double getBounceHeightFromDistanceTraveled(double distance_traveled);
 
@@ -37,5 +44,6 @@ class ChipPass: public BasePass
 
     double first_bounce_range_m;
     double pass_length;
-    std::vector<double> bounce_ranges;
+    std::vector<std::pair<double, double>> bounce_heights_and_ranges;
+    Polygon skip_area;
 };

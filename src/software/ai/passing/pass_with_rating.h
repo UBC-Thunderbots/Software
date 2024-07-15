@@ -1,10 +1,10 @@
 #pragma once
 
-#include "software/ai/passing/pass.h"
+#include "software/ai/passing/base_pass.h"
 
 struct PassWithRating
 {
-    Pass pass;
+    BasePass pass;
     double rating;
 };
 

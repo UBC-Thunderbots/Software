@@ -13,16 +13,28 @@
 #include "software/geom/algorithms/convex_angle.h"
 #include "software/logger/logger.h"
 
-double rateGroundPass(const World& world, const Pass& pass, const Rectangle& zone,
+double rateAnyPass(const World& world, const BasePass& pass, const Rectangle& zone,
                 TbotsProto::PassingConfig passing_config)
 {
-    return ratePass(world, pass, zone, world.enemyTeam(), passing_config);
-}
+    if (pass.type() == PassType::CHIP_PASS)
+    {
+        std::vector<Robot> enemy_team_not_skipped;
 
-double rateChipPass(const World& world, const ChipPass& pass, const Rectangle& zone,
-                TbotsProto::PassingConfig passing_config)
-{
-    return ratePass(world, pass, zone, world.enemyTeam(), passing_config);
+        for (auto &enemy_robot : world.enemyTeam().getAllRobots())
+        {
+            if (!reinterpret_cast<const ChipPass*>(&pass)->isSkipped(enemy_robot.position())) 
+            {
+                enemy_team_not_skipped.push_back(enemy_robot);
+            }
+        }
+        return ratePass(world, pass, zone, Team(enemy_team_not_skipped), passing_config);
+    }
+    else if (pass.type() == PassType::GROUND_PASS)
+    {
+        return ratePass(world, pass, zone, world.enemyTeam(), passing_config);
+    }
+
+    return 0.0;
 }
 
 double ratePass(const World& world, const BasePass& pass, const Rectangle& zone, const Team& enemy_team,

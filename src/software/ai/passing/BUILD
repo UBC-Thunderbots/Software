@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["cost_function.h"],
     deps = [
         ":pass",
+        ":chip_pass",
         "//proto/message_translation:tbots_protobuf",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:time_to_travel",
@@ -57,7 +58,8 @@ cc_library(
     hdrs = ["chip_pass.h"],
     deps = [
         ":base_pass",
-        "//shared:constants"
+        "//shared:constants",
+        "//software/geom/algorithms"
     ],
 )
 
@@ -86,7 +88,7 @@ cc_library(
     srcs = ["pass_with_rating.cpp"],
     hdrs = ["pass_with_rating.h"],
     deps = [
-        ":pass",
+        ":base_pass",
     ],
 )
 

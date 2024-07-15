@@ -60,16 +60,31 @@ message SimulationState
     required double simulation_speed = 2 [default = 1.0];
 }
 
-message Pass
+message BasePass
 {
     // The location of the passer
     required Point passer_point = 1;
 
     // The location of the receiver
     required Point receiver_point = 2;
+}
+
+message Pass
+{
+    // The pass coordinates
+    required BasePass pass_coords = 1;
 
     // The speed of the pass in meters/second
-    required double pass_speed_m_per_s = 3;
+    required double pass_speed_m_per_s = 2;
+}
+
+message ChipPass
+{
+    // The pass coordinates
+    required BasePass pass_coords;
+    
+    // The range of the first bounce of the chip
+    required double chip_distance_meters = 3;
 }
 
 message Shot

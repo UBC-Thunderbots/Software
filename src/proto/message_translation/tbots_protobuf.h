@@ -8,6 +8,8 @@
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/ai/passing/pass_with_rating.h"
+#include "software/ai/passing/pass.h"
+#include "software/ai/passing/chip_pass.h"
 #include "software/world/world.h"
 
 /**

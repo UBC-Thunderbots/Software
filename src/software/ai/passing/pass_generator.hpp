@@ -185,15 +185,24 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
         auto pass_destination =
             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_));
 
-        auto pass = Pass::fromDestReceiveSpeed(world.ball().position(), pass_destination,
+        auto ground_pass = Pass::fromDestReceiveSpeed(world.ball().position(), pass_destination,
                                                passing_config_.max_receive_speed(),
                                                passing_config_.min_pass_speed_m_per_s(),
                                                passing_config_.max_pass_speed_m_per_s());
+        auto ground_pass_rating = ratePass(world, ground_pass, pitch_division_->getZone(zone_id), passing_config_);
 
-        passes.emplace(
-            zone_id,
-            PassWithRating{pass, ratePass(world, pass, pitch_division_->getZone(zone_id),
-                                          passing_config_)});
+        auto chip_pass = ChipPass(world.ball().position(), pass_destination);
+        auto chip_pass_rating = ratePass(world, chip_pass, pitch_division_->getZone(zone_id), passing_config_);
+
+        if (chip_pass_rating > ground_pass_rating)
+        {
+            passes.emplace(zone_id, PassWithRating{chip_pass, chip_pass_rating});
+        }
+        else
+        {
+            passes.emplace(zone_id, PassWithRating{ground_pass, ground_pass_rating});
+        }
+        
     }
 
     return passes;
@@ -211,10 +220,10 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
     {
         // The objective function we minimize in gradient descent to improve each pass
         // that we're optimizing
-        const auto objective_function =
+        const auto ground_pass_objective_function =
             [this, &world,
              zone_id](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
-                // get a pass with the new appropriate speed using the new destination
+                // get a ground pass with the new appropriate speed using the new destination
                 return ratePass(
                     world,
                     Pass::fromDestReceiveSpeed(world.ball().position(),
@@ -225,20 +234,42 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
                     pitch_division_->getZone(zone_id), passing_config_);
             };
 
-        auto optimized_pass_array = optimizer_.maximize(
-            objective_function, generated_passes.at(zone_id).pass.toPassArray(),
+        auto optimized_ground_pass_array = optimizer_.maximize(
+            ground_pass_objective_function, generated_passes.at(zone_id).pass.toPassArray(),
             passing_config_.number_of_gradient_descent_steps_per_iter());
 
         // get a pass with the new appropriate speed using the new destination
-        auto new_pass = Pass::fromDestReceiveSpeed(
-            world.ball().position(),
-            Point(optimized_pass_array[0], optimized_pass_array[1]),
-            passing_config_.max_receive_speed(), passing_config_.min_pass_speed_m_per_s(),
-            passing_config_.max_pass_speed_m_per_s());
-        auto score =
-            ratePass(world, new_pass, pitch_division_->getZone(zone_id), passing_config_);
+        auto ground_pass = Pass::fromDestReceiveSpeed(world.ball().position(), Point(optimized_ground_pass_array[0], optimized_ground_pass_array[1]),
+                                               passing_config_.max_receive_speed(),
+                                               passing_config_.min_pass_speed_m_per_s(),
+                                               passing_config_.max_pass_speed_m_per_s());
+        auto ground_pass_rating = ratePass(world, ground_pass, pitch_division_->getZone(zone_id), passing_config_);
 
-        optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
+        const auto chip_pass_objective_function = 
+            [this, &world,
+             zone_id](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
+                // get a chip pass using the new destination
+                return ratePass(
+                    world,
+                    ChipPass(world.ball().position(), Point(pass_array[0], pass_array[1])),
+                    pitch_division_->getZone(zone_id), passing_config_);
+            };
+
+        auto optimized_chip_pass_array = optimizer_.maximize(
+            chip_pass_objective_function, generated_passes.at(zone_id).pass.toPassArray(),
+            passing_config_.number_of_gradient_descent_steps_per_iter());
+
+        auto chip_pass = ChipPass(world.ball().position(), Point(optimized_chip_pass_array[0], optimized_chip_pass_array[1]));
+        auto chip_pass_rating = ratePass(world, chip_pass, pitch_division_->getZone(zone_id), passing_config_);
+
+        if (chip_pass_rating > ground_pass_rating)
+        {
+            optimized_passes.emplace(zone_id, PassWithRating{chip_pass, chip_pass_rating});
+        }
+        else
+        {
+            optimized_passes.emplace(zone_id, PassWithRating{ground_pass, ground_pass_rating});
+        }
     }
 
     return optimized_passes;
@@ -252,12 +283,20 @@ void PassGenerator<ZoneEnum>::updatePasses(const World& world,
 {
     for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
     {
-        auto pass_array = current_best_passes_.at(zone_id).pass.toPassArray();
-        // update the passer point of the current best pass
-        current_best_passes_.at(zone_id).pass = Pass::fromDestReceiveSpeed(
-            world.ball().position(), Point(pass_array[0], pass_array[1]),
-            passing_config_.max_receive_speed(), passing_config_.min_pass_speed_m_per_s(),
-            passing_config_.max_pass_speed_m_per_s());
+        auto current_best_pass = current_best_passes_.at(zone_id).pass;
+
+        if (current_best_pass.type() == PassType::CHIP_PASS)
+        {
+            current_best_passes_.at(zone_id).pass = ChipPass(
+                world.ball().position(), current_best_pass.receiverPoint());
+        }
+        else
+        {
+            current_best_passes_.at(zone_id).pass = Pass::fromDestReceiveSpeed(
+                world.ball().position(), current_best_pass.receiverPoint(),
+                passing_config_.max_receive_speed(), passing_config_.min_pass_speed_m_per_s(),
+                passing_config_.max_pass_speed_m_per_s());
+        }
 
         if (ratePass(world, current_best_passes_.at(zone_id).pass,
                      pitch_division_->getZone(zone_id),

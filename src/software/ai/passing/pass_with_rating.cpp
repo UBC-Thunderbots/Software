@@ -3,6 +3,5 @@
 bool operator==(const PassWithRating &lhs, const PassWithRating &rhs)
 {
     return lhs.rating == rhs.rating &&
-           lhs.pass.receiverPoint() == rhs.pass.receiverPoint() &&
-           lhs.pass.speed() == rhs.pass.speed();
+           lhs.pass.receiverPoint() == rhs.pass.receiverPoint();
 }

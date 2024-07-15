@@ -376,17 +376,32 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
 
     for (const auto& pass_with_rating : passes_with_rating)
     {
-        auto pass_msg = std::make_unique<TbotsProto::Pass>();
-        *(pass_msg->mutable_passer_point()) =
-            *createPointProto(pass_with_rating.pass.passerPoint());
-        *(pass_msg->mutable_receiver_point()) =
-            *createPointProto(pass_with_rating.pass.receiverPoint());
-        pass_msg->set_pass_speed_m_per_s(pass_with_rating.pass.speed());
-
         auto pass_with_rating_msg = std::make_unique<TbotsProto::PassWithRating>();
         pass_with_rating_msg->set_rating(pass_with_rating.rating);
-        *(pass_with_rating_msg->mutable_pass_()) = *pass_msg;
 
+        auto pass = pass_with_rating.pass;
+
+        auto base_pass_msg = std::make_unique<TbotsProto::BasePass>();
+        *(base_pass_msg->mutable_passer_point()) =
+                *createPointProto(pass.passerPoint());
+        *(base_pass_msg->mutable_receiver_point()) =
+            *createPointProto(pass.receiverPoint());
+
+        if (pass.type() == PassType::CHIP_PASS) 
+        {
+            auto chip_pass_msg = std::make_unique<TbotsProto::ChipPass>();
+            *(chip_pass_msg->mutable_pass_coords()) = *base_pass_msg;
+            chip_pass_msg->set_chip_distance_meters(reinterpret_cast<ChipPass*>(&pass)->firstBounceRange());
+            *(pass_with_rating_msg->mutable_pass_()->mutable_chip_pass()) = *chip_pass_msg;
+        }
+        else
+        {
+            auto pass_msg = std::make_unique<TbotsProto::Pass>();
+            *(pass_msg->mutable_pass_coords()) = *base_pass_msg;
+            pass_msg->set_pass_speed_m_per_s(reinterpret_cast<Pass*>(&pass)->speed());
+            *(pass_with_rating_msg->mutable_pass_()->mutable_ground_pass()) = *pass_msg;
+        }
+        
         *(pass_visualization_msg->add_best_passes()) = *pass_with_rating_msg;
     }
     return pass_visualization_msg;

@@ -34,14 +34,6 @@ std::array<double, NUM_PARAMS_TO_OPTIMIZE> BasePass::toPassArray() const
     return {receiver_point.x(), receiver_point.y()};
 }
 
-// std::ostream& printHelper(std::ostream& output_stream, const BasePass& pass)
-// {
-//     output_stream << "Pass from " << pass.passer_point 
-//                   << " to: " << pass.receiver_point;
-
-//     return output_stream;
-// }
-
 bool BasePass::operator==(const BasePass& other) const
 {
     return this->passer_point == other.passer_point &&

@@ -79,6 +79,8 @@ class Pass: public BasePass
 
     virtual Duration estimateTimeToPoint(Point& point) const;
 
+    virtual PassType type() const;
+
     friend std::ostream& operator<<(std::ostream& output_stream, const Pass& pass);
 
     virtual bool operator==(const Pass& other) const;

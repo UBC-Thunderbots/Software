@@ -24,8 +24,12 @@ message PlotJugglerValue
 
 message PassWithRating
 {
-    double rating = 1;
-    Pass pass_    = 2;  // needs the _ because pass is a keyword in python
+    double rating           = 1;
+    oneof pass_                     // needs the _ because pass is a keyword in python
+    {
+        Pass ground_pass    = 2;
+        ChipPass chip_pass  = 3;
+    }
 }
 
 message PassVisualization
@@ -35,10 +39,14 @@ message PassVisualization
 
 message AttackerVisualization
 {
-    optional Pass pass_        = 1;  // needs the _ because pass is a keyword in python
-    bool pass_committed        = 2;
-    optional Shot shot         = 3;
-    optional Point chip_target = 4;
+    oneof pass_                     // needs the _ because pass is a keyword in python
+    {
+        Pass ground_pass        = 1;
+        ChipPass chip_pass      = 2;
+    }
+    bool pass_committed        = 3;
+    optional Shot shot         = 4;
+    optional Point chip_target = 5;
 }
 
 message CostVisualization

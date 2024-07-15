@@ -6,7 +6,10 @@
 
 #include "software/geom/point.h"
 #include "software/time/duration.h"
+#include "software/util/make_enum/make_enum.h"
 
+MAKE_ENUM(PassType,
+            BASE_PASS, GROUND_PASS, CHIP_PASS);
 
 // The number of parameters (representing a pass) that we optimize
 // (receive_location_x, receive_location_y)
@@ -66,7 +69,15 @@ class BasePass
         return Duration::fromSeconds(0);
     }
 
-    virtual Duration estimateTimeToPoint(Point& point) const;
+    virtual Duration estimateTimeToPoint(Point& point) const
+    {
+        return Duration::fromSeconds(0);
+    }
+
+    virtual PassType type() const
+    {
+        return PassType::BASE_PASS;
+    }
 
     /**
      * Converts a pass to an array
@@ -83,15 +94,6 @@ class BasePass
      * @param receiver_point The point the receiver should be at to receive the pass
      */
     BasePass(Point passer_point, Point receiver_point);
-
-    /**
-    //  * Implement the "<<" operator for printing
-    //  *
-    //  * @param output_stream The stream to print to
-    //  * @param pass The pass to print
-    //  * @return The output stream with the string representation of the class appended
-    //  */
-    // friend std::ostream& printHelper(std::ostream& output_stream, const BasePass& pass);
 
     /**
      * Compares Passes for equality. Passes are considered

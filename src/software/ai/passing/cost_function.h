@@ -5,17 +5,16 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/parameters.pb.h"
 #include "software/ai/passing/pass.h"
+#include "software/ai/passing/chip_pass.h"
 #include "software/math/math_functions.h"
 #include "software/util/make_enum/make_enum.h"
 #include "software/world/field.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
 
-double rateGroundPass(const World& world, const Pass& pass, const Rectangle& zone,
+double ratePass(const World& world, const BasePass& pass, const Rectangle& zone,
                 TbotsProto::PassingConfig passing_config);
 
-double rateChipPass(const World& world, const ChipPass& pass, const Rectangle& zone,
-                TbotsProto::PassingConfig passing_config)
 /**
  * Calculate the quality of a given pass
  *

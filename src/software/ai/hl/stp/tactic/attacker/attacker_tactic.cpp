@@ -79,13 +79,28 @@ void AttackerTactic::visualizeControlParams(
 
     if (control_params.best_pass_so_far.has_value())
     {
-        TbotsProto::Pass pass_msg;
-        *(pass_msg.mutable_passer_point()) =
-            *createPointProto(control_params.best_pass_so_far->passerPoint());
-        *(pass_msg.mutable_receiver_point()) =
-            *createPointProto(control_params.best_pass_so_far->receiverPoint());
-        pass_msg.set_pass_speed_m_per_s(control_params.best_pass_so_far->speed());
-        *(pass_visualization_msg.mutable_pass_()) = pass_msg;
+        auto pass = control_params.best_pass_so_far;
+
+        auto base_pass_msg = std::make_unique<TbotsProto::BasePass>();
+        *(base_pass_msg->mutable_passer_point()) =
+                *createPointProto(pass.passerPoint());
+        *(base_pass_msg->mutable_receiver_point()) =
+            *createPointProto(pass.receiverPoint());
+
+        if (pass.type() == PassType::CHIP_PASS) 
+        {
+            auto chip_pass_msg = std::make_unique<TbotsProto::ChipPass>();
+            *(chip_pass_msg->mutable_pass_coords()) = *base_pass_msg;
+            chip_pass_msg->set_chip_distance_meters(reinterpret_cast<ChipPass*>(&pass)->firstBounceRange());
+            *(pass_visualization_msg->mutable_pass_()->mutable_chip_pass()) = *chip_pass_msg;
+        }
+        else
+        {
+            auto pass_msg = std::make_unique<TbotsProto::Pass>();
+            *(pass_msg->mutable_pass_coords()) = *base_pass_msg;
+            pass_msg->set_pass_speed_m_per_s(reinterpret_cast<Pass*>(&pass)->speed());
+            *(pass_visualization_msg->mutable_pass_()->mutable_ground_pass()) = *pass_msg;
+        }
     }
 
     pass_visualization_msg.set_pass_committed(pass_committed);
