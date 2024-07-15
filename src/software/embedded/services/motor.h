@@ -6,10 +6,23 @@
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "shared/constants.h"
 #include "shared/robot_constants.h"
+#include "software/embedded/constants/constants.h"
 #include "software/embedded/gpio.h"
+#include "software/embedded/gpio_char_dev.h"
+#include "software/embedded/gpio_sysfs.h"
+#include "software/embedded/platform.h"
 #include "software/physics/euclidean_to_wheel.h"
 
+/**
+ * A service that interacts with the motor.
+ *
+ * It is responsible for:
+ * - Converting Euclidean velocities to wheel velocities
+ * - Communicating with the motor
+ * - Detecting and handling faults
+ */
 class MotorService
 {
    public:
@@ -313,6 +326,20 @@ class MotorService
                                               double dribbler_rpm);
 
     /**
+     * Helper function to setup a GPIO pin. Selects the appropriate GPIO implementation
+     * based on the host platform.
+     *
+     * @tparam T The representation of the GPIO number
+     * @param gpio_number The GPIO number (this is typically different from the hardware
+     * pin number)
+     * @param direction The direction of the GPIO pin (input or output)
+     * @param initial_state The initial state of the GPIO pin (high or low)
+     */
+    template <typename T>
+    static std::unique_ptr<Gpio> setupGpio(const T& gpio_number, GpioDirection direction,
+                                           GpioState initial_state);
+
+    /**
      * Returns true if we've detected a RESET in our cached motor faults indicators or if
      * we have a fault that disables drive.
      *
@@ -403,3 +430,19 @@ class MotorService
     static constexpr const char* MOTOR_NAMES[] = {"front_left", "back_left", "back_right",
                                                   "front_right", "dribbler"};
 };
+
+template <typename T>
+std::unique_ptr<Gpio> MotorService::setupGpio(const T& gpio_number,
+                                              GpioDirection direction,
+                                              GpioState initial_state)
+{
+    if constexpr (PLATFORM == Platform::RASP_PI)
+    {
+        return std::make_unique<GpioCharDev>(gpio_number, direction, initial_state,
+                                             "/dev/gpiochip4");
+    }
+    else
+    {
+        return std::make_unique<GpioSysfs>(gpio_number, direction, initial_state);
+    }
+}

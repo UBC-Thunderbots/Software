@@ -1,10 +1,15 @@
 #pragma once
 
-#include "software/embedded/gpio.h"
-
 #include <unistd.h>
 
-class GpioCharDev: public Gpio
+#include "software/embedded/gpio.h"
+
+/**
+ * GPIO with the character device interface
+ *
+ * Available on Linux kernels 5.10 and later.
+ */
+class GpioCharDev : public Gpio
 {
    public:
     /**
@@ -16,7 +21,8 @@ class GpioCharDev: public Gpio
      * @param state The initial state of the gpio
      * @param char_dev_path The path to the gpio character device
      */
-    GpioCharDev(int gpio_number, GpioDirection direction, GpioState state, std::string char_dev_path="/dev/gpiochip0");
+    GpioCharDev(int gpio_number, GpioDirection direction, GpioState state,
+                std::string char_dev_path = "/dev/gpiochip0");
 
     /**
      * Destructor

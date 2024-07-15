@@ -18,6 +18,3 @@ additional_languages:
   # javascript
   python
   # typescript
-
-sync_flags:
-  --//shared:platform=NANO

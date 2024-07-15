@@ -4,23 +4,22 @@ cc_library(
     name = "motor",
     srcs = ["motor.cpp"],
     hdrs = ["motor.h"],
+    defines =
+        select({
+            "//software/embedded:build_nano": ["NANO"],
+            "//software/embedded:build_pi": ["PI"],
+        }),
     deps = [
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
         "//software/embedded:gpio",
+        "//software/embedded/constants",
         "//software/logger",
         "//software/physics:euclidean_to_wheel",
         "//software/util/scoped_timespec_timer",
-        "//shared:thunderloop_constants",
         "@eigen",
         "@trinamic",
     ],
-    defines =
-    select({
-      "//shared:build_nano": ["NANO"],
-      "//shared:build_pi": ["PI"],
-      "//conditions:default": ["NONE"],
-    })
 )
 
 cc_library(

@@ -57,7 +57,7 @@ if __name__ == "__main__":
         "--flash_robots",
         nargs="+",
         type=int,
-        help="A list of space seperated integers representing the robot IDs "
+        help="A list of space separated integers representing the robot IDs "
         "that should be flashed by the deploy_robot_software Ansible playbook",
         action="store",
     )
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         type=str,
         choices=["PI", "NANO"],
         help="The platform to build Thunderloop for",
-        action="store"
+        action="store",
     )
 
     # These are shortcut args for commonly used arguments on our tests
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     bazel_arguments = unknown_args
 
     if args.platform:
-        bazel_arguments += ["--//shared:platform="+args.platform]
+        bazel_arguments += ["--//software/embedded:host_platform=" + args.platform]
     if args.stop_ai_on_start:
         bazel_arguments += ["--stop_ai_on_start"]
     if args.enable_visualizer:
@@ -208,7 +208,9 @@ if __name__ == "__main__":
             platform_ip = "0"
         else:
             platform_ip = "1"
-        bazel_arguments += [f"192.168." + platform_ip + ".20{id}" for id in args.flash_robots]
+        bazel_arguments += [
+            f"192.168." + platform_ip + ".20{id}" for id in args.flash_robots
+        ]
         bazel_arguments += ["-pwd", args.pwd]
 
     if args.action in "test":

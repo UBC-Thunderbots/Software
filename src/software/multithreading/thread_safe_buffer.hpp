@@ -7,7 +7,6 @@
 #include <mutex>
 #include <optional>
 
-#include "software/logger/logger.h"
 #include "software/time/duration.h"
 #include "software/util/typename/typename.h"
 
@@ -84,6 +83,12 @@ class ThreadSafeBuffer
      */
     void push(const T& value);
 
+    /**
+     * Returns whether or not the buffer is empty
+     * @return True if the buffer is empty, false otherwise
+     */
+    bool empty() const;
+
     ~ThreadSafeBuffer();
 
    private:
@@ -151,8 +156,8 @@ void ThreadSafeBuffer<T>::push(const T& value)
     std::scoped_lock<std::mutex> buffer_lock(buffer_mutex);
     if (log_buffer_full && buffer.full())
     {
-        LOG(WARNING) << "Pushing to a full ThreadSafeBuffer of type: " << TYPENAME(T)
-                     << std::endl;
+        std::cerr << "Pushing to a full ThreadSafeBuffer of type: " << TYPENAME(T)
+                  << std::endl;
     }
     buffer.push_back(value);
     received_new_value.notify_all();
@@ -172,6 +177,12 @@ std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue(
     // NOTE: We need to return this in order to prevent it being destructed so
     //       the lock is maintained until the value is read
     return buffer_lock;
+}
+
+template <typename T>
+bool ThreadSafeBuffer<T>::empty() const
+{
+    return buffer.empty();
 }
 
 template <typename T>
