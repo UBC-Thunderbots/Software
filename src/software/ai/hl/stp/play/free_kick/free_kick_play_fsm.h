@@ -162,7 +162,7 @@ struct FreeKickPlayFSM
     /**
      * Guard on whether to abort the pass
      *
-     * @param event the ShootOrPassPlayFSM Update event
+     * @param event the FreeKickPlayFSM Update event
      *
      * @return whether the pass should be aborted
      */
