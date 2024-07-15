@@ -25,9 +25,10 @@ void BallPlacementPlayFSM::alignWall(const Update &event)
     Point ball_pos           = event.common.world_ptr->ball().position();
     Rectangle field_boundary = event.common.world_ptr->field().fieldBoundary();
 
-    pickoff_final_orientation = calculateWallPickOffLocation(ball_pos, field_boundary,
-                                                             MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS)
-                                    .first;
+    pickoff_final_orientation =
+        calculateWallPickOffLocation(ball_pos, field_boundary,
+                                     MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS)
+            .first;
     pickoff_point =
         ball_pos - Vector::createFromAngle(pickoff_final_orientation).normalize(0.4);
     align_wall_tactic->updateControlParams(
@@ -364,25 +365,29 @@ std::pair<Angle, Point> BallPlacementPlayFSM::calculateWallPickOffLocation(
     {
         facing_angle  = Angle::fromDegrees(45);
         backoff_point = field_boundary.posXPosYCorner() -
-                        Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
+                        Vector::createFromAngle(facing_angle)
+                            .normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
     else if (near_positive_y_boundary && near_negative_x_boundary)  // top left corner
     {
         facing_angle  = Angle::fromDegrees(135);
         backoff_point = field_boundary.negXPosYCorner() -
-                        Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
+                        Vector::createFromAngle(facing_angle)
+                            .normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
     else if (near_negative_y_boundary && near_positive_x_boundary)  // bottom right corner
     {
         facing_angle  = Angle::fromDegrees(-45);
         backoff_point = field_boundary.posXNegYCorner() -
-                        Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
+                        Vector::createFromAngle(facing_angle)
+                            .normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
     else if (near_negative_y_boundary && near_negative_x_boundary)  // bottom left corner
     {
         facing_angle  = Angle::fromDegrees(-135);
         backoff_point = field_boundary.negXNegYCorner() -
-                        Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
+                        Vector::createFromAngle(facing_angle)
+                            .normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
     else if (near_positive_y_boundary)
     {
@@ -417,7 +422,8 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
         return;
     }
 
-    move_tactics = std::vector<std::shared_ptr<BallPlacementMoveTactic>>(num_move_tactics);
+    move_tactics =
+        std::vector<std::shared_ptr<BallPlacementMoveTactic>>(num_move_tactics);
     std::generate(move_tactics.begin(), move_tactics.end(),
                   [this]() { return std::make_shared<BallPlacementMoveTactic>(); });
 

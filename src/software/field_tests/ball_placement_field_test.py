@@ -41,6 +41,7 @@ def test_ball_placement(field_test_runner):
     params = AssignedTacticPlayControlParams()
     params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
 
+
 _
 if __name__ == "__main__":
     # Run the test, -s disables all capturing and -vv increases verbosity
