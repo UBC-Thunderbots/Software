@@ -57,6 +57,7 @@ cc_binary(
         ":thunderloop",
         "//shared:constants",
         "@boost//:program_options",
+        "@boost//:format"
     ],
 )
 
