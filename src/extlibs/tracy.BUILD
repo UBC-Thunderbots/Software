@@ -11,6 +11,7 @@ cc_library(
             "public/**/*.cpp",
         ],
     ),
+    linkopts = ["-ldl"],
     includes = ["public/tracy"],
     visibility = ["//visibility:public"],
 )
