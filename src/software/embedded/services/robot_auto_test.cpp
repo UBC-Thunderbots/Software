@@ -78,8 +78,8 @@ int main(int argc, char **argv)
         usleep(DELAY_NS);
 
         TbotsProto::PowerStatus power_status =
-            power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0);
-        power_status = power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0);
+            power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0, 0);
+        power_status = power_service_->poll(TbotsProto::PowerControl(), 0, 0, 0, 0);
 
         if (abs(power_status.battery_voltage()) < THRESHOLD)
         {

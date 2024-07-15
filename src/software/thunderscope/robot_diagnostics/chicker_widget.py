@@ -98,8 +98,8 @@ class ChickerWidget(QWidget):
             self.kick_slider_layout,
             self.kick_slider,
             self.kick_label,
-        ) = common_widgets.create_slider(
-            "Kick Speed (m/s)", 1, BALL_MAX_SPEED_METERS_PER_SECOND, 1
+        ) = common_widgets.create_float_slider(
+            "Kick Speed (m/s)", 2, 1, BALL_MAX_SPEED_METERS_PER_SECOND, 1
         )
         vbox_layout.addLayout(self.kick_slider_layout)
 
@@ -107,8 +107,8 @@ class ChickerWidget(QWidget):
             self.chip_slider_layout,
             self.chip_slider,
             self.chip_label,
-        ) = common_widgets.create_slider(
-            "Chip Distance (m)", 0.2, 1, 0.1
+        ) = common_widgets.create_float_slider(
+            "Chip Distance (m)", 2, 0.2, 1, 0.1
         )
         vbox_layout.addLayout(self.chip_slider_layout)
 
