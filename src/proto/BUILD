@@ -140,6 +140,16 @@ proto_library(
 )
 
 proto_library(
+    name = "validation_proto",
+    srcs = [
+        "validation.proto",
+    ],
+    deps = [
+        ":tbots_proto",
+    ],
+)
+
+proto_library(
     name = "visualization_proto",
     srcs = [
         "visualization.proto",
@@ -166,6 +176,11 @@ cc_proto_library(
 cc_proto_library(
     name = "sensor_msg_cc_proto",
     deps = [":sensor_msg_proto"],
+)
+
+cc_proto_library(
+    name = "validation_cc_proto",
+    deps = [":validation_proto"],
 )
 
 cc_proto_library(

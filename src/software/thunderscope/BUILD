@@ -14,7 +14,6 @@ py_binary(
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
-        "//software/thunderscope/replay:proto_logger",
     ],
 )
 
@@ -94,7 +93,6 @@ py_library(
         "//software/thunderscope/play:playinfo_widget",
         "//software/thunderscope/play:qlearninginfo_widget",
         "//software/thunderscope/play:refereeinfo_widget",
-        "//software/thunderscope/replay:proto_logger",
         "//software/thunderscope/replay:proto_player",
         "//software/thunderscope/robot_diagnostics:chicker",
         "//software/thunderscope/robot_diagnostics:diagnostics_input_widget",

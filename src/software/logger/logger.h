@@ -58,13 +58,16 @@ class LoggerSingleton
      *
      * @param runtime_dir The directory where the log files will be stored.
      */
-    static void initializeLogger(const std::string& runtime_dir)
+    static void initializeLogger(const std::string& runtime_dir,
+                                 const std::shared_ptr<ProtoLogger>& proto_logger)
     {
-        static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton(runtime_dir));
+        static std::shared_ptr<LoggerSingleton> s(
+            new LoggerSingleton(runtime_dir, proto_logger));
     }
 
    private:
-    LoggerSingleton(const std::string& runtime_dir)
+    LoggerSingleton(const std::string& runtime_dir,
+                    const std::shared_ptr<ProtoLogger>& proto_logger)
     {
         logWorker = g3::LogWorker::createLogWorker();
         // Default locations
@@ -109,8 +112,9 @@ class LoggerSingleton
             &LogRotateWithFilter::save);
 
         // Sink for visualization
-        auto visualization_handle = logWorker->addSink(
-            std::make_unique<ProtobufSink>(runtime_dir), &ProtobufSink::sendProtobuf);
+        auto visualization_handle =
+            logWorker->addSink(std::make_unique<ProtobufSink>(runtime_dir, proto_logger),
+                               &ProtobufSink::sendProtobuf);
 
         // Sink for PlotJuggler plotting
         auto plotjuggler_handle = logWorker->addSink(std::make_unique<PlotJugglerSink>(),

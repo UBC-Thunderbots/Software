@@ -1,5 +1,3 @@
-import threading
-
 import pytest
 
 from proto.import_all_protos import *
@@ -13,7 +11,7 @@ from proto.ssl_gc_common_pb2 import Team
 logger = createLogger(__name__)
 
 
-class TbotsTestRunner(TimeProvider):
+class TbotsTestRunner:
 
     """An abstract class that represents a test runner"""
 
@@ -75,8 +73,6 @@ class TbotsTestRunner(TimeProvider):
             self.blue_full_system_proto_unix_io.register_observer(
                 PrimitiveSet, self.primitive_set_buffer
             )
-        self.timestamp = 0
-        self.timestamp_mutex = threading.Lock()
 
     def send_gamecontroller_command(
         self,
