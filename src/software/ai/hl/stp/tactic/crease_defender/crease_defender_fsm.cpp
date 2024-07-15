@@ -36,7 +36,8 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     {
         // rotate pos 90 deg
         block_point = stepAlongPerimeter(inflated_defense_area,block_point.value(),-ROBOT_MAX_RADIUS_METERS*2);
-        // Out of field bounds, adjust
+        // block_point never goes out of bounds because inflated defense area is a rectangle that is always within the field.
+        // However, it may be out of "playable" boundaries, which isn't useful to us so we move it back inside.
         if (!contains(field.fieldLines(),block_point.value())){
             /*  In this scenario 0 moves towards x to come back in play.
             *            +-------
@@ -53,6 +54,8 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::RIGHT && block_point.has_value()) {
         // rotate neg 90 deg
         block_point = stepAlongPerimeter(inflated_defense_area,block_point.value(), ROBOT_MAX_RADIUS_METERS*2);
+        // block_point never goes out of bounds because inflated defense area is a rectangle that is always within the field.
+        // However, it may be out of "playable" boundaries, which isn't useful to us so we move it back inside.
         if (!contains(field.fieldLines(),block_point.value())){
             /*  In this scenario 0 moves towards x to come back in play.
             * -------+
