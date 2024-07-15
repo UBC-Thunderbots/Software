@@ -83,6 +83,17 @@ typedef struct RobotConstants
     // The maximum speed achievable by our robots, in metres per second [m/s]
     float robot_max_speed_m_per_s;
 
+    // The max speed at which we will pick the ball off the wall
+    float ball_placement_wall_max_speed_m_per_s;
+
+    // The max speed at which we will retreat away from the ball after placing it [m/x]
+    float ball_placement_retreat_max_speed_m_per_s;
+
+    // The max speed at which we dribble the ball
+    float dribble_speed_m_per_s;
+
+
+
     // The maximum acceleration achievable by our robots [m/s^2]
     float robot_max_acceleration_m_per_s_2;
 
