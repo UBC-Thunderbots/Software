@@ -240,3 +240,23 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
 
     return covered_points;
 }
+
+std::vector<Point> rasterize(const Stadium& stadium, double resolution_size)
+{
+    std::vector<Point> covered_points;
+    std::vector<Point> start_circle = rasterize(
+        Circle(stadium.segment().getStart(), stadium.radius()), resolution_size);
+    std::vector<Point> end_circle =
+        rasterize(Circle(stadium.segment().getEnd(), stadium.radius()), resolution_size);
+
+    // construct rectangle polygon
+    Polygon inner_rectangle = stadium.innerRectangle();
+
+    std::vector<Point> rectangle_points = rasterize(inner_rectangle, resolution_size);
+
+    covered_points.insert(covered_points.end(), start_circle.begin(), start_circle.end());
+    covered_points.insert(covered_points.end(), end_circle.begin(), end_circle.end());
+    covered_points.insert(covered_points.end(), rectangle_points.begin(),
+                          rectangle_points.end());
+    return covered_points;
+}

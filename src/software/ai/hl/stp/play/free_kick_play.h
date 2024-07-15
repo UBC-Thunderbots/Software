@@ -4,7 +4,9 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/passing/pass_generator.hpp"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/receiver_position_generator.hpp"
 
 /**
  * A Play for Direct Free kicks
@@ -14,7 +16,8 @@ class FreeKickPlay : public Play
    public:
     FreeKickPlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
 
    private:
     // The maximum time that we will wait before committing to a pass
@@ -33,7 +36,7 @@ class FreeKickPlay : public Play
     void chipAtGoalStage(
         TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-        const World &world);
+        const WorldPtr &world_ptr);
 
     /**
      * Given a pass, coordinates and executes the pass with a Passer and Receiver
@@ -46,7 +49,7 @@ class FreeKickPlay : public Play
     void performPassStage(
         TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-        PassWithRating best_pass_and_score_so_far, const World &world);
+        PassWithRating best_pass_and_score_so_far, const WorldPtr &world_ptr);
 
     /**
      * Tries to find a good pass on the field. This function starts with a high threshold
@@ -63,7 +66,7 @@ class FreeKickPlay : public Play
     PassWithRating shootOrFindPassStage(
         TacticCoroutine::push_type &yield, std::shared_ptr<AttackerTactic> shoot_tactic,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-        const World &world);
+        const WorldPtr &world_ptr);
 
     /**
      * Update the tactic that aligns the robot to the ball in preparation to pass
@@ -72,5 +75,8 @@ class FreeKickPlay : public Play
      * @param world The current state of the world
      */
     void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
-                                 const World &world);
+                                 const WorldPtr &world_ptr);
+
+    PassGenerator pass_generator;
+    ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator;
 };

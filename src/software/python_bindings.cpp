@@ -22,6 +22,11 @@
 #include "pybind11_protobuf/native_proto_caster.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/robot_constants.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/pass_with_rating.h"
+#include "software/ai/passing/receiver_position_generator.hpp"
+#include "software/constants.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/circle.h"
@@ -31,8 +36,9 @@
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/vector.h"
-#include "software/networking/threaded_proto_udp_listener.hpp"
-#include "software/networking/threaded_proto_udp_sender.hpp"
+#include "software/networking/radio/threaded_proto_radio_sender.hpp"
+#include "software/networking/udp/threaded_proto_udp_listener.hpp"
+#include "software/networking/udp/threaded_proto_udp_sender.hpp"
 #include "software/uart/boost_uart_communication.h"
 #include "software/world/field.h"
 #include "software/world/robot.h"
@@ -40,26 +46,51 @@
 
 namespace py = pybind11;
 
+// Python doesn't have templating, but we would like to re-use the networking
+// libraries that we have in C++, in python.
+//
+// Adapted from: https://stackoverflow.com/a/47749076
+
 /**
- * Python doesn't have templating, but we would like to re-use the networking
- * libraries that we have in C++, in python.
- *
- * Adapted from: https://stackoverflow.com/a/47749076
+ * Declares a Python binding for a ThreadedProtoUdpSender of type T
  *
  * @param m The module to define the sender/receiver in
- * @param The name to insert into the binded class name (ex. {name}ProtoSender)
+ * @param The name to insert into the binded class name (ex. {name}ProtoUdpSender)
  */
 template <typename T>
 void declareThreadedProtoUdpSender(py::module& m, std::string name)
 {
     using Class              = ThreadedProtoUdpSender<T>;
-    std::string pyclass_name = name + "ProtoSender";
+    std::string pyclass_name = name + "ProtoUdpSender";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
         .def(py::init<std::string, int, bool>())
         .def("send_proto", &Class::sendProto);
 }
 
+/**
+ * Declares a Python binding for a ThreadedProtoRadioSender of type T
+ *
+ * @param m The module to define the sender/receiver in
+ * @param The name to insert into the binded class name (ex. {name}ProtoRadioSender)
+ */
+template <typename T>
+void declareThreadedProtoRadioSender(py::module& m, std::string name)
+{
+    using Class              = ThreadedProtoRadioSender<T>;
+    std::string pyclass_name = name + "ProtoRadioSender";
+    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
+                                              py::buffer_protocol(), py::dynamic_attr())
+        .def(py::init<>())
+        .def("send_proto", &Class::sendProto);
+}
+
+/**
+ * Declares a Python binding for a ThreadedProtoUdpListener of type T
+ *
+ * @param m The module to define the sender/receiver in
+ * @param The name to insert into the binded class name (ex. {name}ProtoUdpListener)
+ */
 template <typename T>
 void declareThreadedProtoUdpListener(py::module& m, std::string name)
 {
@@ -70,6 +101,20 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
         .def(py::init<std::string, unsigned short, const std::function<void(T)>&, bool>())
         .def("close", &Class::close);
 }
+
+template <typename T>
+void declareReceiverPositionGenerator(py::module& m, std::string name)
+{
+    using Class              = ReceiverPositionGenerator<T>;
+    std::string pyclass_name = name + "ReceiverPositionGenerator";
+    py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
+                                              py::buffer_protocol(), py::dynamic_attr())
+        .def(py::init<std::shared_ptr<EighteenZonePitchDivision>,
+                      TbotsProto::PassingConfig>())
+        .def("getBestReceivingPositions",
+             &ReceiverPositionGenerator<T>::getBestReceivingPositions);
+}
+
 
 /**
  * Create a new threaded e-stop reader
@@ -212,6 +257,14 @@ PYBIND11_MODULE(python_bindings, m)
         .def("radius", &Circle::radius)
         .def("area", &Circle::area);
 
+    py::class_<Stadium>(m, "Stadium")
+        .def(py::init<Segment, double>())
+        .def("__repr__", [](const Stadium& s) {
+            std::stringstream stream;
+            stream << s;
+            return stream.str();
+        });
+
     py::class_<RobotConstants>(m, "RobotConstants")
         .def_readwrite("max_force_dribbler_speed_rpm",
                        &RobotConstants::max_force_dribbler_speed_rpm)
@@ -245,12 +298,14 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("createCircle", &createCircle);
     m.def("createVector", &createVector);
     m.def("createSegment", &createSegment);
+    m.def("createStadium", &createStadium);
 
     m.def("createPointProto", &createPointProto);
     m.def("createPolygonProto", &createPolygonProto);
     m.def("createCircleProto", &createCircleProto);
     m.def("createVectorProto", &createVectorProto);
     m.def("createSegmentProto", &createSegmentProto);
+    m.def("createStadiumProto", &createStadiumProto);
 
     m.def("createGeometryData", &createGeometryData);
 
@@ -261,6 +316,7 @@ PYBIND11_MODULE(python_bindings, m)
     m.def("contains",
           py::overload_cast<const Segment&, const Point&, double, int>(&contains));
     m.def("contains", py::overload_cast<const Rectangle&, const Point&>(&contains));
+    m.def("contains", py::overload_cast<const Stadium&, const Point&>(&contains));
 
     py::class_<Robot>(m, "Robot")
         .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())
@@ -270,7 +326,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("velocity", &Robot::velocity)
         .def("orientation", &Robot::orientation)
         .def("angularVelocity", &Robot::angularVelocity)
-        .def("isNearDribbler", &Robot::isNearDribbler)
+        .def("isNearDribbler", &Robot::isNearDribbler, py::arg("test_point"),
+             py::arg("TOLERANCE") = BALL_TO_FRONT_OF_ROBOT_DISTANCE_WHEN_DRIBBLING)
         .def("dribblerArea", &Robot::dribblerArea);
 
     py::class_<Team>(m, "Team")
@@ -278,7 +335,11 @@ PYBIND11_MODULE(python_bindings, m)
         .def("assignGoalie", &Team::assignGoalie)
         .def("getAllRobots", &Team::getAllRobots);
 
-    py::class_<Ball>(m, "Ball").def("position", &Ball::position);
+    py::class_<Timestamp>(m, "Timestamp").def(py::init<>());
+
+    py::class_<Ball>(m, "Ball")
+        .def(py::init<Point, Vector, Timestamp>())
+        .def("position", &Ball::position);
 
     // https://pybind11.readthedocs.io/en/stable/classes.html
     py::class_<Field>(m, "Field")
@@ -322,6 +383,8 @@ PYBIND11_MODULE(python_bindings, m)
         .def("enemyGoalpostPos", &Field::enemyGoalpostPos);
 
     py::class_<World>(m, "World")
+        .def(py::init<Field, Ball, Team, Team>())
+        .def(py::init<TbotsProto::World>())
         .def("friendlyTeam", &World::friendlyTeam)
         .def("enemyTeam", &World::enemyTeam)
         .def("ball", &World::ball)
@@ -335,15 +398,65 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<TbotsProto::RobotCrash>(m, "RobotCrash");
 
     // Senders
-    declareThreadedProtoUdpSender<TbotsProto::World>(m, "World");
-    declareThreadedProtoUdpSender<TbotsProto::RobotStatus>(m, "RobotStatus");
     declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
+    declareThreadedProtoRadioSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
 
     // Estop Reader
     py::class_<ThreadedEstopReader, std::unique_ptr<ThreadedEstopReader>>(
         m, "ThreadedEstopReader")
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
+
+    py::class_<ProtoLogger>(m, "ProtoLogger")
+        .def_static("createLogEntry", &ProtoLogger::createLogEntry);
+
+    py::class_<EighteenZonePitchDivision, std::shared_ptr<EighteenZonePitchDivision>>(
+        m, "EighteenZonePitchDivision")
+        .def(py::init<Field>())
+        .def("getZone", &EighteenZonePitchDivision::getZone);
+
+    declareReceiverPositionGenerator<EighteenZoneId>(m, "EighteenZoneId");
+
+    py::class_<PassGenerator>(m, "PassGenerator")
+        .def(py::init<const TbotsProto::PassingConfig&>())
+        .def("getBestPass", &PassGenerator::getBestPass);
+
+    py::class_<PassWithRating, std::unique_ptr<PassWithRating>>(m, "PassWithRating")
+        .def_readwrite("pass_value", &PassWithRating::pass)
+        .def_readwrite("rating", &PassWithRating::rating);
+
+    py::class_<Pass, std::unique_ptr<Pass>>(m, "Pass")
+        .def("passerPoint", &Pass::passerPoint)
+        .def("receiverPoint", &Pass::receiverPoint)
+        .def("speed", &Pass::speed)
+        .def_static("fromDestReceiveSpeed",
+                    py::overload_cast<const Point&, const Point&, double, double, double>(
+                        &Pass::fromDestReceiveSpeed))
+        .def_static("fromDestReceiveSpeed",
+                    py::overload_cast<const Point&, const Point&,
+                                      const TbotsProto::PassingConfig&>(
+                        &Pass::fromDestReceiveSpeed));
+
+    py::enum_<EighteenZoneId>(m, "EighteenZoneId")
+        .value("ZONE_1", EighteenZoneId::ZONE_1)
+        .value("ZONE_2", EighteenZoneId::ZONE_2)
+        .value("ZONE_3", EighteenZoneId::ZONE_3)
+        .value("ZONE_4", EighteenZoneId::ZONE_4)
+        .value("ZONE_5", EighteenZoneId::ZONE_5)
+        .value("ZONE_6", EighteenZoneId::ZONE_6)
+        .value("ZONE_7", EighteenZoneId::ZONE_7)
+        .value("ZONE_8", EighteenZoneId::ZONE_8)
+        .value("ZONE_9", EighteenZoneId::ZONE_9)
+        .value("ZONE_10", EighteenZoneId::ZONE_10)
+        .value("ZONE_11", EighteenZoneId::ZONE_11)
+        .value("ZONE_12", EighteenZoneId::ZONE_12)
+        .value("ZONE_13", EighteenZoneId::ZONE_13)
+        .value("ZONE_14", EighteenZoneId::ZONE_14)
+        .value("ZONE_15", EighteenZoneId::ZONE_15)
+        .value("ZONE_16", EighteenZoneId::ZONE_16)
+        .value("ZONE_17", EighteenZoneId::ZONE_17)
+        .value("ZONE_18", EighteenZoneId::ZONE_18)
+        .export_values();
 
     py::enum_<EstopState>(m, "EstopStates")
         .value("STOP", EstopState::STOP)

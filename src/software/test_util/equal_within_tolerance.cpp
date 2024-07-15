@@ -40,6 +40,29 @@ namespace TestUtil
         }
     }
 
+    ::testing::AssertionResult equalWithinTolerance(const Stadium &stadium1,
+                                                    const Stadium &stadium2,
+                                                    double tolerance)
+    {
+        if (((equalWithinTolerance(stadium1.segment().getStart(),
+                                   stadium2.segment().getStart(), tolerance) &&
+              equalWithinTolerance(stadium1.segment().getEnd(),
+                                   stadium2.segment().getEnd(), tolerance)) ||
+             (equalWithinTolerance(stadium1.segment().getStart(),
+                                   stadium2.segment().getEnd(), tolerance) &&
+              equalWithinTolerance(stadium1.segment().getEnd(),
+                                   stadium2.segment().getStart(), tolerance))) &&
+            equalWithinTolerance(stadium1.radius(), stadium2.radius(), tolerance))
+        {
+            return ::testing::AssertionSuccess();
+        }
+        else
+        {
+            return ::testing::AssertionFailure()
+                   << "Stadium 1 was " << stadium1 << ", stadium 2 was " << stadium2;
+        }
+    }
+
     ::testing::AssertionResult equalWithinTolerance(const Circle &c1, const Circle &c2,
                                                     double tolerance)
     {

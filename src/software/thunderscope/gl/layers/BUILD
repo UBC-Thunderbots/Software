@@ -31,6 +31,19 @@ py_library(
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_polygon",
+        "//software/thunderscope/gl/graphics:gl_stadium",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_debug_shapes_layer",
+    srcs = ["gl_debug_shapes_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_circle",
+        "//software/thunderscope/gl/graphics:gl_polygon",
+        "//software/thunderscope/gl/graphics:gl_stadium",
         requirement("pyqtgraph"),
     ],
 )
@@ -40,6 +53,17 @@ py_library(
     srcs = ["gl_passing_layer.py"],
     deps = [
         ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_attacker_layer",
+    srcs = ["gl_attacker_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_circle",
         "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],
@@ -57,6 +81,15 @@ py_library(
         "//software/thunderscope/gl/graphics:gl_rect",
         "//software/thunderscope/gl/graphics:gl_robot",
         "//software/thunderscope/gl/graphics:gl_sphere",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_sandbox_world_layer",
+    srcs = ["gl_sandbox_world_layer.py"],
+    deps = [
+        ":gl_world_layer",
         requirement("pyqtgraph"),
     ],
 )
@@ -110,6 +143,16 @@ py_library(
         ":gl_layer",
         "//software/thunderscope/gl/graphics:gl_gradient_legend",
         "//software/thunderscope/gl/graphics:gl_heatmap",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
+    name = "gl_trail_layer",
+    srcs = ["gl_trail_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_polygon",
         requirement("pyqtgraph"),
     ],
 )

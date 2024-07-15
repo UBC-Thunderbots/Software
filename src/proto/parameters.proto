@@ -37,8 +37,12 @@ message AiConfig
     required EnemyCapabilityConfig enemy_capability_config                  = 7;
     required ShootOrPassPlayConfig shoot_or_pass_play_config                = 8;
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
+    required EnemyBallPlacementPlayConfig enemy_ball_placement_play_config  = 10;
     required DefensePlayConfig defense_play_config                          = 11;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 12;
+    required AiParameterConfig ai_parameter_config                          = 13;
+    required ReceiverTacticConfig receiver_tactic_config                    = 14;
+    required CreaseDefenderConfig crease_defender_config                    = 15;
 }
 
 message AiControlConfig
@@ -50,17 +54,46 @@ message AiControlConfig
     required PlayName override_ai_play = 2 [default = UseAiSelection];
 }
 
+message AiParameterConfig
+{
+    // threshold to decide if ball hasn't been kicked
+    required double ball_is_kicked_m_per_s_threshold = 1
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+}
+
 message AttackerTacticConfig
 {
     // The radius of the circle around a friendly robot around which
     // we think an enemy is about to steal the ball
     required double enemy_about_to_steal_ball_radius = 1
-        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 4.0];
+        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 4.0];
 
     // The minimum open angle to the goal that we require before taking a shot
     required double min_open_angle_for_shot_deg = 2 [
         default                   = 6.0,
-        (bounds).min_double_value = 0.0,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 90.0
+    ];
+}
+
+message ReceiverTacticConfig
+{
+    // Whether one touch kicks should be enabled or not
+    required bool enable_one_touch_kick = 1 [default = true];
+
+    // The minimum open angle to the goal that we require before taking a one touch kick
+    required double min_open_angle_for_one_touch_deg = 2 [
+        default                   = 6.0,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 90.0
+    ];
+
+    // TODO (#2570): try to make it as big as possible when tuning
+    // The maximum deflection angle that we will attempt a one-touch kick towards the
+    // enemy goal
+    required double max_deflection_for_one_touch_deg = 3 [
+        default                   = 60.0,
+        (bounds).min_double_value = 10.0,
         (bounds).max_double_value = 90.0
     ];
 }
@@ -75,6 +108,52 @@ message CornerKickPlayConfig
 
 message PassingConfig
 {
+    // Note that the order the fields are defined here is the order that
+    // they are displayed in Thunderscope's Parameters widget, and the order
+    // is independent of the field's numbering.
+
+    reserved 8, 5;
+
+    /*****  Pass generation parameters *****/
+    // The number of passes to sample per robot.
+    required uint32 pass_gen_num_samples_per_robot = 21
+        [default = 5, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
+    // The minimum standard deviation (in meters) of the normal sampling distribution
+    // used to generate passes around robots. This STD is used when the robot is
+    // stationary.
+    required double pass_gen_min_rand_sample_std_dev_meters = 22 [
+        default                   = 0.4,
+        (bounds).min_double_value = 0.01,
+        (bounds).max_double_value = 3.0
+    ];
+    // The rate of growth of the STD as the robot velocity increases.
+    required double pass_gen_rand_sample_std_dev_robot_vel_multiplier = 23 [
+        default                   = 0.15,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 0.5
+    ];
+    // The rate of growth of the distance offset of the center of the normal
+    // distribution as the robot velocity increases. If set to 0, the center
+    // of the sampled receiving positions will be the same as the robot's position.
+    required double pass_gen_rand_sample_center_robot_vel_multiplier = 24
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // The minimum pass speed (in m/s)
+    required double min_pass_speed_m_per_s = 6
+        [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+    // The maximum pass speed (in m/s)
+    required double max_pass_speed_m_per_s = 7 [
+        default                   = 6.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
+    // The max speed at which a pass should be received
+    required double max_receive_speed_m_per_s = 11
+        [default = 2.0, (bounds).min_double_value = 1.0, (bounds).max_double_value = 4.0];
+    // The number of steps of gradient descent to perform in each iteration
+    required int32 number_of_gradient_descent_steps_per_iter = 9
+        [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
+
+    /*****  Cost function parameters *****/
     // The offset from the sides of the field to place the rectangular
     // sigmoid we use to determine what areas to pass to
     required double static_field_position_quality_x_offset = 1
@@ -88,40 +167,108 @@ message PassingConfig
     // to the goal having less of an effect.
     required double static_field_position_quality_friendly_goal_distance_weight = 3
         [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // The estimated delay in seconds between the time we commit to a pass and the time
+    // the pass is taken.
+    required double pass_delay_sec = 12
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // The extra time added to the minimum time that it will take a friendly
+    // robot to reach the receiving position and orientation.
+    required double friendly_time_to_receive_slack_sec = 13
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
     // This controls how heavily we weigh an enemy robot being near the pass
     // receiver when calculating enemy risk to a pass
     required double enemy_proximity_importance = 4 [
         default                   = 0.5,
+        (bounds).min_double_value = 0.01,
+        (bounds).max_double_value = 10.0
+    ];
+    // A value multiplied by the duration that our enemy robot model predicts will
+    // take an enemy robot to intercept a pass. 1 implies that our enemy robot model
+    // is exactly correct, with higher values meaning that the enemy will take longer
+    // to intercept the pass, and lower values meaning that the enemy will intercept
+    // the pass earlier than we anticipate.
+    required double enemy_interception_time_multiplier = 14 [
+        default                   = 1.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
-    // The maximum angle that we have to rotate after receiving a pass to
-    // shoot that we think would likely result in a goal. Note that we may
-    // try to take shots that require us to rotate more then this, it's more
-    // of a soft limit.
-    required double ideal_max_rotation_to_shoot_degrees = 5 [
-        default                   = 60.0,
+    // This controls how heavily we weigh the time the enemy team has to intercept a pass.
+    // Increasing this value increases the risk (decreasing the score) associated with a
+    // pass that the enemy could intercept.
+    required double enemy_interception_risk_importance = 15 [
+        default                   = 4.0,
         (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 180.0
+        (bounds).max_double_value = 20.0
     ];
-    // The minimum pass speed (in m/s)
-    required double min_pass_speed_m_per_s = 6
-        [default = 4.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-    // The maximum pass speed (in m/s)
-    required double max_pass_speed_m_per_s = 7 [
-        default                   = 6.0,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 10.0
+    // The distance in meters along the x-axis from the passer that we prefer the receiver
+    // to be when receiving a pass on the friendly half. Note that this is a soft limit
+    // and the receiver may be further back.
+    required double backwards_pass_distance_meters = 16 [
+        default                   = -1.0,
+        (bounds).min_double_value = -10.0,
+        (bounds).max_double_value = 5.0
     ];
-    // How long we think the enemy will take to recognize we're passing and start
-    // moving to intercept
-    required double enemy_reaction_time = 8
-        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
-    // The number of steps of gradient descent to perform in each iteration
-    required int32 number_of_gradient_descent_steps_per_iter = 9
-        [default = 2, (bounds).min_int_value = 0, (bounds).max_int_value = 100];
-    // Cost visualization parameters
+    // The max distance in meters that the receiver can be from the passer when receiving
+    // a pass.
+    required double receiver_ideal_max_distance_meters = 17 [
+        default                   = 10.0,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 20.0
+    ];
+    // The min distance in meters that the receiver can be from the passer when receiving
+    // a pass.
+    required double receiver_ideal_min_distance_meters = 18 [
+        default                   = 1.5,
+        (bounds).min_double_value = 0.1,
+        (bounds).max_double_value = 20.0
+    ];
+    // The minimum open angle (in degrees) for an ideal shot on enemy goal from the
+    // receiver's position. Any angle greater than this is also considered ideal, where as
+    // angles below this are considered less ideal and are given a lower score.
+    required double min_ideal_pass_shoot_goal_open_angle_deg = 19 [
+        default                   = 10.0,
+        (bounds).min_double_value = 1.0,
+        (bounds).max_double_value = 45.0
+    ];
+    // The min score that ratePassShootScore return. Used to limit the cost function
+    // from returning a very low score, causing the rest of the cost functions to be
+    // ignored.
+    required double min_pass_shoot_score = 20
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    /*****  Visualization parameters *****/
+    // Cost function visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
+    // Pass generator visualization parameters
+    required PassGeneratorVisualizationConfig pass_gen_vis_config = 25;
+
+    /*****  Receiver position generation parameters *****/
+    required ReceiverPositionGeneratorConfig receiver_position_generator_config = 26;
+}
+
+message ReceiverPositionGeneratorConfig
+{
+    // A multiplier to incentivize using the same receiver position as the previous
+    // iteration
+    required double previous_best_receiver_position_score_multiplier = 1
+        [default = 1.5, (bounds).min_double_value = 1.0, (bounds).max_double_value = 3.0];
+    // The number of samples to generate initially for each zone to get a sense of the
+    // best zones.
+    required uint32 num_initial_samples_per_zone = 2
+        [default = 5, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
+    // The number of additional samples to generate for the top zones after the initial
+    // samples. Used to get a more accurate max score.
+    required uint32 num_additional_samples_per_top_zone = 3
+        [default = 20, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
+    // The minimum angle (in degrees) between a receiver, the ball, and a previously
+    // selected receiver.
+    required double min_angle_between_receivers_deg = 4 [
+        default                   = 20.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 45.0
+    ];
+
+    required ReceiverPositionGeneratorVisualizationConfig receiver_vis_config = 5;
 }
 
 message GoalieTacticConfig
@@ -152,6 +299,10 @@ message GoalieTacticConfig
     // defense area crease
     required double min_chip_distance_from_crease_meters = 8
         [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Distance threshold multiplier used for calculating whether or not an enemy robot
+    // is a safe distance away
+    required double safe_distance_multiplier = 9
+        [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
 message DribbleTacticConfig
@@ -171,7 +322,7 @@ message DribbleTacticConfig
 
     // Threshold to determine if the robot has the expected orientation when
     // completing the dribble (in degrees)
-    required double final_destination_close_threshold = 3 [
+    required double final_destination_close_threshold_deg = 3 [
         default                   = 3.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
@@ -188,6 +339,28 @@ message DribbleTacticConfig
     // Robot speed at which the robot is done dribbling (in m/s)
     required double robot_dribbling_done_speed = 5
         [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // The maximum amount of additional time that the robot should
+    // reach the interception point prior to the ball.
+    required double max_ball_interception_slack_time_sec = 6
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // The additional offset from the regular ball interception point that the robot
+    // should aim for when the robot's dribbler is not aligned with the ball.
+    required double offset_to_ball_when_not_aligned_meters = 7 [
+        default                   = 0.08,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 0.2
+    ];
+
+    // The maximum angular velocity the robot can have when it is about to get possession
+    // of the ball. This is used to avoid the robot from trying to get possession of the
+    // ball when it is turning too fast.
+    required double max_robot_angular_vel_when_getting_possession_deg_per_s = 8 [
+        default                   = 40.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 180.0
+    ];
 }
 
 message EnemyCapabilityConfig
@@ -206,6 +379,14 @@ message ShootOrPassPlayConfig
         (bounds).max_double_value = 1.0
     ];
 
+    // The minimum pass quality we're willing to attempt before ramping
+    // down the score to abs_min_pass_score
+    required double min_perfect_pass_score = 6 [
+        default                   = 0.85,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 1.0
+    ];
+
     // When we're choosing a pass, we start by looking for a pass with a perfect score
     // of 1, and then over time lower the score we're will to accept. This parameter
     // how fast we ramp down to abs_min_pass_score. This is in seconds.
@@ -214,19 +395,15 @@ message ShootOrPassPlayConfig
 
     // threshold to decide if the ball has been kicked by a robot
     required double ball_shot_threshold = 3
-        [default = 4.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+        [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 
     // threshold to decide if the ball has been kicked by a robot
     required double min_distance_to_pass = 4
-        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+        [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
     // threshold for the distance between passer and receiver
     required double short_pass_threshold = 5
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-
-    // threshold to decide if ball hasn't been kicked
-    required double ball_not_kicked_threshold = 6
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 
@@ -293,6 +470,16 @@ message SensorFusionConfig
     required PossessionTrackerConfig possession_tracker_config = 13;
 }
 
+message EnemyBallPlacementPlayConfig
+{
+    // The distance to keep from the enemy ball placement stadium
+    required double distance_to_keep_meters = 1 [
+        default                   = 0.75,
+        (bounds).min_double_value = 0.65,
+        (bounds).max_double_value = 1.5
+    ];
+}
+
 message DefensePlayConfig
 {
     message DefenderAssignmentConfig
@@ -353,6 +540,21 @@ message RobotNavigationObstacleConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
+
+    // The additional inflation amount (in meters) for the enemy defense area
+    required double enemy_defense_area_additional_inflation_meters = 2
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // The minimum velocity of an enemy robot for it to be considered
+    // as a dynamic obstacle. Below this speed, the robot is considered
+    // to be stationary.
+    required double dynamic_enemy_robot_obstacle_min_speed_mps = 3
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 3.0];
+
+    // The maximum time into the future that we will predict the enemy
+    // robot's position for obstacle avoidance
+    required double dynamic_enemy_robot_obstacle_horizon_sec = 4
+        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 }
 
 message CostVisualizationConfig
@@ -362,10 +564,28 @@ message CostVisualizationConfig
     required int32 num_cols              = 2
         [default = 45, (bounds).min_int_value = 1, (bounds).max_int_value = 100];
     // cost functions
-    required bool static_position_quality  = 3 [default = false];
+    required bool static_position_quality    = 3 [default = false];
+    required bool pass_forward_quality       = 7 [default = false];
+    required bool pass_not_too_close_quality = 8 [default = false];
+
     required bool pass_friendly_capability = 4 [default = false];
     required bool pass_enemy_risk          = 5 [default = false];
     required bool pass_shoot_score         = 6 [default = false];
+    required bool enemy_proximity_risk     = 9 [default = false];
+    required bool enemy_interception_risk  = 10 [default = false];
+
+    required bool passer_position_score   = 11 [default = false];
+    required bool receiver_position_score = 12 [default = false];
+}
+
+message PassGeneratorVisualizationConfig
+{
+    required bool visualize_sampled_passes = 1 [default = false];
+}
+
+message ReceiverPositionGeneratorVisualizationConfig
+{
+    required bool visualize_best_receiving_positions_and_zones = 1 [default = false];
 }
 
 message PossessionTrackerConfig
@@ -395,4 +615,32 @@ message PossessionTrackerConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
+}
+
+message CreaseDefenderConfig
+{
+    /*
+    Max ratio between distances (crease defender and ball) / (nearest enemy and ball) for
+    pass defender to chase ball.
+    Threshold = 1.0 results in crease defenders chasing the ball even if the ball is
+    equidistant to nearest enemy.
+    Threshold < 1.0 results in crease defenders chasing the ball only when it is at least
+    (threshold) percent closer to our bot than the nearest enemy.
+    ┌──────────────────────────────────────────┐
+    | Pass   | <────> Ball <───────────> Enemy |
+    |       ()         x                  ()   |
+    └──────────────────────────────────────────┘
+     */
+    required double max_get_ball_ratio_threshold = 1
+        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // Max distance that the crease defenders will try and get possession of a ball
+    required double max_get_ball_radius_m = 2
+        [default = 1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Max speed of ball that crease defenders will try and get possession
+    required double max_ball_speed_to_get_m_per_s = 3
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
+    // The additional buffer length for each side of the goal
+    // to determine if crease defender chipping is "towards goal"
+    required double goal_post_offset_chipping = 4
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 }

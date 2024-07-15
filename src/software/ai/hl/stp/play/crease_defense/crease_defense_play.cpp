@@ -15,7 +15,7 @@ CreaseDefensePlay::CreaseDefensePlay(TbotsProto::AiConfig config)
 }
 
 void CreaseDefensePlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                       const World &world)
+                                       const WorldPtr &world_ptr)
 {
     // This function doesn't get called so it does nothing
     while (true)

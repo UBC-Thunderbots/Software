@@ -8,19 +8,18 @@
 
 namespace TestUtil
 {
-    World createBlankTestingWorld(std::unique_ptr<TbotsProto::Field> field_proto)
+    std::shared_ptr<World> createBlankTestingWorld(
+        std::unique_ptr<TbotsProto::Field> field_proto)
     {
         Field field        = Field(*field_proto);
         Team friendly_team = Team(Duration::fromMilliseconds(1000));
         Team enemy_team    = Team(Duration::fromMilliseconds(1000));
         Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
 
-        World world = World(field, ball, friendly_team, enemy_team);
-
-        return world;
+        return std::make_shared<World>(World(field, ball, friendly_team, enemy_team));
     }
 
-    World createBlankTestingWorld(TbotsProto::FieldType field_type)
+    std::shared_ptr<World> createBlankTestingWorld(TbotsProto::FieldType field_type)
     {
         return createBlankTestingWorld(createField(Field::createField(field_type)));
     }
@@ -45,40 +44,36 @@ namespace TestUtil
         return team;
     }
 
-    World setFriendlyRobotPositions(World world, std::vector<Point> robot_positions,
-                                    const Timestamp &timestamp)
+    void setFriendlyRobotPositions(const std::shared_ptr<World> &world,
+                                   std::vector<Point> robot_positions,
+                                   const Timestamp &timestamp)
     {
         Team new_friendly_team =
-            setRobotPositionsHelper(world.friendlyTeam(), robot_positions, timestamp);
-        world.updateFriendlyTeamState(new_friendly_team);
-
-        return world;
+            setRobotPositionsHelper(world->friendlyTeam(), robot_positions, timestamp);
+        world->updateFriendlyTeamState(new_friendly_team);
     }
 
-    World setEnemyRobotPositions(World world, std::vector<Point> robot_positions,
-                                 const Timestamp &timestamp)
+    void setEnemyRobotPositions(const std::shared_ptr<World> &world,
+                                std::vector<Point> robot_positions,
+                                const Timestamp &timestamp)
     {
         Team new_enemy_team =
-            setRobotPositionsHelper(world.enemyTeam(), robot_positions, timestamp);
-        world.updateEnemyTeamState(new_enemy_team);
-
-        return world;
+            setRobotPositionsHelper(world->enemyTeam(), robot_positions, timestamp);
+        world->updateEnemyTeamState(new_enemy_team);
     }
 
-    World setBallPosition(World world, Point ball_position, Timestamp timestamp)
+    void setBallPosition(const std::shared_ptr<World> &world, Point ball_position,
+                         Timestamp timestamp)
     {
-        BallState ball_state(ball_position, world.ball().velocity());
-        world.updateBall(Ball(ball_state, timestamp));
-
-        return world;
+        BallState ball_state(ball_position, world->ball().velocity());
+        world->updateBall(Ball(ball_state, timestamp));
     }
 
-    World setBallVelocity(World world, Vector ball_velocity, Timestamp timestamp)
+    void setBallVelocity(const std::shared_ptr<World> &world, Vector ball_velocity,
+                         Timestamp timestamp)
     {
-        BallState ball_state(world.ball().position(), ball_velocity);
-        world.updateBall(Ball(ball_state, timestamp));
-
-        return world;
+        BallState ball_state(world->ball().position(), ball_velocity);
+        world->updateBall(Ball(ball_state, timestamp));
     }
 
     Robot createRobotAtPos(const Point &pt)

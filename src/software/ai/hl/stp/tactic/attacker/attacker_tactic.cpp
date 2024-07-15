@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 
+#include "proto/message_translation/tbots_geometry.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/logger/logger.h"
@@ -16,8 +17,7 @@ AttackerTactic::AttackerTactic(TbotsProto::AiConfig ai_config)
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
         fsm_map[id] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()),
-            AttackerFSM(ai_config.attacker_tactic_config()));
+            DribbleFSM(ai_config.dribble_tactic_config()), AttackerFSM(ai_config));
     }
 }
 
@@ -44,13 +44,12 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<AttackerFSM>>(
-            DribbleFSM(ai_config.dribble_tactic_config()),
-            AttackerFSM(ai_config.attacker_tactic_config()));
+            DribbleFSM(ai_config.dribble_tactic_config()), AttackerFSM(ai_config));
     }
 
     std::optional<Shot> shot = calcBestShotOnGoal(
-        tactic_update.world.field(), tactic_update.world.friendlyTeam(),
-        tactic_update.world.enemyTeam(), tactic_update.world.ball().position(),
+        tactic_update.world_ptr->field(), tactic_update.world_ptr->friendlyTeam(),
+        tactic_update.world_ptr->enemyTeam(), tactic_update.world_ptr->ball().position(),
         TeamType::ENEMY, {tactic_update.robot});
     if (shot && shot->getOpenAngle() <
                     Angle::fromDegrees(
@@ -67,4 +66,44 @@ void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool res
 
     fsm_map.at(tactic_update.robot.id())
         ->process_event(AttackerFSM::Update(control_params, tactic_update));
+
+    visualizeControlParams(*tactic_update.world_ptr, control_params);
+}
+
+void AttackerTactic::visualizeControlParams(
+    const World& world, const AttackerFSM::ControlParams& control_params)
+{
+    TbotsProto::AttackerVisualization pass_visualization_msg;
+
+    if (control_params.best_pass_so_far.has_value())
+    {
+        TbotsProto::Pass pass_msg;
+        *(pass_msg.mutable_passer_point()) =
+            *createPointProto(control_params.best_pass_so_far->passerPoint());
+        *(pass_msg.mutable_receiver_point()) =
+            *createPointProto(control_params.best_pass_so_far->receiverPoint());
+        pass_msg.set_pass_speed_m_per_s(control_params.best_pass_so_far->speed());
+        *(pass_visualization_msg.mutable_pass_()) = pass_msg;
+    }
+
+    pass_visualization_msg.set_pass_committed(pass_committed);
+
+    if (control_params.shot.has_value())
+    {
+        TbotsProto::Shot shot_msg;
+        *(shot_msg.mutable_shot_origin()) = *createPointProto(world.ball().position());
+        *(shot_msg.mutable_shot_target()) =
+            *createPointProto(control_params.shot->getPointToShootAt());
+        *(shot_msg.mutable_open_angle()) =
+            *createAngleProto(control_params.shot->getOpenAngle());
+        *(pass_visualization_msg.mutable_shot()) = shot_msg;
+    }
+
+    if (chip_target.has_value())
+    {
+        *(pass_visualization_msg.mutable_chip_target()) =
+            *createPointProto(chip_target.value());
+    }
+
+    LOG(VISUALIZE) << pass_visualization_msg;
 }

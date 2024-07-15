@@ -6,7 +6,7 @@
 
 TEST(StopFSMTest, test_transitions)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Robot robot(0,
                 RobotState(Point(1, -3), Vector(2.1, 3.1), Angle::half(),
                            AngularVelocity::zero()),

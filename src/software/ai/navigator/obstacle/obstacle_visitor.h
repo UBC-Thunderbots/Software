@@ -4,6 +4,7 @@
 #include "software/geom/circle.h"
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
+#include "software/geom/stadium.h"
 
 // We forward-declare GeomObstacle because if we include them we induce a
 // circular dependency between the Individual library for each obstacle and this
@@ -32,4 +33,5 @@ class ObstacleVisitor
     virtual void visit(const GeomObstacle<Circle> &geom_obstacle)    = 0;
     virtual void visit(const GeomObstacle<Polygon> &geom_obstacle)   = 0;
     virtual void visit(const GeomObstacle<Rectangle> &geom_obstacle) = 0;
+    virtual void visit(const GeomObstacle<Stadium> &geom_obstacle)   = 0;
 };

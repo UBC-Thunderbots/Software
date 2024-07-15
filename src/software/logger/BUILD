@@ -19,6 +19,7 @@ cc_library(
         "custom_logging_levels.h",
         "logger.h",
     ],
+    linkopts = ["-lstdc++fs"],
     deps = [
         ":coloured_cout_sink",
         ":csv_sink",
@@ -117,7 +118,7 @@ cc_library(
         "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//software/logger:plotjuggler_sink",
-        "//software/networking:threaded_proto_udp_sender",
+        "//software/networking/udp:threaded_proto_udp_sender",
         "@base64",
         "@g3log",
     ],
@@ -135,7 +136,7 @@ cc_library(
     deps = [
         "//proto:visualization_cc_proto",
         "//shared:constants",
-        "//software/networking:threaded_udp_sender",
+        "//software/networking/udp:threaded_udp_sender",
         "@g3log",
     ],
 )
@@ -153,7 +154,8 @@ cc_library(
         "//proto:any_cc_proto",
         "//proto:tbots_cc_proto",
         "//shared:constants",
-        "//software/networking:threaded_unix_sender",
+        "//software/logger:proto_logger",
+        "//software/networking/unix:threaded_unix_sender",
         "@base64",
         "@g3log",
     ],
@@ -163,5 +165,22 @@ py_library(
     name = "py_logger",
     srcs = [
         "logger.py",
+    ],
+)
+
+cc_library(
+    name = "proto_logger",
+    srcs = [
+        "proto_logger.cpp",
+    ],
+    hdrs = [
+        "proto_logger.h",
+    ],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software/multithreading:thread_safe_buffer",
+        "@base64",
+        "@boost//:filesystem",
+        "@zlib",
     ],
 )

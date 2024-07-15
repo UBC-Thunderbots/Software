@@ -8,9 +8,9 @@ TEST(FsmStateTest, test_get_fsm_state)
     TbotsProto::AiConfig ai_config;
     AttackerTactic tactic(ai_config);
 
-    World world = ::TestUtil::createBlankTestingWorld();
-    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    world.updateFriendlyTeamState(Team({robot}));
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
+    Robot robot                  = ::TestUtil::createRobotAtPos(Point(-2, -3));
+    world->updateFriendlyTeamState(Team({robot}));
     Pass pass = Pass(Point(0, 0), Point(2, 0), 5);
     tactic.setLastExecutionRobot(robot.id());
 
@@ -22,7 +22,7 @@ TEST(FsmStateTest, test_get_fsm_state)
     robot.updateState(RobotState(pass.passerPoint() - Vector(0.05, 0), Vector(),
                                  pass.passerOrientation(), AngularVelocity::zero()),
                       Timestamp::fromSeconds(0));
-    world.updateFriendlyTeamState(Team({robot}));
+    world->updateFriendlyTeamState(Team({robot}));
 
     // process event once to fall through the Dribble FSM
     tactic.get(world);
@@ -33,8 +33,8 @@ TEST(FsmStateTest, test_get_fsm_state)
     EXPECT_EQ("PivotKickFSM.KickState", tactic.getFSMState());
 
     // FSM should be done now
-    world = ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(223));
-    EXPECT_TRUE(world.ball().hasBallBeenKicked(pass.passerOrientation()));
+    ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(223));
+    EXPECT_TRUE(world->ball().hasBallBeenKicked(pass.passerOrientation()));
     tactic.get(world);
     EXPECT_EQ("terminate_state", tactic.getFSMState());
 }

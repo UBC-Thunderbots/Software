@@ -21,13 +21,14 @@ cc_library(
     deps = [
         ":backend",
         "//proto:tbots_cc_proto",
+        "//proto:validation_cc_proto",
         "//proto/message_translation:ssl_wrapper",
         "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//software:constants",
         "//software/logger",
-        "//software/networking:threaded_proto_unix_listener",
-        "//software/networking:threaded_proto_unix_sender",
+        "//software/networking/unix:threaded_proto_unix_listener",
+        "//software/networking/unix:threaded_proto_unix_sender",
         "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"

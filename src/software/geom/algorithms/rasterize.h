@@ -5,6 +5,7 @@
 #include "software/geom/circle.h"
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
+#include "software/geom/stadium.h"
 
 /**
  * Set of functions that rasterize a geometric object into a set of points
@@ -39,3 +40,12 @@ std::vector<Point> rasterize(const Rectangle &rectangle, double resolution_size)
  * @return a set of points covered by polygon
  */
 std::vector<Point> rasterize(const Polygon &polygon, double resolution_size);
+
+/**
+ * Returns a set of points covered by a stadium with a set resolution size
+ *
+ * @param stadium stadium being converted into a set of points
+ * @param resolution_size how far should the points be apart from each other in meters
+ * @return a set of points covered by stadium
+ */
+std::vector<Point> rasterize(const Stadium &stadium, double resolution_size);

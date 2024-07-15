@@ -1,5 +1,8 @@
 #include "software/jetson_nano/thunderloop.h"
 
+#include <Tracy.hpp>
+#include <fstream>
+
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
@@ -10,12 +13,13 @@
 #include "software/jetson_nano/services/motor.h"
 #include "software/logger/logger.h"
 #include "software/logger/network_logger.h"
+#include "software/tracy/tracy_constants.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 #include "software/world/team.h"
 
 /**
- * https://rt.wiki.kernel.org/index.php/Squarewave-example
+ * https://web.archive.org/web/20210308013218/https://rt.wiki.kernel.org/index.php/Squarewave-example
  * using clock_nanosleep of librt
  */
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
@@ -170,6 +174,9 @@ Thunderloop::~Thunderloop() {}
             // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
             // CLOCK_REALTIME can jump backwards
             clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
+
+            FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
+
             ScopedTimespecTimer iteration_timer(&iteration_time);
 
             // Collect jetson status
@@ -179,6 +186,9 @@ Thunderloop::~Thunderloop() {}
             // robot status
             {
                 ScopedTimespecTimer timer(&poll_time);
+
+                ZoneNamedN(_tracy_network_poll, "Thunderloop: Poll NetworkService", true);
+
                 new_primitive_set = network_service_->poll(robot_status_);
             }
 
@@ -237,6 +247,8 @@ Thunderloop::~Thunderloop() {}
             {
                 ScopedTimespecTimer timer(&poll_time);
 
+                ZoneNamedN(_tracy_step_primitive, "Thunderloop: Step Primitive", true);
+
                 // Handle emergency stop override
                 auto nanoseconds_elapsed_since_last_primitive =
                     getNanoseconds(time_since_last_primitive_received);
@@ -256,6 +268,10 @@ Thunderloop::~Thunderloop() {}
             // Power Service: execute the power control command
             {
                 ScopedTimespecTimer timer(&poll_time);
+
+                ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService",
+                           true);
+
                 power_status_ =
                     power_service_->poll(direct_control_.power_control(), kick_coeff_,
                                          kick_constant_, chip_coeff_, chip_constant_);
@@ -301,6 +317,9 @@ Thunderloop::~Thunderloop() {}
             // Motor Service: execute the motor control command
             {
                 ScopedTimespecTimer timer(&poll_time);
+
+                ZoneNamedN(_tracy_motor_service, "Thunderloop: Poll MotorService", true);
+
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
                                                      loop_duration_seconds);
             }
@@ -325,11 +344,16 @@ Thunderloop::~Thunderloop() {}
                 primitive_executor_status_;
 
             // Update Redis
-            redis_client_->setNoCommit(ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
-                                       std::to_string(power_status_.battery_voltage()));
-            redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
-                                       std::to_string(power_status_.current_draw()));
-            redis_client_->asyncCommit();
+            {
+                ZoneNamedN(_tracy_redis, "Thunderloop: Commit to REDIS", true);
+
+                redis_client_->setNoCommit(
+                    ROBOT_BATTERY_VOLTAGE_REDIS_KEY,
+                    std::to_string(power_status_.battery_voltage()));
+                redis_client_->setNoCommit(ROBOT_CURRENT_DRAW_REDIS_KEY,
+                                           std::to_string(power_status_.current_draw()));
+                redis_client_->asyncCommit();
+            }
 
             updateErrorCodes();
         }
@@ -345,6 +369,8 @@ Thunderloop::~Thunderloop() {}
         // Calculate next shot taking into account how long this iteration took
         next_shot.tv_nsec += interval - static_cast<long int>(loop_duration_ns);
         timespecNorm(next_shot);
+
+        FrameMarkEnd(TracyConstants::THUNDERLOOP_FRAME_MARKER);
     }
 }
 
@@ -391,6 +417,34 @@ double Thunderloop::getCpuTemperature()
     }
 }
 
+bool isPowerStable(std::ifstream& log_file)
+{
+    // if the log file cannot be open, we would return false. Chances are, the battery
+    // power supply is indeed stable
+    if (!log_file.is_open())
+    {
+        LOG(WARNING) << "Cannot dmesg log file. Do you have permission?";
+        return true;
+    }
+
+    std::string line;
+    while (std::getline(log_file, line))
+    {
+        // if this lines exist, we know for sure that the battery is not stable!
+        if (line.find("soctherm: OC ALARM 0x00000001") != std::string::npos)
+        {
+            return false;
+        }
+    }
+
+    // We have reached the end of the line with the while loop from above. Therefore, we
+    // need to run std::ifstream::clear so that std::getline would return the new lines in
+    // the file stream.
+    log_file.clear();
+
+    return true;
+}
+
 void Thunderloop::updateErrorCodes()
 {
     // Clear existing codes
@@ -408,5 +462,11 @@ void Thunderloop::updateErrorCodes()
     if (jetson_status_.cpu_temperature() >= MAX_JETSON_TEMP_C)
     {
         robot_status_.mutable_error_code()->Add(TbotsProto::ErrorCode::HIGH_BOARD_TEMP);
+    }
+
+    if (!isPowerStable(log_file))
+    {
+        robot_status_.mutable_error_code()->Add(
+            TbotsProto::ErrorCode::UNSTABLE_POWER_SUPPLY);
     }
 }

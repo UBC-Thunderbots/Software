@@ -121,7 +121,7 @@ if __name__ == "__main__":
             if diagram:
 
                 # Regex match to extract FSM struct name
-                fsm_name = re.findall(r"struct\s+(\w+)\s*\{", fsm)[0]
+                fsm_name = re.findall(r"struct\s+(\w+)\s(?:\s:\s.)?{?", fsm)[0]
 
                 # Get file path to FSM header file relative to project root
                 file_path = file_path[file_path.find("src/") :]

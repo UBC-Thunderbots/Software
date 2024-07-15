@@ -12,17 +12,23 @@ import software.python_bindings as tbots_cpp
 from software.py_constants import *
 import proto.message_translation.tbots_protobuf as tbots_protobuf
 from software.thunderscope.robot_communication import RobotCommunication
-from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.constants import EstopMode, ProtoUnixIOTypes
 from software.thunderscope.estop_helpers import get_estop_config
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 import software.thunderscope.thunderscope_config as config
-from software.thunderscope.constants import CI_DURATION_S
+from software.thunderscope.constants import (
+    CI_DURATION_S,
+    ProtoUnixIOTypes,
+    SIM_TICK_RATE_MS,
+)
 from software.thunderscope.util import *
+
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
+
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
+
 
 NUM_ROBOTS = DIV_B_NUM_ROBOTS
 
@@ -144,6 +150,12 @@ if __name__ == "__main__":
         help="Which channel to communicate over",
     )
     parser.add_argument(
+        "--enable_radio",
+        action="store_true",
+        default=False,
+        help="Whether to use radio (True) or Wi-Fi (False) for sending primitives to robots",
+    )
+    parser.add_argument(
         "--visualization_buffer_size",
         action="store",
         type=int,
@@ -178,6 +190,12 @@ if __name__ == "__main__":
         default=False,
         help="Show TigersAutoref GUI",
     )
+    parser.add_argument(
+        "--sudo",
+        action="store_true",
+        default=False,
+        help="Run unix_full_system under sudo",
+    )
 
     estop_group = parser.add_mutually_exclusive_group()
     estop_group.add_argument(
@@ -193,9 +211,27 @@ if __name__ == "__main__":
         help="Disables checking for estop plugged in (ONLY USE FOR LOCAL TESTING)",
     )
 
-    # Sanity check that an interface was provided
+    parser.add_argument(
+        "--empty",
+        action="store_true",
+        default=False,
+        help="Whether to populate with default robot positions (False) or start with an empty field (True) for AI vs AI",
+    )
+
+    parser.add_argument(
+        "--launch_gc",
+        action="store_true",
+        default=False,
+        help="whether or not to launch the gamecontroller when --run_blue or --run_yellow is ran",
+    )
+
     args = parser.parse_args()
 
+    # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
+    if not args.run_blue and not args.run_yellow and args.launch_gc:
+        parser.error("--launch_gc has to be ran with --run_blue argument")
+
+    # Sanity check that an interface was provided
     if args.run_blue or args.run_yellow:
         if args.interface is None:
             parser.error("Must specify interface")
@@ -206,7 +242,7 @@ if __name__ == "__main__":
     # TODO (#2581) remove this
     if args.visualize_cpp_test:
 
-        runtime_dir = "/tmp/tbots/yellow_test"
+        runtime_dir = "/tmp/tbots/gtest_logs"
 
         try:
             os.makedirs(runtime_dir)
@@ -227,7 +263,9 @@ if __name__ == "__main__":
             {"proto_class": ObstacleList},
             {"proto_class": PathVisualization},
             {"proto_class": PassVisualization},
+            {"proto_class": AttackerVisualization},
             {"proto_class": CostVisualization},
+            {"proto_class": DebugShapes},
             {"proto_class": NamedValue},
             {"proto_class": PrimitiveSet},
             {"proto_class": World},
@@ -265,8 +303,6 @@ if __name__ == "__main__":
         )
         tscope = Thunderscope(config=tscope_config, layout_path=args.layout,)
 
-        current_proto_unix_io = None
-
         if args.run_blue:
             runtime_dir = args.blue_full_system_runtime_dir
             friendly_colour_yellow = False
@@ -285,12 +321,18 @@ if __name__ == "__main__":
             args.keyboard_estop, args.disable_communication
         )
 
-        with RobotCommunication(
+        with (
+            Gamecontroller(supress_logs=(not args.verbose), use_conventional_port=False)
+            if args.launch_gc
+            else contextlib.nullcontext()
+        ) as gamecontroller, RobotCommunication(
             current_proto_unix_io=current_proto_unix_io,
             multicast_channel=getRobotMulticastChannel(args.channel),
             interface=args.interface,
             estop_mode=estop_mode,
             estop_path=estop_path,
+            enable_radio=args.enable_radio,
+            referee_port=Gamecontroller.get_referee_port_static(gamecontroller),
         ) as robot_communication:
 
             if estop_mode == EstopMode.KEYBOARD_ESTOP:
@@ -317,11 +359,14 @@ if __name__ == "__main__":
                     if args.run_blue
                     else args.yellow_full_system_runtime_dir
                 )
-                with ProtoLogger(full_system_runtime_dir,) as logger, FullSystem(
-                    runtime_dir, debug, friendly_colour_yellow
+                with FullSystem(
+                    full_system_runtime_dir=runtime_dir,
+                    debug_full_system=debug,
+                    friendly_colour_yellow=friendly_colour_yellow,
+                    should_restart_on_crash=True,
+                    run_sudo=args.sudo,
                 ) as full_system:
 
-                    current_proto_unix_io.register_to_observe_everything(logger.buffer)
                     full_system.setup_proto_unix_io(current_proto_unix_io)
 
                     tscope.show()
@@ -364,7 +409,10 @@ if __name__ == "__main__":
             :param tick_rate_ms: The tick rate of the simulation
 
             """
-            sync_simulation(tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM], NUM_ROBOTS)
+            sync_simulation(
+                tscope.proto_unix_io_map[ProtoUnixIOTypes.SIM],
+                0 if args.empty else NUM_ROBOTS,
+            )
 
             if args.ci_mode:
                 async_sim_ticker(
@@ -383,14 +431,21 @@ if __name__ == "__main__":
         with Simulator(
             args.simulator_runtime_dir, args.debug_simulator, args.enable_realism
         ) as simulator, FullSystem(
-            args.blue_full_system_runtime_dir, args.debug_blue_full_system, False, False
+            full_system_runtime_dir=args.blue_full_system_runtime_dir,
+            debug_full_system=args.debug_blue_full_system,
+            friendly_colour_yellow=False,
+            should_restart_on_crash=False,
+            run_sudo=args.sudo,
+            running_in_realtime=(not args.ci_mode),
         ) as blue_fs, FullSystem(
-            args.yellow_full_system_runtime_dir,
-            args.debug_yellow_full_system,
-            True,
-            False,
+            full_system_runtime_dir=args.yellow_full_system_runtime_dir,
+            debug_full_system=args.debug_yellow_full_system,
+            friendly_colour_yellow=True,
+            should_restart_on_crash=False,
+            run_sudo=args.sudo,
+            running_in_realtime=(not args.ci_mode),
         ) as yellow_fs, Gamecontroller(
-            supress_logs=(not args.verbose), ci_mode=args.enable_autoref
+            supress_logs=(not args.verbose)
         ) as gamecontroller, (
             # Here we only initialize autoref if the --enable_autoref flag is requested.
             # To avoid nested Python withs, the autoref is initialized as None when this flag doesn't exist.
@@ -404,21 +459,11 @@ if __name__ == "__main__":
             )
             if args.enable_autoref
             else contextlib.nullcontext()
-        ) as autoref, ProtoLogger(
-            log_path=args.blue_full_system_runtime_dir,
-            time_provider=autoref.time_provider if args.enable_autoref else None,
-        ) as blue_logger, ProtoLogger(
-            log_path=args.yellow_full_system_runtime_dir,
-            time_provider=autoref.time_provider if args.enable_autoref else None,
-        ) as yellow_logger:
-            autoref_proto_unix_io = ProtoUnixIO()
+        ) as autoref:
 
-            tscope.proto_unix_io_map[
-                ProtoUnixIOTypes.BLUE
-            ].register_to_observe_everything(blue_logger.buffer)
-            tscope.proto_unix_io_map[
-                ProtoUnixIOTypes.YELLOW
-            ].register_to_observe_everything(yellow_logger.buffer)
+            tscope.register_refresh_function(gamecontroller.refresh)
+
+            autoref_proto_unix_io = ProtoUnixIO()
 
             blue_fs.setup_proto_unix_io(tscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE])
             yellow_fs.setup_proto_unix_io(

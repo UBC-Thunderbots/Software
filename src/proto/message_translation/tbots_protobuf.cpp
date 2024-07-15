@@ -331,6 +331,15 @@ std::unique_ptr<TbotsProto::PlotJugglerValue> createPlotJugglerValue(
     return plot_juggler_value_msg;
 }
 
+std::unique_ptr<TbotsProto::DebugShapes> createDebugShapes(
+    const std::vector<TbotsProto::DebugShapes::DebugShape>& debug_shapes)
+{
+    auto debug_shape_list_msg = std::make_unique<TbotsProto::DebugShapes>();
+    (*debug_shape_list_msg->mutable_debug_shapes()) = {debug_shapes.begin(),
+                                                       debug_shapes.end()};
+    return debug_shape_list_msg;
+}
+
 std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
 {
     auto timestamp_msg    = std::make_unique<TbotsProto::Timestamp>();
@@ -496,11 +505,33 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
             return robot_constants.robot_max_speed_m_per_s;
         case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
-            return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
+            return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND -
+                   STOP_COMMAND_SPEED_SAFETY_MARGIN_METERS_PER_SECOND;
         case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
             return COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND;
         default:
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;
     }
+}
+
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Circle& circle)
+{
+    auto shape_msg                 = std::make_unique<TbotsProto::Shape>();
+    (*shape_msg->mutable_circle()) = *createCircleProto(circle);
+    return shape_msg;
+}
+
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Polygon& polygon)
+{
+    auto shape_msg                  = std::make_unique<TbotsProto::Shape>();
+    (*shape_msg->mutable_polygon()) = *createPolygonProto(polygon);
+    return shape_msg;
+}
+
+std::unique_ptr<TbotsProto::Shape> createShapeProto(const Stadium& stadium)
+{
+    auto shape_msg                  = std::make_unique<TbotsProto::Shape>();
+    (*shape_msg->mutable_stadium()) = *createStadiumProto(stadium);
+    return shape_msg;
 }

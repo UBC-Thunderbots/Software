@@ -113,3 +113,9 @@ bool contains(const Rectangle& container, const Point& contained)
            p.x() <= r.negXNegYCorner().x() + r.diagonal().x() &&
            p.y() <= r.negXNegYCorner().y() + r.diagonal().y();
 }
+
+bool contains(const Stadium& container, const Point& contained)
+{
+    return distanceSquared(container.segment(), contained) <=
+           std::pow(container.radius(), 2);
+}

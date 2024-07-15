@@ -10,6 +10,7 @@ from software.thunderscope.constants import *
 from software.thunderscope.robot_diagnostics.motor_fault_view import MotorFaultView
 import time as time
 from typing import Type, List
+from collections import deque
 
 
 class BreakbeamLabel(QLabel):
@@ -100,7 +101,7 @@ class RobotInfo(QWidget):
         self.status_layout = QVBoxLayout()
 
         # Battery Bar
-        self.battery_layout = QHBoxLayout()
+        self.stats_layout = QHBoxLayout()
         self.battery_progress_bar = common_widgets.ColorProgressBar(
             MIN_BATTERY_VOLTAGE - self.BATTERY_MIN_OFFSET, MAX_BATTERY_VOLTAGE
         )
@@ -115,17 +116,33 @@ class RobotInfo(QWidget):
         # Stop primitive received indicator
         self.stop_primitive_label = QLabel()
         self.stop_primitive_label.setText("NA")
-        self.battery_layout.addWidget(self.stop_primitive_label)
+        self.stats_layout.addWidget(self.stop_primitive_label)
 
         # Primitive loss rate label
-        self.primitive_loss_rate_label = QLabel()
-        self.primitive_loss_rate_label.setText("P%NA")
-        self.battery_layout.addWidget(self.primitive_loss_rate_label)
+        self.primitive_loss_rate_label = common_widgets.ColorQLabel(
+            label_text="P%",
+            initial_value="NA",
+            max_val=MAX_ACCEPTABLE_PACKET_LOSS_PERCENT,
+        )
 
-        self.battery_layout.addWidget(self.battery_progress_bar)
-        self.battery_layout.addWidget(self.battery_label)
+        # Primitive round-trip time label and queue
+        self.primitive_rtt_label = common_widgets.ColorQLabel(
+            label_text="RTT:",
+            initial_value="NA",
+            max_val=MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
+            min_val=MIN_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME,
+        )
+        self.previous_primitive_rtt_values = deque(
+            maxlen=MAX_LENGTH_PRIMITIVE_SET_STORE
+        )
 
-        self.status_layout.addLayout(self.battery_layout)
+        self.stats_layout.addWidget(self.primitive_loss_rate_label)
+        self.stats_layout.addWidget(self.primitive_rtt_label)
+
+        self.stats_layout.addWidget(self.battery_progress_bar)
+        self.stats_layout.addWidget(self.battery_label)
+
+        self.status_layout.addLayout(self.stats_layout)
 
         # Control mode dropdown
         self.control_mode_layout = QHBoxLayout()
@@ -270,7 +287,7 @@ class RobotInfo(QWidget):
 
         return pixmap
 
-    def update(self, robot_status: RobotStatus):
+    def update(self, robot_status: RobotStatus, round_trip_time: RobotStatistic):
         """
         Receives parts of a RobotStatus message
 
@@ -279,12 +296,13 @@ class RobotInfo(QWidget):
         Then sets a timer callback to disconnect the robot if needed
 
         :param robot_status: The robot status message for this robot
+        :param round_trip_time: The round trip time proto for this robot's message
         """
         self.time_of_last_robot_status = time.time()
 
         self.robot_model.setPixmap(self.color_vision_pattern)
 
-        self.__update_ui(robot_status)
+        self.__update_ui(robot_status, round_trip_time)
 
         QtCore.QTimer.singleShot(DISCONNECT_DURATION_MS, self.disconnect_robot)
 
@@ -318,7 +336,9 @@ class RobotInfo(QWidget):
             f"background-color: {'green' if is_running else 'red'}; border: 1px solid black;"
         )
 
-    def __update_ui(self, robot_status: RobotStatus) -> None:
+    def __update_ui(
+        self, robot_status: RobotStatus, round_trip_time: RobotStatistic
+    ) -> None:
         """
         Receives important sections of RobotStatus proto for this robot and updates widget with alerts
         Checks for
@@ -328,18 +348,25 @@ class RobotInfo(QWidget):
             - If this robot has errors
             - If the robot is stopped or running
         :param robot_status: The robot status message for this robot
+        :param round_trip_time: The round trip time message for this robot
         """
         motor_status = robot_status.motor_status
         power_status = robot_status.power_status
         network_status = robot_status.network_status
         primitive_executor_status = robot_status.primitive_executor_status
+        rtt_time_seconds = round_trip_time.round_trip_time_seconds
 
         self.__update_stop_primitive(primitive_executor_status.running_primitive)
 
-        self.primitive_loss_rate_label.setText(
-            f"P%{network_status.primitive_packet_loss_percentage:02d}"
+        self.primitive_loss_rate_label.set_float_val(
+            network_status.primitive_packet_loss_percentage
         )
 
+        self.primitive_rtt_label.set_float_val(
+            self.__calculate_average_round_trip_time(
+                rtt_time_seconds * MILLISECONDS_PER_SECOND
+            )
+        )
         self.breakbeam_label.update_breakbeam_status(power_status.breakbeam_tripped)
 
         self.motor_fault_view.refresh(
@@ -350,3 +377,13 @@ class RobotInfo(QWidget):
         )
 
         self.battery_progress_bar.setValue(power_status.battery_voltage)
+
+    def __calculate_average_round_trip_time(self, new_time: float) -> int:
+        """
+        Logs the given round-trip time and calculates the average
+        :param new_time: The new round-trip time to add
+        :return: The mean integer value of the previous round-trip times in milliseconds
+        """
+        self.previous_primitive_rtt_values.append(new_time)
+        sum_rtt_time_milliseconds = sum(self.previous_primitive_rtt_values)
+        return int(sum_rtt_time_milliseconds / len(self.previous_primitive_rtt_values))

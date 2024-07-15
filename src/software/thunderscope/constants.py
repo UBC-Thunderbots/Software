@@ -1,9 +1,12 @@
 from pyqtgraph.Qt import QtCore, QtGui
+from OpenGL.GL import *
 from proto.import_all_protos import *
 from enum import Enum, IntEnum
 from proto.robot_log_msg_pb2 import LogLevel
 
 import textwrap
+
+SIM_TICK_RATE_MS = 16
 
 
 class ProtoUnixIOTypes(Enum):
@@ -79,6 +82,16 @@ class EstopMode(IntEnum):
     PHYSICAL_ESTOP = 2
 
 
+# the maximum packet / world loss percent indicated by UI
+MAX_ACCEPTABLE_PACKET_LOSS_PERCENT = 30
+
+# maximum / minimum acceptable round trip time values in milliseconds
+MAX_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME = 100
+MIN_ACCEPTABLE_MILLISECOND_ROUND_TRIP_TIME = 10
+
+# maximum cache length of the round-trip time deque
+MAX_LENGTH_PRIMITIVE_SET_STORE = 10
+
 LINE_WIDTH = 3
 SPEED_LINE_WIDTH = 2
 SPEED_SEGMENT_SCALE = 0.2
@@ -99,6 +112,8 @@ DEFAULT_EMPTY_FIELD_WORLD = World(
 # How long AI vs AI runs before ending in CI
 CI_DURATION_S = 180
 
+MULTI_PLANE_POINTS = 3
+
 ROBOT_RADIUS = 25
 
 BALL_HEIGHT_EFFECT_MULTIPLIER = 3
@@ -115,6 +130,9 @@ ROBOT_FATAL_TIMEOUT_S = 5
 # crash alert occurs
 ROBOT_CRASH_TIMEOUT_S = 5
 
+# FOV in degrees for top-down orthographic view
+ORTHOGRAPHIC_FOV_DEGREES = 1.0
+
 # LogLevel to string conversion map
 LOG_LEVEL_STR_MAP = {
     LogLevel.DEBUG: "DEBUG",
@@ -123,8 +141,6 @@ LOG_LEVEL_STR_MAP = {
     LogLevel.FATAL: "FATAL",
     LogLevel.CONTRACT: "CONTRACT",
 }
-
-GAME_CONTROLLER_URL = "http://localhost:8081"
 
 # Paths to check for estop when running diagnostics
 ESTOP_PATH_1 = "/dev/ttyACM0"
@@ -144,6 +160,8 @@ LAST_OPENED_LAYOUT_PATH = (
     f"{SAVED_LAYOUT_PATH}/last_opened_tscope_layout.{LAYOUT_FILE_EXTENSION}"
 )
 
+SIMULATION_SPEEDS = [2, 1, 0.5, 0.2, 0.1, 0.05]
+
 THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     f"""
     <h3>General Controls</h3><br>
@@ -152,9 +170,17 @@ THUNDERSCOPE_HELP_TEXT = textwrap.dedent(
     <b><code>M:</code></b> Toggle measure mode<br>
     <b><code>S:</code></b> Toggle visibility of robot/ball speed visualization<br>
     <b><code>Ctrl + Space:</code></b> Stop AI vs AI simulation<br>
+    <b><code>Ctrl + Up:</code></b> Increment simulation speed<br>
+    <b><code>Ctrl + Down:</code></b> Decrement simulation speed<br>
     <b><code>Number Keys:</code></b> Position camera to preset view<br>
     <b><code>Shift + Left Click:</code></b> Place the ball at the cursor<br>
     <b><code>Shift + Left Click Drag:</code></b> Place the ball at the cursor and kick it<br>
+    <b><code>Ctrl + Shift + Left Double Click:</code></b>
+    <ul style="margin: 0;">
+    <li>If no robot is present at cursor, adds a new friendly robot there</li>
+    <li>If a friendly robot is present at cursor, removes it</li>
+    </ul>
+    <b><code>Ctrl + Shift + Left Click Drag:</code></b> Moves a friendly robot along with the cursor
 
     <h3>Camera Controls</h3><br>
 
@@ -240,7 +266,6 @@ def rgb_to_bw(r: int, g: int, b: int) -> tuple:
 
 
 class Colors(object):
-
     DEFAULT_GRAPHICS_COLOR = QtGui.QColor(255, 255, 255, 128)
     FIELD_LINE_COLOR = QtGui.QColor(255, 255, 255, 200)
     FIELD_LINE_LIGHTER_COLOR = QtGui.QColor(255, 255, 255, 100)
@@ -255,8 +280,15 @@ class Colors(object):
     DESIRED_ROBOT_LOCATION_OUTLINE = QtGui.QColor(255, 0, 0, 255)
     NAVIGATOR_PATH_COLOR = QtGui.QColor(0, 255, 0, 255)
     NAVIGATOR_OBSTACLE_COLOR = QtGui.QColor(255, 80, 0, 100)
+    DEBUG_SHAPES_COLOR = QtGui.QColor(190, 50, 235, 255)
     PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
+    UNCOMMITTED_PASS_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 80)
+    COMMITTED_PASS_VISUALIZATION_COLOR = QtGui.QColor(0, 255, 255, 255)
+    SHOT_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 255)
+    CHIP_TARGET_VISUALIZATION_COLOR = QtGui.QColor(255, 0, 0, 255)
     BREAKBEAM_TRIPPED_COLOR = QtGui.QColor(255, 0, 0, 255)
+    AUTO_CHIP_ENABLED_COLOR = QtGui.QColor(215, 0, 200, 255)
+    AUTO_KICK_ENABLED_COLOR = QtGui.QColor(255, 0, 0, 255)
 
     VALIDATION_PASSED_COLOR = QtGui.QColor(0, 200, 0, 255)
     VALIDATION_FAILED_COLOR = QtGui.QColor(200, 0, 0, 255)
@@ -295,3 +327,42 @@ class DepthValues:
     FOREGROUND_DEPTH = 0
     ABOVE_FOREGROUND_DEPTH = 1
     OVERLAY_DEPTH = 2
+
+
+class TrailValues:
+    """Constants for Trails Visualization Layer in Thunderscope."""
+
+    DEFAULT_TRAIL_LENGTH = 20
+    DEFAULT_TRAIL_SAMPLING_RATE = 0
+
+
+class ProtoConfigurationConstant:
+    DEFAULT_SAVE_DIRECTORY = "/opt/tbotspython/thunderbots_configuration_proto"
+    DEFAULT_SAVE_PATH = DEFAULT_SAVE_DIRECTORY + "/default_configuration.proto"
+
+
+class CustomGLOptions:
+    """
+    Custom OpenGL Rendering modes that could be used in addition to
+    the ones provided by PyQtGraph in GLGraphicsItem.py GLOptions.
+    """
+
+    # Opaque rendering (i.e. overlapping colors are not blended) while
+    # also allowing for custom depth values to be set.
+    # This is useful when the graphics are overlaid on top of (e.g.) a
+    # yellow robot where the blended colors would not be easily visible.
+    OPAQUE_WITH_OUT_DEPTH_TEST = {
+        GL_DEPTH_TEST: False,
+        GL_BLEND: False,
+        GL_ALPHA_TEST: False,
+        GL_CULL_FACE: False,
+    }
+
+
+class ProtoPlayerFlags(Enum):
+    """
+    Flags set by the ProtoPlayer to indicate the state of the player
+    """
+
+    NO_ERROR_FLAG = 0
+    UNCAUGHT_EXCEPTION_FLAG = 1 << 0

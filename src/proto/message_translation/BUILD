@@ -14,6 +14,7 @@ cc_library(
         ":tbots_geometry",
         "//proto:tbots_cc_proto",
         "//proto:visualization_cc_proto",
+        "//software/ai/evaluation:shot",
         "//software/ai/navigator/trajectory:bang_bang_trajectory_1d_angular",
         "//software/ai/navigator/trajectory:trajectory_path",
         "//software/ai/passing:pass_with_rating",
@@ -45,6 +46,7 @@ cc_library(
         "//software/geom:circle",
         "//software/geom:point",
         "//software/geom:polygon",
+        "//software/geom:stadium",
         "//software/geom:vector",
     ],
 )

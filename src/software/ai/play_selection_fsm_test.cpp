@@ -204,3 +204,68 @@ TEST_F(PlaySelectionFSMTest,
     EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Playing>));
     EXPECT_EQ("OffensePlay", objectTypeName(*current_play));
 }
+
+TEST_F(PlaySelectionFSMTest, test_transition_between_ball_placement_and_free_kick)
+{
+    std::unique_ptr<Play> current_play = std::make_unique<HaltPlay>(ai_config);
+
+    // Start in halt
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
+        game_state, ai_config));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Halt>));
+    EXPECT_EQ("HaltPlay", objectTypeName(*current_play));
+
+    // Stop
+    game_state.updateRefereeCommand(RefereeCommand::STOP);
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
+        game_state, ai_config));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Stop>));
+    EXPECT_EQ("StopPlay", objectTypeName(*current_play));
+
+    // Friendly ball placement
+    game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_US);
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
+        game_state, ai_config));
+    EXPECT_TRUE(game_state.isOurBallPlacement());
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_EQ("BallPlacementPlay", objectTypeName(*current_play));
+
+    // Friendly free kick
+    game_state.updateRefereeCommand(RefereeCommand::DIRECT_FREE_US);
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
+        game_state, ai_config));
+    EXPECT_TRUE(game_state.isOurDirectFree());
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_EQ("FreeKickPlay", objectTypeName(*current_play));
+
+    // Enemy ball placement
+    game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
+        game_state, ai_config));
+    EXPECT_TRUE(game_state.isTheirBallPlacement());
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_EQ("EnemyBallPlacementPlay", objectTypeName(*current_play));
+
+    // Enemy free kick
+    game_state.updateRefereeCommand(RefereeCommand::DIRECT_FREE_THEM);
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
+        game_state, ai_config));
+    EXPECT_TRUE(game_state.isTheirDirectFree());
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::SetPlay>));
+    EXPECT_EQ("EnemyFreeKickPlay", objectTypeName(*current_play));
+
+    // Ball is kicked and restart state is cleared, enter playing state
+    game_state.setRestartCompleted();
+    fsm->process_event(PlaySelectionFSM::Update(
+        [&current_play](std::unique_ptr<Play> play) { current_play = std::move(play); },
+        game_state, ai_config));
+    EXPECT_TRUE(game_state.isPlaying());
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::Playing>));
+    EXPECT_EQ("OffensePlay", objectTypeName(*current_play));
+}

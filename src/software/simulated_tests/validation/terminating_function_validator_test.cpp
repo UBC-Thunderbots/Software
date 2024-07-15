@@ -14,7 +14,7 @@ TEST(TerminatingFunctionValidatorTest,
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {};
 
-    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    auto world = ::TestUtil::createBlankTestingWorld();
     TerminatingFunctionValidator function_validator(validation_function, world);
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
@@ -31,7 +31,7 @@ TEST(TerminatingFunctionValidatorTest,
         baz++;
     };
 
-    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    auto world = ::TestUtil::createBlankTestingWorld();
     TerminatingFunctionValidator function_validator(validation_function, world);
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
@@ -45,7 +45,7 @@ TEST(TerminatingFunctionValidatorTest,
         yield("Test message");
     };
 
-    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    auto world = ::TestUtil::createBlankTestingWorld();
     TerminatingFunctionValidator function_validator(validation_function, world);
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
@@ -66,7 +66,7 @@ TEST(TerminatingFunctionValidatorTest,
         yield("Test message");
     };
 
-    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    auto world = ::TestUtil::createBlankTestingWorld();
     TerminatingFunctionValidator function_validator(validation_function, world);
 
     for (unsigned int i = 0; i < 5; i++)
@@ -90,7 +90,7 @@ TEST(TerminatingFunctionValidatorTest,
         yield("Second validation not done yet");
     };
 
-    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    auto world = ::TestUtil::createBlankTestingWorld();
     TerminatingFunctionValidator function_validator(validation_function, world);
 
     bool result = function_validator.executeAndCheckForSuccess();
@@ -112,7 +112,7 @@ TEST(TerminatingFunctionValidatorTest,
         }
     };
 
-    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    auto world = ::TestUtil::createBlankTestingWorld();
     TerminatingFunctionValidator function_validator(validation_function, world);
 
     world->updateBall(
@@ -153,7 +153,7 @@ TEST(TerminatingFunctionValidatorTest,
         }
     };
 
-    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    auto world = ::TestUtil::createBlankTestingWorld();
     TerminatingFunctionValidator function_validator(validation_function, world);
 
     world->updateBall(
@@ -188,7 +188,7 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_error_message)
         }
     };
 
-    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    auto world = ::TestUtil::createBlankTestingWorld();
     TerminatingFunctionValidator function_validator(validation_function, world);
 
     world->updateRefereeCommand(RefereeCommand::STOP);

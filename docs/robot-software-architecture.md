@@ -36,7 +36,7 @@ To learn more about how it works, [see the RFC](https://docs.google.com/document
 
 # Thunderloop
 
-Thunderloop is software that runs in a loop. It continuously polls services (unrelated from Systemd) sending relevant control proto (`PowerControl`, `MotorControl`) and receiving back status proto. Currently we have a [Network](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/jetson_nano/services/network.cpp), [Power](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/jetson_nano/services/power.cpp) and [Motor service](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/jetson_nano/services/motor.cpp). Thunderloop also receives `World` and `PrimitiveSet` Proto from AI and sends back Robot Status.
+Thunderloop is software that runs in a loop. It continuously polls services (unrelated from Systemd) sending relevant control proto (`PowerControl`, `MotorControl`) and receiving back status proto. Currently we have a [Network](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/jetson_nano/services/network/network.cpp), [Power](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/jetson_nano/services/power.cpp) and [Motor service](https://github.com/UBC-Thunderbots/Software/blob/master/src/software/jetson_nano/services/motor.cpp). Thunderloop also receives `World` and `PrimitiveSet` Proto from AI and sends back Robot Status.
 
 Motor and Power service both interface with their respective electrical boards over different communication interfaces, namely SPI and UART respectively.
 

@@ -1,4 +1,4 @@
-import random
+from random import randint
 import time
 from collections import deque
 
@@ -7,7 +7,7 @@ from proto.visualization_pb2 import NamedValue
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.Qt import QtGui, QtCore
 
-from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
@@ -82,6 +82,7 @@ class ProtoPlotter(QWidget):
         self.legend.setParentItem(self.win.graphicsItem())
         self.window_secs = window_secs
         self.configuration = configuration
+        self.color_hue = randint(0, 360)
 
         self.buffers = {
             key: ThreadSafeBuffer(buffer_size, key) for key in configuration.keys()
@@ -92,6 +93,9 @@ class ProtoPlotter(QWidget):
         self.last_incoming_value = {}
         self.update_interval = 1.0 / plot_rate_hz
         self.buffer_size = buffer_size
+
+    def isVisible(self):
+        return self.win.isVisible()
 
     def refresh(self):
         """Refreshes ProtoPlotter and updates data in the respective
@@ -112,12 +116,11 @@ class ProtoPlotter(QWidget):
                     if name not in self.plots:
                         self.data_x[name] = deque([], self.buffer_size)
                         self.data_y[name] = deque([], self.buffer_size)
+
+                        # Ensure hue has sufficient contrast
+                        self.color_hue = (self.color_hue + randint(100, 260)) % 360
                         self.plots[name] = self.win.plot(
-                            pen=QtGui.QColor(
-                                random.randint(100, 255),
-                                random.randint(100, 255),
-                                random.randint(100, 255),
-                            ),
+                            pen=QtGui.QColor.fromHsl(self.color_hue, 255, 255 * 0.8),
                             name=name,
                             disableAutoRange=True,
                             brush=None,

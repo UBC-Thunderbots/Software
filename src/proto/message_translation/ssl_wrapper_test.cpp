@@ -59,7 +59,7 @@ TEST(SSLWrapperTest, test_create_wrapper_with_world_friendly_yellow)
 
     TeamColour friendly_team_colour = TeamColour::YELLOW;
 
-    World world = TestUtil::createBlankTestingWorld();
+    World world = *TestUtil::createBlankTestingWorld();
     world.updateFriendlyTeamState(Team(yellow_robots));
     world.updateEnemyTeamState(Team(blue_robots));
 
@@ -87,7 +87,7 @@ TEST(SSLWrapperTest, test_create_wrapper_with_world_friendly_not_yellow)
 
     TeamColour friendly_team_colour = TeamColour::BLUE;
 
-    World world = TestUtil::createBlankTestingWorld();
+    World world = *TestUtil::createBlankTestingWorld();
     world.updateFriendlyTeamState(Team(blue_robots));
     world.updateEnemyTeamState(Team(yellow_robots));
 

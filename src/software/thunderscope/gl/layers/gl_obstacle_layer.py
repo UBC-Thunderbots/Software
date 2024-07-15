@@ -7,6 +7,8 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.gl.layers.gl_layer import GLLayer
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_polygon import GLPolygon
+from software.thunderscope.gl.graphics.gl_stadium import GLStadium
+
 
 from software.thunderscope.gl.helpers.observable_list import ObservableList
 
@@ -29,6 +31,7 @@ class GLObstacleLayer(GLLayer):
 
         self.poly_obstacle_graphics = ObservableList(self._graphics_changed)
         self.circle_obstacle_graphics = ObservableList(self._graphics_changed)
+        self.stadium_obstacle_graphics = ObservableList(self._graphics_changed)
 
     def refresh_graphics(self) -> None:
         """Update graphics in this layer"""
@@ -36,9 +39,12 @@ class GLObstacleLayer(GLLayer):
 
         poly_obstacles = []
         circle_obstacles = []
+        stadium_obstacles = []
         for obstacle in obstacles:
             if obstacle.HasField("polygon"):
                 poly_obstacles.append(obstacle.polygon)
+            elif obstacle.HasField("stadium"):
+                stadium_obstacles.append(obstacle.stadium)
             else:
                 circle_obstacles.append(obstacle.circle)
 
@@ -50,6 +56,10 @@ class GLObstacleLayer(GLLayer):
         self.circle_obstacle_graphics.resize(
             len(circle_obstacles),
             lambda: GLCircle(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR),
+        )
+        self.stadium_obstacle_graphics.resize(
+            len(stadium_obstacles),
+            lambda: GLStadium(outline_color=Colors.NAVIGATOR_OBSTACLE_COLOR),
         )
 
         for poly_obstacle_graphic, poly_obstacle in zip(
@@ -70,3 +80,8 @@ class GLObstacleLayer(GLLayer):
             circle_obstacle_graphic.set_position(
                 circle_obstacle.origin.x_meters, circle_obstacle.origin.y_meters,
             )
+
+        for stadium_obstacle_graphic, stadium_obstacle in zip(
+            self.stadium_obstacle_graphics, stadium_obstacles
+        ):
+            stadium_obstacle_graphic.update_from_stadium(stadium_obstacle)

@@ -5,6 +5,7 @@ from pyqtgraph.opengl import *
 import math
 import numpy as np
 
+import software.python_bindings as tbots_cpp
 from proto.import_all_protos import *
 from software.py_constants import *
 from software.thunderscope.constants import (
@@ -13,7 +14,12 @@ from software.thunderscope.constants import (
     SPEED_SEGMENT_SCALE,
     DEFAULT_EMPTY_FIELD_WORLD,
     is_field_message_empty,
+    SIMULATION_SPEEDS,
+    LINE_WIDTH,
+    CustomGLOptions,
 )
+
+from typing import Dict, Tuple
 
 from software.thunderscope.gl.graphics.gl_circle import GLCircle
 from software.thunderscope.gl.graphics.gl_rect import GLRect
@@ -22,7 +28,7 @@ from software.thunderscope.gl.graphics.gl_robot import GLRobot
 from software.thunderscope.gl.graphics.gl_sphere import GLSphere
 from software.thunderscope.gl.graphics.gl_goal import GLGoal
 
-from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 
@@ -58,9 +64,14 @@ class GLWorldLayer(GLLayer):
         self.friendly_colour_yellow = friendly_colour_yellow
 
         self.world_buffer = ThreadSafeBuffer(buffer_size, World)
+        self.primitive_set_buffer = ThreadSafeBuffer(buffer_size, PrimitiveSet)
         self.robot_status_buffer = ThreadSafeBuffer(buffer_size, RobotStatus)
         self.referee_buffer = ThreadSafeBuffer(buffer_size, Referee, False)
+        self.simulation_state_buffer = ThreadSafeBuffer(buffer_size, SimulationState)
         self.cached_world = World()
+        # fields to store the team from the cached world state as a dict
+        self._cached_friendly_team = {}
+        self._cached_enemy_team = {}
         self.cached_robot_status = {}
 
         self.key_pressed = {}
@@ -69,6 +80,8 @@ class GLWorldLayer(GLLayer):
             Qt.Key.Key_I,
             Qt.Key.Key_Space,
             Qt.Key.Key_Shift,
+            Qt.Key.Key_Up,
+            Qt.Key.Key_Down,
         ]
         for key in self.accepted_keys:
             self.key_pressed[key] = False
@@ -76,6 +89,7 @@ class GLWorldLayer(GLLayer):
         self.display_robot_ids = True
         self.display_speed_lines = True
         self.is_playing = True
+        self.simulation_speed = 1.0
 
         self.ball_velocity_vector = None
         self.point_in_scene_picked = None
@@ -123,6 +137,8 @@ class GLWorldLayer(GLLayer):
         self.friendly_robot_id_graphics = ObservableList(self._graphics_changed)
         self.enemy_robot_id_graphics = ObservableList(self._graphics_changed)
         self.breakbeam_graphics = ObservableList(self._graphics_changed)
+        self.auto_kick_graphics = ObservableList(self._graphics_changed)
+        self.auto_chip_graphics = ObservableList(self._graphics_changed)
         self.speed_line_graphics = ObservableList(self._graphics_changed)
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
@@ -143,11 +159,59 @@ class GLWorldLayer(GLLayer):
             self.key_pressed[QtCore.Qt.Key.Key_Control]
             and self.key_pressed[QtCore.Qt.Key.Key_Space]
         ):
+            self.toggle_play_state()
 
-            simulator_state = SimulationState(is_playing=not self.is_playing)
-            self.is_playing = not self.is_playing
+        if (
+            self.key_pressed[QtCore.Qt.Key.Key_Control]
+            and self.key_pressed[QtCore.Qt.Key.Key_Up]
+        ):
+            self.increment_sim_speed()
 
-            self.simulator_io.send_proto(SimulationState, simulator_state)
+        if (
+            self.key_pressed[QtCore.Qt.Key.Key_Control]
+            and self.key_pressed[QtCore.Qt.Key.Key_Down]
+        ):
+            self.decrement_sim_speed()
+
+    def increment_sim_speed(self) -> None:
+        """Increment the simulation speed to the next fastest speed, if there's one"""
+        curr_sim_speed_index = SIMULATION_SPEEDS.index(self.simulation_speed)
+        new_simulation_speed = SIMULATION_SPEEDS[max(0, curr_sim_speed_index - 1)]
+        self.set_simulation_speed(new_simulation_speed)
+
+    def decrement_sim_speed(self) -> None:
+        """Decrement the simulation speed to the previous fastest speed, if there's one"""
+        curr_sim_speed_index = SIMULATION_SPEEDS.index(self.simulation_speed)
+        new_simulation_speed = SIMULATION_SPEEDS[
+            min(len(SIMULATION_SPEEDS) - 1, curr_sim_speed_index + 1)
+        ]
+        self.set_simulation_speed(new_simulation_speed)
+
+    def toggle_play_state(self) -> bool:
+        """
+        Pauses the simulated gameplay and toggles the play state
+        Calls all callback functions with the new play state
+        :return: the current play state
+        """
+        simulator_state = SimulationState(
+            is_playing=not self.is_playing, simulation_speed=self.simulation_speed
+        )
+        self.is_playing = not self.is_playing
+
+        self.simulator_io.send_proto(SimulationState, simulator_state)
+
+        return self.is_playing
+
+    def set_simulation_speed(self, speed: float) -> None:
+        """
+        Sets the speed of the simulator
+        :param speed: the new speed to set
+        """
+        self.simulation_speed = speed
+        simulator_state = SimulationState(
+            is_playing=self.is_playing, simulation_speed=self.simulation_speed
+        )
+        self.simulator_io.send_proto(SimulationState, simulator_state)
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         """Detect when a key has been released
@@ -163,7 +227,10 @@ class GLWorldLayer(GLLayer):
         :param event: The event
         
         """
-        self.point_in_scene_picked = self.__invert_position_if_defending_negative_half(
+        if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
+            return
+
+        self.point_in_scene_picked = self._invert_position_if_defending_negative_half(
             event.point_in_scene
         )
 
@@ -185,6 +252,9 @@ class GLWorldLayer(GLLayer):
         :param event: The event
         
         """
+        if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
+            return
+
         if not self.point_in_scene_picked:
             return
 
@@ -194,7 +264,7 @@ class GLWorldLayer(GLLayer):
         # mouse has moved away from the ball.
         self.ball_velocity_vector = (
             self.point_in_scene_picked
-            - self.__invert_position_if_defending_negative_half(event.point_in_scene)
+            - self._invert_position_if_defending_negative_half(event.point_in_scene)
         )
 
         # Cap the maximum kick speed
@@ -208,10 +278,13 @@ class GLWorldLayer(GLLayer):
         :param event: The event
         
         """
+        if not event.mouse_event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
+            return
+
         if not self.point_in_scene_picked or not self.ball_velocity_vector:
             return
 
-        if self.__should_invert_coordinate_frame():
+        if self._should_invert_coordinate_frame():
             self.ball_velocity_vector = -self.ball_velocity_vector
 
         # Send a command to the simulator to give the ball the specified
@@ -247,6 +320,42 @@ class GLWorldLayer(GLLayer):
         self.__update_goal_graphics(self.cached_world.field)
         self.__update_ball_graphics(self.cached_world.ball.current_state)
 
+        self._cached_friendly_team = {
+            robot.id: (
+                robot.current_state.global_position.x_meters,
+                robot.current_state.global_position.y_meters,
+                robot.current_state.global_orientation.radians,
+            )
+            for robot in self.cached_world.friendly_team.team_robots
+        }
+
+        self._cached_enemy_team = {
+            robot.id: (
+                robot.current_state.global_position.x_meters,
+                robot.current_state.global_position.y_meters,
+                robot.current_state.global_orientation.radians,
+            )
+            for robot in self.cached_world.enemy_team.team_robots
+        }
+
+        self._update_robots_graphics()
+
+        self.__update_robot_status_graphics()
+        self.__update_auto_chip_or_kick_graphics()
+        self.__update_speed_line_graphics()
+
+        # Update internal simulation state
+        simulation_state = self.simulation_state_buffer.get(
+            block=False, return_cached=False
+        )
+        if simulation_state:
+            self.is_playing = simulation_state.is_playing
+            self.simulation_speed = simulation_state.simulation_speed
+
+    def _update_robots_graphics(self) -> None:
+        """
+        Updates the GLGraphicsItems that display all robots (friendly and enemy team)
+        """
         friendly_colour = (
             Colors.YELLOW_ROBOT_COLOR
             if self.friendly_colour_yellow
@@ -259,20 +368,17 @@ class GLWorldLayer(GLLayer):
         )
 
         self.__update_robot_graphics(
-            self.cached_world.friendly_team,
+            self._cached_friendly_team,
             friendly_colour,
             self.friendly_robot_graphics,
             self.friendly_robot_id_graphics,
         )
         self.__update_robot_graphics(
-            self.cached_world.enemy_team,
+            self._cached_enemy_team,
             enemy_colour,
             self.enemy_robot_graphics,
             self.enemy_robot_id_graphics,
         )
-
-        self.__update_robot_status_graphics()
-        self.__update_speed_line_graphics()
 
     def __update_field_graphics(self, field: Field) -> None:
         """Update the GLGraphicsItems that display the field lines and markings
@@ -347,40 +453,39 @@ class GLWorldLayer(GLLayer):
 
     def __update_robot_graphics(
         self,
-        team: Team,
+        robots: Dict[int, Tuple[float, float, float]],
         color: QtGui.QColor,
         robot_graphics: ObservableList,
         robot_id_graphics: ObservableList,
     ) -> None:
         """Update the GLGraphicsItems that display the robots
         
-        :param team: The team proto
+        :param robots: a mapping of robot ids to a tuple containing x-coord, y-coord, and orientation
         :param color: The color of the robots
         :param robot_graphics: The ObservableList containing the robot graphics for this team
         :param robot_id_graphics: The ObservableList containing the robot ID graphics for this team
 
         """
         # Ensure we have the same number of graphics as robots
-        robot_graphics.resize(len(team.team_robots), lambda: GLRobot())
+        robot_graphics.resize(len(robots), lambda: GLRobot())
         robot_id_graphics.resize(
-            len(team.team_robots),
+            len(robots),
             lambda: GLTextItem(
                 font=QtGui.QFont("Roboto", 10, weight=700),
                 color=Colors.PRIMARY_TEXT_COLOR,
             ),
         )
 
-        for robot_graphic, robot_id_graphic, robot in zip(
-            robot_graphics, robot_id_graphics, team.team_robots,
+        for robot_graphic, robot_id_graphic, robot_id in zip(
+            robot_graphics, robot_id_graphics, robots.keys(),
         ):
-            robot_graphic.set_position(
-                robot.current_state.global_position.x_meters,
-                robot.current_state.global_position.y_meters,
-            )
-            robot_graphic.set_orientation(
-                math.degrees(robot.current_state.global_orientation.radians)
-            )
+            # update the robot graphic with the robot state
+            pos_x, pos_y, orientation = robots[robot_id]
+
+            robot_graphic.set_position(pos_x, pos_y)
+            robot_graphic.set_orientation(math.degrees(orientation))
             robot_graphic.setColor(color)
+            robot_graphic.show()
 
             if self.display_robot_ids:
                 robot_id_graphic.show()
@@ -388,11 +493,10 @@ class GLWorldLayer(GLLayer):
                 robot_id_graphic.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
 
                 robot_id_graphic.setData(
-                    text=str(robot.id),
+                    text=str(robot_id),
                     pos=[
-                        robot.current_state.global_position.x_meters
-                        - (ROBOT_MAX_RADIUS_METERS / 2),
-                        robot.current_state.global_position.y_meters,
+                        pos_x - (ROBOT_MAX_RADIUS_METERS / 2),
+                        pos_y,
                         ROBOT_MAX_HEIGHT_METERS + 0.1,
                     ],
                 )
@@ -442,6 +546,90 @@ class GLWorldLayer(GLLayer):
             else:
                 breakbeam_graphic.hide()
 
+    def __update_auto_chip_or_kick_graphics(self) -> None:
+        """Update the auto kick and auto chip graphics"""
+
+        # See which robots have auto kick or auto chip enabled
+        auto_kick_robots = []
+        auto_chip_robots = []
+        primitive_set = self.primitive_set_buffer.get(block=False)
+
+        for robot_id in primitive_set.robot_primitives:
+            primitive = primitive_set.robot_primitives[robot_id]
+
+            if primitive.HasField("move"):
+                autochip_or_kick = primitive.move.auto_chip_or_kick
+
+                if (
+                    autochip_or_kick.HasField("autokick_speed_m_per_s")
+                    and autochip_or_kick.autokick_speed_m_per_s > 0
+                ):
+                    auto_kick_robots.append(robot_id)
+                elif (
+                    autochip_or_kick.HasField("autochip_distance_meters")
+                    and autochip_or_kick.autochip_distance_meters > 0
+                ):
+                    auto_chip_robots.append(robot_id)
+
+        # Ensure we have the same number of graphics as robots
+        self.auto_chip_graphics.resize(
+            len(self.cached_world.friendly_team.team_robots),
+            lambda: GLPolygon(
+                outline_color=Colors.AUTO_CHIP_ENABLED_COLOR, line_width=LINE_WIDTH * 2
+            ),
+        )
+        self.auto_kick_graphics.resize(
+            len(self.cached_world.friendly_team.team_robots),
+            lambda: GLPolygon(
+                outline_color=Colors.AUTO_KICK_ENABLED_COLOR, line_width=LINE_WIDTH * 2
+            ),
+        )
+
+        def update_polygon(polygon_graphic: GLPolygon, robot: tbots_cpp.Robot) -> None:
+            """
+            Update the polygon graphic with the robot's dribbler area
+            :param polygon_graphic: The polygon graphic to update
+            :param robot: The robot to get the dribbler area from
+            """
+            polygon_graphic.updateGLOptions(CustomGLOptions.OPAQUE_WITH_OUT_DEPTH_TEST)
+            polygon_graphic.setDepthValue(DepthValues.ABOVE_FOREGROUND_DEPTH)
+
+            dribble_area_polygon_points = (
+                tbots_cpp.Robot(robot).dribblerArea().getPoints()
+            )
+            polygon_graphic.set_points(
+                [
+                    (
+                        dribble_area_polygon_points[0].x(),
+                        dribble_area_polygon_points[0].y(),
+                    ),
+                    (
+                        dribble_area_polygon_points[3].x(),
+                        dribble_area_polygon_points[3].y(),
+                    ),
+                ]
+            )
+
+        # Update the graphics
+        for auto_chip_graphic, auto_kick_graphic, robot in zip(
+            self.auto_chip_graphics,
+            self.auto_kick_graphics,
+            self.cached_world.friendly_team.team_robots,
+        ):
+            if robot.id in auto_chip_robots:
+                auto_chip_graphic.show()
+                auto_kick_graphic.hide()
+                update_polygon(auto_chip_graphic, robot)
+
+            elif robot.id in auto_kick_robots:
+                auto_kick_graphic.show()
+                auto_chip_graphic.hide()
+                update_polygon(auto_kick_graphic, robot)
+
+            else:
+                auto_chip_graphic.hide()
+                auto_kick_graphic.hide()
+
     def __update_speed_line_graphics(self) -> None:
         """Update the speed lines visualizing the robot and ball speeds"""
 
@@ -455,14 +643,14 @@ class GLWorldLayer(GLLayer):
             self.ball_kick_velocity_graphic.show()
             self.ball_kick_velocity_graphic.set_points(
                 [
-                    [
+                    (
                         ball_state.global_position.x_meters,
                         ball_state.global_position.y_meters,
-                    ],
-                    [
+                    ),
+                    (
                         ball_state.global_position.x_meters + velocity.x(),
                         ball_state.global_position.y_meters + velocity.y(),
-                    ],
+                    ),
                 ]
             )
 
@@ -494,7 +682,7 @@ class GLWorldLayer(GLLayer):
                 ]
             )
 
-    def __should_invert_coordinate_frame(self) -> bool:
+    def _should_invert_coordinate_frame(self) -> bool:
         """Our coordinate system always assumes that the friendly team is defending
         the negative half of the field.
 
@@ -515,7 +703,7 @@ class GLWorldLayer(GLLayer):
             return True
         return False
 
-    def __invert_position_if_defending_negative_half(
+    def _invert_position_if_defending_negative_half(
         self, point: QtGui.QVector3D
     ) -> QtGui.QVector3D:
         """If we are defending the negative half of the field, we invert the coordinate frame
@@ -525,6 +713,6 @@ class GLWorldLayer(GLLayer):
         :return: The inverted point location [x, y] (if needed to be inverted)
 
         """
-        if self.__should_invert_coordinate_frame():
+        if self._should_invert_coordinate_frame():
             return QtGui.QVector3D(-point[0], -point[1], point[2])
         return point

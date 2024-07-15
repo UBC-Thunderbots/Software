@@ -17,8 +17,8 @@ class Circle final : public ConvexShape
     /**
      * Creates a Circle with arbitrary origin and radius.
      *
-     * @param the origin of the Circle
-     * @param the radius of the Circle
+     * @param origin the origin of the Circle
+     * @param radius the radius of the Circle
      * @throws std::invalid_argument if passed a negative radius.
      */
     explicit Circle(const Point &origin, double radius);

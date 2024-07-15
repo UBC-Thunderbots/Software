@@ -56,3 +56,9 @@ message Segment
     required Point start = 1;
     required Point end   = 2;
 }
+
+message Stadium
+{
+    required Segment segment = 1;
+    required double radius   = 2;
+}

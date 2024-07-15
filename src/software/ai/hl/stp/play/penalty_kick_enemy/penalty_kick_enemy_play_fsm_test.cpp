@@ -8,14 +8,14 @@
 
 TEST(PenaltyKickEnemyPlayFSMTest, test_transitions)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::HALT);
-    world.updateGameState(game_state);
+    world->updateGameState(game_state);
     game_state.updateRefereeCommand(RefereeCommand::STOP);
-    world.updateGameState(game_state);
+    world->updateGameState(game_state);
     game_state.updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_THEM);
-    world.updateGameState(game_state);
+    world->updateGameState(game_state);
 
     TbotsProto::AiConfig ai_config;
 
@@ -36,7 +36,7 @@ TEST(PenaltyKickEnemyPlayFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<PenaltyKickEnemyPlayFSM::SetupPositionState>));
 
     game_state.updateRefereeCommand(RefereeCommand::NORMAL_START);
-    world.updateGameState(game_state);
+    world->updateGameState(game_state);
 
     fsm.process_event(PenaltyKickEnemyPlayFSM::Update(
         PenaltyKickEnemyPlayFSM::ControlParams{goalie_tactic},

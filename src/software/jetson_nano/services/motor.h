@@ -13,6 +13,12 @@
 class MotorService
 {
    public:
+    // SPI Chip Selects
+    static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
+    static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
+    static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
+    static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
+
     /**
      * Service that interacts with the motor board.
      * Opens all the required ports and maintains them until destroyed.
@@ -94,7 +100,6 @@ class MotorService
      */
     void setup();
 
-   private:
     /**
      * Holds motor fault information for a particular motor and whether any fault has
      * caused the motor to be disabled.
@@ -122,6 +127,53 @@ class MotorService
         {
         }
     };
+
+    /**
+     * Log the driver fault in a human readable log msg
+     *
+     * @param motor The motor to log the status for
+     *
+     * @return a struct containing the motor faults and whether the motor was disabled due
+     * to the fault
+     */
+    struct MotorFaultIndicator checkDriverFault(uint8_t motor);
+
+    /**
+     * Sets up motor as drive motor controllers
+     *
+     * @param motor drive motor number
+     */
+    void setUpDriveMotor(uint8_t motor);
+
+    /**
+     * Used for testing purposes:
+     *
+     * Wrapper function that writes int to the TMC4671
+     * @param motor drive motor number
+     * @param address motor address
+     * @param value write value
+     */
+    void writeIntToTMC4671(uint8_t motor, uint8_t address, int32_t value);
+
+    /**
+     * Used for testing purposes:
+     *
+     * Wrapper function that reads int from the TMC4671
+     * @param motor drive motor number
+     * @param address motor address
+     * @return read value
+     */
+    int readIntFromTMC4671(uint8_t motor, uint8_t address);
+
+   private:
+    /**
+     * Initializes Motor Service
+     *
+     * @param robot_constants robot constants for motor service
+     * @param control_loop_frequency_hz control loop frequency in Hertz
+     */
+    void motorServiceInit(const RobotConstants_t& robot_constants,
+                          int control_loop_frequency_hz);
 
     /**
      * Calls the configuration functions below in the right sequence
@@ -187,6 +239,34 @@ class MotorService
                      uint32_t spi_speed);
 
     /**
+     * Performs two back to back SPI transactions, first a read and then a write.
+     * NOTE: read_tx and write_tx must both be in BIG ENDIAN, as required by the
+     * Trinamic controller
+     *
+     * @param fd the SPI file descriptor to transfer data over
+     * @param read_tx pointer to the buffer containing the address for reading
+     * @param write_tx pointer to the buffer containing the address + data for write
+     * @param read_rx the buffer our read response will be placed in
+     * @param spi_speed the speed to run spi at
+     */
+    void readThenWriteSpiTransfer(int fd, const uint8_t* read_tx, uint8_t const* write_tx,
+                                  uint8_t const* read_rx, uint32_t spi_speed);
+
+    /**
+     * A function which is written in the same style as the rest of the Trinamic API.
+     * This will trigger two SPI transactions back to back, reading a value and then
+     * writing a value for a specific motor
+     *
+     * @param motor The motor we want to read & write from
+     * @param read_addr the address of the register to read
+     * @param write_addr the address of the register to write
+     * @param write_data the data to write
+     * @return the value read from the trinamic controller
+     */
+    int32_t tmc4671ReadThenWriteValue(uint8_t motor, uint8_t read_addr,
+                                      uint8_t write_addr, int32_t write_data);
+
+    /**
      * Trinamic API Binding function
      *
      * @param motor Which motor to talk to (in our case, the chip select)
@@ -199,16 +279,6 @@ class MotorService
     uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer,
                           uint32_t spi_speed);
 
-
-    /**
-     * Log the driver fault in a human readable log msg
-     *
-     * @param motor The motor to log the status for
-     *
-     * @return a struct containing the motor faults and whether the motor was disabled due
-     * to the fault
-     */
-    struct MotorFaultIndicator checkDriverFault(uint8_t motor);
 
     /**
      * Spin each motor of the NUM_DRIVE_MOTORS in open loop mode to check if the encoder
@@ -252,6 +322,15 @@ class MotorService
      */
     bool requiresMotorReinit(uint8_t motor);
 
+    // All trinamic RPMS are electrical RPMS, they don't factor in the number of pole
+    // pairs of the drive motor.
+    //
+    // TODO (#2720): compute from robot constants (this was computed by hand and is
+    // accurate)
+    static constexpr double MECHANICAL_MPS_PER_ELECTRICAL_RPM = 0.000111;
+    static constexpr double ELECTRICAL_RPM_PER_MECHANICAL_MPS =
+        1 / MECHANICAL_MPS_PER_ELECTRICAL_RPM;
+
     // to check if the motors have been calibrated
     bool is_initialized_ = false;
 
@@ -263,9 +342,14 @@ class MotorService
     Gpio driver_control_enable_gpio_;
     Gpio reset_gpio_;
 
-    // Transfer Buffers
+    // Transfer Buffers for spiTransfer
     uint8_t tx_[5] = {0};
     uint8_t rx_[5] = {0};
+
+    // Transfer Buffers for readThenWriteSpiTransfer
+    uint8_t write_tx_[5] = {0};
+    uint8_t read_tx_[5]  = {0};
+    uint8_t read_rx_[5]  = {0};
 
     // Transfer State
     bool transfer_started_  = false;
@@ -286,6 +370,11 @@ class MotorService
     // Previous wheel velocities
     WheelSpace_t prev_wheel_velocities_;
 
+    int front_left_target_rpm  = 0;
+    int front_right_target_rpm = 0;
+    int back_left_target_rpm   = 0;
+    int back_right_target_rpm  = 0;
+
     // the motor cs id to check for motor faults
     uint8_t motor_fault_detector_;
 
@@ -296,12 +385,6 @@ class MotorService
     std::optional<std::chrono::time_point<std::chrono::system_clock>>
         tracked_motor_fault_start_time_;
     int num_tracked_motor_resets_;
-
-    // SPI Chip Selects
-    static const uint8_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-    static const uint8_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
-    static const uint8_t BACK_LEFT_MOTOR_CHIP_SELECT   = 1;
-    static const uint8_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 2;
 
     static const uint8_t DRIBBLER_MOTOR_CHIP_SELECT = 4;
 

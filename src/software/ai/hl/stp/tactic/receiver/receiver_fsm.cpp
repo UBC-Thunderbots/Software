@@ -74,29 +74,25 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
     // The percentage of open net the robot would shoot on
     if (best_shot_opt)
     {
-        // Vector from the ball to the robot
         Vector robot_to_ball = world.ball().position() - assigned_robot.position();
 
         // The angle the robot will have to deflect the ball to shoot
-        Angle abs_angle_between_pass_and_shot_vectors;
-
         Vector robot_to_shot_target =
             best_shot_opt.value().getPointToShootAt() - assigned_robot.position();
-        abs_angle_between_pass_and_shot_vectors =
-            convexAngle(robot_to_ball, robot_to_shot_target);
+        double abs_angle_deg_between_pass_and_shot_vectors =
+            convexAngle(robot_to_ball, robot_to_shot_target).toDegrees();
 
-        Angle goal_angle =
-            convexAngle(world.field().friendlyGoalpostPos(), assigned_robot.position(),
-                        world.field().friendlyGoalpostNeg());
-
-        double net_percent_open =
-            best_shot_opt.value().getOpenAngle().toDegrees() / goal_angle.toDegrees();
+        double shot_open_angle = best_shot_opt.value().getOpenAngle().toDegrees();
+        double min_one_touch_open_angle =
+            receiver_tactic_config.min_open_angle_for_one_touch_deg();
+        double max_one_touch_deflection_angle =
+            receiver_tactic_config.max_deflection_for_one_touch_deg();
 
         // If we have a shot with a sufficiently large enough opening, and the
         // deflection angle that is reasonable, we should one-touch kick the ball
         // towards the enemy net
-        if (net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
-            abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
+        if (shot_open_angle > min_one_touch_open_angle &&
+            abs_angle_deg_between_pass_and_shot_vectors < max_one_touch_deflection_angle)
         {
             return best_shot_opt;
         }
@@ -108,23 +104,28 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
 bool ReceiverFSM::onetouchPossible(const Update& event)
 {
     return !event.control_params.disable_one_touch_shot &&
-           (findFeasibleShot(event.common.world, event.common.robot) != std::nullopt);
+           receiver_tactic_config.enable_one_touch_kick() &&
+           (findFeasibleShot(*event.common.world_ptr, event.common.robot) !=
+            std::nullopt);
 }
 
 void ReceiverFSM::updateOnetouch(const Update& event)
 {
-    auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
-    auto one_touch = getOneTouchShotPositionAndOrientation(
-        event.common.robot, event.common.world.ball(), best_shot->getPointToShootAt());
+    auto best_shot = findFeasibleShot(*event.common.world_ptr, event.common.robot);
 
-    if (best_shot && event.control_params.pass)
+    if (best_shot.has_value() && event.control_params.pass)
     {
+        auto one_touch = getOneTouchShotPositionAndOrientation(
+            event.common.robot, event.common.world_ptr->ball(),
+            best_shot->getPointToShootAt());
+
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, one_touch.getPointToShootAt(), one_touch.getOpenAngle(),
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                           BALL_MAX_SPEED_METERS_PER_SECOND}));
+                           BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}));
     }
     else
     {
@@ -140,6 +141,7 @@ void ReceiverFSM::updateReceive(const Update& event)
             event.common.robot, event.control_params.pass->receiverPoint(),
             event.control_params.pass->receiverOrientation(),
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
     }
@@ -147,7 +149,7 @@ void ReceiverFSM::updateReceive(const Update& event)
 
 void ReceiverFSM::adjustReceive(const Update& event)
 {
-    auto ball      = event.common.world.ball();
+    auto ball      = event.common.world_ptr->ball();
     auto robot_pos = event.common.robot.position();
 
     if ((ball.position() - robot_pos).length() >
@@ -166,6 +168,7 @@ void ReceiverFSM::adjustReceive(const Update& event)
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, ball_receive_pos, ball_receive_orientation,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
     }
@@ -173,7 +176,7 @@ void ReceiverFSM::adjustReceive(const Update& event)
 
 bool ReceiverFSM::passStarted(const Update& event)
 {
-    return event.common.world.ball().hasBallBeenKicked(
+    return event.common.world_ptr->ball().hasBallBeenKicked(
         event.control_params.pass->passerOrientation());
 }
 
@@ -181,24 +184,25 @@ bool ReceiverFSM::passFinished(const Update& event)
 {
     // We tolerate imperfect passes that hit the edges of the robot,
     // so that we can quickly transition out and grab the ball.
-    return event.common.robot.isNearDribbler(event.common.world.ball().position());
+    return event.common.robot.isNearDribbler(event.common.world_ptr->ball().position());
 }
 
 bool ReceiverFSM::strayPass(const Update& event)
 {
-    auto ball_position = event.common.world.ball().position();
+    auto ball_position = event.common.world_ptr->ball().position();
 
     Vector ball_receiver_point_vector(
         event.control_params.pass->receiverPoint().x() - ball_position.x(),
         event.control_params.pass->receiverPoint().y() - ball_position.y());
 
-    auto orientation_difference = event.common.world.ball().velocity().orientation() -
-                                  ball_receiver_point_vector.orientation();
+    auto orientation_difference =
+        event.common.world_ptr->ball().velocity().orientation() -
+        ball_receiver_point_vector.orientation();
 
     // if pass has strayed far from its intended destination (ex it was deflected)
     // we consider the pass finished
     bool stray_pass =
-        event.common.world.ball().velocity().length() > MIN_STRAY_PASS_SPEED &&
+        event.common.world_ptr->ball().velocity().length() > MIN_STRAY_PASS_SPEED &&
         orientation_difference > MIN_STRAY_PASS_ANGLE;
 
     return stray_pass;

@@ -12,7 +12,8 @@ class CreaseDefensePlay : public Play
    public:
     CreaseDefensePlay(TbotsProto::AiConfig config);
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield,
+                        const WorldPtr &world_ptr) override;
     void updateTactics(const PlayUpdate &play_update) override;
 
     /**

@@ -17,16 +17,16 @@ TEST_P(GoalieTacticChipTest, test_find_good_chip_targets)
     std::vector<Point> enemy_robot_positions = std::get<0>(GetParam());
     Rectangle expected_chip_region_to_avoid  = std::get<1>(GetParam());
 
-    World world = TestUtil::createBlankTestingWorld();
-    world = TestUtil::setEnemyRobotPositions(world, enemy_robot_positions, Timestamp());
-    world.updateBall(Ball(world.field().friendlyGoalCenter(), Vector(), Timestamp()));
+    std::shared_ptr<World> world = TestUtil::createBlankTestingWorld();
+    TestUtil::setEnemyRobotPositions(world, enemy_robot_positions, Timestamp());
+    world->updateBall(Ball(world->field().friendlyGoalCenter(), Vector(), Timestamp()));
 
-    Point chip_target = GoalieFSM::findGoodChipTarget(world, goalie_tactic_config);
+    Point chip_target = GoalieFSM::findGoodChipTarget(*world, goalie_tactic_config);
 
     // Chip target should be in region in front of friendly defense area
-    EXPECT_TRUE(contains(Rectangle(world.field().friendlyCornerPos() +
-                                       Vector(world.field().defenseAreaXLength(), 0),
-                                   world.field().enemyCornerNeg()),
+    EXPECT_TRUE(contains(Rectangle(world->field().friendlyCornerPos() +
+                                       Vector(world->field().defenseAreaXLength(), 0),
+                                   world->field().enemyCornerNeg()),
                          chip_target));
 
     EXPECT_FALSE(contains(expected_chip_region_to_avoid, chip_target));

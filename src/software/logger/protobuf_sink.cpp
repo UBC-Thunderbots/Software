@@ -7,7 +7,9 @@
 #include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 
-ProtobufSink::ProtobufSink(std::string runtime_dir)
+ProtobufSink::ProtobufSink(std::string runtime_dir,
+                           const std::shared_ptr<ProtoLogger>& proto_logger)
+    : proto_logger(proto_logger)
 {
     // Setup the logs
     unix_senders_["log"] = std::make_unique<ThreadedUnixSender>(runtime_dir + "/log");
@@ -29,7 +31,12 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
             msg.substr(file_name_pos + TYPE_DELIMITER.length(),
                        proto_type_name_pos - TYPE_DELIMITER.length());
         std::string serialized_proto =
-            msg.substr(proto_type_name_pos + TYPE_DELIMITER.length());
+            base64_decode(msg.substr(proto_type_name_pos + TYPE_DELIMITER.length()));
+
+        if (proto_logger)
+        {
+            proto_logger->saveSerializedProto(proto_type_name, serialized_proto);
+        }
 
         // Use the protobuf type as the file name, if no file name was specified in the
         // message
@@ -76,15 +83,10 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
 
 std::ostream& operator<<(std::ostream& os, const google::protobuf::Message& message)
 {
-    // Pack into Any
-    google::protobuf::Any any;
-    any.PackFrom(message);
-
-    // Serialize into any
-    std::string serialized_any;
-    any.SerializeToString(&serialized_any);
-
+    // We have to base64 encode the serialized protobuf before sending it to
+    // g3log since g3log treats \n characters as a new log msg which breaks the serialized
+    // protobuf
     os << TYPE_DELIMITER << message.GetTypeName() << TYPE_DELIMITER
-       << base64_encode(serialized_any);
+       << base64_encode(message.SerializeAsString());
     return os;
 }

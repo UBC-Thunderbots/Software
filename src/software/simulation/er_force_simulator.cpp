@@ -309,9 +309,12 @@ void ErForceSimulator::setYellowRobotPrimitiveSet(
     const TbotsProto::World world_proto = *yellow_team_world_msg;
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
-        setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
-                          world_proto, local_vel, angular_vel);
+        if (robot_to_vel_pair_map.contains(robot_id))
+        {
+            auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
+            setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
+                              world_proto, local_vel, angular_vel);
+        }
     }
 }
 
@@ -325,11 +328,15 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
 
     blue_team_world_msg                 = std::move(world_msg);
     const TbotsProto::World world_proto = *blue_team_world_msg;
+
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
-        setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
-                          world_proto, local_vel, angular_vel);
+        if (robot_to_vel_pair_map.contains(robot_id))
+        {
+            auto& [local_vel, angular_vel] = robot_to_vel_pair_map.at(robot_id);
+            setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
+                              world_proto, local_vel, angular_vel);
+        }
     }
 }
 

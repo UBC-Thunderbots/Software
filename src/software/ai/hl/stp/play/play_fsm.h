@@ -23,11 +23,11 @@ using SetInterPlayCommunicationCallback = std::function<void(InterPlayCommunicat
 // The play update struct is used to update plays and set the new tactics
 struct PlayUpdate
 {
-    PlayUpdate(const World& world, unsigned int num_tactics,
+    PlayUpdate(const WorldPtr& world_ptr, unsigned int num_tactics,
                const SetTacticsCallback& set_tactics_fun,
                const InterPlayCommunication& inter_play_communication,
                const SetInterPlayCommunicationCallback& set_inter_play_communication_fun)
-        : world(world),
+        : world_ptr(world_ptr),
           num_tactics(num_tactics),
           set_tactics(set_tactics_fun),
           inter_play_communication(inter_play_communication),
@@ -35,7 +35,7 @@ struct PlayUpdate
     {
     }
     // updated world
-    World world;
+    WorldPtr world_ptr;
     // Number of tactics to set
     unsigned int num_tactics;
     // callback to return the next tactics

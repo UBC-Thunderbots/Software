@@ -11,7 +11,7 @@ DribblingParcourPlay::DribblingParcourPlay(TbotsProto::AiConfig config)
 }
 
 void DribblingParcourPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                          const World &world)
+                                          const WorldPtr &world_ptr)
 {
     std::shared_ptr<DribbleTactic> dribble_tactic =
         std::make_shared<DribbleTactic>(ai_config);
@@ -21,7 +21,7 @@ void DribblingParcourPlay::getNextTactics(TacticCoroutine::push_type &yield,
     do
     {
         TacticVector result = {};
-        if (world.gameState().isPlaying())
+        if (world_ptr->gameState().isPlaying())
         {
             // TODO (#2108): implement parcour
             result.emplace_back(dribble_tactic);

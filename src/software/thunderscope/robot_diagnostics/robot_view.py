@@ -7,6 +7,7 @@ from software.py_constants import *
 from proto.import_all_protos import *
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.robot_diagnostics.robot_info import RobotInfo
+from software.thunderscope.robot_diagnostics.robot_status import RobotStatusView
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from typing import Type
 
@@ -67,14 +68,17 @@ class RobotViewComponent(QWidget):
 
         self.robot_status.toggle_visibility()
 
-    def update(self, robot_status: RobotStatus) -> None:
+    def update(
+        self, robot_status: RobotStatus, round_trip_time: RobotStatistic
+    ) -> None:
         """
         Updates the Robot View Components with the new robot status message
         Updates the robot info widget and, if initialized, the robot status widget as well
 
         :param robot_status: the new message data to update the widget with
+        :param round_trip_time: robot statistic proto to update with new metrics
         """
-        self.robot_info.update(robot_status)
+        self.robot_info.update(robot_status, round_trip_time)
         if self.robot_status:
             self.robot_status.update(robot_status)
 
@@ -101,6 +105,7 @@ class RobotView(QScrollArea):
         super().__init__()
 
         self.robot_status_buffer = ThreadSafeBuffer(10, RobotStatus)
+        self.round_trip_time_buffer = ThreadSafeBuffer(10, RobotStatistic)
 
         self.layout = QVBoxLayout()
 
@@ -129,9 +134,11 @@ class RobotView(QScrollArea):
         Until the buffer is empty
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
+        round_trip_time = self.round_trip_time_buffer.get(
+            block=False, return_cached=False
+        )
 
-        while robot_status is not None:
-            self.robot_view_widgets[robot_status.robot_id].update(robot_status)
-            robot_status = self.robot_status_buffer.get(
-                block=False, return_cached=False
+        if robot_status is not None and round_trip_time is not None:
+            self.robot_view_widgets[robot_status.robot_id].update(
+                robot_status, round_trip_time
             )

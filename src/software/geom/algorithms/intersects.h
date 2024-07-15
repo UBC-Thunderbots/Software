@@ -4,6 +4,7 @@
 #include "software/geom/polygon.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
+#include "software/geom/stadium.h"
 
 /**
  * Set of functions that determines if two geometric objects intersect,
@@ -83,3 +84,60 @@ bool intersects(const Segment &first, const Segment &second);
  */
 bool intersects(const Ray &first, const Segment &second);
 bool intersects(const Segment &first, const Ray &second);
+
+/**
+ * Returns true if the Stadium intersects the Ray, false otherwise
+ *
+ * @param first
+ * @param second
+ * @return true if the Stadium intersects the Ray, false otherwise
+ */
+bool intersects(const Stadium &first, const Ray &second);
+bool intersects(const Ray &first, const Stadium &second);
+
+/**
+ * Returns true if the Stadium intersects the Circle, false otherwise
+ * An intersection is defined here as an overlap of the shapes, so a stadium
+ * containing a circle is an intersection.
+ *
+ * @param first
+ * @param second
+ * @return true if the Stadium intersects the Circle, false otherwise
+ */
+bool intersects(const Stadium &first, const Circle &second);
+bool intersects(const Circle &first, const Stadium &second);
+
+/**
+ * Returns true if the Stadium intersects the Segment, false otherwise
+ * An intersection is defined here as an overlap of the shapes, so a stadium
+ * containing a segment is an intersection.
+ *
+ * @param first
+ * @param second
+ * @return true if the Stadium intersects the Segment, false otherwise
+ */
+bool intersects(const Stadium &first, const Segment &second);
+bool intersects(const Segment &first, const Stadium &second);
+
+/**
+ * Returns true if the Stadium intersects the Polygon, false otherwise
+ * An intersection is defined here as an overlap of the shapes, so a stadium
+ * containing a polygon is an intersection.
+ *
+ * @param first
+ * @param second
+ * @return true if the Stadium intersects the Polygon, false otherwise
+ */
+bool intersects(const Stadium &first, const Polygon &second);
+bool intersects(const Polygon &first, const Stadium &second);
+
+/**
+ * Returns true if the Stadium intersects the other Stadium, false otherwise
+ * An intersection is defined here as an overlap of the shapes, so a stadium
+ * containing a stadium is an intersection.
+ *
+ * @param first
+ * @param second
+ * @return true if the Stadium intersects the other Stadium, false otherwise
+ */
+bool intersects(const Stadium &first, const Stadium &second);

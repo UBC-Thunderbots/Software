@@ -45,3 +45,17 @@ TEST(AxisAlignedBoundingBoxTest, bounding_box_of_polygon_with_inflation_radius)
     Rectangle bounding_box = axisAlignedBoundingBox(polygon, 0.5);
     EXPECT_EQ(bounding_box, Rectangle(Point(-0.5, -0.5), Point(1.5, 2.5)));
 }
+
+TEST(AxisAlignedBoundingBoxTest, bounding_box_of_stadium)
+{
+    Stadium stadium(Point(0, 0), Point(3, 0), 1);
+    Rectangle bounding_box = axisAlignedBoundingBox(stadium);
+    EXPECT_EQ(bounding_box, Rectangle(Point(-1, -1), Point(4, 1)));
+}
+
+TEST(AxisAlignedBoundingBoxTest, bounding_box_of_stadium_with_inflation_radius)
+{
+    Stadium stadium(Point(0, 0), Point(3, 0), 1);
+    Rectangle bounding_box = axisAlignedBoundingBox(stadium, 0.5);
+    EXPECT_EQ(bounding_box, Rectangle(Point(-1.5, -1.5), Point(4.5, 1.5)));
+}

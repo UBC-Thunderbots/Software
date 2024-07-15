@@ -28,8 +28,10 @@ cc_library(
         "//software/jetson_nano/services:power",
         "//software/jetson_nano/services/network",
         "//software/logger:network_logger",
+        "//software/tracy:tracy_constants",
         "//software/util/scoped_timespec_timer",
         "//software/world:team",
+        "@tracy",
     ],
 )
 
@@ -61,4 +63,13 @@ cc_binary(
 sh_binary(
     name = "setup_nano",
     srcs = ["setup_nano.sh"],
+)
+
+cc_test(
+    name = "test_battery",
+    srcs = ["battery_test.cpp"],
+    deps = [
+        ":thunderloop",
+        "//shared/test_util:tbots_gtest_main",
+    ],
 )

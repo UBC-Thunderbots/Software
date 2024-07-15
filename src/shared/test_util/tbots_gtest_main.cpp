@@ -11,7 +11,7 @@ bool TbotsGtestMain::help                = false;
 bool TbotsGtestMain::enable_visualizer   = false;
 bool TbotsGtestMain::run_sim_in_realtime = false;
 bool TbotsGtestMain::stop_ai_on_start    = false;
-std::string TbotsGtestMain::runtime_dir  = "/tmp/tbots/yellow_test";
+std::string TbotsGtestMain::runtime_dir  = "/tmp/tbots/gtest_logs";
 double TbotsGtestMain::test_speed        = 1.0;
 
 
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
     if (!TbotsGtestMain::help)
     {
-        LoggerSingleton::initializeLogger(TbotsGtestMain::runtime_dir);
+        LoggerSingleton::initializeLogger(TbotsGtestMain::runtime_dir, nullptr);
 
         if (TbotsGtestMain::enable_visualizer || TbotsGtestMain::run_sim_in_realtime)
         {

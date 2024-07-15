@@ -11,7 +11,7 @@ PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(TbotsProto::AiConfig config)
 }
 
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                          const World &world)
+                                          const WorldPtr &world_ptr)
 {
     // This function doesn't get called, it should be removed once coroutines
     // are phased out

@@ -27,7 +27,10 @@ cc_library(
     name = "segment",
     srcs = ["segment.cpp"],
     hdrs = ["segment.h"],
-    deps = [":point"],
+    deps = [
+        ":point",
+        ":vector",
+    ],
 )
 
 cc_library(
@@ -215,6 +218,29 @@ cc_library(
     deps = [
         ":bezier_curve2d",
         ":spline2d",
+    ],
+)
+
+cc_library(
+    name = "stadium",
+    srcs = ["stadium.cpp"],
+    hdrs = ["stadium.h"],
+    deps = [
+        ":convex_shape",
+        ":point",
+        ":polygon",
+        ":segment",
+    ],
+)
+
+cc_test(
+    name = "stadium_test",
+    srcs = [
+        "stadium_test.cpp",
+    ],
+    deps = [
+        ":stadium",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 

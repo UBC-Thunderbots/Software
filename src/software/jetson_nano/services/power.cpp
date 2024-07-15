@@ -8,9 +8,11 @@
 
 PowerService::PowerService()
 {
+    nanopb_command = createNanoPbPowerPulseControl(TbotsProto::PowerControl(), 0.0, 0, 0);
+
     if (!boost::filesystem::exists(DEVICE_SERIAL_PORT))
     {
-        LOG(FATAL) << "PLUG THE USB INTO THE JETSON NANO";
+        throw std::runtime_error("USB not plugged into the Jetson Nano");
     }
     this->uart = std::make_unique<BoostUartCommunication>(BAUD_RATE, DEVICE_SERIAL_PORT);
     this->read_thread = std::thread(boost::bind(&PowerService::continuousRead, this));
@@ -18,12 +20,13 @@ PowerService::PowerService()
 
 PowerService::~PowerService()
 {
+    is_running = false;
     read_thread.join();
 }
 
 void PowerService::continuousRead()
 {
-    for (;;)
+    while (is_running)
     {
         tick();
     }

@@ -40,3 +40,5 @@ class PivotKickTactic : public Tactic
     PivotKickFSM::ControlParams control_params;
     TbotsProto::AiConfig ai_config;
 };
+
+COPY_TACTIC(WallKickoffTactic, PivotKickTactic)

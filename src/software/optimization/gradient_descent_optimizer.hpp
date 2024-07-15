@@ -22,7 +22,7 @@
  * This class uses an implementation of "Adam" (Adaptive Moment) Gradient Descent:
  * https://machinelearningmastery.com/adam-optimization-algorithm-for-deep-learning/
  * https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam
- * http://ruder.io/optimizing-gradient-descent/index.html#adam
+ * https://www.ruder.io/optimizing-gradient-descent/#adam
  * https://en.wikipedia.org/wiki/Moment_(mathematics)
  *
  * NOTE: CLion complains about "Redefinition of GradientDescentOptimizer", but it's
@@ -38,7 +38,7 @@ class GradientDescentOptimizer
     using ParamArray = std::array<double, NUM_PARAMS>;
 
     // Almost always good values for the decay rates, taken from:
-    // http://ruder.io/optimizing-gradient-descent/index.html#adam
+    // https://www.ruder.io/optimizing-gradient-descent/#adam
     static constexpr double DEFAULT_PAST_GRADIENT_DECAY_RATE         = 0.9;
     static constexpr double DEFAULT_PAST_SQUARED_GRADIENT_DECAY_RATE = 0.999;
 

@@ -11,7 +11,7 @@
 // This namespace contains all the test parameters
 namespace
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<World> world = ::TestUtil::createBlankTestingWorld();
     Pass pass({1, 1}, {0.5, 0}, 2.29);
     TbotsProto::AiConfig ai_config;
 
@@ -24,8 +24,7 @@ namespace
             std::make_tuple(std::make_shared<MoveTactic>(),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),
-            std::make_tuple(std::make_shared<CreaseDefenderTactic>(
-                                ai_config.robot_navigation_obstacle_config()),
+            std::make_tuple(std::make_shared<CreaseDefenderTactic>(ai_config),
                             std::set<TbotsProto::MotionConstraint>(
                                 {TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL}),
                             std::set<TbotsProto::MotionConstraint>()),
@@ -59,9 +58,10 @@ namespace
                                  TbotsProto::MotionConstraint::FRIENDLY_HALF,
                                  TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL}),
                             std::set<TbotsProto::MotionConstraint>()),
-            std::make_tuple(std::make_shared<ReceiverTactic>(),
-                            std::set<TbotsProto::MotionConstraint>(),
-                            std::set<TbotsProto::MotionConstraint>()),
+            std::make_tuple(
+                std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config()),
+                std::set<TbotsProto::MotionConstraint>(),
+                std::set<TbotsProto::MotionConstraint>()),
             std::make_tuple(std::make_shared<ShadowEnemyTactic>(),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>()),

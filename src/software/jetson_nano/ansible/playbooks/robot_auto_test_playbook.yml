@@ -1,0 +1,66 @@
+---
+
+- name: Robot Auto Test Playbook
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+
+    - debug:
+        msg: "[Robot ID = {{ inventory_hostname }}]"
+      tags: always
+
+    - name: Start Robot Auto Test Process
+      block:
+
+        - name: Stop Services
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
+              name: "thunderloop.service"
+              masked: no
+              daemon_reload: yes
+              state: stopped
+          tags: always
+
+        - name: Delete robot_auto_test binary under ~/thunderbots_binaries
+          file:
+            state: absent
+            path: ~/thunderbots_binaries/robot_auto_test
+          become_method: sudo
+          become: true
+          register: result
+
+        - debug:
+            msg: "{{ansible_search_path}}"
+          tags: always
+
+        - name: Sync Binary
+          ansible.posix.synchronize:
+            src: ../../services/robot_auto_test
+            dest: ~/thunderbots_binaries/
+            recursive: yes
+            copy_links: yes
+          tags: always
+
+        - name: Run Binary
+          command: "./robot_auto_test"
+          args:
+            chdir: /home/robot/thunderbots_binaries
+          become_method: sudo
+          become: true
+          register: robot_auto_test_output
+          ignore_errors: true
+
+        - name: Print Binary Output
+          debug:
+            var: robot_auto_test_output.stdout
+
+        - name: Start Services
+          become: true
+          become_method: sudo
+          ansible.builtin.systemd:
+            name: "thunderloop.service"
+            masked: no
+            daemon_reload: yes
+            state: started
+          tags: always

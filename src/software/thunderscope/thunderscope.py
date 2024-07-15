@@ -156,11 +156,17 @@ class Thunderscope(object):
 
         with shelve.open(filename, "c") as shelf:
             for key, val in self.tab_dock_map.items():
-                shelf[key] = val.saveState()
+                try:
+                    shelf[key] = val.saveState()
+                except AttributeError:
+                    pass
 
         with shelve.open(LAST_OPENED_LAYOUT_PATH, "c") as shelf:
             for key, val in self.tab_dock_map.items():
-                shelf[key] = val.saveState()
+                try:
+                    shelf[key] = val.saveState()
+                except AttributeError:
+                    pass
 
     def load_layout(self, filename: os.PathLike = None) -> None:
         """Open a file dialog to load the layout and state to all widgets
@@ -214,7 +220,6 @@ class Thunderscope(object):
     def show(self) -> None:
         """Show the main window"""
 
-        self.window.show()
         self.window.showMaximized()
         pyqtgraph.exec()
 

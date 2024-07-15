@@ -3,8 +3,8 @@
 void AttackerFSM::pivotKick(const Update& event,
                             boost::sml::back::process<PivotKickFSM::Update> processEvent)
 {
-    auto ball_position = event.common.world.ball().position();
-    Point chip_target  = event.common.world.field().enemyGoalCenter();
+    auto ball_position = event.common.world_ptr->ball().position();
+    Point chip_target  = event.common.world_ptr->field().enemyGoalCenter();
     if (event.control_params.chip_target)
     {
         chip_target = event.control_params.chip_target.value();
@@ -47,9 +47,9 @@ void AttackerFSM::keepAway(const Update& event,
     // best pass so far
     DribbleFSM::ControlParams control_params;
 
-    auto best_pass_so_far =
-        Pass(event.common.robot.position(), event.common.world.field().enemyGoalCenter(),
-             BALL_MAX_SPEED_METERS_PER_SECOND);
+    auto best_pass_so_far = Pass(event.common.robot.position(),
+                                 event.common.world_ptr->field().enemyGoalCenter(),
+                                 BALL_MAX_SPEED_METERS_PER_SECOND);
 
     if (event.control_params.best_pass_so_far)
     {
@@ -62,20 +62,21 @@ void AttackerFSM::keepAway(const Update& event,
                   << "to enemy goal center.";
     }
 
-    auto keepaway_dribble_dest =
-        findKeepAwayTargetPoint(event.common.world, best_pass_so_far);
+    auto keepaway_dribble_dest = findKeepAwayTargetPoint(
+        *event.common.world_ptr, best_pass_so_far, ai_config.passing_config());
 
-    const auto& enemy_team = event.common.world.enemyTeam();
-    const auto& ball       = event.common.world.ball();
+    const auto& enemy_team = event.common.world_ptr->enemyTeam();
+    const auto& ball       = event.common.world_ptr->ball();
 
     auto final_dribble_orientation = best_pass_so_far.passerOrientation();
 
-    if (enemy_team.numRobots() > 0)
+    // there is a robot on the enemy team close to us, face away from the nearest one
+    auto nearest_enemy_robot = enemy_team.getNearestRobot(event.common.robot.position());
+    if (nearest_enemy_robot.has_value() &&
+        distance(ball.position(), nearest_enemy_robot->position()) <
+            ai_config.attacker_tactic_config().enemy_about_to_steal_ball_radius())
     {
-        // there is a robot on the enemy team, face away from the nearest one
-        auto nearest_enemy_robot =
-            *enemy_team.getNearestRobot(event.common.robot.position());
-        auto dribble_orientation_vec = ball.position() - nearest_enemy_robot.position();
+        auto dribble_orientation_vec = ball.position() - nearest_enemy_robot->position();
         final_dribble_orientation    = dribble_orientation_vec.orientation();
     }
 
@@ -89,17 +90,5 @@ void AttackerFSM::keepAway(const Update& event,
 
 bool AttackerFSM::shouldKick(const Update& event)
 {
-    // check for enemy threat
-    Circle about_to_steal_danger_zone(
-        event.common.robot.position(),
-        attacker_tactic_config.enemy_about_to_steal_ball_radius());
-    for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
-    {
-        if (contains(about_to_steal_danger_zone, enemy.position()))
-        {
-            return true;
-        }
-    }
-    // otherwise check for shot or pass committed
     return event.control_params.pass_committed || event.control_params.shot;
 }

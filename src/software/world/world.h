@@ -217,3 +217,5 @@ class World final
     // which team has possession of the ball
     TeamPossession team_with_possession_;
 };
+
+using WorldPtr = std::shared_ptr<const World>;
