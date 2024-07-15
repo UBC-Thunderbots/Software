@@ -182,6 +182,9 @@ if __name__ == "__main__":
     if args.tracy:
         command += ["--cxxopt=-DTRACY_ENABLE"]
 
+    if args.platform:
+        command += ["--//software/embedded:host_platform=" + args.platform]
+
     # Don't cache test results
     if args.action in "test":
         command += ["--cache_test_results=false"]
@@ -189,9 +192,6 @@ if __name__ == "__main__":
         command += ["--"]
 
     bazel_arguments = unknown_args
-
-    if args.platform:
-        bazel_arguments += ["--//software/embedded:host_platform=" + args.platform]
     if args.stop_ai_on_start:
         bazel_arguments += ["--stop_ai_on_start"]
     if args.enable_visualizer:
