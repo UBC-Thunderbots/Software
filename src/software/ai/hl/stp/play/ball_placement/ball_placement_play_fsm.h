@@ -14,6 +14,10 @@ using Zones = std::unordered_set<EighteenZoneId>;
 
 struct BallPlacementPlayFSM
 {
+    double BACK_AWAY_FROM_CORNER_EXTRA_M = 0.9;
+    double BACK_AWAY_FROM_WALL_M = ROBOT_MAX_RADIUS_METERS * 5.5;
+    double MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS = ROBOT_MAX_RADIUS_METERS * 4.0;
+
     class StartState;
     class PickOffWallState;
     class PickOffWaitState;

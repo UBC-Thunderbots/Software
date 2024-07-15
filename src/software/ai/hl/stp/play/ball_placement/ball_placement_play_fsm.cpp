@@ -3,9 +3,9 @@
 BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
       align_wall_tactic(std::make_shared<MoveTactic>()),
-      pickoff_wall_tactic(std::make_shared<DribbleTactic>(ai_config)),
+      pickoff_wall_tactic(std::make_shared<BallPlacementDribbleTactic>(ai_config)),
       place_ball_tactic(std::make_shared<BallPlacementDribbleTactic>(ai_config)),
-      align_placement_tactic(std::make_shared<PlaceBallMoveTactic>()),
+      align_placement_tactic(std::make_shared<BallPlacementMoveTactic>()),
       retreat_tactic(std::make_shared<MoveTactic>()),
       wait_tactic(std::make_shared<MoveTactic>()),
       move_tactics(std::vector<std::shared_ptr<BallPlacementMoveTactic>>())
@@ -26,7 +26,7 @@ void BallPlacementPlayFSM::alignWall(const Update &event)
     Rectangle field_boundary = event.common.world_ptr->field().fieldBoundary();
 
     pickoff_final_orientation = calculateWallPickOffLocation(ball_pos, field_boundary,
-                                                             ROBOT_MAX_RADIUS_METERS * 4)
+                                                             MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS)
                                     .first;
     pickoff_point =
         ball_pos - Vector::createFromAngle(pickoff_final_orientation).normalize(0.4);
@@ -46,12 +46,12 @@ void BallPlacementPlayFSM::setPickOffDest(const BallPlacementPlayFSM::Update &ev
     Rectangle field_boundary = event.common.world_ptr->field().fieldBoundary();
 
     std::pair<Angle, Point> location = calculateWallPickOffLocation(
-        ball_pos, field_boundary, ROBOT_MAX_RADIUS_METERS * 4);
+        ball_pos, field_boundary, MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS);
 
     pickoff_final_orientation = location.first;
     pickoff_destination =
         location.second - Vector::createFromAngle(pickoff_final_orientation)
-                              .normalize(ROBOT_MAX_RADIUS_METERS * 5.5);
+                              .normalize(BACK_AWAY_FROM_WALL_M);
 }
 
 void BallPlacementPlayFSM::pickOffWall(const BallPlacementPlayFSM::Update &event)
@@ -277,7 +277,7 @@ bool BallPlacementPlayFSM::shouldPickOffWall(const Update &event)
     Rectangle field_lines = event.common.world_ptr->field().fieldBoundary();
     double wiggle_room    = std::abs(signedDistance(ball_pos, field_lines));
 
-    return wiggle_room <= ROBOT_MAX_RADIUS_METERS * 4;  // TODO: make this a constant
+    return wiggle_room <= MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS;
 }
 
 bool BallPlacementPlayFSM::alignDone(const Update &event)
@@ -364,25 +364,25 @@ std::pair<Angle, Point> BallPlacementPlayFSM::calculateWallPickOffLocation(
     {
         facing_angle  = Angle::fromDegrees(45);
         backoff_point = field_boundary.posXPosYCorner() -
-                        Vector::createFromAngle(facing_angle).normalize(0.9);
+                        Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
     else if (near_positive_y_boundary && near_negative_x_boundary)  // top left corner
     {
         facing_angle  = Angle::fromDegrees(135);
         backoff_point = field_boundary.negXPosYCorner() -
-                        Vector::createFromAngle(facing_angle).normalize(0.9);
+                        Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
     else if (near_negative_y_boundary && near_positive_x_boundary)  // bottom right corner
     {
         facing_angle  = Angle::fromDegrees(-45);
         backoff_point = field_boundary.posXNegYCorner() -
-                        Vector::createFromAngle(facing_angle).normalize(0.9);
+                        Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
     else if (near_negative_y_boundary && near_negative_x_boundary)  // bottom left corner
     {
         facing_angle  = Angle::fromDegrees(-135);
         backoff_point = field_boundary.negXNegYCorner() -
-                        Vector::createFromAngle(facing_angle).normalize(0.9);
+                        Vector::createFromAngle(facing_angle).normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
     else if (near_positive_y_boundary)
     {
