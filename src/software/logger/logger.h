@@ -58,7 +58,8 @@ class LoggerSingleton
      *
      * @param runtime_dir The directory where the log files will be stored.
      * @param proto_logger The proto logger to log VISUALIZE protos
-     * @param reduce_repetition Whether logs should be merged whenever possible to reduce spam
+     * @param reduce_repetition Whether logs should be merged whenever possible to reduce
+     * spam
      */
     static void initializeLogger(const std::string& runtime_dir,
                                  const std::shared_ptr<ProtoLogger>& proto_logger,
@@ -70,8 +71,8 @@ class LoggerSingleton
 
    private:
     LoggerSingleton(const std::string& runtime_dir,
-            const std::shared_ptr<ProtoLogger>& proto_logger,
-            const bool reduce_repetition)
+                    const std::shared_ptr<ProtoLogger>& proto_logger,
+                    const bool reduce_repetition)
     {
         logWorker = g3::LogWorker::createLogWorker();
         // Default locations
