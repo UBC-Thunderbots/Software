@@ -260,7 +260,6 @@ struct BallPlacementPlayFSM
     Point pickoff_destination;
     Angle pickoff_final_orientation;
     Timestamp start_time;
-    constexpr static double const WALL_KICKOFF_VELOCITY_M_PER_S   = 3.0;
     constexpr static double const RETREAT_DISTANCE_METERS         = 0.6;
     constexpr static double const PLACEMENT_DIST_THRESHOLD_METERS = 0.15;
     constexpr static double const BALL_IS_PLACED_WAIT_S           = 2.0;
