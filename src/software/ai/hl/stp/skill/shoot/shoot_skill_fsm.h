@@ -16,8 +16,7 @@ struct ShootSkillFSM
 
     /**
      * Guard to check whether we should abort the current shot on goal
-     * because the open angle to the goal decreased below an acceptable
-     * threshold.
+     * because it is unlikely to succeed.
      *
      * @param event the Update event
      *

@@ -2,20 +2,22 @@
 
 bool ShootSkillFSM::shouldAbortShot(const Update& event)
 {
+    // If we have no committed shot, we cannot abort it
     if (!best_shot_)
     {
         return false;
     }
-
-    const auto& shot_config = event.common.strategy->getAiConfig().shot_config();
 
     std::optional<Shot> shot = calcBestShotOnGoal(
         event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
         event.common.world_ptr->enemyTeam(), best_shot_->getOrigin(), TeamType::ENEMY,
         {event.common.robot});
 
-    return !shot || shot->getOpenAngle().toDegrees() <
-                        shot_config.abs_min_open_angle_for_shot_deg();
+    return !shot ||
+           event.common.world_ptr->field().pointInFriendlyHalf(shot->getOrigin()) ||
+           shot->getOpenAngle().toDegrees() < event.common.strategy->getAiConfig()
+                                                  .shot_config()
+                                                  .abs_min_open_angle_for_shot_deg();
 }
 
 void ShootSkillFSM::getBallControl(
