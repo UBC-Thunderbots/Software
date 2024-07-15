@@ -14,8 +14,8 @@ using Zones = std::unordered_set<EighteenZoneId>;
 
 struct BallPlacementPlayFSM
 {
-    double BACK_AWAY_FROM_CORNER_EXTRA_M = 0.9;
-    double BACK_AWAY_FROM_WALL_M = ROBOT_MAX_RADIUS_METERS * 5.5;
+    double BACK_AWAY_FROM_CORNER_EXTRA_M               = 0.9;
+    double BACK_AWAY_FROM_WALL_M                       = ROBOT_MAX_RADIUS_METERS * 5.5;
     double MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS = ROBOT_MAX_RADIUS_METERS * 4.0;
 
     class StartState;
@@ -232,18 +232,19 @@ struct BallPlacementPlayFSM
             AlignPlacementState_S + Update_E[shouldPickOffWall_G] = AlignWallState_S,
             AlignPlacementState_S + Update_E[!alignDone_G] / alignPlacement_A =
                 AlignPlacementState_S,
-            AlignPlacementState_S + Update_E[alignDone_G]            = PlaceBallState_S,
+            AlignPlacementState_S + Update_E[alignDone_G] = PlaceBallState_S,
 
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
             PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A  = ReleaseBallState_S,
 
-            ReleaseBallState_S + Update_E[!waitDone_G && ballPlaced_G] / releaseBall_A = ReleaseBallState_S,
-            ReleaseBallState_S + Update_E[!ballPlaced_G]                        = StartState_S,
-            ReleaseBallState_S + Update_E[waitDone_G]                           = RetreatState_S,
+            ReleaseBallState_S + Update_E[!waitDone_G && ballPlaced_G] / releaseBall_A =
+                ReleaseBallState_S,
+            ReleaseBallState_S + Update_E[!ballPlaced_G] = StartState_S,
+            ReleaseBallState_S + Update_E[waitDone_G]    = RetreatState_S,
 
-            RetreatState_S + Update_E[retreatDone_G && ballPlaced_G]     = X,
-            RetreatState_S + Update_E[ballPlaced_G] / retreat_A          = RetreatState_S,
-            RetreatState_S + Update_E[!ballPlaced_G]                     = StartState_S);
+            RetreatState_S + Update_E[retreatDone_G && ballPlaced_G] = X,
+            RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = RetreatState_S,
+            RetreatState_S + Update_E[!ballPlaced_G]                 = StartState_S);
     }
 
    private:

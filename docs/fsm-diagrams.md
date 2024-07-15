@@ -42,19 +42,15 @@ AlignWallState --> AlignWallState : [!wallAlignDone && shouldPickOffWall]\n<i>al
 AlignWallState --> PickOffWallState : [wallAlignDone]\n<i>setPickOffDest</i>
 AlignWallState --> AlignPlacementState : [!shouldPickOffWall]
 PickOffWallState --> PickOffWallState : [!wallPickOffDone]\n<i>pickOffWall</i>
-PickOffWallState --> PickOffWaitState : [wallPickOffDone]\n<i>startWait</i>
-PickOffWaitState --> PickOffWaitState : [!waitDone]\n<i>wait</i>
-PickOffWaitState --> ReleaseWallState : [waitDone]
-ReleaseWallState --> ReleaseWallState : [!ballReleased]\n<i>releaseBall</i>
-ReleaseWallState --> AlignPlacementState : [ballReleased]
+PickOffWallState --> ReleaseBallState : [wallPickOffDone]\n<i>startWait</i>
 AlignPlacementState --> AlignWallState : [shouldPickOffWall]
 AlignPlacementState --> AlignPlacementState : [!alignDone]\n<i>alignPlacement</i>
 AlignPlacementState --> PlaceBallState : [alignDone]
 PlaceBallState --> PlaceBallState : [!ballPlaced]\n<i>placeBall</i>
-PlaceBallState --> WaitState : [ballPlaced]\n<i>startWait</i>
-WaitState --> WaitState : [!waitDone && ballPlaced]\n<i>wait</i>
-WaitState --> StartState : [!ballPlaced]
-WaitState --> RetreatState : [waitDone]
+PlaceBallState --> ReleaseBallState : [ballPlaced]\n<i>startWait</i>
+ReleaseBallState --> ReleaseBallState : [!waitDone && ballPlaced]\n<i>releaseBall</i>
+ReleaseBallState --> StartState : [!ballPlaced]
+ReleaseBallState --> RetreatState : [waitDone]
 RetreatState --> Terminate:::terminate : [retreatDone && ballPlaced]
 RetreatState --> RetreatState : [ballPlaced]\n<i>retreat</i>
 RetreatState --> StartState : [!ballPlaced]
