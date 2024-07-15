@@ -1,5 +1,6 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
@@ -183,9 +184,7 @@ void SensorFusion::updateWorld(
 
 bool SensorFusion::shouldTrustRobotStatus()
 {
-    // the following if statements essentially ensures that we could calculate the
-    // distance. Essentially unwarpping all the std::optional<T> that are required to
-    // calculate the distance
+    // Check if there is a robot with a tripped breakbeam
     if (!friendly_robot_id_with_ball_in_dribbler.has_value())
     {
         return false;
@@ -198,16 +197,21 @@ bool SensorFusion::shouldTrustRobotStatus()
         return false;
     }
 
-    double distance =
-        (robot_with_ball_in_dribbler.value().position() - ball.value().position())
-            .length();
+    // Check if vision detects a ball on the field
+    if (!ball.has_value())
+    {
+        return true;
+    }
 
-    // In other words, this is only true if we have the position of the breakbeam
-    // robot, and the distance between what SSL says and where the robots are actually
-    // at is less than a threshold distance set by
-    // DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION
-    return distance <= DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION;
+    // In other words, we trust the breakbeam reading from robot status if vision also
+    // agrees that the ball is roughly near the robot or if ssl vision doesn't detect an
+    // ball. If vision has the ball far from the breakbeam detection, then we will ignore
+    // the breakbeam detection and trust vision instead.
+    return distance(robot_with_ball_in_dribbler->position(), ball->position()) <=
+           DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION;
 }
+
+
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
