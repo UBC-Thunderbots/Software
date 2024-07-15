@@ -29,6 +29,7 @@ class QLearningInfoWidget(QWidget):
         """Stores information about Q-learning algorithms for a particular 
         Markov decision process (MDP)
         """
+
         linear_q_func_info: LinearQFunctionInfo = None
         action_selection_strategy_info: ActionSelectionStrategyInfo = None
 

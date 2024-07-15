@@ -221,9 +221,9 @@ bool ReceiverFSM::passReceivedByTeammate(const Update& event)
         event.common.world_ptr->friendlyTeam().getAllRobotsExcept({event.common.robot});
 
     return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(),
-        [&](const Robot& robot)
-        { return robot.isNearDribbler(event.common.world_ptr->ball().position()); });
+        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
+            return robot.isNearDribbler(event.common.world_ptr->ball().position());
+        });
 }
 
 bool ReceiverFSM::strayPass(const Update& event)

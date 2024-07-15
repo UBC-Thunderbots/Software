@@ -11,7 +11,7 @@ class ExamplePlay : public Play
    public:
     /**
      * Creates an ExamplePlay
-     * 
+     *
      * @param strategy the Strategy shared by all of AI
      */
     explicit ExamplePlay(std::shared_ptr<Strategy> strategy);
