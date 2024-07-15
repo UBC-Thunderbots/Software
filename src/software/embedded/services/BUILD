@@ -8,7 +8,6 @@ cc_library(
         select({
             "//software/embedded:build_nano": ["NANO"],
             "//software/embedded:build_pi": ["PI"],
-            "//conditions:default": ["NONE"],
         }),
     deps = [
         "//proto:tbots_cc_proto",

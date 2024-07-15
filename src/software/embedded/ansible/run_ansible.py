@@ -32,8 +32,6 @@ def ansible_runner(playbook: str, options: dict = {}):
     hosts = set(options.get("hosts", []))
     host_aliases = hosts.copy()
 
-    print("running tags: " + str(tags))
-
     if not hosts:
         # Spawn multiple processes to ping different robots
         ping_processes = {}

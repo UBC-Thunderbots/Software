@@ -57,7 +57,7 @@ if __name__ == "__main__":
         "--flash_robots",
         nargs="+",
         type=int,
-        help="A list of space seperated integers representing the robot IDs "
+        help="A list of space separated integers representing the robot IDs "
         "that should be flashed by the deploy_robot_software Ansible playbook",
         action="store",
     )

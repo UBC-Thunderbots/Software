@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <fstream>
 
-#include "thunderloop.h"
+#include "software/embedded/thunderloop.h"
 
 TEST(TestBattery, is_power_stable)
 {
