@@ -93,6 +93,7 @@ cc_binary(
     deps = [
         ":thunderloop",
         "@boost//:program_options",
+        "@boost//:format"
     ],
 )
 
