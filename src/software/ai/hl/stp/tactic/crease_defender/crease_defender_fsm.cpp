@@ -10,7 +10,9 @@
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
     const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
-    double robot_obstacle_inflation_factor)
+    double robot_obstacle_inflation_factor,
+    double alignment_multiplier_x,
+    double alignment_multiplier_y)
 {
 
     // Look directly at the point
@@ -30,8 +32,6 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     // Shot ray to block
     Ray ray(enemy_threat_origin, angle_to_block);
     std::optional<Point> block_point = findDefenseAreaIntersection(field, ray, inflated_defense_area);
-    double x_shift_offset = crease_defender_config.defender_shift_offset_x();
-    double y_shift_offset = crease_defender_config.defender_shift_offset_y();
     if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT && block_point.has_value())
     {
         // rotate pos 90 deg
@@ -46,7 +46,7 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
             *         \
             *          0
             */
-            block_point = block_point.value() + Vector(ROBOT_MAX_RADIUS_METERS*x_shift_offset,ROBOT_MAX_RADIUS_METERS*y_shift_offset);
+            block_point = block_point.value() + Vector(ROBOT_MAX_RADIUS_METERS*alignment_multiplier_x,ROBOT_MAX_RADIUS_METERS*alignment_multiplier_y);
         }
 
     }
@@ -62,7 +62,7 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
             *           /
             *          0
             */
-            block_point = block_point.value() + Vector(ROBOT_MAX_RADIUS_METERS*x_shift_offset,-ROBOT_MAX_RADIUS_METERS*y_shift_offset);
+            block_point = block_point.value() + Vector(ROBOT_MAX_RADIUS_METERS*alignment_multiplier_x,-ROBOT_MAX_RADIUS_METERS*alignment_multiplier_y);
         }
     }
     return block_point;
@@ -94,7 +94,8 @@ void CreaseDefenderFSM::blockThreat(
     // right on the edge of the defense area obstacle.
     auto block_threat_point = findBlockThreatPoint(
         event.common.world_ptr->field(), event.control_params.enemy_threat_origin,
-        event.control_params.crease_defender_alignment, robot_obstacle_inflation_factor);
+        event.control_params.crease_defender_alignment, robot_obstacle_inflation_factor,
+        crease_defender_config.defender_shift_offset_x(), crease_defender_config.defender_shift_offset_y());
 
     if (contains(inflated_defense_area, event.control_params.enemy_threat_origin))
     {
