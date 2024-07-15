@@ -209,7 +209,7 @@ if __name__ == "__main__":
         else:
             platform_ip = "1"
         bazel_arguments += [
-            f"192.168." + platform_ip + ".20{id}" for id in args.flash_robots
+            f"192.168.{platform_ip}.20{id}" for id in args.flash_robots
         ]
         bazel_arguments += ["-pwd", args.pwd]
 
