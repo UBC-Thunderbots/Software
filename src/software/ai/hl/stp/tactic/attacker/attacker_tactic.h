@@ -46,6 +46,15 @@ class AttackerTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
+    /**
+     * Log visualize the control parameters for this AttackerTactic
+     *
+     * @param world Current state of the world
+     * @param control_params The control parameters to visualize
+     */
+    void visualizeControlParams(const World& world,
+                                const AttackerFSM::ControlParams& control_params);
+
     std::map<RobotId, std::unique_ptr<FSM<AttackerFSM>>> fsm_map;
 
     // The pass to execute

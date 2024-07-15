@@ -6,12 +6,46 @@ cc_library(
     hdrs = [
         "obstacle.hpp",
     ],
-    # We expose obstacle so that it can visualized
-    visibility = ["//visibility:public"],
     deps = [
-        "obstacle_visitor",
+        ":obstacle_visitor",
         "//proto/message_translation:tbots_protobuf",
-        "//shared:constants",
+        "//software/geom/algorithms",
+    ],
+)
+
+cc_library(
+    name = "geom_obstacle",
+    hdrs = [
+        "geom_obstacle.hpp",
+    ],
+    deps = [
+        ":obstacle",
+        "//software/geom:point",
+        "//software/geom:segment",
+        "//software/geom/algorithms",
+    ],
+)
+
+cc_library(
+    name = "trajectory_obstacle",
+    hdrs = [
+        "trajectory_obstacle.hpp",
+    ],
+    deps = [
+        ":geom_obstacle",
+        "//software/geom:point",
+        "//software/geom:segment",
+        "//software/geom/algorithms",
+    ],
+)
+
+cc_library(
+    name = "const_velocity_obstacle",
+    hdrs = [
+        "const_velocity_obstacle.hpp",
+    ],
+    deps = [
+        ":geom_obstacle",
         "//software/geom:point",
         "//software/geom:segment",
         "//software/geom/algorithms",
@@ -23,7 +57,8 @@ cc_library(
     srcs = ["robot_navigation_obstacle_factory.cpp"],
     hdrs = ["robot_navigation_obstacle_factory.h"],
     deps = [
-        ":obstacle",
+        ":const_velocity_obstacle",
+        ":trajectory_obstacle",
         "//proto:tbots_cc_proto",
         "//software/geom:point",
         "//software/logger",
@@ -32,13 +67,29 @@ cc_library(
 )
 
 cc_test(
-    name = "obstacle_test",
-    srcs = ["obstacle_test.cpp"],
+    name = "geom_obstacle_test",
+    srcs = ["geom_obstacle_test.cpp"],
     deps = [
-        ":obstacle",
+        ":geom_obstacle",
         "//shared/test_util:tbots_gtest_main",
-        "//software/geom:point",
-        "//software/geom:rectangle",
+    ],
+)
+
+cc_test(
+    name = "const_velocity_obstacle_test",
+    srcs = ["const_velocity_obstacle_test.cpp"],
+    deps = [
+        ":const_velocity_obstacle",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_test(
+    name = "trajectory_obstacle_test",
+    srcs = ["trajectory_obstacle_test.cpp"],
+    deps = [
+        ":trajectory_obstacle",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -64,5 +115,6 @@ cc_library(
         "//software/geom:circle",
         "//software/geom:polygon",
         "//software/geom:rectangle",
+        "//software/geom:stadium",
     ],
 )

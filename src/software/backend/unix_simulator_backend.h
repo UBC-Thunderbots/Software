@@ -1,13 +1,18 @@
 #pragma once
 
+#include <mutex>
+
 #include "proto/parameters.pb.h"
+#include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/sensor_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "proto/validation.pb.h"
 #include "software/backend/backend.h"
-#include "software/networking/threaded_proto_unix_listener.hpp"
-#include "software/networking/threaded_proto_unix_sender.hpp"
+#include "software/logger/proto_logger.h"
+#include "software/networking/unix/threaded_proto_unix_listener.hpp"
+#include "software/networking/unix/threaded_proto_unix_sender.hpp"
 
 class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::ThunderbotsConfig>
 {
@@ -17,7 +22,13 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
      *
      * @param runtime_dir The directory to setup the unix sockets
      */
-    UnixSimulatorBackend(std::string runtime_dir);
+    UnixSimulatorBackend(std::string runtime_dir,
+                         const std::shared_ptr<ProtoLogger>& proto_logger);
+
+    /**
+     * Get the timestamp (in seconds) of the last World received
+     */
+    double getLastWorldTimeSec();
 
    private:
     void receiveThunderbotsConfig(TbotsProto::ThunderbotsConfig request);
@@ -34,6 +45,11 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     std::unique_ptr<ThreadedProtoUnixListener<SensorProto>> sensor_proto_input;
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>>
         dynamic_parameter_update_request_listener;
+    std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::ValidationProtoSet>>
+        validation_proto_set_listener;
+    std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotLog>> robot_log_listener;
+    std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotCrash>>
+        robot_crash_listener;
 
     // Outputs
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::World>> world_output;
@@ -41,6 +57,11 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::ThunderbotsConfig>>
         dynamic_parameter_update_respone_sender;
 
+    std::shared_ptr<ProtoLogger> proto_logger;
+
     // World protobuf sequence number counter
     uint64_t sequence_number = 0;
+
+    // The timestamp of the last world received
+    std::atomic<double> last_world_time_sec = 0;
 };

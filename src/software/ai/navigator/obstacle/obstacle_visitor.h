@@ -4,6 +4,7 @@
 #include "software/geom/circle.h"
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
+#include "software/geom/stadium.h"
 
 // We forward-declare GeomObstacle because if we include them we induce a
 // circular dependency between the Individual library for each obstacle and this

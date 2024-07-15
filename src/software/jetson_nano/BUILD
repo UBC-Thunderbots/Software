@@ -65,3 +65,12 @@ sh_binary(
     name = "setup_nano",
     srcs = ["setup_nano.sh"],
 )
+
+cc_test(
+    name = "test_battery",
+    srcs = ["battery_test.cpp"],
+    deps = [
+        ":thunderloop",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)

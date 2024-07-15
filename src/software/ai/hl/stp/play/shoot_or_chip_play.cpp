@@ -30,10 +30,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
      */
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
-        std::make_shared<CreaseDefenderTactic>(
-            ai_config.robot_navigation_obstacle_config()),
+        std::make_shared<CreaseDefenderTactic>(ai_config),
+        std::make_shared<CreaseDefenderTactic>(ai_config),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
@@ -69,7 +67,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         {
             enemy_robot_points.emplace_back(robot.position());
         }
-        std::vector<Circle> chip_targets = findGoodChipTargets(world_ptr);
+        std::vector<Circle> chip_targets = findGoodChipTargets(*world_ptr);
         for (unsigned i = 0;
              i < chip_targets.size() && i < move_to_open_area_tactics.size(); i++)
         {

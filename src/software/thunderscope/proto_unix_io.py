@@ -3,8 +3,8 @@ import queue
 
 import os
 
-from software.networking.threaded_unix_listener import ThreadedUnixListener
-from software.networking.threaded_unix_sender import ThreadedUnixSender
+from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
+from software.networking.unix.threaded_unix_sender import ThreadedUnixSender
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from typing import Type
 from google.protobuf.message import Message

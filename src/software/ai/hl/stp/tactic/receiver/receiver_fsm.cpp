@@ -63,40 +63,36 @@ Shot ReceiverFSM::getOneTouchShotPositionAndOrientation(const Robot& robot,
     return Shot(ideal_position, ideal_orientation);
 }
 
-std::optional<Shot> ReceiverFSM::findFeasibleShot(const WorldPtr& world_ptr,
+std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
                                                   const Robot& assigned_robot)
 {
     // Check if we can shoot on the enemy goal from the receiver position
-    std::optional<Shot> best_shot_opt = calcBestShotOnGoal(
-        world_ptr->field(), world_ptr->friendlyTeam(), world_ptr->enemyTeam(),
-        assigned_robot.position(), TeamType::ENEMY, {assigned_robot});
+    std::optional<Shot> best_shot_opt =
+        calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                           assigned_robot.position(), TeamType::ENEMY, {assigned_robot});
 
     // The percentage of open net the robot would shoot on
     if (best_shot_opt)
     {
-        // Vector from the ball to the robot
-        Vector robot_to_ball = world_ptr->ball().position() - assigned_robot.position();
+        Vector robot_to_ball = world.ball().position() - assigned_robot.position();
 
         // The angle the robot will have to deflect the ball to shoot
-        Angle abs_angle_between_pass_and_shot_vectors;
-
         Vector robot_to_shot_target =
             best_shot_opt.value().getPointToShootAt() - assigned_robot.position();
-        abs_angle_between_pass_and_shot_vectors =
-            convexAngle(robot_to_ball, robot_to_shot_target);
+        double abs_angle_deg_between_pass_and_shot_vectors =
+            convexAngle(robot_to_ball, robot_to_shot_target).toDegrees();
 
-        Angle goal_angle = convexAngle(world_ptr->field().friendlyGoalpostPos(),
-                                       assigned_robot.position(),
-                                       world_ptr->field().friendlyGoalpostNeg());
-
-        double net_percent_open =
-            best_shot_opt.value().getOpenAngle().toDegrees() / goal_angle.toDegrees();
+        double shot_open_angle = best_shot_opt.value().getOpenAngle().toDegrees();
+        double min_one_touch_open_angle =
+            receiver_tactic_config.min_open_angle_for_one_touch_deg();
+        double max_one_touch_deflection_angle =
+            receiver_tactic_config.max_deflection_for_one_touch_deg();
 
         // If we have a shot with a sufficiently large enough opening, and the
         // deflection angle that is reasonable, we should one-touch kick the ball
         // towards the enemy net
-        if (net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
-            abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
+        if (shot_open_angle > min_one_touch_open_angle &&
+            abs_angle_deg_between_pass_and_shot_vectors < max_one_touch_deflection_angle)
         {
             return best_shot_opt;
         }
@@ -108,24 +104,28 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const WorldPtr& world_ptr,
 bool ReceiverFSM::onetouchPossible(const Update& event)
 {
     return !event.control_params.disable_one_touch_shot &&
-           (findFeasibleShot(event.common.world_ptr, event.common.robot) != std::nullopt);
+           receiver_tactic_config.enable_one_touch_kick() &&
+           (findFeasibleShot(*event.common.world_ptr, event.common.robot) !=
+            std::nullopt);
 }
 
 void ReceiverFSM::updateOnetouch(const Update& event)
 {
-    auto best_shot = findFeasibleShot(event.common.world_ptr, event.common.robot);
-    auto one_touch = getOneTouchShotPositionAndOrientation(
-        event.common.robot, event.common.world_ptr->ball(),
-        best_shot->getPointToShootAt());
+    auto best_shot = findFeasibleShot(*event.common.world_ptr, event.common.robot);
 
-    if (best_shot && event.control_params.pass)
+    if (best_shot.has_value() && event.control_params.pass)
     {
+        auto one_touch = getOneTouchShotPositionAndOrientation(
+            event.common.robot, event.common.world_ptr->ball(),
+            best_shot->getPointToShootAt());
+
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, one_touch.getPointToShootAt(), one_touch.getOpenAngle(),
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-            TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                           BALL_MAX_SPEED_METERS_PER_SECOND}));
+                           BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}));
     }
     else
     {
@@ -141,6 +141,7 @@ void ReceiverFSM::updateReceive(const Update& event)
             event.common.robot, event.control_params.pass->receiverPoint(),
             event.control_params.pass->receiverOrientation(),
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
     }
@@ -167,6 +168,7 @@ void ReceiverFSM::adjustReceive(const Update& event)
         event.common.set_primitive(std::make_unique<MovePrimitive>(
             event.common.robot, ball_receive_pos, ball_receive_orientation,
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
     }

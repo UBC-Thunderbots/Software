@@ -18,7 +18,8 @@ void ChipFSM::updateChip(const Update &event)
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, event.control_params.chip_origin,
         event.control_params.chip_direction,
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, TbotsProto::DribblerMode::OFF,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
                        event.control_params.chip_distance_meters}));

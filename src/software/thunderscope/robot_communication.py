@@ -26,6 +26,8 @@ class RobotCommunication(object):
         estop_mode: EstopMode,
         estop_path: os.PathLike = None,
         estop_baudrate: int = 115200,
+        enable_radio: bool = False,
+        referee_port: int = SSL_REFEREE_PORT,
     ):
         """Initialize the communication with the robots
 
@@ -35,8 +37,12 @@ class RobotCommunication(object):
         :param estop_mode: what estop mode we are running right now, of type EstopMode
         :param estop_path: The path to the estop
         :param estop_baudrate: The baudrate of the estop
+        :param enable_radio: Whether to use radio to send primitives to robots
+        :param referee_port: the referee port that we are using. If this is None, the default port is used
 
         """
+
+        self.referee_port = referee_port
         self.receive_ssl_referee_proto = None
         self.receive_ssl_wrapper = None
         self.sequence_number = 0
@@ -48,6 +54,8 @@ class RobotCommunication(object):
 
         self.estop_path = estop_path
         self.estop_buadrate = estop_baudrate
+
+        self.enable_radio = enable_radio
 
         self.running = False
 
@@ -109,7 +117,7 @@ class RobotCommunication(object):
 
         self.receive_ssl_referee_proto = tbots_cpp.SSLRefereeProtoListener(
             SSL_REFEREE_ADDRESS,
-            SSL_REFEREE_PORT,
+            self.referee_port,
             lambda data: self.current_proto_unix_io.send_proto(Referee, data),
             True,
         )
@@ -294,7 +302,7 @@ class RobotCommunication(object):
         self.receive_robot_status = tbots_cpp.RobotStatusProtoListener(
             self.multicast_channel + "%" + self.interface,
             ROBOT_STATUS_PORT,
-            lambda data: self.__forward_to_proto_unix_io(RobotStatus, data),
+            self.__receive_robot_status,
             True,
         )
 
@@ -313,9 +321,12 @@ class RobotCommunication(object):
         )
 
         # Create multicast senders
-        self.send_primitive_set = tbots_cpp.PrimitiveSetProtoSender(
-            self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
-        )
+        if self.enable_radio:
+            self.send_primitive_set = tbots_cpp.PrimitiveSetProtoRadioSender()
+        else:
+            self.send_primitive_set = tbots_cpp.PrimitiveSetProtoUdpSender(
+                self.multicast_channel + "%" + self.interface, PRIMITIVE_PORT, True
+            )
 
         self.running = True
 
@@ -323,6 +334,20 @@ class RobotCommunication(object):
         self.run_primitive_set_thread.start()
 
         return self
+
+    def __receive_robot_status(self, robot_status: Message) -> None:
+        """
+        Forwards the given robot status to the full system along with the round-trip time
+        :param robot_status: RobotStatus to forward to fullsystem
+        """
+        round_trip_time_seconds = time.time() - (
+            robot_status.adjusted_time_sent.epoch_timestamp_seconds
+        )
+        self.__forward_to_proto_unix_io(
+            RobotStatistic,
+            RobotStatistic(round_trip_time_seconds=round_trip_time_seconds),
+        )
+        self.__forward_to_proto_unix_io(RobotStatus, robot_status)
 
     def __exit__(self, type, value, traceback) -> None:
         """Exit RobotCommunication context manager

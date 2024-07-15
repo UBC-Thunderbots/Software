@@ -1,6 +1,7 @@
 #include "software/geom/algorithms/end_in_obstacle_sample.h"
 
 #include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/geom/algorithms/contains.h"
 #include "software/geom/point.h"
 
 static constexpr double OBSTACLE_AVOIDANCE_BUFFER_CENTIMETERS = 0.01;
@@ -21,10 +22,7 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
         {
             if (obstacle->contains(point))
             {
-                if (!point_in_obstacle)
-                {
-                    point_in_obstacle = true;
-                }
+                point_in_obstacle = true;
 
                 // if point is inside obstacle, perform a second check to see if the
                 // closest point outside the first encroached obstacle is inside another
@@ -82,7 +80,7 @@ std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacl
     // perform sampling only if the provided point or the closest point outside the first
     // encroached obstacle are not valid
     double radius          = 0.15;
-    int samples_per_radius = 6;
+    int samples_per_radius = initial_count;
     while (radius <= max_search_radius)
     {
         double increment = 360.0 / samples_per_radius;

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <set>
 
-#include "software/util/make_enum/make_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 
 MAKE_ENUM(RobotCapability, Dribble, Kick, Chip, Move);
 

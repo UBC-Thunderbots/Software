@@ -6,7 +6,7 @@
 #include "proto/robot_log_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
-#include "software/networking/threaded_proto_udp_listener.hpp"
+#include "software/networking/udp/threaded_proto_udp_listener.hpp"
 
 /*
  * This standalone program listens for RobotLog protos on the specified ip address

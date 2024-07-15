@@ -191,7 +191,10 @@ def run_validation_sequence_sets(
 
     # Validate the eventually validations. Eventually valids
     for validation_sequence in list(eventually_validation_sequence_set):
-        for validation in validation_sequence:
+        # NOTE: It is critical that we iterate over a copy of the validation_sequence
+        # (using the `list` constructor) since we will be modifying the original list
+        # within the loop
+        for validation in list(validation_sequence):
 
             # Add to validation_proto_set and get status
             status = create_validation_proto_helper(
@@ -248,6 +251,7 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
         tbots_cpp.Rectangle.__name__: tbots_cpp.createPolygonProto,
         tbots_cpp.Circle.__name__: tbots_cpp.createCircleProto,
         tbots_cpp.Segment.__name__: tbots_cpp.createSegmentProto,
+        tbots_cpp.Stadium.__name__: tbots_cpp.createStadiumProto,
     }
 
     ADD_TO_VALIDATION_GEOMETRY_DISPATCH = {
@@ -256,6 +260,7 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
         tbots_cpp.Rectangle.__name__: validation_geometry.polygons.append,
         tbots_cpp.Circle.__name__: validation_geometry.circles.append,
         tbots_cpp.Segment.__name__: validation_geometry.segments.append,
+        tbots_cpp.Stadium.__name__: validation_geometry.stadiums.append,
     }
 
     for geom in geometry:

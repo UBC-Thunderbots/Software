@@ -1,17 +1,12 @@
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.widget_setup_functions import *
-from software.thunderscope.constants import (
-    TabNames,
-    ProtoUnixIOTypes,
-    GAME_CONTROLLER_URL,
-)
+from software.thunderscope.constants import TabNames, ProtoUnixIOTypes
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from typing import Sequence, Dict
 from software.thunderscope.thunderscope_types import (
     TScopeTab,
     TScopeWidget,
     TScopeQTTab,
-    TScopeWebTab,
     WidgetStretchData,
 )
 import pyqtgraph
@@ -187,7 +182,7 @@ def configure_base_fullsystem(
             anchor="Field",
             position="left",
             has_refresh_func=False,
-            stretch=WidgetStretchData(x=3),
+            stretch=WidgetStretchData(x=5),
         ),
         TScopeWidget(
             name="Error Log",
@@ -196,19 +191,21 @@ def configure_base_fullsystem(
             ),
             anchor="Parameters",
             position="above",
+            stretch=WidgetStretchData(x=5),
         ),
         TScopeWidget(
             name="Logs",
             widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Parameters",
             position="above",
-            stretch=WidgetStretchData(x=3),
+            stretch=WidgetStretchData(x=5),
         ),
         TScopeWidget(
             name="Referee Info",
             widget=setup_referee_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Field",
             position="bottom",
+            stretch=WidgetStretchData(y=4),
         ),
         TScopeWidget(
             name="Performance",
@@ -222,6 +219,7 @@ def configure_base_fullsystem(
             in_window=True,
             anchor="Referee Info",
             position="below",
+            stretch=WidgetStretchData(y=4),
         ),
         TScopeWidget(
             name="FPS Widget",
@@ -233,12 +231,14 @@ def configure_base_fullsystem(
             ),
             anchor="Performance",
             position="below",
+            stretch=WidgetStretchData(y=4),
         ),
         TScopeWidget(
             name="Play Info",
             widget=setup_play_info(**{"proto_unix_io": full_system_proto_unix_io}),
             anchor="Referee Info",
             position="above",
+            stretch=WidgetStretchData(y=4),
         ),
     ] + extra_widgets
 
@@ -354,11 +354,6 @@ def configure_two_ai_gamecontroller_view(
                     refresh_func_counter=yellow_refresh_func_frametime_counter,
                 ),
                 refresh_func_counter=yellow_refresh_func_frametime_counter,
-            ),
-            TScopeWebTab(
-                name="Gamecontroller",
-                key=TabNames.GAMECONTROLLER,
-                url=GAME_CONTROLLER_URL,
             ),
         ],
     )

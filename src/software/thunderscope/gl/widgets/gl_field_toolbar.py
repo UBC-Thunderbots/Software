@@ -1,15 +1,19 @@
-import textwrap
 from typing import Callable
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from proto.import_all_protos import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
-from software.thunderscope.constants import CameraView, THUNDERSCOPE_HELP_TEXT
-import software.thunderscope.gl.widgets.toolbar_icons.toolbar_icon_loader as icons
+from software.thunderscope.constants import (
+    CameraView,
+    THUNDERSCOPE_HELP_TEXT,
+    SIMULATION_SPEEDS,
+)
+import software.thunderscope.gl.widgets.toolbar_icons.sandbox_mode.icon_loader as icons
 from software.thunderscope.common.common_widgets import ToggleableButton
+from software.thunderscope.gl.widgets.gl_toolbar import GLToolbar
 
 
-class GLFieldToolbar(QWidget):
+class GLFieldToolbar(GLToolbar):
     """
     Toolbar for the GL Field Widget
 
@@ -17,13 +21,13 @@ class GLFieldToolbar(QWidget):
     And for undoing / redoing robot state changes
     """
 
-    BUTTON_ICON_COLOR = "white"
-
     def __init__(
         self,
+        parent: QWidget,
         on_camera_view_change: Callable[[CameraView], None],
         on_measure_mode: Callable[[], None],
         layers_menu: QMenu,
+        toolbars_menu: QMenu,
         sandbox_mode: bool = False,
     ):
         """
@@ -37,12 +41,14 @@ class GLFieldToolbar(QWidget):
         - Measure Mode Toggle
         - Camera View Select menu
 
+        :param parent: the parent to overlay this toolbar over
         :param on_camera_view_change: the callback function for when the camera view is changed
         :param on_measure_mode: the callback function for when measure mode is toggled
         :param layers_menu: the QMenu for the layers menu selection
+        :param toolbars_menu: the QMenu for the toolbars menu selection
         :param sandbox_mode: if sandbox mode should be enabled
         """
-        super(GLFieldToolbar, self).__init__()
+        super(GLFieldToolbar, self).__init__(parent=parent)
 
         # Setup Layers button for toggling visibility of layers
         self.layers_button = QPushButton()
@@ -100,7 +106,32 @@ class GLFieldToolbar(QWidget):
         self.pause_button.setStyleSheet(self.get_button_style())
         self.toggle_pause_button(True)
         # buffer for the simulator pause / play state
-        self.simulation_state_buffer = ThreadSafeBuffer(1, SimulationState)
+        self.simulation_state_buffer = ThreadSafeBuffer(5, SimulationState)
+
+        # Setup Toolbars button for toggling visibility of toolbars
+        self.toolbars_button = QPushButton()
+        self.toolbars_button.setText("Toolbars")
+        self.toolbars_menu = QMenu()
+        self.toolbars_menu_checkboxes = {}
+        self.toolbars_button.setMenu(toolbars_menu)
+        self.toolbars_button.setStyleSheet(self.get_button_style())
+
+        # Setup simulation speed button and menu
+        self.sim_speed_menu = QMenu()
+        self.sim_speed_button = QPushButton()
+        self.sim_speed_button.setText("Speed: 1.00x")
+        self.sim_speed_button.setStyleSheet(self.get_button_style())
+        self.sim_speed_button.setMenu(self.sim_speed_menu)
+        self.sim_speed_button.setToolTip("Simulation Speed")
+
+        # Speed callback should be updated by the parent widget which
+        # handles simulation controls
+        self.speed_callback = None
+        self.simulation_speeds = SIMULATION_SPEEDS
+        for speed in self.simulation_speeds:
+            self.sim_speed_menu.addAction(
+                str(speed), lambda new_speed=speed: self.speed_callback(new_speed),
+            )
 
         # if sandbox mode, set up the sandbox control buttons
         if sandbox_mode:
@@ -122,25 +153,22 @@ class GLFieldToolbar(QWidget):
             self.reset_button.setStyleSheet(self.get_button_style())
 
         # Setup toolbar
-        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        self.setStyleSheet("background-color: black;" "padding: 0px;")
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground)
-        self.setLayout(QHBoxLayout())
         self.layout().addWidget(self.layers_button)
+        self.layout().addWidget(self.toolbars_button)
         self.layout().addStretch()
         if sandbox_mode:
+            self.layout().addWidget(self.sim_speed_button)
             self.layout().addWidget(self.reset_button)
             self.layout().addWidget(self.undo_button)
-        self.layout().addWidget(self.pause_button)
-        if sandbox_mode:
+            self.layout().addWidget(self.pause_button)
             self.layout().addWidget(self.redo_button)
         self.layout().addWidget(self.help_button)
         self.layout().addWidget(self.measure_button)
         self.layout().addWidget(self.camera_view_button)
 
-    def refresh(self):
+    def refresh(self) -> None:
         """
-        Refreshes the UI for all the toolbar icons
+        Refreshes the UI for all the toolbar icons and updates toolbar position
         """
         # update the pause button state
         simulation_state = self.simulation_state_buffer.get(
@@ -148,8 +176,9 @@ class GLFieldToolbar(QWidget):
         )
         if simulation_state:
             self.toggle_pause_button(simulation_state.is_playing)
+            self.update_simulation_speed(simulation_state.simulation_speed)
 
-    def toggle_pause_button(self, is_playing: bool):
+    def toggle_pause_button(self, is_playing: bool) -> None:
         """
         Toggles the state of the pause button by updating its text and icon
         :param is_playing: True if the button is in the Play state, False if its in the Pause state
@@ -161,29 +190,12 @@ class GLFieldToolbar(QWidget):
             else icons.get_play_icon(self.BUTTON_ICON_COLOR)
         )
 
-    def get_button_style(self, is_enabled: bool = True) -> str:
+    def update_simulation_speed(self, speed: float) -> None:
         """
-        Returns the stylesheet for a QPushButton based on if it's enabled or not
-        :param is_enabled: True if button is enabled, False if not
-        :return: the corresponding stylesheet indicating the button state
+        Updates the simulation speed label
+        :param speed: the speed of the simulation
         """
-        # the style for each toolbar button
-        return textwrap.dedent(
-            f"""
-            QPushButton {{
-                background-color: transparent;
-                border-color: transparent;
-                icon-size: 22px;
-                border-width: 4px;
-                border-radius: 4px;
-                height: 16px;
-            }}
-            QPushButton:hover {{
-                background-color: {"#363636" if is_enabled else "transparent"};
-                border-color: {"#363636" if is_enabled else "transparent"};
-            }}
-            """
-        )
+        self.sim_speed_button.setText(f"Speed: {speed:.2f}x")
 
     def toggle_undo_enabled(self, enabled: bool) -> None:
         """
@@ -202,3 +214,10 @@ class GLFieldToolbar(QWidget):
         self.redo_button.toggle_enabled(enabled)
         self.redo_button.setStyleSheet(self.get_button_style(enabled))
         self.redo_button.repaint()
+
+    def set_speed_callback(self, callback: Callable[[float], None]) -> None:
+        """
+        Sets the callback function for updating the simulation speed
+        :param callback: the callback function to update the simulation speed
+        """
+        self.speed_callback = callback

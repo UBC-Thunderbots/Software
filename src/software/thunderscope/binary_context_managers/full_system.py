@@ -3,7 +3,7 @@ import logging
 import time
 import threading
 
-from subprocess import Popen
+from subprocess import Popen, TimeoutExpired
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
 from proto.import_all_protos import *
@@ -22,6 +22,7 @@ class FullSystem(object):
         friendly_colour_yellow: bool = False,
         should_restart_on_crash: bool = True,
         run_sudo: bool = False,
+        running_in_realtime: bool = True,
     ) -> None:
         """Run FullSystem
 
@@ -30,6 +31,7 @@ class FullSystem(object):
         :param friendly_color_yellow: a argument passed into the unix_full_system binary (--friendly_colour_yellow)
         :param should_restart_on_crash: whether or not to restart the program after it has been crashed
         :param run_sudo: true if we should run full system under sudo
+        :param running_in_realtime: True if we are running fullsystem in realtime, else False
 
         """
         self.full_system_runtime_dir = full_system_runtime_dir
@@ -38,8 +40,9 @@ class FullSystem(object):
         self.full_system_proc = None
         self.should_restart_on_crash = should_restart_on_crash
         self.should_run_under_sudo = run_sudo
+        self.running_in_realtime = running_in_realtime
 
-        self.thread = threading.Thread(target=self.__restart__)
+        self.thread = threading.Thread(target=self.__restart__, daemon=True)
 
     def __enter__(self) -> "self":
         """Enter the full_system context manager. 
@@ -57,9 +60,10 @@ class FullSystem(object):
         except:
             pass
 
-        self.full_system = "software/unix_full_system --runtime_dir={} {}".format(
+        self.full_system = "software/unix_full_system --runtime_dir={} {} {}".format(
             self.full_system_runtime_dir,
             "--friendly_colour_yellow" if self.friendly_colour_yellow else "",
+            "--ci" if not self.running_in_realtime else "",
         )
 
         if self.should_run_under_sudo:
@@ -75,7 +79,7 @@ class FullSystem(object):
 Run Fullsystem under sudo ==============
 1. Build the full system:
 
-./tbots.py build unix_full_system -o
+./tbots.py build unix_full_system
 
 2. Run the following binaries from src to run under sudo:
 
@@ -131,7 +135,7 @@ gdb --args bazel-bin/{self.full_system}
 
     def __restart__(self) -> None:
         "Restarts full system."
-        while True:
+        while self.should_restart_on_crash:
             if not is_cmd_running(
                 [
                     "unix_full_system",
@@ -151,12 +155,20 @@ gdb --args bazel-bin/{self.full_system}
         :param traceback: The traceback of the exception
 
         """
-        if self.full_system_proc:
-            self.full_system_proc.kill()
-            self.full_system_proc.wait()
+        self.should_restart_on_crash = False
 
-        if self.should_restart_on_crash:
-            self.thread.join()
+        if self.full_system_proc:
+            # It's important to terminate full system instead of killing
+            # it to allow it to clean up its resources.
+            self.full_system_proc.terminate()
+
+            # Kill the process if it doesn't exit in the given time plus some buffer.
+            try:
+                self.full_system_proc.wait(
+                    timeout=MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC + 0.1
+                )
+            except TimeoutExpired:
+                self.full_system_proc.kill()
 
     def setup_proto_unix_io(self, proto_unix_io: ProtoUnixIO) -> None:
         """Helper to run full system and attach the appropriate unix senders/listeners
@@ -170,10 +182,12 @@ gdb --args bazel-bin/{self.full_system}
         for proto_class in [
             PathVisualization,
             PassVisualization,
+            AttackerVisualization,
             CostVisualization,
             NamedValue,
             PlayInfo,
             ObstacleList,
+            DebugShapes,
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir=self.full_system_runtime_dir,
@@ -199,8 +213,11 @@ gdb --args bazel-bin/{self.full_system}
             (SSL_WRAPPER_PATH, SSL_WrapperPacket),
             (SSL_REFEREE_PATH, Referee),
             (SENSOR_PROTO_PATH, SensorProto),
-            (TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams,),
+            (TACTIC_OVERRIDE_PATH, AssignedTacticPlayControlParams),
             (PLAY_OVERRIDE_PATH, Play),
-            (DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH, ThunderbotsConfig,),
+            (DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH, ThunderbotsConfig),
+            (VALIDATION_PROTO_SET_PATH, ValidationProtoSet),
+            (ROBOT_LOG_PATH, RobotLog),
+            (ROBOT_CRASH_PATH, RobotCrash),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)
