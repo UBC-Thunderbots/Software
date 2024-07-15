@@ -167,12 +167,13 @@ direction LR
 GetBallControl --> Dribble : [haveBallControl]\n<i>dribble</i>
 GetBallControl --> GetBallControl : <i>getBallControl</i>
 Dribble --> GetBallControl : [lostBallControl]\n<i>getBallControl</i>
-Dribble --> LoseBall : [shouldLoseBall && !shouldExcessivelyDribble]\n<i>loseBall</i>
-Dribble --> Terminate:::terminate : [shouldLoseBall && shouldExcessivelyDribble]\n<i>dribble</i>
+Dribble --> LoseBall : [shouldLoseBall && shouldExcessivelyDribble]\n<i>loseBall</i>
+Dribble --> Terminate:::terminate : [shouldLoseBall && !shouldExcessivelyDribble]\n<i>dribble</i>
 Dribble --> Terminate:::terminate : [dribblingDone]\n<i>dribble</i>
 Dribble --> Dribble : <i>dribble</i>
 LoseBall --> GetBallControl : [lostBallControl]\n<i>getBallControl</i>
 LoseBall --> LoseBall : <i>loseBall</i>
+Terminate:::terminate --> Terminate:::terminate : [!shouldExcessivelyDribble]\n<i>dribble</i>
 Terminate:::terminate --> GetBallControl : [lostBallControl]\n<i>getBallControl</i>
 Terminate:::terminate --> Dribble : [!dribblingDone]\n<i>dribble</i>
 Terminate:::terminate --> Terminate:::terminate : <i>dribble</i>
@@ -391,7 +392,7 @@ WaitingForPassState --> WaitingForPassState : [!passStarted]\n<i>updateReceive</
 WaitingForPassState --> OneTouchShotState : [passStarted && onetouchPossible]\n<i>updateOnetouch</i>
 WaitingForPassState --> ReceiveAndDribbleState : [passStarted && !onetouchPossible]\n<i>updateReceive</i>
 ReceiveAndDribbleState --> WaitingForPassState : [passReceivedByTeammate]\n<i>updateReceive</i>
-ReceiveAndDribbleState --> DribbleSkillFSM : [strayOrSlowPass]\n<i>retrieveBall</i>
+ReceiveAndDribbleState --> DribbleSkillFSM : [strayPass_G||slowPass]\n<i>retrieveBall</i>
 ReceiveAndDribbleState --> ReceiveAndDribbleState : <i>adjustReceive</i>
 DribbleSkillFSM --> WaitingForPassState : [passReceivedByTeammate]\n<i>updateReceive</i>
 DribbleSkillFSM --> DribbleSkillFSM : <i>retrieveBall</i>
