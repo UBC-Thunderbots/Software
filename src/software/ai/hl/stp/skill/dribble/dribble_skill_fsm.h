@@ -71,7 +71,7 @@ struct DribbleSkillFSM
      * @param ball_position the position of the ball
      * @param robot_position the position of the robot
      * @param dribble_destination the final dribble orientation
-     * 
+     *
      * @return the final orientation to finish dribbling facing
      */
     static Angle getFinalDribbleOrientation(
