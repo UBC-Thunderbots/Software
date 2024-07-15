@@ -73,7 +73,6 @@ py_library(
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
-        "//software/thunderscope/replay:proto_logger",
     ],
 )
 
@@ -98,7 +97,6 @@ py_library(
         "//software/thunderscope/binary_context_managers:full_system",
         "//software/thunderscope/binary_context_managers:game_controller",
         "//software/thunderscope/binary_context_managers:simulator",
-        "//software/thunderscope/replay:proto_logger",
     ],
 )
 
@@ -107,6 +105,7 @@ py_library(
     srcs = [
         "avoid_collisions.py",
         "ball_enters_region.py",
+        "ball_is_off_ground.py",
         "ball_moves_forward.py",
         "ball_moves_from_rest.py",
         "ball_moves_in_direction.py",

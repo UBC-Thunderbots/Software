@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 import logging
 import os
 import socket
@@ -21,28 +22,59 @@ from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
 
 class Gamecontroller(object):
-    """ Gamecontroller Context Manager """
+    """Gamecontroller Context Manager"""
 
     CI_MODE_LAUNCH_DELAY_S = 0.3
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, supress_logs: bool = False) -> None:
+    def __init__(self, supress_logs: bool = False, use_conventional_port=False) -> None:
         """Run Gamecontroller
 
         :param supress_logs: Whether to suppress the logs
+        :param use_conventional_port: whether or not to use the conventional port!
         """
+
         self.supress_logs = supress_logs
 
-        # We need to find 2 free ports to use for the gamecontroller
-        # so that we can run multiple gamecontroller instances in parallel
-        self.referee_port = self.next_free_port()
-        self.ci_port = self.next_free_port()
+        # We default to using a non-conventional port to avoid emitting
+        # on the same port as what other teams may be listening on.
+        if use_conventional_port:
+            if not self.is_valid_port(SSL_REFEREE_PORT):
+                raise OSError(f"Cannot use port {SSL_REFEREE_PORT} for Gamecontroller")
 
+            self.referee_port = SSL_REFEREE_PORT
+        else:
+            self.referee_port = self.next_free_port(random.randint(1024, 65535))
+
+        self.ci_port = self.next_free_port()
         # this allows gamecontroller to listen to override commands
         self.command_override_buffer = ThreadSafeBuffer(
             buffer_size=2, protobuf_type=ManualGCCommand
         )
+
+    @staticmethod
+    def get_referee_port_static(gamecontroller: Gamecontroller):
+        """
+        return the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
+
+        :param gamecontroller: the gamecontroller we are using
+        :return: the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
+        """
+        if gamecontroller is not None:
+            return gamecontroller.get_referee_port()
+
+        return SSL_REFEREE_PORT
+
+    def get_referee_port(self) -> int:
+        """
+        Sometimes, the port that we are using changes depending on context.
+        We want a getter function that returns the port we are using.
+
+        :return: the port that the game controller is currently using!
+        """
+
+        return self.referee_port
 
     def __enter__(self) -> "self":
         """Enter the gamecontroller context manager. 
@@ -102,24 +134,35 @@ class Gamecontroller(object):
             )
             manual_command = self.command_override_buffer.get(return_cached=False)
 
-    def next_free_port(self, port: int = 40000, max_port: int = 65535) -> None:
+    def is_valid_port(self, port):
+        """
+        determine whether or not a given port is valid
+
+        :param port: the port we are checking
+        :return: True if a port is valid False otherwise
+        """
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        try:
+            sock.bind(("", port))
+            sock.close()
+            return True
+        except OSError:
+            return False
+
+    def next_free_port(self, start_port: int = 40000, max_port: int = 65535) -> int:
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller
         so that we can run multiple gamecontroller instances in parallel.
 
-        :param port: The port to start looking from
+        :param start_port: The port to start looking from
         :param max_port: The maximum port to look up to
         :return: The next free port
 
         """
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        while port <= max_port:
-            try:
-                sock.bind(("", port))
-                sock.close()
-                return port
-            except OSError:
-                port += 1
+        while start_port <= max_port:
+            if self.is_valid_port(start_port):
+                return start_port
+            start_port += 1
 
         raise IOError("no free ports")
 
