@@ -2,7 +2,7 @@
 
 BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
-      align_wall_tactic(std::make_shared<MoveTactic>()),
+      align_wall_tactic(std::make_shared<BallPlacementMoveTactic>()),
       pickoff_wall_tactic(std::make_shared<BallPlacementDribbleTactic>(ai_config)),
       place_ball_tactic(std::make_shared<BallPlacementDribbleTactic>(ai_config)),
       align_placement_tactic(std::make_shared<BallPlacementMoveTactic>()),

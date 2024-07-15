@@ -278,10 +278,10 @@ struct BallPlacementPlayFSM
 
    private:
     TbotsProto::AiConfig ai_config;
-    std::shared_ptr<MoveTactic> align_wall_tactic;
+    std::shared_ptr<BallPlacementMoveTactic> align_wall_tactic;
     std::shared_ptr<BallPlacementDribbleTactic> pickoff_wall_tactic;
     std::shared_ptr<BallPlacementDribbleTactic> place_ball_tactic;
-    std::shared_ptr<MoveTactic> align_placement_tactic;
+    std::shared_ptr<BallPlacementMoveTactic> align_placement_tactic;
     std::shared_ptr<MoveTactic> retreat_tactic;
     std::shared_ptr<MoveTactic> wait_tactic;
     std::vector<std::shared_ptr<BallPlacementMoveTactic>> move_tactics;
