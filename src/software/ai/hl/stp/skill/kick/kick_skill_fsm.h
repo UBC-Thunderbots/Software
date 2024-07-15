@@ -46,6 +46,14 @@ struct KickSkillFSM
      */
     bool ballChicked(const Update &event);
 
+    /**
+     * Guard that checks if the robot is aligned for the kick
+     *
+     * @param event KickSkillFSM::Update event
+     *
+     * @return if the robot is aligned for the kick
+     */
+    bool shouldRealignWithBall(const Update &event);
 
     auto operator()()
     {
@@ -56,13 +64,17 @@ struct KickSkillFSM
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(ballChicked)
+        DEFINE_SML_GUARD(shouldRealignWithBall)
         DEFINE_SML_ACTION(updateKick)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *GetBehindBallSkillFSM_S + Update_E / updateGetBehindBall_A,
-            GetBehindBallSkillFSM_S                               = KickState_S,
+            GetBehindBallSkillFSM_S = KickState_S,
+
+            KickState_S + Update_E[shouldRealignWithBall_G] / updateGetBehindBall_A =
+                GetBehindBallSkillFSM_S,
             KickState_S + Update_E[!ballChicked_G] / updateKick_A = KickState_S,
             KickState_S + Update_E[ballChicked_G] / SET_STOP_PRIMITIVE_ACTION = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                          = X);

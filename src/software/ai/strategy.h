@@ -23,14 +23,14 @@ class Strategy
      *
      * @param ai_config the AI configuration
      */
-    Strategy(const TbotsProto::AiConfig& ai_config);
+    explicit Strategy(const TbotsProto::AiConfig& ai_config);
 
     /**
      * Gets the best pass on the field.
      *
-     * @return the best pass
+     * @see PassGenerator::getBestPass
      */
-    PassWithRating getBestPass();
+    PassWithRating getBestPass(const std::vector<RobotId>& robots_to_ignore = {});
 
     /**
      * Gets the best receiving positions for the friendly robots to go to.
@@ -89,8 +89,6 @@ class Strategy
 
     PassGenerator pass_generator_;
     ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator_;
-
-    std::optional<PassWithRating> best_pass_;
 
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
     std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_sampled_shot_;

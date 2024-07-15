@@ -17,6 +17,11 @@
 class ReceiverTactic : public SupportTactic
 {
    public:
+    /**
+     * Creates a new ReceiverTactic
+     *
+     * @param strategy the Strategy shared by all of AI
+     */
     explicit ReceiverTactic(std::shared_ptr<Strategy> strategy);
 
     void accept(TacticVisitor& visitor) const override;

@@ -22,24 +22,6 @@ struct GetBehindBallSkillFSM
 
     GetBehindBallSkillFSM();
 
-    // ASCII art showing the region behind the ball
-    // Diagram not to scale
-    //
-    //                 X
-    //          v---------------------v
-    //
-    //       >  B---------------------C
-    //       |   \                   /
-    //       |    \                 /
-    //       |     \               /     <- Region considered "behind chick origin"
-    //     X |      \             /
-    //       |       \           /
-    //       |        \         /
-    //                A1---A---A2   <  The chick origin is at A
-    //                     |
-    //                     V
-    //             direction of chip/kick
-
     /**
      * Action that updates the MovePrimitive
      *
@@ -72,14 +54,4 @@ struct GetBehindBallSkillFSM
             X + Update_E[!behindBall_G] / updateMove_A = GetBehindBallState_S,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION   = X);
     }
-
-   private:
-    // How large the triangle is that defines the region where the robot is
-    // behind the chick origin and ready to chip or kick.
-    // We want to keep the region small enough that we won't use the
-    // Chip/KickPrimitive from too far away (since the Chip/KickPrimitive doesn't avoid
-    // obstacles and we risk colliding with something), but large enough we can
-    // reasonably get in the region and chip/kick the ball successfully. This
-    // value is 'X' in the ASCII art below
-    double size_of_region_behind_ball;
 };

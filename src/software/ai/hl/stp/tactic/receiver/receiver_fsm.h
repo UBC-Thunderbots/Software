@@ -34,7 +34,7 @@ struct ReceiverFSM
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     // The minimum speed required for ball to be considered moving
-    static constexpr double BALL_MIN_MOVEMENT_SPEED = 0.04;
+    static constexpr double BALL_MIN_MOVEMENT_SPEED_M_PER_SEC = 0.04;
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray (i.e it won't make it to the receiver)
@@ -65,8 +65,8 @@ struct ReceiverFSM
                                                       const Point& best_shot_target);
 
     /*
-     * Finds a shot that is greater than MIN_SHOT_NET_PERCENT_OPEN and
-     * respects MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT for the highest chance
+     * Finds a shot that is greater than min_open_angle_for_one_touch_deg and
+     * respects max_deflection_for_one_touch_deg for the highest chance
      * of scoring with a one-touch shot. If neither of those are true, return a nullopt
      *
      * @param world The world to find a feasible shot on
