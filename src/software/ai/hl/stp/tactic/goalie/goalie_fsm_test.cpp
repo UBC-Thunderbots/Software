@@ -197,7 +197,7 @@ TEST(GoalieFSMTest, test_transitions)
                                 Timestamp::fromSeconds(125));
     ::TestUtil::setBallVelocity(world_ptr, Vector(0, -0), Timestamp::fromSeconds(125));
 
-    // goalie should enter DribbleFSM
+    // goalie should enter DribbleSkillFSM
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world_ptr, [](std::shared_ptr<Primitive>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleSkillFSM>));

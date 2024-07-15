@@ -158,12 +158,12 @@ struct DribbleSkillFSM
 
     /**
      * Guard that checks whether the excessive_dribbling_mode control param
-     * is set to TbotsProto::ExcessiveDribblingMode::TERMINATE
+     * is NOT set to TbotsProto::ExcessiveDribblingMode::TERMINATE
      *
      * @param event the Update event
      *
-     * @return whether the excessive_dribbling_mode control param is set
-     * to TbotsProto::ExcessiveDribblingMode::TERMINATE
+     * @return false if the excessive_dribbling_mode control param is set
+     * to TbotsProto::ExcessiveDribblingMode::TERMINATE, true otherwise
      */
     bool shouldExcessivelyDribble(const Update &event);
 
@@ -193,19 +193,20 @@ struct DribbleSkillFSM
             GetBallControl_S + Update_E / getBallControl_A,
 
             Dribble_S + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
-            Dribble_S + Update_E[shouldLoseBall_G && !shouldExcessivelyDribble_G] /
-                            loseBall_A = LoseBall_S,
             Dribble_S + Update_E[shouldLoseBall_G && shouldExcessivelyDribble_G] /
-                            dribble_A                         = X,
-            Dribble_S + Update_E[dribblingDone_G] / dribble_A = X,
+                            loseBall_A = LoseBall_S,
+            Dribble_S +
+                Update_E[shouldLoseBall_G && !shouldExcessivelyDribble_G] / dribble_A = X,
+            Dribble_S + Update_E[dribblingDone_G] / dribble_A                         = X,
             Dribble_S + Update_E / dribble_A,
 
             LoseBall_S + Update_E[lostBallControl_G] / getBallControl_A =
                 GetBallControl_S,
             LoseBall_S + Update_E / loseBall_A,
 
+            X + Update_E[!shouldExcessivelyDribble_G] / dribble_A,
             X + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
             X + Update_E[!dribblingDone_G] / dribble_A         = Dribble_S,
-            X + Update_E / dribble_A                           = X);
+            X + Update_E / dribble_A);
     }
 };

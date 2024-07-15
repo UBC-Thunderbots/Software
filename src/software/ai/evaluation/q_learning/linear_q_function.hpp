@@ -32,7 +32,7 @@ class LinearQFunction : public QFunction<TState, TAction>
      * @param discount_factor the initial discount factor
      * @param weights initial weights to use, or std::nullopt to initialize weights with 0
      */
-    explicit LinearQFunction(FeatureExtractor<TState, TAction> features,
+    explicit LinearQFunction(const FeatureExtractor<TState, TAction>& features,
                              double learning_rate, double discount_factor,
                              std::optional<Eigen::VectorXd> weights = std::nullopt);
 
@@ -45,7 +45,7 @@ class LinearQFunction : public QFunction<TState, TAction>
      * @param discount_factor the initial discount factor
      * @param weights_csv_file the CSV file containing the initial weights to use
      */
-    explicit LinearQFunction(FeatureExtractor<TState, TAction> features,
+    explicit LinearQFunction(const FeatureExtractor<TState, TAction>& features,
                              double learning_rate, double discount_factor,
                              std::string weights_csv_file);
 
@@ -57,7 +57,7 @@ class LinearQFunction : public QFunction<TState, TAction>
      *
      * @return the weights from the CSV file, or std::nullopt if the file is empty
      */
-    static Eigen::VectorXd loadWeightsFromCsv(std::string csv_file);
+    static Eigen::VectorXd loadWeightsFromCsv(const std::string& csv_file);
 
     /**
      * Saves the weights of the LinearQFunction to a file in CSV format.
@@ -65,7 +65,7 @@ class LinearQFunction : public QFunction<TState, TAction>
      *
      * @param csv_file the name of the file to save the weights to
      */
-    void saveWeightsToCsv(std::string csv_file);
+    void saveWeightsToCsv(const std::string& csv_file);
 
     /**
      * Gets a LinearQFunctionInfo message containing information about
@@ -105,7 +105,7 @@ class LinearQFunction : public QFunction<TState, TAction>
 
    private:
     // The feature extractor to use on the state representation
-    FeatureExtractor<TState, TAction> features_;
+    const FeatureExtractor<TState, TAction> features_;
 
     // The weights vector with one weight for each feature-action pair
     Eigen::VectorXd weights_;
@@ -119,7 +119,7 @@ class LinearQFunction : public QFunction<TState, TAction>
 
 template <typename TState, typename TAction>
 LinearQFunction<TState, TAction>::LinearQFunction(
-    FeatureExtractor<TState, TAction> features, double learning_rate,
+    const FeatureExtractor<TState, TAction>& features, double learning_rate,
     double discount_factor, std::optional<Eigen::VectorXd> weights)
     : features_(features),
       weights_(weights.value_or(Eigen::VectorXd::Zero(features_.numFeatures() *
@@ -135,7 +135,7 @@ LinearQFunction<TState, TAction>::LinearQFunction(
 
 template <typename TState, typename TAction>
 LinearQFunction<TState, TAction>::LinearQFunction(
-    FeatureExtractor<TState, TAction> features, double learning_rate,
+    const FeatureExtractor<TState, TAction>& features, double learning_rate,
     double discount_factor, std::string weights_csv_file)
     : LinearQFunction(features, learning_rate, discount_factor,
                       loadWeightsFromCsv(weights_csv_file))
@@ -143,7 +143,8 @@ LinearQFunction<TState, TAction>::LinearQFunction(
 }
 
 template <typename TState, typename TAction>
-Eigen::VectorXd LinearQFunction<TState, TAction>::loadWeightsFromCsv(std::string csv_file)
+Eigen::VectorXd LinearQFunction<TState, TAction>::loadWeightsFromCsv(
+    const std::string& csv_file)
 {
     csv::CSVReader reader(csv_file, csv::CSVFormat().no_header());
     csv::CSVRow csv_row;
@@ -157,7 +158,7 @@ Eigen::VectorXd LinearQFunction<TState, TAction>::loadWeightsFromCsv(std::string
 }
 
 template <typename TState, typename TAction>
-void LinearQFunction<TState, TAction>::saveWeightsToCsv(std::string csv_file)
+void LinearQFunction<TState, TAction>::saveWeightsToCsv(const std::string& csv_file)
 {
     const static Eigen::IOFormat CSV_FORMAT(Eigen::StreamPrecision, Eigen::DontAlignCols,
                                             ",", "\n");

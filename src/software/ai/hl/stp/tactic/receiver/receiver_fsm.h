@@ -159,13 +159,13 @@ struct ReceiverFSM
     bool strayPass(const Update& event);
 
     /**
-     * Guard that checks if the pass went astray or if the ball is slowing down.
+     * Guard that if the ball is moving slowly.
      *
      * @param event ReceiverFSM::Update event
      *
-     * @return true if the pass went astray or if the ball is slowing down
+     * @return true if the ball is moving slowly
      */
-    bool strayOrSlowPass(const Update& event);
+    bool slowPass(const Update& event);
 
     auto operator()()
     {
@@ -183,7 +183,7 @@ struct ReceiverFSM
         DEFINE_SML_GUARD(passReceived)
         DEFINE_SML_GUARD(passReceivedByTeammate)
         DEFINE_SML_GUARD(strayPass)
-        DEFINE_SML_GUARD(strayOrSlowPass)
+        DEFINE_SML_GUARD(slowPass)
 
         DEFINE_SML_ACTION(updateOnetouch)
         DEFINE_SML_ACTION(updateReceive)
@@ -200,8 +200,8 @@ struct ReceiverFSM
 
             ReceiveAndDribbleState_S + Update_E[passReceivedByTeammate_G] /
                                            updateReceive_A = WaitingForPassState_S,
-            ReceiveAndDribbleState_S + Update_E[strayOrSlowPass_G] / retrieveBall_A =
-                DribbleSkillFSM_S,
+            ReceiveAndDribbleState_S +
+                Update_E[strayPass_G || slowPass_G] / retrieveBall_A = DribbleSkillFSM_S,
             ReceiveAndDribbleState_S + Update_E / adjustReceive_A,
 
             DribbleSkillFSM_S + Update_E[passReceivedByTeammate_G] / updateReceive_A =

@@ -247,8 +247,7 @@ bool ReceiverFSM::strayPass(const Update& event)
     return stray_pass;
 }
 
-bool ReceiverFSM::strayOrSlowPass(const Update& event)
+bool ReceiverFSM::slowPass(const Update& event)
 {
-    return strayPass(event) ||
-           event.common.world_ptr->ball().velocity().length() <= MIN_STRAY_PASS_SPEED;
+    return event.common.world_ptr->ball().velocity().length() <= MIN_STRAY_PASS_SPEED;
 }

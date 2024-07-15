@@ -229,6 +229,6 @@ bool DribbleSkillFSM::shouldLoseBall(const Update &event)
 
 bool DribbleSkillFSM::shouldExcessivelyDribble(const Update &event)
 {
-    return event.control_params.excessive_dribbling_mode ==
+    return event.control_params.excessive_dribbling_mode !=
            TbotsProto::ExcessiveDribblingMode::TERMINATE;
 }
