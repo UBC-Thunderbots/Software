@@ -16,7 +16,7 @@
 
 ## Ansible
 
-[Ansible](https://www.ansible.com/overview/how-ansible-works) allows us to run actions on multiple robots at once. Actions are communicated through YAML files called playbooks. Playbooks contain a series of tasks (ex move a file, run this script, output this command) and logic dictating dependencies between tasks. When playbooks are run, Ansible establishes an SSH connection between the user's computer and target Jetson Nanos, allowing it to run the tasks in the playbook. Output from each task, and any other requested output, is displayed on the console
+[Ansible](https://www.ansible.com/overview/how-ansible-works) allows us to run actions on multiple robots at once. Actions are communicated through YAML files called playbooks. Playbooks contain a series of tasks (ex move a file, run this script, output this command) and logic dictating dependencies between tasks. When playbooks are run, Ansible establishes an SSH connection between the user's computer and robot, allowing it to run the tasks in the playbook. Output from each task, and any other requested output, is displayed on the console
 
 For a more detailed look at how Ansible works, [see the RFC](https://docs.google.com/document/d/1hN3Us2Vjr8z6ihqUVp_3L7rrjKc-EZ-l2hZJc31gNOc/edit)
 
