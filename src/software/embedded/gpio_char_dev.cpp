@@ -107,5 +107,5 @@ uint8_t GpioCharDev::parseGpioState(GpioState gpio_state)
     }
 
     LOG(FATAL) << "Invalid GPIO state: " << gpio_state;
-    return -1;
+    return 0;
 }
