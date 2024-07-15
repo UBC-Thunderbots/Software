@@ -24,7 +24,6 @@ from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
 from software.thunderscope.thunderscope_config import configure_simulated_test_view
-from software.thunderscope.replay.proto_logger import ProtoLogger
 
 from software.logger.logger import createLogger
 
@@ -76,12 +75,6 @@ class SimulatedTestRunner(TbotsTestRunner):
             worldstate (WorldState): proto containing the desired worldstate
         """
         self.simulator_proto_unix_io.send_proto(WorldState, worldstate)
-
-    def time_provider(self):
-        """Provide the current time in seconds since the epoch"""
-
-        with self.timestamp_mutex:
-            return self.timestamp
 
     def excepthook(self, args):
         """This function is _critical_ for show_thunderscope to work.
@@ -154,11 +147,6 @@ class SimulatedTestRunner(TbotsTestRunner):
                     # remove command from the list
                     ci_cmd_with_delay.remove((delay, cmd, team))
 
-            # Update the timestamp logged by the ProtoLogger
-            with self.timestamp_mutex:
-                ssl_wrapper = self.ssl_wrapper_buffer.get(block=False)
-                self.timestamp = ssl_wrapper.detection.t_capture
-
             tick = SimulatorTick(milliseconds=tick_duration_s * MILLISECONDS_PER_SECOND)
             self.simulator_proto_unix_io.send_proto(SimulatorTick, tick)
             time_elapsed_s += tick_duration_s
@@ -210,17 +198,24 @@ class SimulatedTestRunner(TbotsTestRunner):
                 always_validation_sequence_set,
             )
 
-            if self.thunderscope:
+            # Set the test name
+            eventually_validation_proto_set.test_name = self.test_name
+            always_validation_proto_set.test_name = self.test_name
 
-                # Set the test name
-                eventually_validation_proto_set.test_name = self.test_name
-                always_validation_proto_set.test_name = self.test_name
-
-                # Send out the validation proto to thunderscope
-                self.thunderscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE].send_proto(
+            # Send out the validation proto to the full system
+            # for visualization and logging for replays.
+            if self.is_yellow_friendly:
+                self.yellow_full_system_proto_unix_io.send_proto(
                     ValidationProtoSet, eventually_validation_proto_set
                 )
-                self.thunderscope.proto_unix_io_map[ProtoUnixIOTypes.BLUE].send_proto(
+                self.yellow_full_system_proto_unix_io.send_proto(
+                    ValidationProtoSet, always_validation_proto_set
+                )
+            else:
+                self.blue_full_system_proto_unix_io.send_proto(
+                    ValidationProtoSet, eventually_validation_proto_set
+                )
+                self.blue_full_system_proto_unix_io.send_proto(
                     ValidationProtoSet, always_validation_proto_set
                 )
 
@@ -504,7 +499,12 @@ def pytest_main(file):
     """
     args = load_command_line_arguments()
     # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main(["-svv", "-k", args.test_filter, file]))
+    # -W ignore::DeprecationWarning ignores deprecation warnings that spam the output
+    sys.exit(
+        pytest.main(
+            ["-svv", "-W ignore::DeprecationWarning", "-k", args.test_filter, file]
+        )
+    )
 
 
 @pytest.fixture
@@ -535,11 +535,13 @@ def simulated_test_runner():
         args.debug_blue_full_system,
         False,
         should_restart_on_crash=False,
+        running_in_realtime=args.enable_thunderscope,
     ) as blue_fs, FullSystem(
         f"{args.yellow_full_system_runtime_dir}/test/{test_name}",
         args.debug_yellow_full_system,
         True,
         should_restart_on_crash=False,
+        running_in_realtime=args.enable_thunderscope,
     ) as yellow_fs:
         with Gamecontroller(
             supress_logs=(not args.show_gamecontroller_logs)
@@ -593,31 +595,4 @@ def simulated_test_runner():
                     gamecontroller,
                 )
 
-            # Setup proto loggers.
-            #
-            # NOTE: Its important we use the test runners time provider because
-            # test will run as fast as possible with a varying tick rate. The
-            # SimulatorTestRunner time provider is tied to the simulators
-            # t_capture coming out of the wrapper packet (rather than time.time).
-            with ProtoLogger(
-                f"{args.blue_full_system_runtime_dir}/logs/{current_test}",
-                time_provider=runner.time_provider,
-            ) as blue_logger, ProtoLogger(
-                f"{args.yellow_full_system_runtime_dir}/logs/{current_test}",
-                time_provider=runner.time_provider,
-            ) as yellow_logger:
-
-                blue_full_system_proto_unix_io.register_to_observe_everything(
-                    blue_logger.buffer
-                )
-                yellow_full_system_proto_unix_io.register_to_observe_everything(
-                    yellow_logger.buffer
-                )
-
-                yield runner
-                print(
-                    f"\n\n To replay this test for the blue team, go to the `src` folder and run \n./tbots.py run thunderscope --blue_log {blue_logger.log_folder}"
-                )
-                print(
-                    f"\n\n To replay this test for the yellow team, go to the `src` folder and run \n./tbots.py run thunderscope --yellow_log {yellow_logger.log_folder}"
-                )
+            yield runner

@@ -336,6 +336,11 @@ class TrailValues:
     DEFAULT_TRAIL_SAMPLING_RATE = 0
 
 
+class ProtoConfigurationConstant:
+    DEFAULT_SAVE_DIRECTORY = "/opt/tbotspython/thunderbots_configuration_proto"
+    DEFAULT_SAVE_PATH = DEFAULT_SAVE_DIRECTORY + "/default_configuration.proto"
+
+
 class CustomGLOptions:
     """
     Custom OpenGL Rendering modes that could be used in addition to
@@ -352,3 +357,12 @@ class CustomGLOptions:
         GL_ALPHA_TEST: False,
         GL_CULL_FACE: False,
     }
+
+
+class ProtoPlayerFlags(Enum):
+    """
+    Flags set by the ProtoPlayer to indicate the state of the player
+    """
+
+    NO_ERROR_FLAG = 0
+    UNCAUGHT_EXCEPTION_FLAG = 1 << 0

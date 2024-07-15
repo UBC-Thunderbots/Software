@@ -26,6 +26,12 @@ static const std::unordered_map<int, std::string> ROBOT_MULTICAST_CHANNELS = {
 static const std::string PLOTJUGGLER_GUI_DEFAULT_HOST        = "127.0.0.1";
 static const short unsigned int PLOTJUGGLER_GUI_DEFAULT_PORT = 9870;
 
+// ProtoLogger constants for replay files
+static const std::string REPLAY_FILE_EXTENSION      = "replay";
+static const std::string REPLAY_METADATA_DELIMITER  = ",";
+static const std::string REPLAY_FILE_VERSION_PREFIX = "version:";
+static const unsigned int REPLAY_FILE_VERSION       = 2;
+
 #endif  // PLATFORMIO_BUILD
 
 // Redis default server connections properties
@@ -45,21 +51,23 @@ static const short unsigned int ROBOT_CRASH_PORT  = 42074;
 // this is an int to avoid Wconversion with lwip
 static const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
 
-static const char PROTO_MSG_TYPE_DELIMITER[4] = "!!!";
-
 // This file contains all constants that are shared between our software (AI)
 // and firmware code. Since this needs to be compiled by both C and C++, everything
 // should be defined in a way that's compatible with C.
 
 /* Game Rules */
 // The max allowed speed of the ball, in metres per second
+// https://robocup-ssl.github.io/ssl-rules/sslrules.html#_ball_speed
 static const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
+// The safe max speed of the ball that we should shoot at, in metres per second
+static const double BALL_SAFE_MAX_SPEED_METERS_PER_SECOND =
+    BALL_MAX_SPEED_METERS_PER_SECOND - 0.5;
 // The max allowed height of the robots, in metres
 static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
 static const double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The distance from the center of the robot to the front face (the flat part), in meters
-static const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.07;
+static const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.078;
 // The approximate radius of the ball according to the SSL rulebook
 static const double BALL_MAX_RADIUS_METERS = 0.0215;
 // According to the rules, 80% of the ball must be seen at all times. Robots may not
@@ -138,6 +146,9 @@ static const double DEFAULT_SIMULATOR_TICK_RATE_MILLISECONDS_PER_TICK =
 static const unsigned int MAX_ROBOT_IDS_PER_SIDE = 8;
 // The total number of possible robot ids between two teams
 static const unsigned int MAX_ROBOT_IDS = MAX_ROBOT_IDS_PER_SIDE * 2;
+
+// The maximum time in seconds given to Full System to cleanly exit the process.
+static const double MAX_TIME_TO_EXIT_FULL_SYSTEM_SEC = 0.5;
 
 // Battery Constants
 static const unsigned NUM_CELLS_IN_BATTERY    = 3;
