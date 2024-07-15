@@ -23,9 +23,10 @@ import os
 from proto.import_all_protos import *
 from google.protobuf.message import Message
 import base64
-from software.thunderscope.replay.replay_constants import *
+from software.py_constants import *
+
+from software.thunderscope.constants import ProtoPlayerFlags
 from software.thunderscope.replay.proto_player import ProtoPlayer
-from software.thunderscope.replay.proto_logger import ProtoLogger
 from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.simulated_tests.simulated_test_fixture import pytest_main
 
@@ -55,8 +56,8 @@ def create_valid_log_entry(proto: Message, current_time: float) -> str:
     """
     serialized_proto = base64.b64encode(proto.SerializeToString())
     log_entry = (
-        f"{current_time}{REPLAY_METADATA_DELIMETER}"
-        + f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMETER}"
+        f"{current_time}{REPLAY_METADATA_DELIMITER}"
+        + f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMITER}"
         + f"{serialized_proto}\n"
     )
     return log_entry
@@ -73,7 +74,7 @@ def create_missing_delimeter_log_entry(proto: Message, current_time: float) -> s
     serialized_proto = base64.b64encode(proto.SerializeToString())
     return (
         f"{current_time}"
-        + f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMETER}"
+        + f"{proto.DESCRIPTOR.full_name}{REPLAY_METADATA_DELIMITER}"
         + f"{serialized_proto}\n"
     )
 
@@ -88,8 +89,8 @@ def create_corrupt_log_entry(proto: Message, current_time: float) -> str:
     """
     serialized_proto = base64.b64encode(proto.SerializeToString())
     return (
-        f"{current_time}{REPLAY_METADATA_DELIMETER}"
-        + f"{proto.DESCRIPTOR.full_name}thisissomethingthatwouldbebad{REPLAY_METADATA_DELIMETER}"
+        f"{current_time}{REPLAY_METADATA_DELIMITER}"
+        + f"{proto.DESCRIPTOR.full_name}thisissomethingthatwouldbebad{REPLAY_METADATA_DELIMITER}"
         + f"{serialized_proto}thisisalsosomethingbad\n"
     )
 
@@ -130,7 +131,7 @@ def make_part_replay_chunks(
                 # this would happen 10% of the time
                 log_entry = gen_log_entry_func(proto, proto_time)
 
-            ProtoLogger.write_to_logfile(log_file, bytes(log_entry, encoding="utf-8"))
+            log_file.write(bytes(log_entry, encoding="utf-8"))
 
 
 def make_replay_chunk(size_of_replay_chunk=1000):
@@ -199,7 +200,7 @@ def test_for_file_corruption():
         time.sleep(0.1)
 
     # asserting that no exception has occurred when the protobufs are being played
-    assert player.get_error_bit_flag() == NO_ERROR_FLAG
+    assert player.get_error_bit_flag() == ProtoPlayerFlags.NO_ERROR_FLAG
 
     cleanup()
 

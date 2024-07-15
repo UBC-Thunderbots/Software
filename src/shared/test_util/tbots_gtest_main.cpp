@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
     if (!TbotsGtestMain::help)
     {
-        LoggerSingleton::initializeLogger(TbotsGtestMain::runtime_dir);
+        LoggerSingleton::initializeLogger(TbotsGtestMain::runtime_dir, nullptr);
 
         if (TbotsGtestMain::enable_visualizer || TbotsGtestMain::run_sim_in_realtime)
         {
