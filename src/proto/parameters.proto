@@ -643,4 +643,13 @@ message CreaseDefenderConfig
     // to determine if crease defender chipping is "towards goal"
     required double goal_post_offset_chipping = 4
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+
+    // determines how much to shift over in the x direction if crease defender
+    // is outside of field boundary
+    required double defender_shift_offset_x = 5 [default = 3.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+
+    // determines how much to shift over in the y direction if crease defender
+    // is outside the field boundary
+    required double defender_shift_offset_y = 6 [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+
 }

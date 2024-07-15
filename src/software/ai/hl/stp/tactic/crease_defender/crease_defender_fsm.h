@@ -42,7 +42,7 @@ struct CreaseDefenderFSM
      *
      * @return The best point to block the threat if it exists
      */
-    static std::optional<Point> findBlockThreatPoint(
+    std::optional<Point> findBlockThreatPoint(
         const Field& field, const Point& enemy_threat_origin,
         const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
         double robot_obstacle_inflation_factor);

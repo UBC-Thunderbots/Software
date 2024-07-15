@@ -30,6 +30,8 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     // Shot ray to block
     Ray ray(enemy_threat_origin, angle_to_block);
     std::optional<Point> block_point = findDefenseAreaIntersection(field, ray, inflated_defense_area);
+    double x_shift_offset = crease_defender_config.defender_shift_offset_x();
+    double y_shift_offset = crease_defender_config.defender_shift_offset_y();
     if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT && block_point.has_value())
     {
         // rotate pos 90 deg
@@ -44,7 +46,7 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
             *         \
             *          0
             */
-            block_point = block_point.value() + Vector(ROBOT_MAX_RADIUS_METERS*3,ROBOT_MAX_RADIUS_METERS*2);
+            block_point = block_point.value() + Vector(ROBOT_MAX_RADIUS_METERS*x_shift_offset,ROBOT_MAX_RADIUS_METERS*y_shift_offset);
         }
 
     }
@@ -60,10 +62,9 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
             *           /
             *          0
             */
-            block_point = block_point.value() + Vector(ROBOT_MAX_RADIUS_METERS*3,-ROBOT_MAX_RADIUS_METERS*2);
+            block_point = block_point.value() + Vector(ROBOT_MAX_RADIUS_METERS*x_shift_offset,-ROBOT_MAX_RADIUS_METERS*y_shift_offset);
         }
     }
-
     return block_point;
 }
 
