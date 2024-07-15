@@ -54,4 +54,4 @@ class DribbleTactic : public Tactic
     TbotsProto::AiConfig ai_config;
 };
 
-COPY_TACTIC(PlaceBallTactic, DribbleTactic)
+COPY_TACTIC(BallPlacementDribbleTactic, DribbleTactic)

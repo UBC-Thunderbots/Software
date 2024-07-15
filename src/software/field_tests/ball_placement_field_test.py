@@ -14,10 +14,8 @@ from proto.message_translation.tbots_protobuf import create_world_state
 
 logger = createLogger(__name__)
 
-
+# this field test will start a ball placement referee command to the placement_point.
 def test_ball_placement(field_test_runner):
-    # robot ID
-    id = 2
     # point to place ball
     placement_point = tbots_cpp.Point(0, 0)
 
@@ -43,7 +41,7 @@ def test_ball_placement(field_test_runner):
     params = AssignedTacticPlayControlParams()
     params.assigned_tactics[id].stop.CopyFrom(stop_tactic)
 
-
+_
 if __name__ == "__main__":
     # Run the test, -s disables all capturing and -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    sys.exit(pytest_main(__file__))

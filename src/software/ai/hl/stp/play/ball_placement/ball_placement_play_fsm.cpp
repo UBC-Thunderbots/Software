@@ -4,11 +4,11 @@ BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
     : ai_config(ai_config),
       align_wall_tactic(std::make_shared<MoveTactic>()),
       pickoff_wall_tactic(std::make_shared<DribbleTactic>(ai_config)),
-      place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config)),
+      place_ball_tactic(std::make_shared<BallPlacementDribbleTactic>(ai_config)),
       align_placement_tactic(std::make_shared<PlaceBallMoveTactic>()),
       retreat_tactic(std::make_shared<MoveTactic>()),
       wait_tactic(std::make_shared<MoveTactic>()),
-      move_tactics(std::vector<std::shared_ptr<PlaceBallMoveTactic>>())
+      move_tactics(std::vector<std::shared_ptr<BallPlacementMoveTactic>>())
 {
 }
 
@@ -417,9 +417,9 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
         return;
     }
 
-    move_tactics = std::vector<std::shared_ptr<PlaceBallMoveTactic>>(num_move_tactics);
+    move_tactics = std::vector<std::shared_ptr<BallPlacementMoveTactic>>(num_move_tactics);
     std::generate(move_tactics.begin(), move_tactics.end(),
-                  [this]() { return std::make_shared<PlaceBallMoveTactic>(); });
+                  [this]() { return std::make_shared<BallPlacementMoveTactic>(); });
 
     // non goalie and non ball placing robots line up along a line just outside the
     // friendly defense area to wait for ball placement to finish

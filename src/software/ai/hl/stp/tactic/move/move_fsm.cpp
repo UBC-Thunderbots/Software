@@ -15,6 +15,7 @@ void MoveFSM::updateMove(const Update &event)
 
 bool MoveFSM::moveDone(const Update &event)
 {
+    // only finish moving if not dribbling. Sometimes when dribbling we just want to hold the ball somewhere.
     return event.control_params.dribbler_mode == TbotsProto::DribblerMode::OFF &&
            robotReachedDestination(event.common.robot, event.control_params.destination,
                                    event.control_params.final_orientation);

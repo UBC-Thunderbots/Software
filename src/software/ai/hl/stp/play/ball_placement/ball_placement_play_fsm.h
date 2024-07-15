@@ -237,29 +237,36 @@ struct BallPlacementPlayFSM
             *StartState_S + Update_E[!shouldPickOffWall_G] / alignPlacement_A =
                 AlignPlacementState_S,
             StartState_S + Update_E[shouldPickOffWall_G] = AlignWallState_S,
+
             AlignWallState_S + Update_E[!wallAlignDone_G && shouldPickOffWall_G] /
                                    alignWall_A = AlignWallState_S,
             AlignWallState_S + Update_E[wallAlignDone_G] / setPickOffDest_A =
                 PickOffWallState_S,
             AlignWallState_S + Update_E[!shouldPickOffWall_G] = AlignPlacementState_S,
+
             PickOffWallState_S + Update_E[!wallPickOffDone_G] / pickOffWall_A =
                 PickOffWallState_S,
             PickOffWallState_S + Update_E[wallPickOffDone_G] / startWait_A =
                 PickOffWaitState_S,
             PickOffWaitState_S + Update_E[!waitDone_G] / wait_A = PickOffWaitState_S,
             PickOffWaitState_S + Update_E[waitDone_G]           = ReleaseWallState_S,
+
             ReleaseWallState_S + Update_E[!ballReleased_G] / releaseBall_A =
                 ReleaseWallState_S,
             ReleaseWallState_S + Update_E[ballReleased_G]         = AlignPlacementState_S,
+
             AlignPlacementState_S + Update_E[shouldPickOffWall_G] = AlignWallState_S,
             AlignPlacementState_S + Update_E[!alignDone_G] / alignPlacement_A =
                 AlignPlacementState_S,
             AlignPlacementState_S + Update_E[alignDone_G]            = PlaceBallState_S,
+
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
             PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A  = WaitState_S,
+
             WaitState_S + Update_E[!waitDone_G && ballPlaced_G] / wait_A = WaitState_S,
             WaitState_S + Update_E[!ballPlaced_G]                        = StartState_S,
             WaitState_S + Update_E[waitDone_G]                           = RetreatState_S,
+
             RetreatState_S + Update_E[retreatDone_G && ballPlaced_G]     = X,
             RetreatState_S + Update_E[ballPlaced_G] / retreat_A          = RetreatState_S,
             RetreatState_S + Update_E[!ballPlaced_G]                     = StartState_S);
@@ -268,12 +275,12 @@ struct BallPlacementPlayFSM
    private:
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<MoveTactic> align_wall_tactic;
-    std::shared_ptr<DribbleTactic> pickoff_wall_tactic;
-    std::shared_ptr<PlaceBallTactic> place_ball_tactic;
+    std::shared_ptr<BallPlacementDribbleTactic> pickoff_wall_tactic;
+    std::shared_ptr<BallPlacementDribbleTactic> place_ball_tactic;
     std::shared_ptr<MoveTactic> align_placement_tactic;
     std::shared_ptr<MoveTactic> retreat_tactic;
     std::shared_ptr<MoveTactic> wait_tactic;
-    std::vector<std::shared_ptr<PlaceBallMoveTactic>> move_tactics;
+    std::vector<std::shared_ptr<BallPlacementMoveTactic>> move_tactics;
     Point setup_point;
     Point pickoff_point;
     Point pickoff_destination;

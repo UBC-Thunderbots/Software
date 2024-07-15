@@ -838,7 +838,7 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int3
     // the chip to clear any bad values we just wrote and crash so everything stops.
     reset_gpio_.setValue(GpioState::LOW);
     CHECK(read_value == value) << "Couldn't write " << value << " to the TMC6100"
-                               << " on motor " << static_cast<uint32_t>(motor)
+                               << " on motor " << MOTOR_NAMES[motor]
                                << " at address " << static_cast<uint32_t>(address)
                                << " received: " << read_value;
 }

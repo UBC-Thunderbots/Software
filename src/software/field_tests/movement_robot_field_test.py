@@ -1,7 +1,6 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-import sys
 from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
@@ -134,8 +133,6 @@ def test_basic_rotation(field_test_runner):
         # validate by eye
         logger.info(f"robot set to {angle} orientation")
 
-        # time.sleep(2)
-
 
 def test_one_robots_square(field_test_runner):
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
@@ -150,17 +147,13 @@ def test_one_robots_square(field_test_runner):
         ]
     )
 
-    # field_test_runner.gamecontroller.send_gc_command(
-    #     gc_command=Command.Type.FORCE_START, team=Team.BLUE
-    # )
-
     id = world.friendly_team.team_robots[0].id
     print(f"Running test on robot {id}")
 
-    point1 = Point(x_meters=-0.75, y_meters=0.6)
-    point2 = Point(x_meters=-0.75, y_meters=-0.6)
-    point3 = Point(x_meters=0.75, y_meters=-0.6)
-    point4 = Point(x_meters=0.75, y_meters=0.6)
+    point1 = Point(x_meters=-0.3, y_meters=0.6)
+    point2 = Point(x_meters=-0.3, y_meters=-0.6)
+    point3 = Point(x_meters=-1.5, y_meters=-0.6)
+    point4 = Point(x_meters=-1.5, y_meters=0.6)
 
     tactic_0 = MoveTactic(
         destination=point1,
@@ -208,18 +201,17 @@ def test_one_robots_square(field_test_runner):
     )
     tactics = [tactic_0, tactic_1, tactic_2, tactic_3]
 
-    for i in range(3):
-        for tactic in tactics:
-            print(f"Going to {tactic.destination}")
-            params = AssignedTacticPlayControlParams()
-            params.assigned_tactics[id].move.CopyFrom(tactic)
+    for tactic in tactics:
+        print(f"Going to {tactic.destination}")
+        params = AssignedTacticPlayControlParams()
+        params.assigned_tactics[id].move.CopyFrom(tactic)
 
-            field_test_runner.set_tactics(params, True)
-            field_test_runner.run_test(
-                always_validation_sequence_set=[[]],
-                eventually_validation_sequence_set=[[]],
-                test_timeout_s=4,
-            )
+        field_test_runner.set_tactics(params, True)
+        field_test_runner.run_test(
+            always_validation_sequence_set=[[]],
+            eventually_validation_sequence_set=[[]],
+            test_timeout_s=4,
+        )
 
     # Send a stop tactic after the test finishes
     stop_tactic = StopTactic()
@@ -228,5 +220,4 @@ def test_one_robots_square(field_test_runner):
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)
