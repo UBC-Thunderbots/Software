@@ -5,8 +5,8 @@
 void MotionConstraintVisitor::visit(const GoalieTactic &tactic)
 {
     current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
-    current_motion_constraints.erase(
-        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+//    current_motion_constraints.erase(
+//        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
     current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_HALF);
 }
 
