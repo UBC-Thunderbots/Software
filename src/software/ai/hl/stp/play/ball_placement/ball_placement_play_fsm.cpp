@@ -73,38 +73,6 @@ void BallPlacementPlayFSM::pickOffWall(const BallPlacementPlayFSM::Update &event
     event.common.set_tactics(tactics_to_run);
 }
 
-void BallPlacementPlayFSM::releaseBall(const BallPlacementPlayFSM::Update &event)
-{
-    PriorityTacticVector tactics_to_run = {{}};
-
-    // setup move tactics for robots away from ball placing robot
-    setupMoveTactics(event);
-    tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
-                             move_tactics.end());
-
-    Point ball_pos = event.common.world_ptr->ball().position();
-    std::optional<Robot> robot_placing_ball =
-        event.common.world_ptr->friendlyTeam().getNearestRobot(ball_pos);
-
-    if (!robot_placing_ball.has_value())
-    {
-        return;
-    }
-
-    Point release_point =
-        ball_pos + (robot_placing_ball->position() - ball_pos).normalize(.5);
-
-    align_wall_tactic->updateControlParams(
-        release_point, pickoff_final_orientation, 0.0,
-        TbotsProto::DribblerMode::RELEASE_BALL_SLOW, TbotsProto::BallCollisionType::ALLOW,
-        {AutoChipOrKickMode::OFF, 0},
-        TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
-        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0.0);
-    tactics_to_run[0].emplace_back(align_wall_tactic);
-
-    event.common.set_tactics(tactics_to_run);
-}
-
 void BallPlacementPlayFSM::alignPlacement(const Update &event)
 {
     std::optional<Point> placement_point =
@@ -190,7 +158,7 @@ void BallPlacementPlayFSM::startWait(const Update &event)
     start_time = event.common.world_ptr->getMostRecentTimestamp();
 }
 
-void BallPlacementPlayFSM::wait(const Update &event)
+void BallPlacementPlayFSM::releaseBall(const Update &event)
 {
     WorldPtr world_ptr = event.common.world_ptr;
     std::optional<Robot> nearest_robot =
@@ -443,18 +411,4 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
             TbotsProto::ObstacleAvoidanceMode::SAFE);
     }
-}
-
-bool BallPlacementPlayFSM::ballReleased(const BallPlacementPlayFSM::Update &event)
-{
-    Point ball_pos = event.common.world_ptr->ball().position();
-    std::optional<Robot> robot_placing_ball =
-        event.common.world_ptr->friendlyTeam().getNearestRobot(ball_pos);
-
-    if (!robot_placing_ball.has_value())
-    {
-        return false;
-    }
-
-    return distance(ball_pos, robot_placing_ball->position()) > 0.4;
 }
