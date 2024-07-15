@@ -160,8 +160,8 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
     Vector initial_velocity(-1.0, -1.0);
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
-    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(max_allowed_speed_mode,
-                                                                   robot_constants);
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(max_allowed_speed_mode,
+                                                                         robot_constants);
     KinematicConstraints constraints(max_speed,
                                      robot_constants.robot_max_acceleration_m_per_s_2,
                                      robot_constants.robot_max_deceleration_m_per_s_2);

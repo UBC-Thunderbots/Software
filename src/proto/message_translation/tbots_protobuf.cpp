@@ -419,8 +419,8 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
     const RobotConstants& robot_constants)
 {
-    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-        params.max_speed_mode(), robot_constants);
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
+            params.max_speed_mode(), robot_constants);
 
     if (max_speed == 0)
     {
@@ -498,7 +498,7 @@ double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode
     }
 }
 
-double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+double convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
     RobotConstants_t robot_constants)
 {
@@ -517,6 +517,30 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             return robot_constants.ball_placement_wall_max_speed_m_per_s;
         case TbotsProto::MaxAllowedSpeedMode::DRIBBLE:
             return robot_constants.dribble_speed_m_per_s;
+        default:
+            LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
+            return 0.0;
+    }
+}
+
+double convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+        RobotConstants_t robot_constants)
+{
+    switch (max_allowed_speed_mode)
+    {
+        case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
+            return robot_constants.robot_max_ang_speed_rad_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
+            return robot_constants.robot_max_ang_speed_rad_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
+            return robot_constants.robot_max_ang_speed_rad_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT:
+            return robot_constants.robot_max_ang_speed_rad_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE:
+            return robot_constants.dribble_max_ang_speed_rad_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::DRIBBLE:
+            return robot_constants.dribble_max_ang_speed_rad_per_s;
         default:
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;
