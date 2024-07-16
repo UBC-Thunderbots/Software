@@ -6,8 +6,7 @@
 #include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
-const double DEFAULT_X_ALIGNMENT = 3.0;
-const double DEFAULT_Y_ALIGNMENT = 2.0;
+const double DEFAULT_X_ALIGNMENT = 0.09;
 
 TEST(CreaseDefenderFSMTest, test_find_block_threat_point_in_front_of_crease)
 {
