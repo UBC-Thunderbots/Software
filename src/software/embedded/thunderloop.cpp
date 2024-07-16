@@ -57,10 +57,10 @@ extern "C"
         crash_msg.set_exit_signal(g3::signalToStr(signal_num));
         *(crash_msg.mutable_status()) = *robot_status;
 
+        std::optional<std::string> error;
         auto sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotCrash>>(
-            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)) + "%" +
-                network_interface,
-            ROBOT_CRASH_PORT, true);
+            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)), ROBOT_CRASH_PORT,
+            network_interface, true, error);
         sender->sendProto(crash_msg);
         std::cerr << "Broadcasting robot crash msg";
 
@@ -108,8 +108,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
     network_service_ = std::make_unique<NetworkService>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
-        PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), PRIMITIVE_PORT,
+        ROBOT_STATUS_PORT, network_interface, true);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 

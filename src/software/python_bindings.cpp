@@ -64,8 +64,22 @@ void declareThreadedProtoUdpSender(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoUdpSender";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<std::string, int, bool>())
         .def("send_proto", &Class::sendProto);
+
+    std::string create_pyclass_name = "create" + pyclass_name;
+    m.def(create_pyclass_name.c_str(),
+          [](const std::string& ip_address, unsigned short port,
+             const std::string& interface, bool multicast) {
+              // Pybind doesn't bind references in some cases
+              // (https://pybind11.readthedocs.io/en/stable/faq.html#limitations-involving-reference-arguments)
+              std::optional<std::string> error;
+              std::shared_ptr<Class> sender =
+                  std::make_shared<Class>(ip_address, port, interface, multicast, error);
+
+              // Return the sender and the error message to the Python side
+              // Use as: sender, error = create{name}ProtoUdpSender(...)
+              return std::make_tuple(sender, error);
+          });
 }
 
 /**
@@ -98,8 +112,23 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<std::string, unsigned short, const std::function<void(T)>&, bool>())
         .def("close", &Class::close);
+
+    std::string create_pyclass_name = "create" + pyclass_name;
+    m.def(create_pyclass_name.c_str(),
+          [](const std::string& ip_address, unsigned short port,
+             const std::string& interface, const std::function<void(T)>& callback,
+             bool multicast) {
+              // Pybind doesn't bind references in some cases
+              // (https://pybind11.readthedocs.io/en/stable/faq.html#limitations-involving-reference-arguments)
+              std::optional<std::string> error;
+              std::shared_ptr<Class> listener = std::make_shared<Class>(
+                  ip_address, port, interface, callback, multicast, error);
+
+              // Return the listener and the error message to the Python side
+              // Use as: listener, error = create{name}ProtoListener(...)
+              return std::make_tuple(listener, error);
+          });
 }
 
 template <typename T>
