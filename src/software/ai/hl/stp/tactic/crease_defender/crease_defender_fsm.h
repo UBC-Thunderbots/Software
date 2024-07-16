@@ -39,17 +39,14 @@ struct CreaseDefenderFSM
      * @param enemy_threat_origin The origin of the threat to defend against
      * @param crease_defender_alignment alignment of the crease defender
      * @param robot_obstacle_inflation_factor The robot obstacle inflation factor
-     * @param alignment_multiplier_x The amount of robot radius' to shift in x direction
-     * @param alignment_multiplier_y the amount of robot radius' to shift in y direction
+     * @param x_shift_meters The amount of robot radius' to shift in x direction
      *
      * @return The best point to block the threat if it exists
      */
     static std::optional<Point> findBlockThreatPoint(
         const Field& field, const Point& enemy_threat_origin,
         const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
-        double robot_obstacle_inflation_factor,
-        double alignment_multiplier_x,
-        double alignment_multiplier_y);
+        double robot_obstacle_inflation_factor, double x_shift_meters);
 
     /**
      * Constructor for CreaseDefenderFSM struct

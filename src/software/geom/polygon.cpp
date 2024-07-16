@@ -132,6 +132,22 @@ Polygon Polygon::fromSegment(const Segment& segment, const double length_radius,
     });
 }
 
+// funky little algorithm
+// https://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order/1165943#1165943
+bool Polygon::isClockwise() const
+{
+    double sum          = 0.0;
+    size_t points_count = points_.size();
+    for (size_t i = 0; i < points_count; i++)
+    {
+        Vector v1 = Vector(points_[i].x(), points_[i].y());
+        Vector v2 = Vector(points_[(i + 1) % points_count].x(),
+                           points_[(i + 1) % points_count].y());
+        sum += (v2.x() - v1.x()) * (v2.y() + v1.y());
+    }
+    return sum > 0.0;
+}
+
 const std::vector<Segment>& Polygon::getSegments() const
 {
     return segments_;
