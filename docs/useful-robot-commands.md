@@ -62,9 +62,9 @@ flowchart TD
     tloop_logs --> |No Errors| check_redis(Does `redis-cli get /network_interface` return 'wlan0' or 'tbots', 
     and does `redis-cli get /channel_id` return '0'?)
     tloop_logs --> |Contains Errors| rip2("Fix errors or check errors with a lead")
-    check_redis --> |No| update_redis(Update Redis constants by running:
+    check_redis --> |No| update_redis("Update Redis constants by running:
                                       `redis-cli set /network_interface 'wlan0'` (for Nanos) OR `redis-cli set /network_interface 'tbots'` (for Pis)
-                                      `redis-cli set /channel_id '0'`)
+                                      `redis-cli set /channel_id '0'`")
     check_redis --> |Yes| rip3(Check with a lead)
     update_redis --> tloop_restart
     tloop_restart --> tloop_status
