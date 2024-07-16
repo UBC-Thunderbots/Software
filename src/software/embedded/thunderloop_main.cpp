@@ -9,7 +9,6 @@
 #include <unistd.h>        // needed for sysconf(int name);
 
 #include <boost/program_options.hpp>
-#include <boost/format.hpp>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
@@ -31,9 +30,6 @@ std::string BANNER =
 "  /'                                                                                       /'          \n";
 // clang-format on
 
-int PING_RETRY_DELAY_S = 3;
-std::string WIFI_6_INTERFACE = "tbots";
-std::string ROUTER_IP = "192.168.0.100";
 
 /*
  * Configure malloc for real-time linux
@@ -114,12 +110,6 @@ int main(int argc, char** argv)
     // 100MB pagefault free buffer
     const int pre_allocation_size = 20 * 1024 * 1024;
     reserveProcessMemory(pre_allocation_size);
-
-    while (system((boost::format("ping -I %1% -c 1 %2%") % WIFI_6_INTERFACE % ROUTER_IP).str().c_str()) != 0) 
-    {
-        sleep(PING_RETRY_DELAY_S);
-        std::cout << "Thunderloop: Cannot connect to network!";
-    }
 
     auto thunderloop =
         Thunderloop(create2021RobotConstants(), args.enable_log_merging, THUNDERLOOP_HZ);

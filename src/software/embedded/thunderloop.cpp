@@ -86,6 +86,14 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
+    while (system((boost::format("ping -I %1% -c 1 %2%") % network_interface_ % ROUTER_IP).str().c_str()) != 0) 
+    {
+        sleep(PING_RETRY_DELAY_S);
+        std::cout << "Warning! Thunderloop cannot connect to network!" << std::endl;
+    }
+
+    std::cout << "Thunderloop connected to network!" << std::endl;
+    
     g3::overrideSetupSignals({});
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_,
                                              enable_log_merging);

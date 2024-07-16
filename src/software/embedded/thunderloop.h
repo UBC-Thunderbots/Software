@@ -140,6 +140,10 @@ class Thunderloop
     const std::string CPU_TEMP_FILE_PATH     = "/sys/class/thermal/thermal_zone1/temp";
     const std::string PATH_TO_RINGBUFFER_LOG = "/var/log/dmesg";
 
+    
+    const int PING_RETRY_DELAY_S = 1;
+    const std::string ROUTER_IP = "192.168.0.100";
+
     std::ifstream log_file = std::ifstream(PATH_TO_RINGBUFFER_LOG);
 };
 
