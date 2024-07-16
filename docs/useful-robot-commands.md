@@ -1,7 +1,6 @@
 Table of Contents
 =================
 
-* [Common Robot Commands](#common-robot-commands)
 * [Table of Contents](#table-of-contents)
 * [Common Debugging Steps](#common-debugging-steps)
 * [Off Robot Commands](#off-robot-commands)
@@ -13,6 +12,8 @@ Table of Contents
       * [Jetson Nano](#jetson-nano)
       * [Raspberry Pi](#raspberry-pi)
    * [Robot Diagnostics](#robot-diagnostics)
+      * [For Just Diagnostics](#for-just-diagnostics)
+      * [For AI + Diagnostics](#for-ai--diagnostics)
    * [Robot Auto Test](#robot-auto-test)
 * [On Robot Commands](#on-robot-commands)
    * [Systemd Services](#systemd-services)
@@ -20,6 +21,7 @@ Table of Contents
    * [Redis](#redis)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+
 
 # Common Debugging Steps
 ```mermaid
@@ -162,9 +164,9 @@ Runs the robot auto test fixture on a robot through Ansible, which tests the mot
 
 From Software/src:
 
-`bazel run //software/embedded/ansible:run_ansible --//software/embedded:platform=<platform> --cpu=jetson_nano -- --playbook robot_auto_test_playbook.yml --hosts <robot-ip> --ssh_pass <robot_password>`
-* replace the <platform> with the target platform for the robot (either `PI` or `NANO`)
-* replace the <robot-ip> with the actual ip address of the jetson nano for the ssh connection.
+`bazel run //software/embedded/ansible:run_ansible --//software/embedded:platform=<platform> --cpu=jetson_nano -- --playbook robot_auto_test_playbook.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+* replace the \<platform\> with the target platform for the robot (either `PI` or `NANO`)
+* replace the \<robot_ip\> with the actual ip address of the jetson nano for the ssh connection.
 * replace the <robot_password> with the actual password for the jetson nano for the ssh connection.
 
 # On Robot Commands
