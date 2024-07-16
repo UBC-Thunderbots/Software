@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@thunderscope_deps//:requirements.bzl", "requirement")
+
 py_library(
     name = "proto_configuration_widget",
     srcs = ["proto_configuration_widget.py"],
@@ -26,6 +28,7 @@ py_library(
     srcs = ["proto_parameter_tree_util.py"],
     deps = [
         ":common_widgets",
+        requirement("netifaces"),
     ],
 )
 
@@ -40,4 +43,9 @@ py_library(
     deps = [
         ":frametime_counter",
     ],
+)
+
+py_library(
+    name = "bar_graph_widget",
+    srcs = ["bar_graph_widget.py"],
 )

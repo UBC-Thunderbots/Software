@@ -4,8 +4,8 @@
 
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "software/ai/hl/stp/tactic/primitive.h"
-#include "software/ai/hl/stp/tactic/stop_primitive.h"
+#include "software/ai/hl/stp/primitive/primitive.h"
+#include "software/ai/hl/stp/primitive/stop_primitive.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
 
@@ -65,6 +65,3 @@ struct TacticUpdate
                 getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));      \
         return state_str;                                                                \
     }
-
-#define SET_STOP_PRIMITIVE_ACTION                                                        \
-    [this](auto event) { event.common.set_primitive(std::make_unique<StopPrimitive>()); }

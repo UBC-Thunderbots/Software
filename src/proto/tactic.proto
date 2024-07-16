@@ -16,43 +16,23 @@ message Tactic
     oneof tactic
     {
         AttackerTactic attacker                             = 1;
-        ChipTactic chip                                     = 2;
         CreaseDefenderTactic crease_defender                = 3;
-        DribbleTactic dribble                               = 4;
-        GetBehindBallTactic get_behind_ball                 = 5;
         GoalieTactic goalie                                 = 6;
-        KickTactic kick                                     = 7;
         MoveGoalieToGoalLineTactic move_goalie_to_goal_line = 8;
         MoveTactic move                                     = 9;
         PenaltyKickTactic penalty_kick                      = 10;
-        PivotKickTactic pivot_kick                          = 11;
         ReceiverTactic receiver                             = 12;
         ShadowEnemyTactic shadow_enemy                      = 13;
         StopTactic stop                                     = 14;
         PassDefenderTactic pass_defender                    = 15;
+        KickSkillTactic kick_skill                          = 16;
+        PivotKickSkillTactic pivot_kick_skill               = 17;
+        ShootSkillTactic shoot_skill                        = 18;
     }
+    reserved 2, 4, 5, 7, 11;
 }
 
-message AttackerTactic
-{
-    // The best pass so far
-    optional Pass best_pass_so_far = 1;
-    // whether we have committed to the pass and will be taking it
-    required bool pass_committed = 2;
-    // The point the robot will chip towards if it is unable to shoot and is in danger
-    // of losing the ball to an enemy
-    optional Point chip_target = 3;
-}
-
-message ChipTactic
-{
-    // The location where the chip will be taken from
-    required Point chip_origin = 1;
-    // The direction the Robot will chip in
-    required Angle chip_direction = 2;
-    // The distance the robot will chip to
-    required double chip_distance_meters = 3;
-}
+message AttackerTactic {}
 
 enum CreaseDefenderAlignment
 {
@@ -81,39 +61,10 @@ message CreaseDefenderTactic
     required BallStealMode ball_steal_mode = 4;
 }
 
-message DribbleTactic
-{
-    // The destination for dribbling the ball
-    optional Point dribble_destination = 1;
-    // The final orientation to face the ball when finishing dribbling
-    optional Angle final_dribble_orientation = 2;
-    // whether to allow excessive dribbling, i.e. more than 1 metre at a time
-    required bool allow_excessive_dribbling = 3;
-}
-
-message GetBehindBallTactic
-{
-    // The location where the chick will be taken, i.e. where we expect the ball to be
-    // when we chip or kick it
-    required Point ball_location = 1;
-    // The direction the Robot will chick in
-    required Angle chick_direction = 2;
-}
-
 message GoalieTactic
 {
     // The maximum allowed speed mode
     required MaxAllowedSpeedMode max_allowed_speed_mode = 1;
-}
-
-message KickTactic
-{
-    // The location where the kick will be taken from
-    required Point kick_origin = 1;
-    // The direction the Robot will kick in
-    required Angle kick_direction = 2;
-    // How fast the Robot will kick the ball in meters per second
-    required double kick_speed_meters_per_second = 3;
 }
 
 message MoveGoalieToGoalLineTactic {}
@@ -144,26 +95,18 @@ message PassDefenderTactic
 {
     // The location on the field to block enemy passes from
     required Point position_to_block_from = 1;
+    // The pass defender's aggressiveness towards the ball
+    required BallStealMode ball_steal_mode = 2;
 }
 
 message PenaltyKickTactic {}
 
-message PivotKickTactic
-{
-    // The location where the kick will be taken from
-    required Point kick_origin = 1;
-    // The direction the Robot will kick in
-    required Angle kick_direction = 2;
-    // How the robot will chip or kick the ball
-    required AutoChipOrKick auto_chip_or_kick = 3;
-}
-
 message ReceiverTactic
 {
-    // The pass to receive
-    optional Pass pass = 1;
-    // If set to true, we will only receive and dribble
-    required bool disable_one_touch_shot = 2;
+    // The point at which to receive the pass
+    optional Point receiving_position = 1;
+    // If set to false, we will only receive and dribble
+    required bool enable_one_touch_shot = 2;
 }
 
 message ShadowEnemyTactic
@@ -178,3 +121,38 @@ message ShadowEnemyTactic
 }
 
 message StopTactic {}
+
+enum ExcessiveDribblingMode
+{
+    // Allow excessive dribbling (i.e. more than 1 meter at a time)
+    ALLOWED = 0;
+
+    // Lose ball control if we excessively dribble
+    LOSE_BALL = 1;
+
+    // Terminate the DribbleSkill if we excessively dribble,
+    // regardless of whether we make it to the final dribble destination
+    TERMINATE = 2;
+}
+
+message ShootSkillTactic {}
+
+message PivotKickSkillTactic
+{
+    // The location where the kick will be taken from
+    required Point kick_origin = 1;
+    // The direction the Robot will kick in
+    required Angle kick_direction = 2;
+    // How the robot will chip or kick the ball
+    required AutoChipOrKick auto_chip_or_kick = 3;
+}
+
+message KickSkillTactic
+{
+    // The location where the kick will be taken from
+    required Point kick_origin = 1;
+    // The direction the Robot will kick in
+    required Angle kick_direction = 2;
+    // How fast the Robot will kick the ball in meters per second
+    required double kick_speed_meters_per_second = 3;
+}

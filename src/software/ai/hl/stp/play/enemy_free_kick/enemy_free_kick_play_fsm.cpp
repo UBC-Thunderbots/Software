@@ -10,8 +10,8 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(TbotsProto::AiConfig ai_config)
-    : DefensePlayFSMBase::DefensePlayFSMBase(ai_config)
+EnemyFreeKickPlayFSM::EnemyFreeKickPlayFSM(std::shared_ptr<Strategy> strategy)
+    : DefensePlayFSMBase(strategy)
 {
 }
 
@@ -43,7 +43,7 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
 
     auto assignments = getAllDefenderAssignments(
         enemy_threats, event.common.world_ptr->field(), event.common.world_ptr->ball(),
-        ai_config.defense_play_config().defender_assignment_config());
+        strategy->getAiConfig().defense_play_config().defender_assignment_config());
 
     if (assignments.size() == 0)
     {
@@ -53,14 +53,15 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     // Adds designated free kick defender to block the direction the kicker is facing
     if (!enemy_threats.empty())
     {
-        auto block_free_kicker = std::make_shared<PassDefenderTactic>();
+        auto block_free_kicker = std::make_shared<PassDefenderTactic>(strategy);
         Vector block_direction =
             Vector::createFromAngle(enemy_threats[0].robot.orientation());
         block_kick_point =
             event.common.world_ptr->ball().position() +
             block_direction.normalize(STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M +
                                       2 * ROBOT_MAX_RADIUS_METERS);
-        block_free_kicker->updateControlParams(block_kick_point);
+        block_free_kicker->updateControlParams(block_kick_point,
+                                               TbotsProto::BallStealMode::IGNORE);
         tactics_to_return[0].push_back(block_free_kicker);
     }
 
@@ -109,12 +110,13 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
                      distance(friendly_goal_center, block_kick_point) >=
                          ball_far_threshold_m)
             {
-                auto mid_zone_defender = std::make_shared<PassDefenderTactic>();
+                auto mid_zone_defender = std::make_shared<PassDefenderTactic>(strategy);
                 Point mid_point =
                     Point((event.common.world_ptr->ball().position().toVector() +
                            friendly_goal_center.toVector()) /
                           2);
-                mid_zone_defender->updateControlParams(mid_point);
+                mid_zone_defender->updateControlParams(mid_point,
+                                                       TbotsProto::BallStealMode::IGNORE);
                 tactics_to_return[0].push_back(mid_zone_defender);
             }
             else
@@ -147,7 +149,8 @@ void EnemyFreeKickPlayFSM::setTactics(const Update& event, unsigned int num_tact
     setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
     setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
     setAlignment(event, crease_defender_assignments, TbotsProto::BallStealMode::IGNORE);
-    updatePassDefenderControlParams(pass_defender_assignments);
+    updatePassDefenderControlParams(pass_defender_assignments,
+                                    TbotsProto::BallStealMode::IGNORE);
 
     tactics_to_return[1].insert(tactics_to_return[1].end(), crease_defenders.begin(),
                                 crease_defenders.end());

@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/play/enemy_ball_placement/enemy_ball_placement_play_fsm.h"
 
-EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
-      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(ai_config),
-                               std::make_shared<CreaseDefenderTactic>(ai_config)}),
+EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(std::shared_ptr<Strategy> strategy)
+    : strategy(strategy),
+      crease_defender_tactics({std::make_shared<CreaseDefenderTactic>(strategy),
+                               std::make_shared<CreaseDefenderTactic>(strategy)}),
       avoid_interference_tactics({
           std::make_shared<AvoidInterferenceTactic>(),
           std::make_shared<AvoidInterferenceTactic>(),
@@ -17,9 +17,10 @@ EnemyBallPlacementPlayFSM::EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_con
           std::make_shared<MoveTactic>(),
           std::make_shared<MoveTactic>(),
       }),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config)),
-      distance_to_keep_meters(
-          ai_config.enemy_ball_placement_play_config().distance_to_keep_meters()),
+      goalie_tactic(std::make_shared<GoalieTactic>(strategy)),
+      distance_to_keep_meters(strategy->getAiConfig()
+                                  .enemy_ball_placement_play_config()
+                                  .distance_to_keep_meters()),
       nearly_placed_threshold_meters(0.5)
 {
 }

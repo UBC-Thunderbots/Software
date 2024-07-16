@@ -5,7 +5,9 @@
 #include "software/test_util/test_util.h"
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
-    : game_state(), ai(friendly_thunderbots_config.ai_config())
+    : strategy(std::make_shared<Strategy>(friendly_thunderbots_config.ai_config())),
+      game_state(),
+      ai(strategy)
 {
 }
 
@@ -33,7 +35,10 @@ void SimulatedErForceSimPlayTestFixture::setAiPlay(
         ->mutable_ai_control_config()
         ->set_override_ai_play(ai_play_name);
 
-    ai = Ai(friendly_thunderbots_config.ai_config());
+    TbotsProto::Play play_proto;
+    play_proto.set_name(ai_play_name);
+
+    ai.overridePlayFromProto(play_proto);
 }
 
 void SimulatedErForceSimPlayTestFixture::setAiPlay(std::unique_ptr<Play> play)
@@ -53,7 +58,7 @@ void SimulatedErForceSimPlayTestFixture::setTactic(
 {
     CHECK(static_cast<bool>(tactic)) << "Tactic is invalid" << std::endl;
     std::unique_ptr<AssignedTacticsPlay> play =
-        std::make_unique<AssignedTacticsPlay>(friendly_thunderbots_config.ai_config());
+        std::make_unique<AssignedTacticsPlay>(strategy);
     std::map<RobotId, std::set<TbotsProto::MotionConstraint>>
         motion_constraint_override_map;
     motion_constraint_override_map[id] = motion_constraints;
@@ -83,8 +88,7 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
 
     auto start_tick_time = std::chrono::system_clock::now();
 
-    auto primitive_set_msg =
-        ai.getPrimitives(std::make_shared<World>(world_with_updated_game_state));
+    auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
     LOG(VISUALIZE) << ai.getPlayInfo();
     LOG(VISUALIZE) << *primitive_set_msg;
 

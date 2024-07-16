@@ -28,14 +28,15 @@ message ThunderbotsConfig
 
 message AiConfig
 {
+    reserved 8;
+
     required AiControlConfig ai_control_config                              = 1;
-    required DribbleTacticConfig dribble_tactic_config                      = 2;
+    required DribbleConfig dribble_config                                   = 2;
     required AttackerTacticConfig attacker_tactic_config                    = 3;
-    required CornerKickPlayConfig corner_kick_play_config                   = 4;
+    required FreeKickPlayConfig free_kick_play_config                       = 4;
     required PassingConfig passing_config                                   = 5;
     required GoalieTacticConfig goalie_tactic_config                        = 6;
     required EnemyCapabilityConfig enemy_capability_config                  = 7;
-    required ShootOrPassPlayConfig shoot_or_pass_play_config                = 8;
     required RobotCapabilitiesConfig robot_capabilities_config              = 9;
     required EnemyBallPlacementPlayConfig enemy_ball_placement_play_config  = 10;
     required DefensePlayConfig defense_play_config                          = 11;
@@ -43,6 +44,9 @@ message AiConfig
     required AiParameterConfig ai_parameter_config                          = 13;
     required ReceiverTacticConfig receiver_tactic_config                    = 14;
     required CreaseDefenderConfig crease_defender_config                    = 15;
+    required PassDefenderConfig pass_defender_config                        = 16;
+    required ShotConfig shot_config                                         = 17;
+    required PivotKickConfig pivot_kick_config                              = 18;
 }
 
 message AiControlConfig
@@ -52,6 +56,9 @@ message AiControlConfig
 
     // Override the existing play with the Play enum provided
     required PlayName override_ai_play = 2 [default = UseAiSelection];
+
+    // Interfaces for various network listeners
+    required NetworkConfig network_config = 3;
 }
 
 message AiParameterConfig
@@ -74,6 +81,77 @@ message AttackerTacticConfig
         (bounds).min_double_value = 0.1,
         (bounds).max_double_value = 90.0
     ];
+
+    /*****  Q-learning hyperparameters *****/
+
+    // The learning rate determines the extent to which new information overrides old
+    // information. A higher learning rate means more emphasis on recent information.
+    required double learning_rate = 3
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // The discount factor determines the importance of future rewards.
+    // A factor of 0 makes the agent consider only immediate rewards, ignoring future
+    // rewards completely. This makes the agent myopic, focusing solely on short-term
+    // gains. A factor closer to 1 makes the agent consider future rewards more
+    // significantly, encouraging it to evaluate long-term benefits.
+    required double discount_factor = 4
+        [default = 0.9, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // Controls the epsilon parameter if using an epsilon-greedy selection strategy.
+    // The epsilon determines the exploration-exploitation balance; higher epsilons lead
+    // to more exploration of the action space, while lower epsilons favor exploitation of
+    // the best-known actions.
+    required double action_selection_epsilon = 5 [
+        default                   = 0.3,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
+
+    // Controls the temperature parameter if using a softmax action selection strategy.
+    // Temperature determines the exploration-exploitation balance; higher temperatures
+    // lead to more exploration of the action space, while lower temperatures favor
+    // exploitation of the best-known actions.
+    required double action_selection_temperature = 6 [
+        default                   = 0.3,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
+
+    // Reward function parameters
+    required AttackerRewardFunctionConfig reward_function_config = 7;
+}
+
+message AttackerRewardFunctionConfig
+{
+    // Reward for a goal scored by the friendly team
+    required double friendly_team_scoring_reward = 1
+        [default = 0.8, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // Penalty for a goal scored by the enemy team
+    required double enemy_team_scoring_penalty = 2 [
+        default                   = -0.8,
+        (bounds).min_double_value = -1.0,
+        (bounds).max_double_value = 0.0
+    ];
+
+    // Reward for getting the ball near the enemy goal (i.e. in the enemy defense area)
+    required double ball_near_enemy_goal_reward = 3
+        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // Reward for keeping friendly possession
+    required double kept_possession_reward = 4
+        [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+
+    // Penalty for losing friendly possession
+    required double lost_possession_penalty = 5 [
+        default                   = -0.2,
+        (bounds).min_double_value = -1.0,
+        (bounds).max_double_value = 0.0
+    ];
+
+    // Maximum reward for moving the ball up the field towards the enemy goal
+    required double forward_progress_reward = 6
+        [default = 0.1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 }
 
 message ReceiverTacticConfig
@@ -92,17 +170,17 @@ message ReceiverTacticConfig
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal
     required double max_deflection_for_one_touch_deg = 3 [
-        default                   = 60.0,
+        default                   = 45.0,
         (bounds).min_double_value = 10.0,
         (bounds).max_double_value = 90.0
     ];
 }
 
-message CornerKickPlayConfig
+message FreeKickPlayConfig
 {
     // The maximum time that we will wait before committing to a pass
     required double max_time_commit_to_pass_seconds = 1
-        [default = 3.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+        [default = 5.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 8.0];
 }
 
 
@@ -236,6 +314,29 @@ message PassingConfig
     required double min_pass_shoot_score = 20
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
 
+    /*****  PassSkill parameters *****/
+    // The absolute minimum pass quality we're willing to attempt
+    required double abs_min_pass_score = 27 [
+        default                   = 0.05,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 1.0
+    ];
+    // The minimum pass quality we're willing to attempt before ramping down the
+    // score to abs_min_pass_score
+    required double min_perfect_pass_score = 28 [
+        default                   = 0.75,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 1.0
+    ];
+    // When we're choosing a pass, we start by looking for a pass with a perfect score
+    // of 1, and then over time lower the score we're will to accept. This parameter
+    // how fast we ramp down to abs_min_pass_score. This is in seconds.
+    required double pass_score_ramp_down_duration = 29
+        [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
+    // Width of the pass lane area that the ball must be inside of during the pass
+    required double pass_lane_width_meters = 30
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+
     /*****  Visualization parameters *****/
     // Cost function visualization parameters
     required CostVisualizationConfig cost_vis_config = 10;
@@ -305,11 +406,25 @@ message GoalieTacticConfig
         [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
-message DribbleTacticConfig
+message ShotConfig
+{
+    // Number of shot origin points to sample when finding the best shot to take
+    required int32 num_shot_origin_points_to_sample = 1
+        [default = 8, (bounds).min_int_value = 0, (bounds).max_int_value = 16];
+
+    // The absolute minimum open angle to the goal that we require to attempt a shot
+    required double abs_min_open_angle_for_shot_deg = 2 [
+        default                   = 1.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 90.0
+    ];
+}
+
+message DribbleConfig
 {
     // If ball and front of robot are separated by this amount, then we've lost
-    // possession (in m)
-    required double lose_ball_possession_threshold = 1 [
+    // control over the ball (in m)
+    required double lose_ball_control_threshold = 1 [
         default                   = 0.04,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 1.0
@@ -363,49 +478,31 @@ message DribbleTacticConfig
     ];
 }
 
+message PivotKickConfig
+{
+    // If ball and front of robot are separated by this distance, then we've lost
+    // control over the ball (in m)
+    required double lose_ball_control_distance_threshold = 1 [
+        default                   = 0.04,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 1.0
+    ];
+
+    // If ball and front of robot are separated for this long, then we've lost
+    // control over the ball (in seconds)
+    required double lose_ball_control_time_threshold = 2 [
+        default                   = 1.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
+}
+
 message EnemyCapabilityConfig
 {
     // This value should be set based on whether or not the team we are playing against
     // can pass the ball. This will affect how we defend against the team.
     required bool enemy_team_can_pass = 1 [default = true];
 }
-
-message ShootOrPassPlayConfig
-{
-    // The absolute minimum pass quality we're willing to attempt
-    required double abs_min_pass_score = 1 [
-        default                   = 0.05,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 1.0
-    ];
-
-    // The minimum pass quality we're willing to attempt before ramping
-    // down the score to abs_min_pass_score
-    required double min_perfect_pass_score = 6 [
-        default                   = 0.85,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 1.0
-    ];
-
-    // When we're choosing a pass, we start by looking for a pass with a perfect score
-    // of 1, and then over time lower the score we're will to accept. This parameter
-    // how fast we ramp down to abs_min_pass_score. This is in seconds.
-    required double pass_score_ramp_down_duration = 2
-        [default = 2.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-
-    // threshold to decide if the ball has been kicked by a robot
-    required double ball_shot_threshold = 3
-        [default = 1.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
-
-    // threshold to decide if the ball has been kicked by a robot
-    required double min_distance_to_pass = 4
-        [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-
-    // threshold for the distance between passer and receiver
-    required double short_pass_threshold = 5
-        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-}
-
 
 message RobotCapabilitiesConfig
 {
@@ -464,10 +561,18 @@ message SensorFusionConfig
 
     // Number of dropped detections before we consider the ball not to be in the dribbler
     required int32 num_dropped_detections_before_ball_not_in_dribbler = 12
-        [default = 3, (bounds).min_int_value = 0, (bounds).max_int_value = 1000];
+        [default = 10, (bounds).min_int_value = 0, (bounds).max_int_value = 1000];
 
     // Possession tracker for determining which team has possession of the ball
     required PossessionTrackerConfig possession_tracker_config = 13;
+
+    // Max distance between the ball and front of the robot for the robot to be
+    // considered touching the ball (in m)
+    required double touching_ball_threshold = 14 [
+        default                   = 0.04,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 1.0
+    ];
 }
 
 message EnemyBallPlacementPlayConfig
@@ -524,10 +629,10 @@ message DefensePlayConfig
         ];
     }
 
-    // The distance at which a threat is considered "immediate" if there is only 1
-    // "immediate" threat the defense play will swarm that robot with shadowers
+    // The distance between an enemy robot and the ball for the enemy to be considered
+    // an "immediate" threat that must be avoided
     required double immediate_threat_distance = 1
-        [default = 6.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 9.5];
+        [default = 1.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 9.5];
 
     // The DefenderAssignmentConfig for tuning defender assignments
     required DefenderAssignmentConfig defender_assignment_config = 2;
@@ -555,6 +660,13 @@ message RobotNavigationObstacleConfig
     // robot's position for obstacle avoidance
     required double dynamic_enemy_robot_obstacle_horizon_sec = 4
         [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+
+    // Additional amount to inflate ball obstacle by for extra safety
+    required double additional_ball_obstacle_inflation_meters = 5 [
+        default                   = 0.05,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 0.5
+    ];
 }
 
 message CostVisualizationConfig
@@ -598,7 +710,7 @@ message PossessionTrackerConfig
     // Min distance in meters between robot and ball for robot
     // to be considered far away from the ball
     required double distance_far_tolerance_meters = 2 [
-        default                   = 0.5,
+        default                   = 0.3,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 10.0
     ];
@@ -617,30 +729,56 @@ message PossessionTrackerConfig
     ];
 }
 
+message NetworkConfig
+{
+    // The robot communication interface
+    required string robot_communication_interface = 1 [default = "lo"];
+
+    // The referee interface
+    required string referee_interface = 2 [default = "lo"];
+
+    // The vision interface
+    required string vision_interface = 3 [default = "lo"];
+}
+
 message CreaseDefenderConfig
 {
-    /*
-    Max ratio between distances (crease defender and ball) / (nearest enemy and ball) for
-    pass defender to chase ball.
-    Threshold = 1.0 results in crease defenders chasing the ball even if the ball is
-    equidistant to nearest enemy.
-    Threshold < 1.0 results in crease defenders chasing the ball only when it is at least
-    (threshold) percent closer to our bot than the nearest enemy.
-    ┌──────────────────────────────────────────┐
-    | Pass   | <────> Ball <───────────> Enemy |
-    |       ()         x                  ()   |
-    └──────────────────────────────────────────┘
-     */
-    required double max_get_ball_ratio_threshold = 1
-        [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
-    // Max distance that the crease defenders will try and get possession of a ball
-    required double max_get_ball_radius_m = 2
-        [default = 1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
-    // Max speed of ball that crease defenders will try and get possession
-    required double max_ball_speed_to_get_m_per_s = 3
-        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
     // The additional buffer length for each side of the goal
     // to determine if crease defender chipping is "towards goal"
     required double goal_post_offset_chipping = 4
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+    // Unique steal config for crease defenders
+    required DefenderStealConfig defender_steal_config = 1;
+}
+
+message PassDefenderConfig
+{
+    // Unique steal config for pass defenders
+    required DefenderStealConfig defender_steal_config = 1;
+}
+
+message DefenderStealConfig
+{
+    /*
+    Max ratio between distances (defender and ball) / (nearest enemy and ball) for
+    defender to chase ball.
+    Threshold = 1.0 results in defenders chasing the ball even if the ball is equidistant
+    to nearest enemy. Threshold < 1.0 results in defenders chasing the ball only when it
+    is at least (threshold)% closer to our bot than the nearest enemy.
+    ┌──────────────────────────────────────────┐
+    | Defender <────> Ball <───────────> Enemy |
+    |    ()            x                  ()   |
+    └──────────────────────────────────────────┘
+     */
+    required double max_get_ball_ratio_threshold = 1 [
+        default                   = 0.3,
+        (bounds).min_double_value = 0.01,
+        (bounds).max_double_value = 1.0
+    ];
+    // Max distance that the defender will try and get possession of a ball
+    required double max_get_ball_radius_m = 2
+        [default = 1, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Max speed of ball that pass defender will try and get possession
+    required double max_ball_speed_to_get_m_per_s = 3
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
 }

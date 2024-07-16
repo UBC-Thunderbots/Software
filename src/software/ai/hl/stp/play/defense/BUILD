@@ -66,6 +66,7 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
+        "//software/ai:strategy",
         "//software/ai/evaluation:defender_assignment",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",

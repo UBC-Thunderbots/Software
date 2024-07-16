@@ -1,7 +1,6 @@
 Table of Contents
 =================
 
-* [Common Robot Commands](#common-robot-commands)
 * [Table of Contents](#table-of-contents)
 * [Common Debugging Steps](#common-debugging-steps)
 * [Off Robot Commands](#off-robot-commands)
@@ -13,6 +12,8 @@ Table of Contents
       * [Jetson Nano](#jetson-nano)
       * [Raspberry Pi](#raspberry-pi)
    * [Robot Diagnostics](#robot-diagnostics)
+      * [For Just Diagnostics](#for-just-diagnostics)
+      * [For AI + Diagnostics](#for-ai--diagnostics)
    * [Robot Auto Test](#robot-auto-test)
 * [On Robot Commands](#on-robot-commands)
    * [Systemd Services](#systemd-services)
@@ -21,18 +22,19 @@ Table of Contents
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
+
 # Common Debugging Steps
 ```mermaid
 ---
 title: Robot Debugging Steps
 ---
 flowchart TD
-    ssh(Can you SSH into the robot? 
-        `ssh robot@192.168.0.20RobotID` OR `ssh robot@robot_name.local`
-        E.g. `ssh robot@192.168.0.203` or `ssh robot@robert.local` 
-        for a robot called robert with robot id 3)
+    ssh("Can you SSH into the robot? 
+        `ssh robot@192.168.0.20RobotID` (for Nanos) OR `ssh robot@192.168.1.20RobotID` (for Pis) OR `ssh robot@robot_name.local`
+        e.g. `ssh robot@192.168.0.203` (for Nanos) or `ssh robot@192.168.1.203` (for Pis) or `ssh robot@robert.local`
+        for a robot called robert with robot id 3")
     ssh ---> |Yes| tloop_status
-    ssh --> |No - Second Try| monitor("`Connect Jetson to an external monitor and check wifi connection _or_ SSH using an ethernet cable`")
+    ssh --> |No - Second Try| monitor("Connect Jetson or Pi to an external monitor and check wifi connection or SSH using an ethernet cable")
     ssh --> |No - First Try| restart(Restart robot)
     restart --> ssh
 
@@ -59,12 +61,12 @@ flowchart TD
                                               `service thunderloop restart`)
     tloop_status --> |Running| tloop_logs(Check Thunderloop logs for errors
                                           `journalctl -fu thunderloop -n 300`)
-    tloop_logs --> |No Errors| check_redis(Does `redis-cli get /network_interface` return 'wlan0', 
+    tloop_logs --> |No Errors| check_redis(Does `redis-cli get /network_interface` return 'wlan0' or 'tbots', 
     and does `redis-cli get /channel_id` return '0'?)
-    tloop_logs --> |Contains Errors| rip2("`Fix errors or check errors with a lead`")
-    check_redis --> |No| update_redis(Update Redis constants by running:
-                                      `redis-cli set /network_interface 'wlan0'`
-                                      `redis-cli set /channel_id '0'`)
+    tloop_logs --> |Contains Errors| rip2("Fix errors or check errors with a lead")
+    check_redis --> |No| update_redis("Update Redis constants by running:
+                                      `redis-cli set /network_interface 'wlan0'` (for Nanos) OR `redis-cli set /network_interface 'tbots'` (for Pis)
+                                      `redis-cli set /channel_id '0'`")
     check_redis --> |Yes| rip3(Check with a lead)
     update_redis --> tloop_restart
     tloop_restart --> tloop_status
@@ -99,15 +101,21 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 
 <b>This will trigger motor calibration meaning the wheels may spin. Please elevate the robot so the wheels are not touching the ground for proper calibration.</b>
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+* \<platform\> is the host platform on the robot (either `PI` or `NANO`)
+* <robot_ip> is the IP address of the robot
+* <robot_password> is the password of the `robot` user account
 
 You could also use the `tbots.py` script to flash robot software
 
-`./tbots.py run run_ansible -f <robot_ids> -pwd <robot_password>` (Note that this uses robot IDs rather than full robot IP addresses)
+`./tbots.py run run_ansible -pl <platform> -f <robot_ids> -pwd <robot_password>` (Note that this uses robot IDs rather than full robot IP addresses)
+* \<platform\> is the host platform on the robot (either `PI` or `NANO`
+* <robot_ids> is a list of robot IDs to flash
+* <robot_password> is the password of the `robot` user account
 
-Example: Flashing robots 1, 4, and 7
+Example: Flashing robots 1, 4, and 7 that have a Raspberry Pi
 
-`./tbots.py run run_ansible -f 1 4 7 -pwd <robot_password>`
+`./tbots.py run run_ansible -pl PI -f 1 4 7 -pwd <robot_password>`
 
 ## Flashing the powerboard
 
@@ -125,11 +133,11 @@ This section refers to setting up the computer on the robot for the first time. 
 
 ### Jetson Nano
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:platform=NANO -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 
 ### Raspberry Pi
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano -- --playbook setup_raspberry_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:platform=PI -- --playbook setup_raspberry_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 
 ## Robot Diagnostics
 
@@ -137,13 +145,13 @@ Robot Diagnostics allow users to input various commands to the robots. It can be
 
 <b>If multiple people are using robot diagnostics at the same time on the same network please make sure each person only connects to the robots they are testing via the checkboxes</b>
 
-###For Just Diagnostics
+### For Just Diagnostics
 
 From Software/src
 
 `./tbots.py run thunderscope --run_diagnostics --interface <network_interface>`
 
-###For AI + Diagnostics
+### For AI + Diagnostics
 
 From Software/src
 
@@ -156,8 +164,9 @@ Runs the robot auto test fixture on a robot through Ansible, which tests the mot
 
 From Software/src:
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano -- --playbook robot_auto_test_playbook.yml --hosts <robot-ip> --ssh_pass <robot_password>`
-* replace the <robot-ip> with the actual ip address of the jetson nano for the ssh connection.
+`bazel run //software/embedded/ansible:run_ansible --//software/embedded:platform=<platform> --cpu=jetson_nano -- --playbook robot_auto_test_playbook.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+* replace the \<platform\> with the target platform for the robot (either `PI` or `NANO`)
+* replace the \<robot_ip\> with the actual ip address of the jetson nano for the ssh connection.
 * replace the <robot_password> with the actual password for the jetson nano for the ssh connection.
 
 # On Robot Commands

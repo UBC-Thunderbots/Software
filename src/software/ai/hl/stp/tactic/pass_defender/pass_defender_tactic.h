@@ -14,14 +14,21 @@
 class PassDefenderTactic : public Tactic
 {
    public:
-    explicit PassDefenderTactic();
+    /**
+     * Creates a new PassDefenderTactic
+     *
+     * @param strategy the Strategy shared by all of AI
+     */
+    explicit PassDefenderTactic(std::shared_ptr<Strategy> strategy);
 
     /**
      * Update control params for this tactic
      *
      * @param position_to_block_from The location on the field to block enemy passes from
+     * @param ball_steal_mode The pass defender's aggressiveness towards the ball
      */
-    void updateControlParams(const Point& position_to_block_from);
+    void updateControlParams(const Point& position_to_block_from,
+                             TbotsProto::BallStealMode ball_steal_mode);
 
     void accept(TacticVisitor& visitor) const override;
 
@@ -30,7 +37,7 @@ class PassDefenderTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
+    std::shared_ptr<Strategy> strategy;
     std::map<RobotId, std::unique_ptr<FSM<PassDefenderFSM>>> fsm_map;
-
     PassDefenderFSM::ControlParams control_params;
 };

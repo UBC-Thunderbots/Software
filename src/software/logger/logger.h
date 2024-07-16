@@ -34,7 +34,7 @@
 
 // Called when LOG() is called with 2 arguments
 #define LOG_2(level, filename)                                                           \
-    if (level != CSV && level != VISUALIZE)                                              \
+    if (level != CSV && level != CSV_OVERWRITE && level != VISUALIZE)                    \
     {                                                                                    \
     }                                                                                    \
     else                                                                                 \
@@ -89,14 +89,16 @@ class LoggerSingleton
         // arg. Note: log locations are defaulted to the bazel-out folder due to Bazel's
         // hermetic build principles
 
-        // if log dir doesn't exist, create it
+        // If log dir doesn't exist, create it
         if (!std::experimental::filesystem::exists(runtime_dir))
         {
             std::experimental::filesystem::create_directories(runtime_dir);
         }
 
+        // Sink for logging to CSV files
         auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(runtime_dir),
-                                                  &CSVSink::appendToFile);
+                                                  &CSVSink::writeToFile);
+
         // Sink for outputting logs to the terminal
         auto colour_cout_sink_handle = logWorker->addSink(
             std::make_unique<ColouredCoutSink>(true, reduce_repetition),
@@ -127,11 +129,11 @@ class LoggerSingleton
     }
 
     // levels is this vector are filtered out of the filtered log rotate sink
-    std::vector<LEVELS> filtered_level_filter = {DEBUG, VISUALIZE,    CSV,
-                                                 INFO,  ROBOT_STATUS, PLOTJUGGLER};
-    std::vector<LEVELS> default_level_filter  = {VISUALIZE, CSV, ROBOT_STATUS,
-                                                PLOTJUGGLER};
-    const std::string filter_suffix           = "_filtered";
-    const std::string log_name                = "thunderbots";
+    std::vector<LEVELS> filtered_level_filter = {
+        DEBUG, VISUALIZE, CSV, CSV_OVERWRITE, INFO, ROBOT_STATUS, PLOTJUGGLER};
+    std::vector<LEVELS> default_level_filter = {VISUALIZE, CSV, CSV_OVERWRITE,
+                                                ROBOT_STATUS, PLOTJUGGLER};
+    const std::string filter_suffix          = "_filtered";
+    const std::string log_name               = "thunderbots";
     std::unique_ptr<g3::LogWorker> logWorker;
 };

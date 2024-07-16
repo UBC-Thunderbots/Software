@@ -7,20 +7,6 @@ load("@simulated_tests_deps//:requirements.bzl", "requirement")
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
 
 cc_library(
-    name = "example_play",
-    srcs = ["example_play.cpp"],
-    hdrs = ["example_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "halt_play",
     srcs = ["halt_play.cpp"],
     hdrs = ["halt_play.h"],
@@ -30,31 +16,6 @@ cc_library(
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
         "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
-    name = "free_kick_play",
-    srcs = ["free_kick_play.cpp"],
-    hdrs = ["free_kick_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/evaluation:find_open_areas",
-        "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
-        "//software/ai/passing:eighteen_zone_pitch_division",
-        "//software/ai/passing:pass_generator",
-        "//software/ai/passing:receiver_position_generator",
-        "//software/logger",
-        "//software/util/generic_factory",
-        "//software/world:ball",
     ],
     alwayslink = True,
 )
@@ -85,34 +46,10 @@ cc_library(
         ":play",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
+        "//software/ai/hl/stp/tactic/assigned_skill:specialized_assigned_skill_tactics",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
         "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
-    name = "shoot_or_chip_play",
-    srcs = ["shoot_or_chip_play.cpp"],
-    hdrs = ["shoot_or_chip_play.h"],
-    deps = [
-        ":play",
-        "//proto/message_translation:tbots_protobuf",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/evaluation:find_open_areas",
-        "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-        "//software/world:game_state",
     ],
     alwayslink = True,
 )
@@ -142,6 +79,7 @@ cc_library(
         "play_fsm.h",
     ],
     deps = [
+        "//software/ai:strategy",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
@@ -158,40 +96,22 @@ cc_library(
 cc_library(
     name = "all_plays",
     deps = [
-        ":example_play",
-        ":free_kick_play",
         ":halt_play",
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",
-        ":shoot_or_chip_play",
         ":stop_play",
         "//software/ai/hl/stp/play/ball_placement:ball_placement_play",
-        "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
         "//software/ai/hl/stp/play/defense:defense_play",
+        "//software/ai/hl/stp/play/dynamic_plays:dynamic_play",
+        "//software/ai/hl/stp/play/dynamic_plays:offense_play",
         "//software/ai/hl/stp/play/enemy_ball_placement:enemy_ball_placement_play",
         "//software/ai/hl/stp/play/enemy_free_kick:enemy_free_kick_play",
-        "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
-        "//software/ai/hl/stp/play/hardware_challenge_plays:pass_endurance_play",
-        "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
-        "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_with_static_defenders_play",
-        "//software/ai/hl/stp/play/offense:offense_play",
+        "//software/ai/hl/stp/play/free_kick:free_kick_play",
         "//software/ai/hl/stp/play/penalty_kick:penalty_kick_play",
         "//software/ai/hl/stp/play/penalty_kick_enemy:penalty_kick_enemy_play",
-        "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
-    ],
-)
-
-cc_test(
-    name = "example_play_test",
-    srcs = ["example_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:example_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
+        "//software/ai/hl/stp/play/test_plays:example_play",
+        "//software/ai/hl/stp/play/test_plays:halt_test_play",
+        "//software/ai/hl/stp/play/test_plays:move_test_play",
     ],
 )
 
@@ -291,61 +211,6 @@ py_test(
     ],
 )
 
-cc_test(
-    name = "free_kick_play_cpp_test",
-    srcs = ["free_kick_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:free_kick_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-py_test(
-    name = "free_kick_play_test",
-    srcs = ["free_kick_play_test.py"],
-    tags = ["exclusive"],
-    deps = [
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
-    ],
-)
-
-cc_test(
-    name = "shoot_or_chip_play_cpp_test",
-    srcs = ["shoot_or_chip_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:shoot_or_chip_play",
-        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-py_test(
-    name = "shoot_or_chip_play_test",
-    srcs = [
-        "shoot_or_chip_play_test.py",
-    ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
-    deps = [
-        "//software/simulated_tests:simulated_test_fixture",
-        "//software/simulated_tests:validation",
-        requirement("pytest"),
-    ],
-)
-
 cc_library(
     name = "assigned_tactics_play",
     srcs = ["assigned_tactics_play.cpp"],
@@ -354,6 +219,7 @@ cc_library(
         ":play",
         "//shared:constants",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/logger",
         "//software/util/generic_factory",
     ],

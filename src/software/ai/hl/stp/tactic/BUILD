@@ -1,31 +1,18 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_test(
-    name = "penalty_setup_tactic_test",
-    srcs = ["penalty_setup_tactic_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/test_util",
-    ],
-)
-
 cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
         ":tactic",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic",
+        "//software/ai/hl/stp/tactic/assigned_skill:specialized_assigned_skill_tactics",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/pass_defender:pass_defender_tactic",
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
-        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
@@ -37,18 +24,42 @@ cc_library(
     srcs = ["tactic.cpp"],
     hdrs = [
         "tactic.h",
-        "tactic_fsm.h",
-        "tactic_visitor.h",
     ],
     deps = [
-        ":stop_primitive",
+        ":tactic_fsm",
+        ":tactic_visitor",
         ":transition_conditions",
+        "//software/ai/hl/stp/primitive:stop_primitive",
+        "//software/util/typename",
+        "//software/world",
+        "@tracy",
+    ],
+)
+
+cc_library(
+    name = "tactic_visitor",
+    hdrs = ["tactic_visitor.h"],
+    deps = [
+        "//software/ai/hl/stp/skill:all_skills",
+    ],
+)
+
+cc_library(
+    name = "tactic_fsm",
+    hdrs = ["tactic_fsm.h"],
+    deps = [
         "//proto/primitive:primitive_msg_factory",
         "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",
         "@tracy",
     ],
+)
+
+cc_library(
+    name = "support_tactic",
+    hdrs = ["support_tactic.h"],
+    deps = [":tactic"],
 )
 
 cc_library(
@@ -70,16 +81,6 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "fsm_state_test",
-    srcs = ["fsm_state_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/test_util",
-    ],
-)
-
 cc_library(
     name = "tactic_factory",
     srcs = ["tactic_factory.cpp"],
@@ -90,55 +91,7 @@ cc_library(
         ":all_tactics",
         "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_protobuf",
-    ],
-)
-
-cc_library(
-    name = "primitive",
-    hdrs = [
-        "primitive.h",
-    ],
-    deps = [
-        "//proto:tbots_cc_proto",
-        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
-        "//software/ai/navigator/trajectory:trajectory_path",
-    ],
-)
-
-cc_library(
-    name = "move_primitive",
-    srcs = ["move_primitive.cpp"],
-    hdrs = [
-        "move_primitive.h",
-    ],
-    deps = [
-        ":primitive",
-        "//proto/message_translation:tbots_protobuf",
-        "//proto/primitive:primitive_msg_factory",
-        "//software/ai/navigator/trajectory:trajectory_planner",
-        "//software/geom/algorithms:end_in_obstacle_sample",
-    ],
-)
-
-cc_library(
-    name = "stop_primitive",
-    srcs = ["stop_primitive.cpp"],
-    hdrs = [
-        "stop_primitive.h",
-    ],
-    deps = [
-        ":primitive",
-        "//proto/message_translation:tbots_protobuf",
-    ],
-)
-
-cc_test(
-    name = "primitive_test",
-    srcs = ["primitive_test.cpp"],
-    deps = [
-        ":move_primitive",
-        ":stop_primitive",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
+        "//software/ai:strategy",
+        "//software/ai/hl/stp/skill:all_skills",
     ],
 )

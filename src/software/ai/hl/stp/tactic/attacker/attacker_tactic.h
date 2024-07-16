@@ -1,70 +1,129 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
+#include "software/ai/evaluation/q_learning/attacker_mdp_action.h"
+#include "software/ai/evaluation/q_learning/attacker_mdp_feature_extractor.h"
+#include "software/ai/evaluation/q_learning/attacker_mdp_reward_function.h"
+#include "software/ai/evaluation/q_learning/bandits/epsilon_greedy_strategy.hpp"
+#include "software/ai/evaluation/q_learning/bandits/softmax_strategy.hpp"
+#include "software/ai/evaluation/q_learning/linear_q_function.hpp"
+#include "software/ai/evaluation/q_learning/q_policy.hpp"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/passing/pass.h"
 
 /**
- * This tactic is for a robot performing a pass. It should be used in conjunction with
- * the `ReceiverTactic` in order to complete the pass.
+ * The Attacker is the main ball handler during offensive gameplay. It executes
+ * sequences of Skills (e.g. dribble, pass, kick, chip) to create chances and score goals.
  *
- * Note that this tactic does not take into account the time the pass should occur at,
- * it simply tries to move to the best position to take the pass as fast as possible
+ * The Attacker selects which Skills to execute according to a learned policy, which
+ * gives the probability of taking a given action (Skill) in a given state (the World).
+ * We attempt to find the optimal policy using reinforcement learning algorithms.
  */
 class AttackerTactic : public Tactic
 {
    public:
     /**
-     * Creates a new AttackerTactic
+     * Creates a AttackerTactic.
      *
-     * @param ai_config The AI configuration
+     * @param strategy the shared Strategy used by all of AI
      */
-    explicit AttackerTactic(TbotsProto::AiConfig ai_config);
+    explicit AttackerTactic(std::shared_ptr<Strategy> strategy);
 
     AttackerTactic() = delete;
 
-    /**
-     * Updates the control parameters for this AttackerTactic.
-     *
-     * @param updated_pass The pass to perform
-     */
-    void updateControlParams(const Pass& best_pass_so_far, bool pass_committed);
-
-    /**
-     * Updates the control parameters for this AttackerTactic
-     *
-     * @param chip_target An optional point that the robot will chip towards when it is
-     * unable to shoot and is in danger of losing the ball to an enemy. If this value is
-     * not provided, the point defaults to the enemy goal
-     */
-    void updateControlParams(std::optional<Point> chip_target);
-
     void accept(TacticVisitor& visitor) const override;
 
-    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
+    std::string getFSMState() const override;
+
+    bool done() const override;
+
+    /**
+     * Returns whether the AttackerTactic has temporarily suspended execution
+     * of its current Skill.
+     *
+     * IMPORTANT: updatePrimitive should not be called on this tactic if it is
+     * suspended. This is because a suspended tactic will not yield any primitives
+     * to execute.
+     *
+     * @return true if the tactic has suspended execution, false otherwise
+     */
+    bool suspended() const;
+
+    /**
+     * If the AttackerTactic has temporarily suspended execution of its current Skill,
+     * calling this method will update the AttackerTactic with the given world and try
+     * to resume execution (i.e. leave the suspended state).
+     *
+     * If the AttackerTactic is not suspended, then calling this method effectively
+     * does nothing.
+     *
+     * @param world_ptr the world pointer
+     *
+     * @return true if the tactic resumed execution and is not suspended,
+     * false if the tactic failed to resume and is still suspended
+     */
+    bool tryResumingIfSuspended(const WorldPtr& world_ptr);
+
+    /**
+     * Terminate the current episode of the AttackerTactic and reset the tactic
+     * for a new episode
+     *
+     * @param world_ptr the World at the end of the current episode
+     */
+    void terminate(const WorldPtr& world_ptr);
+
+    /**
+     * Gets a SkillState containing details about the current state of the skill
+     * that the AttackerTactic is executing.
+     *
+     * @return the current state of the Skill that the tactic is executing
+     */
+    SkillState getSkillState() const;
+
+    /**
+     * Log visualize the SkillState for this AttackerTactic.
+     *
+     * @param world the current state of the world
+     */
+    void visualizeSkillState(const World& world);
 
    private:
+    // The shared Strategy used by all of AI
+    std::shared_ptr<Strategy> strategy_;
+
+    // The Q-function of the attacker agent's policy
+    std::shared_ptr<LinearQFunction<AttackerMdpState, AttackerMdpAction>> q_function_;
+
+    // The action selection strategy of attacker agent's policy
+    std::shared_ptr<SoftmaxStrategy<AttackerMdpState, AttackerMdpAction>>
+        action_selection_strategy_;
+
+    // The policy that the attacker agent will follow
+    QPolicy<AttackerMdpState, AttackerMdpAction> policy_;
+
+    // The reward function for the attacker agent
+    AttackerMdpRewardFunction attacker_mdp_reward_function_;
+
+    // The current skill that the attacker is executing
+    std::unique_ptr<Skill> current_skill_;
+
+    // File to load Q-function weights from for initialization
+    inline static const std::string ATTACKER_MDP_Q_FUNCTION_INITIAL_WEIGHTS_FILE =
+        "software/ai/evaluation/q_learning/attacker_mdp_q_function_weights.csv";
+
+    // Name of file that Q-function weights will be saved to at runtime
+    // TODO (#3249): Append timestamp to Q-function weights file name
+    inline static const std::string ATTACKER_MDP_Q_FUNCTION_RUNTIME_WEIGHTS_FILE =
+        "attacker_mdp_q_function_weights.csv";
+
+    // Name that identifies the attacker MDP in Thunderscope
+    inline static const std::string ATTACKER_MDP_NAME = "Attacker";
+
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     /**
-     * Log visualize the control parameters for this AttackerTactic
+     * Update the policy of the attacker agent.
      *
-     * @param world Current state of the world
-     * @param control_params The control parameters to visualize
+     * @param attacker_mdp_state the new state entered after the attacker agent
+     *                           completed the last executed action
      */
-    void visualizeControlParams(const World& world,
-                                const AttackerFSM::ControlParams& control_params);
-
-    std::map<RobotId, std::unique_ptr<FSM<AttackerFSM>>> fsm_map;
-
-    // The pass to execute
-    std::optional<Pass> best_pass_so_far;
-    // whether we have committed to the above pass
-    bool pass_committed;
-    // The point the robot will chip towards if it is unable to shoot and is in danger
-    // of losing the ball to an enemy
-    std::optional<Point> chip_target;
-
-    // AI config
-    TbotsProto::AiConfig ai_config;
+    void updatePolicy(const AttackerMdpState& attacker_mdp_state);
 };

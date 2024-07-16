@@ -1,10 +1,14 @@
 #pragma once
 
+#include "proto/tactic.pb.h"
 #include "shared/constants.h"
+#include "software/ai/hl/stp/skill/dribble/dribble_skill.h"
+#include "software/ai/hl/stp/skill/skill_fsm.h"
+#include "software/ai/hl/stp/tactic/defender/defender_fsm_base.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
 
-struct PassDefenderFSM
+struct PassDefenderFSM : public DefenderFSMBase
 {
     class BlockPassState;
     class InterceptBallState;
@@ -15,7 +19,17 @@ struct PassDefenderFSM
     {
         // The location on the field to block enemy passes from
         Point position_to_block_from;
+        // The pass defender's aggressiveness towards the ball
+        TbotsProto::BallStealMode ball_steal_mode;
     };
+
+    /**
+     * Constructor for PassDefenderFSM struct
+     *
+     * @param strategy the Strategy shared by all of AI
+     */
+    explicit PassDefenderFSM(std::shared_ptr<Strategy> strategy) : strategy(strategy) {}
+
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
@@ -67,6 +81,26 @@ struct PassDefenderFSM
      */
     void interceptBall(const Update& event);
 
+    /**
+     * Guard that determines whether it is appropriate to steal the ball
+     *
+     * @param event PassDefenderFSM::Update event
+     *
+     * @return true if stealing is enabled and the ball is nearby, unguarded by the enemy,
+     *          and within a max get possession threshold
+     */
+    bool ballNearbyWithoutThreat(const Update& event);
+
+    /**
+     * This is the Action that prepares for getting possession of the ball
+     * @param event PassDefenderFSM::Update event
+     * @param processEvent processes the DribbleSkillFSM::Update
+     */
+    void prepareGetPossession(
+        const Update& event,
+        boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
+
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -82,6 +116,10 @@ struct PassDefenderFSM
         DEFINE_SML_ACTION(blockPass)
         DEFINE_SML_ACTION(interceptBall)
 
+        DEFINE_SML_STATE(DribbleSkillFSM)
+        DEFINE_SML_GUARD(ballNearbyWithoutThreat)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleSkillFSM)
+
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *BlockPassState_S + Update_E[passStarted_G] / interceptBall_A =
@@ -89,10 +127,16 @@ struct PassDefenderFSM
             BlockPassState_S + Update_E / blockPass_A,
             InterceptBallState_S + Update_E[ballDeflected_G] / blockPass_A =
                 BlockPassState_S,
+            InterceptBallState_S + Update_E[ballNearbyWithoutThreat_G] /
+                                       prepareGetPossession_A = DribbleSkillFSM_S,
+            DribbleSkillFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockPass_A =
+                BlockPassState_S,
+            DribbleSkillFSM_S + Update_E / prepareGetPossession_A,
             InterceptBallState_S + Update_E / interceptBall_A,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     }
 
    private:
+    std::shared_ptr<Strategy> strategy;
     Angle pass_orientation;
 };

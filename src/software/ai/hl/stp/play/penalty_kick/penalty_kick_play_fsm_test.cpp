@@ -19,9 +19,10 @@ TEST(PenaltyKickPlayFSMTest, test_transitions)
 
     int num_tactics = 5;
 
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<Strategy> strategy =
+        std::make_shared<Strategy>(TbotsProto::AiConfig());
 
-    FSM<PenaltyKickPlayFSM> fsm(PenaltyKickPlayFSM{ai_config});
+    FSM<PenaltyKickPlayFSM> fsm{PenaltyKickPlayFSM(strategy)};
 
     EXPECT_TRUE(fsm.is(boost::sml::state<PenaltyKickPlayFSM::SetupPositionState>));
 
