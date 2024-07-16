@@ -622,10 +622,18 @@ message CreaseDefenderConfig
 {
     // The additional buffer length for each side of the goal
     // to determine if crease defender chipping is "towards goal"
-    required double goal_post_offset_chipping = 4
+    required double goal_post_offset_chipping = 1
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
     // Unique steal config for crease defenders
-    required DefenderStealConfig defender_steal_config = 1;
+    required DefenderStealConfig defender_steal_config = 2;
+
+    // determines how much to shift over in the x direction if crease defender
+    // is outside of field boundary
+    required double out_of_field_boundary_x_shift_meters = 3 [
+        default                   = 0.09,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 5.0
+    ];
 }
 
 message PassDefenderConfig
@@ -662,12 +670,4 @@ message DefenderStealConfig
     // to determine if crease defender chipping is "towards goal"
     required double goal_post_offset_chipping = 4
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
-
-    // determines how much to shift over in the x direction if crease defender
-    // is outside of field boundary
-    required double out_of_field_boundary_x_shift_meters = 5 [
-        default                   = 0.09,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 5.0
-    ];
 }
