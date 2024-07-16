@@ -27,12 +27,12 @@ Table of Contents
 title: Robot Debugging Steps
 ---
 flowchart TD
-    ssh(Can you SSH into the robot? 
-        `ssh robot@192.168.0.20RobotID` OR `ssh robot@robot_name.local`
-        e.g. `ssh robot@192.168.0.203` (for Jetson Nanos) or `ssh robot@192.168.1.203` (for Pis) or `ssh robot@robert.local`
-        for a robot called robert with robot id 3)
+    ssh("Can you SSH into the robot? 
+        `ssh robot@192.168.0.20RobotID` (for Nanos) OR `ssh robot@192.168.1.20RobotID` (for Pis) OR `ssh robot@robot_name.local`
+        e.g. `ssh robot@192.168.0.203` (for Nanos) or `ssh robot@192.168.1.203` (for Pis) or `ssh robot@robert.local`
+        for a robot called robert with robot id 3")
     ssh ---> |Yes| tloop_status
-    ssh --> |No - Second Try| monitor("`Connect Jetson to an external monitor and check wifi connection _or_ SSH using an ethernet cable`")
+    ssh --> |No - Second Try| monitor("`Connect Jetson or Pi to an external monitor and check wifi connection _or_ SSH using an ethernet cable`")
     ssh --> |No - First Try| restart(Restart robot)
     restart --> ssh
 
@@ -100,16 +100,16 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 <b>This will trigger motor calibration meaning the wheels may spin. Please elevate the robot so the wheels are not touching the ground for proper calibration.</b>
 
 `bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
-- <platform> is the host platform on the robot (either `PI` or `NANO`)
-- <robot_ip> is the IP address of the robot
-- <robot_password> is the password of the `robot` user account
+* <platform> is the host platform on the robot (either `PI` or `NANO`)
+* <robot_ip> is the IP address of the robot
+* <robot_password> is the password of the `robot` user account
 
 You could also use the `tbots.py` script to flash robot software
 
 `./tbots.py run run_ansible -pl <platform> -f <robot_ids> -pwd <robot_password>` (Note that this uses robot IDs rather than full robot IP addresses)
-- <platform> is the host platform on the robot (either `PI` or `NANO`
-- <robot_ids> is a list of robot IDs to flash
-- <robot_password> is the password of the `robot` user account
+* <platform> is the host platform on the robot (either `PI` or `NANO`
+* <robot_ids> is a list of robot IDs to flash
+* <robot_password> is the password of the `robot` user account
 
 Example: Flashing robots 1, 4, and 7 that have a Raspberry Pi
 
@@ -163,7 +163,7 @@ Runs the robot auto test fixture on a robot through Ansible, which tests the mot
 From Software/src:
 
 `bazel run //software/embedded/ansible:run_ansible --//software/embedded:platform=<platform> --cpu=jetson_nano -- --playbook robot_auto_test_playbook.yml --hosts <robot-ip> --ssh_pass <robot_password>`
-- replace the <platform> with the target platform for the robot (either `PI` or `NANO`)
+* replace the <platform> with the target platform for the robot (either `PI` or `NANO`)
 * replace the <robot-ip> with the actual ip address of the jetson nano for the ssh connection.
 * replace the <robot_password> with the actual password for the jetson nano for the ssh connection.
 
