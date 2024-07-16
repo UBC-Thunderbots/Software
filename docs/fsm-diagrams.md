@@ -109,6 +109,30 @@ Terminate:::terminate --> Terminate:::terminate
 
 ```
 
+## [FreeKickPlayFSM](/src/software/ai/hl/stp/play/free_kick/free_kick_play_fsm.h)
+
+```mermaid
+
+stateDiagram-v2
+classDef terminate fill:white,color:black,font-weight:bold
+direction LR
+[*] --> SetupPositionState
+SetupPositionState --> SetupPositionState : [!setupDone]\n<i>setupPosition</i>
+SetupPositionState --> ShootState : [shotFound]
+ShootState --> ShootState : [!shotDone]\n<i>shootBall</i>
+ShootState --> Terminate:::terminate : [shotDone]
+SetupPositionState --> AttemptPassState : <i>startLookingForPass</i>
+AttemptPassState --> ChipState : [timeExpired]
+AttemptPassState --> AttemptPassState : [!passFound]\n<i>lookForPass</i>
+AttemptPassState --> PassState : [passFound]
+PassState --> AttemptPassState : [shouldAbortPass]
+PassState --> PassState : [!passDone]\n<i>passBall</i>
+PassState --> Terminate:::terminate : [passDone]
+ChipState --> ChipState : [!chipDone]\n<i>chipBall</i>
+ChipState --> Terminate:::terminate : [chipDone]
+
+```
+
 ## [OffensePlayFSM](/src/software/ai/hl/stp/play/offense/offense_play_fsm.h)
 
 ```mermaid
@@ -201,6 +225,7 @@ direction LR
 [*] --> GetBehindBallFSM
 GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
 GetBehindBallFSM --> ChipState
+ChipState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
 ChipState --> ChipState : [!ballChicked]\n<i>updateChip</i>
 ChipState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
@@ -302,6 +327,7 @@ direction LR
 [*] --> GetBehindBallFSM
 GetBehindBallFSM --> GetBehindBallFSM : <i>updateGetBehindBall</i>
 GetBehindBallFSM --> KickState
+KickState --> GetBehindBallFSM : [shouldRealignWithBall]\n<i>updateGetBehindBall</i>
 KickState --> KickState : [!ballChicked]\n<i>updateKick</i>
 KickState --> Terminate:::terminate : [ballChicked]\n<i>SET_STOP_PRIMITIVE_ACTION</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>

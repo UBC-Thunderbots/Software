@@ -436,6 +436,9 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::init<>(&createThreadedEstopReader))
         .def("isEstopPlay", &ThreadedEstopReader::isEstopPlay);
 
+    py::class_<ProtoLogger>(m, "ProtoLogger")
+        .def_static("createLogEntry", &ProtoLogger::createLogEntry);
+
     py::class_<EighteenZonePitchDivision, std::shared_ptr<EighteenZonePitchDivision>>(
         m, "EighteenZonePitchDivision")
         .def(py::init<Field>())
