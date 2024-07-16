@@ -88,6 +88,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
+    // pings the router on the specific network interface to ensure wifi is connected, keeps trying until success
     while (system((boost::format("ping -I %1% -c 1 %2%") % network_interface_ % ROUTER_IP).str().c_str()) != 0) 
     {
         sleep(PING_RETRY_DELAY_S);
