@@ -17,6 +17,7 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/skill/dribble:dribble_skill",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic/defender:defender_fsm_base",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/geom:stadium",
         "//software/geom/algorithms",

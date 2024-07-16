@@ -30,15 +30,17 @@ void DefensePlayFSMBase::setUpPassDefenders(int num_pass_defenders)
 
     pass_defenders = std::vector<std::shared_ptr<PassDefenderTactic>>(num_pass_defenders);
     std::generate(pass_defenders.begin(), pass_defenders.end(),
-                  [this]() { return std::make_shared<PassDefenderTactic>(); });
+                  [this]() { return std::make_shared<PassDefenderTactic>(strategy); });
 }
 
 void DefensePlayFSMBase::updatePassDefenderControlParams(
-    std::vector<DefenderAssignment>& pass_defender_assignments)
+    std::vector<DefenderAssignment>& pass_defender_assignments,
+    TbotsProto::BallStealMode ball_steal_mode)
 {
     for (unsigned int i = 0; i < pass_defenders.size(); i++)
     {
-        pass_defenders.at(i)->updateControlParams(pass_defender_assignments.at(i).target);
+        pass_defenders.at(i)->updateControlParams(pass_defender_assignments.at(i).target,
+                                                  ball_steal_mode);
     }
 }
 

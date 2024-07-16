@@ -203,70 +203,15 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
 
 bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
-    Point robot_position = event.common.robot.position();
-    Point ball_position  = event.common.world_ptr->ball().position();
-
-    std::optional<Robot> nearest_friendly_to_ball =
-        event.common.world_ptr->friendlyTeam().getNearestRobot(ball_position);
-    std::optional<Robot> nearest_enemy_to_ball =
-        event.common.world_ptr->enemyTeam().getNearestRobot(ball_position);
-
-    if (event.control_params.ball_steal_mode == TbotsProto::BallStealMode::IGNORE)
-    {
-        // Do nothing if stealing is disabled
-        return false;
-    }
-    else if (nearest_friendly_to_ball.has_value() &&
-             event.common.robot.id() != nearest_friendly_to_ball.value().id())
-    {
-        // Do nothing if this robot is not the closest to the ball. Resolves issue of
-        // multiple simultaneous steals
-        return false;
-    }
-    else if (nearest_enemy_to_ball.has_value())
-    {
-        double ball_distance_to_friendly = distance(robot_position, ball_position);
-        double ball_distance_to_enemy =
-            distance(nearest_enemy_to_ball.value().position(), ball_position);
-
-        // Get the ball if the ball is on friendly side, nearby, and unguarded by the
-        // enemy
-        bool ball_is_near_friendly =
-            ball_distance_to_friendly <
-            ball_distance_to_enemy * (1.0 - strategy->getAiConfig()
-                                                .crease_defender_config()
-                                                .max_get_ball_ratio_threshold());
-        bool ball_is_within_max_range =
-            ball_distance_to_friendly <=
-            strategy->getAiConfig().crease_defender_config().max_get_ball_radius_m();
-        bool ball_is_slow = event.common.world_ptr->ball().velocity().length() <=
-                            strategy->getAiConfig()
-                                .crease_defender_config()
-                                .max_ball_speed_to_get_m_per_s();
-        bool ball_on_friendly_side = ball_position.x() < 0;
-
-        return ball_on_friendly_side && ball_is_near_friendly &&
-               ball_is_within_max_range && ball_is_slow;
-    }
-    else
-    {
-        return true;
-    }
+    bool ball_on_friendly_side = event.common.world_ptr->ball().position().x() < 0;
+    return ball_on_friendly_side && DefenderFSMBase::ballNearbyWithoutThreat(
+                                        event.common.world_ptr, event.common.robot,
+                                        event.control_params.ball_steal_mode,
+                                        strategy->getAiConfig().crease_defender_config().defender_steal_config());
 }
 
 void CreaseDefenderFSM::prepareGetPossession(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
-    Point ball_position     = event.common.world_ptr->ball().position();
-    Point enemy_goal_center = event.common.world_ptr->field().enemyGoal().centre();
-    auto ball_to_net_vector = Vector(enemy_goal_center - ball_position);
-
-    DribbleSkillFSM::ControlParams control_params{
-        .dribble_destination       = ball_position,
-        .final_dribble_orientation = ball_to_net_vector.orientation(),
-        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL};
-
-    processEvent(DribbleSkillFSM::Update(
-        control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
-                                    event.common.set_primitive)));
+    DefenderFSMBase::prepareGetPossession(event.common, strategy, processEvent);
 }

@@ -76,7 +76,7 @@ namespace
                      TbotsProto::MotionConstraint::ENEMY_HALF}),
                 std::set<TbotsProto::MotionConstraint>(
                     {TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE})),
-            std::make_tuple(std::make_shared<PassDefenderTactic>(),
+            std::make_tuple(std::make_shared<PassDefenderTactic>(strategy),
                             std::set<TbotsProto::MotionConstraint>(),
                             std::set<TbotsProto::MotionConstraint>())};
 
