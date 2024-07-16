@@ -100,14 +100,14 @@ This will stop the current Systemd services, replace and restart them. Binaries 
 <b>This will trigger motor calibration meaning the wheels may spin. Please elevate the robot so the wheels are not touching the ground for proper calibration.</b>
 
 `bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:platform=<platform> -- --playbook deploy_robot_software.yml --hosts <robot_ip> --ssh_pass <robot_password>`
-* <platform> is the host platform on the robot (either `PI` or `NANO`)
+* \<platform\> is the host platform on the robot (either `PI` or `NANO`)
 * <robot_ip> is the IP address of the robot
 * <robot_password> is the password of the `robot` user account
 
 You could also use the `tbots.py` script to flash robot software
 
 `./tbots.py run run_ansible -pl <platform> -f <robot_ids> -pwd <robot_password>` (Note that this uses robot IDs rather than full robot IP addresses)
-* <platform> is the host platform on the robot (either `PI` or `NANO`
+* \<platform\> is the host platform on the robot (either `PI` or `NANO`
 * <robot_ids> is a list of robot IDs to flash
 * <robot_password> is the password of the `robot` user account
 
@@ -143,13 +143,13 @@ Robot Diagnostics allow users to input various commands to the robots. It can be
 
 <b>If multiple people are using robot diagnostics at the same time on the same network please make sure each person only connects to the robots they are testing via the checkboxes</b>
 
-###For Just Diagnostics
+### For Just Diagnostics
 
 From Software/src
 
 `./tbots.py run thunderscope --run_diagnostics --interface <network_interface>`
 
-###For AI + Diagnostics
+### For AI + Diagnostics
 
 From Software/src
 
