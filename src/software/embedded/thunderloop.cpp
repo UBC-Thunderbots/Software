@@ -3,6 +3,8 @@
 #include <Tracy.hpp>
 #include <fstream>
 
+#include <boost/format.hpp>
+
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
@@ -93,7 +95,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     }
 
     std::cout << "Thunderloop connected to network!" << std::endl;
-    
+
     g3::overrideSetupSignals({});
     NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface_, robot_id_,
                                              enable_log_merging);

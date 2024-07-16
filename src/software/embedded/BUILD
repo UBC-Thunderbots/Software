@@ -61,6 +61,7 @@ cc_library(
         "//software/tracy:tracy_constants",
         "//software/util/scoped_timespec_timer",
         "//software/world:team",
+        "@boost//:format",
         "@tracy",
     ],
 )
@@ -92,8 +93,7 @@ cc_binary(
     ],
     deps = [
         ":thunderloop",
-        "@boost//:program_options",
-        "@boost//:format"
+        "@boost//:program_options"
     ],
 )
 
