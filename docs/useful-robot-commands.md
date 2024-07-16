@@ -32,7 +32,7 @@ flowchart TD
         e.g. `ssh robot@192.168.0.203` (for Nanos) or `ssh robot@192.168.1.203` (for Pis) or `ssh robot@robert.local`
         for a robot called robert with robot id 3")
     ssh ---> |Yes| tloop_status
-    ssh --> |No - Second Try| monitor("Connect Jetson or Pi to an external monitor and check wifi connection _or_ SSH using an ethernet cable")
+    ssh --> |No - Second Try| monitor("Connect Jetson or Pi to an external monitor and check wifi connection or SSH using an ethernet cable")
     ssh --> |No - First Try| restart(Restart robot)
     restart --> ssh
 
@@ -61,7 +61,7 @@ flowchart TD
                                           `journalctl -fu thunderloop -n 300`)
     tloop_logs --> |No Errors| check_redis(Does `redis-cli get /network_interface` return 'wlan0', 
     and does `redis-cli get /channel_id` return '0'?)
-    tloop_logs --> |Contains Errors| rip2("`Fix errors or check errors with a lead`")
+    tloop_logs --> |Contains Errors| rip2("Fix errors or check errors with a lead")
     check_redis --> |No| update_redis(Update Redis constants by running:
                                       `redis-cli set /network_interface 'wlan0'`
                                       `redis-cli set /channel_id '0'`)
