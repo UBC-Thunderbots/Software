@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import threading
+from robot_communication import DISCONNECTED
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 from software.thunderscope.thunderscope import Thunderscope
 from software.thunderscope.binary_context_managers import *
@@ -228,12 +229,18 @@ if __name__ == "__main__":
 
     # we only have --launch_gc parameter but not args.run_yellow and args.run_blue
     if not args.run_blue and not args.run_yellow and args.launch_gc:
-        parser.error("--launch_gc has to be ran with --run_blue argument")
+        parser.error(
+            "--launch_gc has to be ran with --run_blue or --run_yellow argument"
+        )
 
-    # Sanity check that an interface was provided
-    if args.run_blue or args.run_yellow:
-        if args.interface is None:
-            parser.error("Must specify interface")
+    # Sanity check that an interface was provided if we are running diagnostics since it will not load the network
+    # configuration widget
+    if (
+        not (args.run_blue or args.run_yellow)
+        and args.run_diagnostics
+        and args.interface is None
+    ):
+        parser.error("Must specify interface")
 
     ###########################################################################
     #                      Visualize CPP Tests                                #
@@ -354,7 +361,13 @@ if __name__ == "__main__":
                             )
 
             if args.run_blue or args.run_yellow:
-                robot_communication.setup_for_fullsystem()
+                robot_communication.setup_for_fullsystem(
+                    referee_interface=args.interface
+                    if args.interface
+                    else DISCONNECTED,
+                    vision_interface=args.interface if args.interface else DISCONNECTED,
+                )
+                robot_communication.print_current_network_config()
                 full_system_runtime_dir = (
                     args.blue_full_system_runtime_dir
                     if args.run_blue
@@ -461,7 +474,6 @@ if __name__ == "__main__":
             if args.enable_autoref
             else contextlib.nullcontext()
         ) as autoref:
-
             tscope.register_refresh_function(gamecontroller.refresh)
 
             autoref_proto_unix_io = ProtoUnixIO()

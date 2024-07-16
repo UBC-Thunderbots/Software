@@ -57,10 +57,10 @@ extern "C"
         crash_msg.set_exit_signal(g3::signalToStr(signal_num));
         *(crash_msg.mutable_status()) = *robot_status;
 
+        std::optional<std::string> error;
         auto sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotCrash>>(
-            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)) + "%" +
-                network_interface,
-            ROBOT_CRASH_PORT, true);
+            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id)), ROBOT_CRASH_PORT,
+            network_interface, true, error);
         sender->sendProto(crash_msg);
         std::cerr << "Broadcasting robot crash msg";
 
@@ -127,8 +127,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
         << "THUNDERLOOP: Network Logger initialized! Next initializing Network Service";
 
     network_service_ = std::make_unique<NetworkService>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_,
-        PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), PRIMITIVE_PORT,
+        ROBOT_STATUS_PORT, network_interface, true);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
@@ -438,6 +438,15 @@ double Thunderloop::getCpuTemperature()
 
 bool isPowerStable(std::ifstream& log_file)
 {
+    // @TODO #3248 : add isPowerStable support to the raspberry pi
+    // For now in robocup, we return true since we cannot really access the dmesg. This
+    // would be addressed in a future PR
+    if (PLATFORM == Platform::RASP_PI)
+    {
+        return true;
+    }
+    // the following code is executed for the jetson and not the raspberry pi
+
     // if the log file cannot be open, we would return false. Chances are, the battery
     // power supply is indeed stable
     if (!log_file.is_open())
