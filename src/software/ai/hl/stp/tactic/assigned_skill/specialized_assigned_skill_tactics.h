@@ -11,7 +11,4 @@ using ChipSkillTactic = AssignedSkillTactic<ChipSkill>;
 COPY_TACTIC(KickoffChipSkillTactic, ChipSkillTactic);
 
 using DribbleSkillTactic = AssignedSkillTactic<DribbleSkill>;
-COPY_TACTIC(PlaceBallSkillTactic, DribbleSkillTactic);
-
-using PivotKickSkillTactic = AssignedSkillTactic<PivotKickSkill>;
-COPY_TACTIC(WallKickoffSkillTactic, PivotKickSkillTactic);
+COPY_TACTIC(BallPlacementDribbleTactic, DribbleSkillTactic)
