@@ -360,6 +360,9 @@ direction LR
 BlockPassState --> InterceptBallState : [passStarted]\n<i>interceptBall</i>
 BlockPassState --> BlockPassState : <i>blockPass</i>
 InterceptBallState --> BlockPassState : [ballDeflected]\n<i>blockPass</i>
+InterceptBallState --> DribbleFSM : [ballNearbyWithoutThreat]\n<i>prepareGetPossession</i>
+DribbleFSM --> BlockPassState : [!ballNearbyWithoutThreat]\n<i>blockPass</i>
+DribbleFSM --> DribbleFSM : <i>prepareGetPossession</i>
 InterceptBallState --> InterceptBallState : <i>interceptBall</i>
 Terminate:::terminate --> Terminate:::terminate : <i>SET_STOP_PRIMITIVE_ACTION</i>
 
