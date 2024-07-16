@@ -12,8 +12,8 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
     double robot_obstacle_inflation_factor, double x_shift_meters)
 {
-
-    Rectangle inflated_defense_area = buildInflatedDefenseArea(field, robot_obstacle_inflation_factor);
+    Rectangle inflated_defense_area =
+        buildInflatedDefenseArea(field, robot_obstacle_inflation_factor);
     // Look directly at the point
     Vector block_vec     = (field.friendlyGoalCenter() - enemy_threat_origin);
     Angle angle_to_block = block_vec.orientation();
@@ -92,7 +92,8 @@ void CreaseDefenderFSM::blockThreat(
     // right on the edge of the defense area obstacle.
     double robot_obstacle_inflation_factor =
         robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5;
-    Rectangle inflated_defense_area = buildInflatedDefenseArea(event.common.world_ptr->field(), robot_obstacle_inflation_factor);
+    Rectangle inflated_defense_area = buildInflatedDefenseArea(
+        event.common.world_ptr->field(), robot_obstacle_inflation_factor);
     auto block_threat_point = findBlockThreatPoint(
         event.common.world_ptr->field(), event.control_params.enemy_threat_origin,
         event.control_params.crease_defender_alignment, robot_obstacle_inflation_factor,

@@ -34,7 +34,8 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
     bool is_counter_clockwise = travel_distance < 0;
     travel_distance           = std::fmod(std::abs(travel_distance), perimeter);
 
-    if ((is_counter_clockwise && polygon.isClockwise()) || (!is_counter_clockwise && !polygon.isClockwise()))
+    if ((is_counter_clockwise && polygon.isClockwise()) ||
+        (!is_counter_clockwise && !polygon.isClockwise()))
     {
         travel_distance = perimeter - travel_distance;
     }
