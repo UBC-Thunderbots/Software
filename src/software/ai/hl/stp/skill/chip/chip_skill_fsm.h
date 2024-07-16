@@ -49,7 +49,7 @@ struct ChipSkillFSM
     /**
      * Guard that checks if the robot is aligned for the chip
      *
-     * @param event KickFSM::Update event
+     * @param event ChipSkillFSM::Update event
      *
      * @return if the robot is aligned for the chip
      */
