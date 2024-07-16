@@ -88,11 +88,21 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
-    // pings the router on the specific network interface to ensure wifi is connected, keeps trying until success
-    while (system((boost::format("ping -I %1% -c 1 %2%") % network_interface_ % ROUTER_IP).str().c_str()) != 0) 
+    ThreadedUdpSender network_test(std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_, ROBOT_LOGS_PORT, true);
+    // send an empty packet on the specific network interface to ensure wifi is connected, keeps trying until success
+    while (true) 
     {
-        sleep(PING_RETRY_DELAY_S);
-        std::cout << "Warning! Thunderloop cannot connect to network!" << std::endl;
+        try 
+        {
+            network_test.sendString("");
+            break;
+        }
+        catch (std::exception& e)
+        {
+            // resend the message after a delay
+            std::cout << "Warning! Thunderloop cannot connect to network! Waiting for connection..." << std::endl;
+            sleep(PING_RETRY_DELAY_S);
+        }
     }
 
     std::cout << "Thunderloop connected to network!" << std::endl;
