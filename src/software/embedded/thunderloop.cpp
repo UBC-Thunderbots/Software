@@ -419,6 +419,14 @@ double Thunderloop::getCpuTemperature()
 
 bool isPowerStable(std::ifstream& log_file)
 {
+    // For now in robocup, we return true since we cannot really access the dmesg. This
+    // would be addressed in a future PR
+    if (PLATFORM == Platform::RASP_PI)
+    {
+        return true;
+    }
+    // the following code is executed for the jetson and not the raspberry pi
+
     // if the log file cannot be open, we would return false. Chances are, the battery
     // power supply is indeed stable
     if (!log_file.is_open())
