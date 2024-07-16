@@ -138,6 +138,9 @@ class Thunderloop
 
     const std::string PATH_TO_RINGBUFFER_LOG = "/var/log/dmesg";
 
+    
+    const int PING_RETRY_DELAY_S = 1;
+
     std::ifstream log_file = std::ifstream(PATH_TO_RINGBUFFER_LOG);
 };
 
