@@ -15,6 +15,7 @@ cc_library(
     # PlayFactory. This addresses the issue explained here:
     # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
     deps = [
+        ":strategy",
         "//proto:play_info_msg_cc_proto",
         "//software/ai/hl/stp/play:all_plays",
         "//software/ai/hl/stp/play:assigned_tactics_play",
@@ -50,5 +51,20 @@ cc_test(
         "//software/ai",
         "//software/test_util",
         "//software/world",
+    ],
+)
+
+cc_library(
+    name = "strategy",
+    srcs = ["strategy.cpp"],
+    hdrs = ["strategy.h"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//software/ai/evaluation:calc_best_shot",
+        "//software/ai/evaluation:shot",
+        "//software/ai/passing:eighteen_zone_pitch_division",
+        "//software/ai/passing:pass_generator",
+        "//software/ai/passing:receiver_position_generator",
+        "//software/world:field",
     ],
 )

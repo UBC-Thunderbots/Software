@@ -3,8 +3,10 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 
-BallPlacementPlay::BallPlacementPlay(TbotsProto::AiConfig config)
-    : Play(config, true), fsm{BallPlacementPlayFSM{config}}, control_params{}
+BallPlacementPlay::BallPlacementPlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy),
+      fsm(std::make_unique<FSM<BallPlacementPlayFSM>>(BallPlacementPlayFSM(strategy))),
+      control_params{}
 {
 }
 
@@ -17,16 +19,16 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 void BallPlacementPlay::updateTactics(const PlayUpdate &play_update)
 {
-    fsm.process_event(BallPlacementPlayFSM::Update(control_params, play_update));
+    fsm->process_event(BallPlacementPlayFSM::Update(control_params, play_update));
 }
 
 std::vector<std::string> BallPlacementPlay::getState()
 {
     std::vector<std::string> state;
-    state.emplace_back(objectTypeName(*this) + " - " + getCurrentFullStateName(fsm));
+    state.emplace_back(objectTypeName(*this) + " - " + getCurrentFullStateName(*fsm));
     return state;
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, BallPlacementPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, BallPlacementPlay, std::shared_ptr<Strategy>>
     factory;

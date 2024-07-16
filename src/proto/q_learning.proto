@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package TbotsProto;
+
+message LinearQFunctionInfo
+{
+    // The name identifying the MDP associated with this LinearQFunction
+    string mdp_name = 1;
+
+    // The number of state features associated with this LinearQFunction
+    uint32 num_features = 2;
+
+    // The number of actions associated with this LinearQFunction
+    uint32 num_actions = 3;
+
+    // The weights associated with this LinearQFunction
+    repeated double weights = 4;
+
+    // The names of the state features associated with this LinearQFunction
+    repeated string feature_names = 5;
+
+    // The names of the actions associated with this LinearQFunction
+    repeated string action_names = 6;
+}
+
+message ActionSelectionStrategyInfo
+{
+    message Action
+    {
+        // The name of the action
+        string name = 1;
+
+        // The value associated with the action in the current state
+        // (typically its Q-value or a normalized version of it; this should
+        // be documented in the action_value_description field)
+        double value = 2;
+
+        // Whether this action was selected or not
+        bool selected = 3;
+    }
+
+    // The name identifying the MDP associated with this ActionSelectionStrategyInfo
+    string mdp_name = 1;
+
+    // The actions that were evaluated by the ActionSelectionStrategy
+    repeated Action actions = 2;
+
+    // Description of what the value field for each Action represents
+    string action_value_description = 3;
+}

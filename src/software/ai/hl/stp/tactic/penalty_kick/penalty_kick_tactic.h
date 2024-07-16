@@ -17,9 +17,9 @@ class PenaltyKickTactic : public Tactic
     /**
      * Creates a new PenaltyKickTactic
      *
-     * @param ai_config The AI configuration
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit PenaltyKickTactic(TbotsProto::AiConfig ai_config);
+    explicit PenaltyKickTactic(std::shared_ptr<Strategy> strategy);
 
     PenaltyKickTactic() = delete;
 
@@ -32,6 +32,6 @@ class PenaltyKickTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
+    std::shared_ptr<Strategy> strategy;
     std::map<RobotId, std::unique_ptr<FSM<PenaltyKickFSM>>> fsm_map;
-    TbotsProto::AiConfig ai_config;
 };

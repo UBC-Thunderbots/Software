@@ -6,6 +6,7 @@
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
+#include "software/ai/strategy.h"
 #include "software/logger/logger.h"
 
 /**
@@ -25,9 +26,9 @@ class DefensePlayFSMBase
     /**
      * Creates a play FSM with defensive methods
      *
-     * @param ai_config the play config for this play FSM
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit DefensePlayFSMBase(TbotsProto::AiConfig ai_config);
+    explicit DefensePlayFSMBase(std::shared_ptr<Strategy> strategy);
 
    protected:
     /**
@@ -66,7 +67,7 @@ class DefensePlayFSMBase
         std::vector<DefenderAssignment> &pass_defender_assignments,
         TbotsProto::BallStealMode ball_steal_mode);
 
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<Strategy> strategy;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
     std::vector<std::shared_ptr<PassDefenderTactic>> pass_defenders;
 };
