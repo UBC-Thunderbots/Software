@@ -419,6 +419,7 @@ double Thunderloop::getCpuTemperature()
 
 bool isPowerStable(std::ifstream& log_file)
 {
+    // @TODO #3248 : add isPowerStable support to the raspberry pi
     // For now in robocup, we return true since we cannot really access the dmesg. This
     // would be addressed in a future PR
     if (PLATFORM == Platform::RASP_PI)
