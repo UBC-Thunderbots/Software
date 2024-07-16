@@ -243,3 +243,13 @@ TEST(StepAlongPerimeterTest, positive_distance_starts_from_middle_same_segment)
     Point result_point = stepAlongPerimeter(polygon, start_point, travel_distance);
     EXPECT_EQ(result_point, expected_point);
 }
+
+TEST(StepAlongPerimeterTest, counter_clockwise_adjustment_test)
+{
+    Polygon polygon({{1, 0}, {1, 2}, {-1, 2}, {-1, -2}});
+    Point start_point(1, 1.5);
+    double travel_distance = 1.0;
+    Point expected_point(1, 0.5);
+    Point result_point = stepAlongPerimeter(polygon, start_point, travel_distance);
+    EXPECT_EQ(result_point, expected_point);
+}
