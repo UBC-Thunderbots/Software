@@ -140,7 +140,6 @@ class Thunderloop
 
     
     const int PING_RETRY_DELAY_S = 1;
-    const std::string ROUTER_IP = "192.168.0.100";
 
     std::ifstream log_file = std::ifstream(PATH_TO_RINGBUFFER_LOG);
 };
