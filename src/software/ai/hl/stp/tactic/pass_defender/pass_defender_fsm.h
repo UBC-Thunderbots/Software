@@ -2,9 +2,9 @@
 
 #include "proto/tactic.pb.h"
 #include "shared/constants.h"
+#include "software/ai/hl/stp/skill/dribble/dribble_skill.h"
 #include "software/ai/hl/stp/skill/skill_fsm.h"
 #include "software/ai/hl/stp/tactic/defender/defender_fsm_base.h"
-#include "software/ai/hl/stp/skill/dribble/dribble_skill.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
 
@@ -28,9 +28,7 @@ struct PassDefenderFSM : public DefenderFSMBase
      *
      * @param strategy the Strategy shared by all of AI
      */
-    explicit PassDefenderFSM(std::shared_ptr<Strategy> strategy) : strategy(strategy)
-    {
-    }
+    explicit PassDefenderFSM(std::shared_ptr<Strategy> strategy) : strategy(strategy) {}
 
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -98,8 +96,9 @@ struct PassDefenderFSM : public DefenderFSMBase
      * @param event PassDefenderFSM::Update event
      * @param processEvent processes the DribbleSkillFSM::Update
      */
-    void prepareGetPossession(const Update& event,
-                              boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
+    void prepareGetPossession(
+        const Update& event,
+        boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
 
     auto operator()()

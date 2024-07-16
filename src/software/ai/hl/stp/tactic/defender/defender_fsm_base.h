@@ -28,7 +28,6 @@ struct DefenderFSMBase
      * @param processEvent processes the DribbleSkillFSM::Update
      */
     static void prepareGetPossession(
-        const TacticUpdate& tactic_update,
-        std::shared_ptr<Strategy> strategy,
+        const TacticUpdate& tactic_update, std::shared_ptr<Strategy> strategy,
         boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 };

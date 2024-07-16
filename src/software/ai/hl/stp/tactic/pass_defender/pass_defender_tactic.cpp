@@ -12,8 +12,8 @@ PassDefenderTactic::PassDefenderTactic(std::shared_ptr<Strategy> strategy)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<PassDefenderFSM>>(
-            PassDefenderFSM(strategy), DribbleSkillFSM());
+        fsm_map[id] = std::make_unique<FSM<PassDefenderFSM>>(PassDefenderFSM(strategy),
+                                                             DribbleSkillFSM());
     }
 }
 

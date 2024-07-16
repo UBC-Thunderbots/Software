@@ -54,8 +54,7 @@ bool DefenderFSMBase::ballNearbyWithoutThreat(
 }
 
 void DefenderFSMBase::prepareGetPossession(
-    const TacticUpdate& tactic_update,
-    std::shared_ptr<Strategy> strategy,
+    const TacticUpdate& tactic_update, std::shared_ptr<Strategy> strategy,
     boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
     Point ball_position     = tactic_update.world_ptr->ball().position();
@@ -68,6 +67,6 @@ void DefenderFSMBase::prepareGetPossession(
         .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL};
 
     processEvent(DribbleSkillFSM::Update(
-        control_params, SkillUpdate(tactic_update.robot, tactic_update.world_ptr, strategy,
-                                    tactic_update.set_primitive)));
+        control_params, SkillUpdate(tactic_update.robot, tactic_update.world_ptr,
+                                    strategy, tactic_update.set_primitive)));
 }

@@ -11,7 +11,7 @@ cc_library(
         "defender_fsm_base.h",
     ],
     deps = [
-        "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/skill/dribble:dribble_skill",
+        "//software/ai/hl/stp/tactic",
     ],
 )
