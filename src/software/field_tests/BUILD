@@ -32,10 +32,6 @@ py_test(
     srcs = [
         "movement_robot_field_test.py",
     ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
-    ],
     deps = [
         "//software/field_tests:field_test_fixture",
         "//software/simulated_tests:simulated_test_fixture",
@@ -50,9 +46,19 @@ py_test(
     srcs = [
         "pivot_kick_field_test.py",
     ],
-    # TODO (#2619) Remove tag to run in parallel
-    tags = [
-        "exclusive",
+    deps = [
+        "//software/field_tests:field_test_fixture",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:tbots_test_runner",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
+py_test(
+    name = "ball_placement_field_test",
+    srcs = [
+        "ball_placement_field_test.py",
     ],
     deps = [
         "//software/field_tests:field_test_fixture",

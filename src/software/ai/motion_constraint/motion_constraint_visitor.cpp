@@ -59,7 +59,7 @@ void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
     current_motion_constraints.erase(TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA);
 }
 
-void MotionConstraintVisitor::visit(const PlaceBallMoveTactic &tactic)
+void MotionConstraintVisitor::visit(const BallPlacementMoveTactic &tactic)
 {
     current_motion_constraints.clear();
 }
@@ -105,12 +105,7 @@ void MotionConstraintVisitor::visit(const KickoffChipSkillTactic &tactic)
         TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
 }
 
-void MotionConstraintVisitor::visit(const PlaceBallSkillTactic &tactic)
-{
-    current_motion_constraints.clear();
-}
-
-void MotionConstraintVisitor::visit(const WallKickoffSkillTactic &tactic)
+void MotionConstraintVisitor::visit(const BallPlacementDribbleTactic &tactic)
 {
     current_motion_constraints.clear();
 }

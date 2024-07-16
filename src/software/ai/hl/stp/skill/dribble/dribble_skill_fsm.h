@@ -19,6 +19,11 @@ struct DribbleSkillFSM
         std::optional<Angle> final_dribble_orientation;
         // Controls whether to allow excessive dribbling, i.e. more than 1 metre at a time
         TbotsProto::ExcessiveDribblingMode excessive_dribbling_mode;
+        // Max allowed speed mode
+        TbotsProto::MaxAllowedSpeedMode max_speed_dribble =
+            TbotsProto::MaxAllowedSpeedMode::DRIBBLE;
+        TbotsProto::MaxAllowedSpeedMode max_speed_get_possession =
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
     };
 
     DEFINE_SKILL_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
