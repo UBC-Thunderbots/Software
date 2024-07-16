@@ -13,7 +13,8 @@ struct DefenderFSMBase
      *
      * @param world_ptr The current state of the world
      * @param robot The current defender robot
-     * @param ball_steal_mode The aggressive behaviour of the defender denoting whether to steal the ball
+     * @param ball_steal_mode The aggressive behaviour of the defender denoting whether to
+     * steal the ball
      * @param defender_steal_config The dynamic params containing the defender's config
      *
      * @return true if stealing is enabled and the ball is nearby, unguarded by the enemy,
