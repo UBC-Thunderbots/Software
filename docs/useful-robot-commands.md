@@ -32,7 +32,7 @@ flowchart TD
         e.g. `ssh robot@192.168.0.203` (for Nanos) or `ssh robot@192.168.1.203` (for Pis) or `ssh robot@robert.local`
         for a robot called robert with robot id 3")
     ssh ---> |Yes| tloop_status
-    ssh --> |No - Second Try| monitor("`Connect Jetson or Pi to an external monitor and check wifi connection _or_ SSH using an ethernet cable`")
+    ssh --> |No - Second Try| monitor("Connect Jetson or Pi to an external monitor and check wifi connection _or_ SSH using an ethernet cable")
     ssh --> |No - First Try| restart(Restart robot)
     restart --> ssh
 
