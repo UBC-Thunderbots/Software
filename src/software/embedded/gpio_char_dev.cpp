@@ -4,7 +4,7 @@
 
 #include "software/logger/logger.h"
 
-GpioCharDev::GpioCharDev(int gpio_number, GpioDirection direction,
+GpioCharDev::GpioCharDev(uint32_t gpio_number, GpioDirection direction,
                          GpioState initial_state, std::string char_dev_path)
 {
     int fd = open(char_dev_path.c_str(), O_RDONLY);

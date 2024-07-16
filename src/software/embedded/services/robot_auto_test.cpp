@@ -25,7 +25,7 @@ int read_value;
 static const uint8_t CHIP_SELECT[] = {motor_service_->FRONT_LEFT_MOTOR_CHIP_SELECT,
                                       motor_service_->FRONT_RIGHT_MOTOR_CHIP_SELECT,
                                       motor_service_->BACK_LEFT_MOTOR_CHIP_SELECT,
-                                      motor_service_->BACK_RIGHT_MOTOR_CHIP_SELECT, 4};
+                                      motor_service_->BACK_RIGHT_MOTOR_CHIP_SELECT};
 
 constexpr int ASCII_4671_IN_HEXADECIMAL = 0x34363731;
 constexpr double THRESHOLD              = 0.0001;
