@@ -139,4 +139,20 @@ struct CreaseDefenderFSM
 
     TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
     TbotsProto::CreaseDefenderConfig crease_defender_config;
+
+    /**
+     * Return the Rectangle that forms the path around the crease that the defenders must follow.
+     * It's basically the crease inflated by one robot radius multiplied by a factor
+     *
+     * @param event CreaseDefenderFSM::Update event
+     * @param robot_obstacle_inflation_factor the inflation factor to build the inflated defense area
+     * @return inflated area
+     */
+    static inline Rectangle buildInflatedDefenseArea(const Field &field, double robot_obstacle_inflation_factor) {
+        double robot_radius_expansion_amount =
+                ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
+        Rectangle inflated_defense_area =
+                field.friendlyDefenseArea().expand(robot_radius_expansion_amount);
+        return inflated_defense_area;
+    }
 };

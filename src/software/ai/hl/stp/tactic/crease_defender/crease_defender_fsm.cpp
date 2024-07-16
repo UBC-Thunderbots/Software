@@ -12,18 +12,9 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
     double robot_obstacle_inflation_factor, double x_shift_meters)
 {
+
+    Rectangle inflated_defense_area = buildInflatedDefenseArea(field, robot_obstacle_inflation_factor);
     // Look directly at the point
-    // Return the segments that form the path around the crease that the
-    // defenders must follow. It's basically the crease inflated by one robot radius
-    // multiplied by a factor
-    double robot_radius_expansion_amount =
-        ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
-    Rectangle inflated_defense_area =
-        field.friendlyDefenseArea().expand(robot_radius_expansion_amount);
-
-    // We increment the angle to positive goalpost by 1/6, 3/6, or 5/6 of the shot
-    // cone
-
     Vector block_vec     = (field.friendlyGoalCenter() - enemy_threat_origin);
     Angle angle_to_block = block_vec.orientation();
     // Shot ray to block
@@ -96,19 +87,16 @@ void CreaseDefenderFSM::blockThreat(
     Point robot_position    = event.common.robot.position();
     Point destination       = event.common.robot.position();
     Angle robot_orientation = event.common.robot.orientation();
+
     // Use a slightly larger inflation factor to avoid the crease defenders from sitting
+    // right on the edge of the defense area obstacle.
     double robot_obstacle_inflation_factor =
         robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5;
-    double robot_radius_expansion_amount =
-        ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
-    Rectangle inflated_defense_area =
-        event.common.world_ptr->field().friendlyDefenseArea().expand(
-            robot_radius_expansion_amount);
-    // right on the edge of the defense area obstacle.
+    Rectangle inflated_defense_area = buildInflatedDefenseArea(event.common.world_ptr->field(), robot_obstacle_inflation_factor);
     auto block_threat_point = findBlockThreatPoint(
         event.common.world_ptr->field(), event.control_params.enemy_threat_origin,
         event.control_params.crease_defender_alignment, robot_obstacle_inflation_factor,
-        crease_defender_config.x_shift_meters());
+        crease_defender_config.out_of_field_boundary_x_shift_meters());
 
     if (contains(inflated_defense_area, event.control_params.enemy_threat_origin))
     {
