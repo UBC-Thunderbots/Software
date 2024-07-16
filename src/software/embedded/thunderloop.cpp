@@ -3,8 +3,6 @@
 #include <Tracy.hpp>
 #include <fstream>
 
-#include <boost/format.hpp>
-
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"
@@ -88,7 +86,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
-    ThreadedUdpSender network_test(std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_, ROBOT_LOGS_PORT, true);
+    ThreadedUdpSender network_test(std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)) + "%" + network_interface_, UNUSED_PORT, true);
     // send an empty packet on the specific network interface to ensure wifi is connected, keeps trying until success
     while (true) 
     {

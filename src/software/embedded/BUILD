@@ -61,7 +61,6 @@ cc_library(
         "//software/tracy:tracy_constants",
         "//software/util/scoped_timespec_timer",
         "//software/world:team",
-        "@boost//:format",
         "@tracy",
     ],
 )
