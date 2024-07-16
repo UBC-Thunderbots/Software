@@ -5,9 +5,9 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-DefensePlay::DefensePlay(const TbotsProto::AiConfig &config)
-    : Play(config, true),
-      fsm{DefensePlayFSM{config}},
+DefensePlay::DefensePlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy),
+      fsm(std::make_unique<FSM<DefensePlayFSM>>(DefensePlayFSM(strategy))),
       control_params{.max_allowed_speed_mode =
                          TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
 {
@@ -31,8 +31,8 @@ void DefensePlay::updateControlParams(
 
 void DefensePlay::updateTactics(const PlayUpdate &play_update)
 {
-    fsm.process_event(DefensePlayFSM::Update(control_params, play_update));
+    fsm->process_event(DefensePlayFSM::Update(control_params, play_update));
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, DefensePlay, TbotsProto::AiConfig> factory;
+static TGenericFactory<std::string, Play, DefensePlay, std::shared_ptr<Strategy>> factory;

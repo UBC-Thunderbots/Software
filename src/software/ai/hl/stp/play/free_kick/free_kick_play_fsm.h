@@ -5,14 +5,12 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/play/defense/defense_play.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
+#include "software/ai/hl/stp/skill/chip/chip_skill.h"
+#include "software/ai/hl/stp/skill/kick/kick_skill.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/assigned_skill_tactic.hpp"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
-#include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/pass_generator.h"
-#include "software/ai/passing/receiver_position_generator.hpp"
 #include "software/logger/logger.h"
 
 /**
@@ -42,9 +40,9 @@ struct FreeKickPlayFSM
     /**
      * Creates a free kick play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit FreeKickPlayFSM(const TbotsProto::AiConfig& ai_config);
+    explicit FreeKickPlayFSM(std::shared_ptr<Strategy> strategy);
 
     /**
      * Action that sets up the robots in position to perform the free kick
@@ -263,18 +261,17 @@ struct FreeKickPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<Strategy> strategy;
+
     std::optional<Shot> shot;
     std::shared_ptr<MoveTactic> align_to_ball_tactic;
-    std::shared_ptr<KickTactic> shoot_tactic;
-    std::shared_ptr<ChipTactic> chip_tactic;
-    std::shared_ptr<KickTactic> passer_tactic;
+    std::shared_ptr<AssignedSkillTactic<KickSkill>> shoot_tactic;
+    std::shared_ptr<AssignedSkillTactic<ChipSkill>> chip_tactic;
+    std::shared_ptr<AssignedSkillTactic<KickSkill>> passer_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> receiver_positioning_tactics;
     std::shared_ptr<DefensePlay> defense_play;
 
-    ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator;
-    PassGenerator pass_generator;
     PassWithRating best_pass_and_score_so_far;
     Timestamp pass_optimization_start_time;
 };

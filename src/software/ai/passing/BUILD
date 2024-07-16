@@ -20,7 +20,7 @@ cc_library(
 )
 
 cc_test(
-    name = "evaluation_test",
+    name = "cost_function_test",
     srcs = ["cost_function_test.cpp"],
     deps = [
         ":cost_functions",

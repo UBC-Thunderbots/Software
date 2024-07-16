@@ -3,8 +3,8 @@
 #include "software/ai/evaluation/defender_assignment.h"
 #include "software/ai/evaluation/enemy_threat.h"
 
-DefensePlayFSMBase::DefensePlayFSMBase(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config), crease_defenders({}), pass_defenders({})
+DefensePlayFSMBase::DefensePlayFSMBase(std::shared_ptr<Strategy> strategy)
+    : strategy(strategy), crease_defenders({}), pass_defenders({})
 {
 }
 
@@ -18,7 +18,7 @@ void DefensePlayFSMBase::setUpCreaseDefenders(int num_crease_defenders)
     crease_defenders =
         std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_crease_defenders);
     std::generate(crease_defenders.begin(), crease_defenders.end(),
-                  [this]() { return std::make_shared<CreaseDefenderTactic>(ai_config); });
+                  [this]() { return std::make_shared<CreaseDefenderTactic>(strategy); });
 }
 
 void DefensePlayFSMBase::setUpPassDefenders(int num_pass_defenders)
@@ -30,15 +30,17 @@ void DefensePlayFSMBase::setUpPassDefenders(int num_pass_defenders)
 
     pass_defenders = std::vector<std::shared_ptr<PassDefenderTactic>>(num_pass_defenders);
     std::generate(pass_defenders.begin(), pass_defenders.end(),
-                  [this]() { return std::make_shared<PassDefenderTactic>(); });
+                  [this]() { return std::make_shared<PassDefenderTactic>(strategy); });
 }
 
 void DefensePlayFSMBase::updatePassDefenderControlParams(
-    std::vector<DefenderAssignment>& pass_defender_assignments)
+    std::vector<DefenderAssignment>& pass_defender_assignments,
+    TbotsProto::BallStealMode ball_steal_mode)
 {
     for (unsigned int i = 0; i < pass_defenders.size(); i++)
     {
-        pass_defenders.at(i)->updateControlParams(pass_defender_assignments.at(i).target);
+        pass_defenders.at(i)->updateControlParams(pass_defender_assignments.at(i).target,
+                                                  ball_steal_mode);
     }
 }
 

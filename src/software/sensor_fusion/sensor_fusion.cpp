@@ -14,9 +14,11 @@ SensorFusion::SensorFusion(TbotsProto::SensorFusionConfig sensor_fusion_config)
       ball_filter(),
       friendly_team_filter(),
       enemy_team_filter(),
-      possession(TeamPossession::FRIENDLY_TEAM),
+      possession(TeamPossession::LOOSE),
       possession_tracker(std::make_shared<PossessionTracker>(
           sensor_fusion_config.possession_tracker_config())),
+      ball_contacts_by_friendly_robots(),
+      dribble_displacement(std::nullopt),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
       defending_positive_side(false),
@@ -33,6 +35,8 @@ std::optional<World> SensorFusion::getWorld() const
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
         new_world.setTeamWithPossession(possession);
+        new_world.setDribbleDisplacement(dribble_displacement);
+
         if (referee_stage)
         {
             new_world.updateRefereeStage(*referee_stage);
@@ -182,37 +186,6 @@ void SensorFusion::updateWorld(
     }
 }
 
-bool SensorFusion::shouldTrustRobotStatus()
-{
-    // Check if there is a robot with a tripped breakbeam
-    if (!friendly_robot_id_with_ball_in_dribbler.has_value())
-    {
-        return false;
-    }
-
-    std::optional<Robot> robot_with_ball_in_dribbler =
-        friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
-    if (!robot_with_ball_in_dribbler.has_value())
-    {
-        return false;
-    }
-
-    // Check if vision detects a ball on the field
-    if (!ball.has_value())
-    {
-        return true;
-    }
-
-    // In other words, we trust the breakbeam reading from robot status if vision also
-    // agrees that the ball is roughly near the robot or if ssl vision doesn't detect an
-    // ball. If vision has the ball far from the breakbeam detection, then we will ignore
-    // the breakbeam detection and trust vision instead.
-    return distance(robot_with_ball_in_dribbler->position(), ball->position()) <=
-           DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION;
-}
-
-
-
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
     double min_valid_x              = sensor_fusion_config.min_valid_x();
@@ -322,6 +295,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     {
         possession = possession_tracker->getTeamWithPossession(friendly_team, enemy_team,
                                                                *ball, *field);
+
+        updateDribbleDisplacement();
     }
 }
 
@@ -375,6 +350,96 @@ std::optional<Point> SensorFusion::getBallPlacementPoint(const SSLProto::Referee
     return point_opt;
 }
 
+bool SensorFusion::shouldTrustRobotStatus()
+{
+    // Check if there is a robot with a tripped breakbeam
+    if (!friendly_robot_id_with_ball_in_dribbler.has_value())
+    {
+        return false;
+    }
+
+    std::optional<Robot> robot_with_ball_in_dribbler =
+        friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
+    if (!robot_with_ball_in_dribbler.has_value())
+    {
+        return false;
+    }
+
+    // Check if vision detects a ball on the field
+    if (!ball.has_value())
+    {
+        return true;
+    }
+
+    // In other words, we trust the breakbeam reading from robot status if vision also
+    // agrees that the ball is roughly near the robot or if ssl vision doesn't detect an
+    // ball. If vision has the ball far from the breakbeam detection, then we will ignore
+    // the breakbeam detection and trust vision instead.
+    return distance(robot_with_ball_in_dribbler->position(), ball->position()) <=
+           DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION;
+}
+
+void SensorFusion::updateDribbleDisplacement()
+{
+    // Dribble distance algorithm taken from TIGERs autoref implementation
+    // https://t.ly/vNZf9
+
+    if (!ball.has_value())
+    {
+        return;
+    }
+
+    // Add new touching robots and remove non-touching robots
+    for (const Robot &robot : friendly_team.getAllRobots())
+    {
+        if (robot.isNearDribbler(ball->position(),
+                                 sensor_fusion_config.touching_ball_threshold()))
+        {
+            // Insert only occurs if the map doesn't already contain a value
+            // with the key robot.id()
+            ball_contacts_by_friendly_robots.insert(
+                std::make_pair(robot.id(), ball->position()));
+        }
+        else
+        {
+            ball_contacts_by_friendly_robots.erase(robot.id());
+        }
+    }
+
+    // Remove touching robots that have vanished
+    for (const auto &[robot_id, contact_point] : ball_contacts_by_friendly_robots)
+    {
+        if (std::none_of(friendly_team.getAllRobots().begin(),
+                         friendly_team.getAllRobots().end(),
+                         [&](const Robot &robot) { return robot.id() == robot_id; }))
+        {
+            ball_contacts_by_friendly_robots.erase(robot_id);
+        }
+    }
+
+    // Compute displacements from initial contact points to current ball position
+    std::vector<Segment> dribble_displacements;
+    dribble_displacements.reserve(ball_contacts_by_friendly_robots.size());
+    std::transform(ball_contacts_by_friendly_robots.begin(),
+                   ball_contacts_by_friendly_robots.end(),
+                   std::back_inserter(dribble_displacements), [&](const auto &kv_pair) {
+                       const Point contact_point = kv_pair.second;
+                       return Segment(contact_point, ball->position());
+                   });
+
+    // Set dribble_displacement to the longest of dribble_displacements
+    if (dribble_displacements.empty())
+    {
+        dribble_displacement = std::nullopt;
+    }
+    else
+    {
+        dribble_displacement = *std::max_element(
+            dribble_displacements.begin(), dribble_displacements.end(),
+            [](const Segment &a, const Segment &b) { return a.length() < b.length(); });
+    }
+}
+
 RobotDetection SensorFusion::invert(RobotDetection robot_detection) const
 {
     robot_detection.position =
@@ -388,18 +453,6 @@ BallDetection SensorFusion::invert(BallDetection ball_detection) const
     ball_detection.position =
         Point(-ball_detection.position.x(), -ball_detection.position.y());
     return ball_detection;
-}
-
-bool SensorFusion::teamHasBall(const Team &team, const Ball &ball)
-{
-    for (const auto &robot : team.getAllRobots())
-    {
-        if (robot.isNearDribbler(ball.position()))
-        {
-            return true;
-        }
-    }
-    return false;
 }
 
 bool SensorFusion::checkForVisionReset(double t_capture)
@@ -435,5 +488,6 @@ void SensorFusion::resetWorldComponents()
     ball_filter          = BallFilter();
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
-    possession           = TeamPossession::FRIENDLY_TEAM;
+    possession           = TeamPossession::LOOSE;
+    dribble_displacement = std::nullopt;
 }

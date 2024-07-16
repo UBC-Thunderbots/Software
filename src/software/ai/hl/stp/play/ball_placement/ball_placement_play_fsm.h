@@ -3,9 +3,8 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/specialized_assigned_skill_tactics.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 
 
@@ -29,9 +28,9 @@ struct BallPlacementPlayFSM
     /**
      * Creates a ball placement play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param strategy the Strategy
      */
-    explicit BallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit BallPlacementPlayFSM(std::shared_ptr<Strategy> strategy);
 
     /**
      * Action that has the placing robot kick the ball off the wall to give more space to
@@ -189,8 +188,8 @@ struct BallPlacementPlayFSM
 
    private:
     TbotsProto::AiConfig ai_config;
-    std::shared_ptr<WallKickoffTactic> pivot_kick_tactic;
-    std::shared_ptr<PlaceBallTactic> place_ball_tactic;
+    std::shared_ptr<WallKickoffSkillTactic> pivot_kick_tactic;
+    std::shared_ptr<PlaceBallSkillTactic> place_ball_tactic;
     std::shared_ptr<MoveTactic> align_placement_tactic;
     std::shared_ptr<MoveTactic> retreat_tactic;
     std::vector<std::shared_ptr<PlaceBallMoveTactic>> move_tactics;

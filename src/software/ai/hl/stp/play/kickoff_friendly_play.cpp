@@ -2,11 +2,13 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
+#include "software/ai/hl/stp/skill/chip/chip_skill.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/specialized_assigned_skill_tactics.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffFriendlyPlay::KickoffFriendlyPlay(TbotsProto::AiConfig config) : Play(config, true)
+KickoffFriendlyPlay::KickoffFriendlyPlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy)
 {
 }
 
@@ -74,7 +76,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::make_shared<MoveTactic>()};
 
     // specific tactics
-    auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>();
+    auto kickoff_chip_tactic = std::make_shared<KickoffChipSkillTactic>(strategy);
 
     // Part 1: setup state (move to key positions)
     while (world_ptr->gameState().isSetupState())
@@ -112,10 +114,12 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // TODO (#2612): This needs to be adjusted post field testing, ball needs to land
         // exactly in the middle of the enemy field
+        Point chip_target = world_ptr->field().centerPoint() +
+                            Vector(world_ptr->field().xLength() / 6, 0);
+        Point chip_origin = world_ptr->ball().position();
         kickoff_chip_tactic->updateControlParams(
-            world_ptr->ball().position(),
-            world_ptr->field().centerPoint() +
-                Vector(world_ptr->field().xLength() / 6, 0));
+            {chip_origin, (chip_target - chip_origin).orientation(),
+             (chip_target - chip_origin).length()});
         result[0].emplace_back(kickoff_chip_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from
@@ -134,5 +138,5 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffFriendlyPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, KickoffFriendlyPlay, std::shared_ptr<Strategy>>
     factory;

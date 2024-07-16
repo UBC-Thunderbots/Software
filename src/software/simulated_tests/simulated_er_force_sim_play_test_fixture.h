@@ -81,6 +81,8 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
 
     std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
 
+    std::shared_ptr<Strategy> strategy;
+
    private:
     void updatePrimitives(const World& friendly_world, const World& enemy_world,
                           std::shared_ptr<ErForceSimulator> simulator_to_update) override;

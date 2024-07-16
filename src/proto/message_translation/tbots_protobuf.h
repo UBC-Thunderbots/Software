@@ -5,6 +5,7 @@
 #include "proto/vision.pb.h"
 #include "proto/visualization.pb.h"
 #include "proto/world.pb.h"
+#include "software/ai/evaluation/shot.h"
 #include "software/ai/navigator/trajectory/bang_bang_trajectory_1d_angular.h"
 #include "software/ai/navigator/trajectory/trajectory_path.h"
 #include "software/ai/passing/pass_with_rating.h"
@@ -212,6 +213,21 @@ BallState createBallState(const TbotsProto::BallState ball_state);
  */
 std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     const std::vector<PassWithRating>& passes_with_rating);
+
+/**
+ * Returns an attacker visualization
+ *
+ * @param pass An optional pass to visualize
+ * @param pass_committed Whether we are committed to taking the pass
+ * @param shot An optional shot to visualize
+ * @param ball_position The current position of the ball used to visualize the shot
+ * @param chip_target An optional target that we are chipping to
+ *
+ * @return The unique_ptr to an AttackerVisualization proto
+ */
+std::unique_ptr<TbotsProto::AttackerVisualization> createAttackerVisualization(
+    const std::optional<Pass>& pass, bool pass_committed, const std::optional<Shot>& shot,
+    const std::optional<Point>& ball_position, const std::optional<Point>& chip_target);
 
 /**
  * Returns the WorldStateReceivedTrigger given the world state received trigger

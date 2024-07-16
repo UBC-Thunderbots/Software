@@ -392,6 +392,42 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
+std::unique_ptr<TbotsProto::AttackerVisualization> createAttackerVisualization(
+    const std::optional<Pass>& pass, const bool pass_committed,
+    const std::optional<Shot>& shot, const std::optional<Point>& ball_position,
+    const std::optional<Point>& chip_target)
+{
+    auto pass_visualization_msg = std::make_unique<TbotsProto::AttackerVisualization>();
+
+    if (pass.has_value())
+    {
+        TbotsProto::Pass pass_msg;
+        *(pass_msg.mutable_passer_point())   = *createPointProto(pass->passerPoint());
+        *(pass_msg.mutable_receiver_point()) = *createPointProto(pass->receiverPoint());
+        pass_msg.set_pass_speed_m_per_s(pass->speed());
+        *(pass_visualization_msg->mutable_pass_()) = pass_msg;
+    }
+
+    pass_visualization_msg->set_pass_committed(pass_committed);
+
+    if (shot.has_value() && ball_position.has_value())
+    {
+        TbotsProto::Shot shot_msg;
+        *(shot_msg.mutable_shot_origin()) = *createPointProto(ball_position.value());
+        *(shot_msg.mutable_shot_target()) = *createPointProto(shot->getPointToShootAt());
+        *(shot_msg.mutable_open_angle())  = *createAngleProto(shot->getOpenAngle());
+        *(pass_visualization_msg->mutable_shot()) = shot_msg;
+    }
+
+    if (chip_target.has_value())
+    {
+        *(pass_visualization_msg->mutable_chip_target()) =
+            *createPointProto(chip_target.value());
+    }
+
+    return pass_visualization_msg;
+}
+
 std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger()
 {
     auto world_state_received_trigger_msg =

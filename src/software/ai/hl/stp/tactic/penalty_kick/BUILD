@@ -13,10 +13,9 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
+        "//software/ai/hl/stp/skill/dribble:dribble_skill",
+        "//software/ai/hl/stp/skill/kick:kick_skill",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
-        "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/geom/algorithms",
         "//software/logger",
