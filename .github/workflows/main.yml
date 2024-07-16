@@ -2,9 +2,9 @@ name: Tbots CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, robocup_2024 ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, robocup_2024 ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
