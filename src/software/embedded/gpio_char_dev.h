@@ -21,7 +21,7 @@ class GpioCharDev : public Gpio
      * @param state The initial state of the gpio
      * @param char_dev_path The path to the gpio character device
      */
-    GpioCharDev(int gpio_number, GpioDirection direction, GpioState state,
+    GpioCharDev(uint32_t gpio_number, GpioDirection direction, GpioState state,
                 std::string char_dev_path = "/dev/gpiochip0");
 
     /**
