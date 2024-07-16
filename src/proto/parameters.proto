@@ -646,7 +646,7 @@ message CreaseDefenderConfig
 
     // determines how much to shift over in the x direction if crease defender
     // is outside of field boundary
-    required double x_shift_meters = 5 [
+    required double out_of_field_boundary_x_shift_meters = 5 [
         default                   = 0.09,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 5.0
