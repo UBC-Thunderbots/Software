@@ -4,30 +4,23 @@ package TbotsProto;
 
 enum PlayName
 {
-    reserved 5;
+    reserved 2, 5, 6, 16;
 
-    UseAiSelection                     = 1;
-    ShootOrChipPlay                    = 2;
-    KickoffFriendlyPlay                = 3;
-    OffensePlay                        = 4;
-    ShootOrPassPlay                    = 6;
-    BallPlacementPlay                  = 7;
-    HaltPlay                           = 8;
-    EnemyFreeKickPlay                  = 9;
-    ExamplePlay                        = 10;
-    DefensePlay                        = 11;
-    EnemyBallPlacementPlay             = 12;
-    PenaltyKickEnemyPlay               = 13;
-    PenaltyKickPlay                    = 14;
-    FreeKickPlay                       = 15;
-    CreaseDefensePlay                  = 16;
-    StopPlay                           = 17;
-    KickoffEnemyPlay                   = 18;
-    AssignedTacticsPlay                = 19;
-    ScoringWithStaticDefendersPlay     = 20;
-    DribblingParcourPlay               = 21;
-    ScoringFromContestedPossessionPlay = 22;
-    PassEndurancePlay                  = 23;
+    UseAiSelection         = 1;
+    KickoffFriendlyPlay    = 3;
+    KickoffEnemyPlay       = 18;
+    FreeKickPlay           = 15;
+    EnemyFreeKickPlay      = 9;
+    PenaltyKickPlay        = 14;
+    PenaltyKickEnemyPlay   = 13;
+    BallPlacementPlay      = 7;
+    EnemyBallPlacementPlay = 12;
+    OffensePlay            = 4;
+    DefensePlay            = 11;
+    HaltPlay               = 8;
+    StopPlay               = 17;
+    ExamplePlay            = 10;
+    AssignedTacticsPlay    = 19;
 }
 
 message Play

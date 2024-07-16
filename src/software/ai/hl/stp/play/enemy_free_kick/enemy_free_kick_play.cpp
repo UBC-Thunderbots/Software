@@ -9,8 +9,8 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyFreeKickPlay::EnemyFreeKickPlay(TbotsProto::AiConfig config)
-    : Play(config, true), fsm{EnemyFreeKickPlayFSM{config}}, control_params{}
+EnemyFreeKickPlay::EnemyFreeKickPlay(std::shared_ptr<Strategy> strategy)
+    : Play(true, strategy), fsm{EnemyFreeKickPlayFSM{strategy}}, control_params{}
 {
 }
 
@@ -37,5 +37,5 @@ void EnemyFreeKickPlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreeKickPlay, TbotsProto::AiConfig>
+static TGenericFactory<std::string, Play, EnemyFreeKickPlay, std::shared_ptr<Strategy>>
     factory;

@@ -9,6 +9,7 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
+#include "software/ai/strategy.h"
 
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
 using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
@@ -36,10 +37,10 @@ class Play
     /**
      * Creates a new Play
      *
-     * @param ai_config The AI configuration
      * @param requires_goalie Whether this plays requires a goalie
+     * @param strategy   to get and store shared calculations
      */
-    explicit Play(TbotsProto::AiConfig ai_config, bool requires_goalie);
+    explicit Play(bool requires_goalie, std::shared_ptr<Strategy> strategy);
 
     /**
      * Gets Primitives from the Play given the the world, and inter-play communication
@@ -73,8 +74,8 @@ class Play
     virtual std::vector<std::string> getState();
 
    protected:
-    // The Play configuration
-    TbotsProto::AiConfig ai_config;
+    // Holds information about coordinating strategy between multiple Plays
+    std::shared_ptr<Strategy> strategy;
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
@@ -184,10 +185,9 @@ class Play
     // The Play's knowledge of the most up-to-date World
     std::optional<WorldPtr> world_ptr_;
 
-    // TODO (#2359): remove this
-    PriorityTacticVector priority_tactics;
-
+    // Counter that keeps track of the latest Primitive sequence number
     uint64_t sequence_number = 0;
 
+    // Creates obstacles for a robot given some motion constraints
     RobotNavigationObstacleFactory obstacle_factory;
 };

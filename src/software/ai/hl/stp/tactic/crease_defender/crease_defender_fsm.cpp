@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/stadium.h"
@@ -50,8 +49,10 @@ void CreaseDefenderFSM::blockThreat(
     Point destination       = event.common.robot.position();
     Angle robot_orientation = event.common.robot.orientation();
     // Use a slightly larger inflation factor to avoid the crease defenders from sitting
-    double robot_obstacle_inflation_factor =
-        robot_navigation_obstacle_config.robot_obstacle_inflation_factor() + 0.5;
+    double robot_obstacle_inflation_factor = strategy->getAiConfig()
+                                                 .robot_navigation_obstacle_config()
+                                                 .robot_obstacle_inflation_factor() +
+                                             0.5;
     double robot_radius_expansion_amount =
         ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
     Rectangle inflated_defense_area =
@@ -112,8 +113,8 @@ void CreaseDefenderFSM::blockThreat(
     }
 
     AutoChipOrKick auto_chip_or_kick{AutoChipOrKickMode::OFF, 0};
-    auto goal_post_offset_vector =
-        Vector(0, crease_defender_config.goal_post_offset_chipping());
+    auto goal_post_offset_vector = Vector(
+        0, strategy->getAiConfig().crease_defender_config().goal_post_offset_chipping());
     auto goal_line_segment =
         Segment(event.common.world_ptr->field().friendlyGoal().posXPosYCorner() +
                     goal_post_offset_vector,
@@ -203,14 +204,15 @@ std::optional<Point> CreaseDefenderFSM::findDefenseAreaIntersection(
 bool CreaseDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
     bool ball_on_friendly_side = event.common.world_ptr->ball().position().x() < 0;
-    return ball_on_friendly_side && DefenderFSMBase::ballNearbyWithoutThreat(
-                                        event.common.world_ptr, event.common.robot,
-                                        event.control_params.ball_steal_mode,
-                                        crease_defender_config.defender_steal_config());
+    return ball_on_friendly_side &&
+           DefenderFSMBase::ballNearbyWithoutThreat(
+               event.common.world_ptr, event.common.robot,
+               event.control_params.ball_steal_mode,
+               strategy->getAiConfig().crease_defender_config().defender_steal_config());
 }
 
 void CreaseDefenderFSM::prepareGetPossession(
-    const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
-    DefenderFSMBase::prepareGetPossession(event.common, processEvent);
+    DefenderFSMBase::prepareGetPossession(event.common, strategy, processEvent);
 }

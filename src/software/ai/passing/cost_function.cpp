@@ -322,13 +322,20 @@ double rateKeepAwayPosition(const Point& keep_away_position, const World& world,
                             const Rectangle& dribbling_bounds,
                             const TbotsProto::PassingConfig& passing_config)
 {
-    static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.5;
+    static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.8;
 
     // the width of both the field boundary sigmoid and the circular search region sigmoid
     static constexpr auto SIGMOID_WIDTH = 0.1;
 
+    // Get the point on the field where the friendly team started dribbling the ball
+    Point dribble_start_point = world.ball().position();
+    if (world.getDribbleDisplacement().has_value())
+    {
+        dribble_start_point = world.getDribbleDisplacement()->getStart();
+    }
+
     // the region to which the optimization is (effectively) constrained to
-    Circle keepaway_search_region(world.ball().position(), KEEPAWAY_SEARCH_CIRCLE_RADIUS);
+    Circle keepaway_search_region(dribble_start_point, KEEPAWAY_SEARCH_CIRCLE_RADIUS);
 
     Pass updated_best_pass(keep_away_position, best_pass_so_far.receiverPoint(),
                            best_pass_so_far.speed());

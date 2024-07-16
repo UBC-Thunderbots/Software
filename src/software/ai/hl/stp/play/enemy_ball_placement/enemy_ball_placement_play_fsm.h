@@ -41,7 +41,6 @@
  *        G
  *     +-----+
  */
-
 struct EnemyBallPlacementPlayFSM
 {
     class WaitState;
@@ -57,9 +56,9 @@ struct EnemyBallPlacementPlayFSM
     /**
      * Creates an enemy ball placement play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit EnemyBallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit EnemyBallPlacementPlayFSM(std::shared_ptr<Strategy> strategy);
 
     /**
      * Guard that checks if the ball placement point exists
@@ -128,7 +127,7 @@ struct EnemyBallPlacementPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<Strategy> strategy;
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics;
     std::array<std::shared_ptr<AvoidInterferenceTactic>, 6> avoid_interference_tactics;
     std::array<std::shared_ptr<MoveTactic>, 3> move_tactics;

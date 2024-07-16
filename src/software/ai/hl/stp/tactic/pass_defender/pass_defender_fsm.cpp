@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_fsm.h"
 
 #include "proto/message_translation/tbots_protobuf.h"
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/geom/algorithms/closest_point.h"
 
 bool PassDefenderFSM::passStarted(const Update& event)
@@ -111,11 +111,11 @@ bool PassDefenderFSM::ballNearbyWithoutThreat(const Update& event)
 {
     return DefenderFSMBase::ballNearbyWithoutThreat(
         event.common.world_ptr, event.common.robot, event.control_params.ball_steal_mode,
-        pass_defender_config.defender_steal_config());
+        strategy->getAiConfig().pass_defender_config().defender_steal_config());
 }
 
 void PassDefenderFSM::prepareGetPossession(
-    const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+    const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
-    DefenderFSMBase::prepareGetPossession(event.common, processEvent);
+    DefenderFSMBase::prepareGetPossession(event.common, strategy, processEvent);
 }

@@ -1,9 +1,11 @@
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
 
-BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
-      pivot_kick_tactic(std::make_shared<WallKickoffTactic>(ai_config)),
-      place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config)),
+#include "software/geom/algorithms/contains.h"
+
+BallPlacementPlayFSM::BallPlacementPlayFSM(std::shared_ptr<Strategy> strategy)
+    : ai_config(strategy->getAiConfig()),
+      pivot_kick_tactic(std::make_shared<WallKickoffSkillTactic>(strategy)),
+      place_ball_tactic(std::make_shared<PlaceBallSkillTactic>(strategy)),
       align_placement_tactic(std::make_shared<PlaceBallMoveTactic>()),
       retreat_tactic(std::make_shared<MoveTactic>()),
       move_tactics(std::vector<std::shared_ptr<PlaceBallMoveTactic>>())
@@ -26,7 +28,7 @@ void BallPlacementPlayFSM::kickOffWall(const Update &event)
                                  WALL_KICKOFF_VELOCITY_M_PER_S};
 
     Angle kick_angle = calculateWallKickoffAngle(ball_pos, field_lines);
-    pivot_kick_tactic->updateControlParams(ball_pos, kick_angle, auto_chick);
+    pivot_kick_tactic->updateControlParams({ball_pos, kick_angle, auto_chick});
     tactics_to_run[0].emplace_back(pivot_kick_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -90,7 +92,10 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
 
     // setup ball placement tactic for ball placing robot
     place_ball_tactic->updateControlParams(
-        event.common.world_ptr->gameState().getBallPlacementPoint(), final_angle, true);
+        {.dribble_destination =
+             event.common.world_ptr->gameState().getBallPlacementPoint(),
+         .final_dribble_orientation = final_angle,
+         .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::ALLOWED});
     tactics_to_run[0].emplace_back(place_ball_tactic);
 
     event.common.set_tactics(tactics_to_run);

@@ -648,8 +648,7 @@ TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignmen
         std::make_shared<CreaseDefenderTactic>(ai_config)};
 
     Pass passer_pass(Point(2, 3), Point(0.5, 0.3), 2);
-    auto attacker = std::make_shared<AttackerTactic>(ai_config);
-    attacker->updateControlParams(passer_pass, true);
+    auto attacker = std::make_shared<AttackerTactic>();
     auto receiver = std::make_shared<ReceiverTactic>(ai_config.receiver_tactic_config());
 
     auto move_tactic                  = std::make_shared<MoveTactic>();

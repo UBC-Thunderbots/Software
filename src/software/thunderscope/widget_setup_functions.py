@@ -37,6 +37,7 @@ from software.thunderscope.common.proto_configuration_widget import (
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.constants import IndividualRobotMode
 from software.thunderscope.play.playinfo_widget import PlayInfoWidget
+from software.thunderscope.play.qlearninginfo_widget import QLearningInfoWidget
 from software.thunderscope.play.refereeinfo_widget import RefereeInfoWidget
 from software.thunderscope.robot_diagnostics.chicker_widget import ChickerWidget
 from software.thunderscope.robot_diagnostics.diagnostics_input_widget import (
@@ -139,11 +140,11 @@ def setup_gl_widget(
     gl_widget.add_layer(obstacle_layer)
     gl_widget.add_layer(passing_layer)
     gl_widget.add_layer(attacker_layer)
-    gl_widget.add_layer(cost_vis_layer, True)
+    gl_widget.add_layer(cost_vis_layer, False)
     gl_widget.add_layer(tactic_layer, False)
     gl_widget.add_layer(validation_layer)
     gl_widget.add_layer(trail_layer, False)
-    gl_widget.add_layer(debug_shapes_layer, True)
+    gl_widget.add_layer(debug_shapes_layer, False)
 
     simulation_control_toolbar = gl_widget.get_sim_control_toolbar()
     simulation_control_toolbar.set_speed_callback(world_layer.set_simulation_speed)
@@ -294,6 +295,25 @@ def setup_referee_info(proto_unix_io: ProtoUnixIO) -> RefereeInfoWidget:
     proto_unix_io.register_observer(Referee, referee_info.referee_buffer)
 
     return referee_info
+
+
+def setup_q_learning_info(proto_unix_io: ProtoUnixIO) -> QLearningInfoWidget:
+    """Setup the Q-learning info widget
+
+    :param proto_unix_io: The proto unix io object
+    :returns: The Q-learning info widget
+    """
+    q_learning_info = QLearningInfoWidget()
+
+    proto_unix_io.register_observer(
+        LinearQFunctionInfo, q_learning_info.linear_q_func_info_buffer
+    )
+    proto_unix_io.register_observer(
+        ActionSelectionStrategyInfo,
+        q_learning_info.action_selection_strategy_info_buffer,
+    )
+
+    return q_learning_info
 
 
 #################################

@@ -26,7 +26,6 @@ from software.thunderscope.util import *
 from software.thunderscope.binary_context_managers.full_system import FullSystem
 from software.thunderscope.binary_context_managers.simulator import Simulator
 from software.thunderscope.binary_context_managers.game_controller import Gamecontroller
-
 from software.thunderscope.binary_context_managers.tigers_autoref import TigersAutoref
 
 
@@ -270,6 +269,8 @@ if __name__ == "__main__":
             {"proto_class": PrimitiveSet},
             {"proto_class": World},
             {"proto_class": PlayInfo},
+            {"proto_class": LinearQFunctionInfo},
+            {"proto_class": ActionSelectionStrategyInfo},
         ]:
             proto_unix_io.attach_unix_receiver(
                 runtime_dir, from_log_visualize=True, **arg

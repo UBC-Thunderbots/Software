@@ -85,10 +85,18 @@ TEST(ReflectiveEnumTest, test_reflective_enum_functions)
     EXPECT_EQ(reflective_enum::valueNames<FooEnum>(), foo_value_names);
 }
 
-TEST(ReflectiveEnumTest, get_reflective_enum_values_from_names)
+TEST(ReflectiveEnumTest, test_reflective_enum_string_representation)
 {
     EXPECT_EQ(reflective_enum::fromName<FooEnum>("FOO"), FooEnum::FOO);
     EXPECT_EQ(reflective_enum::fromName<FooEnum>("BAR"), FooEnum::BAR);
     EXPECT_EQ(reflective_enum::fromName<FooEnum>("BAZ"), FooEnum::BAZ);
     EXPECT_THROW(reflective_enum::fromName<FooEnum>("QUX"), std::invalid_argument);
+
+    EXPECT_EQ(reflective_enum::nameOf(FooEnum::FOO), "FOO");
+    EXPECT_EQ(reflective_enum::nameOf(FooEnum::BAR), "BAR");
+    EXPECT_EQ(reflective_enum::nameOf(FooEnum::BAZ), "BAZ");
+
+    std::stringstream ss;
+    ss << FooEnum::FOO;
+    EXPECT_EQ(ss.str(), "FOO");
 }
