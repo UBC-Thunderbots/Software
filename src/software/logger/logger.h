@@ -57,17 +57,22 @@ class LoggerSingleton
      * called once at the start of a program.
      *
      * @param runtime_dir The directory where the log files will be stored.
+     * @param proto_logger The proto logger to log VISUALIZE protos
+     * @param reduce_repetition Whether logs should be merged whenever possible to reduce
+     * spam
      */
     static void initializeLogger(const std::string& runtime_dir,
-                                 const std::shared_ptr<ProtoLogger>& proto_logger)
+                                 const std::shared_ptr<ProtoLogger>& proto_logger,
+                                 const bool reduce_repetition = true)
     {
         static std::shared_ptr<LoggerSingleton> s(
-            new LoggerSingleton(runtime_dir, proto_logger));
+            new LoggerSingleton(runtime_dir, proto_logger, reduce_repetition));
     }
 
    private:
     LoggerSingleton(const std::string& runtime_dir,
-                    const std::shared_ptr<ProtoLogger>& proto_logger)
+                    const std::shared_ptr<ProtoLogger>& proto_logger,
+                    const bool reduce_repetition)
     {
         logWorker = g3::LogWorker::createLogWorker();
         // Default locations
@@ -95,9 +100,9 @@ class LoggerSingleton
                                                   &CSVSink::writeToFile);
 
         // Sink for outputting logs to the terminal
-        auto colour_cout_sink_handle =
-            logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
-                               &ColouredCoutSink::displayColouredLog);
+        auto colour_cout_sink_handle = logWorker->addSink(
+            std::make_unique<ColouredCoutSink>(true, reduce_repetition),
+            &ColouredCoutSink::displayColouredLog);
 
         // Sink for storing a file of filtered logs
         auto filtered_log_rotate_sink_handle = logWorker->addSink(

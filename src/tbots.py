@@ -58,7 +58,7 @@ if __name__ == "__main__":
         nargs="+",
         type=int,
         help="A list of space separated integers representing the robot IDs "
-        "that should be flashed by the deploy_nano Ansible playbook",
+        "that should be flashed by the deploy_robot_software Ansible playbook",
         action="store",
     )
     parser.add_argument(
@@ -78,6 +78,14 @@ if __name__ == "__main__":
         "--tracy",
         help="Run the binary with the TRACY_ENABLE macro defined",
         action="store_true",
+    )
+    parser.add_argument(
+        "-pl",
+        "--platform",
+        type=str,
+        choices=["PI", "NANO"],
+        help="The platform to build Thunderloop for",
+        action="store",
     )
 
     # These are shortcut args for commonly used arguments on our tests
@@ -174,6 +182,9 @@ if __name__ == "__main__":
     if args.tracy:
         command += ["--cxxopt=-DTRACY_ENABLE"]
 
+    if args.platform:
+        command += ["--//software/embedded:host_platform=" + args.platform]
+
     # Don't cache test results
     if args.action in "test":
         command += ["--cache_test_results=false"]
@@ -181,7 +192,6 @@ if __name__ == "__main__":
         command += ["--"]
 
     bazel_arguments = unknown_args
-
     if args.stop_ai_on_start:
         bazel_arguments += ["--stop_ai_on_start"]
     if args.enable_visualizer:
@@ -189,9 +199,16 @@ if __name__ == "__main__":
     if args.enable_thunderscope:
         bazel_arguments += ["--enable_thunderscope"]
     if args.flash_robots:
-        bazel_arguments += ["-pb deploy_nano.yml"]
+        if not args.platform:
+            print("No platform specified! Make sure to set the --platform argument.")
+            sys.exit(1)
+        bazel_arguments += ["-pb deploy_robot_software.yml"]
         bazel_arguments += ["--hosts"]
-        bazel_arguments += [f"192.168.0.20{id}" for id in args.flash_robots]
+        if args.platform == "NANO":
+            platform_ip = "0"
+        else:
+            platform_ip = "1"
+        bazel_arguments += [f"192.168.{platform_ip}.20{id}" for id in args.flash_robots]
         bazel_arguments += ["-pwd", args.pwd]
 
     if args.action in "test":
