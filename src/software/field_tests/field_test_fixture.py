@@ -86,7 +86,7 @@ class FieldTestRunner(TbotsTestRunner):
 
     def send_gamecontroller_command(
         self,
-        gc_command: proto.ssl_gc_state_pb2.Command,
+        gc_command: proto.ssl_gc_state_pb2.Command.Type,
         team: proto.ssl_gc_common_pb2.Team,
         final_ball_placement_point=None,
     ):
@@ -96,7 +96,7 @@ class FieldTestRunner(TbotsTestRunner):
         :param team: The team which the command as attributed to
         :param final_ball_placement_point: The ball placement point
         """
-        self.gamecontroller.send_ci_input(
+        self.gamecontroller.send_gc_command(
             gc_command=gc_command,
             team=team,
             final_ball_placement_point=final_ball_placement_point,
@@ -275,11 +275,27 @@ def load_command_line_arguments():
     )
 
     parser.add_argument(
-        "--interface",
+        "--robot_interface",
         action="store",
         type=str,
         default=None,
-        help="Which interface to communicate over",
+        help="Which interface to communicate over with the robots",
+    )
+
+    parser.add_argument(
+        "--vision_interface",
+        action="store",
+        type=str,
+        default=None,
+        help="Which interface to communicate over with vision",
+    )
+
+    parser.add_argument(
+        "--referee_interface",
+        action="store",
+        type=str,
+        default=None,
+        help="Which interface to communicate over with the game controller",
     )
 
     parser.add_argument(
@@ -372,14 +388,14 @@ def field_test_runner():
     ) as gamecontroller, RobotCommunication(
         current_proto_unix_io=friendly_proto_unix_io,
         multicast_channel=getRobotMulticastChannel(args.channel),
-        interface=args.interface,
+        interface=args.robot_interface,
         estop_mode=estop_mode,
         estop_path=estop_path,
         enable_radio=args.enable_radio,
         referee_port=Gamecontroller.get_referee_port_static(gamecontroller),
     ) as rc_friendly:
         friendly_fs.setup_proto_unix_io(friendly_proto_unix_io)
-        rc_friendly.setup_for_fullsystem()
+        rc_friendly.setup_for_fullsystem(args.referee_interface, args.vision_interface)
 
         gamecontroller.setup_proto_unix_io(
             blue_full_system_proto_unix_io, yellow_full_system_proto_unix_io,
