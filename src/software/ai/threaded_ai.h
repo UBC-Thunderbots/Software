@@ -37,15 +37,15 @@ class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
      *
      * @param play_proto The play proto to use to override
      */
-    void overridePlay(TbotsProto::Play play_proto);
+    void overridePlay(const TbotsProto::Play& play_proto);
 
     /**
      * Override Tactics
      *
      * @param assigned_tactic_play_control_params
      */
-    void overrideTactics(
-        TbotsProto::AssignedTacticPlayControlParams assigned_tactic_play_control_params);
+    void overrideTactics(const TbotsProto::AssignedTacticPlayControlParams&
+                             assigned_tactic_play_control_params);
 
    private:
     void onValueReceived(World world) override;
@@ -56,10 +56,17 @@ class ThreadedAi : public FirstInFirstOutThreadedObserver<World>,
      *
      * @param world the new world
      */
-    void runAiAndSendPrimitives(const WorldPtr& world_ptr);
+    void runAiAndSendPrimitives(const World& world);
 
-    Ai ai;
-    TbotsProto::AiConfig ai_config;
-    TbotsProto::AiControlConfig ai_control_config;
+    /**
+     * Checks the current AiConfig to see if we should override the current play
+     * and either applies or clears the override accordingly
+     */
+    void updateOverridePlay();
+
     std::mutex ai_mutex;
+
+    std::shared_ptr<Strategy> strategy;
+    TbotsProto::AiControlConfig ai_control_config;
+    Ai ai;
 };

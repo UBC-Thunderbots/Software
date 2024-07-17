@@ -17,9 +17,9 @@ struct EnemyFreeKickPlayFSM : public DefensePlayFSMBase
     /**
      * Creates a enemy free kick play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit EnemyFreeKickPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit EnemyFreeKickPlayFSM(std::shared_ptr<Strategy> strategy);
 
     /**
      * Action to configure the play for defensive gameplay for enemy free kick

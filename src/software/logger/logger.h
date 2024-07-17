@@ -34,7 +34,7 @@
 
 // Called when LOG() is called with 2 arguments
 #define LOG_2(level, filename)                                                           \
-    if (level != CSV && level != VISUALIZE)                                              \
+    if (level != CSV && level != CSV_OVERWRITE && level != VISUALIZE)                    \
     {                                                                                    \
     }                                                                                    \
     else                                                                                 \
@@ -57,17 +57,22 @@ class LoggerSingleton
      * called once at the start of a program.
      *
      * @param runtime_dir The directory where the log files will be stored.
+     * @param proto_logger The proto logger to log VISUALIZE protos
+     * @param reduce_repetition Whether logs should be merged whenever possible to reduce
+     * spam
      */
     static void initializeLogger(const std::string& runtime_dir,
-                                 const std::shared_ptr<ProtoLogger>& proto_logger)
+                                 const std::shared_ptr<ProtoLogger>& proto_logger,
+                                 const bool reduce_repetition = true)
     {
         static std::shared_ptr<LoggerSingleton> s(
-            new LoggerSingleton(runtime_dir, proto_logger));
+            new LoggerSingleton(runtime_dir, proto_logger, reduce_repetition));
     }
 
    private:
     LoggerSingleton(const std::string& runtime_dir,
-                    const std::shared_ptr<ProtoLogger>& proto_logger)
+                    const std::shared_ptr<ProtoLogger>& proto_logger,
+                    const bool reduce_repetition)
     {
         logWorker = g3::LogWorker::createLogWorker();
         // Default locations
@@ -84,18 +89,20 @@ class LoggerSingleton
         // arg. Note: log locations are defaulted to the bazel-out folder due to Bazel's
         // hermetic build principles
 
-        // if log dir doesn't exist, create it
+        // If log dir doesn't exist, create it
         if (!std::experimental::filesystem::exists(runtime_dir))
         {
             std::experimental::filesystem::create_directories(runtime_dir);
         }
 
+        // Sink for logging to CSV files
         auto csv_sink_handle = logWorker->addSink(std::make_unique<CSVSink>(runtime_dir),
-                                                  &CSVSink::appendToFile);
+                                                  &CSVSink::writeToFile);
+
         // Sink for outputting logs to the terminal
-        auto colour_cout_sink_handle =
-            logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
-                               &ColouredCoutSink::displayColouredLog);
+        auto colour_cout_sink_handle = logWorker->addSink(
+            std::make_unique<ColouredCoutSink>(true, reduce_repetition),
+            &ColouredCoutSink::displayColouredLog);
 
         // Sink for storing a file of filtered logs
         auto filtered_log_rotate_sink_handle = logWorker->addSink(
@@ -122,11 +129,11 @@ class LoggerSingleton
     }
 
     // levels is this vector are filtered out of the filtered log rotate sink
-    std::vector<LEVELS> filtered_level_filter = {DEBUG, VISUALIZE,    CSV,
-                                                 INFO,  ROBOT_STATUS, PLOTJUGGLER};
-    std::vector<LEVELS> default_level_filter  = {VISUALIZE, CSV, ROBOT_STATUS,
-                                                PLOTJUGGLER};
-    const std::string filter_suffix           = "_filtered";
-    const std::string log_name                = "thunderbots";
+    std::vector<LEVELS> filtered_level_filter = {
+        DEBUG, VISUALIZE, CSV, CSV_OVERWRITE, INFO, ROBOT_STATUS, PLOTJUGGLER};
+    std::vector<LEVELS> default_level_filter = {VISUALIZE, CSV, CSV_OVERWRITE,
+                                                ROBOT_STATUS, PLOTJUGGLER};
+    const std::string filter_suffix          = "_filtered";
+    const std::string log_name               = "thunderbots";
     std::unique_ptr<g3::LogWorker> logWorker;
 };

@@ -17,9 +17,9 @@ class PassDefenderTactic : public Tactic
     /**
      * Creates a new PassDefenderTactic
      *
-     * @param ai_config The AI configuration
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit PassDefenderTactic(TbotsProto::AiConfig ai_config);
+    explicit PassDefenderTactic(std::shared_ptr<Strategy> strategy);
 
     /**
      * Update control params for this tactic
@@ -37,8 +37,7 @@ class PassDefenderTactic : public Tactic
    private:
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
+    std::shared_ptr<Strategy> strategy;
     std::map<RobotId, std::unique_ptr<FSM<PassDefenderFSM>>> fsm_map;
-
     PassDefenderFSM::ControlParams control_params;
-    TbotsProto::AiConfig ai_config;
 };

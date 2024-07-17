@@ -1,16 +1,18 @@
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
 
-BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
-      pivot_kick_tactic(std::make_shared<WallKickoffTactic>(ai_config)),
-      place_ball_tactic(std::make_shared<PlaceBallTactic>(ai_config)),
-      align_placement_tactic(std::make_shared<PlaceBallMoveTactic>()),
+BallPlacementPlayFSM::BallPlacementPlayFSM(std::shared_ptr<Strategy> strategy)
+    : strategy(strategy),
+      align_wall_tactic(std::make_shared<BallPlacementMoveTactic>()),
+      pickoff_wall_tactic(std::make_shared<BallPlacementDribbleTactic>(strategy)),
+      place_ball_tactic(std::make_shared<BallPlacementDribbleTactic>(strategy)),
+      align_placement_tactic(std::make_shared<BallPlacementMoveTactic>()),
       retreat_tactic(std::make_shared<MoveTactic>()),
-      move_tactics(std::vector<std::shared_ptr<PlaceBallMoveTactic>>())
+      wait_tactic(std::make_shared<MoveTactic>()),
+      move_tactics(std::vector<std::shared_ptr<BallPlacementMoveTactic>>())
 {
 }
 
-void BallPlacementPlayFSM::kickOffWall(const Update &event)
+void BallPlacementPlayFSM::alignWall(const Update &event)
 {
     PriorityTacticVector tactics_to_run = {{}};
 
@@ -20,14 +22,58 @@ void BallPlacementPlayFSM::kickOffWall(const Update &event)
                              move_tactics.end());
 
     // setup wall kickoff tactic for ball placing robot
-    Point ball_pos            = event.common.world_ptr->ball().position();
-    Rectangle field_lines     = event.common.world_ptr->field().fieldLines();
-    AutoChipOrKick auto_chick = {AutoChipOrKickMode::AUTOKICK,
-                                 WALL_KICKOFF_VELOCITY_M_PER_S};
+    Point ball_pos           = event.common.world_ptr->ball().position();
+    Rectangle field_boundary = event.common.world_ptr->field().fieldBoundary();
 
-    Angle kick_angle = calculateWallKickoffAngle(ball_pos, field_lines);
-    pivot_kick_tactic->updateControlParams(ball_pos, kick_angle, auto_chick);
-    tactics_to_run[0].emplace_back(pivot_kick_tactic);
+    pickoff_final_orientation =
+        calculateWallPickOffLocation(ball_pos, field_boundary,
+                                     MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS)
+            .first;
+    pickoff_point =
+        ball_pos - Vector::createFromAngle(pickoff_final_orientation).normalize(0.4);
+    align_wall_tactic->updateControlParams(
+        pickoff_point, pickoff_final_orientation, 0.0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0.0);
+    tactics_to_run[0].emplace_back(align_wall_tactic);
+
+    event.common.set_tactics(tactics_to_run);
+}
+
+void BallPlacementPlayFSM::setPickOffDest(const BallPlacementPlayFSM::Update &event)
+{
+    Point ball_pos           = event.common.world_ptr->ball().position();
+    Rectangle field_boundary = event.common.world_ptr->field().fieldBoundary();
+
+    std::pair<Angle, Point> location = calculateWallPickOffLocation(
+        ball_pos, field_boundary, MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS);
+
+    pickoff_final_orientation = location.first;
+    pickoff_destination =
+        location.second - Vector::createFromAngle(pickoff_final_orientation)
+                              .normalize(BACK_AWAY_FROM_WALL_M);
+}
+
+void BallPlacementPlayFSM::pickOffWall(const BallPlacementPlayFSM::Update &event)
+{
+    PriorityTacticVector tactics_to_run = {{}};
+
+    // setup move tactics for robots away from ball placing robot
+    setupMoveTactics(event);
+    tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
+                             move_tactics.end());
+
+    pickoff_wall_tactic->updateControlParams(
+        {.dribble_destination       = pickoff_destination,
+         .final_dribble_orientation = pickoff_final_orientation,
+         .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL,
+         .max_speed_dribble =
+             TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE,
+         .max_speed_get_possession =
+             TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE});
+
+    tactics_to_run[0].emplace_back(pickoff_wall_tactic);
 
     event.common.set_tactics(tactics_to_run);
 }
@@ -53,12 +99,12 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
                 .normalize();
         Angle setup_angle = alignment_vector.orientation();
         setup_point       = event.common.world_ptr->ball().position() -
-                      2 * alignment_vector * ROBOT_MAX_RADIUS_METERS;
+                      2.5 * alignment_vector * ROBOT_MAX_RADIUS_METERS;
 
         align_placement_tactic->updateControlParams(
             setup_point, setup_angle, 0.0, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND,
             TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
 
         tactics_to_run[0].emplace_back(align_placement_tactic);
@@ -69,6 +115,14 @@ void BallPlacementPlayFSM::alignPlacement(const Update &event)
 
 void BallPlacementPlayFSM::placeBall(const Update &event)
 {
+    std::optional<Point> placement_point =
+        event.common.world_ptr->gameState().getBallPlacementPoint();
+
+    if (!placement_point.has_value())
+    {
+        return;
+    }
+
     PriorityTacticVector tactics_to_run = {{}};
 
     // setup move tactics for robots away from ball placing robot
@@ -76,21 +130,31 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
     tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
                              move_tactics.end());
 
-    Angle final_angle = Angle::zero();
-    std::optional<Point> placement_point =
-        event.common.world_ptr->gameState().getBallPlacementPoint();
+    Point ball_pos = event.common.world_ptr->ball().position();
+    std::optional<Robot> robot_placing_ball =
+        event.common.world_ptr->friendlyTeam().getNearestRobot(ball_pos);
 
-    Vector placement_dribble_vector;
-    if (placement_point.has_value())
+    if (!robot_placing_ball.has_value())
     {
-        placement_dribble_vector =
-            placement_point.value() - event.common.world_ptr->ball().position();
+        return;
+    }
+
+    Angle final_angle = robot_placing_ball->orientation();
+
+
+    Vector placement_dribble_vector =
+        placement_point.value() - event.common.world_ptr->ball().position();
+    if (placement_dribble_vector.length() > 0.3)
+    {
         final_angle = placement_dribble_vector.orientation();
     }
 
     // setup ball placement tactic for ball placing robot
     place_ball_tactic->updateControlParams(
-        event.common.world_ptr->gameState().getBallPlacementPoint(), final_angle, true);
+        {.dribble_destination =
+             event.common.world_ptr->gameState().getBallPlacementPoint(),
+         .final_dribble_orientation = final_angle,
+         .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::ALLOWED});
     tactics_to_run[0].emplace_back(place_ball_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -99,6 +163,34 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
 void BallPlacementPlayFSM::startWait(const Update &event)
 {
     start_time = event.common.world_ptr->getMostRecentTimestamp();
+}
+
+void BallPlacementPlayFSM::releaseBall(const Update &event)
+{
+    WorldPtr world_ptr = event.common.world_ptr;
+    std::optional<Robot> nearest_robot =
+        world_ptr->friendlyTeam().getNearestRobot(world_ptr->ball().position());
+
+    if (nearest_robot.has_value())
+    {
+        PriorityTacticVector tactics_to_run = {{}};
+
+        // setup move tactics for robots away from ball placing robot
+        setupMoveTactics(event);
+        tactics_to_run[0].insert(tactics_to_run[0].end(), move_tactics.begin(),
+                                 move_tactics.end());
+
+
+        wait_tactic->updateControlParams(
+            nearest_robot->position(), nearest_robot->orientation(), 0.0,
+            TbotsProto::DribblerMode::RELEASE_BALL_SLOW,
+            TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0},
+            TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
+            TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, 0.0);
+        tactics_to_run[0].emplace_back(wait_tactic);
+
+        event.common.set_tactics(tactics_to_run);
+    }
 }
 
 void BallPlacementPlayFSM::retreat(const Update &event)
@@ -145,7 +237,7 @@ void BallPlacementPlayFSM::retreat(const Update &event)
         retreat_tactic->updateControlParams(
             retreat_position, final_orientation, 0.0, TbotsProto::DribblerMode::OFF,
             TbotsProto::BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+            TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT,
             TbotsProto::ObstacleAvoidanceMode::SAFE, 0.0);
         tactics_to_run[0].emplace_back(retreat_tactic);
 
@@ -153,12 +245,14 @@ void BallPlacementPlayFSM::retreat(const Update &event)
     }
 }
 
-bool BallPlacementPlayFSM::shouldKickOffWall(const Update &event)
+bool BallPlacementPlayFSM::shouldPickOffWall(const Update &event)
 {
     // check if ball is too close to border
     Point ball_pos        = event.common.world_ptr->ball().position();
-    Rectangle field_lines = event.common.world_ptr->field().fieldLines();
-    return !contains(field_lines, ball_pos);
+    Rectangle field_lines = event.common.world_ptr->field().fieldBoundary();
+    double wiggle_room    = std::abs(signedDistance(ball_pos, field_lines));
+
+    return wiggle_room <= MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS;
 }
 
 bool BallPlacementPlayFSM::alignDone(const Update &event)
@@ -176,12 +270,24 @@ bool BallPlacementPlayFSM::alignDone(const Update &event)
     }
 }
 
-bool BallPlacementPlayFSM::kickDone(const Update &event)
+bool BallPlacementPlayFSM::wallAlignDone(const BallPlacementPlayFSM::Update &event)
 {
-    const auto ball_velocity = event.common.world_ptr->ball().velocity().length();
-    const auto ball_is_kicked_m_per_s_threshold =
-        this->ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
-    return ball_velocity > ball_is_kicked_m_per_s_threshold;
+    std::optional<Robot> nearest_robot =
+        event.common.world_ptr->friendlyTeam().getNearestRobot(
+            event.common.world_ptr->ball().position());
+    if (nearest_robot.has_value())
+    {
+        return comparePoints(nearest_robot.value().position(), pickoff_point);
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool BallPlacementPlayFSM::wallPickOffDone(const Update &event)
+{
+    return pickoff_wall_tactic->done();
 }
 
 bool BallPlacementPlayFSM::ballPlaced(const Update &event)
@@ -197,7 +303,8 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
         return comparePoints(ball_pos, placement_point.value(),
                              PLACEMENT_DIST_THRESHOLD_METERS) &&
                event.common.world_ptr->ball().velocity().length() <
-                   this->ai_config.ai_parameter_config()
+                   strategy->getAiConfig()
+                       .ai_parameter_config()
                        .ball_is_kicked_m_per_s_threshold();
     }
     else
@@ -220,55 +327,64 @@ bool BallPlacementPlayFSM::retreatDone(const Update &event)
                                        ->position()) > RETREAT_DISTANCE_METERS;
 }
 
-Angle BallPlacementPlayFSM::calculateWallKickoffAngle(const Point &ball_pos,
-                                                      const Rectangle &field_lines)
+std::pair<Angle, Point> BallPlacementPlayFSM::calculateWallPickOffLocation(
+    const Point &ball_pos, const Rectangle &field_boundary, const double max_dist)
 {
-    Angle kick_angle;
-    if (ball_pos.x() > field_lines.xMax())
+    Angle facing_angle;
+    Point backoff_point;
+    bool near_positive_y_boundary = (field_boundary.yMax() - ball_pos.y()) < max_dist;
+    bool near_negative_y_boundary = (ball_pos.y() - field_boundary.yMin()) < max_dist;
+    bool near_positive_x_boundary = (field_boundary.xMax() - ball_pos.x()) < max_dist;
+    bool near_negative_x_boundary = (ball_pos.x() - field_boundary.xMin()) < max_dist;
+    if (near_positive_y_boundary && near_positive_x_boundary)  // top right corner
     {
-        if (ball_pos.y() > 0)
-        {
-            kick_angle = Angle::fromDegrees(45);
-        }
-        else
-        {
-            kick_angle = Angle::fromDegrees(-45);
-        }
+        facing_angle  = Angle::fromDegrees(45);
+        backoff_point = field_boundary.posXPosYCorner() -
+                        Vector::createFromAngle(facing_angle)
+                            .normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
-    else if (ball_pos.x() < field_lines.xMin())
+    else if (near_positive_y_boundary && near_negative_x_boundary)  // top left corner
     {
-        if (ball_pos.y() > 0)
-        {
-            kick_angle = Angle::fromDegrees(135);
-        }
-        else
-        {
-            kick_angle = Angle::fromDegrees(-135);
-        }
+        facing_angle  = Angle::fromDegrees(135);
+        backoff_point = field_boundary.negXPosYCorner() -
+                        Vector::createFromAngle(facing_angle)
+                            .normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
-    else if (ball_pos.y() > field_lines.yMax())
+    else if (near_negative_y_boundary && near_positive_x_boundary)  // bottom right corner
     {
-        if (ball_pos.x() > 0)
-        {
-            kick_angle = Angle::fromDegrees(135);
-        }
-        else
-        {
-            kick_angle = Angle::fromDegrees(45);
-        }
+        facing_angle  = Angle::fromDegrees(-45);
+        backoff_point = field_boundary.posXNegYCorner() -
+                        Vector::createFromAngle(facing_angle)
+                            .normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
-    else if (ball_pos.y() < field_lines.yMin())
+    else if (near_negative_y_boundary && near_negative_x_boundary)  // bottom left corner
     {
-        if (ball_pos.x() > 0)
-        {
-            kick_angle = Angle::fromDegrees(-135);
-        }
-        else
-        {
-            kick_angle = Angle::fromDegrees(-45);
-        }
+        facing_angle  = Angle::fromDegrees(-135);
+        backoff_point = field_boundary.negXNegYCorner() -
+                        Vector::createFromAngle(facing_angle)
+                            .normalize(BACK_AWAY_FROM_CORNER_EXTRA_M);
     }
-    return kick_angle;
+    else if (near_positive_y_boundary)
+    {
+        facing_angle  = Angle::fromDegrees(90);
+        backoff_point = Point(ball_pos.x(), field_boundary.yMax());
+    }
+    else if (near_positive_x_boundary)
+    {
+        facing_angle  = Angle::fromDegrees(0);
+        backoff_point = Point(field_boundary.xMax(), ball_pos.y());
+    }
+    else if (near_negative_y_boundary)
+    {
+        facing_angle  = Angle::fromDegrees(-90);
+        backoff_point = Point(ball_pos.x(), field_boundary.yMin());
+    }
+    else if (near_negative_x_boundary)
+    {
+        facing_angle  = Angle::fromDegrees(180);
+        backoff_point = Point(field_boundary.xMin(), ball_pos.y());
+    }
+    return std::make_pair(facing_angle, backoff_point);
 }
 
 void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
@@ -281,9 +397,10 @@ void BallPlacementPlayFSM::setupMoveTactics(const Update &event)
         return;
     }
 
-    move_tactics = std::vector<std::shared_ptr<PlaceBallMoveTactic>>(num_move_tactics);
+    move_tactics =
+        std::vector<std::shared_ptr<BallPlacementMoveTactic>>(num_move_tactics);
     std::generate(move_tactics.begin(), move_tactics.end(),
-                  [this]() { return std::make_shared<PlaceBallMoveTactic>(); });
+                  [this]() { return std::make_shared<BallPlacementMoveTactic>(); });
 
     // non goalie and non ball placing robots line up along a line just outside the
     // friendly defense area to wait for ball placement to finish

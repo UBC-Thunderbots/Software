@@ -20,6 +20,8 @@ from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
 from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
 
+logger = logging.getLogger(__name__)
+
 
 class Gamecontroller(object):
     """Gamecontroller Context Manager"""
@@ -192,9 +194,18 @@ class Gamecontroller(object):
             if autoref_proto_unix_io is not None:
                 autoref_proto_unix_io.send_proto(Referee, data)
 
-        self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
+        self.receive_referee_command, error = tbots_cpp.createSSLRefereeProtoListener(
+            Gamecontroller.REFEREE_IP,
+            self.referee_port,
+            "lo",
+            __send_referee_command,
+            True,
         )
+
+        if error:
+            logger.error(
+                "[Gamecontroller] Failed to bind to the referee port and listen to referee messages"
+            )
 
         blue_full_system_proto_unix_io.register_observer(
             ManualGCCommand, self.command_override_buffer
@@ -205,7 +216,7 @@ class Gamecontroller(object):
 
     def send_gc_command(
         self,
-        gc_command: proto.ssl_gc_state_pb2.Command,
+        gc_command: proto.ssl_gc_state_pb2.Command.Type,
         team: proto.ssl_gc_common_pb2.Team,
         final_ball_placement_point: tbots_cpp.Point = None,
     ) -> Any:

@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 
 #include "software/ai/evaluation/find_open_areas.h"
-#include "software/ai/hl/stp/tactic/move_primitive.h"
+#include "software/ai/hl/stp/primitive/move_primitive.h"
 #include "software/math/math_functions.h"
 
 Point GoalieFSM::getGoaliePositionToBlock(
@@ -190,7 +190,8 @@ void GoalieFSM::panic(const Update &event)
 }
 
 void GoalieFSM::updatePivotKick(
-    const Update &event, boost::sml::back::process<PivotKickFSM::Update> processEvent)
+    const Update &event,
+    boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
     // Ensure that we start our chip away from the no chip zone in front of
     // the goal (prevents accidentally scoring an own goal)
@@ -204,7 +205,7 @@ void GoalieFSM::updatePivotKick(
     Point chip_target = findGoodChipTarget(*event.common.world_ptr, goalie_tactic_config);
     Vector chip_vector = chip_target - chip_origin;
 
-    PivotKickFSM::ControlParams control_params{
+    PivotKickSkillFSM::ControlParams control_params{
         .kick_origin    = chip_origin,
         .kick_direction = chip_vector.orientation(),
         .auto_chip_or_kick =
@@ -212,7 +213,9 @@ void GoalieFSM::updatePivotKick(
     };
 
     // update the pivotkick fsm
-    processEvent(PivotKickFSM::Update(control_params, event.common));
+    processEvent(PivotKickSkillFSM::Update(
+        control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
+                                    event.common.set_primitive)));
 }
 
 void GoalieFSM::positionToBlock(const Update &event)
@@ -263,19 +266,20 @@ bool GoalieFSM::retrieveDone(const Update &event)
 }
 
 void GoalieFSM::retrieveFromDeadZone(
-    const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent)
+    const Update &event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
     Point ball_position = event.common.world_ptr->ball().position();
     Vector final_dribble_orientation =
         event.common.world_ptr->field().enemyGoalCenter() - ball_position;
 
-    DribbleFSM::ControlParams control_params{
+    DribbleSkillFSM::ControlParams control_params{
         .dribble_destination =
             event.common.world_ptr->field().friendlyDefenseArea().centre(),
         .final_dribble_orientation = final_dribble_orientation.orientation(),
-        .allow_excessive_dribbling = false,
+        .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL,
     };
 
-    // update the dribble fsm
-    processEvent(DribbleFSM::Update(control_params, event.common));
+    processEvent(DribbleSkillFSM::Update(
+        control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
+                                    event.common.set_primitive)));
 }

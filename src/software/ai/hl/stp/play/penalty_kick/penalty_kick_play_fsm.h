@@ -23,9 +23,9 @@ struct PenaltyKickPlayFSM
     /**
      * Creates a penalty kick play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit PenaltyKickPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit PenaltyKickPlayFSM(std::shared_ptr<Strategy> strategy);
 
     /**
      * Action to set up the robots in position to start the penalty kick
@@ -84,7 +84,6 @@ struct PenaltyKickPlayFSM
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
     std::shared_ptr<PenaltyKickTactic> penalty_kick_tactic;
     std::vector<std::shared_ptr<PenaltySetupTactic>> penalty_setup_tactics;
 };
