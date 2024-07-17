@@ -453,10 +453,10 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
 
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
-    const RobotConstants& robot_constants)
+    const RobotConstants& robot_constants, const TbotsProto::MaxAllowedSpeedMode max_speed_mode)
 {
-    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-        params.max_speed_mode(), robot_constants);
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
+        max_speed_mode, robot_constants);
 
     if (max_speed == 0)
     {
@@ -503,12 +503,14 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
 
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
     const TbotsProto::TrajectoryParamsAngular1D& params,
-    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants)
+    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants, const TbotsProto::MaxAllowedSpeedMode max_speed_mode)
 {
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(max_speed_mode, robot_constants);
+
     return BangBangTrajectory1DAngular(
         createAngle(params.start_angle()), createAngle(params.final_angle()),
         initial_velocity,
-        AngularVelocity::fromRadians(robot_constants.robot_max_ang_speed_rad_per_s),
+        AngularVelocity::fromRadians(max_speed),
         AngularVelocity::fromRadians(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2),
         AngularVelocity::fromRadians(
@@ -534,9 +536,34 @@ double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode
     }
 }
 
-double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+double convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
     RobotConstants_t robot_constants)
+{
+    switch (max_allowed_speed_mode)
+    {
+        case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
+            return robot_constants.robot_max_speed_m_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
+            return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND -
+                   STOP_COMMAND_SPEED_SAFETY_MARGIN_METERS_PER_SECOND;
+        case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
+            return COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND;
+        case TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT:
+            return robot_constants.ball_placement_retreat_max_speed_m_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE:
+            return robot_constants.ball_placement_wall_max_speed_m_per_s;
+        case TbotsProto::MaxAllowedSpeedMode::DRIBBLE:
+            return robot_constants.dribble_speed_m_per_s;
+        default:
+            LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
+            return 0.0;
+    }
+}
+
+double convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+        RobotConstants_t robot_constants)
 {
     switch (max_allowed_speed_mode)
     {

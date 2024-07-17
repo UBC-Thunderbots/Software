@@ -27,16 +27,17 @@ MovePrimitive::MovePrimitive(
     }
     else
     {
-        double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-            max_allowed_speed_mode, robot.robotConstants());
-        trajectory.generate(robot.position(), destination, robot.velocity(), max_speed,
+        double max_linear_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
+                max_allowed_speed_mode, robot.robotConstants());
+        double max_angular_speed = convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
+                max_allowed_speed_mode, robot.robotConstants());
+        trajectory.generate(robot.position(), destination, robot.velocity(), max_linear_speed,
                             robot.robotConstants().robot_max_acceleration_m_per_s_2,
                             robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
         angular_trajectory.generate(
             robot.orientation(), final_angle, robot.angularVelocity(),
-            AngularVelocity::fromRadians(
-                robot.robotConstants().robot_max_ang_speed_rad_per_s),
+            AngularVelocity::fromRadians(max_angular_speed),
             AngularVelocity::fromRadians(
                 robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2),
             AngularVelocity::fromRadians(
@@ -56,8 +57,8 @@ MovePrimitive::generatePrimitiveProtoMessage(
     // Generate obstacle avoiding trajectory
     updateObstacles(world, motion_constraints, robot_trajectories, obstacle_factory);
 
-    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-        max_allowed_speed_mode, robot.robotConstants());
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
+            max_allowed_speed_mode, robot.robotConstants());
     KinematicConstraints constraints(
         max_speed, robot.robotConstants().robot_max_acceleration_m_per_s_2,
         robot.robotConstants().robot_max_deceleration_m_per_s_2);
@@ -126,7 +127,6 @@ MovePrimitive::generatePrimitiveProtoMessage(
     *(xy_traj_params.mutable_start_position())   = *createPointProto(robot.position());
     *(xy_traj_params.mutable_destination())      = *createPointProto(destination);
     *(xy_traj_params.mutable_initial_velocity()) = *createVectorProto(robot.velocity());
-    xy_traj_params.set_max_speed_mode(max_allowed_speed_mode);
     *(primitive_proto->mutable_move()->mutable_xy_traj_params()) = xy_traj_params;
 
     const auto &path_nodes = traj_path->getTrajectoryPathNodes();
@@ -155,6 +155,8 @@ MovePrimitive::generatePrimitiveProtoMessage(
     *(primitive_proto->mutable_move()->mutable_w_traj_params()) = w_traj_params;
 
     primitive_proto->mutable_move()->set_dribbler_mode(dribbler_mode);
+
+    primitive_proto->mutable_move()->set_max_speed_mode(max_allowed_speed_mode);
 
     if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
     {
