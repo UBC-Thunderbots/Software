@@ -85,7 +85,7 @@
           become_method: sudo
           shell: 'mv /home/{{ ansible_user }}/iwlwifi* /lib/firmware/'
 
-        - name: Set up WiFI interface systemd rule
+        - name: Set up systemd WiFI interface name rule
           ansible.builtin.import_tasks:
             file: ../tasks/setup_wifi_interface.yml
 

@@ -33,11 +33,11 @@ void PrimitiveExecutor::updatePrimitiveSet(
         if (current_primitive_.has_move())
         {
             trajectory_path_ = createTrajectoryPathFromParams(
-                current_primitive_.move().xy_traj_params(), velocity_, robot_constants_);
+                current_primitive_.move().xy_traj_params(), velocity_, robot_constants_, current_primitive_.move().max_speed_mode());
 
             angular_trajectory_ = createAngularTrajectoryFromParams(
                 current_primitive_.move().w_traj_params(), angular_velocity_,
-                robot_constants_);
+                robot_constants_, current_primitive_.move().max_speed_mode());
 
             time_since_trajectory_creation_ =
                 Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
