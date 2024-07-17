@@ -392,6 +392,42 @@ std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
     return pass_visualization_msg;
 }
 
+std::unique_ptr<TbotsProto::AttackerVisualization> createAttackerVisualization(
+    const std::optional<Pass>& pass, const bool pass_committed,
+    const std::optional<Shot>& shot, const std::optional<Point>& ball_position,
+    const std::optional<Point>& chip_target)
+{
+    auto pass_visualization_msg = std::make_unique<TbotsProto::AttackerVisualization>();
+
+    if (pass.has_value())
+    {
+        TbotsProto::Pass pass_msg;
+        *(pass_msg.mutable_passer_point())   = *createPointProto(pass->passerPoint());
+        *(pass_msg.mutable_receiver_point()) = *createPointProto(pass->receiverPoint());
+        pass_msg.set_pass_speed_m_per_s(pass->speed());
+        *(pass_visualization_msg->mutable_pass_()) = pass_msg;
+    }
+
+    pass_visualization_msg->set_pass_committed(pass_committed);
+
+    if (shot.has_value() && ball_position.has_value())
+    {
+        TbotsProto::Shot shot_msg;
+        *(shot_msg.mutable_shot_origin()) = *createPointProto(ball_position.value());
+        *(shot_msg.mutable_shot_target()) = *createPointProto(shot->getPointToShootAt());
+        *(shot_msg.mutable_open_angle())  = *createAngleProto(shot->getOpenAngle());
+        *(pass_visualization_msg->mutable_shot()) = shot_msg;
+    }
+
+    if (chip_target.has_value())
+    {
+        *(pass_visualization_msg->mutable_chip_target()) =
+            *createPointProto(chip_target.value());
+    }
+
+    return pass_visualization_msg;
+}
+
 std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedTrigger()
 {
     auto world_state_received_trigger_msg =
@@ -419,8 +455,8 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
     const RobotConstants& robot_constants)
 {
-    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
-            params.max_speed_mode(), robot_constants);
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+        params.max_speed_mode(), robot_constants);
 
     if (max_speed == 0)
     {
@@ -498,7 +534,7 @@ double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode
     }
 }
 
-double convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
+double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
     RobotConstants_t robot_constants)
 {
@@ -517,30 +553,6 @@ double convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
             return robot_constants.ball_placement_wall_max_speed_m_per_s;
         case TbotsProto::MaxAllowedSpeedMode::DRIBBLE:
             return robot_constants.dribble_speed_m_per_s;
-        default:
-            LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
-            return 0.0;
-    }
-}
-
-double convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
-        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
-        RobotConstants_t robot_constants)
-{
-    switch (max_allowed_speed_mode)
-    {
-        case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
-            return robot_constants.robot_max_ang_speed_rad_per_s;
-        case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
-            return robot_constants.robot_max_ang_speed_rad_per_s;
-        case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
-            return robot_constants.robot_max_ang_speed_rad_per_s;
-        case TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT:
-            return robot_constants.robot_max_ang_speed_rad_per_s;
-        case TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE:
-            return robot_constants.dribble_max_ang_speed_rad_per_s;
-        case TbotsProto::MaxAllowedSpeedMode::DRIBBLE:
-            return robot_constants.dribble_max_ang_speed_rad_per_s;
         default:
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;

@@ -2,8 +2,8 @@
 
 #include "proto/parameters.pb.h"
 #include "proto/tactic.pb.h"
+#include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
 #include "software/ai/hl/stp/tactic/defender/defender_fsm_base.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
@@ -51,13 +51,9 @@ struct CreaseDefenderFSM : public DefenderFSMBase
     /**
      * Constructor for CreaseDefenderFSM struct
      *
-     * @param ai_config The ai config for this struct
+     * @param strategy the Strategy shared by all of AI
      */
-    explicit CreaseDefenderFSM(const TbotsProto::AiConfig& ai_config)
-        : robot_navigation_obstacle_config(ai_config.robot_navigation_obstacle_config()),
-          crease_defender_config(ai_config.crease_defender_config())
-    {
-    }
+    explicit CreaseDefenderFSM(std::shared_ptr<Strategy> strategy) : strategy(strategy) {}
 
     /**
      * Guard that checks if the ball is on friendly side, nearby, and unguarded by the
@@ -73,10 +69,11 @@ struct CreaseDefenderFSM : public DefenderFSMBase
     /**
      * This is the Action that prepares for getting possession of the ball
      * @param event CreaseDefenderFSM::Update event
-     * @param processEvent processes the DribbleFSM::Update
+     * @param processEvent processes the DribbleSkillFSM::Update
      */
-    void prepareGetPossession(const Update& event,
-                              boost::sml::back::process<DribbleFSM::Update> processEvent);
+    void prepareGetPossession(
+        const Update& event,
+        boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
     /**
      * This is an Action that blocks the threat
@@ -93,26 +90,27 @@ struct CreaseDefenderFSM : public DefenderFSMBase
         DEFINE_SML_STATE(MoveFSM)
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockThreat, MoveFSM)
-        DEFINE_SML_STATE(DribbleFSM)
+        DEFINE_SML_STATE(DribbleSkillFSM)
         DEFINE_SML_GUARD(ballNearbyWithoutThreat)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(prepareGetPossession, DribbleSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *MoveFSM_S + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
-                DribbleFSM_S,
+                DribbleSkillFSM_S,
             MoveFSM_S + Update_E / blockThreat_A, MoveFSM_S = X,
-            DribbleFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A =
+            DribbleSkillFSM_S + Update_E[!ballNearbyWithoutThreat_G] / blockThreat_A =
                 MoveFSM_S,
-            DribbleFSM_S + Update_E / prepareGetPossession_A,
+            DribbleSkillFSM_S + Update_E / prepareGetPossession_A,
             X + Update_E[ballNearbyWithoutThreat_G] / prepareGetPossession_A =
-                DribbleFSM_S,
+                DribbleSkillFSM_S,
             X + Update_E / blockThreat_A = MoveFSM_S);
     }
 
    private:
     static constexpr double DETECT_THREAT_AHEAD_SHAPE_LENGTH_M = 1;
     static constexpr double DETECT_THREAT_AHEAD_SHAPE_RADIUS_M = 0.25;
+
     /**
      * Finds the intersection with the front or sides of the defense area with the given
      * ray
@@ -137,6 +135,5 @@ struct CreaseDefenderFSM : public DefenderFSMBase
      */
     static bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
 
-    TbotsProto::RobotNavigationObstacleConfig robot_navigation_obstacle_config;
-    TbotsProto::CreaseDefenderConfig crease_defender_config;
+    std::shared_ptr<Strategy> strategy;
 };

@@ -23,28 +23,28 @@ class MotionConstraintVisitor : public TacticVisitor
     void visit(const CreaseDefenderTactic &tactic) override;
     void visit(const ShadowEnemyTactic &tactic) override;
     void visit(const MoveTactic &tactic) override;
-    void visit(const ChipTactic &tactic) override;
-    void visit(const KickTactic &tactic) override;
-    void visit(const KickoffChipTactic &tactic) override;
     void visit(const StopTactic &tactic) override;
     void visit(const PenaltyKickTactic &tactic) override;
     void visit(const PenaltySetupTactic &tactic) override;
     void visit(const ReceiverTactic &tactic) override;
     void visit(const AttackerTactic &tactic) override;
-    void visit(const DefenseShadowEnemyTactic &tactic) override;
-    void visit(const MoveTestTactic &tactic) override;
-    void visit(const StopTestTactic &tactic) override;
-    void visit(const GoalieTestTactic &tactic) override;
-    void visit(const DribbleTactic &tactic) override;
-    void visit(const GetBehindBallTactic &tactic) override;
-    void visit(const PivotKickTactic &tactic) override;
     void visit(const MoveGoalieToGoalLineTactic &tactic) override;
     void visit(const PrepareKickoffMoveTactic &tactic) override;
-    void visit(const BallPlacementDribbleTactic &tactic) override;
     void visit(const BallPlacementMoveTactic &tactic) override;
-    void visit(const WallKickoffTactic &tactic) override;
     void visit(const AvoidInterferenceTactic &tactic) override;
     void visit(const PassDefenderTactic &tactic) override;
+    void visit(const AssignedSkillTactic<ChipSkill> &tactic) override;
+    void visit(const AssignedSkillTactic<DribbleSkill> &tactic) override;
+    void visit(const AssignedSkillTactic<GetBehindBallSkill> &tactic) override;
+    void visit(const AssignedSkillTactic<KeepAwaySkill> &tactic) override;
+    void visit(const AssignedSkillTactic<KickSkill> &tactic) override;
+    void visit(const AssignedSkillTactic<KickPassSkill> &tactic) override;
+    void visit(const AssignedSkillTactic<ChipPassSkill> &tactic) override;
+    void visit(const AssignedSkillTactic<PivotKickSkill> &tactic) override;
+    void visit(const AssignedSkillTactic<ShootSkill> &tactic) override;
+    void visit(const AssignedSkillTactic<DribbleShootSkill> &tactic) override;
+    void visit(const KickoffChipSkillTactic &tactic) override;
+    void visit(const BallPlacementDribbleTactic &tactic) override;
 
     /**
      * Gets the motion constraints updated with the requirements of the tactics

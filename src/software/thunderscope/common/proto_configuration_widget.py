@@ -19,6 +19,9 @@ class ProtoConfigurationWidget(QWidget):
 
     """
 
+    DELAYED_CONFIGURATION_TIMEOUT_S = 5
+    """How long to wait after startup to send the first configuration to our AI"""
+
     def __init__(
         self,
         on_change_callback: Callable[[Any, Any, ThunderbotsConfig], None],
@@ -76,7 +79,10 @@ class ProtoConfigurationWidget(QWidget):
         layout.addWidget(self.search_query)
         layout.addWidget(self.param_tree)
 
-        self.run_onetime_async(3, self.send_proto_to_fullsystem)
+        self.run_onetime_async(
+            ProtoConfigurationWidget.DELAYED_CONFIGURATION_TIMEOUT_S,
+            self.send_proto_to_fullsystem,
+        )
 
     def run_onetime_async(self, time_in_seconds: float, func: Callable):
         """
@@ -303,7 +309,6 @@ class ProtoConfigurationWidget(QWidget):
         :param search_term: The search filter
 
         """
-
         field_list = proto_parameter_tree_util.config_proto_to_field_list(
             message,
             search_term=search_term,

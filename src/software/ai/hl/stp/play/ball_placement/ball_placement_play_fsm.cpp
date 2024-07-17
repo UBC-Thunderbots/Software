@@ -1,10 +1,10 @@
 #include "software/ai/hl/stp/play/ball_placement/ball_placement_play_fsm.h"
 
-BallPlacementPlayFSM::BallPlacementPlayFSM(TbotsProto::AiConfig ai_config)
-    : ai_config(ai_config),
+BallPlacementPlayFSM::BallPlacementPlayFSM(std::shared_ptr<Strategy> strategy)
+    : strategy(strategy),
       align_wall_tactic(std::make_shared<BallPlacementMoveTactic>()),
-      pickoff_wall_tactic(std::make_shared<BallPlacementDribbleTactic>(ai_config)),
-      place_ball_tactic(std::make_shared<BallPlacementDribbleTactic>(ai_config)),
+      pickoff_wall_tactic(std::make_shared<BallPlacementDribbleTactic>(strategy)),
+      place_ball_tactic(std::make_shared<BallPlacementDribbleTactic>(strategy)),
       align_placement_tactic(std::make_shared<BallPlacementMoveTactic>()),
       retreat_tactic(std::make_shared<MoveTactic>()),
       wait_tactic(std::make_shared<MoveTactic>()),
@@ -65,9 +65,13 @@ void BallPlacementPlayFSM::pickOffWall(const BallPlacementPlayFSM::Update &event
                              move_tactics.end());
 
     pickoff_wall_tactic->updateControlParams(
-        pickoff_destination, pickoff_final_orientation, true,
-        TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE,
-        TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE);
+        {.dribble_destination       = pickoff_destination,
+         .final_dribble_orientation = pickoff_final_orientation,
+         .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL,
+         .max_speed_dribble =
+             TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE,
+         .max_speed_get_possession =
+             TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE});
 
     tactics_to_run[0].emplace_back(pickoff_wall_tactic);
 
@@ -147,8 +151,10 @@ void BallPlacementPlayFSM::placeBall(const Update &event)
 
     // setup ball placement tactic for ball placing robot
     place_ball_tactic->updateControlParams(
-        event.common.world_ptr->gameState().getBallPlacementPoint(), final_angle, true,
-        TbotsProto::MaxAllowedSpeedMode::DRIBBLE);
+        {.dribble_destination =
+             event.common.world_ptr->gameState().getBallPlacementPoint(),
+         .final_dribble_orientation = final_angle,
+         .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::ALLOWED});
     tactics_to_run[0].emplace_back(place_ball_tactic);
 
     event.common.set_tactics(tactics_to_run);
@@ -297,7 +303,8 @@ bool BallPlacementPlayFSM::ballPlaced(const Update &event)
         return comparePoints(ball_pos, placement_point.value(),
                              PLACEMENT_DIST_THRESHOLD_METERS) &&
                event.common.world_ptr->ball().velocity().length() <
-                   this->ai_config.ai_parameter_config()
+                   strategy->getAiConfig()
+                       .ai_parameter_config()
                        .ball_is_kicked_m_per_s_threshold();
     }
     else

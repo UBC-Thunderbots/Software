@@ -1,8 +1,7 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
-#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
+#include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
+#include "software/ai/hl/stp/skill/kick/kick_skill_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/closest_point.h"
@@ -11,9 +10,11 @@
 struct PenaltyKickFSM
 {
     /**
-     * Constructor for DribbleFSM
+     * Constructor for PenaltyKickFSM
+     *
+     * @param strategy the Strategy shared by all of AI
      */
-    PenaltyKickFSM();
+    PenaltyKickFSM(std::shared_ptr<Strategy> strategy);
 
     struct ControlParams
     {
@@ -51,28 +52,30 @@ struct PenaltyKickFSM
      * Action that causes the shooter to shoot the ball.
      *
      * @param event          PenaltyKickFSM::Update event
-     * @param processEvent   processes the KickFSM::Update
+     * @param processEvent   processes the KickSkillFSM::Update
      */
     void shoot(const Update &event,
-               boost::sml::back::process<KickFSM::Update> processEvent);
+               boost::sml::back::process<KickSkillFSM::Update> processEvent);
 
     /**
      * Action that updates the shooter's approach to the opposition net.
      *
      * @param event          PenaltyKickFSM::Update event
-     * @param processEvent   processes the DribbleFSM::Update
+     * @param processEvent   processes the DribbleSkillFSM::Update
      */
-    void updateApproachKeeper(const Update &event,
-                              boost::sml::back::process<DribbleFSM::Update> processEvent);
+    void updateApproachKeeper(
+        const Update &event,
+        boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
     /**
      * Action that orients the shooter to prepare for a shot.
      *
      * @param event          PenaltyKickFSM::Update
-     * @param processEvent   processes the DribbleFSM::Update
+     * @param processEvent   processes the DribbleSkillFSM::Update
      */
     void adjustOrientationForShot(
-        const Update &event, boost::sml::back::process<DribbleFSM::Update> processEvent);
+        const Update &event,
+        boost::sml::back::process<DribbleSkillFSM::Update> processEvent);
 
     /**
      * Guard that returns true if the shooter has a good shot on goal or if it is
@@ -99,25 +102,25 @@ struct PenaltyKickFSM
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(DribbleFSM)
-        DEFINE_SML_STATE(KickFSM)
+        DEFINE_SML_STATE(DribbleSkillFSM)
+        DEFINE_SML_STATE(KickSkillFSM)
 
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(takePenaltyShot)
         DEFINE_SML_GUARD(timeOutApproach)
 
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(shoot, KickFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateApproachKeeper, DribbleFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(adjustOrientationForShot, DribbleFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(shoot, KickSkillFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateApproachKeeper, DribbleSkillFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(adjustOrientationForShot, DribbleSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state
-            *DribbleFSM_S + Update_E[!takePenaltyShot_G] / updateApproachKeeper_A,
-            DribbleFSM_S + Update_E[timeOutApproach_G] / shoot_A = KickFSM_S,
-            DribbleFSM_S + Update_E / adjustOrientationForShot_A,
-            DribbleFSM_S = KickFSM_S, KickFSM_S + Update_E / shoot_A, KickFSM_S = X,
-            X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
+            *DribbleSkillFSM_S + Update_E[!takePenaltyShot_G] / updateApproachKeeper_A,
+            DribbleSkillFSM_S + Update_E[timeOutApproach_G] / shoot_A = KickSkillFSM_S,
+            DribbleSkillFSM_S + Update_E / adjustOrientationForShot_A,
+            DribbleSkillFSM_S = KickSkillFSM_S, KickSkillFSM_S + Update_E / shoot_A,
+            KickSkillFSM_S = X, X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     };
 
    private:
@@ -141,6 +144,7 @@ struct PenaltyKickFSM
         Duration::fromSeconds(4);
 
    private:
+    std::shared_ptr<Strategy> strategy;
     std::optional<Timestamp> complete_approach;
     Angle shot_angle;
 };

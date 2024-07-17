@@ -3,9 +3,8 @@
 #include "proto/parameters.pb.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
+#include "software/ai/hl/stp/tactic/assigned_skill/specialized_assigned_skill_tactics.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/closest_point.h"
@@ -14,8 +13,8 @@ using Zones = std::unordered_set<EighteenZoneId>;
 
 struct BallPlacementPlayFSM
 {
-    double BACK_AWAY_FROM_CORNER_EXTRA_M = 0.9;
-    double BACK_AWAY_FROM_WALL_M = ROBOT_MAX_RADIUS_METERS * 5.5;
+    double BACK_AWAY_FROM_CORNER_EXTRA_M               = 0.9;
+    double BACK_AWAY_FROM_WALL_M                       = ROBOT_MAX_RADIUS_METERS * 5.5;
     double MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS = ROBOT_MAX_RADIUS_METERS * 4.0;
 
     class StartState;
@@ -35,9 +34,9 @@ struct BallPlacementPlayFSM
     /**
      * Creates a ball placement play FSM
      *
-     * @param ai_config the play config for this play FSM
+     * @param strategy the Strategy
      */
-    explicit BallPlacementPlayFSM(TbotsProto::AiConfig ai_config);
+    explicit BallPlacementPlayFSM(std::shared_ptr<Strategy> strategy);
 
     /**
      * Action that has the robot align with the wall in order to pick the ball off of it.
@@ -232,22 +231,23 @@ struct BallPlacementPlayFSM
             AlignPlacementState_S + Update_E[shouldPickOffWall_G] = AlignWallState_S,
             AlignPlacementState_S + Update_E[!alignDone_G] / alignPlacement_A =
                 AlignPlacementState_S,
-            AlignPlacementState_S + Update_E[alignDone_G]            = PlaceBallState_S,
+            AlignPlacementState_S + Update_E[alignDone_G] = PlaceBallState_S,
 
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
             PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A  = ReleaseBallState_S,
 
-            ReleaseBallState_S + Update_E[!waitDone_G && ballPlaced_G] / releaseBall_A = ReleaseBallState_S,
-            ReleaseBallState_S + Update_E[!ballPlaced_G]                        = StartState_S,
-            ReleaseBallState_S + Update_E[waitDone_G]                           = RetreatState_S,
+            ReleaseBallState_S + Update_E[!waitDone_G && ballPlaced_G] / releaseBall_A =
+                ReleaseBallState_S,
+            ReleaseBallState_S + Update_E[!ballPlaced_G] = StartState_S,
+            ReleaseBallState_S + Update_E[waitDone_G]    = RetreatState_S,
 
-            RetreatState_S + Update_E[retreatDone_G && ballPlaced_G]     = X,
-            RetreatState_S + Update_E[ballPlaced_G] / retreat_A          = RetreatState_S,
-            RetreatState_S + Update_E[!ballPlaced_G]                     = StartState_S);
+            RetreatState_S + Update_E[retreatDone_G && ballPlaced_G] = X,
+            RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = RetreatState_S,
+            RetreatState_S + Update_E[!ballPlaced_G]                 = StartState_S);
     }
 
    private:
-    TbotsProto::AiConfig ai_config;
+    std::shared_ptr<Strategy> strategy;
     std::shared_ptr<BallPlacementMoveTactic> align_wall_tactic;
     std::shared_ptr<BallPlacementDribbleTactic> pickoff_wall_tactic;
     std::shared_ptr<BallPlacementDribbleTactic> place_ball_tactic;

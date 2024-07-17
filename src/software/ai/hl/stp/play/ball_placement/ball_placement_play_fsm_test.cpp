@@ -21,7 +21,8 @@ TEST(BallPlacementPlayFSMTest, test_transitions)
     world_ptr->updateGameState(game_state);
 
     TbotsProto::AiConfig ai_config;
-    FSM<BallPlacementPlayFSM> fsm(BallPlacementPlayFSM{ai_config});
+    std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>(ai_config);
+    FSM<BallPlacementPlayFSM> fsm(BallPlacementPlayFSM{strategy});
 
     EXPECT_TRUE(fsm.is(boost::sml::state<BallPlacementPlayFSM::StartState>));
 

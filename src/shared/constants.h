@@ -1,11 +1,13 @@
 #pragma once
 #include <math.h>
 
+
 // Some platformio targets don't support STL, so we can't
 // use unordered_map, string, .... We guard all networking stuff with
 #ifndef PLATFORMIO_BUILD
 #include <string>
 #include <unordered_map>
+
 
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
@@ -46,6 +48,7 @@ static const short unsigned int PRIMITIVE_PORT = 42070;
 static const short unsigned int ROBOT_STATUS_PORT = 42071;
 static const short unsigned int ROBOT_LOGS_PORT   = 42072;
 static const short unsigned int ROBOT_CRASH_PORT  = 42074;
+static const short unsigned int UNUSED_PORT       = 42075;
 
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip

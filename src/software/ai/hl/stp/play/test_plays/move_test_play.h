@@ -2,6 +2,7 @@
 
 #include "proto/parameters.pb.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/strategy.h"
 
 /**
  * A test Play that moves a robot to the friendly goal, a robot to the enemy goal, and
@@ -15,7 +16,7 @@
 class MoveTestPlay : public Play
 {
    public:
-    MoveTestPlay(TbotsProto::AiConfig config);
+    MoveTestPlay(const TbotsProto::AiConfig &config, std::shared_ptr<Strategy> strategy);
 
     void getNextTactics(TacticCoroutine::push_type &yield,
                         const WorldPtr &world_ptr) override;

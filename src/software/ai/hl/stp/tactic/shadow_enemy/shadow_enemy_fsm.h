@@ -2,6 +2,7 @@
 
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/skill/skill_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/distance.h"
