@@ -204,7 +204,7 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
     }
 
     auto converted_trajectory_path_opt =
-        createTrajectoryPathFromParams(params, initial_velocity, robot_constants, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        createTrajectoryPathFromParams(params, Point(), initial_velocity, robot_constants, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     ASSERT_TRUE(converted_trajectory_path_opt.has_value());
 
     TrajectoryPath converted_trajectory_path = converted_trajectory_path_opt.value();
