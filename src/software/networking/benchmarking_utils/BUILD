@@ -6,10 +6,11 @@ cc_library(
     hdrs = ["latency_tester_node.h"],
     deps = [
         "//shared:constants",
-        "//software/networking:udp_listener",
-        "//software/networking:udp_sender",
+        "//software/networking/udp:udp_listener",
+        "//software/networking/udp:udp_sender",
         "@boost//:asio",
     ],
+    visibility = ["//visibility:private"],
 )
 
 cc_binary(

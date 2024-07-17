@@ -2,8 +2,6 @@ from typing import Callable, Optional, Sequence, Any, Dict
 from software.thunderscope.common.frametime_counter import FrameTimeCounter
 from software.thunderscope.constants import TabNames
 
-import PyQt6
-from PyQt6.QtWebEngineWidgets import QWebEngineView
 from pyqtgraph.Qt import QtCore
 from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph.dockarea import *
@@ -177,20 +175,3 @@ class TScopeQTTab(TScopeTab):
             return self.widgets_map[widget_name]
         else:
             return None
-
-
-class TScopeWebTab(TScopeTab):
-    """
-    Data that describes a tab that shows a webpage in Thunderscope
-    """
-
-    url: str  # url of webpage displayed by this tab
-
-    def __init__(self, name: str, key: TabNames, url: str) -> None:
-        super().__init__(name, key)
-        self.url = url
-
-        web_view = QWebEngineView()
-        web_view.load(QtCore.QUrl(url))
-
-        self.dock_area = web_view

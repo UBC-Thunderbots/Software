@@ -1,4 +1,5 @@
 #include "software/networking/benchmarking_utils/latency_tester_secondary_node.h"
+#include <iostream>
 
 LatencyTesterSecondaryNode::LatencyTesterSecondaryNode(const std::string& interface, const int listen_channel,
                                                        const unsigned short listen_port,

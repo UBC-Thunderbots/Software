@@ -3,8 +3,8 @@
 #include <boost/asio/io_service.hpp>
 
 #include "shared/constants.h"
-#include "software/networking/udp_listener.h"
-#include "software/networking/udp_sender.h"
+#include "software/networking/udp/udp_listener.h"
+#include "software/networking/udp/udp_sender.h"
 
 class LatencyTesterNode
 {

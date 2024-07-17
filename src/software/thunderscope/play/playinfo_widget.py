@@ -1,7 +1,7 @@
 import pyqtgraph as pg
 import pyqtgraph.console as pg_console
 from proto.play_info_msg_pb2 import PlayInfo
-from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.networking.unix.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.constants as constants
 from google.protobuf.json_format import MessageToDict
 from pyqtgraph.Qt import QtCore, QtGui

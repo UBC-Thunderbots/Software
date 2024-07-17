@@ -21,7 +21,7 @@ TEST(DeflectOffEnemyTargetTest, deflectOffEnemyTarget_test)
     test_world->updateEnemyTeamState(Team(enemy_robots));
     TestUtil::setBallPosition(test_world, Point(-1, 0), Timestamp::fromMilliseconds(0));
 
-    Point p = deflectOffEnemyTarget(test_world);
+    Point p = deflectOffEnemyTarget(*test_world);
 
     EXPECT_EQ(p, Point(-3, -0.0675));
 }

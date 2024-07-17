@@ -15,8 +15,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const WorldPtr &world_ptr)
 {
     // Init a Crease Defender Tactic
-    auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
-        ai_config.robot_navigation_obstacle_config());
+    auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(ai_config);
 
     // These robots will both block the enemy robot taking a free kick
     std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_free_kicker = {
@@ -92,7 +91,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
                     .orientation(),
                 0);
-            move_tactic_main->updateControlParams(
+            move_tactic_secondary->updateControlParams(
                 world_ptr->field().friendlyGoalCenter() +
                     Vector(0, -2 * ROBOT_MAX_RADIUS_METERS),
                 (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())

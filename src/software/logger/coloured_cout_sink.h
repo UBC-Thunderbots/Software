@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "software/logger/log_merger.h"
-#include "software/util/make_enum/make_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 
 MAKE_ENUM(FG_Colour, YELLOW, RED, GREEN, WHITE);
 /**

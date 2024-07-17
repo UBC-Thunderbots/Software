@@ -3,8 +3,6 @@ pyqtgraph==0.12.4
 autoflake==1.4
 pyqt6==6.5.0
 PyQt6-Qt6==6.5.0
-PyQt6-WebEngine==6.5.0
-PyQt6-WebEngine-Qt6==6.5.0
 thefuzz==0.19.0
 iterfzf==0.5.0.20.0
 pyqtdarktheme==1.1.0

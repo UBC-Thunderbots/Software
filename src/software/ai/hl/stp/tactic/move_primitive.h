@@ -28,6 +28,7 @@ class MovePrimitive : public Primitive
      */
     MovePrimitive(const Robot &robot, const Point &destination, const Angle &final_angle,
                   const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
+                  const TbotsProto::ObstacleAvoidanceMode &obstacle_avoidance_mode,
                   const TbotsProto::DribblerMode &dribbler_mode,
                   const TbotsProto::BallCollisionType &ball_collision_type,
                   const AutoChipOrKick &auto_chip_or_kick,
@@ -40,12 +41,15 @@ class MovePrimitive : public Primitive
      *
      * @param world Current state of the world
      * @param motion_constraints Motion constraints to consider
+     * @param robot_trajectories A map of the all friendly robots' known trajectories
      * @param obstacle_factory Obstacle factory to use for generating obstacles
-     * @return the primitive proto message
+     * @return A pair of the found trajectory (optional) and the primitive proto message
      */
-    std::unique_ptr<TbotsProto::Primitive> generatePrimitiveProtoMessage(
-        const WorldPtr &world_ptr,
+    std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
+    generatePrimitiveProtoMessage(
+        const World &world,
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+        const std::map<RobotId, TrajectoryPath> &robot_trajectories,
         const RobotNavigationObstacleFactory &obstacle_factory) override;
 
     /**
@@ -66,12 +70,13 @@ class MovePrimitive : public Primitive
      *
      * @param world Current state of the world
      * @param motion_constraints Motion constraints
+     * @param robot_trajectories A map of the friendly robots' known trajectories
      * @param obstacle_factory Obstacle factory to use
      */
-    void generateObstacles(
-        const WorldPtr &world_ptr,
-        const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const RobotNavigationObstacleFactory &obstacle_factory);
+    void updateObstacles(const World &world,
+                         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
+                         const std::map<RobotId, TrajectoryPath> &robot_trajectories,
+                         const RobotNavigationObstacleFactory &obstacle_factory);
 
     Robot robot;
     Point destination;
@@ -82,8 +87,12 @@ class MovePrimitive : public Primitive
 
     TbotsProto::BallCollisionType ball_collision_type;
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
+    TbotsProto::ObstacleAvoidanceMode obstacle_avoidance_mode;
 
+    // List of all obstacles that the robot should avoid
     std::vector<ObstaclePtr> obstacles;
+    // List of only the motion constraint obstacles that the robot should avoid
+    std::vector<ObstaclePtr> field_obstacles;
 
     BangBangTrajectory2D trajectory;
     std::optional<TrajectoryPath> traj_path;

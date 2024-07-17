@@ -57,13 +57,20 @@ class LoggerSingleton
      *
      * @param runtime_dir The directory where the log files will be stored.
      */
-    static void initializeLogger(const std::string& runtime_dir, bool use_default_sinks, bool enable_merging)
+    static void initializeLogger(const std::string& runtime_dir,
+                                 const std::shared_ptr<ProtoLogger>& proto_logger,
+                                 bool use_default_sinks = false,
+                                 bool enable_merging = true)
     {
-        static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton(runtime_dir, use_default_sinks, enable_merging));
+        static std::shared_ptr<LoggerSingleton> s(
+            new LoggerSingleton(runtime_dir, proto_logger, use_default_sinks, enable_merging));
     }
 
    private:
-    LoggerSingleton(const std::string& runtime_dir, bool use_default_sinks = false, bool enable_merging = true)
+    LoggerSingleton(const std::string& runtime_dir,
+                    const std::shared_ptr<ProtoLogger>& proto_logger,
+                    bool use_default_sinks,
+                    bool enable_merging)
     {
         logWorker = g3::LogWorker::createLogWorker();
         // Default locations
@@ -106,7 +113,7 @@ class LoggerSingleton
         {
             // Sink for visualization
             auto visualization_handle = logWorker->addSink(
-                std::make_unique<ProtobufSink>(runtime_dir), &ProtobufSink::sendProtobuf);
+                std::make_unique<ProtobufSink>(runtime_dir, proto_logger), &ProtobufSink::sendProtobuf);
         }
 
         // Sink for PlotJuggler plotting

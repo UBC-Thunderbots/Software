@@ -3,7 +3,7 @@
 
 #include "software/ai/passing/field_pitch_division.h"
 #include "software/geom/rectangle.h"
-#include "software/util/make_enum/make_enum.h"
+#include "software/util/make_enum/make_enum.hpp"
 
 // clang-format off
 //

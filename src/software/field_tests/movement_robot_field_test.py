@@ -1,7 +1,6 @@
 import pytest
 
 import software.python_bindings as tbots_cpp
-import sys
 from proto.ssl_gc_common_pb2 import Team
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
@@ -39,6 +38,7 @@ logger = createLogger(__name__)
 #     move_tactic.ball_collision_type = BallCollisionType.AVOID
 #     move_tactic.auto_chip_or_kick.CopyFrom(AutoChipOrKick(autokick_speed_m_per_s=0.0))
 #     move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
+#     move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
 #     move_tactic.target_spin_rev_per_s = 0.0
 #
 #     # setup world state
@@ -109,6 +109,7 @@ def test_basic_rotation(field_test_runner):
             AutoChipOrKick(autokick_speed_m_per_s=0.0)
         )
         move_tactic.max_allowed_speed_mode = MaxAllowedSpeedMode.PHYSICAL_LIMIT
+        move_tactic.obstacle_avoidance_mode = ObstacleAvoidanceMode.SAFE
         move_tactic.target_spin_rev_per_s = 0.0
 
         # Setup Tactic
@@ -164,6 +165,7 @@ def test_one_robots_square(field_test_runner):
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
         target_spin_rev_per_s=0.0,
     )
     tactic_1 = MoveTactic(
@@ -174,6 +176,7 @@ def test_one_robots_square(field_test_runner):
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
         target_spin_rev_per_s=0.0,
     )
     tactic_2 = MoveTactic(
@@ -184,6 +187,7 @@ def test_one_robots_square(field_test_runner):
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
         target_spin_rev_per_s=0.0,
     )
     tactic_3 = MoveTactic(
@@ -194,6 +198,7 @@ def test_one_robots_square(field_test_runner):
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
+        obstacle_avoidance_mode=ObstacleAvoidanceMode.SAFE,
         target_spin_rev_per_s=0.0,
     )
     tactics = [tactic_0, tactic_1, tactic_2, tactic_3]
@@ -217,5 +222,4 @@ def test_one_robots_square(field_test_runner):
 
 
 if __name__ == "__main__":
-    # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    pytest_main(__file__)

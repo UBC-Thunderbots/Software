@@ -4,7 +4,7 @@
 
 #include "proto/visualization.pb.h"
 #include "software/logger/custom_logging_levels.h"
-#include "software/networking/threaded_udp_sender.h"
+#include "software/networking/udp/threaded_udp_sender.h"
 
 
 /**
@@ -16,8 +16,10 @@ class PlotJugglerSink
    public:
     /**
      * Creates a PlotJugglerSink that sends udp packets to the PlotJuggler server
+     *
+     * @param interface The interface to send Plotjuggler UDP packets on
      */
-    PlotJugglerSink();
+    PlotJugglerSink(const std::string& interface = "lo");
 
     ~PlotJugglerSink() = default;
 
@@ -30,6 +32,9 @@ class PlotJugglerSink
     void sendToPlotJuggler(g3::LogMessageMover log_entry);
 
    private:
+    // Any error that occurs during the creation of the UDP sender will be stored here
+    std::optional<std::string> error;
+
     ThreadedUdpSender udp_sender;
 };
 

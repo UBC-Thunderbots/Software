@@ -12,6 +12,16 @@
 
 struct ReceiverFSM
 {
+    /**
+     * Constructor for ReceiverFSM
+     *
+     * @param receiver_tactic_config The config to fetch parameters from
+     */
+    explicit ReceiverFSM(TbotsProto::ReceiverTacticConfig receiver_tactic_config)
+        : receiver_tactic_config(receiver_tactic_config)
+    {
+    }
+
     class OneTouchShotState;
     class ReceiveAndDribbleState;
     class WaitingForPassState;
@@ -27,16 +37,8 @@ struct ReceiverFSM
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    // The minimum proportion of open net we're shooting on vs the entire size of the net
-    // that we require before attempting a shot
-    static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.3;
-    static constexpr double MIN_PASS_START_SPEED      = 0.02;
-    static constexpr double BALL_MIN_MOVEMENT_SPEED   = 0.04;
-
-    // The maximum deflection angle that we will attempt a one-touch kick towards the
-    // enemy goal with
-    // TODO (#2570): try to make it as big as possible when tuning
-    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(45);
+    static constexpr double MIN_PASS_START_SPEED_M_PER_SEC    = 0.02;
+    static constexpr double BALL_MIN_MOVEMENT_SPEED_M_PER_SEC = 0.04;
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray (i.e it won't make it to the receiver)
@@ -67,15 +69,14 @@ struct ReceiverFSM
                                                       const Point& best_shot_target);
 
     /*
-     * Finds a shot that is greater than MIN_SHOT_NET_PERCENT_OPEN and
-     * respects MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT for the highest chance
+     * Finds a shot that is greater than min_open_angle_for_one_touch_deg and
+     * respects max_deflection_for_one_touch_deg for the highest chance
      * of scoring with a one-touch shot. If neither of those are true, return a nullopt
      *
      * @param world The world to find a feasible shot on
      * @param assigned_robot The robot that will be performing the one-touch
      */
-    static std::optional<Shot> findFeasibleShot(const WorldPtr& world_ptr,
-                                                const Robot& assigned_robot);
+    std::optional<Shot> findFeasibleShot(const World& world, const Robot& assigned_robot);
 
     /**
      * Checks if a one touch shot is possible
@@ -174,4 +175,8 @@ struct ReceiverFSM
             OneTouchShotState_S + Update_E[passFinished_G] / updateOnetouch_A     = X,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION                              = X);
     }
+
+   private:
+    // the receiver tactic config
+    TbotsProto::ReceiverTacticConfig receiver_tactic_config;
 };

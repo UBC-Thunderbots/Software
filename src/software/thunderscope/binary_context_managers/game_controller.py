@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 import logging
 import os
 import socket
@@ -17,29 +18,65 @@ from software.thunderscope.proto_unix_io import ProtoUnixIO
 from software.python_bindings import *
 from software.py_constants import *
 from software.thunderscope.binary_context_managers.util import *
+from software.thunderscope.thread_safe_buffer import ThreadSafeBuffer
+
+logger = logging.getLogger(__name__)
 
 
 class Gamecontroller(object):
-    """ Gamecontroller Context Manager """
+    """Gamecontroller Context Manager"""
 
     CI_MODE_LAUNCH_DELAY_S = 0.3
     REFEREE_IP = "224.5.23.1"
     CI_MODE_OUTPUT_RECEIVE_BUFFER_SIZE = 9000
 
-    def __init__(self, supress_logs: bool = False, ci_mode: bool = False) -> None:
+    def __init__(self, supress_logs: bool = False, use_conventional_port=False) -> None:
         """Run Gamecontroller
 
         :param supress_logs: Whether to suppress the logs
-        :param ci_mode: Whether to run the gamecontroller in CI mode
-
+        :param use_conventional_port: whether or not to use the conventional port!
         """
-        self.supress_logs = supress_logs
-        self.ci_mode = ci_mode
 
-        # We need to find 2 free ports to use for the gamecontroller
-        # so that we can run multiple gamecontroller instances in parallel
-        self.referee_port = self.next_free_port()
+        self.supress_logs = supress_logs
+
+        # We default to using a non-conventional port to avoid emitting
+        # on the same port as what other teams may be listening on.
+        if use_conventional_port:
+            if not self.is_valid_port(SSL_REFEREE_PORT):
+                raise OSError(f"Cannot use port {SSL_REFEREE_PORT} for Gamecontroller")
+
+            self.referee_port = SSL_REFEREE_PORT
+        else:
+            self.referee_port = self.next_free_port(random.randint(1024, 65535))
+
         self.ci_port = self.next_free_port()
+        # this allows gamecontroller to listen to override commands
+        self.command_override_buffer = ThreadSafeBuffer(
+            buffer_size=2, protobuf_type=ManualGCCommand
+        )
+
+    @staticmethod
+    def get_referee_port_static(gamecontroller: Gamecontroller):
+        """
+        return the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
+
+        :param gamecontroller: the gamecontroller we are using
+        :return: the default port if gamecontroller is None, otherwise the port that the gamecontroller is using.
+        """
+        if gamecontroller is not None:
+            return gamecontroller.get_referee_port()
+
+        return SSL_REFEREE_PORT
+
+    def get_referee_port(self) -> int:
+        """
+        Sometimes, the port that we are using changes depending on context.
+        We want a getter function that returns the port we are using.
+
+        :return: the port that the game controller is currently using!
+        """
+
+        return self.referee_port
 
     def __enter__(self) -> "self":
         """Enter the gamecontroller context manager. 
@@ -47,10 +84,7 @@ class Gamecontroller(object):
         :return: gamecontroller context managed instance
 
         """
-        command = ["/opt/tbotspython/gamecontroller"]
-
-        if self.ci_mode:
-            command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
+        command = ["/opt/tbotspython/gamecontroller", "--timeAcquisitionMode", "ci"]
 
         command += ["-publishAddress", f"{self.REFEREE_IP}:{self.referee_port}"]
         command += ["-ciAddress", f"localhost:{self.ci_port}"]
@@ -62,12 +96,10 @@ class Gamecontroller(object):
         else:
             self.gamecontroller_proc = Popen(command)
 
-        if self.ci_mode:
-            # We can't connect to the ci port right away, it takes
-            # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
-            time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
-
-            self.ci_socket = SslSocket(self.ci_port)
+        # We can't connect to the ci port right away, it takes
+        # CI_MODE_LAUNCH_DELAY_S to start up the gamecontroller
+        time.sleep(Gamecontroller.CI_MODE_LAUNCH_DELAY_S)
+        self.ci_socket = SslSocket(self.ci_port)
 
         return self
 
@@ -82,27 +114,57 @@ class Gamecontroller(object):
         self.gamecontroller_proc.terminate()
         self.gamecontroller_proc.wait()
 
-        if self.ci_mode:
-            self.ci_socket.close()
+        self.ci_socket.close()
 
-    def next_free_port(self, port: int = 40000, max_port: int = 65535) -> None:
+    def refresh(self):
+        """
+        Gets any manual gamecontroller commands from the buffer and executes them
+        """
+        manual_command = self.command_override_buffer.get(return_cached=False)
+
+        while manual_command is not None:
+            self.send_gc_command(
+                gc_command=manual_command.manual_command.type,
+                team=manual_command.manual_command.for_team,
+                final_ball_placement_point=tbots_cpp.Point(
+                    manual_command.final_ball_placement_point.x,
+                    manual_command.final_ball_placement_point.y,
+                )
+                # HasField checks if the field was manually set by us
+                # as opposed to if a value exists (since a default value always exists)
+                if manual_command.HasField("final_ball_placement_point") else None,
+            )
+            manual_command = self.command_override_buffer.get(return_cached=False)
+
+    def is_valid_port(self, port):
+        """
+        determine whether or not a given port is valid
+
+        :param port: the port we are checking
+        :return: True if a port is valid False otherwise
+        """
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        try:
+            sock.bind(("", port))
+            sock.close()
+            return True
+        except OSError:
+            return False
+
+    def next_free_port(self, start_port: int = 40000, max_port: int = 65535) -> int:
         """Find the next free port. We need to find 2 free ports to use for the gamecontroller
         so that we can run multiple gamecontroller instances in parallel.
 
-        :param port: The port to start looking from
+        :param start_port: The port to start looking from
         :param max_port: The maximum port to look up to
         :return: The next free port
 
         """
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        while port <= max_port:
-            try:
-                sock.bind(("", port))
-                sock.close()
-                return port
-            except OSError:
-                port += 1
+        while start_port <= max_port:
+            if self.is_valid_port(start_port):
+                return start_port
+            start_port += 1
 
         raise IOError("no free ports")
 
@@ -132,8 +194,24 @@ class Gamecontroller(object):
             if autoref_proto_unix_io is not None:
                 autoref_proto_unix_io.send_proto(Referee, data)
 
-        self.receive_referee_command = tbots_cpp.SSLRefereeProtoListener(
-            Gamecontroller.REFEREE_IP, self.referee_port, __send_referee_command, True,
+        self.receive_referee_command, error = tbots_cpp.createSSLRefereeProtoListener(
+            Gamecontroller.REFEREE_IP,
+            self.referee_port,
+            "lo",
+            __send_referee_command,
+            True,
+        )
+
+        if error:
+            logger.error(
+                "[Gamecontroller] Failed to bind to the referee port and listen to referee messages"
+            )
+
+        blue_full_system_proto_unix_io.register_observer(
+            ManualGCCommand, self.command_override_buffer
+        )
+        yellow_full_system_proto_unix_io.register_observer(
+            ManualGCCommand, self.command_override_buffer
         )
 
     def send_gc_command(

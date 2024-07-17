@@ -1,5 +1,7 @@
 #include "software/networking/benchmarking_utils/latency_tester_node.h"
+
 #include "shared/constants.h"
+#include "software/logger/logger.h"
 
 LatencyTesterNode::LatencyTesterNode(const std::string& interface, const int listen_channel,
                                      const unsigned short listen_port,
@@ -9,13 +11,21 @@ LatencyTesterNode::LatencyTesterNode(const std::string& interface, const int lis
     : io_listener_service_(),
       io_sender_service_()
 {
+    std::optional<std::string> error;
+
     std::string listen_ip = ROBOT_MULTICAST_CHANNELS.at(listen_channel);
-    listen_ip.append(1, '%').append(interface);
-    listener_ = std::make_unique<UdpListener>(io_listener_service_, listen_ip, listen_port, true, receive_callback);
+    listener_ = std::make_unique<UdpListener>(io_listener_service_, listen_ip, listen_port, interface, true, receive_callback, error);
+    if (error)
+    {
+        LOG(FATAL) << "Error creating UdpListener: " << error.value();
+    }
 
     std::string send_ip = ROBOT_MULTICAST_CHANNELS.at(send_channel);
-    send_ip.append(1, '%').append(interface);
-    sender_ = std::make_unique<UdpSender>(io_sender_service_, send_ip, send_port, true);
+    sender_ = std::make_unique<UdpSender>(io_sender_service_, send_ip, send_port, interface, true, error);
+    if (error)
+    {
+        LOG(FATAL) << "Error creating UdpSender: " << error.value();
+    }
 
     listener_thread_ = std::thread([this]() { io_listener_service_.run(); });
     sender_thread_   = std::thread([this]() { io_sender_service_.run(); }); 

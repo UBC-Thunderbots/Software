@@ -6,7 +6,7 @@
 #include "proto/robot_log_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
-#include "software/networking/threaded_proto_udp_listener.hpp"
+#include "software/networking/udp/threaded_proto_udp_listener.hpp"
 
 /*
  * This standalone program listens for RobotLog protos on the specified ip address
@@ -93,9 +93,14 @@ int main(int argc, char **argv)
         logFromNetworking(log);
     };
 
+    std::optional<std::string> error;
     auto log_input = std::make_unique<ThreadedProtoUdpListener<TbotsProto::RobotLog>>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(args.channel)) + "%" + args.interface,
-        ROBOT_LOGS_PORT, robot_log_callback, true);
+        std::string(ROBOT_MULTICAST_CHANNELS.at(args.channel)), ROBOT_LOGS_PORT,
+        args.interface, robot_log_callback, true, error);
+    if (error)
+    {
+        LOG(FATAL) << *error;
+    }
 
 
     LOG(INFO) << "Network logger listening on channel "
