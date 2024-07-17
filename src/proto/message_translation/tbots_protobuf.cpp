@@ -452,7 +452,7 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
 }
 
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
-    const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
+    const TbotsProto::TrajectoryPathParams2D& params, const Point& start_position, const Vector& initial_velocity,
     const RobotConstants& robot_constants)
 {
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
@@ -476,7 +476,7 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     }
 
     auto trajectory = std::make_shared<BangBangTrajectory2D>(
-        createPoint(params.start_position()), initial_destination, initial_velocity,
+        start_position, initial_destination, initial_velocity,
         constraints);
 
     TrajectoryPath trajectory_path(trajectory, BangBangTrajectory2D::generator);
@@ -499,6 +499,13 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     }
 
     return trajectory_path;
+}
+
+std::optional<TrajectoryPath> createTrajectoryPathFromParams(
+    const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
+    const RobotConstants& robot_constants)
+{
+    return createTrajectoryPathFromParams(params, createPoint(params.start_position()), initial_velocity, robot_constants);
 }
 
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
