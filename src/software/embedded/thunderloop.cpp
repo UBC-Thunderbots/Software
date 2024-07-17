@@ -81,7 +81,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       loop_hz_(loop_hz),
       kick_coeff_(std::stod(redis_client_->getSync(ROBOT_KICK_EXP_COEFF_REDIS_KEY))),
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
-      chip_coeff_(std::stoi(redis_client_->getSync(ROBOT_CHIP_EXP_COEFF_REDIS_KEY))), 
+      chip_coeff_(std::stod(redis_client_->getSync(ROBOT_CHIP_EXP_COEFF_REDIS_KEY))),
       chip_constant_(std::stoi(redis_client_->getSync(ROBOT_CHIP_CONSTANT_REDIS_KEY))),  
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)

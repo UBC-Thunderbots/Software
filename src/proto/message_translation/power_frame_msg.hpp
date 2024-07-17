@@ -153,9 +153,6 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                 static_cast<uint32_t>(
                     chip_constant *
                     std::exp(chip_coeff * google_control.chicker().chip_distance_meters()));
-            std::cout << nanopb_control.chicker.chicker_command.chip_pulse_width << std::endl;
-            std::cout << google_control.chicker().chip_distance_meters() << std::endl;
-            std::cout << chip_coeff << std::endl;
             break;
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
             nanopb_control.chicker.which_chicker_command =
