@@ -476,6 +476,13 @@ message DribbleConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 180.0
     ];
+
+    // Robot angular velocity at which the robot is done dribbling (in m/s)
+    required double robot_dribbling_done_angular_velocity_deg_per_s = 9 [
+        default                   = 10.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 180.0
+    ];
 }
 
 message PivotKickConfig

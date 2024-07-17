@@ -215,7 +215,10 @@ bool DribbleSkillFSM::dribblingDone(const Update &event)
                Angle::fromDegrees(
                    dribble_config.final_destination_close_threshold_deg())) &&
            !lostBallControl(event) &&
-           robotStopped(event.common.robot, dribble_config.robot_dribbling_done_speed());
+           robotStopped(event.common.robot,
+                        dribble_config.robot_dribbling_done_speed()) &&
+           event.common.robot.angularVelocity().toDegrees() <
+               dribble_config.robot_dribbling_done_angular_velocity_deg_per_s();
 }
 
 bool DribbleSkillFSM::shouldLoseBall(const Update &event)
