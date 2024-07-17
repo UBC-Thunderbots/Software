@@ -38,18 +38,21 @@ MovePrimitive::MovePrimitive(
                 robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2));
 
     double additional_points_time = 0;
-    Point previous_point = destination;
-    for (const Point& additional_point : additional_points)
+    Point previous_point          = destination;
+    for (const Point &additional_point : additional_points)
     {
         BangBangTrajectory2D dribble_estimate;
-        dribble_estimate.generate(previous_point, additional_point, Vector(0, 0), max_speed,
-                                  robot.robotConstants().robot_max_acceleration_m_per_s_2,
-                                  robot.robotConstants().robot_max_deceleration_m_per_s_2);
+        dribble_estimate.generate(
+            previous_point, additional_point, Vector(0, 0), max_speed,
+            robot.robotConstants().robot_max_acceleration_m_per_s_2,
+            robot.robotConstants().robot_max_deceleration_m_per_s_2);
         additional_points_time += dribble_estimate.getTotalTime();
         previous_point = additional_point;
     }
 
-    estimated_cost = std::max(trajectory.getTotalTime(), angular_trajectory.getTotalTime()) + additional_points_time;
+    estimated_cost =
+        std::max(trajectory.getTotalTime(), angular_trajectory.getTotalTime()) +
+        additional_points_time;
 }
 
 std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>

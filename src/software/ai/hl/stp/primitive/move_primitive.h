@@ -31,7 +31,8 @@ class MovePrimitive : public Primitive
                   const TbotsProto::ObstacleAvoidanceMode &obstacle_avoidance_mode,
                   const TbotsProto::DribblerMode &dribbler_mode,
                   const TbotsProto::BallCollisionType &ball_collision_type,
-                  const AutoChipOrKick &auto_chip_or_kick, std::vector<Point> additional_points = {});
+                  const AutoChipOrKick &auto_chip_or_kick,
+                  std::vector<Point> additional_points = {});
 
     ~MovePrimitive() override = default;
 
