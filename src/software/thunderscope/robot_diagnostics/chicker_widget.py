@@ -108,7 +108,7 @@ class ChickerWidget(QWidget):
             self.chip_slider,
             self.chip_label,
         ) = common_widgets.create_float_slider(
-            "Chip Distance (m)", 2, 0.2, 1, 0.1
+            "Chip Distance (m)", 2, 0.2, 2, 0.1
         )
         vbox_layout.addLayout(self.chip_slider_layout)
 
