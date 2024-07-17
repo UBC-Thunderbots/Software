@@ -35,17 +35,6 @@ void PrimitiveExecutor::updatePrimitiveSet(
 
         if (current_primitive_.has_move())
         {
-            // TODO (NIMA):
-//            Vector initial_velocity = velocity_;
-//            if (trajectory_path_.has_value() && (trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()) - velocity_).length() > 2.0)
-//            {
-//                std::cout << "Initial velocity too different from reality!" << std::endl;
-//                initial_velocity = trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()) - velocity_;
-//            }
-
-//            trajectory_path_ = createTrajectoryPathFromParams(
-//                    current_primitive_.move().xy_traj_params(), initial_velocity, robot_constants_);
-
             angular_trajectory_ = createAngularTrajectoryFromParams(
                     current_primitive_.move().w_traj_params(), angular_velocity_,
                     robot_constants_, current_primitive_.move().max_speed_mode());
