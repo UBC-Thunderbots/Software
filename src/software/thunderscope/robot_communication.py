@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 class RobotCommunication(object):
     """ Communicate with the robots """
 
-    ROBOT_IPS = ["192.168.0.106"] + [f"192.168.1.20{i}" for i in range(1, MAX_ROBOT_IDS_PER_SIDE)]
+    ROBOT_IPS = [f"192.168.1.20{i}" for i in range(MAX_ROBOT_IDS_PER_SIDE)]
 
     def __init__(
         self,

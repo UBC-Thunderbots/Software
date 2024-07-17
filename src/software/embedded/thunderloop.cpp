@@ -28,7 +28,7 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 // signal handling is done by csignal which requires a function pointer with C linkage
 extern "C"
 {
-    //static MotorService* g_motor_service         = NULL;
+    static MotorService* g_motor_service         = NULL;
     static TbotsProto::RobotStatus* robot_status = NULL;
     static int channel_id;
     static std::string network_interface;
@@ -41,7 +41,7 @@ extern "C"
      */
     void tbotsExit(int signal_num)
     {
-        //g_motor_service->resetMotorBoard();
+        g_motor_service->resetMotorBoard();
 
         // by now g3log may have died due to the termination signal, so it isn't reliable
         // to log messages
@@ -86,17 +86,17 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
-    std::optional<std::string> error;
+    std::optional<std::string> network_test_error;
     std::unique_ptr<ThreadedUdpSender> network_test(std::make_unique<ThreadedUdpSender>(
-        std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)),
-        UNUSED_PORT, network_interface_, true, error));
-    while (error.has_value())
+        ROBOT_MULTICAST_CHANNELS.at(channel_id_),
+        UNUSED_PORT, network_interface_, true, network_test_error));
+    while (network_test_error.has_value())
     {
-        std::cout << "Unable to connect to the network. Received error: " << error.value() << ". Retrying...";
+        std::cout << "Unable to connect to the network. Received error: " << network_test_error.value() << ". Retrying...";
         sleep(PING_RETRY_DELAY_S);
         network_test = std::make_unique<ThreadedUdpSender>(
-            std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), UNUSED_PORT,
-            network_interface_, true, error);
+            ROBOT_MULTICAST_CHANNELS.at(channel_id_), UNUSED_PORT,
+            network_interface_, true, network_test_error);
     }
 
     // send an empty packet on the specific network interface to ensure wifi is connected,
@@ -146,13 +146,13 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    //power_service_ = std::make_unique<PowerService>();
+    power_service_ = std::make_unique<PowerService>();
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
-    //motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
-    //g_motor_service = motor_service_.get();
-    //motor_service_->setup();
+    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
+    g_motor_service = motor_service_.get();
+    motor_service_->setup();
     LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
@@ -197,7 +197,7 @@ Thunderloop::~Thunderloop() {}
     clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
 
-    //double loop_duration_seconds = 0.0;
+    double loop_duration_seconds = 0.0;
 
     for (;;)
     {
@@ -305,9 +305,9 @@ Thunderloop::~Thunderloop() {}
                 ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService",
                            true);
 
-                //power_status_ =
-                //    power_service_->poll(direct_control_.power_control(), kick_coeff_,
-                //                         kick_constant_, chip_pulse_width_);
+                power_status_ =
+                    power_service_->poll(direct_control_.power_control(), kick_coeff_,
+                                         kick_constant_, chip_pulse_width_);
             }
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));
@@ -353,8 +353,8 @@ Thunderloop::~Thunderloop() {}
 
                 ZoneNamedN(_tracy_motor_service, "Thunderloop: Poll MotorService", true);
 
-                //motor_status_ = motor_service_->poll(direct_control_.motor_control(),
-                //                                     loop_duration_seconds);
+                motor_status_ = motor_service_->poll(direct_control_.motor_control(),
+                                                     loop_duration_seconds);
             }
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
@@ -368,7 +368,7 @@ Thunderloop::~Thunderloop() {}
             robot_status_.set_last_handled_primitive_set(last_handled_primitive_set);
             *(robot_status_.mutable_time_sent())             = time_sent_;
             *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
-            //*(robot_status_.mutable_motor_status())          = motor_status_.value();
+            *(robot_status_.mutable_motor_status())          = motor_status_.value();
             *(robot_status_.mutable_power_status())          = power_status_;
             *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;
@@ -396,8 +396,8 @@ Thunderloop::~Thunderloop() {}
                                                   NANOSECONDS_PER_MILLISECOND);
 
         // Make sure the iteration can fit inside the period of the loop
-        //loop_duration_seconds =
-        //    static_cast<double>(loop_duration_ns) * SECONDS_PER_NANOSECOND;
+        loop_duration_seconds =
+            static_cast<double>(loop_duration_ns) * SECONDS_PER_NANOSECOND;
 
         // Calculate next shot taking into account how long this iteration took
         next_shot.tv_nsec += interval - static_cast<long int>(loop_duration_ns);
