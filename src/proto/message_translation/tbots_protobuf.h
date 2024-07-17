@@ -261,7 +261,7 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
  */
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
-    const RobotConstants& robot_constants);
+    const RobotConstants& robot_constants, TbotsProto::MaxAllowedSpeedMode max_speed_mode);
 
 /**
  * Generate an angular trajectory Path given angular trajectory proto parameters
@@ -273,7 +273,7 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
  */
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
     const TbotsProto::TrajectoryParamsAngular1D& params,
-    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants);
+    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants, TbotsProto::MaxAllowedSpeedMode max_speed_mode);
 
 /**
  * Convert dribbler mode to dribbler speed

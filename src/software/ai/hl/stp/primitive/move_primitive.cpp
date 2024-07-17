@@ -127,7 +127,6 @@ MovePrimitive::generatePrimitiveProtoMessage(
     *(xy_traj_params.mutable_start_position())   = *createPointProto(robot.position());
     *(xy_traj_params.mutable_destination())      = *createPointProto(destination);
     *(xy_traj_params.mutable_initial_velocity()) = *createVectorProto(robot.velocity());
-    xy_traj_params.set_max_speed_mode(max_allowed_speed_mode);
     *(primitive_proto->mutable_move()->mutable_xy_traj_params()) = xy_traj_params;
 
     const auto &path_nodes = traj_path->getTrajectoryPathNodes();
@@ -156,6 +155,8 @@ MovePrimitive::generatePrimitiveProtoMessage(
     *(primitive_proto->mutable_move()->mutable_w_traj_params()) = w_traj_params;
 
     primitive_proto->mutable_move()->set_dribbler_mode(dribbler_mode);
+
+    primitive_proto->mutable_move()->set_max_speed_mode(max_allowed_speed_mode);
 
     if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
     {

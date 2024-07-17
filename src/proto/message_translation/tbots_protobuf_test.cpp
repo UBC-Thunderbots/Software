@@ -193,7 +193,6 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
     *(params.mutable_start_position())   = *createPointProto(start_position);
     *(params.mutable_destination())      = *createPointProto(destination);
     *(params.mutable_initial_velocity()) = *createVectorProto(initial_velocity);
-    params.set_max_speed_mode(max_allowed_speed_mode);
 
     for (int i = 0; i < sub_destinations.size(); ++i)
     {
@@ -205,7 +204,7 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
     }
 
     auto converted_trajectory_path_opt =
-        createTrajectoryPathFromParams(params, initial_velocity, robot_constants);
+        createTrajectoryPathFromParams(params, initial_velocity, robot_constants, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     ASSERT_TRUE(converted_trajectory_path_opt.has_value());
 
     TrajectoryPath converted_trajectory_path = converted_trajectory_path_opt.value();
