@@ -455,7 +455,7 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
     const RobotConstants& robot_constants)
 {
-    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
         params.max_speed_mode(), robot_constants);
 
     if (max_speed == 0)
@@ -534,7 +534,7 @@ double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode
     }
 }
 
-double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+double convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
     RobotConstants_t robot_constants)
 {
