@@ -49,7 +49,7 @@ class ThreadedProtoUdpListener
      * from the network
      * @param error A user-provided optional string to store any error messages
      */
-    ThreadedProtoUdpListener(unsigned short port, const std::string& interface,
+    ThreadedProtoUdpListener(unsigned short port,
                              std::function<void(ReceiveProtoT)> receive_callback,
                              std::optional<std::string>& error = std::nullopt);
 
@@ -60,6 +60,7 @@ class ThreadedProtoUdpListener
 
     ~ThreadedProtoUdpListener();
 
+    std::string getIpAddressFromLastReceivedPacket() const;
 
    private:
     // The io_service that will be used to service all network requests
@@ -86,10 +87,10 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
 
 template <class ReceiveProtoT>
 ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
-    const unsigned short port, const std::string& interface,
+    const unsigned short port,
     std::function<void(ReceiveProtoT)> receive_callback,
     std::optional<std::string>& error)
-    : io_service(), udp_listener(io_service, port, interface, receive_callback, error)
+    : io_service(), udp_listener(io_service, port, receive_callback, error)
 {
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });
@@ -118,4 +119,10 @@ void ThreadedProtoUdpListener<ReceiveProtoT>::close()
     // finish executing, it will call
     // `std::terminate` when we deallocate the thread object and kill our whole program
     io_service_thread.join();
+}
+
+template <class ReceiveProtoT>
+std::string ThreadedProtoUdpListener<ReceiveProtoT>::getIpAddressFromLastReceivedPacket() const
+{
+    return udp_listener.getIpAddressFromLastReceivedPacket();
 }

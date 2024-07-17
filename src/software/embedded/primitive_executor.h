@@ -27,7 +27,7 @@ class PrimitiveExecutor
      * Update primitive executor with a new Primitive Set
      * @param primitive_set_msg The primitive to start
      */
-    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set_msg);
+    void updatePrimitive(const TbotsProto::Primitive &primitive_msg);
 
     /**
      * Set the current primitive to the stop primitive

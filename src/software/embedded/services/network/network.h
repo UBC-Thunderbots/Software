@@ -3,8 +3,8 @@
 #include <mutex>
 #include <queue>
 
+#include "proto/primitive.pb.h"
 #include "proto/robot_status_msg.pb.h"
-#include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 #include "software/embedded/services/network/proto_tracker.h"
@@ -34,11 +34,11 @@ class NetworkService
 
     /**
      * When the network service is polled, it sends the robot_status and returns
-     * a tuple of the most recent PrimitiveSet
+     * a tuple of the most recent Primitive
      *
      * @returns a tuple of the stored primitive_set
      */
-    TbotsProto::PrimitiveSet poll(TbotsProto::RobotStatus& robot_status);
+    TbotsProto::Primitive poll(TbotsProto::RobotStatus& robot_status);
 
    private:
     /**
@@ -60,14 +60,14 @@ class NetworkService
      *
      * @param input A potential primitive set to be logged
      */
-    void logNewPrimitiveSet(const TbotsProto::PrimitiveSet& new_primitive_set);
+    void logNewPrimitive(const TbotsProto::Primitive& new_primitive);
 
     /**
      * Updates the cached primitive sets for Thunderscope to calculate round-trip time
      *
      * @param robot_status The robot status to compare to within the cache
      */
-    void updatePrimitiveSetLog(TbotsProto::RobotStatus& robot_status);
+    void updatePrimitiveLog(TbotsProto::RobotStatus& robot_status);
 
     /**
      * Getter for the current epoch time in seconds as a double
@@ -86,21 +86,27 @@ class NetworkService
         static_cast<unsigned int>(1500 / ROBOT_STATUS_BROADCAST_RATE_HZ);
 
     // Variables
-    TbotsProto::PrimitiveSet primitive_set_msg;
+    TbotsProto::Primitive primitive_msg;
 
-    std::mutex primitive_set_mutex;
+    std::mutex primitive_mutex;
 
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotStatus>> sender;
-    std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>
-        udp_listener_primitive_set;
-    std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::PrimitiveSet>>
-        radio_listener_primitive_set;
+    std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::Primitive>>
+        udp_listener_primitive;
+    std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::Primitive>>
+        radio_listener_primitive;
+
+    std::optional<std::string> full_system_ip_address;
+    std::string interface;
+    unsigned short robot_status_sender_port;
 
     unsigned int network_ticks     = 0;
     unsigned int thunderloop_ticks = 0;
 
     // Callback function for storing the received primitive_sets
-    void primitiveSetCallback(TbotsProto::PrimitiveSet input);
+    void primitiveCallback(const TbotsProto::Primitive& input);
+
+    void sendRobotStatus(const TbotsProto::RobotStatus& robot_status);
 
     // ProtoTrackers for tracking recent primitive_set packet loss
     ProtoTracker primitive_tracker;
@@ -118,5 +124,5 @@ class NetworkService
         double thunderloop_recieved_time_seconds = 0;
     };
 
-    std::deque<RoundTripTime> primitive_set_rtt;
+    std::deque<RoundTripTime> primitive_rtt;
 };

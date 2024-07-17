@@ -4,6 +4,7 @@ package TbotsProto;
 
 import "proto/geometry.proto";
 import "proto/geneva_slot.proto";
+import "proto/tbots_timestamp_msg.proto";
 import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.EnumValueOptions
@@ -111,13 +112,18 @@ message PowerControl
 
 message Primitive
 {
-    reserved 5;
     oneof primitive
     {
         MovePrimitive move                    = 1;
         StopPrimitive stop                    = 2;
         DirectControlPrimitive direct_control = 3;
     }
+
+    uint64 sequence_number = 4; 
+
+    reserved 5;
+
+    Timestamp time_sent = 6;
 }
 
 message MovePrimitive

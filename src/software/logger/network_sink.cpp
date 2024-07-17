@@ -18,7 +18,6 @@ NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int
     if (error)
     {
         std::cerr << error.value() << std::endl;
-        std::terminate();
     }
 }
 

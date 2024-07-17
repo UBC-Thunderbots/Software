@@ -129,6 +129,19 @@ void declareThreadedProtoUdpListener(py::module& m, std::string name)
               // Use as: listener, error = create{name}ProtoListener(...)
               return std::make_tuple(listener, error);
           });
+
+    m.def(create_pyclass_name.c_str(),
+            [](unsigned short port, const std::function<void(T)>& callback) {
+                // Pybind doesn't bind references in some cases
+                // (https://pybind11.readthedocs.io/en/stable/faq.html#limitations-involving-reference-arguments)
+                std::optional<std::string> error;
+                std::shared_ptr<Class> listener = std::make_shared<Class>(
+                    port, callback, error);
+
+                // Return the listener and the error message to the Python side
+                // Use as: listener, error = create{name}ProtoListener(...)
+                return std::make_tuple(listener, error);
+            });
 }
 
 template <typename T>
@@ -427,7 +440,7 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<TbotsProto::RobotCrash>(m, "RobotCrash");
 
     // Senders
-    declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
+    declareThreadedProtoUdpSender<TbotsProto::Primitive>(m, "Primitive");
     declareThreadedProtoRadioSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
 
     // Estop Reader

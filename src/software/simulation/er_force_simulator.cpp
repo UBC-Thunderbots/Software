@@ -354,7 +354,7 @@ void ErForceSimulator::setRobotPrimitive(
     if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
     {
         auto primitive_executor = robot_primitive_executor_iter->second;
-        primitive_executor->updatePrimitiveSet(primitive_set_msg);
+        primitive_executor->updatePrimitive(primitive_set_msg.robot_primitives().at(id));
         primitive_executor->updateVelocity(local_velocity, angular_velocity);
     }
     else

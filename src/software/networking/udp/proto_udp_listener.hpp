@@ -57,6 +57,9 @@ class ProtoUdpListener
     ProtoUdpListener(boost::asio::io_service& io_service, unsigned short port,
                      std::function<void(ReceiveProtoT&)> receive_callback,
                      std::optional<std::string>& error);
+
+    std::string getIpAddressFromLastReceivedPacket() const;
+
     /**
      * Closes the socket associated to the UDP listener
      */
@@ -293,4 +296,10 @@ void ProtoUdpListener<ReceiveProtoT>::close()
             << TYPENAME(ReceiveProtoT)
             << ". The boost system error is: " << error_code.message() << std::endl;
     }
+}
+
+template <class ReceiveProtoT>
+std::string ProtoUdpListener<ReceiveProtoT>::getIpAddressFromLastReceivedPacket() const
+{
+    return sender_endpoint_.address().to_string();
 }
