@@ -44,6 +44,7 @@ class MotionConstraintVisitor : public TacticVisitor
     void visit(const AssignedSkillTactic<ShootSkill> &tactic) override;
     void visit(const AssignedSkillTactic<DribbleShootSkill> &tactic) override;
     void visit(const KickoffChipSkillTactic &tactic) override;
+    void visit(const KickoffKickSkillTactic &tactic) override;
     void visit(const BallPlacementDribbleTactic &tactic) override;
 
     /**

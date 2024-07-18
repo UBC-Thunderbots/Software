@@ -105,6 +105,16 @@ void MotionConstraintVisitor::visit(const KickoffChipSkillTactic &tactic)
         TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
 }
 
+void MotionConstraintVisitor::visit(const KickoffKickSkillTactic &tactic)
+{
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::CENTER_CIRCLE);
+    current_motion_constraints.erase(TbotsProto::MotionConstraint::ENEMY_HALF);
+    current_motion_constraints.erase(
+        TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL);
+    current_motion_constraints.insert(
+        TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE);
+}
+
 void MotionConstraintVisitor::visit(const BallPlacementDribbleTactic &tactic)
 {
     current_motion_constraints.clear();
