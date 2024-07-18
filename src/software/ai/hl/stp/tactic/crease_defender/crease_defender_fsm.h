@@ -40,13 +40,14 @@ struct CreaseDefenderFSM : public DefenderFSMBase
      * @param enemy_threat_origin The origin of the threat to defend against
      * @param crease_defender_alignment alignment of the crease defender
      * @param robot_obstacle_inflation_factor The robot obstacle inflation factor
+     * @param x_shift_meters The amount of robot radius' to shift in x direction
      *
      * @return The best point to block the threat if it exists
      */
     static std::optional<Point> findBlockThreatPoint(
         const Field& field, const Point& enemy_threat_origin,
         const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
-        double robot_obstacle_inflation_factor);
+        double robot_obstacle_inflation_factor, double x_shift_meters);
 
     /**
      * Constructor for CreaseDefenderFSM struct
@@ -117,14 +118,14 @@ struct CreaseDefenderFSM : public DefenderFSMBase
      *
      * @param field The field that has the friendly defense area
      * @param ray The ray to intersect
-     * @param robot_obstacle_inflation_factor The robot obstacle inflation factor
+     * @param inflated_defense_area The inflated defense area
      *
      * @return the intersection with the front or sides of the defense area, returns
      * std::nullopt if there is no intersection or if the start point of the ray is inside
      * or behind the defense area
      */
     static std::optional<Point> findDefenseAreaIntersection(
-        const Field& field, const Ray& ray, double robot_obstacle_inflation_factor);
+        const Field& field, const Ray& ray, const Rectangle& inflated_defense_area);
 
     /**
      * Returns true if any enemy robot is within the given zone
@@ -136,4 +137,24 @@ struct CreaseDefenderFSM : public DefenderFSMBase
     static bool isAnyEnemyInZone(const Update& event, const Stadium& zone);
 
     std::shared_ptr<Strategy> strategy;
+
+    /**
+     * Return the Rectangle that forms the path around the crease that the defenders must
+     * follow. It's basically the crease inflated by one robot radius multiplied by a
+     * factor
+     *
+     * @param event CreaseDefenderFSM::Update event
+     * @param robot_obstacle_inflation_factor the inflation factor to build the inflated
+     * defense area
+     * @return inflated area
+     */
+    static inline Rectangle buildInflatedDefenseArea(
+        const Field& field, double robot_obstacle_inflation_factor)
+    {
+        double robot_radius_expansion_amount =
+            ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
+        Rectangle inflated_defense_area =
+            field.friendlyDefenseArea().expand(robot_radius_expansion_amount);
+        return inflated_defense_area;
+    }
 };

@@ -27,6 +27,7 @@ template <typename TSkill>
 class AssignedSkillTactic;
 
 class KickoffChipSkillTactic;
+class KickoffKickSkillTactic;
 class BallPlacementDribbleTactic;
 
 /**
@@ -67,6 +68,7 @@ class TacticVisitor
     virtual void visit(const AssignedSkillTactic<ShootSkill> &tactic)         = 0;
     virtual void visit(const AssignedSkillTactic<DribbleShootSkill> &tactic)  = 0;
     virtual void visit(const KickoffChipSkillTactic &tactic)                  = 0;
+    virtual void visit(const KickoffKickSkillTactic &tactic)                  = 0;
     virtual void visit(const BallPlacementDribbleTactic &tactic)              = 0;
     virtual void visit(const BallPlacementMoveTactic &tactic)                 = 0;
 };

@@ -317,7 +317,7 @@ message PassingConfig
     /*****  PassSkill parameters *****/
     // The absolute minimum pass quality we're willing to attempt
     required double abs_min_pass_score = 27 [
-        default                   = 0.05,
+        default                   = 0.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 1.0
     ];
@@ -752,10 +752,18 @@ message CreaseDefenderConfig
 {
     // The additional buffer length for each side of the goal
     // to determine if crease defender chipping is "towards goal"
-    required double goal_post_offset_chipping = 4
+    required double goal_post_offset_chipping = 1
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
     // Unique steal config for crease defenders
-    required DefenderStealConfig defender_steal_config = 1;
+    required DefenderStealConfig defender_steal_config = 2;
+
+    // determines how much to shift over in the x direction if crease defender
+    // is outside of field boundary
+    required double out_of_field_boundary_x_shift_meters = 3 [
+        default                   = 0.09,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 5.0
+    ];
 }
 
 message PassDefenderConfig
@@ -788,4 +796,8 @@ message DefenderStealConfig
     // Max speed of ball that pass defender will try and get possession
     required double max_ball_speed_to_get_m_per_s = 3
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
+    // The additional buffer length for each side of the goal
+    // to determine if crease defender chipping is "towards goal"
+    required double goal_post_offset_chipping = 4
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
 }

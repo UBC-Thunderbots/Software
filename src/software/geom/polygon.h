@@ -4,6 +4,7 @@
 
 #include "software/geom/segment.h"
 #include "software/geom/shape.h"
+#include "software/geom/vector.h"
 
 /**
  * A shape composed of line segments.
@@ -49,6 +50,13 @@ class Polygon : public virtual Shape
      * @return perimeter length of the polygon
      */
     double perimeter() const;
+
+    /**
+     * Checks if the segments of the polygon have been provided in clockwise
+     * form
+     * @return true if the polygon segments are in clockwise order, false otherwise
+     */
+    bool isClockwise() const;
 
     /**
      * Returns the line segments that form this polygon.
