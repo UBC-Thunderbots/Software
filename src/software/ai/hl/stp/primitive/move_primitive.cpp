@@ -195,7 +195,7 @@ void MovePrimitive::updateObstacles(
 {
     // Separately store the non-robot + non-ball obstacles
     field_obstacles =
-        obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world, robot.velocity().length(), robot.robotConstants().robot_max_speed_m_per_s);
+        obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world, robot);
 
     obstacles = field_obstacles;
 

@@ -13,7 +13,7 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
-    const TbotsProto::MotionConstraint &motion_constraint, const World &world, const double curr_robot_speed, const double max_robot_speed) const
+    const TbotsProto::MotionConstraint &motion_constraint, const World &world, const Robot &robot) const
 {
     std::vector<ObstaclePtr> obstacles;
     const Field &field = world.field();
@@ -26,6 +26,8 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
             break;
         case TbotsProto::MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
         {
+            double curr_robot_speed = robot.velocity().length();
+            double max_robot_speed = robot.robotConstants().robot_max_speed_m_per_s;
             obstacles.push_back(createFromFieldRectangle(
                 field.enemyDefenseArea(), field.fieldLines(), field.fieldBoundary(),
                 config.enemy_defense_area_additional_inflation_meters() * (curr_robot_speed / max_robot_speed)));
@@ -142,13 +144,13 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-    const World &world, const double curr_robot_speed, const double max_robot_speed) const
+    const World &world,  const Robot &robot) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)
     {
         auto new_obstacles =
-            createObstaclesFromMotionConstraint(motion_constraint, world, curr_robot_speed, max_robot_speed);
+            createObstaclesFromMotionConstraint(motion_constraint, world, robot);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 

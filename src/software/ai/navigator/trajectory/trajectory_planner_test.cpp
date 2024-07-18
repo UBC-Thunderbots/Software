@@ -15,6 +15,7 @@ class TrajectoryPlannerTest : public testing::Test
           constraints(3.0, 3.0, 3.0),
           stop_cmd_constraints(1.5, 3.0, 3.0)
     {
+        default_robot = createRobotAtPos(Point(0, 0));
         // Set the inflation factor as a constant to avoid future changes of the constant
         // breaking the tests.
         TbotsProto::RobotNavigationObstacleConfig config;
@@ -28,18 +29,18 @@ class TrajectoryPlannerTest : public testing::Test
 
         friendly_defense_area_obstacle =
             obstacle_factory.createObstaclesFromMotionConstraints(
-                {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA}, *world)[0];
+                {TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA}, *world, default_robot)[0];
 
         enemy_half_obstacle = obstacle_factory.createObstaclesFromMotionConstraints(
-            {TbotsProto::MotionConstraint::ENEMY_HALF}, *world)[0];
+            {TbotsProto::MotionConstraint::ENEMY_HALF}, *world, default_robot)[0];
 
         center_circle_obstacle = obstacle_factory.createObstaclesFromMotionConstraints(
-            {TbotsProto::MotionConstraint::CENTER_CIRCLE}, *world)[0];
+            {TbotsProto::MotionConstraint::CENTER_CIRCLE}, *world, default_robot)[0];
 
         enemy_half_without_center_circle_obstacle =
             obstacle_factory.createObstaclesFromMotionConstraints(
                 {TbotsProto::MotionConstraint::ENEMY_HALF_WITHOUT_CENTRE_CIRCLE},
-                *world)[0];
+                *world, default_robot)[0];
     }
 
     void verifyNoCollision(const TrajectoryPath& trajectory,
@@ -75,6 +76,7 @@ class TrajectoryPlannerTest : public testing::Test
 
     TrajectoryPlanner traj_planner;
     std::shared_ptr<World> world;
+    Robot default_robot;
     RobotNavigationObstacleFactory obstacle_factory;
     ObstaclePtr robot_obstacle;
     ObstaclePtr friendly_defense_area_obstacle;
