@@ -193,7 +193,7 @@ void MovePrimitive::updateObstacles(
     const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
-    // Separately store the non-robot + non-ball obstacles (except enemy defense area)
+    // Separately store the non-robot + non-ball obstacles
     field_obstacles =
         obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world, robot.velocity().length(), robot.robotConstants().robot_max_speed_m_per_s);
 
