@@ -201,7 +201,6 @@ void MovePrimitive::updateObstacles(
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {
-
         if (obstacle_avoidance_mode == TbotsProto::SAFE)
         {
             // Generate a possibly long stadium shape obstacle in the region
