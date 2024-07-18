@@ -186,7 +186,7 @@ static const double MAX_KICK_COEFFICIENT = 0.4;
 
 // Chip Distance to Pulse Width Safety Constraint Constants
 // TODO: UPDATE CONSTANTS ONCE MORE CHIP DATA IS TAKEN FOR ROBOTS
-static const double MAX_CHIP_PULSE_WIDTH = 7000;
+static const uint32_t MAX_CHIP_PULSE_WIDTH = 7500;
 
 
 // Arduino

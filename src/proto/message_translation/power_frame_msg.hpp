@@ -133,6 +133,10 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
     kick_constant = std::min(kick_constant, MAX_KICK_CONSTANT);
     kick_coeff    = std::min(kick_coeff, MAX_KICK_COEFFICIENT);
 
+    uint32_t safe_chip_pulse_width = std::min(static_cast<uint32_t>(chip_constant *
+                                            std::exp(chip_coeff * google_control.chicker().chip_distance_meters())),
+                                            MAX_CHIP_PULSE_WIDTH);
+
     switch (google_control.chicker().chicker_command_case())
     {
         case TbotsProto::PowerControl::ChickerControl::kKickSpeedMPerS:
@@ -146,10 +150,8 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
         case TbotsProto::PowerControl::ChickerControl::kChipDistanceMeters:
             nanopb_control.chicker.which_chicker_command =
                 TbotsProto_PowerPulseControl_ChickerControl_chip_pulse_width_tag;
-            nanopb_control.chicker.chicker_command.chip_pulse_width =
-                    std::min(static_cast<double>(chip_constant *
-                        std::exp(chip_coeff * google_control.chicker().chip_distance_meters())),
-                             MAX_CHIP_PULSE_WIDTH);
+            nanopb_control.chicker.chicker_command.chip_pulse_width = safe_chip_pulse_width;
+
             break;
         case TbotsProto::PowerControl::ChickerControl::kAutoChipOrKick:
             nanopb_control.chicker.which_chicker_command =
@@ -172,9 +174,7 @@ TbotsProto_PowerPulseControl inline createNanoPbPowerPulseControl(
                         .which_auto_chip_or_kick =
                         TbotsProto_PowerPulseControl_AutoChipOrKick_autochip_pulse_width_tag;
                     nanopb_control.chicker.chicker_command.auto_chip_or_kick
-                        .auto_chip_or_kick.autochip_pulse_width = std::min(static_cast<double>(chip_constant *
-                            std::exp(chip_coeff * google_control.chicker().chip_distance_meters())),
-                            MAX_CHIP_PULSE_WIDTH);
+                        .auto_chip_or_kick.autochip_pulse_width = safe_chip_pulse_width;
                     break;
 
                 default:
