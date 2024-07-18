@@ -317,7 +317,7 @@ message PassingConfig
     /*****  PassSkill parameters *****/
     // The absolute minimum pass quality we're willing to attempt
     required double abs_min_pass_score = 27 [
-        default                   = 0.05,
+        default                   = 0.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 1.0
     ];
