@@ -35,7 +35,7 @@ class RobotNavigationObstacleFactory
      */
     std::vector<ObstaclePtr> createObstaclesFromMotionConstraints(
         const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-        const World &world) const;
+        const World &world, const double curr_robot_speed = 0, const double max_robot_speed = ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND) const;
 
     /**
      * Create static obstacles for the given motion constraint
@@ -46,7 +46,7 @@ class RobotNavigationObstacleFactory
      * @return Obstacles representing the given motion constraint
      */
     std::vector<ObstaclePtr> createObstaclesFromMotionConstraint(
-        const TbotsProto::MotionConstraint &motion_constraint, const World &world) const;
+        const TbotsProto::MotionConstraint &motion_constraint, const World &world, const double curr_robot_speed = 0, const double max_robot_speed = ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND) const;
 
     /**
      * Create circle obstacle around robot with additional radius scaling
