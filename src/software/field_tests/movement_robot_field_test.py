@@ -4,7 +4,6 @@ import pytest
 
 import software.python_bindings as tbots_cpp
 from proto.ssl_gc_common_pb2 import Team
-import logging
 from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
 
@@ -140,7 +139,9 @@ def test_basic_rotation(field_test_runner):
 
 def test_one_robots_square(field_test_runner):
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
-    if len(world.friendly_team.team_robots) <= 0:
+    use_two_robots = False
+
+    if len(world.friendly_team.team_robots) <= 0 or use_two_robots and len(world.friendly_team.team_robots) < 2:
         raise Exception("The first world received doesn't have enough robots in it!")
 
     logging.info("Here are the robots:")
@@ -151,8 +152,7 @@ def test_one_robots_square(field_test_runner):
         ]
     )
 
-    use_two_robots = False
-    id1 = 7 #world.friendly_team.team_robots[0].id
+    id1 = world.friendly_team.team_robots[0].id
     logging.info(f"Running test on robot {id1=}")
     if use_two_robots:
         id2 = world.friendly_team.team_robots[1].id
@@ -238,7 +238,10 @@ def test_one_robots_square(field_test_runner):
     if use_two_robots:
         params.assigned_tactics[id2].stop.CopyFrom(stop_tactic)
 
+    field_test_runner.set_tactics(params, True)
+
+
 
 if __name__ == "__main__":
     # Run the test, -s disables all capturing at -vv increases verbosity
-    sys.exit(pytest.main([__file__, "-svv"]))
+    sys.exit(pytest.main([__file__, "-svv", "-W ignore::DeprecationWarning"]))
