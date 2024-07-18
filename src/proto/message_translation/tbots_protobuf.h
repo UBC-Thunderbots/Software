@@ -250,6 +250,10 @@ std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedT
 std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
     const std::vector<double>& costs, int num_rows, int num_cols);
 
+std::optional<TrajectoryPath> createTrajectoryPathFromParams(
+        const TbotsProto::TrajectoryPathParams2D& params, const Point& start_position, const Vector& initial_velocity,
+        const RobotConstants& robot_constants, const TbotsProto::MaxAllowedSpeedMode max_speed_mode);
+
 /**
  * Generate a 2D Trajectory Path given 2D trajectory parameters
  *
