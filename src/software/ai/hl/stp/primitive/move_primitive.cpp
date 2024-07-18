@@ -25,7 +25,7 @@ MovePrimitive::MovePrimitive(
         max_allowed_speed_mode, robot.robotConstants());
     double max_angular_speed = convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
             max_allowed_speed_mode, robot.robotConstants());
-    trajectory.generate(robot.position(), destination, robot.velocity(), max_speed,
+    trajectory.generate(robot.position(), destination, robot.velocity(), max_linear_speed,
                         robot.robotConstants().robot_max_acceleration_m_per_s_2,
                         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
@@ -43,7 +43,7 @@ MovePrimitive::MovePrimitive(
     {
         BangBangTrajectory2D dribble_estimate;
         dribble_estimate.generate(
-            previous_point, additional_point, Vector(0, 0), max_speed,
+            previous_point, additional_point, Vector(0, 0), max_linear_speed,
             robot.robotConstants().robot_max_acceleration_m_per_s_2,
             robot.robotConstants().robot_max_deceleration_m_per_s_2);
         additional_points_time += dribble_estimate.getTotalTime();
