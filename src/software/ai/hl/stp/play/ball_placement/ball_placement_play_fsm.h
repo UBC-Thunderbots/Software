@@ -22,8 +22,10 @@ struct BallPlacementPlayFSM
     class AlignWallState;
     class AlignPlacementState;
     class PlaceBallState;
-    class ReleaseBallState;
-    class RetreatState;
+    class ReleaseWallPickedState;
+    class RetreatWallPickedState;
+    class ReleaseBallPlacedState;
+    class RetreatPlacedState;
 
     struct ControlParams
     {
@@ -190,8 +192,10 @@ struct BallPlacementPlayFSM
         DEFINE_SML_STATE(PickOffWallState)
         DEFINE_SML_STATE(AlignPlacementState)
         DEFINE_SML_STATE(PlaceBallState)
-        DEFINE_SML_STATE(ReleaseBallState)
-        DEFINE_SML_STATE(RetreatState)
+        DEFINE_SML_STATE(ReleaseBallPlacedState)
+        DEFINE_SML_STATE(RetreatPlacedState)
+        DEFINE_SML_STATE(ReleaseWallPickedState)
+        DEFINE_SML_STATE(RetreatWallPickedState)
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_ACTION(alignPlacement)
@@ -226,7 +230,16 @@ struct BallPlacementPlayFSM
             PickOffWallState_S + Update_E[!wallPickOffDone_G] / pickOffWall_A =
                 PickOffWallState_S,
             PickOffWallState_S + Update_E[wallPickOffDone_G] / startWait_A =
-                ReleaseBallState_S,
+                ReleaseWallPickedState_S,
+
+            ReleaseWallPickedState_S + Update_E[!waitDone_G && !shouldPickOffWall_G] / releaseBall_A =
+                    ReleaseWallPickedState_S,
+            ReleaseWallPickedState_S + Update_E[shouldPickOffWall_G] = AlignWallState_S,
+            ReleaseWallPickedState_S + Update_E[waitDone_G]    = RetreatWallPickedState_S,
+
+            RetreatWallPickedState_S + Update_E[retreatDone_G && !shouldPickOffWall_G] = AlignPlacementState_S,
+            RetreatWallPickedState_S + Update_E[!retreatDone_G] / retreat_A      = RetreatWallPickedState_S,
+            RetreatWallPickedState_S + Update_E[shouldPickOffWall_G]                 = AlignWallState_S,
 
             AlignPlacementState_S + Update_E[shouldPickOffWall_G] = AlignWallState_S,
             AlignPlacementState_S + Update_E[!alignDone_G] / alignPlacement_A =
@@ -234,16 +247,16 @@ struct BallPlacementPlayFSM
             AlignPlacementState_S + Update_E[alignDone_G] = PlaceBallState_S,
 
             PlaceBallState_S + Update_E[!ballPlaced_G] / placeBall_A = PlaceBallState_S,
-            PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A  = ReleaseBallState_S,
+            PlaceBallState_S + Update_E[ballPlaced_G] / startWait_A  = ReleaseBallPlacedState_S,
 
-            ReleaseBallState_S + Update_E[!waitDone_G && ballPlaced_G] / releaseBall_A =
-                ReleaseBallState_S,
-            ReleaseBallState_S + Update_E[!ballPlaced_G] = StartState_S,
-            ReleaseBallState_S + Update_E[waitDone_G]    = RetreatState_S,
+            ReleaseBallPlacedState_S + Update_E[!waitDone_G && ballPlaced_G] / releaseBall_A =
+                ReleaseBallPlacedState_S,
+            ReleaseBallPlacedState_S + Update_E[!ballPlaced_G] = StartState_S,
+            ReleaseBallPlacedState_S + Update_E[waitDone_G]    = RetreatPlacedState_S,
 
-            RetreatState_S + Update_E[retreatDone_G && ballPlaced_G] = X,
-            RetreatState_S + Update_E[ballPlaced_G] / retreat_A      = RetreatState_S,
-            RetreatState_S + Update_E[!ballPlaced_G]                 = StartState_S);
+            RetreatPlacedState_S + Update_E[retreatDone_G && ballPlaced_G] = X,
+            RetreatPlacedState_S + Update_E[ballPlaced_G] / retreat_A      = RetreatPlacedState_S,
+            RetreatPlacedState_S + Update_E[!ballPlaced_G]                 = StartState_S);
     }
 
    private:

@@ -15,10 +15,12 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
                                      const TeamColour friendly_team_colour,
                                      const RobotId robot_id)
     : current_primitive_(),
+      time_since_trajectory_creation_(Duration::fromSeconds(0)),
       friendly_team_colour_(friendly_team_colour),
       robot_constants_(robot_constants),
       time_step_(time_step),
       robot_id_(robot_id)
+
 {
 }
 
@@ -29,18 +31,16 @@ void PrimitiveExecutor::updatePrimitiveSet(
     if (primitive_set_msg_iter != primitive_set_msg.robot_primitives().end())
     {
         current_primitive_ = primitive_set_msg_iter->second;
+        curr_robot_position_ = createPoint(current_primitive_.move().xy_traj_params().start_position());
 
         if (current_primitive_.has_move())
         {
-            trajectory_path_ = createTrajectoryPathFromParams(
-                current_primitive_.move().xy_traj_params(), velocity_, robot_constants_, current_primitive_.move().max_speed_mode());
-
             angular_trajectory_ = createAngularTrajectoryFromParams(
-                current_primitive_.move().w_traj_params(), angular_velocity_,
-                robot_constants_, current_primitive_.move().max_speed_mode());
+                    current_primitive_.move().w_traj_params(), angular_velocity_,
+                    robot_constants_, current_primitive_.move().max_speed_mode());
 
             time_since_trajectory_creation_ =
-                Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
+                    Duration::fromSeconds(VISION_TO_ROBOT_DELAY_S);
         }
     }
 }
@@ -61,10 +61,10 @@ void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
 Vector PrimitiveExecutor::getTargetLinearVelocity()
 {
     Vector local_velocity = globalToLocalVelocity(
-        trajectory_path_->getVelocity(time_since_trajectory_creation_.toSeconds()),
+        trajectory_path_->getVelocity(VISION_TO_ROBOT_DELAY_S),
         orientation_);
     Point position =
-        trajectory_path_->getPosition(time_since_trajectory_creation_.toSeconds());
+        trajectory_path_->getPosition(VISION_TO_ROBOT_DELAY_S);
     double distance_to_destination =
         distance(position, trajectory_path_->getDestination());
 
@@ -97,8 +97,13 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity()
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
     TbotsProto::PrimitiveExecutorStatus &status)
 {
+    curr_robot_position_ = curr_robot_position_ + (velocity_ * time_step_.toSeconds());
     time_since_trajectory_creation_ += time_step_;
     status.set_running_primitive(true);
+
+
+    trajectory_path_ = createTrajectoryPathFromParams(
+            current_primitive_.move().xy_traj_params(), curr_robot_position_, velocity_, robot_constants_, current_primitive_.move().max_speed_mode());
 
     switch (current_primitive_.primitive_case())
     {

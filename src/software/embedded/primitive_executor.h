@@ -83,6 +83,7 @@ class PrimitiveExecutor
     RobotConstants_t robot_constants_;
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
+    Point curr_robot_position_;
 
     // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
     // time step to be used, in Seconds
