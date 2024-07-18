@@ -19,7 +19,7 @@ class PrimitiveTest : public testing::Test
     RobotConstants_t robot_constants = create2021RobotConstants();
     Robot robot                      = TestUtil::createRobotAtPos(Point(0, 0));
     std::shared_ptr<World> world     = TestUtil::createBlankTestingWorld();
-    RobotNavigationObstacleFactory obstacle_factory =
+    RobotNavigationObstacleFactory obstacle_factory =a
         RobotNavigationObstacleFactory(TbotsProto::RobotNavigationObstacleConfig());
 };
 
