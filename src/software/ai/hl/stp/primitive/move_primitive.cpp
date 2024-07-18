@@ -24,18 +24,18 @@ MovePrimitive::MovePrimitive(
     double max_linear_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
         max_allowed_speed_mode, robot.robotConstants());
     double max_angular_speed = convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
-            max_allowed_speed_mode, robot.robotConstants());
+        max_allowed_speed_mode, robot.robotConstants());
     trajectory.generate(robot.position(), destination, robot.velocity(), max_linear_speed,
                         robot.robotConstants().robot_max_acceleration_m_per_s_2,
                         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
-        angular_trajectory.generate(
-            robot.orientation(), final_angle, robot.angularVelocity(),
-            AngularVelocity::fromRadians(max_angular_speed),
-            AngularVelocity::fromRadians(
-                robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2),
-            AngularVelocity::fromRadians(
-                robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2));
+    angular_trajectory.generate(
+        robot.orientation(), final_angle, robot.angularVelocity(),
+        AngularVelocity::fromRadians(max_angular_speed),
+        AngularVelocity::fromRadians(
+            robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2),
+        AngularVelocity::fromRadians(
+            robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2));
 
     double additional_points_time = 0;
     Point previous_point          = destination;
@@ -65,7 +65,7 @@ MovePrimitive::generatePrimitiveProtoMessage(
     updateObstacles(world, motion_constraints, robot_trajectories, obstacle_factory);
 
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
-            max_allowed_speed_mode, robot.robotConstants());
+        max_allowed_speed_mode, robot.robotConstants());
     KinematicConstraints constraints(
         max_speed, robot.robotConstants().robot_max_acceleration_m_per_s_2,
         robot.robotConstants().robot_max_deceleration_m_per_s_2);

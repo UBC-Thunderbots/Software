@@ -20,7 +20,6 @@ PrimitiveExecutor::PrimitiveExecutor(const Duration time_step,
       robot_constants_(robot_constants),
       time_step_(time_step),
       robot_id_(robot_id)
-
 {
 }
 

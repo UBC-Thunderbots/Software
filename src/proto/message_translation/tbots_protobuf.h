@@ -265,7 +265,8 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
  */
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
-    const RobotConstants& robot_constants, TbotsProto::MaxAllowedSpeedMode max_speed_mode);
+    const RobotConstants& robot_constants,
+    TbotsProto::MaxAllowedSpeedMode max_speed_mode);
 
 /**
  * Generate an angular trajectory Path given angular trajectory proto parameters
@@ -277,7 +278,8 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
  */
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
     const TbotsProto::TrajectoryParamsAngular1D& params,
-    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants, TbotsProto::MaxAllowedSpeedMode max_speed_mode);
+    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants,
+    TbotsProto::MaxAllowedSpeedMode max_speed_mode);
 
 /**
  * Convert dribbler mode to dribbler speed
@@ -311,5 +313,5 @@ double convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
  * @return the max allowed angular speed in m/s
  */
 double convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
-        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
-        RobotConstants_t robot_constants);
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+    RobotConstants_t robot_constants);
