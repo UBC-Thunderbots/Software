@@ -54,7 +54,7 @@ class Polygon : public virtual Shape
     /**
      * Checks if the segments of the polygon have been provided in clockwise
      * form
-     * @return
+     * @return true if the polygon segments are in clockwise order, false otherwise
      */
     bool isClockwise() const;
 
