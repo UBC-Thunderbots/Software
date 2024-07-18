@@ -20,6 +20,8 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
 {
     PriorityTacticVector tactics;
 
+    int num_defenders_and_supporters = static_cast<int>(play_update.num_tactics);
+
     // AttackerTactic should always be assigned
     if (play_update.num_tactics > 0)
     {
@@ -31,6 +33,10 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
         if (attacker_not_suspended)
         {
             tactics.push_back({attacker_tactic_});
+
+            // We have one less defender/supporter to assign since we will assign one
+            // robot to be the attacker
+            --num_defenders_and_supporters;
         }
 
         // Log visualize the state of the attacker's current skill
@@ -38,14 +44,15 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
     }
 
     // Determine number of defense and support tactics to assign
-    auto [num_defenders, num_supporters] = assignNumOfDefendersAndSupporters(
-        std::max(static_cast<int>(play_update.num_tactics) - 1, 0));
+    auto [num_defenders, num_supporters] =
+        assignNumOfDefendersAndSupporters(std::max(num_defenders_and_supporters, 0));
 
     // Get defense tactics from DefensePlay
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
     defense_play_->updateTactics(PlayUpdate(
         play_update.world_ptr, num_defenders,
-        [&](PriorityTacticVector new_tactics) {
+        [&](PriorityTacticVector new_tactics)
+        {
             for (auto& tactic_vec : new_tactics)
             {
                 defense_tactics.insert(defense_tactics.end(), tactic_vec.begin(),
