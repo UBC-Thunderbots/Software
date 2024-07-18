@@ -78,7 +78,6 @@ class PrimitiveExecutor
     Duration time_since_trajectory_creation_;
     Vector velocity_;
     AngularVelocity angular_velocity_;
-    Vector last_commanded_global_velocity_;
     Angle orientation_;
     TeamColour friendly_team_colour_;
     RobotConstants_t robot_constants_;
