@@ -261,14 +261,6 @@ bool FreeKickPlayFSM::passFound(const Update &event)
 
 bool FreeKickPlayFSM::shouldAbortPass(const Update &event)
 {
-    // Check if ball has already been passed
-//    if (distance(event.common.world_ptr->ball().position(),
-//                 best_pass_and_score_so_far.pass.passerPoint()) >
-//        BALL_IN_PLAY_DISTANCE_THRESHOLD_METERS)
-//    {
-//        return false;
-//    }
-
     // Abort pass if the pass score has dropped significantly
     best_pass_and_score_so_far.rating =
         ratePass(*event.common.world_ptr, best_pass_and_score_so_far.pass,
