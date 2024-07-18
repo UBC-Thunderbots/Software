@@ -60,9 +60,20 @@ void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
 
 Vector PrimitiveExecutor::getTargetLinearVelocity()
 {
+    Vector global_velocity = trajectory_path_->getVelocity(VISION_TO_ROBOT_DELAY_S);
     Vector local_velocity = globalToLocalVelocity(
-        trajectory_path_->getVelocity(VISION_TO_ROBOT_DELAY_S),
+        global_velocity,
         orientation_);
+
+    if (last_commanded_global_velocity_.length() - global_velocity.length() > 0.1)
+    {
+        local_velocity = globalToLocalVelocity(
+            trajectory_path_->getVelocity(VISION_TO_ROBOT_DELAY_S * 2), 
+            orientation_);
+    }
+
+    last_commanded_global_velocity_ = global_velocity;
+
     Point position =
         trajectory_path_->getPosition(VISION_TO_ROBOT_DELAY_S);
     double distance_to_destination =
@@ -100,7 +111,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     curr_robot_position_ = curr_robot_position_ + (velocity_ * time_step_.toSeconds());
     time_since_trajectory_creation_ += time_step_;
     status.set_running_primitive(true);
-
 
     trajectory_path_ = createTrajectoryPathFromParams(
             current_primitive_.move().xy_traj_params(), curr_robot_position_, velocity_, robot_constants_, current_primitive_.move().max_speed_mode());

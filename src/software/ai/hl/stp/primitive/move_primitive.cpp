@@ -190,14 +190,15 @@ void MovePrimitive::updateObstacles(
     const std::map<RobotId, TrajectoryPath> &robot_trajectories,
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
-    // Separately store the non-robot + non-ball obstacles
+    // Separately store the non-robot + non-ball obstacles (except enemy defense area)
     field_obstacles =
-        obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
+        obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world, robot.velocity().length(), robot.robotConstants().robot_max_speed_m_per_s);
 
     obstacles = field_obstacles;
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {
+
         if (obstacle_avoidance_mode == TbotsProto::SAFE)
         {
             // Generate a possibly long stadium shape obstacle in the region
