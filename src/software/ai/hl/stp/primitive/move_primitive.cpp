@@ -11,7 +11,7 @@ MovePrimitive::MovePrimitive(
     const TbotsProto::ObstacleAvoidanceMode &obstacle_avoidance_mode,
     const TbotsProto::DribblerMode &dribbler_mode,
     const TbotsProto::BallCollisionType &ball_collision_type,
-    const AutoChipOrKick &auto_chip_or_kick, std::optional<double> cost_override)
+    const AutoChipOrKick &auto_chip_or_kick, std::vector<Point> additional_points)
     : robot(robot),
       destination(destination),
       final_angle(final_angle),
@@ -21,19 +21,13 @@ MovePrimitive::MovePrimitive(
       max_allowed_speed_mode(max_allowed_speed_mode),
       obstacle_avoidance_mode(obstacle_avoidance_mode)
 {
-    if (cost_override.has_value())
-    {
-        estimated_cost = cost_override.value();
-    }
-    else
-    {
-        double max_linear_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
-                max_allowed_speed_mode, robot.robotConstants());
-        double max_angular_speed = convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
-                max_allowed_speed_mode, robot.robotConstants());
-        trajectory.generate(robot.position(), destination, robot.velocity(), max_linear_speed,
-                            robot.robotConstants().robot_max_acceleration_m_per_s_2,
-                            robot.robotConstants().robot_max_deceleration_m_per_s_2);
+    double max_linear_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
+        max_allowed_speed_mode, robot.robotConstants());
+    double max_angular_speed = convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
+            max_allowed_speed_mode, robot.robotConstants());
+    trajectory.generate(robot.position(), destination, robot.velocity(), max_linear_speed,
+                        robot.robotConstants().robot_max_acceleration_m_per_s_2,
+                        robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
         angular_trajectory.generate(
             robot.orientation(), final_angle, robot.angularVelocity(),
@@ -43,9 +37,22 @@ MovePrimitive::MovePrimitive(
             AngularVelocity::fromRadians(
                 robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2));
 
-        estimated_cost =
-            std::max(trajectory.getTotalTime(), angular_trajectory.getTotalTime());
+    double additional_points_time = 0;
+    Point previous_point          = destination;
+    for (const Point &additional_point : additional_points)
+    {
+        BangBangTrajectory2D dribble_estimate;
+        dribble_estimate.generate(
+            previous_point, additional_point, Vector(0, 0), max_linear_speed,
+            robot.robotConstants().robot_max_acceleration_m_per_s_2,
+            robot.robotConstants().robot_max_deceleration_m_per_s_2);
+        additional_points_time += dribble_estimate.getTotalTime();
+        previous_point = additional_point;
     }
+
+    estimated_cost =
+        std::max(trajectory.getTotalTime(), angular_trajectory.getTotalTime()) +
+        additional_points_time;
 }
 
 std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
