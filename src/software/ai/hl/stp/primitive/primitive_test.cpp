@@ -31,7 +31,7 @@ TEST_F(PrimitiveTest, test_create_move_primitive)
         robot, destination, Angle::threeQuarter(),
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         TbotsProto::ObstacleAvoidanceMode::SAFE, TbotsProto::DribblerMode::INDEFINITE,
-        TbotsProto::BallCollisionType::AVOID, AutoChipOrKick(), std::optional<double>());
+        TbotsProto::BallCollisionType::AVOID, AutoChipOrKick());
 
     EXPECT_GT(move_primitive->getEstimatedPrimitiveCost(), 0.0);
 
@@ -52,7 +52,7 @@ TEST_F(PrimitiveTest, test_create_move_primitive)
               0.0);
     EXPECT_EQ(move_primitive_msg->move().auto_chip_or_kick().autokick_speed_m_per_s(),
               0.0);
-    EXPECT_EQ(move_primitive_msg->move().xy_traj_params().max_speed_mode(),
+    EXPECT_EQ(move_primitive_msg->move().max_speed_mode(),
               TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 }
 
@@ -99,7 +99,7 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_sub_destination)
     EXPECT_EQ(move_primitive.dribbler_mode(), TbotsProto::DribblerMode::INDEFINITE);
     EXPECT_EQ(move_primitive.auto_chip_or_kick().autochip_distance_meters(), 0.0);
     EXPECT_EQ(move_primitive.auto_chip_or_kick().autokick_speed_m_per_s(), 0.0);
-    EXPECT_EQ(move_primitive.xy_traj_params().max_speed_mode(),
+    EXPECT_EQ(move_primitive.max_speed_mode(),
               TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND);
 }
 
@@ -128,7 +128,7 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autochip)
     EXPECT_EQ(move_primitive_msg->move().w_traj_params().final_angle().radians(),
               Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive_msg->move().dribbler_mode(), TbotsProto::DribblerMode::OFF);
-    EXPECT_EQ(move_primitive_msg->move().xy_traj_params().max_speed_mode(),
+    EXPECT_EQ(move_primitive_msg->move().max_speed_mode(),
               TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND);
 
     ASSERT_TRUE(move_primitive_msg->move().has_auto_chip_or_kick());
@@ -163,7 +163,7 @@ TEST_F(PrimitiveTest, test_create_move_primitive_with_autokick)
     EXPECT_EQ(move_primitive_msg->move().w_traj_params().final_angle().radians(),
               Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive_msg->move().dribbler_mode(), TbotsProto::DribblerMode::OFF);
-    EXPECT_EQ(move_primitive_msg->move().xy_traj_params().max_speed_mode(),
+    EXPECT_EQ(move_primitive_msg->move().max_speed_mode(),
               TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND);
 
     ASSERT_TRUE(move_primitive_msg->move().has_auto_chip_or_kick());
