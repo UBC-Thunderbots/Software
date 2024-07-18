@@ -31,6 +31,7 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
             obstacles.push_back(createFromFieldRectangle(
                 field.enemyDefenseArea(), field.fieldLines(), field.fieldBoundary(),
                 config.enemy_defense_area_additional_inflation_meters() * (curr_robot_speed / max_robot_speed)));
+                config.enemy_defense_area_additional_inflation_meters() * (curr_robot_speed / max_robot_speed)));
         }
         break;
         case TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA:
