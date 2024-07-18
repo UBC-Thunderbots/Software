@@ -195,3 +195,15 @@ TEST(PolygonExpandTest, test_from_segment_two_radii)
     EXPECT_EQ(third_side.orientation() - fourth_side.orientation(), ninety_degrees);
     EXPECT_EQ(fourth_side.orientation() - first_side.orientation(), ninety_degrees);
 }
+
+TEST(PolygonClockwiseTest, test_is_clockwise)
+{
+    Polygon polygon_cw({{0, 0}, {0, 2}, {2, 2}, {2, 0}});
+    ASSERT_TRUE(polygon_cw.isClockwise());
+    Polygon polygon_ccw({{0, 0}, {2, 0}, {2, 2}, {0, 2}});
+    ASSERT_FALSE(polygon_ccw.isClockwise());
+    Polygon concave_cw({{0, 0}, {1, 1}, {1, 2}, {2, 0}});
+    ASSERT_TRUE(concave_cw.isClockwise());
+    Polygon concave_ccw({{0, 0}, {2, 0}, {1, 2}, {1, 1}});
+    ASSERT_FALSE(concave_ccw.isClockwise());
+}
