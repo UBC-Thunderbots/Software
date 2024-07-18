@@ -158,9 +158,9 @@ def test_one_robots_square(field_test_runner):
         id2 = world.friendly_team.team_robots[1].id
         logging.info(f"Running test on robot {id2=}")
 
-    left_x = 1
-    right_x = 3
-    top_y = 0
+    left_x = -3
+    right_x = -1
+    top_y = 2
     bottom_y = -2
     point1 = Point(x_meters=left_x, y_meters=top_y)
     point2 = Point(x_meters=left_x, y_meters=bottom_y)
@@ -182,7 +182,7 @@ def test_one_robots_square(field_test_runner):
         destination=point2,
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi / 2),
+        final_orientation=Angle(radians=math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
@@ -204,7 +204,7 @@ def test_one_robots_square(field_test_runner):
         destination=point4,
         final_speed=0.0,
         dribbler_mode=DribblerMode.OFF,
-        final_orientation=Angle(radians=-math.pi / 2),
+        final_orientation=Angle(radians=math.pi / 2),
         ball_collision_type=BallCollisionType.AVOID,
         auto_chip_or_kick=AutoChipOrKick(autokick_speed_m_per_s=0.0),
         max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT,
