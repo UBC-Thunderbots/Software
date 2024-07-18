@@ -453,10 +453,11 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
 
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
-    const RobotConstants& robot_constants, const TbotsProto::MaxAllowedSpeedMode max_speed_mode)
+    const RobotConstants& robot_constants,
+    const TbotsProto::MaxAllowedSpeedMode max_speed_mode)
 {
-    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
-        max_speed_mode, robot_constants);
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(max_speed_mode,
+                                                                         robot_constants);
 
     if (max_speed == 0)
     {
@@ -503,14 +504,15 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
 
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
     const TbotsProto::TrajectoryParamsAngular1D& params,
-    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants, const TbotsProto::MaxAllowedSpeedMode max_speed_mode)
+    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants,
+    const TbotsProto::MaxAllowedSpeedMode max_speed_mode)
 {
-    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(max_speed_mode, robot_constants);
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
+        max_speed_mode, robot_constants);
 
     return BangBangTrajectory1DAngular(
         createAngle(params.start_angle()), createAngle(params.final_angle()),
-        initial_velocity,
-        AngularVelocity::fromRadians(max_speed),
+        initial_velocity, AngularVelocity::fromRadians(max_speed),
         AngularVelocity::fromRadians(
             robot_constants.robot_max_ang_acceleration_rad_per_s_2),
         AngularVelocity::fromRadians(
@@ -562,8 +564,8 @@ double convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
 }
 
 double convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
-        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
-        RobotConstants_t robot_constants)
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+    RobotConstants_t robot_constants)
 {
     switch (max_allowed_speed_mode)
     {

@@ -19,8 +19,7 @@ TEST(PassDefenderFSMTest, test_transitions)
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>(ai_config);
 
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM(strategy),
-                             DribbleSkillFSM()};
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(strategy), DribbleSkillFSM()};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
@@ -84,8 +83,7 @@ TEST(PassDefenderFSMTest, test_intercept_edge_case)
     TbotsProto::AiConfig ai_config;
     std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>(ai_config);
 
-    FSM<PassDefenderFSM> fsm{PassDefenderFSM(strategy),
-                             DribbleSkillFSM()};
+    FSM<PassDefenderFSM> fsm{PassDefenderFSM(strategy), DribbleSkillFSM()};
 
     // Start in BlockPassState
     EXPECT_TRUE(fsm.is(boost::sml::state<PassDefenderFSM::BlockPassState>));
