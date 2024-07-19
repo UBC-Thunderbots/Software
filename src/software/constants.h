@@ -32,6 +32,7 @@ const std::string SIMULATOR_STATE_PATH                   = "/simulator_state";
 const std::string VALIDATION_PROTO_SET_PATH              = "/validation_proto_set";
 const std::string ROBOT_LOG_PATH                         = "/robot_log";
 const std::string ROBOT_CRASH_PATH                       = "/robot_crash";
+const std::string ROBOT_STATISTIC_PATH                   = "/robot_statistic";
 const std::string DYNAMIC_PARAMETER_UPDATE_REQUEST_PATH  = "/dynamic_parameter_request";
 const std::string DYNAMIC_PARAMETER_UPDATE_RESPONSE_PATH = "/dynamic_parameter_response";
 const std::string WORLD_STATE_RECEIVED_TRIGGER_PATH = "/world_state_received_trigger";

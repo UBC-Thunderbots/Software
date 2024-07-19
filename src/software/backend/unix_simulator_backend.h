@@ -5,6 +5,7 @@
 #include "proto/parameters.pb.h"
 #include "proto/robot_crash_msg.pb.h"
 #include "proto/robot_log_msg.pb.h"
+#include "proto/robot_statistic.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/sensor_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -50,6 +51,8 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotLog>> robot_log_listener;
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotCrash>>
         robot_crash_listener;
+    std::unique_ptr<ThreadedProtoUnixListener<RobotStatistic>>
+        robot_statistic_listener;
 
     // Outputs
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::World>> world_output;

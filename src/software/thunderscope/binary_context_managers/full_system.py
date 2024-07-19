@@ -221,5 +221,6 @@ gdb --args bazel-bin/{self.full_system}
             (VALIDATION_PROTO_SET_PATH, ValidationProtoSet),
             (ROBOT_LOG_PATH, RobotLog),
             (ROBOT_CRASH_PATH, RobotCrash),
+            (ROBOT_STATISTIC_PATH, RobotStatistic),
         ]:
             proto_unix_io.attach_unix_sender(self.full_system_runtime_dir, *arg)
