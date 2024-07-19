@@ -295,18 +295,6 @@ Thunderloop::~Thunderloop() {}
                     *primitive_executor_.stepPrimitive((1.0 / loop_hz_), primitive_executor_status_);
             }
 
-
-            static int iter3 = 0;
-            iter3++;
-            if (iter3 % 10)
-            {
-                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                                                                    {"iter2", iter3},
-                                                                    {"time_since_prev_iter_sec", time_since_prev_iter_sec},
-                                                                    {"hz", loop_hz_}
-                                                            });
-            }
-
             thunderloop_status_.set_primitive_executor_step_time_ms(
                 getMilliseconds(poll_time));
 

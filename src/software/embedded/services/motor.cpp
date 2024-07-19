@@ -465,18 +465,6 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
         tmc4671ReadThenWriteValue(DRIBBLER_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
                                   TMC4671_PID_VELOCITY_TARGET, dribbler_ramp_rpm_));
 
-    static int iter = 0;
-    iter++;
-    if (iter % 10)
-    {
-        LOG(PLOTJUGGLER) << *createPlotJugglerValue({
-                                                            {"vfr", front_right_velocity},
-                                                            {"vfl", front_left_velocity},
-                                                            {"vbr", back_right_velocity},
-                                                            {"vbl", back_left_velocity}
-                                                    });
-    }
-
     // Construct a MotorStatus object with the current velocities and dribbler rpm
     TbotsProto::MotorStatus motor_status =
         updateMotorStatus(front_left_velocity, front_right_velocity, back_left_velocity,
