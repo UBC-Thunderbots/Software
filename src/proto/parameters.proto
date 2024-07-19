@@ -564,11 +564,11 @@ message SensorFusionConfig
 
     // Overrides the friendly goalie id provided by the game controller,
     // with FriendlyGoalieId parameter
-    required bool override_game_controller_friendly_goalie_id = 10 [default = true];
+    required bool override_game_controller_friendly_goalie_id = 10 [default = false];
 
     // Overrides the enemy goalie id provided by the game controller,
     // with EnemyGoalieId parameter
-    required bool override_game_controller_enemy_goalie_id = 11 [default = true];
+    required bool override_game_controller_enemy_goalie_id = 11 [default = false];
 
     // Number of dropped detections before we consider the ball not to be in the dribbler
     required int32 num_dropped_detections_before_ball_not_in_dribbler = 12
