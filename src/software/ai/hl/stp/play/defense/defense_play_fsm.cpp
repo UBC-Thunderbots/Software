@@ -23,8 +23,8 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         return;
     }
     PriorityTacticVector tactics_to_return = {{}, {}, {}};
-    int num_defenders = event.common.num_tactics;
 
+    int num_defenders = static_cast<int>(event.common.num_tactics);
     // No need to check if we have possession since that would trigger OffensePlay automatically
     if (num_defenders >= 1)
     {
