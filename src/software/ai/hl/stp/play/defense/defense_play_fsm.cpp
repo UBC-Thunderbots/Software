@@ -25,7 +25,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
     PriorityTacticVector tactics_to_return = {{}, {}, {}};
     int num_defenders = event.common.num_tactics;
 
-    if (event.common.world_ptr->getTeamWithPossession() == TeamPossession::ENEMY && num_defenders >= 1)
+    if (num_defenders >= 1)
     {
         Point current_ball_position = event.common.world_ptr->ball().position();
         const auto clock_time = std::chrono::system_clock::now();
@@ -50,11 +50,33 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
 
         double ball_displacement_m =
                 distance(event.common.world_ptr->ball().position(), enemy_possession_ball_position);
-        if (enemy_possession_epoch_time_s - epoch_time_in_seconds
+
+        if (epoch_time_in_seconds - enemy_possession_epoch_time_s
             >= strategy->getAiConfig().defense_play_config().ball_stagnant_time_threshold_s()
             && ball_displacement_m <= strategy->getAiConfig().defense_play_config().ball_stagnant_distance_threshold_m())
         {
             // Ball is defined as "stagnant" due to no progress
+            std::optional<Robot> nearest_enemy_to_ball =
+                    event.common.world_ptr->enemyTeam().getNearestRobot(event.common.world_ptr->ball().position());
+            Angle stealer_orientation;
+
+            if (nearest_enemy_to_ball.has_value())
+            {
+//                stealer_orientation = Angle::fromDegrees(
+//                        nearest_enemy_to_ball.value().orientation().toDegrees() + 180);
+                stealer_orientation = Angle::fromDegrees(180);
+
+                LOG(DEBUG) << "Nearest Robot: " << nearest_enemy_to_ball.value().id();
+
+            }
+            LOG(DEBUG) << "Orientation" << stealer_orientation;
+
+            DribbleSkillFSM::ControlParams dribble_control_params{
+                    .dribble_destination       = event.common.world_ptr->ball().position(),
+                    .final_dribble_orientation = Angle::fromDegrees(180),
+                    .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL
+            };
+            AssignedSkillTactic<DribbleSkill>(strategy).updateControlParams(dribble_control_params);
             num_defenders--;
             auto ball_stealer = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
             tactics_to_return[0].push_back(ball_stealer);

@@ -1,13 +1,16 @@
+import math
+
 import sys
 
 import pytest
 
 import software.python_bindings as tbots_cpp
 from proto.play_pb2 import Play, PlayName
+from proto.import_all_protos import *
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import simulated_test_runner
 from proto.message_translation.tbots_protobuf import create_world_state
-from proto.ssl_gc_common_pb2 import Team
+from proto.ssl_gc_common_pb2 import Team as SslTeam
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.excessive_dribbling import *
@@ -91,6 +94,113 @@ from software.simulated_tests.excessive_dribbling import *
 #     )
 
 
+# @pytest.mark.parametrize(
+#     "blue_bots,yellow_bots,ball_initial_pos,should_dribble",
+#     [
+#         (
+#                 [
+#                     tbots_cpp.Point(-3, 1.5),
+#                     tbots_cpp.Point(-3, 0.5),
+#                     tbots_cpp.Point(-3, -0.5),
+#                     tbots_cpp.Point(-3, -1.5),
+#                     tbots_cpp.Point(-3, 1),
+#                     tbots_cpp.Point(-3, 0.75),
+#                 ],
+#                 [
+#                     tbots_cpp.Point(1, -0.25),
+#                     tbots_cpp.Point(1, -1.25),
+#                     tbots_cpp.Point(2, -0.25),
+#                     tbots_cpp.Point(2, -1.0),
+#                     tbots_cpp.Point(2, -1.25),
+#                 ],
+#                 tbots_cpp.Point(1.9, -1.0),
+#                 True
+#         ),
+#         (
+#                 [
+#                     tbots_cpp.Point(-3, 1.5),
+#                     tbots_cpp.Point(-3, 0.5),
+#                     tbots_cpp.Point(-3, -0.5),
+#                     tbots_cpp.Point(-3, -1.5),
+#                     tbots_cpp.Point(-3, 1),
+#                     tbots_cpp.Point(-3, 0.75),
+#                 ],
+#                 [
+#                     tbots_cpp.Point(1, -0.25),
+#                     tbots_cpp.Point(1, -1.25),
+#                     tbots_cpp.Point(2, -0.25),
+#                     tbots_cpp.Point(2, -1.0),
+#                     tbots_cpp.Point(2, -1.25),
+#                 ],
+#                 tbots_cpp.Point(1.9, -1.0),
+#                 True
+#         )
+#     ],
+# )
+# def test_defense_play_stagnant_ball(simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos, should_dribble):
+#     def setup(*args):
+#         # Game Controller Setup
+#         simulated_test_runner.gamecontroller.send_gc_command(
+#             gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN
+#         )
+#         simulated_test_runner.gamecontroller.send_gc_command(
+#             gc_command=Command.Type.FORCE_START, team=SslTeam.BLUE
+#         )
+#
+#         # Force play override here
+#         blue_play = Play()
+#         blue_play.name = PlayName.DefensePlay
+#
+#         yellow_play = Play()
+#         yellow_play.name = PlayName.HaltPlay
+#
+#         simulated_test_runner.blue_full_system_proto_unix_io.send_proto(Play, blue_play)
+#         simulated_test_runner.yellow_full_system_proto_unix_io.send_proto(
+#             Play, yellow_play
+#         )
+#
+#         # Create world state
+#         simulated_test_runner.simulator_proto_unix_io.send_proto(
+#             WorldState,
+#             create_world_state(
+#                 yellow_robot_locations=yellow_bots,
+#                 blue_robot_locations=blue_bots,
+#                 ball_location=ball_initial_pos,
+#                 ball_velocity=tbots_cpp.Vector(0, 0),
+#             ),
+#         )
+#
+#     # Always Validation
+#     always_validation_sequence_set = [
+#         [NeverExcessivelyDribbles()]
+#     ]
+#     # Eventually Validation
+#     eventually_validation_sequence_set = [[]]
+#
+#     if should_dribble:
+#         eventually_validation_sequence_set = [
+#             [
+#                 RobotEventuallyEntersRegion(
+#                     regions=[tbots_cpp.Circle(ball_initial_pos, 0.2)]
+#                 )
+#             ]
+#         ]
+#     else:
+#         always_validation_sequence_set[0].append(
+#             RobotNeverEntersRegion(regions=[tbots_cpp.Circle(ball_initial_pos, 0.2)])
+#         )
+#
+#     simulated_test_runner.run_test(
+#         setup=setup,
+#         params=[0, 1, 2, 3, 4],  # The aggregate test runs 5 times
+#         inv_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         inv_always_validation_sequence_set=always_validation_sequence_set,
+#         ag_eventually_validation_sequence_set=eventually_validation_sequence_set,
+#         ag_always_validation_sequence_set=always_validation_sequence_set,
+#         test_timeout_s=30,
+#     )
+
+
 @pytest.mark.parametrize(
     "blue_bots,yellow_bots,ball_initial_pos,should_dribble",
     [
@@ -106,17 +216,48 @@ from software.simulated_tests.excessive_dribbling import *
                 [
                     tbots_cpp.Point(1, -0.25),
                     tbots_cpp.Point(1, -1.25),
-                    tbots_cpp.Point(2, -0.25),
+                    tbots_cpp.Point(3, -0.25),
+                    tbots_cpp.Point(3, -1.0),
                     tbots_cpp.Point(2, -1.25),
-                    tbots_cpp.Point(2, -1),
                 ],
-                tbots_cpp.Point(1.5, -0.75),
+                tbots_cpp.Point(2.15, -1.0),
                 True
-        )
+        ),
+        (
+                [
+                    tbots_cpp.Point(-3, 1.5),
+                    tbots_cpp.Point(-3, 0.5),
+                    tbots_cpp.Point(-3, -0.5),
+                    tbots_cpp.Point(-3, -1.5),
+                    tbots_cpp.Point(-3, 1),
+                    tbots_cpp.Point(-3, 0.75),
+                ],
+                [
+                    tbots_cpp.Point(1, -0.25),
+                    tbots_cpp.Point(1, -1.25),
+                    tbots_cpp.Point(2, -0.25),
+                    tbots_cpp.Point(2, -1.0),
+                    tbots_cpp.Point(2, -1.25),
+                ],
+                tbots_cpp.Point(2.15, -1.0),
+                True
+        ),
     ],
 )
-def test_defense_play_stagnant_ball(simulated_test_runner, blue_bots, yellow_bots, ball_initial_pos, should_dribble):
+def test_defense_play_stagnant_ball_rotated(
+        simulated_test_runner,
+        blue_bots,
+        yellow_bots,
+        ball_initial_pos,
+        should_dribble):
     def setup(*args):
+        # Game Controller Setup
+        simulated_test_runner.gamecontroller.send_gc_command(
+            gc_command=Command.Type.STOP, team=SslTeam.UNKNOWN
+        )
+        simulated_test_runner.gamecontroller.send_gc_command(
+            gc_command=Command.Type.FORCE_START, team=SslTeam.BLUE
+        )
 
         # Force play override here
         blue_play = Play()
@@ -138,6 +279,7 @@ def test_defense_play_stagnant_ball(simulated_test_runner, blue_bots, yellow_bot
                 blue_robot_locations=blue_bots,
                 ball_location=ball_initial_pos,
                 ball_velocity=tbots_cpp.Vector(0, 0),
+                yellow_robot_orientations=[0] * 5,
             ),
         )
 

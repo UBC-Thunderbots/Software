@@ -28,8 +28,6 @@ struct DefensePlayFSM : public DefensePlayFSMBase
      */
     void defendAgainstThreats(const Update& event);
 
-    bool ballIsStagnant(const Update& event);
-
     auto operator()()
     {
         using namespace boost::sml;
