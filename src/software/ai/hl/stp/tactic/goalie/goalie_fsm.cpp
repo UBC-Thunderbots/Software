@@ -77,11 +77,9 @@ std::vector<Point> GoalieFSM::getIntersectionsBetweenBallVelocityAndFullGoalSegm
     return intersection(ball_ray, full_goal_segment);
 }
 
-Rectangle GoalieFSM::getNoChipRectangle(const Field &field)
+Rectangle GoalieFSM::getChipOriginRectangle(const Field &field)
 {
-    return Rectangle(
-        field.friendlyGoalpostNeg(),
-        field.friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
+    return field.friendlyDefenseArea().shrink(4 * ROBOT_MAX_RADIUS_METERS);
 }
 
 Point GoalieFSM::findGoodChipTarget(
@@ -170,6 +168,31 @@ bool GoalieFSM::panicDone(const Update &event)
            intersections.empty();
 }
 
+bool GoalieFSM::robotInFront(const Update &event)
+{
+    std::vector<Robot> friendly_robots =
+        event.common.world_ptr->friendlyTeam().getAllRobotsExceptGoalie();
+    std::vector<Robot> enemy_robots =
+        event.common.world_ptr->enemyTeam().getAllRobotsExceptGoalie();
+    std::vector<Robot> all_robots;
+    all_robots.reserve(friendly_robots.size() + enemy_robots.size());
+    all_robots.insert(all_robots.end(), friendly_robots.begin(), friendly_robots.end());
+    all_robots.insert(all_robots.end(), enemy_robots.begin(), enemy_robots.end());
+
+    const double robot_in_front_distance_threshold =
+        strategy->getAiConfig()
+            .goalie_tactic_config()
+            .robot_in_front_distance_threshold_meters();
+
+    auto in_front_of_goalie = [&](const Robot &enemy_robot)
+    {
+        return distance(event.common.robot.position(), enemy_robot.position()) <
+               robot_in_front_distance_threshold;
+    };
+
+    return std::any_of(all_robots.begin(), all_robots.end(), in_front_of_goalie);
+}
+
 void GoalieFSM::panic(const Update &event)
 {
     std::vector<Point> intersections =
@@ -182,11 +205,21 @@ void GoalieFSM::panic(const Update &event)
     Angle goalie_orientation =
         (event.common.world_ptr->ball().position() - goalie_pos).orientation();
 
+    TbotsProto::DribblerMode dribbler_mode = TbotsProto::DribblerMode::OFF;
+    AutoChipOrKick auto_chip_or_kick       = {AutoChipOrKickMode::AUTOCHIP,
+                                              YEET_CHIP_DISTANCE_METERS};
+
+    // Don't chip if there's a robot in front of the goalie (to prevent rebounds)
+    if (robotInFront(event))
+    {
+        dribbler_mode     = TbotsProto::DribblerMode::MAX_FORCE;
+        auto_chip_or_kick = {AutoChipOrKickMode::OFF, 0};
+    }
+
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
-        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, dribbler_mode,
+        TbotsProto::BallCollisionType::ALLOW, auto_chip_or_kick));
 }
 
 void GoalieFSM::updatePivotKick(
@@ -195,10 +228,11 @@ void GoalieFSM::updatePivotKick(
 {
     // Ensure that we start our chip away from the no chip zone in front of
     // the goal (prevents accidentally scoring an own goal)
-    double clear_origin_x = getNoChipRectangle(event.common.world_ptr->field()).xMax() +
-                            ROBOT_MAX_RADIUS_METERS;
-    double chip_origin_x =
-        std::max(clear_origin_x, event.common.world_ptr->ball().position().x());
+    Rectangle chip_origin_rect = getChipOriginRectangle(event.common.world_ptr->field());
+    double clear_origin_min_x  = chip_origin_rect.xMin() + ROBOT_MAX_RADIUS_METERS;
+    double clear_origin_max_x  = chip_origin_rect.xMax() - ROBOT_MAX_RADIUS_METERS;
+    double chip_origin_x       = std::clamp(event.common.world_ptr->ball().position().x(),
+                                            clear_origin_min_x, clear_origin_max_x);
     Point chip_origin =
         Point(chip_origin_x, event.common.world_ptr->ball().position().y());
 
@@ -226,11 +260,21 @@ void GoalieFSM::positionToBlock(const Update &event)
     Angle goalie_orientation =
         (event.common.world_ptr->ball().position() - goalie_pos).orientation();
 
+    TbotsProto::DribblerMode dribbler_mode = TbotsProto::DribblerMode::OFF;
+    AutoChipOrKick auto_chip_or_kick       = {AutoChipOrKickMode::AUTOCHIP,
+                                              YEET_CHIP_DISTANCE_METERS};
+
+    // Don't chip if there's a robot in front of the goalie (to prevent rebounds)
+    if (robotInFront(event))
+    {
+        dribbler_mode     = TbotsProto::DribblerMode::MAX_FORCE;
+        auto_chip_or_kick = {AutoChipOrKickMode::OFF, 0};
+    }
+
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, goalie_pos, goalie_orientation, max_allowed_speed_mode,
-        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}));
+        TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE, dribbler_mode,
+        TbotsProto::BallCollisionType::ALLOW, auto_chip_or_kick));
 }
 
 bool GoalieFSM::ballInInflatedDefenseArea(const Update &event)

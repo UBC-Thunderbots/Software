@@ -82,6 +82,19 @@ Rectangle Rectangle::expand(double expansion_amount) const
     return Rectangle(points[0], points[2]);
 }
 
+Rectangle Rectangle::shrink(double inset_amount) const
+{
+    if (inset_amount < 0 || inset_amount > std::max(xLength() / 2, yLength() / 2))
+    {
+        throw std::invalid_argument(
+            "Rectangle::shrink: inset_amount must be non-negative and"
+            "less than or equal to min(xLength / 2, yLength / 2)");
+    }
+
+    return Rectangle(Point(xMin() + inset_amount, yMin() + inset_amount),
+                     Point(xMax() - inset_amount, yMax() - inset_amount));
+}
+
 bool Rectangle::operator==(const Rectangle &p) const
 {
     return negXNegYCorner() == p.negXNegYCorner() && diagonal() == p.diagonal();

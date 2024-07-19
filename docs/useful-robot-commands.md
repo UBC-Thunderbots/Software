@@ -133,11 +133,11 @@ This section refers to setting up the computer on the robot for the first time. 
 
 ### Jetson Nano
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:platform=NANO -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:host_platform=NANO -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 
 ### Raspberry Pi
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:platform=PI -- --playbook setup_raspberry_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 
 ## Robot Diagnostics
 
