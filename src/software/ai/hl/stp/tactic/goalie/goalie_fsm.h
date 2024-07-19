@@ -75,11 +75,13 @@ struct GoalieFSM
         const Ball &ball, const Field &field);
 
     /**
-     * Gets the area within the friendly goalie's no-chip rectangle
+     * Gets the area within the friendly defense area where the goalie should
+     * chip from to avoid own-goals
      *
-     * @return the area within the friendly goalie's no-chip rectangle
+     * @return the area within the friendly defense area where the goalie should
+     * chip from
      */
-    static Rectangle getNoChipRectangle(const Field &field);
+    static Rectangle getChipOriginRectangle(const Field &field);
 
     /**
      * Finds a good point to chip the ball to from its current position
@@ -152,6 +154,15 @@ struct GoalieFSM
      * @return true if the goalie has finished retrieving the ball
      */
     bool retrieveDone(const Update &event);
+
+    /**
+     * Guard that checks if there is a robot nearby and in front of the goalie
+     *
+     * @param event GoalieFSM::Update event
+     *
+     * @return true if there is a robot nearby and in front of the goalie, false otherwise
+     */
+    bool robotInFront(const Update &event);
 
     /**
      * Action that prompts the goalie to leave the crease momentarily to chip the ball
@@ -232,6 +243,7 @@ struct GoalieFSM
             PositionToBlock_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
                 PivotKickSkillFSM_S,
             PositionToBlock_S + Update_E / positionToBlock_A,
+
             DribbleSkillFSM_S + Update_E[retrieveDone_G] / updatePivotKick_A =
                 PivotKickSkillFSM_S,
             DribbleSkillFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
@@ -240,22 +252,26 @@ struct GoalieFSM
                 Update_E[ballInInflatedDefenseArea_G] / retrieveFromDeadZone_A,
             DribbleSkillFSM_S + Update_E[!ballInInflatedDefenseArea_G] /
                                     positionToBlock_A = PositionToBlock_S,
+
             Panic_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
             Panic_S + Update_E[shouldPivotChip_G] / updatePivotKick_A =
                 PivotKickSkillFSM_S,
             Panic_S + Update_E[panicDone_G] / positionToBlock_A = PositionToBlock_S,
             Panic_S + Update_E / panic_A,
+
             PivotKickSkillFSM_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
             PivotKickSkillFSM_S +
                 Update_E[ballInInflatedDefenseArea_G] / updatePivotKick_A,
             PivotKickSkillFSM_S + Update_E[!ballInInflatedDefenseArea_G] /
                                       positionToBlock_A = PositionToBlock_S,
+
             MoveToGoalLine_S + Update_E[shouldMoveToGoalLine_G] / moveToGoalLine_A =
                 MoveToGoalLine_S,
             MoveToGoalLine_S + Update_E[!shouldMoveToGoalLine_G] / positionToBlock_A =
                 PositionToBlock_S,
+
             X + Update_E = X);
     }
 

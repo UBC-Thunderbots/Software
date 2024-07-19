@@ -392,7 +392,7 @@ message GoalieTacticConfig
     // Depth goalie should be at to aggressively narrow the angle the ball has to the
     // goal as it enters the friendly half
     required double aggressive_depth_meters = 6
-        [default = 0.7, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+        [default = 0.45, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
     // Distance in meters to inset the target area for finding chip targets
     required double chip_target_area_inset_meters = 7
         [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
@@ -404,6 +404,10 @@ message GoalieTacticConfig
     // is a safe distance away
     required double safe_distance_multiplier = 9
         [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Threshold distance between a robot and the goalie within which the robot is considered 
+    // in front of the goalie
+    required double robot_in_front_distance_threshold_meters = 10
+        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
 }
 
 message ShotConfig
