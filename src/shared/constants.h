@@ -54,6 +54,8 @@ static const short unsigned int UNUSED_PORT       = 42075;
 // this is an int to avoid Wconversion with lwip
 static const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
 
+static const double PRIORITIZED_ROBOT_COST_TUNE = 0.5;
+
 // This file contains all constants that are shared between our software (AI)
 // and firmware code. Since this needs to be compiled by both C and C++, everything
 // should be defined in a way that's compatible with C.

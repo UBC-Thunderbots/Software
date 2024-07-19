@@ -313,7 +313,8 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
             std::set<int> prioritized_robot_ids = tactic->prioritizedRobotIds();
             if (prioritized_robot_ids.contains(robot.id()))
             {
-                robot_cost_for_tactic *= 0.5;
+                // tune the cost of the prioritized robot so it gets selected more for this tactic
+                robot_cost_for_tactic *= PRIORITIZED_ROBOT_COST_TUNE;
             }
 
             if (robot.hasLastStatusTime())
@@ -321,6 +322,7 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
                 auto time_since_last_status_s = world_ptr->getMostRecentTimestamp() - robot.getLastStatusTime();
                 if (time_since_last_status_s > Duration::fromMilliseconds(DISCONNECT_DURATION_MS))
                 {
+                    // increase the cost arbitrarily to exclude non-responsive robots
                     robot_cost_for_tactic *= 10;
                 }
             }
