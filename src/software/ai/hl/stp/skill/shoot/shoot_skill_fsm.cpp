@@ -10,8 +10,8 @@ bool ShootSkillFSM::shouldAbortShot(const Update& event)
 
     best_shot_ = calcBestShotOnGoal(
         event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
-        event.common.world_ptr->enemyTeam(), event.common.world_ptr->ball().position(),
-        TeamType::ENEMY, {event.common.robot});
+        event.common.world_ptr->enemyTeam(), best_shot_->getOrigin(), TeamType::ENEMY,
+        {event.common.robot});
 
     event.common.set_skill_state({.shot = best_shot_});
 
@@ -62,7 +62,7 @@ void ShootSkillFSM::pivotKick(
         event.common.set_skill_state({.shot = best_shot_});
     }
 
-    Point kick_origin = event.common.world_ptr->ball().position();
+    Point kick_origin = best_shot_->getOrigin();
     Point kick_target = best_shot_->getPointToShootAt();
 
     processEvent(PivotKickSkillFSM::Update(
