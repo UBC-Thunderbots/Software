@@ -674,6 +674,13 @@ message RobotNavigationObstacleConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 0.5
     ];
+
+    // Additional amount to inflate the half-meter around ball obstacle by for extra safety
+    required double additional_half_meter_around_ball_obstacle_inflation_meters = 6 [
+        default                   = 0.15,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 0.5
+    ];
 }
 
 message CostVisualizationConfig
