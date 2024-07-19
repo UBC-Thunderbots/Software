@@ -161,7 +161,7 @@ Thunderloop::~Thunderloop() {}
 [[noreturn]] void Thunderloop::runLoop()
 {
     // Timing
-    struct timespec next_shot;
+    struct timespec time_remaining_in_iteration;
     struct timespec poll_time;
     struct timespec iteration_time;
     struct timespec last_primitive_received_time;
@@ -180,10 +180,12 @@ Thunderloop::~Thunderloop() {}
     int interval =
         static_cast<int>(1.0f / static_cast<float>(loop_hz_) * NANOSECONDS_PER_SECOND);
 
+    time_remaining_in_iteration.tv_nsec = 0;
+    time_remaining_in_iteration.tv_sec = 0;
+
     // Get current time
     // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
     // CLOCK_REALTIME can jump backwards
-    clock_gettime(CLOCK_MONOTONIC, &next_shot);
     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
     clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
     clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
@@ -203,7 +205,8 @@ Thunderloop::~Thunderloop() {}
             //
             // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
             // CLOCK_REALTIME can jump backwards
-            clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
+            // FLag of 0: relative sleep
+            clock_nanosleep(CLOCK_MONOTONIC, 0, &time_remaining_in_iteration, NULL);
 
             FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
 
@@ -404,8 +407,8 @@ Thunderloop::~Thunderloop() {}
                                                   NANOSECONDS_PER_MILLISECOND);
 
         // Calculate next shot taking into account how long this iteration took
-        next_shot.tv_nsec += interval - static_cast<long int>(loop_duration_ns);
-        timespecNorm(next_shot);
+        time_remaining_in_iteration.tv_nsec = interval - static_cast<long int>(loop_duration_ns);
+        timespecNorm(time_remaining_in_iteration);
 
         FrameMarkEnd(TracyConstants::THUNDERLOOP_FRAME_MARKER);
     }
