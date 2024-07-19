@@ -35,7 +35,7 @@ RobotConstants_t create2021RobotConstants(void)
         // Robot's angular movement constants
         .robot_max_ang_speed_rad_per_s          = 10.0f,
         .dribble_max_ang_speed_rad_per_s        = 2.0f,
-        .robot_max_ang_acceleration_rad_per_s_2 = 30.0f,
+        .robot_max_ang_acceleration_rad_per_s_2 = 20.0f,
 
         .wheel_radius_meters                = 0.03f,
         .wheel_rotations_per_motor_rotation = 17.0f / 60.0f};

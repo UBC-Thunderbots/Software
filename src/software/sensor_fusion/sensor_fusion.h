@@ -59,7 +59,7 @@ class SensorFusion
     // between the robot that has the ball is greater than the distance below, then we
     // know that the breakbeam has a problem see for more:
     // https://github.com/UBC-Thunderbots/Software/issues/3197
-    static constexpr double DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION = 0.5;
+    static constexpr double DISTANCE_THRESHOLD_FOR_BREAKBEAM_FAULT_DETECTION = 0.2;
 
    private:
     /**
