@@ -23,6 +23,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 extern "C"
 {
@@ -463,6 +464,18 @@ TbotsProto::MotorStatus MotorService::poll(const TbotsProto::MotorControl& motor
     double dribbler_rpm = static_cast<double>(
         tmc4671ReadThenWriteValue(DRIBBLER_MOTOR_CHIP_SELECT, TMC4671_PID_VELOCITY_ACTUAL,
                                   TMC4671_PID_VELOCITY_TARGET, dribbler_ramp_rpm_));
+
+    static int iter = 0;
+    iter++;
+    if (iter % 10)
+    {
+        LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+                                                            {"vfr", front_right_velocity},
+                                                            {"vfl", front_left_velocity},
+                                                            {"vbr", back_right_velocity},
+                                                            {"vbl", back_left_velocity}
+                                                    });
+    }
 
     // Construct a MotorStatus object with the current velocities and dribbler rpm
     TbotsProto::MotorStatus motor_status =

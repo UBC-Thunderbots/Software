@@ -51,6 +51,16 @@ void PrimitiveExecutor::setStopPrimitive()
 void PrimitiveExecutor::updateVelocity(const Vector &local_velocity,
                                        const AngularVelocity &angular_velocity)
 {
+
+    static int iter2 = 0;
+    iter2++;
+    if (iter2 % 10)
+    {
+        LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+                                                            {"vx", local_velocity.x()},
+                                                            {"vy", local_velocity.y()}
+                                                    });
+    }
     Vector actual_global_velocity = localToGlobalVelocity(local_velocity, orientation_);
     velocity_                     = actual_global_velocity;
     angular_velocity_             = angular_velocity;

@@ -83,8 +83,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
-      primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
-                          TeamColour::YELLOW, robot_id_)
+      primitive_executor_(robot_constants, TeamColour::YELLOW, robot_id_)
 {
     std::optional<std::string> network_test_error;
     ThreadedUdpSender network_test(ROBOT_MULTICAST_CHANNELS.at(channel_id_), UNUSED_PORT,
@@ -290,7 +289,19 @@ Thunderloop::~Thunderloop() {}
                 }
 
                 direct_control_ =
-                    *primitive_executor_.stepPrimitive(time_since_prev_iter_sec, primitive_executor_status_);
+                    *primitive_executor_.stepPrimitive((1.0 / loop_hz_), primitive_executor_status_);
+            }
+
+
+            static int iter3 = 0;
+            iter3++;
+            if (iter3 % 10)
+            {
+                LOG(PLOTJUGGLER) << *createPlotJugglerValue({
+                                                                    {"iter2", iter3},
+                                                                    {"time_since_prev_iter_sec", time_since_prev_iter_sec},
+                                                                    {"hz", loop_hz_}
+                                                            });
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(
