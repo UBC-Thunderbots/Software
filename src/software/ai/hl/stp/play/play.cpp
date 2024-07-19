@@ -310,6 +310,21 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
             double robot_cost_for_tactic =
                 primitives.at(robot.id())->getEstimatedPrimitiveCost();
 
+            std::set<int> prioritized_robot_ids = tactic->prioritizedRobotIds();
+            if (prioritized_robot_ids.contains(robot.id()))
+            {
+                robot_cost_for_tactic *= 0.5;
+            }
+
+            if (robot.hasLastStatusTime())
+            {
+                auto time_since_last_status_s = world_ptr->getMostRecentTimestamp() - robot.getLastStatusTime();
+                if (time_since_last_status_s > Duration::fromSeconds(1))
+                {
+                    robot_cost_for_tactic *= 10;
+                }
+            }
+
             std::set<RobotCapability> required_capabilities =
                 tactic->robotCapabilityRequirements();
             std::set<RobotCapability> robot_capabilities =

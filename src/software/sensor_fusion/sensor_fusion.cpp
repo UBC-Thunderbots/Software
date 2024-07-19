@@ -176,6 +176,8 @@ void SensorFusion::updateWorld(
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
 
+        friendly_team.setLastReceivedStatusTimestamps(robot_status_msg);
+
         if (robot_status_msg.has_power_status() &&
             robot_status_msg.power_status().breakbeam_tripped())
         {

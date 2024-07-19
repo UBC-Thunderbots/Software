@@ -153,6 +153,18 @@ void Team::setUnavailableRobotCapabilities(
     }
 }
 
+void Team::setLastReceivedStatusTimestamps(const TbotsProto::RobotStatus& robot_status)
+{
+    for (Robot& robot : team_robots_)
+    {
+        if (robot.id() == robot_status.robot_id())
+        {
+            robot.setLastStatusTime(Timestamp::fromTimestampProto(robot_status.adjusted_time_sent()));
+            return;
+        }
+    }
+}
+
 std::optional<Robot> Team::getRobotById(const unsigned int id) const
 {
     for (const Robot& robot : team_robots_)

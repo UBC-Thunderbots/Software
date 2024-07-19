@@ -35,6 +35,8 @@ class AttackerTactic : public Tactic
 
     bool done() const override;
 
+    std::set<int> prioritizedRobotIds() const override;
+
     /**
      * Returns whether the AttackerTactic has temporarily suspended execution
      * of its current Skill.
@@ -116,6 +118,8 @@ class AttackerTactic : public Tactic
 
     // Name that identifies the attacker MDP in Thunderscope
     inline static const std::string ATTACKER_MDP_NAME = "Attacker";
+
+    inline static const std::set<int> PRIORITIZED_ROBOT_IDS = {3, 4};
 
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 

@@ -42,6 +42,11 @@ bool AttackerTactic::done() const
            current_skill_->done(*last_execution_robot);
 }
 
+std::set<int> AttackerTactic::prioritizedRobotIds() const 
+{
+    return PRIORITIZED_ROBOT_IDS;
+}
+
 bool AttackerTactic::suspended() const
 {
     return last_execution_robot && current_skill_ &&

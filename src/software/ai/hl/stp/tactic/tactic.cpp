@@ -27,6 +27,11 @@ void Tactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
     this->last_execution_robot = last_execution_robot;
 }
 
+std::set<int> Tactic::prioritizedRobotIds() const
+{
+    return {};
+}
+
 std::map<RobotId, std::shared_ptr<Primitive>> Tactic::get(const WorldPtr &world_ptr)
 {
     TbotsProto::RobotNavigationObstacleConfig obstacle_config;

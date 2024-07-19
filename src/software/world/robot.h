@@ -149,6 +149,12 @@ class Robot
      */
     std::set<RobotCapability> &getMutableRobotCapabilities();
 
+    bool hasLastStatusTime();
+
+    Timestamp getLastStatusTime();
+
+    void setLastStatusTime(Timestamp last_status_timestamp);
+
     /**
      * Returns the robot constants for this robot
      *
@@ -237,6 +243,7 @@ class Robot
     RobotId id_;
     RobotState current_state_;
     Timestamp timestamp_;
+    Timestamp last_status_timestamp_;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapability> unavailable_capabilities_;

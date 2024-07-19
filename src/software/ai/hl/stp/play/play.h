@@ -11,6 +11,8 @@
 #include "software/ai/navigator/trajectory/trajectory_planner.h"
 #include "software/ai/strategy.h"
 
+
+
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
 using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
 

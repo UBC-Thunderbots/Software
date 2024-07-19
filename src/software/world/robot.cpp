@@ -145,6 +145,21 @@ std::set<RobotCapability> Robot::getAvailableCapabilities() const
     return robot_capabilities;
 }
 
+bool Robot::hasLastStatusTime()
+{
+    return last_status_timestamp_ != Timestamp();
+}
+
+Timestamp Robot::getLastStatusTime()
+{
+    return last_status_timestamp_;
+}
+
+void Robot::setLastStatusTime(Timestamp last_status_timestamp) 
+{
+    last_status_timestamp_ = last_status_timestamp;
+}
+
 std::set<RobotCapability> &Robot::getMutableRobotCapabilities()
 {
     return unavailable_capabilities_;

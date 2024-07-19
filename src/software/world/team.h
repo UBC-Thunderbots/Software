@@ -5,6 +5,7 @@
 #include <optional>
 #include <vector>
 
+#include "proto/robot_status_msg.pb.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot.h"
 
@@ -135,6 +136,8 @@ class Team
      * */
     void setUnavailableRobotCapabilities(
         RobotId id, const std::set<RobotCapability>& new_unavailable_robot_capabilities);
+
+    void setLastReceivedStatusTimestamps(const TbotsProto::RobotStatus& robot_status);
 
     /**
      * Returns the robot with the given id. If this team does not have that robot,
