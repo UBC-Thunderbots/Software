@@ -139,7 +139,7 @@ logger = createLogger(__name__)
 
 def test_one_robots_square(field_test_runner):
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
-    use_two_robots = False
+    use_two_robots = True
 
     if len(world.friendly_team.team_robots) <= 0 or use_two_robots and len(world.friendly_team.team_robots) < 2:
         raise Exception("The first world received doesn't have enough robots in it!")
