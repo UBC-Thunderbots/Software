@@ -25,11 +25,11 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
     PriorityTacticVector tactics_to_return = {{}, {}, {}};
     int num_defenders = event.common.num_tactics;
 
+    // No need to check if we have possession since that would trigger OffensePlay automatically
     if (num_defenders >= 1)
     {
         Point current_ball_position = event.common.world_ptr->ball().position();
         const auto clock_time = std::chrono::system_clock::now();
-
         if (distance(enemy_possession_ball_position, current_ball_position)
             >= strategy->getAiConfig().defense_play_config().ball_stagnant_distance_threshold_m())
         {
@@ -62,23 +62,17 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
 
             if (nearest_enemy_to_ball.has_value())
             {
-//                stealer_orientation = Angle::fromDegrees(
-//                        nearest_enemy_to_ball.value().orientation().toDegrees() + 180);
-                stealer_orientation = Angle::fromDegrees(180);
-
-                LOG(DEBUG) << "Nearest Robot: " << nearest_enemy_to_ball.value().id();
-
+                // We want to face opposing the enemy to effectively obtain the ball
+                stealer_orientation = nearest_enemy_to_ball.value().orientation() + Angle::half();
             }
-            LOG(DEBUG) << "Orientation" << stealer_orientation;
-
             DribbleSkillFSM::ControlParams dribble_control_params{
                     .dribble_destination       = event.common.world_ptr->ball().position(),
-                    .final_dribble_orientation = Angle::fromDegrees(180),
+                    .final_dribble_orientation = stealer_orientation,
                     .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL
             };
-            AssignedSkillTactic<DribbleSkill>(strategy).updateControlParams(dribble_control_params);
             num_defenders--;
             auto ball_stealer = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
+            ball_stealer->updateControlParams(dribble_control_params);
             tactics_to_return[0].push_back(ball_stealer);
         }
     }
