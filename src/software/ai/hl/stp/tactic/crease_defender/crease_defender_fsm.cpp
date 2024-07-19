@@ -98,9 +98,7 @@ void CreaseDefenderFSM::blockThreat(
     auto block_threat_point = findBlockThreatPoint(
         event.common.world_ptr->field(), event.control_params.enemy_threat_origin,
         event.control_params.crease_defender_alignment, robot_obstacle_inflation_factor,
-        strategy->getAiConfig()
-            .crease_defender_config()
-            .out_of_field_boundary_x_shift_meters());
+        strategy->getAiConfig().crease_defender_config().out_of_field_boundary_x_shift_meters());
 
     if (contains(inflated_defense_area, event.control_params.enemy_threat_origin))
     {

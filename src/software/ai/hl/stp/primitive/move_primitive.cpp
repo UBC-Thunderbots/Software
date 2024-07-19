@@ -71,7 +71,7 @@ MovePrimitive::generatePrimitiveProtoMessage(
         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
     // Set navigable area to field boundary shrunk by an amount that is a little bit
-    // less than the robot's radius
+    // less than the robot's radius 
     Rectangle field_boundary = world.field().fieldBoundary();
     Rectangle navigable_area =
         Rectangle(Point(field_boundary.xMin() + ROBOT_MAX_RADIUS_METERS - 0.02,
@@ -196,9 +196,8 @@ void MovePrimitive::updateObstacles(
     const RobotNavigationObstacleFactory &obstacle_factory)
 {
     // Separately store the non-robot + non-ball obstacles
-    field_obstacles = obstacle_factory.createObstaclesFromMotionConstraints(
-        motion_constraints, world, robot.velocity().length(),
-        robot.robotConstants().robot_max_speed_m_per_s);
+    field_obstacles =
+        obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world, robot.velocity().length(), robot.robotConstants().robot_max_speed_m_per_s);
 
     obstacles = field_obstacles;
 

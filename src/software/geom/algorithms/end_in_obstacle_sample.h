@@ -25,7 +25,8 @@
  * an obstacle
  */
 std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr>& obstacles,
-                                         Point point, const Rectangle& navigable_area,
+                                         Point point,
+                                         const Rectangle& navigable_area,
                                          int initial_count = 6, double radius_step = 0.15,
                                          int samples_per_radius_step = 2,
                                          double max_search_radius    = 4.0);

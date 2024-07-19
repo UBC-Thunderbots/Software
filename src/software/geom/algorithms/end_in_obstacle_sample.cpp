@@ -1,15 +1,16 @@
 #include "software/geom/algorithms/end_in_obstacle_sample.h"
 
 #include "software/ai/navigator/obstacle/obstacle.hpp"
-#include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/point.h"
+#include "software/geom/algorithms/closest_point.h"
 
 static constexpr double OBSTACLE_AVOIDANCE_BUFFER_CENTIMETERS = 0.01;
 
 
 std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacles,
-                                         Point point, const Rectangle &navigable_area,
+                                         Point point,
+                                         const Rectangle &navigable_area,
                                          int initial_count, double radius_step,
                                          int samples_per_radius_step,
                                          double max_search_radius)

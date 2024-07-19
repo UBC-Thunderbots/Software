@@ -160,8 +160,8 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
     Vector initial_velocity(-1.0, -1.0);
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT;
-    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
-        max_allowed_speed_mode, robot_constants);
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(max_allowed_speed_mode,
+                                                                         robot_constants);
     KinematicConstraints constraints(max_speed,
                                      robot_constants.robot_max_acceleration_m_per_s_2,
                                      robot_constants.robot_max_deceleration_m_per_s_2);
@@ -203,10 +203,9 @@ TEST_P(TrajectoryParamConversionTest, trajectory_params_msg_test)
         *(params.add_sub_destinations()) = sub_destination_proto;
     }
 
-    // TODO: (robocup) update test
+    // TODO: (robocup) update test 
     auto converted_trajectory_path_opt =
-        createTrajectoryPathFromParams(params, Point(), initial_velocity, robot_constants,
-                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        createTrajectoryPathFromParams(params, Point(), initial_velocity, robot_constants, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     ASSERT_TRUE(converted_trajectory_path_opt.has_value());
 
     TrajectoryPath converted_trajectory_path = converted_trajectory_path_opt.value();
