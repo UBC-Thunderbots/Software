@@ -163,7 +163,7 @@ void PassSkillFSM::takePass(
     const Update& event,
     boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
-    Point pass_origin = best_pass_so_far_->pass.passerPoint();
+    Point pass_origin = event.common.world_ptr->ball().position();
     Point pass_target = best_pass_so_far_->pass.receiverPoint();
 
     AutoChipOrKick auto_chip_or_kick;

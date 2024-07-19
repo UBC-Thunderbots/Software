@@ -123,5 +123,16 @@ class Rectangle : public ConvexPolygon
      */
     Rectangle expand(double expansion_amount) const;
 
+    /**
+     * Returns the Rectangle shrunk (inset) in all directions by the inset_amount
+     * 
+     * @param inset_amount a non-negative inset amount
+     * @throw std::invalid_argument if inset_amount is negative or greater than 
+     * min(xLength / 2, yLength / 2)
+     * 
+     * @return a Rectangle shrunk in all directions by the inset_amount
+     */
+    Rectangle shrink(double inset_amount) const;
+
     bool operator==(const Rectangle &p) const;
 };
