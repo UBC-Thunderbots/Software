@@ -174,7 +174,6 @@ cc_library(
     hdrs = ["team.h"],
     deps = [
         ":robot",
-        "//proto:tbots_cc_proto",
         "//software/logger",
     ],
 )

@@ -319,7 +319,7 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
             if (robot.hasLastStatusTime())
             {
                 auto time_since_last_status_s = world_ptr->getMostRecentTimestamp() - robot.getLastStatusTime();
-                if (time_since_last_status_s > Duration::fromSeconds(1))
+                if (time_since_last_status_s > Duration::fromMilliseconds(DISCONNECT_DURATION_MS))
                 {
                     robot_cost_for_tactic *= 10;
                 }
