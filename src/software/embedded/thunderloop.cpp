@@ -292,7 +292,7 @@ Thunderloop::~Thunderloop() {}
                 }
 
                 direct_control_ =
-                    *primitive_executor_.stepPrimitive((1.0 / loop_hz_), primitive_executor_status_);
+                    *primitive_executor_.stepPrimitive(time_since_prev_iter_sec, primitive_executor_status_);
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(
