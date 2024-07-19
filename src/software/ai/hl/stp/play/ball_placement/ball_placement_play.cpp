@@ -19,7 +19,18 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 void BallPlacementPlay::updateTactics(const PlayUpdate &play_update)
 {
-    fsm->process_event(BallPlacementPlayFSM::Update(control_params, play_update));
+    auto event = BallPlacementPlayFSM::Update(control_params, play_update);
+    fsm->process_event(event);
+
+    auto placement_point = event.common.world_ptr->gameState().getBallPlacementPoint();
+    if (placement_point.has_value())
+    {
+        TbotsProto::BallPlacementVisualization ball_placement_vis_msg;
+         *(ball_placement_vis_msg.mutable_ball_placement_point()) =
+            *createPointProto(placement_point.value());
+
+        LOG(VISUALIZE) << ball_placement_vis_msg;
+    }
 }
 
 std::vector<std::string> BallPlacementPlay::getState()

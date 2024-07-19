@@ -70,6 +70,16 @@ py_library(
 )
 
 py_library(
+    name = "gl_ball_placement_layer",
+    srcs = ["gl_ball_placement_layer.py"],
+    deps = [
+        ":gl_layer",
+        "//software/thunderscope/gl/graphics:gl_circle",
+        requirement("pyqtgraph"),
+    ],
+)
+
+py_library(
     name = "gl_world_layer",
     srcs = ["gl_world_layer.py"],
     deps = [

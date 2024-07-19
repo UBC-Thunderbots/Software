@@ -21,6 +21,7 @@ from software.thunderscope.gl.layers import (
     gl_validation_layer,
     gl_passing_layer,
     gl_attacker_layer,
+    gl_ball_placement_layer,
     gl_sandbox_world_layer,
     gl_world_layer,
     gl_debug_shapes_layer,
@@ -110,6 +111,9 @@ def setup_gl_widget(
     attacker_layer = gl_attacker_layer.GLAttackerLayer(
         "Attacker Tactic", visualization_buffer_size
     )
+    ball_placement_layer = gl_ball_placement_layer.GLBallPlacementLayer(
+        "Ball Placement Layer", visualization_buffer_size
+    )
     cost_vis_layer = gl_cost_vis_layer.GLCostVisLayer(
         "Passing Cost", visualization_buffer_size
     )
@@ -140,6 +144,7 @@ def setup_gl_widget(
     gl_widget.add_layer(obstacle_layer)
     gl_widget.add_layer(passing_layer)
     gl_widget.add_layer(attacker_layer)
+    gl_widget.add_layer(ball_placement_layer)
     gl_widget.add_layer(cost_vis_layer, False)
     gl_widget.add_layer(tactic_layer, False)
     gl_widget.add_layer(validation_layer)
@@ -186,6 +191,7 @@ def setup_gl_widget(
         (PathVisualization, path_layer.path_visualization_buffer),
         (PassVisualization, passing_layer.pass_visualization_buffer),
         (AttackerVisualization, attacker_layer.attacker_vis_buffer),
+        (BallPlacementVisualization, ball_placement_layer.ball_placement_vis_buffer),
         (World, tactic_layer.world_buffer),
         (PlayInfo, tactic_layer.play_info_buffer),
         (ValidationProtoSet, validation_layer.validation_set_buffer),

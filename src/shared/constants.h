@@ -81,6 +81,10 @@ static const double BALL_MAX_RADIUS_METERS = 0.0215;
 // cover more than 20% of the ball
 static const double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
 
+static const double BALL_PLACEMENT_TOLERANCE_RADIUS_METERS = 0.15;
+static const double BALL_PLACEMENT_ROBOT_AVOID_RADIUS_METERS = 0.5;
+static const double BALL_PLACEMENT_TIME_LIMIT_S = 30;
+
 // The mass of a standard golf ball, as defined by https://en.wikipedia.org/wiki/Golf_ball
 constexpr double BALL_MASS_KG = 0.004593;
 // The max allowed speed of the robot when the stop command is issued, in meters per
