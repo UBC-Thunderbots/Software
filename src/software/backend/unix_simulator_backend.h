@@ -51,8 +51,7 @@ class UnixSimulatorBackend : public Backend, public Subject<TbotsProto::Thunderb
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotLog>> robot_log_listener;
     std::unique_ptr<ThreadedProtoUnixListener<TbotsProto::RobotCrash>>
         robot_crash_listener;
-    std::unique_ptr<ThreadedProtoUnixListener<RobotStatistic>>
-        robot_statistic_listener;
+    std::unique_ptr<ThreadedProtoUnixListener<RobotStatistic>> robot_statistic_listener;
 
     // Outputs
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::World>> world_output;

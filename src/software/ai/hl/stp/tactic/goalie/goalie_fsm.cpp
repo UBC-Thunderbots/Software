@@ -184,8 +184,7 @@ bool GoalieFSM::robotInFront(const Update &event)
             .goalie_tactic_config()
             .robot_in_front_distance_threshold_meters();
 
-    auto in_front_of_goalie = [&](const Robot &enemy_robot)
-    {
+    auto in_front_of_goalie = [&](const Robot &enemy_robot) {
         return distance(event.common.robot.position(), enemy_robot.position()) <
                robot_in_front_distance_threshold;
     };
@@ -207,7 +206,7 @@ void GoalieFSM::panic(const Update &event)
 
     TbotsProto::DribblerMode dribbler_mode = TbotsProto::DribblerMode::OFF;
     AutoChipOrKick auto_chip_or_kick       = {AutoChipOrKickMode::AUTOCHIP,
-                                              YEET_CHIP_DISTANCE_METERS};
+                                        YEET_CHIP_DISTANCE_METERS};
 
     // Don't chip if there's a robot in front of the goalie (to prevent rebounds)
     if (robotInFront(event))
@@ -232,7 +231,7 @@ void GoalieFSM::updatePivotKick(
     double clear_origin_min_x  = chip_origin_rect.xMin() + ROBOT_MAX_RADIUS_METERS;
     double clear_origin_max_x  = chip_origin_rect.xMax() - ROBOT_MAX_RADIUS_METERS;
     double chip_origin_x       = std::clamp(event.common.world_ptr->ball().position().x(),
-                                            clear_origin_min_x, clear_origin_max_x);
+                                      clear_origin_min_x, clear_origin_max_x);
     Point chip_origin =
         Point(chip_origin_x, event.common.world_ptr->ball().position().y());
 
@@ -262,7 +261,7 @@ void GoalieFSM::positionToBlock(const Update &event)
 
     TbotsProto::DribblerMode dribbler_mode = TbotsProto::DribblerMode::OFF;
     AutoChipOrKick auto_chip_or_kick       = {AutoChipOrKickMode::AUTOCHIP,
-                                              YEET_CHIP_DISTANCE_METERS};
+                                        YEET_CHIP_DISTANCE_METERS};
 
     // Don't chip if there's a robot in front of the goalie (to prevent rebounds)
     if (robotInFront(event))

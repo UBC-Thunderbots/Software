@@ -316,11 +316,8 @@ message PassingConfig
 
     /*****  PassSkill parameters *****/
     // The absolute minimum pass quality we're willing to attempt
-    required double abs_min_pass_score = 27 [
-        default                   = 0.0,
-        (bounds).min_double_value = 0.0,
-        (bounds).max_double_value = 1.0
-    ];
+    required double abs_min_pass_score = 27
+        [default = 0.0, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
     // The minimum pass quality we're willing to attempt before ramping down the
     // score to abs_min_pass_score
     required double min_perfect_pass_score = 28 [
@@ -391,8 +388,11 @@ message GoalieTacticConfig
         [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
     // Depth goalie should be at to aggressively narrow the angle the ball has to the
     // goal as it enters the friendly half
-    required double aggressive_depth_meters = 6
-        [default = 0.45, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+    required double aggressive_depth_meters = 6 [
+        default                   = 0.45,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 2.0
+    ];
     // Distance in meters to inset the target area for finding chip targets
     required double chip_target_area_inset_meters = 7
         [default = 0.3, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
@@ -404,10 +404,13 @@ message GoalieTacticConfig
     // is a safe distance away
     required double safe_distance_multiplier = 9
         [default = 2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
-    // Threshold distance between a robot and the goalie within which the robot is considered 
-    // in front of the goalie
-    required double robot_in_front_distance_threshold_meters = 10
-        [default = 0.4, (bounds).min_double_value = 0.0, (bounds).max_double_value = 10.0];
+    // Threshold distance between a robot and the goalie within which the robot is
+    // considered in front of the goalie
+    required double robot_in_front_distance_threshold_meters = 10 [
+        default                   = 0.4,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 10.0
+    ];
 }
 
 message ShotConfig
@@ -679,7 +682,8 @@ message RobotNavigationObstacleConfig
         (bounds).max_double_value = 0.5
     ];
 
-    // Additional amount to inflate the half-meter around ball obstacle by for extra safety
+    // Additional amount to inflate the half-meter around ball obstacle by for extra
+    // safety
     required double additional_half_meter_around_ball_obstacle_inflation_meters = 6 [
         default                   = 0.30,
         (bounds).min_double_value = 0.0,

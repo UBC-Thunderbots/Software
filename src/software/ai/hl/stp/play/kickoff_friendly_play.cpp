@@ -111,13 +111,13 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         PriorityTacticVector result = {{}};
 
-        Point kick_target = world_ptr->field().enemyGoalCenter();
+        Point kick_target             = world_ptr->field().enemyGoalCenter();
         std::optional<Shot> best_shot = calcBestShotOnGoal(
             world_ptr->field(), world_ptr->friendlyTeam(), world_ptr->enemyTeam(),
             world_ptr->ball().position(), TeamType::ENEMY);
         if (best_shot.has_value())
         {
-            kick_target = best_shot->getPointToShootAt(); 
+            kick_target = best_shot->getPointToShootAt();
         }
 
         Point kick_origin = world_ptr->ball().position();

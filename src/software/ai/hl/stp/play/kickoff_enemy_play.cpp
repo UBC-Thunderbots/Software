@@ -98,7 +98,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
             getAllEnemyThreats(world_ptr->field(), world_ptr->friendlyTeam(),
                                world_ptr->enemyTeam(), world_ptr->ball(), false);
 
-        // We can only shadow enemy threats on our side of the field        
+        // We can only shadow enemy threats on our side of the field
         std::vector<EnemyThreat> filtered_enemy_threats;
         std::copy_if(all_enemy_threats.begin(), all_enemy_threats.end(),
                      std::back_inserter(filtered_enemy_threats),

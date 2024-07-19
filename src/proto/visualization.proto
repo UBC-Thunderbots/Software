@@ -43,7 +43,7 @@ message AttackerVisualization
 
 message BallPlacementVisualization
 {
-    Point ball_placement_point     = 1; 
+    Point ball_placement_point = 1;
 }
 
 message CostVisualization

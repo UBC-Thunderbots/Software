@@ -52,8 +52,7 @@ UnixSimulatorBackend::UnixSimulatorBackend(
         runtime_dir + ROBOT_CRASH_PATH, [](TbotsProto::RobotCrash& v) {}, proto_logger));
 
     robot_statistic_listener.reset(new ThreadedProtoUnixListener<RobotStatistic>(
-        runtime_dir + ROBOT_STATISTIC_PATH, [](RobotStatistic& v) {},
-        proto_logger));
+        runtime_dir + ROBOT_STATISTIC_PATH, [](RobotStatistic& v) {}, proto_logger));
 
     // Protobuf Outputs
     world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(

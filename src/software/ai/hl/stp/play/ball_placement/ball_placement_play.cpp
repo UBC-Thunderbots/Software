@@ -26,7 +26,7 @@ void BallPlacementPlay::updateTactics(const PlayUpdate &play_update)
     if (placement_point.has_value())
     {
         TbotsProto::BallPlacementVisualization ball_placement_vis_msg;
-         *(ball_placement_vis_msg.mutable_ball_placement_point()) =
+        *(ball_placement_vis_msg.mutable_ball_placement_point()) =
             *createPointProto(placement_point.value());
 
         LOG(VISUALIZE) << ball_placement_vis_msg;

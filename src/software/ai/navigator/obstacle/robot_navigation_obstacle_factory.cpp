@@ -13,7 +13,8 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
-    const TbotsProto::MotionConstraint &motion_constraint, const World &world, const double curr_robot_speed, const double max_robot_speed) const
+    const TbotsProto::MotionConstraint &motion_constraint, const World &world,
+    const double curr_robot_speed, const double max_robot_speed) const
 {
     std::vector<ObstaclePtr> obstacles;
     const Field &field = world.field();
@@ -28,7 +29,8 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
         {
             obstacles.push_back(createFromFieldRectangle(
                 field.enemyDefenseArea(), field.fieldLines(), field.fieldBoundary(),
-                config.enemy_defense_area_additional_inflation_meters() * (curr_robot_speed / max_robot_speed)));
+                config.enemy_defense_area_additional_inflation_meters() *
+                    (curr_robot_speed / max_robot_speed)));
         }
         break;
         case TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA:
@@ -144,14 +146,14 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
 
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
-    const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-    const World &world, const double curr_robot_speed, const double max_robot_speed) const
+    const std::set<TbotsProto::MotionConstraint> &motion_constraints, const World &world,
+    const double curr_robot_speed, const double max_robot_speed) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)
     {
-        auto new_obstacles =
-            createObstaclesFromMotionConstraint(motion_constraint, world, curr_robot_speed, max_robot_speed);
+        auto new_obstacles = createObstaclesFromMotionConstraint(
+            motion_constraint, world, curr_robot_speed, max_robot_speed);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 

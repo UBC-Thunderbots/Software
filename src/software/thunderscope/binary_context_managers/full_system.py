@@ -183,6 +183,7 @@ gdb --args bazel-bin/{self.full_system}
             PathVisualization,
             PassVisualization,
             AttackerVisualization,
+            BallPlacementVisualization,
             CostVisualization,
             NamedValue,
             PlayInfo,
