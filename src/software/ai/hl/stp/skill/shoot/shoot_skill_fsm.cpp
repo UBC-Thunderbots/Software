@@ -14,7 +14,6 @@ bool ShootSkillFSM::shouldAbortShot(const Update& event)
         {event.common.robot});
 
     return !shot ||
-           event.common.world_ptr->field().pointInFriendlyHalf(shot->getOrigin()) ||
            shot->getOpenAngle().toDegrees() < event.common.strategy->getAiConfig()
                                                   .shot_config()
                                                   .abs_min_open_angle_for_shot_deg();
