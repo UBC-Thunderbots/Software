@@ -647,6 +647,12 @@ message DefensePlayConfig
 
     // The DefenderAssignmentConfig for tuning defender assignments
     required DefenderAssignmentConfig defender_assignment_config = 2;
+    // determines the distance threshold for what is considered a "stagnant ball"
+    required double ball_stagnant_distance_threshold_m = 3
+        [default = 0.2, (bounds).min_double_value = 0.0, (bounds).max_double_value = 1.0];
+    // determines the duration threshold for what is considered a "stagnant ball"
+    required double ball_stagnant_time_threshold_s = 4
+        [default = 3.0, (bounds).min_double_value = 0.01, (bounds).max_double_value = 10.0];
 }
 
 message RobotNavigationObstacleConfig

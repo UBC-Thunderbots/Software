@@ -26,6 +26,7 @@ cc_library(
         "//software/logger",
         "//software/util/generic_factory",
         "@sml",
+        "//software/ai/hl/stp/tactic/assigned_skill:assigned_skill_tactic"
     ],
     alwayslink = True,
 )

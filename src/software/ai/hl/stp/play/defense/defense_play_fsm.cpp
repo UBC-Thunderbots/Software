@@ -22,12 +22,50 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
     {
         return;
     }
+    PriorityTacticVector tactics_to_return = {{}, {}, {}};
+    int num_defenders = event.common.num_tactics;
+
+    if (event.common.world_ptr->getTeamWithPossession() == TeamPossession::ENEMY && num_defenders >= 1)
+    {
+        Point current_ball_position = event.common.world_ptr->ball().position();
+        const auto clock_time = std::chrono::system_clock::now();
+
+        if (distance(enemy_possession_ball_position, current_ball_position)
+            >= strategy->getAiConfig().defense_play_config().ball_stagnant_distance_threshold_m())
+        {
+            // Reset the ball's possible stagnant location when it moves out of its threshold radius
+            // and reset the initial time for a possible stagnant ball
+            enemy_possession_ball_position = current_ball_position;
+            enemy_possession_epoch_time_s =
+                    static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
+                            clock_time.time_since_epoch())
+                            .count()) *
+                    SECONDS_PER_MICROSECOND;
+        }
+        double epoch_time_in_seconds =
+                static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
+                        clock_time.time_since_epoch())
+                        .count()) *
+                SECONDS_PER_MICROSECOND;
+
+        double ball_displacement_m =
+                distance(event.common.world_ptr->ball().position(), enemy_possession_ball_position);
+        if (enemy_possession_epoch_time_s - epoch_time_in_seconds
+            >= strategy->getAiConfig().defense_play_config().ball_stagnant_time_threshold_s()
+            && ball_displacement_m <= strategy->getAiConfig().defense_play_config().ball_stagnant_distance_threshold_m())
+        {
+            // Ball is defined as "stagnant" due to no progress
+            num_defenders--;
+            auto ball_stealer = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
+            tactics_to_return[0].push_back(ball_stealer);
+        }
+    }
 
     // Choose which defender assignments to assign defenders to based on number
     // of tactics available to set
     std::vector<DefenderAssignment> crease_defender_assignments;
     std::vector<DefenderAssignment> pass_defender_assignments;
-    for (unsigned int i = 0; i < event.common.num_tactics; i++)
+    for (unsigned int i = 0; i < num_defenders; i++)
     {
         DefenderAssignment defender_assignment;
         if (i < assignments.size())
@@ -69,10 +107,9 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
     updatePassDefenderControlParams(pass_defender_assignments,
                                     TbotsProto::BallStealMode::STEAL);
 
-    PriorityTacticVector tactics_to_return = {{}, {}};
-    tactics_to_return[0].insert(tactics_to_return[0].end(), crease_defenders.begin(),
+    tactics_to_return[1].insert(tactics_to_return[1].end(), crease_defenders.begin(),
                                 crease_defenders.end());
-    tactics_to_return[1].insert(tactics_to_return[1].end(), pass_defenders.begin(),
+    tactics_to_return[2].insert(tactics_to_return[2].end(), pass_defenders.begin(),
                                 pass_defenders.end());
     event.common.set_tactics(tactics_to_return);
 }
