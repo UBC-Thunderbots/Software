@@ -310,6 +310,13 @@ Play::assignTactics(const WorldPtr &world_ptr, TacticVector tactic_vector,
             double robot_cost_for_tactic =
                 primitives.at(robot.id())->getEstimatedPrimitiveCost();
 
+            std::unordered_map<unsigned int, double> assignment_cost_overrides = tactic->robotAssignmentCostsOverride();
+            if (assignment_cost_overrides.contains(robot.id()))
+            {
+                // tune the cost of the prioritized robot so it gets selected more for this tactic
+                robot_cost_for_tactic *= assignment_cost_overrides.at(robot.id());
+            }
+
             std::set<RobotCapability> required_capabilities =
                 tactic->robotCapabilityRequirements();
             std::set<RobotCapability> robot_capabilities =

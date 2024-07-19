@@ -54,6 +54,8 @@ class Tactic
      */
     virtual bool done() const = 0;
 
+    virtual std::unordered_map<unsigned int, double> robotAssignmentCostsOverride() const;
+
     /**
      * Gets the FSM state of the tactic
      *

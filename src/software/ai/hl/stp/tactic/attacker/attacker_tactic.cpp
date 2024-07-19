@@ -42,6 +42,20 @@ bool AttackerTactic::done() const
            current_skill_->done(*last_execution_robot);
 }
 
+std::unordered_map<unsigned int, double> AttackerTactic::robotAssignmentCostsOverride() const 
+{
+    auto base_costs = Tactic::robotAssignmentCostsOverride();
+    for (auto &[id, cost_override] : base_costs)
+    {
+        if (ROBOT_ASSIGNMENT_COSTS_OVERRIDE.contains(id))
+        {
+            base_costs[id] = ROBOT_ASSIGNMENT_COSTS_OVERRIDE.at(id);
+        }
+    }
+
+    return base_costs;
+}
+
 bool AttackerTactic::suspended() const
 {
     return last_execution_robot && current_skill_ &&

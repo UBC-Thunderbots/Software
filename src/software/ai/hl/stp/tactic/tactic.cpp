@@ -27,6 +27,14 @@ void Tactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
     this->last_execution_robot = last_execution_robot;
 }
 
+std::unordered_map<unsigned int, double> Tactic::robotAssignmentCostsOverride() const
+{
+    return {
+        {0, 1.0}, {1, 1.0}, {2, 1.0}, {3, 1.0},
+        {4, 1.0}, {5, 1.0}, {6, 1.0}, {7, 1.0}
+    };
+}
+
 std::map<RobotId, std::shared_ptr<Primitive>> Tactic::get(const WorldPtr &world_ptr)
 {
     TbotsProto::RobotNavigationObstacleConfig obstacle_config;

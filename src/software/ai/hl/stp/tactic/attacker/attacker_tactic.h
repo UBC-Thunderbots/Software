@@ -35,6 +35,8 @@ class AttackerTactic : public Tactic
 
     bool done() const override;
 
+    std::unordered_map<unsigned int, double> robotAssignmentCostsOverride() const override;
+
     /**
      * Returns whether the AttackerTactic has temporarily suspended execution
      * of its current Skill.
@@ -116,6 +118,8 @@ class AttackerTactic : public Tactic
 
     // Name that identifies the attacker MDP in Thunderscope
     inline static const std::string ATTACKER_MDP_NAME = "Attacker";
+
+    inline static const std::unordered_map<unsigned int, double> ROBOT_ASSIGNMENT_COSTS_OVERRIDE = {};
 
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
