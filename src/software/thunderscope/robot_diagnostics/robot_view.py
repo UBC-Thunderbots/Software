@@ -134,6 +134,7 @@ class RobotView(QScrollArea):
         Until the buffer is empty
         """
         robot_status = self.robot_status_buffer.get(block=False, return_cached=False)
+        print(robot_status)
         round_trip_time = self.round_trip_time_buffer.get(
             block=False, return_cached=False
         )

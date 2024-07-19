@@ -137,7 +137,7 @@ class Team
     void setUnavailableRobotCapabilities(
         RobotId id, const std::set<RobotCapability>& new_unavailable_robot_capabilities);
 
-    void setLastReceivedStatusTimestamps(const TbotsProto::RobotStatus& robot_status);
+    void setLastReceivedStatusTimestamps(const TbotsProto::RobotStatus& robot_status, Timestamp time_received);
 
     /**
      * Returns the robot with the given id. If this team does not have that robot,

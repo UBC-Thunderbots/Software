@@ -349,7 +349,11 @@ def configure_two_ai_gamecontroller_view(
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
                     sandbox_mode=True,
-                    extra_widgets=[],
+                    extra_widgets=[
+                        configure_robot_view_fullsystem(
+                            proto_unix_io_map[ProtoUnixIOTypes.BLUE]
+                        )
+                    ],
                     refresh_func_counter=blue_refresh_func_frametime_counter,
                     buffer_func_counter=blue_buffer_func_frametime_counter,
                 ),
@@ -366,7 +370,11 @@ def configure_two_ai_gamecontroller_view(
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
                     sandbox_mode=True,
-                    extra_widgets=[],
+                    extra_widgets=[
+                        configure_robot_view_fullsystem(
+                            proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
+                        )
+                    ],
                     buffer_func_counter=yellow_buffer_func_frametime_counter,
                     refresh_func_counter=yellow_refresh_func_frametime_counter,
                 ),
