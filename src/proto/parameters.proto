@@ -476,7 +476,7 @@ message DribbleConfig
     // of the ball. This is used to avoid the robot from trying to get possession of the
     // ball when it is turning too fast.
     required double max_robot_angular_vel_when_getting_possession_deg_per_s = 8 [
-        default                   = 40.0,
+        default                   = 80.0,
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 180.0
     ];

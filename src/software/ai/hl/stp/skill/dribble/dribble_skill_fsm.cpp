@@ -37,10 +37,10 @@ Point DribbleSkillFSM::findInterceptionPoint(
         bool dribbler_aligned_with_ball =
             contains(infront_of_dribbler_polygon, ball.position());
         bool robot_turning_too_fast =
-            robot.angularVelocity().toDegrees() >
+            std::abs(robot.angularVelocity().toDegrees()) >
             dribble_config.max_robot_angular_vel_when_getting_possession_deg_per_s();
 
-        double offset_to_ball = 0.0;
+        double offset_to_ball = -0.02;
         if (!dribbler_aligned_with_ball || robot_turning_too_fast)
         {
             // The ball is not infront of the robot, or the robot is turning too fast
