@@ -77,6 +77,13 @@ struct PlaySelectionFSM
      */
     void terminateOffensePlay(const Update& event);
 
+    /**
+     * Guard to determine if the ball is in a stagnant state
+     *
+     * @param event The PlaySelection::Update event
+     */
+    bool ballIsStagnant(const Update& event);
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -92,6 +99,7 @@ struct PlaySelectionFSM
         DEFINE_SML_GUARD(gameStatePlaying)
         DEFINE_SML_GUARD(gameStateSetupRestart)
         DEFINE_SML_GUARD(enemyHasPossession)
+        DEFINE_SML_GUARD(ballIsStagnant)
 
         DEFINE_SML_EVENT(Update)
 
@@ -131,7 +139,7 @@ struct PlaySelectionFSM
             OffensePlayState_S + Update_E[gameStateSetupRestart_G] /
                                      (terminateOffensePlay_A, setupSetPlay_A) =
                 SetPlayState_S,
-            OffensePlayState_S + Update_E[enemyHasPossession_G] /
+            OffensePlayState_S + Update_E[enemyHasPossession_G && !ballIsStagnant_G] /
                                      (terminateOffensePlay_A, setupDefensePlay_A) =
                 DefensePlayState_S,
 
@@ -142,6 +150,8 @@ struct PlaySelectionFSM
             DefensePlayState_S + Update_E[gameStateSetupRestart_G] / setupSetPlay_A =
                 SetPlayState_S,
             DefensePlayState_S + Update_E[!enemyHasPossession_G] / setupOffensePlay_A =
+                OffensePlayState_S,
+            DefensePlayState_S + Update_E[ballIsStagnant_G] / setupOffensePlay_A =
                 OffensePlayState_S,
 
             SetPlayState_S + Update_E[gameStateHalted_G] /
@@ -163,4 +173,6 @@ struct PlaySelectionFSM
     std::shared_ptr<Strategy> strategy_;
     std::shared_ptr<OffensePlay> offense_play_;
     std::optional<TbotsProto::PlayName> current_set_play_;
+    Point enemy_possession_ball_position;
+    double enemy_possession_epoch_time_s;
 };
