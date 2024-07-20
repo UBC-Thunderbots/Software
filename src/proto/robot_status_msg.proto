@@ -5,6 +5,7 @@ package TbotsProto;
 import "proto/tbots_timestamp_msg.proto";
 import "proto/geneva_slot.proto";
 import "proto/geometry.proto";
+import "proto/primitive.proto";
 
 message RobotStatus
 {
@@ -25,6 +26,7 @@ message RobotStatus
 message PrimitiveExecutorStatus
 {
     bool running_primitive = 1;
+    MotorControl.DirectVelocityControl commanded_control = 2;
 }
 
 message ThunderloopStatus
