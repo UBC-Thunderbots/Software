@@ -29,8 +29,8 @@ class NetworkService
      * we should join the group
      */
     NetworkService(const std::string& ip_address, unsigned short primitive_listener_port,
-                   unsigned short robot_status_sender_port, const std::string& interface,
-                   bool multicast);
+                   unsigned short robot_status_sender_port, unsigned short robot_broadcast_port,
+                   const std::string& interface, bool multicast, int robot_id);
 
     /**
      * When the network service is polled, it sends the robot_status and returns
@@ -95,6 +95,7 @@ class NetworkService
         udp_listener_primitive;
     std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::Primitive>>
         radio_listener_primitive;
+    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotBroadcast>> robot_broadcast_sender;
 
     std::optional<std::string> full_system_ip_address;
     std::string interface;
@@ -125,4 +126,7 @@ class NetworkService
     };
 
     std::deque<RoundTripTime> primitive_rtt;
+
+    bool is_communication_established;
+    int robot_id;
 };

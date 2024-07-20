@@ -438,6 +438,7 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");
     declareThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>(m, "SSLWrapperPacket");
     declareThreadedProtoUdpListener<TbotsProto::RobotCrash>(m, "RobotCrash");
+    declareThreadedProtoUdpListener<TbotsProto::RobotBroadcast>(m, "RobotBroadcast");
 
     // Senders
     declareThreadedProtoUdpSender<TbotsProto::Primitive>(m, "Primitive");

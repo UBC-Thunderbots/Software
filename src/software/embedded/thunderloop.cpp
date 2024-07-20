@@ -28,7 +28,7 @@ extern int clock_nanosleep(clockid_t __clock_id, int __flags,
 // signal handling is done by csignal which requires a function pointer with C linkage
 extern "C"
 {
-    static MotorService* g_motor_service         = NULL;
+    //static MotorService* g_motor_service         = NULL;
     static TbotsProto::RobotStatus* robot_status = NULL;
     static int channel_id;
     static std::string network_interface;
@@ -41,7 +41,7 @@ extern "C"
      */
     void tbotsExit(int signal_num)
     {
-        g_motor_service->resetMotorBoard();
+        //g_motor_service->resetMotorBoard();
 
         // by now g3log may have died due to the termination signal, so it isn't reliable
         // to log messages
@@ -121,7 +121,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     std::cout << "Thunderloop connected to network!" << std::endl;
 
     g3::overrideSetupSignals({});
-    LoggerSingleton::initializeLogger("/tmp/robot_logs", nullptr);
+    NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface, robot_id_,
+                                             enable_log_merging);
 
     // catch all catch-able signals
     std::signal(SIGSEGV, tbotsExit);
@@ -142,17 +143,17 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
 
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS.at(channel_id_)), PRIMITIVE_PORT,
-        ROBOT_STATUS_PORT, network_interface, true);
+        ROBOT_STATUS_PORT, ROBOT_BROADCAST_PORT, network_interface, true, robot_id);
     LOG(INFO)
         << "THUNDERLOOP: Network Service initialized! Next initializing Power Service";
 
-    power_service_ = std::make_unique<PowerService>();
+    //power_service_ = std::make_unique<PowerService>();
     LOG(INFO)
         << "THUNDERLOOP: Power Service initialized! Next initializing Motor Service";
 
-    motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
-    g_motor_service = motor_service_.get();
-    motor_service_->setup();
+    //motor_service_  = std::make_unique<MotorService>(robot_constants, loop_hz);
+    //g_motor_service = motor_service_.get();
+    //motor_service_->setup();
     LOG(INFO) << "THUNDERLOOP: Motor Service initialized!";
 
     LOG(INFO) << "THUNDERLOOP: finished initialization with ROBOT ID: " << robot_id_
@@ -314,9 +315,9 @@ Thunderloop::~Thunderloop() {}
                 ZoneNamedN(_tracy_power_service_poll, "Thunderloop: Poll PowerService",
                            true);
 
-                power_status_ =
-                    power_service_->poll(direct_control_.power_control(), kick_coeff_,
-                                         kick_constant_, chip_pulse_width_);
+                //power_status_ =
+                //    power_service_->poll(direct_control_.power_control(), kick_coeff_,
+                //                         kick_constant_, chip_pulse_width_);
             }
             thunderloop_status_.set_power_service_poll_time_ms(
                 getMilliseconds(poll_time));
@@ -361,8 +362,8 @@ Thunderloop::~Thunderloop() {}
                 ScopedTimespecTimer timer(&poll_time);
 
                 ZoneNamedN(_tracy_motor_service, "Thunderloop: Poll MotorService", true);
-                motor_status_ = motor_service_->poll(direct_control_.motor_control(),
-                                                     time_since_prev_iter_sec);
+                //motor_status_ = motor_service_->poll(direct_control_.motor_control(),
+                //                                     time_since_prev_iter_sec);
             }
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
@@ -376,7 +377,7 @@ Thunderloop::~Thunderloop() {}
             robot_status_.set_last_handled_primitive_set(last_handled_primitive_set);
             *(robot_status_.mutable_time_sent())             = time_sent_;
             *(robot_status_.mutable_thunderloop_status())    = thunderloop_status_;
-            *(robot_status_.mutable_motor_status())          = motor_status_.value();
+            //*(robot_status_.mutable_motor_status())          = motor_status_.value();
             *(robot_status_.mutable_power_status())          = power_status_;
             *(robot_status_.mutable_jetson_status())         = jetson_status_;
             *(robot_status_.mutable_network_status())        = network_status_;

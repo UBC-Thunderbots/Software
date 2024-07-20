@@ -6,6 +6,12 @@ import "proto/tbots_timestamp_msg.proto";
 import "proto/geneva_slot.proto";
 import "proto/geometry.proto";
 
+message RobotBroadcast
+{
+    uint32 robot_id = 1;
+    string ip_address = 2;
+}
+
 message RobotStatus
 {
     uint32 robot_id                                   = 1;
