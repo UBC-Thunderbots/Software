@@ -590,7 +590,7 @@ message EnemyBallPlacementPlayConfig
 {
     // The distance to keep from the enemy ball placement stadium
     required double distance_to_keep_meters = 1 [
-        default                   = 0.75,
+        default                   = 1.0,
         (bounds).min_double_value = 0.65,
         (bounds).max_double_value = 1.5
     ];
