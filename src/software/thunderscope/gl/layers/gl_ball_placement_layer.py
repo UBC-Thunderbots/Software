@@ -78,10 +78,7 @@ class GLBallPlacementLayer(GLLayer):
             return
         elif ball_placement_vis_proto is not None:
             new_placement_point = ball_placement_vis_proto.ball_placement_point
-            if self.ball_placement_point_hidden and (
-                self.ball_placement_point == None
-                or new_placement_point != self.ball_placement_point
-            ):
+            if self.ball_placement_point_hidden:
                 self.ball_placement_point = new_placement_point
 
                 self.placement_tolerance_graphic.set_position(
