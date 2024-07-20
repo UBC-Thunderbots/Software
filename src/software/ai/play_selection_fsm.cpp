@@ -148,12 +148,11 @@ bool PlaySelectionFSM::ballIsStagnant(const Update& event)
 {
     Point current_ball_position = event.world_ptr->ball().position();
     const auto clock_time = std::chrono::system_clock::now();
-    if (last_ball_position.has_value() && distance(last_ball_position.value(), current_ball_position)
-        <= strategy_->getAiConfig().ai_parameter_config().ball_stagnant_distance_threshold_m())
-    {
-        last_ball_position = current_ball_position;
-    }
-    else
+
+
+
+    if (!last_ball_position.has_value() || distance(last_ball_position.value(), current_ball_position)
+        > strategy_->getAiConfig().ai_parameter_config().ball_stagnant_distance_threshold_m())
     {
         // Reset the ball's possible stagnant location when it moves out of its threshold radius
         // and reset the initial time for a possible stagnant ball
@@ -163,15 +162,13 @@ bool PlaySelectionFSM::ballIsStagnant(const Update& event)
                         clock_time.time_since_epoch())
                         .count()) *
                 SECONDS_PER_MICROSECOND;
+        return false;
     }
     double epoch_time_in_seconds =
             static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
                     clock_time.time_since_epoch())
                     .count()) *
             SECONDS_PER_MICROSECOND;
-
-    double ball_displacement_m =
-            distance(event.world_ptr->ball().position(), last_ball_position);
 
     bool time_is_stagnant = epoch_time_in_seconds - enemy_possession_epoch_time_s
             >= strategy_->getAiConfig().ai_parameter_config().ball_stagnant_time_threshold_s();
