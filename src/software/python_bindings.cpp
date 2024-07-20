@@ -438,11 +438,12 @@ PYBIND11_MODULE(python_bindings, m)
     declareThreadedProtoUdpListener<TbotsProto::RobotLog>(m, "RobotLog");
     declareThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>(m, "SSLWrapperPacket");
     declareThreadedProtoUdpListener<TbotsProto::RobotCrash>(m, "RobotCrash");
-    declareThreadedProtoUdpListener<TbotsProto::RobotBroadcast>(m, "RobotBroadcast");
+    declareThreadedProtoUdpListener<TbotsProto::IpNotification>(m, "RobotIp");
 
     // Senders
     declareThreadedProtoUdpSender<TbotsProto::Primitive>(m, "Primitive");
     declareThreadedProtoRadioSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
+    declareThreadedProtoUdpSender<TbotsProto::IpNotification>(m, "FullsystemIp");
 
     // Estop Reader
     py::class_<ThreadedEstopReader, std::unique_ptr<ThreadedEstopReader>>(
@@ -506,4 +507,10 @@ PYBIND11_MODULE(python_bindings, m)
         .value("PLAY", EstopState::PLAY)
         .value("STATUS_ERROR", EstopState::STATUS_ERROR)
         .export_values();
+
+    m.def("getLocalIp", [](const std::string& interface, const bool& use_ipv4) {
+        std::string ip_address;
+        bool found_ip = getLocalIp(interface, ip_address, use_ipv4);
+        return std::make_tuple(found_ip, ip_address);
+    });
 }

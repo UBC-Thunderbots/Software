@@ -49,7 +49,8 @@ static const short unsigned int ROBOT_STATUS_PORT = 42071;
 static const short unsigned int ROBOT_LOGS_PORT   = 42072;
 static const short unsigned int ROBOT_CRASH_PORT  = 42074;
 static const short unsigned int UNUSED_PORT       = 42075;
-static const short unsigned int ROBOT_BROADCAST_PORT = 42076;
+static const short unsigned int ROBOT_IP_NOTIFICATION_PORT = 42073;
+static const short unsigned int FULLSYSTEM_IP_NOTIFICATION_PORT = 42076;
 
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip

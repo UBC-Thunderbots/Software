@@ -7,9 +7,9 @@ import "proto/geneva_slot.proto";
 import "proto/geometry.proto";
 import "proto/primitive.proto";
 
-message RobotBroadcast
+message IpNotification
 {
-    uint32 robot_id = 1;
+    int32 robot_id = 1;
     string ip_address = 2;
 }
 

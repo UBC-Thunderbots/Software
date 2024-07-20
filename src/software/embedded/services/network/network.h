@@ -29,7 +29,8 @@ class NetworkService
      * we should join the group
      */
     NetworkService(const std::string& ip_address, unsigned short primitive_listener_port,
-                   unsigned short robot_status_sender_port, unsigned short robot_broadcast_port,
+                   unsigned short robot_status_sender_port, unsigned short full_system_ip_notification_port,
+                   unsigned short robot_ip_notification_port,
                    const std::string& interface, bool multicast, int robot_id);
 
     /**
@@ -95,7 +96,9 @@ class NetworkService
         udp_listener_primitive;
     std::unique_ptr<ThreadedProtoRadioListener<TbotsProto::Primitive>>
         radio_listener_primitive;
-    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotBroadcast>> robot_broadcast_sender;
+
+    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::IpNotification>> robot_to_fullsystem_ip_notifier;
+    std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::IpNotification>> fullsystem_to_robot_ip_notifier;
 
     std::optional<std::string> full_system_ip_address;
     std::string interface;
@@ -106,6 +109,8 @@ class NetworkService
 
     // Callback function for storing the received primitive_sets
     void primitiveCallback(const TbotsProto::Primitive& input);
+
+    void fullsystemIpCallback(const TbotsProto::IpNotification& fullsystem_ip_notification);
 
     void sendRobotStatus(const TbotsProto::RobotStatus& robot_status);
 
@@ -127,6 +132,5 @@ class NetworkService
 
     std::deque<RoundTripTime> primitive_rtt;
 
-    bool is_communication_established;
-    int robot_id;
+    TbotsProto::IpNotification robot_ip_notification_msg;
 };

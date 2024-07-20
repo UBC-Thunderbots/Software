@@ -3,57 +3,73 @@
 NetworkService::NetworkService(const std::string& ip_address,
                                unsigned short primitive_listener_port,
                                unsigned short robot_status_sender_port,
-                               unsigned short robot_broadcast_sender_port,
+                               unsigned short full_system_ip_notification_port,
+                               unsigned short robot_ip_notification_port,
                                const std::string& interface, bool multicast,
                                int robot_id)
     : interface(interface),
       robot_status_sender_port(robot_status_sender_port),
-      primitive_tracker(ProtoTracker("primitive set")),
-      is_communication_established(false),
-      robot_id(robot_id)
+      primitive_tracker(ProtoTracker("primitive set"))
 {
     std::optional<std::string> error;
+
+    fullsystem_to_robot_ip_notifier = std::make_unique<ThreadedProtoUdpListener<TbotsProto::IpNotification>>(
+            ip_address, full_system_ip_notification_port, interface,
+            boost::bind(&NetworkService::fullsystemIpCallback, this, _1), true, error);
+    if (error)
+    {
+        LOG(FATAL) << *error;
+    }
+
+    robot_to_fullsystem_ip_notifier = std::make_unique<ThreadedProtoUdpSender<TbotsProto::IpNotification>>(
+            ip_address, robot_ip_notification_port, interface, true, error);
+    if (error)
+    {
+        LOG(FATAL) << *error;
+    }
+
     udp_listener_primitive =
         std::make_unique<ThreadedProtoUdpListener<TbotsProto::Primitive>>(
             primitive_listener_port,
             boost::bind(&NetworkService::primitiveCallback, this, _1),
             error);
-
     if (error)
     {
         LOG(FATAL) << *error;
     }
-    LOG(INFO) << "Listening for primitive sets on port " << primitive_listener_port;
-
-    robot_broadcast_sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotBroadcast>>(ip_address,
-            robot_broadcast_sender_port, interface, true, error);
-
-    if (error)
-    {
-        LOG(FATAL) << *error;
-    }
-    LOG(INFO) << "Sending robot broadcast messages on " << ip_address << ":" << robot_broadcast_sender_port;
 
     radio_listener_primitive =
         std::make_unique<ThreadedProtoRadioListener<TbotsProto::Primitive>>(
             boost::bind(&NetworkService::primitiveCallback, this, _1));
+
+    robot_ip_notification_msg.set_robot_id(robot_id);
+    std::string local_ip_address;
+    if (!getLocalIp(interface, local_ip_address, true))
+    {
+        LOG(FATAL) << "Failed to get local IP address";
+    }
+    robot_ip_notification_msg.set_ip_address(local_ip_address);
+}
+
+void NetworkService::fullsystemIpCallback(const TbotsProto::IpNotification& ip_notification)
+{
+    if (!full_system_ip_address.has_value() || full_system_ip_address.value() != ip_notification.ip_address())
+    {
+        full_system_ip_address = ip_notification.ip_address();
+
+        std::optional<std::string> error;
+        sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
+            full_system_ip_address.value(), robot_status_sender_port, interface, false, error);
+        if (error) {
+            LOG(WARNING) << "Error communicating with full system at IP address " << full_system_ip_address.value() <<
+               ": " << *error;
+            sender = nullptr;
+        }
+    }
 }
 
 TbotsProto::Primitive NetworkService::poll(TbotsProto::RobotStatus& robot_status)
 {
-    if (!is_communication_established)
-    {
-        std::string ip_address;
-        if (getLocalIp(interface, ip_address, true))
-        {
-            TbotsProto::RobotBroadcast robot_broadcast;
-            robot_broadcast.set_ip_address(ip_address);
-            robot_broadcast.set_robot_id(robot_id);
-            robot_broadcast_sender->sendProto(robot_broadcast);
-        }
-        return primitive_msg;
-    }
-
     std::scoped_lock lock{primitive_mutex};
 
     robot_status.mutable_network_status()->set_primitive_packet_loss_percentage(
@@ -93,22 +109,7 @@ bool NetworkService::shouldSendNewRobotStatus(
 
 void NetworkService::sendRobotStatus(const TbotsProto::RobotStatus& robot_status)
 {
-    if (!full_system_ip_address.has_value())
-    {
-        return;
-    }
-
-    if (!sender)
-    {
-        std::optional<std::string> error;
-        sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
-            full_system_ip_address.value(), robot_status_sender_port, interface, false, error);
-        if (error) {
-            LOG(WARNING) << "Error communicating with full system at IP address " << full_system_ip_address.value() <<
-               ": " << *error;
-            sender = nullptr;
-        }
-    }
+    robot_to_fullsystem_ip_notifier->sendProto(robot_ip_notification_msg);
 
     if (sender)
     {
@@ -118,9 +119,6 @@ void NetworkService::sendRobotStatus(const TbotsProto::RobotStatus& robot_status
 
 void NetworkService::primitiveCallback(const TbotsProto::Primitive& input)
 {
-    full_system_ip_address = udp_listener_primitive->getIpAddressFromLastReceivedPacket();
-    is_communication_established = true;
-
     std::scoped_lock<std::mutex> lock(primitive_mutex);
     const uint64_t seq_num = input.sequence_number();
 
