@@ -265,3 +265,36 @@ TEST_F(PlaySelectionFSMTest, test_transition_between_ball_placement_and_free_kic
     EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlayState>));
     EXPECT_EQ("OffensePlay", objectTypeName(*current_play));
 }
+
+TEST_F(PlaySelectionFSMTest, test_transition_between_stagnant_defence_to_offense)
+{
+    auto world = TestUtil::createBlankTestingWorld();
+
+    // Position all robots in the friendly half.
+    auto friendly_team = TestUtil::setRobotPositionsHelper(
+            world->friendlyTeam(), {Point(-0.45, 0)}, Timestamp::fromSeconds(0));
+    auto enemy_team = TestUtil::setRobotPositionsHelper(
+            world->enemyTeam(), {Point(-0.55, 0)}, Timestamp::fromSeconds(0));
+    world->updateFriendlyTeamState(friendly_team);
+    world->updateEnemyTeamState(enemy_team);
+
+    std::shared_ptr<Play> current_play = std::make_shared<HaltPlay>(strategy);
+
+    world->updateBall(Ball({-0.5, 0}, {0, 0}, Timestamp::fromSeconds(0)));
+    // Position all bots in the enemy half.
+//    friendly_team = TestUtil::setRobotPositionsHelper(
+//            world->friendlyTeam(), {Point(0.45, 0)}, Timestamp::fromSeconds(3));
+//    enemy_team = TestUtil::setRobotPositionsHelper(world->enemyTeam(), {Point(0.55, 0)},
+//                                                   Timestamp::fromSeconds(1));
+    world->updateFriendlyTeamState(friendly_team);
+    world->updateEnemyTeamState(enemy_team);
+    world->updateBall(Ball({-0.53, 0}, {0, 0}, Timestamp::fromSeconds(0)));
+    world->updateBall(Ball({-0.53, 0}, {0, 0}, Timestamp::fromSeconds(0.5)));
+
+    fsm->process_event(PlaySelectionFSM::Update(
+            [&current_play](std::shared_ptr<Play> play) { current_play = play; }, world));    // Move ball near enemy bot for a period of time.
+    // Enemy team should have clear possession.
+
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::DefensePlayState>));
+    EXPECT_TRUE(fsm->is(boost::sml::state<PlaySelectionFSM::OffensePlayState>));
+}

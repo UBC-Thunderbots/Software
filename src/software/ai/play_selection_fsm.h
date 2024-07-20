@@ -173,6 +173,7 @@ struct PlaySelectionFSM
     std::shared_ptr<Strategy> strategy_;
     std::shared_ptr<OffensePlay> offense_play_;
     std::optional<TbotsProto::PlayName> current_set_play_;
-    Point enemy_possession_ball_position;
+    std::optional<Point> last_ball_position;
+    std::optional<Timestamp> last_timestamp;
     double enemy_possession_epoch_time_s;
 };

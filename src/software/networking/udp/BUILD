@@ -104,10 +104,3 @@ cc_library(
         ":udp_sender",
     ],
 )
-
-cc_library(
-    name = "udp_network_factory",
-    hdrs = [
-        "udp_network_factory.hpp",
-    ],
-)
