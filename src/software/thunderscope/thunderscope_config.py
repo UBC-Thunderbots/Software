@@ -130,6 +130,7 @@ def configure_base_fullsystem(
     extra_widgets: List[TScopeWidget] = [],
     refresh_func_counter: FrameTimeCounter = None,
     buffer_func_counter: FrameTimeCounter = None,
+    show_parameter_widget: bool = True,
 ) -> list:
     """
     Returns a list of widget data for a FullSystem tab
@@ -146,6 +147,7 @@ def configure_base_fullsystem(
     :param extra_widgets: a list of additional widget data to append
     :param refresh_func_counter: a counter that is used to keep track of the refresh func frametime
     :param buffer_func_counter: a counter that is used to count the bufferswap frametime callback
+    :param show_parameter_widget: whether to include the parameter widget
     :return: list of widget data for FullSystem
     """
 
@@ -155,7 +157,7 @@ def configure_base_fullsystem(
     if buffer_func_counter == None:
         buffer_func_counter = FrameTimeCounter()
 
-    return [
+    widgets = [
         TScopeWidget(
             name="Field",
             widget=setup_gl_widget(
@@ -172,31 +174,18 @@ def configure_base_fullsystem(
             ),
         ),
         TScopeWidget(
-            name="Parameters",
-            widget=setup_parameter_widget(
-                **{
-                    "proto_unix_io": full_system_proto_unix_io,
-                    "friendly_colour_yellow": friendly_colour_yellow,
-                }
-            ),
-            anchor="Field",
-            position="left",
-            has_refresh_func=False,
-            stretch=WidgetStretchData(x=5),
-        ),
-        TScopeWidget(
             name="Error Log",
             widget=setup_robot_error_log_view_widget(
                 **{"proto_unix_io": full_system_proto_unix_io}
             ),
-            anchor="Parameters",
-            position="above",
+            anchor="Field",
+            position="left",
             stretch=WidgetStretchData(x=5),
         ),
         TScopeWidget(
             name="Logs",
             widget=setup_log_widget(**{"proto_unix_io": full_system_proto_unix_io}),
-            anchor="Parameters",
+            anchor="Error Log",
             position="above",
             stretch=WidgetStretchData(x=5),
         ),
@@ -250,6 +239,25 @@ def configure_base_fullsystem(
             stretch=WidgetStretchData(y=4),
         ),
     ] + extra_widgets
+
+    if show_parameter_widget:
+        widgets.append(
+            TScopeWidget(
+                name="Parameters",
+                widget=setup_parameter_widget(
+                    **{
+                        "proto_unix_io": full_system_proto_unix_io,
+                        "friendly_colour_yellow": friendly_colour_yellow,
+                    }
+                ),
+                anchor="Error Log",
+                position="below",
+                has_refresh_func=False,
+                stretch=WidgetStretchData(x=5),
+            )
+        )
+
+    return widgets
 
 
 def configure_base_diagnostics(
@@ -407,6 +415,7 @@ def configure_simulated_test_view(
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[],
+                    show_parameter_widget=False,
                 ),
             ),
             TScopeQTTab(
@@ -420,6 +429,7 @@ def configure_simulated_test_view(
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
                     extra_widgets=[],
+                    show_parameter_widget=False,
                 ),
             ),
         ],
@@ -468,7 +478,12 @@ def configure_field_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=True,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[],
+                    extra_widgets=[
+                        configure_robot_view_fullsystem(
+                            proto_unix_io_map[ProtoUnixIOTypes.YELLOW]
+                        )
+                    ],
+                    show_parameter_widget=False,
                 ),
             )
         ]
@@ -482,7 +497,12 @@ def configure_field_test_view(
                     sim_proto_unix_io=proto_unix_io_map[ProtoUnixIOTypes.SIM],
                     friendly_colour_yellow=False,
                     visualization_buffer_size=visualization_buffer_size,
-                    extra_widgets=[],
+                    extra_widgets=[
+                        configure_robot_view_fullsystem(
+                            proto_unix_io_map[ProtoUnixIOTypes.BLUE]
+                        )
+                    ],
+                    show_parameter_widget=False,
                 ),
             )
         ]

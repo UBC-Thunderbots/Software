@@ -19,7 +19,7 @@ class ProtoConfigurationWidget(QWidget):
 
     """
 
-    DELAYED_CONFIGURATION_TIMEOUT_S = 5
+    DELAYED_CONFIGURATION_TIMEOUT_S = 3
     """How long to wait after startup to send the first configuration to our AI"""
 
     def __init__(

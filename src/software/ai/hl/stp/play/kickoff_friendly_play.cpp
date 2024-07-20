@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/skill/chip/chip_skill.h"
 #include "software/ai/hl/stp/tactic/assigned_skill/specialized_assigned_skill_tactics.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
@@ -39,7 +38,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     //
     // This is a two part play:
     //      Part 1: Get into position, but don't touch the ball (ref kickoff)
-    //      Part 2: Chip the ball over the defender (ref normal start)
+    //      Part 2: Kick the ball (ref normal start)
 
     // the following positions are in the same order as the positions shown above,
     // excluding the goalie for part 1 of this play
@@ -76,7 +75,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::make_shared<MoveTactic>()};
 
     // specific tactics
-    auto kickoff_chip_tactic = std::make_shared<KickoffChipSkillTactic>(strategy);
+    auto kickoff_kick_tactic = std::make_shared<KickoffKickSkillTactic>(strategy);
 
     // Part 1: setup state (move to key positions)
     while (world_ptr->gameState().isSetupState())
@@ -103,7 +102,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         yield(result);
     }
 
-    // Part 2: not normal play, currently ready state (chip the ball)
+    // Part 2: not normal play, currently ready state (kick the ball)
     while (!world_ptr->gameState().isPlaying())
     {
         auto enemy_threats =
@@ -112,15 +111,20 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         PriorityTacticVector result = {{}};
 
-        // TODO (#2612): This needs to be adjusted post field testing, ball needs to land
-        // exactly in the middle of the enemy field
-        Point chip_target = world_ptr->field().centerPoint() +
-                            Vector(world_ptr->field().xLength() / 6, 0);
-        Point chip_origin = world_ptr->ball().position();
-        kickoff_chip_tactic->updateControlParams(
-            {chip_origin, (chip_target - chip_origin).orientation(),
-             (chip_target - chip_origin).length()});
-        result[0].emplace_back(kickoff_chip_tactic);
+        Point kick_target = world_ptr->field().enemyGoalCenter();
+        std::optional<Shot> best_shot = calcBestShotOnGoal(
+            world_ptr->field(), world_ptr->friendlyTeam(), world_ptr->enemyTeam(),
+            world_ptr->ball().position(), TeamType::ENEMY);
+        if (best_shot.has_value())
+        {
+            kick_target = best_shot->getPointToShootAt(); 
+        }
+
+        Point kick_origin = world_ptr->ball().position();
+        kickoff_kick_tactic->updateControlParams(
+            {kick_origin, (kick_target - kick_origin).orientation(),
+             BALL_MAX_SPEED_METERS_PER_SECOND - 0.5});
+        result[0].emplace_back(kickoff_kick_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from
         // 1 will be assigned to the rest of the robots

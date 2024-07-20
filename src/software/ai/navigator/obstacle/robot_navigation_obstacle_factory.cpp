@@ -13,7 +13,7 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
-    const TbotsProto::MotionConstraint &motion_constraint, const World &world) const
+    const TbotsProto::MotionConstraint &motion_constraint, const World &world, const double curr_robot_speed, const double max_robot_speed) const
 {
     std::vector<ObstaclePtr> obstacles;
     const Field &field = world.field();
@@ -28,7 +28,7 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
         {
             obstacles.push_back(createFromFieldRectangle(
                 field.enemyDefenseArea(), field.fieldLines(), field.fieldBoundary(),
-                config.enemy_defense_area_additional_inflation_meters()));
+                config.enemy_defense_area_additional_inflation_meters() * (curr_robot_speed / max_robot_speed)));
         }
         break;
         case TbotsProto::MotionConstraint::FRIENDLY_DEFENSE_AREA:
@@ -91,8 +91,11 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
         }
         case TbotsProto::MotionConstraint::HALF_METER_AROUND_BALL:;
             // 0.5 represents half a metre radius
-            obstacles.push_back(createFromShape(
-                Circle(world.ball().position(), STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M)));
+            obstacles.push_back(createFromShape(Circle(
+                world.ball().position(),
+                STOP_COMMAND_BALL_AVOIDANCE_DISTANCE_M +
+                    config
+                        .additional_half_meter_around_ball_obstacle_inflation_meters())));
             break;
         case TbotsProto::MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
             if (world.gameState().getBallPlacementPoint().has_value())
@@ -142,13 +145,13 @@ RobotNavigationObstacleFactory::createObstaclesFromMotionConstraint(
 std::vector<ObstaclePtr>
 RobotNavigationObstacleFactory::createObstaclesFromMotionConstraints(
     const std::set<TbotsProto::MotionConstraint> &motion_constraints,
-    const World &world) const
+    const World &world, const double curr_robot_speed, const double max_robot_speed) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)
     {
         auto new_obstacles =
-            createObstaclesFromMotionConstraint(motion_constraint, world);
+            createObstaclesFromMotionConstraint(motion_constraint, world, curr_robot_speed, max_robot_speed);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 

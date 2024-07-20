@@ -30,8 +30,8 @@ title: Robot Debugging Steps
 ---
 flowchart TD
     ssh("Can you SSH into the robot? 
-        `ssh robot@192.168.0.20RobotID` (for Nanos) OR `ssh robot@192.168.1.20RobotID` (for Pis) OR `ssh robot@robot_name.local`
-        e.g. `ssh robot@192.168.0.203` (for Nanos) or `ssh robot@192.168.1.203` (for Pis) or `ssh robot@robert.local`
+        `ssh robot@192.168.0.20RobotID` (for Nanos) OR `ssh robot@192.168.5.20RobotID` (for Pis) OR `ssh robot@robot_name.local`
+        e.g. `ssh robot@192.168.0.203` (for Nanos) or `ssh robot@192.168.5.203` (for Pis) or `ssh robot@robert.local`
         for a robot called robert with robot id 3")
     ssh ---> |Yes| tloop_status
     ssh --> |No - Second Try| monitor("Connect Jetson or Pi to an external monitor and check wifi connection or SSH using an ethernet cable")
@@ -133,11 +133,11 @@ This section refers to setting up the computer on the robot for the first time. 
 
 ### Jetson Nano
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:platform=NANO -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:host_platform=NANO -- --playbook setup_nano.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 
 ### Raspberry Pi
 
-`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:platform=PI -- --playbook setup_raspberry_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>`
+`bazel run //software/embedded/ansible:run_ansible --cpu=jetson_nano --//software/embedded:host_platform=PI -- --playbook setup_pi.yml --hosts <robot_ip> --ssh_pass <robot_password>`
 
 ## Robot Diagnostics
 

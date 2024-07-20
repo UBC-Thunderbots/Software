@@ -3,17 +3,24 @@
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/point.h"
+#include "software/geom/algorithms/closest_point.h"
 
 static constexpr double OBSTACLE_AVOIDANCE_BUFFER_CENTIMETERS = 0.01;
 
 
 std::optional<Point> endInObstacleSample(const std::vector<ObstaclePtr> &obstacles,
-                                         const Point &point,
+                                         Point point,
                                          const Rectangle &navigable_area,
                                          int initial_count, double radius_step,
                                          int samples_per_radius_step,
                                          double max_search_radius)
 {
+    // Move the point to inside the field
+    if (!contains(navigable_area, point))
+    {
+        point = closestPoint(navigable_area, point);
+    }
+
     // first, check if point is inside an obstacle or outside the navigable area
     bool point_in_obstacle = false;
     if (contains(navigable_area, point))

@@ -11,7 +11,7 @@ MovePrimitive::MovePrimitive(
     const TbotsProto::ObstacleAvoidanceMode &obstacle_avoidance_mode,
     const TbotsProto::DribblerMode &dribbler_mode,
     const TbotsProto::BallCollisionType &ball_collision_type,
-    const AutoChipOrKick &auto_chip_or_kick, std::optional<double> cost_override)
+    const AutoChipOrKick &auto_chip_or_kick, std::vector<Point> additional_points)
     : robot(robot),
       destination(destination),
       final_angle(final_angle),
@@ -21,30 +21,38 @@ MovePrimitive::MovePrimitive(
       max_allowed_speed_mode(max_allowed_speed_mode),
       obstacle_avoidance_mode(obstacle_avoidance_mode)
 {
-    if (cost_override.has_value())
-    {
-        estimated_cost = cost_override.value();
-    }
-    else
-    {
-        double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-            max_allowed_speed_mode, robot.robotConstants());
-        trajectory.generate(robot.position(), destination, robot.velocity(), max_speed,
-                            robot.robotConstants().robot_max_acceleration_m_per_s_2,
-                            robot.robotConstants().robot_max_deceleration_m_per_s_2);
+    double max_linear_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
+        max_allowed_speed_mode, robot.robotConstants());
+    double max_angular_speed = convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
+        max_allowed_speed_mode, robot.robotConstants());
+    trajectory.generate(robot.position(), destination, robot.velocity(), max_linear_speed,
+                        robot.robotConstants().robot_max_acceleration_m_per_s_2,
+                        robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
-        angular_trajectory.generate(
-            robot.orientation(), final_angle, robot.angularVelocity(),
-            AngularVelocity::fromRadians(
-                robot.robotConstants().robot_max_ang_speed_rad_per_s),
-            AngularVelocity::fromRadians(
-                robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2),
-            AngularVelocity::fromRadians(
-                robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2));
+    angular_trajectory.generate(
+        robot.orientation(), final_angle, robot.angularVelocity(),
+        AngularVelocity::fromRadians(max_angular_speed),
+        AngularVelocity::fromRadians(
+            robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2),
+        AngularVelocity::fromRadians(
+            robot.robotConstants().robot_max_ang_acceleration_rad_per_s_2));
 
-        estimated_cost =
-            std::max(trajectory.getTotalTime(), angular_trajectory.getTotalTime());
+    double additional_points_time = 0;
+    Point previous_point          = destination;
+    for (const Point &additional_point : additional_points)
+    {
+        BangBangTrajectory2D dribble_estimate;
+        dribble_estimate.generate(
+            previous_point, additional_point, Vector(0, 0), max_linear_speed,
+            robot.robotConstants().robot_max_acceleration_m_per_s_2,
+            robot.robotConstants().robot_max_deceleration_m_per_s_2);
+        additional_points_time += dribble_estimate.getTotalTime();
+        previous_point = additional_point;
     }
+
+    estimated_cost =
+        std::max(trajectory.getTotalTime(), angular_trajectory.getTotalTime()) +
+        additional_points_time;
 }
 
 std::pair<std::optional<TrajectoryPath>, std::unique_ptr<TbotsProto::Primitive>>
@@ -56,15 +64,20 @@ MovePrimitive::generatePrimitiveProtoMessage(
     // Generate obstacle avoiding trajectory
     updateObstacles(world, motion_constraints, robot_trajectories, obstacle_factory);
 
-    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+    double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
         max_allowed_speed_mode, robot.robotConstants());
     KinematicConstraints constraints(
         max_speed, robot.robotConstants().robot_max_acceleration_m_per_s_2,
         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
-    // TODO (#3104): The fieldBounary should be shrunk by the robot radius before being
-    //  passed to the planner.
-    Rectangle navigable_area = world.field().fieldBoundary();
+    // Set navigable area to field boundary shrunk by an amount that is a little bit
+    // less than the robot's radius 
+    Rectangle field_boundary = world.field().fieldBoundary();
+    Rectangle navigable_area =
+        Rectangle(Point(field_boundary.xMin() + ROBOT_MAX_RADIUS_METERS - 0.02,
+                        field_boundary.yMin() + ROBOT_MAX_RADIUS_METERS - 0.02),
+                  Point(field_boundary.xMax() - ROBOT_MAX_RADIUS_METERS + 0.02,
+                        field_boundary.yMax() - ROBOT_MAX_RADIUS_METERS + 0.02));
 
     // If the robot is in a static obstacle, then we should first move to the nearest
     // point out
@@ -126,7 +139,6 @@ MovePrimitive::generatePrimitiveProtoMessage(
     *(xy_traj_params.mutable_start_position())   = *createPointProto(robot.position());
     *(xy_traj_params.mutable_destination())      = *createPointProto(destination);
     *(xy_traj_params.mutable_initial_velocity()) = *createVectorProto(robot.velocity());
-    xy_traj_params.set_max_speed_mode(max_allowed_speed_mode);
     *(primitive_proto->mutable_move()->mutable_xy_traj_params()) = xy_traj_params;
 
     const auto &path_nodes = traj_path->getTrajectoryPathNodes();
@@ -156,6 +168,8 @@ MovePrimitive::generatePrimitiveProtoMessage(
 
     primitive_proto->mutable_move()->set_dribbler_mode(dribbler_mode);
 
+    primitive_proto->mutable_move()->set_max_speed_mode(max_allowed_speed_mode);
+
     if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
     {
         primitive_proto->mutable_move()
@@ -183,7 +197,7 @@ void MovePrimitive::updateObstacles(
 {
     // Separately store the non-robot + non-ball obstacles
     field_obstacles =
-        obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world);
+        obstacle_factory.createObstaclesFromMotionConstraints(motion_constraints, world, robot.velocity().length(), robot.robotConstants().robot_max_speed_m_per_s);
 
     obstacles = field_obstacles;
 

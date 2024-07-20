@@ -83,7 +83,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
-      primitive_executor_(Duration::fromSeconds(1.0 / loop_hz), robot_constants,
+      primitive_executor_(robot_constants,
                           TeamColour::YELLOW, robot_id_)
 {
     std::optional<std::string> network_test_error;
@@ -170,7 +170,7 @@ Thunderloop::~Thunderloop() {}
 [[noreturn]] void Thunderloop::runLoop()
 {
     // Timing
-    struct timespec next_shot;
+    struct timespec time_remaining_in_iteration;
     struct timespec poll_time;
     struct timespec iteration_time;
     struct timespec last_primitive_received_time;
@@ -178,6 +178,7 @@ Thunderloop::~Thunderloop() {}
     struct timespec current_time;
     struct timespec last_chipper_fired;
     struct timespec last_kicker_fired;
+    struct timespec prev_iter_start_time;
 
     // Input buffer
     TbotsProto::Primitive new_primitive;
@@ -188,25 +189,33 @@ Thunderloop::~Thunderloop() {}
     int interval =
         static_cast<int>(1.0f / static_cast<float>(loop_hz_) * NANOSECONDS_PER_SECOND);
 
+    time_remaining_in_iteration.tv_nsec = 0;
+    time_remaining_in_iteration.tv_sec = 0;
+    
     // Get current time
     // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
     // CLOCK_REALTIME can jump backwards
-    clock_gettime(CLOCK_MONOTONIC, &next_shot);
     clock_gettime(CLOCK_MONOTONIC, &last_primitive_received_time);
     clock_gettime(CLOCK_MONOTONIC, &last_world_received_time);
     clock_gettime(CLOCK_MONOTONIC, &last_chipper_fired);
     clock_gettime(CLOCK_MONOTONIC, &last_kicker_fired);
-
-    double loop_duration_seconds = 0.0;
+    clock_gettime(CLOCK_MONOTONIC, &prev_iter_start_time);
 
     for (;;)
     {
+        struct timespec time_since_prev_iter;
+        clock_gettime(CLOCK_MONOTONIC, &current_time);
+        ScopedTimespecTimer::timespecDiff(&current_time, &prev_iter_start_time,
+                                          &time_since_prev_iter);
+        double time_since_prev_iter_sec = getMilliseconds(time_since_prev_iter) * SECONDS_PER_MILLISECOND;
+        prev_iter_start_time = current_time;
         {
             // Wait until next shot
             //
             // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
             // CLOCK_REALTIME can jump backwards
-            clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
+            // FLag of 0: relative sleep
+            clock_nanosleep(CLOCK_MONOTONIC, 0, &time_remaining_in_iteration, NULL);
 
             FrameMarkStart(TracyConstants::THUNDERLOOP_FRAME_MARKER);
 
@@ -292,7 +301,7 @@ Thunderloop::~Thunderloop() {}
                 }
 
                 direct_control_ =
-                    *primitive_executor_.stepPrimitive(primitive_executor_status_);
+                    *primitive_executor_.stepPrimitive(time_since_prev_iter_sec, primitive_executor_status_);
             }
 
             thunderloop_status_.set_primitive_executor_step_time_ms(
@@ -352,9 +361,8 @@ Thunderloop::~Thunderloop() {}
                 ScopedTimespecTimer timer(&poll_time);
 
                 ZoneNamedN(_tracy_motor_service, "Thunderloop: Poll MotorService", true);
-
                 motor_status_ = motor_service_->poll(direct_control_.motor_control(),
-                                                     loop_duration_seconds);
+                                                     time_since_prev_iter_sec);
             }
             thunderloop_status_.set_motor_service_poll_time_ms(
                 getMilliseconds(poll_time));
@@ -395,13 +403,9 @@ Thunderloop::~Thunderloop() {}
         thunderloop_status_.set_iteration_time_ms(loop_duration_ns /
                                                   NANOSECONDS_PER_MILLISECOND);
 
-        // Make sure the iteration can fit inside the period of the loop
-        loop_duration_seconds =
-            static_cast<double>(loop_duration_ns) * SECONDS_PER_NANOSECOND;
-
         // Calculate next shot taking into account how long this iteration took
-        next_shot.tv_nsec += interval - static_cast<long int>(loop_duration_ns);
-        timespecNorm(next_shot);
+        time_remaining_in_iteration.tv_nsec = interval - static_cast<long int>(loop_duration_ns);
+        timespecNorm(time_remaining_in_iteration);
 
         FrameMarkEnd(TracyConstants::THUNDERLOOP_FRAME_MARKER);
     }

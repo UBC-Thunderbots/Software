@@ -250,6 +250,10 @@ std::unique_ptr<TbotsProto::WorldStateReceivedTrigger> createWorldStateReceivedT
 std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
     const std::vector<double>& costs, int num_rows, int num_cols);
 
+std::optional<TrajectoryPath> createTrajectoryPathFromParams(
+        const TbotsProto::TrajectoryPathParams2D& params, const Point& start_position, const Vector& initial_velocity,
+        const RobotConstants& robot_constants, const TbotsProto::MaxAllowedSpeedMode max_speed_mode);
+
 /**
  * Generate a 2D Trajectory Path given 2D trajectory parameters
  *
@@ -261,7 +265,7 @@ std::unique_ptr<TbotsProto::CostVisualization> createCostVisualization(
  */
 std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     const TbotsProto::TrajectoryPathParams2D& params, const Vector& initial_velocity,
-    const RobotConstants& robot_constants);
+    const RobotConstants& robot_constants, TbotsProto::MaxAllowedSpeedMode max_speed_mode);
 
 /**
  * Generate an angular trajectory Path given angular trajectory proto parameters
@@ -273,7 +277,7 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
  */
 BangBangTrajectory1DAngular createAngularTrajectoryFromParams(
     const TbotsProto::TrajectoryParamsAngular1D& params,
-    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants);
+    const AngularVelocity& initial_velocity, const RobotConstants& robot_constants, TbotsProto::MaxAllowedSpeedMode max_speed_mode);
 
 /**
  * Convert dribbler mode to dribbler speed
@@ -294,6 +298,18 @@ double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode
  *
  * @return the max allowed speed in m/s
  */
-double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+double convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
     RobotConstants_t robot_constants);
+
+/**
+ * Convert max allowed speed mode to max allowed angular speed
+ *
+ * @param max_allowed_speed_mode The MaxAllowedSpeedMode
+ * @param robot_constants The robot constants
+ *
+ * @return the max allowed angular speed in m/s
+ */
+double convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+        RobotConstants_t robot_constants);

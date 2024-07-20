@@ -12,14 +12,12 @@ class PrimitiveExecutor
    public:
     /**
      * Constructor
-     * @param time_step Time step which this primitive executor operates in
      * @param robot_constants The robot constants for the robot which uses this primitive
      * executor
      * @param friendly_team_colour The colour of the friendly team
      * @param robot_id The id of the robot which uses this primitive executor
      */
-    explicit PrimitiveExecutor(const Duration time_step,
-                               const RobotConstants_t &robot_constants,
+    explicit PrimitiveExecutor(const RobotConstants_t &robot_constants,
                                const TeamColour friendly_team_colour,
                                const RobotId robot_id);
 
@@ -58,7 +56,7 @@ class PrimitiveExecutor
      * @returns DirectControlPrimitive The direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        TbotsProto::PrimitiveExecutorStatus &status);
+        double time_elapsed_since_last_poll_s, TbotsProto::PrimitiveExecutorStatus &status);
 
    private:
     /*
@@ -75,7 +73,7 @@ class PrimitiveExecutor
     AngularVelocity getTargetAngularVelocity();
 
     TbotsProto::Primitive current_primitive_;
-    Duration time_since_trajectory_creation_;
+    Duration time_since_angular_trajectory_creation_;
     Vector velocity_;
     AngularVelocity angular_velocity_;
     Angle orientation_;
@@ -83,10 +81,7 @@ class PrimitiveExecutor
     RobotConstants_t robot_constants_;
     std::optional<TrajectoryPath> trajectory_path_;
     std::optional<BangBangTrajectory1DAngular> angular_trajectory_;
-
-    // TODO (#2855): Add dynamic time_step to `stepPrimitive` and remove this constant
-    // time step to be used, in Seconds
-    Duration time_step_;
+    Point curr_robot_position_;
     RobotId robot_id_;
 
     // Estimated delay between a vision frame to AI processing to robot executing

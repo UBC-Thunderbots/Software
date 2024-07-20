@@ -33,15 +33,25 @@ Point stepAlongPerimeter(const Polygon& polygon, const Point& start,
     double perimeter          = polygon.perimeter();
     bool is_counter_clockwise = travel_distance < 0;
     travel_distance           = std::fmod(std::abs(travel_distance), perimeter);
-    if (is_counter_clockwise)
+
+    if ((is_counter_clockwise && polygon.isClockwise()) ||
+        (!is_counter_clockwise && !polygon.isClockwise()))
     {
         travel_distance = perimeter - travel_distance;
+    }
+    Segment curr_segment = polygon_segments[segment_index];
+
+    //     Edge case where we travel less than 1 segment's worth of distance
+    if ((curr_segment.getEnd() - closest_start).length() > travel_distance)
+    {
+        return closest_start +
+               ((curr_segment.getEnd() - closest_start).normalize() * travel_distance);
     }
 
     bool wrap_flag = false;
     while (travel_distance > 0)
     {
-        Segment curr_segment = polygon_segments[segment_index];
+        curr_segment = polygon_segments[segment_index];
 
         double segment_length = curr_segment.length();
         if (segment_index == start_segment_index && !wrap_flag)

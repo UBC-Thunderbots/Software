@@ -8,16 +8,17 @@ bool ShootSkillFSM::shouldAbortShot(const Update& event)
         return false;
     }
 
-    std::optional<Shot> shot = calcBestShotOnGoal(
+    best_shot_ = calcBestShotOnGoal(
         event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
         event.common.world_ptr->enemyTeam(), best_shot_->getOrigin(), TeamType::ENEMY,
         {event.common.robot});
 
-    return !shot ||
-           event.common.world_ptr->field().pointInFriendlyHalf(shot->getOrigin()) ||
-           shot->getOpenAngle().toDegrees() < event.common.strategy->getAiConfig()
-                                                  .shot_config()
-                                                  .abs_min_open_angle_for_shot_deg();
+    event.common.set_skill_state({.shot = best_shot_});
+
+    return !best_shot_ || best_shot_->getOpenAngle().toDegrees() <
+                              event.common.strategy->getAiConfig()
+                                  .shot_config()
+                                  .abs_min_open_angle_for_shot_deg();
 }
 
 void ShootSkillFSM::getBallControl(

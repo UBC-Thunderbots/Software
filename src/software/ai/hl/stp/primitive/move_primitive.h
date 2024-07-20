@@ -23,8 +23,8 @@ class MovePrimitive : public Primitive
      * ball is allowed
      * @param auto_chip_or_kick Whether auto chip or kick is enabled and the target
      * distance/speed
-     * @param cost_override optionally override the cost of the move primitive, defaults
-     * to the total duration of reaching the destination (ignoring obstacles)
+     * @param additional_points List of additional points that are going to be driven to after this for consideration
+     * when calculating cost.
      */
     MovePrimitive(const Robot &robot, const Point &destination, const Angle &final_angle,
                   const TbotsProto::MaxAllowedSpeedMode &max_allowed_speed_mode,
@@ -32,7 +32,7 @@ class MovePrimitive : public Primitive
                   const TbotsProto::DribblerMode &dribbler_mode,
                   const TbotsProto::BallCollisionType &ball_collision_type,
                   const AutoChipOrKick &auto_chip_or_kick,
-                  std::optional<double> cost_override = std::nullopt);
+                  std::vector<Point> additional_points = {});
 
     ~MovePrimitive() override = default;
 

@@ -131,12 +131,18 @@ void DribbleSkillFSM::getBallControl(const Update &event)
                               event.common.strategy->getAiConfig().dribble_config()) +
         Vector::createFromAngle(face_ball_orientation).normalize(0.05);
 
+    std::vector<Point> additional_points = {};
+    if (event.control_params.dribble_destination.has_value())
+    {
+        additional_points.push_back(event.control_params.dribble_destination.value());
+    }
+
     event.common.set_primitive(std::make_unique<MovePrimitive>(
         event.common.robot, intercept_position, face_ball_orientation,
         event.control_params.max_speed_get_possession,
         TbotsProto::ObstacleAvoidanceMode::AGGRESSIVE,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}));
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, additional_points));
 }
 
 void DribbleSkillFSM::dribble(const Update &event)
@@ -209,7 +215,10 @@ bool DribbleSkillFSM::dribblingDone(const Update &event)
                Angle::fromDegrees(
                    dribble_config.final_destination_close_threshold_deg())) &&
            !lostBallControl(event) &&
-           robotStopped(event.common.robot, dribble_config.robot_dribbling_done_speed());
+           robotStopped(event.common.robot,
+                        dribble_config.robot_dribbling_done_speed()) &&
+           event.common.robot.angularVelocity().toDegrees() <
+               dribble_config.robot_dribbling_done_angular_velocity_deg_per_s();
 }
 
 bool DribbleSkillFSM::shouldLoseBall(const Update &event)

@@ -283,14 +283,14 @@ void ErForceSimulator::setRobots(
         if (side == gameController::Team::BLUE)
         {
             auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                Duration::fromSeconds(primitive_executor_time_step_s), robot_constants,
+                robot_constants,
                 TeamColour::BLUE, id);
             blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
             auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
-                Duration::fromSeconds(primitive_executor_time_step_s), robot_constants,
+                robot_constants,
                 TeamColour::YELLOW, id);
             yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
@@ -393,7 +393,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         TbotsProto::PrimitiveExecutorStatus status;  // Added for compilation
         if (ramping)
         {
-            auto direct_control_no_ramp = primitive_executor->stepPrimitive(status);
+            auto direct_control_no_ramp = primitive_executor->stepPrimitive(primitive_executor_time_step_s, status);
             direct_control              = getRampedVelocityPrimitive(
                 current_velocity_map.at(robot_id).first,
                 current_velocity_map.at(robot_id).second, *direct_control_no_ramp,
@@ -401,7 +401,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         }
         else
         {
-            direct_control = primitive_executor->stepPrimitive(status);
+            direct_control = primitive_executor->stepPrimitive(primitive_executor_time_step_s, status);
         }
 
         auto command = *getRobotCommandFromDirectControl(

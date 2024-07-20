@@ -49,6 +49,8 @@ void BallPlacementPlayFSM::setPickOffDest(const BallPlacementPlayFSM::Update &ev
     std::pair<Angle, Point> location = calculateWallPickOffLocation(
         ball_pos, field_boundary, MINIMUM_DISTANCE_FROM_WALL_FOR_ALIGN_METERS);
 
+    pickoff_wall_tactic = std::make_shared<BallPlacementDribbleTactic>(strategy);
+
     pickoff_final_orientation = location.first;
     pickoff_destination =
         location.second - Vector::createFromAngle(pickoff_final_orientation)

@@ -103,6 +103,9 @@ typedef struct RobotConstants
     // The maximum angular speed achievable by our robots [rad/s]
     float robot_max_ang_speed_rad_per_s;
 
+    // The maximum angular speed while dribbling [rad/s]
+    float dribble_max_ang_speed_rad_per_s;
+
     // The maximum angular acceleration achievable by our robots [rad/s^2]
     float robot_max_ang_acceleration_rad_per_s_2;
 
