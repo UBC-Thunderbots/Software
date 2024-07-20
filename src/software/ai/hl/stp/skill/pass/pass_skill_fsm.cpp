@@ -82,6 +82,25 @@ bool PassSkillFSM::strayPass(const SuspendedUpdate& event)
            ai_config.ai_parameter_config().ball_is_kicked_m_per_s_threshold();
 }
 
+PassWithRating PassSkillFSM::getBestPass(const Update& event)
+{
+    // Avoid passes to the goalie and the passing robot
+    std::vector<RobotId> robots_to_ignore = {};
+    auto friendly_goalie_id_opt = event.common.world_ptr->friendlyTeam().getGoalieId();
+    if (friendly_goalie_id_opt.has_value())
+    {
+        robots_to_ignore.push_back(friendly_goalie_id_opt.value());
+    }
+    auto robot_with_ball_opt = event.common.world_ptr->friendlyTeam().getNearestRobot(
+        event.common.world_ptr->ball().position());
+    if (robot_with_ball_opt.has_value())
+    {
+        robots_to_ignore.push_back(robot_with_ball_opt.value().id());
+    }
+
+    return event.common.strategy->getBestPass(robots_to_ignore);
+}
+
 void PassSkillFSM::findPass(
     const Update& event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
@@ -98,21 +117,7 @@ void PassSkillFSM::findPass(
             {.pass_committed = false, .pass = best_pass_so_far_->pass});
     }
 
-    // Find the current best pass
-    // Avoid passes to the goalie and the passing robot
-    std::vector<RobotId> robots_to_ignore = {};
-    auto friendly_goalie_id_opt = event.common.world_ptr->friendlyTeam().getGoalieId();
-    if (friendly_goalie_id_opt.has_value())
-    {
-        robots_to_ignore.push_back(friendly_goalie_id_opt.value());
-    }
-    auto robot_with_ball_opt = event.common.world_ptr->friendlyTeam().getNearestRobot(
-        event.common.world_ptr->ball().position());
-    if (robot_with_ball_opt.has_value())
-    {
-        robots_to_ignore.push_back(robot_with_ball_opt.value().id());
-    }
-    best_pass_so_far_ = event.common.strategy->getBestPass(robots_to_ignore);
+    best_pass_so_far_ = PassSkillFSM::getBestPass(event);
 
     // Update minimum pass score threshold. Wait for a good pass by starting out only
     // looking for "perfect" passes (with a high score close to 1) and decreasing this
@@ -163,6 +168,8 @@ void PassSkillFSM::takePass(
     const Update& event,
     boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
+    best_pass_so_far_ = PassSkillFSM::getBestPass(event);
+
     Point pass_origin = best_pass_so_far_->pass.passerPoint();
     Point pass_target = best_pass_so_far_->pass.receiverPoint();
 
