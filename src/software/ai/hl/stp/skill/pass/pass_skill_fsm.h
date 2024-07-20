@@ -16,15 +16,6 @@ struct PassSkillFSM
     DEFINE_SUSPENDED_STATE_AND_UPDATE_STRUCT
 
     /**
-     * Gets the best pass
-     * 
-     * @param event the Update event
-     * 
-     * @return the best pass
-     */
-    static PassWithRating getBestPass(const Update& event);
-
-    /**
      * Guard that checks if the best pass so far is viable
      *
      * @param event the Update event
