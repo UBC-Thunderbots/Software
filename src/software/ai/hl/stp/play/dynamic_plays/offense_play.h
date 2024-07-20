@@ -37,7 +37,7 @@ class OffensePlay : public DynamicPlay
      * @return [num_defenders, num_supporters] tuple
      */
     std::tuple<unsigned int, unsigned int> assignNumOfDefendersAndSupporters(
-        unsigned int num_tactics);
+        unsigned int num_tactics, const WorldPtr& world_ptr);
 
    private:
     std::shared_ptr<AttackerTactic> attacker_tactic_;

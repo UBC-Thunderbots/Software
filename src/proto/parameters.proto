@@ -31,6 +31,7 @@ message AiConfig
     reserved 8;
 
     required AiControlConfig ai_control_config                              = 1;
+    required OffensePlayConfig offense_play_config                          = 19;
     required DribbleConfig dribble_config                                   = 2;
     required AttackerTacticConfig attacker_tactic_config                    = 3;
     required FreeKickPlayConfig free_kick_play_config                       = 4;
@@ -59,6 +60,11 @@ message AiControlConfig
 
     // Interfaces for various network listeners
     required NetworkConfig network_config = 3;
+}
+
+message OffensePlayConfig
+{
+    required PlayMode play_mode = 1 [default = NORMAL];
 }
 
 message AiParameterConfig
@@ -811,4 +817,11 @@ message DefenderStealConfig
     // to determine if crease defender chipping is "towards goal"
     required double goal_post_offset_chipping = 4
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 2.0];
+}
+
+enum PlayMode
+{
+    NORMAL = 0;
+    OFFENSIVE = 1;
+    DEFENSIVE = 2;
 }
