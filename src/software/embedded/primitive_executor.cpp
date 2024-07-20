@@ -112,19 +112,12 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
                 prim->direct_control());
             status.set_running_primitive(false);
-            if (output->motor_control().has_direct_velocity_control()){
-                *(status.mutable_commanded_control()) = output->motor_control().direct_velocity_control();
-            }
             return output;
         }
         case TbotsProto::Primitive::kDirectControl:
         {
-            auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
+            return std::make_unique<TbotsProto::DirectControlPrimitive>(
                 current_primitive_.direct_control());
-            if (output->motor_control().has_direct_velocity_control()){
-                *(status.mutable_commanded_control()) = output->motor_control().direct_velocity_control();
-            }
-            return output;
         }
         case TbotsProto::Primitive::kMove:
         {
@@ -136,29 +129,20 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                     prim->direct_control());
                 LOG(INFO)
                     << "Not moving because trajectory_path_ or angular_trajectory_ is not set";
-                if (output->motor_control().has_direct_velocity_control()){
-                    *(status.mutable_commanded_control()) = output->motor_control().direct_velocity_control();
-                }
                 return output;
             }
 
             Vector local_velocity            = getTargetLinearVelocity();
             AngularVelocity angular_velocity = getTargetAngularVelocity();
 
-            auto primitive = createDirectControlPrimitive(
+            auto output = createDirectControlPrimitive(
                 local_velocity, angular_velocity,
                 convertDribblerModeToDribblerSpeed(
                     current_primitive_.move().dribbler_mode(), robot_constants_),
                 current_primitive_.move().auto_chip_or_kick());
 
-            auto output = std::make_unique<TbotsProto::DirectControlPrimitive>(
-                primitive->direct_control());
-
-            if (output->motor_control().has_direct_velocity_control()){
-                *(status.mutable_commanded_control()) = output->motor_control().direct_velocity_control();
-            }
-
-            return output;
+            return std::make_unique<TbotsProto::DirectControlPrimitive>(
+                output->direct_control());
         }
         case TbotsProto::Primitive::PRIMITIVE_NOT_SET:
         {

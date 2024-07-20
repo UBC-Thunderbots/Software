@@ -29,6 +29,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto,
         PROTO_CREATE_TACTIC_CASE(KickSkill, kick_skill)
         PROTO_CREATE_TACTIC_CASE(PivotKickSkill, pivot_kick_skill)
         PROTO_CREATE_TACTIC_CASE(ShootSkill, shoot_skill)
+        PROTO_CREATE_TACTIC_CASE(DribbleSkill, dribble_skill)
         case TbotsProto::Tactic::TACTIC_NOT_SET:
         {
             LOG(FATAL) << "Tactic not set";
@@ -158,6 +159,18 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::ShootSkillTactic &tactic_
                                      std::shared_ptr<Strategy> strategy)
 {
     auto tactic = std::make_shared<AssignedSkillTactic<ShootSkill>>(strategy);
+    return tactic;
+}
+
+std::shared_ptr<Tactic> createTactic(const TbotsProto::DribbleSkillTactic &tactic_proto,
+                                     std::shared_ptr<Strategy> strategy)
+{
+    auto tactic = std::make_shared<AssignedSkillTactic<DribbleSkill>>(strategy);
+    tactic->updateControlParams({createPoint(tactic_proto.dribble_destination()),
+                                 createAngle(tactic_proto.final_orientation()),
+                                 tactic_proto.excessive_dribbling_allowed(),
+                                 tactic_proto.max_speed_dribble(),
+                                 tactic_proto.max_speed_get_possession()});
     return tactic;
 }
 

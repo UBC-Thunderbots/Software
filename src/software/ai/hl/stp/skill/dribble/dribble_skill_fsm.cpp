@@ -145,6 +145,15 @@ void DribbleSkillFSM::getBallControl(const Update &event)
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, additional_points));
 }
 
+void DribbleSkillFSM::startWait(const DribbleSkillFSM::Update &event) {
+    start_time = event.common.world_ptr->getMostRecentTimestamp();
+    waitForBackspin(event);
+}
+
+void DribbleSkillFSM::waitForBackspin(const DribbleSkillFSM::Update &event) {
+    getBallControl(event);
+}
+
 void DribbleSkillFSM::dribble(const Update &event)
 {
     auto [target_destination, target_orientation] =
@@ -240,4 +249,9 @@ bool DribbleSkillFSM::shouldExcessivelyDribble(const Update &event)
 {
     return event.control_params.excessive_dribbling_mode !=
            TbotsProto::ExcessiveDribblingMode::TERMINATE;
+}
+
+bool DribbleSkillFSM::waitDone(const DribbleSkillFSM::Update &event) {
+    Timestamp current_time = event.common.world_ptr->getMostRecentTimestamp();
+    return (current_time - start_time) > Duration::fromSeconds(WAIT_FOR_BACKSPIN_S);
 }

@@ -457,6 +457,8 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
 {
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
         max_speed_mode, robot_constants);
+    double max_linear_acceleration = convertMaxAllowedSpeedModeToMaxAllowedLinearAcceleration(
+            max_speed_mode, robot_constants);
 
     if (max_speed == 0)
     {
@@ -464,7 +466,7 @@ std::optional<TrajectoryPath> createTrajectoryPathFromParams(
     }
 
     KinematicConstraints constraints(max_speed,
-                                     robot_constants.robot_max_acceleration_m_per_s_2,
+                                     max_linear_acceleration,
                                      robot_constants.robot_max_deceleration_m_per_s_2);
 
     Point initial_destination = createPoint(params.destination());
@@ -582,6 +584,26 @@ double convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
             return robot_constants.robot_max_ang_speed_rad_per_s;
         case TbotsProto::MaxAllowedSpeedMode::DRIBBLE:
             return robot_constants.dribble_max_ang_speed_rad_per_s;
+        default:
+            LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
+            return 0.0;
+    }
+}
+
+double convertMaxAllowedSpeedModeToMaxAllowedLinearAcceleration(
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+        RobotConstants_t robot_constants)
+{
+    switch (max_allowed_speed_mode)
+    {
+        case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
+        case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
+        case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
+        case TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_RETREAT:
+            return robot_constants.robot_max_acceleration_m_per_s_2;
+        case TbotsProto::MaxAllowedSpeedMode::BALL_PLACEMENT_WALL_DRIBBLE:
+        case TbotsProto::MaxAllowedSpeedMode::DRIBBLE:
+            return robot_constants.robot_max_dribble_acceleration_m_per_s_2;
         default:
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;

@@ -10,6 +10,7 @@ struct DribbleSkillFSM
     class GetBallControl;
     class Dribble;
     class LoseBall;
+    class WaitForBackspin;
 
     struct ControlParams
     {
@@ -109,6 +110,28 @@ struct DribbleSkillFSM
     void getBallControl(const Update &event);
 
     /**
+     * Action to start waiting
+     *
+     * @param event the Update event
+     */
+    void startWait(const Update &event);
+
+    /**
+     * Guard to check if wait is over
+     *
+     * @param event the Update event
+     */
+    bool waitDone(const Update &event);
+
+    /**
+     * Action to wait for ball to be accelerated by the dribbler
+     *
+     *
+     * @param event the Update event
+     */
+    void waitForBackspin(const Update &event);
+
+    /**
      * Action to dribble the ball
      *
      * This action will orient the robot towards the destination, dribble to the
@@ -180,12 +203,14 @@ struct DribbleSkillFSM
         using namespace boost::sml;
 
         DEFINE_SML_STATE(GetBallControl)
+        DEFINE_SML_STATE(WaitForBackspin)
         DEFINE_SML_STATE(Dribble)
         DEFINE_SML_STATE(LoseBall)
 
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_GUARD(haveBallControl)
+        DEFINE_SML_GUARD(waitDone)
         DEFINE_SML_GUARD(lostBallControl)
         DEFINE_SML_GUARD(dribblingDone)
         DEFINE_SML_GUARD(shouldLoseBall)
@@ -193,12 +218,18 @@ struct DribbleSkillFSM
 
         DEFINE_SML_ACTION(loseBall)
         DEFINE_SML_ACTION(getBallControl)
+        DEFINE_SML_ACTION(startWait)
+        DEFINE_SML_ACTION(waitForBackspin)
         DEFINE_SML_ACTION(dribble)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetBallControl_S + Update_E[haveBallControl_G] / dribble_A = Dribble_S,
+            *GetBallControl_S + Update_E[haveBallControl_G] / startWait_A = WaitForBackspin_S,
             GetBallControl_S + Update_E / getBallControl_A,
+
+            WaitForBackspin_S + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
+            WaitForBackspin_S + Update_E[waitDone_G] / dribble_A = Dribble_S,
+            WaitForBackspin_S + Update_E / waitForBackspin_A,
 
             Dribble_S + Update_E[lostBallControl_G] / getBallControl_A = GetBallControl_S,
             Dribble_S + Update_E[shouldLoseBall_G && shouldExcessivelyDribble_G] /
@@ -217,4 +248,8 @@ struct DribbleSkillFSM
             X + Update_E[!dribblingDone_G] / dribble_A         = Dribble_S,
             X + Update_E / dribble_A);
     }
+
+    Timestamp start_time;
+    constexpr static double const WAIT_FOR_BACKSPIN_S = 0.2;
+
 };

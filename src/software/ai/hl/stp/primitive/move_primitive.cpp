@@ -25,8 +25,10 @@ MovePrimitive::MovePrimitive(
         max_allowed_speed_mode, robot.robotConstants());
     double max_angular_speed = convertMaxAllowedSpeedModeToMaxAllowedAngularSpeed(
         max_allowed_speed_mode, robot.robotConstants());
+    double max_linear_acceleration = convertMaxAllowedSpeedModeToMaxAllowedLinearAcceleration(
+        max_allowed_speed_mode, robot.robotConstants());
     trajectory.generate(robot.position(), destination, robot.velocity(), max_linear_speed,
-                        robot.robotConstants().robot_max_acceleration_m_per_s_2,
+                        max_linear_acceleration,
                         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
     angular_trajectory.generate(
@@ -66,8 +68,10 @@ MovePrimitive::generatePrimitiveProtoMessage(
 
     double max_speed = convertMaxAllowedSpeedModeToMaxAllowedLinearSpeed(
         max_allowed_speed_mode, robot.robotConstants());
+    double max_linear_acceleration = convertMaxAllowedSpeedModeToMaxAllowedLinearAcceleration(
+            max_allowed_speed_mode, robot.robotConstants());
     KinematicConstraints constraints(
-        max_speed, robot.robotConstants().robot_max_acceleration_m_per_s_2,
+        max_speed, max_linear_acceleration,
         robot.robotConstants().robot_max_deceleration_m_per_s_2);
 
     // Set navigable area to field boundary shrunk by an amount that is a little bit

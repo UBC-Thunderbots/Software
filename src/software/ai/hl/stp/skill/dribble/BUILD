@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 # We force linking for all Skills so that the static variables required for the
 # "factory" design pattern to work are linked in
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
@@ -63,5 +65,19 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+py_test(
+    name = "dribble_skill_sim_test",
+    srcs = [
+        "dribble_skill_sim_test.py",
+    ],
+    deps = [
+        "//software/field_tests:field_test_fixture",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:tbots_test_runner",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
     ],
 )

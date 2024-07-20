@@ -30,6 +30,7 @@ RobotConstants_t create2021RobotConstants(void)
         .ball_placement_retreat_max_speed_m_per_s = 0.3f,
         .dribble_speed_m_per_s                    = 1.5f,
         .robot_max_acceleration_m_per_s_2         = 2.f,
+        .robot_max_dribble_acceleration_m_per_s_2 = 0.75f,
         .robot_max_deceleration_m_per_s_2         = 2.f,
 
         // Robot's angular movement constants

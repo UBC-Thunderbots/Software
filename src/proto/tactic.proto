@@ -28,6 +28,7 @@ message Tactic
         KickSkillTactic kick_skill                          = 16;
         PivotKickSkillTactic pivot_kick_skill               = 17;
         ShootSkillTactic shoot_skill                        = 18;
+        DribbleSkillTactic dribble_skill                    = 19;
     }
     reserved 2, 4, 5, 7, 11;
 }
@@ -136,6 +137,14 @@ enum ExcessiveDribblingMode
 }
 
 message ShootSkillTactic {}
+
+message DribbleSkillTactic {
+    required Point dribble_destination = 1;
+    optional Angle final_orientation = 2;
+    required ExcessiveDribblingMode excessive_dribbling_allowed = 3;
+    optional MaxAllowedSpeedMode max_speed_dribble = 4;
+    optional MaxAllowedSpeedMode max_speed_get_possession = 5;
+}
 
 message PivotKickSkillTactic
 {

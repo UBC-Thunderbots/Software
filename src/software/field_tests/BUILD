@@ -42,6 +42,34 @@ py_test(
 )
 
 py_test(
+    name = "dribble_skill_field_test",
+    srcs = [
+        "dribble_skill_field_test.py",
+    ],
+    deps = [
+        "//software/field_tests:field_test_fixture",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:tbots_test_runner",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
+py_test(
+    name = "shoot_skill_field_test",
+    srcs = [
+        "shoot_skill_field_test.py",
+    ],
+    deps = [
+        "//software/field_tests:field_test_fixture",
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:tbots_test_runner",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
+py_test(
     name = "pivot_kick_field_test",
     srcs = [
         "pivot_kick_field_test.py",

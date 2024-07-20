@@ -41,6 +41,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::PivotKickSkillTactic &tac
                                      std::shared_ptr<Strategy> strategy);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ShootSkillTactic &tactic_proto,
                                      std::shared_ptr<Strategy> strategy);
+std::shared_ptr<Tactic> createTactic(const TbotsProto::DribbleSkillTactic &tactic_proto,
+                                     std::shared_ptr<Strategy> strategy);
 
 /**
  * Creates the corresponding C++ struct/class from a proto

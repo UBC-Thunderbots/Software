@@ -97,6 +97,9 @@ typedef struct RobotConstants
     // The maximum acceleration achievable by our robots [m/s^2]
     float robot_max_acceleration_m_per_s_2;
 
+    // The maximum acceleration achievable by our robots when dribbling [m/s^2]
+    float robot_max_dribble_acceleration_m_per_s_2;
+
     // The maximum deceleration (break) achievable by our robots [m/s^2]
     float robot_max_deceleration_m_per_s_2;
 

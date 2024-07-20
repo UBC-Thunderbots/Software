@@ -9,7 +9,7 @@ from proto.import_all_protos import *
 from software.field_tests.field_test_fixture import *
 
 
-def test_shoot_skill(field_test_runner):
+def test_dribble_skill(field_test_runner):
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
     if len(world.friendly_team.team_robots) == 0:
         raise Exception("The first world received had no robots in it!")
@@ -28,9 +28,10 @@ def test_shoot_skill(field_test_runner):
     params = AssignedTacticPlayControlParams()
     params.assigned_tactics[id].dribble_skill.CopyFrom(DribbleSkillTactic(
         dribble_destination=Point(x_meters=-3, y_meters=0),
+        final_orientation=Angle(radians=0),
         excessive_dribbling_allowed=ExcessiveDribblingMode.ALLOWED,
-        max_speed_dribble=PHYSICAL_LIMIT,
-        max_speed_get_possession=DRIBBLE
+        max_speed_dribble=MaxAllowedSpeedMode.DRIBBLE,
+        max_speed_get_possession=MaxAllowedSpeedMode.PHYSICAL_LIMIT
     ))
 
     field_test_runner.set_tactics(params, True)
