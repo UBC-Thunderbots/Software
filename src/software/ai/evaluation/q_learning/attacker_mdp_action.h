@@ -17,7 +17,7 @@ MAKE_ENUM(AttackerMdpAction,
           KEEP_AWAY, 
           KICK_PASS, 
           SHOOT,
-          DRIBBLE_SHOOT,
+//          DRIBBLE_SHOOT,
 )
 // clang-format on
 
