@@ -120,13 +120,22 @@ const Point PenaltyKickFSM::evaluateNextShotPosition(std::optional<Robot> enemy_
 }
 
 void PenaltyKickFSM::shoot(const Update &event,
-                           boost::sml::back::process<KickSkillFSM::Update> processEvent)
+                           boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
-    KickSkillFSM::ControlParams control_params{
-        .kick_origin                  = event.common.world_ptr->ball().position(),
-        .kick_direction               = shot_angle,
-        .kick_speed_meters_per_second = PENALTY_KICK_SHOT_SPEED};
-    processEvent(KickSkillFSM::Update(
+    Point kick_target = event.common.world_ptr->field().enemyGoalCenter();
+    auto best_shot    = strategy->getBestShot(event.common.robot);
+    if (best_shot)
+    {
+        kick_target = best_shot->getPointToShootAt();
+    }
+
+    PivotKickSkillFSM::ControlParams control_params{
+        .kick_origin = event.common.world_ptr->ball().position(),
+        .kick_direction =
+            (kick_target - event.common.world_ptr->ball().position()).orientation(),
+        .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                            BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}};
+    processEvent(PivotKickSkillFSM::Update(
         control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
                                     event.common.set_primitive)));
 }
@@ -134,17 +143,18 @@ void PenaltyKickFSM::shoot(const Update &event,
 void PenaltyKickFSM::updateApproachKeeper(
     const Update &event, boost::sml::back::process<DribbleSkillFSM::Update> processEvent)
 {
-    Field field                       = event.common.world_ptr->field();
-    std::optional<Robot> enemy_goalie = event.common.world_ptr->enemyTeam().goalie();
-    const Point next_shot_position =
-        evaluateNextShotPosition(enemy_goalie, event.common.world_ptr->field());
-    shot_angle =
-        (next_shot_position - event.common.world_ptr->ball().position()).orientation();
-    Point position = field.enemyGoalCenter() + Vector(-field.defenseAreaXLength(), 0);
+    Point position = event.common.world_ptr->field().centerPoint() + Vector(0.5, 0);
+
+    Point kick_target = event.common.world_ptr->field().enemyGoalCenter();
+    auto best_shot    = strategy->getBestShot(event.common.robot);
+    if (best_shot)
+    {
+        kick_target = best_shot->getPointToShootAt();
+    }
 
     DribbleSkillFSM::ControlParams control_params{
-        .dribble_destination       = std::optional<Point>(position),
-        .final_dribble_orientation = std::optional<Angle>(Angle::zero()),
+        .dribble_destination       = position,
+        .final_dribble_orientation = (kick_target - event.common.world_ptr->ball().position()).orientation(),
         .excessive_dribbling_mode  = TbotsProto::ExcessiveDribblingMode::LOSE_BALL};
     processEvent(DribbleSkillFSM::Update(
         control_params, SkillUpdate(event.common.robot, event.common.world_ptr, strategy,
