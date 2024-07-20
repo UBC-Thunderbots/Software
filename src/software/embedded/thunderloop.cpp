@@ -83,8 +83,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
       kick_constant_(std::stoi(redis_client_->getSync(ROBOT_KICK_CONSTANT_REDIS_KEY))),
       chip_pulse_width_(
           std::stoi(redis_client_->getSync(ROBOT_CHIP_PULSE_WIDTH_REDIS_KEY))),
-      primitive_executor_(robot_constants,
-                          TeamColour::YELLOW, robot_id_)
+      primitive_executor_(robot_constants, TeamColour::YELLOW, robot_id_)
 {
     std::optional<std::string> network_test_error;
     std::unique_ptr<ThreadedUdpSender> network_test(std::make_unique<ThreadedUdpSender>(
@@ -192,7 +191,7 @@ Thunderloop::~Thunderloop() {}
 
     time_remaining_in_iteration.tv_nsec = 0;
     time_remaining_in_iteration.tv_sec = 0;
-    
+
     // Get current time
     // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since
     // CLOCK_REALTIME can jump backwards

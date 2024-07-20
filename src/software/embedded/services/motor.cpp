@@ -23,6 +23,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
 #include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 extern "C"
 {
