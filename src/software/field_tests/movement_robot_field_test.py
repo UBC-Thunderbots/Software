@@ -139,7 +139,7 @@ def test_basic_rotation(field_test_runner):
 
 def test_one_robots_square(field_test_runner):
     world = field_test_runner.world_buffer.get(block=True, timeout=WORLD_BUFFER_TIMEOUT)
-    use_two_robots = True
+    use_two_robots = False
 
     if len(world.friendly_team.team_robots) <= 0 or use_two_robots and len(world.friendly_team.team_robots) < 2:
         raise Exception("The first world received doesn't have enough robots in it!")
@@ -152,10 +152,10 @@ def test_one_robots_square(field_test_runner):
         ]
     )
 
-    id1 = 4#world.friendly_team.team_robots[0].id
+    id1 = world.friendly_team.team_robots[0].id
     logging.info(f"Running test on robot {id1=}")
     if use_two_robots:
-        id2 = 0#world.friendly_team.team_robots[1].id
+        id2 = world.friendly_team.team_robots[1].id
         logging.info(f"Running test on robot {id2=}")
 
     left_x = -3
