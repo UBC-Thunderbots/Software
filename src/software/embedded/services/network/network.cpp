@@ -104,7 +104,7 @@ bool NetworkService::shouldSendNewRobotStatus(
                                            ROBOT_STATUS_TO_THUNDERLOOP_HZ_RATIO;
 
     return (has_motor_fault || has_breakbeam_status_changed ||
-           require_heartbeat_status_update) && full_system_ip_address.has_value();
+           require_heartbeat_status_update);
 }
 
 void NetworkService::sendRobotStatus(const TbotsProto::RobotStatus& robot_status)

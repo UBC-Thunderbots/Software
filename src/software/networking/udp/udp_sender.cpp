@@ -28,7 +28,14 @@ UdpSender::UdpSender(boost::asio::io_service& io_service, const std::string& ip_
 
 void UdpSender::sendString(const std::string& message)
 {
-    socket_.send_to(boost::asio::buffer(message, message.length()), receiver_endpoint);
+    boost::system::error_code error;
+    socket_.send_to(boost::asio::buffer(message, message.length()), receiver_endpoint, 0, error);
+
+    if (error)
+    {
+        std::cerr << "Unknown error while sending UDP message with error code: " << error << " and message: "
+            << error.message() << "\n";
+    }
 }
 
 void UdpSender::setupMulticast(const boost::asio::ip::address& ip_address,
