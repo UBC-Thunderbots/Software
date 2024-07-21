@@ -120,8 +120,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants, bool enable_lo
     std::cout << "Thunderloop connected to network!" << std::endl;
 
     g3::overrideSetupSignals({});
-    NetworkLoggerSingleton::initializeLogger(channel_id_, network_interface, robot_id_,
-                                             enable_log_merging);
+    LoggerSingleton::initializeLogger("/tmp/tbots", nullptr);
 
     // catch all catch-able signals
     std::signal(SIGSEGV, tbotsExit);
