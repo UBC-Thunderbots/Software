@@ -56,6 +56,7 @@ void NetworkService::fullsystemIpCallback(const TbotsProto::IpNotification& ip_n
     if (!full_system_ip_address.has_value() || full_system_ip_address.value() != ip_notification.ip_address())
     {
         full_system_ip_address = ip_notification.ip_address();
+        LOG(INFO) << "Now sending RobotStatus messages to " << full_system_ip_address.value();
 
         std::optional<std::string> error;
         sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(
