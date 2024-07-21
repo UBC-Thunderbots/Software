@@ -47,6 +47,36 @@ bool ShadowEnemyFSM::enemyThreatHasBall(const Update &event)
     return false;
 }
 
+bool ShadowEnemyFSM::shouldSteal(const Update &event)
+{
+    Vector robot_orientation_vec =
+        Vector::createFromAngle(event.common.robot.orientation());
+
+    Point steal_ball_region_vertex_a =
+        event.common.robot.position() +
+        robot_orientation_vec.perpendicular().normalize(ROBOT_MAX_RADIUS_METERS * 2);
+    Point steal_ball_region_vertex_b =
+        event.common.robot.position() -
+        robot_orientation_vec.perpendicular().normalize(ROBOT_MAX_RADIUS_METERS * 2);
+    Point steal_ball_region_vertex_c =
+        steal_ball_region_vertex_b + robot_orientation_vec.normalize(0.7);
+    Point steal_ball_region_vertex_d =
+        steal_ball_region_vertex_a + robot_orientation_vec.normalize(0.7);
+
+    Polygon steal_ball_region({steal_ball_region_vertex_a, steal_ball_region_vertex_b,
+                               steal_ball_region_vertex_c, steal_ball_region_vertex_d});
+
+    std::optional<EnemyThreat> enemy_threat = event.control_params.enemy_threat;
+
+    // Robot should be in front of the enemy threat with the ball, roughly facing towards
+    // the enemy threat's dribbler
+    return enemy_threat.has_value() &&
+           contains(steal_ball_region, event.common.world_ptr->ball().position()) &&
+           compareAngles(event.common.robot.orientation(),
+                         enemy_threat->robot.orientation() + Angle::half(),
+                         Angle::fromDegrees(45));
+}
+
 void ShadowEnemyFSM::blockPass(const Update &event)
 {
     std::optional<EnemyThreat> enemy_threat_opt = event.control_params.enemy_threat;

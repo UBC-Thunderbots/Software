@@ -11,7 +11,6 @@
 struct ShadowEnemyFSM
 {
    public:
-    class BlockPassState;
     class StealAndChipState;
 
     // this struct defines the unique control parameters that the ShadowEnemyFSM requires
@@ -71,6 +70,15 @@ struct ShadowEnemyFSM
     bool enemyThreatHasBall(const Update &event);
 
     /**
+     * Guard that checks if we should steal the ball
+     * 
+     * @param event ShadowEnemyFSM::Update
+     * 
+     * @return true if we should steal the ball, false otherwise 
+     */
+    bool shouldSteal(const Update &event);
+
+    /**
      * Action to block the pass to our shadowee
      *
      *
@@ -101,25 +109,19 @@ struct ShadowEnemyFSM
         using namespace boost::sml;
 
         DEFINE_SML_STATE(MoveFSM)
-        DEFINE_SML_STATE(BlockPassState)
         DEFINE_SML_STATE(StealAndChipState)
         DEFINE_SML_EVENT(Update)
-
-        DEFINE_SML_GUARD(enemyThreatHasBall)
-        DEFINE_SML_ACTION(blockPass)
+        DEFINE_SML_GUARD(shouldSteal)
         DEFINE_SML_ACTION(stealAndChip)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(blockShot, MoveFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *MoveFSM_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
+            *MoveFSM_S + Update_E[shouldSteal_G] / stealAndChip_A = StealAndChipState_S,
             MoveFSM_S + Update_E / blockShot_A, MoveFSM_S = StealAndChipState_S,
-            BlockPassState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A,
-            BlockPassState_S + Update_E[enemyThreatHasBall_G] / blockShot_A = MoveFSM_S,
-            StealAndChipState_S + Update_E[enemyThreatHasBall_G] / stealAndChip_A,
-            StealAndChipState_S + Update_E[!enemyThreatHasBall_G] / blockPass_A = X,
-            X + Update_E[!enemyThreatHasBall_G] / blockPass_A = BlockPassState_S,
-            X + Update_E[enemyThreatHasBall_G] / blockShot_A  = MoveFSM_S,
+            StealAndChipState_S + Update_E[!shouldSteal_G] / blockShot_A = MoveFSM_S,
+            StealAndChipState_S + Update_E / stealAndChip_A,
+            StealAndChipState_S = MoveFSM_S,
             X + Update_E / SET_STOP_PRIMITIVE_ACTION          = X);
     }
 };
