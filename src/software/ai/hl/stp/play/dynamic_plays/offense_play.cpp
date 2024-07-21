@@ -44,9 +44,8 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
     }
 
     // Determine number of defense and support tactics to assign
-    auto [num_defenders, num_supporters] =
-        assignNumOfDefendersAndSupporters(std::max(num_defenders_and_supporters, 0),
-                play_update.world_ptr);
+    auto [num_defenders, num_supporters] = assignNumOfDefendersAndSupporters(
+        std::max(num_defenders_and_supporters, 0), play_update.world_ptr);
 
     // Get defense tactics from DefensePlay
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
@@ -141,12 +140,14 @@ std::tuple<unsigned int, unsigned int> OffensePlay::assignNumOfDefendersAndSuppo
         case 3:
             if (world_ptr->getTeamWithPossession() == TeamPossession::IN_CONTEST)
             {
-                num_defenders = 2;
+                num_defenders  = 2;
                 num_supporters = 1;
-                break;
             }
-            num_defenders  = 1;
-            num_supporters = 2;
+            else
+            {
+                num_defenders  = 1;
+                num_supporters = 2;
+            }
             break;
         default:
             num_defenders  = 2;
@@ -158,14 +159,14 @@ std::tuple<unsigned int, unsigned int> OffensePlay::assignNumOfDefendersAndSuppo
         case TbotsProto::PlayMode::DEFENSIVE:
             if (num_supporters > 0)
             {
-                num_defenders  += 1;
+                num_defenders += 1;
                 num_supporters -= 1;
             }
             break;
         case TbotsProto::PlayMode::OFFENSIVE:
             if (num_defenders > 0)
             {
-                num_defenders  -= 1;
+                num_defenders -= 1;
                 num_supporters += 1;
             }
             break;
