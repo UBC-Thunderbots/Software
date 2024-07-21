@@ -6,6 +6,7 @@
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/pass_defender/pass_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/logger/logger.h"
 
 struct DefensePlayFSM : public DefensePlayFSMBase
@@ -42,4 +43,7 @@ struct DefensePlayFSM : public DefensePlayFSMBase
             *DefenseState_S + Update_E / defendAgainstThreats_A = DefenseState_S,
             X + Update_E                                        = X);
     }
+
+   private:
+    std::shared_ptr<ShadowEnemyTactic> shadow_enemy_tactic_;
 };

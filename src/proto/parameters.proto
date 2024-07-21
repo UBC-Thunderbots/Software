@@ -644,9 +644,12 @@ message DefensePlayConfig
     // an "immediate" threat that must be avoided
     required double immediate_threat_distance = 1
         [default = 1.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 9.5];
-
-    // The DefenderAssignmentConfig for tuning defender assignments
-    required DefenderAssignmentConfig defender_assignment_config = 2;
+        
+        // The DefenderAssignmentConfig for tuning defender assignments
+        required DefenderAssignmentConfig defender_assignment_config = 2;
+        
+    required double shadow_enemy_distance_meters = 3
+        [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 5.0];
 }
 
 message RobotNavigationObstacleConfig
