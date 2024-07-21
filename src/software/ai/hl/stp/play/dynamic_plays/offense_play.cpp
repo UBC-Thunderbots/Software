@@ -44,8 +44,8 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
     }
 
     // Determine number of defense and support tactics to assign
-    auto [num_defenders, num_supporters] =
-        assignNumOfDefendersAndSupporters(std::max(num_defenders_and_supporters, 0));
+    auto [num_defenders, num_supporters] = assignNumOfDefendersAndSupporters(
+        std::max(num_defenders_and_supporters, 0), play_update.world_ptr);
 
     // Get defense tactics from DefensePlay
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
@@ -120,7 +120,7 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
 }
 
 std::tuple<unsigned int, unsigned int> OffensePlay::assignNumOfDefendersAndSupporters(
-    unsigned int num_tactics)
+    unsigned int num_tactics, const WorldPtr& world_ptr)
 {
     unsigned int num_defenders, num_supporters;
     switch (num_tactics)
@@ -138,13 +138,42 @@ std::tuple<unsigned int, unsigned int> OffensePlay::assignNumOfDefendersAndSuppo
             num_supporters = 1;
             break;
         case 3:
-            num_defenders  = 1;
-            num_supporters = 2;
+            if (world_ptr->getTeamWithPossession() == TeamPossession::IN_CONTEST)
+            {
+                num_defenders  = 2;
+                num_supporters = 1;
+            }
+            else
+            {
+                num_defenders  = 1;
+                num_supporters = 2;
+            }
             break;
         default:
             num_defenders  = 2;
             num_supporters = num_tactics - 2;
     }
+
+    switch (strategy->getAiConfig().offense_play_config().play_mode())
+    {
+        case TbotsProto::PlayMode::DEFENSIVE:
+            if (num_supporters > 0)
+            {
+                num_defenders += 1;
+                num_supporters -= 1;
+            }
+            break;
+        case TbotsProto::PlayMode::OFFENSIVE:
+            if (num_defenders > 0)
+            {
+                num_defenders -= 1;
+                num_supporters += 1;
+            }
+            break;
+        case TbotsProto::PlayMode::NORMAL:
+            break;
+    }
+
     return {num_defenders, num_supporters};
 }
 
