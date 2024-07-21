@@ -15,10 +15,11 @@ bool ShootSkillFSM::shouldAbortShot(const Update& event)
 
     event.common.set_skill_state({.shot = best_shot_});
 
-    return !best_shot_ || best_shot_->getOpenAngle().toDegrees() <
-                              event.common.strategy->getAiConfig()
-                                  .shot_config()
-                                  .abs_min_open_angle_for_shot_deg();
+    return !best_shot_ ||
+           event.common.world_ptr->field().pointInFriendlyHalf(best_shot_->getOrigin()) ||
+           best_shot_->getOpenAngle().toDegrees() < event.common.strategy->getAiConfig()
+                                                  .shot_config()
+                                                  .abs_min_open_angle_for_shot_deg();
 }
 
 void ShootSkillFSM::getBallControl(
