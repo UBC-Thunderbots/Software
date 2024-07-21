@@ -4,7 +4,8 @@
 #include "software/ai/evaluation/enemy_threat.h"
 
 DefensePlayFSM::DefensePlayFSM(std::shared_ptr<Strategy> strategy)
-    : DefensePlayFSMBase(strategy)
+    : DefensePlayFSMBase(strategy),
+      shadow_enemy_tactic_(std::make_shared<ShadowEnemyTactic>())
 {
 }
 
@@ -23,11 +24,25 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
         return;
     }
 
+    PriorityTacticVector tactics_to_return = {{}};
+    unsigned int num_tactics               = event.common.num_tactics;
+
+    // Assign a ShadowEnemyTactic to defend the primary enemy threat
+    // if we have more than 3 tactics to assign
+    if (num_tactics >= 3)
+    {
+        tactics_to_return.push_back({shadow_enemy_tactic_});
+        shadow_enemy_tactic_->updateControlParams(
+            enemy_threats.front(),
+            strategy->getAiConfig().defense_play_config().shadow_enemy_distance_meters());
+        --num_tactics;
+    }
+
     // Choose which defender assignments to assign defenders to based on number
     // of tactics available to set
     std::vector<DefenderAssignment> crease_defender_assignments;
     std::vector<DefenderAssignment> pass_defender_assignments;
-    for (unsigned int i = 0; i < event.common.num_tactics; i++)
+    for (unsigned int i = 0; i < num_tactics; i++)
     {
         DefenderAssignment defender_assignment;
         if (i < assignments.size())
@@ -49,7 +64,7 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
             // If we have at least two available defenders, two defenders should
             // be assigned to the highest scoring crease defender assignment to better
             // block the shot cone of the most threatening enemy
-            if (i == 0 && event.common.num_tactics >= 2)
+            if (i == 0 && num_tactics >= 2)
             {
                 crease_defender_assignments.emplace_back(defender_assignment);
                 i++;
@@ -63,16 +78,20 @@ void DefensePlayFSM::defendAgainstThreats(const Update& event)
 
     // Reset tactics if the number of crease defenders or pass defenders
     // we intend to assign has changed
-    setUpCreaseDefenders(static_cast<unsigned int>(crease_defender_assignments.size()));
-    setUpPassDefenders(static_cast<unsigned int>(pass_defender_assignments.size()));
+    setUpCreaseDefenders(crease_defender_assignments.size());
+    setUpPassDefenders(pass_defender_assignments.size());
     setAlignment(event, crease_defender_assignments, TbotsProto::BallStealMode::STEAL);
     updatePassDefenderControlParams(pass_defender_assignments,
                                     TbotsProto::BallStealMode::STEAL);
 
-    PriorityTacticVector tactics_to_return = {{}, {}};
-    tactics_to_return[0].insert(tactics_to_return[0].end(), crease_defenders.begin(),
-                                crease_defenders.end());
-    tactics_to_return[1].insert(tactics_to_return[1].end(), pass_defenders.begin(),
-                                pass_defenders.end());
+    TacticVector crease_defender_tactics;
+    TacticVector pass_defender_tactics;
+    crease_defender_tactics.insert(crease_defender_tactics.end(),
+                                   crease_defenders.begin(), crease_defenders.end());
+    pass_defender_tactics.insert(pass_defender_tactics.end(), pass_defenders.begin(),
+                                 pass_defenders.end());
+    tactics_to_return.push_back(std::move(crease_defender_tactics));
+    tactics_to_return.push_back(std::move(pass_defender_tactics));
+
     event.common.set_tactics(tactics_to_return);
 }

@@ -8,9 +8,9 @@ DefensePlayFSMBase::DefensePlayFSMBase(std::shared_ptr<Strategy> strategy)
 {
 }
 
-void DefensePlayFSMBase::setUpCreaseDefenders(int num_crease_defenders)
+void DefensePlayFSMBase::setUpCreaseDefenders(size_t num_crease_defenders)
 {
-    if (num_crease_defenders == int(crease_defenders.size()))
+    if (num_crease_defenders == crease_defenders.size())
     {
         return;
     }
@@ -18,19 +18,19 @@ void DefensePlayFSMBase::setUpCreaseDefenders(int num_crease_defenders)
     crease_defenders =
         std::vector<std::shared_ptr<CreaseDefenderTactic>>(num_crease_defenders);
     std::generate(crease_defenders.begin(), crease_defenders.end(),
-                  [this]() { return std::make_shared<CreaseDefenderTactic>(strategy); });
+                  [&]() { return std::make_shared<CreaseDefenderTactic>(strategy); });
 }
 
-void DefensePlayFSMBase::setUpPassDefenders(int num_pass_defenders)
+void DefensePlayFSMBase::setUpPassDefenders(size_t num_pass_defenders)
 {
-    if (num_pass_defenders == int(pass_defenders.size()))
+    if (num_pass_defenders == pass_defenders.size())
     {
         return;
     }
 
     pass_defenders = std::vector<std::shared_ptr<PassDefenderTactic>>(num_pass_defenders);
     std::generate(pass_defenders.begin(), pass_defenders.end(),
-                  [this]() { return std::make_shared<PassDefenderTactic>(strategy); });
+                  [&]() { return std::make_shared<PassDefenderTactic>(strategy); });
 }
 
 void DefensePlayFSMBase::updatePassDefenderControlParams(

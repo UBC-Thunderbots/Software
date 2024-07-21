@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/skill/dribble/dribble_skill_fsm.h"
-#include "software/ai/hl/stp/skill/kick/kick_skill_fsm.h"
+#include "software/ai/hl/stp/skill/pivot_kick/pivot_kick_skill_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/closest_point.h"
@@ -55,7 +55,7 @@ struct PenaltyKickFSM
      * @param processEvent   processes the KickSkillFSM::Update
      */
     void shoot(const Update &event,
-               boost::sml::back::process<KickSkillFSM::Update> processEvent);
+               boost::sml::back::process<PivotKickSkillFSM::Update> processEvent);
 
     /**
      * Action that updates the shooter's approach to the opposition net.
@@ -103,24 +103,21 @@ struct PenaltyKickFSM
         using namespace boost::sml;
 
         DEFINE_SML_STATE(DribbleSkillFSM)
-        DEFINE_SML_STATE(KickSkillFSM)
+        DEFINE_SML_STATE(PivotKickSkillFSM)
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_GUARD(takePenaltyShot)
-        DEFINE_SML_GUARD(timeOutApproach)
 
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(shoot, KickSkillFSM)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(shoot, PivotKickSkillFSM)
         DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateApproachKeeper, DribbleSkillFSM)
-        DEFINE_SML_SUB_FSM_UPDATE_ACTION(adjustOrientationForShot, DribbleSkillFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state
-            *DribbleSkillFSM_S + Update_E[!takePenaltyShot_G] / updateApproachKeeper_A,
-            DribbleSkillFSM_S + Update_E[timeOutApproach_G] / shoot_A = KickSkillFSM_S,
-            DribbleSkillFSM_S + Update_E / adjustOrientationForShot_A,
-            DribbleSkillFSM_S = KickSkillFSM_S, KickSkillFSM_S + Update_E / shoot_A,
-            KickSkillFSM_S = X, X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
+            // *DribbleSkillFSM_S + Update_E[!takePenaltyShot_G] / updateApproachKeeper_A,
+            // *DribbleSkillFSM_S + Update_E[timeOutApproach_G] / shoot_A = KickSkillFSM_S,
+            *DribbleSkillFSM_S + Update_E / updateApproachKeeper_A,
+            DribbleSkillFSM_S = PivotKickSkillFSM_S, PivotKickSkillFSM_S + Update_E / shoot_A,
+            PivotKickSkillFSM_S = X, X + Update_E / SET_STOP_PRIMITIVE_ACTION = X);
     };
 
    private:

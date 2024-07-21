@@ -11,8 +11,6 @@ std::unique_ptr<Skill> createSkillFromAttackerMdpAction(
             return std::make_unique<KickPassSkill>(strategy);
         case AttackerMdpAction::SHOOT:
             return std::make_unique<ShootSkill>(strategy);
-//        case AttackerMdpAction::DRIBBLE_SHOOT:
-//            return std::make_unique<DribbleShootSkill>(strategy);
         default:
             LOG(FATAL) << "AttackerMdpAction value " << action << " not handled";
     }
