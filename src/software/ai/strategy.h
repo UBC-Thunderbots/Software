@@ -89,7 +89,4 @@ class Strategy
 
     PassGenerator pass_generator_;
     ReceiverPositionGenerator<EighteenZoneId> receiver_position_generator_;
-
-    std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_shot_;
-    std::unordered_map<RobotId, std::optional<Shot>> robot_to_best_sampled_shot_;
 };

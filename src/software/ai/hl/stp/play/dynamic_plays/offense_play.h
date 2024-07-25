@@ -33,11 +33,12 @@ class OffensePlay : public DynamicPlay
      * defender tactics and the number of supporter tactics to assign.
      *
      * @param num_tactics the total number of defense/support tactics to assign
+     * @param world_ptr the world
      *
      * @return [num_defenders, num_supporters] tuple
      */
     std::tuple<unsigned int, unsigned int> assignNumOfDefendersAndSupporters(
-        unsigned int num_tactics);
+        unsigned int num_tactics, const WorldPtr& world_ptr);
 
    private:
     std::shared_ptr<AttackerTactic> attacker_tactic_;

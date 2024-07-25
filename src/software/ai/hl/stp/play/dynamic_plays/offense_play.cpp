@@ -19,8 +19,9 @@ void OffensePlay::terminate(const WorldPtr& world_ptr)
 void OffensePlay::updateTactics(const PlayUpdate& play_update)
 {
     PriorityTacticVector tactics;
+    unsigned int num_defenders_and_supporters = play_update.num_tactics;
 
-    // AttackerTactic should always be assigned
+    // Always try assigning AttackerTactic
     if (play_update.num_tactics > 0)
     {
         const bool attacker_not_suspended =
@@ -31,6 +32,10 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
         if (attacker_not_suspended)
         {
             tactics.push_back({attacker_tactic_});
+
+            // We have one less defender/supporter to assign since we will assign one
+            // robot to be the attacker
+            --num_defenders_and_supporters;
         }
 
         // Log visualize the state of the attacker's current skill
@@ -39,13 +44,14 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
 
     // Determine number of defense and support tactics to assign
     auto [num_defenders, num_supporters] = assignNumOfDefendersAndSupporters(
-        std::max(static_cast<int>(play_update.num_tactics) - 1, 0));
+        num_defenders_and_supporters, play_update.world_ptr);
 
     // Get defense tactics from DefensePlay
     std::vector<std::shared_ptr<Tactic>> defense_tactics;
     defense_play_->updateTactics(PlayUpdate(
         play_update.world_ptr, num_defenders,
-        [&](PriorityTacticVector new_tactics) {
+        [&](PriorityTacticVector new_tactics)
+        {
             for (auto& tactic_vec : new_tactics)
             {
                 defense_tactics.insert(defense_tactics.end(), tactic_vec.begin(),
@@ -113,7 +119,7 @@ void OffensePlay::updateTactics(const PlayUpdate& play_update)
 }
 
 std::tuple<unsigned int, unsigned int> OffensePlay::assignNumOfDefendersAndSupporters(
-    unsigned int num_tactics)
+    unsigned int num_tactics, const WorldPtr& world_ptr)
 {
     unsigned int num_defenders, num_supporters;
     switch (num_tactics)
@@ -131,13 +137,42 @@ std::tuple<unsigned int, unsigned int> OffensePlay::assignNumOfDefendersAndSuppo
             num_supporters = 1;
             break;
         case 3:
-            num_defenders  = 1;
-            num_supporters = 2;
+            if (world_ptr->getTeamWithPossession() == TeamPossession::IN_CONTEST)
+            {
+                num_defenders  = 2;
+                num_supporters = 1;
+            }
+            else
+            {
+                num_defenders  = 1;
+                num_supporters = 2;
+            }
             break;
         default:
             num_defenders  = 2;
             num_supporters = num_tactics - 2;
     }
+
+    switch (strategy->getAiConfig().offense_play_config().play_mode())
+    {
+        case TbotsProto::PlayMode::DEFENSIVE:
+            if (num_supporters > 0)
+            {
+                num_defenders += 1;
+                num_supporters -= 1;
+            }
+            break;
+        case TbotsProto::PlayMode::OFFENSIVE:
+            if (num_defenders > 0)
+            {
+                num_defenders -= 1;
+                num_supporters += 1;
+            }
+            break;
+        case TbotsProto::PlayMode::NORMAL:
+            break;
+    }
+
     return {num_defenders, num_supporters};
 }
 

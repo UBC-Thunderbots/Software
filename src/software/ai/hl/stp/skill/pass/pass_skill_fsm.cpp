@@ -58,9 +58,9 @@ bool PassSkillFSM::passReceived(const SuspendedUpdate& event)
     const auto friendly_robots = event.world_ptr->friendlyTeam().getAllRobots();
 
     return std::any_of(
-        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
-            return robot.isNearDribbler(event.world_ptr->ball().position());
-        });
+        friendly_robots.begin(), friendly_robots.end(),
+        [&](const Robot& robot)
+        { return robot.isNearDribbler(event.world_ptr->ball().position()); });
 }
 
 bool PassSkillFSM::strayPass(const SuspendedUpdate& event)
@@ -98,7 +98,16 @@ void PassSkillFSM::findPass(
             {.pass_committed = false, .pass = best_pass_so_far_->pass});
     }
 
-    best_pass_so_far_ = event.common.strategy->getBestPass();
+    // Find the current best pass.
+    // Avoid passes to the goalie and the passing robot.
+    std::vector<RobotId> robots_to_ignore = {event.common.robot.id()};
+    std::optional<RobotId> friendly_goalie_id =
+        event.common.world_ptr->friendlyTeam().getGoalieId();
+    if (friendly_goalie_id)
+    {
+        robots_to_ignore.push_back(*friendly_goalie_id);
+    }
+    best_pass_so_far_ = event.common.strategy->getBestPass(robots_to_ignore);
 
     // Update minimum pass score threshold. Wait for a good pass by starting out only
     // looking for "perfect" passes (with a high score close to 1) and decreasing this

@@ -47,6 +47,7 @@ message AiConfig
     required PassDefenderConfig pass_defender_config                        = 16;
     required ShotConfig shot_config                                         = 17;
     required PivotKickConfig pivot_kick_config                              = 18;
+    required OffensePlayConfig offense_play_config                          = 19;
 }
 
 message AiControlConfig
@@ -473,6 +474,13 @@ message DribbleConfig
         (bounds).min_double_value = 0.0,
         (bounds).max_double_value = 180.0
     ];
+
+    // Robot angular velocity at which the robot is done dribbling
+    required double robot_dribbling_done_angular_velocity_deg_per_s = 9 [
+        default                   = 10.0,
+        (bounds).min_double_value = 0.0,
+        (bounds).max_double_value = 180.0
+    ];
 }
 
 message PivotKickConfig
@@ -766,4 +774,16 @@ message DefenderStealConfig
     // Max speed of ball that pass defender will try and get possession
     required double max_ball_speed_to_get_m_per_s = 3
         [default = 0.5, (bounds).min_double_value = 0.0, (bounds).max_double_value = 7.0];
+}
+
+message OffensePlayConfig
+{
+    required PlayMode play_mode = 1 [default = NORMAL];
+}
+
+enum PlayMode
+{
+    NORMAL = 0;
+    OFFENSIVE = 1;
+    DEFENSIVE = 2;
 }

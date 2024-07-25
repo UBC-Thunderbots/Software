@@ -2,22 +2,23 @@
 
 bool ShootSkillFSM::shouldAbortShot(const Update& event)
 {
-    // If we have no committed shot, we cannot abort it
-    if (!best_shot_)
+    if (event.control_params.sample_for_best_shot)
     {
-        return false;
+        best_shot_ = event.common.strategy->getBestSampledShot(event.common.robot);
+    }
+    else
+    {
+        best_shot_ = event.common.strategy->getBestShot(event.common.robot);
     }
 
-    std::optional<Shot> shot = calcBestShotOnGoal(
-        event.common.world_ptr->field(), event.common.world_ptr->friendlyTeam(),
-        event.common.world_ptr->enemyTeam(), best_shot_->getOrigin(), TeamType::ENEMY,
-        {event.common.robot});
+    event.common.set_skill_state({.shot = best_shot_});
 
-    return !shot ||
-           event.common.world_ptr->field().pointInFriendlyHalf(shot->getOrigin()) ||
-           shot->getOpenAngle().toDegrees() < event.common.strategy->getAiConfig()
-                                                  .shot_config()
-                                                  .abs_min_open_angle_for_shot_deg();
+    return !best_shot_ ||
+           event.common.world_ptr->field().pointInFriendlyHalf(best_shot_->getOrigin()) ||
+           best_shot_->getOpenAngle().toDegrees() <
+               event.common.strategy->getAiConfig()
+                   .shot_config()
+                   .abs_min_open_angle_for_shot_deg();
 }
 
 void ShootSkillFSM::getBallControl(
@@ -39,30 +40,13 @@ void ShootSkillFSM::pivotKick(
     const Update& event,
     boost::sml::back::process<PivotKickSkillFSM::Update> processEvent)
 {
-    if (!best_shot_)
-    {
-        if (event.control_params.sample_for_best_shot)
-        {
-            best_shot_ = event.common.strategy->getBestSampledShot(event.common.robot);
-        }
-        else
-        {
-            best_shot_ = event.common.strategy->getBestShot(event.common.robot);
-        }
+    // If no there is no best shot, default to shooting at center of the goal
+    Shot best_shot = best_shot_.value_or(
+        Shot(event.common.world_ptr->ball().position(),
+             event.common.world_ptr->field().enemyGoalCenter(), Angle::zero()));
 
-        if (!best_shot_)
-        {
-            // Default kick origin and target if no shot found
-            Point kick_origin = event.common.world_ptr->ball().position();
-            Point kick_target = event.common.world_ptr->field().enemyGoalCenter();
-            best_shot_        = Shot(kick_origin, kick_target, Angle::zero());
-        }
-
-        event.common.set_skill_state({.shot = best_shot_});
-    }
-
-    Point kick_origin = best_shot_->getOrigin();
-    Point kick_target = best_shot_->getPointToShootAt();
+    Point kick_origin = best_shot.getOrigin();
+    Point kick_target = best_shot.getPointToShootAt();
 
     processEvent(PivotKickSkillFSM::Update(
         PivotKickSkillFSM::ControlParams{
